@@ -12,9 +12,8 @@ const commonTexts = {
   },
 } as const;
 
-
-export const hebIL: LocalizationResource = {
-  locale: 'heb-IL',
+export const heIL: LocalizationResource = {
+  locale: 'he-IL',
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
   dividerText: 'או',
   formFieldLabel__emailAddress: 'כתובת דוא"ל',
@@ -135,84 +134,84 @@ export const hebIL: LocalizationResource = {
       actionLink__use_email_username: 'השתמש בדוא"ל או שם משתמש',
     },
     password: {
-          title: 'הכנס את סיסמתך',
-          subtitle: 'להמשיך אל {{applicationName}}',
-          actionLink: 'השתמש בשיטה אחרת',
-        },
+      title: 'הכנס את סיסמתך',
+      subtitle: 'להמשיך אל {{applicationName}}',
+      actionLink: 'השתמש בשיטה אחרת',
+    },
     forgotPasswordAlternativeMethods: {
-          title: 'שכחת סיסמה?',
-          label__alternativeMethods: 'או, התחבר באמצעות שיטה אחרת.',
-          blockButton__resetPassword: 'אפס את הסיסמה שלך',
-        },
+      title: 'שכחת סיסמה?',
+      label__alternativeMethods: 'או, התחבר באמצעות שיטה אחרת.',
+      blockButton__resetPassword: 'אפס את הסיסמה שלך',
+    },
     forgotPassword: {
-          title_email: 'בדוק את הדוא"ל שלך',
-          title_phone: 'בדוק את הטלפון שלך',
-          subtitle: 'לאיפוס הסיסמה שלך',
-          formTitle: 'אפס קוד הסיסמה',
-          formSubtitle_email: 'הכנס את הקוד שנשלח לכתובת הדוא"ל שלך',
-          formSubtitle_phone: 'הכנס את הקוד שנשלח למספר הטלפון שלך',
-          resendButton: 'שלח קוד שוב',
-        },
+      title_email: 'בדוק את הדוא"ל שלך',
+      title_phone: 'בדוק את הטלפון שלך',
+      subtitle: 'לאיפוס הסיסמה שלך',
+      formTitle: 'אפס קוד הסיסמה',
+      formSubtitle_email: 'הכנס את הקוד שנשלח לכתובת הדוא"ל שלך',
+      formSubtitle_phone: 'הכנס את הקוד שנשלח למספר הטלפון שלך',
+      resendButton: 'שלח קוד שוב',
+    },
     resetPassword: {
-          title: 'אפס סיסמה',
-          formButtonPrimary: 'אפס סיסמה',
-          successMessage: 'הסיסמה שלך שונתה בהצלחה. מחבר אותך, אנא המתן רגע.',
-        },
+      title: 'אפס סיסמה',
+      formButtonPrimary: 'אפס סיסמה',
+      successMessage: 'הסיסמה שלך שונתה בהצלחה. מחבר אותך, אנא המתן רגע.',
+    },
     resetPasswordMfa: {
-          detailsLabel: 'אנחנו צריכים לאמת את זהותך לפני שנאפס את הסיסמה שלך.',
-        },
+      detailsLabel: 'אנחנו צריכים לאמת את זהותך לפני שנאפס את הסיסמה שלך.',
+    },
     emailCode: {
-          title: 'בדוק את הדוא"ל שלך',
-          subtitle: 'להמשיך אל {{applicationName}}',
-          formTitle: 'קוד אימות',
-          formSubtitle: 'הכנס את קוד האימות שנשלח לכתובת הדוא"ל שלך',
-          resendButton: 'שלח קוד שוב',
-        },
+      title: 'בדוק את הדוא"ל שלך',
+      subtitle: 'להמשיך אל {{applicationName}}',
+      formTitle: 'קוד אימות',
+      formSubtitle: 'הכנס את קוד האימות שנשלח לכתובת הדוא"ל שלך',
+      resendButton: 'שלח קוד שוב',
+    },
     emailLink: {
-          title: 'בדוק את הדוא"ל שלך',
-          subtitle: 'להמשיך אל {{applicationName}}',
-          formTitle: 'קישור אימות',
-          formSubtitle: 'השתמש בקישור האימות שנשלח לדוא"ל שלך',
-          resendButton: 'שלח קישור שוב',
-          unusedTab: {
-            title: 'אתה יכול לסגור את הכרטיסייה הזו',
-          },
-          verified: {
-            title: 'נכנסת בהצלחה',
-            subtitle: 'תועבר בקרוב',
-          },
-          verifiedSwitchTab: {
-            subtitle: 'חזור לכרטיסייה המקורית להמשך',
-            titleNewTab: 'נכנס בכרטיסייה אחרת',
-            subtitleNewTab: 'חזור לכרטיסייה שנפתחה חדשה להמשך',
-          },
-          loading: {
-            title: 'מתחבר...',
-            subtitle: 'תועבר בקרוב',
-          },
-          failed: {
-            title: 'קישור האימות הזה לא חוקי',
-            subtitle: 'חזור לכרטיסייה המקורית להמשך.',
-          },
-          expired: {
-            title: 'קישור האימות הזה פג תוקף',
-            subtitle: 'חזור לכרטיסייה המקורית להמשך.',
-          },
-        },
+      title: 'בדוק את הדוא"ל שלך',
+      subtitle: 'להמשיך אל {{applicationName}}',
+      formTitle: 'קישור אימות',
+      formSubtitle: 'השתמש בקישור האימות שנשלח לדוא"ל שלך',
+      resendButton: 'שלח קישור שוב',
+      unusedTab: {
+        title: 'אתה יכול לסגור את הכרטיסייה הזו',
+      },
+      verified: {
+        title: 'נכנסת בהצלחה',
+        subtitle: 'תועבר בקרוב',
+      },
+      verifiedSwitchTab: {
+        subtitle: 'חזור לכרטיסייה המקורית להמשך',
+        titleNewTab: 'נכנס בכרטיסייה אחרת',
+        subtitleNewTab: 'חזור לכרטיסייה שנפתחה חדשה להמשך',
+      },
+      loading: {
+        title: 'מתחבר...',
+        subtitle: 'תועבר בקרוב',
+      },
+      failed: {
+        title: 'קישור האימות הזה לא חוקי',
+        subtitle: 'חזור לכרטיסייה המקורית להמשך.',
+      },
+      expired: {
+        title: 'קישור האימות הזה פג תוקף',
+        subtitle: 'חזור לכרטיסייה המקורית להמשך.',
+      },
+    },
     phoneCode: { ...commonTexts.signIn.phoneCode },
     phoneCodeMfa: { ...commonTexts.signIn.phoneCode, subtitle: '' },
     totpMfa: {
-          title: 'אימות שני שלבים',
-          subtitle: '',
-          formTitle: 'קוד אימות',
-          formSubtitle: 'הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
-        },
+      title: 'אימות שני שלבים',
+      subtitle: '',
+      formTitle: 'קוד אימות',
+      formSubtitle: 'הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
+    },
     backupCodeMfa: {
-          title: 'הכנס קוד גיבוי',
-          subtitle: 'להמשיך אל {{applicationName}}',
-          formTitle: '',
-          formSubtitle: '',
-        },
+      title: 'הכנס קוד גיבוי',
+      subtitle: 'להמשיך אל {{applicationName}}',
+      formTitle: '',
+      formSubtitle: '',
+    },
     alternativeMethods: {
       title: 'השתמש בשיטה אחרת',
       actionLink: 'קבל עזרה',
@@ -259,8 +258,7 @@ export const hebIL: LocalizationResource = {
         detailsSubtitle__primary: 'כתובת האימייל הזו היא כתובת האימייל העיקרית',
         detailsAction__primary: 'השלם אימות',
         detailsTitle__nonPrimary: 'הגדר ככתובת אימייל עיקרית',
-        detailsSubtitle__nonPrimary:
-          'הגדר את כתובת האימייל הזו כעיקרית כדי לקבל התראות בנושא החשבון שלך.',
+        detailsSubtitle__nonPrimary: 'הגדר את כתובת האימייל הזו כעיקרית כדי לקבל התראות בנושא החשבון שלך.',
         detailsAction__nonPrimary: 'הגדר כעיקרית',
         detailsTitle__unverified: 'כתובת אימייל לא מאומתת',
         detailsSubtitle__unverified: 'כתובת האימייל הזו לא מאומתת ועשויה להיות מוגבלת בפונקציונליות',
@@ -276,8 +274,7 @@ export const hebIL: LocalizationResource = {
         detailsSubtitle__primary: 'מספר הטלפון הזה הוא המספר הראשי',
         detailsAction__primary: 'השלם אימות',
         detailsTitle__nonPrimary: 'הגדר כמספר טלפון ראשי',
-        detailsSubtitle__nonPrimary:
-          'הגדר מספר טלפון זה כראשי כדי לקבל התראות בנושא החשבון שלך.',
+        detailsSubtitle__nonPrimary: 'הגדר מספר טלפון זה כראשי כדי לקבל התראות בנושא החשבון שלך.',
         detailsAction__nonPrimary: 'הגדר כראשי',
         detailsTitle__unverified: 'מספר טלפון לא מאומת',
         detailsSubtitle__unverified: 'מספר טלפון זה לא מאומת ועשוי להיות מוגבל בפונקציונליות',
@@ -344,11 +341,11 @@ export const hebIL: LocalizationResource = {
         destructiveAction: 'התנתק מהמכשיר',
       },
       web3WalletsSection: {
-      title: 'ארנקי Web3',
-      primaryButton: 'ארנקי Web3',
-      destructiveActionTitle: 'הסר',
-      destructiveActionSubtitle: 'הסר ארנק Web3 זה מהחשבון שלך',
-      destructiveAction: 'הסר ארנק',
+        title: 'ארנקי Web3',
+        primaryButton: 'ארנקי Web3',
+        destructiveActionTitle: 'הסר',
+        destructiveActionSubtitle: 'הסר ארנק Web3 זה מהחשבון שלך',
+        destructiveAction: 'הסר ארנק',
       },
     },
     profilePage: {
@@ -409,8 +406,7 @@ export const hebIL: LocalizationResource = {
       removeResource: {
         title: 'הסר חשבון מחובר',
         messageLine1: '{{identifier}} יוסר מהחשבון הזה.',
-        messageLine2:
-          'לא תוכל יותר להשתמש בחשבון מחובר זה וכל התכונות התלויות לא יעבדו.',
+        messageLine2: 'לא תוכל יותר להשתמש בחשבון מחובר זה וכל התכונות התלויות לא יעבדו.',
         successMessage: '{{connectedAccount}} הוסר מהחשבון שלך.',
       },
     },
@@ -441,14 +437,12 @@ export const hebIL: LocalizationResource = {
       title: 'הוסף אפליקציית אימות',
       verifyTitle: 'קוד אימות',
       verifySubtitle: 'הכנס את קוד האימות שנוצר על ידי האותנטיקטור שלך',
-      successMessage:
-        'האימות הדו-שלבי מופעל כעת. בעת ההתחברות, תידרש להכניס קוד אימות מהאותנטיקטור זה כשלב נוסף.',
+      successMessage: 'האימות הדו-שלבי מופעל כעת. בעת ההתחברות, תידרש להכניס קוד אימות מהאותנטיקטור זה כשלב נוסף.',
       authenticatorApp: {
         infoText__ableToScan:
           'הגדר שיטת התחברות חדשה באפליקציית האותנטיקטור שלך וסרוק את קוד ה-QR הבא כדי לחברו לחשבון שלך.',
         infoText__unableToScan: 'הגדר שיטת התחברות חדשה באותנטיקטור שלך והכנס את המפתח שסופק למטה.',
-        inputLabel__unableToScan1:
-          'וודא שסיסמאות מבוססות-זמן או חד-פעמיות מופעלות, ואז סיים לחבר את החשבון שלך.',
+        inputLabel__unableToScan1: 'וודא שסיסמאות מבוססות-זמן או חד-פעמיות מופעלות, ואז סיים לחבר את החשבון שלך.',
         inputLabel__unableToScan2:
           'לחלופין, אם האותנטיקטור שלך תומך בכתובת URI של TOTP, תוכל גם להעתיק את הכתובת המלאה.',
         buttonAbleToScan__nonPrimary: 'סרוק קוד QR במקום',
@@ -465,8 +459,7 @@ export const hebIL: LocalizationResource = {
       title: 'הוסף אימות קוד SMS',
       primaryButton__addPhoneNumber: 'הוסף מספר טלפון',
       subtitle__availablePhoneNumbers: 'בחר מספר טלפון להרשמה לאימות קוד SMS דו-שלבי.',
-      subtitle__unavailablePhoneNumbers:
-        'אין מספרי טלפון זמינים להרשמה לאימות קוד SMS דו-שלבי.',
+      subtitle__unavailablePhoneNumbers: 'אין מספרי טלפון זמינים להרשמה לאימות קוד SMS דו-שלבי.',
       successMessage:
         'אימות קוד SMS דו-שלבי כעת מופעל למספר הטלפון הזה. בעת ההתחברות, תידרש להכניס קוד אימות שנשלח למספר הטלפון הזה כשלב נוסף.',
       removeResource: {
@@ -481,10 +474,8 @@ export const hebIL: LocalizationResource = {
       title__codelist: 'קודי גיבוי',
       subtitle__codelist: 'אחסן אותם בבטחה ושמור עליהם בסוד.',
       infoText1: 'קודי גיבוי יהיו מופעלים לחשבון זה.',
-      infoText2:
-        'שמור את קודי הגיבוי בסוד ואחסן אותם בבטחה. תוכל לחולל מחדש קודי גיבוי אם אתה חושד שהם נפגעו.',
-      successSubtitle:
-        'תוכל להשתמש באחד מאלה כדי להתחבר לחשבון שלך, אם אתה מאבד גישה למכשיר האימות שלך.',
+      infoText2: 'שמור את קודי הגיבוי בסוד ואחסן אותם בבטחה. תוכל לחולל מחדש קודי גיבוי אם אתה חושד שהם נפגעו.',
+      successSubtitle: 'תוכל להשתמש באחד מאלה כדי להתחבר לחשבון שלך, אם אתה מאבד גישה למכשיר האימות שלך.',
       successMessage:
         'קודי הגיבוי מופעלים כעת. תוכל להשתמש באחד מאלה כדי להתחבר לחשבון שלך, אם אתה מאבד גישה למכשיר האימות שלך. כל קוד יכול להשתמש בו רק פעם אחת.',
       actionLabel__copy: 'העתק הכל',
@@ -524,8 +515,7 @@ export const hebIL: LocalizationResource = {
         title: 'סיכון',
         leaveOrganization: {
           title: 'עזוב את הארגון',
-          messageLine1:
-            'האם אתה בטוח שאתה רוצה לעזוב את הארגון הזה? תאבד גישה לארגון זה וליישומים שלו.',
+          messageLine1: 'האם אתה בטוח שאתה רוצה לעזוב את הארגון הזה? תאבד גישה לארגון זה וליישומים שלו.',
           messageLine2: 'פעולה זו היא סופית ובלתי הפיכה.',
           successMessage: 'עזבת את הארגון.',
         },
@@ -568,8 +558,7 @@ export const hebIL: LocalizationResource = {
   },
   unstable__errors: {
     form_identifier_not_found: '',
-    form_password_pwned:
-      'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, נסה סיסמה אחרת במקום.',
+    form_password_pwned: 'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, נסה סיסמה אחרת במקום.',
     form_username_invalid_length: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',
