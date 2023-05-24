@@ -4,6 +4,7 @@ import type { ClientResource } from '@clerk/types';
 import { getAllETLDs } from '../url';
 import { clientCookie } from './client';
 import { clientUatCookie } from './client_uat';
+import { devBrowserCookie } from './devBrowser';
 import { inittedCookie } from './initted';
 import { sessionCookie } from './session';
 
@@ -58,6 +59,20 @@ export const createCookieHandler = () => {
     });
   };
 
+  const setDevBrowserCookie = (jwt: string) => {
+    const expires = addYears(Date.now(), 1);
+    const sameSite = 'Strict';
+    const secure = false;
+
+    return devBrowserCookie.set(jwt, {
+      expires,
+      sameSite,
+      secure,
+    });
+  };
+
+  const removeDevBrowserCookie = () => devBrowserCookie.remove();
+
   // Third party cookie helpers
   const ssoCookie = clientCookie;
 
@@ -75,5 +90,7 @@ export const createCookieHandler = () => {
     setClientUatCookie,
     removeSessionCookie,
     removeAllDevBrowserCookies,
+    setDevBrowserCookie,
+    removeDevBrowserCookie,
   };
 };

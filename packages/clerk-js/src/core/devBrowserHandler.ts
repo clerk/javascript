@@ -38,11 +38,14 @@ export default function createDevBrowserHandler({
 
   function setDevBrowserJWT(jwt: string) {
     localStorage.setItem(key, jwt);
+    // Append dev browser JWT to cookies, because server-side redirects (e.g. middleware) has no access to local storage
+    cookieHandler.setDevBrowserCookie(jwt);
   }
 
   function removeDevBrowserJWT() {
     // TODO: Maybe clear keys for both dev session sync modes to be on the safe side?
     localStorage.removeItem(key);
+    cookieHandler.removeDevBrowserCookie();
   }
 
   // location.host == *.[lcl.dev](http://lcl.dev)
