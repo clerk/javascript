@@ -1,5 +1,6 @@
 import type { FieldId } from '@clerk/types';
 import type { ClerkAPIError } from '@clerk/types';
+import type { PropsWithChildren } from 'react';
 import React, { forwardRef, useCallback, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
@@ -20,6 +21,7 @@ import {
   Text,
   useLocalizations,
 } from '../customizables';
+import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { useFieldMessageVisibility, usePrefersReducedMotion } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
@@ -113,7 +115,100 @@ const useCalculateErrorTextHeight = () => {
   };
 };
 
-export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props, ref) => {
+type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
+
+type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
+  elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
+};
+
+export const FormFeedback = (props: FormFeedbackProps) => {
+  const { id, elementDescriptors } = props;
+  const errorMessage = useFieldMessageVisibility(props.errorText, 200);
+  const successMessage = useFieldMessageVisibility(props.successfulText, 200);
+  const informationMessage = useFieldMessageVisibility(props.informationText, 200);
+  const warningMessage = useFieldMessageVisibility(props.warningText, 200);
+
+  const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
+  const isSomeMessageVisible = !!messageToDisplay;
+
+  const { calculateHeight, height } = useCalculateErrorTextHeight();
+  const { getFormTextAnimation } = useFormTextAnimation();
+  const defaultElementDescriptors = {
+    error: descriptors.formFieldErrorText,
+    warning: descriptors.formFieldWarningText,
+    info: descriptors.formFieldInfoText,
+    success: descriptors.formFieldSuccessText,
+  };
+
+  const getElementProps = (type: FormFeedbackDescriptorsKeys) => {
+    const descriptor = (elementDescriptors?.[type] || defaultElementDescriptors[type]) as ElementDescriptor | undefined;
+    return {
+      elementDescriptor: descriptor,
+      elementId: id ? descriptor?.setId?.(id) : undefined,
+    };
+  };
+
+  if (!isSomeMessageVisible) {
+    return null;
+  }
+
+  return (
+    <Box
+      style={{
+        height, // dynamic height
+        position: 'relative',
+      }}
+      sx={[
+        getFormTextAnimation(
+          !!props.informationText || !!props.successfulText || !!props.errorText || !!props.warningText,
+        ),
+      ]}
+    >
+      {/*Display the directions after the success message is unmounted*/}
+      {!successMessage && !warningMessage && !errorMessage && informationMessage && (
+        <FormInfoText
+          ref={calculateHeight}
+          sx={getFormTextAnimation(!!props.informationText && !props?.successfulText && !props.warningText)}
+        >
+          {informationMessage}
+        </FormInfoText>
+      )}
+      {/* Display the error message after the directions is unmounted*/}
+      {errorMessage && (
+        <FormErrorText
+          {...getElementProps('error')}
+          ref={calculateHeight}
+          sx={getFormTextAnimation(!!props?.errorText)}
+        >
+          {errorMessage}
+        </FormErrorText>
+      )}
+
+      {/* Display the success message after the error message is unmounted*/}
+      {!errorMessage && successMessage && (
+        <FormSuccessText
+          {...getElementProps('success')}
+          ref={calculateHeight}
+          sx={getFormTextAnimation(!!props?.successfulText)}
+        >
+          {successMessage}
+        </FormSuccessText>
+      )}
+
+      {warningMessage && (
+        <FormWarningText
+          {...getElementProps('warning')}
+          ref={calculateHeight}
+          sx={getFormTextAnimation(!!props.warningText)}
+        >
+          {warningMessage}
+        </FormWarningText>
+      )}
+    </Box>
+  );
+};
+
+export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormControlProps>>((props, ref) => {
   const { t } = useLocalizations();
   const card = useCardState();
   const { submittedWithEnter } = useFormState();
@@ -156,16 +251,6 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
   });
 
   const errorMessage = useFieldMessageVisibility(debouncedState.errorText, 200);
-  const successMessage = useFieldMessageVisibility(debouncedState.successfulText, 200);
-  const informationMessage = useFieldMessageVisibility(debouncedState.informationText, 200);
-  const warningMessage = useFieldMessageVisibility(debouncedState.warningText, 200);
-
-  const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
-  const isSomeMessageVisible = !!messageToDisplay;
-
-  const { calculateHeight, height } = useCalculateErrorTextHeight();
-
-  const { getFormTextAnimation } = useFormTextAnimation();
 
   const ActionLabel = actionLabel ? (
     <Link
@@ -297,68 +382,10 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
         </>
       )}
 
-      {isSomeMessageVisible && (
-        <Box
-          style={{
-            height, // dynamic height
-            position: 'relative',
-          }}
-          sx={[
-            getFormTextAnimation(
-              !!debouncedState.informationText ||
-                !!debouncedState.successfulText ||
-                !!debouncedState.errorText ||
-                !!debouncedState.warningText,
-            ),
-          ]}
-        >
-          {/*Display the directions after is success message is unmounted*/}
-          {!successMessage && !warningMessage && !errorMessage && informationMessage && (
-            <FormInfoText
-              ref={calculateHeight}
-              sx={getFormTextAnimation(
-                !!debouncedState.informationText && !debouncedState?.successfulText && !debouncedState.warningText,
-              )}
-            >
-              {informationMessage}
-            </FormInfoText>
-          )}
-          {/* Display the error message after the directions is unmounted*/}
-          {errorMessage && (
-            <FormErrorText
-              ref={calculateHeight}
-              elementDescriptor={descriptors.formFieldErrorText}
-              elementId={descriptors.formFieldErrorText.setId(id)}
-              sx={getFormTextAnimation(!!debouncedState?.errorText)}
-            >
-              {errorMessage}
-            </FormErrorText>
-          )}
-
-          {/* Display the success message after the error message is unmounted*/}
-          {!errorMessage && successMessage && (
-            <FormSuccessText
-              ref={calculateHeight}
-              elementDescriptor={descriptors.formFieldSuccessText}
-              elementId={descriptors.formFieldSuccessText.setId(id)}
-              sx={getFormTextAnimation(!!debouncedState?.successfulText)}
-            >
-              {successMessage}
-            </FormSuccessText>
-          )}
-
-          {warningMessage && (
-            <FormWarningText
-              ref={calculateHeight}
-              elementDescriptor={descriptors.formFieldWarningText}
-              elementId={descriptors.formFieldWarningText.setId(id)}
-              sx={getFormTextAnimation(!!debouncedState.warningText)}
-            >
-              {warningMessage}
-            </FormWarningText>
-          )}
-        </Box>
-      )}
+      <FormFeedback
+        {...debouncedState}
+        id={id}
+      />
     </FormControlPrim>
   );
 });

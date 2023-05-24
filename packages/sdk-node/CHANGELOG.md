@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.10.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.10.0...@clerk/clerk-sdk-node@4.10.1) (2023-05-23)
+
+### Bug Fixes
+
+- **clerk-sdk-node:** Remove @clerk/shared as dependency ([b239c72](https://github.com/clerkinc/javascript/commit/b239c72da169e3c85414dd65b0010bbd5c6e1e31))
+
+## [4.10.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.10.0-staging.2...@clerk/clerk-sdk-node@4.10.0) (2023-05-23)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
 ### [4.9.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.9.2-staging.1...@clerk/clerk-sdk-node@4.9.2) (2023-05-18)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node
