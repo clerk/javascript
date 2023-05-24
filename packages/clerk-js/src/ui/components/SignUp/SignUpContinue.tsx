@@ -28,10 +28,10 @@ import { completeSignUpFlow } from './util';
 
 function _SignUpContinue() {
   const card = useCardState();
+  const clerk = useCoreClerk();
   const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
-  const { setActive } = useCoreClerk();
   const { navigateAfterSignUp, signInUrl } = useSignUpContext();
   const signUp = useCoreSignUp();
   const isProgressiveSignUp = userSettings.signUp.progressive;
@@ -143,7 +143,7 @@ function _SignUpContinue() {
           signUp: res,
           verifyEmailPath: '../verify-email-address',
           verifyPhonePath: '../verify-phone-number',
-          handleComplete: () => setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
+          handleComplete: () => clerk.setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
           navigate,
         }),
       )
@@ -189,7 +189,7 @@ function _SignUpContinue() {
             <Footer.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
             <Footer.ActionLink
               localizationKey={localizationKeys('signUp.continue.actionLink')}
-              to={signInUrl}
+              to={clerk.buildUrlWithAuth(signInUrl)}
             />
           </Footer.Action>
           <Footer.Links />

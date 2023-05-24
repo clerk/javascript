@@ -36,7 +36,6 @@ export function _SignInStart(): JSX.Element {
   const clerk = useCoreClerk();
   const status = useLoadingStatus();
   const { displayConfig, userSettings } = useEnvironment();
-  const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
@@ -119,7 +118,7 @@ export function _SignInStart(): JSX.Element {
           case 'needs_second_factor':
             return navigate('factor-two');
           case 'complete':
-            return setActive({
+            return clerk.setActive({
               session: res.createdSessionId,
               beforeEmit: navigateAfterSignIn,
             });
@@ -187,7 +186,7 @@ export function _SignInStart(): JSX.Element {
         case 'needs_second_factor':
           return navigate('factor-two');
         case 'complete':
-          return setActive({
+          return clerk.setActive({
             session: res.createdSessionId,
             beforeEmit: navigateAfterSignIn,
           });
@@ -228,7 +227,7 @@ export function _SignInStart(): JSX.Element {
       await signInWithFields(identifierField);
     } else if (alreadySignedInError) {
       const sid = alreadySignedInError.meta!.sessionId!;
-      await setActive({ session: sid, beforeEmit: navigateAfterSignIn });
+      await clerk.setActive({ session: sid, beforeEmit: navigateAfterSignIn });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }
