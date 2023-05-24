@@ -81,7 +81,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             {...user}
             {...externalAccount}
             name={name}
-            imageUrl={imageUrl}
+            avatarUrl={imageUrl}
             size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
             optimize
             sx={avatarSx}

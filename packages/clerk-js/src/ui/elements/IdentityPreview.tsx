@@ -79,7 +79,7 @@ const UsernameOrEmailIdentifier = (props: any) => {
       <UserAvatar
         boxElementDescriptor={descriptors.identityPreviewAvatarBox}
         imageElementDescriptor={descriptors.identityPreviewAvatarImage}
-        imageUrl={props.avatarUrl}
+        avatarUrl={props.avatarUrl}
         size={t => t.sizes.$5}
       />
       <IdentifierContainer>{props.identifier}</IdentifierContainer>
