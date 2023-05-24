@@ -230,6 +230,10 @@ export default class Clerk implements ClerkInterface {
 
   public isReady = (): boolean => this.#isReady;
 
+  public isStandardBrowser = (): boolean => {
+    return this.#options.standardBrowser as boolean;
+  };
+
   public load = async (options?: ClerkOptions): Promise<void> => {
     if (this.#isReady) {
       return;
@@ -788,7 +792,7 @@ export default class Clerk implements ClerkInterface {
       return;
     }
     const { signIn, signUp } = this.client;
-    const { displayConfig } = this.#environment;
+    const { userSettings, displayConfig } = this.#environment;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
     const su = {
@@ -852,7 +856,7 @@ export default class Clerk implements ClerkInterface {
 
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
-    const isCaptchaEnabled = true; // TODO: replace this when environment field is ready
+    const isCaptchaEnabled = userSettings.signUp.captcha_enabled;
     if (userNeedsToBeCreated) {
       const fields = {
         transfer: true,

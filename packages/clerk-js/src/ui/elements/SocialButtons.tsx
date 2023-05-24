@@ -2,7 +2,7 @@ import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@
 import React from 'react';
 
 import { Button, descriptors, Grid, Image, localizationKeys, useAppearance } from '../customizables';
-import { useEnabledThirdPartyProviders } from '../hooks';
+import { useCaptchaToken, useEnabledThirdPartyProviders } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { ArrowBlockButton } from './ArrowBlockButton';
@@ -16,7 +16,7 @@ export type SocialButtonsProps = React.PropsWithChildren<{
 }>;
 
 type SocialButtonsRootProps = SocialButtonsProps & {
-  oauthCallback: (strategy: OAuthStrategy) => Promise<unknown>;
+  oauthCallback: (strategy: OAuthStrategy, captchaToken?: string) => Promise<unknown>;
   web3Callback: (strategy: Web3Strategy) => Promise<unknown>;
 };
 
@@ -29,6 +29,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
+  const { isCaptchaEnabled, widgetProps, handleCaptchaWithCallback } = useCaptchaToken();
 
   const strategies = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
@@ -52,7 +53,11 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
       if (isWeb3Strategy(strategy)) {
         await web3Callback(strategy);
       } else {
-        await oauthCallback(strategy);
+        if (isCaptchaEnabled) {
+          void handleCaptchaWithCallback(oauthCallback, strategy);
+        } else {
+          await oauthCallback(strategy);
+        }
       }
     } catch {
       await sleep(1000);
@@ -89,6 +94,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           }
         />
       ))}
+
+      {isCaptchaEnabled && <div {...widgetProps} />}
     </WrapperElement>
   );
 });

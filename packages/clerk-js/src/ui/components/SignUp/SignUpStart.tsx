@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
@@ -15,7 +15,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useLoadingStatus, usePasswordComplexity } from '../../hooks';
+import { useCaptchaToken, useLoadingStatus, usePasswordComplexity } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, useFormControl } from '../../utils';
@@ -41,8 +41,7 @@ function _SignUpStart(): JSX.Element {
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
-  const [captchaToken, setCaptchaToken] = useState('');
-  const isCaptchaEnabled = true; // TODO: replace this when environment field is ready
+  const { isCaptchaEnabled, widgetProps, handleCaptchaWithCallback, captchaToken } = useCaptchaToken();
 
   const {
     userSettings: { passwordSettings },
@@ -141,19 +140,9 @@ function _SignUpStart(): JSX.Element {
     void handleTokenFlow();
   }, []);
 
-  const captchaRef = useRef(null);
   React.useLayoutEffect(() => {
     if (isCaptchaEnabled) {
-      void loadCaptcha().then(t => {
-        t.execute(captchaRef.current, {
-          sitekey: '1x00000000000000000000AA', // test sitekey
-          // sitekey: '0x4AAAAAAAFHxLeVBtmN8VhF', // staging sitekey
-          callback: function (token: string) {
-            setCaptchaToken(token);
-            console.log(`Challenge Success ${token}`);
-          },
-        });
-      });
+      void handleCaptchaWithCallback();
     }
   }, []);
 
@@ -217,10 +206,11 @@ function _SignUpStart(): JSX.Element {
       fieldsToSubmit.push(formState['phoneNumber']);
     }
 
-    if (isCaptchaEnabled) {
+    if (isCaptchaEnabled && captchaToken) {
       const captchaState = {
         id: 'captchaToken',
         value: captchaToken,
+        setError: () => undefined,
       };
 
       fieldsToSubmit.push(captchaState as any);
@@ -272,12 +262,7 @@ function _SignUpStart(): JSX.Element {
           </Header.Subtitle>
         </Header.Root>
 
-        {isCaptchaEnabled && (
-          <div
-            ref={captchaRef}
-            style={{ display: 'none' }}
-          />
-        )}
+        {isCaptchaEnabled && <div {...widgetProps} />}
 
         <Flex
           direction='col'

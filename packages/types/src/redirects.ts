@@ -33,4 +33,9 @@ export type AuthenticateWithRedirectParams = {
    * Email address to use for targeting a SAML connection at sign-up
    */
   emailAddress?: string;
+
+  /**
+   * Token to use for verifing a user in a real person
+   */
+  captchaToken?: string;
 };

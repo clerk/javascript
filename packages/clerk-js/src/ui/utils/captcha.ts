@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+const SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
 export const loadCaptcha = async () => {
   return new Promise(resolve => {

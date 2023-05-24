@@ -16,3 +16,4 @@ export * from './useSetTimeout';
 export * from './useScrollLock';
 export * from './useDeepEqualMemo';
 export * from './useClerkModalStateParams';
+export * from './useCaptchaToken';
