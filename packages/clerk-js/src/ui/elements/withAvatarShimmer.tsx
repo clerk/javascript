@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 
+import { useAppearance } from '../customizables';
 import type { ThemableCssProp } from '../styledSystem';
 
 /**
@@ -9,18 +10,22 @@ import type { ThemableCssProp } from '../styledSystem';
  */
 export const withAvatarShimmer = <T extends { sx?: ThemableCssProp }>(Component: React.ComponentType<T>) => {
   return forwardRef<HTMLElement, T>((props, ref) => {
+    const { parsedLayout } = useAppearance();
+
     return (
       <Component
         {...props}
         ref={ref}
         sx={[
-          t => ({
-            ':hover': {
-              '--cl-shimmer-hover-shadow': t.shadows.$shadowShimmer,
-              '--cl-shimmer-hover-transform': 'skew(-45deg) translateX(600%)',
-              '--cl-shimmer-hover-after-transform': 'skewX(45deg) translateX(-150%)',
-            },
-          }),
+          parsedLayout.shimmer
+            ? t => ({
+                ':hover': {
+                  '--cl-shimmer-hover-shadow': t.shadows.$shadowShimmer,
+                  '--cl-shimmer-hover-transform': 'skew(-45deg) translateX(600%)',
+                  '--cl-shimmer-hover-after-transform': 'skewX(45deg) translateX(-150%)',
+                },
+              })
+            : {},
           props.sx,
         ]}
       />

@@ -591,6 +591,11 @@ export type Layout = {
    * prebuilt components. Clicking the link will open the passed URL in a new tab
    */
   privacyPageUrl?: string;
+  /**
+   * This option enables the shimmer animation for the avatars of <UserButton/> and <OrganizationSwitcher/>
+   * @default false
+   */
+  shimmer?: boolean;
 };
 
 export type SignInTheme = Theme;

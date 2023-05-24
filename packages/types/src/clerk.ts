@@ -502,10 +502,6 @@ export interface ClerkOptions {
    * @experimental
    */
   experimental_enableClerkImages?: boolean;
-  /**
-   * @experimental
-   */
-  experimental_enableShimmerEffect?: boolean;
 }
 
 export interface Resources {
