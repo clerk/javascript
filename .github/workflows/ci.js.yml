@@ -1,6 +1,3 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: Clerk Javascript CI
 
 on:
@@ -8,10 +5,22 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+
+env:
+  BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+  CACHE_VERSION: 1 # increment to bust all caches
+  CI_BRANCH: ${{ github.ref	}}
+  CI_BRANCH_BASE: refs/heads/develop
+  CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+  CI_REPO_NAME: javascript
+  CI_REPO_OWNER: clerkinc
+  NPM_VERSION: 8.19.0
+  TURBO_CACHE_DIR: .turbo
+  # TURBO_CONCURRENCY: 2
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -19,21 +28,46 @@ jobs:
         node-version: [16.19, 18.15, 19.8]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm i -g npm@8.19.0
-    - run: npm install
-    - run: npm run build
-    - run: npm run test
+      - name: Checkout ${{ env.CI_REPO_OWNER }}/${{ env.CI_REPO_NAME }}
+        uses: actions/checkout@v3
 
-    env:
-      # Bundlewatch
-      BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
-      CI_REPO_OWNER: clerkinc
-      CI_REPO_NAME: javascript
-      CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
-      CI_BRANCH: ${{ github.ref	}}
-      CI_BRANCH_BASE: refs/heads/develop
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache dependencies
+        id: cache-node-modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-${{ env.CACHE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-${{ env.CACHE_VERSION }}-
+            ${{ runner.os }}-node-modules-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-
+
+              ${{ github.sha }}
+
+      - name: Cache Turborepo outputs
+        id: cache-turbo
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.TURBO_CACHE_DIR }}
+          key: ${{ runner.os }}-turbo-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-${{ env.CACHE_VERSION }}-${{ github.ref	}}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-${{ env.CACHE_VERSION }}-${{ github.ref	}}-
+            ${{ runner.os }}-turbo-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-${{ env.CACHE_VERSION }}-
+            ${{ runner.os }}-turbo-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-
+
+      - name: Install npm@${{ env.NPM_VERSION }}
+        run: npm i -g npm@${{ env.NPM_VERSION }}
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm install # --prefer-offline
+
+      - name: Build packages
+        run: npm run build -- --cache-dir=${{ env.TURBO_CACHE_DIR }}
+
+      - name: Run tests
+        run: npm run test -- --cache-dir=${{ env.TURBO_CACHE_DIR }}
