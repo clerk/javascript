@@ -41,6 +41,9 @@ export const decorateResponseWithObservabilityHeaders = (res: NextResponse, requ
   requestState.status && res.headers.set(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
 
+/**
+ * @deprecated Use authMiddleware instead https://clerk.com/docs/nextjs/middleware
+ */
 export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => {
   const noop = () => undefined;
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
