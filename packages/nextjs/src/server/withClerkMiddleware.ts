@@ -41,6 +41,10 @@ export const decorateResponseWithObservabilityHeaders = (res: NextResponse, requ
   requestState.status && res.headers.set(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
 
+/**
+ * @deprecated withClerkMiddleware has been deprecated in favor of `authMiddleware`.
+ * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
+ */
 export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => {
   const noop = () => undefined;
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
