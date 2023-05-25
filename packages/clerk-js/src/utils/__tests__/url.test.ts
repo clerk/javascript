@@ -438,6 +438,6 @@ describe('isAllowedRedirectOrigin', () => {
 
   test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
     expect(isAllowedRedirectOrigin(url, allowedOrigins)).toEqual(expected);
-    expect(warnMock).toHaveBeenCalledTimes(Number(expected)); // Number(boolean) evaluates to 0 or 1
+    expect(warnMock).toHaveBeenCalledTimes(Number(!expected)); // Number(boolean) evaluates to 0 or 1
   });
 });
