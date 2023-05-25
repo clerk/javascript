@@ -15,8 +15,8 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useRouter } from '../../router';
 import { useLoadingStatus, usePasswordComplexity } from '../../hooks';
+import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
@@ -27,6 +27,7 @@ import { completeSignUpFlow } from './util';
 
 function _SignUpStart(): JSX.Element {
   const card = useCardState();
+  const clerk = useCoreClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
   const { showOptionalFields } = useAppearance().parsedLayout;
@@ -274,7 +275,7 @@ function _SignUpStart(): JSX.Element {
             </Footer.ActionText>
             <Footer.ActionLink
               localizationKey={localizationKeys('signUp.start.actionLink')}
-              to={signInUrl}
+              to={clerk.buildUrlWithAuth(signInUrl)}
             />
           </Footer.Action>
           <Footer.Links />
