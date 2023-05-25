@@ -42,7 +42,8 @@ export const decorateResponseWithObservabilityHeaders = (res: NextResponse, requ
 };
 
 /**
- * @deprecated Use authMiddleware instead https://clerk.com/docs/nextjs/middleware
+ * @deprecated withClerkMiddleware has been deprecated in favor of `authMiddleware`.
+ * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
  */
 export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => {
   const noop = () => undefined;
