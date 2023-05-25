@@ -1,6 +1,6 @@
 import { DEV_BROWSER_SSO_JWT_PARAMETER } from '../core/constants';
 
-const DEV_BROWSER_JWT_MARKER = '__clerk_db_jwt';
+export const DEV_BROWSER_JWT_MARKER = '__clerk_db_jwt';
 const DEV_BROWSER_JWT_MARKER_REGEXP = /__clerk_db_jwt\[(.*)\]/;
 
 function extractDevBrowserJWT(url: string): string {

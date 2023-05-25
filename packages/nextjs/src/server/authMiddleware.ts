@@ -7,10 +7,11 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
+import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import { receivedRequestForIgnoredRoute } from './errors';
-import { redirectToSignIn } from './redirect';
+import { isDevOrStagingUrl, redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
-import { decorateRequest, setRequestHeadersOnNextResponse } from './utils';
+import { decorateRequest, getCookie, setRequestHeadersOnNextResponse } from './utils';
 
 type WithPathPatternWildcard<T> = `${T & string}(.*)`;
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
@@ -142,7 +143,8 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
-      return setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
+      const res = setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
+      return appendDevBrowserOnDevOrStaging(req, res);
     }
 
     if (options.debug) {
@@ -208,4 +210,16 @@ const withDefaultPublicRoutes = (publicRoutes: RouteMatcherParam | undefined) =>
     routes.push(matchRoutesStartingWith(signUpUrl));
   }
   return routes;
+};
+
+// grabs the dev browser JWT from cookies and appends it to the redirect URL when redirecting to Clerk Hosted Pages
+// because middleware runs on the server side, before clerk-js is loaded.
+const appendDevBrowserOnDevOrStaging = (req: NextRequest, res: Response) => {
+  const location = res.headers.get('location');
+  if (!!location && isDevOrStagingUrl(location)) {
+    const dbJwt = getCookie(req, DEV_BROWSER_JWT_MARKER);
+    const urlWithDevBrowser = setDevBrowserJWTInURL(location, dbJwt);
+    return NextResponse.redirect(urlWithDevBrowser, res);
+  }
+  return res;
 };

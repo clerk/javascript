@@ -1,7 +1,7 @@
 export * from './clerkClient';
 export { buildClerkProps, getAuth } from './getAuth';
 export * from './withClerkMiddleware';
-export * from './redirect';
+export { redirectToSignUp, redirectToSignIn } from './redirect';
 
 export { auth } from '../app-router/server/auth';
 export { currentUser } from '../app-router/server/currentUser';
