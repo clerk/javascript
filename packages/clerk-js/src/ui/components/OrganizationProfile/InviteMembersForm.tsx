@@ -53,7 +53,20 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   });
 
   const {
-    props: { errorText, hasLostFocus, setError, successfulText, setSuccessful, ...restEmailAddressProps },
+    props: {
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      enableErrorAfterBlur,
+      errorText,
+      hasLostFocus,
+      isFocused,
+      setError,
+      setWarning,
+      setSuccessful,
+      successfulText,
+      warningText,
+      /* eslint-enable @typescript-eslint/no-unused-vars */
+      ...restEmailAddressProps
+    },
   } = emailAddressField;
 
   const roleField = useFormControl('role', 'basic_member', {
