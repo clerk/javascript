@@ -89,9 +89,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
-      profileImageUrl={
-        experimental_enableClerkImages ? signIn.userData.experimental_imageUrl : signIn.userData.profileImageUrl
-      }
+      profileImageUrl={experimental_enableClerkImages ? signIn.userData.imageUrl : signIn.userData.profileImageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
     >
       {isResettingPassword(signIn) && (

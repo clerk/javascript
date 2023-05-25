@@ -12,7 +12,8 @@ interface EncodedImageData {
 }
 
 export const isDefaultImage = (url: string) => {
-  // TODO: Remove this check when renaming experimental_imageUrl to imageUrl
+  // TODO: Next person who touches this util should check
+  // whether this check is still necessary :)
   if ((url || '').includes('gravatar')) {
     return true;
   }

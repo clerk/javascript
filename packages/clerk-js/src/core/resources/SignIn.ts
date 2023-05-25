@@ -246,7 +246,6 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = deepSnakeToCamel(data.user_data || {}) as UserData;
-      this.userData.experimental_imageUrl = (data.user_data || {}).image_url;
     }
     return this;
   }

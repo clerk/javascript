@@ -83,9 +83,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
-      profileImageUrl={
-        experimental_enableClerkImages ? signIn.userData.experimental_imageUrl : signIn.userData.profileImageUrl
-      }
+      profileImageUrl={experimental_enableClerkImages ? signIn.userData.imageUrl : signIn.userData.profileImageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
       onIdentityPreviewEditClicked={goBack}

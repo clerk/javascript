@@ -90,9 +90,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
         resendButton={localizationKeys('signIn.emailLink.resendButton')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
-        profileImageUrl={
-          experimental_enableClerkImages ? signIn.userData.experimental_imageUrl : signIn.userData.profileImageUrl
-        }
+        profileImageUrl={experimental_enableClerkImages ? signIn.userData.imageUrl : signIn.userData.profileImageUrl}
         onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       />
     </Flow.Part>
