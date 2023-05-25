@@ -45,7 +45,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "jest",
