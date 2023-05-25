@@ -16,7 +16,6 @@ env:
   CI_REPO_NAME: javascript
   CI_REPO_OWNER: clerkinc
   NPM_VERSION: 8.19.0
-  TURBO_CACHE_DIR: .turbo
   # TURBO_CONCURRENCY: 2
 
 jobs:
@@ -50,15 +49,9 @@ jobs:
             ${{ runner.os }}-node-modules-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-
 
       - name: Cache Turborepo outputs
-        id: cache-turbo
-        uses: actions/cache@v3
+        uses: dtinth/setup-github-actions-caching-for-turbo@v1
         with:
-          path: ${{ env.TURBO_CACHE_DIR }}
-          key: ${{ runner.os }}-turbo-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-${{ env.CACHE_VERSION }}-${{ github.ref	}}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-${{ env.CACHE_VERSION }}-${{ github.ref	}}-
-            ${{ runner.os }}-turbo-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-${{ env.CACHE_VERSION }}-
-            ${{ runner.os }}-turbo-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-
+          cache-prefix: ${{ runner.os }}-turbo-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-
 
       - name: Install npm@${{ env.NPM_VERSION }}
         run: npm i -g npm@${{ env.NPM_VERSION }}
@@ -68,7 +61,7 @@ jobs:
         run: npm install # --prefer-offline
 
       - name: Build packages
-        run: npm run build -- --cache-dir=${{ env.TURBO_CACHE_DIR }}
+        run: npm run build
 
       - name: Run tests
-        run: npm run test -- --cache-dir=${{ env.TURBO_CACHE_DIR }}
+        run: npm run test
