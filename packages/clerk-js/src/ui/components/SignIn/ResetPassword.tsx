@@ -95,6 +95,15 @@ export const _ResetPassword = () => {
           onSubmit={resetPassword}
           onBlur={validateForm}
         >
+          {/* For password managers */}
+          <input
+            readOnly
+            data-testid='hidden-identifier'
+            id='identifier-field'
+            name='identifier'
+            value={signIn.identifier || ''}
+            style={{ display: 'none' }}
+          />
           <Form.ControlRow elementId={passwordField.id}>
             <Form.Control
               {...passwordField.props}
