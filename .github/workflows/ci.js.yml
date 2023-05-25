@@ -27,6 +27,9 @@ jobs:
       matrix:
         node-version: [16.19, 18.15, 19.8]
 
+    env:
+      NODE_VERSION: ${{ matrix.node-version }}
+
     steps:
       - name: Checkout ${{ env.CI_REPO_OWNER }}/${{ env.CI_REPO_NAME }}
         uses: actions/checkout@v3
@@ -45,8 +48,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-${{ env.CACHE_VERSION }}-
             ${{ runner.os }}-node-modules-${{ matrix.node-version }}-${{ env.NPM_VERSION }}-
-
-              ${{ github.sha }}
 
       - name: Cache Turborepo outputs
         id: cache-turbo

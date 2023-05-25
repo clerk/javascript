@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 import { buildClerkProps, getAuth } from '../server';
 
 const buildRequestLike = () => {
-  return new NextRequest('https://fooplaceholder.com', { headers: headers() });
+  return new NextRequest('https://placeholder.com', { headers: headers() });
 };
 
 export const auth = () => {
