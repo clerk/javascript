@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.19.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.19.0-staging.1...@clerk/nextjs@4.19.0) (2023-05-26)
+
+**Note:** Version bump only for package @clerk/nextjs
+
 ### [4.18.5](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.18.5-staging.0...@clerk/nextjs@4.18.5) (2023-05-26)
 
 **Note:** Version bump only for package @clerk/nextjs
