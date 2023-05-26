@@ -164,7 +164,6 @@ export type SignUpCreateParams = Partial<
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;
-    captchaToken?: string;
     unsafeMetadata: SignUpUnsafeMetadata;
     ticket: string;
   } & SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>

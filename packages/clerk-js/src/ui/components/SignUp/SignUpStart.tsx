@@ -244,7 +244,6 @@ function _SignUpStart(): JSX.Element {
             to continue to {displayConfig.applicationName}
           </Header.Subtitle>
         </Header.Root>
-
         <Flex
           direction='col'
           elementDescriptor={descriptors.main}

@@ -99,7 +99,6 @@ export const SignUpForm = (props: SignUpFormProps) => {
           />
         </Form.ControlRow>
       )}
-
       <Form.SubmitButton>Continue</Form.SubmitButton>
     </Form.Root>
   );

@@ -569,6 +569,8 @@ export const enUS: LocalizationResource = {
   },
   unstable__errors: {
     form_identifier_not_found: '',
+    invalid_captcha:
+      'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     form_password_pwned:
       'This password has been found as part of a breach and can not be used, please try another password instead.',
     form_username_invalid_length: '',

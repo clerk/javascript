@@ -137,7 +137,6 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public __internal_country?: string | null;
-  public isCaptchaEnabled?: boolean = false;
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
 
@@ -198,6 +197,18 @@ export default class Clerk implements ClerkInterface {
     return this.#instanceType;
   }
 
+  get isStandardBrowser() {
+    return this.#options.standardBrowser;
+  }
+
+  get isCaptchaEnabled(): boolean {
+    if (this.#environment) {
+      return this.#environment.userSettings.signUp.captcha_enabled;
+    }
+
+    return false;
+  }
+
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
@@ -230,10 +241,6 @@ export default class Clerk implements ClerkInterface {
   public getFapiClient = (): FapiClient => this.#fapiClient;
 
   public isReady = (): boolean => this.#isReady;
-
-  public isStandardBrowser = (): boolean => {
-    return this.#options.standardBrowser as boolean;
-  };
 
   public load = async (options?: ClerkOptions): Promise<void> => {
     if (this.#isReady) {
@@ -857,20 +864,7 @@ export default class Clerk implements ClerkInterface {
 
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
-    // const isCaptchaEnabled = userSettings.signUp.captcha_enabled;
     if (userNeedsToBeCreated) {
-      // const fields = {
-      //   transfer: true,
-      // } as any;
-
-      // if (isCaptchaEnabled) {
-      //   const captchaToken = getClerkQueryParam('__clerk_captcha_token');
-
-      //   if (captchaToken) {
-      //     fields.captchaToken = captchaToken;
-      //   }
-      // }
-
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
@@ -1237,9 +1231,6 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
-    if (this.#environment) {
-      this.isCaptchaEnabled = this.#environment.userSettings.signUp.captcha_enabled;
-    }
     this.#handleImpersonationFab();
     return true;
   };

@@ -419,11 +419,6 @@ export interface Clerk {
    * Returns true if bootstrapping with Clerk.load has completed successfully. Otherwise, returns false.
    */
   isReady: () => boolean;
-
-  /**
-   * Returns true if Clerk is loaded from a browser. Otherwise, returns false.
-   */
-  isStandardBrowser: () => boolean;
 }
 
 export type HandleOAuthCallbackParams = {

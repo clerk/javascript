@@ -22,24 +22,19 @@ export async function loadCaptcha() {
         globalObject: window.turnstile,
       }),
     );
-  }).then(() => {
-    const turnstile = window.turnstile;
-
-    console.log('captcha loaded');
-    return turnstile;
-  });
+  }).then(() => window.turnstile);
 }
 
 export const getCaptchaToken = async () => {
-  let captchaToken = '' as string | unknown;
-  const SITE_KEY = '0x4AAAAAAAFHxLeVBtmN8VhF'; // staging sitekey
-  // const SITE_KEY = '1x00000000000000000000AA'; // test sitekey
+  let captchaToken = '';
+  const SITE_KEY = '0x4AAAAAAAFHxLeVBtmN8VhF';
+
   const div = document.createElement('div');
   div.classList.add('clerk-captcha');
   document.body.appendChild(div);
   const captcha = await loadCaptcha();
 
-  const handleCaptchaTokenGeneration = () => {
+  const handleCaptchaTokenGeneration = (): Promise<string> => {
     return new Promise((resolve, reject) => {
       return captcha.execute('.clerk-captcha', {
         sitekey: SITE_KEY,
@@ -48,7 +43,6 @@ export const getCaptchaToken = async () => {
         },
         'error-callback': function (err) {
           reject(err);
-          console.log(err);
         },
       });
     });

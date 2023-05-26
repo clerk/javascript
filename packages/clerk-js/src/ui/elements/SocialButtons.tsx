@@ -16,7 +16,7 @@ export type SocialButtonsProps = React.PropsWithChildren<{
 }>;
 
 type SocialButtonsRootProps = SocialButtonsProps & {
-  oauthCallback: (strategy: OAuthStrategy, captchaToken?: string) => Promise<unknown>;
+  oauthCallback: (strategy: OAuthStrategy) => Promise<unknown>;
   web3Callback: (strategy: Web3Strategy) => Promise<unknown>;
 };
 

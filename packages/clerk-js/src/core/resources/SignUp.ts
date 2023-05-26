@@ -66,14 +66,14 @@ export class SignUp extends BaseResource implements SignUpResource {
   }
 
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
-    let captchaToken = '' as string | unknown;
-    const { isStandardBrowser, isCaptchaEnabled } = SignUp.clerk;
+    let captchaToken = '';
+    const { isStandardBrowser, isCaptchaEnabled, instanceType } = SignUp.clerk;
 
-    if (isCaptchaEnabled && isStandardBrowser()) {
+    if (isCaptchaEnabled && isStandardBrowser && instanceType === 'production') {
       captchaToken = await getCaptchaToken();
     }
 
-    return await this._basePost({
+    return this._basePost({
       path: this.pathRoot,
       body: normalizeUnsafeMetadata(captchaToken ? { ...params, captchaToken } : params),
     });
