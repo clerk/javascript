@@ -15,7 +15,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useCaptchaToken, useLoadingStatus, usePasswordComplexity } from '../../hooks';
+import { useLoadingStatus, usePasswordComplexity } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, useFormControl } from '../../utils';
@@ -41,7 +41,6 @@ function _SignUpStart(): JSX.Element {
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
-  const { isCaptchaEnabled, widgetProps, handleCaptchaWithCallback, captchaToken } = useCaptchaToken();
 
   const {
     userSettings: { passwordSettings },
@@ -140,12 +139,6 @@ function _SignUpStart(): JSX.Element {
     void handleTokenFlow();
   }, []);
 
-  React.useLayoutEffect(() => {
-    if (isCaptchaEnabled) {
-      void handleCaptchaWithCallback();
-    }
-  }, []);
-
   React.useEffect(() => {
     async function handleOauthError() {
       const error = signUp.verifications.externalAccount.error;
@@ -206,16 +199,6 @@ function _SignUpStart(): JSX.Element {
       fieldsToSubmit.push(formState['phoneNumber']);
     }
 
-    if (isCaptchaEnabled && captchaToken) {
-      const captchaState = {
-        id: 'captchaToken',
-        value: captchaToken,
-        setError: () => undefined,
-      };
-
-      fieldsToSubmit.push(captchaState as any);
-    }
-
     card.setLoading();
     card.setError(undefined);
 
@@ -261,8 +244,6 @@ function _SignUpStart(): JSX.Element {
             to continue to {displayConfig.applicationName}
           </Header.Subtitle>
         </Header.Root>
-
-        {isCaptchaEnabled && <div {...widgetProps} />}
 
         <Flex
           direction='col'

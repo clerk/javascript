@@ -21,7 +21,7 @@ import type {
   StartMagicLinkFlowParams,
 } from '@clerk/types';
 
-import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import { generateSignatureWithMetamask, getCaptchaToken, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   clerkInvalidFAPIResponse,
@@ -65,10 +65,17 @@ export class SignUp extends BaseResource implements SignUpResource {
     this.fromJSON(data);
   }
 
-  create = (params: SignUpCreateParams): Promise<SignUpResource> => {
-    return this._basePost({
+  create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
+    let captchaToken = '' as string | unknown;
+    const { isStandardBrowser, isCaptchaEnabled } = SignUp.clerk;
+
+    if (isCaptchaEnabled && isStandardBrowser()) {
+      captchaToken = await getCaptchaToken();
+    }
+
+    return await this._basePost({
       path: this.pathRoot,
-      body: normalizeUnsafeMetadata(params),
+      body: normalizeUnsafeMetadata(captchaToken ? { ...params, captchaToken } : params),
     });
   };
 
@@ -192,7 +199,6 @@ export class SignUp extends BaseResource implements SignUpResource {
     continueSignUp = false,
     unsafeMetadata,
     emailAddress,
-    captchaToken,
   }: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata }): Promise<void> => {
     const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
       continueSignUp && this.id ? this.update(args) : this.create(args);
@@ -203,7 +209,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       actionCompleteRedirectUrl: redirectUrlComplete,
       unsafeMetadata,
       emailAddress,
-      captchaToken,
     });
 
     const { externalAccount } = verifications;

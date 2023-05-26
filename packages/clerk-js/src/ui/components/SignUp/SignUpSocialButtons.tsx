@@ -26,14 +26,13 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   return (
     <SocialButtons
       {...rest}
-      oauthCallback={(strategy: OAuthStrategy, captchaToken = '') => {
+      oauthCallback={(strategy: OAuthStrategy) => {
         return signUp
           .authenticateWithRedirect({
             strategy,
             redirectUrl,
             redirectUrlComplete,
             continueSignUp,
-            captchaToken,
           })
           .catch(err => handleError(err, [], card.setError));
       }}

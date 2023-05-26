@@ -20,4 +20,3 @@ export * from './getRelativeToNowDateKey';
 export * from './mergeRefs';
 export * from './createSlug';
 export * from './zxcvbn';
-export * from './captcha';

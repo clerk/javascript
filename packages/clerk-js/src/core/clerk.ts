@@ -137,6 +137,7 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public __internal_country?: string | null;
+  public isCaptchaEnabled?: boolean = false;
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
 
@@ -792,7 +793,7 @@ export default class Clerk implements ClerkInterface {
       return;
     }
     const { signIn, signUp } = this.client;
-    const { userSettings, displayConfig } = this.#environment;
+    const { displayConfig } = this.#environment;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
     const su = {
@@ -856,21 +857,21 @@ export default class Clerk implements ClerkInterface {
 
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
-    const isCaptchaEnabled = userSettings.signUp.captcha_enabled;
+    // const isCaptchaEnabled = userSettings.signUp.captcha_enabled;
     if (userNeedsToBeCreated) {
-      const fields = {
-        transfer: true,
-      } as any;
+      // const fields = {
+      //   transfer: true,
+      // } as any;
 
-      if (isCaptchaEnabled) {
-        const captchaToken = getClerkQueryParam('__clerk_captcha_token');
+      // if (isCaptchaEnabled) {
+      //   const captchaToken = getClerkQueryParam('__clerk_captcha_token');
 
-        if (captchaToken) {
-          fields.captchaToken = captchaToken;
-        }
-      }
+      //   if (captchaToken) {
+      //     fields.captchaToken = captchaToken;
+      //   }
+      // }
 
-      const res = await signUp.create(fields);
+      const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
           return this.setActive({
@@ -1236,6 +1237,9 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
+    if (this.#environment) {
+      this.isCaptchaEnabled = this.#environment.userSettings.signUp.captcha_enabled;
+    }
     this.#handleImpersonationFab();
     return true;
   };
