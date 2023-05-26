@@ -10,8 +10,8 @@ export class Organization {
     readonly createdBy: string,
     readonly createdAt: number,
     readonly updatedAt: number,
-    readonly publicMetadata: Record<string, unknown> | null = {},
-    readonly privateMetadata: Record<string, unknown> = {},
+    readonly publicMetadata: OrganizationPublicMetadata | null = {},
+    readonly privateMetadata: OrganizationPrivateMetadata = {},
     readonly maxAllowedMemberships: number,
   ) {}
 

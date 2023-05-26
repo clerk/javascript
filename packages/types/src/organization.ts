@@ -12,6 +12,15 @@ declare global {
   interface OrganizationPublicMetadata {
     [k: string]: unknown;
   }
+
+  /**
+   * If you want to provide custom types for the organization.privateMetadata object,
+   * simply redeclare this rule in the global namespace.
+   * Every organization object will use the provided type.
+   */
+  interface OrganizationPrivateMetadata {
+    [k: string]: unknown;
+  }
 }
 
 export interface OrganizationResource extends ClerkResource {

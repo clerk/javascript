@@ -5,9 +5,9 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/organizations';
 
-type MetadataParams<TPublic = OrganizationPublicMetadata> = {
+type MetadataParams<TPublic = OrganizationPublicMetadata, TPrivate = OrganizationPrivateMetadata> = {
   publicMetadata?: TPublic;
-  privateMetadata?: Record<string, unknown>;
+  privateMetadata?: TPrivate;
 };
 
 type GetOrganizationListParams = {

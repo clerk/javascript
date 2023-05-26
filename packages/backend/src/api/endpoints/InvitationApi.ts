@@ -7,7 +7,7 @@ const basePath = '/invitations';
 type CreateParams = {
   emailAddress: string;
   redirectUrl?: string;
-  publicMetadata?: Record<string, unknown>;
+  publicMetadata?: UserPublicMetadata;
 };
 
 export class InvitationAPI extends AbstractAPI {
