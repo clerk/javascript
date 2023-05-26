@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect } from 'react';
 
 declare global {
   interface Window {
@@ -15,25 +15,21 @@ export const useAwaitableNavigate = () => {
   const { push } = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const [_, forceUpdate] = useReducer(x => !x, false);
   // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
   const urlKey = pathname + params.toString();
 
   useEffect(() => {
     window.__clerk_nav_ref = (to: string) => {
-      return new Promise(res => {
+      if (to === window.location.href.replace(window.location.origin, '')) {
+        return Promise.resolve();
+      }
+
+      return new Promise<void>(res => {
         if (window.__clerk_nav_resolves_ref) {
           window.__clerk_nav_resolves_ref.push(res);
         } else {
           window.__clerk_nav_resolves_ref = [res];
         }
-
-        if (to === window.location.href) {
-          setTimeout(() => {
-            forceUpdate();
-          }, 100);
-        }
-
         push(to);
       });
     };
