@@ -59,7 +59,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   };
 
   const completeFlow = () => {
-    navigateAfterCreateOrganization();
+    void navigateAfterCreateOrganization();
     if (mode === 'modal') {
       closeCreateOrganization();
     }
