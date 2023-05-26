@@ -1,0 +1,17 @@
+{
+  "sideEffects": false,
+  "imports": {
+    "#components": {
+      "react-server": "./components.server.js",
+      "default": "./components.client.js"
+    },
+    "#server": {
+      "react-server": "./server-helpers.server.js",
+      "edge-light": "./server-helpers.server.js",
+      "worker": "./server-helpers.server.js",
+      "node": "./server-helpers.server.js",
+      "browser": "./server-helpers.client.js",
+      "default": "./server-helpers.client.js"
+    }
+  }
+}

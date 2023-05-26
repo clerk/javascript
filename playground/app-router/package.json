@@ -7,6 +7,7 @@
     "yalc": "yalc add @clerk/nextjs && yalc add @clerk/clerk-react && yalc add @clerk/backend && yalc add @clerk/types",
     "dev": "next dev --port 4011",
     "build": "next build",
+    "build:yalc": "npm run yalc && rm -rf .next && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -18,7 +19,7 @@
     "@types/node": "18.16.0",
     "@types/react": "18.0.38",
     "@types/react-dom": "18.0.11",
-    "next": "^13.4.0",
+    "next": "^13.4.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.4"

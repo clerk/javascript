@@ -11,7 +11,7 @@ import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import { receivedRequestForIgnoredRoute } from './errors';
 import { isDevOrStagingUrl, redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
-import { decorateRequest, getCookie, setRequestHeadersOnNextResponse } from './utils';
+import { decorateRequest, setRequestHeadersOnNextResponse } from './utils';
 
 type WithPathPatternWildcard<T> = `${T & string}(.*)`;
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
@@ -217,7 +217,7 @@ const withDefaultPublicRoutes = (publicRoutes: RouteMatcherParam | undefined) =>
 const appendDevBrowserOnDevOrStaging = (req: NextRequest, res: Response) => {
   const location = res.headers.get('location');
   if (!!location && isDevOrStagingUrl(location)) {
-    const dbJwt = getCookie(req, DEV_BROWSER_JWT_MARKER);
+    const dbJwt = req.cookies.get(DEV_BROWSER_JWT_MARKER)?.value;
     const urlWithDevBrowser = setDevBrowserJWTInURL(location, dbJwt);
     return NextResponse.redirect(urlWithDevBrowser, res);
   }

@@ -1,9 +1,8 @@
 {
   "name": "@clerk/nextjs",
-  "version": "4.18.5-staging.0",
+  "version": "4.19.0-staging.0",
   "license": "MIT",
   "description": "Clerk SDK for NextJS",
-  "sideEffects": false,
   "keywords": [
     "clerk",
     "typescript",
@@ -15,47 +14,69 @@
     "jwt"
   ],
   "author": "Clerk",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "api.d.ts",
-    "api.js",
-    "edge-middleware.js",
-    "edge-middleware.d.ts",
-    "server.d.ts",
-    "server.js",
-    "ssr.d.ts",
-    "ssr.js",
-    "app-beta"
-  ],
-  "imports": {
-    "#components": {
-      "react-server": "./dist/components.server.js",
-      "default": "./dist/components.client.js"
+  "sideEffects": false,
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     },
-    "#server": {
-      "react-server": "./dist/server-helpers.server.js",
-      "edge-light": "./dist/server-helpers.server.js",
-      "worker": "./dist/server-helpers.server.js",
-      "node": "./dist/server-helpers.server.js",
-      "browser": "./dist/server-helpers.client.js",
-      "default": "./dist/server-helpers.client.js"
+    "./server": {
+      "types": "./dist/types/server/index.d.ts",
+      "import": "./dist/esm/server/index.js",
+      "require": "./dist/cjs/server/index.js"
+    },
+    "./api": {
+      "types": "./dist/types/api/index.d.ts",
+      "import": "./dist/esm/api/index.js",
+      "require": "./dist/cjs/api/index.js"
+    },
+    "./ssr": {
+      "types": "./dist/types/ssr/index.d.ts",
+      "import": "./dist/esm/ssr/index.js",
+      "require": "./dist/cjs/ssr/index.js"
+    },
+    "./edge-middlewarefiles": {
+      "types": "./dist/types/edge-middleware/index.d.ts",
+      "import": "./dist/esm/edge-middleware/index.js",
+      "require": "./dist/cjs/edge-middleware/index.js"
+    },
+    "./app-beta": {
+      "types": "./dist/types/app-beta/index.d.ts",
+      "import": "./dist/esm/app-beta/index.js",
+      "require": "./dist/cjs/app-beta/index.js"
+    },
+    "./app-beta/client": {
+      "types": "./dist/types/app-beta/client/index.d.ts",
+      "import": "./dist/esm/app-beta/client/index.js",
+      "require": "./dist/cjs/app-beta/client/index.js"
     }
   },
+  "files": [
+    "dist",
+    "server",
+    "api",
+    "edge-middleware",
+    "ssr",
+    "app-beta"
+  ],
   "scripts": {
+    "build": "npm run clean && tsup && npm run build:declarations",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "prepublishOnly": "npm run build",
-    "build": "npm run clean && tsc -p tsconfig.build.json",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "jest",
-    "dev": "tsc -p tsconfig.build.json --watch"
+    "dev": "tsup --watch"
   },
   "dependencies": {
-    "@clerk/backend": "^0.20.1-staging.0",
-    "@clerk/clerk-react": "^4.17.0-staging.0",
-    "@clerk/clerk-sdk-node": "^4.10.2-staging.0",
-    "@clerk/types": "^3.40.0-staging.0",
+    "@clerk/backend": "^0.20.1",
+    "@clerk/clerk-react": "^4.17.0",
+    "@clerk/clerk-sdk-node": "^4.10.2",
+    "@clerk/types": "^3.40.0",
     "path-to-regexp": "6.2.1",
     "tslib": "2.4.1"
   },
