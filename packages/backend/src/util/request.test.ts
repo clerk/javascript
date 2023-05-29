@@ -76,5 +76,21 @@ export default (QUnit: QUnit) => {
       const forwardedHost = 'localhost:4000';
       assert.true(checkCrossOrigin({ originURL, host, forwardedHost }));
     });
+
+    test('is not CO when forwarded port and origin does not contain a port - http', async assert => {
+      const originURL = new URL('http://localhost');
+      const host = new URL('http://localhost').host;
+      const forwardedPort = '80';
+
+      assert.false(checkCrossOrigin({ originURL, host, forwardedPort }));
+    });
+
+    test('is not CO when forwarded port and origin does not contain a port - https', async assert => {
+      const originURL = new URL('https://localhost');
+      const host = new URL('https://localhost').host;
+      const forwardedPort = '443';
+
+      assert.false(checkCrossOrigin({ originURL, host, forwardedPort }));
+    });
   });
 };
