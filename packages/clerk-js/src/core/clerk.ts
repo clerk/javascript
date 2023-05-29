@@ -127,7 +127,6 @@ const defaultOptions: ClerkOptions = {
   afterSignInUrl: undefined,
   afterSignUpUrl: undefined,
   isInterstitial: false,
-  experimental_enableClerkImages: true,
 };
 
 export default class Clerk implements ClerkInterface {

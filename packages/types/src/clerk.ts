@@ -498,10 +498,6 @@ export interface ClerkOptions {
    * @experimental
    */
   isSatellite?: boolean | ((url: URL) => boolean);
-  /**
-   * @experimental
-   */
-  experimental_enableClerkImages?: boolean;
 }
 
 export interface Resources {
