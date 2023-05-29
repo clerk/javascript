@@ -243,7 +243,7 @@ const rgbaTupleToHslaColor = (rgb: ColorTuple): HslaColor => {
     s = delta / (2 - max - min);
   }
 
-  return { h: Math.floor(h), s: Math.floor(s * 100), l: Math.floor(l * 100), a };
+  return { h: Math.floor(h * 100) / 100, s: Math.floor(s * 100), l: Math.floor(l * 100 * 100) / 100, a };
 };
 
 const hwbTupleToHslaColor = (hwb: ColorTuple): HslaColor => {
