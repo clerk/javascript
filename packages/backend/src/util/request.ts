@@ -22,12 +22,14 @@ export function checkCrossOrigin({
     return true;
   }
 
+  const defaultHostProtocol = originURL.protocol;
+
   /* The forwarded host prioritised over host to be checked against the referrer.  */
-  const finalURL = convertHostHeaderValueToURL(forwardedHost || host);
+  const finalURL = convertHostHeaderValueToURL(forwardedHost || host, defaultHostProtocol);
 
-  finalURL.port = forwardedPort || finalURL.port;
+  const finalURLPort = (forwardedPort || finalURL.port || getDefaultPort(forwardedProto || defaultHostProtocol)) ?? '';
 
-  if (finalURL.port !== originURL.port) {
+  if (finalURLPort !== (originURL.port || getDefaultPort(originURL.protocol))) {
     return true;
   }
   if (finalURL.hostname !== originURL.hostname) {
@@ -37,10 +39,17 @@ export function checkCrossOrigin({
   return false;
 }
 
-export function convertHostHeaderValueToURL(host: string): URL {
+export function convertHostHeaderValueToURL(host: string, protocol: string): URL {
   /**
    * The protocol is added for the URL constructor to work properly.
    * We do not check for the protocol at any point later on.
    */
-  return new URL(`https://${host}`);
+  return new URL(`${protocol}//${host}`);
+}
+
+export function getDefaultPort(protocol: string): string | undefined {
+  return {
+    'http:': '80',
+    'https:': '443',
+  }[protocol];
 }
