@@ -2,7 +2,7 @@ import React from 'react';
 
 import { isDefaultImage } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization, useOptions } from '../../contexts';
+import { useCoreOrganization } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -15,7 +15,6 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
   const subtitle = localizationKeys('organizationProfile.profilePage.subtitle');
   const card = useCardState();
   const [avatarChanged, setAvatarChanged] = React.useState(false);
-  const { experimental_enableClerkImages } = useOptions();
   const { organization } = useCoreOrganization();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
@@ -88,15 +87,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
           <OrganizationProfileAvatarUploader
             organization={organization}
             onAvatarChange={uploadAvatar}
-            onAvatarRemove={
-              experimental_enableClerkImages
-                ? isDefaultImage(organization.imageUrl)
-                  ? null
-                  : onAvatarRemove
-                : organization.logoUrl
-                ? onAvatarRemove
-                : null
-            }
+            onAvatarRemove={isDefaultImage(organization.imageUrl) ? null : onAvatarRemove}
           />
           <Form.ControlRow elementId={nameField.id}>
             <Form.Control
