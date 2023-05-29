@@ -92,5 +92,14 @@ export default (QUnit: QUnit) => {
 
       assert.false(checkCrossOrigin({ originURL, host, forwardedPort }));
     });
+
+    test('is not CO based on referrer with forwarded host & port and referer', async assert => {
+      const host = '';
+      const forwardedPort = '80';
+      const forwardedHost = 'example.com';
+      const referrer = 'http://example.com/';
+
+      assert.false(checkCrossOrigin({ originURL: new URL(referrer), host, forwardedPort, forwardedHost }));
+    });
   });
 };
