@@ -24,8 +24,8 @@ type UserListParams = UserCountParams & {
 
 type UserMetadataParams = {
   publicMetadata?: UserPublicMetadata;
-  privateMetadata?: Record<string, unknown>;
-  unsafeMetadata?: Record<string, unknown>;
+  privateMetadata?: UserPrivateMetadata;
+  unsafeMetadata?: UserUnsafeMetadata;
 };
 
 type PasswordHasher =

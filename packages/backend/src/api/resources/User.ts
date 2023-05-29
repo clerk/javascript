@@ -27,7 +27,7 @@ export class User {
     readonly firstName: string | null,
     readonly lastName: string | null,
     readonly publicMetadata: UserPublicMetadata = {},
-    readonly privateMetadata: Record<string, unknown> = {},
+    readonly privateMetadata: UserPrivateMetadata = {},
     readonly unsafeMetadata: UserUnsafeMetadata = {},
     readonly emailAddresses: EmailAddress[] = [],
     readonly phoneNumbers: PhoneNumber[] = [],

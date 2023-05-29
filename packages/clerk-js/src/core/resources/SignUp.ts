@@ -55,7 +55,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   web3wallet: string | null = null;
   externalAccount: any;
   hasPassword = false;
-  unsafeMetadata: Record<string, unknown> = {};
+  unsafeMetadata: SignUpUnsafeMetadata = {};
   createdSessionId: string | null = null;
   createdUserId: string | null = null;
   abandonAt: number | null = null;

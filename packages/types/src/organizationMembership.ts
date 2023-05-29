@@ -11,6 +11,15 @@ declare global {
   interface OrganizationMembershipPublicMetadata {
     [k: string]: unknown;
   }
+
+  /**
+   * If you want to provide custom types for the organizationMembership.publicMetadata
+   * object, simply redeclare this rule in the global namespace.
+   * Every organizationMembership object will use the provided type.
+   */
+  interface OrganizationMembershipPrivateMetadata {
+    [k: string]: unknown;
+  }
 }
 
 export interface OrganizationMembershipResource extends ClerkResource {
