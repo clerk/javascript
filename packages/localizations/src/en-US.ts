@@ -300,6 +300,9 @@ export const enUS: LocalizationResource = {
         destructiveActionSubtitle: 'Remove this connected account from your account',
         destructiveActionAccordionSubtitle: 'Remove connected account',
       },
+      enterpriseAccountsSection: {
+        title: 'Enterprise accounts',
+      },
       passwordSection: {
         title: 'Password',
         primaryButton__changePassword: 'Change password',

@@ -9,6 +9,7 @@ import type { OAuthProvider } from './oauth';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
+import type { SamlIdpSlug } from './saml';
 import type { SessionStatus } from './session';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
@@ -166,7 +167,7 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
  */
 export interface SamlAccountJSON extends ClerkResourceJSON {
   object: 'saml_account';
-  provider: string;
+  provider: SamlIdpSlug;
   email_address: string;
   first_name: string;
   last_name: string;
