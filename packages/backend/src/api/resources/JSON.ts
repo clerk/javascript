@@ -138,8 +138,8 @@ export interface OrganizationJSON extends ClerkResourceJSON {
    * @experimental
    */
   image_url: string;
-  public_metadata: Record<string, unknown> | null;
-  private_metadata?: Record<string, unknown>;
+  public_metadata: OrganizationPublicMetadata | null;
+  private_metadata?: OrganizationPrivateMetadata;
   created_by: string;
   created_at: number;
   updated_at: number;
@@ -149,7 +149,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   email_address: string;
   organization_id: string;
-  public_metadata: Record<string, unknown>;
+  public_metadata: OrganizationInvitationPublicMetadata;
   role: OrganizationMembershipRole;
   status: OrganizationInvitationStatus;
   created_at: number;
@@ -159,8 +159,8 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: ObjectType.OrganizationMembership;
   organization: OrganizationJSON;
-  public_metadata: Record<string, unknown>;
-  private_metadata?: Record<string, unknown>;
+  public_metadata: OrganizationMembershipPublicMetadata;
+  private_metadata?: OrganizationMembershipPrivateMetadata;
   public_user_data: OrganizationMembershipPublicUserDataJSON;
   role: OrganizationMembershipRole;
   created_at: number;
@@ -276,9 +276,9 @@ export interface UserJSON extends ClerkResourceJSON {
   external_accounts: ExternalAccountJSON[];
   external_id: string | null;
   last_sign_in_at: number | null;
-  public_metadata: Record<string, unknown>;
-  private_metadata: Record<string, unknown>;
-  unsafe_metadata: Record<string, unknown>;
+  public_metadata: UserPublicMetadata;
+  private_metadata: UserPrivateMetadata;
+  unsafe_metadata: UserUnsafeMetadata;
   created_at: number;
   updated_at: number;
 }

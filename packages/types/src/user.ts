@@ -26,6 +26,15 @@ declare global {
   }
 
   /**
+   * If you want to provide custom types for the user.privateMetadata object,
+   * simply redeclare this rule in the global namespace.
+   * Every user object will use the provided type.
+   */
+  interface UserPrivateMetadata {
+    [k: string]: unknown;
+  }
+
+  /**
    * If you want to provide custom types for the user.unsafeMetadata object,
    * simply redeclare this rule in the global namespace.
    * Every user object will use the provided type.
