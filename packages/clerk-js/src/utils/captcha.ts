@@ -2,8 +2,9 @@ import { loadScript } from './script';
 
 interface RenderOptions {
   sitekey: string;
-  callback?: (token: string) => void;
-  'error-callback'?: (err: any) => void;
+  retry: string;
+  callback: (token: string) => void;
+  'error-callback': (err: any) => void;
 }
 
 declare global {
@@ -13,6 +14,7 @@ declare global {
 }
 
 const SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+const SITE_KEY = '0x4AAAAAAAFHxLeVBtmN8VhF';
 
 export async function loadCaptcha() {
   return new Promise(resolve => {
@@ -27,7 +29,6 @@ export async function loadCaptcha() {
 
 export const getCaptchaToken = async () => {
   let captchaToken = '';
-  const SITE_KEY = '0x4AAAAAAAFHxLeVBtmN8VhF';
 
   const div = document.createElement('div');
   div.classList.add('clerk-captcha');
@@ -38,6 +39,7 @@ export const getCaptchaToken = async () => {
     return new Promise((resolve, reject) => {
       return captcha.execute('.clerk-captcha', {
         sitekey: SITE_KEY,
+        retry: 'never',
         callback: function (token: string) {
           resolve(token);
         },
@@ -48,9 +50,11 @@ export const getCaptchaToken = async () => {
     });
   };
 
-  captchaToken = await handleCaptchaTokenGeneration();
-
-  if (captchaToken) {
+  try {
+    captchaToken = await handleCaptchaTokenGeneration();
+  } catch (e) {
+    console.warn(e);
+  } finally {
     document.body.removeChild(div);
   }
 

@@ -197,13 +197,13 @@ export default class Clerk implements ClerkInterface {
     return this.#instanceType;
   }
 
-  get isStandardBrowser() {
-    return this.#options.standardBrowser;
-  }
-
-  get isCaptchaEnabled(): boolean {
+  get canUseCaptcha(): boolean | undefined {
     if (this.#environment) {
-      return this.#environment.userSettings.signUp.captcha_enabled;
+      return (
+        this.#environment.userSettings.signUp.captcha_enabled &&
+        this.#options.standardBrowser &&
+        this.#instanceType === 'production'
+      );
     }
 
     return false;

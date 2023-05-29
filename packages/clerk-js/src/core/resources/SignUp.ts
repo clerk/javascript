@@ -67,9 +67,9 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
     let captchaToken = '';
-    const { isStandardBrowser, isCaptchaEnabled, instanceType } = SignUp.clerk;
+    const { canUseCaptcha } = SignUp.clerk;
 
-    if (isCaptchaEnabled && isStandardBrowser && instanceType === 'production') {
+    if (canUseCaptcha) {
       captchaToken = await getCaptchaToken();
     }
 
