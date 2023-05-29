@@ -124,6 +124,37 @@ describe('RootPage', () => {
       expect(externalAccountButton.closest('button')).not.toBeNull();
     });
 
+    it('shows the enterprise accounts of the user', async () => {
+      const emailAddress = 'george@jungle.com';
+      const firstName = 'George';
+      const lastName = 'Clerk';
+
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSaml();
+        f.withUser({
+          email_addresses: [emailAddress],
+          saml_accounts: [
+            {
+              id: 'samlacc_foo',
+              provider: 'saml_okta',
+              email_address: emailAddress,
+              first_name: firstName,
+              last_name: lastName,
+            },
+          ],
+          first_name: firstName,
+          last_name: lastName,
+        });
+      });
+      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
+
+      render(<RootPage />, { wrapper });
+      await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
+      screen.getByText(/Enterprise Accounts/i);
+      screen.getByText(/Okta Workforce/i);
+    });
+
     it('shows the active devices of the user and has appropriate buttons', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });

@@ -333,6 +333,9 @@ type _LocalizationResource = {
         destructiveActionSubtitle: LocalizationValue;
         destructiveActionAccordionSubtitle: LocalizationValue;
       };
+      enterpriseAccountsSection: {
+        title: LocalizationValue;
+      };
       passwordSection: {
         title: LocalizationValue;
         primaryButton__changePassword: LocalizationValue;

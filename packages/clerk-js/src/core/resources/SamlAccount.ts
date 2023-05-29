@@ -1,4 +1,4 @@
-import type { SamlAccountJSON, SamlAccountResource, VerificationResource } from '@clerk/types';
+import type { SamlAccountJSON, SamlAccountResource, SamlIdpSlug, VerificationResource } from '@clerk/types';
 
 import { BaseResource } from './Base';
 import { Verification } from './Verification';
@@ -8,7 +8,7 @@ import { Verification } from './Verification';
  */
 export class SamlAccount extends BaseResource implements SamlAccountResource {
   id!: string;
-  provider = '';
+  provider: SamlIdpSlug = 'saml_custom';
   emailAddress = '';
   firstName = '';
   lastName = '';

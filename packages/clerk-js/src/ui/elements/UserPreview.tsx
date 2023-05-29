@@ -1,4 +1,4 @@
-import type { ExternalAccountResource, UserPreviewId, UserResource } from '@clerk/types';
+import type { ExternalAccountResource, SamlAccountResource, UserPreviewId, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { getFullName, getIdentifier } from '../../utils/user';
@@ -6,6 +6,11 @@ import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Text, useLocalizations } from '../customizables';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { UserAvatar } from './UserAvatar';
+
+// TODO Make this accept an interface with the superset of fields in:
+// - User
+// - ExternalAccountResource
+// - SamlAccountResource
 
 export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'elementId'> & {
   size?: 'lg' | 'md' | 'sm';
@@ -22,10 +27,17 @@ export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'el
     | {
         user?: Partial<UserResource>;
         externalAccount?: null | undefined;
+        samlAccount?: null | undefined;
       }
     | {
         user?: null | undefined;
         externalAccount?: Partial<ExternalAccountResource>;
+        samlAccount?: null | undefined;
+      }
+    | {
+        user?: null | undefined;
+        externalAccount?: null | undefined;
+        samlAccount?: Partial<SamlAccountResource>;
       }
   );
 
@@ -33,6 +45,7 @@ export const UserPreview = (props: UserPreviewProps) => {
   const {
     user,
     externalAccount,
+    samlAccount,
     size = 'md',
     showAvatar = true,
     icon,
@@ -47,8 +60,8 @@ export const UserPreview = (props: UserPreviewProps) => {
     ...rest
   } = props;
   const { t } = useLocalizations();
-  const name = getFullName({ ...user }) || getFullName({ ...externalAccount });
-  const identifier = getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.();
+  const name = getFullName({ ...user }) || getFullName({ ...externalAccount }) || getFullName({ ...samlAccount });
+  const identifier = getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.() || samlAccount?.emailAddress;
   const localizedTitle = t(title);
 
   const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
@@ -74,6 +87,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             imageElementDescriptor={descriptors.userPreviewAvatarImage}
             {...user}
             {...externalAccount}
+            {...samlAccount}
             name={name}
             avatarUrl={imageUrl}
             size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
