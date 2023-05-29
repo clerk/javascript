@@ -197,7 +197,7 @@ export default class Clerk implements ClerkInterface {
     return this.#instanceType;
   }
 
-  get canUseCaptcha(): boolean | undefined {
+  get experimental_canUseCaptcha(): boolean | undefined {
     if (this.#environment) {
       return (
         this.#environment.userSettings.signUp.captcha_enabled &&
@@ -207,6 +207,14 @@ export default class Clerk implements ClerkInterface {
     }
 
     return false;
+  }
+
+  get experimental_captchaSiteKey(): string | null {
+    if (this.#environment) {
+      return this.#environment.displayConfig.captchaPublicKey;
+    }
+
+    return null;
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {
