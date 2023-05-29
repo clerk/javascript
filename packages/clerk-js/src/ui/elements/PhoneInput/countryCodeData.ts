@@ -54,7 +54,7 @@ const data = [
   ['Central African Republic', 'cf', '236'],
   ['Chad', 'td', '235'],
   ['Chile', 'cl', '56'],
-  ['China', 'cn', '86', '..-........'],
+  ['China', 'cn', '86', '...-....-....'],
   ['Colombia', 'co', '57'],
   ['Comoros', 'km', '269'],
   ['Congo', 'cd', '243'],
