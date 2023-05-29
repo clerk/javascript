@@ -2,7 +2,7 @@ import type { PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
+import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
@@ -34,7 +34,6 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   const { setActive } = useCoreClerk();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
-  const { experimental_enableClerkImages } = useOptions();
 
   React.useEffect(() => {
     if (props.factorAlreadyPrepared) {
@@ -89,7 +88,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
-      profileImageUrl={experimental_enableClerkImages ? signIn.userData.imageUrl : signIn.userData.profileImageUrl}
+      profileImageUrl={signIn.userData.imageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
     >
       {isResettingPassword(signIn) && (

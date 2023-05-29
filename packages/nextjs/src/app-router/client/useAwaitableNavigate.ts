@@ -20,7 +20,11 @@ export const useAwaitableNavigate = () => {
 
   useEffect(() => {
     window.__clerk_nav_ref = (to: string) => {
-      return new Promise(res => {
+      if (to === window.location.href.replace(window.location.origin, '')) {
+        return Promise.resolve();
+      }
+
+      return new Promise<void>(res => {
         if (window.__clerk_nav_resolves_ref) {
           window.__clerk_nav_resolves_ref.push(res);
         } else {

@@ -2,7 +2,6 @@ import type { ExternalAccountResource, UserPreviewId, UserResource } from '@cler
 import React from 'react';
 
 import { getFullName, getIdentifier } from '../../utils/user';
-import { useOptions } from '../contexts';
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Text, useLocalizations } from '../customizables';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
@@ -47,17 +46,12 @@ export const UserPreview = (props: UserPreviewProps) => {
     avatarSx,
     ...rest
   } = props;
-  const { experimental_enableClerkImages } = useOptions();
   const { t } = useLocalizations();
   const name = getFullName({ ...user }) || getFullName({ ...externalAccount });
   const identifier = getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.();
   const localizedTitle = t(title);
 
-  const externalAccountImageUrl = experimental_enableClerkImages
-    ? externalAccount?.imageUrl
-    : externalAccount?.avatarUrl;
-  const userImageUrl = experimental_enableClerkImages ? user?.imageUrl : user?.profileImageUrl;
-  const imageUrl = imageUrlProp || userImageUrl || externalAccountImageUrl;
+  const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
 
   return (
     <Flex

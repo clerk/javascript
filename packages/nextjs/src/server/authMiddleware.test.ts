@@ -54,7 +54,9 @@ const mockRequest = (url: string, appendDevBrowserCookie = false) => {
   return {
     url: new URL(url, 'https://www.clerk.com').toString(),
     nextUrl: new URL(url, 'https://www.clerk.com'),
-    cookies: (appendDevBrowserCookie ? { __clerk_db_jwt: 'test_jwt' } : {}) as any,
+    cookies: {
+      get: () => (appendDevBrowserCookie ? { name: '__clerk_db_jwt', value: 'test_jwt' } : {}) as any,
+    },
     headers: new Headers(),
   } as NextRequest;
 };
