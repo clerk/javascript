@@ -2,7 +2,7 @@ import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
+import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Footer, Form, Header, IdentityPreview, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -50,7 +50,6 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const supportEmail = useSupportEmail();
   const passwordControl = usePasswordControl(props);
   const { navigate } = useRouter();
-  const { experimental_enableClerkImages } = useOptions();
   const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
   const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
 
@@ -89,7 +88,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         </Header.Root>
         <IdentityPreview
           identifier={signIn.identifier}
-          avatarUrl={experimental_enableClerkImages ? signIn.userData.imageUrl : signIn.userData.profileImageUrl}
+          avatarUrl={signIn.userData.imageUrl}
           onClick={goBack}
         />
         {/*TODO: extract main in its own component */}
