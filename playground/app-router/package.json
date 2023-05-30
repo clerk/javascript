@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev1": "npm run yalc && rm -rf .next && next dev --port 4011",
+    "dev:yalc": "npm run yalc && rm -rf .next && next dev --port 4011",
     "yalc": "yalc add @clerk/nextjs && yalc add @clerk/clerk-react && yalc add @clerk/backend && yalc add @clerk/types",
     "dev": "next dev --port 4011",
     "build": "next build",
