@@ -78,7 +78,7 @@ function useFormTextAnimation() {
       }
       return t => ({
         animation: `${enterAnimation ? animations.inAnimation : animations.outAnimation} ${
-          t.transitionDuration.$slower
+          t.transitionDuration.$textField
         } ${t.transitionTiming.$common}`,
         transition: `height ${t.transitionDuration.$slow}  ${t.transitionTiming.$common}`, // This is expensive but required for a smooth layout shift
       });
@@ -121,12 +121,14 @@ type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debo
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
 };
 
+const delay = 350;
+
 export const FormFeedback = (props: FormFeedbackProps) => {
   const { id, elementDescriptors } = props;
-  const errorMessage = useFieldMessageVisibility(props.errorText, 200);
-  const successMessage = useFieldMessageVisibility(props.successfulText, 200);
-  const informationMessage = useFieldMessageVisibility(props.informationText, 200);
-  const warningMessage = useFieldMessageVisibility(props.warningText, 200);
+  const errorMessage = useFieldMessageVisibility(props.errorText, delay);
+  const successMessage = useFieldMessageVisibility(props.successfulText, delay);
+  const informationMessage = useFieldMessageVisibility(props.informationText, delay);
+  const warningMessage = useFieldMessageVisibility(props.warningText, delay);
 
   const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
@@ -250,7 +252,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     skipBlur: submittedWithEnter,
   });
 
-  const errorMessage = useFieldMessageVisibility(debouncedState.errorText, 200);
+  const errorMessage = useFieldMessageVisibility(debouncedState.errorText, delay);
 
   const ActionLabel = actionLabel ? (
     <Link
