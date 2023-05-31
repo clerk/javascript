@@ -87,7 +87,7 @@ export default (QUnit: QUnit) => {
 
     test('is not CO when forwarded port and origin does not contain a port - https', assert => {
       const originURL = new URL('https://localhost');
-      const host = new URL('https://localhost').host;
+      const host = originURL.host;
       const forwardedPort = '443';
 
       assert.false(checkCrossOrigin({ originURL, host, forwardedPort }));
@@ -100,6 +100,17 @@ export default (QUnit: QUnit) => {
       const referrer = 'http://example.com/';
 
       assert.false(checkCrossOrigin({ originURL: new URL(referrer), host, forwardedPort, forwardedHost }));
+    });
+
+    test('is not CO for AWS', assert => {
+      const options = {
+        originURL: new URL('https://main.d38v5rl8fqcx2i.amplifyapp.com'),
+        host: 'prod.eu-central-1.gateway.amplify.aws.dev',
+        forwardedPort: '443,80',
+        forwardedHost: 'main.d38v5rl8fqcx2i.amplifyapp.com',
+        forwardedProto: 'https,http',
+      };
+      assert.false(checkCrossOrigin(options));
     });
   });
 };
