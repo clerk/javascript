@@ -54,7 +54,6 @@ describe('PathRouter', () => {
   beforeAll(() => {
     // @ts-ignore
     delete window.location;
-    history.replaceState = jest.fn();
   });
 
   afterAll(() => {

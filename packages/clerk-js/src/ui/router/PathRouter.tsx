@@ -38,8 +38,7 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
     const convertHashToPath = async () => {
       if (hasUrlInFragment(window.location.hash)) {
         const url = mergeFragmentIntoUrl(new URL(window.location.href));
-        window.history.replaceState(window.history.state, '', url.href);
-        await internalNavigate(url.href); // make this navigation as well since replaceState is asynchronous
+        await internalNavigate(url.href);
         setStripped(true);
       }
     };
