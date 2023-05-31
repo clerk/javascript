@@ -1,4 +1,4 @@
-import { act, render, screen, userEvent } from '@clerk/shared/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 
 import type Clerk from '../../../core/clerk';
@@ -71,10 +71,11 @@ describe('PathRouter', () => {
     });
 
     it('adds the hash path to the primary path', async () => {
-      await act(async () => {
-        render(<Tester />);
+      render(<Tester />);
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/foo/bar');
       });
-      expect(mockNavigate).toHaveBeenNthCalledWith(1, '/foo/bar');
     });
   });
 
@@ -86,19 +87,19 @@ describe('PathRouter', () => {
 
     it('preserves the param for internal navigation', async () => {
       render(<Tester />);
-      await act(async () => {
-        const button = screen.getByRole('button', { name: /Internal/i });
-        await userEvent.click(button);
-      });
+
+      const button = screen.getByRole('button', { name: /Internal/i });
+      await userEvent.click(button);
+
       expect(mockNavigate).toHaveBeenNthCalledWith(1, '/foo/baz?preserved=1');
     });
 
     it('removes the param for external navigation', async () => {
       render(<Tester />);
-      await act(async () => {
-        const button = screen.getByRole('button', { name: /External/i });
-        await userEvent.click(button);
-      });
+
+      const button = screen.getByRole('button', { name: /External/i });
+      await userEvent.click(button);
+
       expect(mockNavigate).toHaveBeenNthCalledWith(1, 'https://www.example.com/');
     });
   });
