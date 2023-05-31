@@ -2,29 +2,43 @@ import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk
 import React from 'react';
 
 import { useCoreClerk } from '../contexts';
-import { Flow } from '../customizables';
-import { LoadingCard } from '../elements';
+import { Flow, Text } from '../customizables';
+import { Card, CardAlert, LoadingCardContainer, useCardState, withCardStateProvider } from '../elements';
 import { useRouter } from '../router';
+import { handleError } from '../utils';
 
-export const SSOCallback = (props: HandleOAuthCallbackParams | HandleSamlCallbackParams) => {
+export const SSOCallback = withCardStateProvider<HandleOAuthCallbackParams | HandleSamlCallbackParams>(props => {
+  return (
+    <Flow.Part part='ssoCallback'>
+      <SSOCallbackCard {...props} />
+    </Flow.Part>
+  );
+});
+
+export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCallbackParams) => {
   const { handleRedirectCallback } = useCoreClerk();
   const { navigate } = useRouter();
+  const card = useCardState();
 
   React.useEffect(() => {
-    handleRedirectCallback({ ...props }, navigate).catch(() => {
-      // This error is caused when the host app is using React18
-      // and strictMode is enabled. This useEffects runs twice because
-      // the clerk-react ui components mounts, unmounts and mounts again
-      // so the clerk-js component loses its state because of the custom
-      // unmount callback we're using.
-      // This needs to be solved by tweaking the logic in uiComponents.tsx
-      // or by making handleRedirectCallback idempotent
+    let timeoutId: ReturnType<typeof setTimeout>;
+    handleRedirectCallback({ ...props }, navigate).catch(e => {
+      handleError(e, [], card.setError);
+      timeoutId = setTimeout(() => void navigate('../'), 4000);
     });
-  }, []);
+
+    return () => clearTimeout(timeoutId);
+  }, [handleError, handleRedirectCallback]);
 
   return (
     <Flow.Part part='ssoCallback'>
-      <LoadingCard />
+      <Card>
+        <CardAlert>{card.error}</CardAlert>
+        <LoadingCardContainer>
+          {/*TODO: Localize this text*/}
+          <Text>We're redirecting you</Text>
+        </LoadingCardContainer>
+      </Card>
     </Flow.Part>
   );
 };
