@@ -47,6 +47,7 @@ export type SignInData = {
 export type SignUpData = {
   allowlist_only: boolean;
   progressive: boolean;
+  captcha_enabled: boolean;
 };
 
 export type PasswordSettingsData = {

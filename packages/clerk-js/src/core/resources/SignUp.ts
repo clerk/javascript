@@ -21,7 +21,7 @@ import type {
   StartMagicLinkFlowParams,
 } from '@clerk/types';
 
-import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import { generateSignatureWithMetamask, getCaptchaToken, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   clerkInvalidFAPIResponse,
@@ -65,10 +65,17 @@ export class SignUp extends BaseResource implements SignUpResource {
     this.fromJSON(data);
   }
 
-  create = (params: SignUpCreateParams): Promise<SignUpResource> => {
+  create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
+    let captchaToken = '';
+    const { experimental_canUseCaptcha, experimental_captchaSiteKey } = SignUp.clerk;
+
+    if (experimental_canUseCaptcha && experimental_captchaSiteKey) {
+      captchaToken = await getCaptchaToken(experimental_captchaSiteKey);
+    }
+
     return this._basePost({
       path: this.pathRoot,
-      body: normalizeUnsafeMetadata(params),
+      body: normalizeUnsafeMetadata(captchaToken ? { ...params, captchaToken } : params),
     });
   };
 

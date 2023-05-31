@@ -46,6 +46,12 @@ const mockDisplayConfigWithDifferentOrigin = {
   organizationProfileUrl: 'http://another-test.host/organization-profile',
 } as DisplayConfig;
 
+const mockUserSettings = {
+  signUp: {
+    captcha_enabled: false,
+  },
+};
+
 const developmentFrontendApi = 'clerk.abcef.12345.dev.lclclerk.com';
 const productionFrontendApi = 'clerk.abcef.12345.prod.lclclerk.com';
 
@@ -96,6 +102,7 @@ describe('Clerk singleton - Redirects', () => {
         mockEnvironmentFetch.mockReturnValue(
           Promise.resolve({
             authConfig: {},
+            userSettings: mockUserSettings,
             displayConfig: mockDisplayConfigWithSameOrigin,
             isProduction: () => false,
             isDevelopmentOrStaging: () => true,
@@ -173,6 +180,7 @@ describe('Clerk singleton - Redirects', () => {
         mockEnvironmentFetch.mockReturnValue(
           Promise.resolve({
             authConfig: {},
+            userSettings: mockUserSettings,
             displayConfig: mockDisplayConfigWithDifferentOrigin,
             isProduction: () => false,
             isDevelopmentOrStaging: () => true,

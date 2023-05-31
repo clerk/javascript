@@ -13,6 +13,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   applicationName!: string;
   backendHost!: string;
   branded!: boolean;
+  captchaPublicKey: string | null = null;
   homeUrl!: string;
   instanceEnvironmentType!: string;
   faviconImageUrl!: string;
@@ -65,6 +66,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.afterSignOutAllUrl = data.after_sign_out_all_url;
     this.afterSwitchSessionUrl = data.after_switch_session_url;
     this.branded = data.branded;
+    this.captchaPublicKey = data.captcha_public_key;
     this.supportEmail = data.support_email || '';
     this.clerkJSVersion = data.clerk_js_version;
     this.experimental__forceOauthFirst = data.experimental_force_oauth_first || false;
