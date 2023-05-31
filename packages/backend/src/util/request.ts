@@ -18,19 +18,24 @@ export function checkCrossOrigin({
   forwardedPort?: string | null;
   forwardedProto?: string | null;
 }) {
-  const proto = getFirstValueFromHeaderValue(forwardedProto);
-  const port = getFirstValueFromHeaderValue(forwardedPort);
+  const fwdProto = getFirstValueFromHeaderValue(forwardedProto);
+  let fwdPort = getFirstValueFromHeaderValue(forwardedPort);
+  // If forwardedPort mismatch with forwardedProto determine forwardedPort
+  // from forwardedProto as fallback (if exists)
+  // This check fixes the Railway App issue
+  if (fwdProto && fwdPort !== getPortFromProtocol(fwdProto)) {
+    fwdPort = getPortFromProtocol(fwdProto);
+  }
 
   const originProtocol = getProtocolVerb(originURL.protocol);
-
-  if (proto && proto !== originProtocol) {
+  if (fwdProto && fwdProto !== originProtocol) {
     return true;
   }
 
-  const protocol = proto || originProtocol;
+  const protocol = fwdProto || originProtocol;
   /* The forwarded host prioritised over host to be checked against the referrer.  */
   const finalURL = convertHostHeaderValueToURL(forwardedHost || host, protocol);
-  finalURL.port = port || finalURL.port;
+  finalURL.port = fwdPort || finalURL.port;
 
   if (getPort(finalURL) !== getPort(originURL)) {
     return true;

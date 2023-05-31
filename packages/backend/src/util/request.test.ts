@@ -112,5 +112,16 @@ export default (QUnit: QUnit) => {
       };
       assert.false(checkCrossOrigin(options));
     });
+
+    test('is not CO for Railway App', assert => {
+      const options = {
+        originURL: new URL('https://aws-clerk-nextjs-production.up.railway.app'),
+        host: 'aws-clerk-nextjs-production.up.railway.app',
+        forwardedPort: '80',
+        forwardedHost: 'aws-clerk-nextjs-production.up.railway.app',
+        forwardedProto: 'https,http',
+      };
+      assert.false(checkCrossOrigin(options));
+    });
   });
 };
