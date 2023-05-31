@@ -31,7 +31,7 @@ import type { AttemptWeb3WalletVerificationParams, AuthenticateWithWeb3Params } 
 
 declare global {
   /**
-   * If you want to provide custom types for the user.unsafeMetadata object,
+   * If you want to provide custom types for the signUp.unsafeMetadata object,
    * simply redeclare this rule in the global namespace.
    * Every user object will use the provided type.
    */

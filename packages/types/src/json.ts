@@ -88,7 +88,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   external_account_strategy: string | null;
   external_account: any;
   has_password: boolean;
-  unsafe_metadata: Record<string, unknown>;
+  unsafe_metadata: SignUpUnsafeMetadata;
   created_session_id: string | null;
   created_user_id: string | null;
   abandon_at: number | null;
@@ -208,8 +208,8 @@ export interface UserJSON extends ClerkResourceJSON {
   totp_enabled: boolean;
   backup_code_enabled: boolean;
   two_factor_enabled: boolean;
-  public_metadata: Record<string, unknown>;
-  unsafe_metadata: Record<string, unknown>;
+  public_metadata: UserPublicMetadata;
+  unsafe_metadata: UserUnsafeMetadata;
   last_sign_in_at: number | null;
   updated_at: number;
   created_at: number;
@@ -297,7 +297,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   image_url: string;
   name: string;
   slug: string;
-  public_metadata: Record<string, unknown>;
+  public_metadata: OrganizationPublicMetadata;
   created_at: number;
   updated_at: number;
   members_count: number;
@@ -308,7 +308,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: 'organization_membership';
   id: string;
   organization: OrganizationJSON;
-  public_metadata: Record<string, unknown>;
+  public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;
   created_at: number;
@@ -320,7 +320,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   id: string;
   email_address: string;
   organization_id: string;
-  public_metadata: Record<string, unknown>;
+  public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
   role: MembershipRole;
   created_at: number;

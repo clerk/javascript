@@ -194,12 +194,13 @@ const unstyledScrollbar = (t: InternalTheme) => ({
   '::-webkit-scrollbar-track': {
     background: 'transparent',
   },
+  scrollbarGutter: 'stable both-edges',
 });
 
 const maxHeightScroller = (t: InternalTheme) =>
   ({
     height: '100%',
-    overflowY: 'scroll',
+    overflowY: 'auto',
     ...unstyledScrollbar(t),
   } as const);
 
