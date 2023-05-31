@@ -5,6 +5,7 @@ const transitionDuration = Object.freeze({
   fast: '120ms',
   focusRing: '200ms',
   controls: '100ms',
+  textField: '450ms',
 } as const);
 
 const transitionProperty = Object.freeze({

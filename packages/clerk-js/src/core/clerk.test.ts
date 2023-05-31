@@ -45,6 +45,12 @@ describe('Clerk singleton', () => {
     organizationProfileUrl: 'http://test.host/organization-profile',
   } as DisplayConfig;
 
+  const mockUserSettings = {
+    signUp: {
+      captcha_enabled: false,
+    },
+  };
+
   let mockWindowLocation;
   let mockHref: jest.Mock;
 
@@ -89,6 +95,7 @@ describe('Clerk singleton', () => {
     mockEnvironmentFetch.mockReturnValue(
       Promise.resolve({
         authConfig: {},
+        userSettings: mockUserSettings,
         displayConfig: mockDisplayConfig,
         isSingleSession: () => false,
         isProduction: () => false,
@@ -475,6 +482,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -535,6 +543,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -591,6 +600,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -659,6 +669,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -710,6 +721,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -766,6 +778,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -807,6 +820,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -851,6 +865,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -907,6 +922,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -964,6 +980,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -1013,6 +1030,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
@@ -1062,6 +1080,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
+          userSettings: mockUserSettings,
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
