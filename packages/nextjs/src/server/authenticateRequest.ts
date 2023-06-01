@@ -33,7 +33,6 @@ export const authenticateRequest = async (req: NextRequest, opts: WithAuthOption
     host: headers.get('host') as string,
     forwardedPort: headers.get('x-forwarded-port') || undefined,
     forwardedHost: headers.get('x-forwarded-host') || undefined,
-    forwardedProto: headers.get('x-forwarded-proto') || undefined,
     referrer: headers.get('referer') || undefined,
     userAgent: headers.get('user-agent') || undefined,
     searchParams: new URL(req.url).searchParams,
