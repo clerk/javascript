@@ -3,7 +3,7 @@ import React from 'react';
 
 import { Interstitial } from './Interstitial';
 
-export function ClerkCatchBoundary(RootCatchBoundary?: () => JSX.Element) {
+export function ClerkCatchBoundary(RootCatchBoundary?: React.ComponentType) {
   return () => {
     const { data } = useCatch();
     const { __clerk_ssr_interstitial_html } = data?.clerkState?.__internal_clerk_state || {};

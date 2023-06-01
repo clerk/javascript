@@ -48,6 +48,16 @@ const common = ({ mode }) => {
     optimization: {
       splitChunks: {
         cacheGroups: {
+          zxcvbnTSCoreVendor: {
+            test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](core)[\\/]/,
+            name: 'zxcvbn-ts-core',
+            chunks: 'all',
+          },
+          zxcvbnTSCommonVendor: {
+            test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](language-common)[\\/]/,
+            name: 'zxcvbn-common',
+            chunks: 'all',
+          },
           common: {
             minChunks: 1,
             name: 'ui-common',
@@ -66,13 +76,25 @@ const common = ({ mode }) => {
   };
 };
 
+/** @type { () => (import('webpack').RuleSetRule) }  */
 const svgLoader = () => {
   return {
     test: /\.svg$/,
-    use: ['@svgr/webpack'],
+    use: {
+      loader: '@svgr/webpack',
+      options: {
+        svgo: true,
+        svgoConfig: {
+          floatPrecision: 3,
+          transformPrecision: 1,
+          plugins: ['preset-default', 'removeDimensions', 'removeStyleElement'],
+        },
+      },
+    },
   };
 };
 
+/** @type { () => (import('webpack').RuleSetRule) } */
 const typescriptLoaderProd = () => {
   return {
     test: /\.(ts|js)x?$/,
@@ -86,6 +108,7 @@ const typescriptLoaderProd = () => {
   };
 };
 
+/** @type { () => (import('webpack').RuleSetRule) } */
 const typescriptLoaderDev = () => {
   return {
     test: /\.(ts|js)x?$/,

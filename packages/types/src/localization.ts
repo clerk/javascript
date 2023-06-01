@@ -605,6 +605,7 @@ type WithParamName<T> = T &
   Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
 type UnstableErrors = WithParamName<{
   form_identifier_not_found: LocalizationValue;
+  captcha_invalid: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_username_invalid_length: LocalizationValue;
   form_param_format_invalid: LocalizationValue;

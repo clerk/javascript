@@ -13,6 +13,7 @@ export interface DisplayConfigJSON {
   after_switch_session_url: string;
   application_name: string;
   branded: boolean;
+  captcha_public_key: string | null;
   home_url: string;
   instance_environment_type: string;
   /* @deprecated */
@@ -45,6 +46,7 @@ export interface DisplayConfigResource extends ClerkResource {
   applicationName: string;
   backendHost: string;
   branded: boolean;
+  captchaPublicKey: string | null;
   homeUrl: string;
   instanceEnvironmentType: string;
   logoImageUrl: string;

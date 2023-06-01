@@ -161,6 +161,7 @@ const createBaseUserSettings = (): UserSettingsJSON => {
     sign_up: {
       custom_action_required: false,
       progressive: true,
+      captcha_enabled: false,
       disable_hibp: false,
     },
     restrictions: {
