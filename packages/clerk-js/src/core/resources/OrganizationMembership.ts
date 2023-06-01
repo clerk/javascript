@@ -37,7 +37,7 @@ export class OrganizationMembership extends BaseResource implements Organization
   }
 
   destroy = async (): Promise<OrganizationMembership> => {
-    // FIXME: Revise the return type of _baseDelete
+    // TODO: Revise the return type of _baseDelete
     const deletedMembership = (await this._baseDelete({
       path: `/organizations/${this.organization.id}/memberships/${this.publicUserData.userId}`,
     })) as unknown as OrganizationMembership;
