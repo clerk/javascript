@@ -642,7 +642,7 @@ export default class Clerk implements ClerkInterface {
       return to;
     }
 
-    const toURL = new URL(to, window.location.href);
+    const toURL = new URL(to, window.location.origin);
 
     if (toURL.origin === window.location.origin) {
       return toURL.href;
