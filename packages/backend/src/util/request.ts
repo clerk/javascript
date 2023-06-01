@@ -61,7 +61,7 @@ const PROTOCOL_TO_PORT_MAPPING: Record<string, string> = {
 } as const;
 
 function getPort(url: URL) {
-  return url.port || getPortFromProtocol(url.protocol);
+  return url.port || getPortFromProtocol(getProtocolVerb(url.protocol));
 }
 
 function getPortFromProtocol(protocol: string) {
