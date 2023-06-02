@@ -4,7 +4,15 @@ import { isDefaultImage } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import {
+  ContentPage,
+  Form,
+  FormButtons,
+  InformationBox,
+  SuccessPage,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
@@ -40,6 +48,8 @@ export const ProfilePage = withCardStateProvider(() => {
   const hasRequiredFields = (showFirstName && first_name.required) || (showLastName && last_name.required);
   const requiredFieldsFilled =
     hasRequiredFields && !!lastNameField.value && !!firstNameField.value && optionalFieldsChanged;
+
+  const canEditName = user.samlAccounts.length == 0;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,6 +93,8 @@ export const ProfilePage = withCardStateProvider(() => {
         headerTitle={title}
         Breadcrumbs={UserProfileBreadcrumbs}
       >
+        {!canEditName && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
+
         <Form.Root onSubmit={onSubmit}>
           <UserProfileAvatarUploader
             user={user}
@@ -95,6 +107,7 @@ export const ProfilePage = withCardStateProvider(() => {
                 autoFocus
                 {...firstNameField.props}
                 required={first_name.required}
+                isDisabled={!canEditName}
               />
             </Form.ControlRow>
           )}
@@ -103,6 +116,7 @@ export const ProfilePage = withCardStateProvider(() => {
               <Form.Control
                 {...lastNameField.props}
                 required={last_name.required}
+                isDisabled={!canEditName}
               />
             </Form.ControlRow>
           )}

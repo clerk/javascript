@@ -394,6 +394,7 @@ type _LocalizationResource = {
       fileDropAreaTitle: LocalizationValue;
       fileDropAreaAction: LocalizationValue;
       fileDropAreaHint: LocalizationValue;
+      readonly: LocalizationValue;
       successMessage: LocalizationValue;
     };
     usernamePage: {
@@ -462,6 +463,7 @@ type _LocalizationResource = {
     };
     passwordPage: {
       title: LocalizationValue;
+      readonly: LocalizationValue;
       successMessage: LocalizationValue;
       changePasswordTitle: LocalizationValue;
       changePasswordSuccessMessage: LocalizationValue;

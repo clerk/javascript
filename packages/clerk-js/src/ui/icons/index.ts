@@ -12,6 +12,7 @@ export { default as CheckCircle } from './check-circle.svg';
 export { default as ExclamationTriangle } from './exclamation-triangle.svg';
 export { default as ExclamationCircle } from './exclamation-circle.svg';
 export { default as EyeSlash } from './eye-slash.svg';
+export { default as InformationCircle } from './information-circle.svg';
 export { default as MagnifyingGlass } from './magnifying-glass.svg';
 export { default as Caret } from './caret.svg';
 export { default as PencilEdit } from './pencil-edit.svg';
