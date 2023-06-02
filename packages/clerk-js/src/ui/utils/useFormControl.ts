@@ -43,6 +43,8 @@ type FieldStateProps<Id> = {
   setError: (error: string | ClerkAPIError | undefined) => void;
   setWarning: (message: string) => void;
   setSuccessful: (message: string) => void;
+  setHasPassedComplexity: (b: boolean) => void;
+  hasPassedComplexity: boolean;
   successfulText: string;
   isFocused: boolean;
 } & Omit<Options, 'defaultChecked'>;
@@ -79,6 +81,7 @@ export const useFormControl = <Id extends string>(
   const [successfulText, setSuccessfulText] = React.useState('');
   const [hasLostFocus, setHasLostFocus] = React.useState(false);
   const [isFocused, setFocused] = React.useState(false);
+  const [hasPassedComplexity, setHasPassedComplexity] = React.useState(false);
 
   const onChange: FormControlState['onChange'] = event => {
     if (opts?.type === 'checkbox') {
@@ -144,6 +147,8 @@ export const useFormControl = <Id extends string>(
     enableErrorAfterBlur: restOpts.enableErrorAfterBlur || false,
     setWarning,
     warningText,
+    hasPassedComplexity,
+    setHasPassedComplexity,
     ...restOpts,
   };
 
@@ -178,6 +183,7 @@ type DebouncingOption = {
   successfulText: string | undefined;
   isFocused: boolean;
   informationText: string | undefined;
+  hasPassedComplexity: boolean;
   skipBlur?: boolean;
   delayInMs?: number;
 };
@@ -192,6 +198,7 @@ export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedbac
     informationText = '',
     skipBlur = false,
     delayInMs = 100,
+    hasPassedComplexity = false,
   } = opts;
 
   const canDisplayFeedback = useMemo(() => {
@@ -205,8 +212,9 @@ export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedbac
   }, [enableErrorAfterBlur, hasLostFocus, skipBlur]);
 
   const feedbackMemo = useMemo(() => {
-    const _errorText = canDisplayFeedback ? errorText : '';
-    const _warningText = warningText;
+    const shouldDisplayErrorAsWarning = hasPassedComplexity ? errorText && !hasLostFocus : false;
+    const _errorText = !shouldDisplayErrorAsWarning && canDisplayFeedback ? errorText : '';
+    const _warningText = shouldDisplayErrorAsWarning ? errorText : warningText;
     const _successfulText = successfulText;
 
     /*
