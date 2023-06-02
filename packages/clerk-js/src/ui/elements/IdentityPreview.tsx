@@ -13,7 +13,7 @@ type IdentityPreviewProps = {
 } & PropsOfComponent<typeof Flex>;
 
 export const IdentityPreview = (props: IdentityPreviewProps) => {
-  const { avatarUrl = 'https://www.gravatar.com/avatar?d=mp', identifier, onClick, ...rest } = props;
+  const { avatarUrl = 'https://img.clerk.com/static/avatar_placeholder.jpeg', identifier, onClick, ...rest } = props;
   const refs = React.useRef({ avatarUrl, identifier: formatSafeIdentifier(identifier) });
 
   const edit = onClick && (
