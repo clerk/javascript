@@ -14,7 +14,7 @@ interface EncodedImageData {
 export const isDefaultImage = (url: string) => {
   // TODO: Next person who touches this util should check
   // whether this check is still necessary :)
-  if ((url || '').includes('gravatar')) {
+  if ((url || '').includes('gravatar') || (url || '').includes('avatar_placeholder')) {
     return true;
   }
 
