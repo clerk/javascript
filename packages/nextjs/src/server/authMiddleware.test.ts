@@ -387,6 +387,7 @@ describe('authMiddleware(params)', () => {
         {
           userId: null,
           isPublicRoute: false,
+          isApiRoute: false,
         },
         req,
         event,
