@@ -2,7 +2,7 @@ import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk
 import React from 'react';
 
 import { useCoreClerk } from '../contexts';
-import { Flow, Text } from '../customizables';
+import { Flow } from '../customizables';
 import { Card, CardAlert, LoadingCardContainer, useCardState, withCardStateProvider } from '../elements';
 import { useRouter } from '../router';
 import { handleError } from '../utils';
@@ -34,10 +34,7 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
     <Flow.Part part='ssoCallback'>
       <Card>
         <CardAlert>{card.error}</CardAlert>
-        <LoadingCardContainer>
-          {/*TODO: Localize this text*/}
-          <Text>We're redirecting you</Text>
-        </LoadingCardContainer>
+        <LoadingCardContainer />
       </Card>
     </Flow.Part>
   );
