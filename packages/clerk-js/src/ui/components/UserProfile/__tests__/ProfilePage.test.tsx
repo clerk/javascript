@@ -42,6 +42,40 @@ describe('ProfilePage', () => {
     });
   });
 
+  describe('with SAML', () => {
+    it('disables the first & last name inputs if user has enterprise connections', async () => {
+      const emailAddress = 'george@jungle.com';
+      const firstName = 'George';
+      const lastName = 'Clerk';
+
+      const config = createFixtures.config(f => {
+        f.withEmailAddress();
+        f.withSaml();
+        f.withName();
+        f.withUser({
+          first_name: firstName,
+          last_name: lastName,
+          email_addresses: [emailAddress],
+          saml_accounts: [
+            {
+              id: 'samlacc_foo',
+              provider: 'saml_okta',
+              email_address: emailAddress,
+            },
+          ],
+        });
+      });
+
+      const { wrapper } = await createFixtures(config);
+
+      render(<ProfilePage />, { wrapper });
+
+      expect(screen.getByRole('textbox', { name: 'First name' })).toBeDisabled();
+      expect(screen.getByRole('textbox', { name: 'Last name' })).toBeDisabled();
+      screen.getByText('Your profile information has been provided by the enterprise connection and cannot be edited.');
+    });
+  });
+
   describe('Profile image', () => {
     it('shows the image', async () => {
       const { wrapper } = await createFixtures(f => {

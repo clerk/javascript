@@ -25,7 +25,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__phoneNumber_username: 'phone number or username',
   formFieldLabel__emailAddress_phoneNumber_username: 'Email address, phone number or username',
   formFieldLabel__password: 'Password',
-  formFieldLabel__currentPassword: 'Current Password',
+  formFieldLabel__currentPassword: 'Current password',
   formFieldLabel__newPassword: 'New password',
   formFieldLabel__confirmPassword: 'Confirm password',
   formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
@@ -363,6 +363,7 @@ export const enUS: LocalizationResource = {
       fileDropAreaTitle: 'Drag file here, or...',
       fileDropAreaAction: 'Select file',
       fileDropAreaHint: 'Upload a JPG, PNG, GIF, or WEBP image smaller than 10 MB',
+      readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
       successMessage: 'Your profile has been updated.',
     },
     usernamePage: {
@@ -433,6 +434,7 @@ export const enUS: LocalizationResource = {
     passwordPage: {
       title: 'Set password',
       changePasswordTitle: 'Change password',
+      readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       successMessage: 'Your password has been set.',
       changePasswordSuccessMessage: 'Your password has been updated.',
       sessionsSignedOutSuccessMessage: 'All other devices have been signed out.',

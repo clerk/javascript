@@ -3,7 +3,17 @@ import { useRef } from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useCoreSession, useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import {
+  ContentPage,
+  Form,
+  FormButtonContainer,
+  FormButtons,
+  InformationBox,
+  SuccessPage,
+  useCardState,
+  useNavigateToFlowStart,
+  withCardStateProvider,
+} from '../../elements';
 import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
@@ -32,6 +42,9 @@ export const PasswordPage = withCardStateProvider(() => {
     : localizationKeys('userProfile.passwordPage.title');
   const card = useCardState();
   const wizard = useWizard();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
+
+  const canEditPassword = user.samlAccounts.length == 0;
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
@@ -58,6 +71,7 @@ export const PasswordPage = withCardStateProvider(() => {
     strengthMeter: true,
     informationText: failedValidationsText,
   });
+
   const confirmField = useFormControl('confirmPassword', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__confirmPassword'),
@@ -113,6 +127,8 @@ export const PasswordPage = withCardStateProvider(() => {
         headerTitle={title}
         Breadcrumbs={UserProfileBreadcrumbs}
       >
+        {!canEditPassword && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
+
         <Form.Root
           onSubmit={updatePassword}
           onBlur={validateForm}
@@ -132,6 +148,7 @@ export const PasswordPage = withCardStateProvider(() => {
                 minLength={6}
                 required
                 autoFocus
+                isDisabled={!canEditPassword}
               />
             </Form.ControlRow>
           )}
@@ -141,6 +158,7 @@ export const PasswordPage = withCardStateProvider(() => {
               minLength={6}
               required
               autoFocus={!user.passwordEnabled}
+              isDisabled={!canEditPassword}
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={confirmField.id}>
@@ -150,12 +168,26 @@ export const PasswordPage = withCardStateProvider(() => {
                 displayConfirmPasswordFeedback(e.target.value);
                 return confirmField.props.onChange(e);
               }}
+              isDisabled={!canEditPassword}
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={sessionsField.id}>
-            <Form.Control {...sessionsField.props} />
+            <Form.Control
+              {...sessionsField.props}
+              isDisabled={!canEditPassword}
+            />
           </Form.ControlRow>
-          <FormButtons isDisabled={!canSubmit} />
+          {canEditPassword ? (
+            <FormButtons isDisabled={!canSubmit} />
+          ) : (
+            <FormButtonContainer>
+              <Form.ResetButton
+                localizationKey={localizationKeys('userProfile.formButtonReset')}
+                block={false}
+                onClick={navigateToFlowStart}
+              />
+            </FormButtonContainer>
+          )}
         </Form.Root>
       </ContentPage>
 
