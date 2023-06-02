@@ -31,6 +31,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         formControlProps?.setSuccessful?.(t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))),
       onValidationFailed: errorMessage => formControlProps?.setError?.(errorMessage),
       onValidationWarning: errorMessage => formControlProps?.setWarning?.(errorMessage),
+      onValidationComplexity: hasPassed => formControlProps?.setHasPassedComplexity?.(hasPassed),
     },
   );
 

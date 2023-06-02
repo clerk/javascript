@@ -48,6 +48,8 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   setSuccessful: (message: string) => void;
   successfulText: string;
   hasLostFocus: boolean;
+  setHasPassedComplexity: (b: boolean) => void;
+  hasPassedComplexity: boolean;
   enableErrorAfterBlur?: boolean;
   informationText?: string;
   isFocused: boolean;
@@ -234,6 +236,8 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     isFocused: _isFocused,
     warningText,
     setWarning,
+    setHasPassedComplexity,
+    hasPassedComplexity,
     ...rest
   } = props;
   const isDisabled = props.isDisabled || card.isLoading;
@@ -245,6 +249,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     errorText,
     informationText,
     enableErrorAfterBlur,
+    hasPassedComplexity,
     isFocused: _isFocused,
     hasLostFocus,
     successfulText,
@@ -342,6 +347,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       setError={setError}
       setSuccessful={setSuccessful}
       setWarning={setWarning}
+      setHasPassedComplexity={setHasPassedComplexity}
       sx={sx}
     >
       {isCheckbox ? (

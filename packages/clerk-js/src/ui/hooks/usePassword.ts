@@ -17,12 +17,18 @@ type UsePasswordCbs = {
   onValidationFailed?: (errorMessage: string | undefined) => void;
   onValidationSuccess?: () => void;
   onValidationWarning?: (warningMessage: string) => void;
+  onValidationComplexity?: (b: boolean) => void;
 };
 
 export const MIN_PASSWORD_LENGTH = 8;
 
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {
-  const { onValidationFailed = noop, onValidationSuccess = noop, onValidationWarning = noop } = callbacks || {};
+  const {
+    onValidationFailed = noop,
+    onValidationSuccess = noop,
+    onValidationWarning = noop,
+    onValidationComplexity = noop,
+  } = callbacks || {};
   const { strengthMeter, show_zxcvbn, complexity } = config;
   const { setPassword: setPasswordComplexity } = usePasswordComplexity(config);
   const { getScore } = usePasswordStrength();
@@ -53,6 +59,7 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
 
       if (complexity) {
         const { failedValidationsText } = setPasswordComplexity(_password);
+        onValidationComplexity(!failedValidationsText);
         complexityError = failedValidationsText;
       }
 
@@ -73,7 +80,16 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
       }
       reportSuccessOrError(complexityError || zxcvbnError, zxcvbnWarning);
     },
-    [onValidationFailed, onValidationSuccess, strengthMeter, show_zxcvbn, complexity, getScore, setPasswordComplexity],
+    [
+      onValidationFailed,
+      onValidationSuccess,
+      onValidationComplexity,
+      strengthMeter,
+      show_zxcvbn,
+      complexity,
+      getScore,
+      setPasswordComplexity,
+    ],
   );
 
   return {
