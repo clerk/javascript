@@ -86,7 +86,7 @@
     "@types/react-dom": "*",
     "expect-type": "^0.15.0",
     "jest": "*",
-    "node-fetch-native": "^0.1.8",
+    "node-fetch-native": "1.1.1",
     "ts-jest": "*",
     "typescript": "*"
   },

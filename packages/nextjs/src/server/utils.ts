@@ -247,3 +247,13 @@ export function decorateRequest(
 
   return res;
 }
+
+export const apiEndpointUnauthorizedNextResponse = () => {
+  const error = {
+    status: 401,
+    error: 'Unauthorized',
+    message: 'Not authorized to access this resource',
+  };
+
+  return NextResponse.json({ error }, { status: 401 });
+};

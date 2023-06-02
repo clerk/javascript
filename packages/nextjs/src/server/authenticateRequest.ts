@@ -13,7 +13,7 @@ import {
   SECRET_KEY,
 } from './clerkClient';
 import type { WithAuthOptions } from './types';
-import { getCookie } from './utils';
+import { apiEndpointUnauthorizedNextResponse, getCookie } from './utils';
 import { decorateResponseWithObservabilityHeaders } from './withClerkMiddleware';
 
 export const authenticateRequest = async (req: NextRequest, opts: WithAuthOptions) => {
@@ -40,7 +40,7 @@ export const authenticateRequest = async (req: NextRequest, opts: WithAuthOption
 };
 
 export const handleUnknownState = (requestState: RequestState) => {
-  const response = new NextResponse(null, { status: 401, headers: { 'Content-Type': 'text/html' } });
+  const response = apiEndpointUnauthorizedNextResponse();
   decorateResponseWithObservabilityHeaders(response, requestState);
   return response;
 };
