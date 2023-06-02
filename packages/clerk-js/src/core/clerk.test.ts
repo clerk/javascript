@@ -3,16 +3,27 @@ import { waitFor } from '@testing-library/dom';
 
 import Clerk from './clerk';
 import { eventBus, events } from './events';
-import type { DisplayConfig, Organization } from './resources/internal';
+import type { AuthConfig, DisplayConfig, Organization } from './resources/internal';
 import { Client, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
 import { SessionCookieService } from './services';
 import { mockJwt } from './test/fixtures';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();
+const mockUsesUrlBasedSessionSync = jest.fn();
 
 jest.mock('./resources/Client');
 jest.mock('./resources/Environment');
+
+// Because Jest, don't ask me why...
+jest.mock('./devBrowserHandler', () => () => ({
+  clear: jest.fn(),
+  setup: jest.fn(),
+  getDevBrowserJWT: jest.fn(() => 'deadbeef'),
+  setDevBrowserJWT: jest.fn(),
+  removeDevBrowserJWT: jest.fn(),
+  usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
+}));
 
 Client.getInstance = jest.fn().mockImplementation(() => {
   return { fetch: mockClientFetch };
@@ -33,6 +44,7 @@ const setWindowQueryParams = (params: Array<[string, string]>) => {
 describe('Clerk singleton', () => {
   // Use a FAPI value for local production instances to avoid triggering the devInit flow during testing
   const frontendApi = 'clerk.abcef.12345.prod.lclclerk.com';
+  const devFrontendApi = 'clerk.abcef.12345.dev.lclclerk.com';
 
   let mockNavigate = jest.fn();
 
@@ -44,6 +56,10 @@ describe('Clerk singleton', () => {
     createOrganizationUrl: 'http://test.host/create-organization',
     organizationProfileUrl: 'http://test.host/organization-profile',
   } as DisplayConfig;
+
+  const mockAuthConfig = {
+    urlBasedSessionSyncing: true,
+  } as AuthConfig;
 
   const mockUserSettings = {
     signUp: {
@@ -94,7 +110,7 @@ describe('Clerk singleton', () => {
 
     mockEnvironmentFetch.mockReturnValue(
       Promise.resolve({
-        authConfig: {},
+        authConfig: mockAuthConfig,
         userSettings: mockUserSettings,
         displayConfig: mockDisplayConfig,
         isSingleSession: () => false,
@@ -1438,6 +1454,43 @@ describe('Clerk singleton', () => {
 
       expect(sut.domain).toBe('clerk.test.host');
       expect(sut.isSatellite).toBe(true);
+    });
+  });
+
+  describe('buildUrlWithAuth', () => {
+    it('builds an absolute url from a relative url in development for url based session syncing', async () => {
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('foo');
+      expect(url).toBe('http://test.host/foo');
+    });
+
+    it('returns what was passed when in production', async () => {
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('foo');
+      expect(url).toBe('foo');
+    });
+
+    it('returns what was passed when not using url based session syncing', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('foo');
+      expect(url).toBe('foo');
     });
   });
 });
