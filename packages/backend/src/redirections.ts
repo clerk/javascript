@@ -2,8 +2,8 @@ import { parsePublishableKey } from './util/parsePublishableKey';
 
 type RedirectAdapter = (url: string) => any;
 
-type SingUpParams = { url?: string; returnBackUrl?: string };
-type SingInParams = { url?: string; returnBackUrl?: string };
+type SignUpParams = { url?: string; returnBackUrl?: string };
+type SignInParams = { url?: string; returnBackUrl?: string };
 
 const buildUrl = (targetUrl: string, redirectUrl?: string) => {
   let url;
@@ -46,7 +46,7 @@ export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, p
 
   const accountsBaseUrl = buildAccountsBaseUrl(frontendApi);
 
-  const redirectToSignUp = ({ returnBackUrl }: SingUpParams = {}) => {
+  const redirectToSignUp = ({ returnBackUrl }: SignUpParams = {}) => {
     if (!signUpUrl && !accountsBaseUrl) {
       throw new Error(missingPublishableKeyErrorMessage);
     }
@@ -55,7 +55,7 @@ export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, p
     return redirectAdapter(buildUrl(signUpUrl || accountsSignUpUrl, returnBackUrl));
   };
 
-  const redirectToSignIn = ({ returnBackUrl }: SingInParams = {}) => {
+  const redirectToSignIn = ({ returnBackUrl }: SignInParams = {}) => {
     if (!signInUrl && !accountsBaseUrl) {
       throw new Error(missingPublishableKeyErrorMessage);
     }
