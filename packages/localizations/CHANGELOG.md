@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.0](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.17.0-staging.2...@clerk/localizations@1.17.0) (2023-06-03)
+
+### Features
+
+- add zh-CN localization ([#1284](https://github.com/clerkinc/javascript/issues/1284)) ([bc3ba51](https://github.com/clerkinc/javascript/commit/bc3ba51dae2c9ee46138cfe65194ea4a78d5ce36))
+
+### Bug Fixes
+
+- **localizations:** Export zhCN ([b67d523](https://github.com/clerkinc/javascript/commit/b67d5234bf0a84217b1cf5cae439c6089912f9ee))
+
 ## [1.16.0](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.16.0-staging.0...@clerk/localizations@1.16.0) (2023-05-26)
 
 **Note:** Version bump only for package @clerk/localizations
