@@ -16,3 +16,4 @@ export { nlNL, nlBE } from './nl-NL';
 export { jaJP } from './ja-JP';
 export { heIL } from './he-IL';
 export { csCZ } from './cs-CZ';
+export { zhCN } from './zh-CN';
