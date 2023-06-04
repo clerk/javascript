@@ -24,6 +24,7 @@ export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
+  clerkJSVersion?: string;
 } & PublishableKeyOrFrontendApi &
   MultiDomainAndOrProxy;
 
