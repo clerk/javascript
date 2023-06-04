@@ -2,6 +2,7 @@ import { handleValueOrFn, inClientSide } from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
+  BeforeEmitCallback,
   Clerk,
   ClientResource,
   CreateOrganizationParams,
@@ -23,7 +24,6 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import type { BeforeEmitCallback } from '@clerk/types';
 import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
@@ -35,7 +35,7 @@ import type {
   HeadlessBrowserClerkConstrutor,
   IsomorphicClerkOptions,
 } from './types';
-import { isConstructor, loadScript } from './utils';
+import { isConstructor, loadClerkJsScript } from './utils';
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
@@ -174,14 +174,15 @@ export default class IsomorphicClerk {
         global.Clerk = c;
       } else {
         // Hot-load latest ClerkJS from Clerk CDN
-        await loadScript({
-          frontendApi: this.frontendApi,
-          publishableKey: this.publishableKey,
-          proxyUrl: this.proxyUrl,
-          domain: this.domain,
-          scriptUrl: this.options.clerkJSUrl,
-          scriptVariant: this.options.clerkJSVariant,
-        });
+        if (!global.Clerk) {
+          await loadClerkJsScript({
+            ...this.options,
+            frontendApi: this.frontendApi,
+            publishableKey: this.publishableKey,
+            proxyUrl: this.proxyUrl,
+            domain: this.domain,
+          });
+        }
 
         if (!global.Clerk) {
           throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
