@@ -23,3 +23,4 @@ export * from './workerTimers';
 export * from './runWithExponentialBackOff';
 export * from './isomorphicAtob';
 export * from './globs';
+export * from './loadScript';
