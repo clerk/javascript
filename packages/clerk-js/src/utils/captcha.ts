@@ -1,4 +1,4 @@
-import { loadScript } from './script';
+import { loadScript } from '@clerk/shared';
 
 interface RenderOptions {
   sitekey: string;
@@ -16,16 +16,11 @@ declare global {
 const WIDGET_CLASSNAME = 'clerk-captcha';
 
 export async function loadCaptcha(url: string) {
-  return new Promise(resolve => {
-    resolve(
-      loadScript(url, {
-        defer: true,
-        globalObject: window.turnstile,
-      }),
-    );
-  }).then(() => window.turnstile);
+  if (!window.turnstile) {
+    await loadScript(url, { defer: true });
+  }
+  return window.turnstile;
 }
-
 export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptUrl: string }) => {
   const { siteKey: sitekey, scriptUrl } = captchaOptions;
   let captchaToken = '';
