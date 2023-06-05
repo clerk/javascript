@@ -80,6 +80,9 @@ const common = ({ mode }) => {
 const svgLoader = () => {
   return {
     test: /\.svg$/,
+    resolve: {
+      fullySpecified: false,
+    },
     use: {
       loader: '@svgr/webpack',
       options: {
@@ -99,6 +102,9 @@ const typescriptLoaderProd = () => {
   return {
     test: /\.(ts|js)x?$/,
     exclude: /node_modules/,
+    resolve: {
+      fullySpecified: false,
+    },
     use: [
       {
         loader: 'ts-loader',
@@ -113,6 +119,9 @@ const typescriptLoaderDev = () => {
   return {
     test: /\.(ts|js)x?$/,
     exclude: /node_modules/,
+    resolve: {
+      fullySpecified: false,
+    },
     use: [
       {
         loader: 'ts-loader',
