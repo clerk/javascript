@@ -11,7 +11,7 @@ const ClerkQueryParams = [
   CLERK_REFERRER_PRIMARY,
 ] as const;
 
-type ClerkQueryParam = typeof ClerkQueryParams[number];
+type ClerkQueryParam = (typeof ClerkQueryParams)[number];
 
 type ClerkQueryParamsToValuesMap = {
   __clerk_status: VerificationStatus;
