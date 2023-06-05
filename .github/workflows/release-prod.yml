@@ -13,7 +13,7 @@ concurrency:
 jobs:
   release:
     name: Release
-    #    if: ${{ github.repository == 'clerkinc/javascript' }}
+    if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ubuntu-latest
     steps:
       - name: Setup
