@@ -308,7 +308,7 @@ export default class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
-  public openSignUp = (props?: SignInProps): void => {
+  public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
       return console.info(warnings.cannotOpenSignUpOrSignUp);
