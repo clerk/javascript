@@ -1,6 +1,5 @@
 import { addClerkPrefix, isValidProxyUrl, loadScript, parsePublishableKey, proxyUrlToAbsoluteURL } from '@clerk/shared';
 
-import { LIB_VERSION } from '../info';
 import type { IsomorphicClerkOptions } from '../types';
 import { errorThrower } from './errorThrower';
 import { isDevOrStagingUrl } from './isDevOrStageUrl';
@@ -45,7 +44,7 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   }
 
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
-  const version = clerkJSVersion || getPrereleaseTag(LIB_VERSION) || getMajorVersion(LIB_VERSION);
+  const version = clerkJSVersion || getPrereleaseTag(PACKAGE_VERSION) || getMajorVersion(PACKAGE_VERSION);
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
 };
 

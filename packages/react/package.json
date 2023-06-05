@@ -3,7 +3,6 @@
   "version": "4.18.0",
   "license": "MIT",
   "description": "Clerk React library",
-  "sideEffects": false,
   "keywords": [
     "clerk",
     "react",
@@ -14,15 +13,25 @@
     "jwt"
   ],
   "author": "Clerk",
-  "source": "src/index.ts",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "node ./scripts/info.js && tsc -p tsconfig.build.json",
-    "dev": "node ./scripts/info.js && tsc -p tsconfig.build.json --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "dev:publish": "npm run dev -- --env.PUBLISH=true",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
