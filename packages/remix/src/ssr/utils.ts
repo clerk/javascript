@@ -1,6 +1,5 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
-import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
@@ -83,7 +82,8 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
         debugData: debugRequestState(requestState),
         frontendApi: requestState.frontendApi,
         publishableKey: requestState.publishableKey,
-        pkgVersion: LIB_VERSION,
+        // TODO: This needs to be the version of clerk/remix not clerk/react
+        // pkgVersion: LIB_VERSION,
         proxyUrl: requestState.proxyUrl,
         isSatellite: requestState.isSatellite,
         domain: requestState.domain,
