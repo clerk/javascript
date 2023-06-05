@@ -4,7 +4,7 @@ export const events = {
   TokenUpdate: 'token:update',
 } as const;
 
-type ClerkEvent = (typeof events)[keyof typeof events];
+type ClerkEvent = typeof events[keyof typeof events];
 type EventHandler<E extends ClerkEvent> = (payload: EventPayload[E]) => void;
 
 type TokenUpdatePayload = { token: TokenResource | null };

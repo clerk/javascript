@@ -36,8 +36,7 @@ export const zhCN: LocalizationResource = {
   formFieldLabel__organizationSlug: 'URL 简称',
   formFieldLabel__role: '角色',
   formFieldInputPlaceholder__emailAddress: '',
-  formFieldInputPlaceholder__emailAddresses:
-    '输入或粘贴一个或多个电子邮件地址，用空格或逗号分隔',
+  formFieldInputPlaceholder__emailAddresses: '输入或粘贴一个或多个电子邮件地址，用空格或逗号分隔',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
   formFieldInputPlaceholder__emailAddress_phoneNumber: '',
@@ -230,7 +229,7 @@ export const zhCN: LocalizationResource = {
     noAvailableMethods: {
       title: '无法登录',
       subtitle: '出现错误',
-      message: "无法继续登录。没有可用的身份验证因素。",
+      message: '无法继续登录。没有可用的身份验证因素。',
     },
   },
   userProfile: {
@@ -258,8 +257,7 @@ export const zhCN: LocalizationResource = {
         detailsSubtitle__primary: '此电子邮件地址是主要电子邮件地址',
         detailsAction__primary: '完成验证',
         detailsTitle__nonPrimary: '设为主要电子邮件地址',
-        detailsSubtitle__nonPrimary:
-          '将此电子邮件地址设为主要的，以接收关于您账户的通信。',
+        detailsSubtitle__nonPrimary: '将此电子邮件地址设为主要的，以接收关于您账户的通信。',
         detailsAction__nonPrimary: '设为主要',
         detailsTitle__unverified: '未验证的电子邮件地址',
         detailsSubtitle__unverified: '此电子邮件地址尚未验证，功能可能受到限制',
@@ -275,8 +273,7 @@ export const zhCN: LocalizationResource = {
         detailsSubtitle__primary: '此电话号码是主要电话号码',
         detailsAction__primary: '完成验证',
         detailsTitle__nonPrimary: '设为主要电话号码',
-        detailsSubtitle__nonPrimary:
-          '将此电话号码设为主要的，以接收关于您账户的通信。',
+        detailsSubtitle__nonPrimary: '将此电话号码设为主要的，以接收关于您账户的通信。',
         detailsAction__nonPrimary: '设为主要',
         detailsTitle__unverified: '未验证的电话号码',
         detailsSubtitle__unverified: '此电话号码尚未验证，功能可能受到限制',
@@ -291,8 +288,7 @@ export const zhCN: LocalizationResource = {
         title__conectionFailed: '重试失败的连接',
         title__connectionFailed: '重试失败的连接',
         title__reauthorize: '需要重新授权',
-        subtitle__reauthorize:
-          '所需的权限已更新，您可能会遇到功能限制。请重新授权此应用程序，以避免任何问题',
+        subtitle__reauthorize: '所需的权限已更新，您可能会遇到功能限制。请重新授权此应用程序，以避免任何问题',
         actionLabel__conectionFailed: '再试一次',
         actionLabel__connectionFailed: '再试一次',
         actionLabel__reauthorize: '立即授权',
@@ -318,15 +314,13 @@ export const zhCN: LocalizationResource = {
           title__default: '默认因素',
           title__setDefault: '设为默认因素',
           subtitle__default: '登录时，此因素将被用作默认的两步验证方法。',
-          subtitle__setDefault:
-            '将此因素设为默认因素，登录时将使用它作为默认的两步验证方法。',
+          subtitle__setDefault: '将此因素设为默认因素，登录时将使用它作为默认的两步验证方法。',
           actionLabel__setDefault: '设为默认',
         },
         backupCodes: {
           headerTitle: '备份代码',
           title__regenerate: '重新生成备份代码',
-          subtitle__regenerate:
-            '获取一套新的安全备份代码。之前的备份代码将被删除，无法使用。',
+          subtitle__regenerate: '获取一套新的安全备份代码。之前的备份代码将被删除，无法使用。',
           actionLabel__regenerate: '重新生成代码',
         },
         totp: {
@@ -414,8 +408,7 @@ export const zhCN: LocalizationResource = {
       removeResource: {
         title: '移除已连接的账户',
         messageLine1: '{{identifier}} 将从此账户中被移除。',
-        messageLine2:
-          '您将无法再使用这个已连接的账户，任何依赖的功能将不再工作。',
+        messageLine2: '您将无法再使用这个已连接的账户，任何依赖的功能将不再工作。',
         successMessage: '{{connectedAccount}} 已从您的账户中移除。',
       },
     },
@@ -446,16 +439,12 @@ export const zhCN: LocalizationResource = {
       title: '添加验证器应用程序',
       verifyTitle: '验证代码',
       verifySubtitle: '输入您的验证器生成的验证码',
-      successMessage:
-        '现在已启用两步验证。在登录时，您需要输入来自此验证器的验证码作为额外步骤。',
+      successMessage: '现在已启用两步验证。在登录时，您需要输入来自此验证器的验证码作为额外步骤。',
       authenticatorApp: {
-        infoText__ableToScan:
-          '在您的验证器应用中设置一个新的登录方法，并扫描下面的二维码将其链接到您的账户。',
+        infoText__ableToScan: '在您的验证器应用中设置一个新的登录方法，并扫描下面的二维码将其链接到您的账户。',
         infoText__unableToScan: '在验证器中设置一个新的登录方法，并输入下面提供的 Key。',
-        inputLabel__unableToScan1:
-          '确保启用了基于时间或一次性密码，然后完成链接您的账户。',
-        inputLabel__unableToScan2:
-          '或者，如果您的验证器支持 TOTP URIs，您也可以复制完整的 URI。',
+        inputLabel__unableToScan1: '确保启用了基于时间或一次性密码，然后完成链接您的账户。',
+        inputLabel__unableToScan2: '或者，如果您的验证器支持 TOTP URIs，您也可以复制完整的 URI。',
         buttonAbleToScan__nonPrimary: '扫描二维码',
         buttonUnableToScan__nonPrimary: '不能扫描二维码？',
       },
@@ -470,8 +459,7 @@ export const zhCN: LocalizationResource = {
       title: '添加短信验证码验证',
       primaryButton__addPhoneNumber: '添加电话号码',
       subtitle__availablePhoneNumbers: '选择一个电话号码来注册短信验证码两步验证。',
-      subtitle__unavailablePhoneNumbers:
-        '没有可用的电话号码来注册短信验证码两步验证。',
+      subtitle__unavailablePhoneNumbers: '没有可用的电话号码来注册短信验证码两步验证。',
       successMessage:
         '现在已启用此电话号码的短信验证码两步验证。在登录时，您需要输入发送到这个电话号码的验证码作为额外步骤。',
       removeResource: {
@@ -486,10 +474,8 @@ export const zhCN: LocalizationResource = {
       title__codelist: '备份代码',
       subtitle__codelist: '安全存储并保守秘密。',
       infoText1: '将为此账户启用备份代码。',
-      infoText2:
-        '保密并安全存储备份代码。如果您怀疑它们已经泄露，您可以重新生成备份代码。',
-      successSubtitle:
-        '如果您失去了验证设备的访问权限，您可以使用其中之一登录您的账户。',
+      infoText2: '保密并安全存储备份代码。如果您怀疑它们已经泄露，您可以重新生成备份代码。',
+      successSubtitle: '如果您失去了验证设备的访问权限，您可以使用其中之一登录您的账户。',
       successMessage:
         '现在已启用备份代码。如果您失去了验证设备的访问权限，您可以使用其中之一登录您的账户。每个代码只能使用一次。',
       actionLabel__copy: '复制全部',
