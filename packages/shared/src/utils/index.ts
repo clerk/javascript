@@ -6,7 +6,6 @@ export * from './createDeferredPromise';
 export * from './date';
 export * from './errors';
 export * from './file';
-export * from './index';
 export * from './keys';
 export * from './isRetinaDisplay';
 export * from './localStorageBroadcastChannel';
