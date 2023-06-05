@@ -1,5 +1,5 @@
+import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import type { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import React from 'react';
 
 import { assertValidClerkState, warnForSsr } from '../utils';
