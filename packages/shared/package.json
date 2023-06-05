@@ -3,16 +3,31 @@
   "version": "0.17.2",
   "description": "Internal package utils used by the Clerk SDKs",
   "types": "./dist/types/index.d.ts",
-  "main": "./dist/index.js",
+  "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "sideEffects": false,
   "files": [
     "dist",
     "testUtils"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./testUtils": {
+      "import": "./dist/esm/testUtils/index.js",
+      "require": "./dist/cjs/testUtils/index.js",
+      "types": "./dist/types/testUtils/index.d.ts"
+    }
+  },
   "scripts": {
+    "build": "tsup",
     "dev": "tsup --watch",
-    "build": "tsup --env.NODE_ENV production",
+    "dev:publish": "npm run dev -- --env.PUBLISH=true",
+    "build:declarations": "tsc -p tsconfig.json",
+    "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "jest",
