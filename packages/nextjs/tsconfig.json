@@ -1,25 +1,26 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "allowJs": true,
     "baseUrl": ".",
-    "lib": ["es6", "dom"],
-    "jsx": "react",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "importHelpers": true,
     "declaration": true,
     "declarationMap": true,
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "isolatedModules": true,
+    "jsx": "react",
+    "lib": ["es6", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "outDir": "dist",
     "resolveJsonModule": true,
+    "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "types": ["jest"],
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "target": "ES2020"
+    "target": "ES2020",
+    "types": ["jest"]
   },
   "include": ["src"]
 }

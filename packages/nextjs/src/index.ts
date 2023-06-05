@@ -52,13 +52,12 @@ export {
   withUser,
   withSession,
   withClerk,
-  WithUserProp,
   WithUser,
-  WithSessionProp,
   WithSession,
-  WithClerkProp,
   WithClerk,
 } from './client-boundary/hooks';
+
+export type { WithUserProp, WithSessionProp, WithClerkProp } from './client-boundary/hooks';
 
 /**
  * Conditionally export components that exhibit different behavior

@@ -15,12 +15,11 @@ export {
   withUser,
   withSession,
   withClerk,
-  WithUserProp,
   WithUser,
-  WithSessionProp,
   WithSession,
-  WithClerkProp,
   WithClerk,
 } from '@clerk/clerk-react';
+
+export type { WithUserProp, WithSessionProp, WithClerkProp } from '@clerk/clerk-react';
 
 export { isMagicLinkError, MagicLinkErrorCode } from '@clerk/clerk-react';
