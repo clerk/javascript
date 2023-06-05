@@ -536,7 +536,7 @@ export const ptBR: LocalizationResource = {
   },
   unstable__errors: {
     form_identifier_not_found: 'Usuário não encontrado',
-    form_password_pwned: 
+    form_password_pwned:
       'Esta senha apareceu em um vazamento e por isso não pode ser usada, por favor tente outra senha.',
     form_username_invalid_length: 'O nome de usuário tem um tamanho inválido',
     form_param_format_invalid: 'Formato inválido',

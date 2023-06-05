@@ -223,7 +223,8 @@ export const jaJP: LocalizationResource = {
       blockButton__backupCode: 'バックアップコードを使用する',
       getHelp: {
         title: 'ヘルプを取得',
-        content: 'アカウントにサインインできない場合は、メールでお問い合わせいただければ、できるだけ早くアクセスを回復するためにお手伝いいたします。',
+        content:
+          'アカウントにサインインできない場合は、メールでお問い合わせいただければ、できるだけ早くアクセスを回復するためにお手伝いいたします。',
         blockButton__emailSupport: 'メールサポート',
       },
     },
@@ -410,8 +411,7 @@ export const jaJP: LocalizationResource = {
       removeResource: {
         title: '連携アカウントの削除',
         messageLine1: '{{identifier}}はこのアカウントから削除されます。',
-        messageLine2:
-          'この連携アカウントを使用することはできなくなり、関連する機能も使用できなくなります。',
+        messageLine2: 'この連携アカウントを使用することはできなくなり、関連する機能も使用できなくなります。',
         successMessage: '{{connectedAccount}}がアカウントから削除されました。',
       },
     },
@@ -466,8 +466,7 @@ export const jaJP: LocalizationResource = {
       title: 'SMSコード認証の追加',
       primaryButton__addPhoneNumber: '電話番号を追加',
       subtitle__availablePhoneNumbers: 'SMSコード二段階認証のために登録する電話番号を選択してください。',
-      subtitle__unavailablePhoneNumbers:
-        'SMSコード二段階認証のために利用可能な電話番号はありません。',
+      subtitle__unavailablePhoneNumbers: 'SMSコード二段階認証のために利用可能な電話番号はありません。',
       successMessage:
         'この電話番号でSMSコード二段階認証が有効になりました。サインイン時には、この電話番号に送信された認証コードを追加のステップとして入力する必要があります。',
       removeResource: {
@@ -484,8 +483,7 @@ export const jaJP: LocalizationResource = {
       infoText1: 'このアカウントではバックアップコードが有効になります。',
       infoText2:
         'バックアップコードは秘密に保管し、安全に保存してください。疑わしい場合はバックアップコードを再生成することができます。',
-      successSubtitle:
-        '認証デバイスにアクセスできない場合、これらのいずれかを使用してアカウントにサインインできます。',
+      successSubtitle: '認証デバイスにアクセスできない場合、これらのいずれかを使用してアカウントにサインインできます。',
       successMessage:
         'バックアップコードが有効になりました。認証デバイスにアクセスできない場合、これらのいずれかを使用してアカウントにサインインできます。各コードは一度しか使用できません。',
       actionLabel__copy: 'すべてコピー',
@@ -569,7 +567,8 @@ export const jaJP: LocalizationResource = {
   },
   unstable__errors: {
     form_identifier_not_found: '',
-    form_password_pwned: 'このパスワードは侵害の一部として見つかったため使用できません。別のパスワードを試してください。',
+    form_password_pwned:
+      'このパスワードは侵害の一部として見つかったため使用できません。別のパスワードを試してください。',
     form_username_invalid_length: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',
@@ -580,7 +579,8 @@ export const jaJP: LocalizationResource = {
     form_identifier_exists: '',
     form_password_validation_failed: 'パスワードが間違っています',
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
-    form_password_size_in_bytes_exceeded: 'パスワードのバイト数が上限を超えています。短くするか、一部の特殊文字を削除してください。',
+    form_password_size_in_bytes_exceeded:
+      'パスワードのバイト数が上限を超えています。短くするか、一部の特殊文字を削除してください。',
     passwordComplexity: {
       sentencePrefix: 'パスワードは次の条件を満たす必要があります：',
       minimumLength: '{{length}}文字以上',
