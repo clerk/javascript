@@ -8,6 +8,7 @@ export type {
   WithUserProp,
   WithClerkProp,
   WithSessionProp,
+  IsomorphicClerkOptions,
 } from './types';
 export { isMagicLinkError, MagicLinkErrorCode } from './errors';
 export { useMagicLink } from './hooks/useMagicLink';
