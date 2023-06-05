@@ -1,4 +1,4 @@
-import type { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
+import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
 import type { MultiDomainAndOrProxy, PublishableKeyOrFrontendApi } from '@clerk/types';
 import type React from 'react';
 
