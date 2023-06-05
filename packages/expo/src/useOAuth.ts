@@ -31,7 +31,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
-  async function startOAuthFlow(startOAuthFlowParams: StartOAuthFlowParams): Promise<StartOAuthFlowReturnType> {
+  async function startOAuthFlow(startOAuthFlowParams?: StartOAuthFlowParams): Promise<StartOAuthFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
         createdSessionId: '',
@@ -49,7 +49,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     // For more information go to:
     // https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturi
     const oauthRedirectUrl =
-      startOAuthFlowParams.redirectUrl ||
+      startOAuthFlowParams?.redirectUrl ||
       useOAuthParams.redirectUrl ||
       AuthSession.makeRedirectUri({
         path: 'oauth-native-callback',
@@ -93,7 +93,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     } else if (firstFactorVerification.status === 'transferable') {
       await signUp.create({
         transfer: true,
-        unsafeMetadata: startOAuthFlowParams.unsafeMetadata || useOAuthParams.unsafeMetadata,
+        unsafeMetadata: startOAuthFlowParams?.unsafeMetadata || useOAuthParams.unsafeMetadata,
       });
       createdSessionId = signUp.createdSessionId || '';
     }
