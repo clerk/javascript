@@ -12,6 +12,7 @@ export type FapiRequestInit = RequestInit & {
   search?: string | URLSearchParams | string[][] | Record<string, string> | undefined;
   sessionId?: string;
   rotatingTokenNonce?: string;
+  pathPrefix?: string;
   url?: URL;
 };
 
@@ -126,7 +127,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
   }
 
   function buildUrl(requestInit: FapiRequestInit): URL {
-    const { path } = requestInit;
+    const { path, pathPrefix = 'v1' } = requestInit;
 
     const { proxyUrl, domain, frontendApi, instanceType } = clerkInstance;
 
@@ -138,7 +139,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
       return buildUrlUtil(
         {
           base: proxyBase.origin,
-          pathname: `${proxyPath}/v1${path}`,
+          pathname: `${proxyPath}/${pathPrefix}${path}`,
           search: buildQueryString(requestInit),
         },
         { stringify: false },
@@ -148,7 +149,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
     return buildUrlUtil(
       {
         base: `https://${domainOnlyInProd || frontendApi}`,
-        pathname: `v1${path}`,
+        pathname: `${pathPrefix}${path}`,
         search: buildQueryString(requestInit),
       },
       { stringify: false },

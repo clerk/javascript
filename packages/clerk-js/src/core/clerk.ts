@@ -217,6 +217,19 @@ export default class Clerk implements ClerkInterface {
     return null;
   }
 
+  get experimental_captchaURL(): string | null {
+    if (this.#fapiClient) {
+      return this.#fapiClient
+        .buildUrl({
+          path: 'cloudflare/turnstile/v0/api.js',
+          pathPrefix: '',
+          search: '?render=explicit',
+        })
+        .toString();
+    }
+    return null;
+  }
+
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
