@@ -22,6 +22,7 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
         registry-url: "https://registry.npmjs.org"
+        cache: "npm"
     - name: Install dependencies
       shell: bash
       run: npm ci
