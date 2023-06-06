@@ -10,7 +10,7 @@ export class Image extends BaseResource implements ImageResource {
   static async create(path: string, body: any = {}): Promise<ImageResource> {
     let fd = body;
 
-    if (body['file']) {
+    if (body['file'] && typeof body['file'] !== 'string') {
       fd = new FormData();
       fd.append('file', body['file']);
     }
