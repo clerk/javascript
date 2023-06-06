@@ -57,6 +57,9 @@ jobs:
       steps:
         - name: Checkout repo
           uses: actions/checkout@v3
+          with:
+            ref: ${{github.event.pull_request.head.sha}}
+            fetch-depth: 0
         - name: Setup
           uses: ./.github/actions/setup
-        - run: npm run changeset:status
+        - run: npx changeset status --since=origin/main
