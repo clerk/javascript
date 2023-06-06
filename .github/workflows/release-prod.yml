@@ -16,8 +16,11 @@ jobs:
     if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
       - name: Setup
-        uses: ./.github/workflows/setup.yml
+        uses: ./.github/actions/setup
 
       - name: Create Release PR
         id: changesets
