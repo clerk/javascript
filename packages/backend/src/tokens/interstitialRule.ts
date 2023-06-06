@@ -14,6 +14,7 @@ const shouldRedirectToSatelliteUrl = (qp?: URLSearchParams) => !!qp?.get('__cler
 const hasJustSynced = (qp?: URLSearchParams) => qp?.get('__clerk_synced') === 'true';
 const isReturningFromPrimary = (qp?: URLSearchParams) => qp?.get('__clerk_referrer_primary') === 'true';
 
+const VALID_USER_AGENTS = /^Mozilla\/|(Amazon CloudFront)/;
 // In development or staging environments only, based on the request's
 // User Agent, detect non-browser requests (e.g. scripts). Since there
 // is no Authorization header, consider the user as signed out and
@@ -23,7 +24,7 @@ const isReturningFromPrimary = (qp?: URLSearchParams) => qp?.get('__clerk_referr
 export const nonBrowserRequestInDevRule: InterstitialRule = options => {
   const { apiKey, secretKey, userAgent } = options;
   const key = secretKey || apiKey;
-  if (isDevelopmentFromApiKey(key) && !userAgent?.startsWith('Mozilla/')) {
+  if (isDevelopmentFromApiKey(key) && !VALID_USER_AGENTS.test(userAgent || '')) {
     return signedOut(options, AuthErrorReason.HeaderMissingNonBrowser);
   }
   return undefined;

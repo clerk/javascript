@@ -491,5 +491,18 @@ export default (QUnit: QUnit) => {
       assert.true(/^JWT is expired/.test(requestState.message || ''));
       assert.strictEqual(requestState.toAuth(), null);
     });
+
+    test('cookieToken: returns signed in for Amazon Cloudfront userAgent', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        apiKey: 'test_deadbeef',
+        userAgent: 'Amazon CloudFront',
+        clientUat: '12345',
+        cookieToken: mockJwt,
+      });
+
+      assertSignedIn(assert, requestState);
+      assertSignedInToAuth(assert, requestState);
+    });
   });
 };
