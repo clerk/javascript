@@ -49,7 +49,7 @@ export const MfaPhoneCodePage = withCardStateProvider(() => {
       <SuccessPage
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         text={localizationKeys('userProfile.mfaPhoneCodePage.successMessage')}
-        content={
+        contents={
           <MfaBackupCodeList
             subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
             backupCodes={ref.current?.backupCodes}

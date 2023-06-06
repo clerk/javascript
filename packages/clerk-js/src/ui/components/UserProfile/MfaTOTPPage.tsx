@@ -28,7 +28,7 @@ export const MfaTOTPPage = withCardStateProvider(() => {
       <SuccessPage
         title={localizationKeys('userProfile.mfaTOTPPage.title')}
         text={localizationKeys('userProfile.mfaTOTPPage.successMessage')}
-        content={
+        contents={
           <MfaBackupCodeList
             subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
             backupCodes={ref.current?.backupCodes}
