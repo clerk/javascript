@@ -2,6 +2,9 @@ name: Snapshot release
 run-name: Snapshot release by ${{ github.actor }}
 
 on:
+  push:
+    branches:
+      - "actions"
   issue_comment:
     types: [created]
 
