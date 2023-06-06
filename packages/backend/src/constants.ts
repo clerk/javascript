@@ -9,6 +9,7 @@ const Attributes = {
   AuthStatus: '__clerkAuthStatus',
   AuthReason: '__clerkAuthReason',
   AuthMessage: '__clerkAuthMessage',
+  AuthMessage1: '__clerkAuthMessag1e',
 } as const;
 
 const Cookies = {
