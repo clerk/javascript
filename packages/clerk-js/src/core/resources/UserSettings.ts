@@ -17,6 +17,10 @@ import { BaseResource } from './internal';
 const defaultMaxPasswordLength = 72;
 const defaultMinPasswordLength = 8;
 
+export type Actions = {
+  create_organization: boolean;
+};
+
 /**
  * @internal
  */
