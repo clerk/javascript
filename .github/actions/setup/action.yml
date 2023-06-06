@@ -15,15 +15,15 @@ runs:
         node-version: ${{ inputs.node-version }}
         registry-url: "https://registry.npmjs.org"
         cache: "npm"
-    #    - name: Cache node modules
-    #      id: cache-npm
-    #      uses: actions/cache@v3
-    #      env:
-    #        cache-name: cache-node-modules
-    #      with:
-    #        path: ./node_modules
-    #        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-    #    - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
-    - name: Install dependencies
+    - name: Cache node modules
+      id: cache-npm
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ./node_modules
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+    - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+      name: Install dependencies
       shell: bash
       run: npm ci
