@@ -1,6 +1,7 @@
 import { useCoreUser } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
+import { Pencil } from '../../icons';
 import { useRouter } from '../../router';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
@@ -28,6 +29,7 @@ export const PasswordSection = () => {
       <AddBlockButton
         id='password'
         onClick={navigateToPage}
+        icon={passwordEnabled ? Pencil : undefined}
         textLocalizationKey={
           passwordEnabled
             ? localizationKeys('userProfile.start.passwordSection.primaryButton__changePassword')

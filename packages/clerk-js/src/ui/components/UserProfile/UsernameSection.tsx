@@ -1,6 +1,7 @@
 import { useCoreUser } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
+import { Pencil } from '../../icons';
 import { useRouter } from '../../router';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
@@ -24,6 +25,7 @@ export const UsernameSection = () => {
       <AddBlockButton
         id='username'
         onClick={() => navigate('username')}
+        icon={user.username ? Pencil : undefined}
         textLocalizationKey={
           user.username
             ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')
