@@ -1,6 +1,5 @@
 import type { RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
-import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -73,7 +72,7 @@ export function getCookie(req: RequestLike, name: string): string | undefined {
     // this should be RequestCookie in all updated apps. In order to support apps
     // using v13.0.0 still, we explicitly add the string type
     // https://github.com/vercel/next.js/pull/41526
-    const reqCookieOrString = req.cookies.get(name) as RequestCookie | string | undefined;
+    const reqCookieOrString = req.cookies.get(name) as ReturnType<NextRequest['cookies']['get']> | string | undefined;
     if (!reqCookieOrString) {
       return undefined;
     }
