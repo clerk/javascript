@@ -5,7 +5,6 @@
  * We are solving this in the SDK level to reduce setup steps.
  */
 if (typeof global === 'undefined' && typeof window !== 'undefined' && !window.global) {
-  console.log('nikos2?');
   (window as any).global = window;
 }
 
