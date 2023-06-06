@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.3.7](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.3.7-staging.4...@clerk/chrome-extension@0.3.7) (2023-06-03)
+
+**Note:** Version bump only for package @clerk/chrome-extension
+
 ### [0.3.6](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.3.6-staging.0...@clerk/chrome-extension@0.3.6) (2023-05-26)
 
 **Note:** Version bump only for package @clerk/chrome-extension

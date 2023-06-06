@@ -10,4 +10,8 @@ coverage
 .next
 .cache
 .yalc
+.changeset
 package-lock.json
+playground
+examples
+/**/scripts/info.js

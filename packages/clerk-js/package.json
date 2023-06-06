@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.45.0-staging.3",
+  "version": "4.45.0",
   "license": "MIT",
   "description": "Clerk JS library",
   "keywords": [
@@ -24,10 +24,10 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run build:bundle && npm run build:declarations && npm run bundlewatch",
+    "build": "npm run build:bundle && npm run build:declarations",
     "build:stats": "webpack --config webpack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
     "build:analyze": "webpack-bundle-analyzer stats.json dist/",
-    "bundlewatch": "bundlewatch",
+    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
     "build:bundle": "npm run clean && webpack --config webpack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "webpack serve --config webpack.config.js",
@@ -41,9 +41,9 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/localizations": "^1.17.0-staging.2",
-    "@clerk/shared": "^0.17.2-staging.1",
-    "@clerk/types": "^3.41.0-staging.1",
+    "@clerk/localizations": "^1.17.0",
+    "@clerk/shared": "^0.17.2",
+    "@clerk/types": "^3.41.0",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
     "@floating-ui/react": "0.19.0",
@@ -96,18 +96,6 @@
     "webpack-merge": "^5.8.0"
   },
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
-  "bundlewatch": {
-    "files": [
-      {
-        "path": "./dist/clerk.browser.js",
-        "maxSize": "60kB"
-      },
-      {
-        "path": "./dist/clerk.headless.js",
-        "maxSize": "44kB"
-      }
-    ]
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/clerkinc/javascript.git"

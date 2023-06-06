@@ -2,8 +2,8 @@ import { parsePublishableKey } from './util/parsePublishableKey';
 
 type RedirectAdapter = (url: string) => any;
 
-type SignUpParams = { url?: string; returnBackUrl?: string };
-type SignInParams = { url?: string; returnBackUrl?: string };
+type SignUpParams = { returnBackUrl?: string };
+type SignInParams = { returnBackUrl?: string };
 
 const buildUrl = (targetUrl: string, redirectUrl?: string) => {
   let url;

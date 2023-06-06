@@ -46,7 +46,7 @@ Once you have installed the package, you will need to import the ClerkJS object 
 ```js
 import Clerk from '@clerk/clerk-js';
 
-const clerkFrontendApi = 'clerk.[your-domain].com';
+const clerkFrontendApi = 'pk_[publishable_key]';
 const clerk = new Clerk(clerkFrontendApi);
 await clerk.load({
   // Set load options here...
@@ -61,13 +61,15 @@ Add the following script to your site's `<body>` element:
 
 ```html
 <script>
-  // Get this URL from the Clerk Dashboard
-  const frontendApi = 'clerk.[your-domain].com';
+  // Get this URL and Publishable Key from the Clerk Dashboard
+  const clerkFrontendApi = 'pk_[publishable_key]';
+  const frontendApi = '[your-domain].clerk.accounts.dev';
   const version = '@latest'; // Set to appropriate version
 
-  // Creates asyncronous script
+  // Creates asynchronous script
   const script = document.createElement('script');
   script.setAttribute('data-clerk-frontend-api', frontendApi);
+  script.setAttribute('data-clerk-publishable-key', clerkFrontendApi);
   script.async = true;
   script.src = `https://${frontendApi}/npm/@clerk/clerk-js${version}/dist/clerk.browser.js`;
 

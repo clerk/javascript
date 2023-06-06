@@ -14,7 +14,9 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'prettier',
-    'turbo',
+    // Incompatible with latest version of eslint,
+    // disabled until this is fixed: https://github.com/vercel/turbo/issues/4469
+    // 'turbo',
   ],
   rules: {
     curly: 'error',
