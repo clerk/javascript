@@ -319,6 +319,9 @@ export class User extends BaseResource implements UserResource {
     this.backupCodeEnabled = data.backup_code_enabled;
     this.twoFactorEnabled = data.two_factor_enabled;
 
+    this.createOrganizationEnabled = data.create_organization_enabled;
+    this.deleteSelfEnabled = data.delete_self_enabled;
+
     if (data.last_sign_in_at) {
       this.lastSignInAt = unixEpochToDate(data.last_sign_in_at);
     }
