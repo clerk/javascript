@@ -19,67 +19,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Setup
-        uses: ./.github/actions/setup
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
-
-      - name: Extract snapshot name
-        id: extract-snapshot-name
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const match = context.payload.comment.body.match(/!snapshot (.*)/)
-            const name = match && match[1] || '';
-            const isKebabCase = name.match(/^[a-z]+(-[a-z]+)*$/)
-            if(name && !isKebabCase) {
-              core.setFailed(`Invalid snapshot name: ${name}`);
-            }
-            core.setOutput('name', name);
-
-      - name: Version packages for snapshot
-        id: version-packages
-        run: npm run version:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
-
-      - name: Snapshot release
-        if: steps.version-packages.outputs.success == '1'
-        run: npm run release:snapshot
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Package info
-        if: steps.version-packages.outputs.success == '1'
-        id: package-info
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const fs = require('fs');
-            const files = await (await glob.create('./packages/*/package.json')).glob();
-            const descriptors = files.map(file => {
-              const { name, version } = JSON.parse(fs.readFileSync(file, 'utf8'));
-              return { name, version };
-            });
-
-            let table = `| Package | Version |\n| --- | --- |\n`;
-            descriptors.forEach(({ name, version }) => { table += `| ${name} | ${version} |\n` });
-            const snippets = descriptors.map(({ name, version }) => `\`\`\`sh\n# ${name}\nnpm i ${name}@${version}\n\`\`\``).join('\n');
-            core.setOutput('table', table);
-            core.setOutput('snippets', snippets);
-
-      - name: Update Comment
-        if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@v3.0.0
-        with:
-          comment-id: ${{ github.event.comment.id }}
-          reactions: heart
-
-      - name: Create snapshot release comment
-        if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@v3.0.0
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            Hey @${{ github.event.comment.user.login }} - the snapshot version command generated the following package versions:
-            ${{ steps.package-info.outputs.table }}
-            Tip: use the snippet copy button below to quickly install the required packages.
-            ${{ steps.package-info.outputs.snippets }}
+      - name: Setup
+        uses: ./.github/actions/setup
+      - run: npm run test -- --dry-run
+      - run: npm run bundlewatch
