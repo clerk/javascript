@@ -1,21 +1,9 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "remoteCache": {
-    "signature": true
-  },
-  "globalDependencies": [
-    "packages/eslint-config-custom/index.js",
-    "package.json",
-    "package-lock.json",
-    "setupJest.afterEnv.ts",
-    "tsconfig.json",
-    "tsconfig.*.json"
-  ],
-  "globalEnv": ["NODE_VERSION", "NPM_VERSION"],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": []
     },
     "dev": {
       "dependsOn": [],
@@ -27,17 +15,7 @@
     },
     "test": {
       "dependsOn": ["build"],
-      "outputs": [],
-      "inputs": [
-        "src/**/*.tsx",
-        "src/**/*.ts",
-        "tests/**/*.ts",
-        "tests/**/*.tsx",
-        "test/**/*.ts",
-        "test/**/*.tsx",
-        "tsconfig.json",
-        "tsconfig.*.json"
-      ]
+      "outputs": []
     },
     "lint": {
       "dependsOn": [],
