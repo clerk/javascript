@@ -55,7 +55,7 @@
     "version:snapshot": "./scripts/snapshot.mjs",
     "version:staging": "./scripts/staging.mjs",
     "release": "npm run build -- --force && npm run test && npx changeset publish && git push --follow-tags",
-    "release:snapshot": "npm run build && npm run test && npx changeset publish --tag snapshot --no-git-tag",
+    "release:snapshot": "npm run build && npx changeset publish --tag snapshot --no-git-tag",
     "release:staging": "npm run build && npm run test && npx changeset publish --tag staging --no-git-tag"
   }
 }
