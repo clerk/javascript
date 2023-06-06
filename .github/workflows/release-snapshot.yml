@@ -17,6 +17,7 @@ jobs:
 #      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 #      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
     steps:
+      - run: echo "Snapshot release 1"
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
