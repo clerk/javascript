@@ -15,6 +15,7 @@ export { default as EyeSlash } from './eye-slash.svg';
 export { default as MagnifyingGlass } from './magnifying-glass.svg';
 export { default as Caret } from './caret.svg';
 export { default as PencilEdit } from './pencil-edit.svg';
+export { default as Pencil } from './pencil.svg';
 export { default as Email } from './email.svg';
 export { default as TickShield } from './tick-shield.svg';
 export { default as SwitchArrows } from './switch-arrows.svg';
