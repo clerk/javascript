@@ -10,7 +10,7 @@ jobs:
   test:
     strategy:
       matrix:
-        node-version: [ 16.19, 18.15, 19.8 ]
+        node-version: [ 18, 19 ]
     env:
       # Bundlewatch
       BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
