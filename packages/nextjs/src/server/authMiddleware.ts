@@ -7,11 +7,12 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
+import { SECRET_KEY } from './clerkClient';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import { receivedRequestForIgnoredRoute } from './errors';
-import { isDevOrStagingUrl, redirectToSignIn } from './redirect';
+import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
-import { apiEndpointUnauthorizedNextResponse, decorateRequest, setRequestHeadersOnNextResponse } from './utils';
+import { apiEndpointUnauthorizedNextResponse, decorateRequest, isCrossOrigin, isDevelopmentFromApiKey, setRequestHeadersOnNextResponse } from './utils';
 
 type WithPathPatternWildcard<T> = `${T & string}(.*)`;
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
@@ -168,7 +169,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
       const res = setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
-      return appendDevBrowserOnDevOrStaging(req, res);
+      return appendDevBrowserOnCrossOrigin(req, res);
     }
 
     if (options.debug) {
@@ -241,11 +242,12 @@ const withDefaultPublicRoutes = (publicRoutes: RouteMatcherParam | undefined) =>
   return routes;
 };
 
-// grabs the dev browser JWT from cookies and appends it to the redirect URL when redirecting to Clerk Hosted Pages
-// because middleware runs on the server side, before clerk-js is loaded.
-const appendDevBrowserOnDevOrStaging = (req: NextRequest, res: Response) => {
+// Grabs the dev browser JWT from cookies and appends it to the redirect URL when redirecting to cross-origin.
+// Middleware runs on the server side, before clerk-js is loaded, that's why we need Cookies.
+const appendDevBrowserOnCrossOrigin = (req: NextRequest, res: Response) => {
   const location = res.headers.get('location');
-  if (!!location && isDevOrStagingUrl(location)) {
+  const shouldAppendDevBrowser = res.headers.get(constants.Headers.ClerkRedirectTo) === 'true';
+  if (shouldAppendDevBrowser && !!location && isDevelopmentFromApiKey(SECRET_KEY) && isCrossOrigin(req.url, location)) {
     const dbJwt = req.cookies.get(DEV_BROWSER_JWT_MARKER)?.value;
     const urlWithDevBrowser = setDevBrowserJWTInURL(location, dbJwt);
     return NextResponse.redirect(urlWithDevBrowser, res);
