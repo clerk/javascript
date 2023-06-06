@@ -37,7 +37,8 @@
     "start": "echo \"Noop\"",
     "test": "jest",
     "test:ci": "jest --maxWorkers=50%",
-    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
+    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
+    "watch": "webpack --config webpack.config.js --env production --watch"
   },
   "dependencies": {
     "@clerk/localizations": "^1.18.1",

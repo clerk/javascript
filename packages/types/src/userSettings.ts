@@ -82,6 +82,11 @@ export type Attributes = {
   [attribute in Attribute]: AttributeData;
 };
 
+export type Actions = {
+  delete_self: boolean;
+  create_organization: boolean;
+};
+
 export interface UserSettingsJSON extends ClerkResourceJSON {
   id: never;
   object: never;
@@ -96,6 +101,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   sign_in: SignInData;
   sign_up: SignUpData;
   password_settings: PasswordSettingsData;
+  actions: Actions;
 }
 
 export interface UserSettingsResource extends ClerkResource {
@@ -108,6 +114,7 @@ export interface UserSettingsResource extends ClerkResource {
   saml: SamlSettings;
 
   attributes: Attributes;
+  actions: Actions;
   signIn: SignInData;
   signUp: SignUpData;
   passwordSettings: PasswordSettingsData;

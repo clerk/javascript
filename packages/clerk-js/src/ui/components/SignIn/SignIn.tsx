@@ -4,7 +4,7 @@ import React from 'react';
 import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { ComponentContext, useCoreClerk, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';

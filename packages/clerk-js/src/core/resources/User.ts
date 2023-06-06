@@ -80,6 +80,8 @@ export class User extends BaseResource implements UserResource {
   publicMetadata: UserPublicMetadata = {};
   unsafeMetadata: UserUnsafeMetadata = {};
   lastSignInAt: Date | null = null;
+  createOrganizationEnabled: boolean = false;
+  deleteSelfEnabled: boolean = false;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
 
@@ -222,6 +224,10 @@ export class User extends BaseResource implements UserResource {
       body: params,
       path: `${this.path()}/remove_password`,
     });
+  };
+
+  delete = (): Promise<void> => {
+    return this._baseDelete({ path: '/me' });
   };
 
   getSessions = async (): Promise<SessionWithActivities[]> => {

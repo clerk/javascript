@@ -83,6 +83,7 @@ export interface UserResource extends ClerkResource {
   createdAt: Date | null;
 
   update: (params: UpdateUserParams) => Promise<UserResource>;
+  delete: () => Promise<void>;
   updatePassword: (params: UpdateUserPasswordParams) => Promise<UserResource>;
   removePassword: (params: RemoveUserPasswordParams) => Promise<UserResource>;
   createEmailAddress: (params: CreateEmailAddressParams) => Promise<EmailAddressResource>;

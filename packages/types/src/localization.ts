@@ -385,6 +385,12 @@ type _LocalizationResource = {
         destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
       };
+      dangerSection: {
+        title: LocalizationValue;
+        deleteAccountButton: LocalizationValue;
+        deleteAccountTitle: LocalizationValue;
+        deleteAccountDescription: LocalizationValue;
+      };
     };
     profilePage: {
       title: LocalizationValue;
@@ -518,6 +524,11 @@ type _LocalizationResource = {
       actionLabel__copied: LocalizationValue;
       actionLabel__download: LocalizationValue;
       actionLabel__print: LocalizationValue;
+    };
+    deletePage: {
+      title: LocalizationValue;
+      description: LocalizationValue;
+      confirm: LocalizationValue;
     };
   };
   userButton: {
