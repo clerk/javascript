@@ -13,13 +13,12 @@ declare global {
   }
 }
 
-const SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 const WIDGET_CLASSNAME = 'clerk-captcha';
 
-export async function loadCaptcha() {
+export async function loadCaptcha(url: string) {
   return new Promise(resolve => {
     resolve(
-      loadScript(SCRIPT_URL, {
+      loadScript(url, {
         defer: true,
         globalObject: window.turnstile,
       }),
@@ -27,18 +26,19 @@ export async function loadCaptcha() {
   }).then(() => window.turnstile);
 }
 
-export const getCaptchaToken = async (captchaSiteKey: string) => {
+export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptUrl: string }) => {
+  const { siteKey: sitekey, scriptUrl } = captchaOptions;
   let captchaToken = '';
 
   const div = document.createElement('div');
   div.classList.add(WIDGET_CLASSNAME);
   document.body.appendChild(div);
-  const captcha = await loadCaptcha();
+  const captcha = await loadCaptcha(scriptUrl);
 
   const handleCaptchaTokenGeneration = (): Promise<string> => {
     return new Promise((resolve, reject) => {
       return captcha.execute(`.${WIDGET_CLASSNAME}`, {
-        sitekey: captchaSiteKey,
+        sitekey,
         retry: 'never',
         callback: function (token: string) {
           resolve(token);
