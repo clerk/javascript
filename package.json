@@ -54,8 +54,8 @@
     "version": "npx changeset version && ./scripts/version-info.sh",
     "version:snapshot": "./scripts/snapshot.mjs",
     "version:staging": "./scripts/staging.mjs",
-    "release": "npm run build -- --force && npm run test && npx changeset publish && git push --follow-tags",
-    "release:snapshot": "npm run build && npx changeset publish --tag snapshot --no-git-tag",
-    "release:staging": "npm run build && npm run test && npx changeset publish --tag staging --no-git-tag"
+    "release": "TURBO_CONCURRENCY=4 npm run build -- --force && npm run test && npx changeset publish && git push --follow-tags",
+    "release:snapshot": "TURBO_CONCURRENCY=4 npm run build && npx changeset publish --tag snapshot --no-git-tag",
+    "release:staging": "TURBO_CONCURRENCY=4 npm run build && npx changeset publish --tag staging --no-git-tag"
   }
 }

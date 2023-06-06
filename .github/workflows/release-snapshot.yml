@@ -19,10 +19,10 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Setup
-        uses: ./.github/actions/setup
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Extract snapshot name
         id: extract-snapshot-name
