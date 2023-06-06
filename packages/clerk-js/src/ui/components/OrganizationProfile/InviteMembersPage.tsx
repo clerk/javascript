@@ -46,7 +46,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
       </ContentPage>
       <SuccessPage
         title={title}
-        content={<InvitationsSentMessage />}
+        contents={<InvitationsSentMessage />}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       />
     </Wizard>

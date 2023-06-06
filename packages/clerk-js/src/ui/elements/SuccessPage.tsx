@@ -11,12 +11,12 @@ type SuccessPageProps = Omit<PropsOfComponent<typeof ContentPage>, 'headerTitle'
   title: LocalizationKey;
   text?: LocalizationKey | LocalizationKey[];
   finishLabel?: LocalizationKey;
-  content?: React.ReactNode;
+  contents?: React.ReactNode;
   onFinish?: () => void;
 };
 
 export const SuccessPage = (props: SuccessPageProps) => {
-  const { text, title, finishLabel, onFinish, content, ...rest } = props;
+  const { text, title, finishLabel, onFinish, contents, ...rest } = props;
 
   return (
     <ContentPage
@@ -42,7 +42,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
           />
         )}
       </Flex>
-      {content}
+      {contents}
 
       <FormButtonContainer>
         <NavigateToFlowStartButton
