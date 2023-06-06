@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          ref: refs/pull/${{ github.event.issue.number }}/head
+          ref: actions
       - name: Setup
         uses: ./.github/actions/setup
       - run: npm run test -- --dry-run
