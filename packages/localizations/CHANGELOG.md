@@ -1,8 +1,5 @@
 # Change Log
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
-
 ## [1.17.0](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.17.0-staging.2...@clerk/localizations@1.17.0) (2023-06-03)
 
 ### Features
