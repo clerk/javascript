@@ -33,3 +33,24 @@ jobs:
         run: npm run release:staging
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Trigger clerkinc/cloudfare-workers workflows
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.PAT }}
+          script: |
+            const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+            const nextjsVersion = require('./packages/nextjs/package.json').version;
+
+            if (clerkjsVersion.includes('staging'))) {
+              console.log('Will notify clerkinc/cloudfare-workers');
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerkinc',
+                repo: 'gh-actions-testbench',
+                workflow_id: 'release-staging-clerkjs-proxy.yml',
+                inputs: { version: clerkjsVersion }
+              })
+            }
