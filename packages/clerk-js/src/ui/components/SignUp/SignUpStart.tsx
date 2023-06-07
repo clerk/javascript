@@ -148,6 +148,8 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
           case ERROR_CODES.OAUTH_ACCESS_DENIED:
           case ERROR_CODES.NOT_ALLOWED_ACCESS:
+          case ERROR_CODES.SAML_EMAIL_ADDRESS_MISSING:
+          case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
             card.setError(error.longMessage);
             break;
           default:
