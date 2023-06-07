@@ -45,7 +45,7 @@ jobs:
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-            if (clerkjsVersion.includes('staging'))) {
+            if (clerkjsVersion.includes('staging')) {
               console.log('Will notify clerkinc/cloudfare-workers');
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerkinc',
