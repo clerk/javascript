@@ -11,7 +11,7 @@ import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import { receivedRequestForIgnoredRoute } from './errors';
 import { isDevOrStagingUrl, redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
-import { decorateRequest, setRequestHeadersOnNextResponse } from './utils';
+import { apiEndpointUnauthorizedNextResponse, decorateRequest, setRequestHeadersOnNextResponse } from './utils';
 
 type WithPathPatternWildcard<T> = `${T & string}(.*)`;
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
@@ -38,6 +38,10 @@ export const DEFAULT_CONFIG_MATCHER = ['/((?!.*\\..*|_next).*)', '/', '/(api|trp
  * This is the inverted version of DEFAULT_CONFIG_MATCHER.
  */
 export const DEFAULT_IGNORED_ROUTES = ['/((?!api|trpc))(_next|.+\\..+)(.*)'];
+/**
+ * Any routes matching this path will be treated as API endpoints by the middleware.
+ */
+export const DEFAULT_API_ROUTES = ['/api/(.*)', '/trpc/(.*)'];
 
 type RouteMatcherParam =
   | Array<RegExp | RouteMatcherWithNextTypedRoutes>
@@ -46,6 +50,7 @@ type RouteMatcherParam =
   | ((req: NextRequest) => boolean);
 
 type IgnoredRoutesParam = Array<RegExp | string> | RegExp | string | ((req: NextRequest) => boolean);
+type ApiRoutesParam = IgnoredRoutesParam;
 
 type BeforeAuthHandler = (
   req: NextRequest,
@@ -85,6 +90,18 @@ type AuthMiddlewareParams = WithAuthOptions & {
    */
   ignoredRoutes?: IgnoredRoutesParam;
   /**
+   * A list of routes that should be treated as API endpoints.
+   * When user is signed out, the middleware will return a 401 response for these routes, instead of redirecting the user.
+   *
+   * If omitted, the following heuristics will be used to determine an API endpoint:
+   * - The route path is ['/api/(.*)', '/trpc/(.*)'],
+   * - or the request has `Content-Type` set to `application/json`,
+   * - or the request method is not one of: `GET`, `OPTIONS` ,` HEAD`
+   *
+   * @default undefined
+   */
+  apiRoutes?: ApiRoutesParam;
+  /**
    * Enables extra debug logging.
    */
   debug?: boolean;
@@ -96,11 +113,12 @@ export interface AuthMiddleware {
 
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
-  const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, ...options } = params;
+  const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...options } = params;
 
   const isIgnoredRoute = createRouteMatcher(ignoredRoutes || DEFAULT_IGNORED_ROUTES);
   const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(publicRoutes));
-  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute);
+  const isApiRoute = createApiRoutes(apiRoutes);
+  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute);
 
   return withLogger('authMiddleware', logger => async (req: NextRequest, evt: NextFetchEvent) => {
     if (options.debug) {
@@ -130,12 +148,18 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     if (requestState.isUnknown) {
       logger.debug('authenticateRequest state is unknown', requestState);
       return handleUnknownState(requestState);
+    } else if (requestState.isInterstitial && isApiRoute(req)) {
+      logger.debug('authenticateRequest state is interstitial in an API route', requestState);
+      return handleUnknownState(requestState);
     } else if (requestState.isInterstitial) {
       logger.debug('authenticateRequest state is interstitial', requestState);
       return handleInterstitialState(requestState, options);
     }
 
-    const auth = Object.assign(requestState.toAuth(), { isPublicRoute: isPublicRoute(req) });
+    const auth = Object.assign(requestState.toAuth(), {
+      isPublicRoute: isPublicRoute(req),
+      isApiRoute: isApiRoute(req),
+    });
     logger.debug(() => ({ auth: JSON.stringify(auth) }));
     const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, req, evt);
     const finalRes = mergeResponses(beforeAuthRes, afterAuthRes) || NextResponse.next();
@@ -173,9 +197,14 @@ export const createRouteMatcher = (routes: RouteMatcherParam) => {
   return (req: NextRequest) => matchers.some(matcher => matcher.test(req.nextUrl.pathname));
 };
 
-const createDefaultAfterAuth = (isPublicRoute: ReturnType<typeof createRouteMatcher>) => {
+const createDefaultAfterAuth = (
+  isPublicRoute: ReturnType<typeof createRouteMatcher>,
+  isApiRoute: ReturnType<typeof createApiRoutes>,
+) => {
   return (auth: AuthObject, req: NextRequest) => {
-    if (!auth.userId && !isPublicRoute(req)) {
+    if (!auth.userId && !isPublicRoute(req) && isApiRoute(req)) {
+      return apiEndpointUnauthorizedNextResponse();
+    } else if (!auth.userId && !isPublicRoute(req)) {
       return redirectToSignIn({ returnBackUrl: req.url });
     }
     return NextResponse.next();
@@ -222,4 +251,31 @@ const appendDevBrowserOnDevOrStaging = (req: NextRequest, res: Response) => {
     return NextResponse.redirect(urlWithDevBrowser, res);
   }
   return res;
+};
+
+// - Default behavior:
+//    If the route path is `['/api/(.*)*', '*/trpc/(.*)']`
+//    or Request has `Content-Type: application/json`
+//    or Request method is not-GET,OPTIONS,HEAD,
+//    then this is considered an API route.
+//
+// - If the user has provided a specific `apiRoutes` prop in `authMiddleware` then all the above are discarded,
+//   and only routes that match the user’s provided paths are considered API routes.
+const createApiRoutes = (apiRoutes: RouteMatcherParam | undefined): ((req: NextRequest) => boolean) => {
+  if (apiRoutes) {
+    return createRouteMatcher(apiRoutes);
+  }
+  const isDefaultApiRoute = createRouteMatcher(DEFAULT_API_ROUTES);
+  return (req: NextRequest) =>
+    isDefaultApiRoute(req) || isRequestMethodIndicatingApiRoute(req) || isRequestContentTypeJson(req);
+};
+
+const isRequestContentTypeJson = (req: NextRequest): boolean => {
+  const requestContentType = req.headers.get(constants.Headers.ContentType);
+  return requestContentType === constants.ContentTypes.Json;
+};
+
+const isRequestMethodIndicatingApiRoute = (req: NextRequest): boolean => {
+  const requestMethod = req.method.toLowerCase();
+  return !['get', 'head', 'options'].includes(requestMethod);
 };

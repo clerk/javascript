@@ -247,3 +247,7 @@ export function decorateRequest(
 
   return res;
 }
+
+export const apiEndpointUnauthorizedNextResponse = () => {
+  return NextResponse.json(null, { status: 401, statusText: 'Unauthorized' });
+};
