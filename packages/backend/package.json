@@ -4,21 +4,32 @@
   "license": "MIT",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "types": "./dist/types/index.d.ts",
-  "main": "./dist/index.js",
+  "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./dist/runtime/node/fetch.js": "./dist/cjs/runtime/node/fetch.js",
+    "./dist/runtime/node/crypto.js": "./dist/cjs/runtime/node/crypto.js"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
+    "build": "tsup",
     "dev": "tsup --watch",
-    "build": "run-s clean build:runtime build:lib",
-    "build:lib": "tsup --env.NODE_ENV production",
-    "build:tests": "tsc -p tsconfig.test.json",
-    "build:runtime": "rsync -r --include '*/' --include '*.js' --include '*.mjs' --exclude='*' src/runtime dist",
+    "dev:publish": "npm run dev -- --env.PUBLISH=true",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "publish:local": "npx yalc push --replace --sig",
     "clean": "rimraf ./dist",
     "clean:tests": "rimraf ./tests/dist",
     "lint": "eslint .",
-    "test": "run-s clean:tests build:runtime build:tests test:node test:edge-runtime test:cloudflare-miniflare",
+    "test": "run-s clean:tests build:tests:runtime build:tests test:node test:edge-runtime test:cloudflare-miniflare",
+    "build:tests": "tsc -p tsconfig.test.json && cp ./package.esm.json ./tests/dist/package.json",
+    "build:tests:runtime": "rsync -r --include '*/' --include '*.js' --include '*.mjs' --exclude='*' src/runtime ./tests/dist",
     "test:node": "./tests/node/run.sh",
     "test:edge-runtime": "./tests/edge-runtime/run.sh",
     "test:cloudflare-miniflare": "tests/cloudflare-miniflare/run.sh",
@@ -52,22 +63,6 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "imports": {
-    "#crypto": {
-      "edge-light": "./dist/runtime/browser/crypto.mjs",
-      "worker": "./dist/runtime/browser/crypto.mjs",
-      "browser": "./dist/runtime/browser/crypto.mjs",
-      "node": "./dist/runtime/node/crypto.js",
-      "default": "./dist/runtime/browser/crypto.mjs"
-    },
-    "#fetch": {
-      "edge-light": "./dist/runtime/browser/fetch.mjs",
-      "worker": "./dist/runtime/browser/fetch.mjs",
-      "browser": "./dist/runtime/browser/fetch.mjs",
-      "node": "./dist/runtime/node/fetch.js",
-      "default": "./dist/runtime/browser/fetch.mjs"
-    }
   },
   "homepage": "https://clerk.com/",
   "repository": {

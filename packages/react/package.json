@@ -31,7 +31,7 @@
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.PUBLISH=true",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "publish:local": "npx yalc push --replace  --sig",
+    "publish:local": "npx yalc push --replace --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test:coverage": "echo \"Error: no test specified yet\"",
