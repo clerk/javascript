@@ -51,6 +51,7 @@
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done",
     "prepare": "husky install",
     "changeset": "npx changeset",
+    "changeset:empty": "npm run changeset -- --empty",
     "version": "npx changeset version && ./scripts/version-info.sh",
     "version:snapshot": "./scripts/snapshot.mjs",
     "version:staging": "./scripts/staging.mjs",
