@@ -1,6 +1,6 @@
+import { isMagicLinkError, MagicLinkErrorCode } from '@clerk/shared';
 import React from 'react';
 
-import { isMagicLinkError, MagicLinkErrorCode } from '../../core/resources/Error';
 import type { VerificationStatus } from '../../utils/getClerkQueryParam';
 import { completeSignUpFlow } from '../components/SignUp/util';
 import { useCoreClerk, useCoreSignUp } from '../contexts';

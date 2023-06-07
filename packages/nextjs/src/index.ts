@@ -47,8 +47,6 @@ export {
   useOrganizationList,
   useOrganizations,
   useMagicLink,
-  MagicLinkErrorCode,
-  isMagicLinkError,
   withUser,
   withSession,
   withClerk,
@@ -58,6 +56,14 @@ export {
 } from './client-boundary/hooks';
 
 export type { WithUserProp, WithSessionProp, WithClerkProp } from './client-boundary/hooks';
+
+export {
+  isClerkAPIResponseError,
+  isMagicLinkError,
+  isMetamaskError,
+  isKnownError,
+  MagicLinkErrorCode,
+} from '@clerk/clerk-react';
 
 /**
  * Conditionally export components that exhibit different behavior
