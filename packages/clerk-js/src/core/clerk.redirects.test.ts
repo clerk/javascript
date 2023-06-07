@@ -4,6 +4,7 @@ import { Client, Environment } from './resources/internal';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();
+const mockUsesUrlBasedSessionSync = jest.fn();
 
 jest.mock('./resources/Client');
 jest.mock('./resources/Environment');
@@ -15,6 +16,7 @@ jest.mock('./devBrowserHandler', () => () => ({
   getDevBrowserJWT: jest.fn(() => 'deadbeef'),
   setDevBrowserJWT: jest.fn(),
   removeDevBrowserJWT: jest.fn(),
+  usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
 }));
 
 Client.getInstance = jest.fn().mockImplementation(() => {
@@ -107,6 +109,8 @@ describe('Clerk singleton - Redirects', () => {
           }),
         );
 
+        mockUsesUrlBasedSessionSync.mockReturnValue(true);
+
         clerkForProductionInstance = new Clerk(productionFrontendApi);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
@@ -182,6 +186,8 @@ describe('Clerk singleton - Redirects', () => {
             isDevelopmentOrStaging: () => true,
           }),
         );
+
+        mockUsesUrlBasedSessionSync.mockReturnValue(true);
 
         clerkForProductionInstance = new Clerk(productionFrontendApi);
         await clerkForProductionInstance.load({
@@ -272,6 +278,8 @@ describe('Clerk singleton - Redirects', () => {
 
     describe('for cookie-based dev instances', () => {
       beforeEach(async () => {
+        mockUsesUrlBasedSessionSync.mockReturnValue(false);
+
         clerkForProductionInstance = new Clerk(productionFrontendApi);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
@@ -294,6 +302,7 @@ describe('Clerk singleton - Redirects', () => {
 
     describe('for dev instances that use url based session syncing', () => {
       beforeEach(async () => {
+        mockUsesUrlBasedSessionSync.mockReturnValue(true);
         mockEnvironmentFetch.mockReturnValue(
           Promise.resolve({
             authConfig: { urlBasedSessionSyncing: true } as AuthConfig,
