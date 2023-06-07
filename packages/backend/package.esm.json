@@ -1,0 +1,20 @@
+{
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#crypto": {
+      "edge-light": "./runtime/browser/crypto.mjs",
+      "worker": "./runtime/browser/crypto.mjs",
+      "browser": "./runtime/browser/crypto.mjs",
+      "node": "./runtime/node/crypto.js",
+      "default": "./runtime/browser/crypto.mjs"
+    },
+    "#fetch": {
+      "edge-light": "./runtime/browser/fetch.mjs",
+      "worker": "./runtime/browser/fetch.mjs",
+      "browser": "./runtime/browser/fetch.mjs",
+      "node": "./runtime/node/fetch.js",
+      "default": "./runtime/browser/fetch.mjs"
+    }
+  }
+}

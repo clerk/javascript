@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev:yalc": "npm run yalc && rm -rf .next && next dev --port 4011",
+    "dev:fromlocal": "npm run dev:yalc",
     "yalc": "yalc add @clerk/nextjs && yalc add @clerk/clerk-react && yalc add @clerk/backend && yalc add @clerk/types",
     "dev": "next dev --port 4011",
     "build": "next build",

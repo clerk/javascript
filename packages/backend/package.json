@@ -4,17 +4,20 @@
   "license": "MIT",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "types": "./dist/types/index.d.ts",
-  "main": "./dist/index.js",
+  "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "files": [
     "dist"
   ],
   "scripts": {
     "dev": "tsup --watch",
-    "build": "run-s clean build:runtime build:lib",
+    "publish:local": "npx yalc push --replace  --sig",
+    "dev:publish": "npm run dev",
+    "build": "run-s clean build:lib",
     "build:lib": "tsup --env.NODE_ENV production",
     "build:tests": "tsc -p tsconfig.test.json",
     "build:runtime": "rsync -r --include '*/' --include '*.js' --include '*.mjs' --exclude='*' src/runtime dist",
+    "build:declarations": "tsc",
     "clean": "rimraf ./dist",
     "clean:tests": "rimraf ./tests/dist",
     "lint": "eslint .",
@@ -52,22 +55,6 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "imports": {
-    "#crypto": {
-      "edge-light": "./dist/runtime/browser/crypto.mjs",
-      "worker": "./dist/runtime/browser/crypto.mjs",
-      "browser": "./dist/runtime/browser/crypto.mjs",
-      "node": "./dist/runtime/node/crypto.js",
-      "default": "./dist/runtime/browser/crypto.mjs"
-    },
-    "#fetch": {
-      "edge-light": "./dist/runtime/browser/fetch.mjs",
-      "worker": "./dist/runtime/browser/fetch.mjs",
-      "browser": "./dist/runtime/browser/fetch.mjs",
-      "node": "./dist/runtime/node/fetch.js",
-      "default": "./dist/runtime/browser/fetch.mjs"
-    }
   },
   "homepage": "https://clerk.com/",
   "repository": {

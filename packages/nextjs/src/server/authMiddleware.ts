@@ -110,6 +110,12 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     logger.debug('URL debug', { url: req.nextUrl.href, method: req.method, headers: stringifyHeaders(req.headers) });
     logger.debug('Options debug', { ...options, beforeAuth: !!beforeAuth, afterAuth: !!afterAuth });
 
+    const t = { counter: 'clerk-counter' };
+    const counter = +(req.cookies.get(t.counter)?.value || 0);
+    if (counter === 6) {
+      throw new Error('Loop detected 2');
+    }
+
     if (isIgnoredRoute(req)) {
       logger.debug({ isIgnoredRoute: true });
       console.warn(receivedRequestForIgnoredRoute(req.nextUrl.href, JSON.stringify(DEFAULT_CONFIG_MATCHER)));
@@ -127,12 +133,15 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     }
 
     const requestState = await authenticateRequest(req, options);
+
     if (requestState.isUnknown) {
       logger.debug('authenticateRequest state is unknown', requestState);
       return handleUnknownState(requestState);
     } else if (requestState.isInterstitial) {
       logger.debug('authenticateRequest state is interstitial', requestState);
-      return handleInterstitialState(requestState, options);
+      const res = handleInterstitialState(requestState, options);
+      res.cookies.set({ name: t.counter, value: `${counter + 1}`, maxAge: 3 });
+      return res;
     }
 
     const auth = Object.assign(requestState.toAuth(), { isPublicRoute: isPublicRoute(req) });

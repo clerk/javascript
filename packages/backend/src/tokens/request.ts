@@ -2,6 +2,7 @@ import { API_URL, API_VERSION } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { isDevelopmentFromApiKey } from '../util/instance';
 import { parsePublishableKey } from '../util/parsePublishableKey';
+import { hello } from '../util/requestAdapter';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
@@ -22,6 +23,8 @@ import {
   satelliteInDevReturningFromPrimary,
 } from './interstitialRule';
 import type { VerifyTokenOptions } from './verify';
+
+console.log({ hello });
 
 export type LoadResourcesOptions = {
   loadSession?: boolean;
