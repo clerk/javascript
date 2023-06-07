@@ -15,4 +15,6 @@ export const ERROR_CODES = {
   NOT_ALLOWED_TO_SIGN_UP: 'not_allowed_to_sign_up',
   OAUTH_ACCESS_DENIED: 'oauth_access_denied',
   NOT_ALLOWED_ACCESS: 'not_allowed_access',
+  SAML_EMAIL_ADDRESS_MISSING: 'saml_email_address_missing',
+  SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'saml_email_address_domain_mismatch',
 };
