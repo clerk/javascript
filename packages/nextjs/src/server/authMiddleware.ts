@@ -50,7 +50,7 @@ type RouteMatcherParam =
   | ((req: NextRequest) => boolean);
 
 type IgnoredRoutesParam = Array<RegExp | string> | RegExp | string | ((req: NextRequest) => boolean);
-type ApiRoutesParam = Array<RegExp | string> | RegExp | string | ((req: NextRequest) => boolean);
+type ApiRoutesParam = IgnoredRoutesParam;
 
 type BeforeAuthHandler = (
   req: NextRequest,
@@ -92,7 +92,13 @@ type AuthMiddlewareParams = WithAuthOptions & {
   /**
    * A list of routes that should be treated as API endpoints.
    * When user is signed out, the middleware will return a 401 response for these routes, instead of redirecting the user.
-   * If omitted, these default API routes will be used: `['/api/(.*)', '/trpc/(.*)']` together with some heuristics.
+   *
+   * If omitted, the following heuristics will be used to determine an API endpoint:
+   * - The route path is ['/api/(.*)', '/trpc/(.*)'],
+   * - or the request has `Content-Type` set to `application/json`,
+   * - or the request method is not one of: `GET`, `OPTIONS` ,` HEAD`
+   *
+   * @default undefined
    */
   apiRoutes?: ApiRoutesParam;
   /**
