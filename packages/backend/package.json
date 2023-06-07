@@ -48,7 +48,7 @@
     "sinon": "^14.0.1",
     "tsup": "*",
     "typescript": "*",
-    "workerd": "1.20220926.3"
+    "workerd": "^1.20230518.0"
   },
   "publishConfig": {
     "access": "public"
