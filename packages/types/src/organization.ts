@@ -76,5 +76,5 @@ export interface UpdateOrganizationParams {
 }
 
 export interface SetOrganizationLogoParams {
-  file: Blob | File | null;
+  file: Blob | File | string | null;
 }
