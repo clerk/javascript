@@ -3,23 +3,20 @@
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const mockRedirectToSignIn = jest
-  .fn()
-  .mockImplementation(() =>
-    NextResponse.redirect(
-      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
-    ),
+const mockRedirectToSignIn = jest.fn().mockImplementation(() => {
+  const res = NextResponse.redirect(
+    'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
   );
+  return setHeader(res, 'x-clerk-redirect-to', 'true');
+});
 
 jest.mock('./redirect', () => {
-  const { isDevOrStagingUrl } = jest.requireActual('./redirect');
   return {
     redirectToSignIn: mockRedirectToSignIn,
-    isDevOrStagingUrl,
   };
 });
 
-import { paths } from '../utils';
+import { paths, setHeader } from '../utils';
 // used to assert the mock
 import { authenticateRequest } from './authenticateRequest';
 import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
@@ -43,6 +40,7 @@ jest.mock('./clerkClient', () => {
   const { debugRequestState } = jest.requireActual('./clerkClient');
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
+    SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
     clerkClient: {
       localInterstitial: jest.fn().mockResolvedValue('<html>interstitial</html>'),
     },
@@ -431,7 +429,7 @@ describe('authMiddleware(params)', () => {
   });
 });
 
-describe('Dev Browser JWT when redirecting to Clerk Hosted Pages', function () {
+describe('Dev Browser JWT when redirecting to cross origin', function () {
   it('does NOT append the Dev Browser JWT when cookie is missing', async () => {
     const resp = await authMiddleware({
       beforeAuth: () => NextResponse.next(),
@@ -458,10 +456,10 @@ describe('Dev Browser JWT when redirecting to Clerk Hosted Pages', function () {
     expect(authenticateRequest).toBeCalled();
   });
 
-  it('does NOT append the Dev Browser JWT on production domains', async () => {
+  it('does NOT append the Dev Browser JWT if x-clerk-redirect-to header is not set', async () => {
     mockRedirectToSignIn.mockReturnValueOnce(
       NextResponse.redirect(
-        'https://accounts.example.com/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
+        'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
       ),
     );
     const resp = await authMiddleware({
@@ -470,7 +468,7 @@ describe('Dev Browser JWT when redirecting to Clerk Hosted Pages', function () {
 
     expect(resp?.status).toEqual(307);
     expect(resp?.headers.get('location')).toEqual(
-      'https://accounts.example.com/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
+      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
     expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(authenticateRequest).toBeCalled();
