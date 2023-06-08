@@ -3,6 +3,8 @@ import { createBackendApiClient } from './api';
 import type { CreateAuthenticateRequestOptions } from './tokens';
 import { createAuthenticateRequest } from './tokens';
 
+export type { InstanceKeys } from './tokens';
+
 export * from './api/resources';
 export * from './tokens';
 export * from './tokens/jwt';

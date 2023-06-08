@@ -13,7 +13,7 @@ export function checkCrossOrigin({
   forwardedProto,
 }: {
   originURL: URL;
-  host: string;
+  host?: string | null;
   forwardedHost?: string | null;
   forwardedPort?: string | null;
   forwardedProto?: string | null;
@@ -37,7 +37,7 @@ export function checkCrossOrigin({
 
   const protocol = fwdProto || originProtocol;
   /* The forwarded host prioritised over host to be checked against the referrer.  */
-  const finalURL = convertHostHeaderValueToURL(forwardedHost || host, protocol);
+  const finalURL = convertHostHeaderValueToURL(forwardedHost || host || undefined, protocol);
   finalURL.port = fwdPort || finalURL.port;
 
   if (getPort(finalURL) !== getPort(originURL)) {
@@ -50,7 +50,7 @@ export function checkCrossOrigin({
   return false;
 }
 
-export function convertHostHeaderValueToURL(host: string, protocol = 'https'): URL {
+export function convertHostHeaderValueToURL(host?: string, protocol = 'https'): URL {
   /**
    * The protocol is added for the URL constructor to work properly.
    * We do not check for the protocol at any point later on.
