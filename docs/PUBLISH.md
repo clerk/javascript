@@ -1,6 +1,8 @@
 # Publishing packages
 
-_Version updates and publishing is managed using Lerna by @clerkinc/frontend-team._
+_Note: Only core maintainers can publish packages._
+
+_Package versioning and publishing is currently handled by @clerkinc/frontend-team._
 
 ## Publishing stable package versions
 
