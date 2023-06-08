@@ -1,25 +1,5 @@
 # Change Log
 
-### [2.6.5](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.6.5-staging.5...@clerk/remix@2.6.5) (2023-06-03)
-
-**Note:** Version bump only for package @clerk/remix
-
-### [2.6.4](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.6.4-staging.0...@clerk/remix@2.6.4) (2023-05-26)
-
-**Note:** Version bump only for package @clerk/remix
-
-### [2.6.3](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.6.3-staging.2...@clerk/remix@2.6.3) (2023-05-23)
-
-**Note:** Version bump only for package @clerk/remix
-
-### [2.6.2](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.6.2-staging.1...@clerk/remix@2.6.2) (2023-05-18)
-
-**Note:** Version bump only for package @clerk/remix
-
-### [2.6.1](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.6.1-staging.1...@clerk/remix@2.6.1) (2023-05-17)
-
-**Note:** Version bump only for package @clerk/remix
-
 ## [2.6.0](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.6.0-staging.4...@clerk/remix@2.6.0) (2023-05-15)
 
 **Note:** Version bump only for package @clerk/remix

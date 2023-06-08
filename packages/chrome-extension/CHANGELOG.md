@@ -1,33 +1,5 @@
 # Change Log
 
-### [0.3.7](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.3.7-staging.4...@clerk/chrome-extension@0.3.7) (2023-06-03)
-
-**Note:** Version bump only for package @clerk/chrome-extension
-
-### [0.3.6](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.3.6-staging.0...@clerk/chrome-extension@0.3.6) (2023-05-26)
-
-**Note:** Version bump only for package @clerk/chrome-extension
-
-### [0.3.5](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.3.5-staging.0...@clerk/chrome-extension@0.3.5) (2023-05-23)
-
-**Note:** Version bump only for package @clerk/chrome-extension
-
-### [0.3.4](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.3.3...@clerk/chrome-extension@0.3.4) (2023-05-23)
-
-**Note:** Version bump only for package @clerk/chrome-extension
-
-### [0.3.3](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.3.3-staging.2...@clerk/chrome-extension@0.3.3) (2023-05-23)
-
-**Note:** Version bump only for package @clerk/chrome-extension
-
-### [0.3.2](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.3.2-staging.1...@clerk/chrome-extension@0.3.2) (2023-05-18)
-
-**Note:** Version bump only for package @clerk/chrome-extension
-
-### [0.3.1](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.3.1-staging.2...@clerk/chrome-extension@0.3.1) (2023-05-17)
-
-**Note:** Version bump only for package @clerk/chrome-extension
-
 ## [0.3.0](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.2.8-staging.4...@clerk/chrome-extension@0.3.0) (2023-05-15)
 
 **Note:** Version bump only for package @clerk/chrome-extension

@@ -1,29 +1,5 @@
 # Change Log
 
-### [4.3.6](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.3.6-staging.4...gatsby-plugin-clerk@4.3.6) (2023-06-03)
-
-**Note:** Version bump only for package gatsby-plugin-clerk
-
-### [4.3.5](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.3.5-staging.0...gatsby-plugin-clerk@4.3.5) (2023-05-26)
-
-**Note:** Version bump only for package gatsby-plugin-clerk
-
-### [4.3.4](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.3.3...gatsby-plugin-clerk@4.3.4) (2023-05-23)
-
-**Note:** Version bump only for package gatsby-plugin-clerk
-
-### [4.3.3](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.3.3-staging.2...gatsby-plugin-clerk@4.3.3) (2023-05-23)
-
-**Note:** Version bump only for package gatsby-plugin-clerk
-
-### [4.3.2](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.3.2-staging.1...gatsby-plugin-clerk@4.3.2) (2023-05-18)
-
-**Note:** Version bump only for package gatsby-plugin-clerk
-
-### [4.3.1](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.3.1-staging.1...gatsby-plugin-clerk@4.3.1) (2023-05-17)
-
-**Note:** Version bump only for package gatsby-plugin-clerk
-
 ## [4.3.0](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.2.8-staging.4...gatsby-plugin-clerk@4.3.0) (2023-05-15)
 
 **Note:** Version bump only for package gatsby-plugin-clerk

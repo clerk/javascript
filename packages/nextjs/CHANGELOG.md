@@ -1,9 +1,5 @@
 # Change Log
 
-### [4.19.1](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.19.1-staging.4...@clerk/nextjs@4.19.1) (2023-06-03)
-
-**Note:** Version bump only for package @clerk/nextjs
-
 ## [4.19.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.19.0-staging.1...@clerk/nextjs@4.19.0) (2023-05-26)
 
 **Note:** Version bump only for package @clerk/nextjs

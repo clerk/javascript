@@ -1,33 +1,5 @@
 # Change Log
 
-### [0.17.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.17.7-staging.4...@clerk/clerk-expo@0.17.7) (2023-06-03)
-
-**Note:** Version bump only for package @clerk/clerk-expo
-
-### [0.17.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.17.6-staging.0...@clerk/clerk-expo@0.17.6) (2023-05-26)
-
-**Note:** Version bump only for package @clerk/clerk-expo
-
-### [0.17.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.17.5-staging.0...@clerk/clerk-expo@0.17.5) (2023-05-23)
-
-**Note:** Version bump only for package @clerk/clerk-expo
-
-### [0.17.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.17.3...@clerk/clerk-expo@0.17.4) (2023-05-23)
-
-**Note:** Version bump only for package @clerk/clerk-expo
-
-### [0.17.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.17.3-staging.2...@clerk/clerk-expo@0.17.3) (2023-05-23)
-
-**Note:** Version bump only for package @clerk/clerk-expo
-
-### [0.17.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.17.2-staging.1...@clerk/clerk-expo@0.17.2) (2023-05-18)
-
-**Note:** Version bump only for package @clerk/clerk-expo
-
-### [0.17.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.17.1-staging.2...@clerk/clerk-expo@0.17.1) (2023-05-17)
-
-**Note:** Version bump only for package @clerk/clerk-expo
-
 ## [0.17.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.16.5-staging.4...@clerk/clerk-expo@0.17.0) (2023-05-15)
 
 **Note:** Version bump only for package @clerk/clerk-expo
