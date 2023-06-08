@@ -167,7 +167,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       isPublicRoute: isPublicRoute(req),
       isApiRoute: isApiRoute(req),
     });
-    logger.debug(() => ({ auth: JSON.stringify(auth) }));
+    logger.debug(() => ({ auth: JSON.stringify(auth), debug: auth.debug() }));
     const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, req, evt);
     const finalRes = mergeResponses(beforeAuthRes, afterAuthRes) || NextResponse.next();
     logger.debug(() => ({ mergedHeaders: stringifyHeaders(finalRes.headers) }));
