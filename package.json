@@ -46,6 +46,7 @@
     "clean": "turbo clean",
     "lint": "turbo lint",
     "bundlewatch": "turbo bundlewatch",
+    "format": "npx prettier --write .",
     "format:check": "npx prettier --cache --check .",
     "nuke": "./scripts/nuke.sh",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done",
