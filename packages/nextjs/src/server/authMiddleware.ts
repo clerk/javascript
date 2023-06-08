@@ -34,6 +34,8 @@ type RouteMatcherWithNextTypedRoutes =
   | NextTypedRoute
   | (string & {});
 
+const INFINITE_REDIRECTION_LOOP_COOKIE = '__clerk_redirection_loop';
+
 /**
  * The default ideal matcher that excludes the _next directory (internals) and all static files,
  * but it will match the root route (/) and any routes that start with /api or /trpc.
@@ -160,7 +162,8 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return handleUnknownState(requestState);
     } else if (requestState.isInterstitial) {
       logger.debug('authenticateRequest state is interstitial', requestState);
-      return handleInterstitialState(requestState, options);
+      const res = handleInterstitialState(requestState, options);
+      return assertInfiniteRedirectionLoop(req, res);
     }
 
     const auth = Object.assign(requestState.toAuth(), {
@@ -286,4 +289,28 @@ const isRequestContentTypeJson = (req: NextRequest): boolean => {
 const isRequestMethodIndicatingApiRoute = (req: NextRequest): boolean => {
   const requestMethod = req.method.toLowerCase();
   return !['get', 'head', 'options'].includes(requestMethod);
+};
+
+// When in development, we want to prevent infinite interstitial redirection loops.
+// We incrementally set a `__clerk_redirection_loop` cookie, and when it loops 6 times, we throw an error.
+// We also utilize the `referer` header to skip the prefetch requests.
+const assertInfiniteRedirectionLoop = (req: NextRequest, res: NextResponse): NextResponse => {
+  if (!isDevelopmentFromApiKey(SECRET_KEY)) {
+    return res;
+  }
+
+  const infiniteRedirectsCounter = Number(req.cookies.get(INFINITE_REDIRECTION_LOOP_COOKIE)?.value) || 0;
+  if (infiniteRedirectsCounter === 6) {
+    throw new Error('Oops! Looks like you ended up in an Infinite Redirection Loop.');
+  }
+
+  // Skip the prefetch requests (when hovering a Next Link element)
+  if (req.headers.get('referer') === req.url) {
+    res.cookies.set({
+      name: INFINITE_REDIRECTION_LOOP_COOKIE,
+      value: `${infiniteRedirectsCounter + 1}`,
+      maxAge: 3,
+    });
+  }
+  return res;
 };
