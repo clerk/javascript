@@ -31,8 +31,6 @@
     "cookies": "0.8.0"
   },
   "devDependencies": {
-    "jest": "*",
-    "ts-jest": "*",
     "tsup": "*",
     "typescript": "*"
   },

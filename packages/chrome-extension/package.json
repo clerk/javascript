@@ -32,17 +32,10 @@
     "@clerk/clerk-react": "^4.18.0"
   },
   "devDependencies": {
-    "@testing-library/dom": "^8.19.0",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.4.3",
     "@types/chrome": "*",
     "@types/node": "^16.11.55",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "jest": "^29.3.0",
-    "jest-environment-jsdom": "^29.3.1",
-    "ts-jest": "^29.0.3",
     "tsup": "*",
     "typescript": "*"
   },
