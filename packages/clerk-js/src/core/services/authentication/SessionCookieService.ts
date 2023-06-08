@@ -1,4 +1,4 @@
-import { is400Error, isNetworkError, isUnauthorizedError } from '@clerk/shared';
+import { is400Error, isNetworkError } from '@clerk/shared';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
 import type { CookieHandler } from '../../../utils';
