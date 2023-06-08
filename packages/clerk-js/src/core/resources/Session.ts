@@ -1,5 +1,5 @@
 import { is400Error } from '@clerk/shared';
-import { deepSnakeToCamel, isUnauthorizedError, runWithExponentialBackOff } from '@clerk/shared';
+import { deepSnakeToCamel, runWithExponentialBackOff } from '@clerk/shared';
 import type {
   ActJWTClaim,
   GetToken,
