@@ -107,7 +107,7 @@ export interface UserResource extends ClerkResource {
 export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };
 export type CreateWeb3WalletParams = { web3Wallet: string };
-export type SetProfileImageParams = { file: Blob | File | null };
+export type SetProfileImageParams = { file: Blob | File | string | null };
 export type CreateExternalAccountParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
