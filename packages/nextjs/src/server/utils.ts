@@ -251,3 +251,9 @@ export function decorateRequest(
 export const apiEndpointUnauthorizedNextResponse = () => {
   return NextResponse.json(null, { status: 401, statusText: 'Unauthorized' });
 };
+
+export const isCrossOrigin = (from: string | URL, to: string | URL) => {
+  const fromUrl = new URL(from);
+  const toUrl = new URL(to);
+  return fromUrl.origin !== toUrl.origin;
+};

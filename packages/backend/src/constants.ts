@@ -21,6 +21,7 @@ const Headers = {
   AuthReason: 'x-clerk-auth-reason',
   AuthMessage: 'x-clerk-auth-message',
   EnableDebug: 'x-clerk-debug',
+  ClerkRedirectTo: 'x-clerk-redirect-to',
   Authorization: 'authorization',
   ForwardedPort: 'x-forwarded-port',
   ForwardedProto: 'x-forwarded-proto',
