@@ -26,7 +26,6 @@
     "api.d.ts"
   ],
   "scripts": {
-    "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
     "clean": "rimraf ./dist",

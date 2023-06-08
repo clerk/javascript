@@ -34,8 +34,6 @@
     "dev:headless": "webpack serve --config webpack.config.js --env variant=\"clerk.headless.browser\"",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
-    "prepublishOnly": "npm run build",
-    "postpublish": "node ./scripts/purge-cache.mjs",
     "start": "echo \"Noop\"",
     "test": "jest",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"

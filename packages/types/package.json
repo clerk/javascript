@@ -20,7 +20,6 @@
     "dist"
   ],
   "scripts": {
-    "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
     "clean": "rimraf ./dist",

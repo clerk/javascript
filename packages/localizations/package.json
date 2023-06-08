@@ -22,7 +22,6 @@
     "dist"
   ],
   "scripts": {
-    "prepublishOnly": "npm run build",
     "dev": "tsup --watch",
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
