@@ -143,6 +143,8 @@ You will need your Frontend API URL, which can be found in your `Dashboard > API
 "host_permissions": ["*://YOUR_CLERK_FRONTEND_API_GOES_HERE/"],
 ```
 
+<a name="clerk-settings"></a>
+
 ### Clerk settings
 
 Add your Chrome extension origin to your instance allowed_origins using BAPI:
@@ -153,6 +155,10 @@ curl  -X PATCH https://api.clerk.com/v1/instance \
       -H "Content-type: application/json" \
       -d '{"allowed_origins": ["chrome-extension://extension_id_goes_here"]}'
 ```
+
+## Deploy to Production
+
+Setting the `allowed_origins` (check [Clerk Settings](#clerk-settings)) is **REQUIRED** for both **Development** and **Production** instances when using the WebSSO use case.
 
 ## Learn More
 
