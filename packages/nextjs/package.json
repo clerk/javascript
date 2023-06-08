@@ -83,10 +83,7 @@
     "@types/node": "^16.11.55",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "expect-type": "^0.15.0",
-    "jest": "*",
     "node-fetch-native": "1.1.1",
-    "ts-jest": "*",
     "typescript": "*"
   },
   "peerDependencies": {
