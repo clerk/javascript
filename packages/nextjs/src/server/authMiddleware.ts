@@ -12,7 +12,13 @@ import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import { receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
-import { apiEndpointUnauthorizedNextResponse, decorateRequest, isCrossOrigin, isDevelopmentFromApiKey, setRequestHeadersOnNextResponse } from './utils';
+import {
+  apiEndpointUnauthorizedNextResponse,
+  decorateRequest,
+  isCrossOrigin,
+  isDevelopmentFromApiKey,
+  setRequestHeadersOnNextResponse,
+} from './utils';
 
 type WithPathPatternWildcard<T> = `${T & string}(.*)`;
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
