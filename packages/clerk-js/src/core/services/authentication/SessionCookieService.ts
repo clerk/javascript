@@ -1,4 +1,4 @@
-import { isNetworkError, isUnauthorizedError } from '@clerk/shared';
+import { is400Error, isNetworkError, isUnauthorizedError } from '@clerk/shared';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
 import type { CookieHandler } from '../../../utils';
@@ -64,7 +64,11 @@ export class SessionCookieService {
     try {
       this.updateSessionCookie(await this.getNewToken());
     } catch (e) {
-      return this.handleGetTokenError(e);
+      try {
+        return this.handleGetTokenError(e);
+      } catch {
+        return this.clerk.setActive({ session: null });
+      }
     }
   }
 
@@ -97,7 +101,7 @@ export class SessionCookieService {
 
   private handleGetTokenError(e: any) {
     if (isClerkAPIResponseError(e)) {
-      if (isUnauthorizedError(e) || isNetworkError(e)) {
+      if (!is400Error(e) || isNetworkError(e)) {
         return;
       }
       clerkCoreErrorTokenRefreshFailed(e.toString());
