@@ -1,16 +1,14 @@
-import type { Clerk, RequestState } from '@clerk/backend';
+import type { RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
 import cookie from 'cookie';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from './shared';
-import type { ClerkMiddlewareOptions } from './types';
+import type { AuthenticateRequestParams, ClerkClient } from './types';
 
 const parseCookies = (req: IncomingMessage) => {
   return cookie.parse(req.headers['cookie'] || '');
 };
-
-type ClerkClient = ReturnType<typeof Clerk>;
 
 export async function loadInterstitial({
   clerkClient,
@@ -36,15 +34,7 @@ export async function loadInterstitial({
   return await clerkClient.remotePrivateInterstitial();
 }
 
-export const authenticateRequest = (opts: {
-  clerkClient: ReturnType<typeof Clerk>;
-  apiKey: string;
-  secretKey: string;
-  frontendApi: string;
-  publishableKey: string;
-  req: IncomingMessage;
-  options?: ClerkMiddlewareOptions;
-}) => {
+export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, apiKey, secretKey, frontendApi, publishableKey, req, options } = opts;
   const cookies = parseCookies(req);
   const { jwtKey, authorizedParties } = options || {};
@@ -63,7 +53,7 @@ export const authenticateRequest = (opts: {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || apiKey)) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 

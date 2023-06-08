@@ -1,6 +1,7 @@
-import type { AuthObject, SignedInAuthObject } from '@clerk/backend';
+import type { AuthObject, Clerk, InstanceKeys, SignedInAuthObject } from '@clerk/backend';
 import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { NextFunction, Request, Response } from 'express';
+import type { IncomingMessage } from 'http';
 
 type LegacyAuthObject<T extends AuthObject> = Pick<T, 'sessionId' | 'userId' | 'actor' | 'getToken' | 'debug'> & {
   claims: AuthObject['sessionClaims'];
@@ -33,3 +34,11 @@ export type ClerkMiddlewareOptions = {
   strict?: boolean;
   signInUrl?: string;
 } & MultiDomainAndOrProxy;
+
+export type ClerkClient = ReturnType<typeof Clerk>;
+
+export type AuthenticateRequestParams = InstanceKeys & {
+  clerkClient: ReturnType<typeof Clerk>;
+  req: IncomingMessage;
+  options?: ClerkMiddlewareOptions;
+};
