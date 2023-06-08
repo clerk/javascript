@@ -123,5 +123,17 @@ export default (QUnit: QUnit) => {
       };
       assert.false(checkCrossOrigin(options));
     });
+
+    test('is not CO for localhost application running in non http port', assert => {
+      const options = {
+        originURL: new URL('http://localhost:4011/protected'),
+        host: 'localhost:4011',
+        forwardedHost: 'localhost:4011',
+        forwardedPort: '4011',
+        forwardedProto: 'http',
+      };
+
+      assert.false(checkCrossOrigin(options));
+    });
   });
 };

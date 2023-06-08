@@ -20,10 +20,13 @@ export function checkCrossOrigin({
 }) {
   const fwdProto = getFirstValueFromHeaderValue(forwardedProto);
   let fwdPort = getFirstValueFromHeaderValue(forwardedPort);
+
   // If forwardedPort mismatch with forwardedProto determine forwardedPort
   // from forwardedProto as fallback (if exists)
   // This check fixes the Railway App issue
-  if (fwdProto && fwdPort !== getPortFromProtocol(fwdProto)) {
+  const fwdProtoHasMoreValuesThanFwdPorts =
+    (forwardedProto || '').split(',').length > (forwardedPort || '').split(',').length;
+  if (fwdProto && fwdProtoHasMoreValuesThanFwdPorts) {
     fwdPort = getPortFromProtocol(fwdProto);
   }
 

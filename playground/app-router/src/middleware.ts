@@ -23,6 +23,7 @@ export default authMiddleware({
     res.headers.set('x-after-auth', 'true');
     return res;
   },
+  debug: true
 });
 
 export const config = {
