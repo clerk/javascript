@@ -14,7 +14,7 @@ export const ERROR_CODES = {
   INVALID_STRATEGY_FOR_USER: 'strategy_for_user_invalid',
   NOT_ALLOWED_TO_SIGN_UP: 'not_allowed_to_sign_up',
   OAUTH_ACCESS_DENIED: 'oauth_access_denied',
+  OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML: 'oauth_email_domain_reserved_by_saml',
   NOT_ALLOWED_ACCESS: 'not_allowed_access',
-  SAML_EMAIL_ADDRESS_MISSING: 'saml_email_address_missing',
-  SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'saml_email_address_domain_mismatch',
+  SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
 };
