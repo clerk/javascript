@@ -92,6 +92,26 @@ A changeset is a piece of information about changes made in a branch or commit. 
 - What version we are releasing packages at (using a semver bump type)
 - A changelog entry for the released packages
 
+The first of the changeset description is used as the changelog entry title, the rest of the description is used as the changelog entry body. For example:
+
+```markdown
+---
+'@clerk/nextjs': minor
+---
+
+Introduce `debug` prop in `authMiddleware`
+A new `debug` prop has been added to the `authMiddleware` function. When set to `true`, the middleware will log the request and response to the console.
+```
+
+Will generate the following changelog entry:
+
+```markdown
+## Minor Changes
+
+- Introduce `debug` prop in `authMiddleware` (#123) by @johndoe
+  A new `debug` prop has been added to the `authMiddleware` function. When set to `true`, the middleware will log the request and response to the console.
+```
+
 Tips:
 
 - Changesets are just markdown files. Feel free to add as much markdown as you want to better describe the change.
