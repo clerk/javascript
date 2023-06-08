@@ -54,6 +54,7 @@ export const runWithExponentialBackOff = async <T>(
     } catch (e) {
       iterationsCount++;
       if (!shouldRetry(e, iterationsCount)) {
+        console.log('throw');
         throw e;
       }
       await delay();

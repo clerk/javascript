@@ -1,3 +1,4 @@
+import { is400Error } from '@clerk/shared';
 import { deepSnakeToCamel, isUnauthorizedError, runWithExponentialBackOff } from '@clerk/shared';
 import type {
   ActJWTClaim,
@@ -66,7 +67,7 @@ export class Session extends BaseResource implements SessionResource {
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
     return runWithExponentialBackOff(() => this._getToken(options), {
-      shouldRetry: (e: unknown, i: number) => !isUnauthorizedError(e) || i < 8,
+      shouldRetry: (e: unknown, i: number) => !is400Error(e) && i < 4,
     });
   };
 
