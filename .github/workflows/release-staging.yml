@@ -52,6 +52,7 @@ jobs:
                 owner: 'clerkinc',
                 repo: 'gh-actions-testbench',
                 workflow_id: 'release-staging-clerkjs-proxy.yml',
+                ref: 'main',
                 inputs: { version: clerkjsVersion }
               })
             }
