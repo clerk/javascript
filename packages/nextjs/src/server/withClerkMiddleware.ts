@@ -4,30 +4,9 @@ import type { NextMiddleware } from 'next/dist/server/web/types';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import {
-  API_KEY,
-  API_URL,
-  clerkClient,
-  DOMAIN,
-  FRONTEND_API,
-  IS_SATELLITE,
-  JS_VERSION,
-  PROXY_URL,
-  PUBLISHABLE_KEY,
-  SECRET_KEY,
-  SIGN_IN_URL,
-} from './clerkClient';
-import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import { API_KEY, API_URL, clerkClient, FRONTEND_API, JS_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from './clerkClient';
 import type { WithAuthOptions } from './types';
-import {
-  decorateRequest,
-  getCookie,
-  getRequestUrl,
-  handleValueOrFn,
-  isDevelopmentFromApiKey,
-  isHttpOrHttps,
-  setCustomAttributeOnRequest,
-} from './utils';
+import { decorateRequest, getCookie, handleMultiDomainAndProxy, setCustomAttributeOnRequest } from './utils';
 
 export interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
@@ -51,29 +30,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
-
-    const requestURL = getRequestUrl({
-      request: req,
-    });
-    const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, requestURL, PROXY_URL);
-    let proxyUrl;
-    if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
-      proxyUrl = new URL(relativeOrAbsoluteProxyUrl, requestURL).toString();
-    } else {
-      proxyUrl = relativeOrAbsoluteProxyUrl;
-    }
-
-    const isSatellite = handleValueOrFn(opts.isSatellite, new URL(req.url), IS_SATELLITE);
-    const domain = handleValueOrFn(opts.domain, new URL(req.url), DOMAIN);
-    const signInUrl = opts?.signInUrl || SIGN_IN_URL;
-
-    if (isSatellite && !proxyUrl && !domain) {
-      throw new Error(missingDomainAndProxy);
-    }
-
-    if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(SECRET_KEY || API_KEY)) {
-      throw new Error(missingSignInUrlInDev);
-    }
+    const { isSatellite, domain, signInUrl, proxyUrl } = handleMultiDomainAndProxy(req, opts);
 
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, constants.Cookies.Session);
