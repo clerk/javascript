@@ -47,10 +47,10 @@ jobs:
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
             if (clerkjsVersion.includes('staging')) {
-              console.log('Will notify clerkinc/cloudfare-workers');
+              console.log('clerk-js changed, will notify clerkinc/cloudflare-workers');
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerkinc',
-                repo: 'gh-actions-testbench',
+                repo: 'cloudflare-workers',
                 workflow_id: 'release-staging-clerkjs-proxy.yml',
                 ref: 'main',
                 inputs: { version: clerkjsVersion }
