@@ -1,0 +1,31 @@
+name: Test action
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  staging-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger clerkinc/cloudfare-workers workflows
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerkinc',
+                repo: 'cloudflare-workers',
+                workflow_id: 'release-staging-clerkjs-proxy.yml',
+                ref: 'main',
+                inputs: { version: clerkjsVersion }
+              })
