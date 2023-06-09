@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.3.7
+
+### Patch Changes
+
+- Updated dependencies [[`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3)]:
+  - @clerk/backend@0.22.0
+  - @clerk/types@3.41.1
+  - @clerk/clerk-react@4.19.0
+  - @clerk/clerk-sdk-node@4.10.4
+
 ## [4.3.0](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.2.8-staging.4...gatsby-plugin-clerk@4.3.0) (2023-05-15)
 
 **Note:** Version bump only for package gatsby-plugin-clerk
