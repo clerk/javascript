@@ -4,7 +4,10 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
+import { API_KEY, DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './clerkClient';
+import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
 import type { NextMiddlewareResult, RequestLike } from './types';
+import type { WithAuthOptions } from './types';
 
 type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
 
@@ -146,6 +149,7 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
 
 // TODO: Use the same function defined in @clerk/shared once the package is tree shakeable
 type VOrFnReturnsV<T> = T | undefined | ((v: URL) => T);
+
 export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL): T | undefined;
 export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL, defaultValue: T): T;
 export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL, defaultValue?: unknown): unknown {
@@ -256,4 +260,36 @@ export const isCrossOrigin = (from: string | URL, to: string | URL) => {
   const fromUrl = new URL(from);
   const toUrl = new URL(to);
   return fromUrl.origin !== toUrl.origin;
+};
+
+export const handleMultiDomainAndProxy = (req: NextRequest, opts: WithAuthOptions) => {
+  const requestURL = getRequestUrl({
+    request: req,
+  });
+  const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, requestURL, PROXY_URL);
+  let proxyUrl;
+  if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
+    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, requestURL).toString();
+  } else {
+    proxyUrl = relativeOrAbsoluteProxyUrl;
+  }
+
+  const isSatellite = handleValueOrFn(opts.isSatellite, new URL(req.url), IS_SATELLITE);
+  const domain = handleValueOrFn(opts.domain, new URL(req.url), DOMAIN);
+  const signInUrl = opts?.signInUrl || SIGN_IN_URL;
+
+  if (isSatellite && !proxyUrl && !domain) {
+    throw new Error(missingDomainAndProxy);
+  }
+
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(SECRET_KEY || API_KEY)) {
+    throw new Error(missingSignInUrlInDev);
+  }
+
+  return {
+    proxyUrl,
+    isSatellite,
+    domain,
+    signInUrl,
+  };
 };
