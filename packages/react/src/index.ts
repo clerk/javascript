@@ -12,5 +12,5 @@ export type {
   WithSessionProp,
   IsomorphicClerkOptions,
 } from './types';
-export { isMagicLinkError, MagicLinkErrorCode } from './errors';
+export { MagicLinkErrorCode, isClerkAPIResponseError, isKnownError, isMetamaskError, isMagicLinkError } from './errors';
 export { useMagicLink } from './hooks/useMagicLink';

@@ -21,7 +21,10 @@ export {
   WithSession,
   withUser,
   WithUser,
+  isClerkAPIResponseError,
   isMagicLinkError,
+  isMetamaskError,
+  isKnownError,
   MagicLinkErrorCode,
 } from '@clerk/clerk-react';
 

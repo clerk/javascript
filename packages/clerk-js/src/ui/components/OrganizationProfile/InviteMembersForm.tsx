@@ -1,7 +1,7 @@
+import { ClerkAPIResponseError } from '@clerk/shared';
 import type { MembershipRole, OrganizationResource } from '@clerk/types';
 import React from 'react';
 
-import { ClerkAPIResponseError } from '../../../core/resources/Error';
 import { Flex, Text } from '../../customizables';
 import {
   Alert,
