@@ -13,6 +13,8 @@ export interface DevBrowserHandler {
   setDevBrowserJWT(jwt: string): void;
 
   removeDevBrowserJWT(): void;
+
+  usesUrlBasedSessionSync(): boolean;
 }
 
 export type CreateDevBrowserHandlerOptions = {
@@ -136,6 +138,10 @@ export default function createDevBrowserHandler({
     return Promise.resolve();
   }
 
+  function usesUrlBasedSessionSync(): boolean {
+    return usesUrlBasedSessionSyncing;
+  }
+
   async function setup(): Promise<void> {
     const devOrStgApi = isDevOrStagingUrl(frontendApi);
     const devOrStgHost = isDevOrStagingUrl(window.location.host);
@@ -158,7 +164,7 @@ export default function createDevBrowserHandler({
 
     await setUrlBasedSessionSyncBrowser();
 
-    if (usesUrlBasedSessionSyncing) {
+    if (usesUrlBasedSessionSync()) {
       return;
     }
 
@@ -176,6 +182,7 @@ export default function createDevBrowserHandler({
     setup,
     getDevBrowserJWT,
     setDevBrowserJWT,
+    usesUrlBasedSessionSync,
     removeDevBrowserJWT,
   };
 }

@@ -651,7 +651,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   public buildUrlWithAuth(to: string, options?: BuildUrlWithAuthParams): string {
-    if (this.#instanceType === 'production' || !this.#environment?.authConfig.urlBasedSessionSyncing) {
+    if (this.#instanceType === 'production' || !this.#devBrowserHandler?.usesUrlBasedSessionSync()) {
       return to;
     }
 
