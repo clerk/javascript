@@ -1,5 +1,47 @@
 # Change Log
 
+## 4.20.0
+
+### Minor Changes
+
+- Add support for NextJS applications hosted on AWS Amplify ([#1306](https://github.com/clerkinc/javascript/pull/1306)) by [@dimkl](https://github.com/dimkl)
+
+- Tweaked the default `authMiddleware` behavior for protected API routes. An unauthenticated request for a protected API route will no longer return a `307 Redirect` - a `401 Unauthorized` response will be returned instead. ([#1276](https://github.com/clerkinc/javascript/pull/1276)) by [@anagstef](https://github.com/anagstef)
+
+  With this change, an API route is considered a request for which the following rules apply:
+
+  - The request url matches the following patterns; `['/api/(.*)', '/trpc/(.*)']`
+  - Or, the request has `Content-Type: application/json`
+  - Or, the request method is not one of: `GET`, `OPTIONS` ,` HEAD`
+
+  A new `apiRoutes` param has been introduced on `authMiddleware`. It can accept an array of path patterns, `RegexExp` or strings. If `apiRoutes` is passed in explicitly, then it overrides the behavior described above and only the requests matching `apiRoutes` will be considered as API routes requests.
+  For more technical details, refer to the PR's description.
+
+- Add support for NextJS applications hosted on Railway ([#1306](https://github.com/clerkinc/javascript/pull/1306)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Improve debug logs in NextJS by adding AuthStatusObject.debug data ([#1306](https://github.com/clerkinc/javascript/pull/1306)) by [@dimkl](https://github.com/dimkl)
+
+- The devBrowser JWT is now added to all cross-origin redirects triggered by calling `redirectToSignIn` or `redirectToSignUp`. ([#1297](https://github.com/clerkinc/javascript/pull/1297)) by [@anagstef](https://github.com/anagstef)
+
+- Improve debug logging by including `AuthObject.debug()` data when `debug` is `true` in `authMiddleware` ([#1306](https://github.com/clerkinc/javascript/pull/1306)) by [@dimkl](https://github.com/dimkl)
+
+- ESM/CJS support for `@clerk/clerk-react` ([#1289](https://github.com/clerkinc/javascript/pull/1289)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Changes that should affect users and OS contributors:
+
+  - Better source map support for `@clerk/clerk-react`, `@clerk/shared`. This affects anyone developing in our monorepo or anyone using a debugger with Clerk installed in their app.
+  - Easier node_modules debugging as `@clerk/clerk-react`, `@clerk/shared` and `@clerk/nextjs` are no longer getting bundled as a single-file package. This also improves error logging in nextjs a lot, as nextjs usually logs the line that threw the error - a minified, single-file package, usually consists of a very long single-line module, so logging error in NextJS wasn't ideal.
+  - Headless clerk-js bundle size reduced by ~10kb, normal clerk-ks by ~6kb
+  - A new `clerkJSVersion` prop has been added on ClerkProvider allowing to fetch a specific clerk-js version.
+
+- Updated dependencies [[`5fce80b8`](https://github.com/clerkinc/javascript/commit/5fce80b8a55927fbaf41e512a0cb8e09dbe69831), [`cf65a322`](https://github.com/clerkinc/javascript/commit/cf65a322b2741448e5932c417d3740afeab9620f), [`6018fb12`](https://github.com/clerkinc/javascript/commit/6018fb12155acfc8f3d5c5198104497770169539), [`4f8a821a`](https://github.com/clerkinc/javascript/commit/4f8a821ae7192bba181f59e6e608a2a57d8db5b4), [`cb7be34b`](https://github.com/clerkinc/javascript/commit/cb7be34b93baddd96fe1f80f8e6f880673f69724), [`5fce80b8`](https://github.com/clerkinc/javascript/commit/5fce80b8a55927fbaf41e512a0cb8e09dbe69831), [`9e64d2369`](https://github.com/clerkinc/javascript/commit/9e64d236980f7cb7cdfaadc5320f2ea52906537c)]:
+  - @clerk/backend@0.22.0
+  - @clerk/types@3.41.1
+  - @clerk/clerk-react@4.19.0
+  - @clerk/clerk-sdk-node@4.10.4
+
 ## [4.19.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.19.0-staging.1...@clerk/nextjs@4.19.0) (2023-05-26)
 
 **Note:** Version bump only for package @clerk/nextjs

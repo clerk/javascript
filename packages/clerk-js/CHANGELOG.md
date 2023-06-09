@@ -1,5 +1,29 @@
 # Change Log
 
+## 4.45.1
+
+### Patch Changes
+
+- Make first name, last name & password readonly for users with active SAML accounts ([#1278](https://github.com/clerkinc/javascript/pull/1278)) by [@yourtallness](https://github.com/yourtallness)
+
+- Load CF turnstile from FAPI ([#1296](https://github.com/clerkinc/javascript/pull/1296)) by [@panteliselef](https://github.com/panteliselef)
+
+- ESM/CJS support for `@clerk/clerk-react` ([#1289](https://github.com/clerkinc/javascript/pull/1289)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Changes that should affect users and OS contributors:
+
+  - Better source map support for `@clerk/clerk-react`, `@clerk/shared`. This affects anyone developing in our monorepo or anyone using a debugger with Clerk installed in their app.
+  - Easier node_modules debugging as `@clerk/clerk-react`, `@clerk/shared` and `@clerk/nextjs` are no longer getting bundled as a single-file package. This also improves error logging in nextjs a lot, as nextjs usually logs the line that threw the error - a minified, single-file package, usually consists of a very long single-line module, so logging error in NextJS wasn't ideal.
+  - Headless clerk-js bundle size reduced by ~10kb, normal clerk-ks by ~6kb
+  - A new `clerkJSVersion` prop has been added on ClerkProvider allowing to fetch a specific clerk-js version.
+
+- Preview known SAML error messages during failed Sign in/up flows ([#1310](https://github.com/clerkinc/javascript/pull/1310)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`cf65a322`](https://github.com/clerkinc/javascript/commit/cf65a322b2741448e5932c417d3740afeab9620f), [`6018fb12`](https://github.com/clerkinc/javascript/commit/6018fb12155acfc8f3d5c5198104497770169539), [`4f8a821a`](https://github.com/clerkinc/javascript/commit/4f8a821ae7192bba181f59e6e608a2a57d8db5b4)]:
+  - @clerk/localizations@1.17.1
+  - @clerk/types@3.41.1
+  - @clerk/shared@0.18.0
+
 ## [4.45.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.45.0-staging.4...@clerk/clerk-js@4.45.0) (2023-06-03)
 
 **Note:** Version bump only for package @clerk/clerk-js

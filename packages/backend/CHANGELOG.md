@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.22.0
+
+### Minor Changes
+
+- Add support for NextJS applications hosted on AWS Amplify ([#1306](https://github.com/clerkinc/javascript/pull/1306)) by [@dimkl](https://github.com/dimkl)
+
+- Address npm audit issues for the clerk backend package ([#1312](https://github.com/clerkinc/javascript/pull/1312)) by [@desiprisg](https://github.com/desiprisg)
+
+- Add support for NextJS applications hosted on Railway ([#1306](https://github.com/clerkinc/javascript/pull/1306)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Remove unused `url` prop from `redirectToSignIn` and `redirectToSignUp` helpers ([#1293](https://github.com/clerkinc/javascript/pull/1293)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`cf65a322`](https://github.com/clerkinc/javascript/commit/cf65a322b2741448e5932c417d3740afeab9620f), [`6018fb12`](https://github.com/clerkinc/javascript/commit/6018fb12155acfc8f3d5c5198104497770169539)]:
+  - @clerk/types@3.41.1
+
 ## [0.21.0](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.21.0-staging.4...@clerk/backend@0.21.0) (2023-06-03)
 
 **Note:** Version bump only for package @clerk/backend
