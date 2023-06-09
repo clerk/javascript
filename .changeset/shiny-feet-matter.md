@@ -2,4 +2,4 @@
 '@clerk/clerk-js': minor
 ---
 
-Add missing appearance keys for the manage organization button
+Add missing appearance keys for the "Manage Organization" button within `<OrganizationSwitcher/>`
