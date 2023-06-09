@@ -56,3 +56,14 @@ jobs:
                 inputs: { version: clerkjsVersion }
               })
             }
+
+            if (nextjsVersion.includes('staging')) {
+              console.log('clerk/nextjs changed, will notify clerkinc/accounts');
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerkinc',
+                repo: 'accounts',
+                workflow_id: 'release-staging.yml',
+                ref: 'main',
+                inputs: { version: nextjsVersion }
+              })
+            }
