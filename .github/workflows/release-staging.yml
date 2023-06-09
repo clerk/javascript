@@ -41,7 +41,7 @@ jobs:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
-          github-token: ${{ secrets.PAT }}
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
