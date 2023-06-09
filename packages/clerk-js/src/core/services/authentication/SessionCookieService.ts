@@ -1,4 +1,4 @@
-import { is400Error, isNetworkError } from '@clerk/shared';
+import { is4xxError, isNetworkError } from '@clerk/shared';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
 import type { CookieHandler } from '../../../utils';
@@ -101,7 +101,7 @@ export class SessionCookieService {
 
   private handleGetTokenError(e: any) {
     if (isClerkAPIResponseError(e)) {
-      if (!is400Error(e) || isNetworkError(e)) {
+      if (!is4xxError(e) || isNetworkError(e)) {
         return;
       }
       clerkCoreErrorTokenRefreshFailed(e.toString());
