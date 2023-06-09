@@ -1,16 +1,5 @@
 # Change Log
 
-## 1.17.1
-
-### Patch Changes
-
-- fix(types,localizations): Improve invalid form email_address param error message ([#1303](https://github.com/clerkinc/javascript/pull/1303)) by [@dimkl](https://github.com/dimkl)
-
-- Make first name, last name & password readonly for users with active SAML accounts ([#1278](https://github.com/clerkinc/javascript/pull/1278)) by [@yourtallness](https://github.com/yourtallness)
-
-- Updated dependencies [[`cf65a322`](https://github.com/clerkinc/javascript/commit/cf65a322b2741448e5932c417d3740afeab9620f), [`6018fb12`](https://github.com/clerkinc/javascript/commit/6018fb12155acfc8f3d5c5198104497770169539), [`fd15b341`](https://github.com/clerkinc/javascript/commit/fd15b341d2389743cbfe9755d31e078a92aba56b)]:
-  - @clerk/types@3.41.1
-
 ## [1.17.0](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.17.0-staging.2...@clerk/localizations@1.17.0) (2023-06-03)
 
 ### Features

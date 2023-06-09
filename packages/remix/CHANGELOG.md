@@ -1,24 +1,5 @@
 # Change Log
 
-## 2.6.6
-
-### Patch Changes
-
-- ESM/CJS support for `@clerk/clerk-react` ([#1289](https://github.com/clerkinc/javascript/pull/1289)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
-
-  Changes that should affect users and OS contributors:
-
-  - Better source map support for `@clerk/clerk-react`, `@clerk/shared`. This affects anyone developing in our monorepo or anyone using a debugger with Clerk installed in their app.
-  - Easier node_modules debugging as `@clerk/clerk-react`, `@clerk/shared` and `@clerk/nextjs` are no longer getting bundled as a single-file package. This also improves error logging in nextjs a lot, as nextjs usually logs the line that threw the error - a minified, single-file package, usually consists of a very long single-line module, so logging error in NextJS wasn't ideal.
-  - Headless clerk-js bundle size reduced by ~10kb, normal clerk-ks by ~6kb
-  - A new `clerkJSVersion` prop has been added on ClerkProvider allowing to fetch a specific clerk-js version.
-
-- Updated dependencies [[`5fce80b8`](https://github.com/clerkinc/javascript/commit/5fce80b8a55927fbaf41e512a0cb8e09dbe69831), [`cf65a322`](https://github.com/clerkinc/javascript/commit/cf65a322b2741448e5932c417d3740afeab9620f), [`6018fb12`](https://github.com/clerkinc/javascript/commit/6018fb12155acfc8f3d5c5198104497770169539), [`4f8a821a`](https://github.com/clerkinc/javascript/commit/4f8a821ae7192bba181f59e6e608a2a57d8db5b4), [`fd15b341`](https://github.com/clerkinc/javascript/commit/fd15b341d2389743cbfe9755d31e078a92aba56b), [`cb7be34b`](https://github.com/clerkinc/javascript/commit/cb7be34b93baddd96fe1f80f8e6f880673f69724), [`5fce80b8`](https://github.com/clerkinc/javascript/commit/5fce80b8a55927fbaf41e512a0cb8e09dbe69831), [`9e64d2369`](https://github.com/clerkinc/javascript/commit/9e64d236980f7cb7cdfaadc5320f2ea52906537c)]:
-  - @clerk/backend@0.22.0
-  - @clerk/types@3.41.1
-  - @clerk/shared@0.18.0
-  - @clerk/clerk-react@4.19.0
-
 ## [2.6.0](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.6.0-staging.4...@clerk/remix@2.6.0) (2023-05-15)
 
 **Note:** Version bump only for package @clerk/remix

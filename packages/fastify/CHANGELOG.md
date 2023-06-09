@@ -1,13 +1,5 @@
 # Change Log
 
-## 0.4.6
-
-### Patch Changes
-
-- Updated dependencies [[`5fce80b8`](https://github.com/clerkinc/javascript/commit/5fce80b8a55927fbaf41e512a0cb8e09dbe69831), [`cf65a322`](https://github.com/clerkinc/javascript/commit/cf65a322b2741448e5932c417d3740afeab9620f), [`6018fb12`](https://github.com/clerkinc/javascript/commit/6018fb12155acfc8f3d5c5198104497770169539), [`fd15b341`](https://github.com/clerkinc/javascript/commit/fd15b341d2389743cbfe9755d31e078a92aba56b), [`cb7be34b`](https://github.com/clerkinc/javascript/commit/cb7be34b93baddd96fe1f80f8e6f880673f69724), [`5fce80b8`](https://github.com/clerkinc/javascript/commit/5fce80b8a55927fbaf41e512a0cb8e09dbe69831), [`9e64d2369`](https://github.com/clerkinc/javascript/commit/9e64d236980f7cb7cdfaadc5320f2ea52906537c)]:
-  - @clerk/backend@0.22.0
-  - @clerk/types@3.41.1
-
 ## [0.4.0](https://github.com/clerkinc/javascript/compare/@clerk/fastify@0.3.1-staging.3...@clerk/fastify@0.4.0) (2023-05-15)
 
 **Note:** Version bump only for package @clerk/fastify

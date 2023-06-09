@@ -1,15 +1,5 @@
 # Change Log
 
-## 3.41.1
-
-### Patch Changes
-
-- fix(types,localizations): Improve invalid form email_address param error message ([#1303](https://github.com/clerkinc/javascript/pull/1303)) by [@dimkl](https://github.com/dimkl)
-
-- Make first name, last name & password readonly for users with active SAML accounts ([#1278](https://github.com/clerkinc/javascript/pull/1278)) by [@yourtallness](https://github.com/yourtallness)
-
-- Add support for dataURLs in User.setProfileImage ([#1320](https://github.com/clerkinc/javascript/pull/1320)) by [@panteliselef](https://github.com/panteliselef)
-
 ## [3.41.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.41.0-staging.1...@clerk/types@3.41.0) (2023-06-03)
 
 **Note:** Version bump only for package @clerk/types
