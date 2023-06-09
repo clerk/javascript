@@ -11,6 +11,7 @@ import {
   JS_VERSION,
   PUBLISHABLE_KEY,
   SECRET_KEY,
+  SIGN_IN_URL,
 } from './clerkClient';
 import type { WithAuthOptions } from './types';
 import { apiEndpointUnauthorizedNextResponse, getCookie } from './utils';
@@ -26,6 +27,7 @@ export const authenticateRequest = async (req: NextRequest, opts: WithAuthOption
     secretKey: opts.secretKey || SECRET_KEY,
     frontendApi: opts.frontendApi || FRONTEND_API,
     publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
+    signInUrl: opts.signInUrl || SIGN_IN_URL,
     cookieToken,
     headerToken,
     clientUat: getCookie(req, constants.Cookies.ClientUat),
