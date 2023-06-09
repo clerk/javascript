@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.3.8
+
+### Patch Changes
+
+- Updated dependencies [[`6018fb12`](https://github.com/clerkinc/javascript/commit/6018fb12155acfc8f3d5c5198104497770169539), [`78d538f09`](https://github.com/clerkinc/javascript/commit/78d538f0993492a67b4acbb55dbd9c982102d84a), [`4f8a821a`](https://github.com/clerkinc/javascript/commit/4f8a821ae7192bba181f59e6e608a2a57d8db5b4), [`4e9eb438`](https://github.com/clerkinc/javascript/commit/4e9eb43812f1aeae47044f4246e92342325dd21e), [`fd15b341`](https://github.com/clerkinc/javascript/commit/fd15b341d2389743cbfe9755d31e078a92aba56b), [`7f200855`](https://github.com/clerkinc/javascript/commit/7f200855359fc69743227861580ee1b0eccdb854), [`6e555829`](https://github.com/clerkinc/javascript/commit/6e555829e6665328fc73e654775e41882e0ef550)]:
+  - @clerk/clerk-js@4.46.0
+  - @clerk/clerk-react@4.19.0
+
 ## [0.3.0](https://github.com/clerkinc/javascript/compare/@clerk/chrome-extension@0.2.8-staging.4...@clerk/chrome-extension@0.3.0) (2023-05-15)
 
 **Note:** Version bump only for package @clerk/chrome-extension
