@@ -36,6 +36,7 @@
     "lint": "eslint .",
     "start": "echo \"Noop\"",
     "test": "jest",
+    "test:ci": "jest --maxWorkers=50%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {

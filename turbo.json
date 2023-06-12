@@ -29,6 +29,10 @@
       "dependsOn": ["build"],
       "outputs": []
     },
+    "test:ci": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
     "lint": {
       "dependsOn": [],
       "outputs": []
