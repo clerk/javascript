@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.47.0
+
+### Minor Changes
+
+- Add base64 string support in Organization.setLogo ([#1309](https://github.com/clerkinc/javascript/pull/1309)) by [@raptisj](https://github.com/raptisj)
+
+- Fix magic link flows for development instances when url-based session syncing is used. ([#1343](https://github.com/clerkinc/javascript/pull/1343)) by [@alex-ntousias](https://github.com/alex-ntousias)
+
+### Patch Changes
+
+- Updated dependencies [[`7af91bc3`](https://github.com/clerkinc/javascript/commit/7af91bc3ecc25cba04968b491e1e3c6ec32c18af), [`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963), [`5cde6d80`](https://github.com/clerkinc/javascript/commit/5cde6d8094c7e03dcf4cd4507d815ddb5951f819), [`6f3d4305`](https://github.com/clerkinc/javascript/commit/6f3d43055690db1d69a356503a0a45dc948beaef)]:
+  - @clerk/shared@0.19.0
+  - @clerk/types@3.42.0
+  - @clerk/localizations@1.18.0
+
 ## 4.46.0
 
 ### Minor Changes

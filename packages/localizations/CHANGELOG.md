@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.18.0
+
+### Minor Changes
+
+- feat(localizations): Add ko-KR localization ([#1339](https://github.com/clerkinc/javascript/pull/1339)) by [@deutschkihun](https://github.com/deutschkihun)
+
+### Patch Changes
+
+- Updated dependencies [[`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963)]:
+  - @clerk/types@3.42.0
+
 ## 1.17.1
 
 ### Patch Changes

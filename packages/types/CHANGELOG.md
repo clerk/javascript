@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.42.0
+
+### Minor Changes
+
+- Add base64 string support in Organization.setLogo ([#1309](https://github.com/clerkinc/javascript/pull/1309)) by [@raptisj](https://github.com/raptisj)
+
 ## 3.41.1
 
 ### Patch Changes
