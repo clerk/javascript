@@ -1,9 +1,9 @@
 #!/usr/bin/env zx
 
 import 'zx/globals';
-import { constants } from './common.mjs';
+import {constants} from './common.mjs';
 
-const prefix = argv.name || argv._[0] || 'snap';
+const prefix = argv.name || argv._[0] || 'snapshot';
 
 await $`npx json -I -f ${constants.ChangesetConfigFile} -e "this.changelog = false"`;
 
