@@ -1,5 +1,25 @@
 # Change Log
 
+## 0.23.0
+
+### Minor Changes
+
+- Support `audience` parameter in authentication request ([#1004](https://github.com/clerkinc/javascript/pull/1004)) by [@dimkl](https://github.com/dimkl)
+
+  The audience parameter is used to verify the the aud claim in
+  the request matches the value of the parameter or is included
+  (when the user provides a list).
+
+  Resolves:
+
+  - [#978](https://github.com/clerkinc/javascript/pull/978)
+  - [#1004](https://github.com/clerkinc/javascript/pull/1004)
+
+### Patch Changes
+
+- Updated dependencies [[`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963)]:
+  - @clerk/types@3.42.0
+
 ## 0.22.0
 
 ### Minor Changes
