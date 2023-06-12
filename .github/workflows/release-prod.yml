@@ -47,7 +47,7 @@ jobs:
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
-              console.log('clerk-js changed, will notify clerkinc/cloudflare-workers');
+              const clerkjsVersion = require('./packages/clerk-js/package.json').version;
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerkinc',
                 repo: 'cloudflare-workers',
