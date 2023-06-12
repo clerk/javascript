@@ -14,6 +14,7 @@ import {
   isRedirectForFAPIInitiatedFlow,
   isValidUrl,
   mergeFragmentIntoUrl,
+  requiresUserInput,
   trimTrailingSlash,
 } from '../url';
 
@@ -384,6 +385,22 @@ describe('isRedirectForFAPIInitiatedFlow(frontendAp: string, redirectUrl: string
       expect(isRedirectForFAPIInitiatedFlow(frontendApi, redirectUrl)).toEqual(expectedValue);
     },
   );
+});
+
+describe('requiresUserInput(redirectUrl: string)', () => {
+  const testCases: Array<[string, boolean]> = [
+    ['foo', false],
+    ['https://clerk.foo.bar-53.lcl.dev/deadbeef.', false],
+    ['https://clerk.foo.bar-53.lcl.dev/oauth/authorize', true],
+    ['https://clerk.foo.bar-53.lcl.dev/v1/verify', false],
+    ['https://clerk.foo.bar-53.lcl.dev/v1/tickets/accept', false],
+    ['https://google.com', false],
+    ['https://google.com/v1/verify', false],
+  ];
+
+  test.each(testCases)('redirectUrl=(%s), expected value=(%s)', (redirectUrl, expectedValue) => {
+    expect(requiresUserInput(redirectUrl)).toEqual(expectedValue);
+  });
 });
 
 describe('getETLDPlusOneFromFrontendApi(frontendAp: string)', () => {
