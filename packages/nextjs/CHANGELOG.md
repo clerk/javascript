@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.21.1
+
+### Patch Changes
+
+- Resolve build issues affecting apps using App Router ([#1346](https://github.com/clerkinc/javascript/pull/1346)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`eff4e45e`](https://github.com/clerkinc/javascript/commit/eff4e45e351f7ab04da3996853d7bca40d642543)]:
+  - @clerk/clerk-sdk-node@4.10.6
+
 ## 4.21.0
 
 ### Minor Changes

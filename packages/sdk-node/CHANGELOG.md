@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.10.6
+
+### Patch Changes
+
+- Load env variables upon first usage of middlewares or clerkClient ([#1230](https://github.com/clerkinc/javascript/pull/1230)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.10.5
 
 ### Patch Changes
