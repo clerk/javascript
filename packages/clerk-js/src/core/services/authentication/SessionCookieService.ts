@@ -81,10 +81,14 @@ export class SessionCookieService {
 
   private setSessionCookie(token: TokenResource | string) {
     this.cookies.setSessionCookie(typeof token === 'string' ? token : token.getRawString());
-    this.cookies.setSessionUatCookie();
   }
 
   private updateSessionCookie(token: TokenResource | string | undefined | null) {
+    if (token) {
+      this.cookies.setSessionUatCookie();
+    } else {
+      this.cookies.removeSessionUatCookie();
+    }
     return token ? this.setSessionCookie(token) : this.removeSessionCookie();
   }
 

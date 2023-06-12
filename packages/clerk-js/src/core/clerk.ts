@@ -57,6 +57,7 @@ import {
   appendAsQueryParams,
   buildURL,
   createBeforeUnloadTracker,
+  createCookieHandler,
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
@@ -1137,11 +1138,23 @@ export default class Clerk implements ClerkInterface {
       clerkMissingSignInUrlAsSatellite();
     }
 
-    return this.#instanceType === 'development' && (this.#authService?.isSessionExpired ?? true);
+    // Attempt to sync if user is logged out or session has expired
+    const cookieHandler = createCookieHandler();
+    return (
+      this.#instanceType === 'development' &&
+      (!this.#devBrowserHandler?.getDevBrowserJWT() ||
+        cookieHandler.getClientUatCookie() <= 0 ||
+        (this.#authService?.isSessionExpired ?? true))
+    );
   };
 
   #shouldSyncWithPrimaryInProduction = (): boolean => {
-    return this.#instanceType === 'production' && (this.#authService?.isSessionExpired ?? true);
+    // Attempt to sync if user is logged out or session has expired
+    const cookieHandler = createCookieHandler();
+    return (
+      this.#instanceType === 'production' &&
+      (cookieHandler.getClientUatCookie() <= 0 || (this.#authService?.isSessionExpired ?? true))
+    );
   };
 
   #shouldRedirectToSatellite = (): boolean => {
@@ -1174,29 +1187,57 @@ export default class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    // Dev Browser handling
+    /**
+     * 1. Create the devBrowser.
+     * At this point the devBrowser is not yet setup, but its API is ready for use
+     */
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
     });
 
+    /**
+     * 2. Initiate Session management
+     */
+    this.#authService = new SessionCookieService(this);
+
+    /**
+     * 3. Multidomain SSO handling
+     * If needed the app will attempt to sync with another app hosted in a different domain in order to acquire a session
+     * - for development instances it populates dev browser JWT and `devBrowserHandler.setup()` should not have run.
+     */
+    if (this.#shouldSyncWithPrimary()) {
+      await this.#syncWithPrimary();
+      // ClerkJS is not considered loaded during the sync/link process with the primary domain
+      return false;
+    }
+
+    /**
+     * 4. Setup dev browser.
+     * This is not needed for production instances hence the .clear()
+     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 3 was successful this will not be overwritten
+     */
     if (this.#instanceType === 'production') {
       await this.#devBrowserHandler.clear();
     } else {
       await this.#devBrowserHandler.setup();
     }
 
-    this.#authService = new SessionCookieService(this);
-
-    // Multidomain SSO handling
-    if (this.#shouldSyncWithPrimary()) {
-      await this.#syncWithPrimary();
-      // ClerkJS is not considered loaded during the sync/link process with the primary domain
-      return false;
-    } else if (this.#shouldRedirectToSatellite()) {
+    /**
+     * 5. If the app is considered a primary domain and is in the middle of the sync/link flow, interact the loading of Clerk and redirect back to the satellite app
+     * Initially step 3 and 5 were considered one but for step 3 we need devBrowserHandler.setup() to not have run and step 5 requires a valid dev browser JWT
+     */
+    if (this.#shouldRedirectToSatellite()) {
       await this.#redirectToSatellite();
       return false;
     }
+
+    /**
+     * 6. Continue with clerk-js setup.
+     * - Fetch & update environment
+     * - Fetch & update client
+     * - Mount components
+     */
 
     this.#pageLifecycle = createPageLifecycle();
 
