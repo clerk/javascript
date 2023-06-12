@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.19.0
+
+### Minor Changes
+
+- Export error helpers from the shared package to the framework specific packages ([#1308](https://github.com/clerkinc/javascript/pull/1308)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Resolve all reported ESM build issues by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 0.18.0
 
 ### Minor Changes

@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.20.0
+
+### Minor Changes
+
+- Export error helpers from the shared package to the framework specific packages ([#1308](https://github.com/clerkinc/javascript/pull/1308)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Resolve all reported ESM build issues by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`7af91bc3`](https://github.com/clerkinc/javascript/commit/7af91bc3ecc25cba04968b491e1e3c6ec32c18af), [`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963), [`6f3d4305`](https://github.com/clerkinc/javascript/commit/6f3d43055690db1d69a356503a0a45dc948beaef)]:
+  - @clerk/shared@0.19.0
+  - @clerk/types@3.42.0
+
 ## 4.19.0
 
 ### Minor Changes
