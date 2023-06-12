@@ -57,7 +57,6 @@ import {
   appendAsQueryParams,
   buildURL,
   createBeforeUnloadTracker,
-  createCookieHandler,
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
@@ -1138,16 +1137,11 @@ export default class Clerk implements ClerkInterface {
       clerkMissingSignInUrlAsSatellite();
     }
 
-    return this.#instanceType === 'development';
+    return this.#instanceType === 'development' && (this.#authService?.isSessionExpired ?? true);
   };
 
   #shouldSyncWithPrimaryInProduction = (): boolean => {
-    if (this.#instanceType === 'development') {
-      return false;
-    }
-
-    const cookieHandler = createCookieHandler();
-    return cookieHandler.getClientUatCookie() <= 0;
+    return this.#instanceType === 'production' && (this.#authService?.isSessionExpired ?? true);
   };
 
   #shouldRedirectToSatellite = (): boolean => {
@@ -1192,6 +1186,8 @@ export default class Clerk implements ClerkInterface {
       await this.#devBrowserHandler.setup();
     }
 
+    this.#authService = new SessionCookieService(this);
+
     // Multidomain SSO handling
     if (this.#shouldSyncWithPrimary()) {
       await this.#syncWithPrimary();
@@ -1202,7 +1198,6 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    this.#authService = new SessionCookieService(this);
     this.#pageLifecycle = createPageLifecycle();
 
     const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);

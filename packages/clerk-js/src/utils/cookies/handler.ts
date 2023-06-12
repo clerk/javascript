@@ -8,6 +8,7 @@ import { clientUatCookie } from './client_uat';
 import { devBrowserCookie } from './devBrowser';
 import { inittedCookie } from './initted';
 import { sessionCookie } from './session';
+import { sessionUatCookie } from './session_uat';
 
 const DEFAULT_SAME_SITE = 'Lax';
 const IFRAME_SAME_SITE = 'None';
@@ -64,6 +65,25 @@ export const createCookieHandler = () => {
     });
   };
 
+  const getSessionUatCookie = (): number => {
+    return parseInt(sessionUatCookie.get() || '0', 10);
+  };
+
+  const setSessionUatCookie = () => {
+    const expires = addYears(Date.now(), 1);
+    const sameSite = 'Lax';
+    const secure = window.location.protocol === 'https:';
+
+    // truncate timestamp to seconds, since this is a unix timestamp
+    const val = Math.floor(Date.now() / 1000).toString();
+
+    return sessionUatCookie.set(val, {
+      expires,
+      sameSite,
+      secure,
+    });
+  };
+
   const setDevBrowserCookie = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
     const sameSite = 'Strict';
@@ -97,5 +117,7 @@ export const createCookieHandler = () => {
     removeAllDevBrowserCookies,
     setDevBrowserCookie,
     removeDevBrowserCookie,
+    getSessionUatCookie,
+    setSessionUatCookie,
   };
 };
