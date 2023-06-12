@@ -37,6 +37,10 @@ The current monorepo setup is based on:
 - [GitHub Actions](https://docs.github.com/en/actions), used for quality checks and automated release orchestration.
 - [Yalc](https://github.com/wclr/yalc), used for to publish packages locally and test them in other local projects.
 
+### Prerequisites
+
+Have a node version installed that is equal or higher than the one defined in `.nvmrc`
+
 ### Setting up your local environment
 
 To set up your development environment, please follow these steps:
@@ -62,11 +66,11 @@ To set up your development environment, please follow these steps:
 
 For package specific setup, refer to the `Build` section of the specific package (eg packages/<package_name>/README.md#build).
 
-### Making changes to local packages
+### Making changes to packages
 
 WIP
 
-### Making changes to hot-loaded clerk-js
+### Making changes to the hot-loaded `clerk-js`
 
 WIP
 
