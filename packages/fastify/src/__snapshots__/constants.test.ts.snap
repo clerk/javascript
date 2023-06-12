@@ -8,6 +8,7 @@ exports[`constants from environment variables 1`] = `
   "Cookies": {
     "ClientUat": "__client_uat",
     "Session": "__session",
+    "SessionUat": "__session_uat",
   },
   "FRONTEND_API": "CLERK_FRONTEND_API",
   "Headers": {

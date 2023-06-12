@@ -53,6 +53,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       cookieToken,
       headerToken,
       clientUat: getCookie(req, constants.Cookies.ClientUat),
+      sessionUat: getCookie(req, constants.Cookies.SessionUat),
       origin: headers.get('origin') || undefined,
       host: headers.get('host') as string,
       forwardedPort: headers.get('x-forwarded-port') || undefined,

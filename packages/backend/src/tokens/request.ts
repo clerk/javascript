@@ -97,6 +97,8 @@ export type AuthenticateRequestOptions = InstanceKeys &
     cookieToken?: string;
     /* Client uat cookie value */
     clientUat?: string;
+    /* Client uat cookie value */
+    sessionUat?: string;
     /* Client token header value */
     headerToken?: string;
     /* Request origin header value */
@@ -174,8 +176,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const state = await runInterstitialRules(options, [
         crossOriginRequestWithoutHeader,
         nonBrowserRequestInDevRule,
-        isSatelliteAndNeedsSyncing,
         satelliteInDevReturningFromPrimary,
+        isSatelliteAndNeedsSyncing,
         isPrimaryInDevAndRedirectsToSatellite,
         potentialFirstRequestOnProductionEnvironment,
         potentialFirstLoadInDevWhenUATMissing,

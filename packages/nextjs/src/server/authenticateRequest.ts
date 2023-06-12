@@ -35,6 +35,7 @@ export const authenticateRequest = async (req: NextRequest, opts: WithAuthOption
     cookieToken,
     headerToken,
     clientUat: getCookie(req, constants.Cookies.ClientUat),
+    sessionUat: getCookie(req, constants.Cookies.SessionUat),
     origin: headers.get('origin') || undefined,
     host: headers.get('host') as string,
     forwardedPort: headers.get('x-forwarded-port') || undefined,
@@ -43,7 +44,7 @@ export const authenticateRequest = async (req: NextRequest, opts: WithAuthOption
     referrer: headers.get('referer') || undefined,
     userAgent: headers.get('user-agent') || undefined,
     searchParams: new URL(req.url).searchParams,
-  } as any);
+  });
 };
 
 export const handleUnknownState = (requestState: RequestState) => {

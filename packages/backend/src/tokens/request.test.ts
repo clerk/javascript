@@ -3,7 +3,7 @@ import sinon from 'sinon';
 
 import runtime from '../runtime';
 import { jsonOk } from '../util/mockFetch';
-import { type AuthReason, type RequestState, AuthErrorReason, AuthStatus } from './authStatus';
+import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from './authStatus';
 import { TokenVerificationErrorReason } from './errors';
 import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from './fixtures';
 import type { AuthenticateRequestOptions } from './request';
@@ -391,6 +391,7 @@ export default (QUnit: QUnit) => {
         cookieToken: mockJwt,
         apiKey: 'pk_test_deadbeef',
         clientUat: '12345',
+        sessionUat: '12345',
         referrer: 'https://clerk.com',
         isSatellite: true,
         signInUrl: 'https://localhost:3000/sign-in/',

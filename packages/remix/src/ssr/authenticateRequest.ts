@@ -103,6 +103,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     cookieToken,
     headerToken,
     clientUat: cookies['__client_uat'],
+    sessionUat: cookies['__session_uat'],
     origin: headers.get('origin') || '',
     host: headers.get('host') as string,
     forwardedPort: headers.get('x-forwarded-port') as string,

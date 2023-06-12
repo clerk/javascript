@@ -14,6 +14,7 @@ const Attributes = {
 const Cookies = {
   Session: '__session',
   ClientUat: '__client_uat',
+  SessionUat: '__session_uat',
 } as const;
 
 const Headers = {

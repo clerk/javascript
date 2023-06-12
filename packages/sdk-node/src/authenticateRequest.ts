@@ -74,6 +74,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     cookieToken: cookies[constants.Cookies.Session] || '',
     headerToken: req.headers[constants.Headers.Authorization]?.replace('Bearer ', '') || '',
     clientUat: cookies[constants.Cookies.ClientUat] || '',
+    sessionUat: cookies[constants.Cookies.SessionUat] || '',
     host: req.headers.host as string,
     forwardedPort: req.headers[constants.Headers.ForwardedPort] as string,
     forwardedHost: req.headers[constants.Headers.ForwardedHost] as string,
