@@ -35,7 +35,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Trigger clerkinc/cloudfare-workers workflows
+      - name: Trigger workflows on related repos
         uses: actions/github-script@v6
         with:
           result-encoding: string
