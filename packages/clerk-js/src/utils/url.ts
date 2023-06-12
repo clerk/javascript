@@ -337,8 +337,11 @@ export const pathFromFullPath = (fullPath: string) => {
   return fullPath.replace(/CLERK-ROUTER\/(.*?)\//, '');
 };
 
-const frontendApiRedirectPaths: string[] = [
+const frontendApiRedirectPathsWithUserInput: string[] = [
   '/oauth/authorize', // OAuth2 identify provider flow
+];
+
+const frontendApiRedirectPathsNoUserInput: string[] = [
   '/v1/verify', // magic links
   '/v1/tickets/accept', // ticket flow
 ];
@@ -347,7 +350,14 @@ export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl:
   const url = new URL(redirectUrl, DUMMY_URL_BASE);
   const path = url.pathname;
 
-  return frontendApi === url.host && frontendApiRedirectPaths.includes(path);
+  const isValidFrontendRedirectPath =
+    frontendApiRedirectPathsWithUserInput.includes(path) || frontendApiRedirectPathsNoUserInput.includes(path);
+  return frontendApi === url.host && isValidFrontendRedirectPath;
+}
+
+export function requiresUserInput(redirectUrl: string): boolean {
+  const url = new URL(redirectUrl, DUMMY_URL_BASE);
+  return frontendApiRedirectPathsWithUserInput.includes(url.pathname);
 }
 
 export const isAllowedRedirectOrigin = (_url: string, allowedRedirectOrigins: Array<string | RegExp> | undefined) => {

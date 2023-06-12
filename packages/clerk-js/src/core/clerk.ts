@@ -73,6 +73,7 @@ import {
   pickRedirectionProp,
   removeClerkQueryParam,
   replaceClerkQueryParam,
+  requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
   setDevBrowserJWTInURL,
   stripOrigin,
@@ -1416,7 +1417,7 @@ export default class Clerk implements ClerkInterface {
     const referrerIsSignInUrl = signInUrl && window.location.href.startsWith(signInUrl);
 
     // don't redirect if user is not signed in and referrer is sign in url
-    if (!userSignedIn && referrerIsSignInUrl) {
+    if (requiresUserInput(redirectUrl) && !userSignedIn && referrerIsSignInUrl) {
       return false;
     }
 
