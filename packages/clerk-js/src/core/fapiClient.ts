@@ -173,16 +173,26 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
       sessionId: clerkInstance.session?.id,
     });
 
+    // Initialize the headers if they're not provided.
     if (!requestInit.headers) {
       requestInit.headers = new Headers();
     }
 
-    // In case FormData is provided, we don't want to mess with the headers,
-    // because for file uploads the header is properly set by the browser.
-    if (method !== 'GET' && !(body instanceof FormData)) {
-      requestInit.body = qs.stringify(body, { encoder: camelToSnakeEncoder, indices: false });
+    // Set the default content type for non-GET requests.
+    // Skip for FormData, because the browser knows how to construct it later on.
+    // Skip if the content-type header has already been set, somebody intends to override it.
+    // @ts-ignore
+    if (method !== 'GET' && !(body instanceof FormData) && !requestInit.headers.has('content-type')) {
       // @ts-ignore
-      requestInit.headers.set('Content-Type', 'application/x-www-form-urlencoded');
+      requestInit.headers.set('content-type', 'application/x-www-form-urlencoded');
+    }
+
+    // Massage the body depending on the content type if needed.
+    // Currently, this is needed only for form-urlencoded, so that the values reach the server in the form
+    // foo=bar&baz=bar&whatever=1
+    // @ts-ignore
+    if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
+      requestInit.body = qs.stringify(body, { encoder: camelToSnakeEncoder, indices: false });
     }
 
     const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);

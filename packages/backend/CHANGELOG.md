@@ -1,5 +1,42 @@
 # Change Log
 
+## 0.23.0
+
+### Minor Changes
+
+- Support `audience` parameter in authentication request ([#1004](https://github.com/clerkinc/javascript/pull/1004)) by [@dimkl](https://github.com/dimkl)
+
+  The audience parameter is used to verify the the aud claim in
+  the request matches the value of the parameter or is included
+  (when the user provides a list).
+
+  Resolves:
+
+  - [#978](https://github.com/clerkinc/javascript/pull/978)
+  - [#1004](https://github.com/clerkinc/javascript/pull/1004)
+
+### Patch Changes
+
+- Updated dependencies [[`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963)]:
+  - @clerk/types@3.42.0
+
+## 0.22.0
+
+### Minor Changes
+
+- Add support for NextJS applications hosted on AWS Amplify by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Address npm audit issues for the clerk backend package by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add support for NextJS applications hosted on Railway by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+### Patch Changes
+
+- Remove unused `url` prop from `redirectToSignIn` and `redirectToSignUp` helpers by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3)]:
+  - @clerk/types@3.41.1
+
 ## [0.21.0](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.21.0-staging.4...@clerk/backend@0.21.0) (2023-06-03)
 
 **Note:** Version bump only for package @clerk/backend

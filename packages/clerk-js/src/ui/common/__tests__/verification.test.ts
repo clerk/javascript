@@ -1,4 +1,5 @@
-import { ClerkAPIResponseError } from '../../../core/resources/Error';
+import { ClerkAPIResponseError } from '@clerk/shared';
+
 import { isVerificationExpiredError, VerificationErrorMessage, verificationErrorMessage } from '../verification';
 
 describe('verification utils', () => {

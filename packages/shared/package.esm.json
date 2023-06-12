@@ -1,4 +1,3 @@
 {
-  "sideEffects": false,
-  "type": "module"
+  "sideEffects": false
 }

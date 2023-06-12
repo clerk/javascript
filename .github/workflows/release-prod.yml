@@ -30,9 +30,28 @@ jobs:
           commit: "chore(repo): Version packages"
           publish: npm run release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Notify on success
         if: steps.changesets.outputs.published == 'true'
-        run: echo "Published!"
+        run: echo "Published! ${{ steps.changesets.outputs.publishedPackages }}"
+
+      - name: Trigger workflows on related repos
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+              const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerkinc',
+                repo: 'cloudflare-workers',
+                workflow_id: 'release-prod-clerkjs-proxy.yml',
+                ref: 'main',
+                inputs: { version: clerkjsVersion }
+              })

@@ -1,7 +1,7 @@
+import { ClerkAPIResponseError } from '@clerk/shared';
 import type { MembershipRole, OrganizationResource } from '@clerk/types';
 import React from 'react';
 
-import { ClerkAPIResponseError } from '../../../core/resources/Error';
 import { Flex, Text } from '../../customizables';
 import {
   Alert,
@@ -33,12 +33,14 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const { onSuccess, onReset = () => navigate('..'), resetButtonLabel, organization } = props;
   const card = useCardState();
   const { t } = useLocalizations();
-
+  const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = React.useState(false);
   const [invalidEmails, setInvalidEmails] = React.useState<string[]>([]);
 
   if (!organization) {
     return null;
   }
+
+  const validateUnsubmittedEmail = (value: string) => setIsValidUnsubmittedEmail(isEmail(value));
 
   const roles: Array<{ label: string; value: MembershipRole }> = [
     { label: t(roleLocalizationKey('admin')), value: 'admin' },
@@ -49,7 +51,6 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const emailAddressField = useFormControl('emailAddress', '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__emailAddresses'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__emailAddresses'),
   });
 
   const {
@@ -86,7 +87,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     }
   }, [invalidEmails]);
 
-  const canSubmit = !!emailAddressField.value.length;
+  const canSubmit = !!emailAddressField.value.length || isValidUnsubmittedEmail;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,11 +127,19 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             sx={{ width: '100%' }}
           >
             <Text localizationKey={localizationKeys('formFieldLabel__emailAddresses')} />
+
+            <Text
+              localizationKey={localizationKeys('formFieldInputPlaceholder__emailAddresses')}
+              colorScheme='neutral'
+              sx={t => ({ fontSize: t.fontSizes.$xs })}
+            />
+
             <TagInput
               {...restEmailAddressProps}
               autoFocus
               validate={isEmail}
               sx={{ width: '100%' }}
+              validateUnsubmittedEmail={validateUnsubmittedEmail}
             />
           </Flex>
         </Form.ControlRow>

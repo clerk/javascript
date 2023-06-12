@@ -1,5 +1,27 @@
 # Change Log
 
+## 1.18.0
+
+### Minor Changes
+
+- feat(localizations): Add ko-KR localization ([#1339](https://github.com/clerkinc/javascript/pull/1339)) by [@deutschkihun](https://github.com/deutschkihun)
+
+### Patch Changes
+
+- Updated dependencies [[`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963)]:
+  - @clerk/types@3.42.0
+
+## 1.17.1
+
+### Patch Changes
+
+- fix(types,localizations): Improve invalid form email_address param error message by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Make first name, last name & password readonly for users with active SAML accounts by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3)]:
+  - @clerk/types@3.41.1
+
 ## [1.17.0](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.17.0-staging.2...@clerk/localizations@1.17.0) (2023-06-03)
 
 ### Features

@@ -22,4 +22,10 @@ export {
 
 export type { WithUserProp, WithSessionProp, WithClerkProp } from '@clerk/clerk-react';
 
-export { isMagicLinkError, MagicLinkErrorCode } from '@clerk/clerk-react';
+export {
+  isClerkAPIResponseError,
+  MagicLinkErrorCode,
+  isKnownError,
+  isMetamaskError,
+  isMagicLinkError,
+} from '@clerk/clerk-react';

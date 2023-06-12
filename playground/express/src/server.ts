@@ -1,10 +1,10 @@
-import './loadEnv';
-
 import type { StrictAuthProp } from '@clerk/clerk-sdk-node';
 import type { Application, Request, Response, NextFunction } from 'express';
 
 import * as express from 'express';
 import { privateRoutes, publicRoutes } from './routes';
+
+import './loadEnv';
 
 const port = process.env.PORT || 3000;
 const app: Application = express();

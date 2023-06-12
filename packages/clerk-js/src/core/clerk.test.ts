@@ -1459,6 +1459,7 @@ describe('Clerk singleton', () => {
 
   describe('buildUrlWithAuth', () => {
     it('builds an absolute url from a relative url in development for url based session syncing', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
       const sut = new Clerk(devFrontendApi);
       await sut.load();
 
@@ -1475,6 +1476,7 @@ describe('Clerk singleton', () => {
     });
 
     it('returns what was passed when not using url based session syncing', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(false);
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},

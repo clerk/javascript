@@ -9,8 +9,13 @@ export class Image extends BaseResource implements ImageResource {
 
   static async create(path: string, body: any = {}): Promise<ImageResource> {
     let fd = body;
-
-    if (body['file'] && typeof body['file'] !== 'string') {
+    let headers;
+    if (typeof body['file'] === 'string') {
+      fd = body['file'];
+      headers = new Headers({
+        'Content-Type': 'application/octet-stream',
+      });
+    } else if (body['file']) {
       fd = new FormData();
       fd.append('file', body['file']);
     }
@@ -20,6 +25,7 @@ export class Image extends BaseResource implements ImageResource {
         path,
         method: 'POST',
         body: fd,
+        headers,
       })
     )?.response as unknown as ImageJSON;
 

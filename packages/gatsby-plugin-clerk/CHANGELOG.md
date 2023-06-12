@@ -1,5 +1,43 @@
 # Change Log
 
+## 4.3.9
+
+### Patch Changes
+
+- Updated dependencies [[`eff4e45e`](https://github.com/clerkinc/javascript/commit/eff4e45e351f7ab04da3996853d7bca40d642543)]:
+  - @clerk/clerk-sdk-node@4.10.6
+
+## 4.3.8
+
+### Patch Changes
+
+- Support `audience` parameter in authentication request ([#1004](https://github.com/clerkinc/javascript/pull/1004)) by [@dimkl](https://github.com/dimkl)
+
+  The audience parameter is used to verify the the aud claim in
+  the request matches the value of the parameter or is included
+  (when the user provides a list).
+
+  Resolves:
+
+  - [#978](https://github.com/clerkinc/javascript/pull/978)
+  - [#1004](https://github.com/clerkinc/javascript/pull/1004)
+
+- Updated dependencies [[`7af91bc3`](https://github.com/clerkinc/javascript/commit/7af91bc3ecc25cba04968b491e1e3c6ec32c18af), [`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963), [`6f3d4305`](https://github.com/clerkinc/javascript/commit/6f3d43055690db1d69a356503a0a45dc948beaef), [`010484f4`](https://github.com/clerkinc/javascript/commit/010484f4978b9616e8c2ef50986eda742c4967bd)]:
+  - @clerk/clerk-react@4.20.0
+  - @clerk/types@3.42.0
+  - @clerk/backend@0.23.0
+  - @clerk/clerk-sdk-node@4.10.5
+
+## 4.3.7
+
+### Patch Changes
+
+- Updated dependencies [[`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3)]:
+  - @clerk/backend@0.22.0
+  - @clerk/types@3.41.1
+  - @clerk/clerk-react@4.19.0
+  - @clerk/clerk-sdk-node@4.10.4
+
 ## [4.3.0](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.2.8-staging.4...gatsby-plugin-clerk@4.3.0) (2023-05-15)
 
 **Note:** Version bump only for package gatsby-plugin-clerk

@@ -1,4 +1,3 @@
 {
-  "sideEffects": ["./index.js", "./polyfills.js"],
-  "type": "commonjs"
+  "sideEffects": ["./index.js", "./polyfills.js"]
 }

@@ -66,7 +66,7 @@ describe('authenticateRequest', () => {
       referrer: 'referer',
       userAgent: 'user-agent',
       isSatellite: false,
-      proxyUrl: undefined,
+      proxyUrl: '',
       signInUrl: '',
       domain: '',
       searchParams,

@@ -1,4 +1,4 @@
-import type { AuthObject, SignedInAuthObject } from '@clerk/backend';
+import type { AuthenticateRequestOptions, AuthObject, SignedInAuthObject } from '@clerk/backend';
 import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -29,6 +29,7 @@ export type ClerkMiddleware = MiddlewareWithAuthProp | MiddlewareRequireAuthProp
 export type ClerkMiddlewareOptions = {
   onError?: (error: any) => unknown;
   authorizedParties?: string[];
+  audience?: AuthenticateRequestOptions['audience'];
   jwtKey?: string;
   strict?: boolean;
   signInUrl?: string;

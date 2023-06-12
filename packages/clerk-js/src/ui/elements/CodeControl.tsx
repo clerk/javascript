@@ -75,6 +75,26 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
     }
   }, [errorText]);
 
+  const handleMultipleCharValue = ({ eventValue, inputPosition }: { eventValue: string; inputPosition: number }) => {
+    const eventValues = (eventValue || '').split('');
+
+    if (eventValues.length === 0 || !eventValues.every(c => isValidInput(c))) {
+      return;
+    }
+
+    if (eventValues.length === length) {
+      setValues([...eventValues]);
+      focusInputAt(length - 1);
+      return;
+    }
+
+    const mergedValues = values.map((value, i) =>
+      i < inputPosition ? value : eventValues[i - inputPosition] || value,
+    );
+    setValues(mergedValues);
+    focusInputAt(inputPosition + eventValues.length);
+  };
+
   const changeValueAt = (index: number, newValue: string) => {
     const newValues = [...values];
     newValues[index] = newValue;
@@ -105,10 +125,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
 
   const handleOnChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    if (isValidInput(e.target.value)) {
-      changeValueAt(index, e.target.value || '');
-      focusInputAt(index + 1);
-    }
+    handleMultipleCharValue({ eventValue: e.target.value || '', inputPosition: index });
   };
 
   const handleOnInput = (index: number) => (e: React.FormEvent<HTMLInputElement>) => {
@@ -123,20 +140,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
 
   const handleOnPaste = (index: number) => (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const clipboardValues = (e.clipboardData.getData('text/plain') || '').split('');
-    if (clipboardValues.length === 0 || !clipboardValues.every(c => isValidInput(c))) {
-      return;
-    }
-
-    if (clipboardValues.length === length) {
-      setValues([...clipboardValues]);
-      focusInputAt(length - 1);
-      return;
-    }
-
-    const mergedValues = values.map((value, i) => (i < index ? value : clipboardValues[i - index] || value));
-    setValues(mergedValues);
-    focusInputAt(index + clipboardValues.length);
+    handleMultipleCharValue({ eventValue: e.clipboardData.getData('text/plain') || '', inputPosition: index });
   };
 
   const handleOnKeyDown = (index: number) => (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -222,7 +226,6 @@ const SingleCharInput = React.forwardRef<
     <Input
       ref={ref}
       type='text'
-      maxLength={1}
       sx={theme => ({
         textAlign: 'center',
         ...common.textVariants(theme).xlargeMedium,

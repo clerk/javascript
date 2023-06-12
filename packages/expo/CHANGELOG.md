@@ -1,5 +1,25 @@
 # Change Log
 
+## 0.18.0
+
+### Minor Changes
+
+- Export error helpers from the shared package to the framework specific packages ([#1308](https://github.com/clerkinc/javascript/pull/1308)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Updated dependencies [[`7af91bc3`](https://github.com/clerkinc/javascript/commit/7af91bc3ecc25cba04968b491e1e3c6ec32c18af), [`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963), [`6f3d4305`](https://github.com/clerkinc/javascript/commit/6f3d43055690db1d69a356503a0a45dc948beaef), [`846b00b9`](https://github.com/clerkinc/javascript/commit/846b00b90167ab5a77456d32653a221faddd835a)]:
+  - @clerk/clerk-react@4.20.0
+  - @clerk/clerk-js@4.47.0
+
+## 0.17.8
+
+### Patch Changes
+
+- Updated dependencies [[`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3)]:
+  - @clerk/clerk-js@4.46.0
+  - @clerk/clerk-react@4.19.0
+
 ## [0.17.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.16.5-staging.4...@clerk/clerk-expo@0.17.0) (2023-05-15)
 
 **Note:** Version bump only for package @clerk/clerk-expo

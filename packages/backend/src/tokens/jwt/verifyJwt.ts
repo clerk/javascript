@@ -2,9 +2,10 @@ import type { Jwt, JwtPayload } from '@clerk/types';
 
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
-import runtime from '../runtime';
-import { base64url } from '../util/rfc4648';
-import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
+import runtime from '../../runtime';
+import { base64url } from '../../util/rfc4648';
+import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
+import { assertAudienceClaim } from './assertions';
 
 type IssuerResolver = string | ((iss: string) => boolean);
 
@@ -147,33 +148,7 @@ export async function verifyJwt(
     });
   }
 
-  // Verify audience claim (aud)
-  if (typeof aud === 'string') {
-    if (aud !== audience) {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClerkJWT,
-        reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message: `Invalid JWT audience claim (aud) ${JSON.stringify(aud)}. Expected "${audience}".`,
-      });
-    }
-  } else if (Array.isArray(aud) && aud.length > 0 && aud.every(a => typeof a === 'string')) {
-    if (!aud.includes(audience)) {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClerkJWT,
-        reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message: `Invalid JWT audience claim array (aud) ${JSON.stringify(aud)}. Does not include "${audience}".`,
-      });
-    }
-  } else {
-    // Notice: Clerk JWTs use AZP claim instead of Audience
-    //
-    // return {
-    //   valid: false,
-    //   reason: `Invalid JWT audience claim (aud) ${JSON.stringify(
-    //     aud,
-    //   )}. Expected a string or a non-empty array of strings.`,
-    // };
-  }
+  assertAudienceClaim([aud], [audience]);
 
   // Verify authorized parties claim (azp)
   if (azp && authorizedParties && authorizedParties.length > 0 && !authorizedParties.includes(azp)) {

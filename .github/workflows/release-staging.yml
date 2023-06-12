@@ -35,24 +35,35 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Trigger clerkinc/cloudfare-workers workflows
+      - name: Trigger workflows on related repos
         uses: actions/github-script@v6
         with:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
-          github-token: ${{ secrets.PAT }}
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
             if (clerkjsVersion.includes('staging')) {
-              console.log('Will notify clerkinc/cloudfare-workers');
+              console.log('clerk-js changed, will notify clerkinc/cloudflare-workers');
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerkinc',
-                repo: 'gh-actions-testbench',
+                repo: 'cloudflare-workers',
                 workflow_id: 'release-staging-clerkjs-proxy.yml',
                 ref: 'main',
                 inputs: { version: clerkjsVersion }
+              })
+            }
+
+            if (nextjsVersion.includes('staging')) {
+              console.log('clerk/nextjs changed, will notify clerkinc/accounts');
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerkinc',
+                repo: 'accounts',
+                workflow_id: 'release-staging.yml',
+                ref: 'main',
+                inputs: { version: nextjsVersion }
               })
             }

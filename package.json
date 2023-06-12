@@ -50,6 +50,7 @@
     "dev": "turbo dev --filter=@clerk/* --filter=!@clerk/expo",
     "build": "turbo build --concurrency=${TURBO_CONCURRENCY:-2}",
     "test": "turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
+    "test:ci": "turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
     "clean": "turbo clean",
     "lint": "turbo lint",
     "bundlewatch": "turbo bundlewatch",

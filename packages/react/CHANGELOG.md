@@ -1,5 +1,38 @@
 # Change Log
 
+## 4.20.0
+
+### Minor Changes
+
+- Export error helpers from the shared package to the framework specific packages ([#1308](https://github.com/clerkinc/javascript/pull/1308)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Resolve all reported ESM build issues by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`7af91bc3`](https://github.com/clerkinc/javascript/commit/7af91bc3ecc25cba04968b491e1e3c6ec32c18af), [`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963), [`6f3d4305`](https://github.com/clerkinc/javascript/commit/6f3d43055690db1d69a356503a0a45dc948beaef)]:
+  - @clerk/shared@0.19.0
+  - @clerk/types@3.42.0
+
+## 4.19.0
+
+### Minor Changes
+
+- ESM/CJS support for `@clerk/clerk-react` by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Changes that should affect users and OS contributors:
+
+  - Better source map support for `@clerk/clerk-react`, `@clerk/shared`. This affects anyone developing in our monorepo or anyone using a debugger with Clerk installed in their app.
+  - Easier node_modules debugging as `@clerk/clerk-react`, `@clerk/shared` and `@clerk/nextjs` are no longer getting bundled as a single-file package. This also improves error logging in nextjs a lot, as nextjs usually logs the line that threw the error - a minified, single-file package, usually consists of a very long single-line module, so logging error in NextJS wasn't ideal.
+  - Headless clerk-js bundle size reduced by ~10kb, normal clerk-ks by ~6kb
+  - A new `clerkJSVersion` prop has been added on ClerkProvider allowing to fetch a specific clerk-js version.
+
+### Patch Changes
+
+- Updated dependencies [[`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3)]:
+  - @clerk/types@3.41.1
+  - @clerk/shared@0.18.0
+
 ## [4.18.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.18.0-staging.1...@clerk/clerk-react@4.18.0) (2023-06-03)
 
 **Note:** Version bump only for package @clerk/clerk-react

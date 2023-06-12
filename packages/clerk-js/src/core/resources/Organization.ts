@@ -146,13 +146,23 @@ export class Organization extends BaseResource implements OrganizationResource {
       }).then(res => new Organization(res?.response as OrganizationJSON));
     }
 
-    const body = new FormData();
-    body.append('file', file);
+    let body;
+    let headers;
+    if (typeof file === 'string') {
+      body = file;
+      headers = new Headers({
+        'Content-Type': 'application/octet-stream',
+      });
+    } else {
+      body = new FormData();
+      body.append('file', file);
+    }
 
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/logo`,
       method: 'PUT',
       body,
+      headers,
     }).then(res => new Organization(res?.response as OrganizationJSON));
   };
 

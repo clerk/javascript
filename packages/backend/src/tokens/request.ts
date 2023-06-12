@@ -34,7 +34,10 @@ export type RequiredVerifyTokenOptions = Required<
 >;
 
 export type OptionalVerifyTokenOptions = Partial<
-  Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache' | 'jwtKey'>
+  Pick<
+    VerifyTokenOptions,
+    'audience' | 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache' | 'jwtKey'
+  >
 >;
 
 export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &

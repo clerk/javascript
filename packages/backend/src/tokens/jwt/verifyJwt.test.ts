@@ -1,8 +1,8 @@
 import type QUnit from 'qunit';
 import sinon from 'sinon';
 
-import { mockJwks, mockJwt, mockJwtHeader, mockJwtPayload } from './fixtures';
-import { decodeJwt, verifyJwt } from './jwt';
+import { mockJwks, mockJwt, mockJwtHeader, mockJwtPayload } from '../fixtures';
+import { decodeJwt, verifyJwt } from './verifyJwt';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

@@ -4,6 +4,8 @@
 export { buildErrorThrower } from './errors/thrower';
 export type { ErrorThrower, ErrorThrowerOptions } from './errors/thrower';
 
+export * from './errors/Error';
+
 /**
  * Utils
  */

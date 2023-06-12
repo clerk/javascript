@@ -91,6 +91,14 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
 
     const manageOrganizationButton = (
       <Action
+        elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
+        elementId={descriptors.organizationSwitcherPopoverActionButton.setId('manageOrganization')}
+        iconBoxElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIconBox}
+        iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('manageOrganization')}
+        iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
+        iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
+        textElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonText}
+        textElementId={descriptors.organizationSwitcherPopoverActionButtonText.setId('manageOrganization')}
         icon={CogFilled}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={handleManageOrganizationClicked}

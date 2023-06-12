@@ -1,5 +1,38 @@
 # Change Log
 
+## 4.10.6
+
+### Patch Changes
+
+- Load env variables upon first usage of middlewares or clerkClient ([#1230](https://github.com/clerkinc/javascript/pull/1230)) by [@dimkl](https://github.com/dimkl)
+
+## 4.10.5
+
+### Patch Changes
+
+- Support `audience` parameter in authentication request ([#1004](https://github.com/clerkinc/javascript/pull/1004)) by [@dimkl](https://github.com/dimkl)
+
+  The audience parameter is used to verify the the aud claim in
+  the request matches the value of the parameter or is included
+  (when the user provides a list).
+
+  Resolves:
+
+  - [#978](https://github.com/clerkinc/javascript/pull/978)
+  - [#1004](https://github.com/clerkinc/javascript/pull/1004)
+
+- Updated dependencies [[`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963), [`010484f4`](https://github.com/clerkinc/javascript/commit/010484f4978b9616e8c2ef50986eda742c4967bd)]:
+  - @clerk/types@3.42.0
+  - @clerk/backend@0.23.0
+
+## 4.10.4
+
+### Patch Changes
+
+- Updated dependencies [[`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3)]:
+  - @clerk/backend@0.22.0
+  - @clerk/types@3.41.1
+
 ## [4.10.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.10.0-staging.2...@clerk/clerk-sdk-node@4.10.0) (2023-05-23)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node

@@ -1,5 +1,83 @@
 # Change Log
 
+## 4.21.1
+
+### Patch Changes
+
+- Resolve build issues affecting apps using App Router ([#1346](https://github.com/clerkinc/javascript/pull/1346)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`eff4e45e`](https://github.com/clerkinc/javascript/commit/eff4e45e351f7ab04da3996853d7bca40d642543)]:
+  - @clerk/clerk-sdk-node@4.10.6
+
+## 4.21.0
+
+### Minor Changes
+
+- Export error helpers from the shared package to the framework specific packages ([#1308](https://github.com/clerkinc/javascript/pull/1308)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Support `audience` parameter in authentication request ([#1004](https://github.com/clerkinc/javascript/pull/1004)) by [@dimkl](https://github.com/dimkl)
+
+  The audience parameter is used to verify the the aud claim in
+  the request matches the value of the parameter or is included
+  (when the user provides a list).
+
+  Resolves:
+
+  - [#978](https://github.com/clerkinc/javascript/pull/978)
+  - [#1004](https://github.com/clerkinc/javascript/pull/1004)
+
+- Updated dependencies [[`7af91bc3`](https://github.com/clerkinc/javascript/commit/7af91bc3ecc25cba04968b491e1e3c6ec32c18af), [`c42b4ac0`](https://github.com/clerkinc/javascript/commit/c42b4ac02d7ab7022a06b8f484e057999c6d7963), [`6f3d4305`](https://github.com/clerkinc/javascript/commit/6f3d43055690db1d69a356503a0a45dc948beaef), [`010484f4`](https://github.com/clerkinc/javascript/commit/010484f4978b9616e8c2ef50986eda742c4967bd)]:
+  - @clerk/clerk-react@4.20.0
+  - @clerk/types@3.42.0
+  - @clerk/backend@0.23.0
+  - @clerk/clerk-sdk-node@4.10.5
+
+## 4.20.0
+
+### Minor Changes
+
+- Add support for NextJS applications hosted on AWS Amplify by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Tweaked the default `authMiddleware` behavior for protected API routes. An unauthenticated request for a protected API route will no longer return a `307 Redirect` - a `401 Unauthorized` response will be returned instead. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  With this change, an API route is considered a request for which the following rules apply:
+
+  - The request url matches the following patterns; `['/api/(.*)', '/trpc/(.*)']`
+  - Or, the request has `Content-Type: application/json`
+  - Or, the request method is not one of: `GET`, `OPTIONS` ,` HEAD`
+
+  A new `apiRoutes` param has been introduced on `authMiddleware`. It can accept an array of path patterns, `RegexExp` or strings. If `apiRoutes` is passed in explicitly, then it overrides the behavior described above and only the requests matching `apiRoutes` will be considered as API routes requests.
+  For more technical details, refer to the PR's description.
+
+- Add support for NextJS applications hosted on Railway by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+### Patch Changes
+
+- Improve debug logs in NextJS by adding AuthStatusObject.debug data by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- The devBrowser JWT is now added to all cross-origin redirects triggered by calling `redirectToSignIn` or `redirectToSignUp`. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Improve debug logging by including `AuthObject.debug()` data when `debug` is `true` in `authMiddleware` by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- ESM/CJS support for `@clerk/clerk-react` by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Changes that should affect users and OS contributors:
+
+  - Better source map support for `@clerk/clerk-react`, `@clerk/shared`. This affects anyone developing in our monorepo or anyone using a debugger with Clerk installed in their app.
+  - Easier node_modules debugging as `@clerk/clerk-react`, `@clerk/shared` and `@clerk/nextjs` are no longer getting bundled as a single-file package. This also improves error logging in nextjs a lot, as nextjs usually logs the line that threw the error - a minified, single-file package, usually consists of a very long single-line module, so logging error in NextJS wasn't ideal.
+  - Headless clerk-js bundle size reduced by ~10kb, normal clerk-ks by ~6kb
+  - A new `clerkJSVersion` prop has been added on ClerkProvider allowing to fetch a specific clerk-js version.
+
+- `authMiddleware` handles multi-domain relared properties passed as functions properly by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3), [`b66ea0a5`](https://github.com/clerkinc/javascript/commit/b66ea0a5aea0d6801e03a1426a0db69921b7b0e3)]:
+  - @clerk/backend@0.22.0
+  - @clerk/types@3.41.1
+  - @clerk/clerk-react@4.19.0
+  - @clerk/clerk-sdk-node@4.10.4
+
 ## [4.19.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.19.0-staging.1...@clerk/nextjs@4.19.0) (2023-05-26)
 
 **Note:** Version bump only for package @clerk/nextjs

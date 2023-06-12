@@ -9,6 +9,7 @@ export type CreateAuthenticateRequestOptions = {
   options: Partial<
     Pick<
       AuthenticateRequestOptions,
+      | 'audience'
       | 'apiKey'
       | 'secretKey'
       | 'apiUrl'
@@ -37,11 +38,13 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     publishableKey: buildtimePublishableKey = '',
     isSatellite: buildtimeIsSatellite = false,
     domain: buildtimeDomain = '',
+    audience: buildtimeAudience = '',
   } = params.options;
 
   const authenticateRequest = ({
     apiKey: runtimeApiKey,
     secretKey: runtimeSecretKey,
+    audience: runtimeAudience,
     frontendApi: runtimeFrontendApi,
     proxyUrl: runtimeProxyUrl,
     publishableKey: runtimePublishableKey,
@@ -55,6 +58,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       ...rest,
       apiKey: runtimeApiKey || buildtimeApiKey,
       secretKey: runtimeSecretKey || buildtimeSecretKey,
+      audience: runtimeAudience || buildtimeAudience,
       apiUrl,
       apiVersion,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
