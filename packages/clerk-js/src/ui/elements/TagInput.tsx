@@ -16,6 +16,7 @@ type TagInputProps = Pick<PropsOfComponent<typeof Flex>, 'sx'> & {
   validate?: (tag: Tag) => boolean;
   placeholder?: LocalizationKey | string;
   autoFocus?: boolean;
+  validateUnsubmittedEmail?: (value: string) => void;
 };
 
 export const TagInput = (props: TagInputProps) => {
@@ -27,6 +28,7 @@ export const TagInput = (props: TagInputProps) => {
     value: valueProp,
     onChange: onChangeProp,
     autoFocus,
+    validateUnsubmittedEmail = () => null,
     ...rest
   } = props;
   const tags = valueProp.split(',').map(sanitize).filter(Boolean);
@@ -38,6 +40,7 @@ export const TagInput = (props: TagInputProps) => {
   const emit = (newTags: Tag[]) => {
     onChangeProp({ target: { value: newTags.join(',') } } as any);
     focusInput();
+    validateUnsubmittedEmail('');
   };
 
   const remove = (tag: Tag) => {
@@ -93,6 +96,7 @@ export const TagInput = (props: TagInputProps) => {
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = e => {
     setInput(e.target.value);
+    validateUnsubmittedEmail(e.target.value);
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
@@ -113,7 +117,6 @@ export const TagInput = (props: TagInputProps) => {
       wrap='wrap'
       onClick={focusInput}
       onFocus={focusInput}
-      onBlur={handleOnBlur}
       sx={[
         t => ({
           maxWidth: '100%',
@@ -137,15 +140,18 @@ export const TagInput = (props: TagInputProps) => {
           {tag}
         </TagPill>
       ))}
+
       <Input
         ref={inputRef}
         value={input}
         type='email'
+        data-testid='tag-input'
         placeholder={!tags.length ? t(placeholder) : undefined}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         onChange={handleChange}
         onPaste={handlePaste}
+        onBlur={handleOnBlur}
         focusRing={false}
         autoFocus={autoFocus}
         sx={t => ({

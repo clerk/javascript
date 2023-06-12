@@ -31,12 +31,10 @@ describe('InviteMembersPage', () => {
         });
       });
 
-      const { getByRole, userEvent, getByPlaceholderText } = render(<InviteMembersPage />, { wrapper });
+      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
       expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
-      await userEvent.type(
-        getByPlaceholderText('Enter or paste one or more email addresses, separated by spaces or commas'),
-        'test+1@clerk.dev,',
-      );
+
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.dev,');
       expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled();
     });
 
@@ -50,11 +48,8 @@ describe('InviteMembersPage', () => {
       });
 
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByPlaceholderText } = render(<InviteMembersPage />, { wrapper });
-      await userEvent.type(
-        getByPlaceholderText('Enter or paste one or more email addresses, separated by spaces or commas'),
-        'test+1@clerk.dev,',
-      );
+      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.dev,');
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
         emailAddresses: ['test+1@clerk.dev'],
@@ -72,9 +67,9 @@ describe('InviteMembersPage', () => {
       });
 
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByPlaceholderText } = render(<InviteMembersPage />, { wrapper });
+      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(
-        getByPlaceholderText('Enter or paste one or more email addresses, separated by spaces or commas'),
+        getByTestId('tag-input'),
         'test+1@clerk.dev,test+2@clerk.dev,test+3@clerk.dev,test+4@clerk.dev,',
       );
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
@@ -94,11 +89,8 @@ describe('InviteMembersPage', () => {
       });
 
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByPlaceholderText, getByText } = render(<InviteMembersPage />, { wrapper });
-      await userEvent.type(
-        getByPlaceholderText('Enter or paste one or more email addresses, separated by spaces or commas'),
-        'test+1@clerk.dev,',
-      );
+      const { getByRole, userEvent, getByText, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.dev,');
       await userEvent.click(getByRole('button', { name: 'Member' }));
       await userEvent.click(getByText('Admin'));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
@@ -130,11 +122,8 @@ describe('InviteMembersPage', () => {
           status: 400,
         }),
       );
-      const { getByRole, userEvent, getByPlaceholderText, getByText } = render(<InviteMembersPage />, { wrapper });
-      await userEvent.type(
-        getByPlaceholderText('Enter or paste one or more email addresses, separated by spaces or commas'),
-        'test+1@clerk.dev,',
-      );
+      const { getByRole, userEvent, getByText, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.dev,');
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       await waitFor(() =>
         expect(getByText('The invitations could not be sent. Fix the following and try again:')).toBeDefined(),
