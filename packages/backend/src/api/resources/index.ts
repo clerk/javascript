@@ -4,7 +4,18 @@ export * from './DeletedObject';
 export * from './Deserializer';
 export * from './Email';
 export * from './EmailAddress';
-export * from './Enums';
+
+export type {
+  InvitationStatus,
+  OAuthProvider,
+  OAuthStrategy,
+  OrganizationInvitationStatus,
+  OrganizationMembershipRole,
+  SignInStatus,
+  SignUpAttributeRequirements,
+  SignUpStatus,
+} from './Enums';
+
 export * from './ExternalAccount';
 export * from './IdentificationLink';
 export * from './Invitation';
@@ -21,4 +32,15 @@ export * from './SMSMessage';
 export * from './Token';
 export * from './User';
 export * from './Verification';
-export * from './Webhooks';
+
+export type {
+  EmailWebhookEvent,
+  OrganizationInvitationWebhookEvent,
+  OrganizationMembershipWebhookEvent,
+  OrganizationWebhookEvent,
+  SessionWebhookEvent,
+  SMSWebhookEvent,
+  UserWebhookEvent,
+  WebhookEvent,
+  WebhookEventType,
+} from './Webhooks';
