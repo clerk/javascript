@@ -58,7 +58,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
           <ArrowBlockButton
             textLocalizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
             onClick={handleEmailSupport}
-            icon={
+            leftIcon={
               <Icon
                 icon={Email}
                 sx={theme => ({ color: theme.colors.$blackAlpha500 })}

@@ -100,7 +100,7 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
             onClick={() => connect(strategy)}
             isLoading={card.loadingMetadata === strategy}
             isDisabled={card.isLoading}
-            icon={
+            leftIcon={
               <Image
                 elementDescriptor={descriptors.socialButtonsProviderIcon}
                 elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}

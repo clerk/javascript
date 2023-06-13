@@ -61,7 +61,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
         variant='ghost'
         colorScheme='neutral'
         textVariant='smallRegular'
-        icon={icon}
+        leftIcon={icon}
         rightIcon={Caret}
         rightIconSx={t => ({
           transitionProperty: t.transitionProperty.$common,

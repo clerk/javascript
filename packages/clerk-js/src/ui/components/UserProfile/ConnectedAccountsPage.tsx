@@ -101,7 +101,7 @@ const AddConnectedAccount = () => {
             onClick={() => connect(strategy)}
             isLoading={card.loadingMetadata === strategy}
             isDisabled={card.isLoading}
-            icon={
+            leftIcon={
               <Image
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}

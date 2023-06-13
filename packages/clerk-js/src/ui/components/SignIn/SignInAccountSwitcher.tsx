@@ -48,7 +48,7 @@ const _SignInAccountSwitcher = () => {
           <Col gap={2}>
             <ArrowBlockButton
               isDisabled={card.isLoading}
-              icon={
+              leftIcon={
                 <Icon
                   size='sm'
                   icon={Plus}
@@ -61,7 +61,7 @@ const _SignInAccountSwitcher = () => {
             </ArrowBlockButton>
             <ArrowBlockButton
               isDisabled={card.isLoading}
-              icon={
+              leftIcon={
                 <Icon
                   icon={SignOutDouble}
                   sx={theme => ({ color: theme.colors.$blackAlpha500 })}
