@@ -10,7 +10,7 @@ import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
-  const shouldPublish = overrideOptions.env?.PUBLISH === 'true';
+  const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
     entry: ['./src/**/*.{ts,tsx,js,jsx}'],

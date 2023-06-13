@@ -29,7 +29,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.PUBLISH=true",
+    "dev:publish": "npm run dev -- --env.publish",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "publish:local": "npx yalc push --replace --sig",
     "clean": "rimraf ./dist",
