@@ -2,6 +2,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import Fastify from 'fastify';
 
 import { clerkPlugin, getAuth } from './index';
+import { FastifyRequestAdapter } from './utils';
 
 const authenticateRequestMock = jest.fn();
 const localInterstitialMock = jest.fn();
@@ -59,15 +60,7 @@ describe('withClerkMiddleware(options)', () => {
       expect.objectContaining({
         secretKey: 'TEST_API_KEY',
         apiKey: 'TEST_API_KEY',
-        headerToken: 'deadbeef',
-        cookieToken: undefined,
-        clientUat: undefined,
-        origin: 'http://origin.com',
-        host: 'host.com',
-        forwardedPort: '1234',
-        forwardedHost: 'forwarded-host.com',
-        referrer: 'referer.com',
-        userAgent: 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+        requestAdapter: expect.any(FastifyRequestAdapter),
       }),
     );
   });
@@ -107,15 +100,7 @@ describe('withClerkMiddleware(options)', () => {
       expect.objectContaining({
         secretKey: 'TEST_API_KEY',
         apiKey: 'TEST_API_KEY',
-        cookieToken: 'deadbeef',
-        headerToken: undefined,
-        clientUat: '1675692233',
-        origin: 'http://origin.com',
-        host: 'host.com',
-        forwardedPort: '1234',
-        forwardedHost: 'forwarded-host.com',
-        referrer: 'referer.com',
-        userAgent: 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+        requestAdapter: expect.any(FastifyRequestAdapter),
       }),
     );
   });
@@ -211,9 +196,7 @@ describe('withClerkMiddleware(options)', () => {
       expect.objectContaining({
         secretKey: 'TEST_API_KEY',
         apiKey: 'TEST_API_KEY',
-        headerToken: 'deadbeef',
-        cookieToken: undefined,
-        clientUat: undefined,
+        requestAdapter: expect.any(FastifyRequestAdapter),
       }),
     );
   });

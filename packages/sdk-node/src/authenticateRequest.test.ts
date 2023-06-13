@@ -2,6 +2,7 @@ import { constants } from '@clerk/backend';
 import type { Request } from 'express';
 
 import { authenticateRequest } from './authenticateRequest';
+import { NodeRequestAdapter } from './utils';
 
 const mockNext = jest.fn();
 
@@ -50,26 +51,20 @@ describe('authenticateRequest', () => {
       req,
       options,
     });
-    expect(clerkClient.authenticateRequest).toHaveBeenCalledWith({
-      authorizedParties: ['party1'],
-      clientUat: 'token',
-      cookieToken: 'token',
-      forwardedHost: 'host',
-      forwardedPort: 'port',
-      apiKey: apiKey,
-      secretKey: secretKey,
-      frontendApi: frontendApi,
-      publishableKey: publishableKey,
-      headerToken: 'token',
-      host: 'host',
-      jwtKey: 'jwtKey',
-      referrer: 'referer',
-      userAgent: 'user-agent',
-      isSatellite: false,
-      proxyUrl: undefined,
-      signInUrl: '',
-      domain: '',
-      searchParams,
-    });
+    expect(clerkClient.authenticateRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        authorizedParties: ['party1'],
+        apiKey: apiKey,
+        secretKey: secretKey,
+        frontendApi: frontendApi,
+        publishableKey: publishableKey,
+        jwtKey: 'jwtKey',
+        isSatellite: false,
+        proxyUrl: undefined,
+        signInUrl: '',
+        domain: '',
+        requestAdapter: expect.any(NodeRequestAdapter),
+      }),
+    );
   });
 });

@@ -1,4 +1,4 @@
-import type { AuthObject, RequestState } from '@clerk/backend';
+import type { AuthObject, RequestAdapter, RequestState } from '@clerk/backend';
 import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
@@ -128,3 +128,20 @@ export const injectRequestStateIntoResponse = async (response: Response, request
 export const wrapWithClerkState = (data: any) => {
   return { clerkState: { __internal_clerk_state: { ...data } } };
 };
+
+export class RemixRequestAdapter implements RequestAdapter {
+  readonly reqCookies: Record<string, string>;
+  constructor(readonly req: Request) {
+    this.reqCookies = parseCookies(req);
+  }
+
+  headers(key: string) {
+    return this.req?.headers?.get(key) || undefined;
+  }
+  cookies(key: string) {
+    return this.reqCookies?.[key] || undefined;
+  }
+  searchParams(): URLSearchParams {
+    return new URL(this.req?.url)?.searchParams;
+  }
+}

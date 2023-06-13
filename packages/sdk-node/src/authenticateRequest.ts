@@ -1,14 +1,10 @@
 import type { RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
-import cookie from 'cookie';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from './shared';
 import type { AuthenticateRequestParams, ClerkClient } from './types';
-
-const parseCookies = (req: IncomingMessage) => {
-  return cookie.parse(req.headers['cookie'] || '');
-};
+import { NodeRequestAdapter } from './utils';
 
 export async function loadInterstitial({
   clerkClient,
@@ -36,7 +32,6 @@ export async function loadInterstitial({
 
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, apiKey, secretKey, frontendApi, publishableKey, req, options } = opts;
-  const cookies = parseCookies(req);
   const { jwtKey, authorizedParties } = options || {};
 
   const requestUrl = getRequestUrl(req);
@@ -64,19 +59,11 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     publishableKey,
     jwtKey,
     authorizedParties,
-    cookieToken: cookies[constants.Cookies.Session] || '',
-    headerToken: req.headers[constants.Headers.Authorization]?.replace('Bearer ', '') || '',
-    clientUat: cookies[constants.Cookies.ClientUat] || '',
-    host: req.headers.host as string,
-    forwardedPort: req.headers[constants.Headers.ForwardedPort] as string,
-    forwardedHost: req.headers[constants.Headers.ForwardedHost] as string,
-    referrer: req.headers.referer,
-    userAgent: req.headers[constants.Headers.UserAgent] as string,
     proxyUrl,
     isSatellite,
     domain,
     signInUrl,
-    searchParams: requestUrl.searchParams,
+    requestAdapter: new NodeRequestAdapter(req),
   });
 };
 export const handleUnknownCase = (res: ServerResponse, requestState: RequestState) => {
@@ -102,7 +89,7 @@ export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, re
 const isDevelopmentFromApiKey = (apiKey: string): boolean =>
   apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
 
-const getRequestUrl = (req: IncomingMessage): URL => {
+export const getRequestUrl = (req: IncomingMessage): URL => {
   return new URL(req.url as string, `${getRequestProto(req)}://${req.headers.host}`);
 };
 

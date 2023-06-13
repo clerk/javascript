@@ -1,4 +1,4 @@
-import type { RequestState } from '@clerk/backend';
+import type { RequestAdapter, RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -257,3 +257,17 @@ export const isCrossOrigin = (from: string | URL, to: string | URL) => {
   const toUrl = new URL(to);
   return fromUrl.origin !== toUrl.origin;
 };
+
+export class NextRequestAdapter implements RequestAdapter {
+  constructor(readonly req: NextRequest) {}
+
+  headers(key: string) {
+    return this.req?.headers?.get(key) || undefined;
+  }
+  cookies(key: string) {
+    return getCookie(this.req, key) || undefined;
+  }
+  searchParams(): URLSearchParams {
+    return new URL(this.req?.url)?.searchParams;
+  }
+}

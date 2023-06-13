@@ -1,7 +1,9 @@
-import type { AuthObject } from '@clerk/backend';
-import { prunePrivateMetadata } from '@clerk/backend';
+import type { AuthObject, RequestAdapter } from '@clerk/backend';
+import { constants, prunePrivateMetadata } from '@clerk/backend';
 import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
+
+import { API_KEY, SECRET_KEY } from './clerkClient';
 
 /**
  * @internal
@@ -53,4 +55,50 @@ export function injectSSRStateIntoProps(callbackResult: any, data: any) {
     ...callbackResult,
     props: { ...callbackResult.props, ...wrapWithClerkState(data) },
   };
+}
+
+const returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy = (headers: Map<string, unknown>) => {
+  if (process.env.NODE_ENV !== 'development') {
+    return headers.get(constants.Headers.ForwardedHost) as string;
+  }
+
+  const forwardedHost = headers.get(constants.Headers.ForwardedHost) as string;
+  if (forwardedHost) {
+    return forwardedHost;
+  }
+
+  const referrerUrl = new URL(headers.get(constants.Headers.Referrer) as string);
+  const hostUrl = new URL('https://' + (headers.get(constants.Headers.Host) as string));
+
+  if (isDevelopmentOrStaging(SECRET_KEY || API_KEY || '') && hostUrl.hostname === referrerUrl.hostname) {
+    return referrerUrl.host;
+  }
+
+  return forwardedHost;
+};
+
+function isDevelopmentOrStaging(apiKey: string): boolean {
+  return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
+}
+
+export class GatsbyRequestAdapter implements RequestAdapter {
+  readonly reqCookies: Record<string, string>;
+  constructor(readonly context: GetServerDataProps) {
+    this.reqCookies = parseCookies(context?.headers);
+  }
+
+  headers(key: string) {
+    if (key === constants.Headers.ForwardedHost) {
+      return returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy(this.context?.headers);
+    }
+    return (this.context?.headers?.get(key) as string) || undefined;
+  }
+
+  cookies(key: string) {
+    return this.reqCookies?.[key] || undefined;
+  }
+
+  searchParams() {
+    return new URL(this.context?.url)?.searchParams;
+  }
 }

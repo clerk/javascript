@@ -8,4 +8,4 @@ export {
   OptionalVerifyTokenOptions,
   RequiredVerifyTokenOptions,
 } from './request';
-export type { InstanceKeys } from './request';
+export type { InstanceKeys, RequestAdapter } from './request';
