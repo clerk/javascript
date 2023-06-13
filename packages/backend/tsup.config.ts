@@ -25,7 +25,7 @@ export default defineConfig(overrideOptions => {
   };
 
   const onSuccess = (format: 'esm' | 'cjs') => {
-    const rsync = `rsync -r --include '*/' --include '*.js' --include '*.mjs' --exclude='*' ./src/runtime ./dist/${format}/`;
+    const rsync = `rsync -r --include '*/' --include '*.js' --include '*.mjs' --include '*.cjs' --exclude='*' ./src/runtime ./dist/${format}/`;
     return `cp ./package.${format}.json ./dist/${format}/package.json && ${rsync}`;
   };
 
