@@ -89,7 +89,6 @@ const OrganizationDangerSection = () => {
           localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
         />
       </Flex>
-      {/* This is where we add the "delete organization" */}
     </ProfileSection>
   );
 };
