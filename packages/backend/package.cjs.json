@@ -1,5 +1,4 @@
 {
-  "type": "commonjs",
   "sideEffects": false,
   "imports": {
     "#crypto": {
