@@ -44,7 +44,6 @@ const pageToRootNavbarRouteMap = {
   username: userProfileRoutes.find(r => r.id === 'account'),
   'multi-factor': userProfileRoutes.find(r => r.id === 'security'),
   password: userProfileRoutes.find(r => r.id === 'security'),
-  delete: userProfileRoutes.find(r => r.id === 'delete'),
 };
 
 export const UserProfileBreadcrumbs = (props: Pick<PropsOfComponent<typeof Breadcrumbs>, 'title'>) => {
