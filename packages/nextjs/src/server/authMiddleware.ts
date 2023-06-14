@@ -301,7 +301,7 @@ const assertInfiniteRedirectionLoop = (req: NextRequest, res: NextResponse): Nex
 
   const infiniteRedirectsCounter = Number(req.cookies.get(INFINITE_REDIRECTION_LOOP_COOKIE)?.value) || 0;
   if (infiniteRedirectsCounter === 6) {
-    throw new Error('Oops! Looks like you ended up in an Infinite Redirection Loop.');
+    throw new Error(INFINITE_REDIRECTION_LOOP_ERROR_MESSAGE);
   }
 
   // Skip the prefetch requests (when hovering a Next Link element)
@@ -314,3 +314,15 @@ const assertInfiniteRedirectionLoop = (req: NextRequest, res: NextResponse): Nex
   }
   return res;
 };
+
+const INFINITE_REDIRECTION_LOOP_ERROR_MESSAGE = `Clerk: Infinite redirect loop detected. That usually means that we were not able to determine the auth state for this request.
+
+  Actions that may help you resolve this issue:
+
+  - Make sure your system's clock is set to the correct time.
+
+  - If you have changed your Clerk instance keys (Publishable Key, Secret Key),
+    make sure you have cleared your browser's application data and cookies.
+
+  - Make sure you are using the latest version of '@clerk/nextjs'.
+  `;
