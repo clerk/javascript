@@ -67,7 +67,7 @@ export class SessionCookieService {
       try {
         return this.handleGetTokenError(e);
       } catch {
-        return this.clerk.setActive({ session: null });
+        void this.clerk.handleUnauthenticated();
       }
     }
   }
