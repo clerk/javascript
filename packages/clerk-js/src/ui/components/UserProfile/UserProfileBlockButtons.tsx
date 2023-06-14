@@ -15,7 +15,7 @@ export const BlockButton = (props: BlockButtonProps) => {
 };
 
 export const AddBlockButton = (props: BlockButtonProps) => {
-  const { id, icon, ...rest } = props;
+  const { id, leftIcon, ...rest } = props;
   return (
     <BlockButton
       elementDescriptor={descriptors.profileSectionPrimaryButton}
@@ -23,9 +23,9 @@ export const AddBlockButton = (props: BlockButtonProps) => {
       colorScheme='primary'
       {...rest}
       sx={theme => ({ justifyContent: 'flex-start', gap: theme.space.$2 })}
-      icon={
+      leftIcon={
         <Icon
-          icon={icon || Plus}
+          icon={leftIcon || Plus}
           sx={theme => ({
             width: theme.sizes.$2x5,
             height: theme.sizes.$2x5,

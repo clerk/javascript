@@ -122,7 +122,7 @@ const AddMfa = (props: AddMfaProps) => {
               onClick={() => enableMfa(phone)}
               isLoading={card.loadingMetadata === phone.id}
               isDisabled={card.isLoading}
-              icon={
+              leftIcon={
                 <Text
                   as='span'
                   sx={theme => ({ fontSize: theme.fontSizes.$sm })}
