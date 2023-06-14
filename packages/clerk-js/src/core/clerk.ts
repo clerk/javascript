@@ -1,10 +1,9 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
-import { is4xxError } from '@clerk/shared';
-import { isUnauthorizedError } from '@clerk/shared';
 import {
   addClerkPrefix,
   handleValueOrFn,
   inClientSide,
+  is4xxError,
   isHttpOrHttps,
   isLegacyFrontendApiKey,
   isValidBrowserOnline,
