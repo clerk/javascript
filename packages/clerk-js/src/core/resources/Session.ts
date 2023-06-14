@@ -67,7 +67,7 @@ export class Session extends BaseResource implements SessionResource {
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
     return runWithExponentialBackOff(() => this._getToken(options), {
-      shouldRetry: (e: unknown, i: number) => !is4xxError(e) && i < 4,
+      shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,
     });
   };
 
