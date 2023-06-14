@@ -76,10 +76,6 @@ export const unknownResponse = (requestState: RequestState) => {
 };
 
 export const interstitialJsonResponse = (requestState: RequestState, opts: { loader: 'root' | 'nested' }) => {
-  console.log('HEEEE', {
-    clerkJSUrl: getEnvVariable('CLERK_JS'),
-    clerkJSVersion: getEnvVariable('CLERK_JS_VERSION'),
-  });
   return json(
     wrapWithClerkState({
       __loader: opts.loader,
