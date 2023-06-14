@@ -20,6 +20,7 @@ export async function loadInterstitial({
   clerkClient: ClerkClient;
   requestState: RequestState;
 }) {
+  const { clerkJSVersion, clerkJSUrl } = loadClientEnv();
   /**
    * When publishable key or frontendApi is present utilize the localInterstitial method
    * and avoid the extra network call
@@ -32,6 +33,8 @@ export async function loadInterstitial({
       signInUrl: requestState.signInUrl,
       isSatellite: requestState.isSatellite,
       domain: requestState.domain,
+      clerkJSVersion,
+      clerkJSUrl,
     });
   }
   return await clerkClient.remotePrivateInterstitial();
