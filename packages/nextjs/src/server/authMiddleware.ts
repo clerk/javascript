@@ -34,6 +34,8 @@ type RouteMatcherWithNextTypedRoutes =
   | NextTypedRoute
   | (string & {});
 
+const INFINITE_REDIRECTION_LOOP_COOKIE = '__clerk_redirection_loop';
+
 /**
  * The default ideal matcher that excludes the _next directory (internals) and all static files,
  * but it will match the root route (/) and any routes that start with /api or /trpc.
@@ -160,7 +162,8 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return handleUnknownState(requestState);
     } else if (requestState.isInterstitial) {
       logger.debug('authenticateRequest state is interstitial', requestState);
-      return handleInterstitialState(requestState, options);
+      const res = handleInterstitialState(requestState, options);
+      return assertInfiniteRedirectionLoop(req, res);
     }
 
     const auth = Object.assign(requestState.toAuth(), {
@@ -287,3 +290,43 @@ const isRequestMethodIndicatingApiRoute = (req: NextRequest): boolean => {
   const requestMethod = req.method.toLowerCase();
   return !['get', 'head', 'options'].includes(requestMethod);
 };
+
+// When in development, we want to prevent infinite interstitial redirection loops.
+// We incrementally set a `__clerk_redirection_loop` cookie, and when it loops 6 times, we throw an error.
+// We also utilize the `referer` header to skip the prefetch requests.
+const assertInfiniteRedirectionLoop = (req: NextRequest, res: NextResponse): NextResponse => {
+  if (!isDevelopmentFromApiKey(SECRET_KEY)) {
+    return res;
+  }
+
+  const infiniteRedirectsCounter = Number(req.cookies.get(INFINITE_REDIRECTION_LOOP_COOKIE)?.value) || 0;
+  if (infiniteRedirectsCounter === 6) {
+    throw new Error(INFINITE_REDIRECTION_LOOP_ERROR_MESSAGE);
+  }
+
+  // Skip the prefetch requests (when hovering a Next Link element)
+  if (req.headers.get('referer') === req.url) {
+    res.cookies.set({
+      name: INFINITE_REDIRECTION_LOOP_COOKIE,
+      value: `${infiniteRedirectsCounter + 1}`,
+      maxAge: 3,
+    });
+  }
+  return res;
+};
+
+const INFINITE_REDIRECTION_LOOP_ERROR_MESSAGE = `Clerk: Infinite redirect loop detected. That usually means that we were not able to determine the auth state for this request. A list of common causes and solutions follows.
+
+    Reason 1: Your server's system clock is inaccurate. Clerk will continuously try to issue new tokens,
+    as the existing ones will be treated as "expired" due to clock skew.
+    How to resolve:
+      - Make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
+
+    Reason 2: You changed Clerk instance keys (Publishable Key, Secret Key).
+    Steps to resolve:
+      - Make sure you have cleared your browser's application data and cookies everytime you change keys.
+
+    Reason 3: A bug that may have already been fixed in the latest version of Clerk NextJS package.
+    Steps to resolve:
+      - Make sure you are using the latest version of '@clerk/nextjs' and 'next'.
+  `;
