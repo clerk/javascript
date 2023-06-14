@@ -1,4 +1,6 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
+import { is4xxError } from '@clerk/shared';
+import { isUnauthorizedError } from '@clerk/shared';
 import {
   addClerkPrefix,
   handleValueOrFn,
@@ -1309,7 +1311,11 @@ export default class Clerk implements ClerkInterface {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
-    await session.touch().catch(noop);
+    await session.touch().catch(e => {
+      if (is4xxError(e)) {
+        void this.handleUnauthenticated();
+      }
+    });
   };
 
   #emit = (): void => {
