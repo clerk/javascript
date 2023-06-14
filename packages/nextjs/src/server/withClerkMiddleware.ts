@@ -4,7 +4,16 @@ import type { NextMiddleware } from 'next/dist/server/web/types';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { API_KEY, API_URL, clerkClient, FRONTEND_API, JS_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from './clerkClient';
+import {
+  API_KEY,
+  API_URL,
+  CLERK_JS_URL,
+  CLERK_JS_VERSION,
+  clerkClient,
+  FRONTEND_API,
+  PUBLISHABLE_KEY,
+  SECRET_KEY,
+} from './clerkClient';
 import type { WithAuthOptions } from './types';
 import { decorateRequest, getCookie, handleMultiDomainAndProxy, setCustomAttributeOnRequest } from './utils';
 
@@ -71,7 +80,8 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
           apiUrl: API_URL,
           frontendApi: opts.frontendApi || FRONTEND_API,
           publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
-          pkgVersion: JS_VERSION,
+          clerkJSUrl: CLERK_JS_URL,
+          clerkJSVersion: CLERK_JS_VERSION,
           proxyUrl: requestState.proxyUrl as any,
           isSatellite: requestState.isSatellite,
           domain: requestState.domain as any,
