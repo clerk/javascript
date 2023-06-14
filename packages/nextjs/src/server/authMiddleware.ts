@@ -317,16 +317,18 @@ const assertInfiniteRedirectionLoop = (req: NextRequest, res: NextResponse): Nex
 
 const INFINITE_REDIRECTION_LOOP_ERROR_MESSAGE = `Clerk: Infinite redirect loop detected. That usually means that we were not able to determine the auth state for this request. A list of common causes and solutions follows.
 
-    Reason 1: Your server's system clock is inaccurate. Clerk will continuously try to issue new tokens,
-    as the existing ones will be treated as "expired" due to clock skew.
-    How to resolve:
-      - Make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
+Reason 1:
+Your server's system clock is inaccurate. Clerk will continuously try to issue new tokens, as the existing ones will be treated as "expired" due to clock skew.
+How to resolve:
+-> Make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
 
-    Reason 2: You changed Clerk instance keys (Publishable Key, Secret Key).
-    Steps to resolve:
-      - Make sure you have cleared your browser's application data and cookies everytime you change keys.
+Reason 2:
+You changed Clerk instance keys (Publishable Key, Secret Key).
+How to resolve:
+-> Make sure you have cleared your browser's application data and cookies everytime you change keys.
 
-    Reason 3: A bug that may have already been fixed in the latest version of Clerk NextJS package.
-    Steps to resolve:
-      - Make sure you are using the latest version of '@clerk/nextjs' and 'next'.
+Reason 3:
+A bug that may have already been fixed in the latest version of Clerk NextJS package.
+How to resolve:
+-> Make sure you are using the latest version of '@clerk/nextjs' and 'next'.
   `;
