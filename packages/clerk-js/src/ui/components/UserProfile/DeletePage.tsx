@@ -1,6 +1,6 @@
 import { useCoreClerk, useCoreSession, useEnvironment, useCoreUser } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
-import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { useRouter } from '../../router';
