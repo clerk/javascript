@@ -29,7 +29,7 @@ export const PasswordSection = () => {
       <AddBlockButton
         id='password'
         onClick={navigateToPage}
-        icon={passwordEnabled ? Pencil : undefined}
+        leftIcon={passwordEnabled ? Pencil : undefined}
         textLocalizationKey={
           passwordEnabled
             ? localizationKeys('userProfile.start.passwordSection.primaryButton__changePassword')

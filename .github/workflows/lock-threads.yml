@@ -1,0 +1,40 @@
+name: 'Lock stale PRs and issues'
+
+on:
+  workflow_dispatch:
+  schedule:
+    # This runs 4 times a day:
+    # https://crontab.guru/#0_0,12_*_*_*
+    - cron: '0 0,6,12,18 * * *'
+
+permissions:
+  contents: write # only for delete-branch option
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: lock-threads
+
+jobs:
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v8
+        with:
+          repo-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          days-before-issue-stale: 30
+          days-before-pr-stale: 45
+          days-before-issue-close: 10
+          days-before-pr-close: 10
+          stale-issue-message: 'This issue is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 10 days.'
+          stale-pr-message: 'This PR is stale because it has been open 45 days with no activity. Remove stale label or comment or this will be closed in 10 days.'
+          close-issue-message: 'This issue was closed because it has been stalled for 10 days with no activity.'
+          close-pr-message: 'This PR was closed because it has been stalled for 10 days with no activity.'
+      - uses: dessant/lock-threads@v4
+        with:
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          issue-inactive-days: '365'
+          pr-inactive-days: '365'
+          issue-comment: 'This issue has been automatically locked since there has not been any recent activity after it was closed. Please open a new issue for related bugs.'
+          pr-comment: 'This PR has been automatically locked since there has not been any recent activity after it was closed. Please open a new issue for related bugs.'
+          log-output: true

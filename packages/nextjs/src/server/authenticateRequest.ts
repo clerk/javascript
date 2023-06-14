@@ -5,10 +5,11 @@ import { NextResponse } from 'next/server';
 import type { RequestState } from './clerkClient';
 import {
   API_KEY,
+  CLERK_JS_URL,
+  CLERK_JS_VERSION,
   clerkClient,
   debugRequestState,
   FRONTEND_API,
-  JS_VERSION,
   PUBLISHABLE_KEY,
   SECRET_KEY,
 } from './clerkClient';
@@ -56,10 +57,11 @@ export const handleInterstitialState = (requestState: RequestState, opts: WithAu
     clerkClient.localInterstitial({
       frontendApi: opts.frontendApi || FRONTEND_API,
       publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
-      pkgVersion: JS_VERSION,
-      proxyUrl: requestState.proxyUrl as any,
+      clerkJSUrl: CLERK_JS_URL,
+      clerkJSVersion: CLERK_JS_VERSION,
+      proxyUrl: requestState.proxyUrl,
       isSatellite: requestState.isSatellite,
-      domain: requestState.domain as any,
+      domain: requestState.domain,
       debugData: debugRequestState(requestState),
       signInUrl: requestState.signInUrl,
     }),

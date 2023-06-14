@@ -8,6 +8,8 @@ export const loadClientEnv = () => {
   return {
     publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
     frontendApi: process.env.CLERK_FRONTEND_API || '',
+    clerkJSUrl: process.env.CLERK_JS || '',
+    clerkJSVersion: process.env.CLERK_JS_VERSION || '',
   };
 };
 
@@ -23,6 +25,7 @@ export const loadApiEnv = () => {
     isSatellite: process.env.CLERK_IS_SATELLITE === 'true',
   };
 };
+
 /**
  * This needs to be a *named* function in order to support the older
  * new Clerk() syntax for v4 compatibility.

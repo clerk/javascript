@@ -12,6 +12,8 @@ export type ClerkState = {
     __isSatellite: boolean;
     __signInUrl: string | undefined;
     __clerk_debug: any;
+    __clerkJSUrl: string | undefined;
+    __clerkJSVersion: string | undefined;
   };
 };
 

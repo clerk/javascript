@@ -5,6 +5,8 @@ import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import {
   API_URL,
+  CLERK_JS_URL,
+  CLERK_JS_VERSION,
   clerkClient,
   FRONTEND_API,
   JS_VERSION,
@@ -63,6 +65,8 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
         publishableKey: PUBLISHABLE_KEY,
         frontendApi: FRONTEND_API,
         pkgVersion: JS_VERSION,
+        clerkJSUrl: CLERK_JS_URL,
+        clerkJSVersion: CLERK_JS_VERSION,
         proxyUrl: requestState.proxyUrl as any,
         isSatellite: requestState.isSatellite,
         domain: requestState.domain as any,

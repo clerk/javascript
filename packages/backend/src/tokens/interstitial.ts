@@ -16,6 +16,11 @@ export type LoadInterstitialOptions = {
   apiUrl: string;
   frontendApi: string;
   publishableKey: string;
+  clerkJSUrl?: string;
+  clerkJSVersion?: string;
+  /**
+   * @deprecated
+   */
   pkgVersion?: string;
   debugData?: DebugRequestSate;
   isSatellite?: boolean;
@@ -47,6 +52,8 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
     debugData,
     frontendApi,
     pkgVersion,
+    clerkJSUrl,
+    clerkJSVersion,
     publishableKey,
     proxyUrl,
     isSatellite = false,
@@ -114,7 +121,13 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                 ${domain ? `script.setAttribute('data-clerk-domain', '${domain}');` : ''}
                 ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
-                script.src = '${getScriptUrl(proxyUrl || domainOnlyInProd || frontendApi, pkgVersion)}';
+                script.src = '${
+                  clerkJSUrl ||
+                  getScriptUrl(proxyUrl || domainOnlyInProd || frontendApi, {
+                    pkgVersion,
+                    clerkJSVersion,
+                  })
+                }';
                 script.crossOrigin = 'anonymous';
                 script.addEventListener('load', startClerk);
                 document.body.appendChild(script);
@@ -143,10 +156,11 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl, isSatellite, domain, signInUrl } = options;
+  const { apiUrl, frontendApi, pkgVersion, clerkJSVersion, publishableKey, proxyUrl, isSatellite, domain, signInUrl } =
+    options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
-  url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
+  url.searchParams.append('clerk_js_version', clerkJSVersion || getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
   if (publishableKey) {
     url.searchParams.append('publishable_key', publishableKey);
   } else {
@@ -190,8 +204,11 @@ const getClerkJsMajorVersionOrTag = (frontendApi: string, pkgVersion?: string) =
   return pkgVersion.split('.')[0] || 'latest';
 };
 
-const getScriptUrl = (frontendApi: string, pkgVersion?: string) => {
+const getScriptUrl = (
+  frontendApi: string,
+  { pkgVersion, clerkJSVersion }: { pkgVersion?: string; clerkJSVersion?: string },
+) => {
   const noSchemeFrontendApi = frontendApi.replace(/http(s)?:\/\//, '');
   const major = getClerkJsMajorVersionOrTag(frontendApi, pkgVersion);
-  return `https://${noSchemeFrontendApi}/npm/@clerk/clerk-js@${major}/dist/clerk.browser.js`;
+  return `https://${noSchemeFrontendApi}/npm/@clerk/clerk-js@${clerkJSVersion || major}/dist/clerk.browser.js`;
 };

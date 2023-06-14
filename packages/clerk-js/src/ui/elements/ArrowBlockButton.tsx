@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { isValidElement } from 'react';
 
 import type { Button, LocalizationKey } from '../customizables';
 import { Flex, Icon, SimpleButton, Spinner, Text } from '../customizables';
@@ -7,13 +7,9 @@ import { ArrowRightIcon } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
-  /**
-   * @deprecated use leftIcon and leftIconSx instead
-   */
-  icon?: React.ReactElement;
   rightIcon?: React.ComponentType;
   rightIconSx?: ThemableCssProp;
-  leftIcon?: React.ComponentType;
+  leftIcon?: React.ComponentType | React.ReactElement;
   leftIconSx?: ThemableCssProp;
   leftIconElementDescriptor?: ElementDescriptor;
   leftIconElementId?: ElementId;
@@ -36,7 +32,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     leftIconElementId,
     leftIconElementDescriptor,
     isLoading,
-    icon,
     children,
     textElementDescriptor,
     textElementId,
@@ -49,17 +44,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     ...rest
   } = props;
 
-  const deprecatedleftIcon = icon
-    ? React.cloneElement(icon, {
-        sx: [
-          icon.props.sx,
-          (theme: any) => ({
-            width: theme.sizes.$4,
-            position: 'absolute',
-          }),
-        ],
-      })
-    : null;
+  const isIconElement = isValidElement(leftIcon);
 
   return (
     <SimpleButton
@@ -84,7 +69,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         props.sx,
       ]}
     >
-      {(deprecatedleftIcon || isLoading || leftIcon) && (
+      {(isLoading || leftIcon) && (
         <Flex
           as='span'
           center
@@ -97,7 +82,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
               sx={{ position: 'absolute' }}
               size={'sm'}
             />
-          ) : leftIcon ? (
+          ) : !isIconElement && leftIcon ? (
             <Icon
               elementDescriptor={leftIconElementDescriptor}
               elementId={leftIconElementId}
@@ -112,7 +97,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
               ]}
             />
           ) : (
-            deprecatedleftIcon
+            leftIcon
           )}
         </Flex>
       )}

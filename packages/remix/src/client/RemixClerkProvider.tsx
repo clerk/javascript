@@ -46,6 +46,8 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     __isSatellite,
     __clerk_debug,
     __signInUrl,
+    __clerkJSUrl,
+    __clerkJSVersion,
   } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
@@ -66,6 +68,8 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
       domain={__domain as any}
       isSatellite={__isSatellite}
       signInUrl={__signInUrl}
+      clerkJSUrl={__clerkJSUrl}
+      clerkJSVersion={__clerkJSVersion}
       {...restProps}
     >
       {children}

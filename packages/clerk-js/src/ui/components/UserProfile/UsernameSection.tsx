@@ -25,7 +25,7 @@ export const UsernameSection = () => {
       <AddBlockButton
         id='username'
         onClick={() => navigate('username')}
-        icon={user.username ? Pencil : undefined}
+        leftIcon={user.username ? Pencil : undefined}
         textLocalizationKey={
           user.username
             ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')

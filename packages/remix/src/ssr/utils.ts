@@ -3,6 +3,7 @@ import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
+import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
 
 /**
@@ -84,6 +85,8 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
         publishableKey: requestState.publishableKey,
         // TODO: This needs to be the version of clerk/remix not clerk/react
         // pkgVersion: LIB_VERSION,
+        clerkJSUrl: getEnvVariable('CLERK_JS'),
+        clerkJSVersion: getEnvVariable('CLERK_JS_VERSION'),
         proxyUrl: requestState.proxyUrl,
         isSatellite: requestState.isSatellite,
         domain: requestState.domain,
@@ -108,6 +111,8 @@ export const injectRequestStateIntoResponse = async (response: Response, request
     __isSatellite: requestState.isSatellite,
     __signInUrl: requestState.signInUrl,
     __clerk_debug: debugRequestState(requestState),
+    __clerkJSUrl: getEnvVariable('CLERK_JS'),
+    __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION'),
   });
   // set the correct content-type header in case the user returned a `Response` directly
   // without setting the header, instead of using the `json()` helper
