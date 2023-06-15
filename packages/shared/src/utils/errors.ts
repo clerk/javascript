@@ -6,7 +6,7 @@ export function isUnauthorizedError(e: any): boolean {
 
 export function is4xxError(e: any): boolean {
   const status = e?.status;
-  return status >= 400 && status < 500;
+  return !!status && status >= 400 && status < 500;
 }
 
 export function isNetworkError(e: any): boolean {
