@@ -1,4 +1,3 @@
-import { isRetinaDisplay } from '@clerk/shared';
 import React from 'react';
 
 import { Box, descriptors, Flex, Image, Text } from '../customizables';
@@ -13,7 +12,6 @@ type AvatarProps = PropsOfComponent<typeof Flex> & {
   initials?: string;
   imageUrl?: string | null;
   imageFetchSize?: number;
-  optimize?: boolean;
   rounded?: boolean;
   boxElementDescriptor?: ElementDescriptor;
   imageElementDescriptor?: ElementDescriptor;
@@ -25,22 +23,15 @@ export const Avatar = (props: AvatarProps) => {
     title,
     initials,
     imageUrl,
-    optimize,
     rounded = true,
-    imageFetchSize = 64,
+    imageFetchSize = 80,
     sx,
     boxElementDescriptor,
     imageElementDescriptor,
   } = props;
   const [error, setError] = React.useState(false);
 
-  let src = imageUrl;
-  if (src && !optimize) {
-    const optimizedHeight = Math.max(imageFetchSize) * (isRetinaDisplay() ? 2 : 1);
-    const srcUrl = new URL(src);
-    srcUrl.searchParams.append('height', optimizedHeight.toString());
-    src = srcUrl.toString();
-  }
+  const src = imageUrl;
 
   const ImgOrFallback =
     initials && (!src || error) ? (
@@ -55,6 +46,7 @@ export const Avatar = (props: AvatarProps) => {
         height='100%'
         sx={{ objectFit: 'cover' }}
         onError={() => setError(true)}
+        size={imageFetchSize}
       />
     );
 

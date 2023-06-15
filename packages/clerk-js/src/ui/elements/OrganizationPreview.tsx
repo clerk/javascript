@@ -41,7 +41,6 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           imageElementDescriptor={descriptors.organizationPreviewAvatarImage}
           {...organization}
           size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
-          optimize
           sx={avatarSx}
           rounded={rounded}
         />
