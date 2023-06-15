@@ -19,7 +19,7 @@ export default defineConfig(overrideOptions => {
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
-      __DEV__: `${!isWatch}`,
+      __DEV__: `${isWatch}`,
     },
   };
 
