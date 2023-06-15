@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.10.7
+
+### Patch Changes
+
+- Correctly display "Missing Clerk keys" error instead of simply throwing during initialization ([#1365](https://github.com/clerkinc/javascript/pull/1365)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Allow `clerkJSVersion` to be passed when loading interstitial. Support for ([#1354](https://github.com/clerkinc/javascript/pull/1354)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Nextjs
+  - Remix
+  - Node
+
+- Updated dependencies [[`b945c921`](https://github.com/clerkinc/javascript/commit/b945c92100454f00ff4b6b9c769201ca2ceaac93)]:
+  - @clerk/backend@0.23.1
+
 ## 4.10.6
 
 ### Patch Changes
