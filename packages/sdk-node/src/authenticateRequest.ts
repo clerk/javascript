@@ -3,9 +3,9 @@ import { constants } from '@clerk/backend';
 import cookie from 'cookie';
 import type { IncomingMessage, ServerResponse } from 'http';
 
-import { loadApiEnv, loadClientEnv } from './clerkClient';
 import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from './shared';
 import type { ClerkMiddlewareOptions } from './types';
+import { loadApiEnv, loadClientEnv } from './utils';
 
 const parseCookies = (req: IncomingMessage) => {
   return cookie.parse(req.headers['cookie'] || '');
