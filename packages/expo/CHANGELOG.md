@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.18.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@4.47.1
+
 ## 0.18.0
 
 ### Minor Changes

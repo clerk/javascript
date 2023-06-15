@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.47.1
+
+### Patch Changes
+
+- Updated dependencies [[`0d5caa84`](https://github.com/clerkinc/javascript/commit/0d5caa84a2808dbd260259a4359d7339b99cfb39)]:
+  - @clerk/localizations@1.18.1
+
 ## 4.47.0
 
 ### Minor Changes

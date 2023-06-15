@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.18.1
+
+### Patch Changes
+
+- Add more fr-FR translations ([#1364](https://github.com/clerkinc/javascript/pull/1364)) by [@selimjouan](https://github.com/selimjouan)
+
 ## 1.18.0
 
 ### Minor Changes

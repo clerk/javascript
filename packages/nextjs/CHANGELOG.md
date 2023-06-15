@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.21.2
+
+### Patch Changes
+
+- Detect infinite redirect loops when using `authMiddleware` and inform the user about possible resolution steps. ([#1324](https://github.com/clerkinc/javascript/pull/1324)) by [@anagstef](https://github.com/anagstef)
+
+- Allow `clerkJSVersion` to be passed when loading interstitial. Support for ([#1354](https://github.com/clerkinc/javascript/pull/1354)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Nextjs
+  - Remix
+  - Node
+
+- Updated dependencies [[`f8a334b1`](https://github.com/clerkinc/javascript/commit/f8a334b1a97b1dab36d3114c42c4ba50ca6d38dc), [`b945c921`](https://github.com/clerkinc/javascript/commit/b945c92100454f00ff4b6b9c769201ca2ceaac93)]:
+  - @clerk/clerk-sdk-node@4.10.7
+  - @clerk/backend@0.23.1
+
 ## 4.21.1
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.23.1
+
+### Patch Changes
+
+- Allow `clerkJSVersion` to be passed when loading interstitial. Support for ([#1354](https://github.com/clerkinc/javascript/pull/1354)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Nextjs
+  - Remix
+  - Node
+
 ## 0.23.0
 
 ### Minor Changes
