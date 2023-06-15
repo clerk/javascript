@@ -8,7 +8,7 @@ import { clerkPlugin } from './clerkPlugin';
 import { createFastifyInstanceMock } from './test/utils';
 
 describe('clerkPlugin()', () => {
-  test('adds withClerkMiddleware as preHandler', () => {
+  test('adds withClerkMiddleware as preHandler by default', () => {
     const doneFn = jest.fn();
     const fastify = createFastifyInstanceMock();
 
@@ -17,6 +17,28 @@ describe('clerkPlugin()', () => {
     expect(fastify.addHook).toBeCalledWith('preHandler', 'withClerkMiddlewareMocked');
     expect(doneFn).toBeCalled();
   });
+
+  test('adds withClerkMiddleware as onRequest when specified', () => {
+    const doneFn = jest.fn();
+    const fastify = createFastifyInstanceMock();
+
+    clerkPlugin(fastify, { hookName: 'onRequest' }, doneFn);
+
+    expect(fastify.addHook).toBeCalledWith('onRequest', 'withClerkMiddlewareMocked');
+    expect(doneFn).toBeCalled();
+  });
+
+  test.each(['preParsing', 'preValidation', 'preSerialization', 'NOT_A_VALID_HOOK_NAME'])(
+    'throws when hookName is %s',
+    hookName => {
+      const doneFn = jest.fn();
+      const fastify = createFastifyInstanceMock();
+
+      expect(() => {
+        clerkPlugin(fastify, { hookName }, doneFn);
+      }).toThrowError(`Unsupported hookName: ${hookName}`);
+    },
+  );
 
   test('adds auth decorator', () => {
     const doneFn = jest.fn();
