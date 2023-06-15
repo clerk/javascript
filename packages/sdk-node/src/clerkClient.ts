@@ -46,7 +46,7 @@ let clerkClientSingleton = {} as unknown as ReturnType<typeof Clerk>;
 export const clerkClient = new Proxy(clerkClientSingleton, {
   get(_target, property) {
     const env = { ...loadApiEnv(), ...loadClientEnv() };
-    if (!env.secretKey) {
+    if (env.secretKey) {
       clerkClientSingleton = Clerk({
         ...env,
         userAgent: '@clerk/clerk-sdk-node',
