@@ -45,15 +45,21 @@ let clerkClientSingleton = {} as unknown as ReturnType<typeof Clerk>;
 
 export const clerkClient = new Proxy(clerkClientSingleton, {
   get(_target, property) {
+    const hasBeenInitialised = !!clerkClientSingleton.authenticateRequest;
+    if (hasBeenInitialised) {
+      // @ts-expect-error
+      return clerkClientSingleton[property];
+    }
+
     const env = { ...loadApiEnv(), ...loadClientEnv() };
     if (env.secretKey) {
-      clerkClientSingleton = Clerk({
-        ...env,
-        userAgent: '@clerk/clerk-sdk-node',
-      });
+      clerkClientSingleton = Clerk({ ...env, userAgent: '@clerk/clerk-sdk-node' });
+      // @ts-expect-error
+      return clerkClientSingleton[property];
     }
-    // @ts-ignore
-    return clerkClientSingleton[property];
+
+    // @ts-expect-error
+    return Clerk({ ...env, userAgent: '@clerk/clerk-sdk-node' })[property];
   },
   set() {
     return false;
