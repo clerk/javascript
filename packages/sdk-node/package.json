@@ -2,25 +2,25 @@
   "version": "4.10.6",
   "license": "MIT",
   "type": "commonjs",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js"
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/cjs/index.js"
     },
     "./esm/instance": {
       "types": "./dist/types/instance.d.ts",
-      "require": "./dist/instance.js",
-      "import": "./dist/instance.mjs"
+      "require": "./dist/cjs/instance.js",
+      "import": "./dist/esm/instance.js"
     },
     "./cjs/instance": {
       "types": "./dist/types/instance.d.ts",
-      "require": "./dist/instance.js",
-      "import": "./dist/instance.mjs"
+      "require": "./dist/cjs/instance.js",
+      "import": "./dist/esm/instance.js"
     }
   },
   "files": [
@@ -32,13 +32,15 @@
     "node": ">=14"
   },
   "scripts": {
+    "build": "npm run clean && tsup",
     "dev": "tsup --watch",
-    "build": "tsup --env.NODE_ENV production",
+    "dev:publish": "npm run dev -- --env.publish",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%",
-    "pack": "npm pack"
+    "test:ci": "jest --maxWorkers=50%"
   },
   "name": "@clerk/clerk-sdk-node",
   "author": {
