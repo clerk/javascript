@@ -2,7 +2,7 @@ import { Clerk } from './clerkClient';
 
 export default Clerk;
 
-export { WithAuthProp, RequireAuthProp } from './types';
+export type { WithAuthProp, RequireAuthProp } from './types';
 
 export {
   AllowlistIdentifier,
