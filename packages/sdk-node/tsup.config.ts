@@ -1,24 +1,44 @@
+import type { Options } from 'tsup';
 import { defineConfig } from 'tsup';
 
+import { runAfterLast } from '../../scripts/utils';
+// @ts-ignore
 import { name, version } from './package.json';
 
-console.log({ name, version });
 export default defineConfig(overrideOptions => {
-  const isProd = overrideOptions.env?.NODE_ENV === 'production';
+  const isWatch = !!overrideOptions.watch;
+  const shouldPublish = !!overrideOptions.env?.publish;
 
-  return {
-    entry: ['src/index.ts', 'src/instance.ts'],
-    onSuccess: 'tsc',
+  const common: Options = {
+    entry: ['./src/*.{ts,tsx,js,jsx}'],
+    bundle: false,
     clean: true,
-    // minify: isProd,
     minify: false,
-    sourcemap: true,
-    format: ['cjs', 'esm'],
+    sourcemap: false,
+    legacyOutput: true,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
-      __DEV__: `${!isProd}`,
+      __DEV__: `${isWatch}`,
     },
-    external: [],
   };
+
+  // const onSuccess = (format: 'esm' | 'cjs') => {
+  //   return `cp ./package.${format}.json ./dist/${format}/package.json`;
+  // };
+
+  const esm: Options = {
+    ...common,
+    format: 'esm',
+    // onSuccess: onSuccess('esm'),
+  };
+
+  const cjs: Options = {
+    ...common,
+    format: 'cjs',
+    outDir: './dist/cjs',
+    // onSuccess: onSuccess('cjs'),
+  };
+
+  return runAfterLast(['npm run build:declarations', shouldPublish && 'npm run publish:local'])(esm, cjs);
 });

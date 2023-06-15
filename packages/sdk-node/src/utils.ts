@@ -12,3 +12,25 @@ export function runMiddleware(req: IncomingMessage, res: ServerResponse, fn: (..
     });
   });
 }
+
+export const loadClientEnv = () => {
+  return {
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
+    frontendApi: process.env.CLERK_FRONTEND_API || '',
+    clerkJSUrl: process.env.CLERK_JS || '',
+    clerkJSVersion: process.env.CLERK_JS_VERSION || '',
+  };
+};
+
+export const loadApiEnv = () => {
+  return {
+    secretKey: process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '',
+    apiKey: process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '',
+    apiUrl: process.env.CLERK_API_URL || 'https://api.clerk.dev',
+    apiVersion: process.env.CLERK_API_VERSION || 'v1',
+    domain: process.env.CLERK_DOMAIN || '',
+    proxyUrl: process.env.CLERK_PROXY_URL || '',
+    signInUrl: process.env.CLERK_SIGN_IN_URL || '',
+    isSatellite: process.env.CLERK_IS_SATELLITE === 'true',
+  };
+};

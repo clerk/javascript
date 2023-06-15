@@ -3,28 +3,7 @@ import { Clerk as _Clerk, decodeJwt, verifyToken as _verifyToken } from '@clerk/
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
-
-export const loadClientEnv = () => {
-  return {
-    publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
-    frontendApi: process.env.CLERK_FRONTEND_API || '',
-    clerkJSUrl: process.env.CLERK_JS || '',
-    clerkJSVersion: process.env.CLERK_JS_VERSION || '',
-  };
-};
-
-export const loadApiEnv = () => {
-  return {
-    secretKey: process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '',
-    apiKey: process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '',
-    apiUrl: process.env.CLERK_API_URL || 'https://api.clerk.dev',
-    apiVersion: process.env.CLERK_API_VERSION || 'v1',
-    domain: process.env.CLERK_DOMAIN || '',
-    proxyUrl: process.env.CLERK_PROXY_URL || '',
-    signInUrl: process.env.CLERK_SIGN_IN_URL || '',
-    isSatellite: process.env.CLERK_IS_SATELLITE === 'true',
-  };
-};
+import { loadApiEnv, loadClientEnv } from './utils';
 
 /**
  * This needs to be a *named* function in order to support the older
@@ -66,15 +45,21 @@ let clerkClientSingleton = {} as unknown as ReturnType<typeof Clerk>;
 
 export const clerkClient = new Proxy(clerkClientSingleton, {
   get(_target, property) {
-    const env = { ...loadApiEnv(), ...loadClientEnv() };
-    if (!env.secretKey) {
-      clerkClientSingleton = Clerk({
-        ...env,
-        userAgent: '@clerk/clerk-sdk-node',
-      });
+    const hasBeenInitialised = !!clerkClientSingleton.authenticateRequest;
+    if (hasBeenInitialised) {
+      // @ts-expect-error
+      return clerkClientSingleton[property];
     }
-    // @ts-ignore
-    return clerkClientSingleton[property];
+
+    const env = { ...loadApiEnv(), ...loadClientEnv() };
+    if (env.secretKey) {
+      clerkClientSingleton = Clerk({ ...env, userAgent: '@clerk/clerk-sdk-node' });
+      // @ts-expect-error
+      return clerkClientSingleton[property];
+    }
+
+    // @ts-expect-error
+    return Clerk({ ...env, userAgent: '@clerk/clerk-sdk-node' })[property];
   },
   set() {
     return false;

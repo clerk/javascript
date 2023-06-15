@@ -10,7 +10,7 @@ import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
-  const shouldPublish = overrideOptions.env?.PUBLISH === 'true';
+  const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
     entry: ['./src/**/*.{ts,tsx,js,jsx}'],
@@ -24,7 +24,7 @@ export default defineConfig(overrideOptions => {
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
-      __DEV__: `${!isWatch}`,
+      __DEV__: `${isWatch}`,
     },
   };
 
