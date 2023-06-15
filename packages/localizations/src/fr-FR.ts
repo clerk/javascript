@@ -563,8 +563,8 @@ export const frFR: LocalizationResource = {
     },
     zxcvbn: {
       notEnough: "Votre mot de passe n'est pas assez fort.",
-      couldBeStronger: 'Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d\'ajouter des caractères.',
-      goodPassword: 'Bien joué. C\'est un excellent mot de passe.',
+      couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
+      goodPassword: "Bien joué. C'est un excellent mot de passe.",
       warnings: {
         straightRow: 'Les lignes droites de touches de votre clavier sont faciles à deviner',
         keyPattern: 'Des motifs de clavier courts sont faciles à deviner',
