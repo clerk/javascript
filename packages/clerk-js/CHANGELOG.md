@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.47.2
+
+### Patch Changes
+
+- Optimize all images displayed within the Clerk components, such as Avatars, static OAuth provider assets etc. All images are now resized and compressed. Additionally, all images are automatically converted into more efficient formats (`avif`, `webp`) if they are supported by the user's browser, otherwise all images fall back to `jpeg`. ([#1367](https://github.com/clerkinc/javascript/pull/1367)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`59bc649a`](https://github.com/clerkinc/javascript/commit/59bc649a92316f5d6ade00f3cd52a9b46dcdc401)]:
+  - @clerk/shared@0.19.1
+
 ## 4.47.1
 
 ### Patch Changes

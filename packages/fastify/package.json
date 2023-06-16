@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "0.4.8",
+  "version": "0.5.0",
   "license": "MIT",
   "description": "Clerk SDK for Fastify",
   "keywords": [

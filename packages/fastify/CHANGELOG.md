@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.5.0
+
+### Minor Changes
+
+- Add support for binding middleware to `onRequest` in addition to `preHandler` ([#1356](https://github.com/clerkinc/javascript/pull/1356)) by [@mikestopcontinues](https://github.com/mikestopcontinues)
+
 ## 0.4.8
 
 ### Patch Changes
