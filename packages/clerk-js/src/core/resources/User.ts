@@ -80,8 +80,6 @@ export class User extends BaseResource implements UserResource {
   publicMetadata: UserPublicMetadata = {};
   unsafeMetadata: UserUnsafeMetadata = {};
   lastSignInAt: Date | null = null;
-  createOrganizationEnabled: boolean = false;
-  deleteSelfEnabled: boolean = false;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
 
@@ -320,9 +318,6 @@ export class User extends BaseResource implements UserResource {
     this.totpEnabled = data.totp_enabled;
     this.backupCodeEnabled = data.backup_code_enabled;
     this.twoFactorEnabled = data.two_factor_enabled;
-
-    this.createOrganizationEnabled = data.create_organization_enabled;
-    this.deleteSelfEnabled = data.delete_self_enabled;
 
     if (data.last_sign_in_at) {
       this.lastSignInAt = unixEpochToDate(data.last_sign_in_at);
