@@ -1,4 +1,4 @@
-import { useCoreOrganization, useEnvironment } from '../../contexts';
+import { useCoreOrganization } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
 import { Times } from '../../icons';
@@ -60,8 +60,7 @@ const OrganizationProfileSection = () => {
 const OrganizationDangerSection = () => {
   const { organization, membership } = useCoreOrganization();
   const { navigate } = useRouter();
-  const environment = useEnvironment();
-  const adminDeleteEnabled = environment.organizationSettings.actions.adminDelete;
+  const adminDeleteEnabled = organization?.adminDeleteEnabled;
 
   if (!organization || !membership) {
     return null;
