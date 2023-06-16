@@ -214,8 +214,6 @@ export interface UserJSON extends ClerkResourceJSON {
   public_metadata: UserPublicMetadata;
   unsafe_metadata: UserUnsafeMetadata;
   last_sign_in_at: number | null;
-  create_organization_enabled: boolean;
-  delete_self_enabled: boolean;
   updated_at: number;
   created_at: number;
 }
@@ -307,7 +305,6 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   updated_at: number;
   members_count: number;
   pending_invitations_count: number;
-  admin_delete_enabled: boolean;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {

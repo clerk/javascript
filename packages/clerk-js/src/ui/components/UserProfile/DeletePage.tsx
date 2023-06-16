@@ -14,7 +14,7 @@ export const DeletePage = withCardStateProvider(() => {
   const deleteUser = async () => {
     try {
       await user.delete();
-      await router.navigate(environment.displayConfig.afterSignOutUrl);
+      await router.navigate(environment.displayConfig.afterSignOutAllUrl);
     } catch (e) {
       handleError(e, [], card.setError);
     }
