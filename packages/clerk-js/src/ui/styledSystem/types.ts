@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import type { Interpolation as _Interpolation } from '@emotion/react';
+import type React from 'react';
 
 import type { InternalTheme } from '../foundations';
 
@@ -15,21 +16,21 @@ type CssProp = { css?: ThemableCssProp };
 export type AsProp = { as?: React.ElementType };
 
 type ElementProps = {
-  div: JSX.IntrinsicElements['div'];
-  input: JSX.IntrinsicElements['input'];
-  button: JSX.IntrinsicElements['button'];
-  heading: JSX.IntrinsicElements['h1'];
-  p: JSX.IntrinsicElements['p'];
-  a: JSX.IntrinsicElements['a'];
-  label: JSX.IntrinsicElements['label'];
-  img: JSX.IntrinsicElements['img'];
-  form: JSX.IntrinsicElements['form'];
-  table: JSX.IntrinsicElements['table'];
-  thead: JSX.IntrinsicElements['thead'];
-  tbody: JSX.IntrinsicElements['tbody'];
-  th: JSX.IntrinsicElements['th'];
-  tr: JSX.IntrinsicElements['tr'];
-  td: JSX.IntrinsicElements['td'];
+  div: React.JSX.IntrinsicElements['div'];
+  input: React.JSX.IntrinsicElements['input'];
+  button: React.JSX.IntrinsicElements['button'];
+  heading: React.JSX.IntrinsicElements['h1'];
+  p: React.JSX.IntrinsicElements['p'];
+  a: React.JSX.IntrinsicElements['a'];
+  label: React.JSX.IntrinsicElements['label'];
+  img: React.JSX.IntrinsicElements['img'];
+  form: React.JSX.IntrinsicElements['form'];
+  table: React.JSX.IntrinsicElements['table'];
+  thead: React.JSX.IntrinsicElements['thead'];
+  tbody: React.JSX.IntrinsicElements['tbody'];
+  th: React.JSX.IntrinsicElements['th'];
+  tr: React.JSX.IntrinsicElements['tr'];
+  td: React.JSX.IntrinsicElements['td'];
 };
 
 /**

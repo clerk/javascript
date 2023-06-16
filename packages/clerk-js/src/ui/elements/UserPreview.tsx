@@ -91,7 +91,6 @@ export const UserPreview = (props: UserPreviewProps) => {
             name={name}
             avatarUrl={imageUrl}
             size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
-            optimize
             sx={avatarSx}
             rounded={rounded}
           />

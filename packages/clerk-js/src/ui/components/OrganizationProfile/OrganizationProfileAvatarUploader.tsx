@@ -16,7 +16,6 @@ export const OrganizationProfileAvatarUploader = (
       avatarPreview={
         <OrganizationAvatar
           size={theme => theme.sizes.$11}
-          optimize
           {...organization}
         />
       }
