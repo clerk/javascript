@@ -19,6 +19,7 @@ import {
 import { RootPage } from './RootPage';
 import { UsernamePage } from './UsernamePage';
 import { Web3Page } from './Web3Page';
+import { DeletePage } from './DeletePage';
 
 export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardContent>) => {
   return (
@@ -102,6 +103,9 @@ export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardCont
         <PasswordPage />
       </Route>
       {/*</Route>*/}
+      <Route path='delete'>
+        <DeletePage />
+      </Route>
     </ProfileCardContent>
   );
 };
