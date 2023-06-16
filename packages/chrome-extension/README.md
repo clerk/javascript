@@ -156,6 +156,10 @@ curl  -X PATCH https://api.clerk.com/v1/instance \
       -d '{"allowed_origins": ["chrome-extension://extension_id_goes_here"]}'
 ```
 
+## Development
+
+The `Enable URL-based session syncing` should be `DISABLED` from the `Clerk Dashboard > Setting` for a development instance to support @clerk/chrome-extension functionality.
+
 ## Deploy to Production
 
 Setting the `allowed_origins` (check [Clerk Settings](#clerk-settings)) is **REQUIRED** for both **Development** and **Production** instances when using the WebSSO use case.
