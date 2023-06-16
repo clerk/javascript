@@ -214,6 +214,7 @@ export interface UserJSON extends ClerkResourceJSON {
   public_metadata: UserPublicMetadata;
   unsafe_metadata: UserUnsafeMetadata;
   last_sign_in_at: number | null;
+  delete_self_enabled: boolean;
   updated_at: number;
   created_at: number;
 }
