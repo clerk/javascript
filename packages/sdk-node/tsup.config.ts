@@ -10,12 +10,12 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['./src/*.{ts,tsx,js,jsx}'],
-    bundle: false,
+    entry: ['src/index.ts', 'src/instance.ts'],
+    bundle: true,
     clean: true,
     minify: false,
-    sourcemap: false,
-    legacyOutput: true,
+    sourcemap: true,
+    legacyOutput: false,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
@@ -30,6 +30,7 @@ export default defineConfig(overrideOptions => {
   const esm: Options = {
     ...common,
     format: 'esm',
+    outDir: './dist/esm',
     // onSuccess: onSuccess('esm'),
   };
 
