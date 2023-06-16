@@ -1,4 +1,3 @@
-import { noop } from '@clerk/shared';
 import type { PasswordSettingsData } from '@clerk/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -10,10 +9,6 @@ type ComplexityErrorMessages = {
 };
 
 type UsePasswordComplexityConfig = Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>;
-type UsePasswordComplexityCbs = {
-  onValidationFailed?: (validationErrorMessages: ComplexityErrorMessages, errorMessage: string) => void;
-  onValidationSuccess?: () => void;
-};
 
 const useTestComplexityCases = (config: Pick<UsePasswordComplexityConfig, 'allowed_special_characters'>) => {
   let specialCharsRegex: RegExp;
@@ -51,8 +46,7 @@ const useTestComplexityCases = (config: Pick<UsePasswordComplexityConfig, 'allow
   };
 };
 
-export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callbacks?: UsePasswordComplexityCbs) => {
-  const { onValidationFailed = noop, onValidationSuccess = noop } = callbacks || {};
+export const usePasswordComplexity = (config: UsePasswordComplexityConfig) => {
   const {
     min_length,
     max_length,
@@ -164,9 +158,9 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
       const _validationsFailed = validate(password);
       if (Object.keys(_validationsFailed).length > 0) {
         message = generateErrorText(_validationsFailed);
-        onValidationFailed(_validationsFailed, message);
+        // onValidationFailed(_validationsFailed, message);
       } else {
-        onValidationSuccess();
+        // onValidationSuccess();
       }
       setFailedValidations(_validationsFailed);
       _setPassword(password);
@@ -174,7 +168,7 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
         failedValidationsText: message,
       };
     },
-    [callbacks?.onValidationFailed, callbacks?.onValidationSuccess, t, min_length, max_length],
+    [t, min_length, max_length],
   );
 
   return {

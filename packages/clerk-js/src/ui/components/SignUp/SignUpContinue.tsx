@@ -77,8 +77,7 @@ function _SignUpContinue() {
       label: localizationKeys('formFieldLabel__password'),
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
       enableErrorAfterBlur: true,
-      complexity: true,
-      strengthMeter: true,
+      validatePassword: true,
     }),
   } as const;
 

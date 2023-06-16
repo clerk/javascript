@@ -1,4 +1,3 @@
-import { noop } from '@clerk/shared';
 import type { ZxcvbnResult } from '@zxcvbn-ts/core';
 import { useCallback, useState } from 'react';
 
@@ -6,14 +5,7 @@ import { useEnvironment } from '../contexts';
 import { localizationKeys, useLocalizations } from '../localization';
 import type { zxcvbnFN } from '../utils';
 
-type UsePasswordStrengthCbs = {
-  onValidationFailed?: (validationErrorMessages: string[], errorMessage: string) => void;
-  onValidationSuccess?: () => void;
-  onValidationWarning?: (warningMessage: string) => void;
-};
-
-export const usePasswordStrength = (callbacks?: UsePasswordStrengthCbs) => {
-  const { onValidationFailed = noop, onValidationSuccess = noop, onValidationWarning = noop } = callbacks || {};
+export const usePasswordStrength = () => {
   const {
     userSettings: {
       passwordSettings: { min_zxcvbn_strength },
@@ -37,19 +29,19 @@ export const usePasswordStrength = (callbacks?: UsePasswordStrengthCbs) => {
           fErrors.unshift(t(localizationKeys('unstable__errors.zxcvbn.notEnough')));
         }
         errorText = fErrors.join(' ');
-        onValidationFailed(fErrors, fErrors.join(' '));
+        // onValidationFailed(fErrors, fErrors.join(' '));
       } else if (result.score >= min_zxcvbn_strength && result.score < 3) {
         warningText = t(localizationKeys('unstable__errors.zxcvbn.couldBeStronger'));
-        onValidationWarning(warningText);
+        // onValidationWarning(warningText);
       } else if (result.score >= min_zxcvbn_strength) {
-        onValidationSuccess?.();
+        // onValidationSuccess?.();
       }
       return {
         errorText,
         warningText,
       };
     },
-    [onValidationFailed, onValidationSuccess, onValidationWarning, min_zxcvbn_strength],
+    [min_zxcvbn_strength],
   );
   return {
     getScore,
