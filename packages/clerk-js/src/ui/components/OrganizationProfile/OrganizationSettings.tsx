@@ -1,4 +1,4 @@
-import { useCoreOrganization } from '../../contexts';
+import { useCoreOrganization, useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
 import { Times } from '../../icons';
@@ -60,6 +60,8 @@ const OrganizationProfileSection = () => {
 const OrganizationDangerSection = () => {
   const { organization, membership } = useCoreOrganization();
   const { navigate } = useRouter();
+  const environment = useEnvironment();
+  const adminDeleteEnabled = environment.organizationSettings.actions.adminDelete;
 
   if (!organization || !membership) {
     return null;
@@ -88,6 +90,23 @@ const OrganizationDangerSection = () => {
           isDisabled={membership.role === 'admin'}
           localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
         />
+        {membership.role === 'admin' && adminDeleteEnabled && (
+          <IconButton
+            aria-label='Delete organization'
+            icon={
+              <Icon
+                icon={Times}
+                size={'sm'}
+                sx={t => ({ marginRight: t.space.$2 })}
+              />
+            }
+            variant='outline'
+            colorScheme='danger'
+            textVariant='buttonExtraSmallBold'
+            onClick={() => navigate('delete')}
+            localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
+          />
+        )}
       </Flex>
     </ProfileSection>
   );

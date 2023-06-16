@@ -42,6 +42,33 @@ export const LeaveOrganizationPage = () => {
   );
 };
 
+export const DeleteOrganizationPage = () => {
+  const card = useCardState();
+  const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
+  const { organization, membership } = useCoreOrganization();
+
+  if (!organization || !membership) {
+    return null;
+  }
+
+  const deleteOrg = () => {
+    return card.runAsync(organization.destroy()).then(navigateAfterLeaveOrganization);
+  };
+
+  return (
+    <ActionConfirmationPage
+      title={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
+      messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine1')}
+      messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine2')}
+      submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
+      successMessage={localizationKeys(
+        'organizationProfile.profilePage.dangerSection.deleteOrganization.successMessage',
+      )}
+      onConfirmation={deleteOrg}
+    />
+  );
+};
+
 type ActionConfirmationPageProps = {
   title: LocalizationKey;
   messageLine1: LocalizationKey;

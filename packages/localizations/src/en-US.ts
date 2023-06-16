@@ -546,6 +546,12 @@ export const enUS: LocalizationResource = {
           messageLine2: 'This action is permanent and irreversible.',
           successMessage: 'You have left the organization.',
         },
+        deleteOrganization: {
+          title: 'Delete organization',
+          messageLine1: 'Are you sure you want to delete this organization?',
+          messageLine2: 'This action is permanent and irreversible.',
+          successMessage: 'You have deleted the organization.',
+        },
       },
     },
     invitePage: {
