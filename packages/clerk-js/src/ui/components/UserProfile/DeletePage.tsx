@@ -1,4 +1,4 @@
-import { useEnvironment, useCoreUser } from '../../contexts';
+import { useEnvironment, useCoreUser, useCoreClerk } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
@@ -10,11 +10,16 @@ export const DeletePage = withCardStateProvider(() => {
   const environment = useEnvironment();
   const router = useRouter();
   const user = useCoreUser();
+  const clerk = useCoreClerk();
 
   const deleteUser = async () => {
     try {
       await user.delete();
-      await router.navigate(environment.displayConfig.afterSignOutAllUrl);
+      if (clerk.client.activeSessions.length > 0) {
+        await router.navigate(environment.displayConfig.afterSignOutOneUrl);
+      } else {
+        await router.navigate(environment.displayConfig.afterSignOutAllUrl);
+      }
     } catch (e) {
       handleError(e, [], card.setError);
     }
