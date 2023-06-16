@@ -124,7 +124,7 @@ export const koKR: LocalizationResource = {
   },
   signIn: {
     start: {
-      title: '회원가입',
+      title: '로그인',
       subtitle: '계속하려면 {{applicationName}}을 클릭합니다.',
       actionText: '계정이 없으신가요?',
       actionLink: '회원가입',
