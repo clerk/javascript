@@ -9,8 +9,7 @@ import { usePasswordComplexity } from './usePasswordComplexity';
 import { usePasswordStrength } from './usePasswordStrength';
 
 type UsePasswordConfig = PasswordSettingsData & {
-  strengthMeter: boolean;
-  complexity: boolean;
+  validatePassword: boolean;
 };
 
 type UsePasswordCbs = {
@@ -29,7 +28,7 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
     onValidationWarning = noop,
     onValidationComplexity = noop,
   } = callbacks || {};
-  const { strengthMeter, show_zxcvbn, complexity } = config;
+  const { show_zxcvbn, validatePassword } = config;
   const { setPassword: setPasswordComplexity } = usePasswordComplexity(config);
   const { getScore } = usePasswordStrength();
   const hasZxcvbnDownloadRef = useRef(false);
@@ -48,22 +47,23 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
   );
 
   const setPassword = useCallback(
-    (_password: string) => {
+    async (_password: string) => {
       let zxcvbnError = '';
       let complexityError = '';
       let zxcvbnWarning = '';
 
-      if (!complexity && !(strengthMeter && show_zxcvbn)) {
+      if (!validatePassword) {
         return;
       }
 
-      if (complexity) {
-        const { failedValidationsText } = setPasswordComplexity(_password);
-        onValidationComplexity(!failedValidationsText);
-        complexityError = failedValidationsText;
-      }
+      /**
+       * Validate Complexity
+       */
+      const { failedValidationsText } = setPasswordComplexity(_password);
+      onValidationComplexity(!failedValidationsText);
+      complexityError = failedValidationsText;
 
-      if (complexity && strengthMeter && show_zxcvbn) {
+      if (show_zxcvbn) {
         void loadZxcvbn().then(zxcvbn => {
           hasZxcvbnDownloadRef.current = true;
           const setPasswordScore = getScore(zxcvbn);
@@ -80,16 +80,7 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
       }
       reportSuccessOrError(complexityError || zxcvbnError, zxcvbnWarning);
     },
-    [
-      onValidationFailed,
-      onValidationSuccess,
-      onValidationComplexity,
-      strengthMeter,
-      show_zxcvbn,
-      complexity,
-      getScore,
-      setPasswordComplexity,
-    ],
+    [onValidationFailed, onValidationSuccess, onValidationComplexity, show_zxcvbn, getScore, setPasswordComplexity],
   );
 
   return {

@@ -42,6 +42,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   placeholder?: string | LocalizationKey;
   actionLabel?: string | LocalizationKey;
   icon?: React.ComponentType;
+  validatePassword?: boolean;
   setError: (error: string | ClerkAPIError | undefined) => void;
   warningText: string | undefined;
   setWarning: (error: string) => void;
@@ -238,10 +239,13 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     setWarning,
     setHasPassedComplexity,
     hasPassedComplexity,
-    ...rest
+    ...restInputProps
   } = props;
   const isDisabled = props.isDisabled || card.isLoading;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { validatePassword, ...inputProps } = restInputProps;
+  const inputElementProps = props.type === 'password' ? restInputProps : inputProps;
   const InputElement = getInputElementForType(props.type);
   const isCheckbox = props.type === 'checkbox';
 
@@ -330,7 +334,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       hasError={!!errorMessage}
       isDisabled={isDisabled}
       isRequired={isRequired}
-      {...rest}
+      {...inputElementProps}
       ref={ref}
       placeholder={t(placeholder)}
     />
