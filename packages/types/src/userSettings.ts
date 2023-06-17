@@ -84,6 +84,7 @@ export type Attributes = {
 
 export type Actions = {
   create_organization: boolean;
+  delete_self: boolean;
 };
 
 export interface UserSettingsJSON extends ClerkResourceJSON {
@@ -101,7 +102,6 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   sign_in: SignInData;
   sign_up: SignUpData;
   password_settings: PasswordSettingsData;
-  actions: Actions;
 }
 
 export interface UserSettingsResource extends ClerkResource {

@@ -1,6 +1,5 @@
 import type {
   Attributes,
-  Actions,
   OAuthProviders,
   OAuthStrategy,
   PasswordSettingsData,
@@ -19,6 +18,7 @@ const defaultMinPasswordLength = 8;
 
 export type Actions = {
   create_organization: boolean;
+  delete_self: boolean;
 };
 
 /**
