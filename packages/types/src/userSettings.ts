@@ -83,8 +83,8 @@ export type Attributes = {
 };
 
 export type Actions = {
-  create_organization: boolean;
   delete_self: boolean;
+  create_organization: boolean;
 };
 
 export interface UserSettingsJSON extends ClerkResourceJSON {
