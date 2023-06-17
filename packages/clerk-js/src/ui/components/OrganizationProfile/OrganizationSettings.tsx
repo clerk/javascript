@@ -60,11 +60,12 @@ const OrganizationProfileSection = () => {
 const OrganizationDangerSection = () => {
   const { organization, membership } = useCoreOrganization();
   const { navigate } = useRouter();
-  const adminDeleteEnabled = organization?.adminDeleteEnabled;
 
   if (!organization || !membership) {
     return null;
   }
+
+  const adminDeleteEnabled = organization.adminDeleteEnabled;
 
   return (
     <ProfileSection

@@ -3,6 +3,7 @@
 exports[`Organization has the same initial properties 1`] = `
 Organization {
   "addMember": [Function],
+  "adminDeleteEnabled": undefined,
   "createdAt": 1970-01-01T00:00:12.345Z,
   "destroy": [Function],
   "getMemberships": [Function],
