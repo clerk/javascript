@@ -20,7 +20,7 @@ describe('usePasswordComplexity', () => {
     const { result } = renderHook(defaultRenderer, { wrapper });
 
     await act(() => {
-      result.current.setPassword('password1');
+      result.current.getComplexity('password1');
     });
 
     expect(result.current.password).toBe('password1');
@@ -31,7 +31,7 @@ describe('usePasswordComplexity', () => {
     const { result } = renderHook(defaultRenderer, { wrapper });
 
     await act(() => {
-      result.current.setPassword('thispasswordfails');
+      result.current.getComplexity('thispasswordfails');
     });
 
     expect(result.current.hasFailedComplexity).toBe(true);
@@ -43,7 +43,7 @@ describe('usePasswordComplexity', () => {
     const { result } = renderHook(defaultRenderer, { wrapper });
 
     await act(() => {
-      result.current.setPassword('th1sp@sswordPasses');
+      result.current.getComplexity('th1sp@sswordPasses');
     });
 
     expect(result.current.hasFailedComplexity).toBe(false);
@@ -55,7 +55,7 @@ describe('usePasswordComplexity', () => {
     const { result } = renderHook(defaultRenderer, { wrapper });
 
     await act(() => {
-      result.current.setPassword('thispasswordfails');
+      result.current.getComplexity('thispasswordfails');
     });
 
     expect(result.current.failedValidations).toHaveProperty('require_uppercase');
@@ -66,7 +66,7 @@ describe('usePasswordComplexity', () => {
     expect(result.current.failedValidations).not.toHaveProperty('min_length');
 
     await act(() => {
-      result.current.setPassword(`thispasswordfails"`);
+      result.current.getComplexity(`thispasswordfails"`);
     });
 
     expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
@@ -89,7 +89,7 @@ describe('usePasswordComplexity', () => {
     });
 
     await act(() => {
-      result.current.setPassword('@');
+      result.current.getComplexity('@');
     });
 
     expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
@@ -112,52 +112,34 @@ describe('usePasswordComplexity', () => {
     });
 
     await act(() => {
-      result.current.setPassword('[');
+      result.current.getComplexity('[');
     });
 
     expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
 
     await act(() => {
-      result.current.setPassword(']');
+      result.current.getComplexity(']');
     });
 
     expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
 
     await act(() => {
-      result.current.setPassword('[test]');
+      result.current.getComplexity('[test]');
     });
 
     expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
 
     await act(() => {
-      result.current.setPassword('test[]');
+      result.current.getComplexity('test[]');
     });
 
     expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
 
     await act(() => {
-      result.current.setPassword('[!"#$%&\'()*+,-./:;<=>?@^_`{|}~]');
+      result.current.getComplexity('[!"#$%&\'()*+,-./:;<=>?@^_`{|}~]');
     });
 
     expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
-  });
-
-  it('returns an object with all validations and their status (true:passed, false:failed)', async () => {
-    const { wrapper } = await createFixtures();
-    const { result } = renderHook(defaultRenderer, { wrapper });
-
-    await act(() => {
-      result.current.setPassword('thispasswordfails');
-    });
-
-    expect(result.current.passwordComplexity).toMatchObject({
-      max_length: true,
-      min_length: true,
-      require_special_char: false,
-      require_numbers: false,
-      require_lowercase: true,
-      require_uppercase: false,
-    });
   });
 
   it('returns error message with localized conjunction', async () => {
@@ -165,13 +147,13 @@ describe('usePasswordComplexity', () => {
     const { result } = renderHook(defaultRenderer, { wrapper });
 
     await act(() => {
-      result.current.setPassword('@aP');
+      result.current.getComplexity('@aP');
     });
 
     expect(result.current.failedValidationsText).toBe('Your password must contain 8 or more characters and a number');
 
     await act(() => {
-      result.current.setPassword('aP');
+      result.current.getComplexity('aP');
     });
 
     expect(result.current.failedValidationsText).toBe(
