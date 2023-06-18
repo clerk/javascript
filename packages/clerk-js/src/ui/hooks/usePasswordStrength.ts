@@ -1,50 +1,50 @@
+import type { PasswordSettingsData } from '@clerk/types';
 import type { ZxcvbnResult } from '@zxcvbn-ts/core';
-import { useCallback, useState } from 'react';
 
-import { useEnvironment } from '../contexts';
-import { localizationKeys, useLocalizations } from '../localization';
 import type { zxcvbnFN } from '../utils';
 
-export const usePasswordStrength = () => {
-  const {
-    userSettings: {
-      passwordSettings: { min_zxcvbn_strength },
-    },
-  } = useEnvironment();
+export type PasswordStrength =
+  | {
+      state: 'excellent';
+      result: ZxcvbnResult;
+    }
+  | {
+      state: 'pass' | 'fail';
+      keys: string[];
+      result: ZxcvbnResult;
+    };
 
-  const { t } = useLocalizations();
-  const [zxcvbnResult, setZxcvbnResult] = useState<ZxcvbnResult | undefined>(undefined);
+type CreateValidatePasswordStrength = (
+  options: Pick<PasswordSettingsData, 'min_zxcvbn_strength'> & { onResult?: (res: ZxcvbnResult) => void },
+) => (zxcvbn: zxcvbnFN) => (password: string) => PasswordStrength;
 
-  const getScore = useCallback(
-    (zxcvbn: zxcvbnFN) => (password: string) => {
-      const result = zxcvbn(password);
-      setZxcvbnResult(result);
+export const createValidatePasswordStrength: CreateValidatePasswordStrength = ({ min_zxcvbn_strength, onResult }) => {
+  return zxcvbn => password => {
+    const result = zxcvbn(password);
+    onResult?.(result);
 
-      let errorText = '';
-      let warningText = '';
-      if (result?.feedback?.suggestions?.length > 0 && result.score < min_zxcvbn_strength) {
-        const errors = [...result.feedback.suggestions];
-        const fErrors = errors.map(er => t(localizationKeys(`unstable__errors.zxcvbn.suggestions.${er}` as any)));
-        if (result.score < min_zxcvbn_strength) {
-          fErrors.unshift(t(localizationKeys('unstable__errors.zxcvbn.notEnough')));
-        }
-        errorText = fErrors.join(' ');
-        // onValidationFailed(fErrors, fErrors.join(' '));
-      } else if (result.score >= min_zxcvbn_strength && result.score < 3) {
-        warningText = t(localizationKeys('unstable__errors.zxcvbn.couldBeStronger'));
-        // onValidationWarning(warningText);
-      } else if (result.score >= min_zxcvbn_strength) {
-        // onValidationSuccess?.();
-      }
+    if (result.score >= min_zxcvbn_strength && result.score < 3) {
       return {
-        errorText,
-        warningText,
+        state: 'pass',
+        keys: ['unstable__errors.zxcvbn.couldBeStronger'],
+        result,
       };
-    },
-    [min_zxcvbn_strength],
-  );
-  return {
-    getScore,
-    zxcvbnResult,
+    }
+
+    if (result.score >= min_zxcvbn_strength) {
+      return {
+        state: 'excellent',
+        result,
+      };
+    }
+
+    return {
+      state: 'fail',
+      keys: [
+        'unstable__errors.zxcvbn.notEnough',
+        ...result.feedback.suggestions.map(er => `unstable__errors.zxcvbn.suggestions.${er}` as any),
+      ],
+      result,
+    };
   };
 };
