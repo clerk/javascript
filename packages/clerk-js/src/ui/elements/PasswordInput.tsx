@@ -17,7 +17,6 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   const [hidden, setHidden] = React.useState(true);
   const { id, onChange: onChangeProp, validatePassword = false, ...rest } = props;
 
-  console.log('WOW', validatePassword);
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
@@ -40,7 +39,6 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     setPassword(e.target.value);
     return onChangeProp?.(e);
   };
-  console.log('----rest', rest);
 
   return (
     <Flex
