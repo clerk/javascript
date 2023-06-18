@@ -238,7 +238,6 @@ export class SignIn extends BaseResource implements SignInResource {
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
       return createValidatePassword({
-        // TODO: Remove as any
         ...(SignIn.clerk.__unstable__environment?.userSettings.passwordSettings as any),
         validatePassword: true,
       })(password, cb);

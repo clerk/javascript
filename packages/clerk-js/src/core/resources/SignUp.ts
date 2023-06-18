@@ -234,7 +234,6 @@ export class SignUp extends BaseResource implements SignUpResource {
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
       return createValidatePassword({
-        // TODO: Remove as any
         ...(SignUp.clerk.__unstable__environment?.userSettings.passwordSettings as any),
         validatePassword: true,
       })(password, cb);
