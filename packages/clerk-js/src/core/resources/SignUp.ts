@@ -22,6 +22,7 @@ import type {
 } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getCaptchaToken, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   clerkInvalidFAPIResponse,
@@ -228,6 +229,16 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });
+  };
+
+  validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
+    if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
+      return createValidatePassword({
+        // TODO: Remove as any
+        ...(SignUp.clerk.__unstable__environment?.userSettings.passwordSettings as any),
+        validatePassword: true,
+      })(password, cb);
+    }
   };
 
   protected fromJSON(data: SignUpJSON | null): this {

@@ -41,6 +41,7 @@ import type {
   UserDataJSON,
   VerificationJSON,
 } from './json';
+import type { ValidatePasswordCallbacks } from './passwords';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type {
@@ -90,6 +91,8 @@ export interface SignInResource extends ClerkResource {
   authenticateWithMetamask: () => Promise<SignInResource>;
 
   createMagicLinkFlow: () => CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource>;
+
+  validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
 }
 
 export type SignInStatus =

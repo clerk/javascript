@@ -1,7 +1,7 @@
 import type { PasswordSettingsData } from '@clerk/types';
 import type { ZxcvbnResult } from '@zxcvbn-ts/core';
 
-import type { zxcvbnFN } from '../utils';
+import type { zxcvbnFN } from '../zxcvbn';
 
 export type PasswordStrength =
   | {

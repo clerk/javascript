@@ -29,6 +29,7 @@ import type {
 } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import { createValidatePassword } from '../../utils/passwords/password';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -232,6 +233,16 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier,
       generateSignature: generateSignatureWithMetamask,
     });
+  };
+
+  validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
+    if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
+      return createValidatePassword({
+        // TODO: Remove as any
+        ...(SignIn.clerk.__unstable__environment?.userSettings.passwordSettings as any),
+        validatePassword: true,
+      })(password, cb);
+    }
   };
 
   protected fromJSON(data: SignInJSON | null): this {
