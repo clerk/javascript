@@ -4,10 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LocalizationKey, localizationKeys, useLocalizations } from '../localization';
 import { canUseListFormat } from '../utils';
 
-// type ComplexityErrorMessages = {
-//   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]: string;
-// };
-
 export type ComplexityErrors = {
   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]?: boolean;
 };
@@ -91,16 +87,6 @@ export const generateErrorTextUtil = ({
   return `${t(localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`;
 };
 
-// const useTestComplexityCases = ({
-//   allowed_special_characters,
-// }: Pick<UsePasswordComplexityConfig, 'allowed_special_characters'>) => {
-//   return useMemo(() => {
-//     return {
-//       testComplexityCases: createTestComplexityCases({ allowed_special_characters }),
-//     };
-//   }, [allowed_special_characters]);
-// };
-
 const validate = (password: string, config: UsePasswordComplexityConfig): ComplexityErrors => {
   const { max_length, min_length, require_special_char, require_lowercase, require_numbers, require_uppercase } =
     config;
@@ -149,35 +135,15 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig) => {
     getComplexity('');
   }, []);
 
-  // const errorMessages = useMemo(
-  //   () =>
-  //     ({
-  //       max_length: t(localizationKeys('unstable__errors.passwordComplexity.maximumLength', { length: max_length })),
-  //       min_length: t(localizationKeys('unstable__errors.passwordComplexity.minimumLength', { length: min_length })),
-  //       require_numbers: t(localizationKeys('unstable__errors.passwordComplexity.requireNumbers')),
-  //       require_lowercase: t(localizationKeys('unstable__errors.passwordComplexity.requireLowercase')),
-  //       require_uppercase: t(localizationKeys('unstable__errors.passwordComplexity.requireUppercase')),
-  //       require_special_char: t(localizationKeys('unstable__errors.passwordComplexity.requireSpecialCharacter')),
-  //     } satisfies ComplexityErrorMessages),
-  //   [min_length],
-  // );
+  const hasPassedComplexity = useMemo(
+    () => !!password && Object.keys(failedValidations || {}).length === 0,
+    [failedValidations, password],
+  );
 
-  // const passwordComplexity = useMemo(() => {
-  //   return testComplexityCases(password, {
-  //     maxLength: max_length,
-  //     minLength: min_length,
-  //   });
-  // }, [password, min_length, max_length]);
-
-  // const hasPassedComplexity = useMemo(
-  //   () => !!password && Object.keys(failedValidations || {}).length === 0,
-  //   [failedValidations, password],
-  // );
-  //
-  // const hasFailedComplexity = useMemo(
-  //   () => !!password && Object.keys(failedValidations || {}).length > 0,
-  //   [failedValidations, password],
-  // );
+  const hasFailedComplexity = useMemo(
+    () => !!password && Object.keys(failedValidations || {}).length > 0,
+    [failedValidations, password],
+  );
 
   const generateErrorText = useCallback(
     (failedValidations: ComplexityErrors | undefined) => {
@@ -207,5 +173,7 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig) => {
     getComplexity,
     failedValidations,
     failedValidationsText,
+    hasFailedComplexity,
+    hasPassedComplexity,
   };
 };
