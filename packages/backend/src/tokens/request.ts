@@ -40,9 +40,59 @@ export type OptionalVerifyTokenOptions = Partial<
   >
 >;
 
-export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
+type PublicKeys =
+  | {
+      publishableKey: string;
+      /**
+       * @deprecated Use `publishableKey` instead.
+       */
+      frontendApi: never;
+    }
+  | {
+      publishableKey: never;
+      /**
+       * @deprecated Use `publishableKey` instead.
+       */
+      frontendApi: string;
+    }
+  | {
+      publishableKey: string;
+      /**
+       * @deprecated Use `publishableKey` instead.
+       */
+      frontendApi: string;
+    };
+
+type SecretKeys =
+  | {
+      secretKey: string;
+      /**
+       * @deprecated Use `secretKey` instead.
+       */
+      apiKey: never;
+    }
+  | {
+      secretKey: never;
+      /**
+       * @deprecated Use `secretKey` instead.
+       */
+      apiKey: string;
+    }
+  | {
+      secretKey: string;
+      /**
+       * @deprecated Use `secretKey` instead.
+       */
+      apiKey: string;
+    };
+
+export type InstanceKeys = PublicKeys & SecretKeys;
+
+export type AuthenticateRequestOptions = InstanceKeys &
   OptionalVerifyTokenOptions &
   LoadResourcesOptions & {
+    apiVersion?: string;
+    apiUrl?: string;
     /* Client token cookie value */
     cookieToken?: string;
     /* Client uat cookie value */
@@ -51,12 +101,8 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
     headerToken?: string;
     /* Request origin header value */
     origin?: string;
-    /* Clerk frontend Api value */
-    frontendApi: string;
-    /* Clerk Publishable Key value */
-    publishableKey: string;
     /* Request host header value */
-    host: string;
+    host?: string;
     /* Request forwarded host value */
     forwardedHost?: string;
     /* Request forwarded port value */
@@ -105,6 +151,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   options.apiUrl = options.apiUrl || API_URL;
   options.apiVersion = options.apiVersion || API_VERSION;
+  options.headerToken = options.headerToken?.replace('Bearer ', '');
 
   assertValidSecretKey(options.secretKey || options.apiKey);
 

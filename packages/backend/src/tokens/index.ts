@@ -8,3 +8,4 @@ export {
   OptionalVerifyTokenOptions,
   RequiredVerifyTokenOptions,
 } from './request';
+export type { InstanceKeys } from './request';
