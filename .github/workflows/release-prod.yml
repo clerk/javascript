@@ -59,6 +59,7 @@ jobs:
 
       - name: Send commit log to Slack
         id: slack
+        if: steps.changesets.outputs.published == 'true'
         uses: slackapi/slack-github-action@v1.18.0
         with:
           payload: |
