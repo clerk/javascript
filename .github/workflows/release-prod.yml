@@ -69,7 +69,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "${{ steps.notification.outputs.message }}"
+                    "text": ${{ steps.notification.outputs.message }}
                   }
                 }
               ]

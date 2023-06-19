@@ -41,15 +41,22 @@ const packages = releasedPackages.map(({ name, version }) => {
   return { name, version, url };
 });
 
+// Slack is using their own Markdown format, see:
+// https://api.slack.com/reference/surfaces/formatting#basics
+// https://app.slack.com/block-kit-builder
 let message = '';
-message += `Javascript SDKs - Stable Release - ${new Date().toLocaleDateString('en-US')}\n\n`;
+message += `*Javascript SDKs - Stable Release - ${new Date().toLocaleDateString('en-US')}*\n\n`;
 for (const { name, version, url } of packages) {
-  message += `- \`${name}@${version}\` ([release notes ↗](<${url}>))\n`;
+  message += `• \`${name}@${version}\` - <${url}|release notes>\n`;
 }
 
 // TODO: Get PR number using the GitHub API
 // if (prNumber) {
-//   message += `\nView the [release PR ↗](<https://github.com/clerkinc/javascript/pull/${prNumber}>)`;
+//   message += `\nView <https://github.com/clerkinc/javascript/pull/${prNumber}|release PR>`;
 // }
 
-console.log(message);
+message += `\nView <https://github.com/clerkinc/javascript/pulls?q=is%3Apr+is%3Aclosed+Version+Packages+in%3Atitle+merged%3A${new Date()
+  .toISOString()
+  .slice(0, 10)}|all release PRs for this day>`;
+
+console.log(JSON.stringify(message));
