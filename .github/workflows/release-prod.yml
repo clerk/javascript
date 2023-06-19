@@ -34,10 +34,6 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Notify on success
-        if: steps.changesets.outputs.published == 'true'
-        run: echo "Published! ${{ steps.changesets.outputs.publishedPackages }}"
-
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
         uses: actions/github-script@v6
@@ -47,11 +43,38 @@ jobs:
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
-              const clerkjsVersion = require('./packages/clerk-js/package.json').version;
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerkinc',
-                repo: 'cloudflare-workers',
-                workflow_id: 'release-prod-clerkjs-proxy.yml',
-                ref: 'main',
-                inputs: { version: clerkjsVersion }
-              })
+            const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'clerkinc',
+              repo: 'cloudflare-workers',
+              workflow_id: 'release-prod-clerkjs-proxy.yml',
+              ref: 'main',
+              inputs: { version: clerkjsVersion }
+            })
+
+      - name: Generate notification
+        id: notification
+        if: steps.changesets.outputs.published == 'true'
+        run: message=$(node scripts/notify.mjs '${{ steps.changesets.outputs.publishedPackages }}' '${{ github.event.number }}') && echo ::set-output name=message::${message//$'\n'/'%0A'}
+
+      - name: Send commit log to Slack
+        id: slack
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ steps.notification.outputs.message }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+
