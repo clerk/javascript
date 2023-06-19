@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.10.9
+
+### Patch Changes
+
+- Fix ESM build issues ([#1377](https://github.com/clerkinc/javascript/pull/1377)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.10.8
 
 ### Patch Changes
