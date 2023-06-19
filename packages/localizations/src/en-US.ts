@@ -584,6 +584,8 @@ export const enUS: LocalizationResource = {
     },
   },
   unstable__errors: {
+    identification_deletion_failed: 'You cannot delete your last identification.',
+    phone_number_exists: 'This phone number is taken. Please try another.',
     form_identifier_not_found: '',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -614,7 +616,7 @@ export const enUS: LocalizationResource = {
     zxcvbn: {
       notEnough: 'Your password is not strong enough.',
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
-      goodPassword: 'Nice work. This is an excellent password.',
+      goodPassword: 'Your password meets all the necessary requirements.',
       warnings: {
         straightRow: 'Straight rows of keys on your keyboard are easy to guess.',
         keyPattern: 'Short keyboard patterns are easy to guess.',

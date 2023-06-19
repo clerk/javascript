@@ -620,6 +620,8 @@ type _LocalizationResource = {
 type WithParamName<T> = T &
   Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
 type UnstableErrors = WithParamName<{
+  identification_deletion_failed: LocalizationValue;
+  phone_number_exists: LocalizationValue;
   form_identifier_not_found: LocalizationValue;
   captcha_invalid: LocalizationValue;
   form_password_pwned: LocalizationValue;
