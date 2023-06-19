@@ -16,7 +16,7 @@ import { Web3Section } from './Web3Section';
 import { DeleteSection } from './DeleteSection';
 
 export const RootPage = withCardStateProvider(() => {
-  const { attributes, saml, social, actions, instanceIsPasswordBased } = useEnvironment().userSettings;
+  const { attributes, saml, social, instanceIsPasswordBased } = useEnvironment().userSettings;
   const card = useCardState();
   const user = useCoreUser();
   const showUsername = attributes.username.enabled;
@@ -27,7 +27,7 @@ export const RootPage = withCardStateProvider(() => {
   const showWeb3 = attributes.web3_wallet.enabled;
   const showPassword = instanceIsPasswordBased;
   const showMfa = getSecondFactors(attributes).length > 0;
-  const showDelete = actions.delete_self;
+  const showDelete = user.deleteSelfEnabled;
 
   return (
     <Col
