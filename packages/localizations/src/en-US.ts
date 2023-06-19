@@ -584,6 +584,8 @@ export const enUS: LocalizationResource = {
     },
   },
   unstable__errors: {
+    identification_deletion_failed: 'You cannot delete your last identification.',
+    phone_number_exists: 'This phone number is taken. Please try another.',
     form_identifier_not_found: '',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
