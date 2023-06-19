@@ -52,28 +52,17 @@ jobs:
               inputs: { version: clerkjsVersion }
             })
 
-      - name: Generate notification
+      - name: Generate notification payload
         id: notification
         if: steps.changesets.outputs.published == 'true'
-        run: message=$(node scripts/notify.mjs '${{ steps.changesets.outputs.publishedPackages }}' '${{ github.event.number }}') && echo ::set-output name=message::${message//$'\n'/'%0A'}
+        run: payload=$(node scripts/notify.mjs '${{ steps.changesets.outputs.publishedPackages }}' '${{ github.event.pusher.username }}') && echo ::set-output name=payload::${payload//$'\n'/'%0A'}
 
       - name: Send commit log to Slack
         id: slack
         if: steps.changesets.outputs.published == 'true'
         uses: slackapi/slack-github-action@v1.18.0
         with:
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": ${{ steps.notification.outputs.message }}
-                  }
-                }
-              ]
-            }
+          payload: ${{ steps.notification.outputs.payload }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
