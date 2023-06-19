@@ -112,8 +112,8 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       actionText: "Vous n'avez pas encore de compte ?",
       actionLink: "S'inscrire",
-      actionLink__use_email: "Utiliser e-mail",
-      actionLink__use_phone: "Utiliser téléphone",
+      actionLink__use_email: 'Utiliser e-mail',
+      actionLink__use_phone: 'Utiliser téléphone',
     },
     password: {
       title: 'Tapez votre mot de passe',
