@@ -77,6 +77,7 @@ export interface UserResource extends ClerkResource {
   publicMetadata: UserPublicMetadata;
   unsafeMetadata: UserUnsafeMetadata;
   lastSignInAt: Date | null;
+  deleteSelfEnabled: boolean;
   updatedAt: Date | null;
   createdAt: Date | null;
 
