@@ -16,6 +16,9 @@ jobs:
     if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Echo env
+        run: echo "${{ toJson(github) }}"
+
       - name: Checkout repo
         uses: actions/checkout@v3
 
@@ -55,12 +58,12 @@ jobs:
       - name: Generate notification payload
         id: notification
         if: steps.changesets.outputs.published == 'true'
-        run: payload=$(node scripts/notify.mjs '${{ steps.changesets.outputs.publishedPackages }}' '${{ github.event.pusher.username }}') && echo ::set-output name=payload::${payload//$'\n'/'%0A'}
+        run: payload=$(node scripts/notify.mjs '${{ steps.changesets.outputs.publishedPackages }}' '${{ github.actor }}') && echo ::set-output name=payload::${payload//$'\n'/'%0A'}
 
       - name: Send commit log to Slack
         id: slack
         if: steps.changesets.outputs.published == 'true'
-        uses: slackapi/slack-github-action@v1.18.0
+        uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: ${{ steps.notification.outputs.payload }}
         env:
