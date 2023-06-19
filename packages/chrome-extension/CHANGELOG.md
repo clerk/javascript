@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.3.13
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@4.48.1
+  - @clerk/clerk-react@4.20.3
+
 ## 0.3.12
 
 ### Patch Changes
