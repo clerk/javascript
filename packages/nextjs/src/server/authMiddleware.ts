@@ -1,8 +1,8 @@
 import type { AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend';
 import type Link from 'next/link';
-import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import type { NextFetchEvent, NextMiddleware } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
@@ -120,6 +120,12 @@ export interface AuthMiddleware {
   (params?: AuthMiddlewareParams): NextMiddleware;
 }
 
+const normaliseHost = (req: NextRequest): NextRequest => {
+  const url = new URL(req.url);
+  url.host = 'google.com';
+  return new NextRequest(url.toString(), { headers: req.headers });
+};
+
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
   const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...options } = params;
@@ -129,7 +135,9 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const isApiRoute = createApiRoutes(apiRoutes);
   const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute);
 
-  return withLogger('authMiddleware', logger => async (req: NextRequest, evt: NextFetchEvent) => {
+  return withLogger('authMiddleware', logger => async (_req: NextRequest, evt: NextFetchEvent) => {
+    const req = normaliseHost(_req);
+
     if (options.debug) {
       logger.enable();
     }
