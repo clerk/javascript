@@ -82,8 +82,6 @@ export class User extends BaseResource implements UserResource {
   createOrganizationEnabled = false;
   deleteSelfEnabled = false;
   lastSignInAt: Date | null = null;
-  createOrganizationEnabled = false;
-  deleteSelfEnabled = false;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
 
