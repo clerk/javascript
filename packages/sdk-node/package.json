@@ -3,24 +3,26 @@
   "license": "MIT",
   "type": "commonjs",
   "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
+  "module": "./dist/esm/index.mjs",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "require": "./dist/cjs/index.js",
-      "import": "./dist/esm/index.js",
+      "import": "./dist/esm/index.mjs",
       "default": "./dist/cjs/index.js"
     },
     "./esm/instance": {
       "types": "./dist/types/instance.d.ts",
       "require": "./dist/cjs/instance.js",
-      "import": "./dist/esm/instance.js"
+      "import": "./dist/esm/instance.mjs",
+      "default": "./dist/cjs/instance.js"
     },
     "./cjs/instance": {
       "types": "./dist/types/instance.d.ts",
       "require": "./dist/cjs/instance.js",
-      "import": "./dist/esm/instance.js"
+      "import": "./dist/esm/instance.mjs",
+      "default": "./dist/cjs/instance.js"
     }
   },
   "files": [
