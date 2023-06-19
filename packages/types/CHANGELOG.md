@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.44.0
+
+### Minor Changes
+
+- Add localization keys for when the phone number exists and the last identification is deleted ([#1383](https://github.com/clerkinc/javascript/pull/1383)) by [@raptisj](https://github.com/raptisj)
+
 ## 3.43.0
 
 ### Minor Changes

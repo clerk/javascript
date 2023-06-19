@@ -1,5 +1,18 @@
 # Change Log
 
+## 1.20.0
+
+### Minor Changes
+
+- Add localization keys for when the phone number exists and the last identification is deleted ([#1383](https://github.com/clerkinc/javascript/pull/1383)) by [@raptisj](https://github.com/raptisj)
+
+### Patch Changes
+
+- Add missing fr-FR translations (use_email & use_phone) ([#1379](https://github.com/clerkinc/javascript/pull/1379)) by [@kohort-aymeric](https://github.com/kohort-aymeric)
+
+- Updated dependencies [[`17cc14ec`](https://github.com/clerkinc/javascript/commit/17cc14ec64ed292239ee782662171a4a8cbd9e87)]:
+  - @clerk/types@3.44.0
+
 ## 1.19.0
 
 ### Minor Changes
