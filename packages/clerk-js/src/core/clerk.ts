@@ -72,7 +72,7 @@ import {
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
   noUserExists,
-  pickRedirectionProp,
+  pickUrl,
   removeClerkQueryParam,
   replaceClerkQueryParam,
   requiresUserInput,
@@ -1386,16 +1386,13 @@ export default class Clerk implements ClerkInterface {
     }
 
     const opts: RedirectOptions = {
-      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
-      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
+      afterSignInUrl: pickUrl('afterSignInUrl', [options, this.#options]),
+      afterSignUpUrl: pickUrl('afterSignUpUrl', [options, this.#options]),
       redirectUrl: options?.redirectUrl || window.location.href,
     };
 
-    const signInOrUpUrl = pickRedirectionProp(
-      key,
-      { options: this.#options, displayConfig: this.#environment.displayConfig },
-      false,
-    );
+    const signInOrUpUrl = pickUrl(key, [this.#options, this.#environment.displayConfig]);
+
     return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, opts));
   };
 
