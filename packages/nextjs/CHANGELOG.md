@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.21.5
+
+### Patch Changes
+
+- Updated dependencies [[`e41f848c`](https://github.com/clerkinc/javascript/commit/e41f848c35f5f284bde918e60bdfd77693e5d7bd)]:
+  - @clerk/clerk-sdk-node@4.10.9
+
 ## 4.21.4
 
 ### Patch Changes
