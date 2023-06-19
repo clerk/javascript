@@ -42,14 +42,14 @@ export const useSignUpContext = (): SignUpContextType => {
     pickUrl(['afterSignUpUrl', 'redirectUrl'], queryParams, {
       validator: url => isAllowedRedirectOrigin(url, options.allowedRedirectOrigins),
       formatter: camelToSnake,
-    }) || pickUrl('afterSignUpUrl', [ctx, options, displayConfig]),
+    }) || pickUrl(['afterSignUpUrl', 'redirectUrl'], [ctx, options, displayConfig]),
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(
     pickUrl(['afterSignInUrl', 'redirectUrl'], queryParams, {
       validator: url => isAllowedRedirectOrigin(url, options.allowedRedirectOrigins),
       formatter: camelToSnake,
-    }) || pickUrl('afterSignInUrl', [ctx, options, displayConfig]),
+    }) || pickUrl(['afterSignInUrl', 'redirectUrl'], [ctx, options, displayConfig]),
   );
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
@@ -108,14 +108,14 @@ export const useSignInContext = (): SignInContextType => {
     pickUrl(['afterSignUpUrl', 'redirectUrl'], queryParams, {
       validator: url => isAllowedRedirectOrigin(url, options.allowedRedirectOrigins),
       formatter: camelToSnake,
-    }) || pickUrl('afterSignUpUrl', [ctx, options, displayConfig]),
+    }) || pickUrl(['afterSignUpUrl', 'redirectUrl'], [ctx, options, displayConfig]),
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(
     pickUrl(['afterSignInUrl', 'redirectUrl'], [queryParams], {
       validator: url => isAllowedRedirectOrigin(url, options.allowedRedirectOrigins),
       formatter: camelToSnake,
-    }) || pickUrl('afterSignInUrl', [ctx, options, displayConfig]),
+    }) || pickUrl(['afterSignInUrl', 'redirectUrl'], [ctx, options, displayConfig]),
   );
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
