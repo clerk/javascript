@@ -16,8 +16,10 @@ jobs:
     if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Echo env
-        run: echo "${{ toJson(github) }}"
+      - name: Echo github context
+        run: echo "$GITHUB_CONTEXT"
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: Checkout repo
         uses: actions/checkout@v3
