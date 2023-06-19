@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.48.0
+
+### Minor Changes
+
+- Adds the ability for users to delete their own accounts, as long as they have permission to do so ([#1307](https://github.com/clerkinc/javascript/pull/1307)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Password, first name & last name fields will be disabled if there are active SAML accounts. ([#1326](https://github.com/clerkinc/javascript/pull/1326)) by [@yourtallness](https://github.com/yourtallness)
+
+- Updated dependencies [[`9651658c`](https://github.com/clerkinc/javascript/commit/9651658c2ab00108ffcb9679cd119488c41ec521), [`4e1bb2bd`](https://github.com/clerkinc/javascript/commit/4e1bb2bd1f3cc933b1e8422849119e0aa16fdaa6), [`eed73021`](https://github.com/clerkinc/javascript/commit/eed73021b0e3d8fd25f7e58828460d9013e0e689), [`a23a3cc8`](https://github.com/clerkinc/javascript/commit/a23a3cc8dc9ecc3d01188dbd763dc68a74ea06f9)]:
+  - @clerk/types@3.43.0
+  - @clerk/localizations@1.19.0
+
 ## 4.47.2
 
 ### Patch Changes
