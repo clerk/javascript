@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.45.0
+
+### Minor Changes
+
+- If user does not have permission to create an org, create org button will not display in the OrganizationSwitcher UI ([#1373](https://github.com/clerkinc/javascript/pull/1373)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Fix to pull from the correct permissions set when displaying user delete self UI ([#1372](https://github.com/clerkinc/javascript/pull/1372)) by [@jescalan](https://github.com/jescalan)
+
 ## 3.44.0
 
 ### Minor Changes
