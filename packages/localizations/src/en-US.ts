@@ -614,7 +614,7 @@ export const enUS: LocalizationResource = {
     zxcvbn: {
       notEnough: 'Your password is not strong enough.',
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
-      goodPassword: 'Nice work. This is an excellent password.',
+      goodPassword: 'Your password meets all the necessary requirements.',
       warnings: {
         straightRow: 'Straight rows of keys on your keyboard are easy to guess.',
         keyPattern: 'Short keyboard patterns are easy to guess.',
