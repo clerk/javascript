@@ -14,12 +14,6 @@ declare global {
 
 // This is used as a dummy base when we need to invoke "new URL()" but we don't care about the URL origin.
 const DUMMY_URL_BASE = 'http://clerk-dummy';
-const CLERK_IMAGE_URL_BASES = [
-  'https://images.clerk.com/',
-  'https://images.clerk.dev/',
-  'https://images.clerkstage.dev/',
-  'https://images.lclclerk.com/',
-];
 
 export const DEV_OR_STAGING_SUFFIXES = [
   '.lcl.dev',
@@ -257,39 +251,6 @@ export function hasBannedProtocol(val: string | URL) {
   const protocol = new URL(val).protocol;
   return BANNED_URI_PROTOCOLS.some(bp => bp === protocol);
 }
-
-export const isClerkImage = (src?: string): boolean => {
-  return !!CLERK_IMAGE_URL_BASES.some(base => src?.includes(base));
-};
-
-export const generateSrc = ({ src, width }: { src?: string; width: number }) => {
-  if (!isValidUrl(src) || isDataUri(src)) {
-    return src;
-  }
-
-  const newSrc = new URL(src);
-  if (width) {
-    newSrc.searchParams.append('width', width?.toString());
-  }
-
-  return newSrc.href;
-};
-
-export const generateSrcSet = ({
-  src,
-  width,
-  xDescriptors,
-}: {
-  src?: string;
-  width: number;
-  xDescriptors: number[];
-}) => {
-  if (!src) {
-    return '';
-  }
-
-  return xDescriptors.map(i => `${generateSrc({ src, width: width * i })} ${i}x`).toString();
-};
 
 export const hasUrlInFragment = (_url: URL | string) => {
   return new URL(_url, DUMMY_URL_BASE).hash.startsWith('#/');

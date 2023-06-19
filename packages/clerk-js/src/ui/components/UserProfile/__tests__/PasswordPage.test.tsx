@@ -52,7 +52,7 @@ describe('PasswordPage', () => {
   });
 
   describe('with SAML', () => {
-    it('prevents adding a password if user has enterprise connections', async () => {
+    it('prevents adding a password if user has active enterprise connections', async () => {
       const emailAddress = 'george@jungle.com';
 
       const config = createFixtures.config(f => {
@@ -64,6 +64,7 @@ describe('PasswordPage', () => {
             {
               id: 'samlacc_foo',
               provider: 'saml_okta',
+              active: true,
               email_address: emailAddress,
             },
           ],
@@ -78,12 +79,48 @@ describe('PasswordPage', () => {
       expect(screen.getByLabelText(/confirm password/i)).toBeDisabled();
       expect(screen.getByRole('checkbox', { name: 'Sign out of all other devices' })).toBeDisabled();
 
-      screen.getByText(
-        'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      );
+      expect(
+        screen.getByText(
+          'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+        ),
+      ).toBeInTheDocument();
     });
 
-    it('prevents changing a password if user has enterprise connections', async () => {
+    it('does not prevent adding a password if user has no active enterprise connections', async () => {
+      const emailAddress = 'george@jungle.com';
+
+      const config = createFixtures.config(f => {
+        f.withEmailAddress();
+        f.withSaml();
+        f.withUser({
+          email_addresses: [emailAddress],
+          saml_accounts: [
+            {
+              id: 'samlacc_foo',
+              provider: 'saml_okta',
+              active: false,
+              email_address: emailAddress,
+            },
+          ],
+        });
+      });
+
+      const { wrapper } = await createFixtures(config);
+
+      render(<PasswordPage />, { wrapper });
+
+      expect(screen.getByLabelText(/new password/i)).not.toBeDisabled();
+      expect(screen.getByLabelText(/confirm password/i)).not.toBeDisabled();
+      expect(screen.getByRole('checkbox', { name: 'Sign out of all other devices' })).not.toBeDisabled();
+
+      expect(
+        screen.queryByText(
+          'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+        ),
+      ).not.toBeInTheDocument();
+    });
+
+    it('prevents changing a password if user has active enterprise connections', async () => {
       const emailAddress = 'george@jungle.com';
 
       const config = createFixtures.config(f => {
@@ -96,6 +133,7 @@ describe('PasswordPage', () => {
             {
               id: 'samlacc_foo',
               provider: 'saml_okta',
+              active: true,
               email_address: emailAddress,
             },
           ],
@@ -111,9 +149,47 @@ describe('PasswordPage', () => {
       expect(screen.getByLabelText(/confirm password/i)).toBeDisabled();
       expect(screen.getByRole('checkbox', { name: 'Sign out of all other devices' })).toBeDisabled();
 
-      screen.getByText(
-        'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      );
+      expect(
+        screen.getByText(
+          'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('does not prevent changing a password if user has no active enterprise connections', async () => {
+      const emailAddress = 'george@jungle.com';
+
+      const config = createFixtures.config(f => {
+        f.withEmailAddress();
+        f.withSaml();
+        f.withUser({
+          password_enabled: true,
+          email_addresses: [emailAddress],
+          saml_accounts: [
+            {
+              id: 'samlacc_foo',
+              provider: 'saml_okta',
+              active: false,
+              email_address: emailAddress,
+            },
+          ],
+        });
+      });
+
+      const { wrapper } = await createFixtures(config);
+
+      render(<PasswordPage />, { wrapper });
+
+      expect(screen.getByLabelText(/current password/i)).not.toBeDisabled();
+      expect(screen.getByLabelText(/new password/i)).not.toBeDisabled();
+      expect(screen.getByLabelText(/confirm password/i)).not.toBeDisabled();
+      expect(screen.getByRole('checkbox', { name: 'Sign out of all other devices' })).not.toBeDisabled();
+
+      expect(
+        screen.queryByText(
+          'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+        ),
+      ).not.toBeInTheDocument();
     });
   });
 

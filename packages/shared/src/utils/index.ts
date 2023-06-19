@@ -7,7 +7,6 @@ export * from './date';
 export * from './errors';
 export * from './file';
 export * from './keys';
-export * from './isRetinaDisplay';
 export * from './localStorageBroadcastChannel';
 export * from './mimeTypeExtensions';
 export * from './multiDomain';

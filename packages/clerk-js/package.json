@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.47.1",
+  "version": "4.47.2",
   "license": "MIT",
   "description": "Clerk JS library",
   "keywords": [
@@ -37,11 +37,12 @@
     "start": "echo \"Noop\"",
     "test": "jest",
     "test:ci": "jest --maxWorkers=50%",
-    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
+    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
+    "watch": "webpack --config webpack.config.js --env production --watch"
   },
   "dependencies": {
     "@clerk/localizations": "^1.18.1",
-    "@clerk/shared": "^0.19.0",
+    "@clerk/shared": "^0.19.1",
     "@clerk/types": "^3.42.0",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",

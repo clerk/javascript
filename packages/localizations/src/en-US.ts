@@ -354,6 +354,12 @@ export const enUS: LocalizationResource = {
         destructiveActionSubtitle: 'Remove this web3 wallet from your account',
         destructiveAction: 'Remove wallet',
       },
+      dangerSection: {
+        title: 'Danger',
+        deleteAccountButton: 'Delete Account',
+        deleteAccountTitle: 'Delete Account',
+        deleteAccountDescription: 'Delete your account and all its associated data',
+      },
     },
     profilePage: {
       title: 'Update profile',
@@ -497,6 +503,11 @@ export const enUS: LocalizationResource = {
       actionLabel__copied: 'Copied!',
       actionLabel__download: 'Download .txt',
       actionLabel__print: 'Print',
+    },
+    deletePage: {
+      title: 'Delete account',
+      description: 'Are you sure you want to delete your account? This action is permanent and irreversible.',
+      confirm: 'Delete account',
     },
   },
   userButton: {

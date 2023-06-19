@@ -224,6 +224,10 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
+  delete = (): Promise<void> => {
+    return this._baseDelete({ path: '/me' });
+  };
+
   getSessions = async (): Promise<SessionWithActivities[]> => {
     if (this.cachedSessionsWithActivities) {
       return this.cachedSessionsWithActivities;

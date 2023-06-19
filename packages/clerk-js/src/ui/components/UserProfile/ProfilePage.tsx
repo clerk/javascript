@@ -49,7 +49,7 @@ export const ProfilePage = withCardStateProvider(() => {
   const requiredFieldsFilled =
     hasRequiredFields && !!lastNameField.value && !!firstNameField.value && optionalFieldsChanged;
 
-  const canEditName = user.samlAccounts.length == 0;
+  const nameEditDisabled = user.samlAccounts.some(sa => sa.active);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +93,7 @@ export const ProfilePage = withCardStateProvider(() => {
         headerTitle={title}
         Breadcrumbs={UserProfileBreadcrumbs}
       >
-        {!canEditName && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
+        {nameEditDisabled && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
 
         <Form.Root onSubmit={onSubmit}>
           <UserProfileAvatarUploader
@@ -107,7 +107,7 @@ export const ProfilePage = withCardStateProvider(() => {
                 autoFocus
                 {...firstNameField.props}
                 required={first_name.required}
-                isDisabled={!canEditName}
+                isDisabled={nameEditDisabled}
               />
             </Form.ControlRow>
           )}
@@ -116,7 +116,7 @@ export const ProfilePage = withCardStateProvider(() => {
               <Form.Control
                 {...lastNameField.props}
                 required={last_name.required}
-                isDisabled={!canEditName}
+                isDisabled={nameEditDisabled}
               />
             </Form.ControlRow>
           )}

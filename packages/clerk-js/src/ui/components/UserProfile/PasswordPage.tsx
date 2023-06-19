@@ -44,7 +44,7 @@ export const PasswordPage = withCardStateProvider(() => {
   const wizard = useWizard();
   const { navigateToFlowStart } = useNavigateToFlowStart();
 
-  const canEditPassword = user.samlAccounts.length == 0;
+  const passwordEditDisabled = user.samlAccounts.some(sa => sa.active);
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
@@ -127,7 +127,7 @@ export const PasswordPage = withCardStateProvider(() => {
         headerTitle={title}
         Breadcrumbs={UserProfileBreadcrumbs}
       >
-        {!canEditPassword && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
+        {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
 
         <Form.Root
           onSubmit={updatePassword}
@@ -148,7 +148,7 @@ export const PasswordPage = withCardStateProvider(() => {
                 minLength={6}
                 required
                 autoFocus
-                isDisabled={!canEditPassword}
+                isDisabled={passwordEditDisabled}
               />
             </Form.ControlRow>
           )}
@@ -158,7 +158,7 @@ export const PasswordPage = withCardStateProvider(() => {
               minLength={6}
               required
               autoFocus={!user.passwordEnabled}
-              isDisabled={!canEditPassword}
+              isDisabled={passwordEditDisabled}
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={confirmField.id}>
@@ -168,18 +168,16 @@ export const PasswordPage = withCardStateProvider(() => {
                 displayConfirmPasswordFeedback(e.target.value);
                 return confirmField.props.onChange(e);
               }}
-              isDisabled={!canEditPassword}
+              isDisabled={passwordEditDisabled}
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={sessionsField.id}>
             <Form.Control
               {...sessionsField.props}
-              isDisabled={!canEditPassword}
+              isDisabled={passwordEditDisabled}
             />
           </Form.ControlRow>
-          {canEditPassword ? (
-            <FormButtons isDisabled={!canSubmit} />
-          ) : (
+          {passwordEditDisabled ? (
             <FormButtonContainer>
               <Form.ResetButton
                 localizationKey={localizationKeys('userProfile.formButtonReset')}
@@ -187,6 +185,8 @@ export const PasswordPage = withCardStateProvider(() => {
                 onClick={navigateToFlowStart}
               />
             </FormButtonContainer>
+          ) : (
+            <FormButtons isDisabled={!canSubmit} />
           )}
         </Form.Root>
       </ContentPage>

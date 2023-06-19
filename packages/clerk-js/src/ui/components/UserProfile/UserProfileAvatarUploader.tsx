@@ -15,7 +15,6 @@ export const UserProfileAvatarUploader = (
       avatarPreview={
         <UserAvatar
           size={theme => theme.sizes.$11}
-          optimize
           {...user}
         />
       }

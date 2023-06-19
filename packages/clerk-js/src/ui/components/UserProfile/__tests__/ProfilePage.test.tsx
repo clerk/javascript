@@ -43,7 +43,7 @@ describe('ProfilePage', () => {
   });
 
   describe('with SAML', () => {
-    it('disables the first & last name inputs if user has enterprise connections', async () => {
+    it('disables the first & last name inputs if user has active enterprise connections', async () => {
       const emailAddress = 'george@jungle.com';
       const firstName = 'George';
       const lastName = 'Clerk';
@@ -60,6 +60,7 @@ describe('ProfilePage', () => {
             {
               id: 'samlacc_foo',
               provider: 'saml_okta',
+              active: true,
               email_address: emailAddress,
             },
           ],
@@ -72,7 +73,46 @@ describe('ProfilePage', () => {
 
       expect(screen.getByRole('textbox', { name: 'First name' })).toBeDisabled();
       expect(screen.getByRole('textbox', { name: 'Last name' })).toBeDisabled();
+
       screen.getByText('Your profile information has been provided by the enterprise connection and cannot be edited.');
+    });
+
+    it('does not disable the first & last name inputs if user has no active enterprise connections', async () => {
+      const emailAddress = 'george@jungle.com';
+      const firstName = 'George';
+      const lastName = 'Clerk';
+
+      const config = createFixtures.config(f => {
+        f.withEmailAddress();
+        f.withSaml();
+        f.withName();
+        f.withUser({
+          first_name: firstName,
+          last_name: lastName,
+          email_addresses: [emailAddress],
+          saml_accounts: [
+            {
+              id: 'samlacc_foo',
+              provider: 'saml_okta',
+              active: false,
+              email_address: emailAddress,
+            },
+          ],
+        });
+      });
+
+      const { wrapper } = await createFixtures(config);
+
+      render(<ProfilePage />, { wrapper });
+
+      expect(screen.getByRole('textbox', { name: 'First name' })).not.toBeDisabled();
+      expect(screen.getByRole('textbox', { name: 'Last name' })).not.toBeDisabled();
+
+      expect(
+        screen.queryByText(
+          'Your profile information has been provided by the enterprise connection and cannot be edited.',
+        ),
+      ).not.toBeInTheDocument();
     });
   });
 

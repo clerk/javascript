@@ -168,6 +168,8 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
 export interface SamlAccountJSON extends ClerkResourceJSON {
   object: 'saml_account';
   provider: SamlIdpSlug;
+  provider_user_id: string | null;
+  active: boolean;
   email_address: string;
   first_name: string;
   last_name: string;
