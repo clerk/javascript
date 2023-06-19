@@ -3,4 +3,4 @@
 '@clerk/types': minor
 ---
 
-Add localization keys for when phone number exists and deleting last identification
+Add localization keys for when the phone number exists and the last identification is deleted
