@@ -65,6 +65,8 @@ const OrganizationDangerSection = () => {
     return null;
   }
 
+  const adminDeleteEnabled = organization.adminDeleteEnabled;
+
   return (
     <ProfileSection
       id='organizationDanger'
@@ -88,6 +90,23 @@ const OrganizationDangerSection = () => {
           isDisabled={membership.role === 'admin'}
           localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
         />
+        {membership.role === 'admin' && adminDeleteEnabled && (
+          <IconButton
+            aria-label='Delete organization'
+            icon={
+              <Icon
+                icon={Times}
+                size={'sm'}
+                sx={t => ({ marginRight: t.space.$2 })}
+              />
+            }
+            variant='outline'
+            colorScheme='danger'
+            textVariant='buttonExtraSmallBold'
+            onClick={() => navigate('delete')}
+            localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
+          />
+        )}
       </Flex>
     </ProfileSection>
   );

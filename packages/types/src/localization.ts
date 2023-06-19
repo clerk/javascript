@@ -566,6 +566,12 @@ type _LocalizationResource = {
           messageLine2: LocalizationValue;
           successMessage: LocalizationValue;
         };
+        deleteOrganization: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
       };
     };
     invitePage: {
