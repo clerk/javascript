@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.43.0
+
+### Minor Changes
+
+- Adds the ability for users to delete their own accounts, as long as they have permission to do so ([#1307](https://github.com/clerkinc/javascript/pull/1307)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Password, first name & last name fields will be disabled if there are active SAML accounts. ([#1326](https://github.com/clerkinc/javascript/pull/1326)) by [@yourtallness](https://github.com/yourtallness)
+
 ## 3.42.0
 
 ### Minor Changes

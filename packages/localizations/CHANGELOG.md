@@ -1,5 +1,20 @@
 # Change Log
 
+## 1.19.0
+
+### Minor Changes
+
+- Adds the ability for users to delete their own accounts, as long as they have permission to do so ([#1307](https://github.com/clerkinc/javascript/pull/1307)) by [@jescalan](https://github.com/jescalan)
+
+- Introduce `nb-NO` localization ([#1376](https://github.com/clerkinc/javascript/pull/1376)) by [@Richard87](https://github.com/Richard87)
+
+### Patch Changes
+
+- Fix "Sign in" text for the Korean localization ([#1371](https://github.com/clerkinc/javascript/pull/1371)) by [@perkinsjr](https://github.com/perkinsjr)
+
+- Updated dependencies [[`9651658c`](https://github.com/clerkinc/javascript/commit/9651658c2ab00108ffcb9679cd119488c41ec521), [`4e1bb2bd`](https://github.com/clerkinc/javascript/commit/4e1bb2bd1f3cc933b1e8422849119e0aa16fdaa6)]:
+  - @clerk/types@3.43.0
+
 ## 1.18.1
 
 ### Patch Changes
