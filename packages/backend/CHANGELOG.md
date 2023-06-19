@@ -1,5 +1,18 @@
 # Change Log
 
+## 0.23.4
+
+### Patch Changes
+
+- Simplify the signature of the low-level `authenticateRequest` helper. ([#1329](https://github.com/clerkinc/javascript/pull/1329)) by [@anagstef](https://github.com/anagstef)
+
+  - One pair of legacy or new instance keys are required instead of all 4 of them in `authenticateRequest`
+  - `@clerk/backend` now can handle the `"Bearer "` prefix in Authorization header for better DX
+  - `host` parameter is now optional in `@clerk/backend`
+
+- Updated dependencies [[`11954816`](https://github.com/clerkinc/javascript/commit/119548164a1757b878027019c20a688d312b1cfd), [`32148490`](https://github.com/clerkinc/javascript/commit/32148490b813028412af0467e342aa85227cb4d2)]:
+  - @clerk/types@3.45.0
+
 ## 0.23.3
 
 ### Patch Changes
