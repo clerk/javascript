@@ -3,6 +3,7 @@ import {
   addClerkPrefix,
   handleValueOrFn,
   inClientSide,
+  is4xxError,
   isHttpOrHttps,
   isLegacyFrontendApiKey,
   isValidBrowserOnline,
@@ -1309,7 +1310,11 @@ export default class Clerk implements ClerkInterface {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
-    await session.touch().catch(noop);
+    await session.touch().catch(e => {
+      if (is4xxError(e)) {
+        void this.handleUnauthenticated();
+      }
+    });
   };
 
   #emit = (): void => {

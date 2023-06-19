@@ -1,11 +1,12 @@
-import { isNetworkError, isUnauthorizedError } from '@clerk/shared';
+import { isClerkAPIResponseError } from '@clerk/shared';
+import { isNetworkError } from '@clerk/shared';
+import { is4xxError } from '@clerk/shared';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
 import type { CookieHandler } from '../../../utils';
 import { createCookieHandler, inBrowser } from '../../../utils';
 import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
 import { eventBus, events } from '../../events';
-import { isClerkAPIResponseError } from '../../resources';
 import { SessionCookiePoller } from './SessionCookiePoller';
 
 export class SessionCookieService {
@@ -96,12 +97,21 @@ export class SessionCookieService {
   }
 
   private handleGetTokenError(e: any) {
-    if (isClerkAPIResponseError(e)) {
-      if (isUnauthorizedError(e) || isNetworkError(e)) {
-        return;
-      }
-      clerkCoreErrorTokenRefreshFailed(e.toString());
+    //throw if not a clerk error
+    if (!isClerkAPIResponseError(e)) {
+      clerkCoreErrorTokenRefreshFailed(e.message || e);
     }
-    clerkCoreErrorTokenRefreshFailed(e.message || e);
+
+    //sign user out if a 4XX error
+    if (is4xxError(e)) {
+      void this.clerk.handleUnauthenticated();
+      return;
+    }
+
+    if (isNetworkError(e)) {
+      return;
+    }
+
+    clerkCoreErrorTokenRefreshFailed(e.toString());
   }
 }
