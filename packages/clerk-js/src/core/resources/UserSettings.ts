@@ -1,6 +1,5 @@
 import type {
   Attributes,
-  Actions,
   OAuthProviders,
   OAuthStrategy,
   PasswordSettingsData,
@@ -16,6 +15,11 @@ import { BaseResource } from './internal';
 
 const defaultMaxPasswordLength = 72;
 const defaultMinPasswordLength = 8;
+
+export type Actions = {
+  create_organization: boolean;
+  delete_self: boolean;
+};
 
 /**
  * @internal

@@ -84,7 +84,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
           </PreviewButton>
         ))}
       </Box>
-      {createOrganizationButton}
+      {user.createOrganizationEnabled && createOrganizationButton}
     </SecondaryActions>
   );
 };

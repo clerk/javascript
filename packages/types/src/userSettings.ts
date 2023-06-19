@@ -91,6 +91,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   id: never;
   object: never;
   attributes: AttributesJSON;
+  actions: Actions;
   social: OAuthProviders;
 
   /**
@@ -101,7 +102,6 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   sign_in: SignInData;
   sign_up: SignUpData;
   password_settings: PasswordSettingsData;
-  actions: Actions;
 }
 
 export interface UserSettingsResource extends ClerkResource {

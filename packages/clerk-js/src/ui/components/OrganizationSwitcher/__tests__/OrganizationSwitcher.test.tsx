@@ -46,7 +46,7 @@ describe('OrganizationSwitcher', () => {
     it('opens the organization switcher popover when clicked', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
-        f.withUser({ email_addresses: ['test@clerk.dev'] });
+        f.withUser({ email_addresses: ['test@clerk.dev'], create_organization_enabled: true });
       });
       props.setProps({ hidePersonal: true });
       const { getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
@@ -107,6 +107,7 @@ describe('OrganizationSwitcher', () => {
         f.withUser({
           email_addresses: ['test@clerk.dev'],
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+          create_organization_enabled: true,
         });
       });
       props.setProps({ hidePersonal: true });
@@ -114,6 +115,20 @@ describe('OrganizationSwitcher', () => {
       await userEvent.click(getByRole('button'));
       await userEvent.click(getByRole('button', { name: 'Create Organization' }));
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
+    });
+
+    it('does not display create organization button if permissions not present', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+          create_organization_enabled: false,
+        });
+      });
+      props.setProps({ hidePersonal: true });
+      const { queryByRole } = render(<OrganizationSwitcher />, { wrapper });
+      expect(queryByRole('button', { name: 'Create Organization' })).not.toBeInTheDocument();
     });
 
     it.todo('switches between active organizations when one is clicked');
