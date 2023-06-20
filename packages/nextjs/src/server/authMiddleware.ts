@@ -134,6 +134,9 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       logger.enable();
     }
 
+    setClerkUrlInRequest(req);
+    const requestUrl = process.env.CLERK_USE_X_FWD_HEADERS !== 'true' ? req.clerkUrl : req.nextUrl;
+
     logger.debug('URL debug', { url: req.nextUrl.href, method: req.method, headers: stringifyHeaders(req.headers) });
     logger.debug('Options debug', { ...options, beforeAuth: !!beforeAuth, afterAuth: !!afterAuth });
 
@@ -215,7 +218,7 @@ const createDefaultAfterAuth = (
     if (!auth.userId && !isPublicRoute(req) && isApiRoute(req)) {
       return apiEndpointUnauthorizedNextResponse();
     } else if (!auth.userId && !isPublicRoute(req)) {
-      return redirectToSignIn({ returnBackUrl: req.url });
+      return redirectToSignIn({ returnBackUrl: req.nextUrl.href });
     }
     return NextResponse.next();
   };
@@ -332,3 +335,17 @@ A bug that may have already been fixed in the latest version of Clerk NextJS pac
 How to resolve:
 -> Make sure you are using the latest version of '@clerk/nextjs' and 'next'.
   `;
+
+const setClerkUrlInRequest = (req: NextRequest) => {
+  const clerkUrl = req.nextUrl.clone();
+  clerkUrl.protocol = getFirstValueFromHeader(req, 'x-forwarded-proto') ?? clerkUrl.protocol;
+  clerkUrl.host = getFirstValueFromHeader(req, 'x-forwarded-host') ?? clerkUrl.host;
+  clerkUrl.port = getFirstValueFromHeader(req, 'x-forwarded-port') ?? clerkUrl.port;
+
+  Object.assign(req, { clerkUrl });
+};
+
+const getFirstValueFromHeader = (req: NextRequest, key: string) => {
+  const value = req.headers.get(key);
+  return value?.split(',')[0];
+};
