@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useCoreClerk } from '../contexts';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { common, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
@@ -49,6 +50,7 @@ export type LinkProps = PrimitiveProps<'a'> & OwnProps & StyleVariants<typeof ap
 
 export const Link = (props: LinkProps): JSX.Element => {
   const { isExternal, children, href, onClick, ...rest } = props;
+  const clerk = useCoreClerk();
 
   const onClickHandler = onClick
     ? (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -63,7 +65,7 @@ export const Link = (props: LinkProps): JSX.Element => {
     <a
       {...applyDataStateProps(filterProps(rest))}
       onClick={onClickHandler}
-      href={href || ''}
+      href={href ? clerk.buildUrlWithAuth(href) : ''}
       target={href && isExternal ? '_blank' : undefined}
       rel={href && isExternal ? 'noopener' : undefined}
       css={applyVariants(props)}

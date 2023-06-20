@@ -30,6 +30,7 @@ import type {
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
+  NavigateOptions,
   OrganizationInvitationResource,
   OrganizationMembershipResource,
   OrganizationProfileProps,
@@ -51,7 +52,6 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import { NavigateOptions } from '@clerk/types/src';
 
 import type { MountComponentRenderer } from '../ui/Components';
 import {

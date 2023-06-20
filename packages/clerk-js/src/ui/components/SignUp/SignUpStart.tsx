@@ -28,7 +28,6 @@ import { completeSignUpFlow } from './util';
 
 function _SignUpStart(): JSX.Element {
   const card = useCardState();
-  const clerk = useCoreClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
   const { showOptionalFields } = useAppearance().parsedLayout;

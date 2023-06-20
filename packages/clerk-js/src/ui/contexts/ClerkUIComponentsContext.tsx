@@ -31,7 +31,6 @@ export const useSignUpContext = (): SignUpContextType => {
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
   const options = useOptions();
-  const clerk = useCoreClerk();
 
   if (componentName !== 'SignUp') {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
@@ -97,7 +96,6 @@ export const useSignInContext = (): SignInContextType => {
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
   const options = useOptions();
-  const clerk = useCoreClerk();
 
   if (componentName !== 'SignIn') {
     throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
