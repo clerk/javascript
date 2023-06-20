@@ -1,6 +1,7 @@
-import { API_URL, API_VERSION } from '../constants';
+import { API_URL, API_VERSION, constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { isDevelopmentFromApiKey } from '../util/instance';
+import { parseIsomorphicRequestCookies } from '../util/IsomorphicRequest';
 import { parsePublishableKey } from '../util/parsePublishableKey';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
@@ -100,6 +101,7 @@ export type AuthenticateRequestOptions = OptionalVerifyTokenOptions &
      * @experimental
      */
     signInUrl?: string;
+    request?: Request;
   };
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
@@ -115,10 +117,35 @@ function assertProxyUrlOrDomain(proxyUrlOrDomain: string | undefined) {
 }
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
-  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  options.apiUrl = options.apiUrl || API_URL;
-  options.apiVersion = options.apiVersion || API_VERSION;
-  options.headerToken = options.headerToken?.replace('Bearer ', '');
+  const { request: isomorphicRequest } = options;
+  const isomorphicRequestCookies = isomorphicRequest ? parseIsomorphicRequestCookies(isomorphicRequest) : undefined;
+  const isomorphicRequestSearchParams = isomorphicRequest?.url
+    ? new URL(isomorphicRequest.url)?.searchParams
+    : undefined;
+
+  options = {
+    ...options,
+    frontendApi: parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi,
+    apiUrl: options.apiUrl || API_URL,
+    apiVersion: options.apiVersion || API_VERSION,
+    headerToken:
+      stripAuthorizationHeader(options.headerToken) ||
+      stripAuthorizationHeader(isomorphicRequest?.headers?.get(constants.Headers.Authorization)) ||
+      undefined,
+    cookieToken: options.cookieToken || isomorphicRequestCookies?.(constants.Cookies.Session) || undefined,
+    clientUat: options.clientUat || isomorphicRequestCookies?.(constants.Cookies.ClientUat) || undefined,
+    origin: options.origin || isomorphicRequest?.headers?.get(constants.Headers.Origin) || undefined,
+    host: options.host || isomorphicRequest?.headers?.get(constants.Headers.Host) || undefined,
+    forwardedHost:
+      options.forwardedHost || isomorphicRequest?.headers?.get(constants.Headers.ForwardedHost) || undefined,
+    forwardedPort:
+      options.forwardedPort || isomorphicRequest?.headers?.get(constants.Headers.ForwardedPort) || undefined,
+    forwardedProto:
+      options.forwardedProto || isomorphicRequest?.headers?.get(constants.Headers.ForwardedProto) || undefined,
+    referrer: options.referrer || isomorphicRequest?.headers?.get(constants.Headers.Referrer) || undefined,
+    userAgent: options.userAgent || isomorphicRequest?.headers?.get(constants.Headers.UserAgent) || undefined,
+    searchParams: options.searchParams || isomorphicRequestSearchParams || undefined,
+  };
 
   assertValidSecretKey(options.secretKey || options.apiKey);
 
@@ -191,3 +218,7 @@ export const debugRequestState = (params: RequestState) => {
 };
 
 export type DebugRequestSate = ReturnType<typeof debugRequestState>;
+
+const stripAuthorizationHeader = (authValue: string | undefined | null): string | undefined => {
+  return authValue?.replace('Bearer ', '');
+};

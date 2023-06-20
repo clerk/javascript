@@ -1,5 +1,5 @@
 import type { RequestState } from '@clerk/backend';
-import { Clerk } from '@clerk/backend';
+import { Clerk, createIsomorphicRequest } from '@clerk/backend';
 import { getRequestUrl, handleValueOrFn, isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared';
 
 import {
@@ -9,7 +9,6 @@ import {
 } from '../errors';
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
-import { parseCookies } from './utils';
 
 function isDevelopmentFromApiKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
@@ -84,12 +83,6 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
-  const { headers } = request;
-  const cookies = parseCookies(request);
-
-  const cookieToken = cookies['__session'];
-  const headerToken = headers.get('authorization')?.replace('Bearer ', '');
-
   return Clerk({ apiUrl, apiKey, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({
     apiKey,
     audience,
@@ -100,20 +93,11 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     loadUser,
     loadSession,
     loadOrganization,
-    cookieToken,
-    headerToken,
-    clientUat: cookies['__client_uat'],
-    origin: headers.get('origin') || '',
-    host: headers.get('host') as string,
-    forwardedPort: headers.get('x-forwarded-port') as string,
-    forwardedHost: headers.get('x-forwarded-host') as string,
-    referrer: headers.get('referer') || '',
-    userAgent: headers.get('user-agent') as string,
     authorizedParties,
     proxyUrl,
     isSatellite,
     domain,
-    searchParams: new URL(request.url).searchParams,
     signInUrl,
+    request: createIsomorphicRequest(requestURL, { headers: request.headers }),
   });
 }

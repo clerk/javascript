@@ -1,15 +1,10 @@
 import type { RequestState } from '@clerk/backend';
-import { constants } from '@clerk/backend';
-import cookie from 'cookie';
+import { constants, createIsomorphicRequest } from '@clerk/backend';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from './shared';
 import type { AuthenticateRequestParams, ClerkClient } from './types';
 import { loadApiEnv, loadClientEnv } from './utils';
-
-const parseCookies = (req: IncomingMessage) => {
-  return cookie.parse(req.headers['cookie'] || '');
-};
 
 export async function loadInterstitial({
   clerkClient,
@@ -61,8 +56,6 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
-  const cookies = parseCookies(req);
-
   return clerkClient.authenticateRequest({
     audience,
     apiKey,
@@ -71,19 +64,11 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     publishableKey,
     jwtKey,
     authorizedParties,
-    cookieToken: cookies[constants.Cookies.Session] || '',
-    headerToken: req.headers[constants.Headers.Authorization]?.replace('Bearer ', '') || '',
-    clientUat: cookies[constants.Cookies.ClientUat] || '',
-    host: req.headers.host as string,
-    forwardedPort: req.headers[constants.Headers.ForwardedPort] as string,
-    forwardedHost: req.headers[constants.Headers.ForwardedHost] as string,
-    referrer: req.headers.referer,
-    userAgent: req.headers[constants.Headers.UserAgent] as string,
     proxyUrl,
     isSatellite,
     domain,
     signInUrl,
-    searchParams: requestUrl.searchParams,
+    request: createIsomorphicRequest(requestUrl, { headers: req.headers }),
   });
 };
 export const handleUnknownCase = (res: ServerResponse, requestState: RequestState) => {

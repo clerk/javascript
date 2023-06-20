@@ -15,11 +15,19 @@
 // @ts-expect-error
 import crypto from '#crypto';
 // @ts-expect-error
-import fetch from '#fetch';
+import * as fetchApisPolyfill from '#fetch';
+
+const { default: fetch, AbortController, Blob, FormData, Headers, Request, Response } = fetchApisPolyfill;
 
 type Runtime = {
   crypto: Crypto;
   fetch: typeof global.fetch;
+  AbortController: typeof global.AbortController;
+  Blob: typeof global.Blob;
+  FormData: typeof global.FormData;
+  Headers: typeof global.Headers;
+  Request: typeof global.Request;
+  Response: typeof global.Response;
 };
 
 // Invoking the global.fetch without binding it first to the globalObject fails in
@@ -29,8 +37,17 @@ type Runtime = {
 //
 // https://github.com/supabase/supabase/issues/4417
 const globalFetch = fetch.bind(globalThis);
-
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
-const runtime: Runtime = { crypto, fetch: globalFetch };
+const runtime: Runtime = {
+  crypto,
+  fetch: globalFetch,
+  AbortController,
+  Blob,
+  FormData,
+  Headers,
+  Request,
+  Response,
+};
+
 export default runtime;
