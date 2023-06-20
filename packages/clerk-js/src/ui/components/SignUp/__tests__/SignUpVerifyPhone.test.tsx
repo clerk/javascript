@@ -50,7 +50,7 @@ describe('SignUpVerifyPhone', () => {
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
     });
     render(<SignUpVerifyPhone />, { wrapper });
-    const resendButton = screen.getByText(/Resend code/i);
+    const resendButton = screen.getByText(/Resend/i);
     expect(resendButton.tagName.toUpperCase()).toBe('BUTTON');
   });
 

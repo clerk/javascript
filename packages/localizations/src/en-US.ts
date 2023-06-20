@@ -7,7 +7,7 @@ const commonTexts = {
       subtitle: 'to continue to {{applicationName}}',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your phone number',
-      resendButton: 'Resend code',
+      resendButton: "Didn't receive a code? Resend",
     },
   },
 } as const;
@@ -88,7 +88,7 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       formTitle: 'Verification link',
       formSubtitle: 'Use the verification link sent to your email address',
-      resendButton: 'Resend link',
+      resendButton: "Didn't receive a link? Resend",
       verified: {
         title: 'Successfully signed up',
       },
@@ -106,14 +106,14 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your email address',
-      resendButton: 'Resend code',
+      resendButton: "Didn't receive a code? Resend",
     },
     phoneCode: {
       title: 'Verify your phone',
       subtitle: 'to continue to {{applicationName}}',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your phone number',
-      resendButton: 'Resend code',
+      resendButton: "Didn't receive a code? Resend",
     },
     continue: {
       title: 'Fill in missing fields',
@@ -150,7 +150,7 @@ export const enUS: LocalizationResource = {
       formTitle: 'Reset password code',
       formSubtitle_email: 'Enter the code sent to your email address',
       formSubtitle_phone: 'Enter the code sent to your phone number',
-      resendButton: 'Resend code',
+      resendButton: "Didn't receive a code? Resend",
     },
     resetPassword: {
       title: 'Reset Password',
@@ -165,14 +165,14 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your email address',
-      resendButton: 'Resend code',
+      resendButton: "Didn't receive a code? Resend",
     },
     emailLink: {
       title: 'Check your email',
       subtitle: 'to continue to {{applicationName}}',
       formTitle: 'Verification link',
       formSubtitle: 'Use the verification link sent to your email',
-      resendButton: 'Resend link',
+      resendButton: "Didn't receive a link? Resend",
       unusedTab: {
         title: 'You may close this tab',
       },
@@ -382,14 +382,14 @@ export const enUS: LocalizationResource = {
         formHint: 'An email containing a verification code will be sent to this email address.',
         formTitle: 'Verification code',
         formSubtitle: 'Enter the verification code sent to {{identifier}}',
-        resendButton: 'Resend code',
+        resendButton: "Didn't receive a code? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
       emailLink: {
         formHint: 'An email containing a verification link will be sent to this email address.',
         formTitle: 'Verification link',
         formSubtitle: 'Click on the verification link in the email sent to {{identifier}}',
-        resendButton: 'Resend link',
+        resendButton: "Didn't receive a link? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
       removeResource: {
