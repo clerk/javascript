@@ -17,6 +17,7 @@ export const PROXY_URL = process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '';
 export const IS_SATELLITE = process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true' || false;
 export const SIGN_IN_URL = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '';
 export const SIGN_UP_URL = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '';
+export const USE_X_FWD_HEADERS = process.env.CLERK_USE_X_FWD_HEADERS === 'true';
 
 const clerkClient = Clerk({
   apiKey: API_KEY,
