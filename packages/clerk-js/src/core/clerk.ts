@@ -51,6 +51,7 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
+import { NavigateOptions } from '@clerk/types/src';
 
 import type { MountComponentRenderer } from '../ui/Components';
 import {
@@ -635,7 +636,7 @@ export default class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public navigate = async (to: string | undefined): Promise<unknown> => {
+  public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
     if (!to || !inBrowser()) {
       return;
     }
@@ -644,7 +645,7 @@ export default class Clerk implements ClerkInterface {
     const customNavigate = this.#options.navigate;
 
     if (toURL.origin !== window.location.origin || !customNavigate) {
-      windowNavigate(toURL);
+      windowNavigate(this.buildUrlWithAuth(toURL.href, options?.buildUrlWithAuthOptions));
       return;
     }
 
@@ -726,12 +727,12 @@ export default class Clerk implements ClerkInterface {
       { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
       { stringify: true },
     );
-    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl));
+    return this.navigate(backToSatelliteUrl);
   };
 
   public redirectWithAuth = async (to: string): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildUrlWithAuth(to));
+      return this.navigate(to);
     }
     return;
   };
@@ -1453,7 +1454,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     const buildUrlWithAuthParams: BuildUrlWithAuthParams = { useQueryParam: true };
-    await this.navigate(this.buildUrlWithAuth(redirectUrl, buildUrlWithAuthParams));
+    await this.navigate(redirectUrl, { buildUrlWithAuthOptions: buildUrlWithAuthParams });
     return true;
   };
 }

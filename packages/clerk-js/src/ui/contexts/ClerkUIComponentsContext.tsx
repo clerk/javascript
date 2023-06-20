@@ -37,23 +37,19 @@ export const useSignUpContext = (): SignUpContextType => {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
-  const afterSignUpUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignUpUrl', {
-      queryParams,
-      ctx,
-      options,
-      displayConfig,
-    }),
-  );
+  const afterSignUpUrl = pickRedirectionProp('afterSignUpUrl', {
+    queryParams,
+    ctx,
+    options,
+    displayConfig,
+  });
 
-  const afterSignInUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignInUrl', {
-      queryParams,
-      ctx,
-      options,
-      displayConfig,
-    }),
-  );
+  const afterSignInUrl = pickRedirectionProp('afterSignInUrl', {
+    queryParams,
+    ctx,
+    options,
+    displayConfig,
+  });
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
@@ -107,23 +103,19 @@ export const useSignInContext = (): SignInContextType => {
     throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
   }
 
-  const afterSignUpUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignUpUrl', {
-      queryParams,
-      ctx,
-      options,
-      displayConfig,
-    }),
-  );
+  const afterSignUpUrl = pickRedirectionProp('afterSignUpUrl', {
+    queryParams,
+    ctx,
+    options,
+    displayConfig,
+  });
 
-  const afterSignInUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignInUrl', {
-      queryParams,
-      ctx,
-      options,
-      displayConfig,
-    }),
-  );
+  const afterSignInUrl = pickRedirectionProp('afterSignInUrl', {
+    queryParams,
+    ctx,
+    options,
+    displayConfig,
+  });
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 

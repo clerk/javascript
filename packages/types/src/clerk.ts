@@ -465,6 +465,10 @@ export type BuildUrlWithAuthParams = {
   useQueryParam?: boolean | null;
 };
 
+export type NavigateOptions = {
+  buildUrlWithAuthOptions: BuildUrlWithAuthParams;
+};
+
 // TODO: Make sure Isomorphic Clerk navigate can work with the correct type:
 // (to: string) => Promise<unknown>
 export type CustomNavigation = (to: string) => Promise<unknown> | void;
