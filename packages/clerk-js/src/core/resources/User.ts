@@ -79,9 +79,9 @@ export class User extends BaseResource implements UserResource {
   backupCodeEnabled = false;
   publicMetadata: UserPublicMetadata = {};
   unsafeMetadata: UserUnsafeMetadata = {};
-  lastSignInAt: Date | null = null;
   createOrganizationEnabled = false;
   deleteSelfEnabled = false;
+  lastSignInAt: Date | null = null;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
 

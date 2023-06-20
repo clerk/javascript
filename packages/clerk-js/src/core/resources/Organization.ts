@@ -27,6 +27,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   logoUrl!: string;
   imageUrl!: string;
   publicMetadata: OrganizationPublicMetadata = {};
+  adminDeleteEnabled!: boolean;
   createdAt!: Date;
   updatedAt!: Date;
   membersCount = 0;
@@ -179,6 +180,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.publicMetadata = data.public_metadata;
     this.membersCount = data.members_count;
     this.pendingInvitationsCount = data.pending_invitations_count;
+    this.adminDeleteEnabled = data.admin_delete_enabled;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
