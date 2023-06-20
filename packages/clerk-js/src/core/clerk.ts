@@ -1,6 +1,5 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import { isCrossOrigin } from '@clerk/shared';
-import { isRelativeUrl } from '@clerk/shared';
 import {
   addClerkPrefix,
   handleValueOrFn,
