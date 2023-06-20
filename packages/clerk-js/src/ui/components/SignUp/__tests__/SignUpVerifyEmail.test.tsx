@@ -83,7 +83,7 @@ describe('SignUpVerifyEmail', () => {
     );
 
     render(<SignUpVerifyEmail />, { wrapper });
-    const resendButton = screen.getByText(/Resend link/i);
+    const resendButton = screen.getByText(/Resend/i);
     expect(resendButton.tagName.toUpperCase()).toBe('BUTTON');
   });
 

@@ -312,15 +312,15 @@ describe('SignInFactorOne', () => {
         );
 
         const { getByText } = render(<SignInFactorOne />, { wrapper });
-        expect(getByText('Resend link', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
         await act(() => {
           jest.advanceTimersByTime(30000);
         });
-        expect(getByText('Resend link', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
         await act(() => {
           jest.advanceTimersByTime(30000);
         });
-        expect(getByText('Resend link', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+        expect(getByText(/Resend/, { exact: false }).closest('button')).not.toHaveAttribute('disabled');
 
         jest.useRealTimers();
       });
