@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.46.0
+
+### Minor Changes
+
+- Add ability for organization admins to delete an organization if they have permission to do so ([#1368](https://github.com/clerkinc/javascript/pull/1368)) by [@jescalan](https://github.com/jescalan)
+
 ## 3.45.0
 
 ### Minor Changes
