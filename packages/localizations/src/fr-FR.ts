@@ -36,6 +36,8 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
+  formFieldError__notMatchingPasswords: 'Les mots de passe ne correspondent pas.',
+  formFieldError__matchingPasswords: 'Les mots de passe correspondent.',
   formFieldAction__forgotPassword: 'Mot de passe oublié?',
   formFieldHintText__optional: 'Optionnel',
   formButtonPrimary: 'Continuer',
@@ -119,6 +121,11 @@ export const frFR: LocalizationResource = {
       title: 'Tapez votre mot de passe',
       subtitle: 'pour continuer à {{applicationName}}',
       actionLink: 'Utiliser une autre méthode',
+    },
+    resetPassword: {
+      title: 'Réinitialiser le mot de passe',
+      formButtonPrimary: 'Réinitialiser',
+      successMessage: 'Votre mot de passe a été modifié avec succès. Nous vous reconnectons, veuillez patienter un instant.',
     },
     emailCode: {
       title: 'Vérifiez votre messagerie',
