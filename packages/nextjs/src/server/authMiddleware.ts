@@ -67,7 +67,7 @@ type BeforeAuthHandler = (
 ) => NextMiddlewareResult | Promise<NextMiddlewareResult> | false | Promise<false>;
 
 type AfterAuthHandler = (
-  auth: AuthObject & { isPublicRoute: boolean },
+  auth: AuthObject & { isPublicRoute: boolean; isApiRoute: boolean },
   req: NextRequest,
   evt: NextFetchEvent,
 ) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
