@@ -556,6 +556,8 @@ export const ptBR: LocalizationResource = {
     },
     zxcvbn: {
       notEnough: 'Sua senha não é forte o suficiente.',
+      couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
+      goodPassword: 'Bom trabalho. Esta é uma ótima senha.',
       warnings: {
         straightRow: 'Letras que vêm em sequência no teclado são fáceis de adivinhar.',
         keyPattern: 'Padrões de teclado curtos são fáceis de adivinhar.',
