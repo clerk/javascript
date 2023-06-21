@@ -125,12 +125,12 @@ describe('SignInFactorTwo', () => {
         runFakeTimers(timers => {
           fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
           const { getByText } = render(<SignInFactorTwo />, { wrapper });
-          expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+          expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
           timers.advanceTimersByTime(15000);
-          expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+          expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
           getByText('(15)', { exact: false });
           timers.advanceTimersByTime(15000);
-          expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+          expect(getByText(/Resend/, { exact: false }).closest('button')).not.toHaveAttribute('disabled');
         });
       });
 
@@ -146,12 +146,12 @@ describe('SignInFactorTwo', () => {
 
         await runFakeTimers(async timers => {
           const { getByText, userEvent } = render(<SignInFactorTwo />, { wrapper });
-          expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+          expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
           timers.advanceTimersByTime(30000);
-          expect(getByText('Resend code').closest('button')).not.toHaveAttribute('disabled');
-          await userEvent.click(getByText('Resend code'));
+          expect(getByText(/Resend/).closest('button')).not.toHaveAttribute('disabled');
+          await userEvent.click(getByText(/Resend/));
           timers.advanceTimersByTime(1000);
-          expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+          expect(getByText(/Resend/, { exact: false }).closest('button')).toHaveAttribute('disabled');
         });
       });
 
