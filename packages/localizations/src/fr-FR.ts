@@ -125,7 +125,8 @@ export const frFR: LocalizationResource = {
     resetPassword: {
       title: 'Réinitialiser le mot de passe',
       formButtonPrimary: 'Réinitialiser',
-      successMessage: 'Votre mot de passe a été modifié avec succès. Nous vous reconnectons, veuillez patienter un instant.',
+      successMessage:
+        'Votre mot de passe a été modifié avec succès. Nous vous reconnectons, veuillez patienter un instant.',
     },
     emailCode: {
       title: 'Vérifiez votre messagerie',
