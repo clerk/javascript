@@ -714,7 +714,7 @@ export default class Clerk implements ClerkInterface {
       return;
     }
     const searchParams = new URLSearchParams({
-      [CLERK_REFERRER_PRIMARY]: 'true',
+      [CLERK_SYNCED]: 'true',
     });
 
     const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
@@ -1084,9 +1084,13 @@ export default class Clerk implements ClerkInterface {
 
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
   #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
-
+  /**
+   * @deprecated This will be removed in the next minor version
+   */
   #isReturningFromPrimary = () => getClerkQueryParam(CLERK_REFERRER_PRIMARY) === 'true';
-
+  /**
+   * @deprecated This will be removed in the next minor version
+   */
   #replacePrimaryReferrerWithClerkSynced = () => {
     if (this.#options.isInterstitial) {
       replaceClerkQueryParam(CLERK_REFERRER_PRIMARY, CLERK_SYNCED, 'true');
@@ -1118,13 +1122,16 @@ export default class Clerk implements ClerkInterface {
   };
 
   #shouldSyncWithPrimary = (): boolean => {
+    // TODO: Remove this in the minor release
     if (this.#isReturningFromPrimary()) {
       this.#replacePrimaryReferrerWithClerkSynced();
       return false;
     }
 
     if (this.#hasJustSynced()) {
-      this.#clearJustSynced();
+      if (!this.#options.isInterstitial) {
+        this.#clearJustSynced();
+      }
       return false;
     }
 
