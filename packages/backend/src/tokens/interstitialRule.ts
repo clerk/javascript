@@ -187,10 +187,7 @@ async function verifyRequestState(options: AuthenticateRequestOptions, token: st
  * Let the next rule for UatMissing to fire if needed
  */
 export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
-  const { clientUat, isSatellite, searchParams, secretKey, apiKey, userAgent } = options;
-
-  const key = secretKey || apiKey || '';
-  const isDev = isDevelopmentFromApiKey(key);
+  const { clientUat, isSatellite, searchParams, userAgent } = options;
 
   const isSignedOut = !clientUat || clientUat === '0';
 
@@ -198,7 +195,7 @@ export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
     return signedOut(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
   }
 
-  if (isSatellite && isSignedOut && !hasJustSynced(searchParams) && !isDev) {
+  if (isSatellite && isSignedOut && !hasJustSynced(searchParams)) {
     return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
   }
 

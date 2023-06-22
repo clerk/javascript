@@ -716,6 +716,12 @@ export default class Clerk implements ClerkInterface {
     const searchParams = new URLSearchParams({
       [CLERK_REFERRER_PRIMARY]: 'true',
     });
+
+    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
+    if (!satelliteUrl || !isHttpOrHttps(satelliteUrl)) {
+      clerkRedirectUrlIsMissingScheme();
+    }
+
     const backToSatelliteUrl = buildURL(
       { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
       { stringify: true },
@@ -1126,26 +1132,6 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    if (!this.proxyUrl && !this.domain) {
-      clerkMissingProxyUrlAndDomain();
-    }
-
-    return this.#shouldSyncWithPrimaryInDevelopment() || this.#shouldSyncWithPrimaryInProduction();
-  };
-
-  #shouldSyncWithPrimaryInDevelopment = (): boolean => {
-    if (this.#instanceType === 'development' && !this.#options.signInUrl) {
-      clerkMissingSignInUrlAsSatellite();
-    }
-
-    return this.#instanceType === 'development';
-  };
-
-  #shouldSyncWithPrimaryInProduction = (): boolean => {
-    if (this.#instanceType === 'development') {
-      return false;
-    }
-
     const cookieHandler = createCookieHandler();
     return cookieHandler.getClientUatCookie() <= 0;
   };
@@ -1160,48 +1146,80 @@ export default class Clerk implements ClerkInterface {
     }
 
     const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
-    if (!satelliteUrl) {
-      return false;
-    }
-
-    if (!isHttpOrHttps(satelliteUrl)) {
-      clerkRedirectUrlIsMissingScheme();
-    }
-
-    return true;
+    return !!satelliteUrl;
   };
 
   #syncWithPrimary = async () => {
-    if (this.#shouldSyncWithPrimaryInDevelopment()) {
+    if (this.instanceType === 'development') {
       await this.navigate(this.#buildSyncUrlForDevelopmentInstances());
-    } else if (this.#shouldSyncWithPrimaryInProduction()) {
+    } else if (this.instanceType === 'production') {
       await this.navigate(this.#buildSyncUrlForProductionInstances());
     }
   };
 
+  #validateMultiDomainOptions = () => {
+    if (!this.isSatellite) {
+      return;
+    }
+    if (this.#instanceType === 'development' && !this.#options.signInUrl) {
+      clerkMissingSignInUrlAsSatellite();
+    }
+
+    if (!this.proxyUrl && !this.domain) {
+      clerkMissingProxyUrlAndDomain();
+    }
+  };
+
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    // Dev Browser handling
+    /**
+     * 1. Create the devBrowser.
+     * At this point the devBrowser is not yet setup, but its API is ready for use
+     * Multi-domain SSO needs this handler to be initiated
+     */
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
     });
 
+    /**
+     * 2. Multi-domain SSO handling
+     * If needed the app will attempt to sync with another app hosted in a different domain in order to acquire a session
+     * - for development instances it populates dev browser JWT and `devBrowserHandler.setup()` should not have run.
+     */
+    this.#validateMultiDomainOptions();
+    if (this.#shouldSyncWithPrimary()) {
+      await this.#syncWithPrimary();
+      // ClerkJS is not considered loaded during the sync/link process with the primary domain
+      return false;
+    }
+
+    /**
+     * 3. Setup dev browser.
+     * This is not needed for production instances hence the .clear()
+     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
+     * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
+     */
     if (this.#instanceType === 'production') {
       await this.#devBrowserHandler.clear();
     } else {
       await this.#devBrowserHandler.setup();
     }
 
-    // Multidomain SSO handling
-    if (this.#shouldSyncWithPrimary()) {
-      await this.#syncWithPrimary();
-      // ClerkJS is not considered loaded during the sync/link process with the primary domain
-      return false;
-    } else if (this.#shouldRedirectToSatellite()) {
+    /**
+     * 4. If the app is considered a primary domain and is in the middle of the sync/link flow, interact the loading of Clerk and redirect back to the satellite app
+     * Initially step 2 and 4 were considered one but for step 2 we need devBrowserHandler.setup() to not have run and step 4 requires a valid dev browser JWT
+     */
+    if (this.#shouldRedirectToSatellite()) {
       await this.#redirectToSatellite();
       return false;
     }
 
+    /**
+     * 5. Continue with clerk-js setup.
+     * - Fetch & update environment
+     * - Fetch & update client
+     * - Mount components
+     */
     this.#authService = new SessionCookieService(this);
     this.#pageLifecycle = createPageLifecycle();
 
