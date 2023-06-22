@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.21.9
+
+### Patch Changes
+
+- Add isApiRoute to AfterAuthHandler['auth'] type ([#1397](https://github.com/clerkinc/javascript/pull/1397)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.21.8
 
 ### Patch Changes

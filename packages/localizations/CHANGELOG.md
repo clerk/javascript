@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.21.1
+
+### Patch Changes
+
+- Add missing `fr-FR` translations for reset password page ([#1398](https://github.com/clerkinc/javascript/pull/1398)) by [@kohort-aymeric](https://github.com/kohort-aymeric)
+
+- Make resend link/code message clearer. ([#1390](https://github.com/clerkinc/javascript/pull/1390)) by [@desiprisg](https://github.com/desiprisg)
+
+- Add missing pt-BR translations ([#1388](https://github.com/clerkinc/javascript/pull/1388)) by [@Gustavo-Pauli](https://github.com/Gustavo-Pauli)
+
 ## 1.21.0
 
 ### Minor Changes
