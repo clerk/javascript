@@ -1,7 +1,7 @@
 import { addYears } from '@clerk/shared';
 import type { ClientResource } from '@clerk/types';
 
-import { inCrossOriginIframe } from '../../utils';
+import { inSecureCrossOriginIframe } from '../../utils';
 import { getAllETLDs } from '../url';
 import { clientCookie } from './client';
 import { clientUatCookie } from './client_uat';
@@ -22,7 +22,8 @@ export const createCookieHandler = () => {
   const setDevBrowserInittedCookie = () =>
     inittedCookie.set('1', {
       expires: addYears(Date.now(), 1),
-      sameSite: inCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE,
+      sameSite: inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE,
+      secure: inSecureCrossOriginIframe() ? true : undefined,
       path: COOKIE_PATH,
     });
 
@@ -30,8 +31,8 @@ export const createCookieHandler = () => {
 
   const setSessionCookie = (token: string) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = inCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE;
-    const secure = window.location.protocol === 'https:';
+    const sameSite = inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE;
+    const secure = inSecureCrossOriginIframe() || window.location.protocol === 'https:';
 
     return sessionCookie.set(token, {
       expires,
