@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
-import { SECRET_KEY, USE_X_FWD_HEADERS } from './clerkClient';
+import { SECRET_KEY, TRUST_HOST } from './clerkClient';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import { receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
@@ -61,16 +61,28 @@ type RouteMatcherParam =
 type IgnoredRoutesParam = Array<RegExp | string> | RegExp | string | ((req: NextRequest) => boolean);
 type ApiRoutesParam = IgnoredRoutesParam;
 
-type NextRequestWithClerkUrl = NextRequest & { experimental_clerkUrl: NextRequest['nextUrl'] };
+type WithClerkUrl<T> = T & {
+  /**
+   * When a NextJs app is hosted on a platform different from Vercel
+   * or inside a container (Netlify, Fly.io, AWS Amplify, docker etc),
+   * req.url is always set to `localhost:3000` instead of the actual host of the app.
+   *
+   * If the CLERK_TRUST_HOST environment variable is set to "true",
+   * `authMiddleware` will use the value of the available req.headers in order to construct
+   * and use the correct url internally. This url is then exposed as `experimental_clerkUrl`,
+   * intended to be used within `beforeAuth` and `afterAuth` if needed.
+   */
+  experimental_clerkUrl: NextRequest['nextUrl'];
+};
 
 type BeforeAuthHandler = (
-  req: NextRequestWithClerkUrl,
+  req: WithClerkUrl<NextRequest>,
   evt: NextFetchEvent,
 ) => NextMiddlewareResult | Promise<NextMiddlewareResult> | false | Promise<false>;
 
 type AfterAuthHandler = (
   auth: AuthObject & { isPublicRoute: boolean; isApiRoute: boolean },
-  req: NextRequestWithClerkUrl,
+  req: WithClerkUrl<NextRequest>,
   evt: NextFetchEvent,
 ) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
 
@@ -127,8 +139,8 @@ const getFirstValueFromHeader = (req: NextRequest, key: string) => {
   return value?.split(',')[0];
 };
 
-const withNormalizedClerkUrl = (req: NextRequest): NextRequestWithClerkUrl => {
-  if (!USE_X_FWD_HEADERS) {
+const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => {
+  if (!TRUST_HOST) {
     return Object.assign(req, { experimental_clerkUrl: req.nextUrl });
   }
   const clerkUrl = req.nextUrl.clone();
@@ -238,7 +250,7 @@ const createDefaultAfterAuth = (
   isPublicRoute: ReturnType<typeof createRouteMatcher>,
   isApiRoute: ReturnType<typeof createApiRoutes>,
 ) => {
-  return (auth: AuthObject, req: NextRequestWithClerkUrl) => {
+  return (auth: AuthObject, req: WithClerkUrl<NextRequest>) => {
     if (!auth.userId && !isPublicRoute(req) && isApiRoute(req)) {
       return apiEndpointUnauthorizedNextResponse();
     } else if (!auth.userId && !isPublicRoute(req)) {
@@ -280,7 +292,7 @@ const withDefaultPublicRoutes = (publicRoutes: RouteMatcherParam | undefined) =>
 
 // Grabs the dev browser JWT from cookies and appends it to the redirect URL when redirecting to cross-origin.
 // Middleware runs on the server side, before clerk-js is loaded, that's why we need Cookies.
-const appendDevBrowserOnCrossOrigin = (req: NextRequestWithClerkUrl, res: Response) => {
+const appendDevBrowserOnCrossOrigin = (req: WithClerkUrl<NextRequest>, res: Response) => {
   const location = res.headers.get('location');
   const shouldAppendDevBrowser = res.headers.get(constants.Headers.ClerkRedirectTo) === 'true';
   if (
@@ -304,12 +316,12 @@ const appendDevBrowserOnCrossOrigin = (req: NextRequestWithClerkUrl, res: Respon
 //
 // - If the user has provided a specific `apiRoutes` prop in `authMiddleware` then all the above are discarded,
 //   and only routes that match the user’s provided paths are considered API routes.
-const createApiRoutes = (apiRoutes: RouteMatcherParam | undefined): ((req: NextRequestWithClerkUrl) => boolean) => {
+const createApiRoutes = (apiRoutes: RouteMatcherParam | undefined): ((req: WithClerkUrl<NextRequest>) => boolean) => {
   if (apiRoutes) {
     return createRouteMatcher(apiRoutes);
   }
   const isDefaultApiRoute = createRouteMatcher(DEFAULT_API_ROUTES);
-  return (req: NextRequestWithClerkUrl) =>
+  return (req: WithClerkUrl<NextRequest>) =>
     isDefaultApiRoute(req) || isRequestMethodIndicatingApiRoute(req) || isRequestContentTypeJson(req);
 };
 
