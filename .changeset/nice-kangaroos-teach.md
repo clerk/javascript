@@ -2,4 +2,4 @@
 '@clerk/nextjs': patch
 ---
 
-Support non-Vercel platforms to override hostname of the url to fix the `localhost:3000` redirect from authMiddleware
+Support hosting NextJs apps on non-Vercel platforms by constructing req.url using host-related headers instead of using on `req.url` directly. In order to enable this feature, set the `CLERK_TRUST_HOST` env variable to `true` 
