@@ -17,7 +17,26 @@ import crypto from '#crypto';
 // @ts-expect-error
 import * as fetchApisPolyfill from '#fetch';
 
-const { default: fetch, AbortController, Blob, FormData, Headers, Request, Response } = fetchApisPolyfill;
+const {
+  default: fetch,
+  RuntimeAbortController,
+  RuntimeBlob,
+  RuntimeFormData,
+  RuntimeHeaders,
+  RuntimeRequest,
+  RuntimeResponse,
+} = fetchApisPolyfill;
+
+// @ts-ignore
+console.log(__BUILD__, {
+  fetch,
+  RuntimeAbortController,
+  RuntimeBlob,
+  RuntimeFormData,
+  RuntimeHeaders,
+  RuntimeRequest,
+  RuntimeResponse,
+});
 
 type Runtime = {
   crypto: Crypto;
@@ -42,12 +61,12 @@ const globalFetch = fetch.bind(globalThis);
 const runtime: Runtime = {
   crypto,
   fetch: globalFetch,
-  AbortController,
-  Blob,
-  FormData,
-  Headers,
-  Request,
-  Response,
+  AbortController: RuntimeAbortController,
+  Blob: RuntimeBlob,
+  FormData: RuntimeFormData,
+  Headers: RuntimeHeaders,
+  Request: RuntimeRequest,
+  Response: RuntimeResponse,
 };
 
 export default runtime;
