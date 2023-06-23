@@ -59,15 +59,7 @@ describe('withClerkMiddleware(options)', () => {
       expect.objectContaining({
         secretKey: 'TEST_API_KEY',
         apiKey: 'TEST_API_KEY',
-        headerToken: 'deadbeef',
-        cookieToken: undefined,
-        clientUat: undefined,
-        origin: 'http://origin.com',
-        host: 'host.com',
-        forwardedPort: '1234',
-        forwardedHost: 'forwarded-host.com',
-        referrer: 'referer.com',
-        userAgent: 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+        request: expect.any(Request),
       }),
     );
   });
@@ -107,15 +99,7 @@ describe('withClerkMiddleware(options)', () => {
       expect.objectContaining({
         secretKey: 'TEST_API_KEY',
         apiKey: 'TEST_API_KEY',
-        cookieToken: 'deadbeef',
-        headerToken: undefined,
-        clientUat: '1675692233',
-        origin: 'http://origin.com',
-        host: 'host.com',
-        forwardedPort: '1234',
-        forwardedHost: 'forwarded-host.com',
-        referrer: 'referer.com',
-        userAgent: 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+        request: expect.any(Request),
       }),
     );
   });
@@ -211,9 +195,7 @@ describe('withClerkMiddleware(options)', () => {
       expect.objectContaining({
         secretKey: 'TEST_API_KEY',
         apiKey: 'TEST_API_KEY',
-        headerToken: 'deadbeef',
-        cookieToken: undefined,
-        clientUat: undefined,
+        request: expect.any(Request),
       }),
     );
   });

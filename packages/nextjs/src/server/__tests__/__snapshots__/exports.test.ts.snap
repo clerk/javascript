@@ -48,6 +48,7 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "constants",
   "createAuthenticateRequest",
   "createClerkClient",
+  "createIsomorphicRequest",
   "currentUser",
   "debugRequestState",
   "decodeJwt",

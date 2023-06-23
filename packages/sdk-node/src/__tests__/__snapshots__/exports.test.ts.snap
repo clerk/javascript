@@ -36,6 +36,7 @@ exports[`module exports should not change unless explicitly set 1`] = `
   "createClerkClient",
   "createClerkExpressRequireAuth",
   "createClerkExpressWithAuth",
+  "createIsomorphicRequest",
   "debugRequestState",
   "decodeJwt",
   "default",

@@ -1,4 +1,4 @@
-import { constants } from '@clerk/backend';
+import { constants, createIsomorphicRequest } from '@clerk/backend';
 import type { Request } from 'express';
 
 import { authenticateRequest } from './authenticateRequest';
@@ -25,7 +25,7 @@ describe('authenticateRequest', () => {
         referer: 'referer',
         'user-agent': 'user-agent',
       },
-      url: '/whatever?__query=true',
+      url: 'https://example.com/whatever?__query=true',
     } as any as Request;
 
     const options = {
@@ -41,6 +41,14 @@ describe('authenticateRequest', () => {
     const searchParams = new URLSearchParams();
     searchParams.set('__query', 'true');
 
+    const expectedIsomorphicRequest = createIsomorphicRequest((Request, Headers) => {
+      // @ts-ignore
+      return new Request(req.url, {
+        // @ts-ignore
+        headers: new Headers(req.headers),
+      });
+    });
+
     await authenticateRequest({
       clerkClient: clerkClient as any,
       apiKey,
@@ -50,26 +58,20 @@ describe('authenticateRequest', () => {
       req,
       options,
     });
-    expect(clerkClient.authenticateRequest).toHaveBeenCalledWith({
-      authorizedParties: ['party1'],
-      clientUat: 'token',
-      cookieToken: 'token',
-      forwardedHost: 'host',
-      forwardedPort: 'port',
-      apiKey: apiKey,
-      secretKey: secretKey,
-      frontendApi: frontendApi,
-      publishableKey: publishableKey,
-      headerToken: 'token',
-      host: 'host',
-      jwtKey: 'jwtKey',
-      referrer: 'referer',
-      userAgent: 'user-agent',
-      isSatellite: false,
-      proxyUrl: '',
-      signInUrl: '',
-      domain: '',
-      searchParams,
-    });
+    expect(clerkClient.authenticateRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        authorizedParties: ['party1'],
+        apiKey: apiKey,
+        secretKey: secretKey,
+        frontendApi: frontendApi,
+        publishableKey: publishableKey,
+        jwtKey: 'jwtKey',
+        isSatellite: false,
+        proxyUrl: '',
+        signInUrl: '',
+        domain: '',
+        request: expect.objectContaining(expectedIsomorphicRequest),
+      }),
+    );
   });
 });

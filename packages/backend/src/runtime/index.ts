@@ -27,17 +27,6 @@ const {
   RuntimeResponse,
 } = fetchApisPolyfill;
 
-// @ts-ignore
-console.log(__BUILD__, {
-  fetch,
-  RuntimeAbortController,
-  RuntimeBlob,
-  RuntimeFormData,
-  RuntimeHeaders,
-  RuntimeRequest,
-  RuntimeResponse,
-});
-
 type Runtime = {
   crypto: Crypto;
   fetch: typeof global.fetch;

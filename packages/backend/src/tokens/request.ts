@@ -1,7 +1,7 @@
 import { API_URL, API_VERSION, constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { isDevelopmentFromApiKey } from '../util/instance';
-import { parseIsomorphicRequestCookies } from '../util/IsomorphicRequest';
+import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { parsePublishableKey } from '../util/parsePublishableKey';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
@@ -117,34 +117,24 @@ function assertProxyUrlOrDomain(proxyUrlOrDomain: string | undefined) {
 }
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
-  const { request: isomorphicRequest } = options;
-  const isomorphicRequestCookies = isomorphicRequest ? parseIsomorphicRequestCookies(isomorphicRequest) : undefined;
-  const isomorphicRequestSearchParams = isomorphicRequest?.url
-    ? new URL(isomorphicRequest.url)?.searchParams
-    : undefined;
+  const { cookies, headers, searchParams } = buildRequest(options?.request);
 
   options = {
     ...options,
     frontendApi: parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi,
     apiUrl: options.apiUrl || API_URL,
     apiVersion: options.apiVersion || API_VERSION,
-    headerToken:
-      stripAuthorizationHeader(options.headerToken) ||
-      stripAuthorizationHeader(isomorphicRequest?.headers?.get(constants.Headers.Authorization)) ||
-      undefined,
-    cookieToken: options.cookieToken || isomorphicRequestCookies?.(constants.Cookies.Session) || undefined,
-    clientUat: options.clientUat || isomorphicRequestCookies?.(constants.Cookies.ClientUat) || undefined,
-    origin: options.origin || isomorphicRequest?.headers?.get(constants.Headers.Origin) || undefined,
-    host: options.host || isomorphicRequest?.headers?.get(constants.Headers.Host) || undefined,
-    forwardedHost:
-      options.forwardedHost || isomorphicRequest?.headers?.get(constants.Headers.ForwardedHost) || undefined,
-    forwardedPort:
-      options.forwardedPort || isomorphicRequest?.headers?.get(constants.Headers.ForwardedPort) || undefined,
-    forwardedProto:
-      options.forwardedProto || isomorphicRequest?.headers?.get(constants.Headers.ForwardedProto) || undefined,
-    referrer: options.referrer || isomorphicRequest?.headers?.get(constants.Headers.Referrer) || undefined,
-    userAgent: options.userAgent || isomorphicRequest?.headers?.get(constants.Headers.UserAgent) || undefined,
-    searchParams: options.searchParams || isomorphicRequestSearchParams || undefined,
+    headerToken: stripAuthorizationHeader(options.headerToken || headers?.(constants.Headers.Authorization)),
+    cookieToken: options.cookieToken || cookies?.(constants.Cookies.Session),
+    clientUat: options.clientUat || cookies?.(constants.Cookies.ClientUat),
+    origin: options.origin || headers?.(constants.Headers.Origin),
+    host: options.host || headers?.(constants.Headers.Host),
+    forwardedHost: options.forwardedHost || headers?.(constants.Headers.ForwardedHost),
+    forwardedPort: options.forwardedPort || headers?.(constants.Headers.ForwardedPort),
+    forwardedProto: options.forwardedProto || headers?.(constants.Headers.ForwardedProto),
+    referrer: options.referrer || headers?.(constants.Headers.Referrer),
+    userAgent: options.userAgent || headers?.(constants.Headers.UserAgent),
+    searchParams: options.searchParams || searchParams || undefined,
   };
 
   assertValidSecretKey(options.secretKey || options.apiKey);
@@ -218,7 +208,3 @@ export const debugRequestState = (params: RequestState) => {
 };
 
 export type DebugRequestSate = ReturnType<typeof debugRequestState>;
-
-const stripAuthorizationHeader = (authValue: string | undefined | null): string | undefined => {
-  return authValue?.replace('Bearer ', '');
-};

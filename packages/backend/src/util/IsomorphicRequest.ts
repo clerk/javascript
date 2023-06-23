@@ -2,19 +2,24 @@ import { parse } from 'cookie';
 
 import runtime from '../runtime';
 
-type IsomorphicRequestOptions = {
-  headers?: Record<string, string> | any;
+type IsomorphicRequestOptions = (Request: typeof runtime.Request, Headers: typeof runtime.Headers) => Request;
+export const createIsomorphicRequest = (cb: IsomorphicRequestOptions): Request => {
+  return cb(runtime.Request, runtime.Headers);
 };
 
-export const createIsomorphicRequest = (url: string | URL, reqOpts?: IsomorphicRequestOptions): Request => {
-  const headers = reqOpts?.headers;
-  // if (!!reqOpts?.headers && typeof headers.forEach === 'function') {
-  //   headers = {};
-  //   reqOpts?.headers.forEach((value: string, key: string) => {
-  //     headers = Object.assign(headers, { [key]: value });
-  //   });
-  // }
-  return new runtime.Request(url, { ...reqOpts, headers });
+export const buildRequest = (req?: Request) => {
+  if (!req) {
+    return {};
+  }
+  const cookies = parseIsomorphicRequestCookies(req);
+  const headers = getHeaderFromIsomorphicRequest(req);
+  const searchParams = getSearchParamsFromIsomorphicRequest(req);
+
+  return {
+    cookies,
+    headers,
+    searchParams,
+  };
 };
 
 const decode = (str: string): string => {
@@ -24,7 +29,7 @@ const decode = (str: string): string => {
   return str.replace(/(%[0-9A-Z]{2})+/g, decodeURIComponent);
 };
 
-export const parseIsomorphicRequestCookies = (req: Request) => {
+const parseIsomorphicRequestCookies = (req: Request) => {
   const cookies = req.headers && req.headers?.get('cookie') ? parse(req.headers.get('cookie') as string) : {};
   return (key: string): string | undefined => {
     const value = cookies?.[key];
@@ -33,4 +38,12 @@ export const parseIsomorphicRequestCookies = (req: Request) => {
     }
     return decode(value);
   };
+};
+
+const getHeaderFromIsomorphicRequest = (req: Request) => (key: string) => req?.headers?.get(key) || undefined;
+
+const getSearchParamsFromIsomorphicRequest = (req: Request) => (req?.url ? new URL(req.url)?.searchParams : undefined);
+
+export const stripAuthorizationHeader = (authValue: string | undefined | null): string | undefined => {
+  return authValue?.replace('Bearer ', '');
 };
