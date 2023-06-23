@@ -134,22 +134,6 @@ export interface AuthMiddleware {
   (params?: AuthMiddlewareParams): NextMiddleware;
 }
 
-const getFirstValueFromHeader = (req: NextRequest, key: string) => {
-  const value = req.headers.get(key);
-  return value?.split(',')[0];
-};
-
-const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => {
-  if (!TRUST_HOST) {
-    return Object.assign(req, { experimental_clerkUrl: req.nextUrl });
-  }
-  const clerkUrl = req.nextUrl.clone();
-  clerkUrl.protocol = getFirstValueFromHeader(req, constants.Headers.ForwardedProto) ?? clerkUrl.protocol;
-  clerkUrl.host = getFirstValueFromHeader(req, constants.Headers.ForwardedHost) ?? clerkUrl.host;
-  clerkUrl.port = getFirstValueFromHeader(req, constants.Headers.ForwardedPort) ?? clerkUrl.port;
-  return Object.assign(req, { experimental_clerkUrl: clerkUrl });
-};
-
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
   const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...options } = params;
@@ -376,3 +360,19 @@ A bug that may have already been fixed in the latest version of Clerk NextJS pac
 How to resolve:
 -> Make sure you are using the latest version of '@clerk/nextjs' and 'next'.
   `;
+
+const getFirstValueFromHeader = (req: NextRequest, key: string) => {
+  const value = req.headers.get(key);
+  return value?.split(',')[0];
+};
+
+const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => {
+  if (!TRUST_HOST) {
+    return Object.assign(req, { experimental_clerkUrl: req.nextUrl });
+  }
+  const clerkUrl = req.nextUrl.clone();
+  clerkUrl.protocol = getFirstValueFromHeader(req, constants.Headers.ForwardedProto) ?? clerkUrl.protocol;
+  clerkUrl.host = getFirstValueFromHeader(req, constants.Headers.ForwardedHost) ?? clerkUrl.host;
+  clerkUrl.port = getFirstValueFromHeader(req, constants.Headers.ForwardedPort) ?? clerkUrl.port;
+  return Object.assign(req, { experimental_clerkUrl: clerkUrl });
+};
