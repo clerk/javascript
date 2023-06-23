@@ -6,12 +6,31 @@
   "types": "./dist/types/index.d.ts",
   "main": "./dist/index.js",
   "module": "./dist/esm/index.js",
+  "imports": {
+    "#crypto": {
+      "edge-light": "./dist/runtime/browser/crypto.mjs",
+      "worker": "./dist/runtime/browser/crypto.mjs",
+      "browser": "./dist/runtime/browser/crypto.mjs",
+      "node": "./dist/runtime/node/crypto.js",
+      "default": "./dist/runtime/browser/crypto.mjs"
+    },
+    "#fetch": {
+      "edge-light": "./dist/runtime/browser/fetch.mjs",
+      "worker": "./dist/runtime/browser/fetch.mjs",
+      "browser": "./dist/runtime/browser/fetch.mjs",
+      "node": "./dist/runtime/node/fetch.js",
+      "default": "./dist/runtime/browser/fetch.mjs"
+    }
+  },
   "files": [
     "dist"
   ],
   "scripts": {
+    "build": "tsup",
     "dev": "tsup --watch",
-    "build": "run-s clean build:runtime build:lib",
+    "dev:publish": "npm run dev -- --env.publish",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "publish:local": "npx yalc push --replace --sig",
     "build:lib": "tsup --env.NODE_ENV production",
     "build:tests": "tsc -p tsconfig.test.json",
     "build:runtime": "rsync -r --include '*/' --include '*.js' --include '*.mjs' --exclude='*' src/runtime dist",
@@ -54,22 +73,6 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "imports": {
-    "#crypto": {
-      "edge-light": "./dist/runtime/browser/crypto.mjs",
-      "worker": "./dist/runtime/browser/crypto.mjs",
-      "browser": "./dist/runtime/browser/crypto.mjs",
-      "node": "./dist/runtime/node/crypto.js",
-      "default": "./dist/runtime/browser/crypto.mjs"
-    },
-    "#fetch": {
-      "edge-light": "./dist/runtime/browser/fetch.mjs",
-      "worker": "./dist/runtime/browser/fetch.mjs",
-      "browser": "./dist/runtime/browser/fetch.mjs",
-      "node": "./dist/runtime/node/fetch.js",
-      "default": "./dist/runtime/browser/fetch.mjs"
-    }
   },
   "homepage": "https://clerk.com/",
   "repository": {
