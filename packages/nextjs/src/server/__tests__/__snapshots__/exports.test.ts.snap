@@ -37,6 +37,7 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "SMSMessage",
   "Session",
   "SignInToken",
+  "TRUST_HOST",
   "Token",
   "User",
   "Verification",
