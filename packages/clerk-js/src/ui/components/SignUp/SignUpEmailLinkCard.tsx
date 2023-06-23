@@ -77,7 +77,7 @@ export const SignUpEmailLinkCard = () => {
         formSubtitle={localizationKeys('signUp.emailLink.formSubtitle')}
         resendButton={localizationKeys('signUp.emailLink.resendButton')}
         onResendCodeClicked={restartVerification}
-        safeIdentifier={signUp.emailAddress || ''}
+        safeIdentifier={signUp.emailAddress}
       />
     </Flow.Part>
   );
