@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.50.1
+
+### Patch Changes
+
+- Set the `__session` cookie with `samesite:none` for secure iframes only ([#1403](https://github.com/clerkinc/javascript/pull/1403)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`137322862`](https://github.com/clerkinc/javascript/commit/137322862f346f0515ff78090b1c19cadc487d3e), [`741012544`](https://github.com/clerkinc/javascript/commit/741012544a12d34c4e4204626a00f7b1d6a88a05), [`0b55cdf27`](https://github.com/clerkinc/javascript/commit/0b55cdf2766ea2a0eb2dfe7c42c589816d77e077)]:
+  - @clerk/localizations@1.21.1
+
 ## 4.50.0
 
 ### Minor Changes
