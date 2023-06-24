@@ -19,3 +19,4 @@ export { csCZ } from './cs-CZ';
 export { zhCN } from './zh-CN';
 export { koKR } from './ko-KR';
 export { nbNO } from './nb-NO';
+export { viVN } from './vi-VN';

@@ -12,7 +12,7 @@ const commonTexts = {
   },
 } as const;
 
-export const enUS: LocalizationResource = {
+export const viVN: LocalizationResource = {
   locale: 'vi-VN',
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
   dividerText: 'hoặc',
