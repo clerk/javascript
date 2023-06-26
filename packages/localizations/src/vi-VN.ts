@@ -458,7 +458,8 @@ export const viVN: LocalizationResource = {
       authenticatorApp: {
         infoText__ableToScan:
           'Thiết lập một phương thức đăng nhập mới trong ứng dụng xác thực của bạn và quét mã QR dưới đây để liên kết nó với tài khoản của bạn.',
-        infoText__unableToScan: 'Thiết lập một phương thức đăng nhập mới trong ứng dụng xác thực và nhập Khóa được cung cấp bên dưới.',
+        infoText__unableToScan:
+          'Thiết lập một phương thức đăng nhập mới trong ứng dụng xác thực và nhập Khóa được cung cấp bên dưới.',
         inputLabel__unableToScan1:
           'Đảm bảo đã kích hoạt mật khẩu dựa trên thời gian hoặc mật khẩu một lần, sau đó hoàn thành việc liên kết tài khoản của bạn.',
         inputLabel__unableToScan2:
@@ -506,7 +507,8 @@ export const viVN: LocalizationResource = {
     },
     deletePage: {
       title: 'Xóa tài khoản',
-      description: 'Bạn có chắc chắn muốn xóa tài khoản của mình không? Hành động này là vĩnh viễn và không thể hoàn tác.',
+      description:
+        'Bạn có chắc chắn muốn xóa tài khoản của mình không? Hành động này là vĩnh viễn và không thể hoàn tác.',
       confirm: 'Xóa tài khoản',
     },
   },
