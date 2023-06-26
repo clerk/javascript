@@ -361,18 +361,28 @@ How to resolve:
 -> Make sure you are using the latest version of '@clerk/nextjs' and 'next'.
   `;
 
-const getFirstValueFromHeader = (req: NextRequest, key: string) => {
-  const value = req.headers.get(key);
-  return value?.split(',')[0];
-};
+const getHeader = (req: NextRequest, key: string) => req.headers.get(key);
+const getFirstValueFromHeader = (req: NextRequest, key: string) => getHeader(req, key)?.split(',')[0];
 
 const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => {
   if (!TRUST_HOST) {
     return Object.assign(req, { experimental_clerkUrl: req.nextUrl });
   }
+
   const clerkUrl = req.nextUrl.clone();
-  clerkUrl.protocol = getFirstValueFromHeader(req, constants.Headers.ForwardedProto) ?? clerkUrl.protocol;
-  clerkUrl.host = getFirstValueFromHeader(req, constants.Headers.ForwardedHost) ?? clerkUrl.host;
-  clerkUrl.port = getFirstValueFromHeader(req, constants.Headers.ForwardedPort) ?? clerkUrl.port;
+
+  const host = getFirstValueFromHeader(req, constants.Headers.ForwardedHost);
+  const protocol = getFirstValueFromHeader(req, constants.Headers.ForwardedProto);
+  const port = getFirstValueFromHeader(req, constants.Headers.ForwardedPort);
+
+  const isHttpRelatedProtocol = protocol && ['http', 'https'].includes(protocol);
+  const isHttpRelatedPort = port && ['80', '443'].includes(port);
+  if (isHttpRelatedProtocol && isHttpRelatedPort) {
+    clerkUrl.port = '';
+  }
+
+  clerkUrl.protocol = protocol ?? clerkUrl.protocol;
+  clerkUrl.host = host ?? clerkUrl.host;
+
   return Object.assign(req, { experimental_clerkUrl: clerkUrl });
 };
