@@ -31,4 +31,5 @@ export interface PhoneNumberResource extends ClerkResource {
   makeDefaultSecondFactor: () => Promise<PhoneNumberResource>;
   setReservedForSecondFactor: (params: SetReservedForSecondFactorParams) => Promise<PhoneNumberResource>;
   destroy: () => Promise<void>;
+  create: () => Promise<PhoneNumberResource>;
 }
