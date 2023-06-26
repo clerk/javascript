@@ -1,5 +1,28 @@
 # Change Log
 
+## 4.50.1
+
+### Patch Changes
+
+- Set the `__session` cookie with `samesite:none` for secure iframes only ([#1403](https://github.com/clerkinc/javascript/pull/1403)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`137322862`](https://github.com/clerkinc/javascript/commit/137322862f346f0515ff78090b1c19cadc487d3e), [`741012544`](https://github.com/clerkinc/javascript/commit/741012544a12d34c4e4204626a00f7b1d6a88a05), [`0b55cdf27`](https://github.com/clerkinc/javascript/commit/0b55cdf2766ea2a0eb2dfe7c42c589816d77e077)]:
+  - @clerk/localizations@1.21.1
+
+## 4.50.0
+
+### Minor Changes
+
+- Add ability for organization admins to delete an organization if they have permission to do so ([#1368](https://github.com/clerkinc/javascript/pull/1368)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Support cross-origin iframe to use session cookie ([#1389](https://github.com/clerkinc/javascript/pull/1389)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`bfb3af28`](https://github.com/clerkinc/javascript/commit/bfb3af28eb69d47e31f2b846d1ecc309fd885704)]:
+  - @clerk/localizations@1.21.0
+  - @clerk/types@3.46.0
+
 ## 4.49.0
 
 ### Minor Changes

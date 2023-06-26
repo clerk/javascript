@@ -87,7 +87,7 @@ WIP
 7. [Open a Pull Request](https://github.com/clerkinc/javascript/compare?expand=1). Make sure the description includes enough information for the reviewer to understand what the PR is about.
 8. Follow the instructions of the pull request template
 
-### Changeset
+### Changesets
 
 For more details about changesets, see [Adding a Changeset](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md).
 A changeset is a piece of information about changes made in a branch or commit. It holds three bits of information:
@@ -120,6 +120,12 @@ Tips:
 
 - Changesets are just markdown files. Feel free to add as much markdown as you want to better describe the change.
 - Multiple changesets can be added in a single PR if needed, please see [Tips on adding changesets](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md#you-can-add-more-than-one-changeset-to-a-pull-request)
+
+#### Why We Use Changesets
+
+Great release notes and changelogs are an incredibly important trait of good software. We are always working hard at Clerk to bring updates and improvements to our libraries. And while we believe that this is a good thing, it also means we need to be responsible to our users in making clear what these changes are in a way that is as brief, clear, and understandable as possible. We have all seen libraries that publish changelogs as a list of commits, and I don't think many would argue that while this makes it easy for library developers, it's far from ideal for library users. To reach the standards we have for our library users' experience with Clerk, there is nothing that beats hand-written changelogs by the developers who worked on the features, and this is exactly what changesets empowers us to provide.
+
+Changesets provides streamlined tooling and enforcement to ensure that developers working on features have as easy of a time as possible writing great changelogs, and puts together release notes for us at the quality bar that we strive for. Make sure to think from the perspecitve of a user when writing changesets to make it crystal clear what your feature is, what impact is has on the library, how to use it, and how to find more detail, if relevant.
 
 ### Commit messages
 

@@ -1,6 +1,7 @@
 import { addYears } from '@clerk/shared';
 import type { ClientResource } from '@clerk/types';
 
+import { inSecureCrossOriginIframe } from '../../utils';
 import { getAllETLDs } from '../url';
 import { clientCookie } from './client';
 import { clientUatCookie } from './client_uat';
@@ -8,7 +9,11 @@ import { devBrowserCookie } from './devBrowser';
 import { inittedCookie } from './initted';
 import { sessionCookie } from './session';
 
+const DEFAULT_SAME_SITE = 'Lax';
+const IFRAME_SAME_SITE = 'None';
+
 const COOKIE_PATH = '/';
+
 export type CookieHandler = ReturnType<typeof createCookieHandler>;
 export const createCookieHandler = () => {
   // First party cookie helpers
@@ -17,7 +22,8 @@ export const createCookieHandler = () => {
   const setDevBrowserInittedCookie = () =>
     inittedCookie.set('1', {
       expires: addYears(Date.now(), 1),
-      sameSite: 'Lax',
+      sameSite: inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE,
+      secure: inSecureCrossOriginIframe() ? true : undefined,
       path: COOKIE_PATH,
     });
 
@@ -25,8 +31,8 @@ export const createCookieHandler = () => {
 
   const setSessionCookie = (token: string) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = 'Lax';
-    const secure = window.location.protocol === 'https:';
+    const sameSite = inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE;
+    const secure = inSecureCrossOriginIframe() || window.location.protocol === 'https:';
 
     return sessionCookie.set(token, {
       expires,

@@ -1,5 +1,27 @@
 # Change Log
 
+## 4.21.10
+
+### Patch Changes
+
+- Support hosting NextJs apps on non-Vercel platforms by constructing req.url using host-related headers instead of using on `req.url` directly. In order to enable this feature, set the `CLERK_TRUST_HOST` env variable to `true` ([#1394](https://github.com/clerkinc/javascript/pull/1394)) by [@dimkl](https://github.com/dimkl)
+
+## 4.21.9
+
+### Patch Changes
+
+- Add isApiRoute to AfterAuthHandler['auth'] type ([#1397](https://github.com/clerkinc/javascript/pull/1397)) by [@dimkl](https://github.com/dimkl)
+
+## 4.21.8
+
+### Patch Changes
+
+- Updated dependencies [[`bfb3af28`](https://github.com/clerkinc/javascript/commit/bfb3af28eb69d47e31f2b846d1ecc309fd885704)]:
+  - @clerk/types@3.46.0
+  - @clerk/backend@0.23.5
+  - @clerk/clerk-react@4.20.5
+  - @clerk/clerk-sdk-node@4.10.12
+
 ## 4.21.7
 
 ### Patch Changes

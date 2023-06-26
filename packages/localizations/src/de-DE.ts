@@ -321,6 +321,12 @@ export const deDE: LocalizationResource = {
         destructiveActionSubtitle: 'Entfernen Sie dieses Web3-Wallet aus Ihrem Konto',
         destructiveAction: 'Wallet entfernen',
       },
+      dangerSection: {
+        title: 'Achtung',
+        deleteAccountButton: 'Konto löschen',
+        deleteAccountTitle: 'Konto löschen',
+        deleteAccountDescription: 'Löschen Sie ihr Konto und alle damit verknüpften Daten',
+      },
     },
     profilePage: {
       title: 'Profil aktualisieren',

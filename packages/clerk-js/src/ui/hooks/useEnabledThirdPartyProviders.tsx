@@ -22,6 +22,8 @@ type ThirdPartyProviderToDataMap = {
   };
 };
 
+const oauthStrategies = OAUTH_PROVIDERS.map(p => p.strategy);
+
 const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries(
   [...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
     return [p.provider, { strategy: p.strategy, name: p.name, iconUrl: iconImageUrl(p.provider) }];
@@ -37,10 +39,14 @@ const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
 export const useEnabledThirdPartyProviders = () => {
   const { socialProviderStrategies, web3FirstFactors, authenticatableSocialStrategies } = useEnvironment().userSettings;
 
+  // Filter out any OAuth strategies that are not yet known, they are not included in our types.
+  const knownSocialProviderStrategies = socialProviderStrategies.filter(s => oauthStrategies.includes(s));
+  const knownAuthenticatableSocialStrategies = authenticatableSocialStrategies.filter(s => oauthStrategies.includes(s));
+
   return {
-    strategies: [...socialProviderStrategies, ...web3FirstFactors],
+    strategies: [...knownSocialProviderStrategies, ...web3FirstFactors],
     web3Strategies: [...web3FirstFactors],
-    authenticatableOauthStrategies: [...authenticatableSocialStrategies],
+    authenticatableOauthStrategies: [...knownAuthenticatableSocialStrategies],
     strategyToDisplayData: strategyToDisplayData,
     providerToDisplayData: providerToDisplayData,
   };
