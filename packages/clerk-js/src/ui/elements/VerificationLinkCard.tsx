@@ -12,7 +12,7 @@ import { IdentityPreview } from './IdentityPreview';
 import { TimerButton } from './TimerButton';
 
 type VerificationLinkCardProps = {
-  safeIdentifier: string;
+  safeIdentifier: string | undefined | null;
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
   formTitle: LocalizationKey;
