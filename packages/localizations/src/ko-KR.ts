@@ -576,7 +576,7 @@ export const koKR: LocalizationResource = {
     form_password_size_in_bytes_exceeded:
       '비밀번호가 허용되는 최대 바이트 수를 초과했습니다. 비밀번호를 줄이거나 일부 특수 문자를 제거해 주세요.',
     passwordComplexity: {
-      sentencePrefix: '당신의 비밀번호는 반드시 포함해야합니다.',
+      sentencePrefix: '당신의 비밀번호는 반드시 포함해야합니다',
       minimumLength: '{{length}} 또는 그이샹의 문자열',
       maximumLength: '{{length}} 보다 짧은 문자열',
       requireNumbers: '숫자',
