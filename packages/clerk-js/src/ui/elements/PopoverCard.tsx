@@ -57,7 +57,6 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
         theme => ({
           padding: `${theme.space.$6}`,
           paddingBottom: 0,
-          borderTop: `${theme.borders.$normal} ${theme.colors.$blackAlpha200}`,
           '&:empty': {
             padding: '0',
           },

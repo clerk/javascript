@@ -26,4 +26,5 @@ export interface EmailAddressResource extends ClerkResource {
   attemptVerification: (params: AttemptEmailAddressVerificationParams) => Promise<EmailAddressResource>;
   createMagicLinkFlow: () => CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, EmailAddressResource>;
   destroy: () => Promise<void>;
+  create: () => Promise<EmailAddressResource>;
 }
