@@ -1,5 +1,4 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
-import { isCrossOrigin } from '@clerk/shared';
 import {
   addClerkPrefix,
   handleValueOrFn,
@@ -654,18 +653,15 @@ export default class Clerk implements ClerkInterface {
   };
 
   public buildUrlWithAuth(to: string, options?: BuildUrlWithAuthParams): string {
-    if (
-      this.#instanceType === 'production' ||
-      !this.#devBrowserHandler?.usesUrlBasedSessionSync() ||
-      !isCrossOrigin(to, window.location.href)
-    ) {
+    if (this.#instanceType === 'production' || !this.#devBrowserHandler?.usesUrlBasedSessionSync()) {
       return to;
     }
 
-    //we have an absolute url inside `to` at this point because of the isCrossOrigin check
-
-    //do this to always keep the trailing lash
     const toURL = new URL(to, window.location.origin);
+
+    if (toURL.origin === window.location.origin) {
+      return toURL.href;
+    }
 
     const devBrowserJwt = this.#devBrowserHandler?.getDevBrowserJWT();
     if (!devBrowserJwt) {
