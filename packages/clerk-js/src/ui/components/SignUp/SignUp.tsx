@@ -12,9 +12,9 @@ import { SignUpVerifyEmail } from './SignUpVerifyEmail';
 import { SignUpVerifyPhone } from './SignUpVerifyPhone';
 
 function RedirectToSignUp() {
-  const { redirectToSignUp } = useCoreClerk();
+  const clerk = useCoreClerk();
   React.useEffect(() => {
-    void redirectToSignUp();
+    void clerk.redirectToSignUp();
   }, []);
   return null;
 }

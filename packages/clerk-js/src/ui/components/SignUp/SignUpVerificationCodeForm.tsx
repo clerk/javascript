@@ -15,7 +15,7 @@ type SignInFactorOneCodeFormProps = {
   resendButton: LocalizationKey;
   prepare: () => Promise<SignUpResource> | undefined;
   attempt: (code: string) => Promise<SignUpResource>;
-  safeIdentifier: string | undefined | null;
+  safeIdentifier?: string | undefined | null;
 };
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
@@ -28,7 +28,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    return props
+    void props
       .attempt(code)
       .then(async res => {
         await resolve();
@@ -55,7 +55,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
       resendButton={props.resendButton}
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={props.prepare}
-      safeIdentifier={props.safeIdentifier || ''}
+      safeIdentifier={props.safeIdentifier}
       onIdentityPreviewEditClicked={goBack}
     />
   );

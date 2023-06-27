@@ -14,10 +14,9 @@ import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
 
 function RedirectToSignIn() {
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { redirectToSignIn } = useCoreClerk();
+  const clerk = useCoreClerk();
   React.useEffect(() => {
-    void redirectToSignIn();
+    void clerk.redirectToSignIn();
   }, []);
   return null;
 }
