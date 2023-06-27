@@ -663,6 +663,10 @@ export default class Clerk implements ClerkInterface {
     }
 
     //we have an absolute url inside `to` at this point because of the isCrossOrigin check
+
+    //do this to always keep the trailing lash
+    const toURL = new URL(to, window.location.origin);
+
     const devBrowserJwt = this.#devBrowserHandler?.getDevBrowserJWT();
     if (!devBrowserJwt) {
       return clerkMissingDevBrowserJwt();
@@ -670,7 +674,7 @@ export default class Clerk implements ClerkInterface {
 
     const asQueryParam = !!options?.useQueryParam;
 
-    return setDevBrowserJWTInURL(to, devBrowserJwt, asQueryParam);
+    return setDevBrowserJWTInURL(toURL.href, devBrowserJwt, asQueryParam);
   }
 
   public buildSignInUrl(options?: RedirectOptions): string {
