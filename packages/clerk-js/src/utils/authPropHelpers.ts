@@ -8,14 +8,21 @@ type PickUrlOptions = {
   formatter?: (url: string) => string;
 };
 
+/**
+ * This function will pick the first value that is found inside a source using a key provided.
+ * There is a validator option which is used to validate that the value is acceptable. If it isn't, it will
+ * look for the next available value and repeat. The formatter is used to format the keys if provided.
+ * Example usage that looks through the sources for the value of any of the keys provided (with order priority)
+ * `pickUrl(['afterSignInUrl', 'redirectUrl'], [optionsA, optionsB])`
+ */
 export const pickUrl = (key: string | string[], source: Record<string, any>, opts?: PickUrlOptions): string => {
   const { validator = () => true, formatter } = opts || {};
   const keys = (Array.isArray(key) ? key : [key]).map(k => formatter?.(k) || k);
   const sources = Array.isArray(source) ? source : [source];
 
   let pickedUrl = '';
-  sources.every(s => {
-    keys.every(k => {
+  sources.some(s => {
+    keys.some(k => {
       const url = s[k];
       if (
         typeof url === 'string' &&
@@ -25,9 +32,9 @@ export const pickUrl = (key: string | string[], source: Record<string, any>, opt
       ) {
         pickedUrl = url;
       }
-      return !pickedUrl;
+      return pickedUrl;
     });
-    return !pickedUrl;
+    return pickedUrl;
   });
 
   return pickedUrl;
