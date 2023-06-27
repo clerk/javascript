@@ -4,8 +4,8 @@
  * https://vitejs.dev/config/#define
  * We are solving this in the SDK level to reduce setup steps.
  */
-if (typeof global === 'undefined' && typeof window !== 'undefined' && !window.global) {
-  (window as any).global = window;
+if (typeof window !== 'undefined' && !window.global) {
+  window.global = typeof global === 'undefined' ? window : global;
 }
 
 export {};
