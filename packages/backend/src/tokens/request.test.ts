@@ -224,7 +224,7 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    test('headerToken: returns interstitial state when token expired [1y.2n]', async assert => {
+    test('headerToken: returns unknown state when token expired [1y.2n]', async assert => {
       // advance clock for 1 hour
       fakeClock.tick(3600 * 1000);
 
@@ -235,6 +235,22 @@ export default (QUnit: QUnit) => {
 
       assertUnknown(assert, requestState, TokenVerificationErrorReason.TokenExpired);
       assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('headerToken: returns signed out state when token expired and experimental_ignoreInterstitial is true [1y.2n]', async assert => {
+      // advance clock for 1 hour
+      fakeClock.tick(3600 * 1000);
+
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        headerToken: mockJwt,
+        experimental_ignoreInterstitial: true,
+      });
+
+      assertSignedOut(assert, requestState, {
+        reason: AuthErrorReason.StandardSignedOut,
+      });
+      assertSignedOutToAuth(assert, requestState);
     });
 
     test('headerToken: returns signed out state when invalid signature [1y.2n]', async assert => {
@@ -539,6 +555,23 @@ export default (QUnit: QUnit) => {
       assertInterstitial(assert, requestState, { reason: TokenVerificationErrorReason.TokenExpired });
       assert.true(/^JWT is expired/.test(requestState.message || ''));
       assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('cookieToken: returns signed out when cookieToken.iat >= clientUat and expired token and experimental_ignoreInterstitial is true [10y.2n.1n]', async assert => {
+      // advance clock for 1 hour
+      fakeClock.tick(3600 * 1000);
+
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        cookieToken: mockJwt,
+        clientUat: `${mockJwtPayload.iat - 10}`,
+        experimental_ignoreInterstitial: true,
+      });
+
+      assertSignedOut(assert, requestState, {
+        reason: AuthErrorReason.StandardSignedOut,
+      });
+      assertSignedOutToAuth(assert, requestState);
     });
 
     test('cookieToken: returns signed in for Amazon Cloudfront userAgent', async assert => {

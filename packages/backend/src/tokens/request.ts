@@ -94,6 +94,10 @@ export type AuthenticateRequestOptions = OptionalVerifyTokenOptions &
      * @experimental
      */
     signInUrl?: string;
+    /**
+     * @experimental
+     */
+    experimental_ignoreInterstitial?: boolean;
   };
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
@@ -106,6 +110,14 @@ function assertProxyUrlOrDomain(proxyUrlOrDomain: string | undefined) {
   if (!proxyUrlOrDomain) {
     throw new Error(`Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`);
   }
+}
+
+function handleRequestStateForApiRoutes(options: AuthenticateRequestOptions, requestState: RequestState): RequestState {
+  if (!requestState.isInterstitial && !requestState.isUnknown) {
+    return requestState;
+  }
+
+  return signedOut(options, AuthErrorReason.StandardSignedOut);
 }
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
@@ -172,10 +184,15 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     return signedOut<AuthenticateRequestOptions>(options, AuthErrorReason.UnexpectedError, (err as Error).message);
   }
 
-  if (options.headerToken) {
-    return authenticateRequestWithTokenInHeader();
+  const state = options.headerToken
+    ? await authenticateRequestWithTokenInHeader()
+    : await authenticateRequestWithTokenInCookie();
+
+  if (options.experimental_ignoreInterstitial) {
+    return handleRequestStateForApiRoutes(options, state);
   }
-  return authenticateRequestWithTokenInCookie();
+
+  return state;
 }
 
 export const debugRequestState = (params: RequestState) => {
