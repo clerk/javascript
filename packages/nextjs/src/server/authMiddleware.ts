@@ -351,9 +351,9 @@ How to resolve:
 -> Make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
 
 Reason 2:
-You changed Clerk instance keys (Publishable Key, Secret Key).
+Your Clerk instance keys are incorrect, or you recently changed keys (Publishable Key, Secret Key).
 How to resolve:
--> Make sure you have cleared your browser's application data and cookies everytime you change keys.
+-> Make sure you're using the correct keys from the Clerk Dashboard. If you changed keys recently, make sure to clear your browser application data and cookies.
 
 Reason 3:
 A bug that may have already been fixed in the latest version of Clerk NextJS package.
