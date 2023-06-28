@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.50.1",
+  "version": "4.51.0",
   "license": "MIT",
   "description": "Clerk JS library",
   "keywords": [
@@ -41,9 +41,9 @@
     "watch": "webpack --config webpack.config.js --env production --watch"
   },
   "dependencies": {
-    "@clerk/localizations": "^1.21.1",
+    "@clerk/localizations": "^1.22.0",
     "@clerk/shared": "^0.19.1",
-    "@clerk/types": "^3.46.0",
+    "@clerk/types": "^3.46.1",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
     "@floating-ui/react": "0.19.0",

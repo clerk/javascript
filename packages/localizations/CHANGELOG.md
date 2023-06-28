@@ -1,5 +1,18 @@
 # Change Log
 
+## 1.22.0
+
+### Minor Changes
+
+- Add vi-VN translations ([#1409](https://github.com/clerkinc/javascript/pull/1409)) by [@kungfu321](https://github.com/kungfu321)
+
+### Patch Changes
+
+- Add missing translations in de-DE.ts ([#1414](https://github.com/clerkinc/javascript/pull/1414)) by [@Yardie83](https://github.com/Yardie83)
+
+- Updated dependencies [[`30f8ad18a`](https://github.com/clerkinc/javascript/commit/30f8ad18a4f85ca2e3fda46e5c180b28bc8fb47c)]:
+  - @clerk/types@3.46.1
+
 ## 1.21.1
 
 ### Patch Changes
