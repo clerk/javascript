@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.51.0
+
+### Minor Changes
+
+- Navigate to the signUp url if user visits the verify-email-address/verify-phone-number route without the proper identifier present ([#1405](https://github.com/clerkinc/javascript/pull/1405)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Updated dependencies [[`30f8ad18a`](https://github.com/clerkinc/javascript/commit/30f8ad18a4f85ca2e3fda46e5c180b28bc8fb47c), [`1ce885065`](https://github.com/clerkinc/javascript/commit/1ce885065e7ca548a3306d5f03edeaf7ec709850), [`9ce3cbe41`](https://github.com/clerkinc/javascript/commit/9ce3cbe41f7ce7cb9cd102b45a3626da77062b7d)]:
+  - @clerk/types@3.46.1
+  - @clerk/localizations@1.22.0
+
 ## 4.50.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.46.1
+
+### Patch Changes
+
+- Add missing `create` method to `PhoneNumberResource`, `EmailAddressResource`, `Web3WalletResource` interfaces ([#1411](https://github.com/clerkinc/javascript/pull/1411)) by [@crutchcorn](https://github.com/crutchcorn)
+
 ## 3.46.0
 
 ### Minor Changes
