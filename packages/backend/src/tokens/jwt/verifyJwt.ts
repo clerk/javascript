@@ -9,7 +9,7 @@ import { assertAudienceClaim } from './assertions';
 
 type IssuerResolver = string | ((iss: string) => boolean);
 
-const DEFAULT_CLOCK_SKEW_IN_SECONDS = 2 * 1000;
+const DEFAULT_CLOCK_SKEW_IN_SECONDS = 5 * 1000;
 
 const algToHash: Record<string, string> = {
   RS256: 'SHA-256',
