@@ -7,6 +7,8 @@ type LegacyAuthObject<T extends AuthObject> = Pick<T, 'sessionId' | 'userId' | '
   claims: AuthObject['sessionClaims'];
 };
 
+type BooleanOrURLFnToBoolean = boolean | ((url: URL) => boolean);
+
 export type MiddlewareWithAuthProp = (
   // req: WithAuthProp<Request>
   req: Request,
@@ -34,6 +36,10 @@ export type ClerkMiddlewareOptions = {
   jwtKey?: string;
   strict?: boolean;
   signInUrl?: string;
+  /**
+   * @experimental
+   */
+  experimental_isApiRoute?: BooleanOrURLFnToBoolean;
 } & MultiDomainAndOrProxy;
 
 export type ClerkClient = ReturnType<typeof Clerk>;

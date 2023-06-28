@@ -70,6 +70,48 @@ describe('authenticateRequest', () => {
       signInUrl: '',
       domain: '',
       searchParams,
+      audience: undefined,
+      experimental_ignoreInterstitial: false,
     });
+  });
+
+  it('correctly evaluates and passes experimental_IsApiRoute as experimental_ignoreInterstitial', async () => {
+    const req = {
+      headers: {
+        ['cookie']: `${constants.Cookies.Session}=token; expires=Mon, 27 june 2022 12:00:00 UTC;${constants.Cookies.ClientUat}=token; expires=Mon, 27 june 2022 12:00:00 UTC;`,
+        [constants.Headers.Authorization]: 'Bearer token',
+        [constants.Headers.ForwardedPort]: 'port',
+        [constants.Headers.ForwardedHost]: 'host',
+        host: 'host',
+        referer: 'referer',
+        'user-agent': 'user-agent',
+      },
+      url: '/whatever?__query=true',
+    } as any as Request;
+
+    const options = {
+      jwtKey: 'jwtKey',
+      authorizedParties: ['party1'],
+      experimental_isApiRoute: (url: URL) => url.pathname === '/whatever',
+    };
+
+    const clerkClient = mockClerkClient();
+    const apiKey = 'apiKey';
+    const secretKey = '';
+    const frontendApi = 'frontendApi';
+    const publishableKey = 'publishableKey';
+    const searchParams = new URLSearchParams();
+    searchParams.set('__query', 'true');
+
+    await authenticateRequest({
+      clerkClient: clerkClient as any,
+      apiKey,
+      secretKey,
+      frontendApi,
+      publishableKey,
+      req,
+      options,
+    });
+    expect(clerkClient.authenticateRequest.mock.calls[0][0].experimental_ignoreInterstitial).toEqual(true);
   });
 });

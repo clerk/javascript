@@ -53,6 +53,8 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     requestUrl.toString(),
   );
 
+  const experimental_ignoreInterstitial = !!handleValueOrFn(options?.experimental_isApiRoute, requestUrl);
+
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
@@ -84,6 +86,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     domain,
     signInUrl,
     searchParams: requestUrl.searchParams,
+    experimental_ignoreInterstitial,
   });
 };
 export const handleUnknownCase = (res: ServerResponse, requestState: RequestState) => {
