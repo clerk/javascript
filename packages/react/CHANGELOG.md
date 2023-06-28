@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.21.0
+
+### Minor Changes
+
+- Fix `global is not defined` error when using Vite + React by [@anagstef](https://github.com/anagstef)
+
 ## 4.20.6
 
 ### Patch Changes
