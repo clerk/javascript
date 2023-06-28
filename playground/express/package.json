@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "ts-node ./src/server.ts",
-    "yalc:add": "yalc add -- @clerk/types @clerk/backend @clerk/clerk-sdk-node",
-    "dev:fromlocal": " nodemon --watch .yalc --watch src --exec \"npm run yalc:add && npm run start\""
+    "dev": "ts-node ./src/server.ts",
+    "yalc": "yalc add -- @clerk/types @clerk/backend @clerk/clerk-sdk-node"
   },
   "author": "",
   "license": "ISC",

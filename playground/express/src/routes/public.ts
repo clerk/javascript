@@ -1,6 +1,10 @@
 import { Router } from 'express';
+import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 
 const router = Router();
+
+const experimental_isApiRoute = (url: URL) => url.pathname === '/public';
+router.use(ClerkExpressWithAuth({ experimental_isApiRoute }));
 
 router.get('/public', async (_req, reply) => {
   return reply.json({ hello: 'world' });
