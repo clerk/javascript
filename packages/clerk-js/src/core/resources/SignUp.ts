@@ -208,8 +208,8 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     const { verifications } = await authenticateFn({
       strategy,
-      redirectUrl: redirectUrl,
-      actionCompleteRedirectUrl: redirectUrlComplete,
+      redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
+      actionCompleteRedirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrlComplete),
       unsafeMetadata,
       emailAddress,
     });

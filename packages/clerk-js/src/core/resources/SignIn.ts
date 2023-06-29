@@ -177,14 +177,14 @@ export class SignIn extends BaseResource implements SignInResource {
       strategy === 'saml' && this.id
         ? await this.prepareFirstFactor({
             strategy,
-            redirectUrl,
-            actionCompleteRedirectUrl: redirectUrlComplete,
+            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+            actionCompleteRedirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrlComplete),
           })
         : await this.create({
             strategy,
             identifier,
-            redirectUrl,
-            actionCompleteRedirectUrl: redirectUrlComplete,
+            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+            actionCompleteRedirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrlComplete),
           });
 
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
