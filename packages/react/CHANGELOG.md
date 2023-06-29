@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.21.1
+
+### Patch Changes
+
+- Populate `openCreateOrganization` return from the `useClerk()` hook ([#1435](https://github.com/clerkinc/javascript/pull/1435)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.21.0
 
 ### Minor Changes

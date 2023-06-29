@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.23.7
+
+### Patch Changes
+
+- Treat expired JWT as signed-out state for requests originated from non-browser clients on satellite apps ([#1433](https://github.com/clerkinc/javascript/pull/1433)) by [@panteliselef](https://github.com/panteliselef)
+
+- Make all 4 keys (legacy and new) optional in authenticateRequest params ([#1437](https://github.com/clerkinc/javascript/pull/1437)) by [@anagstef](https://github.com/anagstef)
+
+- Increase the default value for clock skew in `verifyJwt` from 2 to 5 seconds ([#1428](https://github.com/clerkinc/javascript/pull/1428)) by [@anagstef](https://github.com/anagstef)
+
 ## 0.23.6
 
 ### Patch Changes
