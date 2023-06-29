@@ -15,6 +15,9 @@ const hasJustSynced = (qp?: URLSearchParams) => qp?.get('__clerk_synced') === 't
 const isReturningFromPrimary = (qp?: URLSearchParams) => qp?.get('__clerk_referrer_primary') === 'true';
 
 const VALID_USER_AGENTS = /^Mozilla\/|(Amazon CloudFront)/;
+
+const isBrowser = (userAgent: string | undefined) => VALID_USER_AGENTS.test(userAgent || '');
+
 // In development or staging environments only, based on the request's
 // User Agent, detect non-browser requests (e.g. scripts). Since there
 // is no Authorization header, consider the user as signed out and
@@ -24,7 +27,7 @@ const VALID_USER_AGENTS = /^Mozilla\/|(Amazon CloudFront)/;
 export const nonBrowserRequestInDevRule: InterstitialRule = options => {
   const { apiKey, secretKey, userAgent } = options;
   const key = secretKey || apiKey;
-  if (isDevelopmentFromApiKey(key) && !VALID_USER_AGENTS.test(userAgent || '')) {
+  if (isDevelopmentFromApiKey(key) && !isBrowser(userAgent)) {
     return signedOut(options, AuthErrorReason.HeaderMissingNonBrowser);
   }
   return undefined;
@@ -184,12 +187,18 @@ async function verifyRequestState(options: AuthenticateRequestOptions, token: st
  * Let the next rule for UatMissing to fire if needed
  */
 export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
-  const { clientUat, isSatellite, searchParams, secretKey, apiKey } = options;
+  const { clientUat, isSatellite, searchParams, secretKey, apiKey, userAgent } = options;
 
   const key = secretKey || apiKey;
   const isDev = isDevelopmentFromApiKey(key);
 
-  if (isSatellite && (!clientUat || clientUat === '0') && !hasJustSynced(searchParams) && !isDev) {
+  const isSignedOut = !clientUat || clientUat === '0';
+
+  if (isSatellite && isSignedOut && !isBrowser(userAgent)) {
+    return signedOut(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
+  }
+
+  if (isSatellite && isSignedOut && !hasJustSynced(searchParams) && !isDev) {
     return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
   }
 

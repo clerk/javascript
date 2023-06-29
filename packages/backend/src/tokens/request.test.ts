@@ -3,13 +3,23 @@ import sinon from 'sinon';
 
 import runtime from '../runtime';
 import { jsonOk } from '../util/mockFetch';
-import { type AuthReason, type RequestState, AuthErrorReason, AuthStatus } from './authStatus';
+import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from './authStatus';
 import { TokenVerificationErrorReason } from './errors';
 import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from './fixtures';
 import type { AuthenticateRequestOptions } from './request';
 import { authenticateRequest } from './request';
 
-function assertSignedOut(assert, requestState: RequestState, reason: AuthReason, message = '') {
+function assertSignedOut(
+  assert,
+  requestState: RequestState,
+  expectedState: {
+    reason: AuthReason;
+    isSatellite?: boolean;
+    domain?: string;
+    signInUrl?: string;
+    message?: string;
+  },
+) {
   assert.propEqual(requestState, {
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
@@ -21,9 +31,9 @@ function assertSignedOut(assert, requestState: RequestState, reason: AuthReason,
     isSatellite: false,
     signInUrl: '',
     domain: '',
-    message,
-    reason,
+    message: '',
     toAuth: {},
+    ...expectedState,
   });
 }
 
@@ -174,7 +184,10 @@ export default (QUnit: QUnit) => {
 
       const errMessage =
         'The JWKS endpoint did not contain any signing keys. Contact support@clerk.com. Contact support@clerk.com (reason=jwk-remote-failed-to-load, token-carrier=header)';
-      assertSignedOut(assert, requestState, TokenVerificationErrorReason.RemoteJWKFailedToLoad, errMessage);
+      assertSignedOut(assert, requestState, {
+        reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
+        message: errMessage,
+      });
       assertSignedOutToAuth(assert, requestState);
     });
 
@@ -204,7 +217,10 @@ export default (QUnit: QUnit) => {
 
       const errMessage =
         'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-invalid-authorized-parties, token-carrier=header)';
-      assertSignedOut(assert, requestState, TokenVerificationErrorReason.TokenInvalidAuthorizedParties, errMessage);
+      assertSignedOut(assert, requestState, {
+        reason: TokenVerificationErrorReason.TokenInvalidAuthorizedParties,
+        message: errMessage,
+      });
       assertSignedOutToAuth(assert, requestState);
     });
 
@@ -228,7 +244,10 @@ export default (QUnit: QUnit) => {
       });
 
       const errMessage = 'JWT signature is invalid. (reason=token-invalid-signature, token-carrier=header)';
-      assertSignedOut(assert, requestState, TokenVerificationErrorReason.TokenInvalidSignature, errMessage);
+      assertSignedOut(assert, requestState, {
+        reason: TokenVerificationErrorReason.TokenInvalidSignature,
+        message: errMessage,
+      });
       assertSignedOutToAuth(assert, requestState);
     });
 
@@ -240,7 +259,10 @@ export default (QUnit: QUnit) => {
 
       const errMessage =
         'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, token-carrier=header)';
-      assertSignedOut(assert, requestState, TokenVerificationErrorReason.TokenInvalid, errMessage);
+      assertSignedOut(assert, requestState, {
+        reason: TokenVerificationErrorReason.TokenInvalid,
+        message: errMessage,
+      });
       assertSignedOutToAuth(assert, requestState);
     });
 
@@ -256,7 +278,9 @@ export default (QUnit: QUnit) => {
         cookieToken: mockJwt,
       });
 
-      assertSignedOut(assert, requestState, AuthErrorReason.HeaderMissingCORS);
+      assertSignedOut(assert, requestState, {
+        reason: AuthErrorReason.HeaderMissingCORS,
+      });
       assertSignedOutToAuth(assert, requestState);
     });
 
@@ -270,7 +294,7 @@ export default (QUnit: QUnit) => {
         cookieToken: mockJwt,
       });
 
-      assertSignedOut(assert, requestState, AuthErrorReason.HeaderMissingNonBrowser);
+      assertSignedOut(assert, requestState, { reason: AuthErrorReason.HeaderMissingNonBrowser });
       assertSignedOutToAuth(assert, requestState);
     });
 
@@ -290,6 +314,24 @@ export default (QUnit: QUnit) => {
       });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('cookieToken: returns signed out is satellite but a non-browser request [11y]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        apiKey: 'deadbeef',
+        clientUat: '0',
+        isSatellite: true,
+        domain: 'satellite.dev',
+        userAgent: '[some-agent]',
+      });
+
+      assertSignedOut(assert, requestState, {
+        reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+        isSatellite: true,
+        domain: 'satellite.dev',
+      });
+      assertSignedOutToAuth(assert, requestState);
     });
 
     test('returns interstitial when app is satellite, returns from primary and is dev instance [13y]', async assert => {
@@ -339,7 +381,9 @@ export default (QUnit: QUnit) => {
         apiKey: 'live_deadbeef',
       });
 
-      assertSignedOut(assert, requestState, AuthErrorReason.CookieAndUATMissing);
+      assertSignedOut(assert, requestState, {
+        reason: AuthErrorReason.CookieAndUATMissing,
+      });
       assertSignedOutToAuth(assert, requestState);
     });
 
@@ -430,7 +474,9 @@ export default (QUnit: QUnit) => {
         clientUat: '0',
       });
 
-      assertSignedOut(assert, requestState, AuthErrorReason.StandardSignedOut);
+      assertSignedOut(assert, requestState, {
+        reason: AuthErrorReason.StandardSignedOut,
+      });
       assertSignedOutToAuth(assert, requestState);
     });
 
@@ -455,7 +501,10 @@ export default (QUnit: QUnit) => {
 
       const errMessage =
         'Subject claim (sub) is required and must be a string. Received undefined. Make sure that this is a valid Clerk generate JWT. (reason=token-verification-failed, token-carrier=cookie)';
-      assertSignedOut(assert, requestState, TokenVerificationErrorReason.TokenVerificationFailed, errMessage);
+      assertSignedOut(assert, requestState, {
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message: errMessage,
+      });
       assertSignedOutToAuth(assert, requestState);
     });
 
