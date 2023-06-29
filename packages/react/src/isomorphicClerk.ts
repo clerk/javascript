@@ -62,6 +62,7 @@ export default class IsomorphicClerk {
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
+  private preopenCreateOrganization?: null | CreateOrganizationProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
@@ -239,6 +240,10 @@ export default class IsomorphicClerk {
       clerkjs.openUserProfile(this.preopenUserProfile);
     }
 
+    if (this.preopenCreateOrganization !== null) {
+      clerkjs.openCreateOrganization(this.preopenCreateOrganization);
+    }
+
     this.premountSignInNodes.forEach((props: SignInProps, node: HTMLDivElement) => {
       clerkjs.mountSignIn(node, props);
     });
@@ -386,6 +391,22 @@ export default class IsomorphicClerk {
       this.clerkjs.closeOrganizationProfile();
     } else {
       this.preopenOrganizationProfile = null;
+    }
+  };
+
+  openCreateOrganization = (props?: CreateOrganizationProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.openCreateOrganization(props);
+    } else {
+      this.preopenCreateOrganization = props;
+    }
+  };
+
+  closeCreateOrganization = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.closeCreateOrganization();
+    } else {
+      this.preopenCreateOrganization = null;
     }
   };
 
