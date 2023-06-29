@@ -240,6 +240,10 @@ export default class IsomorphicClerk {
       clerkjs.openUserProfile(this.preopenUserProfile);
     }
 
+    if (this.preopenOrganizationProfile !== null) {
+      clerkjs.openOrganizationProfile(this.preopenOrganizationProfile);
+    }
+
     if (this.preopenCreateOrganization !== null) {
       clerkjs.openCreateOrganization(this.preopenCreateOrganization);
     }
