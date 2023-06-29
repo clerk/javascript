@@ -306,5 +306,21 @@ export default (QUnit: QUnit) => {
         redirectAdapterSpy.calledWith(`https://included.katydid-92.accounts.dev/sign-up?redirect_url=${encodedUrl}`),
       );
     });
+
+    test('returns path based url with development (kima) publishableKey (with staging Clerk) but without signUpUrl to redirectToSignUp', assert => {
+      const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
+      const { redirectToSignUp } = redirect({
+        redirectAdapter: redirectAdapterSpy,
+        publishableKey: 'pk_test_aW5jbHVkZWQua2F0eWRpZC05Mi5jbGVyay5hY2NvdW50c3N0YWdlLmRldiQ',
+      });
+
+      const result = redirectToSignUp({ returnBackUrl });
+      assert.equal(result, 'redirectAdapterValue');
+      assert.ok(
+        redirectAdapterSpy.calledWith(
+          `https://included.katydid-92.accountsstage.dev/sign-up?redirect_url=${encodedUrl}`,
+        ),
+      );
+    });
   });
 };
