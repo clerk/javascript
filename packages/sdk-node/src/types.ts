@@ -1,4 +1,4 @@
-import type { AuthenticateRequestOptions, AuthObject, Clerk, InstanceKeys, SignedInAuthObject } from '@clerk/backend';
+import type { AuthenticateRequestOptions, AuthObject, Clerk, SignedInAuthObject } from '@clerk/backend';
 import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { NextFunction, Request, Response } from 'express';
 import type { IncomingMessage } from 'http';
@@ -38,8 +38,18 @@ export type ClerkMiddlewareOptions = {
 
 export type ClerkClient = ReturnType<typeof Clerk>;
 
-export type AuthenticateRequestParams = InstanceKeys & {
+export type AuthenticateRequestParams = {
   clerkClient: ClerkClient;
+  publishableKey?: string;
+  secretKey?: string;
+  /**
+   * @deprecated Use `publishableKey` instead.
+   */
+  frontendApi?: string;
+  /**
+   * @deprecated Use `secretKey` instead.
+   */
+  apiKey?: string;
   req: IncomingMessage;
   options?: ClerkMiddlewareOptions;
 };

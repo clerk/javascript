@@ -57,7 +57,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || apiKey)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || apiKey || '')) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
