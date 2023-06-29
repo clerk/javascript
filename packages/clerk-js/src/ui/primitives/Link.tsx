@@ -43,13 +43,13 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-type OwnProps = { isExternal?: boolean; isDisabled?: boolean };
+type OwnProps = { isExternal?: boolean; isDisabled?: boolean; useBuildUrlWithAuth?: boolean };
 
 // @ts-ignore
 export type LinkProps = PrimitiveProps<'a'> & OwnProps & StyleVariants<typeof applyVariants>;
 
 export const Link = (props: LinkProps): JSX.Element => {
-  const { isExternal, children, href, onClick, ...rest } = props;
+  const { isExternal, children, href = '', onClick, useBuildUrlWithAuth = true, ...rest } = props;
   const clerk = useCoreClerk();
 
   const onClickHandler = onClick
@@ -65,7 +65,7 @@ export const Link = (props: LinkProps): JSX.Element => {
     <a
       {...applyDataStateProps(filterProps(rest))}
       onClick={onClickHandler}
-      href={href ? clerk.buildUrlWithAuth(href) : ''}
+      href={useBuildUrlWithAuth ? clerk.buildUrlWithAuth(href) : href}
       target={href && isExternal ? '_blank' : undefined}
       rel={href && isExternal ? 'noopener' : undefined}
       css={applyVariants(props)}
