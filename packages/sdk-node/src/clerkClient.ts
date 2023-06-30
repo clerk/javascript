@@ -30,10 +30,11 @@ export function Clerk(options: ClerkOptions) {
 
 const createBasePropForRedwoodCompatibility = () => {
   const verifySessionToken = (token: string) => {
+    const { jwtKey } = loadApiEnv();
     const { payload } = decodeJwt(token);
     return _verifyToken(token, {
       issuer: payload.iss,
-      jwtKey: process.env.CLERK_JWT_KEY,
+      jwtKey,
     });
   };
   return { base: { verifySessionToken } };
