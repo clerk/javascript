@@ -56,7 +56,6 @@ export const RootPage = withCardStateProvider(() => {
         {showConnectedAccounts && <ConnectedAccountsSection />}
         {showSamlAccounts && <EnterpriseAccountsSection />}
         {showWeb3 && <Web3Section />}
-        {showDelete && <DeleteSection />}
       </Col>
       <Col
         elementDescriptor={descriptors.profilePage}
@@ -73,6 +72,7 @@ export const RootPage = withCardStateProvider(() => {
         {showPassword && <PasswordSection />}
         {showMfa && <MfaSection />}
         <ActiveDevicesSection />
+        {showDelete && <DeleteSection />}
       </Col>
     </Col>
   );
