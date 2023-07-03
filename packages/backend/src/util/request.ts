@@ -78,3 +78,13 @@ function getFirstValueFromHeaderValue(value?: string | null) {
 function getProtocolVerb(protocol: string) {
   return protocol?.replace(/:$/, '') || '';
 }
+
+type ErrorFields = {
+  message: string;
+  long_message: string;
+  code: string;
+};
+
+export const getErrorObjectByCode = (errors: ErrorFields[], code: string) => {
+  return errors.find((err: ErrorFields) => err.code === code);
+};

@@ -1,5 +1,9 @@
 export type TokenCarrier = 'header' | 'cookie';
 
+export enum TokenVerificationErrorCode {
+  InvalidSecretKey = 'clerk_key_invalid',
+}
+
 export enum TokenVerificationErrorReason {
   TokenExpired = 'token-expired',
   TokenInvalid = 'token-invalid',
@@ -9,6 +13,7 @@ export enum TokenVerificationErrorReason {
   TokenInvalidSignature = 'token-invalid-signature',
   TokenNotActiveYet = 'token-not-active-yet',
   TokenVerificationFailed = 'token-verification-failed',
+  InvalidSecretKey = 'secret-key-invalid',
 
   LocalJWKMissing = 'jwk-local-missing',
 
