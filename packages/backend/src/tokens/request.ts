@@ -36,7 +36,13 @@ export type RequiredVerifyTokenOptions = Required<
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
     VerifyTokenOptions,
-    'audience' | 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache' | 'jwtKey'
+    | 'audience'
+    | 'authorizedParties'
+    | 'clockSkewInSeconds'
+    | 'clockSkewInMs'
+    | 'jwksCacheTtlInMs'
+    | 'skipJwksCache'
+    | 'jwtKey'
   >
 >;
 

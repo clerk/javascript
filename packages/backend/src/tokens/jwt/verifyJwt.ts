@@ -101,7 +101,11 @@ export function decodeJwt(token: string): Jwt {
 export type VerifyJwtOptions = {
   audience?: string | string[];
   authorizedParties?: string[];
+  /**
+   * @deprecated This option incorrectly accepts milliseconds instead of seconds and has been deprecated. Use clockSkewInMs instead.
+   */
   clockSkewInSeconds?: number;
+  clockSkewInMs?: number;
   issuer: IssuerResolver | string | null;
   key: JsonWebKey;
 };
@@ -109,8 +113,10 @@ export type VerifyJwtOptions = {
 // TODO: Revise the return types. Maybe it's better to throw an error instead of return an object with a reason
 export async function verifyJwt(
   token: string,
-  { audience, authorizedParties, clockSkewInSeconds = DEFAULT_CLOCK_SKEW_IN_SECONDS, issuer, key }: VerifyJwtOptions,
+  { audience, authorizedParties, clockSkewInSeconds, clockSkewInMs, issuer, key }: VerifyJwtOptions,
 ): Promise<JwtPayload> {
+  const clockSkew = clockSkewInMs || clockSkewInSeconds || DEFAULT_CLOCK_SKEW_IN_SECONDS;
+
   const decoded = decodeJwt(token);
 
   const { header, payload } = decoded;
@@ -182,7 +188,7 @@ export async function verifyJwt(
   const currentDate = new Date(Date.now());
   const expiryDate = new Date(0);
   expiryDate.setUTCSeconds(exp);
-  const expired = expiryDate.getTime() <= currentDate.getTime() - clockSkewInSeconds;
+  const expired = expiryDate.getTime() <= currentDate.getTime() - clockSkew;
   if (expired) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenExpired,
@@ -201,7 +207,7 @@ export async function verifyJwt(
     }
     const notBeforeDate = new Date(0);
     notBeforeDate.setUTCSeconds(nbf);
-    const early = notBeforeDate.getTime() > currentDate.getTime() + clockSkewInSeconds;
+    const early = notBeforeDate.getTime() > currentDate.getTime() + clockSkew;
     if (early) {
       throw new TokenVerificationError({
         reason: TokenVerificationErrorReason.TokenNotActiveYet,
@@ -221,7 +227,7 @@ export async function verifyJwt(
     }
     const issuedAtDate = new Date(0);
     issuedAtDate.setUTCSeconds(iat);
-    const postIssued = issuedAtDate.getTime() > currentDate.getTime() + clockSkewInSeconds;
+    const postIssued = issuedAtDate.getTime() > currentDate.getTime() + clockSkew;
     if (postIssued) {
       throw new TokenVerificationError({
         reason: TokenVerificationErrorReason.TokenNotActiveYet,
