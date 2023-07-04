@@ -245,7 +245,7 @@ export function _SignInStart(): JSX.Element {
   }
 
   const hasSocialOrWeb3Buttons = !!authenticatableSocialStrategies.length || !!web3FirstFactors.length;
-  const shouldAutofocus = !isMobileDevice() && hasSocialOrWeb3Buttons;
+  const shouldAutofocus = !isMobileDevice() && !hasSocialOrWeb3Buttons;
 
   return (
     <Flow.Part part='start'>
