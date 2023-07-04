@@ -208,28 +208,16 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   });
 
   if (!response.ok) {
-    const errors = await response.json().then(({ errors }) => {
-      if (!errors) {
-        return false;
-      }
+    const json = await response.json();
+    const invalidSecretKeyError = getErrorObjectByCode(json?.errors, TokenVerificationErrorCode.InvalidSecretKey);
 
-      const invalidSecretKey = getErrorObjectByCode(errors, TokenVerificationErrorCode.InvalidSecretKey);
+    if (invalidSecretKeyError) {
+      const reason = TokenVerificationErrorReason.InvalidSecretKey;
 
-      if (!invalidSecretKey) {
-        return false;
-      }
-
-      return {
-        ...invalidSecretKey,
-        reason: TokenVerificationErrorReason.InvalidSecretKey,
-      };
-    });
-
-    if (errors) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.ContactSupport,
-        message: errors.message,
-        reason: errors.reason,
+        message: invalidSecretKeyError.message,
+        reason,
       });
     }
 

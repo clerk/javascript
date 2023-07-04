@@ -86,5 +86,9 @@ type ErrorFields = {
 };
 
 export const getErrorObjectByCode = (errors: ErrorFields[], code: string) => {
+  if (!errors) {
+    return null;
+  }
+
   return errors.find((err: ErrorFields) => err.code === code);
 };
