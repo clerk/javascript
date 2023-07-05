@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, Flex, localizationKeys, Text } from '../customizables';
+import { Button, Col, descriptors, Flex, localizationKeys, Text } from '../customizables';
 import { handleError } from '../utils';
 import { useCardState } from './contexts';
 import { FileDropArea } from './FileDropArea';
@@ -67,8 +67,12 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
             localizationKey={title}
             variant='regularMedium'
           />
-          <Flex gap={4}>
+          <Flex
+            elementDescriptor={descriptors.avatarImageActions}
+            gap={4}
+          >
             <Button
+              elementDescriptor={descriptors.avatarImageActionsUpload}
               localizationKey={
                 !showUpload
                   ? localizationKeys('userProfile.profilePage.imageFormSubtitle')
@@ -84,6 +88,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
 
             {!!onAvatarRemove && !showUpload && (
               <Button
+                elementDescriptor={descriptors.avatarImageActionsReset}
                 localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}
                 isDisabled={card.isLoading}
                 sx={t => ({ color: t.colors.$danger500 })}
