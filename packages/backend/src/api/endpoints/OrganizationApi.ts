@@ -33,6 +33,11 @@ type UpdateParams = {
   maxAllowedMemberships?: number;
 } & MetadataParams;
 
+type UpdateLogoParams = {
+  file: Blob | File | null;
+  uploaderUserId: string;
+};
+
 type UpdateMetadataParams = MetadataParams;
 
 type GetOrganizationMembershipListParams = {
@@ -113,6 +118,34 @@ export class OrganizationAPI extends AbstractAPI {
       method: 'PATCH',
       path: joinPaths(basePath, organizationId),
       bodyParams: params,
+    });
+  }
+
+  public async updateOrganizationLogo(organizationId: string, params: UpdateLogoParams) {
+    this.requireId(organizationId);
+
+    if (params?.file === null) {
+      return this.request<Organization>({
+        method: 'DELETE',
+        path: joinPaths(basePath, organizationId, 'logo'),
+      });
+    }
+
+    if (!params?.file) {
+      throw new Error('A valid Blob or File is required.');
+    }
+    if (!params?.uploaderUserId) {
+      throw new Error('A valid uploaderUserId is required.');
+    }
+
+    const formData = new FormData();
+    formData.append('file', params.file);
+    formData.append('uploader_user_id', params.uploaderUserId);
+
+    return this.request<Organization>({
+      method: 'PUT',
+      path: joinPaths(basePath, organizationId, 'logo'),
+      formData,
     });
   }
 
