@@ -507,7 +507,8 @@ export const enUS: LocalizationResource = {
     },
     deletePage: {
       title: 'Delete account',
-      description: 'Are you sure you want to delete your account? This action is permanent and irreversible.',
+      messageLine1: 'Are you sure you want to delete your account?',
+      messageLine2: 'This action is permanent and irreversible.',
       actionDescription: 'Type Delete account below to continue.',
       confirm: 'Delete account',
     },
@@ -552,6 +553,7 @@ export const enUS: LocalizationResource = {
           title: 'Delete organization',
           messageLine1: 'Are you sure you want to delete this organization?',
           messageLine2: 'This action is permanent and irreversible.',
+          actionDescription: 'Type {{organizationName}} below to continue.',
           successMessage: 'You have deleted the organization.',
         },
       },

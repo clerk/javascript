@@ -72,7 +72,8 @@ export type FieldId =
   | 'username'
   | 'code'
   | 'role'
-  | 'deleteConfirmation';
+  | 'deleteConfirmation'
+  | 'deleteOrganizationConfirmation';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

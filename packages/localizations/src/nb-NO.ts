@@ -509,8 +509,8 @@ export const nbNO: LocalizationResource = {
     },
     deletePage: {
       title: 'Slett konto',
-      description:
-        'Er du sikker på at du vil slette kontoen din? Denne handlingen er permanent og kan ikke reverseres.',
+      messageLine1: 'Er du sikker på at du vil slette kontoen din?',
+      messageLine2: 'Denne handlingen er permanent og kan ikke reverseres.',
       confirm: 'Slett konto',
     },
   },

@@ -507,8 +507,8 @@ export const viVN: LocalizationResource = {
     },
     deletePage: {
       title: 'Xóa tài khoản',
-      description:
-        'Bạn có chắc chắn muốn xóa tài khoản của mình không? Hành động này là vĩnh viễn và không thể hoàn tác.',
+      messageLine1: 'Bạn có chắc chắn muốn xóa tài khoản của mình không?',
+      messageLine2: 'Hành động này là vĩnh viễn và không thể hoàn tác.',
       confirm: 'Xóa tài khoản',
     },
   },

@@ -11,7 +11,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useRouter } from '../../router';
-import { handleError } from '../../utils';
+import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const LeaveOrganizationPage = () => {
@@ -57,9 +57,14 @@ export const DeleteOrganizationPage = () => {
 
   return (
     <ActionConfirmationPage
+      organizationName={organization?.name}
       title={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
       messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine1')}
       messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine2')}
+      actionDescription={localizationKeys(
+        'organizationProfile.profilePage.dangerSection.deleteOrganization.actionDescription',
+        { organizationName: organization?.name },
+      )}
       submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
       successMessage={localizationKeys(
         'organizationProfile.profilePage.dangerSection.deleteOrganization.successMessage',
@@ -73,6 +78,8 @@ type ActionConfirmationPageProps = {
   title: LocalizationKey;
   messageLine1: LocalizationKey;
   messageLine2: LocalizationKey;
+  actionDescription?: LocalizationKey;
+  organizationName?: string;
   successMessage: LocalizationKey;
   submitLabel: LocalizationKey;
   onConfirmation: () => Promise<any>;
@@ -84,6 +91,8 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     title,
     messageLine1,
     messageLine2,
+    actionDescription,
+    organizationName,
     successMessage,
     submitLabel,
     onConfirmation,
@@ -92,6 +101,14 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
   const wizard = useWizard();
   const card = useCardState();
   const { navigate } = useRouter();
+
+  const confirmationField = useFormControl('deleteOrganizationConfirmation', '', {
+    type: 'text',
+    label: localizationKeys('formFieldLabel__confirmDeletion'),
+    isRequired: true,
+  });
+
+  const canSubmit = actionDescription ? confirmationField.value === organizationName : true;
 
   const handleSubmit = async () => {
     try {
@@ -108,19 +125,31 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <Form.Root onSubmit={handleSubmit}>
-          <Text
-            localizationKey={messageLine1}
-            variant='regularRegular'
-          />
-          <Text
-            localizationKey={messageLine2}
-            variant='regularRegular'
-          />
+          <Text localizationKey={messageLine1} />
+          <Text localizationKey={messageLine2} />
+
+          {actionDescription && (
+            <>
+              <Text
+                localizationKey={actionDescription}
+                variant='regularRegular'
+              />
+
+              <Form.ControlRow elementId={confirmationField.id}>
+                <Form.Control
+                  {...confirmationField.props}
+                  required
+                />
+              </Form.ControlRow>
+            </>
+          )}
+
           <FormButtonContainer>
             <Form.SubmitButton
               block={false}
               colorScheme={colorScheme}
               localizationKey={submitLabel}
+              isDisabled={!canSubmit}
             />
             <Form.ResetButton
               localizationKey={localizationKeys('userProfile.formButtonReset')}

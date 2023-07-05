@@ -528,7 +528,8 @@ type _LocalizationResource = {
     };
     deletePage: {
       title: LocalizationValue;
-      description: LocalizationValue;
+      messageLine1: LocalizationValue;
+      messageLine2: LocalizationValue;
       actionDescription: LocalizationValue;
       confirm: LocalizationValue;
     };
@@ -572,6 +573,7 @@ type _LocalizationResource = {
           title: LocalizationValue;
           messageLine1: LocalizationValue;
           messageLine2: LocalizationValue;
+          actionDescription: LocalizationValue;
           successMessage: LocalizationValue;
         };
       };

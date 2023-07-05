@@ -39,7 +39,8 @@ export const DeletePage = withCardStateProvider(() => {
       Breadcrumbs={UserProfileBreadcrumbs}
     >
       <Form.Root onSubmit={deleteUser}>
-        <Text localizationKey={localizationKeys('userProfile.deletePage.description')} />
+        <Text localizationKey={localizationKeys('userProfile.deletePage.messageLine1')} />
+        <Text localizationKey={localizationKeys('userProfile.deletePage.messageLine2')} />
         <Text localizationKey={localizationKeys('userProfile.deletePage.actionDescription')} />
 
         <Form.ControlRow elementId={confirmationField.id}>
