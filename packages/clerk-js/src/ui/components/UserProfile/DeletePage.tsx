@@ -1,9 +1,9 @@
-import { useEnvironment, useCoreUser, useCoreClerk } from '../../contexts';
+import { useCoreClerk, useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
-import { handleError } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { useRouter } from '../../router';
+import { handleError, useFormControl } from '../../utils';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const DeletePage = withCardStateProvider(() => {
   const card = useCardState();
@@ -25,6 +25,14 @@ export const DeletePage = withCardStateProvider(() => {
     }
   };
 
+  const confirmationField = useFormControl('deleteConfirmation', '', {
+    type: 'text',
+    label: localizationKeys('formFieldLabel__confirmDeletion'),
+    isRequired: true,
+  });
+
+  const canSubmit = confirmationField.value === 'Delete account';
+
   return (
     <ContentPage
       headerTitle={localizationKeys('userProfile.deletePage.title')}
@@ -32,9 +40,18 @@ export const DeletePage = withCardStateProvider(() => {
     >
       <Form.Root onSubmit={deleteUser}>
         <Text localizationKey={localizationKeys('userProfile.deletePage.description')} />
+        <Text localizationKey={localizationKeys('userProfile.deletePage.actionDescription')} />
+
+        <Form.ControlRow elementId={confirmationField.id}>
+          <Form.Control
+            {...confirmationField.props}
+            required
+          />
+        </Form.ControlRow>
         <FormButtons
           submitLabel={localizationKeys('userProfile.deletePage.confirm')}
           colorScheme='danger'
+          isDisabled={!canSubmit}
         />
       </Form.Root>
     </ContentPage>

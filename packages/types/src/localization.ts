@@ -44,6 +44,7 @@ type _LocalizationResource = {
   formFieldLabel__backupCode: LocalizationValue;
   formFieldLabel__organizationName: LocalizationValue;
   formFieldLabel__organizationSlug: LocalizationValue;
+  formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
@@ -528,6 +529,7 @@ type _LocalizationResource = {
     deletePage: {
       title: LocalizationValue;
       description: LocalizationValue;
+      actionDescription: LocalizationValue;
       confirm: LocalizationValue;
     };
   };

@@ -34,6 +34,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddresses:
@@ -507,6 +508,7 @@ export const enUS: LocalizationResource = {
     deletePage: {
       title: 'Delete account',
       description: 'Are you sure you want to delete your account? This action is permanent and irreversible.',
+      actionDescription: 'Type Delete account below to continue.',
       confirm: 'Delete account',
     },
   },
