@@ -99,6 +99,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'avatarBox',
   'avatarImage',
+  'avatarImageActions',
+  'avatarImageActionsUpload',
+  'avatarImageActionsReset',
 
   'userButtonBox',
   'userButtonOuterIdentifier',
