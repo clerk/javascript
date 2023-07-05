@@ -10,16 +10,17 @@ import type {
   DomainOrProxyUrl,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  ListenerCallback,
   OrganizationMembershipResource,
   OrganizationResource,
   RedirectOptions,
-  Resources,
   SetActiveParams,
   SignInProps,
   SignOut,
   SignOutCallback,
   SignOutOptions,
   SignUpProps,
+  UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
   UserResource,
@@ -542,12 +543,14 @@ export default class IsomorphicClerk {
     }
   };
 
-  addListener = (listener: (emission: Resources) => void): void => {
+  addListener = (listener: ListenerCallback): UnsubscribeCallback => {
     const callback = () => this.clerkjs?.addListener(listener);
+
     if (this.clerkjs) {
-      callback();
+      return callback() as UnsubscribeCallback;
     } else {
       this.premountMethodCalls.set('addListener', callback);
+      return () => this.premountMethodCalls.delete('addListener');
     }
   };
 
