@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.10.15
+
+### Patch Changes
+
+- Load `jwtKey` from `CLERK_JWT_KEY` env variable ([#1443](https://github.com/clerkinc/javascript/pull/1443)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`2ad7cf390`](https://github.com/clerkinc/javascript/commit/2ad7cf390ba84b8e767ed6fe136800e38356d79c), [`f0b044c47`](https://github.com/clerkinc/javascript/commit/f0b044c475546e96a5995ef16198e60e35e8098f)]:
+  - @clerk/backend@0.24.0
+
 ## 4.10.14
 
 ### Patch Changes

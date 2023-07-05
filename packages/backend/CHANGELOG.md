@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.24.0
+
+### Minor Changes
+
+- The `clockSkewInSeconds` property is now deprecated from the `verifyJWT` options in favour of the new `clockSkewInMs` property. The old property accepted a value in milliseconds, so this change fixes the property name. ([#1450](https://github.com/clerkinc/javascript/pull/1450)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Add a more descriptive error when secret key is invalid ([#1446](https://github.com/clerkinc/javascript/pull/1446)) by [@raptisj](https://github.com/raptisj)
+
 ## 0.23.7
 
 ### Patch Changes
