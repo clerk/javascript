@@ -16,6 +16,7 @@ export type ClerkBackendApiRequestOptions = {
   queryParams?: Record<string, unknown>;
   headerParams?: Record<string, string>;
   bodyParams?: object;
+  formData?: FormData;
 } & (
   | {
       url: string;
@@ -71,7 +72,7 @@ export function buildRequest(options: CreateBackendApiOptions) {
       userAgent = USER_AGENT,
       httpOptions = {},
     } = options;
-    const { path, method, queryParams, headerParams, bodyParams } = requestOptions;
+    const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
     const key = secretKey || apiKey;
 
     assertValidSecretKey(key);
@@ -94,30 +95,40 @@ export function buildRequest(options: CreateBackendApiOptions) {
     }
 
     // Build headers
-    const headers = {
+    const headers: Record<string, any> = {
       Authorization: `Bearer ${key}`,
-      'Content-Type': 'application/json',
       'Clerk-Backend-SDK': userAgent,
       ...headerParams,
     };
 
-    // Build body
-    const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
-    const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
-
     let res: Response | undefined = undefined;
     try {
-      res = await runtime.fetch(
-        finalUrl.href,
-        deepmerge(httpOptions, {
+      if (formData) {
+        res = await runtime.fetch(finalUrl.href, {
+          ...httpOptions,
           method,
           headers,
-          ...body,
-        }),
-      );
+          body: formData,
+        });
+      } else {
+        // Enforce application/json for all non form-data requests
+        headers['Content-Type'] = 'application/json';
+        // Build body
+        const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
+        const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
+
+        res = await runtime.fetch(
+          finalUrl.href,
+          deepmerge(httpOptions, {
+            method,
+            headers,
+            ...body,
+          }),
+        );
+      }
 
       // TODO: Parse JSON or Text response based on a response header
-      const isJSONResponse = headers && headers['Content-Type'] === 'application/json';
+      const isJSONResponse = headers['Content-Type'] === 'application/json';
       const data = await (isJSONResponse ? res.json() : res.text());
 
       if (!res.ok) {
