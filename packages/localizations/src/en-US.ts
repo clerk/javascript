@@ -548,6 +548,7 @@ export const enUS: LocalizationResource = {
             'Are you sure you want to leave this organization? You will lose access to this organization and its applications.',
           messageLine2: 'This action is permanent and irreversible.',
           successMessage: 'You have left the organization.',
+          actionDescription: 'Type {{organizationName}} below to continue.',
         },
         deleteOrganization: {
           title: 'Delete organization',

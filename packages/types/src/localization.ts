@@ -567,6 +567,7 @@ type _LocalizationResource = {
           title: LocalizationValue;
           messageLine1: LocalizationValue;
           messageLine2: LocalizationValue;
+          actionDescription: LocalizationValue;
           successMessage: LocalizationValue;
         };
         deleteOrganization: {

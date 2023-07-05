@@ -30,9 +30,14 @@ export const LeaveOrganizationPage = () => {
 
   return (
     <ActionConfirmationPage
+      organizationName={organization?.name}
       title={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
       messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine1')}
       messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine2')}
+      actionDescription={localizationKeys(
+        'organizationProfile.profilePage.dangerSection.leaveOrganization.actionDescription',
+        { organizationName: organization?.name },
+      )}
       submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
       successMessage={localizationKeys(
         'organizationProfile.profilePage.dangerSection.leaveOrganization.successMessage',
@@ -106,6 +111,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     type: 'text',
     label: localizationKeys('formFieldLabel__confirmDeletion'),
     isRequired: true,
+    placeholder: organizationName,
   });
 
   const canSubmit = actionDescription ? confirmationField.value === organizationName : true;
@@ -128,21 +134,14 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
           <Text localizationKey={messageLine1} />
           <Text localizationKey={messageLine2} />
 
-          {actionDescription && (
-            <>
-              <Text
-                localizationKey={actionDescription}
-                variant='regularRegular'
-              />
+          <Text localizationKey={actionDescription} />
 
-              <Form.ControlRow elementId={confirmationField.id}>
-                <Form.Control
-                  {...confirmationField.props}
-                  required
-                />
-              </Form.ControlRow>
-            </>
-          )}
+          <Form.ControlRow elementId={confirmationField.id}>
+            <Form.Control
+              {...confirmationField.props}
+              required
+            />
+          </Form.ControlRow>
 
           <FormButtonContainer>
             <Form.SubmitButton
