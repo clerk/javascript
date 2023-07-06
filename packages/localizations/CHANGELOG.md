@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.22.1
+
+### Patch Changes
+
+- Introduce Polish localization (pl-PL) ([#1457](https://github.com/clerkinc/javascript/pull/1457)) by [@teceer](https://github.com/teceer)
+
 ## 1.22.0
 
 ### Minor Changes
