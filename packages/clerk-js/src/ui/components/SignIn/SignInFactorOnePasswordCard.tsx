@@ -107,7 +107,10 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               style={{ display: 'none' }}
             />
             <Form.ControlRow elementId={passwordControl.id}>
-              <Form.Control {...passwordControl.props} />
+              <Form.Control
+                {...passwordControl.props}
+                autoFocus
+              />
             </Form.ControlRow>
             <Form.SubmitButton />
           </Form.Root>

@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.22.0
+
+### Minor Changes
+
+- Update IsomorphicClerk#addListener to correctly return an unsubscribe method ([#1452](https://github.com/clerkinc/javascript/pull/1452)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.21.1
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.52.0
+
+### Minor Changes
+
+- The password field will now autofocus on the sign in factor one page. ([#1447](https://github.com/clerkinc/javascript/pull/1447)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Move UI for deleting account to bottom of user profile component in the security section ([#1407](https://github.com/clerkinc/javascript/pull/1407)) by [@jescalan](https://github.com/jescalan)
+
 ## 4.51.0
 
 ### Minor Changes

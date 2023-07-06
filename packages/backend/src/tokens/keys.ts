@@ -4,7 +4,13 @@ import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../cons
 import runtime from '../runtime';
 import { callWithRetry } from '../util/callWithRetry';
 import { joinPaths } from '../util/path';
-import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
+import { getErrorObjectByCode } from '../util/request';
+import {
+  TokenVerificationError,
+  TokenVerificationErrorAction,
+  TokenVerificationErrorCode,
+  TokenVerificationErrorReason,
+} from './errors';
 
 type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 
@@ -202,6 +208,19 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   });
 
   if (!response.ok) {
+    const json = await response.json();
+    const invalidSecretKeyError = getErrorObjectByCode(json?.errors, TokenVerificationErrorCode.InvalidSecretKey);
+
+    if (invalidSecretKeyError) {
+      const reason = TokenVerificationErrorReason.InvalidSecretKey;
+
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.ContactSupport,
+        message: invalidSecretKeyError.message,
+        reason,
+      });
+    }
+
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.ContactSupport,
       message: `Error loading Clerk JWKS from ${url.href} with code=${response.status}`,
