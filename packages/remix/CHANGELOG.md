@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.7.0
+
+### Minor Changes
+
+- Introduce `V2_ClerkErrorBoundary` to support `v2_errorBoundary` future flag ([#1444](https://github.com/clerkinc/javascript/pull/1444)) by [@anagstef](https://github.com/anagstef)
+
 ## 2.6.17
 
 ### Patch Changes

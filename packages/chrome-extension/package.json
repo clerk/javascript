@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "0.3.20",
+  "version": "0.3.21",
   "license": "MIT",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
@@ -29,7 +29,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@clerk/clerk-js": "^4.52.0",
+    "@clerk/clerk-js": "^4.52.1",
     "@clerk/clerk-react": "^4.22.0"
   },
   "devDependencies": {
