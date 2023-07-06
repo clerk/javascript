@@ -1,16 +1,22 @@
 import { noop } from '@clerk/shared';
 import type { PasswordSettingsData } from '@clerk/types';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { localizationKeys, useLocalizations } from '../localization';
 import type { FormControlState } from '../utils';
 import { loadZxcvbn } from '../utils';
-import { usePasswordComplexity } from './usePasswordComplexity';
-import { usePasswordStrength } from './usePasswordStrength';
+import type { ComplexityErrors } from './usePasswordComplexity';
+import { createValidateComplexity, generateErrorTextUtil } from './usePasswordComplexity';
+import type { PasswordStrength } from './usePasswordStrength';
+import { createValidatePasswordStrength } from './usePasswordStrength';
 
 type UsePasswordConfig = PasswordSettingsData & {
-  strengthMeter: boolean;
-  complexity: boolean;
+  validatePassword: boolean;
+};
+
+type PasswordValidation = {
+  complexity?: ComplexityErrors;
+  strength?: PasswordStrength;
 };
 
 type UsePasswordCbs = {
@@ -20,81 +26,121 @@ type UsePasswordCbs = {
   onValidationComplexity?: (b: boolean) => void;
 };
 
+type ValidatePasswordCbs = {
+  onValidation?: (res: PasswordValidation) => void;
+  onValidationComplexity?: (b: boolean) => void;
+};
+
 export const MIN_PASSWORD_LENGTH = 8;
 
+const createValidatePassword = (config: UsePasswordConfig, callbacks?: ValidatePasswordCbs) => {
+  const { onValidation = noop, onValidationComplexity = noop } = callbacks || {};
+  const { show_zxcvbn, validatePassword: validatePasswordProp } = config;
+  const getComplexity = createValidateComplexity(config);
+  const getScore = createValidatePasswordStrength(config);
+  let result = {} satisfies PasswordValidation;
+
+  return (password: string) => {
+    if (!validatePasswordProp) {
+      return;
+    }
+
+    /**
+     * Validate Complexity
+     */
+    const failedValidationsComplexity = getComplexity(password);
+    onValidationComplexity(Object.keys(failedValidationsComplexity).length === 0);
+    result = {
+      ...result,
+      complexity: failedValidationsComplexity,
+    };
+    /**
+     * Validate score
+     */
+    if (show_zxcvbn) {
+      /**
+       * Lazy load zxcvbn without preventing a complexityError to be thrown if it exists
+       */
+      void loadZxcvbn().then(zxcvbn => {
+        const setPasswordScore = getScore(zxcvbn);
+        const strength = setPasswordScore(password);
+
+        result = {
+          ...result,
+          strength,
+        };
+        onValidation({
+          ...result,
+          strength,
+        });
+      });
+    }
+
+    onValidation({
+      ...result,
+      complexity: failedValidationsComplexity,
+    });
+  };
+};
+
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {
+  const { t, locale } = useLocalizations();
   const {
     onValidationFailed = noop,
     onValidationSuccess = noop,
     onValidationWarning = noop,
-    onValidationComplexity = noop,
+    onValidationComplexity,
   } = callbacks || {};
-  const { strengthMeter, show_zxcvbn, complexity } = config;
-  const { setPassword: setPasswordComplexity } = usePasswordComplexity(config);
-  const { getScore } = usePasswordStrength();
-  const hasZxcvbnDownloadRef = useRef(false);
 
-  const reportSuccessOrError = useCallback(
-    (error: string | undefined, warning: string | undefined) => {
-      if (error) {
-        onValidationFailed(error);
-      } else if (warning) {
-        onValidationWarning(warning);
-      } else {
-        onValidationSuccess();
+  const onValidate = useCallback(
+    (res: PasswordValidation) => {
+      /**
+       * Failed complexity rules always have priority
+       */
+      if (Object.values(res?.complexity || {}).length > 0) {
+        return onValidationFailed(
+          generateErrorTextUtil({
+            config,
+            t,
+            failedValidations: res.complexity,
+            locale,
+          }),
+        );
       }
+
+      /**
+       * Failed strength
+       */
+      if (res?.strength?.state === 'fail') {
+        const error = res.strength.keys.map(localizationKey => t(localizationKeys(localizationKey as any))).join(' ');
+        return onValidationFailed(error);
+      }
+
+      /**
+       * Password meets all criteria but could be stronger
+       */
+      if (res?.strength?.state === 'pass') {
+        const error = res.strength.keys.map(localizationKey => t(localizationKeys(localizationKey as any))).join(' ');
+        return onValidationWarning(error);
+      }
+
+      /**
+       * Password meets all criteria and is strong
+       */
+      return onValidationSuccess();
     },
-    [callbacks],
+    [callbacks, t, locale],
   );
 
-  const setPassword = useCallback(
-    (_password: string) => {
-      let zxcvbnError = '';
-      let complexityError = '';
-      let zxcvbnWarning = '';
-
-      if (!complexity && !(strengthMeter && show_zxcvbn)) {
-        return;
-      }
-
-      if (complexity) {
-        const { failedValidationsText } = setPasswordComplexity(_password);
-        onValidationComplexity(!failedValidationsText);
-        complexityError = failedValidationsText;
-      }
-
-      if (complexity && strengthMeter && show_zxcvbn) {
-        void loadZxcvbn().then(zxcvbn => {
-          hasZxcvbnDownloadRef.current = true;
-          const setPasswordScore = getScore(zxcvbn);
-          const { errorText, warningText } = setPasswordScore(_password);
-          zxcvbnError = errorText;
-          zxcvbnWarning = warningText;
-          reportSuccessOrError(complexityError || zxcvbnError, zxcvbnWarning);
-        });
-
-        if (!hasZxcvbnDownloadRef.current && complexityError) {
-          onValidationFailed(complexityError);
-        }
-        return;
-      }
-      reportSuccessOrError(complexityError || zxcvbnError, zxcvbnWarning);
-    },
-    [
-      onValidationFailed,
-      onValidationSuccess,
+  const setPassword = useMemo(() => {
+    return createValidatePassword(config, {
+      onValidation: onValidate,
       onValidationComplexity,
-      strengthMeter,
-      show_zxcvbn,
-      complexity,
-      getScore,
-      setPasswordComplexity,
-    ],
-  );
+    });
+  }, [onValidate]);
 
   return {
     setPassword,
-    getScore,
   };
 };
 

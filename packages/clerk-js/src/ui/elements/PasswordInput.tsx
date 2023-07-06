@@ -10,13 +10,13 @@ import type { PropsOfComponent } from '../styledSystem';
 import { IconButton } from './IconButton';
 
 type PasswordInputProps = PropsOfComponent<typeof Input> & {
-  strengthMeter?: boolean;
-  complexity?: boolean;
+  validatePassword?: boolean;
 };
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
   const [hidden, setHidden] = React.useState(true);
-  const { id, onChange: onChangeProp, strengthMeter = false, complexity = false, ...rest } = props;
+  const { id, onChange: onChangeProp, validatePassword = false, ...rest } = props;
+
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
@@ -25,7 +25,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   const { t } = useLocalizations();
 
   const { setPassword } = usePassword(
-    { ...passwordSettings, complexity, strengthMeter },
+    { ...passwordSettings, validatePassword },
     {
       onValidationSuccess: () =>
         formControlProps?.setSuccessful?.(t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))),

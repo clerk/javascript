@@ -23,8 +23,7 @@ export const _ResetPassword = () => {
     label: localizationKeys('formFieldLabel__newPassword'),
     isRequired: true,
     enableErrorAfterBlur: true,
-    complexity: true,
-    strengthMeter: true,
+    validatePassword: true,
     informationText: failedValidationsText,
   });
 

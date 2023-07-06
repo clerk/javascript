@@ -1,5 +1,22 @@
 # Change Log
 
+## 4.52.1
+
+### Patch Changes
+
+- Updated dependencies [[`561a78bd7`](https://github.com/clerkinc/javascript/commit/561a78bd725ba893c229ddcc312573fb52fbd916)]:
+  - @clerk/localizations@1.22.1
+
+## 4.52.0
+
+### Minor Changes
+
+- The password field will now autofocus on the sign in factor one page. ([#1447](https://github.com/clerkinc/javascript/pull/1447)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Move UI for deleting account to bottom of user profile component in the security section ([#1407](https://github.com/clerkinc/javascript/pull/1407)) by [@jescalan](https://github.com/jescalan)
+
 ## 4.51.0
 
 ### Minor Changes

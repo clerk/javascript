@@ -10,16 +10,17 @@ import type {
   DomainOrProxyUrl,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  ListenerCallback,
   OrganizationMembershipResource,
   OrganizationResource,
   RedirectOptions,
-  Resources,
   SetActiveParams,
   SignInProps,
   SignOut,
   SignOutCallback,
   SignOutOptions,
   SignUpProps,
+  UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
   UserResource,
@@ -62,6 +63,7 @@ export default class IsomorphicClerk {
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
+  private preopenCreateOrganization?: null | CreateOrganizationProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
@@ -239,6 +241,14 @@ export default class IsomorphicClerk {
       clerkjs.openUserProfile(this.preopenUserProfile);
     }
 
+    if (this.preopenOrganizationProfile !== null) {
+      clerkjs.openOrganizationProfile(this.preopenOrganizationProfile);
+    }
+
+    if (this.preopenCreateOrganization !== null) {
+      clerkjs.openCreateOrganization(this.preopenCreateOrganization);
+    }
+
     this.premountSignInNodes.forEach((props: SignInProps, node: HTMLDivElement) => {
       clerkjs.mountSignIn(node, props);
     });
@@ -389,6 +399,22 @@ export default class IsomorphicClerk {
     }
   };
 
+  openCreateOrganization = (props?: CreateOrganizationProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.openCreateOrganization(props);
+    } else {
+      this.preopenCreateOrganization = props;
+    }
+  };
+
+  closeCreateOrganization = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.closeCreateOrganization();
+    } else {
+      this.preopenCreateOrganization = null;
+    }
+  };
+
   openSignUp = (props?: SignUpProps): void => {
     if (this.clerkjs && this.#loaded) {
       this.clerkjs.openSignUp(props);
@@ -517,12 +543,14 @@ export default class IsomorphicClerk {
     }
   };
 
-  addListener = (listener: (emission: Resources) => void): void => {
+  addListener = (listener: ListenerCallback): UnsubscribeCallback => {
     const callback = () => this.clerkjs?.addListener(listener);
+
     if (this.clerkjs) {
-      callback();
+      return callback() as UnsubscribeCallback;
     } else {
       this.premountMethodCalls.set('addListener', callback);
+      return () => this.premountMethodCalls.delete('addListener');
     }
   };
 

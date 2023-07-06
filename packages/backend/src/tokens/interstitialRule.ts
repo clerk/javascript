@@ -12,9 +12,15 @@ type InterstitialRule = <T extends AuthenticateRequestOptions>(
 
 const shouldRedirectToSatelliteUrl = (qp?: URLSearchParams) => !!qp?.get('__clerk_satellite_url');
 const hasJustSynced = (qp?: URLSearchParams) => qp?.get('__clerk_synced') === 'true';
+/**
+ * @deprecated This will be removed in the next minor version
+ */
 const isReturningFromPrimary = (qp?: URLSearchParams) => qp?.get('__clerk_referrer_primary') === 'true';
 
 const VALID_USER_AGENTS = /^Mozilla\/|(Amazon CloudFront)/;
+
+const isBrowser = (userAgent: string | undefined) => VALID_USER_AGENTS.test(userAgent || '');
+
 // In development or staging environments only, based on the request's
 // User Agent, detect non-browser requests (e.g. scripts). Since there
 // is no Authorization header, consider the user as signed out and
@@ -23,8 +29,8 @@ const VALID_USER_AGENTS = /^Mozilla\/|(Amazon CloudFront)/;
 // automatically treated as signed out. This exception is needed for development, because the any // missing uat throws an interstitial in development.
 export const nonBrowserRequestInDevRule: InterstitialRule = options => {
   const { apiKey, secretKey, userAgent } = options;
-  const key = secretKey || apiKey;
-  if (isDevelopmentFromApiKey(key) && !VALID_USER_AGENTS.test(userAgent || '')) {
+  const key = secretKey || apiKey || '';
+  if (isDevelopmentFromApiKey(key) && !isBrowser(userAgent)) {
     return signedOut(options, AuthErrorReason.HeaderMissingNonBrowser);
   }
   return undefined;
@@ -50,7 +56,7 @@ export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
 
 export const isPrimaryInDevAndRedirectsToSatellite: InterstitialRule = options => {
   const { apiKey, secretKey, isSatellite, searchParams } = options;
-  const key = secretKey || apiKey;
+  const key = secretKey || apiKey || '';
   const isDev = isDevelopmentFromApiKey(key);
 
   if (isDev && !isSatellite && shouldRedirectToSatelliteUrl(searchParams)) {
@@ -61,7 +67,7 @@ export const isPrimaryInDevAndRedirectsToSatellite: InterstitialRule = options =
 
 export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options => {
   const { apiKey, secretKey, clientUat } = options;
-  const key = secretKey || apiKey;
+  const key = secretKey || apiKey || '';
   const res = isDevelopmentFromApiKey(key);
   if (res && !clientUat) {
     return interstitial(options, AuthErrorReason.CookieUATMissing);
@@ -77,7 +83,7 @@ export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: Interstitia
   const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto } = options;
   const crossOriginReferrer =
     referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
-  const key = secretKey || apiKey;
+  const key = secretKey || apiKey || '';
 
   if (isDevelopmentFromApiKey(key) && crossOriginReferrer) {
     return interstitial(options, AuthErrorReason.CrossOriginReferrer);
@@ -85,10 +91,13 @@ export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: Interstitia
   return undefined;
 };
 
+/**
+ * @deprecated This will be removed in the next minor version
+ */
 export const satelliteInDevReturningFromPrimary: InterstitialRule = options => {
   const { apiKey, secretKey, isSatellite, searchParams } = options;
 
-  const key = secretKey || apiKey;
+  const key = secretKey || apiKey || '';
 
   if (isSatellite && isReturningFromPrimary(searchParams) && isDevelopmentFromApiKey(key)) {
     return interstitial(options, AuthErrorReason.SatelliteReturnsFromPrimary);
@@ -98,7 +107,7 @@ export const satelliteInDevReturningFromPrimary: InterstitialRule = options => {
 
 export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = options => {
   const { apiKey, secretKey, clientUat, cookieToken } = options;
-  const key = secretKey || apiKey;
+  const key = secretKey || apiKey || '';
 
   if (isProductionFromApiKey(key) && !clientUat && !cookieToken) {
     return signedOut(options, AuthErrorReason.CookieAndUATMissing);
@@ -184,12 +193,15 @@ async function verifyRequestState(options: AuthenticateRequestOptions, token: st
  * Let the next rule for UatMissing to fire if needed
  */
 export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
-  const { clientUat, isSatellite, searchParams, secretKey, apiKey } = options;
+  const { clientUat, isSatellite, searchParams, userAgent } = options;
 
-  const key = secretKey || apiKey;
-  const isDev = isDevelopmentFromApiKey(key);
+  const isSignedOut = !clientUat || clientUat === '0';
 
-  if (isSatellite && (!clientUat || clientUat === '0') && !hasJustSynced(searchParams) && !isDev) {
+  if (isSatellite && isSignedOut && !isBrowser(userAgent)) {
+    return signedOut(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
+  }
+
+  if (isSatellite && isSignedOut && !hasJustSynced(searchParams)) {
     return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
   }
 

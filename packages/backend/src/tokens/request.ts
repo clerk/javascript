@@ -36,61 +36,28 @@ export type RequiredVerifyTokenOptions = Required<
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
     VerifyTokenOptions,
-    'audience' | 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache' | 'jwtKey'
+    | 'audience'
+    | 'authorizedParties'
+    | 'clockSkewInSeconds'
+    | 'clockSkewInMs'
+    | 'jwksCacheTtlInMs'
+    | 'skipJwksCache'
+    | 'jwtKey'
   >
 >;
 
-type PublicKeys =
-  | {
-      publishableKey: string;
-      /**
-       * @deprecated Use `publishableKey` instead.
-       */
-      frontendApi: never;
-    }
-  | {
-      publishableKey: never;
-      /**
-       * @deprecated Use `publishableKey` instead.
-       */
-      frontendApi: string;
-    }
-  | {
-      publishableKey: string;
-      /**
-       * @deprecated Use `publishableKey` instead.
-       */
-      frontendApi: string;
-    };
-
-type SecretKeys =
-  | {
-      secretKey: string;
-      /**
-       * @deprecated Use `secretKey` instead.
-       */
-      apiKey: never;
-    }
-  | {
-      secretKey: never;
-      /**
-       * @deprecated Use `secretKey` instead.
-       */
-      apiKey: string;
-    }
-  | {
-      secretKey: string;
-      /**
-       * @deprecated Use `secretKey` instead.
-       */
-      apiKey: string;
-    };
-
-export type InstanceKeys = PublicKeys & SecretKeys;
-
-export type AuthenticateRequestOptions = InstanceKeys &
-  OptionalVerifyTokenOptions &
+export type AuthenticateRequestOptions = OptionalVerifyTokenOptions &
   LoadResourcesOptions & {
+    publishableKey?: string;
+    secretKey?: string;
+    /**
+     * @deprecated Use `publishableKey` instead.
+     */
+    frontendApi?: string;
+    /**
+     * @deprecated Use `secretKey` instead.
+     */
+    apiKey?: string;
     apiVersion?: string;
     apiUrl?: string;
     /* Client token cookie value */
@@ -156,7 +123,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   assertValidSecretKey(options.secretKey || options.apiKey);
 
   if (options.isSatellite) {
-    assertSignInUrlExists(options.signInUrl, options.secretKey || options.apiKey);
+    assertSignInUrlExists(options.signInUrl, (options.secretKey || options.apiKey) as string);
     assertProxyUrlOrDomain(options.proxyUrl || options.domain);
   }
 

@@ -67,8 +67,7 @@ export const PasswordPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__newPassword'),
     isRequired: true,
     enableErrorAfterBlur: true,
-    complexity: true,
-    strengthMeter: true,
+    validatePassword: true,
     informationText: failedValidationsText,
   });
 

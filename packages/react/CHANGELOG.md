@@ -1,5 +1,23 @@
 # Change Log
 
+## 4.22.0
+
+### Minor Changes
+
+- Update IsomorphicClerk#addListener to correctly return an unsubscribe method ([#1452](https://github.com/clerkinc/javascript/pull/1452)) by [@dimkl](https://github.com/dimkl)
+
+## 4.21.1
+
+### Patch Changes
+
+- Populate `openCreateOrganization` return from the `useClerk()` hook ([#1435](https://github.com/clerkinc/javascript/pull/1435)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.21.0
+
+### Minor Changes
+
+- Fix `global is not defined` error when using Vite + React by [@anagstef](https://github.com/anagstef)
+
 ## 4.20.6
 
 ### Patch Changes
