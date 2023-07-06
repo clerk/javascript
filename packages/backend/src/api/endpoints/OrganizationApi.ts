@@ -34,7 +34,7 @@ type UpdateParams = {
 } & MetadataParams;
 
 type UpdateLogoParams = {
-  file: Blob | File | null;
+  file: Blob | File;
   uploaderUserId: string;
 };
 
@@ -124,28 +124,23 @@ export class OrganizationAPI extends AbstractAPI {
   public async updateOrganizationLogo(organizationId: string, params: UpdateLogoParams) {
     this.requireId(organizationId);
 
-    if (params?.file === null) {
-      return this.request<Organization>({
-        method: 'DELETE',
-        path: joinPaths(basePath, organizationId, 'logo'),
-      });
-    }
-
-    if (!params?.file) {
-      throw new Error('A valid Blob or File is required.');
-    }
-    if (!params?.uploaderUserId) {
-      throw new Error('A valid uploaderUserId is required.');
-    }
-
     const formData = new FormData();
-    formData.append('file', params.file);
-    formData.append('uploader_user_id', params.uploaderUserId);
+    formData.append('file', params?.file);
+    formData.append('uploader_user_id', params?.uploaderUserId);
 
     return this.request<Organization>({
       method: 'PUT',
       path: joinPaths(basePath, organizationId, 'logo'),
       formData,
+    });
+  }
+
+  public async deleteOrganizationLogo(organizationId: string) {
+    this.requireId(organizationId);
+
+    return this.request<Organization>({
+      method: 'DELETE',
+      path: joinPaths(basePath, organizationId, 'logo'),
     });
   }
 

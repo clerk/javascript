@@ -129,12 +129,8 @@ export class UserAPI extends AbstractAPI {
   public async updateUserProfileImage(userId: string, params: { file: Blob | File }) {
     this.requireId(userId);
 
-    if (!params?.file) {
-      throw new Error('A valid Blob or File parameter is required.');
-    }
-
     const formData = new FormData();
-    formData.append('file', params.file);
+    formData.append('file', params?.file);
 
     return this.request<User>({
       method: 'POST',
