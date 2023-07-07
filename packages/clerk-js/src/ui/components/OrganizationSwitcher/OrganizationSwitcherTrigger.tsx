@@ -13,7 +13,8 @@ type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & {
 export const OrganizationSwitcherTrigger = withAvatarShimmer(
   forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>((props, ref) => {
     const { sx, ...rest } = props;
-    const user = useCoreUser();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
     const { organization } = useCoreOrganization();
     const { hidePersonal } = useOrganizationSwitcherContext();
 
@@ -39,7 +40,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
           <PersonalWorkspacePreview
             size={'sm'}
             gap={3}
-            user={user}
+            user={userWithoutIdentifiers}
             title={
               hidePersonal
                 ? localizationKeys('organizationSwitcher.notSelected')
