@@ -7,8 +7,10 @@ import { createEmailService } from './emailService';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
 import { createSignUpComponentPageObject } from './signUpPageObject';
+import type { FakeUser } from './usersService';
 import { createUserService } from './usersService';
 
+export type { FakeUser };
 const createClerkClient = (app: Application) => {
   return Clerk({
     secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
