@@ -44,3 +44,6 @@ playground:
 
 actions:
   - .github/workflows/**
+
+integration:
+  - integration/**
