@@ -4,7 +4,7 @@ import React from 'react';
 import { getFullName, getIdentifier } from '../../utils/user';
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Text, useLocalizations } from '../customizables';
-import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import type { InternalTheme, PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { UserAvatar } from './UserAvatar';
 
 // TODO Make this accept an interface with the superset of fields in:
@@ -66,6 +66,8 @@ export const UserPreview = (props: UserPreviewProps) => {
 
   const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
 
+  const getAvatarSizes = (t: InternalTheme) => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size]);
+
   return (
     <Flex
       elementDescriptor={descriptors.userPreview}
@@ -75,7 +77,7 @@ export const UserPreview = (props: UserPreviewProps) => {
       sx={[{ minWidth: '0px', width: '100%' }, sx]}
       {...rest}
     >
-      {showAvatar && (
+      {showAvatar ? (
         <Flex
           elementDescriptor={descriptors.userPreviewAvatarContainer}
           elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
@@ -90,13 +92,23 @@ export const UserPreview = (props: UserPreviewProps) => {
             {...samlAccount}
             name={name}
             avatarUrl={imageUrl}
-            size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
+            size={getAvatarSizes}
             sx={avatarSx}
             rounded={rounded}
           />
 
           {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
         </Flex>
+      ) : (
+        // Reserve layout space when avatar is not visible
+        <Flex
+          elementDescriptor={descriptors.userPreviewAvatarContainer}
+          elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
+          justify='center'
+          sx={t => ({
+            height: getAvatarSizes(t),
+          })}
+        />
       )}
 
       <Flex
