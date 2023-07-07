@@ -41,6 +41,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             size={'sm'}
             gap={3}
             user={userWithoutIdentifiers}
+            showAvatar={!hidePersonal}
             title={
               hidePersonal
                 ? localizationKeys('organizationSwitcher.notSelected')
