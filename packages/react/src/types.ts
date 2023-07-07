@@ -77,7 +77,9 @@ type ButtonProps = {
 };
 
 export type SignInButtonProps = ButtonProps;
-export type SignUpButtonProps = ButtonProps;
+export interface SignUpButtonProps extends ButtonProps {
+  unsafeMetadata?: SignUpUnsafeMetadata;
+}
 
 export type SignInWithMetamaskButtonProps = Pick<ButtonProps, 'redirectUrl' | 'children'>;
 
