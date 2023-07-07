@@ -10,7 +10,7 @@ out
 node_modules
 
 # IDEs and editors
-/.idea
+.idea
 .project
 .classpath
 .c9/
@@ -66,3 +66,13 @@ packages/*/examples/*/package-lock.json
 packages/*/examples/*/yarn.lock
 playground/*/package-lock.json
 playground/*/yarn.lock
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# integration testing
+.keys.json
+.env.json
+.temp_integration
+playwright-report
+test-results
