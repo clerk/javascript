@@ -1,3 +1,5 @@
+import type { TestArgs } from './signInPageObject';
+
 export const common = ({ page }: TestArgs) => {
   return {
     continue: () => {

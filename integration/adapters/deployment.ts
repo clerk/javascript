@@ -1,4 +1,4 @@
-import { appConfigs } from '../configs';
+import { appConfigs } from '../presets';
 import { createLogger, run } from '../utils';
 import type { ApplicationConfig } from './applicationConfig';
 
