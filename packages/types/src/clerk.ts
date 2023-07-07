@@ -597,6 +597,11 @@ export type SignUpProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: SignUpTheme;
+
+  /**
+   * Additional arbitrary metadata to be stored alongside the User object
+   */
+  unsafeMetadata?: SignUpUnsafeMetadata;
 } & RedirectOptions;
 
 export type UserProfileProps = {

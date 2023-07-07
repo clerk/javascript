@@ -129,7 +129,7 @@
       }
 
       function openSignUp() {
-        Clerk.openSignUp();
+        Clerk.openSignUp({ unsafeMetadata: { playground: 'vanillajs' } });
       }
 
       function signOut() {

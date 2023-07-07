@@ -36,7 +36,7 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useCoreClerk();
   const ctx = useSignUpContext();
-  const { navigateAfterSignUp, signInUrl } = ctx;
+  const { navigateAfterSignUp, signInUrl, unsafeMetadata } = ctx;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -181,6 +181,10 @@ function _SignUpStart(): JSX.Element {
       (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
       [] as Array<FormControlState>,
     );
+
+    if (unsafeMetadata) {
+      fieldsToSubmit.push({ id: 'unsafeMetadata', value: unsafeMetadata } as any);
+    }
 
     if (fields.ticket) {
       const noop = () => {
