@@ -1,5 +1,6 @@
 import type { OAuthProvider } from '@clerk/types';
 
+import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
 import { AbstractAPI } from './AbstractApi';
@@ -129,7 +130,7 @@ export class UserAPI extends AbstractAPI {
   public async updateUserProfileImage(userId: string, params: { file: Blob | File }) {
     this.requireId(userId);
 
-    const formData = new FormData();
+    const formData = new runtime.FormData();
     formData.append('file', params?.file);
 
     return this.request<User>({

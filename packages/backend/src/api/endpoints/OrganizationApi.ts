@@ -1,3 +1,4 @@
+import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
 import type { OrganizationMembershipRole } from '../resources/Enums';
@@ -124,7 +125,7 @@ export class OrganizationAPI extends AbstractAPI {
   public async updateOrganizationLogo(organizationId: string, params: UpdateLogoParams) {
     this.requireId(organizationId);
 
-    const formData = new FormData();
+    const formData = new runtime.FormData();
     formData.append('file', params?.file);
     formData.append('uploader_user_id', params?.uploaderUserId);
 
