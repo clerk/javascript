@@ -44,6 +44,7 @@ type _LocalizationResource = {
   formFieldLabel__backupCode: LocalizationValue;
   formFieldLabel__organizationName: LocalizationValue;
   formFieldLabel__organizationSlug: LocalizationValue;
+  formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
@@ -527,7 +528,9 @@ type _LocalizationResource = {
     };
     deletePage: {
       title: LocalizationValue;
-      description: LocalizationValue;
+      messageLine1: LocalizationValue;
+      messageLine2: LocalizationValue;
+      actionDescription: LocalizationValue;
       confirm: LocalizationValue;
     };
   };
@@ -564,12 +567,14 @@ type _LocalizationResource = {
           title: LocalizationValue;
           messageLine1: LocalizationValue;
           messageLine2: LocalizationValue;
+          actionDescription: LocalizationValue;
           successMessage: LocalizationValue;
         };
         deleteOrganization: {
           title: LocalizationValue;
           messageLine1: LocalizationValue;
           messageLine2: LocalizationValue;
+          actionDescription: LocalizationValue;
           successMessage: LocalizationValue;
         };
       };
