@@ -1,3 +1,4 @@
+import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
 import type { OrganizationMembershipRole } from '../resources/Enums';
@@ -32,6 +33,11 @@ type UpdateParams = {
   slug?: string;
   maxAllowedMemberships?: number;
 } & MetadataParams;
+
+type UpdateLogoParams = {
+  file: Blob | File;
+  uploaderUserId: string;
+};
 
 type UpdateMetadataParams = MetadataParams;
 
@@ -113,6 +119,29 @@ export class OrganizationAPI extends AbstractAPI {
       method: 'PATCH',
       path: joinPaths(basePath, organizationId),
       bodyParams: params,
+    });
+  }
+
+  public async updateOrganizationLogo(organizationId: string, params: UpdateLogoParams) {
+    this.requireId(organizationId);
+
+    const formData = new runtime.FormData();
+    formData.append('file', params?.file);
+    formData.append('uploader_user_id', params?.uploaderUserId);
+
+    return this.request<Organization>({
+      method: 'PUT',
+      path: joinPaths(basePath, organizationId, 'logo'),
+      formData,
+    });
+  }
+
+  public async deleteOrganizationLogo(organizationId: string) {
+    this.requireId(organizationId);
+
+    return this.request<Organization>({
+      method: 'DELETE',
+      path: joinPaths(basePath, organizationId, 'logo'),
     });
   }
 
