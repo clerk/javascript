@@ -52,6 +52,8 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     } = useOrganizationSwitcherContext();
 
     const user = useCoreUser();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
 
     if (!isLoaded) {
       return null;
@@ -139,7 +141,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
               !hidePersonal && (
                 <PersonalWorkspacePreview
                   gap={4}
-                  user={user}
+                  user={userWithoutIdentifiers}
                   sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$6 })}
                   title={localizationKeys('organizationSwitcher.personalWorkspace')}
                 />
