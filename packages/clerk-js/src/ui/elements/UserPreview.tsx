@@ -123,7 +123,7 @@ export const UserPreview = (props: UserPreviewProps) => {
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
           colorScheme='inherit'
-          sx={theme => ({ display: 'flex', gap: theme.sizes.$1 })}
+          sx={theme => ({ display: 'flex', gap: theme.sizes.$1, alignItems: 'center' })}
         >
           <Text
             as='span'
