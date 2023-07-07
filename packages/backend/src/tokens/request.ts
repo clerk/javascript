@@ -1,6 +1,7 @@
-import { API_URL, API_VERSION } from '../constants';
+import { API_URL, API_VERSION, constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { isDevelopmentFromApiKey } from '../util/instance';
+import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { parsePublishableKey } from '../util/parsePublishableKey';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
@@ -100,6 +101,7 @@ export type AuthenticateRequestOptions = OptionalVerifyTokenOptions &
      * @experimental
      */
     signInUrl?: string;
+    request?: Request;
   };
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
@@ -115,10 +117,25 @@ function assertProxyUrlOrDomain(proxyUrlOrDomain: string | undefined) {
 }
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
-  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  options.apiUrl = options.apiUrl || API_URL;
-  options.apiVersion = options.apiVersion || API_VERSION;
-  options.headerToken = options.headerToken?.replace('Bearer ', '');
+  const { cookies, headers, searchParams } = buildRequest(options?.request);
+
+  options = {
+    ...options,
+    frontendApi: parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi,
+    apiUrl: options.apiUrl || API_URL,
+    apiVersion: options.apiVersion || API_VERSION,
+    headerToken: stripAuthorizationHeader(options.headerToken || headers?.(constants.Headers.Authorization)),
+    cookieToken: options.cookieToken || cookies?.(constants.Cookies.Session),
+    clientUat: options.clientUat || cookies?.(constants.Cookies.ClientUat),
+    origin: options.origin || headers?.(constants.Headers.Origin),
+    host: options.host || headers?.(constants.Headers.Host),
+    forwardedHost: options.forwardedHost || headers?.(constants.Headers.ForwardedHost),
+    forwardedPort: options.forwardedPort || headers?.(constants.Headers.ForwardedPort),
+    forwardedProto: options.forwardedProto || headers?.(constants.Headers.ForwardedProto),
+    referrer: options.referrer || headers?.(constants.Headers.Referrer),
+    userAgent: options.userAgent || headers?.(constants.Headers.UserAgent),
+    searchParams: options.searchParams || searchParams || undefined,
+  };
 
   assertValidSecretKey(options.secretKey || options.apiKey);
 

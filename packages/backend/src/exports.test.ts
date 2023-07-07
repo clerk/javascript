@@ -34,6 +34,7 @@ export default (QUnit: QUnit) => {
         'Verification',
         'constants',
         'createAuthenticateRequest',
+        'createIsomorphicRequest',
         'debugRequestState',
         'decodeJwt',
         'deserialize',
