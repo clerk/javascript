@@ -36,6 +36,7 @@ export interface OrganizationResource extends ClerkResource {
   pendingInvitationsCount: number;
   publicMetadata: OrganizationPublicMetadata;
   adminDeleteEnabled: boolean;
+  maxAllowedMemberships: number;
   createdAt: Date;
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
