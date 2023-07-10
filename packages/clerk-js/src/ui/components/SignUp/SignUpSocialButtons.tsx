@@ -29,10 +29,11 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
       oauthCallback={(strategy: OAuthStrategy) => {
         return signUp
           .authenticateWithRedirect({
-            strategy,
+            continueSignUp,
             redirectUrl,
             redirectUrlComplete,
-            continueSignUp,
+            strategy,
+            unsafeMetadata: ctx.unsafeMetadata,
           })
           .catch(err => handleError(err, [], card.setError));
       }}
@@ -42,6 +43,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             customNavigate: navigate,
             redirectUrl: redirectUrlComplete,
             signUpContinueUrl: 'continue',
+            unsafeMetadata: ctx.unsafeMetadata,
           })
           .catch(err => handleError(err, [], card.setError));
       }}
