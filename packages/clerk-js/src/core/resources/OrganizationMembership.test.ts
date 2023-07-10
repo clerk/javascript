@@ -20,6 +20,8 @@ describe('OrganizationMembership', () => {
         updated_at: 67890,
         members_count: 1,
         pending_invitations_count: 10,
+        admin_delete_enabled: true,
+        max_allowed_memberships: 3,
       },
       public_metadata: {
         foo: 'bar',
