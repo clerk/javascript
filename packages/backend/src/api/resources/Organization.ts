@@ -13,6 +13,7 @@ export class Organization {
     readonly publicMetadata: OrganizationPublicMetadata | null = {},
     readonly privateMetadata: OrganizationPrivateMetadata = {},
     readonly maxAllowedMemberships: number,
+    readonly adminDeleteEnabled: boolean,
   ) {}
 
   static fromJSON(data: OrganizationJSON): Organization {
@@ -28,6 +29,7 @@ export class Organization {
       data.public_metadata,
       data.private_metadata,
       data.max_allowed_memberships,
+      data.admin_delete_enabled,
     );
   }
 }
