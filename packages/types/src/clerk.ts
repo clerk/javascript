@@ -818,9 +818,10 @@ export interface CreateOrganizationParams {
 }
 
 export interface AuthenticateWithMetamaskParams {
+  customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;
-  customNavigate?: (to: string) => Promise<unknown>;
+  unsafeMetadata?: SignUpUnsafeMetadata;
 }
 
 export interface LoadedClerk extends Clerk {
