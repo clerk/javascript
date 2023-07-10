@@ -10,6 +10,10 @@ declare global {
   interface OrganizationInvitationPublicMetadata {
     [k: string]: unknown;
   }
+
+  interface OrganizationInvitationPrivateMetadata {
+    [k: string]: unknown;
+  }
 }
 
 export interface OrganizationInvitationResource extends ClerkResource {
