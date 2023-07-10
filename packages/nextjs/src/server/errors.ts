@@ -25,6 +25,7 @@ export const config = {
 };
 
 Alternatively, you can set your own ignoredRoutes. See https://clerk.com/docs/nextjs/middleware
+(This log only appears in development mode)
 `;
 
 export const getAuthAuthHeaderMissing = () =>
@@ -32,3 +33,46 @@ export const getAuthAuthHeaderMissing = () =>
 
 export const authAuthHeaderMissing = () =>
   "Clerk: auth() was called but it looks like you aren't using `authMiddleware` in your middleware file. Please use `authMiddleware` and make sure your middleware matcher is configured correctly and it matches this route or page. See https://clerk.com/docs/quickstarts/get-started-with-nextjs";
+
+export const infiniteRedirectLoopDetected = () =>
+  `Clerk: Infinite redirect loop detected. That usually means that we were not able to determine the auth state for this request. A list of common causes and solutions follows.
+
+Reason 1:
+Your server's system clock is inaccurate. Clerk will continuously try to issue new tokens, as the existing ones will be treated as "expired" due to clock skew.
+How to resolve:
+-> Make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
+
+Reason 2:
+Your Clerk instance keys are incorrect, or you recently changed keys (Publishable Key, Secret Key).
+How to resolve:
+-> Make sure you're using the correct keys from the Clerk Dashboard. If you changed keys recently, make sure to clear your browser application data and cookies.
+
+Reason 3:
+A bug that may have already been fixed in the latest version of Clerk NextJS package.
+How to resolve:
+-> Make sure you are using the latest version of '@clerk/nextjs' and 'next'.
+`;
+
+export const informAboutProtectedRouteInfo = (
+  path: string,
+  hasPublicRoutes: boolean,
+  hasIgnoredRoutes: boolean,
+  defaultIgnoredRoutes: string[],
+) => {
+  const publicRoutesText = hasPublicRoutes
+    ? `1. To make the route accessible to both signed in and signed out users, add "${path}" to the \`publicRoutes\` array passed to authMiddleware`
+    : `1. To make the route accessible to both signed in and signed out users, pass \`publicRoutes: ["${path}"]\` to authMiddleware`;
+  const ignoredRoutes = [...defaultIgnoredRoutes, path].map(r => `"${r}"`).join(', ');
+  const ignoredRoutesText = hasIgnoredRoutes
+    ? `2. To prevent Clerk authentication from running at all, add "${path}" to the \`ignoredRoutes\` array passed to authMiddleware`
+    : `2. To prevent Clerk authentication from running at all, pass \`ignoredRoutes: [${ignoredRoutes}]\` to authMiddleware`;
+  const afterAuthText =
+    "3. Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes";
+
+  return `INFO: Clerk: The request to ${path} is being redirected because there is no signed-in user, and the path is not included in \`ignoredRoutes\` or \`publicRoutes\`. To prevent this behavior, choose one of:
+
+${[publicRoutesText, ignoredRoutesText, afterAuthText].join('\n')}
+
+For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
+(This log only appears in development mode, or if \`debug: true\` is passed to authMiddleware)`;
+};
