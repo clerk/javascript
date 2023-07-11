@@ -1,11 +1,13 @@
 import type { Options } from 'tsup';
 import { defineConfig } from 'tsup';
 
+import { runAfterLast } from '../../scripts/utils';
 // @ts-ignore
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
+  const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
     entry: ['./src/**/*.{ts,tsx,js,jsx}'],
@@ -24,20 +26,23 @@ export default defineConfig(overrideOptions => {
     },
   };
 
-  const onSuccess = (format: 'esm' | 'cjs') => `cp ./package.${format}.json ./dist/${format}/package.json`;
-
   const esm: Options = {
     ...common,
     format: 'esm',
-    onSuccess: onSuccess('esm'),
   };
 
   const cjs: Options = {
     ...common,
     format: 'cjs',
     outDir: './dist/cjs',
-    onSuccess: onSuccess('cjs'),
   };
 
-  return [esm, cjs];
+  const copyPackageJson = (format: 'esm' | 'cjs') => `cp ./package.${format}.json ./dist/${format}/package.json`;
+
+  return runAfterLast([
+    'npm run build:declarations',
+    copyPackageJson('esm'),
+    copyPackageJson('cjs'),
+    shouldPublish && 'npm run publish:local',
+  ])(esm, cjs);
 });

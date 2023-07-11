@@ -64,13 +64,15 @@
     "app-beta"
   ],
   "scripts": {
-    "build": "npm run clean && tsup && npm run build:declarations",
+    "build": "npm run clean && tsup",
+    "dev": "tsup --watch",
+    "dev:publish": "npm run dev -- --env.publish",
     "build:declarations": "tsc -p tsconfig.declarations.json",
+    "publish:local": "npx yalc push --replace --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%",
-    "dev": "tsup --watch"
+    "test:ci": "jest --maxWorkers=50%"
   },
   "dependencies": {
     "@clerk/backend": "^0.24.0",

@@ -43,7 +43,7 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
   }
 }
 
-const οbservabilityHeadersFromRequestState = (requestState: RequestState): Headers => {
+const observabilityHeadersFromRequestState = (requestState: RequestState): Headers => {
   const headers = {} as Record<string, string>;
 
   if (requestState.message) {
@@ -72,7 +72,7 @@ export const getClerkDebugHeaders = (headers: Headers) => {
 };
 
 export const unknownResponse = (requestState: RequestState) => {
-  return json(null, { status: 401, headers: οbservabilityHeadersFromRequestState(requestState) });
+  return json(null, { status: 401, headers: observabilityHeadersFromRequestState(requestState) });
 };
 
 export const interstitialJsonResponse = (requestState: RequestState, opts: { loader: 'root' | 'nested' }) => {
@@ -93,7 +93,7 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
         signInUrl: requestState.signInUrl,
       }),
     }),
-    { status: 401, headers: οbservabilityHeadersFromRequestState(requestState) },
+    { status: 401, headers: observabilityHeadersFromRequestState(requestState) },
   );
 };
 
@@ -117,7 +117,7 @@ export const injectRequestStateIntoResponse = async (response: Response, request
   // set the correct content-type header in case the user returned a `Response` directly
   // without setting the header, instead of using the `json()` helper
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
-  οbservabilityHeadersFromRequestState(requestState).forEach((value, key) => {
+  observabilityHeadersFromRequestState(requestState).forEach((value, key) => {
     clone.headers.set(key, value);
   });
 
