@@ -61,9 +61,11 @@
     "api",
     "edge-middleware",
     "ssr",
-    "app-beta"
+    "app-beta",
+    "post-install.js"
   ],
   "scripts": {
+    "postinstall": "node post-install.js",
     "build": "npm run clean && tsup",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
