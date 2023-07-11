@@ -1,3 +1,4 @@
+import type { RemixClerkProviderProps } from './client';
 import type { ClerkState } from './client/types';
 import { invalidClerkStatePropError, noClerkStateError } from './errors';
 

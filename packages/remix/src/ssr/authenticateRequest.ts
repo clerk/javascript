@@ -73,6 +73,21 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const signInUrl =
     opts.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL') || (context?.CLERK_SIGN_IN_URL as string) || '';
 
+  const signUpUrl =
+    opts.signUpUrl || getEnvVariable('CLERK_SIGN_UP_URL') || (context?.CLERK_SIGN_UP_URL as string) || '';
+
+  const afterSignInUrl =
+    opts.afterSignInUrl ||
+    getEnvVariable('CLERK_AFTER_SIGN_IN_URL') ||
+    (context?.CLERK_AFTER_SIGN_IN_URL as string) ||
+    '';
+
+  const afterSignUpUrl =
+    opts.afterSignUpUrl ||
+    getEnvVariable('CLERK_AFTER_SIGN_UP_URL') ||
+    (context?.CLERK_AFTER_SIGN_UP_URL as string) ||
+    '';
+
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
@@ -96,6 +111,9 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     isSatellite,
     domain,
     signInUrl,
+    signUpUrl,
+    afterSignInUrl,
+    afterSignUpUrl,
     request,
   });
 }

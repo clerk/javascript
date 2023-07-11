@@ -21,6 +21,9 @@ export type RootAuthLoaderOptions = {
   loadOrganization?: boolean;
   authorizedParties?: [];
   signInUrl?: string;
+  signUpUrl?: string;
+  afterSignInUrl?: string;
+  afterSignUpUrl?: string;
 } & Pick<VerifyTokenOptions, 'audience'> &
   MultiDomainAndOrProxy;
 
