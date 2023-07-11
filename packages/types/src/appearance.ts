@@ -240,7 +240,7 @@ export type ElementsConfig = {
   avatarImage: WithOptions<never, never, never>;
   avatarImageActions: WithOptions<never, never, never>;
   avatarImageActionsUpload: WithOptions<never, never, never>;
-  avatarImageActionsReset: WithOptions<never, never, never>;
+  avatarImageActionsRemove: WithOptions<never, never, never>;
 
   // TODO: We can remove "Popover" from these:
   userButtonBox: WithOptions<never, 'open', never>;

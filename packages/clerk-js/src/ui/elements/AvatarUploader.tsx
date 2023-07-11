@@ -88,7 +88,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
 
             {!!onAvatarRemove && !showUpload && (
               <Button
-                elementDescriptor={descriptors.avatarImageActionsReset}
+                elementDescriptor={descriptors.avatarImageActionsRemove}
                 localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}
                 isDisabled={card.isLoading}
                 sx={t => ({ color: t.colors.$danger500 })}

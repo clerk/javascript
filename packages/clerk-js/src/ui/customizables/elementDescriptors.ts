@@ -101,7 +101,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'avatarImage',
   'avatarImageActions',
   'avatarImageActionsUpload',
-  'avatarImageActionsReset',
+  'avatarImageActionsRemove',
 
   'userButtonBox',
   'userButtonOuterIdentifier',
