@@ -1,11 +1,11 @@
+import { constants } from '../constants';
+
 export function jsonOk(body: unknown, status = 200) {
   // Mock response object that satisfies the window.Response interface
   const mockResponse = {
     ok: true,
     status,
-    headers: {
-      'Content-type': 'application/json',
-    },
+    headers: { get: mockHeadersGet },
     json() {
       return Promise.resolve(body);
     },
@@ -19,9 +19,7 @@ export function jsonNotOk(body: unknown) {
   const mockResponse = {
     ok: false,
     status: 422,
-    headers: {
-      'Content-type': 'application/json',
-    },
+    headers: { get: mockHeadersGet },
     json() {
       return Promise.resolve(body);
     },
@@ -35,9 +33,7 @@ export function jsonError(body: unknown, status = 500) {
   const mockResponse = {
     ok: false,
     status: status,
-    headers: {
-      'Content-type': 'application/json',
-    },
+    headers: { get: mockHeadersGet },
     json() {
       return Promise.resolve(body);
     },
@@ -45,3 +41,5 @@ export function jsonError(body: unknown, status = 500) {
 
   return Promise.resolve(mockResponse);
 }
+
+const mockHeadersGet = (key: string) => (key === constants.Headers.ContentType ? constants.ContentTypes.Json : null);
