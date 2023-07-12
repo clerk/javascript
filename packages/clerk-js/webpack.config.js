@@ -238,12 +238,12 @@ const devConfig = ({ mode, env }) => {
         rules: [svgLoader(), typescriptLoaderDev()],
       },
       plugins: [
-        new ReactRefreshWebpackPlugin({ overlay: { sockHost: 'js.lclclerk.com' } }),
+        new ReactRefreshWebpackPlugin({ overlay: { sockHost: 'http://localhost:4000' } }),
         ...(env.serveAnalyzer ? [new BundleAnalyzerPlugin()] : []),
       ],
       devtool: 'eval-cheap-source-map',
       output: {
-        publicPath: 'https://js.lclclerk.com/npm/',
+        publicPath: 'http://localhost:4000/npm/',
         crossOriginLoading: 'anonymous',
         filename: `${variant}.js`,
         libraryTarget: 'umd',
@@ -258,7 +258,7 @@ const devConfig = ({ mode, env }) => {
         port: 4000,
         hot: true,
         liveReload: false,
-        client: { webSocketURL: 'auto://js.lclclerk.com/ws' },
+        client: { webSocketURL: 'auto://localhost:4000/ws' },
       },
     };
   };

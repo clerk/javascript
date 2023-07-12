@@ -4,19 +4,14 @@
   "private": true,
   "scripts": {
     "dev:yalc": "npm run yalc && rm -rf .next && next dev --port 4011",
-    "yalc": "yalc add -- @clerk/nextjs @clerk/clerk-react @clerk/backend @clerk/types @clerk/shared",
     "dev": "next dev --port 4011",
     "build": "next build",
-    "build:yalc": "npm run yalc && rm -rf .next && next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/backend": "file:.yalc/@clerk/backend",
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
-    "@clerk/nextjs": "file:.yalc/@clerk/nextjs",
-    "@clerk/shared": "file:.yalc/@clerk/shared",
-    "@clerk/types": "file:.yalc/@clerk/types",
+    "@clerk/nextjs": "file:../../packages/nextjs",
+    "@clerk/clerk-react": "file:../../packages/react",
     "@types/node": "18.16.0",
     "@types/react": "18.0.38",
     "@types/react-dom": "18.0.11",

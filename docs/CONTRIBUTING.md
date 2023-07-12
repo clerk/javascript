@@ -25,7 +25,7 @@ Please note we have a [code of conduct](https://github.com/clerkinc/javascript/b
 
 ## Developing locally
 
-This section is a work-in-progress. More details will be added soon.
+_This section is a work-in-progress. More details will be added soon._
 
 ### Monorepo setup
 
@@ -69,6 +69,37 @@ For package specific setup, refer to the `Build` section of the specific package
 ### Making changes to packages
 
 WIP
+
+#### Using fixtures
+
+This monorepo contains a number of fixtures called "playgrounds" that are used to test Clerk's JavaScript SDKs. To get started, run the development command:
+
+```
+npm run dev
+```
+
+##### `playgrounds/app-router`
+
+This fixture contains a Clerk / Next.js integration. Using your Clerk keys, add the following environment variables to `playgrounds/app-router/.env.local`. Refer to the [Get started with Next.js](https://clerk.com/docs/nextjs/get-started-with-nextjs) for additional information.
+
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<Your pk>
+CLERK_SECRET_KEY=<Your sk>
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+```
+
+To start the fixture, run the following:
+
+```
+cd packages/app-router
+npm install
+npm run dev
+```
+
+Changes to the local `clerk-js`, `nextjs` and `clerk-react` packages should reflect in the running development app.
 
 ### Making changes to the hot-loaded `clerk-js`
 

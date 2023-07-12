@@ -40,9 +40,9 @@ export default defineConfig(overrideOptions => {
   const copyPackageJson = (format: 'esm' | 'cjs') => `cp ./package.${format}.json ./dist/${format}/package.json`;
 
   return runAfterLast([
-    'npm run build:declarations',
     copyPackageJson('esm'),
     copyPackageJson('cjs'),
+    'npm run build:declarations',
     shouldPublish && 'npm run publish:local',
   ])(esm, cjs);
 });
