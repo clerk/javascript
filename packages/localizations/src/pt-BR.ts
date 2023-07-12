@@ -539,6 +539,7 @@ export const ptBR: LocalizationResource = {
     form_password_pwned:
       'Esta senha apareceu em um vazamento e por isso não pode ser usada, por favor tente outra senha.',
     form_username_invalid_length: 'O nome de usuário tem um tamanho inválido',
+    form_username_invalid_character: '',
     form_param_format_invalid: 'Formato inválido',
     form_password_length_too_short: 'A senha é muito curta',
     form_param_nil: 'O campo é obrigatório',

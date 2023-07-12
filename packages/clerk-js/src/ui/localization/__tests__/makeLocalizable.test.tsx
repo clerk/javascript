@@ -93,6 +93,7 @@ describe('Test localizable components', () => {
         form_identifier_not_found: 'form_identifier_not_found',
         form_password_pwned: 'form_password_pwned',
         form_username_invalid_length: 'form_username_invalid_length',
+        form_username_invalid_character: 'form_username_invalid_character',
         form_param_format_invalid: 'form_param_format_invalid',
         form_password_length_too_short: 'form_password_length_too_short',
         form_param_nil: 'form_param_nil',
@@ -113,6 +114,9 @@ describe('Test localizable components', () => {
     expect(translateError({ code: 'form_password_pwned', message: 'message' })).toBe('form_password_pwned');
     expect(translateError({ code: 'form_username_invalid_length', message: 'message' })).toBe(
       'form_username_invalid_length',
+    );
+    expect(translateError({ code: 'form_username_invalid_character', message: 'message' })).toBe(
+      'form_username_invalid_character',
     );
     expect(translateError({ code: 'form_param_format_invalid', message: 'message' })).toBe('form_param_format_invalid');
     expect(translateError({ code: 'form_password_length_too_short', message: 'message' })).toBe(
