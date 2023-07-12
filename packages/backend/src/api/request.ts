@@ -2,7 +2,7 @@ import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import deepmerge from 'deepmerge';
 import snakecaseKeys from 'snakecase-keys';
 
-import { API_URL, API_VERSION, USER_AGENT } from '../constants';
+import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
@@ -128,7 +128,8 @@ export function buildRequest(options: CreateBackendApiOptions) {
       }
 
       // TODO: Parse JSON or Text response based on a response header
-      const isJSONResponse = headers['Content-Type'] === 'application/json';
+      const isJSONResponse =
+        res?.headers && res.headers?.get(constants.Headers.ContentType) === constants.ContentTypes.Json;
       const data = await (isJSONResponse ? res.json() : res.text());
 
       if (!res.ok) {
