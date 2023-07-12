@@ -603,6 +603,7 @@ export const enUS: LocalizationResource = {
     form_password_pwned:
       'This password has been found as part of a breach and can not be used, please try another password instead.',
     form_username_invalid_length: '',
+    form_username_invalid_character: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_password_length_too_short: '',

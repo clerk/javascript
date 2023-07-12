@@ -564,6 +564,7 @@ export const koKR: LocalizationResource = {
     form_identifier_not_found: '',
     form_password_pwned: '이 비밀번호는 유출사항이 발견되어 사용할 수 없으므로 대신 다른 비밀번호를 사용해 보세요.',
     form_username_invalid_length: '',
+    form_username_invalid_character: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',
     form_param_nil: '',

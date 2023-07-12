@@ -578,6 +578,7 @@ export const ruRU: LocalizationResource = {
     form_password_size_in_bytes_exceeded:
       'Ваш пароль превышает максимально допустимое количество байтов, сократите его или удалите некоторые специальные символы.',
     form_username_invalid_length: '',
+    form_username_invalid_character: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',
     form_param_nil: '',

@@ -594,6 +594,7 @@ export const nbNO: LocalizationResource = {
     form_password_pwned:
       'Dette passordet er funnet som en del av et datainnbrudd og kan ikke brukes. Vennligst prøv et annet passord.',
     form_username_invalid_length: '',
+    form_username_invalid_character: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'E-postadressen må være en gyldig e-postadresse',
     form_password_length_too_short: '',

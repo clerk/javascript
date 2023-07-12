@@ -600,6 +600,7 @@ export const viVN: LocalizationResource = {
     form_password_pwned:
       'Mật khẩu này đã được phát hiện trong một cuộc tấn công và không thể sử dụng, vui lòng thử mật khẩu khác.',
     form_username_invalid_length: '',
+    form_username_invalid_character: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Địa chỉ email phải là một địa chỉ email hợp lệ',
     form_password_length_too_short: '',
