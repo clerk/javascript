@@ -359,16 +359,14 @@ const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => 
 
   const host = getFirstValueFromHeader(req, constants.Headers.ForwardedHost);
   const protocol = getFirstValueFromHeader(req, constants.Headers.ForwardedProto);
-  const port = getFirstValueFromHeader(req, constants.Headers.ForwardedPort);
 
-  const isHttpRelatedProtocol = protocol && ['http', 'https'].includes(protocol);
-  const isHttpRelatedPort = port && ['80', '443'].includes(port);
-  if (isHttpRelatedProtocol && isHttpRelatedPort) {
-    clerkUrl.port = '';
+  if (host && protocol) {
+    const origin = new URL(`${protocol}://${host}`);
+
+    clerkUrl.port = origin.port;
+    clerkUrl.protocol = origin.protocol;
+    clerkUrl.host = origin.host;
   }
-
-  clerkUrl.protocol = protocol ?? clerkUrl.protocol;
-  clerkUrl.host = host ?? clerkUrl.host;
 
   return Object.assign(req, { experimental_clerkUrl: clerkUrl });
 };
