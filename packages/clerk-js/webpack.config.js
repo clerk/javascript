@@ -231,6 +231,9 @@ const prodConfig = ({ mode, env }) => {
 
 const devConfig = ({ mode, env }) => {
   const variant = env.variant || variants.clerkBrowser;
+  // accept an optional devOrigin environment option to change the origin of the dev server.
+  // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
+  const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
 
   const commonForDev = () => {
     return {
@@ -238,12 +241,12 @@ const devConfig = ({ mode, env }) => {
         rules: [svgLoader(), typescriptLoaderDev()],
       },
       plugins: [
-        new ReactRefreshWebpackPlugin({ overlay: { sockHost: 'js.lclclerk.com' } }),
+        new ReactRefreshWebpackPlugin({ overlay: { sockHost: devUrl.host } }),
         ...(env.serveAnalyzer ? [new BundleAnalyzerPlugin()] : []),
       ],
       devtool: 'eval-cheap-source-map',
       output: {
-        publicPath: 'https://js.lclclerk.com/npm/',
+        publicPath: `${devUrl.origin}/npm`,
         crossOriginLoading: 'anonymous',
         filename: `${variant}.js`,
         libraryTarget: 'umd',
@@ -258,7 +261,7 @@ const devConfig = ({ mode, env }) => {
         port: 4000,
         hot: true,
         liveReload: false,
-        client: { webSocketURL: 'auto://js.lclclerk.com/ws' },
+        client: { webSocketURL: `auto://${devUrl.host}/ws` },
       },
     };
   };
