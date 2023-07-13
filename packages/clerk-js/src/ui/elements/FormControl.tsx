@@ -95,10 +95,10 @@ function useFormTextAnimation() {
 }
 
 type CalculateConfigProps = {
-  recalculate: string | boolean | undefined;
+  recalculate?: string | boolean | undefined;
 };
 type Px = number;
-const useCalculateErrorTextHeight = (config: CalculateConfigProps) => {
+const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
   const [height, setHeight] = useState<Px>(24);
 
   const calculateHeight = useCallback(
@@ -111,12 +111,22 @@ const useCalculateErrorTextHeight = (config: CalculateConfigProps) => {
         setHeight(newHeight);
       }
     },
-    [config.recalculate],
+    [config?.recalculate],
   );
   return {
     height,
     calculateHeight,
   };
+};
+
+const addFullStop = (string: string | undefined) => {
+  if (!string) {
+    return '';
+  }
+
+  const wordSet = string?.split(' ');
+  const lastWordHasFullStop = wordSet.slice(-1)[0].includes('.') || '';
+  return lastWordHasFullStop || wordSet.length <= 1 ? string : string + '.';
 };
 
 type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
@@ -137,7 +147,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
 
-  const { calculateHeight, height } = useCalculateErrorTextHeight({ recalculate: warningMessage });
+  const { calculateHeight, height } = useCalculateErrorTextHeight({ recalculate: warningMessage || errorMessage });
   const { getFormTextAnimation } = useFormTextAnimation();
   const defaultElementDescriptors = {
     error: descriptors.formFieldErrorText,
@@ -176,7 +186,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props.informationText && !props?.successfulText && !props.warningText)}
         >
-          {informationMessage}
+          {addFullStop(informationMessage)}
         </FormInfoText>
       )}
       {/* Display the error message after the directions is unmounted*/}
@@ -186,7 +196,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props?.errorText)}
         >
-          {errorMessage}
+          {addFullStop(errorMessage)}
         </FormErrorText>
       )}
 
@@ -197,7 +207,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props?.successfulText)}
         >
-          {successMessage}
+          {addFullStop(successMessage)}
         </FormSuccessText>
       )}
 
@@ -207,7 +217,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props.warningText)}
         >
-          {warningMessage}
+          {addFullStop(warningMessage)}
         </FormWarningText>
       )}
     </Box>

@@ -244,7 +244,7 @@ describe('PasswordPage', () => {
           screen.getByText(/or more/i);
         });
       });
-    }, 10000);
+    });
 
     it('results in error if the passwords do not match and persists', async () => {
       const { wrapper } = await createFixtures(initConfig);
