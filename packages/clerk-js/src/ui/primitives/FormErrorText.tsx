@@ -13,7 +13,7 @@ const { applyVariants } = createVariants(theme => ({
     marginTop: theme.sizes.$2,
     animation: `${animations.textInSmall} ${theme.transitionDuration.$fast}`,
     display: 'flex',
-    gap: theme.sizes.$2,
+    gap: theme.sizes.$1,
     position: 'absolute',
     top: '0',
   },
