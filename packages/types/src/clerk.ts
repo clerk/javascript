@@ -171,9 +171,9 @@ export interface Clerk {
    * Mounts a sign up flow component at the target element.
    *
    * @param targetNode Target node to mount the SignUp component.
-   * @param signUnProps sign up configuration parameters.
+   * @param signUpProps sign up configuration parameters.
    */
-  mountSignUp: (targetNode: HTMLDivElement, signUnProps?: SignUpProps) => void;
+  mountSignUp: (targetNode: HTMLDivElement, signUpProps?: SignUpProps) => void;
 
   /**
    * Unmount a sign up flow component from the target element.

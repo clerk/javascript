@@ -9,7 +9,7 @@ import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
 import { SECRET_KEY, TRUST_HOST } from './clerkClient';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
-import { receivedRequestForIgnoredRoute } from './errors';
+import { infiniteRedirectLoopDetected, informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
 import {
@@ -141,7 +141,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const isIgnoredRoute = createRouteMatcher(ignoredRoutes || DEFAULT_IGNORED_ROUTES);
   const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(publicRoutes));
   const isApiRoute = createApiRoutes(apiRoutes);
-  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute);
+  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, params);
 
   return withLogger('authMiddleware', logger => async (_req: NextRequest, evt: NextFetchEvent) => {
     if (options.debug) {
@@ -160,9 +160,11 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     if (isIgnoredRoute(req)) {
       logger.debug({ isIgnoredRoute: true });
-      console.warn(
-        receivedRequestForIgnoredRoute(req.experimental_clerkUrl.href, JSON.stringify(DEFAULT_CONFIG_MATCHER)),
-      );
+      if (isDevelopmentFromApiKey(options.secretKey || SECRET_KEY) && !params.ignoredRoutes) {
+        console.warn(
+          receivedRequestForIgnoredRoute(req.experimental_clerkUrl.href, JSON.stringify(DEFAULT_CONFIG_MATCHER)),
+        );
+      }
       return setHeader(NextResponse.next(), constants.Headers.AuthReason, 'ignored-route');
     }
 
@@ -186,7 +188,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     } else if (requestState.isInterstitial) {
       logger.debug('authenticateRequest state is interstitial', requestState);
       const res = handleInterstitialState(requestState, options);
-      return assertInfiniteRedirectionLoop(req, res);
+      return assertInfiniteRedirectionLoop(req, res, options);
     }
 
     const auth = Object.assign(requestState.toAuth(), {
@@ -201,7 +203,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
       const res = setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
-      return appendDevBrowserOnCrossOrigin(req, res);
+      return appendDevBrowserOnCrossOrigin(req, res, options);
     }
 
     if (options.debug) {
@@ -233,11 +235,14 @@ export const createRouteMatcher = (routes: RouteMatcherParam) => {
 const createDefaultAfterAuth = (
   isPublicRoute: ReturnType<typeof createRouteMatcher>,
   isApiRoute: ReturnType<typeof createApiRoutes>,
+  params: AuthMiddlewareParams,
 ) => {
   return (auth: AuthObject, req: WithClerkUrl<NextRequest>) => {
-    if (!auth.userId && !isPublicRoute(req) && isApiRoute(req)) {
-      return apiEndpointUnauthorizedNextResponse();
-    } else if (!auth.userId && !isPublicRoute(req)) {
+    if (!auth.userId && !isPublicRoute(req)) {
+      informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params);
+      if (isApiRoute(req)) {
+        return apiEndpointUnauthorizedNextResponse();
+      }
       return redirectToSignIn({ returnBackUrl: req.experimental_clerkUrl.href });
     }
     return NextResponse.next();
@@ -276,13 +281,13 @@ const withDefaultPublicRoutes = (publicRoutes: RouteMatcherParam | undefined) =>
 
 // Grabs the dev browser JWT from cookies and appends it to the redirect URL when redirecting to cross-origin.
 // Middleware runs on the server side, before clerk-js is loaded, that's why we need Cookies.
-const appendDevBrowserOnCrossOrigin = (req: WithClerkUrl<NextRequest>, res: Response) => {
+const appendDevBrowserOnCrossOrigin = (req: WithClerkUrl<NextRequest>, res: Response, opts: AuthMiddlewareParams) => {
   const location = res.headers.get('location');
   const shouldAppendDevBrowser = res.headers.get(constants.Headers.ClerkRedirectTo) === 'true';
   if (
     shouldAppendDevBrowser &&
     !!location &&
-    isDevelopmentFromApiKey(SECRET_KEY) &&
+    isDevelopmentFromApiKey(opts.secretKey || SECRET_KEY) &&
     isCrossOrigin(req.experimental_clerkUrl, location)
   ) {
     const dbJwt = req.cookies.get(DEV_BROWSER_JWT_MARKER)?.value;
@@ -322,14 +327,18 @@ const isRequestMethodIndicatingApiRoute = (req: NextRequest): boolean => {
 // When in development, we want to prevent infinite interstitial redirection loops.
 // We incrementally set a `__clerk_redirection_loop` cookie, and when it loops 6 times, we throw an error.
 // We also utilize the `referer` header to skip the prefetch requests.
-const assertInfiniteRedirectionLoop = (req: NextRequest, res: NextResponse): NextResponse => {
-  if (!isDevelopmentFromApiKey(SECRET_KEY)) {
+const assertInfiniteRedirectionLoop = (
+  req: NextRequest,
+  res: NextResponse,
+  opts: AuthMiddlewareParams,
+): NextResponse => {
+  if (!isDevelopmentFromApiKey(opts.secretKey || SECRET_KEY)) {
     return res;
   }
 
   const infiniteRedirectsCounter = Number(req.cookies.get(INFINITE_REDIRECTION_LOOP_COOKIE)?.value) || 0;
   if (infiniteRedirectsCounter === 6) {
-    throw new Error(INFINITE_REDIRECTION_LOOP_ERROR_MESSAGE);
+    throw new Error(infiniteRedirectLoopDetected());
   }
 
   // Skip the prefetch requests (when hovering a Next Link element)
@@ -342,24 +351,6 @@ const assertInfiniteRedirectionLoop = (req: NextRequest, res: NextResponse): Nex
   }
   return res;
 };
-
-const INFINITE_REDIRECTION_LOOP_ERROR_MESSAGE = `Clerk: Infinite redirect loop detected. That usually means that we were not able to determine the auth state for this request. A list of common causes and solutions follows.
-
-Reason 1:
-Your server's system clock is inaccurate. Clerk will continuously try to issue new tokens, as the existing ones will be treated as "expired" due to clock skew.
-How to resolve:
--> Make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
-
-Reason 2:
-Your Clerk instance keys are incorrect, or you recently changed keys (Publishable Key, Secret Key).
-How to resolve:
--> Make sure you're using the correct keys from the Clerk Dashboard. If you changed keys recently, make sure to clear your browser application data and cookies.
-
-Reason 3:
-A bug that may have already been fixed in the latest version of Clerk NextJS package.
-How to resolve:
--> Make sure you are using the latest version of '@clerk/nextjs' and 'next'.
-  `;
 
 const getHeader = (req: NextRequest, key: string) => req.headers.get(key);
 const getFirstValueFromHeader = (req: NextRequest, key: string) => getHeader(req, key)?.split(',')[0];
@@ -385,4 +376,12 @@ const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => 
   clerkUrl.host = host ?? clerkUrl.host;
 
   return Object.assign(req, { experimental_clerkUrl: clerkUrl });
+};
+
+const informAboutProtectedRoute = (path: string, params: AuthMiddlewareParams) => {
+  if (params.debug || isDevelopmentFromApiKey(params.secretKey || SECRET_KEY)) {
+    console.warn(
+      informAboutProtectedRouteInfo(path, !!params.publicRoutes, !!params.ignoredRoutes, DEFAULT_IGNORED_ROUTES),
+    );
+  }
 };

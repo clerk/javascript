@@ -40,8 +40,10 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
       }
     },
     dev: async (opts: { port?: number; manualStart?: boolean; detached?: boolean } = {}) => {
+      const log = logger.child({ prefix: 'dev' }).info;
       const port = opts.port || (await getPort());
       const serverUrl = `http://localhost:${port}`;
+      log(`Will try to serve app at ${serverUrl}`);
       if (opts.manualStart) {
         // for debugging, you can start the dev server manually by cd'ing into the temp dir
         // and running the corresponding dev command
@@ -50,7 +52,6 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
         state.serverUrl = serverUrl;
         return { port, serverUrl };
       }
-      const log = logger.child({ prefix: 'dev' }).info;
       const proc = run(scripts.dev, { cwd: appDirPath, env: { PORT: port.toString() }, log, detached: opts.detached });
       cleanupFns.push(() => treekill(proc.pid, 'SIGKILL'));
       await waitForIdleProcess(proc);

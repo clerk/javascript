@@ -33,6 +33,10 @@ export const longRunningApplication = (_name: string, _config: ApplicationConfig
   let appDir: string;
   let env: EnvironmentConfig;
 
+  const stateFileExists = () => {
+    return fs.pathExists(constants.APPS_STATE_FILE);
+  };
+
   const readFromStateFile = async () => {
     const json = (await fs.readJSON(constants.APPS_STATE_FILE)) as AppStateFile;
     const data = json.longRunningApps[name];
@@ -55,6 +59,9 @@ export const longRunningApplication = (_name: string, _config: ApplicationConfig
       },
       // will be called by global.teardown.ts
       destroy: async () => {
+        if (!(await stateFileExists())) {
+          return;
+        }
         await readFromStateFile();
         console.log(`Destroying ${serverUrl}`);
         treekill(pid, 'SIGKILL');

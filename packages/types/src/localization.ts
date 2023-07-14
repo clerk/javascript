@@ -637,6 +637,7 @@ type UnstableErrors = WithParamName<{
   captcha_invalid: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_username_invalid_length: LocalizationValue;
+  form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;
   form_param_format_invalid__email_address: LocalizationValue;
   form_password_length_too_short: LocalizationValue;

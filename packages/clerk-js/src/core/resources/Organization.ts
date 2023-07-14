@@ -32,6 +32,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   updatedAt!: Date;
   membersCount = 0;
   pendingInvitationsCount = 0;
+  maxAllowedMemberships!: number;
 
   constructor(data: OrganizationJSON) {
     super();
@@ -180,6 +181,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.publicMetadata = data.public_metadata;
     this.membersCount = data.members_count;
     this.pendingInvitationsCount = data.pending_invitations_count;
+    this.maxAllowedMemberships = data.max_allowed_memberships;
     this.adminDeleteEnabled = data.admin_delete_enabled;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);

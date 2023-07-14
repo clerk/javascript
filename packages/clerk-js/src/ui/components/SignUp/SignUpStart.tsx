@@ -244,10 +244,8 @@ function _SignUpStart(): JSX.Element {
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          <Header.Title localizationKey={localizationKeys('signUp.start.title')}>Create your account</Header.Title>
-          <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')}>
-            to continue to {displayConfig.applicationName}
-          </Header.Subtitle>
+          <Header.Title localizationKey={localizationKeys('signUp.start.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')} />
         </Header.Root>
         <Flex
           direction='col'
@@ -275,9 +273,7 @@ function _SignUpStart(): JSX.Element {
         </Flex>
         <Footer.Root>
           <Footer.Action elementId='signUp'>
-            <Footer.ActionText localizationKey={localizationKeys('signUp.start.actionText')}>
-              Have an account?
-            </Footer.ActionText>
+            <Footer.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
             <Footer.ActionLink
               localizationKey={localizationKeys('signUp.start.actionLink')}
               to={clerk.buildUrlWithAuth(signInUrl)}

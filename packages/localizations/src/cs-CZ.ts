@@ -572,6 +572,7 @@ export const csCZ: LocalizationResource = {
     form_identifier_not_found: '',
     form_password_pwned: 'Toto heslo bylo nalezeno v rámci uniku dat a nemůže být použito, prosím zvolte jiné heslo.',
     form_username_invalid_length: '',
+    form_username_invalid_character: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',
     form_param_nil: '',

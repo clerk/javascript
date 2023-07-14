@@ -144,12 +144,14 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
   max_allowed_memberships: number;
+  admin_delete_enabled: boolean;
 }
 
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   email_address: string;
   organization_id: string;
   public_metadata: OrganizationInvitationPublicMetadata;
+  private_metadata: OrganizationInvitationPrivateMetadata;
   role: OrganizationMembershipRole;
   status: OrganizationInvitationStatus;
   created_at: number;

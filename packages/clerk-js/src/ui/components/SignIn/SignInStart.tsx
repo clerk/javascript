@@ -278,22 +278,18 @@ export function _SignInStart(): JSX.Element {
                   />
                 </Form.ControlRow>
                 <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
-                <Form.SubmitButton>Continue</Form.SubmitButton>
+                <Form.SubmitButton />
               </Form.Root>
             ) : null}
           </SocialButtonsReversibleContainerWithDivider>
         </Col>
         <Footer.Root>
           <Footer.Action elementId='signIn'>
-            <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')}>
-              No account?
-            </Footer.ActionText>
+            <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
             <Footer.ActionLink
               localizationKey={localizationKeys('signIn.start.actionLink')}
               to={clerk.buildUrlWithAuth(signUpUrl)}
-            >
-              Sign up
-            </Footer.ActionLink>
+            />
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>

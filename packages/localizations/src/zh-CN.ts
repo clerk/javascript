@@ -561,6 +561,7 @@ export const zhCN: LocalizationResource = {
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     form_password_pwned: '这个密码在数据泄露中被发现，不能使用，请换一个密码试试。',
     form_username_invalid_length: '',
+    form_username_invalid_character: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',
     form_param_nil: '',

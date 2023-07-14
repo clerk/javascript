@@ -1,8 +1,8 @@
-import type { DataFunctionArgs, MetaFunction, Headers } from '@remix-run/node';
+import type { DataFunctionArgs, Headers } from '@remix-run/node';
+import type { V2_MetaFunction } from '@remix-run/react';
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
-import { rootAuthLoader } from '@clerk/remix/ssr.server';
-import { getClerkDebugHeaders } from '@clerk/remix/ssr.server';
-import { ClerkApp, ClerkCatchBoundary } from '@clerk/remix';
+import { getClerkDebugHeaders, rootAuthLoader } from '@clerk/remix/ssr.server';
+import { ClerkApp, V2_ClerkErrorBoundary } from '@clerk/remix';
 
 export const loader = (args: DataFunctionArgs) => {
   return rootAuthLoader(
@@ -33,13 +33,20 @@ export function headers({
   };
 }
 
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'New Remix App',
-  viewport: 'width=device-width,initial-scale=1',
-});
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Remix',
+        url: 'https://remix.run',
+      },
+    },
+  ];
+};
 
-export const CatchBoundary = ClerkCatchBoundary();
+export const ErrorBoundary = V2_ClerkErrorBoundary();
 
 function App() {
   const loaderData = useLoaderData<typeof loader>();

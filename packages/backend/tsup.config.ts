@@ -9,12 +9,6 @@ export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
   const shouldPublish = !!overrideOptions.env?.publish;
 
-  // const onSuccess = (format: 'esm' | 'cjs') => {
-  //   const rsync = `rsync -r --include '*/' --include '*.js' --include '*.mjs' --include '*.cjs' --exclude='*' ./src/runtime ./dist/${format}/`;
-  //   // return `cp ./package.${format}.json ./dist/${format}/package.json && ${rsync}`;
-  //   return rsync;
-  // };
-
   const common: Options = {
     entry: ['src/index.ts'],
     onSuccess: `rsync -r --include '*/' --include '*.js' --include '*.mjs' --include '*.cjs' --exclude='*' ./src/runtime ./dist/`,

@@ -23,7 +23,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const inviteTitle = localizationKeys('organizationProfile.invitePage.title');
   const card = useCardState();
   const [file, setFile] = React.useState<File | null>();
-  const { createOrganization } = useCoreOrganizations();
+  const { createOrganization, isLoaded } = useCoreOrganizations();
   const { setActive, closeCreateOrganization } = useCoreClerk();
   const { mode, navigateAfterCreateOrganization } = useCreateOrganizationContext();
   const { organization } = useCoreOrganization();
@@ -51,11 +51,26 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
       return;
     }
 
-    return createOrganization?.({ name: nameField.value, slug: slugField.value })
-      .then(org => (file ? org.setLogo({ file }) : org))
-      .then(org => setActive({ organization: org }))
-      .then(wizard.nextStep)
-      .catch(err => handleError(err, [nameField, slugField], card.setError));
+    if (!isLoaded) {
+      return;
+    }
+
+    try {
+      const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
+      if (file) {
+        await organization.setLogo({ file });
+      }
+
+      await setActive({ organization });
+
+      if (organization.maxAllowedMemberships === 1) {
+        return completeFlow();
+      }
+
+      wizard.nextStep();
+    } catch (err) {
+      handleError(err, [nameField, slugField], card.setError);
+    }
   };
 
   const completeFlow = () => {

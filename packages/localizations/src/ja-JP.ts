@@ -570,6 +570,7 @@ export const jaJP: LocalizationResource = {
     form_password_pwned:
       'このパスワードは侵害の一部として見つかったため使用できません。別のパスワードを試してください。',
     form_username_invalid_length: '',
+    form_username_invalid_character: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',
     form_param_nil: '',
