@@ -1,10 +1,9 @@
-import type { ClerkProviderProps as ClerkReactProviderProps, ClerkProp } from '@clerk/clerk-react';
-import type { TokenCache } from './cache';
-
-import React from 'react';
-import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import Clerk from '@clerk/clerk-js';
+import type { ClerkProp, ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
+import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
+import React from 'react';
 
+import type { TokenCache } from './cache';
 import { ChromeStorageCache } from './cache';
 import { buildClerk } from './singleton';
 
