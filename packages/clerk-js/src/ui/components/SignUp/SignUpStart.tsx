@@ -77,7 +77,7 @@ function _SignUpStart(): JSX.Element {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
-      enableErrorAfterBlur: true,
+      enableErrorAfterBlur: false,
       informationText: failedValidationsText,
       validatePassword: true,
     }),

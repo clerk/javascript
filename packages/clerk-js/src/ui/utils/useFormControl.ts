@@ -195,10 +195,20 @@ export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedbac
     hasPassedComplexity = false,
   } = opts;
 
+  const canDisplayFeedback = useMemo(() => {
+    if (enableErrorAfterBlur) {
+      if (skipBlur) {
+        return true;
+      }
+      return hasLostFocus;
+    }
+    return true;
+  }, [enableErrorAfterBlur, hasLostFocus, skipBlur]);
+
   const feedbackMemo = useMemo(() => {
-    const shouldDisplayErrorAsWarning = hasPassedComplexity ? errorText : false;
-    const _errorText = !shouldDisplayErrorAsWarning ? errorText : '';
-    const _warningText = shouldDisplayErrorAsWarning ? errorText : warningText;
+    const shouldDisplayErrorAsWarning = hasPassedComplexity ? errorText && !hasLostFocus : false;
+    const _errorText = !shouldDisplayErrorAsWarning && canDisplayFeedback ? errorText : '';
+    const _warningText = shouldDisplayErrorAsWarning && enableErrorAfterBlur ? errorText : warningText;
     const _successfulText = successfulText;
 
     /*
@@ -216,7 +226,16 @@ export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedbac
       isFocused,
       informationText: shouldShowInformationText ? informationText : '',
     };
-  }, [informationText, enableErrorAfterBlur, isFocused, successfulText, hasLostFocus, errorText, skipBlur]);
+  }, [
+    informationText,
+    enableErrorAfterBlur,
+    isFocused,
+    successfulText,
+    hasLostFocus,
+    errorText,
+    canDisplayFeedback,
+    skipBlur,
+  ]);
 
   const debouncedState = useSetTimeout(feedbackMemo, delayInMs);
 
