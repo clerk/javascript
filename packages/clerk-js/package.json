@@ -14,7 +14,7 @@
   "author": "Clerk",
   "jsdelivr": "dist/clerk.browser.js",
   "main": "dist/clerk.js",
-  "module": "dist/clerk.js",
+  "module": "dist/clerk.mjs",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",

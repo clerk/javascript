@@ -20,6 +20,7 @@ export default function Page() {
       <ClerkLoaded>
         <h2>Clerk loaded</h2>
       </ClerkLoaded>
+      <UserButton />
       <UserButton afterSignOutUrl='/' />
 
       <ClientSideWrapper>
