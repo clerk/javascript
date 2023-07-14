@@ -15,7 +15,7 @@ import {
   SECRET_KEY,
 } from './clerkClient';
 import type { WithAuthOptions } from './types';
-import { decorateRequest, getCookie, handleMultiDomainAndProxy, setCustomAttributeOnRequest } from './utils';
+import { decorateRequest, handleMultiDomainAndProxy, setCustomAttributeOnRequest } from './utils';
 
 export interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
