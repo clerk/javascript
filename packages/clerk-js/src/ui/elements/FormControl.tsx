@@ -95,7 +95,7 @@ function useFormTextAnimation() {
 }
 
 type CalculateConfigProps = {
-  recalculate?: string | boolean | undefined;
+  recalculate?: string | undefined;
 };
 type Px = number;
 const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
@@ -147,7 +147,9 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
 
-  const { calculateHeight, height } = useCalculateErrorTextHeight({ recalculate: warningMessage || errorMessage });
+  const { calculateHeight, height } = useCalculateErrorTextHeight({
+    recalculate: warningMessage || errorMessage || informationMessage,
+  });
   const { getFormTextAnimation } = useFormTextAnimation();
   const defaultElementDescriptors = {
     error: descriptors.formFieldErrorText,

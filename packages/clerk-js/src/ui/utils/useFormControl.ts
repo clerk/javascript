@@ -208,7 +208,7 @@ export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedbac
   const feedbackMemo = useMemo(() => {
     const shouldDisplayErrorAsWarning = hasPassedComplexity ? errorText && !hasLostFocus : false;
     const _errorText = !shouldDisplayErrorAsWarning && canDisplayFeedback ? errorText : '';
-    const _warningText = shouldDisplayErrorAsWarning && enableErrorAfterBlur ? errorText : warningText;
+    const _warningText = shouldDisplayErrorAsWarning ? errorText : warningText;
     const _successfulText = successfulText;
 
     /*
