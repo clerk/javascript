@@ -24,7 +24,7 @@ const variantToSourceFile = {
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
 };
 
-/** @type { () => import('webpack').Configuration } */
+/** @returns { import('webpack').Configuration } */
 const common = ({ mode }) => {
   return {
     mode,
@@ -177,56 +177,48 @@ const entryForVariant = variant => {
 
 /** @type { () => (import('webpack').Configuration)[] } */
 const prodConfig = ({ mode, env }) => {
-  const variant = env.variant;
+  const clerkBrowser = merge(entryForVariant(variants.clerkBrowser), common({ mode }), commonForProd());
 
-  const entryToConfigMap = {
-    // prettier-ignore
-    [variants.clerk]: merge(
-      entryForVariant(variants.clerk),
-      common({ mode }),
-      commonForProd(),
-      {
-        // Include the lazy chunks in the bundle as well
-        // so that the final bundle can be imported and bundled again
-        // by a different bundler, eg the webpack instance used by react-scripts
-        // This is very similar to using new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
-        module: {
-          parser: {
-            javascript: {
-              dynamicImportMode: 'eager'
-            }
-          }
-        }
-      }
-    ),
-    // prettier-ignore
-    [variants.clerkBrowser]: merge(
-      entryForVariant(variants.clerkBrowser),
-      common({ mode }),
-      commonForProd(),
-    ),
-    [variants.clerkHeadless]: merge(
-      entryForVariant(variants.clerkHeadless),
-      common({ mode }),
-      commonForProd(),
-      // externalsForHeadless(),
-    ),
-    [variants.clerkHeadlessBrowser]: merge(
-      entryForVariant(variants.clerkHeadlessBrowser),
-      common({ mode }),
-      commonForProd(),
-      // externalsForHeadless(),
-    ),
-  };
+  const clerkHeadless = merge(
+    entryForVariant(variants.clerkHeadless),
+    common({ mode }),
+    commonForProd(),
+    // externalsForHeadless(),
+  );
 
-  if (variant) {
-    if (!entryToConfigMap[variant]) {
-      throw new Error('Clerk variant does not exist in config');
-    }
-    return entryToConfigMap[variant];
-  }
+  const clerkHeadlessBrowser = merge(
+    entryForVariant(variants.clerkHeadlessBrowser),
+    common({ mode }),
+    commonForProd(),
+    // externalsForHeadless(),
+  );
 
-  return [...Object.values(entryToConfigMap)];
+  const clerkEsm = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), {
+    experiments: {
+      outputModule: true,
+    },
+    output: {
+      filename: '[name].mjs',
+      libraryTarget: 'module',
+    },
+    plugins: [
+      // Include the lazy chunks in the bundle as well
+      // so that the final bundle can be imported and bundled again
+      // by a different bundler, eg the webpack instance used by react-scripts
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1,
+      }),
+    ],
+  });
+
+  const clerkCjs = merge(clerkEsm, {
+    output: {
+      filename: '[name].js',
+      libraryTarget: 'commonjs',
+    },
+  });
+
+  return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkCjs];
 };
 
 const devConfig = ({ mode, env }) => {

@@ -8,5 +8,5 @@ export default () => {
     console.log('cient/page side only component');
   });
 
-  return <div>this is a client components?</div>;
+  return <div>this is a client components</div>;
 };
