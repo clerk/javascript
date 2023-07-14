@@ -2,12 +2,11 @@ import type { Browser, BrowserContext, Page } from '@playwright/test';
 import { test } from '@playwright/test';
 
 import type { Application } from '../adapters/application';
-import { appConfigs, longRunningApps } from '../presets';
+import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
 
 test.describe('sign up and sign in using email link', () => {
-  // const configs = [appConfigs.next.appRouter, appConfigs.react.vite];
-  const configs = [longRunningApps.react.viteEmailLink];
+  const configs = [appConfigs.longRunning.react.viteEmailLink, appConfigs.remix.remixNode];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {
@@ -87,6 +86,7 @@ const performSignUpVerificationLinkSameDevice = async (
     const verificationLink = await u.services.email.getVerificationLinkForEmailAddress(fakeUser.email);
     await u.page.goto(verificationLink);
     await u.po.expect.toBeSignedIn();
+    await u.page.close();
   });
   await u.po.expect.toBeSignedIn();
   await fakeUser.deleteIfExists();
@@ -110,6 +110,7 @@ const performSignUpVerificationLinkDifferentDevice = async (
     await u.po.expect.toBeSignedOut();
     await u.page.pause();
     await u.page.getByText(/Return to original tab to continue/i).waitFor();
+    await u.page.close();
   });
   await u.po.expect.toBeSignedIn();
   await fakeUser.deleteIfExists();

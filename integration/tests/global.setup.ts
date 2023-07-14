@@ -10,7 +10,7 @@ import { fs } from '../utils';
  * so we save the state in a file using a strategy similar to `storageState`
  */
 const startAllLongRunningApps = async (apps: LongRunningApplication[]) => {
-  await fs.remove(constants.APPS_STATE_FILE);
+  await fs.remove(constants.TMP_DIR);
   const contents = { longRunningApps: {} };
   await Promise.all(
     apps.map(async app => {

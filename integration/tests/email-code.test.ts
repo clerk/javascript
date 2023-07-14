@@ -6,7 +6,6 @@ import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
 test.describe('sign up and sign in with email code', () => {
-  // const configs = [appConfigs.next.appRouter, appConfigs.react.vite];
   const configs = [longRunningApps.react.viteAllEnabled];
 
   configs.forEach(config => {
