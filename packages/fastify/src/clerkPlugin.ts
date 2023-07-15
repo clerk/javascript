@@ -5,7 +5,11 @@ import type { ClerkFastifyOptions } from './types';
 import { ALLOWED_HOOKS } from './types';
 import { withClerkMiddleware } from './withClerkMiddleware';
 
-const plugin: FastifyPluginCallback = (instance: FastifyInstance, opts: ClerkFastifyOptions, done) => {
+const plugin: FastifyPluginCallback<ClerkFastifyOptions> = (
+  instance: FastifyInstance,
+  opts: ClerkFastifyOptions,
+  done,
+) => {
   instance.decorateRequest('auth', null);
   // run clerk as a middleware to all scoped routes
   const hookName = opts.hookName || 'preHandler';
