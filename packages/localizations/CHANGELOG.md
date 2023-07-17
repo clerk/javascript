@@ -1,5 +1,28 @@
 # Change Log
 
+## 1.23.0
+
+### Minor Changes
+
+- Add a confirmation input as an additional check when doing destructive actions such as: ([#1454](https://github.com/clerkinc/javascript/pull/1454)) by [@raptisj](https://github.com/raptisj)
+
+  - delete an organization
+  - delete a user account
+  - leave an organization
+
+  Νew localization keys were introduced to support the above
+
+- Add el-GR localization ([#1479](https://github.com/clerkinc/javascript/pull/1479)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+### Patch Changes
+
+- Add `form_username_invalid_character` unstable error localization key. ([#1475](https://github.com/clerkinc/javascript/pull/1475)) by [@desiprisg](https://github.com/desiprisg)
+
+- Add missing "delete account" French translations ([#1487](https://github.com/clerkinc/javascript/pull/1487)) by [@selimjouan](https://github.com/selimjouan)
+
+- Updated dependencies [[`73c9c1d0e`](https://github.com/clerkinc/javascript/commit/73c9c1d0e3c5f102a515e1ddda01a0a441b40d5b), [`ae9fc247a`](https://github.com/clerkinc/javascript/commit/ae9fc247aca5bf8211cc8e021706325a010ce9d3), [`1a151e701`](https://github.com/clerkinc/javascript/commit/1a151e701da80f2d5b1ba1447d6fd5f8612a4bb8), [`090bab66e`](https://github.com/clerkinc/javascript/commit/090bab66e295bff2358115d2cbd3ed0e603b5ff5), [`592911196`](https://github.com/clerkinc/javascript/commit/5929111966811ac578019a9c1dda03b09eda72a8)]:
+  - @clerk/types@3.47.0
+
 ## 1.22.1
 
 ### Patch Changes

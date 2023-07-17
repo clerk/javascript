@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.22.1
+
+### Patch Changes
+
+- Mark setSession as deprecated when it is re-exported within hooks ([#1486](https://github.com/clerkinc/javascript/pull/1486)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`73c9c1d0e`](https://github.com/clerkinc/javascript/commit/73c9c1d0e3c5f102a515e1ddda01a0a441b40d5b), [`ae9fc247a`](https://github.com/clerkinc/javascript/commit/ae9fc247aca5bf8211cc8e021706325a010ce9d3), [`1a151e701`](https://github.com/clerkinc/javascript/commit/1a151e701da80f2d5b1ba1447d6fd5f8612a4bb8), [`090bab66e`](https://github.com/clerkinc/javascript/commit/090bab66e295bff2358115d2cbd3ed0e603b5ff5), [`5ecbb0a37`](https://github.com/clerkinc/javascript/commit/5ecbb0a37e99fa2099629c573951c7735d5f0810), [`592911196`](https://github.com/clerkinc/javascript/commit/5929111966811ac578019a9c1dda03b09eda72a8)]:
+  - @clerk/types@3.47.0
+  - @clerk/shared@0.20.0
+
 ## 4.22.0
 
 ### Minor Changes

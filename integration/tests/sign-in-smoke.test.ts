@@ -1,13 +1,12 @@
 import { test } from '@playwright/test';
 
 import type { Application } from '../adapters/application';
-import { appConfigs, longRunningApps } from '../presets';
+import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
 test.describe('sign in smoke test', () => {
-  const configs = [longRunningApps.react.viteAllEnabled];
-  // const configs = [longRunningApps.react.viteAllEnabled, longRunningApps.next.appRouterAllEnabled];
+  const configs = [appConfigs.longRunning.react.viteEmailLink, appConfigs.remix.remixNode];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {

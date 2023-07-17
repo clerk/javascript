@@ -1,5 +1,26 @@
 # Change Log
 
+## 0.25.0
+
+### Minor Changes
+
+- Introduce `createIsomorphicRequest` in `@clerk/backend` ([#1393](https://github.com/clerkinc/javascript/pull/1393)) by [@anagstef](https://github.com/anagstef)
+
+  This utility simplifies the `authenticateRequest` signature, and it makes it easier to integrate with more frameworks.
+
+- Add `updateUserProfileImage` and `updateOrganizationLogo` methods for uploading images to `User` and `Organization` respectively. ([#1456](https://github.com/clerkinc/javascript/pull/1456)) by [@anagstef](https://github.com/anagstef)
+
+### Patch Changes
+
+- Add missing property 'adminDeleteEnabled' in Organization resource ([#1468](https://github.com/clerkinc/javascript/pull/1468)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Fix the headers checked to determine the Response Content-Type ([#1469](https://github.com/clerkinc/javascript/pull/1469)) by [@anagstef](https://github.com/anagstef)
+
+- Add missing property 'privateMetadata' in OrganizationInvitation resource ([#1468](https://github.com/clerkinc/javascript/pull/1468)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`73c9c1d0e`](https://github.com/clerkinc/javascript/commit/73c9c1d0e3c5f102a515e1ddda01a0a441b40d5b), [`ae9fc247a`](https://github.com/clerkinc/javascript/commit/ae9fc247aca5bf8211cc8e021706325a010ce9d3), [`1a151e701`](https://github.com/clerkinc/javascript/commit/1a151e701da80f2d5b1ba1447d6fd5f8612a4bb8), [`090bab66e`](https://github.com/clerkinc/javascript/commit/090bab66e295bff2358115d2cbd3ed0e603b5ff5), [`592911196`](https://github.com/clerkinc/javascript/commit/5929111966811ac578019a9c1dda03b09eda72a8)]:
+  - @clerk/types@3.47.0
+
 ## 0.24.0
 
 ### Minor Changes
