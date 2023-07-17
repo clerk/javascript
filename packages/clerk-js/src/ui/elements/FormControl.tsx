@@ -119,16 +119,6 @@ const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
   };
 };
 
-const addFullStop = (string: string | undefined) => {
-  if (!string) {
-    return '';
-  }
-
-  const wordSet = string?.split(' ');
-  const lastWordHasFullStop = wordSet.slice(-1)[0].includes('.') || '';
-  return lastWordHasFullStop || wordSet.length <= 1 ? string : string + '.';
-};
-
 type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
 
 type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
@@ -188,7 +178,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props.informationText && !props?.successfulText && !props.warningText)}
         >
-          {addFullStop(informationMessage)}
+          {informationMessage}
         </FormInfoText>
       )}
       {/* Display the error message after the directions is unmounted*/}
@@ -198,7 +188,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props?.errorText)}
         >
-          {addFullStop(errorMessage)}
+          {errorMessage}
         </FormErrorText>
       )}
 
@@ -209,7 +199,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props?.successfulText)}
         >
-          {addFullStop(successMessage)}
+          {successMessage}
         </FormSuccessText>
       )}
 
@@ -219,7 +209,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props.warningText)}
         >
-          {addFullStop(warningMessage)}
+          {warningMessage}
         </FormWarningText>
       )}
     </Box>

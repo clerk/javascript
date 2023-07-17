@@ -51,6 +51,18 @@ const errorMessages = {
   require_special_char: 'unstable__errors.passwordComplexity.requireSpecialCharacter',
 };
 
+const addFullStop = (string: string | undefined) => {
+  if (!string) {
+    return '';
+  }
+
+  if (string.charAt(string.length - 1) === '.') {
+    return string;
+  }
+
+  return string + '.';
+};
+
 export const generateErrorTextUtil = ({
   config,
   failedValidations,
@@ -84,7 +96,9 @@ export const generateErrorTextUtil = ({
   } else {
     messageWithPrefix = messages.join(', ');
   }
-  return `${t(localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`;
+  return addFullStop(
+    `${t(localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`,
+  );
 };
 
 const validate = (password: string, config: UsePasswordComplexityConfig): ComplexityErrors => {
