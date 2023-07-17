@@ -43,6 +43,7 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "auth",
   "authMiddleware",
   "buildClerkProps",
+  "buildRequestUrl",
   "clerkClient",
   "constants",
   "createAuthenticateRequest",

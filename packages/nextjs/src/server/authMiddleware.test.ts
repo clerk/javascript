@@ -1,5 +1,6 @@
 // There is no need to execute the complete authenticateRequest to test authMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
+import { NextURL } from 'next/dist/server/web/next-url';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -22,6 +23,18 @@ import { authenticateRequest } from './authenticateRequest';
 import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
 // used to assert the mock
 import { clerkClient } from './clerkClient';
+
+/**
+ * Disable console warnings about config matchers
+ */
+const consoleWarn = console.warn;
+global.console.warn = jest.fn();
+beforeAll(() => {
+  global.console.warn = jest.fn();
+});
+afterAll(() => {
+  global.console.warn = consoleWarn;
+});
 
 jest.mock('./authenticateRequest', () => {
   const { handleInterstitialState, handleUnknownState } = jest.requireActual('./authenticateRequest');
@@ -63,7 +76,7 @@ const mockRequest = ({
 }: MockRequestParams) => {
   return {
     url: new URL(url, 'https://www.clerk.com').toString(),
-    nextUrl: new URL(url, 'https://www.clerk.com'),
+    nextUrl: new NextURL(url, 'https://www.clerk.com'),
     cookies: {
       get: () => (appendDevBrowserCookie ? { name: '__clerk_db_jwt', value: 'test_jwt' } : {}) as any,
     },

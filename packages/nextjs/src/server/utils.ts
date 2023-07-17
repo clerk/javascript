@@ -1,5 +1,5 @@
 import type { RequestState } from '@clerk/backend';
-import { constants } from '@clerk/backend';
+import { buildRequestUrl, constants } from '@clerk/backend';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -177,19 +177,6 @@ export function isDevelopmentFromApiKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
 }
 
-// TODO: use @clerk/shared once it is tree-shakeable
-export function getRequestUrl({ request, relativePath }: { request: Request; relativePath?: string }): URL {
-  const { headers, url: initialUrl } = request;
-  const url = new URL(initialUrl);
-  const host = headers.get('X-Forwarded-Host') ?? headers.get('host') ?? (headers as any)['host'] ?? url.host;
-
-  // X-Forwarded-Proto could be 'https, http'
-  const protocol =
-    (headers.get('X-Forwarded-Proto') ?? (headers as any)['X-Forwarded-Proto'])?.split(',')[0] ??
-    (url.protocol && url.protocol.replace(/\:$/, ''));
-  return new URL(relativePath || url.pathname, `${protocol}://${host}`);
-}
-
 // Auth result will be set as both a query param & header when applicable
 export function decorateRequest(
   req: NextRequest,
@@ -263,9 +250,7 @@ export const isCrossOrigin = (from: string | URL, to: string | URL) => {
 };
 
 export const handleMultiDomainAndProxy = (req: NextRequest, opts: WithAuthOptions) => {
-  const requestURL = getRequestUrl({
-    request: req,
-  });
+  const requestURL = buildRequestUrl(req);
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, requestURL, PROXY_URL);
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
