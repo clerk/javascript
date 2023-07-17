@@ -332,6 +332,12 @@ export const frFR: LocalizationResource = {
         destructiveActionSubtitle: 'Supprimer ce portefeuille Web3 de votre compte',
         destructiveAction: 'Supprimer le portefeuille',
       },
+      dangerSection: {
+        title: 'Danger',
+        deleteAccountButton: 'Supprimer le compte',
+        deleteAccountTitle: 'Supprimer le compte',
+        deleteAccountDescription: 'Supprimer votre compte et toutes les données associées',
+      },
     },
     profilePage: {
       title: 'Mettre à jour le profil',
