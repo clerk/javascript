@@ -25,7 +25,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const [file, setFile] = React.useState<File | null>();
   const { createOrganization, isLoaded } = useCoreOrganizations();
   const { setActive, closeCreateOrganization } = useCoreClerk();
-  const { mode, navigateAfterCreateOrganization } = useCreateOrganizationContext();
+  const { mode, navigateAfterCreateOrganization, skipInvitationScreen } = useCreateOrganizationContext();
   const { organization } = useCoreOrganization();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
@@ -63,7 +63,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
 
       await setActive({ organization });
 
-      if (organization.maxAllowedMemberships === 1) {
+      if (skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
         return completeFlow();
       }
 
