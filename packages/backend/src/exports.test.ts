@@ -32,6 +32,7 @@ export default (QUnit: QUnit) => {
         'Token',
         'User',
         'Verification',
+        'buildRequestUrl',
         'constants',
         'createAuthenticateRequest',
         'createIsomorphicRequest',
