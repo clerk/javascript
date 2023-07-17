@@ -5,14 +5,13 @@ import React, { useEffect } from 'react';
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import { usePopover } from '../hooks';
+import { useNavigateToFlowStart, usePopover } from '../hooks';
 import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, mqu } from '../styledSystem';
 import { colors, sleep } from '../utils';
 import { withFloatingTree } from './contexts';
-import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 import { Popover } from './Popover';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };

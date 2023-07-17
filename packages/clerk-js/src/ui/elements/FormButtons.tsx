@@ -1,9 +1,9 @@
 import { Flex } from '../customizables';
+import { useNavigateToFlowStart } from '../hooks';
 import type { LocalizationKey } from '../localization';
 import { localizationKeys } from '../localization';
 import type { PropsOfComponent } from '../styledSystem';
 import { Form } from './Form';
-import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 
 type FormButtonsProps = PropsOfComponent<typeof Form.SubmitButton> & {
   isDisabled?: boolean;

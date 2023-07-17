@@ -1,13 +1,15 @@
+import type { LoadedClerk } from '@clerk/types';
 import React from 'react';
 
+import { useCoreClerk } from '../../ui/contexts';
 import { pathFromFullPath, trimTrailingSlash } from '../../utils';
+import { useNavigateToFlowStart } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
 import { RouteContext, useRouter } from './RouteContext';
 
 interface RouteGuardProps {
-  canActivate: () => boolean;
-  fallbackPath: string;
+  canActivate: (clerk: LoadedClerk) => boolean;
 }
 
 interface UnguardedRouteProps {
@@ -15,7 +17,6 @@ interface UnguardedRouteProps {
   index?: boolean;
   flowStart?: boolean;
   canActivate?: never;
-  fallbackPath?: never;
 }
 type GuardedRouteProps = {
   path?: string;
@@ -25,18 +26,16 @@ type GuardedRouteProps = {
 
 export type RouteProps = React.PropsWithChildren<UnguardedRouteProps | GuardedRouteProps>;
 
-const RouteGuard = ({
-  canActivate,
-  fallbackPath,
-  children,
-}: React.PropsWithChildren<RouteGuardProps>): JSX.Element | null => {
-  const router = useRouter();
+const RouteGuard = ({ canActivate, children }: React.PropsWithChildren<RouteGuardProps>): JSX.Element | null => {
+  const { navigateToFlowStart } = useNavigateToFlowStart();
+  const clerk = useCoreClerk();
+
   React.useEffect(() => {
-    if (!canActivate()) {
-      void router.navigate(fallbackPath);
+    if (!canActivate(clerk)) {
+      void navigateToFlowStart();
     }
   });
-  if (canActivate()) {
+  if (canActivate(clerk)) {
     return <>{children}</>;
   }
   return null;
@@ -86,11 +85,12 @@ export function Route(props: RouteProps): JSX.Element | null {
     paramsDict[key] = value;
   }
 
-  const flowStartPath = props.flowStart
-    ? //set it as the old full path (the previous step),
-      //replacing the base path for navigateToFlowStart() to work as expected
-      pathFromFullPath(router.fullPath).replace('/' + router.basePath, '')
-    : router.flowStartPath;
+  const flowStartPath =
+    (props.flowStart
+      ? //set it as the old full path (the previous step),
+        //replacing the base path for navigateToFlowStart() to work as expected
+        pathFromFullPath(router.fullPath).replace('/' + router.basePath, '')
+      : router.flowStartPath) || router.startPath;
 
   return (
     <RouteContext.Provider
@@ -118,16 +118,7 @@ export function Route(props: RouteProps): JSX.Element | null {
         urlStateParam: router.urlStateParam,
       }}
     >
-      {props.canActivate ? (
-        <RouteGuard
-          canActivate={props.canActivate}
-          fallbackPath={props.fallbackPath}
-        >
-          {props.children}
-        </RouteGuard>
-      ) : (
-        props.children
-      )}
+      {props.canActivate ? <RouteGuard canActivate={props.canActivate}>{props.children}</RouteGuard> : props.children}
     </RouteContext.Provider>
   );
 }

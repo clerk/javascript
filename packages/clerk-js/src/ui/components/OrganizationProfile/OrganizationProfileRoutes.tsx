@@ -1,7 +1,7 @@
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
-import { LeaveOrganizationPage, DeleteOrganizationPage } from './ActionConfirmationPage';
+import { DeleteOrganizationPage, LeaveOrganizationPage } from './ActionConfirmationPage';
 import { InviteMembersPage } from './InviteMembersPage';
 import { OrganizationMembers } from './OrganizationMembers';
 import { OrganizationSettings } from './OrganizationSettings';

@@ -42,7 +42,6 @@ export const VirtualRouter = ({
       getPath={getPath}
       basePath={VIRTUAL_ROUTER_BASE_PATH}
       startPath={startPath}
-      flowStartPath={startPath}
       getQueryString={getQueryString}
       internalNavigate={internalNavigate}
       onExternalNavigate={onExternalNavigate}

@@ -25,10 +25,16 @@ function SignUpRoutes(): JSX.Element {
   return (
     <Flow.Root flow='signUp'>
       <Switch>
-        <Route path='verify-email-address'>
+        <Route
+          path='verify-email-address'
+          canActivate={clerk => !!clerk.client.signUp.emailAddress}
+        >
           <SignUpVerifyEmail />
         </Route>
-        <Route path='verify-phone-number'>
+        <Route
+          path='verify-phone-number'
+          canActivate={clerk => !!clerk.client.signUp.phoneNumber}
+        >
           <SignUpVerifyPhone />
         </Route>
         <Route path='sso-callback'>
