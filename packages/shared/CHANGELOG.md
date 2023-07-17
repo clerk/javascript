@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.20.0
+
+### Minor Changes
+
+- Deprecate the `useOrganizations` react hook. The hook can be replaced from useClerk, useOrganization, useOrganizationList ([#1466](https://github.com/clerkinc/javascript/pull/1466)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 0.19.1
 
 ### Patch Changes

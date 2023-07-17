@@ -1,5 +1,39 @@
 # Change Log
 
+## 4.53.0
+
+### Minor Changes
+
+- Add a confirmation input as an additional check when doing destructive actions such as: ([#1454](https://github.com/clerkinc/javascript/pull/1454)) by [@raptisj](https://github.com/raptisj)
+
+  - delete an organization
+  - delete a user account
+  - leave an organization
+
+  Νew localization keys were introduced to support the above
+
+### Patch Changes
+
+- Add missing property 'maxAllowedMemberships' in Organization resource ([#1468](https://github.com/clerkinc/javascript/pull/1468)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Add `form_username_invalid_character` unstable error localization key. ([#1475](https://github.com/clerkinc/javascript/pull/1475)) by [@desiprisg](https://github.com/desiprisg)
+
+- Fixed a bug where overriding some localization values in the sign in/up start pages with an empty string would result in showing the english translation. ([#1474](https://github.com/clerkinc/javascript/pull/1474)) by [@desiprisg](https://github.com/desiprisg)
+
+- Changes to OrganizationSwitcher ([#1462](https://github.com/clerkinc/javascript/pull/1462)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Removal of user identifier from the trigger & popover
+  - Hidden avatar of active user when `hidePersonal` is true
+
+- Enable the ability to target the avatar upload and remove action buttons ([#1455](https://github.com/clerkinc/javascript/pull/1455)) by [@tmilewski](https://github.com/tmilewski)
+
+- In the <CreateOrganization /> component, if the newly created organization has max allowed membership equal to 1, skip the invitation page ([#1471](https://github.com/clerkinc/javascript/pull/1471)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`73c9c1d0e`](https://github.com/clerkinc/javascript/commit/73c9c1d0e3c5f102a515e1ddda01a0a441b40d5b), [`ae9fc247a`](https://github.com/clerkinc/javascript/commit/ae9fc247aca5bf8211cc8e021706325a010ce9d3), [`1a151e701`](https://github.com/clerkinc/javascript/commit/1a151e701da80f2d5b1ba1447d6fd5f8612a4bb8), [`090bab66e`](https://github.com/clerkinc/javascript/commit/090bab66e295bff2358115d2cbd3ed0e603b5ff5), [`8bd5b3d38`](https://github.com/clerkinc/javascript/commit/8bd5b3d386cbcdf460bf347b76a87f0306934bfd), [`5ecbb0a37`](https://github.com/clerkinc/javascript/commit/5ecbb0a37e99fa2099629c573951c7735d5f0810), [`592911196`](https://github.com/clerkinc/javascript/commit/5929111966811ac578019a9c1dda03b09eda72a8), [`cd361e169`](https://github.com/clerkinc/javascript/commit/cd361e1698abd58a7eb81290bc86a784333421f1)]:
+  - @clerk/types@3.47.0
+  - @clerk/localizations@1.23.0
+  - @clerk/shared@0.20.0
+
 ## 4.52.1
 
 ### Patch Changes
