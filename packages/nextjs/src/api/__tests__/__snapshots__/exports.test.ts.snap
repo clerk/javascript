@@ -27,6 +27,7 @@ exports[`/api public exports should not include a breaking change 1`] = `
   "User",
   "Verification",
   "allowlistIdentifiers",
+  "buildRequestUrl",
   "clerkClient",
   "clients",
   "constants",

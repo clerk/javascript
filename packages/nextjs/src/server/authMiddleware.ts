@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants } from '@clerk/backend';
+import { buildRequestUrl, constants } from '@clerk/backend';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -351,22 +351,14 @@ const assertInfiniteRedirectionLoop = (
   return res;
 };
 
-const getHeader = (req: NextRequest, key: string) => req.headers.get(key);
-const getFirstValueFromHeader = (req: NextRequest, key: string) => getHeader(req, key)?.split(',')[0];
-
 const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => {
   const clerkUrl = req.nextUrl.clone();
 
-  const host = getFirstValueFromHeader(req, constants.Headers.ForwardedHost);
-  const protocol = getFirstValueFromHeader(req, constants.Headers.ForwardedProto);
+  const originUrl = buildRequestUrl(req);
 
-  if (host && protocol) {
-    const origin = new URL(`${protocol}://${host}`);
-
-    clerkUrl.port = origin.port;
-    clerkUrl.protocol = origin.protocol;
-    clerkUrl.host = origin.host;
-  }
+  clerkUrl.port = originUrl.port;
+  clerkUrl.protocol = originUrl.protocol;
+  clerkUrl.host = originUrl.host;
 
   return Object.assign(req, { experimental_clerkUrl: clerkUrl });
 };
