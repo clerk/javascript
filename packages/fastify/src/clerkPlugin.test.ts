@@ -6,6 +6,7 @@ jest.mock('./withClerkMiddleware', () => {
 
 import { clerkPlugin } from './clerkPlugin';
 import { createFastifyInstanceMock } from './test/utils';
+import type { ALLOWED_HOOKS } from './types';
 
 describe('clerkPlugin()', () => {
   test('adds withClerkMiddleware as preHandler by default', () => {
@@ -35,7 +36,13 @@ describe('clerkPlugin()', () => {
       const fastify = createFastifyInstanceMock();
 
       expect(() => {
-        clerkPlugin(fastify, { hookName }, doneFn);
+        clerkPlugin(
+          fastify,
+          {
+            hookName: hookName as (typeof ALLOWED_HOOKS)[number],
+          },
+          doneFn,
+        );
       }).toThrowError(`Unsupported hookName: ${hookName}`);
     },
   );
