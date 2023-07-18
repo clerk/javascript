@@ -124,7 +124,6 @@ export type VerifyTOTPParams = { code: string };
 
 type UpdateUserJSON = Pick<
   UserJSON,
-  | 'username'
   | 'password'
   | 'first_name'
   | 'last_name'
