@@ -1,5 +1,27 @@
 # Change Log
 
+## 3.47.0
+
+### Minor Changes
+
+- Add a confirmation input as an additional check when doing destructive actions such as: ([#1454](https://github.com/clerkinc/javascript/pull/1454)) by [@raptisj](https://github.com/raptisj)
+
+  - delete an organization
+  - delete a user account
+  - leave an organization
+
+  Νew localization keys were introduced to support the above
+
+### Patch Changes
+
+- Add missing property 'maxAllowedMemberships' in Organization resource ([#1468](https://github.com/clerkinc/javascript/pull/1468)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Add `form_username_invalid_character` unstable error localization key. ([#1475](https://github.com/clerkinc/javascript/pull/1475)) by [@desiprisg](https://github.com/desiprisg)
+
+- Add missing property 'privateMetadata' in OrganizationInvitation resource ([#1468](https://github.com/clerkinc/javascript/pull/1468)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Enable the ability to target the avatar upload and remove action buttons ([#1455](https://github.com/clerkinc/javascript/pull/1455)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 3.46.1
 
 ### Patch Changes

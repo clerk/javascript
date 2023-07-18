@@ -278,7 +278,7 @@ export interface Clerk {
 
   /**
    * @deprecated This method is deprecated and will be removed in the future. Use {@link Clerk.setActive} instead
-   * Set the current session explicitly. Setting the session to `null` deletes the active session.
+   * Set the current session explicitly. Setting the session to `null` unsets the active session and signs out the user.
    * @param session Passed session resource object, session id (string version) or null
    * @param beforeEmit Callback run just before the active session is set to the passed object. Can be used to hook up for pre-navigation actions.
    */

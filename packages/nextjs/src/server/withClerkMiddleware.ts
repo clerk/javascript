@@ -15,7 +15,7 @@ import {
   SECRET_KEY,
 } from './clerkClient';
 import type { WithAuthOptions } from './types';
-import { decorateRequest, getCookie, handleMultiDomainAndProxy, setCustomAttributeOnRequest } from './utils';
+import { decorateRequest, handleMultiDomainAndProxy, setCustomAttributeOnRequest } from './utils';
 
 export interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
@@ -38,32 +38,20 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
 
   return async (req: NextRequest, event: NextFetchEvent) => {
-    const { headers } = req;
     const { isSatellite, domain, signInUrl, proxyUrl } = handleMultiDomainAndProxy(req, opts);
 
     // get auth state, check if we need to return an interstitial
-    const cookieToken = getCookie(req, constants.Cookies.Session);
-    const headerToken = headers.get('authorization')?.replace('Bearer ', '');
     const requestState = await clerkClient.authenticateRequest({
       ...opts,
       apiKey: opts.apiKey || API_KEY,
       secretKey: opts.secretKey || SECRET_KEY,
       frontendApi: opts.frontendApi || FRONTEND_API,
       publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
-      cookieToken,
-      headerToken,
-      clientUat: getCookie(req, constants.Cookies.ClientUat),
-      origin: headers.get('origin') || undefined,
-      host: headers.get('host') as string,
-      forwardedPort: headers.get('x-forwarded-port') || undefined,
-      forwardedHost: headers.get('x-forwarded-host') || undefined,
-      referrer: headers.get('referer') || undefined,
-      userAgent: headers.get('user-agent') || undefined,
-      proxyUrl,
       isSatellite,
       domain,
-      searchParams: new URL(req.url).searchParams,
       signInUrl,
+      proxyUrl,
+      request: req,
     });
 
     // Interstitial case
