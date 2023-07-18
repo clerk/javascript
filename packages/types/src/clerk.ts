@@ -597,6 +597,11 @@ export type SignUpProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: SignUpTheme;
+
+  /**
+   * Additional arbitrary metadata to be stored alongside the User object
+   */
+  unsafeMetadata?: SignUpUnsafeMetadata;
 } & RedirectOptions;
 
 export type UserProfileProps = {
@@ -813,9 +818,10 @@ export interface CreateOrganizationParams {
 }
 
 export interface AuthenticateWithMetamaskParams {
+  customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;
-  customNavigate?: (to: string) => Promise<unknown>;
+  unsafeMetadata?: SignUpUnsafeMetadata;
 }
 
 export interface LoadedClerk extends Clerk {

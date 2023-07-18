@@ -32,7 +32,7 @@ function _SignUpContinue() {
   const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
-  const { navigateAfterSignUp, signInUrl } = useSignUpContext();
+  const { navigateAfterSignUp, signInUrl, unsafeMetadata } = useSignUpContext();
   const signUp = useCoreSignUp();
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
@@ -112,6 +112,10 @@ function _SignUpContinue() {
       (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
       [] as Array<FormControlState>,
     );
+
+    if (unsafeMetadata) {
+      fieldsToSubmit.push({ id: 'unsafeMetadata', value: unsafeMetadata } as any);
+    }
 
     // Add both email & phone to the submitted fields to trigger and render an error for both respective inputs in
     // case all the below requirements are met:

@@ -1,6 +1,5 @@
 import { SignUp } from '@clerk/nextjs';
 import type { NextPage } from 'next';
-import React from 'react';
 
 const SignUpPage: NextPage = () => {
   return (

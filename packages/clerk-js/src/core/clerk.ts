@@ -963,6 +963,7 @@ export default class Clerk implements ClerkInterface {
     redirectUrl,
     signUpContinueUrl,
     customNavigate,
+    unsafeMetadata,
   }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
     if (!this.client || !this.#environment) {
       return;
@@ -976,7 +977,7 @@ export default class Clerk implements ClerkInterface {
       signInOrSignUp = await this.client.signIn.authenticateWithMetamask();
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
-        signInOrSignUp = await this.client.signUp.authenticateWithMetamask();
+        signInOrSignUp = await this.client.signUp.authenticateWithMetamask({ unsafeMetadata });
 
         if (
           signUpContinueUrl &&
