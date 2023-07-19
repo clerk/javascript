@@ -4,4 +4,4 @@
 '@clerk/types': minor
 ---
 
-Add unsafeMetadata prop to <SignUp />
+Add unsafeMetadata prop to the SignUp component
