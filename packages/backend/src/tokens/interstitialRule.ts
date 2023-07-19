@@ -37,14 +37,13 @@ export const nonBrowserRequestInDevRule: InterstitialRule = options => {
 };
 
 export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
-  const { origin, host, forwardedHost, forwardedPort, forwardedProto } = options;
+  const { origin, host, forwardedHost, forwardedProto } = options;
   const isCrossOrigin =
     origin &&
     checkCrossOrigin({
       originURL: new URL(origin),
       host,
       forwardedHost,
-      forwardedPort,
       forwardedProto,
     });
 
@@ -80,9 +79,9 @@ export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options =
  * It is expected that a primary app will trigger a redirect back to the satellite app.
  */
 export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: InterstitialRule = options => {
-  const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto } = options;
+  const { apiKey, secretKey, referrer, host, forwardedHost, forwardedProto } = options;
   const crossOriginReferrer =
-    referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
+    referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedProto });
   const key = secretKey || apiKey || '';
 
   if (isDevelopmentFromApiKey(key) && crossOriginReferrer) {

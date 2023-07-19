@@ -40,12 +40,12 @@ export default (QUnit: QUnit) => {
       assert.true(checkCrossOrigin({ originURL, host, forwardedHost, forwardedProto }));
     });
 
-    test('is CO when HTTPS to HTTP with forwarded port', assert => {
+    test('is CO when HTTPS to HTTP with forwarded proto', assert => {
       const originURL = new URL('https://localhost');
       const host = new URL('http://localhost').host;
-      const forwardedPort = '80';
+      const forwardedProto = 'http';
 
-      assert.true(checkCrossOrigin({ originURL, host, forwardedPort }));
+      assert.true(checkCrossOrigin({ originURL, host, forwardedProto }));
     });
 
     test('is CO with cross origin auth domain', assert => {
@@ -56,9 +56,8 @@ export default (QUnit: QUnit) => {
 
     test('is CO when forwarded port overrides host derived port', assert => {
       const originURL = new URL('https://localhost:443');
-      const host = new URL('https://localhost').host;
-      const forwardedPort = '3001';
-      assert.true(checkCrossOrigin({ originURL, host, forwardedPort }));
+      const host = new URL('https://localhost:3001').host;
+      assert.true(checkCrossOrigin({ originURL, host }));
     });
 
     test('is not CO with port included in x-forwarded host', assert => {
@@ -80,26 +79,23 @@ export default (QUnit: QUnit) => {
     test('is not CO when forwarded port and origin does not contain a port - http', assert => {
       const originURL = new URL('http://localhost');
       const host = new URL('http://localhost').host;
-      const forwardedPort = '80';
 
-      assert.false(checkCrossOrigin({ originURL, host, forwardedPort }));
+      assert.false(checkCrossOrigin({ originURL, host }));
     });
 
     test('is not CO when forwarded port and origin does not contain a port - https', assert => {
       const originURL = new URL('https://localhost');
-      const host = originURL.host;
-      const forwardedPort = '443';
+      const host = new URL('https://localhost').host;
 
-      assert.false(checkCrossOrigin({ originURL, host, forwardedPort }));
+      assert.false(checkCrossOrigin({ originURL, host }));
     });
 
     test('is not CO based on referrer with forwarded host & port and referer', assert => {
       const host = '';
-      const forwardedPort = '80';
       const forwardedHost = 'example.com';
       const referrer = 'http://example.com/';
 
-      assert.false(checkCrossOrigin({ originURL: new URL(referrer), host, forwardedPort, forwardedHost }));
+      assert.false(checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost }));
     });
 
     test('is not CO for AWS', assert => {
