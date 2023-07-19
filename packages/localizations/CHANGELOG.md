@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.23.1
+
+### Patch Changes
+
+- Update de-DE localization file ([#1496](https://github.com/clerkinc/javascript/pull/1496)) by [@mwerder](https://github.com/mwerder)
+
+- Updated dependencies [[`2a9d83280`](https://github.com/clerkinc/javascript/commit/2a9d8328011cb4c3e1a4c6c675cbd5a4edac4c5c)]:
+  - @clerk/types@3.48.0
+
 ## 1.23.0
 
 ### Minor Changes

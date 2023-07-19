@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.48.0
+
+### Minor Changes
+
+- Add unsafeMetadata prop to the SignUp component ([#1464](https://github.com/clerkinc/javascript/pull/1464)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 3.47.0
 
 ### Minor Changes
