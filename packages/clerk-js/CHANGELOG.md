@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.54.0
+
+### Minor Changes
+
+- Add unsafeMetadata prop to the SignUp component ([#1464](https://github.com/clerkinc/javascript/pull/1464)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Experimental support for ESM and CJS for clerk-js ([#1485](https://github.com/clerkinc/javascript/pull/1485)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2a9d83280`](https://github.com/clerkinc/javascript/commit/2a9d8328011cb4c3e1a4c6c675cbd5a4edac4c5c), [`73c0f9a29`](https://github.com/clerkinc/javascript/commit/73c0f9a29499f4fea590aae9c4bf4026395f0c12)]:
+  - @clerk/types@3.48.0
+  - @clerk/localizations@1.23.1
+
 ## 4.53.0
 
 ### Minor Changes

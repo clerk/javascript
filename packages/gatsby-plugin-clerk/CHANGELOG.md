@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`2a9d83280`](https://github.com/clerkinc/javascript/commit/2a9d8328011cb4c3e1a4c6c675cbd5a4edac4c5c)]:
+  - @clerk/clerk-react@4.23.0
+  - @clerk/types@3.48.0
+  - @clerk/backend@0.25.1
+  - @clerk/clerk-sdk-node@4.11.1
+
 ## 4.4.0
 
 ### Minor Changes
