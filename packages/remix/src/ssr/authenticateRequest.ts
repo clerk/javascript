@@ -1,5 +1,5 @@
 import type { RequestState } from '@clerk/backend';
-import { buildRequestUrl, Clerk, createIsomorphicRequest } from '@clerk/backend';
+import { buildRequestUrl, Clerk } from '@clerk/backend';
 import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared';
 
 import {
@@ -96,11 +96,6 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     isSatellite,
     domain,
     signInUrl,
-    request: createIsomorphicRequest((Request, Headers) => {
-      return new Request(requestURL, {
-        method: request.method,
-        headers: new Headers(request.headers),
-      });
-    }),
+    request,
   });
 }
