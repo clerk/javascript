@@ -274,7 +274,7 @@ export default (QUnit: QUnit) => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
         origin: 'https://clerk.com',
-        forwardedProto: '80',
+        forwardedProto: 'http',
         cookieToken: mockJwt,
       });
 
