@@ -51,7 +51,9 @@ export interface OrganizationResource extends ClerkResource {
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
 }
 
-export type GetMembershipsParams = ClerkPaginationParams;
+export type GetMembershipsParams = {
+  role?: MembershipRole[];
+} & ClerkPaginationParams;
 
 export type GetPendingInvitationsParams = ClerkPaginationParams;
 

@@ -1,6 +1,7 @@
 import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
 import { jest } from '@jest/globals';
 import React from 'react';
+import { SWRConfig } from 'swr';
 
 import { default as ClerkCtor } from '../../../core/clerk';
 import { Client, Environment } from '../../../core/resources';
@@ -84,23 +85,25 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
     const MockClerkProvider = (props: any) => {
       const { children } = props;
       return (
-        <CoreClerkContextWrapper clerk={clerkMock}>
-          <EnvironmentProvider value={environmentMock}>
-            <OptionsProvider value={optionsMock}>
-              <RouteContext.Provider value={routerMock}>
-                <AppearanceProvider appearanceKey={'signIn'}>
-                  <FlowMetadataProvider flow={componentName as any}>
-                    <InternalThemeProvider>
-                      <ComponentContext.Provider value={{ ...componentContextProps, componentName }}>
-                        {children}
-                      </ComponentContext.Provider>
-                    </InternalThemeProvider>
-                  </FlowMetadataProvider>
-                </AppearanceProvider>
-              </RouteContext.Provider>
-            </OptionsProvider>
-          </EnvironmentProvider>
-        </CoreClerkContextWrapper>
+        <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
+          <CoreClerkContextWrapper clerk={clerkMock}>
+            <EnvironmentProvider value={environmentMock}>
+              <OptionsProvider value={optionsMock}>
+                <RouteContext.Provider value={routerMock}>
+                  <AppearanceProvider appearanceKey={'signIn'}>
+                    <FlowMetadataProvider flow={componentName as any}>
+                      <InternalThemeProvider>
+                        <ComponentContext.Provider value={{ ...componentContextProps, componentName }}>
+                          {children}
+                        </ComponentContext.Provider>
+                      </InternalThemeProvider>
+                    </FlowMetadataProvider>
+                  </AppearanceProvider>
+                </RouteContext.Provider>
+              </OptionsProvider>
+            </EnvironmentProvider>
+          </CoreClerkContextWrapper>
+        </SWRConfig>
       );
     };
 

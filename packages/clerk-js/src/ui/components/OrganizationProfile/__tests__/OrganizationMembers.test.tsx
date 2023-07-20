@@ -1,44 +1,12 @@
 import { render, userEvent, waitFor } from '@clerk/shared/testUtils';
-import type { MembershipRole, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
-import { describe, it, jest } from '@jest/globals';
+import type { OrganizationMembershipResource } from '@clerk/types';
+import { describe, it } from '@jest/globals';
 
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationMembers } from '../OrganizationMembers';
+import { createFakeMember } from './utils';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
-
-type FakeMemberParams = {
-  id: string;
-  orgId: string;
-  role?: MembershipRole;
-  identifier?: string;
-  firstName?: string;
-  lastName?: string;
-  profileImageUrl?: string;
-  imageUrl?: string;
-  createdAt?: Date;
-};
-
-const createFakeMember = (params: FakeMemberParams): OrganizationMembershipResource => {
-  return {
-    destroy: jest.fn() as any,
-    update: jest.fn() as any,
-    organization: { id: params.orgId } as any as OrganizationResource,
-    id: params.id,
-    role: params?.role || 'admin',
-    createdAt: params?.createdAt || new Date(),
-    updatedAt: new Date(),
-    publicMetadata: {},
-    publicUserData: {
-      userId: params.id,
-      identifier: params?.identifier || 'test_user',
-      firstName: params?.firstName || 'test_firstName',
-      lastName: params?.lastName || 'test_lastName',
-      profileImageUrl: params?.profileImageUrl || '',
-      imageUrl: params?.imageUrl || '',
-    },
-  } as any;
-};
 
 describe('OrganizationMembers', () => {
   it('renders the Organization Members page', async () => {
@@ -144,7 +112,7 @@ describe('OrganizationMembers', () => {
   it.todo('changes role on a member from organization when clicking the respective button on a user row');
   it.todo('changes tab and renders the pending invites list');
 
-  it.skip('shows the "You" badge when the member id from the list matches the current session user id', async () => {
+  it('shows the "You" badge when the member id from the list matches the current session user id', async () => {
     const membersList: OrganizationMembershipResource[] = [
       createFakeMember({ id: '1', orgId: '1', role: 'admin', identifier: 'test_user1' }),
       createFakeMember({ id: '2', orgId: '1', role: 'basic_member', identifier: 'test_user2' }),

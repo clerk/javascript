@@ -58,14 +58,22 @@ const OrganizationProfileSection = () => {
 };
 
 const OrganizationDangerSection = () => {
-  const { organization, membership } = useCoreOrganization();
+  const {
+    organization,
+    membership,
+    membershipList: adminMembers,
+  } = useCoreOrganization({
+    membershipList: { role: ['admin'] },
+  });
   const { navigate } = useRouter();
 
-  if (!organization || !membership) {
+  if (!organization || !membership || !adminMembers) {
     return null;
   }
 
   const adminDeleteEnabled = organization.adminDeleteEnabled;
+  const hasMoreThanOneAdmin = adminMembers.length > 1;
+  const isAdmin = membership.role === 'admin';
 
   return (
     <ProfileSection
@@ -87,10 +95,10 @@ const OrganizationDangerSection = () => {
           colorScheme='danger'
           textVariant='buttonExtraSmallBold'
           onClick={() => navigate('leave')}
-          isDisabled={membership.role === 'admin'}
+          isDisabled={isAdmin && !hasMoreThanOneAdmin}
           localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
         />
-        {membership.role === 'admin' && adminDeleteEnabled && (
+        {isAdmin && adminDeleteEnabled && (
           <IconButton
             aria-label='Delete organization'
             icon={
