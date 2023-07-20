@@ -131,6 +131,56 @@ describe('OrganizationSwitcher', () => {
       expect(queryByRole('button', { name: 'Create Organization' })).not.toBeInTheDocument();
     });
 
-    it.todo('switches between active organizations when one is clicked');
+    it("switches between active organizations when one is clicked'", async () => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [
+            { name: 'Org1', role: 'basic_member' },
+            { name: 'Org2', role: 'admin' },
+          ],
+          create_organization_enabled: false,
+        });
+      });
+      fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button'));
+      await userEvent.click(getByText('Org2'));
+
+      expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organization: expect.objectContaining({
+            name: 'Org2',
+          }),
+        }),
+      );
+    });
+
+    it("switches to personal workspace when clicked'", async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [
+            { name: 'Org1', role: 'basic_member' },
+            { name: 'Org2', role: 'admin' },
+          ],
+        });
+      });
+
+      fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+      const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button'));
+      await userEvent.click(getByText(/Personal workspace/i));
+
+      expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organization: null,
+        }),
+      );
+    });
   });
 });

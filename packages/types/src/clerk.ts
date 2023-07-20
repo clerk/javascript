@@ -661,7 +661,9 @@ export type CreateOrganizationProps = {
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
    */
-  afterCreateOrganizationUrl?: string;
+  afterCreateOrganizationUrl?:
+    | ((organization: OrganizationResource) => string)
+    | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
    * Hides the screen for sending invitations after an organization is created.
    * @default undefined When left undefined Clerk will automatically hide the screen if
@@ -730,6 +732,12 @@ export type UserButtonProps = {
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes'>;
 };
 
+type PrimitiveKeys<T> = {
+  [K in keyof T]: T[K] extends string | boolean | number | null ? K : never;
+}[keyof T];
+
+type LooseExtractedParams<T extends string> = `:${T}` | (string & NonNullable<unknown>);
+
 export type OrganizationSwitcherProps = {
   /**
    Controls the default state of the OrganizationSwitcher
@@ -746,13 +754,31 @@ export type OrganizationSwitcherProps = {
   /**
    * Full URL or path to navigate after a successful organization switch.
    * @default undefined
+   * @deprecated use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`
    */
   afterSwitchOrganizationUrl?: string;
   /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
    */
-  afterCreateOrganizationUrl?: string;
+  afterCreateOrganizationUrl?:
+    | ((organization: OrganizationResource) => string)
+    | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
+  /**
+   * Full URL or path to navigate after a successful organization selection.
+   * Accepts a function that returns URL or path
+   * @default undefined`
+   */
+  afterSelectOrganizationUrl?:
+    | ((organization: OrganizationResource) => string)
+    | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
+
+  /**
+   * Full URL or path to navigate after a successful selection of personal workspace.
+   * Accepts a function that returns URL or path
+   * @default undefined`
+   */
+  afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
   /**
    * Full URL or path to navigate to after the user leaves the currently active organization.
    * @default undefined

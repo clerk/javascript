@@ -48,7 +48,8 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       afterCreateOrganizationUrl,
       navigateCreateOrganization,
       navigateOrganizationProfile,
-      navigateAfterSwitchOrganization,
+      navigateAfterSelectPersonal,
+      navigateAfterSelectOrganization,
     } = useOrganizationSwitcherContext();
 
     const user = useCoreUser();
@@ -60,12 +61,19 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     }
 
     const handleOrganizationClicked = (organization: OrganizationResource) => {
-      return card.runAsync(() => setActive({ organization, beforeEmit: navigateAfterSwitchOrganization })).then(close);
+      return card
+        .runAsync(() =>
+          setActive({
+            organization,
+            beforeEmit: () => navigateAfterSelectOrganization(organization),
+          }),
+        )
+        .then(close);
     };
 
     const handlePersonalWorkspaceClicked = () => {
       return card
-        .runAsync(() => setActive({ organization: null, beforeEmit: navigateAfterSwitchOrganization }))
+        .runAsync(() => setActive({ organization: null, beforeEmit: () => navigateAfterSelectPersonal(user) }))
         .then(close);
     };
 

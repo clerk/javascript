@@ -1,6 +1,7 @@
 export * from './beforeUnloadTracker';
 export * from './componentGuards';
 export * from './cookies';
+export * from './dynamicParamParser';
 export * from './devBrowser';
 export * from './email';
 export * from './encoders';
