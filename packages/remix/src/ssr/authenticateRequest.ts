@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
-import { Clerk, createIsomorphicRequest } from '@clerk/backend';
-import { getRequestUrl, handleValueOrFn, isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared';
+import { buildRequestUrl, Clerk } from '@clerk/backend';
+import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared';
 
 import {
   noSecretKeyOrApiKeyError,
@@ -55,13 +55,11 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     (context?.CLERK_IS_SATELLITE as string) === 'true' ||
     false;
 
-  const requestURL = getRequestUrl({
-    request,
-  });
+  const requestURL = buildRequestUrl(request);
 
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(
     opts?.proxyUrl,
-    new URL(requestURL),
+    requestURL,
     getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string),
   );
 
@@ -98,11 +96,6 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     isSatellite,
     domain,
     signInUrl,
-    request: createIsomorphicRequest((Request, Headers) => {
-      return new Request(requestURL, {
-        method: request.method,
-        headers: new Headers(request.headers),
-      });
-    }),
+    request,
   });
 }

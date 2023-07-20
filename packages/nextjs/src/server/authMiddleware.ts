@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants } from '@clerk/backend';
+import { buildRequestUrl, constants } from '@clerk/backend';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
-import { SECRET_KEY, TRUST_HOST } from './clerkClient';
+import { SECRET_KEY } from './clerkClient';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import { infiniteRedirectLoopDetected, informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
@@ -67,8 +67,7 @@ type WithClerkUrl<T> = T & {
    * or inside a container (Netlify, Fly.io, AWS Amplify, docker etc),
    * req.url is always set to `localhost:3000` instead of the actual host of the app.
    *
-   * If the CLERK_TRUST_HOST environment variable is set to "true",
-   * `authMiddleware` will use the value of the available req.headers in order to construct
+   * The `authMiddleware` uses the value of the available req.headers in order to construct
    * and use the correct url internally. This url is then exposed as `experimental_clerkUrl`,
    * intended to be used within `beforeAuth` and `afterAuth` if needed.
    */
@@ -352,28 +351,14 @@ const assertInfiniteRedirectionLoop = (
   return res;
 };
 
-const getHeader = (req: NextRequest, key: string) => req.headers.get(key);
-const getFirstValueFromHeader = (req: NextRequest, key: string) => getHeader(req, key)?.split(',')[0];
-
 const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => {
-  if (!TRUST_HOST) {
-    return Object.assign(req, { experimental_clerkUrl: req.nextUrl });
-  }
-
   const clerkUrl = req.nextUrl.clone();
 
-  const host = getFirstValueFromHeader(req, constants.Headers.ForwardedHost);
-  const protocol = getFirstValueFromHeader(req, constants.Headers.ForwardedProto);
-  const port = getFirstValueFromHeader(req, constants.Headers.ForwardedPort);
+  const originUrl = buildRequestUrl(req);
 
-  const isHttpRelatedProtocol = protocol && ['http', 'https'].includes(protocol);
-  const isHttpRelatedPort = port && ['80', '443'].includes(port);
-  if (isHttpRelatedProtocol && isHttpRelatedPort) {
-    clerkUrl.port = '';
-  }
-
-  clerkUrl.protocol = protocol ?? clerkUrl.protocol;
-  clerkUrl.host = host ?? clerkUrl.host;
+  clerkUrl.port = originUrl.port;
+  clerkUrl.protocol = originUrl.protocol;
+  clerkUrl.host = originUrl.host;
 
   return Object.assign(req, { experimental_clerkUrl: clerkUrl });
 };

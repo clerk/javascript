@@ -14,6 +14,7 @@ import factoryTest from './dist/api/factory.test.js';
 import exportsTest from './dist/exports.test.js';
 
 import redirectTest from './dist/redirections.test.js';
+import utilsTest from './dist/utils.test.js';
 
 // Add them to the suite array
 const suites = [
@@ -28,6 +29,7 @@ const suites = [
   verifyJwtTest,
   factoryTest,
   redirectTest,
+  utilsTest,
 ];
 
 export default suites;

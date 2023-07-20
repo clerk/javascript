@@ -11,6 +11,7 @@ export * from './tokens/jwt';
 export * from './tokens/verify';
 export { constants } from './constants';
 export { redirect } from './redirections';
+export { buildRequestUrl } from './utils';
 
 export type ClerkOptions = CreateBackendApiOptions &
   Partial<
