@@ -30,6 +30,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     organization: clerk.organization,
     lastOrganizationInvitation: null,
     lastOrganizationMember: null,
+    authStateKey: clerk.authStateKey,
   });
 
   React.useEffect(() => {
@@ -52,10 +53,11 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     organization,
     orgRole,
     orgSlug,
+    authStateKey,
   } = derivedState;
 
   const authCtx = React.useMemo(() => {
-    const value = { sessionId, userId, actor, orgId, orgRole, orgSlug };
+    const value = { sessionId, userId, actor, orgId, orgRole, orgSlug, authStateKey };
     return { value };
   }, [sessionId, userId, actor, orgId, orgRole, orgSlug]);
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);

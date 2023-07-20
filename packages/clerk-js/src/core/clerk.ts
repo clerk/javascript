@@ -78,6 +78,7 @@ import {
   sessionExistsAndSingleSessionModeEnabled,
   setDevBrowserJWTInURL,
   stripOrigin,
+  syncDigest,
   validateFrontendApi,
   windowNavigate,
 } from '../utils';
@@ -230,6 +231,14 @@ export default class Clerk implements ClerkInterface {
         .toString();
     }
     return null;
+  }
+
+  get authStateKey() {
+    return syncDigest({
+      userId: this.user?.id,
+      sessionId: this.session?.id,
+      orgId: this.organization?.id,
+    });
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {
@@ -626,6 +635,7 @@ export default class Clerk implements ClerkInterface {
         organization: this.organization,
         lastOrganizationInvitation: this.#lastOrganizationInvitation,
         lastOrganizationMember: this.#lastOrganizationMember,
+        authStateKey: this.authStateKey,
       });
     }
 
@@ -1353,6 +1363,7 @@ export default class Clerk implements ClerkInterface {
           organization: this.organization,
           lastOrganizationInvitation: this.#lastOrganizationInvitation,
           lastOrganizationMember: this.#lastOrganizationMember,
+          authStateKey: this.authStateKey,
         });
       }
     }

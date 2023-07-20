@@ -90,6 +90,24 @@ export interface Clerk {
   user?: UserResource | null;
 
   /**
+   * Returns a unique hash of the auth state.
+   * This string is deterministic and it is derived by hashing the userId, sessionId and orgId values.
+   * If any of these values happen to change, it will produce a completely different hash.
+   * This can be useful if you want to invalidate caches from libraries like react-query, swr. etc
+   *
+   * @example
+   * usage with @clerk-react
+   * const { authStateKey }  = useAuth()
+   *
+   * const singleUser = '/user'
+   *
+   * useSWR(`${singleUser}?hash=${authStateKey}`, fetcher);
+   *
+   * @returns {String} Returns the hashed value of userId, sessionId and orgId.
+   */
+  authStateKey?: string;
+
+  /**
    * Signs out the current user on single-session instances, or all users on multi-session instances
    * @param signOutCallback - Optional A callback that runs after sign out completes.
    * @param options - Optional Configuration options, see {@link SignOutOptions}
@@ -507,6 +525,7 @@ export interface Resources {
   organization?: OrganizationResource | null;
   lastOrganizationInvitation?: OrganizationInvitationResource | null;
   lastOrganizationMember?: OrganizationMembershipResource | null;
+  authStateKey?: string;
 }
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';

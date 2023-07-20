@@ -46,7 +46,7 @@ function userMembershipsChanged(prev: UserResource, next: UserResource): boolean
 }
 
 // TODO: Decide if this belongs in the resources
-function resourceChanged<T extends AcceptedResource | undefined | null>(prev: T, next: T): boolean {
+function resourceChanged<T extends AcceptedResource | undefined | null | string>(prev: T, next: T): boolean {
   // support the setSession undefined intermediate state
   if ((!prev && !!next) || (!!prev && !next)) {
     return true;
@@ -90,7 +90,8 @@ function getSameOrUpdatedResource<
     | OrganizationInvitationResource
     | OrganizationMembershipResource
     | undefined
-    | null,
+    | null
+    | string,
 >(prev: T, next: T): T {
   return resourceChanged(prev, next) ? next : prev;
 }
@@ -106,6 +107,7 @@ function stateWithMemoizedResources(cur: Resources, next: Resources): Resources 
       next.lastOrganizationInvitation,
     ),
     lastOrganizationMember: getSameOrUpdatedResource(cur.lastOrganizationMember, next.lastOrganizationMember),
+    authStateKey: getSameOrUpdatedResource(cur.authStateKey, next.authStateKey),
   };
 }
 

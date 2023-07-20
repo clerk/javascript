@@ -31,6 +31,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
     actor,
     lastOrganizationInvitation: null,
     lastOrganizationMember: null,
+    authStateKey: '',
   };
 };
 
@@ -50,6 +51,7 @@ const deriveFromClientSideState = (state: Resources) => {
 
   const lastOrganizationInvitation = state.lastOrganizationInvitation;
   const lastOrganizationMember = state.lastOrganizationMember;
+  const authStateKey = state.authStateKey || '';
 
   return {
     userId,
@@ -63,5 +65,6 @@ const deriveFromClientSideState = (state: Resources) => {
     actor,
     lastOrganizationInvitation,
     lastOrganizationMember,
+    authStateKey,
   };
 };

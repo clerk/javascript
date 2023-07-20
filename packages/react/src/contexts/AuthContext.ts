@@ -8,4 +8,5 @@ export const [AuthContext, useAuthContext] = createContextAndHook<{
   orgId: string | null | undefined;
   orgRole: MembershipRole | null | undefined;
   orgSlug: string | null | undefined;
+  authStateKey: string;
 }>('AuthContext');

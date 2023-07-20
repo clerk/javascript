@@ -19,6 +19,7 @@ type UseAuthReturn =
       orgSlug: undefined;
       signOut: SignOut;
       getToken: GetToken;
+      authStateKey: string;
     }
   | {
       isLoaded: true;
@@ -31,6 +32,7 @@ type UseAuthReturn =
       orgSlug: null;
       signOut: SignOut;
       getToken: GetToken;
+      authStateKey: string;
     }
   | {
       isLoaded: true;
@@ -43,6 +45,7 @@ type UseAuthReturn =
       orgSlug: null;
       signOut: SignOut;
       getToken: GetToken;
+      authStateKey: string;
     }
   | {
       isLoaded: true;
@@ -55,6 +58,7 @@ type UseAuthReturn =
       orgSlug: string | null;
       signOut: SignOut;
       getToken: GetToken;
+      authStateKey: string;
     };
 
 type UseAuth = () => UseAuthReturn;
@@ -99,7 +103,7 @@ type UseAuth = () => UseAuthReturn;
  * }
  */
 export const useAuth: UseAuth = () => {
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug } = useAuthContext();
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug, authStateKey } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -117,6 +121,7 @@ export const useAuth: UseAuth = () => {
       orgSlug: undefined,
       signOut,
       getToken,
+      authStateKey,
     };
   }
 
@@ -132,6 +137,7 @@ export const useAuth: UseAuth = () => {
       orgSlug: null,
       signOut,
       getToken,
+      authStateKey,
     };
   }
 
@@ -147,6 +153,7 @@ export const useAuth: UseAuth = () => {
       orgSlug: orgSlug || null,
       signOut,
       getToken,
+      authStateKey,
     };
   }
 
@@ -162,6 +169,7 @@ export const useAuth: UseAuth = () => {
       orgSlug: null,
       signOut,
       getToken,
+      authStateKey,
     };
   }
 

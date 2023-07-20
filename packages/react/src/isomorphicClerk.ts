@@ -307,6 +307,14 @@ export default class IsomorphicClerk {
     }
   }
 
+  get authStateKey() {
+    if (this.clerkjs) {
+      return this.clerkjs.authStateKey;
+    } else {
+      return undefined;
+    }
+  }
+
   get __unstable__environment(): any {
     if (this.clerkjs) {
       return (this.clerkjs as any).__unstable__environment;
