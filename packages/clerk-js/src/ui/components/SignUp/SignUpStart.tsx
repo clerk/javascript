@@ -4,7 +4,7 @@ import { ERROR_CODES } from '../../../core/constants';
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
-import { descriptors, Flex, Flow, localizationKeys, useAppearance } from '../../customizables';
+import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
   CardAlert,
@@ -40,6 +40,8 @@ function _SignUpStart(): JSX.Element {
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
+  const { t, locale } = useLocalizations();
+
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
   const {
@@ -223,7 +225,9 @@ function _SignUpStart(): JSX.Element {
           redirectUrlComplete,
         }),
       )
-      .catch(err => handleError(err, fieldsToSubmit, card.setError))
+      .catch(err => {
+        handleError(err, fieldsToSubmit, card.setError, { t, locale, passwordSettings });
+      })
       .finally(() => card.setIdle());
   };
 

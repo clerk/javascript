@@ -1,8 +1,9 @@
 import type { PasswordSettingsData } from '@clerk/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { LocalizationKey, localizationKeys, useLocalizations } from '../localization';
-import { canUseListFormat } from '../utils';
+import type { LocalizationKey } from '../localization';
+import { localizationKeys, useLocalizations } from '../localization';
+import { addFullStop, canUseListFormat } from '../utils';
 
 export type ComplexityErrors = {
   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]?: boolean;
@@ -49,18 +50,6 @@ const errorMessages = {
   require_lowercase: 'unstable__errors.passwordComplexity.requireLowercase',
   require_uppercase: 'unstable__errors.passwordComplexity.requireUppercase',
   require_special_char: 'unstable__errors.passwordComplexity.requireSpecialCharacter',
-};
-
-const addFullStop = (string: string | undefined) => {
-  if (!string) {
-    return '';
-  }
-
-  if (string.charAt(string.length - 1) === '.') {
-    return string;
-  }
-
-  return string + '.';
 };
 
 export const generateErrorTextUtil = ({
