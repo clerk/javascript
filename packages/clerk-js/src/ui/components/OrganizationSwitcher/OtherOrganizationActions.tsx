@@ -23,6 +23,8 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
   const { organizationList } = useCoreOrganizationList();
   const { organization: currentOrg } = useCoreOrganization();
   const user = useCoreUser();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
   const { hidePersonal } = useOrganizationSwitcherContext();
 
   const otherOrgs = (organizationList || []).map(e => e.organization).filter(o => o.id !== currentOrg?.id);
@@ -60,7 +62,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
             onClick={onPersonalWorkspaceClick}
           >
             <PersonalWorkspacePreview
-              user={user}
+              user={userWithoutIdentifiers}
               size='sm'
               avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
               title={localizationKeys('organizationSwitcher.personalWorkspace')}
