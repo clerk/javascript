@@ -150,14 +150,14 @@ describe('usePasswordComplexity', () => {
       result.current.getComplexity('@aP');
     });
 
-    expect(result.current.failedValidationsText).toBe('Your password must contain 8 or more characters and a number');
+    expect(result.current.failedValidationsText).toBe('Your password must contain 8 or more characters and a number.');
 
     await act(() => {
       result.current.getComplexity('aP');
     });
 
     expect(result.current.failedValidationsText).toBe(
-      'Your password must contain 8 or more characters, a special character, and a number',
+      'Your password must contain 8 or more characters, a special character, and a number.',
     );
   });
 });

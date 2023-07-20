@@ -94,24 +94,25 @@ function useFormTextAnimation() {
   };
 }
 
+type CalculateConfigProps = {
+  recalculate?: string | undefined;
+};
 type Px = number;
-const useCalculateErrorTextHeight = () => {
+const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
   const [height, setHeight] = useState<Px>(24);
 
-  const calculateHeight = useCallback((element: HTMLElement | null) => {
-    if (element) {
-      const computedStyles = getComputedStyle(element);
-      const marginTop = parseInt(computedStyles.marginTop.replace('px', ''));
+  const calculateHeight = useCallback(
+    (element: HTMLElement | null) => {
+      if (element) {
+        const computedStyles = getComputedStyle(element);
+        const marginTop = parseInt(computedStyles.marginTop.replace('px', ''));
 
-      setHeight(prevHeight => {
-        const newHeight = 1.5 * marginTop + element.scrollHeight;
-        if (prevHeight < newHeight) {
-          return newHeight;
-        }
-        return prevHeight;
-      });
-    }
-  }, []);
+        const newHeight = 1.1 * marginTop + element.scrollHeight;
+        setHeight(newHeight);
+      }
+    },
+    [config?.recalculate],
+  );
   return {
     height,
     calculateHeight,
@@ -136,7 +137,9 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
 
-  const { calculateHeight, height } = useCalculateErrorTextHeight();
+  const { calculateHeight, height } = useCalculateErrorTextHeight({
+    recalculate: warningMessage || errorMessage || informationMessage,
+  });
   const { getFormTextAnimation } = useFormTextAnimation();
   const defaultElementDescriptors = {
     error: descriptors.formFieldErrorText,
