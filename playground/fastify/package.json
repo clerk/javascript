@@ -6,7 +6,9 @@
     "start": "ts-node ./src/server.ts"
   },
   "dependencies": {
-    "@clerk/fastify": "*",
+    "@clerk/backend": "file:.yalc/@clerk/backend",
+    "@clerk/fastify": "file:.yalc/@clerk/fastify",
+    "@clerk/types": "file:.yalc/@clerk/types",
     "dotenv": "^16.0.3",
     "fastify": "^4.12.0",
     "ts-node": "^10.9.1"
