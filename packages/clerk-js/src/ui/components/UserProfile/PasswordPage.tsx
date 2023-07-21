@@ -2,7 +2,7 @@ import { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreSession, useCoreUser, useEnvironment } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { localizationKeys, useLocalizations } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -89,9 +89,12 @@ export const PasswordPage = withCardStateProvider(() => {
     confirmPasswordField: confirmField,
   });
 
-  const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
+  const { t, locale } = useLocalizations();
+
   const canSubmit =
-    (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) && !hasErrors;
+    (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) &&
+    passwordField.value &&
+    confirmField.value;
 
   const validateForm = () => {
     displayConfirmPasswordFeedback(confirmField.value);
@@ -116,7 +119,11 @@ export const PasswordPage = withCardStateProvider(() => {
       await user.updatePassword(opts);
       wizard.nextStep();
     } catch (e) {
-      handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);
+      handleError(e, [currentPasswordField, passwordField, confirmField], card.setError, {
+        t,
+        locale,
+        passwordSettings,
+      });
     }
   };
 

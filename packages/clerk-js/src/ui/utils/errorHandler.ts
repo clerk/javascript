@@ -23,16 +23,21 @@ function setFieldErrors(
 
   fieldStates.forEach(field => {
     const passwordError = errors.filter(err => {
-      return err.meta!.paramName === PASSWORD || snakeToCamel(err.meta!.paramName) === PASSWORD;
+      return (
+        err.meta!.paramName === PASSWORD ||
+        snakeToCamel(err.meta!.paramName) === PASSWORD ||
+        err.meta!.paramName === 'newPassword' ||
+        snakeToCamel(err.meta!.paramName) === 'newPassword'
+      );
     });
 
     const error = errors
-      .filter(err => err.meta?.paramName !== PASSWORD)
+      .filter(err => err.meta?.paramName !== PASSWORD && err.meta?.paramName !== 'newPassword')
       .find(err => {
         return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
       });
 
-    if (field.id === PASSWORD) {
+    if ((field.id === PASSWORD || field.id === 'newPassword') && passwordError.length) {
       const passwordErrorMessage = createPasswordError(passwordError, localizationConfig);
 
       field.setError(passwordErrorMessage || undefined);
@@ -106,9 +111,6 @@ export function getFieldError(err: Error): ClerkAPIError | undefined {
   }
 
   const { fieldErrors } = parseErrors(err.errors);
-  if (fieldErrors.length) {
-    return fieldErrors as any;
-  }
 
   if (!fieldErrors.length) {
     return;

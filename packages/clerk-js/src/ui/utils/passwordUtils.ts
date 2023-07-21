@@ -1,10 +1,10 @@
 import type { PasswordSettingsData } from '@clerk/types';
 
 import { localizationKeys } from '../customizables';
-import { addFullStop, canUseListFormat } from '../utils';
+import { addFullStop, createListFormat } from '../utils';
 
 // match FAPI error codes with localization keys
-export const getCodes = (passwordSettings: Pick<PasswordSettingsData, 'max_length' | 'min_length'>) => {
+export const mapComplexityErrors = (passwordSettings: Pick<PasswordSettingsData, 'max_length' | 'min_length'>) => {
   return {
     form_password_length_too_long: [
       'unstable__errors.passwordComplexity.maximumLength',
@@ -24,10 +24,14 @@ export const getCodes = (passwordSettings: Pick<PasswordSettingsData, 'max_lengt
 };
 
 export const createPasswordError = (error: any, localizationConfig: any) => {
+  if (!localizationConfig) {
+    return error[0].longMessage;
+  }
+
   const { t, locale, passwordSettings } = localizationConfig;
 
   const message = error.map((s: any) => {
-    const localizedKey = (getCodes(passwordSettings) as any)[s.code];
+    const localizedKey = (mapComplexityErrors(passwordSettings) as any)[s.code];
 
     if (Array.isArray(localizedKey)) {
       const [lk, attr, val] = localizedKey;
@@ -36,13 +40,7 @@ export const createPasswordError = (error: any, localizationConfig: any) => {
     return t(localizationKeys(localizedKey));
   });
 
-  let messageWithPrefix: string;
-  if (canUseListFormat(locale)) {
-    const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
-    messageWithPrefix = formatter.format(message);
-  } else {
-    messageWithPrefix = message.join(', ');
-  }
+  const messageWithPrefix = createListFormat(message, locale);
 
   const passwordErrorMessage = addFullStop(
     `${t(localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`,

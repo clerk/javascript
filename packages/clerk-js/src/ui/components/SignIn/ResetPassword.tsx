@@ -1,7 +1,7 @@
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
-import { Col, descriptors, localizationKeys } from '../../customizables';
+import { Col, descriptors, localizationKeys, useLocalizations } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -17,6 +17,8 @@ export const _ResetPassword = () => {
     userSettings: { passwordSettings },
   } = useEnvironment();
   const { failedValidationsText } = usePasswordComplexity(passwordSettings);
+
+  const { t, locale } = useLocalizations();
 
   const passwordField = useFormControl('password', '', {
     type: 'password',
@@ -45,8 +47,7 @@ export const _ResetPassword = () => {
     confirmPasswordField: confirmField,
   });
 
-  const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
-  const canSubmit = isPasswordMatch && !hasErrors;
+  const canSubmit = isPasswordMatch;
 
   const validateForm = () => {
     displayConfirmPasswordFeedback(confirmField.value);
@@ -75,7 +76,7 @@ export const _ResetPassword = () => {
           return console.error(clerkInvalidFAPIResponse(status, supportEmail));
       }
     } catch (e) {
-      handleError(e, [passwordField, confirmField], card.setError);
+      handleError(e, [passwordField, confirmField], card.setError, { t, locale, passwordSettings });
     }
   };
 

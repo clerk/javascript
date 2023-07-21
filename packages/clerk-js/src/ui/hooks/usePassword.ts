@@ -153,12 +153,14 @@ export const useConfirmPassword = ({
 }) => {
   const { t } = useLocalizations();
   const checkPasswordMatch = useCallback(
-    (confirmPassword: string) =>
-      passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmPassword,
+    (confirmPassword: string) => passwordField.value === confirmPassword,
     [passwordField.value],
   );
 
-  const isPasswordMatch = useMemo(() => checkPasswordMatch(confirmPasswordField.value), [confirmPasswordField.value]);
+  const isPasswordMatch = useMemo(
+    () => checkPasswordMatch(confirmPasswordField.value),
+    [passwordField, confirmPasswordField.value],
+  );
 
   const displayConfirmPasswordFeedback = useCallback(
     (password: string) => {

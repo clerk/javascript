@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { LocalizationKey } from '../localization';
 import { localizationKeys, useLocalizations } from '../localization';
-import { addFullStop, canUseListFormat } from '../utils';
+import { addFullStop, createListFormat } from '../utils';
 
 export type ComplexityErrors = {
   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]?: boolean;
@@ -78,13 +78,8 @@ export const generateErrorTextUtil = ({
       return t(localizationKeys(localizedKey as any));
     });
 
-  let messageWithPrefix: string;
-  if (canUseListFormat(locale)) {
-    const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
-    messageWithPrefix = formatter.format(messages);
-  } else {
-    messageWithPrefix = messages.join(', ');
-  }
+  const messageWithPrefix = createListFormat(messages, locale);
+
   return addFullStop(
     `${t(localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`,
   );
