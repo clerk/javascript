@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.48.1
+
+### Patch Changes
+
+- Introduce the `skipInvitationScreen` prop on `<CreateOrganization />` component ([#1501](https://github.com/clerkinc/javascript/pull/1501)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.48.0
 
 ### Minor Changes

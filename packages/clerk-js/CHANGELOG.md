@@ -1,5 +1,23 @@
 # Change Log
 
+## 4.54.1
+
+### Patch Changes
+
+- Introduce the `skipInvitationScreen` prop on `<CreateOrganization />` component ([#1501](https://github.com/clerkinc/javascript/pull/1501)) by [@panteliselef](https://github.com/panteliselef)
+
+- Removes identifier from Personal Workspace in the OrganizationSwitcher list (UI) ([#1502](https://github.com/clerkinc/javascript/pull/1502)) by [@panteliselef](https://github.com/panteliselef)
+
+- - Address spacing issues when password feedback message changes ([#1482](https://github.com/clerkinc/javascript/pull/1482)) by [@raptisj](https://github.com/raptisj)
+
+  - Add a full stop in form feedback(errors and warnings) when needed
+
+- In `<OrganizationProfile />` component, allow an admin to leave the current organization if there are more admins present. ([#1498](https://github.com/clerkinc/javascript/pull/1498)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`6fa4768dc`](https://github.com/clerkinc/javascript/commit/6fa4768dc6b261026d6e75d84c9ade1f389fe0d3)]:
+  - @clerk/types@3.48.1
+  - @clerk/localizations@1.23.2
+
 ## 4.54.0
 
 ### Minor Changes
