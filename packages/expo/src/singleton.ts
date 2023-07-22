@@ -14,10 +14,15 @@ type BuildClerkOptions = {
 };
 
 export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrowserClerk {
-  if (!clerk) {
+  if (!clerk || key !== clerk.publishableKey) {
     const getToken = tokenCache.getToken;
     const saveToken = tokenCache.saveToken;
-    // TODO: DO NOT ACCEPT THIS
+
+    if (clerk && key !== clerk.publishableKey) {
+      // handle key change at runtime (e.g. switching from dev to staging)
+      tokenCache.deleteToken(KEY);
+    }
+
     clerk = new Clerk(key);
 
     // @ts-expect-error
