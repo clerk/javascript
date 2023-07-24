@@ -29,7 +29,6 @@ exports[`module exports should not change unless explicitly set 1`] = `
   "User",
   "Verification",
   "allowlistIdentifiers",
-  "buildRequestUrl",
   "clerkClient",
   "clients",
   "constants",
