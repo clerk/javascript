@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.3.25
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@4.54.2
+
 ## 0.3.24
 
 ### Patch Changes
