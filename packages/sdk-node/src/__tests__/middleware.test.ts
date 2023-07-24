@@ -7,6 +7,8 @@ import type { WithAuthProp } from '../types';
 
 const mockNext = jest.fn();
 
+const createRequest = () => ({ url: '/path', cookies: {}, headers: {} } as Request);
+
 afterEach(() => {
   mockNext.mockReset();
 });
@@ -20,7 +22,7 @@ const mockClerkClient = () => ({
 
 describe('ClerkExpressWithAuth', () => {
   it('should decorate request with auth and move on to the next middleware when no session token exists', async () => {
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = {} as Response;
 
     const clerkClient = mockClerkClient() as any;
@@ -37,7 +39,7 @@ describe('ClerkExpressWithAuth', () => {
   });
 
   it('should decorate request with auth and move on to the next middleware when a session token does exist', async () => {
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = {} as Response;
 
     const clerkClient = mockClerkClient() as any;
@@ -55,7 +57,7 @@ describe('ClerkExpressWithAuth', () => {
   it('should halt middleware execution and return empty response with 401 http code for unknown request state', async () => {
     const writeHeadSpy = jest.fn();
     const endSpy = jest.fn();
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = { writeHead: writeHeadSpy, end: endSpy } as unknown as Response;
 
     const clerkClient = mockClerkClient() as any;
@@ -76,7 +78,7 @@ describe('ClerkExpressWithAuth', () => {
   it('should halt middleware execution and return remote private interstitial response with 401 http code for unknown request state', async () => {
     const writeHeadSpy = jest.fn();
     const endSpy = jest.fn();
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = { writeHead: writeHeadSpy, end: endSpy } as unknown as Response;
 
     const clerkClient = mockClerkClient() as any;
@@ -98,7 +100,7 @@ describe('ClerkExpressWithAuth', () => {
   it('should halt middleware execution and return local interstitial response with 401 http code for unknown request state', async () => {
     const writeHeadSpy = jest.fn();
     const endSpy = jest.fn();
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = { writeHead: writeHeadSpy, end: endSpy } as unknown as Response;
 
     const clerkClient = mockClerkClient() as any;
@@ -121,7 +123,7 @@ describe('ClerkExpressWithAuth', () => {
 
 describe('ClerkExpressRequireAuth', () => {
   it('should halt middleware execution by calling next with an error when no session exists', async () => {
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = {} as Response;
 
     const clerkClient = mockClerkClient() as any;
@@ -138,7 +140,7 @@ describe('ClerkExpressRequireAuth', () => {
   });
 
   it('should decorate request with auth and move on to the next middleware when a session token does exist', async () => {
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = {} as Response;
 
     const clerkClient = mockClerkClient() as any;
@@ -157,7 +159,7 @@ describe('ClerkExpressRequireAuth', () => {
   it('should halt middleware execution and return empty response with 401 http code for unknown request state', async () => {
     const writeHeadSpy = jest.fn();
     const endSpy = jest.fn();
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = { writeHead: writeHeadSpy, end: endSpy } as unknown as Response;
 
     const clerkClient = mockClerkClient() as any;
@@ -178,7 +180,7 @@ describe('ClerkExpressRequireAuth', () => {
   it('should halt middleware execution and return remote private interstitial response with 401 http code for unknown request state', async () => {
     const writeHeadSpy = jest.fn();
     const endSpy = jest.fn();
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = { writeHead: writeHeadSpy, end: endSpy } as unknown as Response;
 
     const clerkClient = mockClerkClient() as any;
@@ -200,7 +202,7 @@ describe('ClerkExpressRequireAuth', () => {
   it('should halt middleware execution and return local interstitial response with 401 http code for unknown request state', async () => {
     const writeHeadSpy = jest.fn();
     const endSpy = jest.fn();
-    const req = { cookies: {}, headers: {} } as Request;
+    const req = createRequest();
     const res = { writeHead: writeHeadSpy, end: endSpy } as unknown as Response;
 
     const clerkClient = mockClerkClient() as any;
