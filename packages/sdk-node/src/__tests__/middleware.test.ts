@@ -7,7 +7,7 @@ import type { WithAuthProp } from '../types';
 
 const mockNext = jest.fn();
 
-const createRequest = () => ({ url: 'http://localhost:3000', cookies: {}, headers: {} } as Request);
+const createRequest = () => ({ url: '/path', cookies: {}, headers: {} } as Request);
 
 afterEach(() => {
   mockNext.mockReset();
