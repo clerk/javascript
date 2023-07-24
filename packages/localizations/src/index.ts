@@ -22,3 +22,4 @@ export { nbNO } from './nb-NO';
 export { viVN } from './vi-VN';
 export { plPL } from './pl-PL';
 export { elGR } from './el-GR';
+export { skSK } from './sk-SK';

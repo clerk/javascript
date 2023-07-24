@@ -1,4 +1,4 @@
-import { deDe, enUS, esES, frFR, itIT, jaJP, ptBR, ruRU, svSE, trTR, csCZ, koKR } from '@clerk/localizations';
+import { deDe, enUS, esES, frFR, itIT, jaJP, ptBR, ruRU, svSE, trTR, csCZ, koKR, skSK } from '@clerk/localizations';
 import { dark } from '@clerk/themes';
 import { expectTypeOf } from 'expect-type';
 
@@ -187,9 +187,15 @@ describe('ClerkProvider', () => {
         ...defaultProps,
         localization: csCZ,
       }).toMatchTypeOf<ClerkProviderProps>();
+
       expectTypeOf({
         ...defaultProps,
         localization: koKR,
+      }).toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        localization: skSK,
       }).toMatchTypeOf<ClerkProviderProps>();
     });
 
