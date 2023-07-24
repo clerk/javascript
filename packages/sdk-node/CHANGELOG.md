@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.12.1
+
+### Patch Changes
+
+- Fix "invalid URL" issue when creating the isomorphicRequest ([#1516](https://github.com/clerkinc/javascript/pull/1516)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.12.0
 
 ### Minor Changes

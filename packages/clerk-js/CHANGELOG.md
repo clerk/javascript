@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.54.2
+
+### Patch Changes
+
+- Updated dependencies [[`30cf15c10`](https://github.com/clerkinc/javascript/commit/30cf15c10c9b47c2b3ba3975bc86856846cf4129)]:
+  - @clerk/localizations@1.24.0
+
 ## 4.54.1
 
 ### Patch Changes

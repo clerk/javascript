@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.24.0
+
+### Minor Changes
+
+- Introduce sk-SK localization ([#1515](https://github.com/clerkinc/javascript/pull/1515)) by [@l0st0](https://github.com/l0st0)
+
 ## 1.23.2
 
 ### Patch Changes
