@@ -273,6 +273,7 @@ export type ElementsConfig = {
     never
   >;
   organizationSwitcherPreviewButton: WithOptions<never, never, never>;
+  organizationSwitcherInvitationRejectButton: WithOptions<never, never, never>;
   organizationSwitcherPopoverActionButtonIconBox: WithOptions<
     'manageOrganization' | 'createOrganization',
     never,

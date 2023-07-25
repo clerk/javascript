@@ -1,5 +1,5 @@
 import { withOrganizationsEnabledGuard } from '../../common';
-import { withCoreUserGuard } from '../../contexts';
+import { useCoreOrganizationList, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
@@ -10,6 +10,12 @@ const _OrganizationSwitcher = withFloatingTree(() => {
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     placement: 'bottom-start',
     offset: 8,
+  });
+
+  useCoreOrganizationList({
+    userInvitations: {
+      aggregate: true,
+    },
   });
 
   return (
