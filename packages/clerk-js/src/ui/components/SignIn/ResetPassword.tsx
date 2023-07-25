@@ -6,7 +6,7 @@ import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } fr
 import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
-import { handleError, useFormControl } from '../../utils';
+import { createPasswordError, handleError, useFormControl } from '../../utils';
 
 export const _ResetPassword = () => {
   const signIn = useCoreSignIn();
@@ -27,6 +27,7 @@ export const _ResetPassword = () => {
     enableErrorAfterBlur: true,
     validatePassword: true,
     informationText: failedValidationsText,
+    buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
   });
 
   const confirmField = useFormControl('confirmPassword', '', {
@@ -76,7 +77,7 @@ export const _ResetPassword = () => {
           return console.error(clerkInvalidFAPIResponse(status, supportEmail));
       }
     } catch (e) {
-      handleError(e, [passwordField, confirmField], card.setError, { t, locale, passwordSettings });
+      handleError(e, [passwordField, confirmField], card.setError);
     }
   };
 

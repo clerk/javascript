@@ -1,9 +1,7 @@
 import { snakeToCamel } from '@clerk/shared';
-import type { ClerkAPIError, PasswordSettingsData } from '@clerk/types';
+import type { ClerkAPIError } from '@clerk/types';
 
 import { isClerkAPIResponseError, isKnownError, isMetamaskError } from '../../core/resources/internal';
-import type { LocalizationKey } from '../localization';
-import { createPasswordError } from '../utils';
 import type { FormControlState } from './useFormControl';
 
 interface ParserErrors {
@@ -11,39 +9,23 @@ interface ParserErrors {
   globalErrors: ClerkAPIError[];
 }
 
-const PASSWORD = 'password';
-function setFieldErrors(
-  fieldStates: Array<FormControlState<string>>,
-  errors: ClerkAPIError[],
-  localizationConfig?: any,
-) {
+function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: ClerkAPIError[]) {
   if (!errors || errors.length < 1) {
     return;
   }
 
   fieldStates.forEach(field => {
-    const passwordError = errors.filter(err => {
-      return (
-        err.meta!.paramName === PASSWORD ||
-        snakeToCamel(err.meta!.paramName) === PASSWORD ||
-        err.meta!.paramName === 'newPassword' ||
-        snakeToCamel(err.meta!.paramName) === 'newPassword'
-      );
+    let buildErrorMessage = field?.buildErrorMessage;
+
+    if (!buildErrorMessage) {
+      buildErrorMessage = (err: ClerkAPIError[]) => err[0];
+    }
+
+    const errorsArray = errors.filter(err => {
+      return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
     });
 
-    const error = errors
-      .filter(err => err.meta?.paramName !== PASSWORD && err.meta?.paramName !== 'newPassword')
-      .find(err => {
-        return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
-      });
-
-    if ((field.id === PASSWORD || field.id === 'newPassword') && passwordError.length) {
-      const passwordErrorMessage = createPasswordError(passwordError, localizationConfig);
-
-      field.setError(passwordErrorMessage || undefined);
-    } else {
-      field.setError(error || undefined);
-    }
+    field.setError(errorsArray.length ? buildErrorMessage(errorsArray) : undefined);
   });
 }
 
@@ -69,15 +51,10 @@ type HandleError = {
     err: Error,
     fieldStates: Array<FormControlState<string>>,
     setGlobalError?: (err: ClerkAPIError | string | undefined) => void,
-    localizationConfig?: {
-      passwordSettings: PasswordSettingsData;
-      locale: string;
-      t: (localizationKey: LocalizationKey | string | undefined) => string;
-    },
   ): void;
 };
 
-export const handleError: HandleError = (err, fieldStates, setGlobalError, localizationConfig) => {
+export const handleError: HandleError = (err, fieldStates, setGlobalError) => {
   // Throw unknown errors
   if (!isKnownError(err)) {
     throw err;
@@ -88,7 +65,7 @@ export const handleError: HandleError = (err, fieldStates, setGlobalError, local
   }
 
   if (isClerkAPIResponseError(err)) {
-    return handleClerkApiError(err, fieldStates, setGlobalError, localizationConfig);
+    return handleClerkApiError(err, fieldStates, setGlobalError);
   }
 };
 
@@ -127,13 +104,13 @@ const handleMetamaskError: HandleError = (err, _, setGlobalError) => {
   return setGlobalError?.(err.message);
 };
 
-const handleClerkApiError: HandleError = (err, fieldStates, setGlobalError, localizationConfig) => {
+const handleClerkApiError: HandleError = (err, fieldStates, setGlobalError) => {
   if (!isClerkAPIResponseError(err)) {
     return;
   }
 
   const { fieldErrors, globalErrors } = parseErrors(err.errors);
-  setFieldErrors(fieldStates, fieldErrors, localizationConfig);
+  setFieldErrors(fieldStates, fieldErrors);
 
   if (setGlobalError) {
     setGlobalError(undefined);

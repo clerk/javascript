@@ -18,6 +18,7 @@ import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus, usePasswordComplexity } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
+import { createPasswordError } from '../../utils';
 import { buildRequest, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
@@ -82,6 +83,7 @@ function _SignUpStart(): JSX.Element {
       enableErrorAfterBlur: true,
       informationText: failedValidationsText,
       validatePassword: true,
+      buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
     }),
     ticket: useFormControl(
       'ticket',
@@ -225,9 +227,7 @@ function _SignUpStart(): JSX.Element {
           redirectUrlComplete,
         }),
       )
-      .catch(err => {
-        handleError(err, fieldsToSubmit, card.setError, { t, locale, passwordSettings });
-      })
+      .catch(err => handleError(err, fieldsToSubmit, card.setError))
       .finally(() => card.setIdle());
   };
 

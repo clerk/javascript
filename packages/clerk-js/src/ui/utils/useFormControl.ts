@@ -19,11 +19,13 @@ type Options = {
 } & (
   | {
       validatePassword?: never;
+      buildErrorMessage?: never;
       type?: Exclude<HTMLInputTypeAttribute, 'password'>;
     }
   | {
       type: Extract<HTMLInputTypeAttribute, 'password'>;
       validatePassword: boolean;
+      buildErrorMessage?: (err: ClerkAPIError[]) => ClerkAPIError | string | undefined;
     }
 );
 

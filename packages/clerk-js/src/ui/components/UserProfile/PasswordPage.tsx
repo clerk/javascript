@@ -15,7 +15,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
-import { handleError, useFormControl } from '../../utils';
+import { createPasswordError, handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
@@ -69,6 +69,7 @@ export const PasswordPage = withCardStateProvider(() => {
     enableErrorAfterBlur: true,
     validatePassword: true,
     informationText: failedValidationsText,
+    buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
   });
 
   const confirmField = useFormControl('confirmPassword', '', {
@@ -119,11 +120,7 @@ export const PasswordPage = withCardStateProvider(() => {
       await user.updatePassword(opts);
       wizard.nextStep();
     } catch (e) {
-      handleError(e, [currentPasswordField, passwordField, confirmField], card.setError, {
-        t,
-        locale,
-        passwordSettings,
-      });
+      handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);
     }
   };
 

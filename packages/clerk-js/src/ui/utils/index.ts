@@ -21,4 +21,3 @@ export * from './mergeRefs';
 export * from './createSlug';
 export * from './zxcvbn';
 export * from './passwordUtils';
-export * from './formatStrings';

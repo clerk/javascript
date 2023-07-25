@@ -1,7 +1,8 @@
-import type { PasswordSettingsData } from '@clerk/types';
+import type { ClerkAPIError, PasswordSettingsData } from '@clerk/types';
 
-import { localizationKeys } from '../customizables';
-import { addFullStop, createListFormat } from '../utils';
+import type { LocalizationKey } from '../localization';
+import { localizationKeys } from '../localization/localizationKeys';
+import { canUseListFormat } from '../utils';
 
 // match FAPI error codes with localization keys
 export const mapComplexityErrors = (passwordSettings: Pick<PasswordSettingsData, 'max_length' | 'min_length'>) => {
@@ -23,14 +24,19 @@ export const mapComplexityErrors = (passwordSettings: Pick<PasswordSettingsData,
   };
 };
 
-export const createPasswordError = (error: any, localizationConfig: any) => {
+type LocalizationConfigProps = {
+  t: (localizationKey: LocalizationKey | string | undefined) => string;
+  locale: string;
+  passwordSettings: PasswordSettingsData;
+};
+export const createPasswordError = (errors: ClerkAPIError[], localizationConfig: LocalizationConfigProps) => {
   if (!localizationConfig) {
-    return error[0].longMessage;
+    return errors[0].longMessage;
   }
 
   const { t, locale, passwordSettings } = localizationConfig;
 
-  const message = error.map((s: any) => {
+  const message = errors.map((s: any) => {
     const localizedKey = (mapComplexityErrors(passwordSettings) as any)[s.code];
 
     if (Array.isArray(localizedKey)) {
@@ -47,4 +53,20 @@ export const createPasswordError = (error: any, localizationConfig: any) => {
   );
 
   return passwordErrorMessage;
+};
+
+export const addFullStop = (string: string | undefined) => {
+  return !string ? '' : string.endsWith('.') ? string : `${string}.`;
+};
+
+export const createListFormat = (message: string[], locale: string) => {
+  let messageWithPrefix: string;
+  if (canUseListFormat(locale)) {
+    const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
+    messageWithPrefix = formatter.format(message);
+  } else {
+    messageWithPrefix = message.join(', ');
+  }
+
+  return messageWithPrefix;
 };
