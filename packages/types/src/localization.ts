@@ -697,4 +697,5 @@ type UnstableErrors = WithParamName<{
       pwned: LocalizationValue;
     };
   };
+  form_param_max_length_exceeded: LocalizationValue;
 }>;

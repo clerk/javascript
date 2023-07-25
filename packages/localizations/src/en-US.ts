@@ -664,6 +664,9 @@ export const enUS: LocalizationResource = {
         pwned: 'If you use this password elsewhere, you should change it.',
       },
     },
+    form_param_max_length_exceeded__name: 'Name should not exceed 256 characters.',
+    form_param_max_length_exceeded__first_name: 'First name should not exceed 256 characters.',
+    form_param_max_length_exceeded__last_name: 'Last name should not exceed 256 characters.',
   },
   dates: {
     previous6Days: "Last {{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}",
