@@ -9,6 +9,8 @@ interface ParserErrors {
   globalErrors: ClerkAPIError[];
 }
 
+const getFirstError = (err: ClerkAPIError[]) => err[0];
+
 function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: ClerkAPIError[]) {
   if (!errors || errors.length < 1) {
     return;
@@ -18,7 +20,7 @@ function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: Cl
     let buildErrorMessage = field?.buildErrorMessage;
 
     if (!buildErrorMessage) {
-      buildErrorMessage = (err: ClerkAPIError[]) => err[0];
+      buildErrorMessage = getFirstError;
     }
 
     const errorsArray = errors.filter(err => {
@@ -86,7 +88,6 @@ export function getFieldError(err: Error): ClerkAPIError | undefined {
   if (!isClerkAPIResponseError(err)) {
     return;
   }
-
   const { fieldErrors } = parseErrors(err.errors);
 
   if (!fieldErrors.length) {

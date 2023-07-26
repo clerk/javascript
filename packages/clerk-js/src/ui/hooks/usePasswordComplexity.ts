@@ -98,8 +98,8 @@ const validate = (password: string, config: UsePasswordComplexityConfig): Comple
     max_length,
     min_length,
     require_special_char,
-    require_lowercase,
     require_numbers,
+    require_lowercase,
     require_uppercase,
   };
 

@@ -159,7 +159,7 @@ export const useConfirmPassword = ({
 
   const isPasswordMatch = useMemo(
     () => checkPasswordMatch(confirmPasswordField.value),
-    [passwordField, confirmPasswordField.value],
+    [checkPasswordMatch, confirmPasswordField.value],
   );
 
   const displayConfirmPasswordFeedback = useCallback(

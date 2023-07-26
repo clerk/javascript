@@ -27,7 +27,7 @@ export const mapComplexityErrors = (passwordSettings: Pick<PasswordSettingsData,
 type LocalizationConfigProps = {
   t: (localizationKey: LocalizationKey | string | undefined) => string;
   locale: string;
-  passwordSettings: PasswordSettingsData;
+  passwordSettings: Pick<PasswordSettingsData, 'max_length' | 'min_length'>;
 };
 export const createPasswordError = (errors: ClerkAPIError[], localizationConfig: LocalizationConfigProps) => {
   if (!localizationConfig) {

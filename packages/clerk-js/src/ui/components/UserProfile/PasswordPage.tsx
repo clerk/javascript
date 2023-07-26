@@ -98,7 +98,9 @@ export const PasswordPage = withCardStateProvider(() => {
     confirmField.value;
 
   const validateForm = () => {
-    displayConfirmPasswordFeedback(confirmField.value);
+    if (passwordField.value) {
+      displayConfirmPasswordFeedback(confirmField.value);
+    }
   };
 
   const updatePassword = async () => {
