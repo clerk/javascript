@@ -39,6 +39,7 @@ export * from './theme';
 export * from './token';
 export * from './totp';
 export * from './user';
+export * from './userOrganizationInvitation';
 export * from './userSettings';
 export * from './utils';
 export * from './verification';

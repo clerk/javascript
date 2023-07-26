@@ -1,3 +1,4 @@
+import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
 import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
@@ -12,6 +13,7 @@ import type { SamlAccountResource } from './samlAccount';
 import type { SessionWithActivitiesResource } from './session';
 import type { OAuthStrategy } from './strategies';
 import type { TOTPResource } from './totp';
+import type { UserOrganizationInvitationResource } from './userOrganizationInvitation';
 import type { SnakeToCamel } from './utils';
 import type { Web3WalletResource } from './web3Wallet';
 
@@ -93,6 +95,9 @@ export interface UserResource extends ClerkResource {
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
   setProfileImage: (params: SetProfileImageParams) => Promise<ImageResource>;
   createExternalAccount: (params: CreateExternalAccountParams) => Promise<ExternalAccountResource>;
+  getOrganizationInvitations: (
+    params?: GetUserOrganizationInvitationsParams,
+  ) => Promise<ClerkPaginatedResponse<UserOrganizationInvitationResource>>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
@@ -150,3 +155,5 @@ export type UpdateUserPasswordParams = {
 };
 
 export type RemoveUserPasswordParams = Pick<UpdateUserPasswordParams, 'currentPassword'>;
+
+export type GetUserOrganizationInvitationsParams = ClerkPaginationParams;

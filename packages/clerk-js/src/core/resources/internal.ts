@@ -23,5 +23,6 @@ export * from './SignUp';
 export * from './Token';
 export * from './TOTP';
 export * from './User';
+export * from './UserOrganizationInvitation';
 export * from './Verification';
 export * from './Web3Wallet';
