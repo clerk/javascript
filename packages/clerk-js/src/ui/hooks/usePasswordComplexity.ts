@@ -1,8 +1,9 @@
 import type { PasswordSettingsData } from '@clerk/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { LocalizationKey, localizationKeys, useLocalizations } from '../localization';
-import { canUseListFormat } from '../utils';
+import type { LocalizationKey } from '../localization';
+import { localizationKeys, useLocalizations } from '../localization';
+import { addFullStop, createListFormat } from '../utils';
 
 export type ComplexityErrors = {
   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]?: boolean;
@@ -51,18 +52,6 @@ const errorMessages = {
   require_special_char: 'unstable__errors.passwordComplexity.requireSpecialCharacter',
 };
 
-const addFullStop = (string: string | undefined) => {
-  if (!string) {
-    return '';
-  }
-
-  if (string.charAt(string.length - 1) === '.') {
-    return string;
-  }
-
-  return string + '.';
-};
-
 export const generateErrorTextUtil = ({
   config,
   failedValidations,
@@ -89,13 +78,8 @@ export const generateErrorTextUtil = ({
       return t(localizationKeys(localizedKey as any));
     });
 
-  let messageWithPrefix: string;
-  if (canUseListFormat(locale)) {
-    const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
-    messageWithPrefix = formatter.format(messages);
-  } else {
-    messageWithPrefix = messages.join(', ');
-  }
+  const messageWithPrefix = createListFormat(messages, locale);
+
   return addFullStop(
     `${t(localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`,
   );
@@ -114,8 +98,8 @@ const validate = (password: string, config: UsePasswordComplexityConfig): Comple
     max_length,
     min_length,
     require_special_char,
-    require_lowercase,
     require_numbers,
+    require_lowercase,
     require_uppercase,
   };
 

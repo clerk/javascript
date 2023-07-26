@@ -2,7 +2,7 @@ import { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreSession, useCoreUser, useEnvironment } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { localizationKeys, useLocalizations } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -15,7 +15,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
-import { handleError, useFormControl } from '../../utils';
+import { createPasswordError, handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
@@ -69,6 +69,7 @@ export const PasswordPage = withCardStateProvider(() => {
     enableErrorAfterBlur: true,
     validatePassword: true,
     informationText: failedValidationsText,
+    buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
   });
 
   const confirmField = useFormControl('confirmPassword', '', {
@@ -89,12 +90,17 @@ export const PasswordPage = withCardStateProvider(() => {
     confirmPasswordField: confirmField,
   });
 
-  const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
+  const { t, locale } = useLocalizations();
+
   const canSubmit =
-    (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) && !hasErrors;
+    (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) &&
+    passwordField.value &&
+    confirmField.value;
 
   const validateForm = () => {
-    displayConfirmPasswordFeedback(confirmField.value);
+    if (passwordField.value) {
+      displayConfirmPasswordFeedback(confirmField.value);
+    }
   };
 
   const updatePassword = async () => {

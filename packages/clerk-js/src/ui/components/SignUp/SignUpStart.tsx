@@ -4,7 +4,7 @@ import { ERROR_CODES } from '../../../core/constants';
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
-import { descriptors, Flex, Flow, localizationKeys, useAppearance } from '../../customizables';
+import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
   CardAlert,
@@ -18,6 +18,7 @@ import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus, usePasswordComplexity } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
+import { createPasswordError } from '../../utils';
 import { buildRequest, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
@@ -40,6 +41,8 @@ function _SignUpStart(): JSX.Element {
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
+  const { t, locale } = useLocalizations();
+
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
   const {
@@ -80,6 +83,7 @@ function _SignUpStart(): JSX.Element {
       enableErrorAfterBlur: true,
       informationText: failedValidationsText,
       validatePassword: true,
+      buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
     }),
     ticket: useFormControl(
       'ticket',

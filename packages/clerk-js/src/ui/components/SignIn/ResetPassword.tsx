@@ -1,12 +1,12 @@
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
-import { Col, descriptors, localizationKeys } from '../../customizables';
+import { Col, descriptors, localizationKeys, useLocalizations } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
-import { handleError, useFormControl } from '../../utils';
+import { createPasswordError, handleError, useFormControl } from '../../utils';
 
 export const _ResetPassword = () => {
   const signIn = useCoreSignIn();
@@ -18,6 +18,8 @@ export const _ResetPassword = () => {
   } = useEnvironment();
   const { failedValidationsText } = usePasswordComplexity(passwordSettings);
 
+  const { t, locale } = useLocalizations();
+
   const passwordField = useFormControl('password', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__newPassword'),
@@ -25,6 +27,7 @@ export const _ResetPassword = () => {
     enableErrorAfterBlur: true,
     validatePassword: true,
     informationText: failedValidationsText,
+    buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
   });
 
   const confirmField = useFormControl('confirmPassword', '', {
@@ -45,8 +48,7 @@ export const _ResetPassword = () => {
     confirmPasswordField: confirmField,
   });
 
-  const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
-  const canSubmit = isPasswordMatch && !hasErrors;
+  const canSubmit = isPasswordMatch;
 
   const validateForm = () => {
     displayConfirmPasswordFeedback(confirmField.value);

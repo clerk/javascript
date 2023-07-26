@@ -9,16 +9,25 @@ interface ParserErrors {
   globalErrors: ClerkAPIError[];
 }
 
+const getFirstError = (err: ClerkAPIError[]) => err[0];
+
 function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: ClerkAPIError[]) {
   if (!errors || errors.length < 1) {
     return;
   }
 
   fieldStates.forEach(field => {
-    const error = errors.find(err => {
+    let buildErrorMessage = field?.buildErrorMessage;
+
+    if (!buildErrorMessage) {
+      buildErrorMessage = getFirstError;
+    }
+
+    const errorsArray = errors.filter(err => {
       return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
     });
-    field.setError(error || undefined);
+
+    field.setError(errorsArray.length ? buildErrorMessage(errorsArray) : undefined);
   });
 }
 
@@ -80,9 +89,11 @@ export function getFieldError(err: Error): ClerkAPIError | undefined {
     return;
   }
   const { fieldErrors } = parseErrors(err.errors);
+
   if (!fieldErrors.length) {
     return;
   }
+
   return fieldErrors[0];
 }
 
