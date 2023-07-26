@@ -6,6 +6,8 @@ import type { TokenCache } from './cache';
 
 const KEY = '__clerk_client_jwt';
 
+const getCacheKey = (publishableKey: string) => `${publishableKey}:${KEY}`;
+
 export let clerk: HeadlessBrowserClerk;
 
 type BuildClerkOptions = {
@@ -27,7 +29,8 @@ export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrow
 
       requestInit.url?.searchParams.append('_is_native', '1');
 
-      const jwt = await getToken(KEY);
+      // To avoid logging everyone out we could use the old key as a fallback eg:
+      const jwt = (await getToken(getCacheKey(key))) || (await getToken(KEY));
       (requestInit.headers as Headers).set('authorization', jwt || '');
     });
 
@@ -35,7 +38,7 @@ export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrow
     clerk.__unstable__onAfterResponse(async (_: FapiRequestInit, response: FapiResponse<unknown>) => {
       const authHeader = response.headers.get('authorization');
       if (authHeader) {
-        await saveToken(KEY, authHeader);
+        await saveToken(getCacheKey(key), authHeader);
       }
     });
   }
