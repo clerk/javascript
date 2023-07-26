@@ -12,7 +12,7 @@ export const privateRoutes = async (fastify: FastifyInstance, _opts: any) => {
     const auth = getAuth(req);
 
     if (!auth.userId) {
-      return reply.code(403);
+      return reply.code(403).send();
     }
 
     return { hello: 'world', auth };
