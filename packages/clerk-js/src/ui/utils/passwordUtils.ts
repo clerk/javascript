@@ -29,12 +29,23 @@ type LocalizationConfigProps = {
   locale: string;
   passwordSettings: Pick<PasswordSettingsData, 'max_length' | 'min_length'>;
 };
+
 export const createPasswordError = (errors: ClerkAPIError[], localizationConfig: LocalizationConfigProps) => {
   if (!localizationConfig) {
     return errors[0].longMessage;
   }
 
   const { t, locale, passwordSettings } = localizationConfig;
+
+  if (errors?.[0]?.code === 'form_password_not_strong_enough') {
+    const message = errors[0].meta?.zxcvbn?.suggestions
+      ?.map(s => {
+        return t(localizationKeys(`unstable__errors.zxcvbn.suggestions.${s.code}` as any));
+      })
+      .join(' ');
+
+    return `${t(localizationKeys('unstable__errors.zxcvbn.notEnough'))} ${message}`;
+  }
 
   const message = errors.map((s: any) => {
     const localizedKey = (mapComplexityErrors(passwordSettings) as any)[s.code];

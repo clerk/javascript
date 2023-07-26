@@ -165,4 +165,69 @@ describe('createPasswordError() constructs error that password', () => {
       'Your password must contain 8 or more characters, a special character, a number, a lowercase letter, and an uppercase letter.',
     );
   });
+
+  //
+  // zxcvbn
+  //
+  //
+  it('is not strong enough', async () => {
+    const { wrapper: Wrapper } = await createFixtures();
+
+    const wrapperBefore = ({ children }) => (
+      <Wrapper>
+        <OptionsProvider value={{ localization: {} }}>{children}</OptionsProvider>
+      </Wrapper>
+    );
+
+    const { result } = renderHook(() => useLocalizations(), { wrapper: wrapperBefore });
+
+    const res = createPasswordError(
+      [
+        {
+          code: 'form_password_not_strong_enough',
+          message: '',
+          meta: {
+            zxcvbn: {
+              suggestions: [{ code: 'anotherWord', message: '' }],
+            },
+          },
+        },
+      ],
+      createLocalizationConfig(result.current.t),
+    );
+    expect(res).toBe('Your password is not strong enough. Add more words that are less common.');
+  });
+
+  it('is not strong enough and has repeated characters', async () => {
+    const { wrapper: Wrapper } = await createFixtures();
+
+    const wrapperBefore = ({ children }) => (
+      <Wrapper>
+        <OptionsProvider value={{ localization: {} }}>{children}</OptionsProvider>
+      </Wrapper>
+    );
+
+    const { result } = renderHook(() => useLocalizations(), { wrapper: wrapperBefore });
+
+    const res = createPasswordError(
+      [
+        {
+          code: 'form_password_not_strong_enough',
+          message: '',
+          meta: {
+            zxcvbn: {
+              suggestions: [
+                { code: 'anotherWord', message: '' },
+                { code: 'repeated', message: '' },
+              ],
+            },
+          },
+        },
+      ],
+      createLocalizationConfig(result.current.t),
+    );
+    expect(res).toBe(
+      'Your password is not strong enough. Add more words that are less common. Avoid repeated words and characters.',
+    );
+  });
 });

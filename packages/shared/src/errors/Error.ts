@@ -38,6 +38,7 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
       paramName: error?.meta?.param_name,
       sessionId: error?.meta?.session_id,
       emailAddresses: error?.meta?.email_addresses,
+      zxcvbn: error?.meta?.zxcvbn,
     },
   };
 }
