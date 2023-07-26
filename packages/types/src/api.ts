@@ -25,3 +25,11 @@ export interface ClerkPaginationParams {
   limit?: number;
   offset?: number;
 }
+
+/**
+ * Pagination params
+ */
+export interface ClerkPaginatedResponse<T> {
+  data: T[];
+  total_count: number;
+}

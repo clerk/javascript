@@ -10,6 +10,7 @@ import type {
   EmailAddressResource,
   ExternalAccountJSON,
   ExternalAccountResource,
+  GetUserOrganizationInvitationsParams,
   ImageResource,
   OrganizationMembershipResource,
   PhoneNumberResource,
@@ -42,6 +43,7 @@ import {
   SamlAccount,
   SessionWithActivities,
   TOTP,
+  UserOrganizationInvitation,
   Web3Wallet,
 } from './internal';
 
@@ -248,6 +250,10 @@ export class User extends BaseResource implements UserResource {
     return Image.create(`${this.path()}/profile_image`, {
       file,
     });
+  };
+
+  getOrganizationInvitations = (params?: GetUserOrganizationInvitationsParams) => {
+    return UserOrganizationInvitation.retrieve(params);
   };
 
   getOrganizationMemberships = async (
