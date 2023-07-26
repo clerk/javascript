@@ -14,7 +14,7 @@ const _OrganizationSwitcher = withFloatingTree(() => {
 
   useCoreOrganizationList({
     userInvitations: {
-      aggregate: true,
+      infinite: true,
     },
   });
 

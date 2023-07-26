@@ -1,6 +1,5 @@
 import type { OrganizationResource, UserOrganizationInvitationResource } from '@clerk/types';
-import React from 'react';
-import { useInView } from 'react-intersection-observer';
+import React, { useCallback, useRef, useState } from 'react';
 
 import { Plus, SwitchArrows } from '../../../ui/icons';
 import {
@@ -19,11 +18,62 @@ type OrganizationActionListProps = {
   onOrganizationClick: (org: OrganizationResource) => unknown;
 };
 
+export interface IntersectionOptions extends IntersectionObserverInit {
+  /** Only trigger the inView callback once */
+  triggerOnce?: boolean;
+  /** Call this function whenever the in view state changes */
+  onChange?: (inView: boolean, entry: IntersectionObserverEntry) => void;
+}
+
+const useInView = (params: IntersectionOptions) => {
+  const [inView, setInView] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const thresholds = Array.isArray(params.threshold) ? params.threshold : [params.threshold || 0];
+  const internalOnChange = React.useRef<IntersectionOptions['onChange']>();
+
+  internalOnChange.current = params.onChange;
+
+  const ref = useCallback((element: HTMLElement | null) => {
+    if (!element) {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      return;
+    }
+
+    observerRef.current = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          const _inView = entry.isIntersecting && thresholds.some(threshold => entry.intersectionRatio >= threshold);
+
+          setInView(_inView);
+
+          if (internalOnChange.current) {
+            internalOnChange.current(_inView, entry);
+          }
+        });
+      },
+      {
+        root: params.root,
+        rootMargin: params.rootMargin,
+        threshold: thresholds,
+      },
+    );
+
+    observerRef.current.observe(element);
+  }, []);
+
+  return {
+    inView,
+    ref,
+  };
+};
+
 export const OrganizationActionList = (props: OrganizationActionListProps) => {
   const { onCreateOrganizationClick, onPersonalWorkspaceClick, onOrganizationClick } = props;
   const { organizationList, userInvitations } = useCoreOrganizationList({
     userInvitations: {
-      aggregate: true,
+      infinite: true,
     },
   });
 
@@ -31,7 +81,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
     threshold: 0,
     onChange: inView => {
       if (inView) {
-        void userInvitations?.setSize?.(n => n + 1);
+        void userInvitations.fetchNext?.();
       }
     },
   });
@@ -102,9 +152,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
         ))}
       </Box>
 
-      {userInvitations.isLoading && <p>is loading</p>}
-
-      {userInvitations.count > 0 && (
+      {(userInvitations.count ?? 0) > 0 && (
         <>
           <Text
             variant={'smallRegular'}
@@ -136,7 +184,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
               );
             })}
 
-            {userInvitations.count > (userInvitations.data?.length || 0) && (
+            {(userInvitations.hasNextPage || userInvitations.isLoading) && (
               <Box
                 ref={ref}
                 sx={[
