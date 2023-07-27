@@ -143,7 +143,7 @@ export const frFR: LocalizationResource = {
       title: 'Mot de passe oublié ?',
       label__alternativeMethods: 'Ou connectez-vous avec une autre méthode.',
       blockButton__resetPassword: 'Réinitialiser votre mot de passe',
-      },
+    },
     forgotPassword: {
       title_email: 'Vérifiez votre e-mail',
       title_phone: 'Vérifiez votre téléphone',
@@ -372,7 +372,8 @@ export const frFR: LocalizationResource = {
       fileDropAreaTitle: 'Faites glisser le fichier ici, ou...',
       fileDropAreaAction: 'Choisir le dossier',
       fileDropAreaHint: 'Téléchargez une image JPG, PNG, GIF ou WEBP inférieure à 10 Mo',
-      readonly: "Les informations de votre profil ont été fournies par la connexion d'entreprise et ne peuvent pas être modifiées.",
+      readonly:
+        "Les informations de votre profil ont été fournies par la connexion d'entreprise et ne peuvent pas être modifiées.",
       successMessage: 'Votre profil a été mis a jour.',
     },
     usernamePage: {
@@ -514,7 +515,7 @@ export const frFR: LocalizationResource = {
       messageLine2: 'Cette action est définitive et irréversible.',
       actionDescription: 'Saisissez "Supprimer le compte" ci-dessous pour continuer.',
       confirm: 'Supprimer le compte',
-      },
+    },
   },
   userButton: {
     action__manageAccount: 'Gérer son compte',
@@ -554,11 +555,11 @@ export const frFR: LocalizationResource = {
           actionDescription: 'Saisissez {{organizationName}} ci-dessous pour continuer.',
         },
         deleteOrganization: {
-        title: "Supprimer l'organisation",
-        messageLine1: "Êtes-vous sûr(e) de vouloir supprimer cette organisation ?",
-        messageLine2: 'Cette action est définitive et irréversible.',
-        actionDescription: 'Saisissez {{organizationName}} ci-dessous pour continuer.',
-        successMessage: "Vous avez supprimé l'organisation.",
+          title: "Supprimer l'organisation",
+          messageLine1: 'Êtes-vous sûr(e) de vouloir supprimer cette organisation ?',
+          messageLine2: 'Cette action est définitive et irréversible.',
+          actionDescription: 'Saisissez {{organizationName}} ci-dessous pour continuer.',
+          successMessage: "Vous avez supprimé l'organisation.",
         },
       },
     },
