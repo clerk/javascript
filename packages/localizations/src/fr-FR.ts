@@ -1,5 +1,17 @@
 import type { LocalizationResource } from '@clerk/types';
 
+const commonTexts = {
+  signIn: {
+    phoneCode: {
+      title: 'Vérifiez votre téléphone',
+      subtitle: 'pour continuer sur {{applicationName}}',
+      formTitle: 'Code de vérification',
+      formSubtitle: 'Renseigner votre code de vérification envoyé à votre numéro de téléphone',
+      resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
+    },
+  },
+} as const;
+
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
@@ -21,6 +33,8 @@ export const frFR: LocalizationResource = {
   formFieldLabel__lastName: 'Nom de famille',
   formFieldLabel__backupCode: 'Code de récupération',
   formFieldLabel__organizationName: "Nom de l'organisation",
+  formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Rôle',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddresses:
@@ -36,6 +50,7 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
+  formFieldInputPlaceholder__organizationSlug: '',
   formFieldError__notMatchingPasswords: 'Les mots de passe ne correspondent pas.',
   formFieldError__matchingPasswords: 'Les mots de passe correspondent.',
   formFieldAction__forgotPassword: 'Mot de passe oublié?',
@@ -116,17 +131,36 @@ export const frFR: LocalizationResource = {
       actionLink: "S'inscrire",
       actionLink__use_email: 'Utiliser e-mail',
       actionLink__use_phone: 'Utiliser téléphone',
+      actionLink__use_username: "Utiliser le nom d'utilisateur",
+      actionLink__use_email_username: "Utiliser l'e-mail ou le nom d'utilisateur",
     },
     password: {
       title: 'Tapez votre mot de passe',
       subtitle: 'pour continuer à {{applicationName}}',
       actionLink: 'Utiliser une autre méthode',
     },
+    forgotPasswordAlternativeMethods: {
+      title: 'Mot de passe oublié ?',
+      label__alternativeMethods: 'Ou connectez-vous avec une autre méthode.',
+      blockButton__resetPassword: 'Réinitialiser votre mot de passe',
+      },
+    forgotPassword: {
+      title_email: 'Vérifiez votre e-mail',
+      title_phone: 'Vérifiez votre téléphone',
+      subtitle: 'pour réinitialiser votre mot de passe',
+      formTitle: 'Code de réinitialisation du mot de passe',
+      formSubtitle_email: 'Entrez le code envoyé à votre adresse e-mail',
+      formSubtitle_phone: 'Entrez le code envoyé à votre numéro de téléphone',
+      resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
+    },
     resetPassword: {
       title: 'Réinitialiser le mot de passe',
       formButtonPrimary: 'Réinitialiser',
       successMessage:
         'Votre mot de passe a été modifié avec succès. Nous vous reconnectons, veuillez patienter un instant.',
+    },
+    resetPasswordMfa: {
+      detailsLabel: 'Nous devons vérifier votre identité avant de réinitialiser votre mot de passe.',
     },
     emailCode: {
       title: 'Vérifiez votre messagerie',
@@ -166,20 +200,8 @@ export const frFR: LocalizationResource = {
         subtitle: "Retournez à l'onglet d'origine pour continuer",
       },
     },
-    phoneCode: {
-      title: 'Regarde ton Téléphone',
-      subtitle: 'pour continuer vers {{applicationName}}',
-      formTitle: 'Le code de vérification',
-      formSubtitle: 'Entrez le code de vérification envoyé à votre numéro de téléphone',
-      resendButton: 'Renvoyer le code',
-    },
-    phoneCodeMfa: {
-      title: 'Regarde ton Téléphone',
-      formTitle: 'Le code de vérification',
-      formSubtitle: 'Entrez le code de vérification envoyé à votre numéro de téléphone',
-      resendButton: 'Renvoyer le code',
-      subtitle: '',
-    },
+    phoneCode: { ...commonTexts.signIn.phoneCode },
+    phoneCodeMfa: { ...commonTexts.signIn.phoneCode, subtitle: '' },
     totpMfa: {
       title: 'Vérification en deux étapes',
       subtitle: '',
@@ -279,6 +301,9 @@ export const frFR: LocalizationResource = {
         destructiveActionSubtitle: 'Supprimer ce compte connecté de votre compte',
         destructiveActionAccordionSubtitle: 'Supprimer le compte connecté',
       },
+      enterpriseAccountsSection: {
+        title: 'Comptes entreprise',
+      },
       passwordSection: {
         title: 'Mot de passe',
         primaryButton__changePassword: 'Changer le mot de passe',
@@ -347,6 +372,7 @@ export const frFR: LocalizationResource = {
       fileDropAreaTitle: 'Faites glisser le fichier ici, ou...',
       fileDropAreaAction: 'Choisir le dossier',
       fileDropAreaHint: 'Téléchargez une image JPG, PNG, GIF ou WEBP inférieure à 10 Mo',
+      readonly: "Les informations de votre profil ont été fournies par la connexion d'entreprise et ne peuvent pas être modifiées.",
       successMessage: 'Votre profil a été mis a jour.',
     },
     usernamePage: {
@@ -482,6 +508,13 @@ export const frFR: LocalizationResource = {
       actionLabel__download: 'Télécharger en .txt',
       actionLabel__print: 'Imprimer',
     },
+    deletePage: {
+      title: 'Supprimer le compte',
+      messageLine1: 'Êtes-vous sûr(e) de vouloir supprimer votre compte ?',
+      messageLine2: 'Cette action est définitive et irréversible.',
+      actionDescription: 'Saisissez "Supprimer le compte" ci-dessous pour continuer.',
+      confirm: 'Supprimer le compte',
+      },
   },
   userButton: {
     action__manageAccount: 'Gérer son compte',
@@ -518,6 +551,14 @@ export const frFR: LocalizationResource = {
             "Êtes-vous sûr de vouloir quitter cette organisation ? Vous perdrez l'accès à cette organisation et à ses applications.",
           messageLine2: 'Cette action est permanente et irréversible.',
           successMessage: "Vous avez quitté l'organisation.",
+          actionDescription: 'Saisissez {{organizationName}} ci-dessous pour continuer.',
+        },
+        deleteOrganization: {
+        title: "Supprimer l'organisation",
+        messageLine1: "Êtes-vous sûr(e) de vouloir supprimer cette organisation ?",
+        messageLine2: 'Cette action est définitive et irréversible.',
+        actionDescription: 'Saisissez {{organizationName}} ci-dessous pour continuer.',
+        successMessage: "Vous avez supprimé l'organisation.",
         },
       },
     },
@@ -558,25 +599,35 @@ export const frFR: LocalizationResource = {
     },
   },
   unstable__errors: {
-    form_identifier_not_found: '',
-    form_password_pwned: '',
-    form_username_invalid_length: '',
-    form_username_invalid_character: '',
+    identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
+    phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
+    form_identifier_not_found: 'Identifiant introuvable',
+    captcha_invalid:
+      "Inscription échouée en raison de validations de sécurité incorrectes. Veuillez rafraîchir la page pour réessayer ou contacter le support pour obtenir de l'aide.",
+    form_password_pwned:
+      'Ce mot de passe a été compromis et ne peut pas être utilisé. Veuillez essayer un autre mot de passe à la place.',
+    form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
+    form_username_invalid_character: "L'identifiant contient des caractères invalide.",
     form_param_format_invalid: 'Le format est invalide',
-    form_password_length_too_short: '',
+    form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",
+    form_password_length_too_short: 'Votre mot de passe est trop court.',
     form_param_nil: '',
     form_code_incorrect: 'Code incorrect',
     form_password_incorrect: 'Mot de passe incorrect',
-    not_allowed_access: '',
-    form_identifier_exists: '',
+    not_allowed_access: 'Accès non autorisé',
+    form_identifier_exists: 'Cet identifiant existe déjà. Veuillez en renseigner un différent.',
+    form_password_validation_failed: 'Mot de passe incorrect',
+    form_password_not_strong_enough: "Votre mot de passe n'est pas assez fort.",
+    form_password_size_in_bytes_exceeded:
+      "Votre mot de passe a dépassé le nombre maximum d'octets autorisés. Veuillez le raccourcir ou supprimer certains caractères spéciaux.",
     passwordComplexity: {
-      sentencePrefix: '',
-      minimumLength: '',
-      maximumLength: '',
-      requireNumbers: '',
-      requireLowercase: '',
-      requireUppercase: '',
-      requireSpecialCharacter: '',
+      sentencePrefix: 'Votre mot de passe doit contenir',
+      minimumLength: '{{length}} caractères ou plus',
+      maximumLength: 'moins de {{length}} caractères',
+      requireNumbers: 'un chiffre',
+      requireLowercase: 'une lettre minuscule',
+      requireUppercase: 'une lettre majuscule',
+      requireSpecialCharacter: 'un caractère spécial',
     },
     zxcvbn: {
       notEnough: "Votre mot de passe n'est pas assez fort.",
