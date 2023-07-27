@@ -67,7 +67,11 @@ export const generateErrorTextUtil = ({
     return '';
   }
 
+  // show min length error first by itself
+  const hasMinLengthError = failedValidations?.min_length || false;
+
   const messages = Object.entries(failedValidations)
+    .filter(k => (hasMinLengthError ? k[0] === 'min_length' : true))
     .filter(([, v]) => !!v)
     .map(([k]) => {
       const localizedKey = errorMessages[k as keyof typeof errorMessages];

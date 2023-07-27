@@ -24,7 +24,6 @@ export const _ResetPassword = () => {
     type: 'password',
     label: localizationKeys('formFieldLabel__newPassword'),
     isRequired: true,
-    enableErrorAfterBlur: true,
     validatePassword: true,
     informationText: failedValidationsText,
     buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
@@ -51,7 +50,9 @@ export const _ResetPassword = () => {
   const canSubmit = isPasswordMatch;
 
   const validateForm = () => {
-    displayConfirmPasswordFeedback(confirmField.value);
+    if (passwordField.value) {
+      displayConfirmPasswordFeedback(confirmField.value);
+    }
   };
 
   const resetPassword = async () => {

@@ -147,17 +147,21 @@ describe('usePasswordComplexity', () => {
     const { result } = renderHook(defaultRenderer, { wrapper });
 
     await act(() => {
-      result.current.getComplexity('@aP');
+      result.current.getComplexity('@apapapap');
     });
 
-    expect(result.current.failedValidationsText).toBe('Your password must contain 8 or more characters and a number.');
+    expect(result.current.failedValidationsText).toBe('Your password must contain a number and an uppercase letter.');
+
+    await act(() => {
+      result.current.getComplexity('aPaPaPaPaP');
+    });
+
+    expect(result.current.failedValidationsText).toBe('Your password must contain a special character and a number.');
 
     await act(() => {
       result.current.getComplexity('aP');
     });
 
-    expect(result.current.failedValidationsText).toBe(
-      'Your password must contain 8 or more characters, a special character, and a number.',
-    );
+    expect(result.current.failedValidationsText).toBe('Your password must contain 8 or more characters.');
   });
 });

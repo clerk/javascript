@@ -47,7 +47,10 @@ export const createPasswordError = (errors: ClerkAPIError[], localizationConfig:
     return `${t(localizationKeys('unstable__errors.zxcvbn.notEnough'))} ${message}`;
   }
 
-  const message = errors.map((s: any) => {
+  // show min length error first by itself
+  const minLenErrors = errors.filter(e => e.code === 'form_password_length_too_short');
+
+  const message = (minLenErrors.length ? minLenErrors : errors).map((s: any) => {
     const localizedKey = (mapComplexityErrors(passwordSettings) as any)[s.code];
 
     if (Array.isArray(localizedKey)) {
