@@ -99,9 +99,7 @@ export interface Clerk {
    * usage with @clerk-react
    * const { authStateKey }  = useAuth()
    *
-   * const singleUser = '/user'
-   *
-   * useSWR(`${singleUser}?hash=${authStateKey}`, fetcher);
+   * useSWR(['/api/movies/', authStateKey], fetcher);
    *
    * @returns {String} Returns the hashed value of userId, sessionId and orgId.
    */
