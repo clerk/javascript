@@ -10,11 +10,26 @@ type CreateParams = {
   publicMetadata?: UserPublicMetadata;
 };
 
+type GetInvitationListParams = {
+  /**
+   * Filters invitations based on their status(accepted, pending, revoked).
+   *
+   * @example
+   * get all revoked invitations
+   *
+   * import { invitations } from '@clerk/clerk-sdk-node';
+   * await invitations.getInvitationList({ status: 'revoked })
+   *
+   */
+  status?: 'accepted' | 'pending' | 'revoked';
+};
+
 export class InvitationAPI extends AbstractAPI {
-  public async getInvitationList() {
+  public async getInvitationList(params: GetInvitationListParams = {}) {
     return this.request<Invitation[]>({
       method: 'GET',
       path: basePath,
+      queryParams: params,
     });
   }
 
