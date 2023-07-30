@@ -12,7 +12,6 @@ import { RouteContext } from './RouteContext';
 interface BaseRouterProps {
   basePath: string;
   startPath: string;
-  flowStartPath: string;
   getPath: () => string;
   getQueryString: () => string;
   internalNavigate: (toURL: URL) => Promise<any> | any;
@@ -32,7 +31,6 @@ interface BaseRouterProps {
 export const BaseRouter = ({
   basePath,
   startPath,
-  flowStartPath,
   getPath,
   getQueryString,
   internalNavigate,
@@ -126,7 +124,7 @@ export const BaseRouter = ({
       value={{
         basePath: basePath,
         startPath: startPath,
-        flowStartPath: flowStartPath || startPath,
+        flowStartPath: startPath,
         fullPath: '',
         indexPath: '',
         currentPath: currentPath,

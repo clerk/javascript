@@ -11,10 +11,9 @@ import {
   InformationBox,
   SuccessPage,
   useCardState,
-  useNavigateToFlowStart,
   withCardStateProvider,
 } from '../../elements';
-import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
+import { useConfirmPassword, useNavigateToFlowStart, usePasswordComplexity } from '../../hooks';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Icon, Link, Text, useLocalizations } from '../customizables';
-import { useNavigateToFlowStart } from '../elements';
+import { useNavigateToFlowStart } from '../hooks';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
 import { mqu } from '../styledSystem';
