@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useCoreClerk } from '../contexts';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { common, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
@@ -43,14 +42,13 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-type OwnProps = { isExternal?: boolean; isDisabled?: boolean; useBuildUrlWithAuth?: boolean };
+type OwnProps = { isExternal?: boolean; isDisabled?: boolean };
 
 // @ts-ignore
 export type LinkProps = PrimitiveProps<'a'> & OwnProps & StyleVariants<typeof applyVariants>;
 
 export const Link = (props: LinkProps): JSX.Element => {
-  const { isExternal, children, href = '', onClick, useBuildUrlWithAuth = true, ...rest } = props;
-  const clerk = useCoreClerk();
+  const { isExternal, children, href = '', onClick, ...rest } = props;
 
   const onClickHandler = onClick
     ? (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -65,7 +63,7 @@ export const Link = (props: LinkProps): JSX.Element => {
     <a
       {...applyDataStateProps(filterProps(rest))}
       onClick={onClickHandler}
-      href={useBuildUrlWithAuth ? clerk.buildUrlWithAuth(href) : href}
+      href={href}
       target={href && isExternal ? '_blank' : undefined}
       rel={href && isExternal ? 'noopener' : undefined}
       css={applyVariants(props)}
