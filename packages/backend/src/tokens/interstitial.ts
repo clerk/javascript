@@ -141,7 +141,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
-  const response = await callWithRetry(() => runtime.fetch(buildPublicInterstitialUrl(options)));
+  const response = await callWithRetry(() => runtime.fetch(buildPublicInterstitialUrl(options), { method: 'GET' }));
 
   if (!response.ok) {
     throw new TokenVerificationError({
