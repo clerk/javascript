@@ -24,6 +24,9 @@ export class Organization extends BaseResource implements OrganizationResource {
   id!: string;
   name!: string;
   slug!: string;
+  /**
+   * @deprecated  Use `imageUrl` instead.
+   */
   logoUrl!: string;
   imageUrl!: string;
   publicMetadata: OrganizationPublicMetadata = {};

@@ -19,6 +19,9 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   approvedScopes = '';
   firstName = '';
   lastName = '';
+  /**
+   * @deprecated  Use `imageUrl` instead.
+   */
   avatarUrl = '';
   imageUrl = '';
   username = '';
