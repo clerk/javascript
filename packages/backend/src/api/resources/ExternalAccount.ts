@@ -11,6 +11,9 @@ export class ExternalAccount {
     readonly emailAddress: string,
     readonly firstName: string,
     readonly lastName: string,
+    /**
+     * @deprecated  Use `imageUrl` instead.
+     */
     readonly picture: string,
     readonly imageUrl: string,
     readonly username: string | null,

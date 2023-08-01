@@ -33,6 +33,9 @@ export class OrganizationMembershipPublicUserData {
     readonly identifier: string,
     readonly firstName: string | null,
     readonly lastName: string | null,
+    /**
+     * @deprecated  Use `imageUrl` instead.
+     */
     readonly profileImageUrl: string,
     readonly imageUrl: string,
     readonly userId: string,

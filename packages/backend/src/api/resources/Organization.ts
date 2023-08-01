@@ -5,6 +5,9 @@ export class Organization {
     readonly id: string,
     readonly name: string,
     readonly slug: string | null,
+    /**
+     * @deprecated  Use `imageUrl` instead.
+     */
     readonly logoUrl: string | null,
     readonly imageUrl: string,
     readonly createdBy: string,
