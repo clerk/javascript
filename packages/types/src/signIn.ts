@@ -121,6 +121,9 @@ export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor
 export interface UserData {
   firstName?: string;
   lastName?: string;
+  /**
+   * @deprecated  Use `imageUrl` instead.
+   */
   profileImageUrl?: string;
   imageUrl?: string;
 }

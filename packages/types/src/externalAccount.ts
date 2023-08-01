@@ -16,6 +16,9 @@ export interface ExternalAccountResource extends ClerkResource {
   approvedScopes: string;
   firstName: string;
   lastName: string;
+  /**
+   * @deprecated  Use `imageUrl` instead.
+   */
   avatarUrl: string;
   imageUrl: string;
   username?: string;

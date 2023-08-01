@@ -55,6 +55,9 @@ export type SessionStatus = 'abandoned' | 'active' | 'ended' | 'expired' | 'remo
 export interface PublicUserData {
   firstName: string | null;
   lastName: string | null;
+  /**
+   * @deprecated  Use `imageUrl` instead.
+   */
   profileImageUrl: string;
   imageUrl: string;
   identifier: string;
