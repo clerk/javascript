@@ -138,6 +138,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
    */
   logo_url: string | null;
   image_url: string;
+  has_image: boolean;
   public_metadata: OrganizationPublicMetadata | null;
   private_metadata?: OrganizationPrivateMetadata;
   created_by: string;
@@ -178,6 +179,7 @@ export interface OrganizationMembershipPublicUserDataJSON {
    */
   profile_image_url: string;
   image_url: string;
+  has_image: boolean;
   user_id: string;
 }
 
@@ -264,6 +266,7 @@ export interface UserJSON extends ClerkResourceJSON {
    */
   profile_image_url: string;
   image_url: string;
+  has_image: boolean;
   primary_email_address_id: string;
   primary_phone_number_id: string | null;
   primary_web3_wallet_id: string | null;

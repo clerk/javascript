@@ -10,6 +10,7 @@ export class Organization {
      */
     readonly logoUrl: string | null,
     readonly imageUrl: string,
+    readonly hasImage: boolean,
     readonly createdBy: string,
     readonly createdAt: number,
     readonly updatedAt: number,
@@ -26,6 +27,7 @@ export class Organization {
       data.slug,
       data.logo_url,
       data.image_url,
+      data.has_image,
       data.created_by,
       data.created_at,
       data.updated_at,
