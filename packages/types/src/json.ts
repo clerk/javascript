@@ -188,6 +188,7 @@ export interface UserJSON extends ClerkResourceJSON {
    */
   profile_image_url: string;
   image_url: string;
+  has_image: boolean;
   username: string;
   email_addresses: EmailAddressJSON[];
   phone_numbers: PhoneNumberJSON[];
@@ -228,6 +229,7 @@ export interface PublicUserDataJSON extends ClerkResourceJSON {
    */
   profile_image_url: string;
   image_url: string;
+  has_image: boolean;
   identifier: string;
   user_id?: string;
 }
@@ -306,6 +308,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
    */
   logo_url: string;
   image_url: string;
+  has_image: boolean;
   name: string;
   slug: string;
   public_metadata: OrganizationPublicMetadata;
@@ -360,6 +363,7 @@ export interface UserDataJSON {
    */
   profile_image_url?: string;
   image_url: string;
+  has_image: boolean;
 }
 
 export interface TOTPJSON extends ClerkResourceJSON {
