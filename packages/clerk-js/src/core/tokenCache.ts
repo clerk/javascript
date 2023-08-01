@@ -50,11 +50,14 @@ export class TokenCacheKey {
 const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   const cache = new Map<string, TokenCacheValue>();
 
+  let timer: ReturnType<typeof setTimeout>;
+
   const size = () => {
     return cache.size;
   };
 
   const clear = () => {
+    clearTimeout(timer);
     cache.clear();
   };
 
@@ -83,7 +86,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
         // Mutate cached value and set expirations
         value.expiresIn = expiresIn;
-        setTimeout(deleteKey, expiresIn * 1000);
+        timer = setTimeout(deleteKey, expiresIn * 1000);
       })
       .catch(() => {
         deleteKey();

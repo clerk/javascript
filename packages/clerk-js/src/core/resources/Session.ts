@@ -65,6 +65,10 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
+  clearCache = (): void => {
+    return SessionTokenCache.clear();
+  };
+
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
     return runWithExponentialBackOff(() => this._getToken(options), {
       shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,

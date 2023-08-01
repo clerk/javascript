@@ -60,6 +60,10 @@ export class Client extends BaseResource implements ClientResource {
     });
   }
 
+  clearCache(): void {
+    return this.sessions.forEach(s => s.clearCache());
+  }
+
   fromJSON(data: ClientJSON | null): this {
     if (data) {
       this.id = data.id;
