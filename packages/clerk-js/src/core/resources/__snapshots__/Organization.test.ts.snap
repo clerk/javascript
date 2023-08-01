@@ -8,6 +8,7 @@ Organization {
   "destroy": [Function],
   "getMemberships": [Function],
   "getPendingInvitations": [Function],
+  "hasImage": true,
   "id": "test_id",
   "imageUrl": "https://clerk.com",
   "inviteMember": [Function],

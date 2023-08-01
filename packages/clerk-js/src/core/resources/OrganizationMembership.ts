@@ -68,6 +68,7 @@ export class OrganizationMembership extends BaseResource implements Organization
         lastName: data.public_user_data.last_name,
         profileImageUrl: data.public_user_data.profile_image_url,
         imageUrl: data.public_user_data.image_url,
+        hasImage: data.public_user_data.has_image,
         identifier: data.public_user_data.identifier,
         userId: data.public_user_data.user_id,
       };

@@ -79,6 +79,7 @@ export class User extends BaseResource implements UserResource {
    */
   profileImageUrl = '';
   imageUrl = '';
+  hasImage = false;
   twoFactorEnabled = false;
   totpEnabled = false;
   backupCodeEnabled = false;
@@ -296,6 +297,7 @@ export class User extends BaseResource implements UserResource {
 
     this.profileImageUrl = data.profile_image_url;
     this.imageUrl = data.image_url;
+    this.hasImage = data.has_image;
     this.username = data.username;
     this.passwordEnabled = data.password_enabled;
     this.emailAddresses = (data.email_addresses || []).map(
