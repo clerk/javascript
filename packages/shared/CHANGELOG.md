@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.21.0
+
+### Minor Changes
+
+- Handle the construction of zxcvbn errors with information from FAPI ([#1526](https://github.com/clerkinc/javascript/pull/1526)) by [@raptisj](https://github.com/raptisj)
+
 ## 0.20.0
 
 ### Minor Changes

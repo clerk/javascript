@@ -1,5 +1,20 @@
 # Change Log
 
+## 1.24.1
+
+### Patch Changes
+
+- Add more translations to fr-FR ([#1529](https://github.com/clerkinc/javascript/pull/1529)) by [@PierreC1024](https://github.com/PierreC1024)
+
+- New localization keys for max length exceeded validation: ([#1521](https://github.com/clerkinc/javascript/pull/1521)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Organization name (form_param_max_length_exceeded\_\_name)
+  - First name (form_param_max_length_exceeded\_\_first_name)
+  - Last name (form_param_max_length_exceeded\_\_last_name)
+
+- Updated dependencies [[`ea95525a4`](https://github.com/clerkinc/javascript/commit/ea95525a423bcc89bc9e210c2d29c78e5a6c1210), [`24a46ae7e`](https://github.com/clerkinc/javascript/commit/24a46ae7e038b56197dc56a535c05e698c5bf249), [`d433b83b9`](https://github.com/clerkinc/javascript/commit/d433b83b92c61752917f62cc410a774813f38fd7), [`5e1a09df4`](https://github.com/clerkinc/javascript/commit/5e1a09df4e905ddd887d64c7e8cab10fb4beb3ec), [`0a59e122d`](https://github.com/clerkinc/javascript/commit/0a59e122d12b672f111a43ef3897061bfd9bdb52)]:
+  - @clerk/types@3.49.0
+
 ## 1.24.0
 
 ### Minor Changes

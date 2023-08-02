@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "4.23.1",
+  "version": "4.23.2",
   "license": "MIT",
   "description": "Clerk React library",
   "keywords": [
@@ -38,8 +38,8 @@
     "test:ci": "jest --maxWorkers=50%"
   },
   "dependencies": {
-    "@clerk/shared": "^0.20.0",
-    "@clerk/types": "^3.48.1",
+    "@clerk/shared": "^0.21.0",
+    "@clerk/types": "^3.49.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
