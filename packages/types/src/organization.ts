@@ -32,6 +32,7 @@ export interface OrganizationResource extends ClerkResource {
    */
   logoUrl: string | null;
   imageUrl: string;
+  hasImage: boolean;
   membersCount: number;
   pendingInvitationsCount: number;
   publicMetadata: OrganizationPublicMetadata;

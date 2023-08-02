@@ -19,6 +19,7 @@ export class User {
      */
     readonly profileImageUrl: string,
     readonly imageUrl: string,
+    readonly hasImage: boolean,
     readonly gender: string,
     readonly birthday: string,
     readonly primaryEmailAddressId: string | null,
@@ -50,6 +51,7 @@ export class User {
       data.updated_at,
       data.profile_image_url,
       data.image_url,
+      data.has_image,
       data.gender,
       data.birthday,
       data.primary_email_address_id,

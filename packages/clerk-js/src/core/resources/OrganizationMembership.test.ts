@@ -22,6 +22,7 @@ describe('OrganizationMembership', () => {
         pending_invitations_count: 10,
         admin_delete_enabled: true,
         max_allowed_memberships: 3,
+        has_image: true,
       },
       public_metadata: {
         foo: 'bar',
@@ -34,6 +35,7 @@ describe('OrganizationMembership', () => {
         image_url: 'https://clerk.com',
         identifier: 'test@identifier.gr',
         id: 'test_user_id',
+        has_image: true,
       },
     });
 

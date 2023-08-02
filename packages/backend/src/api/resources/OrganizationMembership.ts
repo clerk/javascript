@@ -38,6 +38,7 @@ export class OrganizationMembershipPublicUserData {
      */
     readonly profileImageUrl: string,
     readonly imageUrl: string,
+    readonly hasImage: boolean,
     readonly userId: string,
   ) {}
 
@@ -48,6 +49,7 @@ export class OrganizationMembershipPublicUserData {
       data.last_name,
       data.profile_image_url,
       data.image_url,
+      data.has_image,
       data.user_id,
     );
   }

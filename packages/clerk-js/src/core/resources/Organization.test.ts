@@ -16,6 +16,7 @@ describe('Organization', () => {
       pending_invitations_count: 10,
       admin_delete_enabled: true,
       max_allowed_memberships: 3,
+      has_image: true,
     });
 
     expect(organization).toMatchSnapshot();

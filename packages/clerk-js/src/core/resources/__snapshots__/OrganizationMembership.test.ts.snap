@@ -12,6 +12,7 @@ OrganizationMembership {
     "destroy": [Function],
     "getMemberships": [Function],
     "getPendingInvitations": [Function],
+    "hasImage": true,
     "id": "test_org_id",
     "imageUrl": "https://clerk.com",
     "inviteMember": [Function],
@@ -38,6 +39,7 @@ OrganizationMembership {
   },
   "publicUserData": {
     "firstName": "test_first_name",
+    "hasImage": true,
     "identifier": "test@identifier.gr",
     "imageUrl": "https://clerk.com",
     "lastName": "test_last_name",

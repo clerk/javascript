@@ -61,6 +61,7 @@ export interface PublicUserData {
    */
   profileImageUrl: string;
   imageUrl: string;
+  hasImage: boolean;
   identifier: string;
   userId?: string;
 }
