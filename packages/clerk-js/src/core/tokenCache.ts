@@ -50,11 +50,14 @@ export class TokenCacheKey {
 const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   const cache = new Map<string, TokenCacheValue>();
 
+  let timer: ReturnType<typeof setTimeout>;
+
   const size = () => {
     return cache.size;
   };
 
   const clear = () => {
+    clearTimeout(timer);
     cache.clear();
   };
 
@@ -83,7 +86,13 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
         // Mutate cached value and set expirations
         value.expiresIn = expiresIn;
-        setTimeout(deleteKey, expiresIn * 1000);
+        timer = setTimeout(deleteKey, expiresIn * 1000);
+
+        // Teach ClerkJS not to block the exit of the event loop when used in Node environments.
+        // More info at https://nodejs.org/api/timers.html#timeoutunref
+        if (typeof timer.unref === 'function') {
+          timer.unref();
+        }
       })
       .catch(() => {
         deleteKey();
