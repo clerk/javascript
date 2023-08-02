@@ -32,6 +32,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
   const { logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
   const { parsedLayout } = useAppearance();
   const imageSrc = parsedLayout.logoImageUrl || logoImageUrl;
+  const logoUrl = parsedLayout.logoLinkUrl || homeUrl;
 
   if (!imageSrc) {
     return null;
@@ -64,7 +65,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
         props.sx,
       ]}
     >
-      {homeUrl ? <RouterLink to={homeUrl}>{image}</RouterLink> : image}
+      {logoUrl ? <RouterLink to={logoUrl}>{image}</RouterLink> : image}
     </Flex>
   );
 };
