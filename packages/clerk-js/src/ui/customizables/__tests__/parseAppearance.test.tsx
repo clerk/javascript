@@ -233,6 +233,7 @@ describe('AppearanceProvider layout flows', () => {
           layout: {
             helpPageUrl: 'test',
             logoImageUrl: 'test',
+            logoLinkUrl: 'test',
             privacyPageUrl: 'test',
             termsPageUrl: 'test',
             logoPlacement: 'inside',
@@ -249,6 +250,7 @@ describe('AppearanceProvider layout flows', () => {
     const { result } = renderHook(() => useAppearance(), { wrapper });
     expect(result.current.parsedLayout.helpPageUrl).toBe('test');
     expect(result.current.parsedLayout.logoImageUrl).toBe('test');
+    expect(result.current.parsedLayout.logoLinkUrl).toBe('test');
     expect(result.current.parsedLayout.privacyPageUrl).toBe('test');
     expect(result.current.parsedLayout.termsPageUrl).toBe('test');
     expect(result.current.parsedLayout.logoPlacement).toBe('inside');
@@ -265,6 +267,7 @@ describe('AppearanceProvider layout flows', () => {
           layout: {
             helpPageUrl: 'test2',
             logoImageUrl: 'test2',
+            logoLinkUrl: 'test2',
             privacyPageUrl: 'test2',
             termsPageUrl: 'test2',
             logoPlacement: 'outside',
@@ -281,6 +284,7 @@ describe('AppearanceProvider layout flows', () => {
     const { result } = renderHook(() => useAppearance(), { wrapper });
     expect(result.current.parsedLayout.helpPageUrl).toBe('test2');
     expect(result.current.parsedLayout.logoImageUrl).toBe('test2');
+    expect(result.current.parsedLayout.logoLinkUrl).toBe('test2');
     expect(result.current.parsedLayout.privacyPageUrl).toBe('test2');
     expect(result.current.parsedLayout.termsPageUrl).toBe('test2');
     expect(result.current.parsedLayout.logoPlacement).toBe('outside');
@@ -297,6 +301,7 @@ describe('AppearanceProvider layout flows', () => {
           layout: {
             helpPageUrl: 'test',
             logoImageUrl: 'test',
+            logoLinkUrl: 'test',
             privacyPageUrl: 'test',
             termsPageUrl: 'test',
             logoPlacement: 'inside',
@@ -309,6 +314,7 @@ describe('AppearanceProvider layout flows', () => {
           layout: {
             helpPageUrl: 'test2',
             logoImageUrl: 'test2',
+            logoLinkUrl: 'test2',
             privacyPageUrl: 'test2',
             termsPageUrl: 'test2',
             logoPlacement: 'outside',
@@ -325,6 +331,7 @@ describe('AppearanceProvider layout flows', () => {
     const { result } = renderHook(() => useAppearance(), { wrapper });
     expect(result.current.parsedLayout.helpPageUrl).toBe('test2');
     expect(result.current.parsedLayout.logoImageUrl).toBe('test2');
+    expect(result.current.parsedLayout.logoLinkUrl).toBe('test2');
     expect(result.current.parsedLayout.privacyPageUrl).toBe('test2');
     expect(result.current.parsedLayout.termsPageUrl).toBe('test2');
     expect(result.current.parsedLayout.logoPlacement).toBe('outside');

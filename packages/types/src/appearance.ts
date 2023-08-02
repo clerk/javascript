@@ -568,6 +568,14 @@ export type Layout = {
    */
   logoImageUrl?: string;
   /**
+   * Controls where the browser will redirect to after the user clicks the application logo,
+   * usually found in the SignIn and SignUp components.
+   * If a URL is provided, it will be used as the `href` of the link.
+   * If a value is not passed in, the components will use the Home URL as set in the Clerk dashboard
+   * @default undefined
+   */
+  logoLinkUrl?: string;
+  /**
    * Controls the variant that will be used for the social buttons.
    * By default, the components will use block buttons if you have less than
    * 3 social providers enabled, otherwise icon buttons will be used.
