@@ -74,6 +74,9 @@ export class User extends BaseResource implements UserResource {
   primaryPhoneNumber: PhoneNumberResource | null = null;
   primaryWeb3WalletId: string | null = null;
   primaryWeb3Wallet: Web3WalletResource | null = null;
+  /**
+   * @deprecated  Use `imageUrl` instead.
+   */
   profileImageUrl = '';
   imageUrl = '';
   twoFactorEnabled = false;

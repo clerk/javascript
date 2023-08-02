@@ -14,6 +14,9 @@ export class User {
     readonly banned: boolean,
     readonly createdAt: number,
     readonly updatedAt: number,
+    /**
+     * @deprecated  Use `imageUrl` instead.
+     */
     readonly profileImageUrl: string,
     readonly imageUrl: string,
     readonly gender: string,
