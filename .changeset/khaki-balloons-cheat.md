@@ -2,4 +2,4 @@
 "@clerk/backend": patch
 ---
 
-Fix incorrect cross-orign detection behind AWS CloudFront
+Fix incorrect cross-origin detection behind AWS CloudFront
