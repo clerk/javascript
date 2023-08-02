@@ -1,6 +1,6 @@
 {
   "name": "@clerk/types",
-  "version": "3.48.1",
+  "version": "3.49.0",
   "license": "MIT",
   "description": "Typings for Clerk libraries.",
   "keywords": [

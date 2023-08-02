@@ -1,5 +1,33 @@
 # Change Log
 
+## 3.49.0
+
+### Minor Changes
+
+- Handle the construction of zxcvbn errors with information from FAPI ([#1526](https://github.com/clerkinc/javascript/pull/1526)) by [@raptisj](https://github.com/raptisj)
+
+### Patch Changes
+
+- Deprecate usage of old image fields in favor of `imageUrl` ([#1543](https://github.com/clerkinc/javascript/pull/1543)) by [@dimkl](https://github.com/dimkl)
+
+- New localization keys for max length exceeded validation: ([#1521](https://github.com/clerkinc/javascript/pull/1521)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Organization name (form_param_max_length_exceeded\_\_name)
+  - First name (form_param_max_length_exceeded\_\_first_name)
+  - Last name (form_param_max_length_exceeded\_\_last_name)
+
+- Introduces a new internal class `UserOrganizationInvitation` that represents and invitation to join an organization with the organization data populated ([#1527](https://github.com/clerkinc/javascript/pull/1527)) by [@panteliselef](https://github.com/panteliselef)
+
+  Additions to support the above
+
+  - UserOrganizationInvitationResource
+  - UserOrganizationInvitationJSON
+  - ClerkPaginatedResponse
+
+  ClerkPaginatedResponse represents a paginated FAPI response
+
+- Introduce Clerk.client.clearCache() method ([#1545](https://github.com/clerkinc/javascript/pull/1545)) by [@SokratisVidros](https://github.com/SokratisVidros)
+
 ## 3.48.1
 
 ### Patch Changes
