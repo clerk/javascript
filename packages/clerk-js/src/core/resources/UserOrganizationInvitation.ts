@@ -31,13 +31,14 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
     params?: GetUserOrganizationInvitationsParams,
   ): Promise<ClerkPaginatedResponse<UserOrganizationInvitation>> {
     function convertPageToOffset(pageParams: GetUserOrganizationInvitationsParams | undefined): ClerkPaginationParams {
-      const initialPageSize = pageParams?.initialPageSize ?? 10;
-
-      const initialPage = pageParams?.initialPage ?? 1;
+      const { initialPageSize, initialPage, ...restParams } = pageParams || {};
+      const _initialPageSize = initialPageSize ?? 10;
+      const _initialPage = initialPage ?? 1;
 
       return {
+        ...restParams,
         limit: initialPageSize,
-        offset: (initialPage - 1) * initialPageSize,
+        offset: (_initialPage - 1) * _initialPageSize,
       };
     }
 

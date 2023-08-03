@@ -29,8 +29,8 @@ type CustomSetAction<T = unknown> = (size: T | ((_size: T) => T)) => void;
 type PaginatedDataAPI<T = unknown> = {
   data: T[];
   count: number;
-  isLoadingInitial: boolean;
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   page: number;
   pageCount: number;
@@ -76,6 +76,7 @@ export const useOrganizationList: UseOrganizationList = params => {
 
   const triggerInfinite = shouldUseDefaults ? false : !!userInvitations?.infinite;
   const internalKeepPreviousData = shouldUseDefaults ? false : !!userInvitations?.keepPreviousData;
+  const internalStatus = shouldUseDefaults ? 'pending' : userInvitations?.status ?? 'pending';
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
@@ -86,6 +87,7 @@ export const useOrganizationList: UseOrganizationList = params => {
       : {
           initialPage: paginatedPage,
           initialPageSize: initialPageSizeRef.current,
+          status: internalStatus,
         };
 
   const canFetch = !!(clerk.loaded && user);
@@ -101,6 +103,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     isValidating: userInvitationsValidating,
     isLoading: userInvitationsLoading,
     error: userInvitationsError,
+    mutate: userInvitationsMutate,
   } = useSWR(
     !triggerInfinite && canFetch && paginatedParams ? cacheKey('userInvitations', user, paginatedParams) : null,
     fetchInvitations,
@@ -118,6 +121,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     return cacheKey('userInvitations', user, {
       initialPage: initialPageRef.current + pageIndex,
       initialPageSize: initialPageSizeRef.current,
+      status: internalStatus,
     });
   };
 
@@ -128,12 +132,14 @@ export const useOrganizationList: UseOrganizationList = params => {
     error: userInvitationsInfiniteError,
     size,
     setSize,
-  } = useSWRInfinite(getInfiniteKey, ({ initialPage, initialPageSize }) => {
+    mutate: userInvitationsInfiniteMutate,
+  } = useSWRInfinite(getInfiniteKey, ({ initialPage, initialPageSize, status }) => {
     return !clerk.loaded || !user
       ? ({ data: [], total_count: 0 } as ClerkPaginatedResponse<UserOrganizationInvitationResource>)
       : user.getOrganizationInvitations({
           initialPage,
           initialPageSize,
+          status,
         });
   });
 
@@ -169,6 +175,9 @@ export const useOrganizationList: UseOrganizationList = params => {
     return userInvitationsData?.total_count ?? 0;
   }, [triggerInfinite, userInvitationsDataInfinite, userInvitationsData]);
 
+  const isomorphicIsLoading = triggerInfinite ? userInvitationsLoadingInfinite : userInvitationsLoading;
+  const isomorphicIsFetching = triggerInfinite ? userInvitationsInfiniteValidating : userInvitationsValidating;
+  const isomorphicIsError = !!(triggerInfinite ? userInvitationsInfiniteError : userInvitationsError);
   /**
    * Helpers
    */
@@ -187,6 +196,8 @@ export const useOrganizationList: UseOrganizationList = params => {
     isomorphicCount - offsetCount * initialPageSizeRef.current > isomorphicPage * initialPageSizeRef.current;
   const hasPreviousPage = (isomorphicPage - 1) * initialPageSizeRef.current > offsetCount * initialPageSizeRef.current;
 
+  const unstable__mutate = triggerInfinite ? userInvitationsInfiniteMutate : userInvitationsMutate;
+
   // TODO: Properly check for SSR user values
   if (!clerk.loaded || !user) {
     return {
@@ -197,8 +208,8 @@ export const useOrganizationList: UseOrganizationList = params => {
       userInvitations: {
         data: undefined,
         count: undefined,
-        isLoadingInitial: false,
         isLoading: false,
+        isFetching: false,
         isError: false,
         page: undefined,
         pageCount: undefined,
@@ -207,6 +218,7 @@ export const useOrganizationList: UseOrganizationList = params => {
         fetchPrevious: undefined,
         hasNextPage: false,
         hasPreviousPage: false,
+        unstable__mutate: undefined,
       },
     };
   }
@@ -216,35 +228,21 @@ export const useOrganizationList: UseOrganizationList = params => {
     organizationList: createOrganizationList(user.organizationMemberships),
     setActive: clerk.setActive,
     createOrganization: clerk.createOrganization,
-    userInvitations: triggerInfinite
-      ? {
-          data: isomorphicData,
-          count: isomorphicCount,
-          isLoadingInitial: userInvitationsLoadingInfinite,
-          isLoading: userInvitationsInfiniteValidating,
-          isError: !!userInvitationsInfiniteError,
-          page: isomorphicPage,
-          pageCount,
-          fetchPage: isomorphicSetPage,
-          fetchNext,
-          fetchPrevious,
-          hasNextPage,
-          hasPreviousPage,
-        }
-      : {
-          data: isomorphicData,
-          count: isomorphicCount,
-          isLoadingInitial: userInvitationsLoading,
-          isError: !!userInvitationsError,
-          isLoading: userInvitationsValidating,
-          page: isomorphicPage,
-          pageCount,
-          fetchPage: isomorphicSetPage,
-          fetchNext,
-          fetchPrevious,
-          hasNextPage,
-          hasPreviousPage,
-        },
+    userInvitations: {
+      data: isomorphicData,
+      count: isomorphicCount,
+      isLoading: isomorphicIsLoading,
+      isFetching: isomorphicIsFetching,
+      isError: isomorphicIsError,
+      page: isomorphicPage,
+      pageCount,
+      fetchPage: isomorphicSetPage,
+      fetchNext,
+      fetchPrevious,
+      hasNextPage,
+      hasPreviousPage,
+      unstable__mutate,
+    },
   };
 };
 
@@ -261,5 +259,6 @@ function cacheKey(type: 'userInvitations', user: UserResource, pagination: GetUs
     userId: user.id,
     initialPage: pagination.initialPage,
     initialPageSize: pagination.initialPageSize,
+    status: pagination.status,
   };
 }

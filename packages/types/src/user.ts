@@ -6,6 +6,7 @@ import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
 import type { OAuthScope } from './oauth';
+import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationMembershipResource } from './organizationMembership';
 import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
@@ -169,4 +170,6 @@ export type GetUserOrganizationInvitationsParams = {
    * Maximum number of items returned per request. The initial value persists between re-renders
    */
   initialPageSize?: number;
+
+  status?: OrganizationInvitationStatus;
 };
