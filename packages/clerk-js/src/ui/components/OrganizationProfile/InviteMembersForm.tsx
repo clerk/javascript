@@ -65,6 +65,9 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       setSuccessful,
       successfulText,
       warningText,
+      validatePassword,
+      setHasPassedComplexity,
+      hasPassedComplexity,
       /* eslint-enable @typescript-eslint/no-unused-vars */
       ...restEmailAddressProps
     },
