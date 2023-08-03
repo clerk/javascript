@@ -66,14 +66,16 @@ type UseOrganizationList = (params?: UseOrganizationListParams) => UseOrganizati
 
 export const useOrganizationList: UseOrganizationList = params => {
   const { userInvitations } = params || {};
-  const [paginatedPage, setPaginatedPage] = useState(1);
 
-  // Cache limit and offset until unmount
-  const offsetRef = useRef(userInvitations !== true ? userInvitations?.offset ?? 0 : 0);
-  const limitRef = useRef(userInvitations !== true ? userInvitations?.limit ?? 10 : 10);
+  const shouldUseDefaults = typeof userInvitations === 'boolean' && userInvitations;
+  const [paginatedPage, setPaginatedPage] = useState(shouldUseDefaults ? 1 : userInvitations?.initialPage ?? 1);
 
-  const triggerInfinite = userInvitations !== true ? userInvitations?.infinite ?? false : false;
-  const internalKeepPreviousData = userInvitations !== true ? userInvitations?.keepPreviousData ?? false : false;
+  // Cache initialPage and initialPageSize until unmount
+  const initialPageRef = useRef(shouldUseDefaults ? 1 : userInvitations?.initialPage ?? 1);
+  const initialPageSizeRef = useRef(shouldUseDefaults ? 10 : userInvitations?.initialPageSize ?? 10);
+
+  const triggerInfinite = shouldUseDefaults ? false : !!userInvitations?.infinite;
+  const internalKeepPreviousData = shouldUseDefaults ? false : !!userInvitations?.keepPreviousData;
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
@@ -82,8 +84,8 @@ export const useOrganizationList: UseOrganizationList = params => {
     typeof userInvitations === 'undefined'
       ? undefined
       : {
-          limit: limitRef.current,
-          offset: offsetRef.current + (paginatedPage - 1) * limitRef.current,
+          initialPage: paginatedPage,
+          initialPageSize: initialPageSizeRef.current,
         };
 
   const canFetch = !!(clerk.loaded && user);
@@ -113,15 +115,10 @@ export const useOrganizationList: UseOrganizationList = params => {
       return null;
     }
 
-    const limit = limitRef.current;
-    const offset = offsetRef.current + pageIndex * limit;
-
-    const param = {
-      limit,
-      offset,
-    };
-
-    return cacheKey('userInvitations', user, param);
+    return cacheKey('userInvitations', user, {
+      initialPage: initialPageRef.current + pageIndex,
+      initialPageSize: initialPageSizeRef.current,
+    });
   };
 
   const {
@@ -131,14 +128,12 @@ export const useOrganizationList: UseOrganizationList = params => {
     error: userInvitationsInfiniteError,
     size,
     setSize,
-  } = useSWRInfinite(getInfiniteKey, str => {
-    const { offset, limit } = JSON.parse(str);
-
+  } = useSWRInfinite(getInfiniteKey, ({ initialPage, initialPageSize }) => {
     return !clerk.loaded || !user
       ? ({ data: [], total_count: 0 } as ClerkPaginatedResponse<UserOrganizationInvitationResource>)
       : user.getOrganizationInvitations({
-          offset: parseInt(offset),
-          limit: parseInt(limit),
+          initialPage,
+          initialPageSize,
         });
   });
 
@@ -185,9 +180,12 @@ export const useOrganizationList: UseOrganizationList = params => {
     isomorphicSetPage(n => n - 1);
   }, [isomorphicSetPage]);
 
-  const pageCount = Math.ceil((isomorphicCount - offsetRef.current) / limitRef.current);
-  const hasNextPage = isomorphicCount - offsetRef.current > isomorphicPage * limitRef.current;
-  const hasPreviousPage = (isomorphicPage - 1) * limitRef.current > offsetRef.current;
+  const offsetCount = (initialPageRef.current - 1) * initialPageSizeRef.current;
+
+  const pageCount = Math.ceil((isomorphicCount - offsetCount) / initialPageSizeRef.current);
+  const hasNextPage =
+    isomorphicCount - offsetCount * initialPageSizeRef.current > isomorphicPage * initialPageSizeRef.current;
+  const hasPreviousPage = (isomorphicPage - 1) * initialPageSizeRef.current > offsetCount * initialPageSizeRef.current;
 
   // TODO: Properly check for SSR user values
   if (!clerk.loaded || !user) {
@@ -258,10 +256,10 @@ function createOrganizationList(organizationMemberships: OrganizationMembershipR
 }
 
 function cacheKey(type: 'userInvitations', user: UserResource, pagination: GetUserOrganizationInvitationsParams) {
-  return JSON.stringify({
+  return {
     type,
     userId: user.id,
-    offset: pagination.offset,
-    limit: pagination.limit,
-  });
+    initialPage: pagination.initialPage,
+    initialPageSize: pagination.initialPageSize,
+  };
 }
