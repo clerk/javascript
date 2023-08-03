@@ -123,7 +123,7 @@ export const useFormControl = <Id extends string>(
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { defaultChecked, validatePassword: validatePasswordProp, ...restOpts } = opts;
+  const { defaultChecked, validatePassword: validatePasswordProp, buildErrorMessage, ...restOpts } = opts;
 
   const props = {
     id,
@@ -148,7 +148,7 @@ export const useFormControl = <Id extends string>(
     ...restOpts,
   };
 
-  return { props, ...props, setError, setValue, setChecked };
+  return { props, ...props, buildErrorMessage, setError, setValue, setChecked };
 };
 
 type FormControlStateLike = Pick<FormControlState, 'id' | 'value'>;
