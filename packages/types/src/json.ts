@@ -370,7 +370,7 @@ export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
   public_organization_data: {
     id: string;
     name: string;
-    slug: string;
+    slug: string | null;
     has_image: boolean;
     image_url: string;
   };
