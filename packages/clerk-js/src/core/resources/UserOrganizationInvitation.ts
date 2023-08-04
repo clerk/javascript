@@ -3,18 +3,23 @@ import type {
   GetUserOrganizationInvitationsParams,
   MembershipRole,
   OrganizationInvitationStatus,
-  OrganizationResource,
   UserOrganizationInvitationJSON,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, Organization } from './internal';
+import { BaseResource } from './internal';
 
 export class UserOrganizationInvitation extends BaseResource implements UserOrganizationInvitationResource {
   id!: string;
   emailAddress!: string;
-  organization!: OrganizationResource;
+  publicOrganizationData!: {
+    hasImage: boolean;
+    imageUrl: string;
+    name: string;
+    id: string;
+    slug: string;
+  };
   publicMetadata: OrganizationInvitationPublicMetadata = {};
   status!: OrganizationInvitationStatus;
   role!: MembershipRole;
@@ -59,7 +64,13 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
     if (data) {
       this.id = data.id;
       this.emailAddress = data.email_address;
-      this.organization = new Organization(data.organization);
+      this.publicOrganizationData = {
+        hasImage: data.public_organization_data.has_image,
+        imageUrl: data.public_organization_data.image_url,
+        name: data.public_organization_data.name,
+        id: data.public_organization_data.id,
+        slug: data.public_organization_data.slug,
+      };
       this.publicMetadata = data.public_metadata;
       this.role = data.role;
       this.status = data.status;
