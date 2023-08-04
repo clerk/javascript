@@ -11,6 +11,9 @@ export type ClerkState = {
     __domain: string | undefined;
     __isSatellite: boolean;
     __signInUrl: string | undefined;
+    __signUpUrl: string | undefined;
+    __afterSignInUrl: string | undefined;
+    __afterSignUpUrl: string | undefined;
     __clerk_debug: any;
     __clerkJSUrl: string | undefined;
     __clerkJSVersion: string | undefined;

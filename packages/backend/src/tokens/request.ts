@@ -101,6 +101,9 @@ export type AuthenticateRequestOptions = OptionalVerifyTokenOptions &
      * @experimental
      */
     signInUrl?: string;
+    signUpUrl?: string;
+    afterSignInUrl?: string;
+    afterSignUpUrl?: string;
     request?: Request;
   };
 

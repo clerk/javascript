@@ -46,6 +46,9 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     __isSatellite,
     __clerk_debug,
     __signInUrl,
+    __signUpUrl,
+    __afterSignInUrl,
+    __afterSignUpUrl,
     __clerkJSUrl,
     __clerkJSVersion,
   } = clerkState?.__internal_clerk_state || {};
@@ -68,6 +71,9 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
       domain={__domain as any}
       isSatellite={__isSatellite}
       signInUrl={__signInUrl}
+      signUpUrl={__signUpUrl}
+      afterSignInUrl={__afterSignInUrl}
+      afterSignUpUrl={__afterSignUpUrl}
       clerkJSUrl={__clerkJSUrl}
       clerkJSVersion={__clerkJSVersion}
       {...restProps}
