@@ -27,4 +27,5 @@ export interface UserOrganizationInvitationResource extends ClerkResource {
   status: OrganizationInvitationStatus;
   createdAt: Date;
   updatedAt: Date;
+  accept: () => Promise<UserOrganizationInvitationResource>;
 }

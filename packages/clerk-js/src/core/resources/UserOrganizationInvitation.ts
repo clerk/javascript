@@ -48,6 +48,13 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
     super();
     this.fromJSON(data);
   }
+
+  accept = async (): Promise<UserOrganizationInvitation> => {
+    return await this._basePost({
+      path: `/me/organization_invitations/${this.id}/accept`,
+    });
+  };
+
   protected fromJSON(data: UserOrganizationInvitationJSON | null): this {
     if (data) {
       this.id = data.id;
