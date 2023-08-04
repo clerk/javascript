@@ -27,13 +27,21 @@ export default (QUnit: QUnit) => {
         apiUrl: 'https://api.clerk.test',
         publishableKey,
         frontendApi: 'accounts.included.katydid-92.lcl.dev',
+        userAgent: 'clerk-backend-sdk-from-options',
       });
 
       const qs = `clerk_js_version=latest&publishable_key=${publishableKey}&sign_in_url=`;
       const interstitialUrl = `https://api.clerk.test/v1/public/interstitial?${qs}`;
 
       assert.equal(resp, '<html>Interstitial Page</html>');
-      assert.ok(fakeFetch.calledOnceWith(interstitialUrl, { method: 'GET' }));
+      assert.ok(
+        fakeFetch.calledOnceWith(interstitialUrl, {
+          method: 'GET',
+          headers: {
+            'Clerk-Backend-SDK': 'clerk-backend-sdk-from-options',
+          },
+        }),
+      );
     });
   });
 };

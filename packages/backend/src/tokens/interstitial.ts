@@ -1,6 +1,6 @@
 import type { MultiDomainAndOrProxyPrimitives } from '@clerk/types';
 
-import { API_VERSION } from '../constants';
+import { API_VERSION, USER_AGENT } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
@@ -18,6 +18,7 @@ export type LoadInterstitialOptions = {
   publishableKey: string;
   clerkJSUrl?: string;
   clerkJSVersion?: string;
+  userAgent?: string;
   /**
    * @deprecated
    */
@@ -141,7 +142,14 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
-  const response = await callWithRetry(() => runtime.fetch(buildPublicInterstitialUrl(options), { method: 'GET' }));
+  const response = await callWithRetry(() =>
+    runtime.fetch(buildPublicInterstitialUrl(options), {
+      method: 'GET',
+      headers: {
+        'Clerk-Backend-SDK': options.userAgent || USER_AGENT,
+      },
+    }),
+  );
 
   if (!response.ok) {
     throw new TokenVerificationError({
