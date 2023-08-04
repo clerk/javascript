@@ -347,7 +347,13 @@ export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
   object: 'organization_invitation';
   id: string;
   email_address: string;
-  organization: OrganizationJSON;
+  public_organization_data: {
+    id: string;
+    name: string;
+    slug: string;
+    has_image: boolean;
+    image_url: string;
+  };
   public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
   role: MembershipRole;

@@ -1,4 +1,3 @@
-import type { OrganizationResource } from './organization';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole } from './organizationMembership';
 import type { ClerkResource } from './resource';
@@ -21,7 +20,13 @@ declare global {
 export interface UserOrganizationInvitationResource extends ClerkResource {
   id: string;
   emailAddress: string;
-  organization: OrganizationResource;
+  publicOrganizationData: {
+    hasImage: boolean;
+    imageUrl: string;
+    name: string;
+    id: string;
+    slug: string;
+  };
   publicMetadata: UserOrganizationInvitationPublicMetadata;
   role: MembershipRole;
   status: OrganizationInvitationStatus;
