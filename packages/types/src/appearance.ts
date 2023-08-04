@@ -267,12 +267,14 @@ export type ElementsConfig = {
   organizationSwitcherPopoverCard: WithOptions<never, never, never>;
   organizationSwitcherPopoverMain: WithOptions<never, never, never>;
   organizationSwitcherPopoverActions: WithOptions<never, never, never>;
+  organizationSwitcherPopoverInvitationActions: WithOptions<never, never, never>;
   organizationSwitcherPopoverActionButton: WithOptions<
     'manageOrganization' | 'createOrganization' | 'switchOrganization',
     never,
     never
   >;
   organizationSwitcherPreviewButton: WithOptions<never, never, never>;
+  organizationSwitcherInvitationAcceptButton: WithOptions<never, never, never>;
   organizationSwitcherInvitationRejectButton: WithOptions<never, never, never>;
   organizationSwitcherPopoverActionButtonIconBox: WithOptions<
     'manageOrganization' | 'createOrganization',

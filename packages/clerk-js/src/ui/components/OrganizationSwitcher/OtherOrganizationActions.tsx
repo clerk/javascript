@@ -9,8 +9,17 @@ import {
   useOrganizationSwitcherContext,
 } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
-import { Action, OrganizationPreview, PersonalWorkspacePreview, PreviewButton, SecondaryActions } from '../../elements';
+import {
+  Action,
+  OrganizationPreview,
+  PersonalWorkspacePreview,
+  PreviewButton,
+  SecondaryActions,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { common } from '../../styledSystem';
+import { handleError } from '../../utils';
 
 type OrganizationActionListProps = {
   onCreateOrganizationClick: React.MouseEventHandler;
@@ -153,7 +162,15 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
       </Box>
 
       {(userInvitations.count ?? 0) > 0 && (
-        <>
+        <Flex
+          direction={'col'}
+          elementDescriptor={descriptors.organizationSwitcherPopoverInvitationActions}
+          sx={[
+            t => ({
+              backgroundColor: t.colors.$blackAlpha50,
+            }),
+          ]}
+        >
           <Text
             variant={'smallRegular'}
             sx={[
@@ -165,9 +182,15 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
                 alignItems: 'center',
               }),
             ]}
-          >
-            1 pending invitation to join:
-          </Text>
+            localizationKey={localizationKeys(
+              (userInvitations.count ?? 0) > 1
+                ? 'organizationSwitcher.invitationCountLabel_many'
+                : 'organizationSwitcher.invitationCountLabel_single',
+              {
+                count: userInvitations.count,
+              },
+            )}
+          />
           <Box
             sx={t => ({
               maxHeight: `calc(4 * ${t.sizes.$12})`,
@@ -184,13 +207,13 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
               );
             })}
 
-            {(userInvitations.hasNextPage || userInvitations.isLoading) && (
+            {(userInvitations.hasNextPage || userInvitations.isFetching) && (
               <Box
                 ref={ref}
                 sx={[
                   t => ({
                     width: '100%',
-                    height: t.sizes.$8,
+                    height: t.space.$12,
                     position: 'relative',
                   }),
                 ]}
@@ -212,14 +235,47 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
               </Box>
             )}
           </Box>
-        </>
+        </Flex>
       )}
       {user.createOrganizationEnabled && createOrganizationButton}
     </SecondaryActions>
   );
 };
 
-const InvitationPreview = (props: UserOrganizationInvitationResource) => {
+const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource) => {
+  const card = useCardState();
+  const { userInvitations } = useCoreOrganizationList({
+    userInvitations: {
+      infinite: true,
+    },
+  });
+
+  const mutateSwrState = () => {
+    (userInvitations as any)?.unstable__mutate?.();
+  };
+
+  const handleAccept = () => {
+    return card
+      .runAsync(props.accept())
+      .then(mutateSwrState)
+      .catch(err => handleError(err, [], card.setError));
+  };
+
+  return (
+    <>
+      <Button
+        elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
+        textVariant='buttonExtraSmallBold'
+        variant={'solid'}
+        isLoading={card.isLoading}
+        onClick={handleAccept}
+        localizationKey={localizationKeys('organizationSwitcher.invitationAccept')}
+      />
+    </>
+  );
+};
+
+const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
   return (
     <Flex
       align={'center'}
@@ -230,16 +286,6 @@ const InvitationPreview = (props: UserOrganizationInvitationResource) => {
           height: t.space.$12,
           justifyContent: 'space-between',
           padding: `0 ${t.space.$6}`,
-          ':hover > .cl-organizationSwitcherPreviewButton': {
-            opacity: 1,
-            transform: 'translateY(0px)',
-            tabIndex: 1,
-          },
-          ':focus-within > .cl-organizationSwitcherPreviewButton': {
-            opacity: 1,
-            transform: 'translateY(0px)',
-            tabIndex: 1,
-          },
         }),
       ]}
     >
@@ -250,28 +296,7 @@ const InvitationPreview = (props: UserOrganizationInvitationResource) => {
         size='sm'
       />
 
-      <Button
-        elementDescriptor={descriptors.organizationSwitcherPreviewButton}
-        variant={'ghost'}
-        hoverAsFocus
-        textVariant='buttonExtraSmallBold'
-        sx={[
-          t => ({
-            tabIndex: 0,
-            opacity: 0,
-            transform: 'translateY(3px)',
-            transitionDuration: t.transitionDuration.$slower,
-          }),
-        ]}
-      >
-        Reject
-      </Button>
-      <Button
-        textVariant='buttonExtraSmallBold'
-        variant={'solid'}
-      >
-        Join
-      </Button>
+      <AcceptRejectInvitationButtons {...props} />
     </Flex>
   );
-};
+});
