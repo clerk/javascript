@@ -178,6 +178,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           as='span'
           gap={2}
           center
+          css={{
+            position: 'relative',
+          }}
         >
           <Spinner
             css={{ position: loadingText ? undefined : 'absolute' }}
