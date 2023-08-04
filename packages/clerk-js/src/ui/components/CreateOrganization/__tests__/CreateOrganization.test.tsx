@@ -29,6 +29,7 @@ const createFakeOrganization = (params: FakeOrganizationParams): OrganizationRes
     id: params.id,
     name: params.name,
     slug: params.slug,
+    hasImage: !!params.imageUrl,
     imageUrl: params.imageUrl || '',
     membersCount: params.membersCount,
     pendingInvitationsCount: params.pendingInvitationsCount,
