@@ -292,7 +292,7 @@ const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitati
       <OrganizationPreview
         elementId={'organizationSwitcher'}
         avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
-        organization={props.organization}
+        organization={props.publicOrganizationData}
         size='sm'
       />
 
