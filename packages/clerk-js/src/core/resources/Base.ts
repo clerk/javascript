@@ -15,7 +15,6 @@ export type BaseMutateParams = {
   path?: string;
 };
 
-const redirectUrlKeys = ['redirectUrl', 'actionCompleteRedirectUrl'];
 export abstract class BaseResource {
   static clerk: Clerk;
   id?: string;
@@ -130,14 +129,6 @@ export abstract class BaseResource {
     method = 'POST',
     path,
   }: BaseMutateParams): Promise<this> {
-    if (typeof body === 'object') {
-      redirectUrlKeys.forEach(rkey => {
-        if (typeof body[rkey] === 'string') {
-          body[rkey] = BaseResource.clerk.buildUrlWithAuth(body[rkey]);
-        }
-      });
-    }
-
     const json = await BaseResource._fetch<J>({
       method,
       path: path || this.path(action),

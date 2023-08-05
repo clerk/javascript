@@ -77,7 +77,7 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'email_link':
         config = {
           emailAddressId: factor.emailAddressId,
-          redirectUrl: factor.redirectUrl,
+          redirectUrl: BaseResource.clerk.buildUrlWithAuth(factor.redirectUrl),
         } as EmailLinkConfig;
         break;
       case 'email_code':
@@ -100,8 +100,8 @@ export class SignIn extends BaseResource implements SignInResource {
         break;
       case 'saml':
         config = {
-          redirectUrl: factor.redirectUrl,
-          actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
+          redirectUrl: BaseResource.clerk.buildUrlWithAuth(factor.redirectUrl),
+          actionCompleteRedirectUrl: BaseResource.clerk.buildUrlWithAuth(factor.actionCompleteRedirectUrl),
         } as SamlConfig;
         break;
       default:
@@ -133,7 +133,7 @@ export class SignIn extends BaseResource implements SignInResource {
       await this.prepareFirstFactor({
         strategy: 'email_link',
         emailAddressId: emailAddressId,
-        redirectUrl: redirectUrl,
+        redirectUrl: BaseResource.clerk.buildUrlWithAuth(redirectUrl),
       });
       return new Promise((resolve, reject) => {
         void run(() => {
@@ -177,14 +177,14 @@ export class SignIn extends BaseResource implements SignInResource {
       strategy === 'saml' && this.id
         ? await this.prepareFirstFactor({
             strategy,
-            redirectUrl: redirectUrl,
-            actionCompleteRedirectUrl: redirectUrlComplete,
+            redirectUrl: BaseResource.clerk.buildUrlWithAuth(redirectUrl),
+            actionCompleteRedirectUrl: BaseResource.clerk.buildUrlWithAuth(redirectUrlComplete),
           })
         : await this.create({
             strategy,
             identifier,
-            redirectUrl: redirectUrl,
-            actionCompleteRedirectUrl: redirectUrlComplete,
+            redirectUrl: BaseResource.clerk.buildUrlWithAuth(redirectUrl),
+            actionCompleteRedirectUrl: BaseResource.clerk.buildUrlWithAuth(redirectUrlComplete),
           });
 
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
