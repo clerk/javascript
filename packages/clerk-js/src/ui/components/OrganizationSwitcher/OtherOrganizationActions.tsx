@@ -165,11 +165,6 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
         <Flex
           direction={'col'}
           elementDescriptor={descriptors.organizationSwitcherPopoverInvitationActions}
-          sx={[
-            t => ({
-              backgroundColor: t.colors.$blackAlpha50,
-            }),
-          ]}
         >
           <Text
             variant={'smallRegular'}
@@ -182,6 +177,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
                 alignItems: 'center',
               }),
             ]}
+            // Handle plurals
             localizationKey={localizationKeys(
               (userInvitations.count ?? 0) > 1
                 ? 'organizationSwitcher.invitationCountLabel_many'
