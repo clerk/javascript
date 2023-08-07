@@ -13,6 +13,7 @@ export * from './IdentificationLink';
 export * from './Image';
 export * from './PhoneNumber';
 export * from './Organization';
+export * from './OrganizationDomain';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
 export * from './SamlAccount';

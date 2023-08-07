@@ -1,11 +1,15 @@
 import type {
   AddMemberParams,
+  ClerkPaginatedResponse,
   ClerkResourceReloadParams,
   CreateOrganizationParams,
+  GetDomainsParams,
   GetMembershipsParams,
   GetPendingInvitationsParams,
   InviteMemberParams,
   InviteMembersParams,
+  OrganizationDomainJSON,
+  OrganizationDomainResource,
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -14,9 +18,11 @@ import type {
   UpdateMembershipParams,
   UpdateOrganizationParams,
 } from '@clerk/types';
+import type { ClerkPaginationParams, GetUserOrganizationInvitationsParams } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
+import { OrganizationDomain } from './OrganizationDomain';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
@@ -73,6 +79,89 @@ export class Organization extends BaseResource implements OrganizationResource {
     return this._basePatch({
       body: params,
     });
+  };
+
+  getDomains = async (
+    getDomainParams?: GetDomainsParams,
+  ): Promise<ClerkPaginatedResponse<OrganizationDomainResource>> => {
+    function convertPageToOffset(pageParams: GetUserOrganizationInvitationsParams | undefined): ClerkPaginationParams {
+      const { initialPageSize, initialPage, ...restParams } = pageParams || {};
+      const _initialPageSize = initialPageSize ?? 10;
+      const _initialPage = initialPage ?? 1;
+
+      return {
+        ...restParams,
+        limit: initialPageSize,
+        offset: (_initialPage - 1) * _initialPageSize,
+      };
+    }
+
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/domains`,
+      method: 'GET',
+      search: convertPageToOffset(getDomainParams) as any,
+    })
+      .then(res => {
+        const { data: invites, total_count } =
+          res?.response as unknown as ClerkPaginatedResponse<OrganizationDomainJSON>;
+
+        return {
+          total_count,
+          data: invites.map(domain => new OrganizationDomain(domain)),
+        };
+      })
+      .catch(() => ({
+        total_count: 0,
+        data: [],
+      }));
+  };
+
+  getDomain = async ({ domainId }: { domainId: string }): Promise<OrganizationDomainResource> => {
+    const json = (
+      await BaseResource._fetch<OrganizationDomainJSON>({
+        path: `/organizations/${this.id}/domains/${domainId}`,
+        method: 'GET',
+      })
+    )?.response as unknown as OrganizationDomainJSON;
+    return new OrganizationDomain(json);
+  };
+
+  prepareDomainAffiliationVerification = async ({
+    domainId,
+    emailAddress,
+  }: {
+    domainId: string;
+    emailAddress: string;
+  }): Promise<OrganizationDomainResource> => {
+    const json = (
+      await BaseResource._fetch<OrganizationDomainJSON>({
+        path: `/organizations/${this.id}/domains/${domainId}/prepare_affiliation_verification`,
+        method: 'POST',
+        body: { affiliationEmailAddress: emailAddress } as any,
+      })
+    )?.response as unknown as OrganizationDomainJSON;
+    return new OrganizationDomain(json);
+  };
+
+  attemptDomainAffiliationVerification = async ({
+    domainId,
+    code,
+  }: {
+    domainId: string;
+    code: string;
+  }): Promise<OrganizationDomainResource> => {
+    const json = (
+      await BaseResource._fetch<OrganizationDomainJSON>({
+        path: `/organizations/${this.id}/domains/${domainId}/attempt_affiliation_verification`,
+        method: 'POST',
+        body: { code } as any,
+      })
+    )?.response as unknown as OrganizationDomainJSON;
+    return new OrganizationDomain(json);
+  };
+
+  createDomain = async (name: string): Promise<OrganizationDomainResource> => {
+    return OrganizationDomain.create(this.id, { name });
   };
 
   getMemberships = async (getMemberhipsParams?: GetMembershipsParams): Promise<OrganizationMembership[]> => {
