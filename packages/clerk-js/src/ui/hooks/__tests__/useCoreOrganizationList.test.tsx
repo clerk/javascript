@@ -10,7 +10,7 @@ const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 const defaultRenderer = () =>
   useCoreOrganizationList({
     userInvitations: {
-      initialPageSize: 2,
+      pageSize: 2,
     },
   });
 
@@ -189,7 +189,7 @@ describe('useOrganizationList', () => {
       () =>
         useCoreOrganizationList({
           userInvitations: {
-            initialPageSize: 2,
+            pageSize: 2,
             infinite: true,
           },
         }),
