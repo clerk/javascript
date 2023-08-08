@@ -29,11 +29,13 @@ export const enUS: LocalizationResource = {
   formFieldLabel__newPassword: 'New password',
   formFieldLabel__confirmPassword: 'Confirm password',
   formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
+  formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__firstName: 'First name',
   formFieldLabel__lastName: 'Last name',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__organizationEmailDomain: 'Email domain',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
@@ -51,6 +53,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
+  formFieldInputPlaceholder__organizationEmailDomain: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldAction__forgotPassword: 'Forgot password?',
@@ -561,6 +564,30 @@ export const enUS: LocalizationResource = {
           successMessage: 'You have deleted the organization.',
         },
       },
+      domainSection: {
+        title: 'Verified Domains',
+        subtitle:
+          'Setup a domain so everyone with email addresses at this domain can automatically join your organization.',
+        primaryButton: 'Add verified domain',
+      },
+    },
+    createDomainPage: {
+      title: 'Add verified domain',
+      subtitle:
+        'Add a domain so new users signing up with email addresses at this domain can automatically join your organization as a member.',
+    },
+    verifyDomainPage: {
+      title: 'Verify domain',
+      subtitle: 'Add an email address under {{domainName}} to receive a code and verify this domain.',
+      formTitle: 'Verification code',
+      formSubtitle: 'Enter the verification code sent to your email address',
+      resendButton: "Didn't receive a code? Resend",
+    },
+    verifiedDomainPage: {
+      title: 'Verified domain',
+      actionLabel__remove: 'Remove verified domain',
+      formTitle: 'Automatic invitations',
+      formSubtitle: 'Users matching this domain are invited to join automatically.',
     },
     invitePage: {
       title: 'Invite members',
