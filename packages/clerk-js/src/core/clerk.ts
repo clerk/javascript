@@ -53,6 +53,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
+import { handleMissingRequirements } from '../ui/components/SignUp/util';
 import {
   appendAsQueryParams,
   buildURL,
@@ -834,6 +835,8 @@ export default class Clerk implements ClerkInterface {
     const { externalAccount } = signUp.verifications;
     const su = {
       status: signUp.status,
+      missingFields: signUp.missingFields,
+      unverifiedFields: signUp.unverifiedFields,
       externalAccountStatus: externalAccount.status,
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
@@ -873,6 +876,23 @@ export default class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
     );
 
+    const navigateToNextStepSignUp = () => {
+      if (su.unverifiedFields.length === 0 || su.missingFields.length !== 0) {
+        return navigateToContinueSignUp();
+      }
+
+      return handleMissingRequirements({
+        signUp,
+        verifyEmailPath:
+          params.verifyEmailAddressUrl ||
+          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-email-address' }, { stringify: true }),
+        verifyPhonePath:
+          params.verifyPhoneNumberUrl ||
+          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
+        navigate,
+      });
+    };
+
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
 
@@ -902,7 +922,7 @@ export default class Clerk implements ClerkInterface {
             beforeEmit: navigateAfterSignUp,
           });
         case 'missing_requirements':
-          return navigateToContinueSignUp();
+          return navigateToNextStepSignUp();
         default:
           clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
@@ -938,7 +958,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
-      return navigateToContinueSignUp();
+      return navigateToNextStepSignUp();
     }
 
     return navigateToSignIn();

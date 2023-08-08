@@ -700,6 +700,8 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
+            missing_fields: [],
+            unverified_fields: [],
             verifications: {
               external_account: {
                 status: 'unverified',
@@ -1111,6 +1113,8 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
+            missing_fields: ['last_name'],
+            unverified_fields: [],
             verifications: {
               external_account: {
                 status: 'verified',
