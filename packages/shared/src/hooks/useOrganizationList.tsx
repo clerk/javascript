@@ -13,6 +13,7 @@ import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 
 import { useClerkInstanceContext, useUserContext } from './contexts';
+import type { PaginatedResources, PaginatedResourcesWithDefault, ValueOrSetter } from './types';
 
 type UseOrganizationListParams = {
   userInvitations?:
@@ -25,41 +26,20 @@ type UseOrganizationListParams = {
 
 type OrganizationList = ReturnType<typeof createOrganizationList>;
 
-type CustomSetAction<T = unknown> = (size: T | ((_size: T) => T)) => void;
-type PaginatedDataAPI<T = unknown> = {
-  data: T[];
-  count: number;
-  isLoading: boolean;
-  isFetching: boolean;
-  isError: boolean;
-  page: number;
-  pageCount: number;
-  fetchPage: CustomSetAction<number>;
-  fetchPrevious: () => void;
-  fetchNext: () => void;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-};
-
-// Utility type to convert PaginatedDataAPI to properties as undefined, except booleans set to false
-type PaginatedDataAPIWithDefaults<T> = {
-  [K in keyof PaginatedDataAPI<T>]: PaginatedDataAPI<T>[K] extends boolean ? false : PaginatedDataAPI<T>[K] | undefined;
-};
-
 type UseOrganizationListReturn =
   | {
       isLoaded: false;
       organizationList: undefined;
       createOrganization: undefined;
       setActive: undefined;
-      userInvitations: PaginatedDataAPIWithDefaults<UserOrganizationInvitationResource>;
+      userInvitations: PaginatedResourcesWithDefault<UserOrganizationInvitationResource>;
     }
   | {
       isLoaded: boolean;
       organizationList: OrganizationList;
       createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
       setActive: SetActive;
-      userInvitations: PaginatedDataAPI<UserOrganizationInvitationResource>;
+      userInvitations: PaginatedResources<UserOrganizationInvitationResource>;
     };
 
 type UseOrganizationList = (params?: UseOrganizationListParams) => UseOrganizationListReturn;
@@ -67,16 +47,16 @@ type UseOrganizationList = (params?: UseOrganizationListParams) => UseOrganizati
 export const useOrganizationList: UseOrganizationList = params => {
   const { userInvitations } = params || {};
 
-  const shouldUseDefaults = typeof userInvitations === 'boolean' && userInvitations;
-  const [paginatedPage, setPaginatedPage] = useState(shouldUseDefaults ? 1 : userInvitations?.initialPage ?? 1);
+  const shouldUseDefaultOptions = userInvitations === true;
+  const [paginatedPage, setPaginatedPage] = useState(shouldUseDefaultOptions ? 1 : userInvitations?.initialPage ?? 1);
 
   // Cache initialPage and initialPageSize until unmount
-  const initialPageRef = useRef(shouldUseDefaults ? 1 : userInvitations?.initialPage ?? 1);
-  const initialPageSizeRef = useRef(shouldUseDefaults ? 10 : userInvitations?.initialPageSize ?? 10);
+  const initialPageRef = useRef(shouldUseDefaultOptions ? 1 : userInvitations?.initialPage ?? 1);
+  const pageSizeRef = useRef(shouldUseDefaultOptions ? 10 : userInvitations?.pageSize ?? 10);
 
-  const triggerInfinite = shouldUseDefaults ? false : !!userInvitations?.infinite;
-  const internalKeepPreviousData = shouldUseDefaults ? false : !!userInvitations?.keepPreviousData;
-  const internalStatus = shouldUseDefaults ? 'pending' : userInvitations?.status ?? 'pending';
+  const triggerInfinite = shouldUseDefaultOptions ? false : !!userInvitations?.infinite;
+  const internalKeepPreviousData = shouldUseDefaultOptions ? false : !!userInvitations?.keepPreviousData;
+  const internalStatus = shouldUseDefaultOptions ? 'pending' : userInvitations?.status ?? 'pending';
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
@@ -86,17 +66,13 @@ export const useOrganizationList: UseOrganizationList = params => {
       ? undefined
       : {
           initialPage: paginatedPage,
-          initialPageSize: initialPageSizeRef.current,
+          pageSize: pageSizeRef.current,
           status: internalStatus,
         };
 
   const canFetch = !!(clerk.loaded && user);
 
-  // Some gymnastics to adhere to the rules of hooks
-  // We need to make sure useSWR is called on every render
-  const fetchInvitations = !clerk.loaded
-    ? () => ({ data: [], total_count: 0 } as ClerkPaginatedResponse<UserOrganizationInvitationResource>)
-    : () => user?.getOrganizationInvitations(paginatedParams);
+  const fetchInvitations = () => user!.getOrganizationInvitations(paginatedParams);
 
   const {
     data: userInvitationsData,
@@ -120,7 +96,7 @@ export const useOrganizationList: UseOrganizationList = params => {
 
     return cacheKey('userInvitations', user, {
       initialPage: initialPageRef.current + pageIndex,
-      initialPageSize: initialPageSizeRef.current,
+      pageSize: pageSizeRef.current,
       status: internalStatus,
     });
   };
@@ -133,14 +109,12 @@ export const useOrganizationList: UseOrganizationList = params => {
     size,
     setSize,
     mutate: userInvitationsInfiniteMutate,
-  } = useSWRInfinite(getInfiniteKey, ({ initialPage, initialPageSize, status }) => {
-    return !clerk.loaded || !user
-      ? ({ data: [], total_count: 0 } as ClerkPaginatedResponse<UserOrganizationInvitationResource>)
-      : user.getOrganizationInvitations({
-          initialPage,
-          initialPageSize,
-          status,
-        });
+  } = useSWRInfinite(getInfiniteKey, ({ initialPage, pageSize, status }) => {
+    return user!.getOrganizationInvitations({
+      initialPage,
+      pageSize,
+      status,
+    });
   });
 
   const isomorphicPage = useMemo(() => {
@@ -150,7 +124,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     return paginatedPage;
   }, [triggerInfinite, size, paginatedPage]);
 
-  const isomorphicSetPage: CustomSetAction<number> = useCallback(
+  const isomorphicSetPage: ValueOrSetter<number> = useCallback(
     numberOrgFn => {
       if (triggerInfinite) {
         void setSize(numberOrgFn);
@@ -182,19 +156,18 @@ export const useOrganizationList: UseOrganizationList = params => {
    * Helpers
    */
   const fetchNext = useCallback(() => {
-    isomorphicSetPage(n => n + 1);
+    isomorphicSetPage(n => Math.max(0, n + 1));
   }, [isomorphicSetPage]);
 
   const fetchPrevious = useCallback(() => {
-    isomorphicSetPage(n => n - 1);
+    isomorphicSetPage(n => Math.max(0, n - 1));
   }, [isomorphicSetPage]);
 
-  const offsetCount = (initialPageRef.current - 1) * initialPageSizeRef.current;
+  const offsetCount = (initialPageRef.current - 1) * pageSizeRef.current;
 
-  const pageCount = Math.ceil((isomorphicCount - offsetCount) / initialPageSizeRef.current);
-  const hasNextPage =
-    isomorphicCount - offsetCount * initialPageSizeRef.current > isomorphicPage * initialPageSizeRef.current;
-  const hasPreviousPage = (isomorphicPage - 1) * initialPageSizeRef.current > offsetCount * initialPageSizeRef.current;
+  const pageCount = Math.ceil((isomorphicCount - offsetCount) / pageSizeRef.current);
+  const hasNextPage = isomorphicCount - offsetCount * pageSizeRef.current > isomorphicPage * pageSizeRef.current;
+  const hasPreviousPage = (isomorphicPage - 1) * pageSizeRef.current > offsetCount * pageSizeRef.current;
 
   const unstable__mutate = triggerInfinite ? userInvitationsInfiniteMutate : userInvitationsMutate;
 
@@ -258,7 +231,7 @@ function cacheKey(type: 'userInvitations', user: UserResource, pagination: GetUs
     type,
     userId: user.id,
     initialPage: pagination.initialPage,
-    initialPageSize: pagination.initialPageSize,
+    pageSize: pagination.pageSize,
     status: pagination.status,
   };
 }

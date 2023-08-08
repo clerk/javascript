@@ -169,7 +169,7 @@ export type GetUserOrganizationInvitationsParams = {
   /**
    * Maximum number of items returned per request. The initial value persists between re-renders
    */
-  initialPageSize?: number;
+  pageSize?: number;
 
   status?: OrganizationInvitationStatus;
 };
