@@ -7,6 +7,7 @@ import { InviteMembersPage } from './InviteMembersPage';
 import { OrganizationMembers } from './OrganizationMembers';
 import { OrganizationSettings } from './OrganizationSettings';
 import { ProfileSettingsPage } from './ProfileSettingsPage';
+import { RemoveDomainPage } from './RemoveDomainPage';
 import { VerifiedDomainPage } from './VerifiedDomainPage';
 import { VerifyDomainPage } from './VerifyDomainPage';
 
@@ -29,6 +30,9 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
               <Route path=':id/verify'>
                 <VerifyDomainPage />
               </Route>
+              <Route path=':id/remove'>
+                <RemoveDomainPage />
+              </Route>
               <Route path=':id'>
                 <VerifiedDomainPage />
               </Route>
@@ -37,22 +41,6 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
               </Route>
             </Switch>
           </Route>
-          {/*<Route*/}
-          {/*  path='add-domain'*/}
-          {/*  flowStart*/}
-          {/*>*/}
-          {/*  <AddDomainPage />*/}
-          {/*</Route>*/}
-          {/*<Route*/}
-          {/*  path='verify-domain/:id'*/}
-          {/*  flowStart*/}
-          {/*>*/}
-          {/*  <VerifyDomainPage />*/}
-          {/*</Route>*/}
-
-          {/*<Route path='verified-domain/:id'>*/}
-          {/*  <VerifiedDomainPage />*/}
-          {/*</Route>*/}
           <Route
             path='leave'
             flowStart

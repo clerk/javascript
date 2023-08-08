@@ -10,5 +10,6 @@ export * from './EmailLinkStatusCard';
 export * from './Wizard';
 export * from './RemoveResourcePage';
 export * from './PrintableComponent';
+export * from './RemoveResourcePage';
 export * from './withOrganizationsEnabledGuard';
 export * from './QRCode';
