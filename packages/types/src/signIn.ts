@@ -126,6 +126,7 @@ export interface UserData {
    */
   profileImageUrl?: string;
   imageUrl?: string;
+  hasImage?: boolean;
 }
 
 export type SignInFactor = SignInFirstFactor | SignInSecondFactor;
