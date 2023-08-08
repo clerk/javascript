@@ -3,9 +3,10 @@ import React, { useEffect } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
-import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
+import { Badge, Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import {
+  BlockWithAction,
   ContentPage,
   Form,
   FormButtonContainer,
@@ -15,7 +16,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { CodeForm } from '../../elements/CodeForm';
-import { useLoadingStatus } from '../../hooks';
+import { useLoadingStatus, useNavigateToFlowStart } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
@@ -23,7 +24,8 @@ import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 export const VerifyDomainPage = withCardStateProvider(() => {
   const card = useCardState();
   const { organization } = useCoreOrganization();
-  const { navigate, params } = useRouter();
+  const { params, navigate } = useRouter();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
 
   const [success, setSuccess] = React.useState(false);
   const [domain, setDomain] = React.useState<OrganizationDomainResource | null>(null);
@@ -77,7 +79,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       .then(async res => {
         await resolve();
         if (res.verification?.status === 'verified') {
-          return navigate('../../');
+          return navigateToFlowStart();
         }
         return;
       })
@@ -120,15 +122,16 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       });
   };
 
-  if (domainStatus.isLoading) {
+  if (domainStatus.isLoading || !domain) {
     return (
       <Flex
         direction={'row'}
         align={'center'}
         justify={'center'}
-        sx={{
+        sx={t => ({
           height: '100%',
-        }}
+          minHeight: t.sizes.$120,
+        })}
       >
         <Spinner
           size={'lg'}
@@ -145,6 +148,27 @@ export const VerifyDomainPage = withCardStateProvider(() => {
         headerSubtitle={subtitle}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
+        <BlockWithAction
+          elementDescriptor={descriptors.accordionTriggerButton}
+          badge={
+            <Badge
+              textVariant={'extraSmallRegular'}
+              colorScheme={'warning'}
+            >
+              Unverified
+            </Badge>
+          }
+          sx={t => ({
+            backgroundColor: t.colors.$blackAlpha50,
+            padding: `${t.space.$3} ${t.space.$4}`,
+            minHeight: t.sizes.$10,
+          })}
+          actionLabel={localizationKeys('organizationProfile.verifyDomainPage.actionLabel__remove')}
+          onActionClick={() => navigate(`../../../domain/${domain.id}/remove`)}
+        >
+          {domain.name}
+        </BlockWithAction>
+
         <Form.Root onSubmit={onSubmitPrepare}>
           <Form.ControlRow elementId={emailField.id}>
             <Form.Control

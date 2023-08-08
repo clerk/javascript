@@ -1,9 +1,9 @@
-import type { OrganizationDomainResource } from '@clerk/types';
+import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '@clerk/types';
 import React, { useEffect } from 'react';
 
 import { useCoreOrganization } from '../../contexts';
 import { Badge, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { ArrowBlockButton, ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
+import { BlockWithAction, ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
@@ -21,9 +21,19 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     status: 'loading',
   });
 
-  const automaticInvitationsField = useFormControl('automaticInvitations', '', {
-    type: 'checkbox',
+  const enrollmentMode = useFormControl('enrollmentMode', '', {
+    type: 'radio',
     label: localizationKeys('formFieldLabel__automaticInvitations'),
+    radios: [
+      {
+        value: 'automatic_invitation',
+        label: 'Automatic invitation',
+      },
+      {
+        value: 'manual_invitation',
+        label: 'Manual invitation',
+      },
+    ],
   });
 
   useEffect(() => {
@@ -35,7 +45,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
       .then(domain => {
         domainStatus.setIdle();
         setDomain(domain);
-        automaticInvitationsField.setChecked(domain.enrollmentMode === 'automatic_invitation');
+        enrollmentMode.setValue(domain.enrollmentMode);
       })
       .catch(() => {
         setDomain(null);
@@ -50,12 +60,12 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
 
     try {
       await domain.update({
-        enrollmentMode: automaticInvitationsField.checked ? 'automatic_invitation' : 'manual_invitation',
+        enrollmentMode: enrollmentMode.value as OrganizationEnrollmentMode,
       });
 
       await navigate('../../');
     } catch (e) {
-      handleError(e, [automaticInvitationsField], card.setError);
+      handleError(e, [enrollmentMode], card.setError);
     }
   };
 
@@ -69,9 +79,10 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         direction={'row'}
         align={'center'}
         justify={'center'}
-        sx={{
+        sx={t => ({
           height: '100%',
-        }}
+          minHeight: t.sizes.$120,
+        })}
       >
         <Spinner
           size={'lg'}
@@ -86,30 +97,25 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
       headerTitle={title}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     >
-      <ArrowBlockButton
+      <BlockWithAction
         elementDescriptor={descriptors.accordionTriggerButton}
-        variant='ghost'
-        colorScheme='neutral'
         badge={<Badge textVariant={'extraSmallRegular'}>Verified</Badge>}
         sx={t => ({
           backgroundColor: t.colors.$blackAlpha50,
           padding: `${t.space.$3} ${t.space.$4}`,
           minHeight: t.sizes.$10,
         })}
-        rightIconSx={{
-          visibility: 'hidden',
-        }}
+        actionLabel={localizationKeys('organizationProfile.verifiedDomainPage.actionLabel__remove')}
+        onActionClick={() => navigate(`../../domain/${domain.id}/remove`)}
       >
         {domain.name}
-      </ArrowBlockButton>
+      </BlockWithAction>
 
       <Form.Root onSubmit={updateEnrollmentMode}>
-        <Form.ControlRow elementId={automaticInvitationsField.id}>
-          <Form.Control
-            {...automaticInvitationsField.props}
-            autoFocus
-          />
+        <Form.ControlRow elementId={enrollmentMode.id}>
+          <Form.Control {...enrollmentMode.props} />
         </Form.ControlRow>
+
         <FormButtons isDisabled={domainStatus.isLoading || !domain} />
       </Form.Root>
     </ContentPage>
