@@ -73,7 +73,8 @@ export type FieldId =
   | 'code'
   | 'role'
   | 'deleteConfirmation'
-  | 'deleteOrganizationConfirmation';
+  | 'deleteOrganizationConfirmation'
+  | 'automaticInvitations';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -87,7 +88,8 @@ export type ProfileSectionId =
   | 'danger'
   | 'activeDevices'
   | 'organizationProfile'
-  | 'organizationDanger';
+  | 'organizationDanger'
+  | 'organizationDomains';
 export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'organizationMembers';
 
 export type NavbarItemId = 'account' | 'security' | 'members' | 'settings';
