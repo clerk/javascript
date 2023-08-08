@@ -596,6 +596,7 @@ type _LocalizationResource = {
     };
     verifyDomainPage: {
       title: LocalizationValue;
+      actionLabel__remove: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
@@ -606,6 +607,12 @@ type _LocalizationResource = {
       actionLabel__remove: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
+    };
+    removeDomainPage: {
+      title: LocalizationValue;
+      messageLine1: LocalizationValue;
+      messageLine2: LocalizationValue;
+      successMessage: LocalizationValue;
     };
     invitePage: {
       title: LocalizationValue;
@@ -618,8 +625,16 @@ type _LocalizationResource = {
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
       start: {
+        /**
+         * @deprecated use `headerTitle__members` instead
+         */
         headerTitle__active: LocalizationValue;
+        headerTitle__members: LocalizationValue;
+        /**
+         * @deprecated use `headerTitle__invitations` instead
+         */
         headerTitle__invited: LocalizationValue;
+        headerTitle__invitations: LocalizationValue;
       };
       activeMembersTab: {
         tableHeader__user: LocalizationValue;
@@ -631,6 +646,18 @@ type _LocalizationResource = {
       invitedMembersTab: {
         tableHeader__invited: LocalizationValue;
         menuAction__revoke: LocalizationValue;
+      };
+      invitationsTab: {
+        manualInvitations: {
+          headerTitle: LocalizationValue;
+          headerSubtitle: LocalizationValue;
+        };
+        autoInvitations: {
+          headerTitle: LocalizationValue;
+          headerSubtitle: LocalizationValue;
+          calloutTextLabel: LocalizationValue;
+          calloutActionLabel: LocalizationValue;
+        };
       };
     };
   };
