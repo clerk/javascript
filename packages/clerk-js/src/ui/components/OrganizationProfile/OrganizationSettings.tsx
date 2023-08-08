@@ -1,7 +1,15 @@
-import { BlockButton } from '../../common';
+import { AddBlockButton, BlockButton } from '../../common';
 import { useCoreOrganization } from '../../contexts';
-import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
-import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
+import { Badge, Box, Col, descriptors, Flex, Icon, localizationKeys, Spinner } from '../../customizables';
+import {
+  ArrowBlockButton,
+  Header,
+  IconButton,
+  NavbarMenuButtonRow,
+  OrganizationPreview,
+  ProfileSection,
+} from '../../elements';
+import { useInView } from '../../hooks';
 import { Times } from '../../icons';
 import { useRouter } from '../../router';
 
@@ -25,6 +33,7 @@ export const OrganizationSettings = () => {
           <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__settings')} />
         </Header.Root>
         <OrganizationProfileSection />
+        <OrganizationDomainsSection />
         <OrganizationDangerSection />
       </Col>
     </Col>
@@ -53,6 +62,105 @@ const OrganizationProfileSection = () => {
       id='organizationProfile'
     >
       {isAdmin ? <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton> : profile}
+    </ProfileSection>
+  );
+};
+
+const OrganizationDomainsSection = () => {
+  const { organization, membership, domains } = useCoreOrganization({
+    domains: {
+      infinite: true,
+    },
+  });
+
+  const { ref } = useInView({
+    threshold: 0,
+    onChange: inView => {
+      if (inView) {
+        void domains?.fetchNext?.();
+      }
+    },
+  });
+
+  const { navigate } = useRouter();
+  const isAdmin = membership?.role === 'admin';
+
+  if (!organization || !isAdmin) {
+    return null;
+  }
+
+  return (
+    <ProfileSection
+      title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
+      id='organizationDomains'
+    >
+      <Col>
+        {domains?.data?.map(d => (
+          <ArrowBlockButton
+            key={d.id}
+            elementDescriptor={descriptors.accordionTriggerButton}
+            variant='ghost'
+            colorScheme='neutral'
+            badge={
+              d.verification && d.verification.status === 'verified' ? (
+                <Badge textVariant={'extraSmallRegular'}>Verified</Badge>
+              ) : (
+                <Badge
+                  textVariant={'extraSmallRegular'}
+                  colorScheme={'warning'}
+                >
+                  Unverified
+                </Badge>
+              )
+            }
+            sx={t => ({
+              padding: `${t.space.$3} ${t.space.$4}`,
+              minHeight: t.sizes.$10,
+            })}
+            onClick={() => {
+              d.verification && d.verification.status === 'verified'
+                ? void navigate(`domain/${d.id}`)
+                : void navigate(`domain/${d.id}/verify`);
+            }}
+          >
+            {d.name}
+          </ArrowBlockButton>
+        ))}
+        {(domains?.hasNextPage || domains?.isFetching) && (
+          <Box
+            ref={domains?.isFetching ? undefined : ref}
+            sx={[
+              t => ({
+                width: '100%',
+                height: t.space.$10,
+                position: 'relative',
+              }),
+            ]}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                margin: 'auto',
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translateY(-50%) translateX(-50%)',
+              }}
+            >
+              <Spinner
+                size='md'
+                colorScheme='primary'
+              />
+            </Box>
+          </Box>
+        )}
+      </Col>
+
+      <AddBlockButton
+        textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
+        id='addOrganizationDomain'
+        onClick={() => navigate('domain')}
+      />
     </ProfileSection>
   );
 };
