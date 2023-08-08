@@ -1,3 +1,4 @@
+import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { QuestionMark } from '../../../ui/icons';
@@ -27,6 +28,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const { setActive, closeCreateOrganization } = useCoreClerk();
   const { mode, navigateAfterCreateOrganization, skipInvitationScreen } = useCreateOrganizationContext();
   const { organization } = useCoreOrganization();
+  const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
@@ -61,6 +63,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
         await organization.setLogo({ file });
       }
 
+      lastCreatedOrganizationRef.current = organization;
       await setActive({ organization });
 
       if (skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
@@ -74,7 +77,9 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   };
 
   const completeFlow = () => {
-    void navigateAfterCreateOrganization();
+    // We are confident that lastCreatedOrganizationRef.current will never be null
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    void navigateAfterCreateOrganization(lastCreatedOrganizationRef.current!);
     if (mode === 'modal') {
       closeCreateOrganization();
     }

@@ -1,6 +1,7 @@
+import type { OrganizationResource, UserResource } from '@clerk/types';
 import React from 'react';
 
-import { buildAuthQueryString, buildURL, pickRedirectionProp } from '../../utils';
+import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
@@ -14,6 +15,8 @@ import type {
   UserButtonCtx,
   UserProfileCtx,
 } from '../types';
+
+const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 
 export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
@@ -230,8 +233,50 @@ export const useOrganizationSwitcherContext = () => {
   const navigateCreateOrganization = () => navigate(ctx.createOrganizationUrl || displayConfig.createOrganizationUrl);
   const navigateOrganizationProfile = () =>
     navigate(ctx.organizationProfileUrl || displayConfig.organizationProfileUrl);
-  const navigateAfterSwitchOrganization = () =>
-    ctx.afterSwitchOrganizationUrl ? navigate(ctx.afterSwitchOrganizationUrl) : Promise.resolve();
+
+  const navigateAfterSelectOrganizationOrPersonal = ({
+    organization,
+    user,
+  }: {
+    organization?: OrganizationResource;
+    user?: UserResource;
+  }) => {
+    if (typeof ctx.afterSelectPersonalUrl === 'function' && user) {
+      return navigate(ctx.afterSelectPersonalUrl(user));
+    }
+
+    if (typeof ctx.afterSelectOrganizationUrl === 'function' && organization) {
+      return navigate(ctx.afterSelectOrganizationUrl(organization));
+    }
+
+    if (ctx.afterSelectPersonalUrl && user) {
+      const parsedUrl = populateParamFromObject({
+        urlWithParam: ctx.afterSelectPersonalUrl as string,
+        entity: user,
+      });
+      return navigate(parsedUrl);
+    }
+
+    if (ctx.afterSelectOrganizationUrl && organization) {
+      const parsedUrl = populateParamFromObject({
+        urlWithParam: ctx.afterSelectOrganizationUrl as string,
+        entity: organization,
+      });
+      return navigate(parsedUrl);
+    }
+
+    // Continue to support afterSwitchOrganizationUrl
+    if (ctx.afterSwitchOrganizationUrl) {
+      return navigate(ctx.afterSwitchOrganizationUrl);
+    }
+
+    return Promise.resolve();
+  };
+
+  const navigateAfterSelectOrganization = (organization: OrganizationResource) =>
+    navigateAfterSelectOrganizationOrPersonal({ organization });
+
+  const navigateAfterSelectPersonal = (user: UserResource) => navigateAfterSelectOrganizationOrPersonal({ user });
 
   return {
     ...ctx,
@@ -242,7 +287,8 @@ export const useOrganizationSwitcherContext = () => {
     afterLeaveOrganizationUrl,
     navigateOrganizationProfile,
     navigateCreateOrganization,
-    navigateAfterSwitchOrganization,
+    navigateAfterSelectOrganization,
+    navigateAfterSelectPersonal,
     componentName,
   };
 };
@@ -275,8 +321,21 @@ export const useCreateOrganizationContext = () => {
     throw new Error('Clerk: useCreateOrganizationContext called outside CreateOrganization.');
   }
 
-  const navigateAfterCreateOrganization = () =>
-    navigate(ctx.afterCreateOrganizationUrl || displayConfig.afterCreateOrganizationUrl);
+  const navigateAfterCreateOrganization = (organization: OrganizationResource) => {
+    if (typeof ctx.afterCreateOrganizationUrl === 'function') {
+      return navigate(ctx.afterCreateOrganizationUrl(organization));
+    }
+
+    if (ctx.afterCreateOrganizationUrl) {
+      const parsedUrl = populateParamFromObject({
+        urlWithParam: ctx.afterCreateOrganizationUrl,
+        entity: organization,
+      });
+      return navigate(parsedUrl);
+    }
+
+    return navigate(displayConfig.afterCreateOrganizationUrl);
+  };
 
   return {
     ...ctx,

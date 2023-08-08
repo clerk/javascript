@@ -158,4 +158,54 @@ describe('CreateOrganization', () => {
       expect(queryByText(/Invite members/i)).not.toBeInTheDocument();
     });
   });
+
+  describe('navigation', () => {
+    it('constructs afterCreateOrganizationUrl from function', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+        });
+      });
+
+      const createdOrg = getCreatedOrg({
+        maxAllowedMemberships: 1,
+      });
+
+      fixtures.clerk.createOrganization.mockReturnValue(Promise.resolve(createdOrg));
+
+      props.setProps({ afterCreateOrganizationUrl: org => `/org/${org.id}` });
+      const { getByRole, userEvent, getByLabelText } = render(<CreateOrganization />, {
+        wrapper,
+      });
+      await userEvent.type(getByLabelText(/Organization name/i), 'new org');
+      await userEvent.click(getByRole('button', { name: /create organization/i }));
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/${createdOrg.id}`);
+    });
+
+    it('constructs afterCreateOrganizationUrl from `:slug` ', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+        });
+      });
+
+      const createdOrg = getCreatedOrg({
+        maxAllowedMemberships: 1,
+      });
+
+      fixtures.clerk.createOrganization.mockReturnValue(Promise.resolve(createdOrg));
+
+      props.setProps({ afterCreateOrganizationUrl: '/org/:slug' });
+      const { getByRole, userEvent, getByLabelText } = render(<CreateOrganization />, {
+        wrapper,
+      });
+      await userEvent.type(getByLabelText(/Organization name/i), 'new org');
+      await userEvent.click(getByRole('button', { name: /create organization/i }));
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/${createdOrg.slug}`);
+    });
+  });
 });
