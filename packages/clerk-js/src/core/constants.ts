@@ -20,4 +20,6 @@ export const ERROR_CODES = {
   OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML: 'oauth_email_domain_reserved_by_saml',
   NOT_ALLOWED_ACCESS: 'not_allowed_access',
   SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
+  IDENTIFICATION_CLAIMED: 'identification_claimed',
+  EXTERNAL_ACCOUNT_UNVERIFIED_EMAIL_ADDRESS: 'external_account_unverified_email_address',
 };
