@@ -1,20 +1,21 @@
 import type {
   ClerkPaginationParams,
   GetDomainsParams,
+  GetMembershipRequestParams,
   GetMembershipsParams,
   GetPendingInvitationsParams,
   OrganizationDomainResource,
   OrganizationInvitationResource,
+  OrganizationMembershipRequestResource,
   OrganizationMembershipResource,
   OrganizationResource,
 } from '@clerk/types';
 import type { ClerkPaginatedResponse } from '@clerk/types';
-import { useRef } from 'react';
 import useSWR from 'swr';
 
 import { useClerkInstanceContext, useOrganizationContext, useSessionContext } from './contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
-import { usePagesOrInfinite } from './usePagesOrInfinite';
+import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationParams = {
   invitationList?: GetPendingInvitationsParams;
@@ -22,6 +23,12 @@ type UseOrganizationParams = {
   domains?:
     | true
     | (GetDomainsParams & {
+        infinite?: boolean;
+        keepPreviousData?: boolean;
+      });
+  membershipRequests?:
+    | true
+    | (GetMembershipRequestParams & {
         infinite?: boolean;
         keepPreviousData?: boolean;
       });
@@ -35,6 +42,7 @@ type UseOrganizationReturn =
       membershipList: undefined;
       membership: undefined;
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
+      membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
     }
   | {
       isLoaded: true;
@@ -43,6 +51,7 @@ type UseOrganizationReturn =
       membershipList: undefined;
       membership: undefined;
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
+      membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
     }
   | {
       isLoaded: boolean;
@@ -51,66 +60,102 @@ type UseOrganizationReturn =
       membershipList: OrganizationMembershipResource[] | null | undefined;
       membership: OrganizationMembershipResource | null | undefined;
       domains: PaginatedResources<OrganizationDomainResource> | null;
+      membershipRequests: PaginatedResources<OrganizationMembershipRequestResource> | null;
     };
 
 type UseOrganization = (params?: UseOrganizationParams) => UseOrganizationReturn;
+
+const undefinedPaginatedResource = {
+  data: undefined,
+  count: undefined,
+  isLoading: false,
+  isFetching: false,
+  isError: false,
+  page: undefined,
+  pageCount: undefined,
+  fetchPage: undefined,
+  fetchNext: undefined,
+  fetchPrevious: undefined,
+  hasNextPage: false,
+  hasPreviousPage: false,
+} as const;
 
 export const useOrganization: UseOrganization = params => {
   const {
     invitationList: invitationListParams,
     membershipList: membershipListParams,
     domains: domainListParams,
+    membershipRequests: membershipRequestsListParams,
   } = params || {};
   const { organization, lastOrganizationMember, lastOrganizationInvitation } = useOrganizationContext();
   const session = useSessionContext();
 
-  const shouldUseDefaults = typeof domainListParams === 'boolean' && domainListParams;
+  const domainSafeValues = useWithSafeValues(domainListParams, {
+    initialPage: 1,
+    pageSize: 10,
+    keepPreviousData: false,
+    infinite: false,
+  });
 
-  // Cache initialPage and initialPageSize until unmount
-  const initialPageRef = useRef(shouldUseDefaults ? 1 : domainListParams?.initialPage ?? 1);
-  const pageSizeRef = useRef(shouldUseDefaults ? 10 : domainListParams?.pageSize ?? 10);
-
-  const triggerInfinite = shouldUseDefaults ? false : !!domainListParams?.infinite;
-  const internalKeepPreviousData = shouldUseDefaults ? false : !!domainListParams?.keepPreviousData;
+  const membershipRequestSafeValues = useWithSafeValues(membershipRequestsListParams, {
+    initialPage: 1,
+    pageSize: 10,
+    status: 'pending',
+    keepPreviousData: false,
+    infinite: false,
+  });
 
   const clerk = useClerkInstanceContext();
 
   const shouldFetch = !!(clerk.loaded && session && organization);
 
-  const paginatedParams =
+  const domainParams =
     typeof domainListParams === 'undefined'
       ? undefined
       : {
-          initialPage: initialPageRef.current,
-          pageSize: pageSizeRef.current,
+          initialPage: domainSafeValues.initialPage,
+          pageSize: domainSafeValues.pageSize,
         };
 
-  const {
-    data: isomorphicData,
-    count: isomorphicCount,
-    isLoading: isomorphicIsLoading,
-    isFetching: isomorphicIsFetching,
-    isError: isomorphicIsError,
-    page: isomorphicPage,
-    pageCount,
-    fetchPage: isomorphicSetPage,
-    fetchNext,
-    fetchPrevious,
-    hasNextPage,
-    hasPreviousPage,
-    unstable__mutate,
-  } = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
+  const membershipRequestParams =
+    typeof membershipRequestsListParams === 'undefined'
+      ? undefined
+      : {
+          initialPage: membershipRequestSafeValues.initialPage,
+          pageSize: membershipRequestSafeValues.pageSize,
+        };
+
+  const domains = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
     {
-      ...paginatedParams,
+      ...domainParams,
     },
     organization?.getDomains,
     {
-      keepPreviousData: internalKeepPreviousData,
-      infinite: triggerInfinite,
-      enabled: !!paginatedParams,
+      keepPreviousData: domainSafeValues.keepPreviousData,
+      infinite: domainSafeValues.infinite,
+      enabled: !!domainParams,
     },
     {
       type: 'domains',
+      organizationId: organization?.id,
+    },
+  );
+
+  const membershipRequests = usePagesOrInfinite<
+    GetMembershipRequestParams,
+    ClerkPaginatedResponse<OrganizationMembershipRequestResource>
+  >(
+    {
+      ...membershipRequestParams,
+    },
+    organization?.getMembershipRequests,
+    {
+      keepPreviousData: membershipRequestSafeValues.keepPreviousData,
+      infinite: membershipRequestSafeValues.infinite,
+      enabled: !!membershipRequestParams,
+    },
+    {
+      type: 'membershipRequests',
       organizationId: organization?.id,
     },
   );
@@ -154,20 +199,8 @@ export const useOrganization: UseOrganization = params => {
       invitationList: undefined,
       membershipList: undefined,
       membership: undefined,
-      domains: {
-        data: undefined,
-        count: undefined,
-        isLoading: false,
-        isFetching: false,
-        isError: false,
-        page: undefined,
-        pageCount: undefined,
-        fetchPage: undefined,
-        fetchNext: undefined,
-        fetchPrevious: undefined,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
+      domains: undefinedPaginatedResource,
+      membershipRequests: undefinedPaginatedResource,
     };
   }
 
@@ -179,6 +212,7 @@ export const useOrganization: UseOrganization = params => {
       membershipList: null,
       membership: null,
       domains: null,
+      membershipRequests: null,
     };
   }
 
@@ -190,20 +224,8 @@ export const useOrganization: UseOrganization = params => {
       invitationList: undefined,
       membershipList: undefined,
       membership: undefined,
-      domains: {
-        data: undefined,
-        count: undefined,
-        isLoading: false,
-        isFetching: false,
-        isError: false,
-        page: undefined,
-        pageCount: undefined,
-        fetchPage: undefined,
-        fetchNext: undefined,
-        fetchPrevious: undefined,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
+      domains: undefinedPaginatedResource,
+      membershipRequests: undefinedPaginatedResource,
     };
   }
 
@@ -217,21 +239,8 @@ export const useOrganization: UseOrganization = params => {
       void mutateMembershipList();
       void mutateInvitationList();
     },
-    domains: {
-      data: isomorphicData,
-      count: isomorphicCount,
-      isLoading: isomorphicIsLoading,
-      isFetching: isomorphicIsFetching,
-      isError: isomorphicIsError,
-      page: isomorphicPage,
-      pageCount,
-      fetchPage: isomorphicSetPage,
-      fetchNext,
-      fetchPrevious,
-      hasNextPage,
-      hasPreviousPage,
-      unstable__mutate,
-    },
+    domains,
+    membershipRequests,
   };
 };
 
