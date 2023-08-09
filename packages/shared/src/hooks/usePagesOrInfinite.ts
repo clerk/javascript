@@ -29,6 +29,28 @@ type PagesOrInfiniteOptions = {
   pageSize?: number;
 };
 
+export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | true | undefined, defaultValues: T) => {
+  const shouldUseDefaults = typeof params === 'boolean' && params;
+
+  // Cache initialPage and initialPageSize until unmount
+  const initialPageRef = useRef(
+    shouldUseDefaults ? defaultValues.initialPage : params?.initialPage ?? defaultValues.initialPage,
+  );
+  const pageSizeRef = useRef(shouldUseDefaults ? defaultValues.pageSize : params?.pageSize ?? defaultValues.pageSize);
+
+  const newObj: Record<string, unknown> = {};
+  for (const key of Object.keys(defaultValues)) {
+    // @ts-ignore
+    newObj[key] = shouldUseDefaults ? defaultValues[key] : params?.[key] ?? defaultValues[key];
+  }
+
+  return {
+    ...newObj,
+    initialPage: initialPageRef.current,
+    pageSize: pageSizeRef.current,
+  } as T;
+};
+
 type ArrayType<DataArray> = DataArray extends Array<infer ElementType> ? ElementType : never;
 type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Data> : Type;
 
