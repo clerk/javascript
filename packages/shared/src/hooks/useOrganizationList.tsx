@@ -7,11 +7,10 @@ import type {
   SetActive,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
-import { useRef } from 'react';
 
 import { useClerkInstanceContext, useUserContext } from './contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
-import { usePagesOrInfinite } from './usePagesOrInfinite';
+import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationListParams = {
   userInvitations?:
@@ -45,26 +44,24 @@ type UseOrganizationList = (params?: UseOrganizationListParams) => UseOrganizati
 export const useOrganizationList: UseOrganizationList = params => {
   const { userInvitations } = params || {};
 
-  const shouldUseDefaultOptions = userInvitations === true;
-
-  // Cache initialPage and initialPageSize until unmount
-  const initialPageRef = useRef(shouldUseDefaultOptions ? 1 : userInvitations?.initialPage ?? 1);
-  const pageSizeRef = useRef(shouldUseDefaultOptions ? 10 : userInvitations?.pageSize ?? 10);
-
-  const triggerInfinite = shouldUseDefaultOptions ? false : !!userInvitations?.infinite;
-  const internalKeepPreviousData = shouldUseDefaultOptions ? false : !!userInvitations?.keepPreviousData;
-  const internalStatus = shouldUseDefaultOptions ? 'pending' : userInvitations?.status ?? 'pending';
+  const userInvitationsSafeValues = useWithSafeValues(userInvitations, {
+    initialPage: 1,
+    pageSize: 10,
+    status: 'pending',
+    keepPreviousData: false,
+    infinite: false,
+  });
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
 
-  const paginatedParams =
+  const userInvitationsParams =
     typeof userInvitations === 'undefined'
       ? undefined
       : {
-          initialPage: initialPageRef.current,
-          pageSize: pageSizeRef.current,
-          status: internalStatus,
+          initialPage: userInvitationsSafeValues.initialPage,
+          pageSize: userInvitationsSafeValues.pageSize,
+          status: userInvitationsSafeValues.status,
         };
 
   const isClerkLoaded = !!(clerk.loaded && user);
@@ -88,13 +85,13 @@ export const useOrganizationList: UseOrganizationList = params => {
     ClerkPaginatedResponse<UserOrganizationInvitationResource>
   >(
     {
-      ...paginatedParams,
+      ...userInvitationsParams,
     },
     user?.getOrganizationInvitations,
     {
-      keepPreviousData: internalKeepPreviousData,
-      infinite: triggerInfinite,
-      enabled: !!paginatedParams,
+      keepPreviousData: userInvitationsSafeValues.keepPreviousData,
+      infinite: userInvitationsSafeValues.infinite,
+      enabled: !!userInvitationsParams,
     },
     {
       type: 'userInvitations',
