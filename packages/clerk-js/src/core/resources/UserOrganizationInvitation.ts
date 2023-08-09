@@ -1,6 +1,5 @@
 import type {
   ClerkPaginatedResponse,
-  ClerkPaginationParams,
   GetUserOrganizationInvitationsParams,
   MembershipRole,
   OrganizationInvitationStatus,
@@ -9,6 +8,7 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource } from './internal';
 
 export class UserOrganizationInvitation extends BaseResource implements UserOrganizationInvitationResource {
@@ -30,18 +30,6 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
   static async retrieve(
     params?: GetUserOrganizationInvitationsParams,
   ): Promise<ClerkPaginatedResponse<UserOrganizationInvitation>> {
-    function convertPageToOffset(pageParams: GetUserOrganizationInvitationsParams | undefined): ClerkPaginationParams {
-      const { pageSize, initialPage, ...restParams } = pageParams || {};
-      const _pageSize = pageSize ?? 10;
-      const _initialPage = initialPage ?? 1;
-
-      return {
-        ...restParams,
-        limit: _pageSize,
-        offset: (_initialPage - 1) * _pageSize,
-      };
-    }
-
     return await BaseResource._fetch({
       path: '/me/organization_invitations',
       method: 'GET',
