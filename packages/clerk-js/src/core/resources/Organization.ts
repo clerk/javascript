@@ -85,14 +85,14 @@ export class Organization extends BaseResource implements OrganizationResource {
     getDomainParams?: GetDomainsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationDomainResource>> => {
     function convertPageToOffset(pageParams: GetUserOrganizationInvitationsParams | undefined): ClerkPaginationParams {
-      const { initialPageSize, initialPage, ...restParams } = pageParams || {};
-      const _initialPageSize = initialPageSize ?? 10;
+      const { pageSize, initialPage, ...restParams } = pageParams || {};
+      const _pageSize = pageSize ?? 10;
       const _initialPage = initialPage ?? 1;
 
       return {
         ...restParams,
-        limit: initialPageSize,
-        offset: (_initialPage - 1) * _initialPageSize,
+        limit: _pageSize,
+        offset: (_initialPage - 1) * _pageSize,
       };
     }
 

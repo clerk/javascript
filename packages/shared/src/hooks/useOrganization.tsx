@@ -1,5 +1,4 @@
 import type {
-  ClerkPaginatedResponse,
   ClerkPaginationParams,
   GetDomainsParams,
   GetMembershipsParams,
@@ -9,12 +8,13 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
 } from '@clerk/types';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import type { ClerkPaginatedResponse } from '@clerk/types';
+import { useRef } from 'react';
 import useSWR from 'swr';
-import useSWRInfinite from 'swr/infinite';
 
 import { useClerkInstanceContext, useOrganizationContext, useSessionContext } from './contexts';
-import type { PaginatedDataAPI, PaginatedDataAPIWithDefaults } from './useOrganizationList';
+import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
+import { usePagesOrInfinite } from './usePagesOrInfinite';
 
 type UseOrganizationParams = {
   invitationList?: GetPendingInvitationsParams;
@@ -34,7 +34,7 @@ type UseOrganizationReturn =
       invitationList: undefined;
       membershipList: undefined;
       membership: undefined;
-      domains: PaginatedDataAPIWithDefaults<OrganizationDomainResource>;
+      domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
     }
   | {
       isLoaded: true;
@@ -42,7 +42,7 @@ type UseOrganizationReturn =
       invitationList: undefined;
       membershipList: undefined;
       membership: undefined;
-      domains: PaginatedDataAPIWithDefaults<OrganizationDomainResource>;
+      domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
     }
   | {
       isLoaded: boolean;
@@ -50,9 +50,8 @@ type UseOrganizationReturn =
       invitationList: OrganizationInvitationResource[] | null | undefined;
       membershipList: OrganizationMembershipResource[] | null | undefined;
       membership: OrganizationMembershipResource | null | undefined;
-      domains: PaginatedDataAPI<OrganizationDomainResource> | null;
+      domains: PaginatedResources<OrganizationDomainResource> | null;
     };
-type CustomSetAction<T = unknown> = (size: T | ((_size: T) => T)) => void;
 
 type UseOrganization = (params?: UseOrganizationParams) => UseOrganizationReturn;
 
@@ -66,11 +65,10 @@ export const useOrganization: UseOrganization = params => {
   const session = useSessionContext();
 
   const shouldUseDefaults = typeof domainListParams === 'boolean' && domainListParams;
-  const [paginatedPage, setPaginatedPage] = useState(shouldUseDefaults ? 1 : domainListParams?.initialPage ?? 1);
 
   // Cache initialPage and initialPageSize until unmount
   const initialPageRef = useRef(shouldUseDefaults ? 1 : domainListParams?.initialPage ?? 1);
-  const initialPageSizeRef = useRef(shouldUseDefaults ? 10 : domainListParams?.initialPageSize ?? 10);
+  const pageSizeRef = useRef(shouldUseDefaults ? 10 : domainListParams?.pageSize ?? 10);
 
   const triggerInfinite = shouldUseDefaults ? false : !!domainListParams?.infinite;
   const internalKeepPreviousData = shouldUseDefaults ? false : !!domainListParams?.keepPreviousData;
@@ -83,115 +81,39 @@ export const useOrganization: UseOrganization = params => {
     typeof domainListParams === 'undefined'
       ? undefined
       : {
-          initialPage: paginatedPage,
-          initialPageSize: initialPageSizeRef.current,
+          initialPage: initialPageRef.current,
+          pageSize: pageSizeRef.current,
         };
 
-  // Some gymnastics to adhere to the rules of hooks
-  // We need to make sure useSWR is called on every render
-  const fetchInvitations = !clerk.loaded
-    ? () => ({ data: [], total_count: 0 } as ClerkPaginatedResponse<OrganizationDomainResource>)
-    : () => organization?.getDomains(paginatedParams);
-
   const {
-    data: userInvitationsData,
-    isValidating: userInvitationsValidating,
-    isLoading: userInvitationsLoading,
-    error: userInvitationsError,
-    mutate: userInvitationsMutate,
-  } = useSWR(
-    !triggerInfinite && shouldFetch && paginatedParams
-      ? cacheKeyDomains('domains', organization, paginatedParams)
-      : null,
-    fetchInvitations,
-    { keepPreviousData: internalKeepPreviousData },
-  );
-
-  const getInfiniteKey = (
-    pageIndex: number,
-    previousPageData: ClerkPaginatedResponse<OrganizationDomainResource> | null,
-  ) => {
-    if (!shouldFetch || !paginatedParams || !triggerInfinite) {
-      return null;
-    }
-
-    return cacheKeyDomains('domains', organization, {
-      initialPage: initialPageRef.current + pageIndex,
-      initialPageSize: initialPageSizeRef.current,
-    });
-  };
-
-  const {
-    data: userInvitationsDataInfinite,
-    isLoading: userInvitationsLoadingInfinite,
-    isValidating: userInvitationsInfiniteValidating,
-    error: userInvitationsInfiniteError,
-    size,
-    setSize,
-    mutate: userInvitationsInfiniteMutate,
-  } = useSWRInfinite(getInfiniteKey, ({ initialPage, initialPageSize }) => {
-    return !clerk.loaded || !organization
-      ? ({ data: [], total_count: 0 } as ClerkPaginatedResponse<OrganizationDomainResource>)
-      : organization.getDomains({
-          initialPage,
-          initialPageSize,
-        });
-  });
-
-  const isomorphicPage = useMemo(() => {
-    if (triggerInfinite) {
-      return size;
-    }
-    return paginatedPage;
-  }, [triggerInfinite, size, paginatedPage]);
-
-  const isomorphicSetPage: CustomSetAction<number> = useCallback(
-    numberOrgFn => {
-      if (triggerInfinite) {
-        void setSize(numberOrgFn);
-        return;
-      }
-      return setPaginatedPage(numberOrgFn);
+    data: isomorphicData,
+    count: isomorphicCount,
+    isLoading: isomorphicIsLoading,
+    isFetching: isomorphicIsFetching,
+    isError: isomorphicIsError,
+    page: isomorphicPage,
+    pageCount,
+    fetchPage: isomorphicSetPage,
+    fetchNext,
+    fetchPrevious,
+    hasNextPage,
+    hasPreviousPage,
+    unstable__mutate,
+  } = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
+    {
+      ...paginatedParams,
     },
-    [setSize],
+    organization?.getDomains,
+    {
+      keepPreviousData: internalKeepPreviousData,
+      infinite: triggerInfinite,
+      enabled: !!paginatedParams,
+    },
+    {
+      type: 'domains',
+      organizationId: organization?.id,
+    },
   );
-
-  const isomorphicData = useMemo(() => {
-    if (triggerInfinite) {
-      return userInvitationsDataInfinite?.map(a => a?.data).flat() ?? [];
-    }
-    return userInvitationsData?.data ?? [];
-  }, [triggerInfinite, userInvitationsDataInfinite, userInvitationsData]);
-
-  const isomorphicCount = useMemo(() => {
-    if (triggerInfinite) {
-      return userInvitationsDataInfinite?.[userInvitationsDataInfinite?.length - 1]?.total_count || 0;
-    }
-    return userInvitationsData?.total_count ?? 0;
-  }, [triggerInfinite, userInvitationsDataInfinite, userInvitationsData]);
-
-  const isomorphicIsLoading = triggerInfinite ? userInvitationsLoadingInfinite : userInvitationsLoading;
-  const isomorphicIsFetching = triggerInfinite ? userInvitationsInfiniteValidating : userInvitationsValidating;
-  const isomorphicIsError = !!(triggerInfinite ? userInvitationsInfiniteError : userInvitationsError);
-  /**
-   * Helpers
-   */
-  const fetchNext = useCallback(() => {
-    isomorphicSetPage(n => n + 1);
-  }, [isomorphicSetPage]);
-
-  const fetchPrevious = useCallback(() => {
-    isomorphicSetPage(n => n - 1);
-  }, [isomorphicSetPage]);
-
-  const offsetCount = (initialPageRef.current - 1) * initialPageSizeRef.current;
-
-  const pageCount = Math.ceil((isomorphicCount - offsetCount) / initialPageSizeRef.current);
-  const hasNextPage =
-    isomorphicCount - offsetCount * initialPageSizeRef.current > isomorphicPage * initialPageSizeRef.current;
-  const hasPreviousPage = (isomorphicPage - 1) * initialPageSizeRef.current > offsetCount * initialPageSizeRef.current;
-
-  const unstable__mutate = triggerInfinite ? userInvitationsInfiniteMutate : userInvitationsMutate;
 
   // Some gymnastics to adhere to the rules of hooks
   // We need to make sure useSWR is called on every render
@@ -331,13 +253,4 @@ function cacheKey(
   return [type, organization.id, resource?.id, resource?.updatedAt, pagination.offset, pagination.limit]
     .filter(Boolean)
     .join('-');
-}
-
-function cacheKeyDomains(type: 'domains', organization: OrganizationResource, pagination: GetDomainsParams) {
-  return {
-    type,
-    organizationId: organization.id,
-    initialPage: pagination.initialPage,
-    initialPageSize: pagination.initialPageSize,
-  };
 }

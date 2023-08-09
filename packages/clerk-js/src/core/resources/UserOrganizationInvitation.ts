@@ -14,13 +14,7 @@ import { BaseResource } from './internal';
 export class UserOrganizationInvitation extends BaseResource implements UserOrganizationInvitationResource {
   id!: string;
   emailAddress!: string;
-  publicOrganizationData!: {
-    hasImage: boolean;
-    imageUrl: string;
-    name: string;
-    id: string;
-    slug: string;
-  };
+  publicOrganizationData!: UserOrganizationInvitationResource['publicOrganizationData'];
   publicMetadata: OrganizationInvitationPublicMetadata = {};
   status!: OrganizationInvitationStatus;
   role!: MembershipRole;
