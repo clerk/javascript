@@ -2,8 +2,16 @@ import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '@cl
 import React, { useEffect } from 'react';
 
 import { useCoreOrganization } from '../../contexts';
-import { Badge, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { BlockWithAction, ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
+import { Badge, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
+import {
+  BlockWithAction,
+  ContentPage,
+  Form,
+  FormButtons,
+  Header,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
@@ -23,8 +31,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
 
   const enrollmentMode = useFormControl('enrollmentMode', '', {
     type: 'radio',
-    label: localizationKeys('formFieldLabel__automaticInvitations'),
-    radios: [
+    radioOptions: [
       {
         value: 'automatic_invitation',
         label: 'Automatic invitation',
@@ -111,13 +118,26 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         {domain.name}
       </BlockWithAction>
 
-      <Form.Root onSubmit={updateEnrollmentMode}>
-        <Form.ControlRow elementId={enrollmentMode.id}>
-          <Form.Control {...enrollmentMode.props} />
-        </Form.ControlRow>
+      <Col gap={2}>
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.formTitle')}
+            textVariant='largeMedium'
+          />
+          <Header.Subtitle
+            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.formSubtitle')}
+            variant='regularRegular'
+          />
+        </Header.Root>
 
-        <FormButtons isDisabled={domainStatus.isLoading || !domain} />
-      </Form.Root>
+        <Form.Root onSubmit={updateEnrollmentMode}>
+          <Form.ControlRow elementId={enrollmentMode.id}>
+            <Form.Control {...enrollmentMode.props} />
+          </Form.ControlRow>
+
+          <FormButtons isDisabled={domainStatus.isLoading || !domain} />
+        </Form.Root>
+      </Col>
     </ContentPage>
   );
 });

@@ -571,7 +571,6 @@ export const enUS: LocalizationResource = {
         primaryButton: 'Add verified domain',
       },
     },
-
     createDomainPage: {
       title: 'Add verified domain',
       subtitle:
@@ -588,8 +587,9 @@ export const enUS: LocalizationResource = {
     verifiedDomainPage: {
       title: 'Verified domain',
       actionLabel__remove: 'Remove verified domain',
-      formTitle: 'Automatic invitations',
-      formSubtitle: 'Users matching this domain are invited to join automatically.',
+      formTitle: 'Enrollment method',
+      formSubtitle:
+        'Define the method for automatically adding new and existing users who are associated with this domain to the organization.',
     },
     invitePage: {
       title: 'Invite members',
