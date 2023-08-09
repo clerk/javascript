@@ -131,14 +131,14 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     },
   );
 
-  const isomorphicPage = useMemo(() => {
+  const page = useMemo(() => {
     if (triggerInfinite) {
       return size;
     }
     return paginatedPage;
   }, [triggerInfinite, size, paginatedPage]);
 
-  const isomorphicSetPage: ValueOrSetter<number> = useCallback(
+  const fetchPage: ValueOrSetter<number> = useCallback(
     numberOrgFn => {
       if (triggerInfinite) {
         void setSize(numberOrgFn);
@@ -149,51 +149,51 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     [setSize],
   );
 
-  const isomorphicData = useMemo(() => {
+  const data = useMemo(() => {
     if (triggerInfinite) {
       return swrInfiniteData?.map(a => a?.data).flat() ?? [];
     }
     return swrData?.data ?? [];
   }, [triggerInfinite, swrData, swrInfiniteData]);
 
-  const isomorphicCount = useMemo(() => {
+  const count = useMemo(() => {
     if (triggerInfinite) {
       return swrInfiniteData?.[swrInfiniteData?.length - 1]?.total_count || 0;
     }
     return swrData?.total_count ?? 0;
   }, [triggerInfinite, swrData, swrInfiniteData]);
 
-  const isomorphicIsLoading = triggerInfinite ? swrInfiniteIsLoading : swrIsLoading;
-  const isomorphicIsFetching = triggerInfinite ? swrInfiniteIsValidating : swrIsValidating;
-  const isomorphicIsError = !!(triggerInfinite ? swrInfiniteError : swrError);
+  const isLoading = triggerInfinite ? swrInfiniteIsLoading : swrIsLoading;
+  const isFetching = triggerInfinite ? swrInfiniteIsValidating : swrIsValidating;
+  const isError = !!(triggerInfinite ? swrInfiniteError : swrError);
   /**
    * Helpers
    */
   const fetchNext = useCallback(() => {
-    isomorphicSetPage(n => Math.max(0, n + 1));
-  }, [isomorphicSetPage]);
+    fetchPage(n => Math.max(0, n + 1));
+  }, [fetchPage]);
 
   const fetchPrevious = useCallback(() => {
-    isomorphicSetPage(n => Math.max(0, n - 1));
-  }, [isomorphicSetPage]);
+    fetchPage(n => Math.max(0, n - 1));
+  }, [fetchPage]);
 
   const offsetCount = (initialPageRef.current - 1) * pageSizeRef.current;
 
-  const pageCount = Math.ceil((isomorphicCount - offsetCount) / pageSizeRef.current);
-  const hasNextPage = isomorphicCount - offsetCount * pageSizeRef.current > isomorphicPage * pageSizeRef.current;
-  const hasPreviousPage = (isomorphicPage - 1) * pageSizeRef.current > offsetCount * pageSizeRef.current;
+  const pageCount = Math.ceil((count - offsetCount) / pageSizeRef.current);
+  const hasNextPage = count - offsetCount * pageSizeRef.current > page * pageSizeRef.current;
+  const hasPreviousPage = (page - 1) * pageSizeRef.current > offsetCount * pageSizeRef.current;
 
   const unstable__mutate = triggerInfinite ? swrInfiniteMutate : swrMutate;
 
   return {
-    data: isomorphicData,
-    count: isomorphicCount,
-    isLoading: isomorphicIsLoading,
-    isFetching: isomorphicIsFetching,
-    isError: isomorphicIsError,
-    page: isomorphicPage,
+    data,
+    count,
+    isLoading,
+    isFetching,
+    isError,
+    page,
     pageCount,
-    fetchPage: isomorphicSetPage,
+    fetchPage,
     fetchNext,
     fetchPrevious,
     hasNextPage,
