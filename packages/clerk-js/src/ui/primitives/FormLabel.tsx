@@ -20,11 +20,11 @@ type FormLabelProps = PrimitiveProps<'label'> & StyleVariants<typeof applyVarian
 
 export const FormLabel = (props: FormLabelProps) => {
   const { id } = useFormControl();
-  const { isRequired, ...rest } = props;
+  const { isRequired, htmlFor: htmlForProp, ...rest } = props;
   return (
     <label
       {...applyDataStateProps(rest)}
-      htmlFor={id}
+      htmlFor={htmlForProp ?? id}
       css={applyVariants(props)}
     >
       {props.children}

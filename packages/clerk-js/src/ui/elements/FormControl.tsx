@@ -1,7 +1,7 @@
 import type { FieldId } from '@clerk/types';
 import type { ClerkAPIError } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { forwardRef, useCallback, useState } from 'react';
+import React, { forwardRef, useCallback, useId, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -38,7 +38,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   errorText?: string;
   onActionClicked?: React.MouseEventHandler;
   isDisabled?: boolean;
-  label: string | LocalizationKey;
+  label?: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
   actionLabel?: string | LocalizationKey;
   icon?: React.ComponentType;
@@ -53,7 +53,69 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   hasPassedComplexity: boolean;
   enableErrorAfterBlur?: boolean;
   informationText?: string;
+  radioOptions?: {
+    value: string;
+    label: string | LocalizationKey;
+  }[];
   isFocused: boolean;
+};
+
+const RadioGroupItem = (props: {
+  inputProps: PropsOfComponent<typeof Input>;
+  value: string;
+  label: string | LocalizationKey;
+}) => {
+  const id = useId();
+  return (
+    <Flex
+      align='center'
+      sx={t => ({
+        height: t.sizes.$6,
+      })}
+    >
+      <Input
+        {...props.inputProps}
+        focusRing={false}
+        id={id}
+        sx={{
+          width: 'fit-content',
+        }}
+        type='radio'
+        value={props.value}
+        checked={props.value === props.inputProps.value}
+      />
+      <FormLabel
+        htmlFor={id}
+        localizationKey={props.label}
+        sx={t => ({
+          padding: `${t.space.$1} ${t.space.$2}`,
+          fontWeight: t.fontWeights.$normal,
+          lineHeight: t.lineHeights.$none,
+        })}
+      />
+    </Flex>
+  );
+};
+
+export const RadioButtons = (
+  props: PropsOfComponent<typeof Input> & {
+    radioOptions?: {
+      value: string;
+      label: string | LocalizationKey;
+    }[];
+  },
+) => {
+  return (
+    <>
+      {props.radioOptions?.map(r => (
+        <RadioGroupItem
+          key={r.value}
+          {...r}
+          inputProps={props}
+        />
+      ))}
+    </>
+  );
 };
 
 // TODO: Convert this into a Component?
@@ -61,6 +123,7 @@ const getInputElementForType = (type: FormControlProps['type']) => {
   const CustomInputs = {
     password: PasswordInput,
     tel: PhoneInput,
+    radio: RadioButtons,
   };
   if (!type) {
     return Input;
@@ -242,8 +305,10 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     setWarning,
     setHasPassedComplexity,
     hasPassedComplexity,
+    radioOptions,
     ...restInputProps
   } = props;
+
   const isDisabled = props.isDisabled || card.isLoading;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -332,6 +397,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
 
   const Input = (
     <InputElement
+      radioOptions={radioOptions}
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(id)}
       hasError={!!errorMessage}

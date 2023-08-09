@@ -10,7 +10,6 @@ type SelectOption = { value: string; label?: string };
 
 type Options = {
   isRequired?: boolean;
-  label: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
   options?: SelectOption[];
   defaultChecked?: boolean;
@@ -18,14 +17,28 @@ type Options = {
   informationText?: string;
 } & (
   | {
+      label: string | LocalizationKey;
       validatePassword?: never;
       buildErrorMessage?: never;
-      type?: Exclude<HTMLInputTypeAttribute, 'password'>;
+      type?: Exclude<HTMLInputTypeAttribute, 'password' | 'radio'>;
+      radioOptions?: never;
     }
   | {
+      label: string | LocalizationKey;
       type: Extract<HTMLInputTypeAttribute, 'password'>;
       validatePassword: boolean;
       buildErrorMessage?: (err: ClerkAPIError[]) => ClerkAPIError | string | undefined;
+      radioOptions?: never;
+    }
+  | {
+      validatePassword?: never;
+      buildErrorMessage?: never;
+      type: Extract<HTMLInputTypeAttribute, 'radio'>;
+      label?: string | LocalizationKey;
+      radioOptions: {
+        value: string;
+        label: string | LocalizationKey;
+      }[];
     }
 );
 
