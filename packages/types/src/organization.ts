@@ -1,7 +1,8 @@
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
 import type { OrganizationDomainResource } from './organizationDomain';
-import type { OrganizationInvitationResource } from './organizationInvitation';
+import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
+import type { OrganizationMembershipRequestResource } from './organizationMembershipRequest';
 import type { ClerkResource } from './resource';
 
 declare global {
@@ -45,6 +46,9 @@ export interface OrganizationResource extends ClerkResource {
   getMemberships: (params?: GetMembershipsParams) => Promise<OrganizationMembershipResource[]>;
   getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
+  getMembershipRequests: (
+    params?: GetMembershipRequestParams,
+  ) => Promise<ClerkPaginatedResponse<OrganizationMembershipRequestResource>>;
   addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   inviteMembers: (params: InviteMembersParams) => Promise<OrganizationInvitationResource[]>;
@@ -70,6 +74,19 @@ export type GetDomainsParams = {
    * Maximum number of items returned per request. The initial value persists between re-renders
    */
   pageSize?: number;
+};
+
+export type GetMembershipRequestParams = {
+  /**
+   * This the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+
+  status?: OrganizationInvitationStatus;
 };
 
 export interface AddMemberParams {

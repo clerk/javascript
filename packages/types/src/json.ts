@@ -363,6 +363,16 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+export interface OrganizationMembershipRequestJSON extends ClerkResourceJSON {
+  object: 'organization_membership_request';
+  id: string;
+  organization_id: string;
+  status: OrganizationInvitationStatus;
+  public_user_data: PublicUserDataJSON;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
   object: 'organization_invitation';
   id: string;
