@@ -1,5 +1,7 @@
 import { getDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '../devBrowser';
 
+const DUMMY_URL_BASE = 'http://clerk-dummy';
+
 describe('setDevBrowserJWTInURL(url, jwt)', () => {
   const testCases: Array<[string, string, boolean, string]> = [
     ['', 'deadbeef', false, '#__clerk_db_jwt[deadbeef]'],
@@ -15,8 +17,10 @@ describe('setDevBrowserJWTInURL(url, jwt)', () => {
 
   test.each(testCases)(
     'sets the dev browser JWT at the end of the provided url. Params: url=(%s), jwt=(%s), expected url=(%s)',
-    (hash, paramName, asQueryParam, expectedUrl) => {
-      expect(setDevBrowserJWTInURL(hash, paramName, asQueryParam)).toEqual(expectedUrl);
+    (input, paramName, asQueryParam, expected) => {
+      expect(setDevBrowserJWTInURL(new URL(input, DUMMY_URL_BASE), paramName, asQueryParam).href).toEqual(
+        new URL(expected, DUMMY_URL_BASE).href,
+      );
     },
   );
 });
@@ -42,7 +46,7 @@ describe('getDevBrowserJWTFromURL(url,)', () => {
   });
 
   it('does not replaceState if the url does not contain a dev browser JWT', () => {
-    expect(getDevBrowserJWTFromURL('/foo')).toEqual('');
+    expect(getDevBrowserJWTFromURL(new URL('/foo', DUMMY_URL_BASE))).toEqual('');
     expect(replaceStateMock).not.toHaveBeenCalled();
   });
 
@@ -56,12 +60,16 @@ describe('getDevBrowserJWTFromURL(url,)', () => {
     ['/foo?bar=42#qux__clerk_db_jwt[deadbeef]', 'deadbeef', '/foo?bar=42#qux'],
   ];
 
-  test.each(testCases)('returns the dev browser JWT from a url. Params: url=(%s), jwt=(%s)', (url, jwt, calledWith) => {
-    expect(getDevBrowserJWTFromURL(url)).toEqual(jwt);
-    if (calledWith === null) {
-      expect(replaceStateMock).not.toHaveBeenCalled();
-    } else {
-      expect(replaceStateMock).toHaveBeenCalledWith(null, '', calledWith);
-    }
-  });
+  test.each(testCases)(
+    'returns the dev browser JWT from a url. Params: url=(%s), jwt=(%s)',
+    (input, jwt, calledWith) => {
+      expect(getDevBrowserJWTFromURL(new URL(input, DUMMY_URL_BASE))).toEqual(jwt);
+
+      if (calledWith === null) {
+        expect(replaceStateMock).not.toHaveBeenCalled();
+      } else {
+        expect(replaceStateMock).toHaveBeenCalledWith(null, '', new URL(calledWith, DUMMY_URL_BASE).href);
+      }
+    },
+  );
 });

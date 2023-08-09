@@ -27,24 +27,50 @@ export const DEV_OR_STAGING_SUFFIXES = [
   'accounts.dev',
 ];
 
+export const LEGACY_DEV_SUFFIXES = ['.lcl.dev', '.lclstage.dev', '.lclclerk.com'];
+export const CURRENT_DEV_SUFFIXES = ['.accounts.dev', '.accountsstage.dev', '.accounts.lclclerk.com'];
+
 const BANNED_URI_PROTOCOLS = ['javascript:'] as const;
 
 const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 export { isDevOrStagingUrl };
-const accountsCache = new Map<string, boolean>();
+const accountPortalCache = new Map<string, boolean>();
 
-export function isAccountsHostedPages(url: string | URL = window.location.hostname): boolean {
-  if (!url) {
+export function isDevAccountPortalOrigin(hostname: string = window.location.hostname): boolean {
+  if (!hostname) {
     return false;
   }
 
-  const hostname = typeof url === 'string' ? url : url.hostname;
-  let res = accountsCache.get(hostname);
+  let res = accountPortalCache.get(hostname);
+
   if (res === undefined) {
-    res = DEV_OR_STAGING_SUFFIXES.some(s => /^(https?:\/\/)?accounts\./.test(hostname) && hostname.endsWith(s));
-    accountsCache.set(hostname, res);
+    res = isLegacyDevAccountPortalOrigin(hostname) || isCurrentDevAccountPortalOrigin(hostname);
+    accountPortalCache.set(hostname, res);
   }
+
   return res;
+}
+
+// Returns true for hosts such as:
+// * accounts.foo.bar-13.lcl.dev
+// * accounts.foo.bar-13.lclstage.dev
+// * accounts.foo.bar-13.dev.lclclerk.com
+function isLegacyDevAccountPortalOrigin(host: string): boolean {
+  return LEGACY_DEV_SUFFIXES.some(legacyDevSuffix => {
+    return host.startsWith('accounts.') && host.endsWith(legacyDevSuffix);
+  });
+}
+
+// Returns true for hosts such as:
+// * foo-bar-13.accounts.dev
+// * foo-bar-13.accountsstage.dev
+// * foo-bar-13.accounts.lclclerk.com
+// But false for:
+// * foo-bar-13.clerk.accounts.lclclerk.com
+function isCurrentDevAccountPortalOrigin(host: string): boolean {
+  return CURRENT_DEV_SUFFIXES.some(currentDevSuffix => {
+    return host.endsWith(currentDevSuffix) && !host.endsWith('.clerk' + currentDevSuffix);
+  });
 }
 
 export function getETLDPlusOneFromFrontendApi(frontendApi: string): string {
