@@ -25,6 +25,7 @@ export * from './organization';
 export * from './organizationInvitation';
 export * from './organizationMembership';
 export * from './organizationSettings';
+export * from './passwords';
 export * from './phoneNumber';
 export * from './redirects';
 export * from './resource';

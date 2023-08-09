@@ -1,87 +1,14 @@
 import { noop } from '@clerk/shared';
-import type { PasswordSettingsData } from '@clerk/types';
+import type { PasswordValidation } from '@clerk/types';
 import { useCallback, useMemo } from 'react';
 
+import type { UsePasswordCbs, UsePasswordConfig } from '../../utils/passwords/password';
+import { createValidatePassword } from '../../utils/passwords/password';
 import { localizationKeys, useLocalizations } from '../localization';
 import type { FormControlState } from '../utils';
-import { loadZxcvbn } from '../utils';
-import type { ComplexityErrors } from './usePasswordComplexity';
-import { createValidateComplexity, generateErrorTextUtil } from './usePasswordComplexity';
-import type { PasswordStrength } from './usePasswordStrength';
-import { createValidatePasswordStrength } from './usePasswordStrength';
-
-type UsePasswordConfig = PasswordSettingsData & {
-  validatePassword: boolean;
-};
-
-type PasswordValidation = {
-  complexity?: ComplexityErrors;
-  strength?: PasswordStrength;
-};
-
-type UsePasswordCbs = {
-  onValidationFailed?: (errorMessage: string | undefined) => void;
-  onValidationSuccess?: () => void;
-  onValidationWarning?: (warningMessage: string) => void;
-  onValidationComplexity?: (b: boolean) => void;
-};
-
-type ValidatePasswordCbs = {
-  onValidation?: (res: PasswordValidation) => void;
-  onValidationComplexity?: (b: boolean) => void;
-};
+import { generateErrorTextUtil } from './usePasswordComplexity';
 
 export const MIN_PASSWORD_LENGTH = 8;
-
-const createValidatePassword = (config: UsePasswordConfig, callbacks?: ValidatePasswordCbs) => {
-  const { onValidation = noop, onValidationComplexity = noop } = callbacks || {};
-  const { show_zxcvbn, validatePassword: validatePasswordProp } = config;
-  const getComplexity = createValidateComplexity(config);
-  const getScore = createValidatePasswordStrength(config);
-  let result = {} satisfies PasswordValidation;
-
-  return (password: string) => {
-    if (!validatePasswordProp) {
-      return;
-    }
-
-    /**
-     * Validate Complexity
-     */
-    const failedValidationsComplexity = getComplexity(password);
-    onValidationComplexity(Object.keys(failedValidationsComplexity).length === 0);
-    result = {
-      ...result,
-      complexity: failedValidationsComplexity,
-    };
-    /**
-     * Validate score
-     */
-    if (show_zxcvbn) {
-      /**
-       * Lazy load zxcvbn without preventing a complexityError to be thrown if it exists
-       */
-      void loadZxcvbn().then(zxcvbn => {
-        const setPasswordScore = getScore(zxcvbn);
-        const strength = setPasswordScore(password);
-
-        result = {
-          ...result,
-          strength,
-        };
-        onValidation({
-          ...result,
-          strength,
-        });
-      });
-    }
-
-    onValidation({
-      ...result,
-      complexity: failedValidationsComplexity,
-    });
-  };
-};
 
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {
   const { t, locale } = useLocalizations();

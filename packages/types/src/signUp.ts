@@ -13,6 +13,7 @@ import type {
   UsernameIdentifier,
   Web3WalletIdentifier,
 } from './identifiers';
+import type { ValidatePasswordCallbacks } from './passwords';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
@@ -81,6 +82,8 @@ export interface SignUpResource extends ClerkResource {
   attemptWeb3WalletVerification: (params: AttemptWeb3WalletVerificationParams) => Promise<SignUpResource>;
 
   createMagicLinkFlow: () => CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource>;
+
+  validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
 
   authenticateWithRedirect: (
     params: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata },
