@@ -1,8 +1,10 @@
 import type {
+  AttemptAffiliationVerificationParams,
   OrganizationDomainJSON,
   OrganizationDomainResource,
   OrganizationDomainVerification,
   OrganizationEnrollmentMode,
+  PrepareAffiliationVerificationParams,
   UpdateOrganizationDomainParams,
 } from '@clerk/types';
 
@@ -35,6 +37,26 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
     return new OrganizationDomain(json);
   }
 
+  prepareDomainAffiliationVerification = async (
+    params: PrepareAffiliationVerificationParams,
+  ): Promise<OrganizationDomainResource> => {
+    return this._basePost({
+      path: `/organizations/${this.organizationId}/domains/${this.id}/prepare_affiliation_verification`,
+      method: 'POST',
+      body: params as any,
+    });
+  };
+
+  attemptAffiliationVerification = async (
+    params: AttemptAffiliationVerificationParams,
+  ): Promise<OrganizationDomainResource> => {
+    return this._basePost({
+      path: `/organizations/${this.organizationId}/domains/${this.id}/attempt_affiliation_verification`,
+      method: 'POST',
+      body: params as any,
+    });
+  };
+
   update = (params: UpdateOrganizationDomainParams): Promise<OrganizationDomainResource> => {
     return this._basePatch({
       method: 'PATCH',
@@ -48,22 +70,6 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
       path: `/organizations/${this.organizationId}/domains/${this.id}`,
     });
   };
-
-  // static async get({
-  //   organizationId,
-  //   domainId,
-  // }: {
-  //   organizationId: string;
-  //   domainId: string;
-  // }): Promise<OrganizationDomainResource> {
-  //   const json = (
-  //     await BaseResource._fetch<OrganizationDomainJSON>({
-  //       path: `/organizations/${organizationId}/domains/${domainId}`,
-  //       method: 'GET',
-  //     })
-  //   )?.response as unknown as OrganizationDomainJSON;
-  //   return new OrganizationDomain(json);
-  // }
 
   protected fromJSON(data: OrganizationDomainJSON | null): this {
     if (data) {

@@ -126,40 +126,6 @@ export class Organization extends BaseResource implements OrganizationResource {
     return new OrganizationDomain(json);
   };
 
-  prepareDomainAffiliationVerification = async ({
-    domainId,
-    emailAddress,
-  }: {
-    domainId: string;
-    emailAddress: string;
-  }): Promise<OrganizationDomainResource> => {
-    const json = (
-      await BaseResource._fetch<OrganizationDomainJSON>({
-        path: `/organizations/${this.id}/domains/${domainId}/prepare_affiliation_verification`,
-        method: 'POST',
-        body: { affiliationEmailAddress: emailAddress } as any,
-      })
-    )?.response as unknown as OrganizationDomainJSON;
-    return new OrganizationDomain(json);
-  };
-
-  attemptDomainAffiliationVerification = async ({
-    domainId,
-    code,
-  }: {
-    domainId: string;
-    code: string;
-  }): Promise<OrganizationDomainResource> => {
-    const json = (
-      await BaseResource._fetch<OrganizationDomainJSON>({
-        path: `/organizations/${this.id}/domains/${domainId}/attempt_affiliation_verification`,
-        method: 'POST',
-        body: { code } as any,
-      })
-    )?.response as unknown as OrganizationDomainJSON;
-    return new OrganizationDomain(json);
-  };
-
   createDomain = async (name: string): Promise<OrganizationDomainResource> => {
     return OrganizationDomain.create(this.id, { name });
   };

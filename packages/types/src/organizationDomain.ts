@@ -20,8 +20,21 @@ export interface OrganizationDomainResource extends ClerkResource {
   createdAt: Date;
   updatedAt: Date;
   affiliationEmailAddress: string | null;
+  prepareDomainAffiliationVerification: (
+    params: PrepareAffiliationVerificationParams,
+  ) => Promise<OrganizationDomainResource>;
+
+  attemptAffiliationVerification: (params: AttemptAffiliationVerificationParams) => Promise<OrganizationDomainResource>;
   delete: () => Promise<void>;
   update: (params: UpdateOrganizationDomainParams) => Promise<OrganizationDomainResource>;
 }
+
+export type PrepareAffiliationVerificationParams = {
+  affiliationEmailAddress: string;
+};
+
+export type AttemptAffiliationVerificationParams = {
+  emailAddress: string;
+};
 
 export type UpdateOrganizationDomainParams = Partial<Pick<OrganizationDomainResource, 'enrollmentMode'>>;

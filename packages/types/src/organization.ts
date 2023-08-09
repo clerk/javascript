@@ -52,21 +52,6 @@ export interface OrganizationResource extends ClerkResource {
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
   createDomain: (domainName: string) => Promise<OrganizationDomainResource>;
   getDomain: ({ domainId }: { domainId: string }) => Promise<OrganizationDomainResource>;
-  prepareDomainAffiliationVerification: ({
-    domainId,
-    emailAddress,
-  }: {
-    domainId: string;
-    emailAddress: string;
-  }) => Promise<OrganizationDomainResource>;
-
-  attemptDomainAffiliationVerification: ({
-    domainId,
-    code,
-  }: {
-    domainId: string;
-    code: string;
-  }) => Promise<OrganizationDomainResource>;
   destroy: () => Promise<void>;
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
 }
