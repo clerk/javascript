@@ -1,7 +1,7 @@
 import type { FieldId } from '@clerk/types';
 import type { ClerkAPIError } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { forwardRef, useCallback, useId, useState } from 'react';
+import React, { forwardRef, useCallback, useId, useMemo, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -105,13 +105,14 @@ export const RadioButtons = (
     }[];
   },
 ) => {
+  const { radioOptions, ...rest } = props;
   return (
     <>
-      {props.radioOptions?.map(r => (
+      {radioOptions?.map(r => (
         <RadioGroupItem
           key={r.value}
           {...r}
-          inputProps={props}
+          inputProps={rest}
         />
       ))}
     </>
@@ -313,7 +314,22 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { validatePassword, ...inputProps } = restInputProps;
-  const inputElementProps = props.type === 'password' ? restInputProps : inputProps;
+
+  const inputElementProps = useMemo(() => {
+    const propMap = {
+      password: restInputProps,
+      radio: {
+        ...inputProps,
+        radioOptions,
+      },
+    };
+    if (!props.type) {
+      return inputProps;
+    }
+    const type = props.type as keyof typeof propMap;
+    return propMap[type] || inputProps;
+  }, [restInputProps]);
+
   const InputElement = getInputElementForType(props.type);
   const isCheckbox = props.type === 'checkbox';
 
@@ -397,7 +413,6 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
 
   const Input = (
     <InputElement
-      radioOptions={radioOptions}
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(id)}
       hasError={!!errorMessage}
