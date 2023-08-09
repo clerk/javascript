@@ -456,14 +456,14 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
     expect(authenticateRequest).toBeCalled();
   });
 
-  it('appends the Dev Browser JWT on the URL when cookie __clerk_db_jwt exists', async () => {
+  it('appends the Dev Browser JWT to the search when cookie __clerk_db_jwt exists and location is an Account Portal URL', async () => {
     const resp = await authMiddleware({
       beforeAuth: () => NextResponse.next(),
     })(mockRequest({ url: '/protected', appendDevBrowserCookie: true }), {} as NextFetchEvent);
 
     expect(resp?.status).toEqual(307);
     expect(resp?.headers.get('location')).toEqual(
-      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected#__clerk_db_jwt[test_jwt]',
+      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__dev_session=test_jwt',
     );
     expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(authenticateRequest).toBeCalled();

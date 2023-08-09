@@ -65,7 +65,7 @@ import {
   ignoreEventValue,
   inActiveBrowserTab,
   inBrowser,
-  isAccountsHostedPages,
+  isDevAccountPortalOrigin,
   isDevOrStagingUrl,
   isError,
   isRedirectForFAPIInitiatedFlow,
@@ -668,9 +668,10 @@ export default class Clerk implements ClerkInterface {
       return clerkMissingDevBrowserJwt();
     }
 
-    const asQueryParam = !!options?.useQueryParam;
+    // Use query param for Account Portal pages so that SSR can access the dev_browser JWT
+    const asQueryParam = !!options?.useQueryParam || isDevAccountPortalOrigin(toURL.hostname);
 
-    return setDevBrowserJWTInURL(toURL.href, devBrowserJwt, asQueryParam);
+    return setDevBrowserJWTInURL(toURL, devBrowserJwt, asQueryParam).href;
   }
 
   public buildSignInUrl(options?: RedirectOptions): string {
@@ -1231,7 +1232,7 @@ export default class Clerk implements ClerkInterface {
     this.#authService = new SessionCookieService(this);
     this.#pageLifecycle = createPageLifecycle();
 
-    const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
+    const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
 
     this.#setupListeners();
 
