@@ -8,8 +8,11 @@ OrganizationMembership {
   "organization": Organization {
     "addMember": [Function],
     "adminDeleteEnabled": true,
+    "createDomain": [Function],
     "createdAt": 1970-01-01T00:00:12.345Z,
     "destroy": [Function],
+    "getDomain": [Function],
+    "getDomains": [Function],
     "getMemberships": [Function],
     "getPendingInvitations": [Function],
     "hasImage": true,
