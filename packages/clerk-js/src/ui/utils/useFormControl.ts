@@ -15,6 +15,7 @@ type Options = {
   defaultChecked?: boolean;
   enableErrorAfterBlur?: boolean;
   informationText?: string | LocalizationKey;
+  debouncePasswordOnType?: boolean;
 } & (
   | {
       label: string | LocalizationKey;
@@ -88,7 +89,6 @@ export const useFormControl = <Id extends string>(
     enableErrorAfterBlur: false,
     informationText: '',
     defaultChecked: false,
-    passwordMinLength: 8,
   };
 
   const { translateError } = useLocalizations();
@@ -141,15 +141,8 @@ export const useFormControl = <Id extends string>(
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {
-    defaultChecked,
-    validatePassword: validatePasswordProp,
-    buildErrorMessage,
-    passwordMinLength,
-    ...restOpts
-  } = opts;
+  const { defaultChecked, validatePassword: validatePasswordProp, buildErrorMessage, ...restOpts } = opts;
 
-  // console.log(passwordMinLength, 'passwordMinLength')
   const props = {
     id,
     name: id,
@@ -169,7 +162,6 @@ export const useFormControl = <Id extends string>(
     warningText,
     hasPassedComplexity,
     setHasPassedComplexity,
-    passwordMinLength: 8,
     validatePassword: opts.type === 'password' ? opts.validatePassword : undefined,
     ...restOpts,
   };

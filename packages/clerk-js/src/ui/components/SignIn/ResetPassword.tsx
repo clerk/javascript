@@ -40,6 +40,7 @@ export const _ResetPassword = () => {
     validatePassword: true,
     informationText: failedValidationsText,
     buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
+    debouncePasswordOnType: true,
     passwordMinLength: passwordSettings.min_length,
   });
 

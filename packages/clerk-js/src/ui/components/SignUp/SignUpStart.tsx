@@ -83,6 +83,7 @@ function _SignUpStart(): JSX.Element {
       informationText: failedValidationsText,
       validatePassword: true,
       buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
+      debouncePasswordOnType: true,
       passwordMinLength: passwordSettings.min_length,
     }),
     ticket: useFormControl(

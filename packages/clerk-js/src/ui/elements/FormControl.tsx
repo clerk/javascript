@@ -56,6 +56,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   enableErrorAfterBlur?: boolean;
   informationText?: string | LocalizationKey;
   passwordMinLength?: number;
+  debouncePasswordOnType?: boolean;
   radioOptions?: {
     value: string;
     label: string | LocalizationKey;
@@ -157,24 +158,24 @@ type FormFeedbackProps = Partial<
   }
 > & {
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
-} & { showText: boolean; hasPassedLengthValidation: boolean };
+} & { showText?: boolean; hasPassedLengthValidation?: boolean; debouncePasswordOnType?: boolean };
 
 const delay = 350;
+const passwordDebounceDelay = 2000;
 
 export const FormFeedback = (props: FormFeedbackProps) => {
-  const { id, elementDescriptors } = props;
+  const { id, elementDescriptors, debouncePasswordOnType = true } = props;
   const errorMessage = useFieldMessageVisibility(props.errorText, delay);
   const successMessage = useFieldMessageVisibility(props.successfulText, delay);
   const informationMessage = useFieldMessageVisibility(props.informationText, delay);
   const warningMessage = useFieldMessageVisibility(props.warningText, delay);
-  const showText = useFieldMessageVisibility(props.showText, delay);
 
   const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
 
   const { calculateHeight, height } = useCalculateErrorTextHeight({
     recalculate: warningMessage || errorMessage || informationMessage,
-    showText,
+    showText: props.showText,
   });
   const { getFormTextAnimation } = useFormTextAnimation();
   const defaultElementDescriptors = {
@@ -196,7 +197,15 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return null;
   }
 
-  const showFeedbackText = props?.hasPassedLengthValidation ? true : showText;
+  const skipDebounceShowFeedback = () => {
+    if (!debouncePasswordOnType || props.elementDescriptors || id !== 'password' || props?.hasPassedLengthValidation) {
+      return true;
+    }
+
+    return props.showText;
+  };
+
+  const showFeedbackText = skipDebounceShowFeedback();
 
   return (
     <Box
@@ -337,10 +346,10 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
   const hasPassedLengthValidation = (inputElementProps?.value as string).length < (passwordMinLength || 8);
 
   React.useEffect(() => {
-    if (props.type === 'password') {
+    if (props.type === 'password' && debouncedState.isFocused) {
       const timeoutId = setTimeout(() => {
         setShowText(true);
-      }, 2000);
+      }, passwordDebounceDelay);
 
       return () => {
         clearTimeout(timeoutId);
@@ -351,7 +360,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
   }, [showText, inputElementProps.value]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (props.type === 'password') {
+    if (props.type === 'password' && debouncedState.isFocused) {
       setShowText(false);
     }
 
@@ -495,6 +504,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
         id={id}
         showText={showText}
         hasPassedLengthValidation={hasPassedLengthValidation}
+        debouncePasswordOnType={props?.debouncePasswordOnType}
       />
     </FormControlPrim>
   );
