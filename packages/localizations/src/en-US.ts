@@ -524,6 +524,9 @@ export const enUS: LocalizationResource = {
     notSelected: 'No organization selected',
     action__createOrganization: 'Create Organization',
     action__manageOrganization: 'Manage Organization',
+    invitationCountLabel_single: '1 pending invitation to join:',
+    invitationCountLabel_many: '{{count}} pending invitations to join:',
+    invitationAccept: 'Join',
   },
   impersonationFab: {
     title: 'Signed in as {{identifier}}',

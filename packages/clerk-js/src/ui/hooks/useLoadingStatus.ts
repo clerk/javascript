@@ -2,10 +2,11 @@ import { useSafeState } from './useSafeState';
 
 type Status = 'idle' | 'loading' | 'error';
 
-export const useLoadingStatus = <Metadata>() => {
+export const useLoadingStatus = <Metadata>(initialState?: { status: Status; metadata?: Metadata | undefined }) => {
   const [state, setState] = useSafeState<{ status: Status; metadata?: Metadata | undefined }>({
     status: 'idle',
     metadata: undefined,
+    ...initialState,
   });
 
   return {
