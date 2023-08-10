@@ -530,6 +530,9 @@ export const enUS: LocalizationResource = {
     invitationCountLabel_single: '1 pending invitation to join:',
     invitationCountLabel_many: '{{count}} pending invitations to join:',
     invitationAccept: 'Join',
+    suggestionCountLabel_single: '1 suggested organization:',
+    suggestionCountLabel_many: '{{count}} suggested organizations:',
+    suggestionsAccept: 'Request to join',
   },
   impersonationFab: {
     title: 'Signed in as {{identifier}}',

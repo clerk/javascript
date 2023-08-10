@@ -7,6 +7,7 @@ import { Action, SecondaryActions } from '../../elements';
 import { UserInvitationList } from './UserInvitationList';
 import type { UserMembershipListProps } from './UserMembershipList';
 import { UserMembershipList } from './UserMembershipList';
+import { UserSuggestionList } from './UserSuggestionList';
 
 export interface OrganizationActionListProps extends UserMembershipListProps {
   onCreateOrganizationClick: React.MouseEventHandler;
@@ -45,6 +46,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
     <SecondaryActions elementDescriptor={descriptors.organizationSwitcherPopoverActions}>
       <UserMembershipList {...{ onPersonalWorkspaceClick, onOrganizationClick }} />
       <UserInvitationList />
+      <UserSuggestionList />
       <CreateOrganizationButton {...{ onCreateOrganizationClick }} />
     </SecondaryActions>
   );
