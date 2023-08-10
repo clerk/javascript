@@ -2,8 +2,10 @@ import type {
   ClerkPaginatedResponse,
   CreateOrganizationParams,
   GetUserOrganizationInvitationsParams,
+  GetUserOrganizationSuggestionsParams,
   OrganizationMembershipResource,
   OrganizationResource,
+  OrganizationSuggestionResource,
   SetActive,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
@@ -19,6 +21,12 @@ type UseOrganizationListParams = {
         infinite?: boolean;
         keepPreviousData?: boolean;
       });
+  userSuggestions?:
+    | true
+    | (GetUserOrganizationSuggestionsParams & {
+        infinite?: boolean;
+        keepPreviousData?: boolean;
+      });
 };
 
 type OrganizationList = ReturnType<typeof createOrganizationList>;
@@ -30,6 +38,7 @@ type UseOrganizationListReturn =
       createOrganization: undefined;
       setActive: undefined;
       userInvitations: PaginatedResourcesWithDefault<UserOrganizationInvitationResource>;
+      userSuggestions: PaginatedResourcesWithDefault<OrganizationSuggestionResource>;
     }
   | {
       isLoaded: boolean;
@@ -37,14 +46,23 @@ type UseOrganizationListReturn =
       createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
       setActive: SetActive;
       userInvitations: PaginatedResources<UserOrganizationInvitationResource>;
+      userSuggestions: PaginatedResources<OrganizationSuggestionResource>;
     };
 
 type UseOrganizationList = (params?: UseOrganizationListParams) => UseOrganizationListReturn;
 
 export const useOrganizationList: UseOrganizationList = params => {
-  const { userInvitations } = params || {};
+  const { userInvitations, userSuggestions } = params || {};
 
   const userInvitationsSafeValues = useWithSafeValues(userInvitations, {
+    initialPage: 1,
+    pageSize: 10,
+    status: 'pending',
+    keepPreviousData: false,
+    infinite: false,
+  });
+
+  const userSuggestionsSafeValues = useWithSafeValues(userSuggestions, {
     initialPage: 1,
     pageSize: 10,
     status: 'pending',
@@ -64,23 +82,18 @@ export const useOrganizationList: UseOrganizationList = params => {
           status: userInvitationsSafeValues.status,
         };
 
+  const userSuggestionsParams =
+    typeof userSuggestions === 'undefined'
+      ? undefined
+      : {
+          initialPage: userSuggestionsSafeValues.initialPage,
+          pageSize: userSuggestionsSafeValues.pageSize,
+          status: userSuggestionsSafeValues.status,
+        };
+
   const isClerkLoaded = !!(clerk.loaded && user);
 
-  const {
-    data: isomorphicData,
-    count: isomorphicCount,
-    isLoading: isomorphicIsLoading,
-    isFetching: isomorphicIsFetching,
-    isError: isomorphicIsError,
-    page: isomorphicPage,
-    pageCount,
-    fetchPage: isomorphicSetPage,
-    fetchNext,
-    fetchPrevious,
-    hasNextPage,
-    hasPreviousPage,
-    unstable__mutate,
-  } = usePagesOrInfinite<
+  const invitations = usePagesOrInfinite<
     GetUserOrganizationInvitationsParams,
     ClerkPaginatedResponse<UserOrganizationInvitationResource>
   >(
@@ -95,6 +108,25 @@ export const useOrganizationList: UseOrganizationList = params => {
     },
     {
       type: 'userInvitations',
+      userId: user?.id,
+    },
+  );
+
+  const suggestions = usePagesOrInfinite<
+    GetUserOrganizationSuggestionsParams,
+    ClerkPaginatedResponse<OrganizationSuggestionResource>
+  >(
+    {
+      ...userSuggestionsParams,
+    },
+    user?.getOrganizationSuggestions,
+    {
+      keepPreviousData: userSuggestionsSafeValues.keepPreviousData,
+      infinite: userSuggestionsSafeValues.infinite,
+      enabled: !!userSuggestionsParams,
+    },
+    {
+      type: 'userSuggestions',
       userId: user?.id,
     },
   );
@@ -121,6 +153,21 @@ export const useOrganizationList: UseOrganizationList = params => {
         hasPreviousPage: false,
         unstable__mutate: undefined,
       },
+      userSuggestions: {
+        data: undefined,
+        count: undefined,
+        isLoading: false,
+        isFetching: false,
+        isError: false,
+        page: undefined,
+        pageCount: undefined,
+        fetchPage: undefined,
+        fetchNext: undefined,
+        fetchPrevious: undefined,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        unstable__mutate: undefined,
+      },
     };
   }
 
@@ -129,21 +176,8 @@ export const useOrganizationList: UseOrganizationList = params => {
     organizationList: createOrganizationList(user.organizationMemberships),
     setActive: clerk.setActive,
     createOrganization: clerk.createOrganization,
-    userInvitations: {
-      data: isomorphicData,
-      count: isomorphicCount,
-      isLoading: isomorphicIsLoading,
-      isFetching: isomorphicIsFetching,
-      isError: isomorphicIsError,
-      page: isomorphicPage,
-      pageCount,
-      fetchPage: isomorphicSetPage,
-      fetchNext,
-      fetchPrevious,
-      hasNextPage,
-      hasPreviousPage,
-      unstable__mutate,
-    },
+    userInvitations: invitations,
+    userSuggestions: suggestions,
   };
 };
 

@@ -17,6 +17,7 @@ export * from './OrganizationDomain';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
 export * from './OrganizationMembershipRequest';
+export * from './OrganizationSuggestion';
 export * from './SamlAccount';
 export * from './Session';
 export * from './SessionWithActivities';
