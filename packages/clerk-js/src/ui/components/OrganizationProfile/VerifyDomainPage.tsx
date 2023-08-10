@@ -71,11 +71,8 @@ export const VerifyDomainPage = withCardStateProvider(() => {
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    organization
-      ?.attemptDomainAffiliationVerification({
-        domainId: params.id,
-        code,
-      })
+    domain
+      ?.attemptAffiliationVerification?.({ code })
       .then(async res => {
         await resolve();
         if (res.verification?.status === 'verified') {
@@ -111,10 +108,9 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   const onSubmitPrepare = (e: React.FormEvent) => {
     e.preventDefault();
-    return organization
-      .prepareDomainAffiliationVerification({
-        domainId: params.id,
-        emailAddress: emailField.value,
+    return domain
+      ?.prepareAffiliationVerification({
+        affiliationEmailAddress: emailField.value,
       })
       .then(wizard.nextStep)
       .catch(err => {
