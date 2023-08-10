@@ -1138,6 +1138,55 @@ describe('Clerk singleton', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
       });
     });
+
+    it('redirects user to the verify-email-address url if the external account has unverified email and there are no missing requirements', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: [],
+            unverified_fields: ['email_address'],
+            verifications: {
+              email_address: {
+                status: 'unverified',
+                strategy: 'from_oauth_google',
+                next_action: 'needs_attempt',
+              },
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/verify-email-address');
+      });
+    });
   });
 
   describe('.handleMagicLinkVerification()', () => {
