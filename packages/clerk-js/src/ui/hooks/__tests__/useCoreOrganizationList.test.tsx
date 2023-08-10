@@ -78,7 +78,7 @@ describe('useOrganizationList', () => {
     );
   });
 
-  it.only('opens organization profile when "Manage Organization" is clicked', async () => {
+  it('fetch with pages', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
@@ -104,6 +104,7 @@ describe('useOrganizationList', () => {
     );
     const { result } = renderHook(defaultRenderer, { wrapper });
     expect(result.current.userInvitations.isLoading).toBe(true);
+    expect(result.current.userInvitations.isFetching).toBe(true);
     expect(result.current.userInvitations.count).toBe(0);
 
     await waitFor(() => {
@@ -161,7 +162,7 @@ describe('useOrganizationList', () => {
     });
   });
 
-  it.only('infinite', async () => {
+  it('infinite fetch', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
