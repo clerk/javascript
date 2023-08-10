@@ -1,16 +1,19 @@
 import { render, userEvent, waitFor } from '@clerk/shared/testUtils';
-import type { OrganizationMembershipResource } from '@clerk/types';
+import type { OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSettings } from '../OrganizationSettings';
-import { createFakeMember } from './utils';
+import { createFakeDomain, createFakeMember } from './utils';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('OrganizationSettings', () => {
   it('enables organization profile button and disables leave when user is the only admin', async () => {
     const adminsList: OrganizationMembershipResource[] = [createFakeMember({ id: '1', orgId: '1', role: 'admin' })];
+    const domainList: OrganizationDomainResource[] = [
+      createFakeDomain({ id: '1', organizationId: '1', name: 'clerk.dev' }),
+    ];
 
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
@@ -18,6 +21,12 @@ describe('OrganizationSettings', () => {
     });
 
     fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
+    fixtures.clerk.organization?.getDomains.mockReturnValue(
+      Promise.resolve({
+        data: domainList,
+        total_count: 1,
+      }),
+    );
     const { getByText } = render(<OrganizationSettings />, { wrapper });
     await waitFor(() => {
       expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
@@ -32,6 +41,9 @@ describe('OrganizationSettings', () => {
       createFakeMember({ id: '1', orgId: '1', role: 'admin' }),
       createFakeMember({ id: '2', orgId: '1', role: 'admin' }),
     ];
+    const domainList: OrganizationDomainResource[] = [
+      createFakeDomain({ id: '1', organizationId: '1', name: 'clerk.dev' }),
+    ];
 
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
@@ -39,6 +51,12 @@ describe('OrganizationSettings', () => {
     });
 
     fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
+    fixtures.clerk.organization?.getDomains.mockReturnValue(
+      Promise.resolve({
+        data: domainList,
+        total_count: 1,
+      }),
+    );
     const { getByText } = render(<OrganizationSettings />, { wrapper });
     await waitFor(() => {
       expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
@@ -79,6 +97,12 @@ describe('OrganizationSettings', () => {
         });
       });
 
+      fixtures.clerk.organization?.getDomains.mockReturnValue(
+        Promise.resolve({
+          data: [],
+          total_count: 0,
+        }),
+      );
       const { getByText } = render(<OrganizationSettings />, { wrapper });
       await userEvent.click(getByText('Org1', { exact: false }));
       expect(fixtures.router.navigate).toHaveBeenCalledWith('profile');

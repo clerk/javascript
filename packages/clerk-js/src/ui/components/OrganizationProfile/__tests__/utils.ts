@@ -1,4 +1,11 @@
-import type { MembershipRole, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
+import type {
+  MembershipRole,
+  OrganizationDomainResource,
+  OrganizationDomainVerification,
+  OrganizationEnrollmentMode,
+  OrganizationMembershipResource,
+  OrganizationResource,
+} from '@clerk/types';
 import { jest } from '@jest/globals';
 
 type FakeMemberParams = {
@@ -31,5 +38,31 @@ export const createFakeMember = (params: FakeMemberParams): OrganizationMembersh
       profileImageUrl: params?.profileImageUrl || '',
       imageUrl: params?.imageUrl || '',
     },
+  } as any;
+};
+
+type FakeDomainParams = {
+  id: string;
+  name: string;
+  organizationId: string;
+  enrollmentMode?: OrganizationEnrollmentMode;
+  verification?: OrganizationDomainVerification | null;
+  createdAt?: Date;
+  affiliationEmailAddress?: string | null;
+};
+
+export const createFakeDomain = (params: FakeDomainParams): OrganizationDomainResource => {
+  return {
+    destroy: jest.fn() as any,
+    update: jest.fn() as any,
+    id: params.id,
+    name: params.name,
+    verification: params.verification ?? null,
+    organizationId: params.organizationId,
+    enrollmentMode: params.enrollmentMode ?? 'manual_invitation',
+    prepareAffiliationVerification: jest.fn() as any,
+    attemptAffiliationVerification: jest.fn() as any,
+    createdAt: params?.createdAt || new Date(),
+    updatedAt: new Date(),
   } as any;
 };
