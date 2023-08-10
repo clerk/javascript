@@ -612,6 +612,7 @@ export const enUS: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__invited: 'Invited',
         headerTitle__invitations: 'Invitations',
+        headerTitle__requests: 'Requests',
       },
       activeMembersTab: {
         tableHeader__user: 'User',
@@ -635,6 +636,19 @@ export const enUS: LocalizationResource = {
             'New and existing users will be able to join anytime as members and will get notified in-app.',
           calloutTextLabel: 'Invite users to your organization using verified email domains.',
           calloutActionLabel: 'Setup verified domain',
+        },
+      },
+      requestsTab: {
+        tableHeader__requested: 'Requested access',
+        menuAction__approve: 'Approve',
+        requests: {
+          headerTitle: 'Requests',
+          headerSubtitle: 'Browse and manage users who requested to join the organization.',
+        },
+        autoSuggestions: {
+          headerTitle: 'Automatic suggestions',
+          headerSubtitle:
+            'Users with an email address on your verified domain will see a suggestion to request to join the organization.',
         },
       },
     },
