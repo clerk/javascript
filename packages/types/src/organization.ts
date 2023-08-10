@@ -1,5 +1,5 @@
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
-import type { OrganizationDomainResource } from './organizationDomain';
+import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationMembershipRequestResource } from './organizationMembershipRequest';
@@ -74,6 +74,8 @@ export type GetDomainsParams = {
    * Maximum number of items returned per request. The initial value persists between re-renders
    */
   pageSize?: number;
+
+  enrollmentMode?: OrganizationEnrollmentMode;
 };
 
 export type GetMembershipRequestParams = {

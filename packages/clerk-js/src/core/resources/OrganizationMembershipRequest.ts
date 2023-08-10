@@ -1,6 +1,7 @@
 import type { OrganizationInvitationStatus, OrganizationMembershipRequestResource, PublicUserData } from '@clerk/types';
 import type { OrganizationMembershipRequestJSON } from '@clerk/types';
 
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './Base';
 
 export class OrganizationMembershipRequest extends BaseResource implements OrganizationMembershipRequestResource {
@@ -27,6 +28,8 @@ export class OrganizationMembershipRequest extends BaseResource implements Organ
       this.id = data.id;
       this.organizationId = data.organization_id;
       this.status = data.status;
+      this.createdAt = unixEpochToDate(data.created_at);
+      this.updatedAt = unixEpochToDate(data.updated_at);
       if (data.public_user_data) {
         this.publicUserData = {
           firstName: data.public_user_data.first_name,
