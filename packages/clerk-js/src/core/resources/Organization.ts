@@ -18,9 +18,9 @@ import type {
   UpdateMembershipParams,
   UpdateOrganizationParams,
 } from '@clerk/types';
-import type { ClerkPaginationParams, GetUserOrganizationInvitationsParams } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 
@@ -84,18 +84,6 @@ export class Organization extends BaseResource implements OrganizationResource {
   getDomains = async (
     getDomainParams?: GetDomainsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationDomainResource>> => {
-    function convertPageToOffset(pageParams: GetUserOrganizationInvitationsParams | undefined): ClerkPaginationParams {
-      const { pageSize, initialPage, ...restParams } = pageParams || {};
-      const _pageSize = pageSize ?? 10;
-      const _initialPage = initialPage ?? 1;
-
-      return {
-        ...restParams,
-        limit: _pageSize,
-        offset: (_initialPage - 1) * _pageSize,
-      };
-    }
-
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/domains`,
       method: 'GET',
