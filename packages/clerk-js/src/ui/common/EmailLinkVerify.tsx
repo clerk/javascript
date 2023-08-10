@@ -2,11 +2,11 @@ import { isMagicLinkError, MagicLinkErrorCode } from '@clerk/shared';
 import React from 'react';
 
 import type { VerificationStatus } from '../../utils/getClerkQueryParam';
-import { completeSignUpFlow } from '../components/SignUp/util';
 import { useCoreClerk, useCoreSignUp } from '../contexts';
 import type { LocalizationKey } from '../localization';
 import { useRouter } from '../router';
 import { sleep } from '../utils';
+import { completeSignUpFlow } from '../utils/completeSignUpFlow';
 import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 
 export type EmailLinkVerifyProps = {

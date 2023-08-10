@@ -6,7 +6,6 @@ import { useCoreOrganization } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { UserProfileBreadcrumbs } from '../UserProfile/UserProfileNavbar';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
@@ -109,7 +108,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
       <SuccessPage
         title={title}
         text={localizationKeys('organizationProfile.profilePage.successMessage')}
-        Breadcrumbs={UserProfileBreadcrumbs}
+        Breadcrumbs={OrganizationProfileBreadcrumbs}
       />
     </Wizard>
   );
