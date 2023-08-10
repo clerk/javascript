@@ -13,6 +13,7 @@ OrganizationMembership {
     "destroy": [Function],
     "getDomain": [Function],
     "getDomains": [Function],
+    "getMembershipRequests": [Function],
     "getMemberships": [Function],
     "getPendingInvitations": [Function],
     "hasImage": true,

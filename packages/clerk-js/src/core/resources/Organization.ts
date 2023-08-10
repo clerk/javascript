@@ -4,6 +4,7 @@ import type {
   ClerkResourceReloadParams,
   CreateOrganizationParams,
   GetDomainsParams,
+  GetMembershipRequestParams,
   GetMembershipsParams,
   GetPendingInvitationsParams,
   InviteMemberParams,
@@ -13,6 +14,8 @@ import type {
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
+  OrganizationMembershipRequestJSON,
+  OrganizationMembershipRequestResource,
   OrganizationResource,
   SetOrganizationLogoParams,
   UpdateMembershipParams,
@@ -23,6 +26,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
+import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
@@ -112,6 +116,29 @@ export class Organization extends BaseResource implements OrganizationResource {
       })
     )?.response as unknown as OrganizationDomainJSON;
     return new OrganizationDomain(json);
+  };
+
+  getMembershipRequests = async (
+    getRequestParam?: GetMembershipRequestParams,
+  ): Promise<ClerkPaginatedResponse<OrganizationMembershipRequestResource>> => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/membership_requests`,
+      method: 'GET',
+      search: convertPageToOffset(getRequestParam) as any,
+    })
+      .then(res => {
+        const { data: requests, total_count } =
+          res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipRequestJSON>;
+
+        return {
+          total_count,
+          data: requests.map(request => new OrganizationMembershipRequest(request)),
+        };
+      })
+      .catch(() => ({
+        total_count: 0,
+        data: [],
+      }));
   };
 
   createDomain = async (name: string): Promise<OrganizationDomainResource> => {
