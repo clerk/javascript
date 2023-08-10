@@ -1,9 +1,10 @@
-import { BlockButton } from '../../common';
+import { AddBlockButton, BlockButton } from '../../common';
 import { useCoreOrganization } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
 import { Times } from '../../icons';
 import { useRouter } from '../../router';
+import { DomainList } from './DomainList';
 
 export const OrganizationSettings = () => {
   return (
@@ -25,6 +26,7 @@ export const OrganizationSettings = () => {
           <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__settings')} />
         </Header.Root>
         <OrganizationProfileSection />
+        <OrganizationDomainsSection />
         <OrganizationDangerSection />
       </Col>
     </Col>
@@ -53,6 +55,32 @@ const OrganizationProfileSection = () => {
       id='organizationProfile'
     >
       {isAdmin ? <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton> : profile}
+    </ProfileSection>
+  );
+};
+
+const OrganizationDomainsSection = () => {
+  const { organization, membership } = useCoreOrganization();
+
+  const { navigate } = useRouter();
+  const isAdmin = membership?.role === 'admin';
+
+  if (!organization || !isAdmin) {
+    return null;
+  }
+
+  return (
+    <ProfileSection
+      title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
+      id='organizationDomains'
+    >
+      <DomainList redirectSubPath={'domain/'} />
+
+      <AddBlockButton
+        textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
+        id='addOrganizationDomain'
+        onClick={() => navigate('domain')}
+      />
     </ProfileSection>
   );
 };

@@ -29,11 +29,13 @@ export const enUS: LocalizationResource = {
   formFieldLabel__newPassword: 'New password',
   formFieldLabel__confirmPassword: 'Confirm password',
   formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
+  formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__firstName: 'First name',
   formFieldLabel__lastName: 'Last name',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__organizationEmailDomain: 'Email domain',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
@@ -51,6 +53,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
+  formFieldInputPlaceholder__organizationEmailDomain: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldAction__forgotPassword: 'Forgot password?',
@@ -561,6 +564,32 @@ export const enUS: LocalizationResource = {
           successMessage: 'You have deleted the organization.',
         },
       },
+      domainSection: {
+        title: 'Verified Domains',
+        subtitle:
+          'Setup a domain so everyone with email addresses at this domain can automatically join your organization.',
+        primaryButton: 'Add verified domain',
+      },
+    },
+    createDomainPage: {
+      title: 'Add verified domain',
+      subtitle:
+        'Add a domain so new users signing up with email addresses at this domain can automatically join your organization as a member.',
+    },
+    verifyDomainPage: {
+      title: 'Verify domain',
+      actionLabel__remove: 'Remove unverified domain',
+      subtitle: 'Add an email address under {{domainName}} to receive a code and verify this domain.',
+      formTitle: 'Verification code',
+      formSubtitle: 'Enter the verification code sent to your email address',
+      resendButton: "Didn't receive a code? Resend",
+    },
+    verifiedDomainPage: {
+      title: 'Verified domain',
+      actionLabel__remove: 'Remove verified domain',
+      formTitle: 'Enrollment method',
+      formSubtitle:
+        'Define the method for automatically adding new and existing users who are associated with this domain to the organization.',
     },
     invitePage: {
       title: 'Invite members',
@@ -569,12 +598,20 @@ export const enUS: LocalizationResource = {
       detailsTitle__inviteFailed: 'The invitations could not be sent. Fix the following and try again:',
       formButtonPrimary__continue: 'Send invitations',
     },
+    removeDomainPage: {
+      title: 'Remove domain',
+      messageLine1: 'The email domain {{domain}} will be removed.',
+      messageLine2: 'Users won’t be able to join the organization automatically after this.',
+      successMessage: '{{domain}} has been removed.',
+    },
     membersPage: {
       detailsTitle__emptyRow: 'No members to display',
       action__invite: 'Invite',
       start: {
         headerTitle__active: 'Active',
+        headerTitle__members: 'Members',
         headerTitle__invited: 'Invited',
+        headerTitle__invitations: 'Invitations',
       },
       activeMembersTab: {
         tableHeader__user: 'User',
@@ -586,6 +623,19 @@ export const enUS: LocalizationResource = {
       invitedMembersTab: {
         tableHeader__invited: 'Invited',
         menuAction__revoke: 'Revoke invitation',
+      },
+      invitationsTab: {
+        manualInvitations: {
+          headerTitle: 'Individual invitations',
+          headerSubtitle: 'Browse and manage invited members.',
+        },
+        autoInvitations: {
+          headerTitle: 'Domain invitations',
+          headerSubtitle:
+            'New and existing users will be able to join anytime as members and will get notified in-app.',
+          calloutTextLabel: 'Invite users to your organization using verified email domains.',
+          calloutActionLabel: 'Setup verified domain',
+        },
       },
     },
   },

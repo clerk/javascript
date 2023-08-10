@@ -37,7 +37,7 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
     return new OrganizationDomain(json);
   }
 
-  prepareDomainAffiliationVerification = async (
+  prepareAffiliationVerification = async (
     params: PrepareAffiliationVerificationParams,
   ): Promise<OrganizationDomainResource> => {
     return this._basePost({
