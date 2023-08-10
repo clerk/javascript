@@ -1,10 +1,10 @@
 import type { OrganizationDomainResource } from '@clerk/types';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { RemoveResourcePage } from '../../common';
 import { useCoreOrganization } from '../../contexts';
 import { Flex, Spinner } from '../../customizables';
-import { useLoadingStatus } from '../../hooks';
+import { useFetch } from '../../hooks';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
@@ -13,28 +13,18 @@ export const RemoveDomainPage = () => {
   const { organization } = useCoreOrganization();
   const { params } = useRouter();
 
-  const [domain, setDomain] = React.useState<OrganizationDomainResource | null>(null);
-  let ref = React.useRef<OrganizationDomainResource>();
-  const domainStatus = useLoadingStatus({
-    status: 'loading',
-  });
-
-  useEffect(() => {
-    domainStatus.setLoading();
-    organization
-      ?.getDomain?.({
-        domainId: params.id,
-      })
-      .then(domain => {
-        domainStatus.setIdle();
-        setDomain(domain);
+  const ref = React.useRef<OrganizationDomainResource>();
+  const { data: domain, status: domainStatus } = useFetch(
+    organization?.getDomain,
+    {
+      domainId: params.id,
+    },
+    {
+      onSuccess(domain) {
         ref.current = { ...domain };
-      })
-      .catch(() => {
-        domainStatus.setError();
-        setDomain(null);
-      });
-  }, [params.id]);
+      },
+    },
+  );
 
   if (domainStatus.isLoading || !domain) {
     return (

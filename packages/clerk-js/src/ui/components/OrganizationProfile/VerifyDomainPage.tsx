@@ -1,5 +1,4 @@
-import type { OrganizationDomainResource } from '@clerk/types';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
@@ -16,7 +15,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { CodeForm } from '../../elements/CodeForm';
-import { useLoadingStatus, useNavigateToFlowStart } from '../../hooks';
+import { useFetch, useLoadingStatus, useNavigateToFlowStart } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
@@ -28,16 +27,16 @@ export const VerifyDomainPage = withCardStateProvider(() => {
   const { navigateToFlowStart } = useNavigateToFlowStart();
 
   const [success, setSuccess] = React.useState(false);
-  const [domain, setDomain] = React.useState<OrganizationDomainResource | null>(null);
 
+  const { data: domain, status: domainStatus } = useFetch(organization?.getDomain, {
+    domainId: params.id,
+  });
   const title = localizationKeys('organizationProfile.verifyDomainPage.title');
   const subtitle = localizationKeys('organizationProfile.verifyDomainPage.subtitle', {
     domainName: domain?.name ?? '',
   });
   const status = useLoadingStatus();
-  const domainStatus = useLoadingStatus({
-    status: 'loading',
-  });
+
   const codeControlState = useFormControl('code', '');
   const codeControl = useCodeControl(codeControlState);
 
@@ -48,22 +47,6 @@ export const VerifyDomainPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__organizationEmailDomain'),
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
   });
-
-  useEffect(() => {
-    domainStatus.setLoading();
-    organization
-      ?.getDomain?.({
-        domainId: params.id,
-      })
-      .then(domain => {
-        domainStatus.setIdle();
-        setDomain(domain);
-      })
-      .catch(() => {
-        setDomain(null);
-        domainStatus.setError();
-      });
-  }, [params.id]);
 
   const resolve = async () => {
     setSuccess(true);

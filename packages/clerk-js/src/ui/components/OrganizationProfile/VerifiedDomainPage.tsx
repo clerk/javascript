@@ -1,5 +1,4 @@
-import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '@clerk/types';
-import React, { useEffect } from 'react';
+import type { OrganizationEnrollmentMode } from '@clerk/types';
 
 import { useCoreOrganization } from '../../contexts';
 import { Badge, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
@@ -12,7 +11,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useLoadingStatus } from '../../hooks';
+import { useFetch } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
@@ -22,12 +21,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   const { organization } = useCoreOrganization();
   const { params, navigate } = useRouter();
 
-  const [domain, setDomain] = React.useState<OrganizationDomainResource | null>(null);
-
   const title = localizationKeys('organizationProfile.verifiedDomainPage.title');
-  const domainStatus = useLoadingStatus({
-    status: 'loading',
-  });
 
   const enrollmentMode = useFormControl('enrollmentMode', '', {
     type: 'radio',
@@ -43,22 +37,17 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     ],
   });
 
-  useEffect(() => {
-    domainStatus.setLoading();
-    organization
-      ?.getDomain?.({
-        domainId: params.id,
-      })
-      .then(domain => {
-        domainStatus.setIdle();
-        setDomain(domain);
-        enrollmentMode.setValue(domain.enrollmentMode);
-      })
-      .catch(() => {
-        setDomain(null);
-        domainStatus.setError();
-      });
-  }, [params.id]);
+  const { data: domain, status: domainStatus } = useFetch(
+    organization?.getDomain,
+    {
+      domainId: params.id,
+    },
+    {
+      onSuccess(d) {
+        enrollmentMode.setValue(d.enrollmentMode);
+      },
+    },
+  );
 
   const updateEnrollmentMode = async () => {
     if (!domain || !organization) {
