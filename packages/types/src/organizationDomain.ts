@@ -34,7 +34,7 @@ export type PrepareAffiliationVerificationParams = {
 };
 
 export type AttemptAffiliationVerificationParams = {
-  emailAddress: string;
+  code: string;
 };
 
 export type UpdateOrganizationDomainParams = Partial<Pick<OrganizationDomainResource, 'enrollmentMode'>>;
