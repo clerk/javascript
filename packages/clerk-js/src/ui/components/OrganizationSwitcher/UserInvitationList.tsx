@@ -117,16 +117,15 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
   };
 
   return (
-    <>
-      <Button
-        elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
-        textVariant='buttonExtraSmallBold'
-        variant='solid'
-        isLoading={card.isLoading}
-        onClick={handleAccept}
-        localizationKey={localizationKeys('organizationSwitcher.invitationAccept')}
-      />
-    </>
+    <Button
+      elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
+      textVariant='buttonExtraSmallBold'
+      variant='solid'
+      size='sm'
+      isLoading={card.isLoading}
+      onClick={handleAccept}
+      localizationKey={localizationKeys('organizationSwitcher.invitationAccept')}
+    />
   );
 };
 

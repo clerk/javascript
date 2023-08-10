@@ -121,6 +121,7 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
       textVariant='buttonExtraSmallBold'
       variant='solid'
+      size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
       localizationKey={localizationKeys('organizationSwitcher.suggestionsAccept')}
