@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react';
 
-import type { LocalizationKey } from '../../customizables';
-import { Col, Flex, Link, Text } from '../../customizables';
+import { Col, Flex, Link, Text } from '../customizables';
+import type { LocalizationKey } from '../localization';
 
 type CalloutWithActionProps = {
   text: LocalizationKey;

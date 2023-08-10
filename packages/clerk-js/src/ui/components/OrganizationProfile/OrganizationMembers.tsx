@@ -1,3 +1,4 @@
+import { CalloutWithAction } from '../../common';
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import {
@@ -16,7 +17,6 @@ import {
 import { UserAdd } from '../../icons';
 import { useRouter } from '../../router';
 import { ActiveMembersList } from './ActiveMembersList';
-import { CalloutWithAction } from './CalloutWithAction';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';
 import { MembershipWidget } from './MembershipWidget';
