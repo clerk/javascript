@@ -877,7 +877,7 @@ export default class Clerk implements ClerkInterface {
     );
 
     const navigateToNextStepSignUp = () => {
-      if (su.unverifiedFields.length === 0 || su.missingFields.length !== 0) {
+      if (su.missingFields.length) {
         return navigateToContinueSignUp();
       }
 
