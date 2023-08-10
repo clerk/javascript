@@ -593,7 +593,14 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSignUpCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'missing_requirements' }));
+      const mockSignUpCreate = jest.fn().mockReturnValue(
+        Promise.resolve(
+          new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['phone_number'],
+          } as any as SignUpJSON),
+        ),
+      );
 
       const sut = new Clerk(frontendApi);
       await sut.load({
@@ -701,7 +708,6 @@ describe('Clerk singleton', () => {
           signUp: new SignUp({
             status: 'missing_requirements',
             missing_fields: [],
-            unverified_fields: [],
             verifications: {
               external_account: {
                 status: 'unverified',
@@ -1114,7 +1120,6 @@ describe('Clerk singleton', () => {
           signUp: new SignUp({
             status: 'missing_requirements',
             missing_fields: ['last_name'],
-            unverified_fields: [],
             verifications: {
               external_account: {
                 status: 'verified',

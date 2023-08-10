@@ -44,6 +44,7 @@ import type {
   SignOut,
   SignOutCallback,
   SignOutOptions,
+  SignUpField,
   SignUpProps,
   SignUpResource,
   UnsubscribeCallback,
@@ -836,7 +837,6 @@ export default class Clerk implements ClerkInterface {
     const su = {
       status: signUp.status,
       missingFields: signUp.missingFields,
-      unverifiedFields: signUp.unverifiedFields,
       externalAccountStatus: externalAccount.status,
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
@@ -876,8 +876,8 @@ export default class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
     );
 
-    const navigateToNextStepSignUp = () => {
-      if (su.missingFields.length) {
+    const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
+      if (missingFields.length) {
         return navigateToContinueSignUp();
       }
 
@@ -922,7 +922,7 @@ export default class Clerk implements ClerkInterface {
             beforeEmit: navigateAfterSignUp,
           });
         case 'missing_requirements':
-          return navigateToNextStepSignUp();
+          return navigateToNextStepSignUp({ missingFields: res.missingFields });
         default:
           clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
@@ -958,7 +958,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
-      return navigateToNextStepSignUp();
+      return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
     }
 
     return navigateToSignIn();
