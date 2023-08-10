@@ -27,13 +27,6 @@ type OrganizationActionListProps = {
   onOrganizationClick: (org: OrganizationResource) => unknown;
 };
 
-export interface IntersectionOptions extends IntersectionObserverInit {
-  /** Only trigger the inView callback once */
-  triggerOnce?: boolean;
-  /** Call this function whenever the in view state changes */
-  onChange?: (inView: boolean, entry: IntersectionObserverEntry) => void;
-}
-
 export const OrganizationActionList = (props: OrganizationActionListProps) => {
   const { onCreateOrganizationClick, onPersonalWorkspaceClick, onOrganizationClick } = props;
   const { organizationList, userInvitations } = useCoreOrganizationList({
@@ -46,7 +39,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
     threshold: 0,
     onChange: inView => {
       if (inView) {
-        void userInvitations.fetchNext?.();
+        userInvitations.fetchNext?.();
       }
     },
   });
@@ -119,20 +112,18 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
 
       {(userInvitations.count ?? 0) > 0 && (
         <Flex
-          direction={'col'}
+          direction='col'
           elementDescriptor={descriptors.organizationSwitcherPopoverInvitationActions}
         >
           <Text
-            variant={'smallRegular'}
-            sx={[
-              t => ({
-                minHeight: 'unset',
-                height: t.space.$12,
-                padding: `${t.space.$3} ${t.space.$6}`,
-                display: 'flex',
-                alignItems: 'center',
-              }),
-            ]}
+            variant='smallRegular'
+            sx={t => ({
+              minHeight: 'unset',
+              height: t.space.$12,
+              padding: `${t.space.$3} ${t.space.$6}`,
+              display: 'flex',
+              alignItems: 'center',
+            })}
             // Handle plurals
             localizationKey={localizationKeys(
               (userInvitations.count ?? 0) > 1
@@ -162,13 +153,11 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
             {(userInvitations.hasNextPage || userInvitations.isFetching) && (
               <Box
                 ref={ref}
-                sx={[
-                  t => ({
-                    width: '100%',
-                    height: t.space.$12,
-                    position: 'relative',
-                  }),
-                ]}
+                sx={t => ({
+                  width: '100%',
+                  height: t.space.$12,
+                  position: 'relative',
+                })}
               >
                 <Box
                   sx={{
@@ -230,16 +219,14 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
 const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
   return (
     <Flex
-      align={'center'}
+      align='center'
       gap={2}
-      sx={[
-        t => ({
-          minHeight: 'unset',
-          height: t.space.$12,
-          justifyContent: 'space-between',
-          padding: `0 ${t.space.$6}`,
-        }),
-      ]}
+      sx={t => ({
+        minHeight: 'unset',
+        height: t.space.$12,
+        justifyContent: 'space-between',
+        padding: `0 ${t.space.$6}`,
+      })}
     >
       <OrganizationPreview
         elementId={'organizationSwitcher'}

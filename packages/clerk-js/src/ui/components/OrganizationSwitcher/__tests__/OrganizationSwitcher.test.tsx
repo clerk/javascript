@@ -175,7 +175,6 @@ describe('OrganizationSwitcher', () => {
       expect(queryByText('OrgTwo')).toBeInTheDocument();
     });
 
-    it.todo('switches between active organizations when one is clicked');
     it("switches between active organizations when one is clicked'", async () => {
       const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
