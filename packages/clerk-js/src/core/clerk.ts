@@ -54,7 +54,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
-import { handleMissingRequirements } from '../ui/components/SignUp/util';
+import { completeSignUpFlow } from '../ui/components/SignUp/util';
 import {
   appendAsQueryParams,
   buildURL,
@@ -881,7 +881,7 @@ export default class Clerk implements ClerkInterface {
         return navigateToContinueSignUp();
       }
 
-      return handleMissingRequirements({
+      return completeSignUpFlow({
         signUp,
         verifyEmailPath:
           params.verifyEmailAddressUrl ||
