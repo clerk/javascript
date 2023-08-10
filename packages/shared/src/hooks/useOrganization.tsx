@@ -95,6 +95,7 @@ export const useOrganization: UseOrganization = params => {
     pageSize: 10,
     keepPreviousData: false,
     infinite: false,
+    enrollmentMode: undefined,
   });
 
   const membershipRequestSafeValues = useWithSafeValues(membershipRequestsListParams, {
@@ -115,6 +116,7 @@ export const useOrganization: UseOrganization = params => {
       : {
           initialPage: domainSafeValues.initialPage,
           pageSize: domainSafeValues.pageSize,
+          enrollmentMode: domainSafeValues.enrollmentMode,
         };
 
   const membershipRequestParams =
@@ -123,6 +125,7 @@ export const useOrganization: UseOrganization = params => {
       : {
           initialPage: membershipRequestSafeValues.initialPage,
           pageSize: membershipRequestSafeValues.pageSize,
+          status: membershipRequestSafeValues.status,
         };
 
   const domains = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
