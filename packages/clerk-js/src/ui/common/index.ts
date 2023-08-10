@@ -1,3 +1,4 @@
+export * from './BlockButtons';
 export * from './constants';
 export * from './forms';
 export * from './redirects';
@@ -7,6 +8,7 @@ export * from './SSOCallback';
 export * from './EmailLinkVerify';
 export * from './EmailLinkStatusCard';
 export * from './Wizard';
+export * from './RemoveResourcePage';
 export * from './PrintableComponent';
 export * from './withOrganizationsEnabledGuard';
 export * from './QRCode';

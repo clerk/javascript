@@ -1,13 +1,10 @@
 import React from 'react';
 
-import { useWizard, Wizard } from '../../common';
+import { RemoveResourcePage } from '../../common';
 import { useCoreUser } from '../../contexts';
-import type { LocalizationKey } from '../../customizables';
-import { localizationKeys, Text } from '../../customizables';
-import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { localizationKeys } from '../../customizables';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
-import { handleError } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const RemoveEmailPage = () => {
@@ -31,6 +28,7 @@ export const RemoveEmailPage = () => {
         emailAddress: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
+      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
@@ -56,6 +54,7 @@ export const RemovePhonePage = () => {
         phoneNumber: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
+      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
@@ -82,6 +81,7 @@ export const RemoveConnectedAccountPage = () => {
         connectedAccount: providerToDisplayData[ref.current]?.name,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
+      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
@@ -107,6 +107,7 @@ export const RemoveWeb3WalletPage = () => {
         web3Wallet: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
+      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
@@ -133,6 +134,7 @@ export const RemoveMfaPhoneCodePage = () => {
         mfaPhoneCode: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.setReservedForSecondFactor({ reserved: false }))}
+      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
@@ -146,54 +148,7 @@ export const RemoveMfaTOTPPage = () => {
       messageLine2={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.mfaTOTPPage.removeResource.successMessage')}
       deleteResource={user.disableTOTP}
+      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
-
-type RemovePageProps = {
-  title: LocalizationKey;
-  messageLine1: LocalizationKey;
-  messageLine2: LocalizationKey;
-  successMessage: LocalizationKey;
-  deleteResource: () => Promise<any>;
-};
-
-const RemoveResourcePage = withCardStateProvider((props: RemovePageProps) => {
-  const { title, messageLine1, messageLine2, successMessage, deleteResource } = props;
-  const wizard = useWizard();
-  const card = useCardState();
-
-  const handleSubmit = async () => {
-    try {
-      await deleteResource().then(() => wizard.nextStep());
-    } catch (e) {
-      handleError(e, [], card.setError);
-    }
-  };
-
-  return (
-    <Wizard {...wizard.props}>
-      <ContentPage
-        headerTitle={title}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      >
-        <Form.Root onSubmit={handleSubmit}>
-          <Text
-            localizationKey={messageLine1}
-            variant='regularRegular'
-          />
-          <Text
-            localizationKey={messageLine2}
-            variant='regularRegular'
-          />
-          <FormButtons colorScheme={'danger'} />
-        </Form.Root>
-      </ContentPage>
-      <SuccessPage
-        title={title}
-        text={successMessage}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      />
-    </Wizard>
-  );
-});
