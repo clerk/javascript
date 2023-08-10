@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OrganizationMembership has the same initial properties 1`] = `
+OrganizationMembershipRequest {
+  "accept": [Function],
+  "id": "test_id",
+  "organizationId": "test_org_id",
+  "pathRoot": "",
+  "publicUserData": {
+    "firstName": "test_first_name",
+    "hasImage": true,
+    "identifier": "test@identifier.gr",
+    "imageUrl": "https://clerk.com",
+    "lastName": "test_last_name",
+    "profileImageUrl": "test_url",
+    "userId": undefined,
+  },
+  "status": "pending",
+}
+`;
