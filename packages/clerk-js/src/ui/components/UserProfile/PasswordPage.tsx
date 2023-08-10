@@ -69,6 +69,7 @@ export const PasswordPage = withCardStateProvider(() => {
     validatePassword: true,
     informationText: failedValidationsText,
     buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
+    passwordMinLength: passwordSettings.min_length,
   });
 
   const confirmField = useFormControl('confirmPassword', '', {

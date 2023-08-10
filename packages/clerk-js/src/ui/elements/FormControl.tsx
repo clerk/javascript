@@ -55,6 +55,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   hasPassedComplexity: boolean;
   enableErrorAfterBlur?: boolean;
   informationText?: string | LocalizationKey;
+  passwordMinLength?: number;
   radioOptions?: {
     value: string;
     label: string | LocalizationKey;
@@ -119,6 +120,7 @@ function useFormTextAnimation() {
 
 type CalculateConfigProps = {
   recalculate?: LocalizationKey | string | undefined;
+  showText?: boolean;
 };
 type Px = number;
 const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
@@ -130,11 +132,16 @@ const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
         const computedStyles = getComputedStyle(element);
         const marginTop = parseInt(computedStyles.marginTop.replace('px', ''));
 
-        const newHeight = 1.1 * marginTop + element.scrollHeight;
-        setHeight(newHeight);
+        setHeight(prevHeight => {
+          const newHeight = 1.1 * marginTop + element.scrollHeight;
+          if (prevHeight < newHeight || config.showText) {
+            return newHeight;
+          }
+          return prevHeight;
+        });
       }
     },
-    [config?.recalculate],
+    [config.recalculate, config.showText],
   );
   return {
     height,
@@ -144,9 +151,13 @@ const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
 
 type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
 
-type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
+type FormFeedbackProps = Partial<
+  ReturnType<typeof useFormControlFeedback>['debounced'] & {
+    id: FieldId;
+  }
+> & {
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
-};
+} & { showText: boolean; hasPassedLengthValidation: boolean };
 
 const delay = 350;
 
@@ -156,12 +167,14 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const successMessage = useFieldMessageVisibility(props.successfulText, delay);
   const informationMessage = useFieldMessageVisibility(props.informationText, delay);
   const warningMessage = useFieldMessageVisibility(props.warningText, delay);
+  const showText = useFieldMessageVisibility(props.showText, delay);
 
   const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
 
   const { calculateHeight, height } = useCalculateErrorTextHeight({
     recalculate: warningMessage || errorMessage || informationMessage,
+    showText,
   });
   const { getFormTextAnimation } = useFormTextAnimation();
   const defaultElementDescriptors = {
@@ -183,6 +196,8 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return null;
   }
 
+  const showFeedbackText = props?.hasPassedLengthValidation ? true : showText;
+
   return (
     <Box
       style={{
@@ -196,7 +211,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
       ]}
     >
       {/*Display the directions after the success message is unmounted*/}
-      {!successMessage && !warningMessage && !errorMessage && informationMessage && (
+      {!successMessage && !warningMessage && !errorMessage && informationMessage && showFeedbackText && (
         <FormInfoText
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props.informationText && !props?.successfulText && !props.warningText)}
@@ -204,7 +219,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
         />
       )}
       {/* Display the error message after the directions is unmounted*/}
-      {errorMessage && (
+      {errorMessage && showFeedbackText && (
         <FormErrorText
           {...getElementProps('error')}
           ref={calculateHeight}
@@ -214,7 +229,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
       )}
 
       {/* Display the success message after the error message is unmounted*/}
-      {!errorMessage && successMessage && (
+      {!errorMessage && successMessage && showFeedbackText && (
         <FormSuccessText
           {...getElementProps('success')}
           ref={calculateHeight}
@@ -223,7 +238,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
         />
       )}
 
-      {warningMessage && (
+      {warningMessage && showFeedbackText && (
         <FormWarningText
           {...getElementProps('warning')}
           ref={calculateHeight}
@@ -269,9 +284,10 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
   } = props;
 
   const isDisabled = props.isDisabled || card.isLoading;
+  const [showText, setShowText] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { validatePassword, ...inputProps } = restInputProps;
+  const { validatePassword, passwordMinLength, ...inputProps } = restInputProps;
 
   const inputElementProps = useMemo(() => {
     const propMap = {
@@ -318,6 +334,29 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
   });
 
   const errorMessage = useFieldMessageVisibility(debouncedState.errorText, delay);
+  const hasPassedLengthValidation = (inputElementProps?.value as string).length < (passwordMinLength || 8);
+
+  React.useEffect(() => {
+    if (props.type === 'password') {
+      const timeoutId = setTimeout(() => {
+        setShowText(true);
+      }, 2000);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+
+    return;
+  }, [showText, inputElementProps.value]);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (props.type === 'password') {
+      setShowText(false);
+    }
+
+    return inputElementProps?.onChange?.(e);
+  };
 
   const ActionLabel = actionLabel ? (
     <Link
@@ -391,6 +430,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       isDisabled={isDisabled}
       isRequired={isRequired}
       {...inputElementProps}
+      onChange={onChange}
       ref={ref}
       placeholder={t(placeholder)}
     />
@@ -453,6 +493,8 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       <FormFeedback
         {...debouncedState}
         id={id}
+        showText={showText}
+        hasPassedLengthValidation={hasPassedLengthValidation}
       />
     </FormControlPrim>
   );
