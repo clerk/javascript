@@ -1,6 +1,6 @@
 import type { GetDomainsParams, OrganizationEnrollmentMode } from '@clerk/types';
 import type { OrganizationDomainVerificationStatus } from '@clerk/types';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useCoreOrganization } from '../../contexts';
 import { Badge, Box, Col, descriptors, Spinner } from '../../customizables';
@@ -11,6 +11,10 @@ import { useRouter } from '../../router';
 type DomainListProps = GetDomainsParams & {
   verificationStatus?: OrganizationDomainVerificationStatus;
   enrollmentMode?: OrganizationEnrollmentMode;
+  /**
+   * Enables internal links to navigate to the correct page
+   * based on when this component is used
+   */
   redirectSubPath: string;
   fallback?: React.ReactNode;
 };
@@ -36,8 +40,12 @@ export const DomainList = (props: DomainListProps) => {
 
   const isAdmin = membership?.role === 'admin';
 
-  const domainList =
-    domains?.data?.filter(d => {
+  const domainList = useMemo(() => {
+    if (!domains?.data) {
+      return [];
+    }
+
+    return domains.data.filter(d => {
       let matchesStatus = true;
       let matchesMode = true;
       if (verificationStatus) {
@@ -48,12 +56,14 @@ export const DomainList = (props: DomainListProps) => {
       }
 
       return matchesStatus && matchesMode;
-    }) ?? [];
+    });
+  }, [domains?.data]);
 
   if (!organization || !isAdmin) {
     return null;
   }
 
+  // TODO: Split this to smaller components
   return (
     <Col>
       {domainList.length === 0 && !domains?.isLoading && fallback}

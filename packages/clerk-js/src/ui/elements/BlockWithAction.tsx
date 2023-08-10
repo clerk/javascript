@@ -1,4 +1,5 @@
-import React, { MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
+import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Box, Button, Flex, Text } from '../customizables';
@@ -15,6 +16,10 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Box> & {
   onActionClick?: (e: MouseEvent<HTMLButtonElement>) => void | Promise<void | unknown>;
 };
 
+/**
+ * Similar to ArrowBlockButton but just a container
+ * - An action is expected instead of an icon
+ */
 export const BlockWithAction = (props: ArrowBlockButtonProps) => {
   const {
     actionSx,

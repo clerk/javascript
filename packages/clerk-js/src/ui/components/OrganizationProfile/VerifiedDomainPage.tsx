@@ -28,6 +28,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     radioOptions: [
       {
         value: 'automatic_invitation',
+        // TODO: Add labels
         label: 'Automatic invitation',
       },
       {

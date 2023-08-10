@@ -24,8 +24,7 @@ export const AddDomainPage = withCardStateProvider(() => {
     return null;
   }
 
-  const dataChanged = organization.name !== nameField.value;
-  const canSubmit = dataChanged;
+  const canSubmit = organization.name !== nameField.value;
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +42,6 @@ export const AddDomainPage = withCardStateProvider(() => {
   };
 
   return (
-    // <Wizard {...wizard.props}>
     <ContentPage
       headerTitle={title}
       headerSubtitle={subtitle}
@@ -60,11 +58,5 @@ export const AddDomainPage = withCardStateProvider(() => {
         <FormButtons isDisabled={!canSubmit} />
       </Form.Root>
     </ContentPage>
-    // <SuccessPage
-    //   title={title}
-    //   text={localizationKeys('organizationProfile.profilePage.successMessage')}
-    //   Breadcrumbs={UserProfileBreadcrumbs}
-    // />
-    // </Wizard>
   );
 });
