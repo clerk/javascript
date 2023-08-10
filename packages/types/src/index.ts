@@ -22,6 +22,7 @@ export * from './jwtv2';
 export * from './multiDomain';
 export * from './oauth';
 export * from './organization';
+export * from './organizationDomain';
 export * from './organizationInvitation';
 export * from './organizationMembership';
 export * from './organizationSettings';

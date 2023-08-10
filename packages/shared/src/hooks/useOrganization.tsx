@@ -1,18 +1,30 @@
 import type {
   ClerkPaginationParams,
+  GetDomainsParams,
   GetMembershipsParams,
   GetPendingInvitationsParams,
+  OrganizationDomainResource,
   OrganizationInvitationResource,
   OrganizationMembershipResource,
   OrganizationResource,
 } from '@clerk/types';
+import type { ClerkPaginatedResponse } from '@clerk/types';
+import { useRef } from 'react';
 import useSWR from 'swr';
 
 import { useClerkInstanceContext, useOrganizationContext, useSessionContext } from './contexts';
+import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
+import { usePagesOrInfinite } from './usePagesOrInfinite';
 
 type UseOrganizationParams = {
   invitationList?: GetPendingInvitationsParams;
   membershipList?: GetMembershipsParams;
+  domains?:
+    | true
+    | (GetDomainsParams & {
+        infinite?: boolean;
+        keepPreviousData?: boolean;
+      });
 };
 
 type UseOrganizationReturn =
@@ -22,6 +34,7 @@ type UseOrganizationReturn =
       invitationList: undefined;
       membershipList: undefined;
       membership: undefined;
+      domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
     }
   | {
       isLoaded: true;
@@ -29,6 +42,7 @@ type UseOrganizationReturn =
       invitationList: undefined;
       membershipList: undefined;
       membership: undefined;
+      domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
     }
   | {
       isLoaded: boolean;
@@ -36,17 +50,70 @@ type UseOrganizationReturn =
       invitationList: OrganizationInvitationResource[] | null | undefined;
       membershipList: OrganizationMembershipResource[] | null | undefined;
       membership: OrganizationMembershipResource | null | undefined;
+      domains: PaginatedResources<OrganizationDomainResource> | null;
     };
 
 type UseOrganization = (params?: UseOrganizationParams) => UseOrganizationReturn;
 
 export const useOrganization: UseOrganization = params => {
-  const { invitationList: invitationListParams, membershipList: membershipListParams } = params || {};
+  const {
+    invitationList: invitationListParams,
+    membershipList: membershipListParams,
+    domains: domainListParams,
+  } = params || {};
   const { organization, lastOrganizationMember, lastOrganizationInvitation } = useOrganizationContext();
   const session = useSessionContext();
 
+  const shouldUseDefaults = typeof domainListParams === 'boolean' && domainListParams;
+
+  // Cache initialPage and initialPageSize until unmount
+  const initialPageRef = useRef(shouldUseDefaults ? 1 : domainListParams?.initialPage ?? 1);
+  const pageSizeRef = useRef(shouldUseDefaults ? 10 : domainListParams?.pageSize ?? 10);
+
+  const triggerInfinite = shouldUseDefaults ? false : !!domainListParams?.infinite;
+  const internalKeepPreviousData = shouldUseDefaults ? false : !!domainListParams?.keepPreviousData;
+
   const clerk = useClerkInstanceContext();
-  const shouldFetch = clerk.loaded && session && organization;
+
+  const shouldFetch = !!(clerk.loaded && session && organization);
+
+  const paginatedParams =
+    typeof domainListParams === 'undefined'
+      ? undefined
+      : {
+          initialPage: initialPageRef.current,
+          pageSize: pageSizeRef.current,
+        };
+
+  const {
+    data: isomorphicData,
+    count: isomorphicCount,
+    isLoading: isomorphicIsLoading,
+    isFetching: isomorphicIsFetching,
+    isError: isomorphicIsError,
+    page: isomorphicPage,
+    pageCount,
+    fetchPage: isomorphicSetPage,
+    fetchNext,
+    fetchPrevious,
+    hasNextPage,
+    hasPreviousPage,
+    unstable__mutate,
+  } = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
+    {
+      ...paginatedParams,
+    },
+    organization?.getDomains,
+    {
+      keepPreviousData: internalKeepPreviousData,
+      infinite: triggerInfinite,
+      enabled: !!paginatedParams,
+    },
+    {
+      type: 'domains',
+      organizationId: organization?.id,
+    },
+  );
 
   // Some gymnastics to adhere to the rules of hooks
   // We need to make sure useSWR is called on every render
@@ -87,6 +154,20 @@ export const useOrganization: UseOrganization = params => {
       invitationList: undefined,
       membershipList: undefined,
       membership: undefined,
+      domains: {
+        data: undefined,
+        count: undefined,
+        isLoading: false,
+        isFetching: false,
+        isError: false,
+        page: undefined,
+        pageCount: undefined,
+        fetchPage: undefined,
+        fetchNext: undefined,
+        fetchPrevious: undefined,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
     };
   }
 
@@ -97,6 +178,7 @@ export const useOrganization: UseOrganization = params => {
       invitationList: null,
       membershipList: null,
       membership: null,
+      domains: null,
     };
   }
 
@@ -108,6 +190,20 @@ export const useOrganization: UseOrganization = params => {
       invitationList: undefined,
       membershipList: undefined,
       membership: undefined,
+      domains: {
+        data: undefined,
+        count: undefined,
+        isLoading: false,
+        isFetching: false,
+        isError: false,
+        page: undefined,
+        pageCount: undefined,
+        fetchPage: undefined,
+        fetchNext: undefined,
+        fetchPrevious: undefined,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
     };
   }
 
@@ -120,6 +216,21 @@ export const useOrganization: UseOrganization = params => {
     unstable__mutate: () => {
       void mutateMembershipList();
       void mutateInvitationList();
+    },
+    domains: {
+      data: isomorphicData,
+      count: isomorphicCount,
+      isLoading: isomorphicIsLoading,
+      isFetching: isomorphicIsFetching,
+      isError: isomorphicIsError,
+      page: isomorphicPage,
+      pageCount,
+      fetchPage: isomorphicSetPage,
+      fetchNext,
+      fetchPrevious,
+      hasNextPage,
+      hasPreviousPage,
+      unstable__mutate,
     },
   };
 };

@@ -1,4 +1,5 @@
-import type { ClerkPaginationParams } from './api';
+import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
+import type { OrganizationDomainResource } from './organizationDomain';
 import type { OrganizationInvitationResource } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import type { ClerkResource } from './resource';
@@ -43,11 +44,14 @@ export interface OrganizationResource extends ClerkResource {
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: (params?: GetMembershipsParams) => Promise<OrganizationMembershipResource[]>;
   getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
+  getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   inviteMembers: (params: InviteMembersParams) => Promise<OrganizationInvitationResource[]>;
   updateMember: (params: UpdateMembershipParams) => Promise<OrganizationMembershipResource>;
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
+  createDomain: (domainName: string) => Promise<OrganizationDomainResource>;
+  getDomain: ({ domainId }: { domainId: string }) => Promise<OrganizationDomainResource>;
   destroy: () => Promise<void>;
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
 }
@@ -57,6 +61,16 @@ export type GetMembershipsParams = {
 } & ClerkPaginationParams;
 
 export type GetPendingInvitationsParams = ClerkPaginationParams;
+export type GetDomainsParams = {
+  /**
+   * This the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+};
 
 export interface AddMemberParams {
   userId: string;
