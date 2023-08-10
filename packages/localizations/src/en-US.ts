@@ -626,6 +626,7 @@ export const enUS: LocalizationResource = {
         menuAction__revoke: 'Revoke invitation',
       },
       invitationsTab: {
+        table__emptyRow: 'No invitations to display',
         manualInvitations: {
           headerTitle: 'Individual invitations',
           headerSubtitle: 'Browse and manage invited members.',
@@ -641,6 +642,7 @@ export const enUS: LocalizationResource = {
       requestsTab: {
         tableHeader__requested: 'Requested access',
         menuAction__approve: 'Approve',
+        table__emptyRow: 'No requests to display',
         requests: {
           headerTitle: 'Requests',
           headerSubtitle: 'Browse and manage users who requested to join the organization.',

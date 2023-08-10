@@ -649,6 +649,7 @@ type _LocalizationResource = {
         menuAction__revoke: LocalizationValue;
       };
       invitationsTab: {
+        table__emptyRow: LocalizationValue;
         manualInvitations: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
@@ -663,6 +664,7 @@ type _LocalizationResource = {
       requestsTab: {
         tableHeader__requested: LocalizationValue;
         menuAction__approve: LocalizationValue;
+        table__emptyRow: LocalizationValue;
         requests: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;

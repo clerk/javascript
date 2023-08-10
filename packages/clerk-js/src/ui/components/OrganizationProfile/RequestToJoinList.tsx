@@ -4,7 +4,7 @@ import { useCoreOrganization } from '../../contexts';
 import { Button, Flex, localizationKeys, Td } from '../../customizables';
 import { useCardState, UserPreview } from '../../elements';
 import { handleError } from '../../utils';
-import { MembersListTable, RowContainer } from './MemberListTable';
+import { DataTable, RowContainer } from './MemberListTable';
 
 const ITEMS_PER_PAGE = 10;
 export const RequestToJoinList = () => {
@@ -34,12 +34,13 @@ export const RequestToJoinList = () => {
   };
 
   return (
-    <MembersListTable
+    <DataTable
       page={membershipRequests?.page || 1}
       onPageChange={membershipRequests?.fetchPage ?? (() => null)}
       itemCount={membershipRequests?.count ?? 0}
       itemsPerPage={ITEMS_PER_PAGE}
       isLoading={membershipRequests?.isFetching}
+      emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.table__emptyRow')}
       headers={[
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
         localizationKeys('organizationProfile.membersPage.requestsTab.tableHeader__requested'),
