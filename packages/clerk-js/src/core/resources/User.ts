@@ -11,6 +11,7 @@ import type {
   ExternalAccountJSON,
   ExternalAccountResource,
   GetUserOrganizationInvitationsParams,
+  GetUserOrganizationSuggestionsParams,
   ImageResource,
   OrganizationMembershipResource,
   PhoneNumberResource,
@@ -39,6 +40,7 @@ import {
   ExternalAccount,
   Image,
   OrganizationMembership,
+  OrganizationSuggestion,
   PhoneNumber,
   SamlAccount,
   SessionWithActivities,
@@ -258,6 +260,10 @@ export class User extends BaseResource implements UserResource {
 
   getOrganizationInvitations = (params?: GetUserOrganizationInvitationsParams) => {
     return UserOrganizationInvitation.retrieve(params);
+  };
+
+  getOrganizationSuggestions = (params?: GetUserOrganizationSuggestionsParams) => {
+    return OrganizationSuggestion.retrieve(params);
   };
 
   getOrganizationMemberships = async (

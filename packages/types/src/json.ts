@@ -10,6 +10,7 @@ import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode }
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
+import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus } from './session';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
@@ -363,6 +364,23 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
+  id: string;
+  name: string;
+  slug: string | null;
+  has_image: boolean;
+  image_url: string;
+}
+
+export interface OrganizationSuggestionJSON extends ClerkResourceJSON {
+  object: 'organization_suggestion';
+  id: string;
+  public_organization_data: PublicOrganizationDataJSON;
+  status: OrganizationSuggestionStatus;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface OrganizationMembershipRequestJSON extends ClerkResourceJSON {
   object: 'organization_membership_request';
   id: string;
@@ -377,13 +395,7 @@ export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
   object: 'organization_invitation';
   id: string;
   email_address: string;
-  public_organization_data: {
-    id: string;
-    name: string;
-    slug: string | null;
-    has_image: boolean;
-    image_url: string;
-  };
+  public_organization_data: PublicOrganizationDataJSON;
   public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
   role: MembershipRole;
