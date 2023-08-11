@@ -84,6 +84,9 @@ export const VerifyDomainPage = withCardStateProvider(() => {
   }
   const handleResend = () => {
     codeControl.reset();
+    domain?.prepareAffiliationVerification({ affiliationEmailAddress: emailField.value }).catch(err => {
+      handleError(err, [emailField], card.setError);
+    });
   };
 
   const dataChanged = organization.name !== emailField.value;
