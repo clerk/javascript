@@ -598,13 +598,13 @@ export const enUS: LocalizationResource = {
       actionLabel__remove: 'Remove email domain',
       formTitle: 'Enrollment mode',
       formSubtitle: 'Choose how users from this domain can join the organization.',
-      radioLabel__manualInvitation: 'No automatic enrollment',
-      radioDescription__manualInvitation: 'Users can only be invited manually to the organization.',
-      radioLabel__automaticInvitation: 'Automatic invitations',
-      radioDescription__automaticInvitation:
+      manualInvitationOption__label: 'No automatic enrollment',
+      manualInvitationOption__description: 'Users can only be invited manually to the organization.',
+      automaticInvitationOption__label: 'Automatic invitations',
+      automaticInvitationOption__description:
         'Users are automatically invited to join the organization when they sign-up and can join anytime.',
-      radioLabel__automaticSuggestion: 'Automatic suggestions',
-      radioDescription__automaticSuggestion:
+      automaticSuggestionOption__label: 'Automatic suggestions',
+      automaticSuggestionOption__description:
         'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
     },
     invitePage: {

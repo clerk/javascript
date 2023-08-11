@@ -616,12 +616,12 @@ type _LocalizationResource = {
       actionLabel__remove: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
-      radioLabel__manualInvitation: LocalizationValue;
-      radioDescription__manualInvitation: LocalizationValue;
-      radioLabel__automaticInvitation: LocalizationValue;
-      radioDescription__automaticInvitation: LocalizationValue;
-      radioLabel__automaticSuggestion: LocalizationValue;
-      radioDescription__automaticSuggestion: LocalizationValue;
+      manualInvitationOption__label: LocalizationValue;
+      manualInvitationOption__description: LocalizationValue;
+      automaticInvitationOption__label: LocalizationValue;
+      automaticInvitationOption__description: LocalizationValue;
+      automaticSuggestionOption__label: LocalizationValue;
+      automaticSuggestionOption__description: LocalizationValue;
     };
     removeDomainPage: {
       title: LocalizationValue;

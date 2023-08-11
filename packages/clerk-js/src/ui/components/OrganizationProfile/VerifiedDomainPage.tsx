@@ -32,9 +32,9 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         ? [
             {
               value: 'manual_invitation',
-              label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__manualInvitation'),
+              label: localizationKeys('organizationProfile.verifiedDomainPage.manualInvitationOption__label'),
               description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.radioDescription__manualInvitation',
+                'organizationProfile.verifiedDomainPage.manualInvitationOption__description',
               ),
             },
           ]
@@ -43,9 +43,9 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         ? [
             {
               value: 'automatic_invitation',
-              label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__automaticInvitation'),
+              label: localizationKeys('organizationProfile.verifiedDomainPage.automaticInvitationOption__label'),
               description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.radioDescription__automaticInvitation',
+                'organizationProfile.verifiedDomainPage.automaticInvitationOption__description',
               ),
             },
           ]
@@ -54,9 +54,9 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         ? [
             {
               value: 'automatic_suggestion',
-              label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__automaticSuggestion'),
+              label: localizationKeys('organizationProfile.verifiedDomainPage.automaticSuggestionOption__label'),
               description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.radioDescription__automaticSuggestion',
+                'organizationProfile.verifiedDomainPage.automaticSuggestionOption__description',
               ),
             },
           ]
