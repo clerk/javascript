@@ -17,7 +17,7 @@ export const AddDomainPage = withCardStateProvider(() => {
   const nameField = useFormControl('name', '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__organizationEmailDomain'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationEmailDomain'),
   });
 
   if (!organization) {
