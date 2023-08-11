@@ -36,6 +36,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__organizationName: 'Organization name',
   formFieldLabel__organizationSlug: 'Slug URL',
   formFieldLabel__organizationEmailDomain: 'Email domain',
+  formFieldLabel__organizationEmailDomainEmailAddress: 'Verification email address',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
@@ -54,6 +55,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
   formFieldInputPlaceholder__organizationEmailDomain: '',
+  formFieldInputPlaceholder__organizationEmailDomainEmailAddress: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldAction__forgotPassword: 'Forgot password?',
@@ -568,16 +570,16 @@ export const enUS: LocalizationResource = {
         },
       },
       domainSection: {
-        title: 'Verified Domains',
+        title: 'Domain-based enrollment',
         subtitle:
-          'Setup a domain so everyone with email addresses at this domain can automatically join your organization.',
-        primaryButton: 'Add verified domain',
+          'Allow users to join the organization automatically or request to join based on a verified email domain.',
+        primaryButton: 'Add email domain',
       },
     },
     createDomainPage: {
-      title: 'Add verified domain',
+      title: 'Add email domain',
       subtitle:
-        'Add a domain so new users signing up with email addresses at this domain can automatically join your organization as a member.',
+        'Add the email domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
     },
     verifyDomainPage: {
       title: 'Verify domain',
@@ -588,11 +590,10 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
     },
     verifiedDomainPage: {
-      title: 'Verified domain',
-      actionLabel__remove: 'Remove verified domain',
-      formTitle: 'Enrollment method',
-      formSubtitle:
-        'Define the method for automatically adding new and existing users who are associated with this domain to the organization.',
+      title: 'Enrollment options',
+      actionLabel__remove: 'Remove email domain',
+      formTitle: 'Enrollment mode',
+      formSubtitle: 'Choose how users from this domain can join the organization.',
     },
     invitePage: {
       title: 'Invite members',

@@ -46,7 +46,10 @@ export const DataTable = (props: MembersListTableProps) => {
             {isLoading ? (
               <Tr>
                 <Td colSpan={4}>
-                  <Spinner sx={{ margin: 'auto', display: 'block' }} />
+                  <Spinner
+                    colorScheme='primary'
+                    sx={{ margin: 'auto', display: 'block' }}
+                  />
                 </Td>
               </Tr>
             ) : !rows.length ? (

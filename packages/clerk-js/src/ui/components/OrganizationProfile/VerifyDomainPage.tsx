@@ -44,8 +44,8 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   const emailField = useFormControl('emailAddress', '', {
     type: 'email',
-    label: localizationKeys('formFieldLabel__organizationEmailDomain'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
+    label: localizationKeys('formFieldLabel__organizationEmailDomainEmailAddress'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationEmailDomainEmailAddress'),
   });
 
   const resolve = async () => {
@@ -147,6 +147,9 @@ export const VerifyDomainPage = withCardStateProvider(() => {
           })}
           actionLabel={localizationKeys('organizationProfile.verifyDomainPage.actionLabel__remove')}
           onActionClick={() => navigate(`../../../domain/${domain.id}/remove`)}
+          actionSx={t => ({
+            color: t.colors.$danger500,
+          })}
         >
           {domain.name}
         </BlockWithAction>

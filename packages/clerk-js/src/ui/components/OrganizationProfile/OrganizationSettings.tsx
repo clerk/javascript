@@ -77,6 +77,7 @@ const OrganizationDomainsSection = () => {
   return (
     <ProfileSection
       title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
+      subtitle={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
       id='organizationDomains'
     >
       <DomainList redirectSubPath={'domain/'} />

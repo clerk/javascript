@@ -119,6 +119,9 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
           padding: `${t.space.$3} ${t.space.$4}`,
           minHeight: t.sizes.$10,
         })}
+        actionSx={t => ({
+          color: t.colors.$danger500,
+        })}
         actionLabel={localizationKeys('organizationProfile.verifiedDomainPage.actionLabel__remove')}
         onActionClick={() => navigate(`../../domain/${domain.id}/remove`)}
       >
