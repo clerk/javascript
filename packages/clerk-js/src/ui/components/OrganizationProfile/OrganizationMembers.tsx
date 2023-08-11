@@ -1,10 +1,8 @@
-import { CalloutWithAction } from '../../common';
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   CardAlert,
   Header,
-  IconButton,
   NavbarMenuButtonRow,
   Tab,
   TabPanel,
@@ -14,15 +12,12 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { UserAdd } from '../../icons';
-import { useRouter } from '../../router';
 import { ActiveMembersList } from './ActiveMembersList';
-import { DomainList } from './DomainList';
-import { InvitedMembersList } from './InvitedMembersList';
 import { MembershipWidget } from './MembershipWidget';
+import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
+import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
 export const OrganizationMembers = withCardStateProvider(() => {
-  const { navigate } = useRouter();
   const card = useCardState();
   const { membership } = useCoreOrganization();
   //@ts-expect-error
@@ -56,6 +51,9 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
               />
             )}
+            {isAdmin && (
+              <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')} />
+            )}
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>
@@ -72,96 +70,12 @@ export const OrganizationMembers = withCardStateProvider(() => {
             </TabPanel>
             {isAdmin && (
               <TabPanel sx={{ width: '100%' }}>
-                <Col
-                  gap={8}
-                  sx={{
-                    width: '100%',
-                  }}
-                >
-                  {isAdmin && __unstable_manageBillingUrl && <MembershipWidget />}
-                  <Col
-                    gap={2}
-                    sx={{
-                      width: '100%',
-                    }}
-                  >
-                    <Header.Root>
-                      <Header.Title
-                        localizationKey={localizationKeys(
-                          'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
-                        )}
-                        textVariant='largeMedium'
-                      />
-                      <Header.Subtitle
-                        localizationKey={localizationKeys(
-                          'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
-                        )}
-                        variant='regularRegular'
-                      />
-                    </Header.Root>
-                    <DomainList
-                      fallback={
-                        <CalloutWithAction
-                          text={localizationKeys(
-                            'organizationProfile.membersPage.invitationsTab.autoInvitations.calloutTextLabel',
-                          )}
-                          actionLabel={localizationKeys(
-                            'organizationProfile.membersPage.invitationsTab.autoInvitations.calloutActionLabel',
-                          )}
-                          onClick={() => navigate('organization-settings/domain')}
-                        />
-                      }
-                      redirectSubPath={'organization-settings/domain/'}
-                      verificationStatus={'verified'}
-                      enrollmentMode={'automatic_invitation'}
-                    />
-                  </Col>
-
-                  <Flex
-                    direction='col'
-                    gap={4}
-                    sx={{
-                      width: '100%',
-                    }}
-                  >
-                    <Flex
-                      justify={'between'}
-                      align={'center'}
-                    >
-                      <Header.Root>
-                        <Header.Title
-                          localizationKey={localizationKeys(
-                            'organizationProfile.membersPage.invitationsTab.manualInvitations.headerTitle',
-                          )}
-                          textVariant='largeMedium'
-                        />
-                        <Header.Subtitle
-                          localizationKey={localizationKeys(
-                            'organizationProfile.membersPage.invitationsTab.manualInvitations.headerSubtitle',
-                          )}
-                          variant='regularRegular'
-                        />
-                      </Header.Root>
-                      {isAdmin && (
-                        <IconButton
-                          elementDescriptor={descriptors.membersPageInviteButton}
-                          aria-label='Invite'
-                          onClick={() => navigate('invite-members')}
-                          icon={
-                            <Icon
-                              icon={UserAdd}
-                              size={'sm'}
-                              sx={t => ({ marginRight: t.space.$2 })}
-                            />
-                          }
-                          textVariant='buttonExtraSmallBold'
-                          localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
-                        />
-                      )}
-                    </Flex>
-                    <InvitedMembersList />
-                  </Flex>
-                </Col>
+                <OrganizationMembersTabInvitations />
+              </TabPanel>
+            )}
+            {isAdmin && (
+              <TabPanel sx={{ width: '100%' }}>
+                <OrganizationMembersTabRequests />
               </TabPanel>
             )}
           </TabPanels>

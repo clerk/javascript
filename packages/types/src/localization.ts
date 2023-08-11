@@ -635,6 +635,7 @@ type _LocalizationResource = {
          */
         headerTitle__invited: LocalizationValue;
         headerTitle__invitations: LocalizationValue;
+        headerTitle__requests: LocalizationValue;
       };
       activeMembersTab: {
         tableHeader__user: LocalizationValue;
@@ -648,6 +649,7 @@ type _LocalizationResource = {
         menuAction__revoke: LocalizationValue;
       };
       invitationsTab: {
+        table__emptyRow: LocalizationValue;
         manualInvitations: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
@@ -657,6 +659,19 @@ type _LocalizationResource = {
           headerSubtitle: LocalizationValue;
           calloutTextLabel: LocalizationValue;
           calloutActionLabel: LocalizationValue;
+        };
+      };
+      requestsTab: {
+        tableHeader__requested: LocalizationValue;
+        menuAction__approve: LocalizationValue;
+        table__emptyRow: LocalizationValue;
+        requests: {
+          headerTitle: LocalizationValue;
+          headerSubtitle: LocalizationValue;
+        };
+        autoSuggestions: {
+          headerTitle: LocalizationValue;
+          headerSubtitle: LocalizationValue;
         };
       };
     };

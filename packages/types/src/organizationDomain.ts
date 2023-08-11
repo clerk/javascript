@@ -9,7 +9,7 @@ export interface OrganizationDomainVerification {
 
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 
-export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation';
+export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation' | 'automatic_suggestion';
 
 export interface OrganizationDomainResource extends ClerkResource {
   id: string;
