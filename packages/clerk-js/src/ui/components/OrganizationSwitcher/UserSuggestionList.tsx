@@ -1,4 +1,4 @@
-import type { UserOrganizationInvitationResource } from '@clerk/types';
+import type { OrganizationSuggestionResource } from '@clerk/types';
 
 import { useCoreOrganizationList } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
@@ -7,23 +7,23 @@ import { useInView } from '../../hooks';
 import { common } from '../../styledSystem';
 import { handleError } from '../../utils';
 
-export const UserInvitationList = () => {
-  const { ref } = useInView({
-    threshold: 0,
-    onChange: inView => {
-      if (inView) {
-        userInvitations.fetchNext?.();
-      }
-    },
-  });
-
-  const { userInvitations } = useCoreOrganizationList({
-    userInvitations: {
+export const UserSuggestionList = () => {
+  const { userSuggestions } = useCoreOrganizationList({
+    userSuggestions: {
       infinite: true,
     },
   });
 
-  if ((userInvitations.count ?? 0) === 0) {
+  const { ref } = useInView({
+    threshold: 0,
+    onChange: inView => {
+      if (inView) {
+        userSuggestions.fetchNext?.();
+      }
+    },
+  });
+
+  if ((userSuggestions.count ?? 0) === 0) {
     return null;
   }
 
@@ -43,11 +43,11 @@ export const UserInvitationList = () => {
         })}
         // Handle plurals
         localizationKey={localizationKeys(
-          (userInvitations.count ?? 0) > 1
-            ? 'organizationSwitcher.invitationCountLabel_many'
-            : 'organizationSwitcher.invitationCountLabel_single',
+          (userSuggestions.count ?? 0) > 1
+            ? 'organizationSwitcher.suggestionCountLabel_many'
+            : 'organizationSwitcher.suggestionCountLabel_single',
           {
-            count: userInvitations.count,
+            count: userSuggestions.count,
           },
         )}
       />
@@ -58,16 +58,16 @@ export const UserInvitationList = () => {
           ...common.unstyledScrollbar(t),
         })}
       >
-        {userInvitations?.data?.map(inv => {
+        {userSuggestions?.data?.map(inv => {
           return (
-            <InvitationPreview
+            <SuggestionPreview
               key={inv.id}
               {...inv}
             />
           );
         })}
 
-        {(userInvitations.hasNextPage || userInvitations.isFetching) && (
+        {(userSuggestions.hasNextPage || userSuggestions.isFetching) && (
           <Box
             ref={ref}
             sx={t => ({
@@ -97,16 +97,16 @@ export const UserInvitationList = () => {
   );
 };
 
-const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource) => {
+const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) => {
   const card = useCardState();
-  const { userInvitations } = useCoreOrganizationList({
-    userInvitations: {
+  const { userSuggestions } = useCoreOrganizationList({
+    userSuggestions: {
       infinite: true,
     },
   });
 
   const mutateSwrState = () => {
-    (userInvitations as any)?.unstable__mutate?.();
+    (userSuggestions as any)?.unstable__mutate?.();
   };
 
   const handleAccept = () => {
@@ -124,12 +124,12 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
-      localizationKey={localizationKeys('organizationSwitcher.invitationAccept')}
+      localizationKey={localizationKeys('organizationSwitcher.suggestionsAccept')}
     />
   );
 };
 
-const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
+const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionResource) => {
   return (
     <Flex
       align='center'
@@ -148,7 +148,7 @@ const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitati
         size='sm'
       />
 
-      <AcceptRejectInvitationButtons {...props} />
+      <AcceptRejectSuggestionButtons {...props} />
     </Flex>
   );
 });

@@ -12,8 +12,14 @@ const _OrganizationSwitcher = withFloatingTree(() => {
     offset: 8,
   });
 
+  /**
+   * Prefetch user invitations and suggestions
+   */
   useCoreOrganizationList({
     userInvitations: {
+      infinite: true,
+    },
+    userSuggestions: {
       infinite: true,
     },
   });
