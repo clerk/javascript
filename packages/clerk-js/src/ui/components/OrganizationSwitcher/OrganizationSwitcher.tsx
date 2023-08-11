@@ -13,7 +13,7 @@ const _OrganizationSwitcher = withFloatingTree(() => {
   });
 
   /**
-   * Prefetch user invitations and suggestions
+   * Prefetch user invitations and suggestionss
    */
   useCoreOrganizationList({
     userInvitations: {
