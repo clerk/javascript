@@ -1,4 +1,4 @@
-import { CalloutWithAction } from '../../common';
+import { AddBlockButton } from '../../common';
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton } from '../../elements';
@@ -50,11 +50,9 @@ export const OrganizationMembersTabInvitations = () => {
         </Header.Root>
         <DomainList
           fallback={
-            <CalloutWithAction
-              text={localizationKeys('organizationProfile.membersPage.invitationsTab.autoInvitations.calloutTextLabel')}
-              actionLabel={localizationKeys(
-                'organizationProfile.membersPage.invitationsTab.autoInvitations.calloutActionLabel',
-              )}
+            <AddBlockButton
+              textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
+              id='addOrganizationDomain'
               onClick={() => navigate('organization-settings/domain')}
             />
           }
