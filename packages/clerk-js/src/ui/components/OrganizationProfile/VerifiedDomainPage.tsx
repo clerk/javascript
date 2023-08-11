@@ -1,7 +1,7 @@
 import type { OrganizationEnrollmentMode } from '@clerk/types';
 
 import { useCoreOrganization, useEnvironment } from '../../contexts';
-import { Badge, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import {
   BlockWithAction,
   ContentPage,
@@ -14,6 +14,7 @@ import {
 import { useFetch } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
+import { EnrollmentBadge } from './EnrollmentBadge';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const VerifiedDomainPage = withCardStateProvider(() => {
@@ -29,30 +30,36 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     radioOptions: [
       ...(organizationSettings.domains.enrollmentModes.includes('manual_invitation')
         ? [
-          {
-            value: 'manual_invitation',
-            label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__manualInvitation'),
-            description: localizationKeys('organizationProfile.verifiedDomainPage.radioDescription__manualInvitation'),
-          },
-        ]
+            {
+              value: 'manual_invitation',
+              label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__manualInvitation'),
+              description: localizationKeys(
+                'organizationProfile.verifiedDomainPage.radioDescription__manualInvitation',
+              ),
+            },
+          ]
         : []),
       ...(organizationSettings.domains.enrollmentModes.includes('automatic_invitation')
         ? [
-          {
-            value: 'automatic_invitation',
-            label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__automaticInvitation'),
-            description: localizationKeys('organizationProfile.verifiedDomainPage.radioDescription__automaticInvitation'),
-          },
-        ]
+            {
+              value: 'automatic_invitation',
+              label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__automaticInvitation'),
+              description: localizationKeys(
+                'organizationProfile.verifiedDomainPage.radioDescription__automaticInvitation',
+              ),
+            },
+          ]
         : []),
       ...(organizationSettings.domains.enrollmentModes.includes('automatic_suggestion')
         ? [
-          {
-            value: 'automatic_suggestion',
-            label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__automaticSuggestion'),
-            description: localizationKeys('organizationProfile.verifiedDomainPage.radioDescription__automaticSuggestion'),
-          },
-        ]
+            {
+              value: 'automatic_suggestion',
+              label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__automaticSuggestion'),
+              description: localizationKeys(
+                'organizationProfile.verifiedDomainPage.radioDescription__automaticSuggestion',
+              ),
+            },
+          ]
         : []),
     ],
   });
@@ -115,7 +122,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     >
       <BlockWithAction
         elementDescriptor={descriptors.accordionTriggerButton}
-        badge={<Badge textVariant={'extraSmallRegular'}>Verified</Badge>}
+        badge={<EnrollmentBadge organizationDomain={domain} />}
         sx={t => ({
           backgroundColor: t.colors.$blackAlpha50,
           padding: `${t.space.$3} ${t.space.$4}`,

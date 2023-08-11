@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
-import { Badge, Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
+import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import {
   BlockWithAction,
@@ -18,6 +18,7 @@ import { CodeForm } from '../../elements/CodeForm';
 import { useFetch, useLoadingStatus, useNavigateToFlowStart } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep, useFormControl } from '../../utils';
+import { EnrollmentBadge } from './EnrollmentBadge';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const VerifyDomainPage = withCardStateProvider(() => {
@@ -132,14 +133,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       >
         <BlockWithAction
           elementDescriptor={descriptors.accordionTriggerButton}
-          badge={
-            <Badge
-              textVariant={'extraSmallRegular'}
-              colorScheme={'warning'}
-            >
-              Unverified
-            </Badge>
-          }
+          badge={<EnrollmentBadge organizationDomain={domain} />}
           sx={t => ({
             backgroundColor: t.colors.$blackAlpha50,
             padding: `${t.space.$3} ${t.space.$4}`,

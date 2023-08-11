@@ -3,10 +3,11 @@ import type { OrganizationDomainVerificationStatus } from '@clerk/types';
 import React, { useMemo } from 'react';
 
 import { useCoreOrganization } from '../../contexts';
-import { Badge, Box, Col, descriptors, Spinner } from '../../customizables';
+import { Box, Col, descriptors, Spinner } from '../../customizables';
 import { ArrowBlockButton } from '../../elements';
 import { useInView } from '../../hooks';
 import { useRouter } from '../../router';
+import { EnrollmentBadge } from './EnrollmentBadge';
 
 type DomainListProps = GetDomainsParams & {
   verificationStatus?: OrganizationDomainVerificationStatus;
@@ -73,20 +74,7 @@ export const DomainList = (props: DomainListProps) => {
           elementDescriptor={descriptors.accordionTriggerButton}
           variant='ghost'
           colorScheme='neutral'
-          badge={
-            !verificationStatus ? (
-              d.verification && d.verification.status === 'verified' ? (
-                <Badge textVariant={'extraSmallRegular'}>Verified</Badge>
-              ) : (
-                <Badge
-                  textVariant={'extraSmallRegular'}
-                  colorScheme={'warning'}
-                >
-                  Unverified
-                </Badge>
-              )
-            ) : undefined
-          }
+          badge={!verificationStatus ? <EnrollmentBadge organizationDomain={d} /> : undefined}
           sx={t => ({
             padding: `${t.space.$3} ${t.space.$4}`,
             minHeight: t.sizes.$10,
