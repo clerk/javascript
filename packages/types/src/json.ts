@@ -364,12 +364,21 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
+export interface PublicOrganizationDataJSON {
   id: string;
   name: string;
   slug: string | null;
   has_image: boolean;
   image_url: string;
+}
+
+export interface OrganizationSuggestionJSON extends ClerkResourceJSON {
+  object: 'organization_suggestion';
+  id: string;
+  public_organization_data: PublicOrganizationDataJSON;
+  status: OrganizationSuggestionStatus;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface OrganizationSuggestionJSON extends ClerkResourceJSON {
