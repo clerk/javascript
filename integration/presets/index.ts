@@ -6,7 +6,7 @@ import { remix } from './remix';
 
 export const longRunningApps = {
   next: {
-    // appRouterAllEnabled: longRunningApplication(next.appRouter, instances.allEnabled),
+    appRouterAllEnabled: longRunningApplication('approuter-all-enabled', next.appRouter, instances.allEnabled),
     // appRouterEmailLink: longRunningApplication(next.appRouter, instances.withEmailLinks),
   },
   react: {
