@@ -1,5 +1,5 @@
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser } from '../../contexts';
+import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -7,6 +7,7 @@ import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const UsernamePage = withCardStateProvider(() => {
   const user = useCoreUser();
+  const { userSettings } = useEnvironment();
   const card = useCardState();
   const wizard = useWizard();
   const usernameField = useFormControl('username', user.username || '', {
@@ -15,7 +16,10 @@ export const UsernamePage = withCardStateProvider(() => {
     placeholder: localizationKeys('formFieldInputPlaceholder__username'),
   });
 
-  const canSubmit = usernameField.value.length > 1 && user.username !== usernameField.value;
+  const isUsernameRequired = userSettings.attributes.username.required;
+
+  const canSubmit =
+    (isUsernameRequired ? usernameField.value.length > 1 : true) && user.username !== usernameField.value;
 
   const updatePassword = async () => {
     try {
