@@ -350,6 +350,8 @@ export type ElementsConfig = {
   profileSection: WithOptions<ProfileSectionId, never, never>;
   profileSectionTitle: WithOptions<ProfileSectionId, never, never>;
   profileSectionTitleText: WithOptions<ProfileSectionId, never, never>;
+  profileSectionSubtitle: WithOptions<ProfileSectionId, never, never>;
+  profileSectionSubtitleText: WithOptions<ProfileSectionId, never, never>;
   profileSectionContent: WithOptions<ProfileSectionId, never, never>;
   profileSectionPrimaryButton: WithOptions<ProfileSectionId, never, never>;
   profilePage: WithOptions<ProfilePageId, never, never>;

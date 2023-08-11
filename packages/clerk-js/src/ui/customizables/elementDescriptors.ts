@@ -198,6 +198,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'profileSection',
   'profileSectionTitle',
   'profileSectionTitleText',
+  'profileSectionSubtitle',
+  'profileSectionSubtitleText',
   'profileSectionContent',
   'profileSectionPrimaryButton',
   'profilePage',
