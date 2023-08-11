@@ -662,8 +662,6 @@ type _LocalizationResource = {
         autoInvitations: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
-          calloutTextLabel: LocalizationValue;
-          calloutActionLabel: LocalizationValue;
         };
       };
       requestsTab: {

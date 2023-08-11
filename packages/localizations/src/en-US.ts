@@ -639,8 +639,6 @@ export const enUS: LocalizationResource = {
           headerTitle: 'Domain invitations',
           headerSubtitle:
             'New and existing users will be able to join anytime as members and will get notified in-app.',
-          calloutTextLabel: 'Invite users to your organization using verified email domains.',
-          calloutActionLabel: 'Setup verified domain',
         },
       },
       requestsTab: {
