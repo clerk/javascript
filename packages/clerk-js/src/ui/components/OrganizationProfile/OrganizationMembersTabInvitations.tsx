@@ -1,5 +1,5 @@
 import { AddBlockButton } from '../../common';
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
+import { useCoreOrganization, useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton } from '../../elements';
 import { UserAdd } from '../../icons';
@@ -9,12 +9,15 @@ import { InvitedMembersList } from './InvitedMembersList';
 import { MembershipWidget } from './MembershipWidget';
 
 export const OrganizationMembersTabInvitations = () => {
+  const { organizationSettings } = useEnvironment();
   const { navigate } = useRouter();
   const { membership } = useCoreOrganization();
   //@ts-expect-error
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
 
   const isAdmin = membership?.role === 'admin';
+
+  const allowDomains = organizationSettings?.domains?.enabled;
 
   if (!isAdmin) {
     return null;
@@ -28,39 +31,42 @@ export const OrganizationMembersTabInvitations = () => {
       }}
     >
       {__unstable_manageBillingUrl && <MembershipWidget />}
-      <Col
-        gap={2}
-        sx={{
-          width: '100%',
-        }}
-      >
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys(
-              'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
-            )}
-            textVariant='largeMedium'
-          />
-          <Header.Subtitle
-            localizationKey={localizationKeys(
-              'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
-            )}
-            variant='regularRegular'
-          />
-        </Header.Root>
-        <DomainList
-          fallback={
-            <AddBlockButton
-              textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
-              id='addOrganizationDomain'
-              onClick={() => navigate('organization-settings/domain')}
+
+      {allowDomains && (
+        <Col
+          gap={2}
+          sx={{
+            width: '100%',
+          }}
+        >
+          <Header.Root>
+            <Header.Title
+              localizationKey={localizationKeys(
+                'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
+              )}
+              textVariant='largeMedium'
             />
-          }
-          redirectSubPath={'organization-settings/domain/'}
-          verificationStatus={'verified'}
-          enrollmentMode={'automatic_invitation'}
-        />
-      </Col>
+            <Header.Subtitle
+              localizationKey={localizationKeys(
+                'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
+              )}
+              variant='regularRegular'
+            />
+          </Header.Root>
+          <DomainList
+            fallback={
+              <AddBlockButton
+                textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
+                id='addOrganizationDomain'
+                onClick={() => navigate('organization-settings/domain')}
+              />
+            }
+            redirectSubPath={'organization-settings/domain/'}
+            verificationStatus={'verified'}
+            enrollmentMode={'automatic_invitation'}
+          />
+        </Col>
+      )}
 
       <Flex
         direction='col'
