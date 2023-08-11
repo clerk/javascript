@@ -29,7 +29,7 @@ export const EmailPage = withCardStateProvider(() => {
   });
 
   const emailField = useFormControl('emailAddress', '', {
-    type: 'text',
+    type: 'email',
     label: localizationKeys('formFieldLabel__emailAddress'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     isRequired: true,
