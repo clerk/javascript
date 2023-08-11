@@ -1,5 +1,5 @@
 import { AddBlockButton, BlockButton } from '../../common';
-import { useCoreOrganization } from '../../contexts';
+import { useCoreOrganization, useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
 import { Times } from '../../icons';
@@ -60,12 +60,17 @@ const OrganizationProfileSection = () => {
 };
 
 const OrganizationDomainsSection = () => {
+  const { organizationSettings } = useEnvironment();
   const { organization, membership } = useCoreOrganization();
 
   const { navigate } = useRouter();
   const isAdmin = membership?.role === 'admin';
 
-  if (!organization || !isAdmin) {
+  if (!organizationSettings || !organization || !isAdmin) {
+    return null;
+  }
+
+  if (!organizationSettings.domains.enabled) {
     return null;
   }
 
