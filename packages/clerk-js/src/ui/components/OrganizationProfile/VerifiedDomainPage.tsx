@@ -24,6 +24,39 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
 
   const title = localizationKeys('organizationProfile.verifiedDomainPage.title');
 
+  const enrollmentMode = useFormControl('enrollmentMode', '', {
+    type: 'radio',
+    radioOptions: [
+      ...(organizationSettings.domains.enrollmentModes.includes('manual_invitation')
+        ? [
+          {
+            value: 'manual_invitation',
+            label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__manualInvitation'),
+            description: localizationKeys('organizationProfile.verifiedDomainPage.radioDescription__manualInvitation'),
+          },
+        ]
+        : []),
+      ...(organizationSettings.domains.enrollmentModes.includes('automatic_invitation')
+        ? [
+          {
+            value: 'automatic_invitation',
+            label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__automaticInvitation'),
+            description: localizationKeys('organizationProfile.verifiedDomainPage.radioDescription__automaticInvitation'),
+          },
+        ]
+        : []),
+      ...(organizationSettings.domains.enrollmentModes.includes('automatic_suggestion')
+        ? [
+          {
+            value: 'automatic_suggestion',
+            label: localizationKeys('organizationProfile.verifiedDomainPage.radioLabel__automaticSuggestion'),
+            description: localizationKeys('organizationProfile.verifiedDomainPage.radioDescription__automaticSuggestion'),
+          },
+        ]
+        : []),
+    ],
+  });
+
   const { data: domain, status: domainStatus } = useFetch(
     organization?.getDomain,
     {
@@ -55,37 +88,6 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   if (!organization || !organizationSettings) {
     return null;
   }
-
-  const enrollmentMode = useFormControl('enrollmentMode', '', {
-    type: 'radio',
-    // TODO: Add labels
-    radioOptions: [
-      ...(organizationSettings.domains.enrollmentModes.includes('manual_invitation')
-        ? [
-            {
-              value: 'manual_invitation',
-              label: 'Manual invitation',
-            },
-          ]
-        : []),
-      ...(organizationSettings.domains.enrollmentModes.includes('automatic_invitation')
-        ? [
-            {
-              value: 'automatic_invitation',
-              label: 'Automatic invitation',
-            },
-          ]
-        : []),
-      ...(organizationSettings.domains.enrollmentModes.includes('automatic_suggestion')
-        ? [
-            {
-              value: 'automatic_suggestion',
-              label: 'Automatic suggestion',
-            },
-          ]
-        : []),
-    ],
-  });
 
   if (domainStatus.isLoading || !domain) {
     return (

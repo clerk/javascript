@@ -562,6 +562,10 @@ type _LocalizationResource = {
     action__signOut: LocalizationValue;
   };
   organizationProfile: {
+    badge__unverified: LocalizationValue;
+    badge__automaticInvitation: LocalizationValue;
+    badge__automaticSuggestion: LocalizationValue;
+    badge__manualInvitation: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;
@@ -612,6 +616,12 @@ type _LocalizationResource = {
       actionLabel__remove: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
+      radioLabel__manualInvitation: LocalizationValue;
+      radioDescription__manualInvitation: LocalizationValue;
+      radioLabel__automaticInvitation: LocalizationValue;
+      radioDescription__automaticInvitation: LocalizationValue;
+      radioLabel__automaticSuggestion: LocalizationValue;
+      radioDescription__automaticSuggestion: LocalizationValue;
     };
     removeDomainPage: {
       title: LocalizationValue;

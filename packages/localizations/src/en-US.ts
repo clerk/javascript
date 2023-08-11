@@ -541,6 +541,10 @@ export const enUS: LocalizationResource = {
     action__signOut: 'Sign out',
   },
   organizationProfile: {
+    badge__unverified: 'Unverified',
+    badge__automaticInvitation: 'Automatic invitations',
+    badge__automaticSuggestion: 'Automatic suggestions',
+    badge__manualInvitation: 'Manual invitations',
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
@@ -594,6 +598,14 @@ export const enUS: LocalizationResource = {
       actionLabel__remove: 'Remove email domain',
       formTitle: 'Enrollment mode',
       formSubtitle: 'Choose how users from this domain can join the organization.',
+      radioLabel__manualInvitation: 'No automatic enrollment',
+      radioDescription__manualInvitation: 'Users can only be invited manually to the organization.',
+      radioLabel__automaticInvitation: 'Automatic invitations',
+      radioDescription__automaticInvitation:
+        'Users are automatically invited to join the organization when they sign-up and can join anytime.',
+      radioLabel__automaticSuggestion: 'Automatic suggestions',
+      radioDescription__automaticSuggestion:
+        'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
     },
     invitePage: {
       title: 'Invite members',
