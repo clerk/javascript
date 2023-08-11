@@ -2,7 +2,7 @@ import type { OrganizationDomainResource } from '@clerk/types';
 import React from 'react';
 
 import { RemoveResourcePage } from '../../common';
-import { useCoreOrganization } from '../../contexts';
+import { useCoreOrganization, useEnvironment } from '../../contexts';
 import { Flex, Spinner } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { localizationKeys } from '../../localization';
@@ -10,6 +10,7 @@ import { useRouter } from '../../router';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const RemoveDomainPage = () => {
+  const { organizationSettings } = useEnvironment();
   const { organization } = useCoreOrganization();
   const { params } = useRouter();
 
@@ -25,6 +26,10 @@ export const RemoveDomainPage = () => {
       },
     },
   );
+
+  if (!organization || !organizationSettings) {
+    return null;
+  }
 
   if (domainStatus.isLoading || !domain) {
     return (

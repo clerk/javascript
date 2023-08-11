@@ -1,4 +1,4 @@
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
+import { useCoreOrganization, useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   CardAlert,
@@ -18,11 +18,14 @@ import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvit
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
 export const OrganizationMembers = withCardStateProvider(() => {
+  const { organizationSettings } = useEnvironment();
   const card = useCardState();
   const { membership } = useCoreOrganization();
   //@ts-expect-error
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
   const isAdmin = membership?.role === 'admin';
+
+  const allowRequests = organizationSettings?.domains?.enabled && isAdmin;
 
   return (
     <Col
@@ -51,7 +54,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
               />
             )}
-            {isAdmin && (
+            {allowRequests && (
               <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')} />
             )}
           </TabsList>
@@ -73,7 +76,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 <OrganizationMembersTabInvitations />
               </TabPanel>
             )}
-            {isAdmin && (
+            {allowRequests && (
               <TabPanel sx={{ width: '100%' }}>
                 <OrganizationMembersTabRequests />
               </TabPanel>
