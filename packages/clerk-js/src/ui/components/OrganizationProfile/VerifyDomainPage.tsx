@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization } from '../../contexts';
+import { useCoreOrganization, useEnvironment } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import {
@@ -23,6 +23,7 @@ import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const VerifyDomainPage = withCardStateProvider(() => {
   const card = useCardState();
+  const { organizationSettings } = useEnvironment();
   const { organization } = useCoreOrganization();
   const { params, navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
@@ -80,9 +81,10 @@ export const VerifyDomainPage = withCardStateProvider(() => {
     action(code, resolve, reject);
   });
 
-  if (!organization) {
+  if (!organization || !organizationSettings) {
     return null;
   }
+
   const handleResend = () => {
     codeControl.reset();
     domain?.prepareAffiliationVerification({ affiliationEmailAddress: emailField.value }).catch(err => {

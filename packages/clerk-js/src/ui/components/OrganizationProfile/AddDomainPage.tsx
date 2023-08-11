@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useCoreOrganization } from '../../contexts';
+import { useCoreOrganization, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
@@ -8,6 +8,7 @@ import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const AddDomainPage = withCardStateProvider(() => {
+  const { organizationSettings } = useEnvironment();
   const title = localizationKeys('organizationProfile.createDomainPage.title');
   const subtitle = localizationKeys('organizationProfile.createDomainPage.subtitle');
   const card = useCardState();
@@ -20,7 +21,7 @@ export const AddDomainPage = withCardStateProvider(() => {
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationEmailDomain'),
   });
 
-  if (!organization) {
+  if (!organization || !organizationSettings) {
     return null;
   }
 
