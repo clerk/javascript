@@ -38,6 +38,7 @@ type Options = {
       radioOptions: {
         value: string;
         label: string | LocalizationKey;
+        description?: string | LocalizationKey;
       }[];
     }
 );

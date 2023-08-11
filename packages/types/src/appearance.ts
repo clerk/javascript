@@ -219,6 +219,12 @@ export type ElementsConfig = {
   formField: WithOptions<FieldId, ControlState, never>;
   formFieldLabelRow: WithOptions<FieldId, ControlState, never>;
   formFieldLabel: WithOptions<FieldId, ControlState, never>;
+  formFieldRadioGroup: WithOptions<never, never, never>;
+  formFieldRadioGroupItem: WithOptions<never, never, never>;
+  formFieldRadioInput: WithOptions<never, never, never>;
+  formFieldRadioLabel: WithOptions<FieldId, ControlState, never>;
+  formFieldRadioLabelTitle: WithOptions<FieldId, ControlState, never>;
+  formFieldRadioLabelDescription: WithOptions<FieldId, ControlState, never>;
   formFieldAction: WithOptions<FieldId, ControlState, never>;
   formFieldInput: WithOptions<FieldId, ControlState, never>;
   formFieldErrorText: WithOptions<FieldId, ControlState, never>;

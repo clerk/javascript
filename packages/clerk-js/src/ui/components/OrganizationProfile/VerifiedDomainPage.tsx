@@ -1,7 +1,7 @@
 import type { OrganizationEnrollmentMode } from '@clerk/types';
 
 import { useCoreOrganization, useEnvironment } from '../../contexts';
-import { Badge, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import {
   BlockWithAction,
   ContentPage,
@@ -14,6 +14,7 @@ import {
 import { useFetch } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
+import { EnrollmentBadge } from './EnrollmentBadge';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const VerifiedDomainPage = withCardStateProvider(() => {
@@ -23,6 +24,45 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   const { params, navigate } = useRouter();
 
   const title = localizationKeys('organizationProfile.verifiedDomainPage.title');
+
+  const enrollmentMode = useFormControl('enrollmentMode', '', {
+    type: 'radio',
+    radioOptions: [
+      ...(organizationSettings.domains.enrollmentModes.includes('manual_invitation')
+        ? [
+            {
+              value: 'manual_invitation',
+              label: localizationKeys('organizationProfile.verifiedDomainPage.manualInvitationOption__label'),
+              description: localizationKeys(
+                'organizationProfile.verifiedDomainPage.manualInvitationOption__description',
+              ),
+            },
+          ]
+        : []),
+      ...(organizationSettings.domains.enrollmentModes.includes('automatic_invitation')
+        ? [
+            {
+              value: 'automatic_invitation',
+              label: localizationKeys('organizationProfile.verifiedDomainPage.automaticInvitationOption__label'),
+              description: localizationKeys(
+                'organizationProfile.verifiedDomainPage.automaticInvitationOption__description',
+              ),
+            },
+          ]
+        : []),
+      ...(organizationSettings.domains.enrollmentModes.includes('automatic_suggestion')
+        ? [
+            {
+              value: 'automatic_suggestion',
+              label: localizationKeys('organizationProfile.verifiedDomainPage.automaticSuggestionOption__label'),
+              description: localizationKeys(
+                'organizationProfile.verifiedDomainPage.automaticSuggestionOption__description',
+              ),
+            },
+          ]
+        : []),
+    ],
+  });
 
   const { data: domain, status: domainStatus } = useFetch(
     organization?.getDomain,
@@ -56,37 +96,6 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     return null;
   }
 
-  const enrollmentMode = useFormControl('enrollmentMode', '', {
-    type: 'radio',
-    // TODO: Add labels
-    radioOptions: [
-      ...(organizationSettings.domains.enrollmentModes.includes('manual_invitation')
-        ? [
-            {
-              value: 'manual_invitation',
-              label: 'Manual invitation',
-            },
-          ]
-        : []),
-      ...(organizationSettings.domains.enrollmentModes.includes('automatic_invitation')
-        ? [
-            {
-              value: 'automatic_invitation',
-              label: 'Automatic invitation',
-            },
-          ]
-        : []),
-      ...(organizationSettings.domains.enrollmentModes.includes('automatic_suggestion')
-        ? [
-            {
-              value: 'automatic_suggestion',
-              label: 'Automatic suggestion',
-            },
-          ]
-        : []),
-    ],
-  });
-
   if (domainStatus.isLoading || !domain) {
     return (
       <Flex
@@ -113,7 +122,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     >
       <BlockWithAction
         elementDescriptor={descriptors.accordionTriggerButton}
-        badge={<Badge textVariant={'extraSmallRegular'}>Verified</Badge>}
+        badge={<EnrollmentBadge organizationDomain={domain} />}
         sx={t => ({
           backgroundColor: t.colors.$blackAlpha50,
           padding: `${t.space.$3} ${t.space.$4}`,

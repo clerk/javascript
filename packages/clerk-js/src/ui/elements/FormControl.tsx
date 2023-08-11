@@ -1,7 +1,7 @@
 import type { FieldId } from '@clerk/types';
 import type { ClerkAPIError } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { forwardRef, useCallback, useId, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -30,6 +30,7 @@ import { useCardState } from './contexts';
 import { useFormState } from './Form';
 import { PasswordInput } from './PasswordInput';
 import { PhoneInput } from './PhoneInput';
+import { RadioGroup } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> & {
   id: FieldId;
@@ -56,67 +57,9 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   radioOptions?: {
     value: string;
     label: string | LocalizationKey;
+    description?: string | LocalizationKey;
   }[];
   isFocused: boolean;
-};
-
-const RadioGroupItem = (props: {
-  inputProps: PropsOfComponent<typeof Input>;
-  value: string;
-  label: string | LocalizationKey;
-}) => {
-  const id = useId();
-  return (
-    <Flex
-      align='center'
-      sx={t => ({
-        height: t.sizes.$6,
-      })}
-    >
-      <Input
-        {...props.inputProps}
-        focusRing={false}
-        id={id}
-        sx={{
-          width: 'fit-content',
-        }}
-        type='radio'
-        value={props.value}
-        checked={props.value === props.inputProps.value}
-      />
-      <FormLabel
-        htmlFor={id}
-        localizationKey={props.label}
-        sx={t => ({
-          padding: `${t.space.$1} ${t.space.$2}`,
-          fontWeight: t.fontWeights.$normal,
-          lineHeight: t.lineHeights.$none,
-        })}
-      />
-    </Flex>
-  );
-};
-
-export const RadioButtons = (
-  props: PropsOfComponent<typeof Input> & {
-    radioOptions?: {
-      value: string;
-      label: string | LocalizationKey;
-    }[];
-  },
-) => {
-  const { radioOptions, ...rest } = props;
-  return (
-    <>
-      {radioOptions?.map(r => (
-        <RadioGroupItem
-          key={r.value}
-          {...r}
-          inputProps={rest}
-        />
-      ))}
-    </>
-  );
 };
 
 // TODO: Convert this into a Component?
@@ -124,7 +67,7 @@ const getInputElementForType = (type: FormControlProps['type']) => {
   const CustomInputs = {
     password: PasswordInput,
     tel: PhoneInput,
-    radio: RadioButtons,
+    radio: RadioGroup,
   };
   if (!type) {
     return Input;
