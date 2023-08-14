@@ -1,4 +1,4 @@
-import type { UserOrganizationInvitationResource } from '@clerk/types';
+import type { ClerkPaginatedResponse, UserOrganizationInvitationResource } from '@clerk/types';
 
 import { useCoreOrganizationList } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
@@ -101,14 +101,30 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
   const { userInvitations } = useCoreOrganizationList({
     userInvitations: organizationListParams.userInvitations,
   });
-  const mutateSwrState = () => {
-    (userInvitations as any)?.unstable__mutate?.();
-  };
 
   const handleAccept = () => {
     return card
-      .runAsync(props.accept())
-      .then(mutateSwrState)
+      .runAsync(props.accept)
+      .then(result => {
+        (userInvitations as any)?.unstable__mutate?.(result, {
+          populateCache: (
+            updatedInvitation: UserOrganizationInvitationResource,
+            invitationInfinitePages: ClerkPaginatedResponse<UserOrganizationInvitationResource>[],
+          ) => {
+            const prevTotalCount = invitationInfinitePages[invitationInfinitePages.length - 1].total_count;
+
+            return invitationInfinitePages.map(item => {
+              const newData = item.data.filter(obj => {
+                return obj.id !== updatedInvitation.id;
+              });
+              return { ...item, data: newData, total_count: prevTotalCount - 1 };
+            });
+          },
+          // Since `accept` gives back the updated information,
+          // we don't need to revalidate here.
+          revalidate: false,
+        });
+      })
       .catch(err => handleError(err, [], card.setError));
   };
 
