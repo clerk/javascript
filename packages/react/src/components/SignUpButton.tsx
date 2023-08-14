@@ -5,13 +5,13 @@ import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../ut
 import { withClerk } from './withClerk';
 
 export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkProp<SignUpButtonProps>) => {
-  const { afterSignInUrl, afterSignUpUrl, redirectUrl, mode, unsafeMetadata, ...rest } = props;
+  const { afterSignInUrl, afterSignUpUrl, redirectUrl, mode, unsafeMetadata, initialValues, ...rest } = props;
 
   children = normalizeWithDefaultValue(children, 'Sign up');
   const child = assertSingleChild(children)('SignUpButton');
 
   const clickHandler = () => {
-    const opts = { afterSignInUrl, afterSignUpUrl, redirectUrl, unsafeMetadata };
+    const opts = { afterSignInUrl, afterSignUpUrl, redirectUrl, unsafeMetadata, initialValues };
 
     if (mode === 'modal') {
       return clerk.openSignUp(opts);

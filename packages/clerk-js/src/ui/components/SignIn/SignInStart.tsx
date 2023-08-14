@@ -39,7 +39,7 @@ export function _SignInStart(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { navigateAfterSignIn, signUpUrl } = ctx;
+  const { navigateAfterSignIn, signUpUrl, initialValues } = ctx;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -58,13 +58,16 @@ export function _SignInStart(): JSX.Element {
     identifierAttributes,
     identifierAttribute,
   );
+  const identifierInitialValue =
+    identifierAttribute === 'email_address' ? initialValues?.emailAddress : initialValues?.phoneNumber;
+
   const instantPasswordField = useFormControl('password', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__password'),
     placeholder: localizationKeys('formFieldInputPlaceholder__password') as any,
   });
 
-  const identifierField = useFormControl('identifier', '', {
+  const identifierField = useFormControl('identifier', identifierInitialValue || '', {
     ...currentIdentifier,
     isRequired: true,
   });

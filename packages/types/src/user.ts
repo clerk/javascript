@@ -121,6 +121,14 @@ export interface UserResource extends ClerkResource {
   get hasVerifiedPhoneNumber(): boolean;
 }
 
+export type InitialFormValues = {
+  emailAddress?: string;
+  phoneNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+};
+
 export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };
 export type CreateWeb3WalletParams = { web3Wallet: string };

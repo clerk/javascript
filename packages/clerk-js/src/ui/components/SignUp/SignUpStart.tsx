@@ -37,7 +37,7 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useCoreClerk();
   const ctx = useSignUpContext();
-  const { navigateAfterSignUp, signInUrl, unsafeMetadata } = ctx;
+  const { navigateAfterSignUp, signInUrl, unsafeMetadata, initialValues } = ctx;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -51,27 +51,27 @@ function _SignUpStart(): JSX.Element {
   const { failedValidationsText } = usePasswordComplexity(passwordSettings);
 
   const formState = {
-    firstName: useFormControl('firstName', signUp.firstName || '', {
+    firstName: useFormControl('firstName', initialValues?.firstName || signUp.firstName || '', {
       type: 'text',
       label: localizationKeys('formFieldLabel__firstName'),
       placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
     }),
-    lastName: useFormControl('lastName', signUp.lastName || '', {
+    lastName: useFormControl('lastName', initialValues?.lastName || signUp.lastName || '', {
       type: 'text',
       label: localizationKeys('formFieldLabel__lastName'),
       placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
     }),
-    emailAddress: useFormControl('emailAddress', signUp.emailAddress || '', {
+    emailAddress: useFormControl('emailAddress', initialValues?.emailAddress || signUp.emailAddress || '', {
       type: 'email',
       label: localizationKeys('formFieldLabel__emailAddress'),
       placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     }),
-    username: useFormControl('username', signUp.username || '', {
+    username: useFormControl('username', initialValues?.username || signUp.username || '', {
       type: 'text',
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
     }),
-    phoneNumber: useFormControl('phoneNumber', signUp.phoneNumber || '', {
+    phoneNumber: useFormControl('phoneNumber', initialValues?.phoneNumber || signUp.phoneNumber || '', {
       type: 'tel',
       label: localizationKeys('formFieldLabel__phoneNumber'),
       placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
@@ -111,7 +111,8 @@ function _SignUpStart(): JSX.Element {
     signUp
       .create({ strategy: 'ticket', ticket: formState.ticket.value })
       .then(signUp => {
-        formState.emailAddress.setValue(signUp.emailAddress || '');
+        // emailAddress from initialValues takes precedence over __clerk_ticket flows
+        formState.emailAddress.setValue(initialValues?.emailAddress || signUp.emailAddress || '');
         // In case we are in a Ticket flow and the sign up is not complete yet, update the state
         // to render properly the SignUp form with other available options to complete it (e.g. OAuth)
         if (signUp.status === 'missing_requirements') {

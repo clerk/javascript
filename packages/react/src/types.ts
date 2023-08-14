@@ -3,6 +3,7 @@ import type {
   ClerkOptions,
   ClientResource,
   DomainOrProxyUrl,
+  InitialFormValues,
   LoadedClerk,
   MultiDomainAndOrProxy,
   PublishableKeyOrFrontendApi,
@@ -76,9 +77,12 @@ type ButtonProps = {
   children?: React.ReactNode;
 };
 
-export type SignInButtonProps = ButtonProps;
+export interface SignInButtonProps extends ButtonProps {
+  initialValues?: InitialFormValues;
+}
 export interface SignUpButtonProps extends ButtonProps {
   unsafeMetadata?: SignUpUnsafeMetadata;
+  initialValues?: InitialFormValues;
 }
 
 export type SignInWithMetamaskButtonProps = Pick<ButtonProps, 'redirectUrl' | 'children'>;

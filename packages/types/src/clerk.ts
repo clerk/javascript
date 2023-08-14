@@ -16,7 +16,7 @@ import type { OrganizationResource } from './organization';
 import type { OrganizationInvitationResource } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import type { ActiveSessionResource } from './session';
-import type { UserResource } from './user';
+import type { InitialFormValues, UserResource } from './user';
 import type { DeepPartial, DeepSnakeToCamel } from './utils';
 
 export type InstanceType = 'production' | 'development';
@@ -575,6 +575,10 @@ export type SignInProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: SignInTheme;
+  /**
+   * Initial values in order to pre-fill signUp and signIn forms
+   */
+  initialValues?: InitialFormValues;
 } & RedirectOptions;
 
 export type SignUpProps = {
@@ -602,6 +606,10 @@ export type SignUpProps = {
    * Additional arbitrary metadata to be stored alongside the User object
    */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * Initial values in order to pre-fill signUp and signIn forms
+   */
+  initialValues?: InitialFormValues;
 } & RedirectOptions;
 
 export type UserProfileProps = {

@@ -1,4 +1,4 @@
-import type { OrganizationResource, UserResource } from '@clerk/types';
+import type { InitialFormValues, OrganizationResource, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
@@ -26,10 +26,11 @@ export type SignUpContextType = SignUpCtx & {
   signInUrl: string;
   secondFactorUrl: string;
   authQueryString: string | null;
+  initialValues?: InitialFormValues | undefined;
 };
 
 export const useSignUpContext = (): SignUpContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignUpCtx;
+  const { componentName, initialValues, ...ctx } = (React.useContext(ComponentContext) || {}) as SignUpCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
@@ -87,6 +88,7 @@ export const useSignUpContext = (): SignUpContextType => {
     navigateAfterSignUp,
     queryParams,
     authQueryString: authQs,
+    initialValues,
   };
 };
 
@@ -96,10 +98,11 @@ export type SignInContextType = SignInCtx & {
   signUpUrl: string;
   signUpContinueUrl: string;
   authQueryString: string | null;
+  initialValues?: InitialFormValues | undefined;
 };
 
 export const useSignInContext = (): SignInContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignInCtx;
+  const { componentName, initialValues, ...ctx } = (React.useContext(ComponentContext) || {}) as SignInCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
@@ -154,6 +157,7 @@ export const useSignInContext = (): SignInContextType => {
     signUpContinueUrl,
     queryParams,
     authQueryString: authQs,
+    initialValues,
   };
 };
 
