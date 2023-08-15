@@ -1,4 +1,4 @@
-import type { OrganizationSuggestionResource } from '@clerk/types';
+import type { ClerkPaginatedResponse, OrganizationSuggestionResource } from '@clerk/types';
 
 import { useCoreOrganizationList } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
@@ -105,16 +105,47 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
     },
   });
 
-  const mutateSwrState = () => {
-    (userSuggestions as any)?.unstable__mutate?.();
-  };
-
   const handleAccept = () => {
     return card
-      .runAsync(props.accept())
-      .then(mutateSwrState)
+      .runAsync(props.accept)
+      .then(result => {
+        (userSuggestions as any)?.unstable__mutate?.(result, {
+          populateCache: (
+            updatedSuggestion: OrganizationSuggestionResource,
+            suggestionInfinitePages: ClerkPaginatedResponse<OrganizationSuggestionResource>[],
+          ) => {
+            return suggestionInfinitePages.map(item => {
+              const newData = item.data.map(obj => {
+                if (obj.id === updatedSuggestion.id) {
+                  return {
+                    ...updatedSuggestion,
+                  };
+                }
+
+                return obj;
+              });
+              return { ...item, data: newData };
+            });
+          },
+          // Since `accept` gives back the updated information,
+          // we don't need to revalidate here.
+          revalidate: false,
+        });
+      })
+
       .catch(err => handleError(err, [], card.setError));
   };
+
+  if (props.status !== 'accepted') {
+    return (
+      <Text
+        variant='smallRegular'
+        colorScheme='neutral'
+      >
+        Pending approval
+      </Text>
+    );
+  }
 
   return (
     <Button
@@ -124,7 +155,7 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
-      localizationKey={localizationKeys('organizationSwitcher.suggestionsAccept')}
+      localizationKey={localizationKeys('organizationSwitcher.action__suggestionsAccept')}
     />
   );
 };

@@ -552,10 +552,11 @@ type _LocalizationResource = {
     action__manageOrganization: LocalizationValue;
     invitationCountLabel_single: LocalizationValue;
     invitationCountLabel_many: LocalizationValue;
-    invitationAccept: LocalizationValue;
+    action__invitationAccept: LocalizationValue;
     suggestionCountLabel_single: LocalizationValue;
     suggestionCountLabel_many: LocalizationValue;
-    suggestionsAccept: LocalizationValue;
+    action__suggestionsAccept: LocalizationValue;
+    suggestionsAcceptedLabel: LocalizationValue;
   };
   impersonationFab: {
     title: LocalizationValue;

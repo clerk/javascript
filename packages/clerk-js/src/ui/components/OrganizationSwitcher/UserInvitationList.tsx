@@ -124,7 +124,7 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
-      localizationKey={localizationKeys('organizationSwitcher.invitationAccept')}
+      localizationKey={localizationKeys('organizationSwitcher.action__invitationAccept')}
     />
   );
 };
