@@ -80,12 +80,14 @@
     "@clerk/clerk-sdk-node": "^4.12.2",
     "@clerk/types": "^3.49.0",
     "path-to-regexp": "6.2.1",
+    "truncate-utf8-bytes": "^1.0.2",
     "tslib": "2.4.1"
   },
   "devDependencies": {
     "@types/node": "^16.11.55",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "@types/truncate-utf8-bytes": "^1.0.0",
     "node-fetch-native": "1.1.1",
     "typescript": "*"
   },

@@ -1,5 +1,7 @@
 // TODO: Replace with a more sophisticated logging solution
 
+import truncate from 'truncate-utf8-bytes';
+
 import { logFormatter } from './logFormatter';
 
 export type Log = string | Record<string, unknown>;
@@ -25,12 +27,15 @@ export const createDebugLogger = (name: string, formatter: (val: LogEntry) => st
     },
     commit: () => {
       if (isEnabled) {
-        console.log(
-          `Clerk debug start :: ${name}\n${entries
-            .map(log => formatter(log))
-            .map(e => `-- ${e}\n`)
-            .join('')}`,
-        );
+        const log = `Clerk debug start :: ${name}\n${entries
+          .map(log => formatter(log))
+          .map(e => `-- ${e}\n`)
+          .join('')}`;
+        if (process.env.VERCEL) {
+          console.log(truncate(log, 4096));
+        } else {
+          console.log(log);
+        }
       }
     },
   };
