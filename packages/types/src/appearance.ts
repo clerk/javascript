@@ -74,7 +74,8 @@ export type FieldId =
   | 'role'
   | 'deleteConfirmation'
   | 'deleteOrganizationConfirmation'
-  | 'enrollmentMode';
+  | 'enrollmentMode'
+  | 'affiliationEmailAddress';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

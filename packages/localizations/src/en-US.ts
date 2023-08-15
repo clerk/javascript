@@ -37,6 +37,8 @@ export const enUS: LocalizationResource = {
   formFieldLabel__organizationSlug: 'Slug URL',
   formFieldLabel__organizationEmailDomain: 'Email domain',
   formFieldLabel__organizationEmailDomainEmailAddress: 'Verification email address',
+  formFieldLabel__organizationEmailDomainEmailAddressDescription:
+    'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
@@ -589,7 +591,7 @@ export const enUS: LocalizationResource = {
     verifyDomainPage: {
       title: 'Verify domain',
       actionLabel__remove: 'Remove unverified domain',
-      subtitle: 'Add an email address under {{domainName}} to receive a code and verify this domain.',
+      subtitle: 'The domain {{domainName}} needs to be verified via email.',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your email address',
       resendButton: "Didn't receive a code? Resend",
