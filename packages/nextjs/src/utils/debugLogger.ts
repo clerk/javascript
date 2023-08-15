@@ -1,7 +1,5 @@
 // TODO: Replace with a more sophisticated logging solution
 
-import truncate from 'truncate-utf8-bytes';
-
 import { logFormatter } from './logFormatter';
 
 export type Log = string | Record<string, unknown>;
@@ -78,3 +76,15 @@ export const withLogger: WithLogger = (loggerFactoryOrName, handlerCtor) => {
     }
   }) as ReturnType<typeof handlerCtor>;
 };
+
+// ref: https://stackoverflow.com/questions/57769465/javascript-truncate-text-by-bytes-length
+function truncate(str: string, maxLength: number) {
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder('utf-8');
+
+  const encodedString = encoder.encode(str);
+  const truncatedString = encodedString.slice(0, maxLength);
+
+  // return the truncated string, removing any replacement characters that result from partially truncated characters
+  return decoder.decode(truncatedString).replace(/\uFFFD/g, '');
+}
