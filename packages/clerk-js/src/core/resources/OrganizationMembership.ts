@@ -129,7 +129,13 @@ export type UpdateOrganizationMembershipParams = {
  * @deprecated
  */
 export type RetrieveMembershipsParams = {
+  /**
+   * @deprecated Use pageSize instead
+   */
   limit?: number;
+  /**
+   * @deprecated Use initialPage instead
+   */
   offset?: number;
 };
 
