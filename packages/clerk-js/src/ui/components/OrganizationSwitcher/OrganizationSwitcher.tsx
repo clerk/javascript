@@ -5,6 +5,7 @@ import { Popover, withCardStateProvider, withFloatingTree } from '../../elements
 import { usePopover } from '../../hooks';
 import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
 import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
+import { organizationListParams } from './utils';
 
 const _OrganizationSwitcher = withFloatingTree(() => {
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
@@ -15,14 +16,7 @@ const _OrganizationSwitcher = withFloatingTree(() => {
   /**
    * Prefetch user invitations and suggestions
    */
-  useCoreOrganizationList({
-    userInvitations: {
-      infinite: true,
-    },
-    userSuggestions: {
-      infinite: true,
-    },
-  });
+  useCoreOrganizationList(organizationListParams);
 
   return (
     <Flow.Root flow='organizationSwitcher'>

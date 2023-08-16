@@ -6,6 +6,7 @@ import { OrganizationPreview, useCardState, withCardStateProvider } from '../../
 import { useInView } from '../../hooks';
 import { common } from '../../styledSystem';
 import { handleError } from '../../utils';
+import { organizationListParams } from './utils';
 
 export const UserInvitationList = () => {
   const { ref } = useInView({
@@ -18,9 +19,7 @@ export const UserInvitationList = () => {
   });
 
   const { userInvitations } = useCoreOrganizationList({
-    userInvitations: {
-      infinite: true,
-    },
+    userInvitations: organizationListParams.userInvitations,
   });
 
   if ((userInvitations.count ?? 0) === 0) {
@@ -100,11 +99,8 @@ export const UserInvitationList = () => {
 const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource) => {
   const card = useCardState();
   const { userInvitations } = useCoreOrganizationList({
-    userInvitations: {
-      infinite: true,
-    },
+    userInvitations: organizationListParams.userInvitations,
   });
-
   const mutateSwrState = () => {
     (userInvitations as any)?.unstable__mutate?.();
   };

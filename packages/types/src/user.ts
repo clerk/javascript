@@ -188,5 +188,5 @@ export type GetUserOrganizationSuggestionsParams = {
    */
   pageSize?: number;
 
-  status?: OrganizationSuggestionStatus;
+  status?: OrganizationSuggestionStatus | OrganizationSuggestionStatus[];
 };

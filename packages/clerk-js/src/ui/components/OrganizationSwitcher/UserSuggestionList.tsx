@@ -6,12 +6,11 @@ import { OrganizationPreview, useCardState, withCardStateProvider } from '../../
 import { useInView } from '../../hooks';
 import { common } from '../../styledSystem';
 import { handleError } from '../../utils';
+import { organizationListParams } from './utils';
 
 export const UserSuggestionList = () => {
   const { userSuggestions } = useCoreOrganizationList({
-    userSuggestions: {
-      infinite: true,
-    },
+    userSuggestions: organizationListParams.userSuggestions,
   });
 
   const { ref } = useInView({
@@ -100,9 +99,7 @@ export const UserSuggestionList = () => {
 const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) => {
   const card = useCardState();
   const { userSuggestions } = useCoreOrganizationList({
-    userSuggestions: {
-      infinite: true,
-    },
+    userSuggestions: organizationListParams.userSuggestions,
   });
 
   const handleAccept = () => {
@@ -136,7 +133,7 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
       .catch(err => handleError(err, [], card.setError));
   };
 
-  if (props.status !== 'accepted') {
+  if (props.status === 'accepted') {
     return (
       <Text
         variant='smallRegular'
