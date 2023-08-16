@@ -1,6 +1,9 @@
 import type { useCoreOrganizationList } from '../../contexts';
 
 export const organizationListParams = {
+  userMemberships: {
+    infinite: true,
+  },
   userInvitations: {
     infinite: true,
   },
