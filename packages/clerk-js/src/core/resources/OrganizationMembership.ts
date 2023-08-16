@@ -1,5 +1,7 @@
 import type {
+  ClerkPaginatedResponse,
   ClerkResourceReloadParams,
+  GetUserOrganizationMembershipParams,
   MembershipRole,
   OrganizationMembershipJSON,
   OrganizationMembershipResource,
@@ -7,6 +9,7 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource, Organization } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
@@ -23,18 +26,40 @@ export class OrganizationMembership extends BaseResource implements Organization
     this.fromJSON(data);
   }
 
-  static async retrieve(retrieveMembershipsParams?: RetrieveMembershipsParams): Promise<OrganizationMembership[]> {
+  static retrieve: GetOrganizationMembershipsClass = async retrieveMembershipsParams => {
+    const isDeprecatedParams =
+      typeof retrieveMembershipsParams === 'undefined' || !retrieveMembershipsParams?.paginated;
     return await BaseResource._fetch({
       path: '/me/organization_memberships',
       method: 'GET',
-      search: retrieveMembershipsParams as any,
+      search: isDeprecatedParams
+        ? retrieveMembershipsParams
+        : (convertPageToOffset(retrieveMembershipsParams as unknown as any) as any),
     })
       .then(res => {
-        const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
-        return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem));
+        if (isDeprecatedParams) {
+          const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
+          return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem)) as any;
+        }
+
+        const { data: suggestions, total_count } =
+          res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
+
+        return {
+          total_count,
+          data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
+        } as any;
       })
-      .catch(() => []);
-  }
+      .catch(() => {
+        if (isDeprecatedParams) {
+          return [];
+        }
+        return {
+          total_count: 0,
+          data: [],
+        };
+      });
+  };
 
   destroy = async (): Promise<OrganizationMembership> => {
     // TODO: Revise the return type of _baseDelete
@@ -100,7 +125,19 @@ export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;
 };
 
+/**
+ * @deprecated
+ */
 export type RetrieveMembershipsParams = {
   limit?: number;
   offset?: number;
 };
+
+type MembershipParams = (RetrieveMembershipsParams | GetUserOrganizationMembershipParams) & {
+  paginated?: boolean;
+};
+export type GetOrganizationMembershipsClass = <T extends MembershipParams>(
+  params?: T,
+) => T['paginated'] extends true
+  ? Promise<ClerkPaginatedResponse<OrganizationMembership>>
+  : Promise<OrganizationMembership[]>;
