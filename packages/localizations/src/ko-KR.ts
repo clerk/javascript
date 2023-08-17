@@ -493,6 +493,13 @@ export const koKR: LocalizationResource = {
       actionLabel__download: '.txt 다운로드',
       actionLabel__print: '인쇄',
     },
+    deletePage: {
+      title: '계정 삭제',
+      messageLine1: '정말로 계정을 삭제하시겠습니까?',
+      messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다.',
+      actionDescription: '계속하려면 아래에 계정 삭제를 입력하세요.',
+      confirm: '계정 삭제',
+    },
   },
   userButton: {
     action__manageAccount: '계정 관리',
