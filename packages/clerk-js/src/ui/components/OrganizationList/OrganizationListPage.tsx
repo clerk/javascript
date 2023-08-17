@@ -71,9 +71,8 @@ export const OrganizationListPage = withCardStateProvider(() => {
                 display: 'flex',
                 alignItems: 'center',
               })}
-            >
-              Create an organization
-            </Text>
+              localizationKey={localizationKeys('organizationList.createOrganization')}
+            />
             <Button
               block={false}
               colorScheme='neutral'
@@ -81,14 +80,13 @@ export const OrganizationListPage = withCardStateProvider(() => {
               variant='ghost'
               textVariant='buttonExtraSmallBold'
               onClick={handleCreateOrganizationClicked}
-            >
-              Create
-            </Button>
+              localizationKey={localizationKeys('organizationList.action__createOrganization')}
+            />
           </Flex>
         </Col>
       )}
 
-      {afterSkipUrl && (
+      {!isLoading && afterSkipUrl && (
         <Footer.Root>
           <Footer.Action
             elementId='organizationList'
@@ -97,7 +95,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
             })}
           >
             <Footer.ActionLink
-              localizationKey={localizationKeys('signIn.start.actionLink')}
+              localizationKey={localizationKeys('organizationList.actionLink')}
               to={clerk.buildUrlWithAuth(afterSkipUrl)}
             />
           </Footer.Action>

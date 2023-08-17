@@ -678,6 +678,11 @@ export const enUS: LocalizationResource = {
       formButtonReset: 'Skip',
     },
   },
+  organizationList: {
+    createOrganization: 'Create Organization',
+    action__createOrganization: 'Create',
+    actionLink: 'Skip and Continue',
+  },
   unstable__errors: {
     identification_deletion_failed: 'You cannot delete your last identification.',
     phone_number_exists: 'This phone number is taken. Please try another.',
