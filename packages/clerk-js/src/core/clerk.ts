@@ -31,6 +31,7 @@ import type {
   InstanceType,
   ListenerCallback,
   OrganizationInvitationResource,
+  OrganizationListProps,
   OrganizationMembershipResource,
   OrganizationProfileProps,
   OrganizationResource,
@@ -502,7 +503,7 @@ export default class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
+  public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationList' }).then(controls =>
       controls.mountComponent({

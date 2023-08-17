@@ -635,6 +635,7 @@ export type SignUpTheme = Theme;
 export type UserButtonTheme = Theme;
 export type UserProfileTheme = Theme;
 export type OrganizationSwitcherTheme = Theme;
+export type OrganizationListTheme = Theme;
 export type OrganizationProfileTheme = Theme;
 export type CreateOrganizationTheme = Theme;
 

@@ -1,6 +1,7 @@
 import type {
   Appearance,
   CreateOrganizationTheme,
+  OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
   SignInTheme,
@@ -259,7 +260,7 @@ export interface Clerk {
    * @param targetNode Target to mount the UserProfile component.
    * @param props Configuration parameters.
    */
-  mountOrganizationList: (targetNode: HTMLDivElement, props?: OrganizationSwitcherProps) => void;
+  mountOrganizationList: (targetNode: HTMLDivElement, props?: OrganizationListProps) => void;
 
   /**
    * Unmount the organization profile component from the target node.*
@@ -827,6 +828,47 @@ export type OrganizationSwitcherProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: OrganizationSwitcherTheme;
+};
+
+export type OrganizationListProps = {
+  /**
+   * Full URL or path to navigate after creating a new organization.
+   * @default undefined
+   */
+  afterCreateOrganizationUrl?:
+    | ((organization: OrganizationResource) => string)
+    | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
+  /**
+   * Full URL or path to navigate after a successful organization selection.
+   * Accepts a function that returns URL or path
+   * @default undefined`
+   */
+  afterSelectOrganizationUrl?:
+    | ((organization: OrganizationResource) => string)
+    | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
+  /**
+   * Controls whether clicking the "Create organization" button will cause
+   * the CreateOrganization component to open as a modal, or if the browser will navigate
+   * to the `createOrganizationUrl` where CreateOrganization is mounted as a page.
+   * @default modal
+   */
+  createOrganizationMode?: 'modal' | 'navigation';
+  /**
+   * Full URL or path where the <CreateOrganization /> component is mounted.
+   * @default undefined
+   */
+  createOrganizationUrl?: string;
+  /**
+   * Full URL or path where the <CreateOrganization /> component is mounted.
+   * @default undefined
+   */
+  afterSkipUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: OrganizationListTheme;
 };
 
 export interface HandleMagicLinkVerificationParams {
