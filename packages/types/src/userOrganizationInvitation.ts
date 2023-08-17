@@ -25,7 +25,7 @@ export interface UserOrganizationInvitationResource extends ClerkResource {
     imageUrl: string;
     name: string;
     id: string;
-    slug: string;
+    slug: string | null;
   };
   publicMetadata: UserOrganizationInvitationPublicMetadata;
   role: MembershipRole;

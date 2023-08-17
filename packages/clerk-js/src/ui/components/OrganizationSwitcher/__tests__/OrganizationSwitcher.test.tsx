@@ -5,6 +5,7 @@ import React from 'react';
 import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
+import { createFakeUserOrganizationInvitations } from './utlis';
 
 const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
@@ -131,6 +132,99 @@ describe('OrganizationSwitcher', () => {
       expect(queryByRole('button', { name: 'Create Organization' })).not.toBeInTheDocument();
     });
 
-    it.todo('switches between active organizations when one is clicked');
+    it('displays a list of user invitations', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+          create_organization_enabled: false,
+        });
+      });
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationInvitations({
+              id: '1',
+              emailAddress: 'one@clerk.com',
+              publicOrganizationData: {
+                name: 'OrgOne',
+              },
+            }),
+            createFakeUserOrganizationInvitations({
+              id: '2',
+              emailAddress: 'two@clerk.com',
+              publicOrganizationData: { name: 'OrgTwo' },
+            }),
+          ],
+          total_count: 11,
+        }),
+      );
+      const { queryByText, userEvent, getByRole } = render(<OrganizationSwitcher />, {
+        wrapper,
+      });
+
+      await userEvent.click(getByRole('button'));
+
+      expect(fixtures.clerk.user?.getOrganizationInvitations).toHaveBeenCalledWith({
+        initialPage: 1,
+        pageSize: 10,
+        status: 'pending',
+      });
+      expect(queryByText('OrgOne')).toBeInTheDocument();
+      expect(queryByText('OrgTwo')).toBeInTheDocument();
+    });
+
+    it("switches between active organizations when one is clicked'", async () => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [
+            { name: 'Org1', role: 'basic_member' },
+            { name: 'Org2', role: 'admin' },
+          ],
+          create_organization_enabled: false,
+        });
+      });
+      fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button'));
+      await userEvent.click(getByText('Org2'));
+
+      expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organization: expect.objectContaining({
+            name: 'Org2',
+          }),
+        }),
+      );
+    });
+
+    it("switches to personal workspace when clicked'", async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [
+            { name: 'Org1', role: 'basic_member' },
+            { name: 'Org2', role: 'admin' },
+          ],
+        });
+      });
+
+      fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+      const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button'));
+      await userEvent.click(getByText(/Personal workspace/i));
+
+      expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organization: null,
+        }),
+      );
+    });
   });
 });

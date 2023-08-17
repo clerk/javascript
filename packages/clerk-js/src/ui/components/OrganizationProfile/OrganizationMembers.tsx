@@ -1,9 +1,8 @@
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
+import { useCoreOrganization, useEnvironment, useOrganizationProfileContext } from '../../contexts';
+import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   CardAlert,
   Header,
-  IconButton,
   NavbarMenuButtonRow,
   Tab,
   TabPanel,
@@ -13,19 +12,20 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { UserAdd } from '../../icons';
-import { useRouter } from '../../router';
 import { ActiveMembersList } from './ActiveMembersList';
-import { InvitedMembersList } from './InvitedMembersList';
 import { MembershipWidget } from './MembershipWidget';
+import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
+import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
 export const OrganizationMembers = withCardStateProvider(() => {
-  const { navigate } = useRouter();
+  const { organizationSettings } = useEnvironment();
   const card = useCardState();
   const { membership } = useCoreOrganization();
   //@ts-expect-error
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
   const isAdmin = membership?.role === 'admin';
+
+  const allowRequests = organizationSettings?.domains?.enabled && isAdmin;
 
   return (
     <Col
@@ -39,39 +39,23 @@ export const OrganizationMembers = withCardStateProvider(() => {
         elementId={descriptors.profilePage.setId('organizationMembers')}
         gap={8}
       >
-        <Flex
-          justify={'between'}
-          align={'center'}
-        >
-          <Header.Root>
-            <Header.Title
-              localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
-              textVariant='xxlargeMedium'
-            />
-            <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__members')} />
-          </Header.Root>
-          {isAdmin && (
-            <IconButton
-              elementDescriptor={descriptors.membersPageInviteButton}
-              aria-label='Invite'
-              onClick={() => navigate('invite-members')}
-              icon={
-                <Icon
-                  icon={UserAdd}
-                  size={'sm'}
-                  sx={t => ({ marginRight: t.space.$2 })}
-                />
-              }
-              textVariant='buttonExtraSmallBold'
-              localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
-            />
-          )}
-        </Flex>
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
+            textVariant='xxlargeMedium'
+          />
+          <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__members')} />
+        </Header.Root>
         <Tabs>
           <TabsList>
-            <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__active')} />
+            <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
             {isAdmin && (
-              <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invited')} />
+              <Tab
+                localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
+              />
+            )}
+            {allowRequests && (
+              <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')} />
             )}
           </TabsList>
           <TabPanels>
@@ -89,16 +73,12 @@ export const OrganizationMembers = withCardStateProvider(() => {
             </TabPanel>
             {isAdmin && (
               <TabPanel sx={{ width: '100%' }}>
-                <Flex
-                  direction='col'
-                  gap={4}
-                  sx={{
-                    width: '100%',
-                  }}
-                >
-                  {isAdmin && __unstable_manageBillingUrl && <MembershipWidget />}
-                  <InvitedMembersList />
-                </Flex>
+                <OrganizationMembersTabInvitations />
+              </TabPanel>
+            )}
+            {allowRequests && (
+              <TabPanel sx={{ width: '100%' }}>
+                <OrganizationMembersTabRequests />
               </TabPanel>
             )}
           </TabPanels>

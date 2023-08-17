@@ -73,7 +73,8 @@ export type FieldId =
   | 'code'
   | 'role'
   | 'deleteConfirmation'
-  | 'deleteOrganizationConfirmation';
+  | 'deleteOrganizationConfirmation'
+  | 'enrollmentMode';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -87,7 +88,8 @@ export type ProfileSectionId =
   | 'danger'
   | 'activeDevices'
   | 'organizationProfile'
-  | 'organizationDanger';
+  | 'organizationDanger'
+  | 'organizationDomains';
 export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'organizationMembers';
 
 export type NavbarItemId = 'account' | 'security' | 'members' | 'settings';
@@ -217,6 +219,12 @@ export type ElementsConfig = {
   formField: WithOptions<FieldId, ControlState, never>;
   formFieldLabelRow: WithOptions<FieldId, ControlState, never>;
   formFieldLabel: WithOptions<FieldId, ControlState, never>;
+  formFieldRadioGroup: WithOptions<never, never, never>;
+  formFieldRadioGroupItem: WithOptions<never, never, never>;
+  formFieldRadioInput: WithOptions<never, never, never>;
+  formFieldRadioLabel: WithOptions<FieldId, ControlState, never>;
+  formFieldRadioLabelTitle: WithOptions<FieldId, ControlState, never>;
+  formFieldRadioLabelDescription: WithOptions<FieldId, ControlState, never>;
   formFieldAction: WithOptions<FieldId, ControlState, never>;
   formFieldInput: WithOptions<FieldId, ControlState, never>;
   formFieldErrorText: WithOptions<FieldId, ControlState, never>;
@@ -267,12 +275,15 @@ export type ElementsConfig = {
   organizationSwitcherPopoverCard: WithOptions<never, never, never>;
   organizationSwitcherPopoverMain: WithOptions<never, never, never>;
   organizationSwitcherPopoverActions: WithOptions<never, never, never>;
+  organizationSwitcherPopoverInvitationActions: WithOptions<never, never, never>;
   organizationSwitcherPopoverActionButton: WithOptions<
     'manageOrganization' | 'createOrganization' | 'switchOrganization',
     never,
     never
   >;
   organizationSwitcherPreviewButton: WithOptions<never, never, never>;
+  organizationSwitcherInvitationAcceptButton: WithOptions<never, never, never>;
+  organizationSwitcherInvitationRejectButton: WithOptions<never, never, never>;
   organizationSwitcherPopoverActionButtonIconBox: WithOptions<
     'manageOrganization' | 'createOrganization',
     never,
@@ -345,6 +356,8 @@ export type ElementsConfig = {
   profileSection: WithOptions<ProfileSectionId, never, never>;
   profileSectionTitle: WithOptions<ProfileSectionId, never, never>;
   profileSectionTitleText: WithOptions<ProfileSectionId, never, never>;
+  profileSectionSubtitle: WithOptions<ProfileSectionId, never, never>;
+  profileSectionSubtitleText: WithOptions<ProfileSectionId, never, never>;
   profileSectionContent: WithOptions<ProfileSectionId, never, never>;
   profileSectionPrimaryButton: WithOptions<ProfileSectionId, never, never>;
   profilePage: WithOptions<ProfilePageId, never, never>;

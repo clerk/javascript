@@ -2,20 +2,7 @@ import type { MembershipRole } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import {
-  Col,
-  Flex,
-  localizationKeys,
-  Spinner,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  useLocalizations,
-} from '../../customizables';
+import { Col, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr, useLocalizations } from '../../customizables';
 import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
 import { roleLocalizationKey } from '../../utils';
@@ -28,10 +15,11 @@ type MembersListTableProps = {
   onPageChange: (page: number) => void;
   itemCount: number;
   itemsPerPage: number;
+  emptyStateLocalizationKey: LocalizationKey;
 };
 
-export const MembersListTable = (props: MembersListTableProps) => {
-  const { headers, page, onPageChange, rows, isLoading, itemCount, itemsPerPage } = props;
+export const DataTable = (props: MembersListTableProps) => {
+  const { headers, page, onPageChange, rows, isLoading, itemCount, itemsPerPage, emptyStateLocalizationKey } = props;
 
   const pageCount = rows.length !== 0 ? Math.ceil(itemCount / itemsPerPage) : 1;
   const startRowIndex = (page - 1) * rows.length;
@@ -58,11 +46,17 @@ export const MembersListTable = (props: MembersListTableProps) => {
             {isLoading ? (
               <Tr>
                 <Td colSpan={4}>
-                  <Spinner sx={{ margin: 'auto', display: 'block' }} />
+                  <Spinner
+                    colorScheme='primary'
+                    sx={{ margin: 'auto', display: 'block' }}
+                  />
                 </Td>
               </Tr>
             ) : !rows.length ? (
-              <EmptyRow key='empty' />
+              <EmptyRow
+                key='empty'
+                localizationKey={emptyStateLocalizationKey}
+              />
             ) : (
               rows
             )}
@@ -86,12 +80,12 @@ export const MembersListTable = (props: MembersListTableProps) => {
   );
 };
 
-const EmptyRow = () => {
+const EmptyRow = (props: { localizationKey: LocalizationKey }) => {
   return (
     <Tr>
       <Td colSpan={4}>
         <Text
-          localizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
+          localizationKey={props.localizationKey}
           sx={t => ({
             margin: 'auto',
             display: 'block',

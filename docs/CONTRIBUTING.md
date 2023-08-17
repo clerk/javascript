@@ -81,7 +81,7 @@ WIP
    that relate to your submission. You don't want to duplicate effort.
 2. Fork the project
 3. Create your feature branch (`git checkout -b feat/amazing_feature`)
-4. If required, create a `changeset` that describes your changes (`npm run changeset`). In cases where a changeset is not required, an empty changeset can be created instead (`npm run changeset:emtpy`) - an empty changeset will not generate a changelog entry for the change, so please use it as an escape hatch or for internal refactors only.
+4. If required, create a `changeset` that describes your changes (`npm run changeset`). In cases where a changeset is not required, an empty changeset can be created instead (`npm run changeset:empty`) - an empty changeset will not generate a changelog entry for the change, so please use it as an escape hatch or for internal refactors only.
 5. Commit your changes (`git commit -m 'feat: Add amazing_feature'`)
 6. Push to the branch (`git push origin feat/amazing_feature`)
 7. [Open a Pull Request](https://github.com/clerkinc/javascript/compare?expand=1). Make sure the description includes enough information for the reviewer to understand what the PR is about.

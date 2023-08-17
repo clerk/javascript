@@ -79,7 +79,7 @@
     "bundlewatch": "^0.3.3",
     "node-fetch": "^2.6.0",
     "react-refresh-typescript": "^2.0.5",
-    "semver": "^7.3.5",
+    "semver": "^7.5.2",
     "ts-loader": "^9.3.0",
     "typescript": "*",
     "webpack": "^5.85.0",

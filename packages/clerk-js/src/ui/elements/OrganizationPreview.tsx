@@ -1,4 +1,4 @@
-import type { OrganizationPreviewId, OrganizationResource, UserResource } from '@clerk/types';
+import type { OrganizationPreviewId, UserOrganizationInvitationResource, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { descriptors, Flex, Text } from '../customizables';
@@ -7,7 +7,7 @@ import { roleLocalizationKey } from '../utils';
 import { OrganizationAvatar } from './OrganizationAvatar';
 
 export type OrganizationPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'elementId'> & {
-  organization: OrganizationResource;
+  organization: UserOrganizationInvitationResource['publicOrganizationData'];
   user?: UserResource;
   size?: 'lg' | 'md' | 'sm';
   avatarSx?: ThemableCssProp;
@@ -27,7 +27,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
       elementId={descriptors.organizationPreview.setId(elementId)}
       gap={4}
       align='center'
-      sx={[{ minWidth: '0px', width: '100%' }, sx]}
+      sx={[{ minWidth: '0' }, sx]}
       {...rest}
     >
       <Flex

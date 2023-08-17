@@ -23,6 +23,7 @@ export {
   ClerkInstanceContext,
   ClientContext,
   OrganizationContext,
+  OrganizationProvider,
   SessionContext,
   useClerkInstanceContext,
   useClientContext,

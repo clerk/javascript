@@ -1,3 +1,4 @@
+export * from './completeSignUpFlow';
 export * from './fromEntries';
 export * from './containsAllOf';
 export * from './createInfiniteAccessProxy';
@@ -19,5 +20,4 @@ export * from './roleLocalizationKey';
 export * from './getRelativeToNowDateKey';
 export * from './mergeRefs';
 export * from './createSlug';
-export * from './zxcvbn';
 export * from './passwordUtils';

@@ -1,7 +1,7 @@
 import type { FieldId } from '@clerk/types';
 import type { ClerkAPIError } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { forwardRef, useCallback, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -30,6 +30,7 @@ import { useCardState } from './contexts';
 import { useFormState } from './Form';
 import { PasswordInput } from './PasswordInput';
 import { PhoneInput } from './PhoneInput';
+import { RadioGroup } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> & {
   id: FieldId;
@@ -38,7 +39,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   errorText?: string;
   onActionClicked?: React.MouseEventHandler;
   isDisabled?: boolean;
-  label: string | LocalizationKey;
+  label?: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
   actionLabel?: string | LocalizationKey;
   icon?: React.ComponentType;
@@ -53,6 +54,11 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   hasPassedComplexity: boolean;
   enableErrorAfterBlur?: boolean;
   informationText?: string;
+  radioOptions?: {
+    value: string;
+    label: string | LocalizationKey;
+    description?: string | LocalizationKey;
+  }[];
   isFocused: boolean;
 };
 
@@ -61,6 +67,7 @@ const getInputElementForType = (type: FormControlProps['type']) => {
   const CustomInputs = {
     password: PasswordInput,
     tel: PhoneInput,
+    radio: RadioGroup,
   };
   if (!type) {
     return Input;
@@ -242,13 +249,30 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     setWarning,
     setHasPassedComplexity,
     hasPassedComplexity,
+    radioOptions,
     ...restInputProps
   } = props;
+
   const isDisabled = props.isDisabled || card.isLoading;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { validatePassword, ...inputProps } = restInputProps;
-  const inputElementProps = props.type === 'password' ? restInputProps : inputProps;
+
+  const inputElementProps = useMemo(() => {
+    const propMap = {
+      password: restInputProps,
+      radio: {
+        ...inputProps,
+        radioOptions,
+      },
+    };
+    if (!props.type) {
+      return inputProps;
+    }
+    const type = props.type as keyof typeof propMap;
+    return propMap[type] || inputProps;
+  }, [restInputProps]);
+
   const InputElement = getInputElementForType(props.type);
   const isCheckbox = props.type === 'checkbox';
 

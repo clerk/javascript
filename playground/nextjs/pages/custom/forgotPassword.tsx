@@ -2,6 +2,13 @@ import React, { SyntheticEvent, useState } from 'react';
 import { useSignIn } from '@clerk/nextjs';
 import type { NextPage } from 'next';
 
+type PasswordState = 'neutral' | 'success' | 'warn' | 'fail';
+const colors: { [k in PasswordState]?: string } = {
+  fail: 'red',
+  success: 'green',
+  warn: 'orange',
+};
+
 const SignInPage: NextPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -9,6 +16,7 @@ const SignInPage: NextPage = () => {
   const [successfulCreation, setSuccessfulCreation] = useState(false);
   const [complete, setComplete] = useState(false);
   const [secondFactor, setSecondFactor] = useState(false);
+  const [passwordState, setPasswordState] = useState<PasswordState>('neutral');
 
   const { isLoaded, signIn, setActive } = useSignIn();
 
@@ -86,7 +94,33 @@ const SignInPage: NextPage = () => {
             <input
               type='password'
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              style={{
+                outline: 'none',
+                borderColor: colors[passwordState],
+              }}
+              onChange={e => {
+                signIn.validatePassword(e.target.value, {
+                  onValidation(res) {
+                    if (Object.values(res?.complexity || {}).length > 0) {
+                      return setPasswordState('fail');
+                    }
+
+                    // Strength that fails
+                    if (res?.strength?.state === 'fail') {
+                      return setPasswordState('fail');
+                    }
+
+                    // Strength that can be better
+                    if (res?.strength?.state === 'pass') {
+                      return setPasswordState('warn');
+                    }
+
+                    // Perfection
+                    return setPasswordState('success');
+                  },
+                });
+                setPassword(e.target.value);
+              }}
             />
 
             <label htmlFor='password'>Reset password code</label>

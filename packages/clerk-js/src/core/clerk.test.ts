@@ -1494,5 +1494,41 @@ describe('Clerk singleton', () => {
       const url = sut.buildUrlWithAuth('foo');
       expect(url).toBe('foo');
     });
+
+    it('uses the hash to propagate the dev_browser JWT by default on dev', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('https://example.com/some-path');
+      expect(url).toBe('https://example.com/some-path#__clerk_db_jwt[deadbeef]');
+    });
+
+    it('uses the query param to propagate the dev_browser JWT if specified by option on dev', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('https://example.com/some-path', { useQueryParam: true });
+      expect(url).toBe('https://example.com/some-path?__dev_session=deadbeef');
+    });
+
+    it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - non-kima', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('https://accounts.abcef.12345.dev.lclclerk.com');
+      expect(url).toBe('https://accounts.abcef.12345.dev.lclclerk.com/?__dev_session=deadbeef');
+    });
+
+    it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - kima', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('https://rested-anemone-14.accounts.dev');
+      expect(url).toBe('https://rested-anemone-14.accounts.dev/?__dev_session=deadbeef');
+    });
   });
 });

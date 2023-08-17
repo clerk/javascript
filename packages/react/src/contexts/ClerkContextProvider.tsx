@@ -7,7 +7,7 @@ import { deriveState } from '../utils/deriveState';
 import { AuthContext } from './AuthContext';
 import { ClientContext } from './ClientContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
-import { OrganizationContext } from './OrganizationContext';
+import { OrganizationProvider } from './OrganizationContext';
 import { SessionContext } from './SessionContext';
 import { UserContext } from './UserContext';
 
@@ -74,11 +74,11 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     <IsomorphicClerkContext.Provider value={clerkCtx}>
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>
-          <OrganizationContext.Provider value={organizationCtx}>
+          <OrganizationProvider {...organizationCtx.value}>
             <AuthContext.Provider value={authCtx}>
               <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
             </AuthContext.Provider>
-          </OrganizationContext.Provider>
+          </OrganizationProvider>
         </SessionContext.Provider>
       </ClientContext.Provider>
     </IsomorphicClerkContext.Provider>

@@ -8,18 +8,13 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource } from './internal';
 
 export class UserOrganizationInvitation extends BaseResource implements UserOrganizationInvitationResource {
   id!: string;
   emailAddress!: string;
-  publicOrganizationData!: {
-    hasImage: boolean;
-    imageUrl: string;
-    name: string;
-    id: string;
-    slug: string;
-  };
+  publicOrganizationData!: UserOrganizationInvitationResource['publicOrganizationData'];
   publicMetadata: OrganizationInvitationPublicMetadata = {};
   status!: OrganizationInvitationStatus;
   role!: MembershipRole;
@@ -32,7 +27,7 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
     return await BaseResource._fetch({
       path: '/me/organization_invitations',
       method: 'GET',
-      search: params as any,
+      search: convertPageToOffset(params) as any,
     })
       .then(res => {
         const { data: invites, total_count } =
