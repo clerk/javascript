@@ -142,3 +142,14 @@ export const OrganizationSwitcher = withClerk(({ clerk, ...props }: WithClerkPro
     />
   );
 }, 'OrganizationSwitcher');
+
+export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationSwitcherProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountOrganizationList}
+      unmount={clerk.unmountOrganizationList}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+}, 'OrganizationList');

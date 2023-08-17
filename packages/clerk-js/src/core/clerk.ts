@@ -502,6 +502,23 @@ export default class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
+  public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationList' }).then(controls =>
+      controls.mountComponent({
+        name: 'OrganizationList',
+        appearanceKey: 'organizationList',
+        node,
+        props,
+      }),
+    );
+  };
+
+  public unmountOrganizationList = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
   public mountUserButton = (node: HTMLDivElement, props?: UserButtonProps) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted({ preloadHint: 'UserButton' }).then(controls =>

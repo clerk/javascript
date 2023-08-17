@@ -255,6 +255,19 @@ export interface Clerk {
   unmountOrganizationSwitcher: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount an organization switcher component at the target element.
+   * @param targetNode Target to mount the UserProfile component.
+   * @param props Configuration parameters.
+   */
+  mountOrganizationList: (targetNode: HTMLDivElement, props?: OrganizationSwitcherProps) => void;
+
+  /**
+   * Unmount the organization profile component from the target node.*
+   * @param targetNode Target node to unmount the UserProfile component from.
+   */
+  unmountOrganizationList: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
    * Allows to hook up at different steps in the sign up, sign in processes.
    *

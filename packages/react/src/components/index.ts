@@ -6,6 +6,7 @@ export {
   OrganizationSwitcher,
   OrganizationProfile,
   CreateOrganization,
+  OrganizationList,
 } from './uiComponents';
 
 export {
