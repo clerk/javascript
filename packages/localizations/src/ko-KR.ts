@@ -350,6 +350,12 @@ export const koKR: LocalizationResource = {
         destructiveActionSubtitle: '이 web3 지갑을 계정에서 삭제',
         destructiveAction: '지갑 제거',
       },
+       dangerSection: {
+        title: '위험',
+        deleteAccountButton: '계정 삭제',
+        deleteAccountTitle: '계정 삭제',
+        deleteAccountDescription: '계정과 관련된 모든 데이터와 계정을 삭제합니다',
+      },
     },
     profilePage: {
       title: '프로필 업데이트',
