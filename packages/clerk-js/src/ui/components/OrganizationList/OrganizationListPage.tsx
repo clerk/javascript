@@ -1,4 +1,4 @@
-import { useCoreOrganizationList } from '../../contexts';
+import { useCoreClerk, useCoreOrganizationList, useOrganizationListContext } from '../../contexts';
 import { Button, Col, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import { Card, CardAlert, Footer, useCardState, withCardStateProvider } from '../../elements';
 import { UserInvitationList } from './UserInvitationList';
@@ -8,10 +8,20 @@ import { organizationListParams } from './utils';
 
 export const OrganizationListPage = withCardStateProvider(() => {
   const card = useCardState();
+  const clerk = useCoreClerk();
+  const { afterSkipUrl, createOrganizationMode, afterCreateOrganizationUrl, navigateCreateOrganization } =
+    useOrganizationListContext();
 
   const { userMemberships, userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
+
+  const handleCreateOrganizationClicked = () => {
+    if (createOrganizationMode === 'navigation') {
+      return navigateCreateOrganization();
+    }
+    return clerk.openCreateOrganization({ afterCreateOrganizationUrl });
+  };
 
   return (
     <Card
@@ -21,7 +31,6 @@ export const OrganizationListPage = withCardStateProvider(() => {
       })}
     >
       <CardAlert>{card.error}</CardAlert>
-
       {isLoading && (
         <Flex
           direction={'row'}
@@ -71,6 +80,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
               size='sm'
               variant='ghost'
               textVariant='buttonExtraSmallBold'
+              onClick={handleCreateOrganizationClicked}
             >
               Create
             </Button>
@@ -78,20 +88,22 @@ export const OrganizationListPage = withCardStateProvider(() => {
         </Col>
       )}
 
-      <Footer.Root>
-        <Footer.Action
-          elementId='organizationList'
-          sx={t => ({
-            padding: `${t.space.$none} ${t.space.$8}`,
-          })}
-        >
-          <Footer.ActionLink
-            localizationKey={localizationKeys('signIn.start.actionLink')}
-            // to={clerk.buildUrlWithAuth(signUpUrl)}
-          />
-        </Footer.Action>
-        <Footer.Links />
-      </Footer.Root>
+      {afterSkipUrl && (
+        <Footer.Root>
+          <Footer.Action
+            elementId='organizationList'
+            sx={t => ({
+              padding: `${t.space.$none} ${t.space.$8}`,
+            })}
+          >
+            <Footer.ActionLink
+              localizationKey={localizationKeys('signIn.start.actionLink')}
+              to={clerk.buildUrlWithAuth(afterSkipUrl)}
+            />
+          </Footer.Action>
+          <Footer.Links />
+        </Footer.Root>
+      )}
     </Card>
   );
 });
