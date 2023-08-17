@@ -354,7 +354,7 @@ export const koKR: LocalizationResource = {
         title: '위험',
         deleteAccountButton: '계정 삭제',
         deleteAccountTitle: '계정 삭제',
-        deleteAccountDescription: '계정과 관련된 모든 데이터와 계정을 삭제합니다',
+        deleteAccountDescription: '계정과 그와 연관된 모든 데이터 삭제',
       },
     },
     profilePage: {
