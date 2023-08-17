@@ -95,9 +95,9 @@ export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'o
 export type NavbarItemId = 'account' | 'security' | 'members' | 'settings';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
-export type OrganizationPreviewId = 'organizationSwitcher';
+export type OrganizationPreviewId = 'organizationSwitcher' | 'organizationList';
 
-export type FooterActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn';
+export type FooterActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn' | 'organizationList';
 
 export type MenuId = 'invitation' | 'member';
 export type SelectId = 'countryCode' | 'role';
@@ -659,6 +659,10 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<OrganizationSwitcher/>` component
    */
   organizationSwitcher?: T;
+  /**
+   * Theme overrides that only apply to the `<OrganizationList/>` component
+   */
+  organizationList?: T;
   /**
    * Theme overrides that only apply to the `<OrganizationProfile/>` component
    */
