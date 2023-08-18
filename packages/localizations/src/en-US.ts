@@ -680,8 +680,17 @@ export const enUS: LocalizationResource = {
   },
   organizationList: {
     createOrganization: 'Create Organization',
-    action__createOrganization: 'Create',
+    organizationCountLabel_single: '1 joined organization:',
+    organizationCountLabel_many: '{{count}} joined organizations:',
+    invitationCountLabel_single: '1 pending invitation to join:',
+    invitationCountLabel_many: '{{count}} pending invitations to join:',
+    suggestionCountLabel_single: '1 suggested organization:',
+    suggestionCountLabel_many: '{{count}} suggested organizations:',
+    action__invitationAccept: 'Join',
     action__setActiveOrganization: 'Open',
+    action__suggestionsAccept: 'Request to join',
+    suggestionsAcceptedLabel: 'Pending approval',
+    action__createOrganization: 'Create',
     actionLink: 'Skip and Continue',
   },
   unstable__errors: {

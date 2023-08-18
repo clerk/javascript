@@ -45,8 +45,8 @@ export const UserMembershipList = () => {
         // Handle plurals
         localizationKey={localizationKeys(
           (userMemberships.count ?? 0) > 1
-            ? 'organizationSwitcher.invitationCountLabel_many'
-            : 'organizationSwitcher.invitationCountLabel_single',
+            ? 'organizationList.organizationCountLabel_many'
+            : 'organizationList.organizationCountLabel_single',
           {
             count: userMemberships.count,
           },

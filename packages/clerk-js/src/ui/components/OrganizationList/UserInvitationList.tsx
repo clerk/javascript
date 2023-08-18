@@ -46,8 +46,8 @@ export const UserInvitationList = () => {
         // Handle plurals
         localizationKey={localizationKeys(
           (userInvitations.count ?? 0) > 1
-            ? 'organizationSwitcher.invitationCountLabel_many'
-            : 'organizationSwitcher.invitationCountLabel_single',
+            ? 'organizationList.invitationCountLabel_many'
+            : 'organizationList.invitationCountLabel_single',
           {
             count: userInvitations.count,
           },
@@ -153,7 +153,7 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
-      localizationKey={localizationKeys('organizationSwitcher.action__invitationAccept')}
+      localizationKey={localizationKeys('organizationList.action__invitationAccept')}
     />
   );
 };

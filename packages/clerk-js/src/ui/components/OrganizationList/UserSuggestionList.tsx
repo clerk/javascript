@@ -50,8 +50,8 @@ export const UserSuggestionList = () => {
         // Handle plurals
         localizationKey={localizationKeys(
           (userSuggestions.count ?? 0) > 1
-            ? 'organizationSwitcher.suggestionCountLabel_many'
-            : 'organizationSwitcher.suggestionCountLabel_single',
+            ? 'organizationList.suggestionCountLabel_many'
+            : 'organizationList.suggestionCountLabel_single',
           {
             count: userSuggestions.count,
           },
@@ -160,7 +160,7 @@ const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResource) =>
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
-      localizationKey={localizationKeys('organizationSwitcher.action__suggestionsAccept')}
+      localizationKey={localizationKeys('organizationList.action__suggestionsAccept')}
     />
   );
 };
