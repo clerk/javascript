@@ -657,6 +657,7 @@ export const enUS: LocalizationResource = {
       requestsTab: {
         tableHeader__requested: 'Requested access',
         menuAction__approve: 'Approve',
+        menuAction__reject: 'Reject',
         table__emptyRow: 'No requests to display',
         requests: {
           headerTitle: 'Requests',
