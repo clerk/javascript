@@ -704,6 +704,7 @@ type _LocalizationResource = {
   organizationList: {
     createOrganization: LocalizationValue;
     action__createOrganization: LocalizationValue;
+    action__setActiveOrganization: LocalizationValue;
     actionLink: LocalizationValue;
   };
   unstable__errors: UnstableErrors;

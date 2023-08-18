@@ -1,8 +1,8 @@
-import type { OrganizationMembershipResource } from '@clerk/types';
+import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
 
-import { useCoreOrganizationList } from '../../contexts';
-import { Box, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
-import { OrganizationPreview, withCardStateProvider } from '../../elements';
+import { useCoreOrganizationList, useOrganizationListContext } from '../../contexts';
+import { Box, Button, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
+import { OrganizationPreview, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { common } from '../../styledSystem';
 import { organizationListParams } from './utils';
@@ -104,50 +104,35 @@ export const UserMembershipList = () => {
   );
 };
 
-// const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource) => {
-//   const card = useCardState();
-//   const { userInvitations } = useCoreOrganizationList({
-//     userInvitations: organizationListParams.userInvitations,
-//   });
-//
-//   const handleAccept = () => {
-//     return card
-//       .runAsync(props.accept)
-//       .then(result => {
-//         (userInvitations as any)?.unstable__mutate?.(result, {
-//           populateCache: (
-//             updatedInvitation: UserOrganizationInvitationResource,
-//             invitationInfinitePages: ClerkPaginatedResponse<UserOrganizationInvitationResource>[],
-//           ) => {
-//             const prevTotalCount = invitationInfinitePages[invitationInfinitePages.length - 1].total_count;
-//
-//             return invitationInfinitePages.map(item => {
-//               const newData = item.data.filter(obj => {
-//                 return obj.id !== updatedInvitation.id;
-//               });
-//               return { ...item, data: newData, total_count: prevTotalCount - 1 };
-//             });
-//           },
-//           // Since `accept` gives back the updated information,
-//           // we don't need to revalidate here.
-//           revalidate: false,
-//         });
-//       })
-//       .catch(err => handleError(err, [], card.setError));
-//   };
-//
-//   return (
-//     <Button
-//       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
-//       textVariant='buttonExtraSmallBold'
-//       variant='solid'
-//       size='sm'
-//       isLoading={card.isLoading}
-//       onClick={handleAccept}
-//       localizationKey={localizationKeys('organizationSwitcher.action__invitationAccept')}
-//     />
-//   );
-// };
+const SetActiveButton = (props: OrganizationResource) => {
+  const card = useCardState();
+  const { navigateAfterSelectOrganization } = useOrganizationListContext();
+  const { isLoaded, setActive } = useCoreOrganizationList();
+
+  if (!isLoaded) {
+    return null;
+  }
+  const handleOrganizationClicked = (organization: OrganizationResource) => {
+    return card.runAsync(() =>
+      setActive({
+        organization,
+        beforeEmit: () => navigateAfterSelectOrganization(organization),
+      }),
+    );
+  };
+
+  return (
+    <Button
+      elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
+      textVariant='buttonExtraSmallBold'
+      variant='solid'
+      size='sm'
+      isLoading={card.isLoading}
+      onClick={() => handleOrganizationClicked(props)}
+      localizationKey={localizationKeys('organizationList.action__setActiveOrganization')}
+    />
+  );
+};
 
 const InvitationPreview = withCardStateProvider((props: OrganizationMembershipResource) => {
   return (
@@ -170,7 +155,7 @@ const InvitationPreview = withCardStateProvider((props: OrganizationMembershipRe
         organization={props.organization}
       />
 
-      {/*<AcceptRejectInvitationButtons {...props} />*/}
+      <SetActiveButton {...props.organization} />
     </Flex>
   );
 });
