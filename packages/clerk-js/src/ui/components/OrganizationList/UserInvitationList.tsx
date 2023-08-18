@@ -175,6 +175,7 @@ const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitati
         avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)`, width: t.sizes.$10, height: t.sizes.$10 })}
         mainIdentifierSx={t => ({
           fontSize: t.fontSizes.$xl,
+          color: t.colors.$colorText,
         })}
         organization={props.publicOrganizationData}
       />
