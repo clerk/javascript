@@ -295,6 +295,14 @@ export type ElementsConfig = {
   organizationSwitcherPopoverFooterPages: WithOptions<never, never, never>;
   organizationSwitcherPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
 
+  organizationListPreviewList: WithOptions<'memberships' | 'suggestions' | 'invitations', never, never>;
+  organizationListPreviewListSubtitle: WithOptions<never, never, never>;
+  organizationListPreviewListDivider: WithOptions<never, never, never>;
+  organizationListPreviewItems: WithOptions<never, never, never>;
+  organizationListPreviewItem: WithOptions<never, never, never>;
+  organizationListPreviewItemActionButton: WithOptions<never, never, never>;
+  organizationListPreviewItemDestructiveActionButton: WithOptions<never, never, never>;
+
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
   userPreview: WithOptions<UserPreviewId, never, never>;

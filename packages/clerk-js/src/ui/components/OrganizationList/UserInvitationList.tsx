@@ -1,12 +1,20 @@
 import type { ClerkPaginatedResponse, UserOrganizationInvitationResource } from '@clerk/types';
 
 import { useCoreOrganizationList } from '../../contexts';
-import { Box, Button, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
-import { OrganizationPreview, useCardState, withCardStateProvider } from '../../elements';
+import { localizationKeys } from '../../customizables';
+import { useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
-import { common } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { organizationListParams } from './utils';
+import {
+  PreviewListDivider,
+  PreviewListItem,
+  PreviewListItemButton,
+  PreviewListSpinner,
+  PreviewList,
+  PreviewListItems,
+  PreviewListSubtitle,
+} from './shared';
 
 export const UserInvitationList = () => {
   const { ref } = useInView({
@@ -27,23 +35,8 @@ export const UserInvitationList = () => {
   }
 
   return (
-    <Flex
-      direction='col'
-      elementDescriptor={descriptors.organizationSwitcherPopoverInvitationActions}
-      gap={2}
-    >
-      <Text
-        variant='largeMedium'
-        colorScheme='neutral'
-        sx={t => ({
-          fontWeight: t.fontWeights.$normal,
-          minHeight: 'unset',
-          height: t.space.$7,
-          padding: `${t.space.$none} ${t.space.$8}`,
-          display: 'flex',
-          alignItems: 'center',
-        })}
-        // Handle plurals
+    <PreviewList elementId='invitations'>
+      <PreviewListSubtitle
         localizationKey={localizationKeys(
           (userInvitations.count ?? 0) > 1
             ? 'organizationList.invitationCountLabel_many'
@@ -53,13 +46,8 @@ export const UserInvitationList = () => {
           },
         )}
       />
-      <Box
-        sx={t => ({
-          maxHeight: `calc(4 * ${t.sizes.$12})`,
-          overflowY: 'auto',
-          ...common.unstyledScrollbar(t),
-        })}
-      >
+
+      <PreviewListItems>
         {userInvitations?.data?.map(inv => {
           return (
             <InvitationPreview
@@ -69,39 +57,10 @@ export const UserInvitationList = () => {
           );
         })}
 
-        {userInvitations.hasNextPage && (
-          <Box
-            ref={ref}
-            sx={t => ({
-              width: '100%',
-              height: t.space.$12,
-              position: 'relative',
-            })}
-          >
-            <Box
-              sx={{
-                margin: 'auto',
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
-                transform: 'translateY(-50%) translateX(-50%)',
-              }}
-            >
-              <Spinner
-                size='md'
-                colorScheme='primary'
-              />
-            </Box>
-          </Box>
-        )}
-      </Box>
-      <Box
-        sx={t => ({
-          margin: `${t.space.$2} ${t.space.$8} ${t.space.$none} ${t.space.$8}`,
-          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
-        })}
-      ></Box>
-    </Flex>
+        {userInvitations.hasNextPage && <PreviewListSpinner ref={ref} />}
+      </PreviewListItems>
+      <PreviewListDivider />
+    </PreviewList>
   );
 };
 
@@ -140,17 +99,14 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
           revalidate: false,
         });
 
+        // Fetch memberships again to update the list in the UI
         await (userMemberships as any)?.unstable__mutate();
       })
       .catch(err => handleError(err, [], card.setError));
   };
 
   return (
-    <Button
-      elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
-      textVariant='buttonExtraSmallBold'
-      variant='solid'
-      size='sm'
+    <PreviewListItemButton
       isLoading={card.isLoading}
       onClick={handleAccept}
       localizationKey={localizationKeys('organizationList.action__invitationAccept')}
@@ -160,27 +116,8 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
 
 const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
   return (
-    <Flex
-      align='center'
-      gap={2}
-      sx={t => ({
-        minHeight: 'unset',
-        height: t.space.$12,
-        justifyContent: 'space-between',
-        padding: `0 ${t.space.$8}`,
-      })}
-    >
-      <OrganizationPreview
-        elementId='organizationList'
-        avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)`, width: t.sizes.$10, height: t.sizes.$10 })}
-        mainIdentifierSx={t => ({
-          fontSize: t.fontSizes.$xl,
-          color: t.colors.$colorText,
-        })}
-        organization={props.publicOrganizationData}
-      />
-
+    <PreviewListItem organizationData={props.publicOrganizationData}>
       <AcceptRejectInvitationButtons {...props} />
-    </Flex>
+    </PreviewListItem>
   );
 });

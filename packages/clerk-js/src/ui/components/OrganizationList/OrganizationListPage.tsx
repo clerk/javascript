@@ -1,5 +1,5 @@
 import { useCoreClerk, useCoreOrganizationList, useOrganizationListContext } from '../../contexts';
-import { Button, Col, Flex, localizationKeys, Spinner, Text } from '../../customizables';
+import { Button, Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import { Card, CardAlert, Footer, useCardState, withCardStateProvider } from '../../elements';
 import { UserInvitationList } from './UserInvitationList';
 import { UserMembershipList } from './UserMembershipList';
@@ -25,6 +25,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 
   return (
     <Card
+      justify={'between'}
       sx={t => ({
         minHeight: t.sizes.$100,
         padding: `${t.space.$8} ${t.space.$none}`,
@@ -49,7 +50,10 @@ export const OrganizationListPage = withCardStateProvider(() => {
       )}
 
       {!isLoading && (
-        <Col gap={2}>
+        <Col
+          elementDescriptor={descriptors.main}
+          gap={2}
+        >
           <UserMembershipList />
           <UserInvitationList />
           <UserSuggestionList />
@@ -74,6 +78,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
               localizationKey={localizationKeys('organizationList.createOrganization')}
             />
             <Button
+              elementDescriptor={descriptors.button}
               block={false}
               colorScheme='neutral'
               size='sm'
