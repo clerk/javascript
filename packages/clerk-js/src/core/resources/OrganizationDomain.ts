@@ -5,6 +5,7 @@ import type {
   OrganizationDomainVerification,
   OrganizationEnrollmentMode,
   PrepareAffiliationVerificationParams,
+  UpdateEnrollmentModeParams,
   UpdateOrganizationDomainParams,
 } from '@clerk/types';
 
@@ -61,6 +62,13 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
     return this._basePatch({
       method: 'PATCH',
       path: `/organizations/${this.organizationId}/domains/${this.id}`,
+      body: params,
+    });
+  };
+
+  updateEnrollmentMode = (params: UpdateEnrollmentModeParams): Promise<OrganizationDomainResource> => {
+    return this._basePost({
+      path: `/organizations/${this.organizationId}/domains/${this.id}/update_enrollment_mode`,
       body: params,
     });
   };

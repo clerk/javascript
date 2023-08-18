@@ -24,7 +24,11 @@ export interface OrganizationDomainResource extends ClerkResource {
 
   attemptAffiliationVerification: (params: AttemptAffiliationVerificationParams) => Promise<OrganizationDomainResource>;
   delete: () => Promise<void>;
+  /**
+   * @deprecated use updateEnrollmentMode instead
+   */
   update: (params: UpdateOrganizationDomainParams) => Promise<OrganizationDomainResource>;
+  updateEnrollmentMode: (params: UpdateEnrollmentModeParams) => Promise<OrganizationDomainResource>;
 }
 
 export type PrepareAffiliationVerificationParams = {
@@ -35,4 +39,9 @@ export type AttemptAffiliationVerificationParams = {
   code: string;
 };
 
+/**
+ * @deprecated use UpdateEnrollmentModeParams instead
+ */
 export type UpdateOrganizationDomainParams = Partial<Pick<OrganizationDomainResource, 'enrollmentMode'>>;
+
+export type UpdateEnrollmentModeParams = Partial<Pick<OrganizationDomainResource, 'enrollmentMode'>>;

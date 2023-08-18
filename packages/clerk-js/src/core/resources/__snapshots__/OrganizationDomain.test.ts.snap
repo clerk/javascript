@@ -12,6 +12,7 @@ OrganizationDomain {
   "pathRoot": "",
   "prepareAffiliationVerification": [Function],
   "update": [Function],
+  "updateEnrollmentMode": [Function],
   "verification": null,
 }
 `;
@@ -28,6 +29,7 @@ OrganizationDomain {
   "pathRoot": "",
   "prepareAffiliationVerification": [Function],
   "update": [Function],
+  "updateEnrollmentMode": [Function],
   "verification": {
     "attempts": 1,
     "expiresAt": 1970-01-01T00:00:12.345Z,
