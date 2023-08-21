@@ -6,7 +6,6 @@ import type {
   OrganizationEnrollmentMode,
   PrepareAffiliationVerificationParams,
   UpdateEnrollmentModeParams,
-  UpdateOrganizationDomainParams,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
@@ -55,14 +54,6 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
       path: `/organizations/${this.organizationId}/domains/${this.id}/attempt_affiliation_verification`,
       method: 'POST',
       body: params as any,
-    });
-  };
-
-  update = (params: UpdateOrganizationDomainParams): Promise<OrganizationDomainResource> => {
-    return this._basePatch({
-      method: 'PATCH',
-      path: `/organizations/${this.organizationId}/domains/${this.id}`,
-      body: params,
     });
   };
 
