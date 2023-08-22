@@ -82,7 +82,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     }
 
     try {
-      await domain.update({
+      await domain.updateEnrollmentMode({
         enrollmentMode: enrollmentMode.value as OrganizationEnrollmentMode,
       });
 

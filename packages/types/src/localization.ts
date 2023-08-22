@@ -678,6 +678,7 @@ type _LocalizationResource = {
       requestsTab: {
         tableHeader__requested: LocalizationValue;
         menuAction__approve: LocalizationValue;
+        menuAction__reject: LocalizationValue;
         table__emptyRow: LocalizationValue;
         requests: {
           headerTitle: LocalizationValue;
