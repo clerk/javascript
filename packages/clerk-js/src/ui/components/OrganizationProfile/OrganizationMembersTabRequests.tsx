@@ -1,4 +1,4 @@
-import { AddBlockButton } from '../../common';
+import { BlockButton } from '../../common';
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
@@ -48,9 +48,12 @@ export const OrganizationMembersTabRequests = () => {
         </Header.Root>
         <DomainList
           fallback={
-            <AddBlockButton
-              textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
-              id='addOrganizationDomain'
+            <BlockButton
+              colorScheme='primary'
+              textLocalizationKey={localizationKeys(
+                'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
+              )}
+              id='manageVerifiedDomains'
               onClick={() => navigate('organization-settings/domain')}
             />
           }

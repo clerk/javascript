@@ -674,6 +674,7 @@ type _LocalizationResource = {
         autoInvitations: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
+          primaryButton: LocalizationValue;
         };
       };
       requestsTab: {
@@ -688,6 +689,7 @@ type _LocalizationResource = {
         autoSuggestions: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
+          primaryButton: LocalizationValue;
         };
       };
     };
