@@ -16,6 +16,7 @@ OrganizationMembershipRequest {
     "profileImageUrl": "test_url",
     "userId": undefined,
   },
+  "reject": [Function],
   "status": "pending",
   "updatedAt": 1970-01-01T00:00:05.678Z,
 }

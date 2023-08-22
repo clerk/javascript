@@ -1009,6 +1009,9 @@ export default class Clerk implements ClerkInterface {
     return Organization.create({ name, slug });
   };
 
+  /**
+   * @deprecated use User.getOrganizationMemberships
+   */
   public getOrganizationMemberships = async (): Promise<OrganizationMembership[]> => {
     return await OrganizationMembership.retrieve();
   };

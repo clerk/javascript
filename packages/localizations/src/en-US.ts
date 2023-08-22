@@ -531,10 +531,11 @@ export const enUS: LocalizationResource = {
     action__manageOrganization: 'Manage Organization',
     invitationCountLabel_single: '1 pending invitation to join:',
     invitationCountLabel_many: '{{count}} pending invitations to join:',
-    invitationAccept: 'Join',
+    action__invitationAccept: 'Join',
     suggestionCountLabel_single: '1 suggested organization:',
     suggestionCountLabel_many: '{{count}} suggested organizations:',
-    suggestionsAccept: 'Request to join',
+    action__suggestionsAccept: 'Request to join',
+    suggestionsAcceptedLabel: 'Pending approval',
   },
   impersonationFab: {
     title: 'Signed in as {{identifier}}',
@@ -656,6 +657,7 @@ export const enUS: LocalizationResource = {
       requestsTab: {
         tableHeader__requested: 'Requested access',
         menuAction__approve: 'Approve',
+        menuAction__reject: 'Reject',
         table__emptyRow: 'No requests to display',
         requests: {
           headerTitle: 'Requests',

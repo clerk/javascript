@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Icon, Link, Text, useLocalizations } from '../customizables';
@@ -32,17 +32,24 @@ const BreadcrumbItem = (props: PropsOfComponent<typeof Text> & { href?: string }
 };
 
 export const Breadcrumbs = (props: BreadcrumbsProps) => {
+  const { title, pageToRootNavbarRoute, ...rest } = props;
   const router = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const { t } = useLocalizations();
-  const currentPage = (router.currentPath || '').split('/').pop();
+  const currentPath = router.currentPath.replace(`/${router.basePath}/`, '');
 
-  const { title, pageToRootNavbarRoute, ...rest } = props;
+  const root = useMemo(
+    () =>
+      Object.entries(pageToRootNavbarRoute).find(([key]) => {
+        return currentPath.includes(key);
+      })?.[1],
+    [],
+  );
+
   if (!title) {
     return null;
   }
 
-  const root = currentPage ? pageToRootNavbarRoute[currentPage] : undefined;
   const handleRootClick = (e: React.MouseEvent) => {
     e.preventDefault();
     return navigateToFlowStart();
