@@ -36,8 +36,7 @@ export const InputGroup = forwardRef<
 
   return (
     <Flex
-      // TODO: update this.
-      elementDescriptor={descriptors.phoneInputBox}
+      elementDescriptor={descriptors.formInputGroup}
       direction='row'
       hasError={rest.hasError}
       sx={theme => ({
