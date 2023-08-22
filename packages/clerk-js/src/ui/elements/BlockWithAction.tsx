@@ -98,3 +98,65 @@ export const BlockWithAction = (props: ArrowBlockButtonProps) => {
     </Box>
   );
 };
+
+type SimpleBlockProps = PropsOfComponent<typeof Box> & {
+  badge?: React.ReactElement;
+  something?: React.ReactElement;
+  textElementDescriptor?: ElementDescriptor;
+  textElementId?: ElementId;
+  textLocalizationKey?: LocalizationKey;
+};
+
+export const SimpleBlock = (props: SimpleBlockProps) => {
+  const { isLoading, children, something, textElementDescriptor, textElementId, textLocalizationKey, badge, ...rest } =
+    props;
+
+  return (
+    <Box
+      isLoading={isLoading}
+      {...rest}
+      sx={theme => [
+        {
+          borderRadius: theme.radii.$md,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: theme.space.$4,
+          position: 'relative',
+          justifyContent: 'flex-start',
+          borderColor: theme.colors.$blackAlpha200,
+          '--action-opacity': '0',
+          '--action-transform': `translateX(-${theme.space.$2});`,
+          '&:hover,&:focus ': {
+            '--action-opacity': '1',
+            '--action-transform': 'translateX(0px);',
+          },
+        },
+        props.sx,
+      ]}
+    >
+      <Flex
+        justify='start'
+        align='center'
+        gap={2}
+        sx={{
+          flexGrow: '1',
+          overflow: 'hidden',
+        }}
+      >
+        <Text
+          elementDescriptor={textElementDescriptor}
+          elementId={textElementId}
+          as='span'
+          truncate
+          colorScheme='inherit'
+          variant='buttonSmallRegular'
+          localizationKey={textLocalizationKey}
+        >
+          {children}
+        </Text>
+        {badge}
+      </Flex>
+      {something}
+    </Box>
+  );
+};
