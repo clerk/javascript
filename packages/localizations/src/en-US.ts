@@ -648,12 +648,13 @@ export const enUS: LocalizationResource = {
         table__emptyRow: 'No invitations to display',
         manualInvitations: {
           headerTitle: 'Individual invitations',
-          headerSubtitle: 'Browse and manage invited members.',
+          headerSubtitle: 'Manually invite members and manage existing invitations.',
         },
         autoInvitations: {
-          headerTitle: 'Domain invitations',
+          headerTitle: 'Automatic invitations',
           headerSubtitle:
-            'New and existing users will be able to join anytime as members and will get notified in-app.',
+            'Invite users by connecting an email domain with your organization. Anyone who signs up with a matching email domain will be able to join the organization anytime.',
+          primaryButton: 'Manage verified domains',
         },
       },
       requestsTab: {
@@ -668,7 +669,8 @@ export const enUS: LocalizationResource = {
         autoSuggestions: {
           headerTitle: 'Automatic suggestions',
           headerSubtitle:
-            'Users with an email address on your verified domain will see a suggestion to request to join the organization.',
+            'Users who sign up with a matching email domain, will be able to see a suggestion to request to join your organization.',
+          primaryButton: 'Manage verified domains',
         },
       },
     },
