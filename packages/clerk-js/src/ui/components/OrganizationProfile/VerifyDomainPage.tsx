@@ -44,10 +44,11 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
-  const emailField = useFormControl('emailAddress', '', {
-    type: 'email',
+  const emailField = useFormControl('affiliationEmailAddress', '', {
+    type: 'text',
     label: localizationKeys('formFieldLabel__organizationEmailDomainEmailAddress'),
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationEmailDomainEmailAddress'),
+    informationText: localizationKeys('formFieldLabel__organizationEmailDomainEmailAddressDescription'),
   });
 
   const resolve = async () => {
@@ -99,7 +100,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
     e.preventDefault();
     return domain
       ?.prepareAffiliationVerification({
-        affiliationEmailAddress: emailField.value,
+        affiliationEmailAddress: `${emailField.value}@${domain.name}`,
       })
       .then(wizard.nextStep)
       .catch(err => {
@@ -155,6 +156,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
             <Form.Control
               {...emailField.props}
               autoFocus
+              groupSuffix={`@${domain.name}`}
               required
             />
           </Form.ControlRow>

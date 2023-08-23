@@ -47,6 +47,7 @@ type _LocalizationResource = {
   formFieldLabel__organizationSlug: LocalizationValue;
   formFieldLabel__organizationEmailDomain: LocalizationValue;
   formFieldLabel__organizationEmailDomainEmailAddress: LocalizationValue;
+  formFieldLabel__organizationEmailDomainEmailAddressDescription: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
