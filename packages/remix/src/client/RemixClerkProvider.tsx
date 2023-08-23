@@ -3,6 +3,7 @@ import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import { assertValidClerkState, warnForSsr } from '../utils';
+import { ClerkRemixOptionsProvider } from './RemixOptionsContext';
 import type { ClerkState } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
@@ -61,24 +62,30 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     (window as any).__clerk_debug = __clerk_debug;
   }, []);
 
+  const mergedProps = {
+    frontendApi: __frontendApi as any,
+    publishableKey: __publishableKey as any,
+    proxyUrl: __proxyUrl as any,
+    domain: __domain as any,
+    isSatellite: __isSatellite,
+    signInUrl: __signInUrl,
+    signUpUrl: __signUpUrl,
+    afterSignInUrl: __afterSignInUrl,
+    afterSignUpUrl: __afterSignUpUrl,
+    clerkJSUrl: __clerkJSUrl,
+    clerkJSVersion: __clerkJSVersion,
+  };
+
   return (
-    <ReactClerkProvider
-      navigate={(to: string) => awaitableNavigateRef.current?.(to)}
-      initialState={__clerk_ssr_state}
-      frontendApi={__frontendApi as any}
-      publishableKey={__publishableKey as any}
-      proxyUrl={__proxyUrl as any}
-      domain={__domain as any}
-      isSatellite={__isSatellite}
-      signInUrl={__signInUrl}
-      signUpUrl={__signUpUrl}
-      afterSignInUrl={__afterSignInUrl}
-      afterSignUpUrl={__afterSignUpUrl}
-      clerkJSUrl={__clerkJSUrl}
-      clerkJSVersion={__clerkJSVersion}
-      {...restProps}
-    >
-      {children}
-    </ReactClerkProvider>
+    <ClerkRemixOptionsProvider options={mergedProps}>
+      <ReactClerkProvider
+        navigate={(to: string) => awaitableNavigateRef.current?.(to)}
+        initialState={__clerk_ssr_state}
+        {...mergedProps}
+        {...restProps}
+      >
+        {children}
+      </ReactClerkProvider>
+    </ClerkRemixOptionsProvider>
   );
 }
