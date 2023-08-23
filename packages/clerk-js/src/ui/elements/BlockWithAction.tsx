@@ -99,17 +99,25 @@ export const BlockWithAction = (props: ArrowBlockButtonProps) => {
   );
 };
 
-type SimpleBlockProps = PropsOfComponent<typeof Box> & {
+type BlockWithTrailingComponentProps = PropsOfComponent<typeof Box> & {
   badge?: React.ReactElement;
-  something?: React.ReactElement;
+  trailingComponent?: React.ReactElement;
   textElementDescriptor?: ElementDescriptor;
   textElementId?: ElementId;
   textLocalizationKey?: LocalizationKey;
 };
 
-export const SimpleBlock = (props: SimpleBlockProps) => {
-  const { isLoading, children, something, textElementDescriptor, textElementId, textLocalizationKey, badge, ...rest } =
-    props;
+export const BlockWithTrailingComponent = (props: BlockWithTrailingComponentProps) => {
+  const {
+    isLoading,
+    children,
+    trailingComponent,
+    textElementDescriptor,
+    textElementId,
+    textLocalizationKey,
+    badge,
+    ...rest
+  } = props;
 
   return (
     <Box
@@ -124,12 +132,6 @@ export const SimpleBlock = (props: SimpleBlockProps) => {
           position: 'relative',
           justifyContent: 'flex-start',
           borderColor: theme.colors.$blackAlpha200,
-          '--action-opacity': '0',
-          '--action-transform': `translateX(-${theme.space.$2});`,
-          '&:hover,&:focus ': {
-            '--action-opacity': '1',
-            '--action-transform': 'translateX(0px);',
-          },
         },
         props.sx,
       ]}
@@ -156,7 +158,7 @@ export const SimpleBlock = (props: SimpleBlockProps) => {
         </Text>
         {badge}
       </Flex>
-      {something}
+      {trailingComponent}
     </Box>
   );
 };

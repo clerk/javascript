@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 
 import { useCoreOrganization } from '../../contexts';
 import { Box, Col, localizationKeys, Spinner } from '../../customizables';
-import { ArrowBlockButton, SimpleBlock, ThreeDotsMenu } from '../../elements';
+import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
 import { useInView } from '../../hooks';
 import { useRouter } from '../../router';
 import { EnrollmentBadge } from './EnrollmentBadge';
@@ -71,7 +71,7 @@ export const DomainList = (props: DomainListProps) => {
       {domainList.map(d => {
         if (!(d.verification && d.verification.status === 'verified')) {
           return (
-            <SimpleBlock
+            <BlockWithTrailingComponent
               key={d.id}
               sx={t => ({
                 '&:hover': {
@@ -81,7 +81,7 @@ export const DomainList = (props: DomainListProps) => {
                 minHeight: t.sizes.$10,
               })}
               badge={<EnrollmentBadge organizationDomain={d} />}
-              something={
+              trailingComponent={
                 <ThreeDotsMenu
                   actions={[
                     {
@@ -102,7 +102,7 @@ export const DomainList = (props: DomainListProps) => {
               }
             >
               {d.name}
-            </SimpleBlock>
+            </BlockWithTrailingComponent>
           );
         }
 
