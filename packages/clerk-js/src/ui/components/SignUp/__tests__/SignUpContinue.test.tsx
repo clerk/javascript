@@ -42,7 +42,9 @@ describe('SignUpContinue', () => {
       f.startSignUpWithEmailAddress();
     });
     render(<SignUpContinue />, { wrapper });
-    screen.getByText(/email address/i);
+    // Because the email address is already set, it should not be shown,
+    // as we're in PSU mode and it's not a missing field.
+    expect(screen.queryByText(/email address/i)).not.toBeInTheDocument();
     screen.getByText(/password/i);
   });
 

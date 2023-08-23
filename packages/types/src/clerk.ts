@@ -451,6 +451,16 @@ export type HandleOAuthCallbackParams = {
    * Full URL or path to navigate after an incomplete sign up.
    */
   continueSignUpUrl?: string | null;
+
+  /**
+   * Full URL or path to navigate after requesting email verification.
+   */
+  verifyEmailAddressUrl?: string | null;
+
+  /**
+   * Full URL or path to navigate after requesting phone verification.
+   */
+  verifyPhoneNumberUrl?: string | null;
 };
 
 /**
