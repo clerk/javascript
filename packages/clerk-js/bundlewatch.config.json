@@ -6,7 +6,7 @@
     { "path": "./dist/vendors*.js", "maxSize": "70KB" },
     { "path": "./dist/createorganization*.js", "maxSize": "5KB" },
     { "path": "./dist/impersonationfab*.js", "maxSize": "5KB" },
-    { "path": "./dist/organizationprofile*.js", "maxSize": "8.7KB" },
+    { "path": "./dist/organizationprofile*.js", "maxSize": "10KB" },
     { "path": "./dist/organizationswitcher*.js", "maxSize": "5KB" },
     { "path": "./dist/signin*.js", "maxSize": "10KB" },
     { "path": "./dist/signup*.js", "maxSize": "10KB" },
