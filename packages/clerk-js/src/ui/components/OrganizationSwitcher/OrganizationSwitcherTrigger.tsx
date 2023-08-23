@@ -22,16 +22,16 @@ function useEnterAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const getFormTextAnimation = useCallback(
-    (enterAnimation: boolean): ThemableCssProp => {
+    (enterAnimation: boolean, delay?: number): ThemableCssProp => {
       if (prefersReducedMotion) {
         return {
           animation: 'none',
         };
       }
       return t => ({
-        animation: `${enterAnimation ? animations.notificationAnimation : animations.outAnimation} ${
-          t.transitionDuration.$textField
-        } ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`,
+        animation: `${animations.notificationAnimation} ${t.transitionDuration.$textField} ${
+          t.transitionTiming.$slowBezier
+        } ${delay ?? 0}ms 1 ${enterAnimation ? 'normal' : 'reverse'} forwards`,
       });
     },
     [prefersReducedMotion],
@@ -91,11 +91,6 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             }
           />
         )}
-        <Icon
-          elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
-          icon={Selector}
-          sx={t => ({ opacity: t.opacity.$sm, marginLeft: `${t.space.$2}` })}
-        />
         {(notificationCountAnimated ?? 0) > 0 ? (
           <NotificationBadge
             sx={[
@@ -103,15 +98,31 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
                 // marginLeft: `${t.space.$2}`,
                 position: 'absolute',
                 // top: -8,
-                right: -8,
+                right: 8,
+                lineHeight: 0,
                 border: t.borders.$normal,
+                opacity: 0,
               }),
-              getFormTextAnimation(!!notificationCountAnimated),
+              getFormTextAnimation(!!notificationCountAnimated, 500),
             ]}
           >
             {notificationCountAnimated}
           </NotificationBadge>
         ) : null}
+
+        <Icon
+          elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
+          icon={Selector}
+          sx={[
+            t => ({
+              marginLeft: `${t.space.$2}`,
+              '--organization-switcher-icon-opacity': t.opacity.$sm,
+              opacity: 'var(--organization-switcher-icon-opacity)',
+            }),
+            !!notificationCountAnimated && getFormTextAnimation(!notificationCountAnimated),
+          ]}
+        />
+
         {/*{(notificationCountAnimated ?? 0) > 0 ? (*/}
         {/*  <NotificationBadge*/}
         {/*    sx={[*/}
