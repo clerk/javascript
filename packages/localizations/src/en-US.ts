@@ -547,7 +547,7 @@ export const enUS: LocalizationResource = {
     badge__unverified: 'Unverified',
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
-    badge__manualInvitation: 'Manual invitations',
+    badge__manualInvitation: 'No automatic enrollment',
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
@@ -577,10 +577,12 @@ export const enUS: LocalizationResource = {
         },
       },
       domainSection: {
-        title: 'Domain-based enrollment',
+        title: 'Verified domains',
         subtitle:
           'Allow users to join the organization automatically or request to join based on a verified email domain.',
-        primaryButton: 'Add email domain',
+        primaryButton: 'Add domain',
+        unverifiedDomain_menuAction__verify: 'Verify domain',
+        unverifiedDomain_menuAction__remove: 'Delete domain',
       },
     },
     createDomainPage: {
