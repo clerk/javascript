@@ -8,6 +8,7 @@ import type { UserJSON } from './json';
 import type { OAuthScope } from './oauth';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationMembershipResource } from './organizationMembership';
+import type { OrganizationSuggestionResource, OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
 import type { SamlAccountResource } from './samlAccount';
@@ -100,9 +101,13 @@ export interface UserResource extends ClerkResource {
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
   setProfileImage: (params: SetProfileImageParams) => Promise<ImageResource>;
   createExternalAccount: (params: CreateExternalAccountParams) => Promise<ExternalAccountResource>;
+  getOrganizationMemberships: GetOrganizationMemberships;
   getOrganizationInvitations: (
     params?: GetUserOrganizationInvitationsParams,
   ) => Promise<ClerkPaginatedResponse<UserOrganizationInvitationResource>>;
+  getOrganizationSuggestions: (
+    params?: GetUserOrganizationSuggestionsParams,
+  ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
@@ -173,3 +178,42 @@ export type GetUserOrganizationInvitationsParams = {
 
   status?: OrganizationInvitationStatus;
 };
+
+export type GetUserOrganizationSuggestionsParams = {
+  /**
+   * This the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+
+  status?: OrganizationSuggestionStatus | OrganizationSuggestionStatus[];
+};
+
+type GetUserOrganizationMembershipOldParams = {
+  limit?: number;
+  offset?: number;
+};
+
+export type GetUserOrganizationMembershipParams = {
+  /**
+   * This the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+};
+
+type MembershipParams = (GetUserOrganizationMembershipOldParams | GetUserOrganizationMembershipParams) & {
+  paginated?: boolean;
+};
+
+export type GetOrganizationMemberships = <T extends MembershipParams>(
+  params?: T,
+) => T['paginated'] extends true
+  ? Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>
+  : Promise<OrganizationMembershipResource[]>;

@@ -4,7 +4,7 @@ import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../elements';
 import { handleError, roleLocalizationKey } from '../../utils';
-import { MembersListTable, RoleSelect, RowContainer } from './MemberListTable';
+import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -53,12 +53,13 @@ export const ActiveMembersList = () => {
   };
 
   return (
-    <MembersListTable
+    <DataTable
       page={page}
       onPageChange={changePage}
       itemCount={organization.membersCount}
       itemsPerPage={ITEMS_PER_PAGE}
       isLoading={!membershipList}
+      emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
       headers={[
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__joined'),

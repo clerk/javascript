@@ -29,11 +29,16 @@ export const enUS: LocalizationResource = {
   formFieldLabel__newPassword: 'New password',
   formFieldLabel__confirmPassword: 'Confirm password',
   formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
+  formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__firstName: 'First name',
   formFieldLabel__lastName: 'Last name',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__organizationEmailDomain: 'Email domain',
+  formFieldLabel__organizationEmailDomainEmailAddress: 'Verification email address',
+  formFieldLabel__organizationEmailDomainEmailAddressDescription:
+    'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
@@ -51,6 +56,8 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
+  formFieldInputPlaceholder__organizationEmailDomain: '',
+  formFieldInputPlaceholder__organizationEmailDomainEmailAddress: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldAction__forgotPassword: 'Forgot password?',
@@ -524,12 +531,23 @@ export const enUS: LocalizationResource = {
     notSelected: 'No organization selected',
     action__createOrganization: 'Create Organization',
     action__manageOrganization: 'Manage Organization',
+    invitationCountLabel_single: '1 pending invitation to join:',
+    invitationCountLabel_many: '{{count}} pending invitations to join:',
+    action__invitationAccept: 'Join',
+    suggestionCountLabel_single: '1 suggested organization:',
+    suggestionCountLabel_many: '{{count}} suggested organizations:',
+    action__suggestionsAccept: 'Request to join',
+    suggestionsAcceptedLabel: 'Pending approval',
   },
   impersonationFab: {
     title: 'Signed in as {{identifier}}',
     action__signOut: 'Sign out',
   },
   organizationProfile: {
+    badge__unverified: 'Unverified',
+    badge__automaticInvitation: 'Automatic invitations',
+    badge__automaticSuggestion: 'Automatic suggestions',
+    badge__manualInvitation: 'Manual invitations',
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
@@ -558,6 +576,39 @@ export const enUS: LocalizationResource = {
           successMessage: 'You have deleted the organization.',
         },
       },
+      domainSection: {
+        title: 'Domain-based enrollment',
+        subtitle:
+          'Allow users to join the organization automatically or request to join based on a verified email domain.',
+        primaryButton: 'Add email domain',
+      },
+    },
+    createDomainPage: {
+      title: 'Add email domain',
+      subtitle:
+        'Add the email domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
+    },
+    verifyDomainPage: {
+      title: 'Verify domain',
+      actionLabel__remove: 'Remove unverified domain',
+      subtitle: 'The domain {{domainName}} needs to be verified via email.',
+      formTitle: 'Verification code',
+      formSubtitle: 'Enter the verification code sent to your email address',
+      resendButton: "Didn't receive a code? Resend",
+    },
+    verifiedDomainPage: {
+      title: 'Enrollment options',
+      actionLabel__remove: 'Remove email domain',
+      formTitle: 'Enrollment mode',
+      formSubtitle: 'Choose how users from this domain can join the organization.',
+      manualInvitationOption__label: 'No automatic enrollment',
+      manualInvitationOption__description: 'Users can only be invited manually to the organization.',
+      automaticInvitationOption__label: 'Automatic invitations',
+      automaticInvitationOption__description:
+        'Users are automatically invited to join the organization when they sign-up and can join anytime.',
+      automaticSuggestionOption__label: 'Automatic suggestions',
+      automaticSuggestionOption__description:
+        'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
     },
     invitePage: {
       title: 'Invite members',
@@ -566,12 +617,21 @@ export const enUS: LocalizationResource = {
       detailsTitle__inviteFailed: 'The invitations could not be sent. Fix the following and try again:',
       formButtonPrimary__continue: 'Send invitations',
     },
+    removeDomainPage: {
+      title: 'Remove domain',
+      messageLine1: 'The email domain {{domain}} will be removed.',
+      messageLine2: 'Users won’t be able to join the organization automatically after this.',
+      successMessage: '{{domain}} has been removed.',
+    },
     membersPage: {
       detailsTitle__emptyRow: 'No members to display',
       action__invite: 'Invite',
       start: {
         headerTitle__active: 'Active',
+        headerTitle__members: 'Members',
         headerTitle__invited: 'Invited',
+        headerTitle__invitations: 'Invitations',
+        headerTitle__requests: 'Requests',
       },
       activeMembersTab: {
         tableHeader__user: 'User',
@@ -583,6 +643,35 @@ export const enUS: LocalizationResource = {
       invitedMembersTab: {
         tableHeader__invited: 'Invited',
         menuAction__revoke: 'Revoke invitation',
+      },
+      invitationsTab: {
+        table__emptyRow: 'No invitations to display',
+        manualInvitations: {
+          headerTitle: 'Individual invitations',
+          headerSubtitle: 'Manually invite members and manage existing invitations.',
+        },
+        autoInvitations: {
+          headerTitle: 'Automatic invitations',
+          headerSubtitle:
+            'Invite users by connecting an email domain with your organization. Anyone who signs up with a matching email domain will be able to join the organization anytime.',
+          primaryButton: 'Manage verified domains',
+        },
+      },
+      requestsTab: {
+        tableHeader__requested: 'Requested access',
+        menuAction__approve: 'Approve',
+        menuAction__reject: 'Reject',
+        table__emptyRow: 'No requests to display',
+        requests: {
+          headerTitle: 'Requests',
+          headerSubtitle: 'Browse and manage users who requested to join the organization.',
+        },
+        autoSuggestions: {
+          headerTitle: 'Automatic suggestions',
+          headerSubtitle:
+            'Users who sign up with a matching email domain, will be able to see a suggestion to request to join your organization.',
+          primaryButton: 'Manage verified domains',
+        },
       },
     },
   },

@@ -25,12 +25,15 @@ export const createDebugLogger = (name: string, formatter: (val: LogEntry) => st
     },
     commit: () => {
       if (isEnabled) {
-        console.log(
-          `Clerk debug start :: ${name}\n${entries
-            .map(log => formatter(log))
-            .map(e => `-- ${e}\n`)
-            .join('')}`,
-        );
+        const log = `Clerk debug start :: ${name}\n${entries
+          .map(log => formatter(log))
+          .map(e => `-- ${e}\n`)
+          .join('')}`;
+        if (process.env.VERCEL) {
+          console.log(truncate(log, 4096));
+        } else {
+          console.log(log);
+        }
       }
     },
   };
@@ -73,3 +76,15 @@ export const withLogger: WithLogger = (loggerFactoryOrName, handlerCtor) => {
     }
   }) as ReturnType<typeof handlerCtor>;
 };
+
+// ref: https://stackoverflow.com/questions/57769465/javascript-truncate-text-by-bytes-length
+function truncate(str: string, maxLength: number) {
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder('utf-8');
+
+  const encodedString = encoder.encode(str);
+  const truncatedString = encodedString.slice(0, maxLength);
+
+  // return the truncated string, removing any replacement characters that result from partially truncated characters
+  return decoder.decode(truncatedString).replace(/\uFFFD/g, '');
+}

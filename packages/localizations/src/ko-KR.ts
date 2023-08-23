@@ -350,6 +350,12 @@ export const koKR: LocalizationResource = {
         destructiveActionSubtitle: '이 web3 지갑을 계정에서 삭제',
         destructiveAction: '지갑 제거',
       },
+      dangerSection: {
+        title: '위험',
+        deleteAccountButton: '계정 삭제',
+        deleteAccountTitle: '계정 삭제',
+        deleteAccountDescription: '계정과 그와 연관된 모든 데이터 삭제',
+      },
     },
     profilePage: {
       title: '프로필 업데이트',
@@ -486,6 +492,13 @@ export const koKR: LocalizationResource = {
       actionLabel__copied: '복사 완료!',
       actionLabel__download: '.txt 다운로드',
       actionLabel__print: '인쇄',
+    },
+    deletePage: {
+      title: '계정 삭제',
+      messageLine1: '정말로 계정을 삭제하시겠습니까?',
+      messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다.',
+      actionDescription: '계속하려면 아래에 계정 삭제를 입력하세요.',
+      confirm: '계정 삭제',
     },
   },
   userButton: {

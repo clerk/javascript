@@ -1,7 +1,7 @@
 import type { FieldId } from '@clerk/types';
 import type { ClerkAPIError } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { forwardRef, useCallback, useId, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -28,8 +28,10 @@ import { animations } from '../styledSystem';
 import { useFormControlFeedback } from '../utils';
 import { useCardState } from './contexts';
 import { useFormState } from './Form';
+import { InputGroup } from './InputGroup';
 import { PasswordInput } from './PasswordInput';
 import { PhoneInput } from './PhoneInput';
+import { RadioGroup } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> & {
   id: FieldId;
@@ -52,83 +54,40 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   setHasPassedComplexity: (b: boolean) => void;
   hasPassedComplexity: boolean;
   enableErrorAfterBlur?: boolean;
-  informationText?: string;
+  informationText?: string | LocalizationKey;
   radioOptions?: {
     value: string;
     label: string | LocalizationKey;
+    description?: string | LocalizationKey;
   }[];
   isFocused: boolean;
-};
-
-const RadioGroupItem = (props: {
-  inputProps: PropsOfComponent<typeof Input>;
-  value: string;
-  label: string | LocalizationKey;
-}) => {
-  const id = useId();
-  return (
-    <Flex
-      align='center'
-      sx={t => ({
-        height: t.sizes.$6,
-      })}
-    >
-      <Input
-        {...props.inputProps}
-        focusRing={false}
-        id={id}
-        sx={{
-          width: 'fit-content',
-        }}
-        type='radio'
-        value={props.value}
-        checked={props.value === props.inputProps.value}
-      />
-      <FormLabel
-        htmlFor={id}
-        localizationKey={props.label}
-        sx={t => ({
-          padding: `${t.space.$1} ${t.space.$2}`,
-          fontWeight: t.fontWeights.$normal,
-          lineHeight: t.lineHeights.$none,
-        })}
-      />
-    </Flex>
-  );
-};
-
-export const RadioButtons = (
-  props: PropsOfComponent<typeof Input> & {
-    radioOptions?: {
-      value: string;
-      label: string | LocalizationKey;
-    }[];
-  },
-) => {
-  const { radioOptions, ...rest } = props;
-  return (
-    <>
-      {radioOptions?.map(r => (
-        <RadioGroupItem
-          key={r.value}
-          {...r}
-          inputProps={rest}
-        />
-      ))}
-    </>
-  );
+  groupPreffix?: string;
+  groupSuffix?: string;
 };
 
 // TODO: Convert this into a Component?
-const getInputElementForType = (type: FormControlProps['type']) => {
+const getInputElementForType = ({
+  type,
+  groupPreffix,
+  groupSuffix,
+}: {
+  type: FormControlProps['type'];
+  groupPreffix: string | undefined;
+  groupSuffix: string | undefined;
+}) => {
   const CustomInputs = {
     password: PasswordInput,
     tel: PhoneInput,
-    radio: RadioButtons,
+    radio: RadioGroup,
   };
+
+  if (groupPreffix || groupSuffix) {
+    return InputGroup;
+  }
   if (!type) {
     return Input;
   }
+
   const customInput = type as keyof typeof CustomInputs;
   return CustomInputs[customInput] || Input;
 };
@@ -159,7 +118,7 @@ function useFormTextAnimation() {
 }
 
 type CalculateConfigProps = {
-  recalculate?: string | undefined;
+  recalculate?: LocalizationKey | string | undefined;
 };
 type Px = number;
 const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
@@ -241,9 +200,8 @@ export const FormFeedback = (props: FormFeedbackProps) => {
         <FormInfoText
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props.informationText && !props?.successfulText && !props.warningText)}
-        >
-          {informationMessage}
-        </FormInfoText>
+          localizationKey={informationMessage}
+        />
       )}
       {/* Display the error message after the directions is unmounted*/}
       {errorMessage && (
@@ -251,9 +209,8 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           {...getElementProps('error')}
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props?.errorText)}
-        >
-          {errorMessage}
-        </FormErrorText>
+          localizationKey={errorMessage}
+        />
       )}
 
       {/* Display the success message after the error message is unmounted*/}
@@ -262,9 +219,8 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           {...getElementProps('success')}
           ref={calculateHeight}
           sx={getFormTextAnimation(!!props?.successfulText)}
-        >
-          {successMessage}
-        </FormSuccessText>
+          localizationKey={successMessage}
+        />
       )}
 
       {warningMessage && (
@@ -307,6 +263,8 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     setHasPassedComplexity,
     hasPassedComplexity,
     radioOptions,
+    groupPreffix,
+    groupSuffix,
     ...restInputProps
   } = props;
 
@@ -323,6 +281,15 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
         radioOptions,
       },
     };
+
+    if (groupPreffix || groupSuffix) {
+      return {
+        ...inputProps,
+        groupPreffix,
+        groupSuffix,
+      };
+    }
+
     if (!props.type) {
       return inputProps;
     }
@@ -330,7 +297,12 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     return propMap[type] || inputProps;
   }, [restInputProps]);
 
-  const InputElement = getInputElementForType(props.type);
+  const InputElement = getInputElementForType({
+    type: props.type,
+    groupPreffix,
+    groupSuffix,
+  });
+
   const isCheckbox = props.type === 'checkbox';
 
   const { debounced: debouncedState } = useFormControlFeedback({
@@ -413,6 +385,8 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
 
   const Input = (
     <InputElement
+      groupPreffix={groupPreffix}
+      groupSuffix={groupSuffix}
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(id)}
       hasError={!!errorMessage}

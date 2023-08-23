@@ -3,41 +3,62 @@ import { DEV_BROWSER_SSO_JWT_PARAMETER } from '../core/constants';
 export const DEV_BROWSER_JWT_MARKER = '__clerk_db_jwt';
 const DEV_BROWSER_JWT_MARKER_REGEXP = /__clerk_db_jwt\[(.*)\]/;
 
-function extractDevBrowserJWT(url: string): string {
-  const matches = url.match(DEV_BROWSER_JWT_MARKER_REGEXP);
-  return matches ? matches[1] : '';
+// Sets the dev_browser JWT in the hash or the search
+export function setDevBrowserJWTInURL(url: URL, jwt: string, asQueryParam: boolean): URL {
+  const resultURL = new URL(url);
+
+  // extract & strip existing jwt from hash
+  const jwtFromHash = extractDevBrowserJWTFromHash(resultURL.hash);
+  resultURL.hash = resultURL.hash.replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
+  if (resultURL.href.endsWith('#')) {
+    resultURL.hash = '';
+  }
+
+  // extract & strip existing jwt from search
+  const jwtFromSearch = resultURL.searchParams.get(DEV_BROWSER_SSO_JWT_PARAMETER);
+  resultURL.searchParams.delete(DEV_BROWSER_SSO_JWT_PARAMETER);
+
+  // Existing jwt takes precedence
+  const jwtToSet = jwtFromHash || jwtFromSearch || jwt;
+
+  if (jwtToSet) {
+    if (asQueryParam) {
+      resultURL.searchParams.append(DEV_BROWSER_SSO_JWT_PARAMETER, jwtToSet);
+    } else {
+      resultURL.hash = resultURL.hash + `${DEV_BROWSER_JWT_MARKER}[${jwtToSet}]`;
+    }
+  }
+
+  return resultURL;
 }
 
-export function setDevBrowserJWTInURL(url: string, jwt: string, asQueryParam: boolean): string {
-  if (asQueryParam) {
-    const hasQueryParam = (url || '').includes('?');
-    return `${url}${hasQueryParam ? '&' : '?'}${DEV_BROWSER_SSO_JWT_PARAMETER}=${(jwt || '').trim()}`;
+// Gets the dev_browser JWT from either the hash or the search
+// Side effect:
+// Removes dev_browser JWT from the URL as a side effect and updates the browser history
+export function getDevBrowserJWTFromURL(url: URL): string {
+  const resultURL = new URL(url);
+
+  // extract & strip existing jwt from hash
+  const jwtFromHash = extractDevBrowserJWTFromHash(resultURL.hash);
+  resultURL.hash = resultURL.hash.replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
+  if (resultURL.href.endsWith('#')) {
+    resultURL.hash = '';
   }
 
-  const dbJwt = extractDevBrowserJWT(url);
-  if (dbJwt) {
-    url.replace(`${DEV_BROWSER_JWT_MARKER}[${dbJwt}]`, jwt);
-    return url;
-  }
-  const hasHash = (url || '').includes('#');
-  return `${url}${hasHash ? '' : '#'}${DEV_BROWSER_JWT_MARKER}[${(jwt || '').trim()}]`;
-}
+  // extract & strip existing jwt from search
+  const jwtFromSearch = resultURL.searchParams.get(DEV_BROWSER_SSO_JWT_PARAMETER) || '';
+  resultURL.searchParams.delete(DEV_BROWSER_SSO_JWT_PARAMETER);
 
-export function getDevBrowserJWTFromURL(url: string): string {
-  const jwt = extractDevBrowserJWT(url);
-  if (!jwt) {
-    return '';
-  }
+  const jwt = jwtFromHash || jwtFromSearch;
 
-  let newUrl = url.replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
-
-  if (newUrl.endsWith('#')) {
-    newUrl = newUrl.slice(0, -1);
-  }
-
-  if (typeof globalThis.history !== undefined) {
-    globalThis.history.replaceState(null, '', newUrl);
+  if (jwt && typeof globalThis.history !== undefined) {
+    globalThis.history.replaceState(null, '', resultURL.href);
   }
 
   return jwt;
+}
+
+function extractDevBrowserJWTFromHash(hash: string): string {
+  const matches = hash.match(DEV_BROWSER_JWT_MARKER_REGEXP);
+  return matches ? matches[1] : '';
 }

@@ -14,7 +14,7 @@ type Options = {
   options?: SelectOption[];
   defaultChecked?: boolean;
   enableErrorAfterBlur?: boolean;
-  informationText?: string;
+  informationText?: string | LocalizationKey;
 } & (
   | {
       label: string | LocalizationKey;
@@ -38,6 +38,7 @@ type Options = {
       radioOptions: {
         value: string;
         label: string | LocalizationKey;
+        description?: string | LocalizationKey;
       }[];
     }
 );
@@ -180,7 +181,7 @@ type DebouncedFeedback = {
     warningText: string;
     successfulText: string;
     isFocused: boolean;
-    informationText: string;
+    informationText: string | LocalizationKey;
   };
 };
 
@@ -191,7 +192,7 @@ type DebouncingOption = {
   enableErrorAfterBlur: boolean | undefined;
   successfulText: string | undefined;
   isFocused: boolean;
-  informationText: string | undefined;
+  informationText: LocalizationKey | string | undefined;
   hasPassedComplexity: boolean;
   skipBlur?: boolean;
   delayInMs?: number;

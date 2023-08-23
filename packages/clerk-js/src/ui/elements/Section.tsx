@@ -7,11 +7,12 @@ import type { PropsOfComponent } from '../styledSystem';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
+  subtitle?: LocalizationKey;
   id: ProfileSectionId;
 };
 
 export const ProfileSection = (props: ProfileSectionProps) => {
-  const { title, children, id, ...rest } = props;
+  const { title, children, id, subtitle, ...rest } = props;
   return (
     <Col
       elementDescriptor={descriptors.profileSection}
@@ -26,6 +27,15 @@ export const ProfileSection = (props: ProfileSectionProps) => {
         textElementDescriptor={descriptors.profileSectionTitleText}
         textElementId={descriptors.profileSectionTitleText.setId(id)}
       />
+      {subtitle && (
+        <SectionSubHeader
+          localizationKey={subtitle}
+          elementDescriptor={descriptors.profileSectionSubtitle}
+          elementId={descriptors.profileSectionSubtitle.setId(id)}
+          textElementDescriptor={descriptors.profileSectionSubtitleText}
+          textElementId={descriptors.profileSectionSubtitleText.setId(id)}
+        />
+      )}
       <Col
         elementDescriptor={descriptors.profileSectionContent}
         elementId={descriptors.profileSectionContent.setId(id)}
@@ -53,6 +63,23 @@ export const SectionHeader = (props: SectionHeaderProps) => {
       <Text
         localizationKey={localizationKey}
         variant='largeMedium'
+        elementDescriptor={textElementDescriptor}
+        elementId={textElementId}
+      />
+    </Flex>
+  );
+};
+export const SectionSubHeader = (props: SectionHeaderProps) => {
+  const { textElementDescriptor, textElementId, localizationKey, ...rest } = props;
+  return (
+    <Flex
+      {...rest}
+      sx={t => ({ padding: `${t.space.$2} ${t.space.$none}` })}
+    >
+      <Text
+        localizationKey={localizationKey}
+        variant='regularRegular'
+        colorScheme='neutral'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
       />

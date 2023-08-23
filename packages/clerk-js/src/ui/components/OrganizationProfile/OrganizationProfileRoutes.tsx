@@ -2,10 +2,14 @@ import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { DeleteOrganizationPage, LeaveOrganizationPage } from './ActionConfirmationPage';
+import { AddDomainPage } from './AddDomainPage';
 import { InviteMembersPage } from './InviteMembersPage';
 import { OrganizationMembers } from './OrganizationMembers';
 import { OrganizationSettings } from './OrganizationSettings';
 import { ProfileSettingsPage } from './ProfileSettingsPage';
+import { RemoveDomainPage } from './RemoveDomainPage';
+import { VerifiedDomainPage } from './VerifiedDomainPage';
+import { VerifyDomainPage } from './VerifyDomainPage';
 
 export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof ProfileCardContent>) => {
   return (
@@ -17,6 +21,25 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
             flowStart
           >
             <ProfileSettingsPage />
+          </Route>
+          <Route
+            path='domain'
+            flowStart
+          >
+            <Switch>
+              <Route path=':id/verify'>
+                <VerifyDomainPage />
+              </Route>
+              <Route path=':id/remove'>
+                <RemoveDomainPage />
+              </Route>
+              <Route path=':id'>
+                <VerifiedDomainPage />
+              </Route>
+              <Route index>
+                <AddDomainPage />
+              </Route>
+            </Switch>
           </Route>
           <Route
             path='leave'

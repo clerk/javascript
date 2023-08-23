@@ -6,9 +6,11 @@ import type { FontFamily } from './appearance';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
+import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
+import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus } from './session';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
@@ -343,17 +345,66 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+interface OrganizationDomainVerificationJSON {
+  status: OrganizationDomainVerificationStatus;
+  strategy: 'email_code'; // only available value for now
+  attempts: number;
+  expires_at: number;
+}
+
+export interface OrganizationDomainJSON extends ClerkResourceJSON {
+  object: 'organization_domain';
+  id: string;
+  name: string;
+  organization_id: string;
+  enrollment_mode: OrganizationEnrollmentMode;
+  verification: OrganizationDomainVerificationJSON | null;
+  affiliation_email_address: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface PublicOrganizationDataJSON {
+  id: string;
+  name: string;
+  slug: string | null;
+  has_image: boolean;
+  image_url: string;
+}
+
+export interface OrganizationSuggestionJSON extends ClerkResourceJSON {
+  object: 'organization_suggestion';
+  id: string;
+  public_organization_data: PublicOrganizationDataJSON;
+  status: OrganizationSuggestionStatus;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationSuggestionJSON extends ClerkResourceJSON {
+  object: 'organization_suggestion';
+  id: string;
+  public_organization_data: PublicOrganizationDataJSON;
+  status: OrganizationSuggestionStatus;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationMembershipRequestJSON extends ClerkResourceJSON {
+  object: 'organization_membership_request';
+  id: string;
+  organization_id: string;
+  status: OrganizationInvitationStatus;
+  public_user_data: PublicUserDataJSON;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
   object: 'organization_invitation';
   id: string;
   email_address: string;
-  public_organization_data: {
-    id: string;
-    name: string;
-    slug: string;
-    has_image: boolean;
-    image_url: string;
-  };
+  public_organization_data: PublicOrganizationDataJSON;
   public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
   role: MembershipRole;

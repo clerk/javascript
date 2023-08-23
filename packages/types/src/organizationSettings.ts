@@ -1,4 +1,5 @@
 import type { ClerkResourceJSON } from './json';
+import type { OrganizationEnrollmentMode } from './organizationDomain';
 import type { ClerkResource } from './resource';
 
 export interface OrganizationSettingsJSON extends ClerkResourceJSON {
@@ -9,6 +10,10 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   actions: {
     admin_delete: boolean;
   };
+  domains: {
+    enabled: boolean;
+    enrollment_modes: OrganizationEnrollmentMode[];
+  };
 }
 
 export interface OrganizationSettingsResource extends ClerkResource {
@@ -16,5 +21,9 @@ export interface OrganizationSettingsResource extends ClerkResource {
   maxAllowedMemberships: number;
   actions: {
     adminDelete: boolean;
+  };
+  domains: {
+    enabled: boolean;
+    enrollmentModes: OrganizationEnrollmentMode[];
   };
 }

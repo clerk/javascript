@@ -1,4 +1,4 @@
-import { render, userEvent, waitFor } from '@clerk/shared/testUtils';
+import { render, waitFor } from '@clerk/shared/testUtils';
 import type { OrganizationMembershipResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
@@ -15,27 +15,34 @@ describe('OrganizationMembers', () => {
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
     });
 
-    const { getByText } = render(<OrganizationMembers />, { wrapper });
-
-    await waitFor(() => {
-      expect(getByText('Members')).toBeDefined();
-      expect(getByText('View and manage organization members')).toBeDefined();
-    });
-  });
-
-  it('shows an invite button and invited tab if the current user is an admin', async () => {
-    const { wrapper } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
-    });
-
     const { getByText, getByRole } = render(<OrganizationMembers />, { wrapper });
 
     await waitFor(() => {
-      expect(getByText('Invited')).toBeDefined();
-      expect(getByRole('button', { name: 'Invite' })).toBeDefined();
+      expect(getByRole('heading', { name: /members/i })).toBeInTheDocument();
+      expect(getByText('View and manage organization members')).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      // Tabs
+      expect(getByRole('tab', { name: 'Members' })).toBeInTheDocument();
+      expect(getByRole('tab', { name: 'Invitations' })).toBeInTheDocument();
     });
   });
+
+  // TODO: to be removed no longer valid
+  // it('shows an invite button and invited tab if the current user is an admin', async () => {
+  //   const { wrapper } = await createFixtures(f => {
+  //     f.withOrganizations();
+  //     f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+  //   });
+  //
+  //   const { getByText, getByRole } = render(<OrganizationMembers />, { wrapper });
+  //
+  //   await waitFor(() => {
+  //     expect(getByText('Invited')).toBeDefined();
+  //     expect(getByRole('button', { name: 'Invite' })).toBeDefined();
+  //   });
+  // });
 
   it('does not show an invite button and invited tab if the current user is not an admin', async () => {
     const { wrapper } = await createFixtures(f => {
@@ -54,19 +61,20 @@ describe('OrganizationMembers', () => {
     });
   });
 
-  it('navigates to invite screen when user clicks on Invite button', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
-    });
-
-    const { getByRole } = render(<OrganizationMembers />, { wrapper });
-    await userEvent.click(getByRole('button', { name: 'Invite' }));
-
-    await waitFor(() => {
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('invite-members');
-    });
-  });
+  // TODO: to be removed no longer valid
+  // it('navigates to invite screen when user clicks on Invite button', async () => {
+  //   const { wrapper, fixtures } = await createFixtures(f => {
+  //     f.withOrganizations();
+  //     f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+  //   });
+  //
+  //   const { getByRole } = render(<OrganizationMembers />, { wrapper });
+  //   await userEvent.click(getByRole('button', { name: 'Invite' }));
+  //
+  //   await waitFor(() => {
+  //     expect(fixtures.router.navigate).toHaveBeenCalledWith('invite-members');
+  //   });
+  // });
 
   it('lists all the members of the Organization', async () => {
     const membersList: OrganizationMembershipResource[] = [

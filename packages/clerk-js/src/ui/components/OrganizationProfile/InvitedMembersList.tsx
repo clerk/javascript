@@ -4,7 +4,7 @@ import { useCoreOrganization } from '../../contexts';
 import { localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../elements';
 import { handleError, roleLocalizationKey } from '../../utils';
-import { MembersListTable, RowContainer } from './MemberListTable';
+import { DataTable, RowContainer } from './MemberListTable';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -35,12 +35,13 @@ export const InvitedMembersList = () => {
   };
 
   return (
-    <MembersListTable
+    <DataTable
       page={page}
       onPageChange={changePage}
       itemCount={organization.pendingInvitationsCount}
       itemsPerPage={ITEMS_PER_PAGE}
       isLoading={!invitationList}
+      emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.invitationsTab.table__emptyRow')}
       headers={[
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
         localizationKeys('organizationProfile.membersPage.invitedMembersTab.tableHeader__invited'),
@@ -65,7 +66,6 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRe
       <Td>
         <UserPreview
           sx={{ maxWidth: '30ch' }}
-          showAvatar={false}
           user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any}
         />
       </Td>

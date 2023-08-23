@@ -4,6 +4,8 @@ export * from './useWindowEventListener';
 export * from './useMagicLink';
 export * from './useClipboard';
 export * from './useEnabledThirdPartyProviders';
+export * from './useFetch';
+export * from './useInView';
 export * from './useLoadingStatus';
 export * from './usePassword';
 export * from './usePasswordComplexity';

@@ -10,7 +10,9 @@ import type {
   EmailAddressResource,
   ExternalAccountJSON,
   ExternalAccountResource,
+  GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
+  GetUserOrganizationSuggestionsParams,
   ImageResource,
   OrganizationMembershipResource,
   PhoneNumberResource,
@@ -31,7 +33,6 @@ import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
 import { BackupCode } from './BackupCode';
-import type { RetrieveMembershipsParams } from './internal';
 import {
   BaseResource,
   DeletedObject,
@@ -39,6 +40,7 @@ import {
   ExternalAccount,
   Image,
   OrganizationMembership,
+  OrganizationSuggestion,
   PhoneNumber,
   SamlAccount,
   SessionWithActivities,
@@ -260,11 +262,12 @@ export class User extends BaseResource implements UserResource {
     return UserOrganizationInvitation.retrieve(params);
   };
 
-  getOrganizationMemberships = async (
-    retrieveMembership: RetrieveMembershipsParams,
-  ): Promise<OrganizationMembership[]> => {
-    return await OrganizationMembership.retrieve(retrieveMembership);
+  getOrganizationSuggestions = (params?: GetUserOrganizationSuggestionsParams) => {
+    return OrganizationSuggestion.retrieve(params);
   };
+
+  getOrganizationMemberships: GetOrganizationMemberships = retrieveMembership =>
+    OrganizationMembership.retrieve(retrieveMembership);
 
   get verifiedExternalAccounts() {
     return this.externalAccounts.filter(externalAccount => externalAccount.verification?.status == 'verified');
