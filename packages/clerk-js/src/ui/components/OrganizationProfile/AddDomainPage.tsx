@@ -26,7 +26,7 @@ export const AddDomainPage = withCardStateProvider(() => {
     return null;
   }
 
-  const canSubmit = organization.name !== nameField.value;
+  const canSubmit = nameField.value.trim() !== '';
 
   const onSubmit = (e: React.FormEvent) => {
     nameField.setError(undefined);
@@ -35,7 +35,7 @@ export const AddDomainPage = withCardStateProvider(() => {
       .createDomain(nameField.value)
       .then(res => {
         if (res.verification && res.verification.status === 'verified') {
-          return navigate(`../domain/${res.id}`);
+          return navigate(`../domain/${res.id}?mode=select`);
         }
         return navigate(`../domain/${res.id}/verify`);
       })

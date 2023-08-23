@@ -14,7 +14,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { CodeForm } from '../../elements/CodeForm';
-import { useFetch, useLoadingStatus, useNavigateToFlowStart } from '../../hooks';
+import { useFetch, useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
@@ -23,8 +23,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
   const { organization } = useCoreOrganization();
-  const { params } = useRouter();
-  const { navigateToFlowStart } = useNavigateToFlowStart();
+  const { params, navigate } = useRouter();
 
   const [success, setSuccess] = React.useState(false);
 
@@ -72,7 +71,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       .then(async res => {
         await resolve();
         if (res.verification?.status === 'verified') {
-          return navigateToFlowStart();
+          return navigate(`../../../domain/${res.id}?mode=select`);
         }
         return;
       })
@@ -105,16 +104,17 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   const dataChanged = organization.name !== emailField.value;
   const canSubmit = dataChanged;
+  const emailDomainSuffix = `@${domain?.name}`;
 
   const onSubmitPrepare = (e: React.FormEvent) => {
     e.preventDefault();
     if (!domain) {
       return;
     }
-    affiliationEmailAddressRef.current = `${emailField.value}@${domain.name}`;
+    affiliationEmailAddressRef.current = `${emailField.value}${emailDomainSuffix}`;
     return domain
       .prepareAffiliationVerification({
-        affiliationEmailAddress: `${emailField.value}@${domain.name}`,
+        affiliationEmailAddress: affiliationEmailAddressRef.current,
       })
       .then(wizard.nextStep)
       .catch(err => {

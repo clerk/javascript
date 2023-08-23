@@ -35,7 +35,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
   formFieldLabel__organizationSlug: 'Slug URL',
-  formFieldLabel__organizationDomain: 'Email domain',
+  formFieldLabel__organizationDomain: 'Domain',
   formFieldLabel__organizationDomainEmailAddress: 'Verification email address',
   formFieldLabel__organizationDomainEmailAddressDescription:
     'Enter an email address under this domain to receive a code and verify this domain.',
@@ -587,9 +587,9 @@ export const enUS: LocalizationResource = {
       },
     },
     createDomainPage: {
-      title: 'Add email domain',
+      title: 'Add domain',
       subtitle:
-        'Add the email domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
+        'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
     },
     verifyDomainPage: {
       title: 'Verify domain',
@@ -616,6 +616,11 @@ export const enUS: LocalizationResource = {
         automaticSuggestionOption__description:
           'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
         formButton__save: 'Save',
+      },
+      dangerTab: {
+        removeDomainTitle: 'Remove domain',
+        removeDomainSubtitle: 'Remove this domain from your verified domains',
+        removeDomainActionLabel__remove: 'Remove domain',
       },
     },
     invitePage: {
