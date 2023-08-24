@@ -7,12 +7,14 @@ import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';
 
 const ITEMS_PER_PAGE = 10;
+
+const membershipRequestsParams = {
+  pageSize: ITEMS_PER_PAGE,
+};
 export const RequestToJoinList = () => {
   const card = useCardState();
   const { organization, membershipRequests } = useCoreOrganization({
-    membershipRequests: {
-      pageSize: ITEMS_PER_PAGE,
-    },
+    membershipRequests: membershipRequestsParams,
   });
 
   if (!organization) {
@@ -47,26 +49,24 @@ const RequestRow = withCardStateProvider(
   (props: { request: OrganizationMembershipRequestResource; onError: ReturnType<typeof useCardState>['setError'] }) => {
     const { request, onError } = props;
     const card = useCardState();
-    const { membershipRequests } = useCoreOrganization();
-
-    const mutateSwrState = () => {
-      const unstable__mutate = (membershipRequests as any).unstable__mutate;
-      if (unstable__mutate && typeof unstable__mutate === 'function') {
-        unstable__mutate();
-      }
-    };
+    const { membershipRequests } = useCoreOrganization({
+      membershipRequests: membershipRequestsParams,
+    });
 
     const onAccept = () => {
       return card
-        .runAsync(request.accept, 'accept')
-        .then(mutateSwrState)
+        .runAsync(async () => {
+          await request.accept();
+          await (membershipRequests as any).unstable__mutate?.();
+        }, 'accept')
         .catch(err => handleError(err, [], onError));
     };
-
     const onReject = () => {
       return card
-        .runAsync(request.reject, 'reject')
-        .then(mutateSwrState)
+        .runAsync(async () => {
+          await request.reject();
+          await (membershipRequests as any).unstable__mutate?.();
+        }, 'reject')
         .catch(err => handleError(err, [], onError));
     };
 
