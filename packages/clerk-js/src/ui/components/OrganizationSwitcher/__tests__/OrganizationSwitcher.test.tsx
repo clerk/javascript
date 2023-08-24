@@ -1,11 +1,10 @@
 import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
-import React from 'react';
 
 import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
-import { createFakeUserOrganizationInvitations } from './utlis';
+import { createFakeUserOrganizationInvitation, createFakeUserOrganizationSuggestion } from './utlis';
 
 const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
@@ -144,14 +143,14 @@ describe('OrganizationSwitcher', () => {
       fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
         Promise.resolve({
           data: [
-            createFakeUserOrganizationInvitations({
+            createFakeUserOrganizationInvitation({
               id: '1',
               emailAddress: 'one@clerk.com',
               publicOrganizationData: {
                 name: 'OrgOne',
               },
             }),
-            createFakeUserOrganizationInvitations({
+            createFakeUserOrganizationInvitation({
               id: '2',
               emailAddress: 'two@clerk.com',
               publicOrganizationData: { name: 'OrgTwo' },
@@ -173,6 +172,51 @@ describe('OrganizationSwitcher', () => {
       });
       expect(queryByText('OrgOne')).toBeInTheDocument();
       expect(queryByText('OrgTwo')).toBeInTheDocument();
+    });
+
+    it('displays a list of user suggestions', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+          create_organization_enabled: false,
+        });
+      });
+      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationSuggestion({
+              id: '1',
+              emailAddress: 'one@clerk.com',
+              publicOrganizationData: {
+                name: 'OrgOneSuggestion',
+              },
+            }),
+            createFakeUserOrganizationSuggestion({
+              id: '2',
+              emailAddress: 'two@clerk.com',
+              publicOrganizationData: {
+                name: 'OrgTwoSuggestion',
+              },
+            }),
+          ],
+          total_count: 11,
+        }),
+      );
+      const { queryByText, userEvent, getByRole } = render(<OrganizationSwitcher />, {
+        wrapper,
+      });
+
+      await userEvent.click(getByRole('button'));
+
+      expect(fixtures.clerk.user?.getOrganizationSuggestions).toHaveBeenCalledWith({
+        initialPage: 1,
+        pageSize: 10,
+        status: ['pending', 'accepted'],
+      });
+      expect(queryByText('OrgOneSuggestion')).toBeInTheDocument();
+      expect(queryByText('OrgTwoSuggestion')).toBeInTheDocument();
     });
 
     it("switches between active organizations when one is clicked'", async () => {
