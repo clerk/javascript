@@ -547,7 +547,7 @@ export const enUS: LocalizationResource = {
     badge__unverified: 'Unverified',
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
-    badge__manualInvitation: 'Manual invitations',
+    badge__manualInvitation: 'No automatic enrollment',
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
@@ -577,10 +577,12 @@ export const enUS: LocalizationResource = {
         },
       },
       domainSection: {
-        title: 'Domain-based enrollment',
+        title: 'Verified domains',
         subtitle:
           'Allow users to join the organization automatically or request to join based on a verified email domain.',
-        primaryButton: 'Add email domain',
+        primaryButton: 'Add domain',
+        unverifiedDomain_menuAction__verify: 'Verify domain',
+        unverifiedDomain_menuAction__remove: 'Delete domain',
       },
     },
     createDomainPage: {
@@ -648,12 +650,13 @@ export const enUS: LocalizationResource = {
         table__emptyRow: 'No invitations to display',
         manualInvitations: {
           headerTitle: 'Individual invitations',
-          headerSubtitle: 'Browse and manage invited members.',
+          headerSubtitle: 'Manually invite members and manage existing invitations.',
         },
         autoInvitations: {
-          headerTitle: 'Domain invitations',
+          headerTitle: 'Automatic invitations',
           headerSubtitle:
-            'New and existing users will be able to join anytime as members and will get notified in-app.',
+            'Invite users by connecting an email domain with your organization. Anyone who signs up with a matching email domain will be able to join the organization anytime.',
+          primaryButton: 'Manage verified domains',
         },
       },
       requestsTab: {
@@ -668,7 +671,8 @@ export const enUS: LocalizationResource = {
         autoSuggestions: {
           headerTitle: 'Automatic suggestions',
           headerSubtitle:
-            'Users with an email address on your verified domain will see a suggestion to request to join the organization.',
+            'Users who sign up with a matching email domain, will be able to see a suggestion to request to join your organization.',
+          primaryButton: 'Manage verified domains',
         },
       },
     },

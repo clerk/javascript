@@ -599,6 +599,8 @@ type _LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue;
         primaryButton: LocalizationValue;
+        unverifiedDomain_menuAction__verify: LocalizationValue;
+        unverifiedDomain_menuAction__remove: LocalizationValue;
       };
     };
     createDomainPage: {
@@ -674,6 +676,7 @@ type _LocalizationResource = {
         autoInvitations: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
+          primaryButton: LocalizationValue;
         };
       };
       requestsTab: {
@@ -688,6 +691,7 @@ type _LocalizationResource = {
         autoSuggestions: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
+          primaryButton: LocalizationValue;
         };
       };
     };
