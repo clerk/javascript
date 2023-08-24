@@ -1,3 +1,4 @@
+import { isDevelopmentEnvironment } from '@clerk/shared';
 import type {
   CreateOrganizationProps,
   OrganizationListProps,
@@ -8,9 +9,12 @@ import type {
   UserButtonProps,
   UserProfileProps,
 } from '@clerk/types';
-import React from 'react';
+import type { PropsWithChildren } from 'react';
+import React, { createElement } from 'react';
 
-import type { MountProps, WithClerkProp } from '../types';
+import { userProfileLinkRenderedError, userProfilePageRenderedError } from '../errors';
+import type { MountProps, UserProfileLinkProps, UserProfilePageProps, WithClerkProp } from '../types';
+import { useCustomPages } from '../utils/useCustomPages';
 import { withClerk } from './withClerk';
 
 // README: <Portal/> should be a class pure component in order for mount and unmount
@@ -63,7 +67,12 @@ class Portal extends React.PureComponent<MountProps> {
   }
 
   render() {
-    return <div ref={this.portalRef} />;
+    return (
+      <>
+        <div ref={this.portalRef} />
+        {this.props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
+      </>
+    );
   }
 }
 
@@ -89,27 +98,64 @@ export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>
   );
 }, 'SignUp');
 
-export const UserProfile = withClerk(({ clerk, ...props }: WithClerkProp<UserProfileProps>) => {
+export function UserProfilePage({ children }: PropsWithChildren<UserProfilePageProps>) {
+  if (isDevelopmentEnvironment()) {
+    console.error(userProfilePageRenderedError);
+  }
+  return <div>{children}</div>;
+}
+
+export function UserProfileLink({ children }: PropsWithChildren<UserProfileLinkProps>) {
+  if (isDevelopmentEnvironment()) {
+    console.error(userProfileLinkRenderedError);
+  }
+  return <div>{children}</div>;
+}
+
+const _UserProfile = withClerk(({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserProfileProps>>) => {
+  const { customPages, customPagesPortals } = useCustomPages(props.children);
   return (
     <Portal
       mount={clerk.mountUserProfile}
       unmount={clerk.unmountUserProfile}
       updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
+      props={{ ...props, customPages }}
+      customPagesPortals={customPagesPortals}
     />
   );
 }, 'UserProfile');
 
-export const UserButton = withClerk(({ clerk, ...props }: WithClerkProp<UserButtonProps>) => {
+type UserProfileExportType = typeof _UserProfile & {
+  Page: ({ children }: PropsWithChildren<UserProfilePageProps>) => React.JSX.Element;
+  Link: ({ children }: PropsWithChildren<UserProfileLinkProps>) => React.JSX.Element;
+};
+export const UserProfile: UserProfileExportType = Object.assign(_UserProfile, {
+  Page: UserProfilePage,
+  Link: UserProfileLink,
+});
+
+const _UserButton = withClerk(({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserButtonProps>>) => {
+  const { customPages, customPagesPortals } = useCustomPages(props.children);
+  const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
   return (
     <Portal
       mount={clerk.mountUserButton}
       unmount={clerk.unmountUserButton}
       updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
+      props={{ ...props, userProfileProps }}
+      customPagesPortals={customPagesPortals}
     />
   );
 }, 'UserButton');
+
+type UserButtonExportType = typeof _UserButton & {
+  UserProfilePage: ({ children }: PropsWithChildren<UserProfilePageProps>) => React.JSX.Element;
+  UserProfileLink: ({ children }: PropsWithChildren<UserProfileLinkProps>) => React.JSX.Element;
+};
+export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
+  UserProfilePage: UserProfilePage,
+  UserProfileLink: UserProfileLink,
+});
 
 export const OrganizationProfile = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationProfileProps>) => {
   return (

@@ -10,6 +10,7 @@ import type {
   UserProfileTheme,
 } from './appearance';
 import type { ClientResource } from './client';
+import type { CustomPage } from './customPages';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
@@ -721,6 +722,16 @@ export type UserProfileProps = {
    * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
    */
   additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
+  /*
+   * Provide addition custom route items and pages to be rendered inside the UserProfile.
+   * e.g.
+   *  <UserProfile>
+   *    <UserProfile.Page label="Custom Page" url="custom-page" labelIcon={<div>C</div>}>
+   *      <div>Hello from custom page!</div>
+   *    </UserProfile.Page>
+   *  </UserProfile>
+   */
+  customPages?: CustomPage[];
 };
 
 export type OrganizationProfileProps = {
@@ -831,7 +842,7 @@ export type UserButtonProps = {
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages'>;
 };
 
 type PrimitiveKeys<T> = {
