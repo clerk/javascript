@@ -48,20 +48,17 @@ const inAnimation = keyframes`
 const notificationAnimation = keyframes`
   0% {
     opacity: 0;
-    transform: translateX(-5px) translateY(5px) scale(.5);
-    max-height: 0;
+    transform: translateY(5px) scale(.5);
   }
 
   50% {
     opacity: 1;
-    transform: translateX(0px) translateY(0px) scale(1.2);
-    max-height: 6rem;
+    transform: translateY(0px) scale(1.2);
   }
 
   100% {
     opacity: 1;
-    transform: translateX(0px) translateY(0px) scale(1);
-    max-height: 6rem;
+    transform: translateY(0px) scale(1);
   }
 `;
 

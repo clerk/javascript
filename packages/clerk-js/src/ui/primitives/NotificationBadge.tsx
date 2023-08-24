@@ -18,9 +18,6 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     textVariant: { ...common.textVariants(theme) },
     colorScheme: {
       primary: {
-        // [vars.accent]: theme.colors.$primary500,
-        // [vars.bg]: colors.setAlpha(theme.colors.$primary400, 0.2),
-
         [vars.accent]: theme.colors.$colorTextOnPrimaryBackground,
         [vars.bg]: theme.colors.$primary500,
       },
@@ -41,7 +38,12 @@ export const NotificationBadge = (props: NotificationBadgeProps) => {
       {...filterProps(props)}
       center
       as='span'
-      css={applyVariants(props)}
+      css={[
+        applyVariants(props),
+        {
+          lineHeight: 0,
+        },
+      ]}
     />
   );
 };
