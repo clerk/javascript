@@ -74,7 +74,8 @@ export type FieldId =
   | 'role'
   | 'deleteConfirmation'
   | 'deleteOrganizationConfirmation'
-  | 'enrollmentMode';
+  | 'enrollmentMode'
+  | 'affiliationEmailAddress';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -243,6 +244,7 @@ export type ElementsConfig = {
   formFieldInputCopyToClipboardIcon: WithOptions<never, never, never>;
 
   phoneInputBox: WithOptions<never, ControlState, never>;
+  formInputGroup: WithOptions<never, ControlState, never>;
 
   avatarBox: WithOptions<never, never, never>;
   avatarImage: WithOptions<never, never, never>;

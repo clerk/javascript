@@ -37,6 +37,8 @@ export const enUS: LocalizationResource = {
   formFieldLabel__organizationSlug: 'Slug URL',
   formFieldLabel__organizationEmailDomain: 'Email domain',
   formFieldLabel__organizationEmailDomainEmailAddress: 'Verification email address',
+  formFieldLabel__organizationEmailDomainEmailAddressDescription:
+    'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
@@ -545,7 +547,7 @@ export const enUS: LocalizationResource = {
     badge__unverified: 'Unverified',
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
-    badge__manualInvitation: 'Manual invitations',
+    badge__manualInvitation: 'No automatic enrollment',
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
@@ -575,10 +577,12 @@ export const enUS: LocalizationResource = {
         },
       },
       domainSection: {
-        title: 'Domain-based enrollment',
+        title: 'Verified domains',
         subtitle:
           'Allow users to join the organization automatically or request to join based on a verified email domain.',
-        primaryButton: 'Add email domain',
+        primaryButton: 'Add domain',
+        unverifiedDomain_menuAction__verify: 'Verify domain',
+        unverifiedDomain_menuAction__remove: 'Delete domain',
       },
     },
     createDomainPage: {
@@ -589,7 +593,7 @@ export const enUS: LocalizationResource = {
     verifyDomainPage: {
       title: 'Verify domain',
       actionLabel__remove: 'Remove unverified domain',
-      subtitle: 'Add an email address under {{domainName}} to receive a code and verify this domain.',
+      subtitle: 'The domain {{domainName}} needs to be verified via email.',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your email address',
       resendButton: "Didn't receive a code? Resend",
@@ -646,12 +650,13 @@ export const enUS: LocalizationResource = {
         table__emptyRow: 'No invitations to display',
         manualInvitations: {
           headerTitle: 'Individual invitations',
-          headerSubtitle: 'Browse and manage invited members.',
+          headerSubtitle: 'Manually invite members and manage existing invitations.',
         },
         autoInvitations: {
-          headerTitle: 'Domain invitations',
+          headerTitle: 'Automatic invitations',
           headerSubtitle:
-            'New and existing users will be able to join anytime as members and will get notified in-app.',
+            'Invite users by connecting an email domain with your organization. Anyone who signs up with a matching email domain will be able to join the organization anytime.',
+          primaryButton: 'Manage verified domains',
         },
       },
       requestsTab: {
@@ -666,7 +671,8 @@ export const enUS: LocalizationResource = {
         autoSuggestions: {
           headerTitle: 'Automatic suggestions',
           headerSubtitle:
-            'Users with an email address on your verified domain will see a suggestion to request to join the organization.',
+            'Users who sign up with a matching email domain, will be able to see a suggestion to request to join your organization.',
+          primaryButton: 'Manage verified domains',
         },
       },
     },

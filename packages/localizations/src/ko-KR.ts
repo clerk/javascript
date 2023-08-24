@@ -536,7 +536,21 @@ export const koKR: LocalizationResource = {
           messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다',
           successMessage: '조직을 탈퇴했습니다.',
         },
+        deleteOrganization: {
+          title: '조직 삭제',
+          messageLine1: '이 조직을 삭제하시겠습니까?',
+          messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다.',
+          actionDescription: '계속하려면 아래에 {{organizationName}}을(를) 입력하세요.',
+          successMessage: '조직을 삭제했습니다.',
+        }
       },
+      domainSection: {
+        title: '인증된 도메인',
+        subtitle: '인증된 이메일 도메인을 기반으로 사용자가 조직에 자동으로 가입하거나 가입 요청을 할 수 있게 합니다.',
+        primaryButton: '도메인 추가',
+        unverifiedDomain_menuAction__verify: '도메인 인증',
+        unverifiedDomain_menuAction__remove: '도메인 삭제',
+      }
     },
     invitePage: {
       title: '회원 초대',
