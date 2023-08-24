@@ -8,6 +8,7 @@ import { useWizard, Wizard } from './Wizard';
 
 type RemovePageProps = {
   title: LocalizationKey;
+  breadcrumbTitle?: LocalizationKey;
   messageLine1: LocalizationKey;
   messageLine2: LocalizationKey;
   successMessage: LocalizationKey;
@@ -16,7 +17,7 @@ type RemovePageProps = {
 };
 
 export const RemoveResourcePage = withCardStateProvider((props: RemovePageProps) => {
-  const { title, messageLine1, messageLine2, successMessage, deleteResource } = props;
+  const { title, messageLine1, messageLine2, breadcrumbTitle, successMessage, deleteResource } = props;
   const wizard = useWizard();
   const card = useCardState();
 
@@ -32,6 +33,7 @@ export const RemoveResourcePage = withCardStateProvider((props: RemovePageProps)
     <Wizard {...wizard.props}>
       <ContentPage
         headerTitle={title}
+        breadcrumbTitle={breadcrumbTitle}
         Breadcrumbs={props.Breadcrumbs}
       >
         <Form.Root onSubmit={handleSubmit}>

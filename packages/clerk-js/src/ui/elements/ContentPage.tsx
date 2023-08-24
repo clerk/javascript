@@ -7,12 +7,13 @@ import { CardAlert, Header, NavbarMenuButtonRow, useCardState } from './index';
 
 type PageProps = PropsOfComponent<typeof Col> & {
   headerTitle: LocalizationKey | string;
+  breadcrumbTitle?: LocalizationKey;
   Breadcrumbs?: React.ComponentType<any> | null;
   headerSubtitle?: LocalizationKey;
 };
 
 export const ContentPage = (props: PageProps) => {
-  const { headerTitle, headerSubtitle, children, Breadcrumbs, sx, ...rest } = props;
+  const { headerTitle, headerSubtitle, breadcrumbTitle, children, Breadcrumbs, sx, ...rest } = props;
   const card = useCardState();
 
   return (
@@ -27,7 +28,7 @@ export const ContentPage = (props: PageProps) => {
       <Header.Root>
         {Breadcrumbs && (
           <Breadcrumbs
-            title={headerTitle}
+            title={breadcrumbTitle || headerTitle}
             sx={(t: any) => ({ marginBottom: t.space.$5 })}
           />
         )}
@@ -36,10 +37,12 @@ export const ContentPage = (props: PageProps) => {
           localizationKey={headerTitle}
           textVariant={'xxlargeMedium'}
         />
-        <Header.Subtitle
-          variant={'regularRegular'}
-          localizationKey={headerSubtitle}
-        />
+        {headerSubtitle && (
+          <Header.Subtitle
+            variant={'regularRegular'}
+            localizationKey={headerSubtitle}
+          />
+        )}
       </Header.Root>
       <Col gap={8}>{children}</Col>
     </Col>
