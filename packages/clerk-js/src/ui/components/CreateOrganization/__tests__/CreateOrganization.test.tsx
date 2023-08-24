@@ -1,7 +1,6 @@
 import type { OrganizationResource } from '@clerk/types';
 import { describe, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
-import React from 'react';
 
 import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
@@ -9,7 +8,7 @@ import { CreateOrganization } from '../CreateOrganization';
 
 const { createFixtures } = bindCreateFixtures('CreateOrganization');
 
-type FakeOrganizationParams = {
+export type FakeOrganizationParams = {
   id: string;
   createdAt?: Date;
   imageUrl?: string;
@@ -22,7 +21,7 @@ type FakeOrganizationParams = {
   maxAllowedMemberships: number;
 };
 
-const createFakeOrganization = (params: FakeOrganizationParams): OrganizationResource => {
+export const createFakeOrganization = (params: FakeOrganizationParams): OrganizationResource => {
   return {
     logoUrl: null,
     pathRoot: '',
@@ -46,6 +45,10 @@ const createFakeOrganization = (params: FakeOrganizationParams): OrganizationRes
     inviteMembers: jest.fn() as any,
     updateMember: jest.fn() as any,
     removeMember: jest.fn() as any,
+    createDomain: jest.fn() as any,
+    getDomain: jest.fn() as any,
+    getDomains: jest.fn() as any,
+    getMembershipRequests: jest.fn() as any,
     destroy: jest.fn() as any,
     setLogo: jest.fn() as any,
     reload: jest.fn() as any,
