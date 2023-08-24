@@ -29,3 +29,17 @@ export const invalidStateError =
 
 export const unsupportedNonBrowserDomainOrProxyUrlFunction =
   'Unsupported usage of domain or proxyUrl. The usage of domain or proxyUrl as function is not supported in non-browser environments.';
+
+export const userProfilePageRenderedError =
+  '<UserProfile.Page /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.';
+export const userProfileLinkRenderedError =
+  '<UserProfile.Link /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.';
+
+export const customPagesIngoredComponent =
+  '<UserProfile /> can only accept <UserProfile.Page /> and <UserProfile.Link /> as its children. Any other provided component will be ignored.';
+
+export const userProfilePageWrongProps =
+  'Missing props. <UserProfile.Page /> component requires the following props: url, label, labelIcon, alongside with children to be rendered inside the page.';
+
+export const userProfileLinkWrongProps =
+  'Missing props. <UserProfile.Link /> component requires the following props: url, label and labelIcon.';

@@ -21,3 +21,5 @@ export * from './getRelativeToNowDateKey';
 export * from './mergeRefs';
 export * from './createSlug';
 export * from './passwordUtils';
+export * from './createCustomPages';
+export * from './ExternalElementMounter';

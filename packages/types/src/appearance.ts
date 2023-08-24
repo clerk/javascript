@@ -94,8 +94,6 @@ export type ProfileSectionId =
   | 'organizationDomains';
 export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'organizationMembers';
 
-export type NavbarItemId = 'account' | 'security' | 'members' | 'settings';
-
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId = 'organizationSwitcher' | 'organizationList';
 
@@ -386,8 +384,8 @@ export type ElementsConfig = {
 
   navbar: WithOptions<never, never, never>;
   navbarButtons: WithOptions<never, ActiveState, never>;
-  navbarButton: WithOptions<NavbarItemId, ActiveState, never>;
-  navbarButtonIcon: WithOptions<NavbarItemId, ActiveState, never>;
+  navbarButton: WithOptions<string, ActiveState, never>;
+  navbarButtonIcon: WithOptions<string, ActiveState, never>;
   navbarMobileMenuRow: WithOptions<never, never, never>;
   navbarMobileMenuButton: WithOptions<never, never, never>;
   navbarMobileMenuButtonIcon: WithOptions<never, never, never>;
