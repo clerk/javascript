@@ -1,29 +1,27 @@
 import type { OrganizationEnrollmentMode } from '@clerk/types';
 
 import { useCoreOrganization, useEnvironment } from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import {
-  BlockWithAction,
-  ContentPage,
-  Form,
-  FormButtons,
-  Header,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
-import { useFetch } from '../../hooks';
+import { Col, Flex, localizationKeys, Spinner } from '../../customizables';
+import { ContentPage, Form, FormButtons, Header, useCardState, withCardStateProvider } from '../../elements';
+import { useFetch, useNavigateToFlowStart } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
-import { EnrollmentBadge } from './EnrollmentBadge';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const VerifiedDomainPage = withCardStateProvider(() => {
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
   const { organization } = useCoreOrganization();
-  const { params, navigate } = useRouter();
+  const { domains } = useCoreOrganization({
+    domains: {
+      infinite: true,
+    },
+  });
+  const { navigateToFlowStart } = useNavigateToFlowStart();
+  const { params, navigate, queryParams } = useRouter();
+  const mode = (queryParams.mode ?? 'edit') as 'select' | 'edit';
 
-  const title = localizationKeys('organizationProfile.verifiedDomainPage.title');
+  const allowsEdit = mode === 'edit';
 
   const enrollmentMode = useFormControl('enrollmentMode', '', {
     type: 'radio',
@@ -32,9 +30,11 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         ? [
             {
               value: 'manual_invitation',
-              label: localizationKeys('organizationProfile.verifiedDomainPage.manualInvitationOption__label'),
+              label: localizationKeys(
+                'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__label',
+              ),
               description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.manualInvitationOption__description',
+                'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__description',
               ),
             },
           ]
@@ -43,9 +43,11 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         ? [
             {
               value: 'automatic_invitation',
-              label: localizationKeys('organizationProfile.verifiedDomainPage.automaticInvitationOption__label'),
+              label: localizationKeys(
+                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__label',
+              ),
               description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.automaticInvitationOption__description',
+                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__description',
               ),
             },
           ]
@@ -54,14 +56,21 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         ? [
             {
               value: 'automatic_suggestion',
-              label: localizationKeys('organizationProfile.verifiedDomainPage.automaticSuggestionOption__label'),
+              label: localizationKeys(
+                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__label',
+              ),
               description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.automaticSuggestionOption__description',
+                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__description',
               ),
             },
           ]
         : []),
     ],
+  });
+
+  const deletePending = useFormControl('deleteExistingInvitationsSuggestions', '', {
+    label: localizationKeys('formFieldLabel__organizationDomainDeletePending'),
+    type: 'checkbox',
   });
 
   const { data: domain, status: domainStatus } = useFetch(
@@ -76,6 +85,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     },
   );
 
+  const isFormDirty = deletePending.checked || domain?.enrollmentMode !== enrollmentMode.value;
   const updateEnrollmentMode = async () => {
     if (!domain || !organization) {
       return;
@@ -84,7 +94,10 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     try {
       await domain.updateEnrollmentMode({
         enrollmentMode: enrollmentMode.value as OrganizationEnrollmentMode,
+        deletePending: deletePending.checked,
       });
+
+      await (domains as any).unstable__mutate();
 
       await navigate('../../');
     } catch (e) {
@@ -115,36 +128,23 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     );
   }
 
+  if (!(domain.verification && domain.verification.status === 'verified')) {
+    void navigateToFlowStart();
+  }
   return (
     <ContentPage
-      headerTitle={title}
+      headerTitle={domain.name}
+      gap={4}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     >
-      <BlockWithAction
-        elementDescriptor={descriptors.accordionTriggerButton}
-        badge={<EnrollmentBadge organizationDomain={domain} />}
-        sx={t => ({
-          backgroundColor: t.colors.$blackAlpha50,
-          padding: `${t.space.$3} ${t.space.$4}`,
-          minHeight: t.sizes.$10,
-        })}
-        actionSx={t => ({
-          color: t.colors.$danger500,
-        })}
-        actionLabel={localizationKeys('organizationProfile.verifiedDomainPage.actionLabel__remove')}
-        onActionClick={() => navigate(`../../domain/${domain.id}/remove`)}
-      >
-        {domain.name}
-      </BlockWithAction>
-
       <Col gap={2}>
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.formTitle')}
+            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.start.headerTitle__enrollment')}
             textVariant='largeMedium'
           />
           <Header.Subtitle
-            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.formSubtitle')}
+            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
             variant='regularRegular'
           />
         </Header.Root>
@@ -154,7 +154,16 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
             <Form.Control {...enrollmentMode.props} />
           </Form.ControlRow>
 
-          <FormButtons isDisabled={domainStatus.isLoading || !domain} />
+          {allowsEdit && (
+            <Form.ControlRow elementId={deletePending.id}>
+              <Form.Control {...deletePending.props} />
+            </Form.ControlRow>
+          )}
+
+          <FormButtons
+            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save')}
+            isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
+          />
         </Form.Root>
       </Col>
     </ContentPage>

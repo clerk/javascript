@@ -6,7 +6,7 @@ import type { PropsOfComponent } from '../styledSystem';
 import { CardAlert, Header, NavbarMenuButtonRow, useCardState } from './index';
 
 type PageProps = PropsOfComponent<typeof Col> & {
-  headerTitle: LocalizationKey;
+  headerTitle: LocalizationKey | string;
   Breadcrumbs?: React.ComponentType<any> | null;
   headerSubtitle?: LocalizationKey;
 };
