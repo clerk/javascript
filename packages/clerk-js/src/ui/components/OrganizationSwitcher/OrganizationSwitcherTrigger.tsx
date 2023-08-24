@@ -1,4 +1,4 @@
-import { forwardRef, useCallback } from 'react';
+import { forwardRef } from 'react';
 
 import {
   useCoreOrganization,
@@ -18,47 +18,13 @@ type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & {
   isOpen: boolean;
 };
 
-function useEnterAnimation() {
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  const getFormTextAnimation = useCallback(
-    (enterAnimation: boolean): ThemableCssProp => {
-      if (prefersReducedMotion) {
-        return {
-          animation: 'none',
-        };
-      }
-      return t => ({
-        animation: `${enterAnimation ? animations.notificationAnimation : animations.outAnimation} ${
-          t.transitionDuration.$textField
-        } ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`,
-      });
-    },
-    [prefersReducedMotion],
-  );
-
-  return {
-    getFormTextAnimation,
-  };
-}
-
 export const OrganizationSwitcherTrigger = withAvatarShimmer(
   forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>((props, ref) => {
-    const { getFormTextAnimation } = useEnterAnimation();
     const { sx, ...rest } = props;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
     const { organization } = useCoreOrganization();
     const { hidePersonal } = useOrganizationSwitcherContext();
-
-    /**
-     * Prefetch user invitations and suggestions
-     */
-    const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
-
-    const notificationCount = (userInvitations.count ?? 0) + (userSuggestions.count ?? 0);
-
-    const notificationCountAnimated = useDelayedVisibility(notificationCount, 350);
 
     return (
       <Button
@@ -92,20 +58,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
           />
         )}
 
-        <Box
-          sx={t => ({
-            position: 'relative',
-            width: t.sizes.$4,
-            height: t.sizes.$4,
-            marginLeft: `${t.space.$2}`,
-          })}
-        >
-          {(notificationCountAnimated ?? 0) > 0 && (
-            <NotificationBadge sx={getFormTextAnimation(!!notificationCount)}>
-              {notificationCountAnimated}
-            </NotificationBadge>
-          )}
-        </Box>
+        <NotificationCountBadge />
 
         <Icon
           elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
@@ -116,3 +69,35 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
     );
   }),
 );
+
+const NotificationCountBadge = () => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  /**
+   * Prefetch user invitations and suggestions
+   */
+  const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
+  const notificationCount = (userInvitations.count || 0) + (userSuggestions.count || 0);
+  const showNotification = useDelayedVisibility(notificationCount > 0, 350) || false;
+
+  const enterExitAnimation: ThemableCssProp = t => ({
+    animation: prefersReducedMotion
+      ? 'none'
+      : `${notificationCount ? animations.notificationAnimation : animations.outAnimation} ${
+          t.transitionDuration.$textField
+        } ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`,
+  });
+
+  return (
+    <Box
+      sx={t => ({
+        position: 'relative',
+        width: t.sizes.$4,
+        height: t.sizes.$4,
+        marginLeft: `${t.space.$2}`,
+      })}
+    >
+      {showNotification && <NotificationBadge sx={enterExitAnimation}>{notificationCount}</NotificationBadge>}
+    </Box>
+  );
+};
