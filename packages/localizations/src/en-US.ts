@@ -35,9 +35,9 @@ export const enUS: LocalizationResource = {
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
   formFieldLabel__organizationSlug: 'Slug URL',
-  formFieldLabel__organizationEmailDomain: 'Email domain',
-  formFieldLabel__organizationEmailDomainEmailAddress: 'Verification email address',
-  formFieldLabel__organizationEmailDomainEmailAddressDescription:
+  formFieldLabel__organizationDomain: 'Email domain',
+  formFieldLabel__organizationDomainEmailAddress: 'Verification email address',
+  formFieldLabel__organizationDomainEmailAddressDescription:
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationDomainDeletePending: 'Delete pending invitations and suggestions',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -57,8 +57,8 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
-  formFieldInputPlaceholder__organizationEmailDomain: '',
-  formFieldInputPlaceholder__organizationEmailDomainEmailAddress: '',
+  formFieldInputPlaceholder__organizationDomain: '',
+  formFieldInputPlaceholder__organizationDomainEmailAddress: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldAction__forgotPassword: 'Forgot password?',

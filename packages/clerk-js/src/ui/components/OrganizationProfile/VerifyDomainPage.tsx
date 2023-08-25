@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
@@ -35,6 +35,9 @@ export const VerifyDomainPage = withCardStateProvider(() => {
   const subtitle = localizationKeys('organizationProfile.verifyDomainPage.subtitle', {
     domainName: domain?.name ?? '',
   });
+
+  const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
+
   const status = useLoadingStatus();
 
   const codeControlState = useFormControl('code', '');
@@ -44,10 +47,19 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   const emailField = useFormControl('affiliationEmailAddress', '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__organizationEmailDomainEmailAddress'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationEmailDomainEmailAddress'),
-    informationText: localizationKeys('formFieldLabel__organizationEmailDomainEmailAddressDescription'),
+    label: localizationKeys('formFieldLabel__organizationDomainEmailAddress'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationDomainEmailAddress'),
+    informationText: localizationKeys('formFieldLabel__organizationDomainEmailAddressDescription'),
   });
+
+  const affiliationEmailAddressRef = useRef<string>();
+
+  const subtitleVerificationCodeScreen = localizationKeys(
+    'organizationProfile.verifyDomainPage.subtitleVerificationCodeScreen',
+    {
+      emailAddress: affiliationEmailAddressRef.current,
+    },
+  );
 
   const resolve = async () => {
     setSuccess(true);
@@ -96,8 +108,12 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   const onSubmitPrepare = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!domain) {
+      return;
+    }
+    affiliationEmailAddressRef.current = `${emailField.value}@${domain.name}`;
     return domain
-      ?.prepareAffiliationVerification({
+      .prepareAffiliationVerification({
         affiliationEmailAddress: `${emailField.value}@${domain.name}`,
       })
       .then(wizard.nextStep)
@@ -129,6 +145,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
     <Wizard {...wizard.props}>
       <ContentPage
         headerTitle={title}
+        breadcrumbTitle={breadcrumbTitle}
         headerSubtitle={subtitle}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
@@ -147,7 +164,8 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
       <ContentPage
         headerTitle={title}
-        headerSubtitle={subtitle}
+        breadcrumbTitle={breadcrumbTitle}
+        headerSubtitle={subtitleVerificationCodeScreen}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <CodeForm

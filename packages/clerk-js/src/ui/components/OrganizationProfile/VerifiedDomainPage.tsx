@@ -21,6 +21,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   const { params, navigate, queryParams } = useRouter();
   const mode = (queryParams.mode ?? 'edit') as 'select' | 'edit';
 
+  const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const allowsEdit = mode === 'edit';
 
   const enrollmentMode = useFormControl('enrollmentMode', '', {
@@ -133,7 +134,8 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   }
   return (
     <ContentPage
-      headerTitle={domain.name}
+      headerTitle={domain?.name}
+      breadcrumbTitle={breadcrumbTitle}
       gap={4}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     >

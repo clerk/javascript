@@ -11,14 +11,15 @@ export const AddDomainPage = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const title = localizationKeys('organizationProfile.createDomainPage.title');
   const subtitle = localizationKeys('organizationProfile.createDomainPage.subtitle');
+  const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const card = useCardState();
   const { organization } = useCoreOrganization();
   const { navigate } = useRouter();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__organizationEmailDomain'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationEmailDomain'),
+    label: localizationKeys('formFieldLabel__organizationDomain'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationDomain'),
   });
 
   if (!organization || !organizationSettings) {
@@ -47,6 +48,7 @@ export const AddDomainPage = withCardStateProvider(() => {
     <ContentPage
       headerTitle={title}
       headerSubtitle={subtitle}
+      breadcrumbTitle={breadcrumbTitle}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     >
       <Form.Root onSubmit={onSubmit}>

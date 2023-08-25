@@ -45,9 +45,9 @@ type _LocalizationResource = {
   formFieldLabel__backupCode: LocalizationValue;
   formFieldLabel__organizationName: LocalizationValue;
   formFieldLabel__organizationSlug: LocalizationValue;
-  formFieldLabel__organizationEmailDomain: LocalizationValue;
-  formFieldLabel__organizationEmailDomainEmailAddress: LocalizationValue;
-  formFieldLabel__organizationEmailDomainEmailAddressDescription: LocalizationValue;
+  formFieldLabel__organizationDomain: LocalizationValue;
+  formFieldLabel__organizationDomainEmailAddress: LocalizationValue;
+  formFieldLabel__organizationDomainEmailAddressDescription: LocalizationValue;
   formFieldLabel__organizationDomainDeletePending: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
@@ -74,8 +74,8 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__backupCode: LocalizationValue;
   formFieldInputPlaceholder__organizationName: LocalizationValue;
   formFieldInputPlaceholder__organizationSlug: LocalizationValue;
-  formFieldInputPlaceholder__organizationEmailDomain: LocalizationValue;
-  formFieldInputPlaceholder__organizationEmailDomainEmailAddress: LocalizationValue;
+  formFieldInputPlaceholder__organizationDomain: LocalizationValue;
+  formFieldInputPlaceholder__organizationDomainEmailAddress: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;

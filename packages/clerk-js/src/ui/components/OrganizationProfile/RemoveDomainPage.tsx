@@ -27,6 +27,12 @@ export const RemoveDomainPage = () => {
     },
   );
 
+  const { domains } = useCoreOrganization({
+    domains: {
+      infinite: true,
+    },
+  });
+
   if (!organization || !organizationSettings) {
     return null;
   }
@@ -60,7 +66,8 @@ export const RemoveDomainPage = () => {
       successMessage={localizationKeys('organizationProfile.removeDomainPage.successMessage', {
         domain: ref.current?.name,
       })}
-      deleteResource={() => Promise.resolve(domain?.delete())}
+      deleteResource={() => domain?.delete().then((domains as any).unstable__mutate())}
+      breadcrumbTitle={localizationKeys('organizationProfile.profilePage.domainSection.title')}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     />
   );
