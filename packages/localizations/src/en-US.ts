@@ -39,6 +39,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__organizationEmailDomainEmailAddress: 'Verification email address',
   formFieldLabel__organizationEmailDomainEmailAddressDescription:
     'Enter an email address under this domain to receive a code and verify this domain.',
+  formFieldLabel__organizationDomainDeletePending: 'Delete pending invitations and suggestions',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
@@ -592,25 +593,30 @@ export const enUS: LocalizationResource = {
     },
     verifyDomainPage: {
       title: 'Verify domain',
-      actionLabel__remove: 'Remove unverified domain',
       subtitle: 'The domain {{domainName}} needs to be verified via email.',
+      subtitleVerificationCodeScreen: 'A verification code was sent to {{emailAddress}}. Enter the code to continue.',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your email address',
       resendButton: "Didn't receive a code? Resend",
     },
     verifiedDomainPage: {
-      title: 'Enrollment options',
-      actionLabel__remove: 'Remove email domain',
-      formTitle: 'Enrollment mode',
-      formSubtitle: 'Choose how users from this domain can join the organization.',
-      manualInvitationOption__label: 'No automatic enrollment',
-      manualInvitationOption__description: 'Users can only be invited manually to the organization.',
-      automaticInvitationOption__label: 'Automatic invitations',
-      automaticInvitationOption__description:
-        'Users are automatically invited to join the organization when they sign-up and can join anytime.',
-      automaticSuggestionOption__label: 'Automatic suggestions',
-      automaticSuggestionOption__description:
-        'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
+      subtitle: 'The domain {{domain}} is now verified. Continue by selecting enrollment mode.',
+      start: {
+        headerTitle__enrollment: 'Enrollment options',
+        headerTitle__danger: 'Danger',
+      },
+      enrollmentTab: {
+        subtitle: 'Choose how users from this domain can join the organization.',
+        manualInvitationOption__label: 'No automatic enrollment',
+        manualInvitationOption__description: 'Users can only be invited manually to the organization.',
+        automaticInvitationOption__label: 'Automatic invitations',
+        automaticInvitationOption__description:
+          'Users are automatically invited to join the organization when they sign-up and can join anytime.',
+        automaticSuggestionOption__label: 'Automatic suggestions',
+        automaticSuggestionOption__description:
+          'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
+        formButton__save: 'Save',
+      },
     },
     invitePage: {
       title: 'Invite members',

@@ -48,6 +48,7 @@ type _LocalizationResource = {
   formFieldLabel__organizationEmailDomain: LocalizationValue;
   formFieldLabel__organizationEmailDomainEmailAddress: LocalizationValue;
   formFieldLabel__organizationEmailDomainEmailAddressDescription: LocalizationValue;
+  formFieldLabel__organizationDomainDeletePending: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
@@ -609,23 +610,33 @@ type _LocalizationResource = {
     };
     verifyDomainPage: {
       title: LocalizationValue;
-      actionLabel__remove: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitleVerificationCodeScreen: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
     verifiedDomainPage: {
-      title: LocalizationValue;
-      actionLabel__remove: LocalizationValue;
-      formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue;
-      manualInvitationOption__label: LocalizationValue;
-      manualInvitationOption__description: LocalizationValue;
-      automaticInvitationOption__label: LocalizationValue;
-      automaticInvitationOption__description: LocalizationValue;
-      automaticSuggestionOption__label: LocalizationValue;
-      automaticSuggestionOption__description: LocalizationValue;
+      subtitle: LocalizationValue;
+      start: {
+        headerTitle__enrollment: LocalizationValue;
+        headerTitle__danger: LocalizationValue;
+      };
+      enrollmentTab: {
+        subtitle: LocalizationValue;
+        manualInvitationOption__label: LocalizationValue;
+        manualInvitationOption__description: LocalizationValue;
+        automaticInvitationOption__label: LocalizationValue;
+        automaticInvitationOption__description: LocalizationValue;
+        automaticSuggestionOption__label: LocalizationValue;
+        automaticSuggestionOption__description: LocalizationValue;
+        formButton__save: LocalizationValue;
+      };
+      dangerTab: {
+        removeDomainTitle: LocalizationValue;
+        removeDomainSubtitle: LocalizationValue;
+        removeDomainActionLabel__remove: LocalizationValue;
+      };
     };
     removeDomainPage: {
       title: LocalizationValue;

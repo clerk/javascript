@@ -36,5 +36,5 @@ export type AttemptAffiliationVerificationParams = {
 };
 
 export type UpdateEnrollmentModeParams = Pick<OrganizationDomainResource, 'enrollmentMode'> & {
-  deleteExisting?: boolean;
+  deletePending?: boolean;
 };
