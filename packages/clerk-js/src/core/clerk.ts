@@ -578,7 +578,7 @@ export default class Clerk implements ClerkInterface {
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
     //   id.
-    if (inActiveBrowserTab()) {
+    if (inActiveBrowserTab() || !this.#options.standardBrowser) {
       await this.#touchLastActiveSession(newSession);
       // reload session from updated client
       newSession = this.#getSessionFromClient(newSession?.id);
