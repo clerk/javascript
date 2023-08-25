@@ -83,7 +83,11 @@ const createBaseOrganizationSettings = (): OrganizationSettingsJSON => {
   return {
     enabled: false,
     max_allowed_memberships: 5,
-  } as OrganizationSettingsJSON;
+    domains: {
+      enabled: false,
+      enrollment_modes: [],
+    },
+  } as unknown as OrganizationSettingsJSON;
 };
 
 const attributes = Object.freeze(

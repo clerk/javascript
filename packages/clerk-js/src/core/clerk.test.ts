@@ -593,7 +593,14 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSignUpCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'missing_requirements' }));
+      const mockSignUpCreate = jest.fn().mockReturnValue(
+        Promise.resolve(
+          new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['phone_number'],
+          } as any as SignUpJSON),
+        ),
+      );
 
       const sut = new Clerk(frontendApi);
       await sut.load({
@@ -700,6 +707,7 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
+            missing_fields: [],
             verifications: {
               external_account: {
                 status: 'unverified',
@@ -1111,6 +1119,7 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
+            missing_fields: ['last_name'],
             verifications: {
               external_account: {
                 status: 'verified',
@@ -1132,6 +1141,55 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
+      });
+    });
+
+    it('redirects user to the verify-email-address url if the external account has unverified email and there are no missing requirements', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: [],
+            unverified_fields: ['email_address'],
+            verifications: {
+              email_address: {
+                status: 'unverified',
+                strategy: 'from_oauth_google',
+                next_action: 'needs_attempt',
+              },
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/verify-email-address');
       });
     });
   });
@@ -1493,6 +1551,42 @@ describe('Clerk singleton', () => {
 
       const url = sut.buildUrlWithAuth('foo');
       expect(url).toBe('foo');
+    });
+
+    it('uses the hash to propagate the dev_browser JWT by default on dev', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('https://example.com/some-path');
+      expect(url).toBe('https://example.com/some-path#__clerk_db_jwt[deadbeef]');
+    });
+
+    it('uses the query param to propagate the dev_browser JWT if specified by option on dev', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('https://example.com/some-path', { useQueryParam: true });
+      expect(url).toBe('https://example.com/some-path?__dev_session=deadbeef');
+    });
+
+    it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - non-kima', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('https://accounts.abcef.12345.dev.lclclerk.com');
+      expect(url).toBe('https://accounts.abcef.12345.dev.lclclerk.com/?__dev_session=deadbeef');
+    });
+
+    it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - kima', async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
+      const sut = new Clerk(devFrontendApi);
+      await sut.load();
+
+      const url = sut.buildUrlWithAuth('https://rested-anemone-14.accounts.dev');
+      expect(url).toBe('https://rested-anemone-14.accounts.dev/?__dev_session=deadbeef');
     });
   });
 });

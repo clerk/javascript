@@ -74,7 +74,9 @@ export type FieldId =
   | 'role'
   | 'deleteConfirmation'
   | 'deleteOrganizationConfirmation'
-  | 'enrollmentMode';
+  | 'enrollmentMode'
+  | 'affiliationEmailAddress'
+  | 'deleteExistingInvitationsSuggestions';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -219,6 +221,12 @@ export type ElementsConfig = {
   formField: WithOptions<FieldId, ControlState, never>;
   formFieldLabelRow: WithOptions<FieldId, ControlState, never>;
   formFieldLabel: WithOptions<FieldId, ControlState, never>;
+  formFieldRadioGroup: WithOptions<never, never, never>;
+  formFieldRadioGroupItem: WithOptions<never, never, never>;
+  formFieldRadioInput: WithOptions<never, never, never>;
+  formFieldRadioLabel: WithOptions<FieldId, ControlState, never>;
+  formFieldRadioLabelTitle: WithOptions<FieldId, ControlState, never>;
+  formFieldRadioLabelDescription: WithOptions<FieldId, ControlState, never>;
   formFieldAction: WithOptions<FieldId, ControlState, never>;
   formFieldInput: WithOptions<FieldId, ControlState, never>;
   formFieldErrorText: WithOptions<FieldId, ControlState, never>;
@@ -237,6 +245,7 @@ export type ElementsConfig = {
   formFieldInputCopyToClipboardIcon: WithOptions<never, never, never>;
 
   phoneInputBox: WithOptions<never, ControlState, never>;
+  formInputGroup: WithOptions<never, ControlState, never>;
 
   avatarBox: WithOptions<never, never, never>;
   avatarImage: WithOptions<never, never, never>;
@@ -350,6 +359,8 @@ export type ElementsConfig = {
   profileSection: WithOptions<ProfileSectionId, never, never>;
   profileSectionTitle: WithOptions<ProfileSectionId, never, never>;
   profileSectionTitleText: WithOptions<ProfileSectionId, never, never>;
+  profileSectionSubtitle: WithOptions<ProfileSectionId, never, never>;
+  profileSectionSubtitleText: WithOptions<ProfileSectionId, never, never>;
   profileSectionContent: WithOptions<ProfileSectionId, never, never>;
   profileSectionPrimaryButton: WithOptions<ProfileSectionId, never, never>;
   profilePage: WithOptions<ProfilePageId, never, never>;
@@ -407,6 +418,7 @@ export type ElementsConfig = {
 
   // default descriptors
   badge: WithOptions<'primary' | 'actionRequired', never, never>;
+  notificationBadge: WithOptions<never, never, never>;
   button: WithOptions<never, LoadingState, never>;
   providerIcon: WithOptions<OAuthProvider | Web3Provider, never, never>;
 };

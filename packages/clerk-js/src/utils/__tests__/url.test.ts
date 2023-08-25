@@ -8,9 +8,9 @@ import {
   getSearchParameterFromHash,
   hasBannedProtocol,
   hasExternalAccountSignUpError,
-  isAccountsHostedPages,
   isAllowedRedirectOrigin,
   isDataUri,
+  isDevAccountPortalOrigin,
   isRedirectForFAPIInitiatedFlow,
   isValidUrl,
   mergeFragmentIntoUrl,
@@ -18,22 +18,22 @@ import {
   trimTrailingSlash,
 } from '../url';
 
-describe('isAccountsHostedPages(url)', () => {
+describe('isDevAccountPortalOrigin(url)', () => {
   const goodUrls: Array<[string | URL, boolean]> = [
     ['clerk.dev.lclclerk.com', false],
     ['clerk.prod.lclclerk.com', false],
     ['clerk.abc.efg.lclstage.dev', false],
     ['clerk.abc.efg.stgstage.dev', false],
     ['accounts.abc.efg.dev.lclclerk.com', true],
-    ['https://accounts.abc.efg.stg.lclclerk.com', true],
-    [new URL('https://clerk.abc.efg.lcl.dev'), false],
-    [new URL('https://accounts.abc.efg.lcl.dev'), true],
-    [new URL('https://accounts.abc.efg.stg.dev'), true],
+    ['rested-anemone-14.accounts.dev', true],
+    ['rested-anemone-14.accounts.dev.accountsstage.dev', true],
+    ['rested-anemone-14.accounts.dev.accounts.lclclerk.com', true],
+    ['rested-anemone-14.clerk.accounts.dev', false],
   ];
 
-  test.each(goodUrls)('.isAccountsHostedPages(%s)', (a, expected) => {
+  test.each(goodUrls)('.isDevAccountPortalOrigin(%s)', (a, expected) => {
     // @ts-ignore
-    expect(isAccountsHostedPages(a)).toBe(expected);
+    expect(isDevAccountPortalOrigin(a)).toBe(expected);
   });
 });
 

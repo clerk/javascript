@@ -1,11 +1,14 @@
+import { BlockButton } from '../../common';
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
+import { useRouter } from '../../router';
 import { DomainList } from './DomainList';
 import { MembershipWidget } from './MembershipWidget';
 import { RequestToJoinList } from './RequestToJoinList';
 
 export const OrganizationMembersTabRequests = () => {
+  const { navigate } = useRouter();
   const { membership } = useCoreOrganization();
   //@ts-expect-error
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
@@ -44,6 +47,16 @@ export const OrganizationMembersTabRequests = () => {
           />
         </Header.Root>
         <DomainList
+          fallback={
+            <BlockButton
+              colorScheme='primary'
+              textLocalizationKey={localizationKeys(
+                'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
+              )}
+              id='manageVerifiedDomains'
+              onClick={() => navigate('organization-settings/domain')}
+            />
+          }
           redirectSubPath={'organization-settings/domain/'}
           verificationStatus={'verified'}
           enrollmentMode={'automatic_suggestion'}

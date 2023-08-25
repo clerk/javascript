@@ -1,5 +1,5 @@
-import { CalloutWithAction } from '../../common';
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
+import { BlockButton } from '../../common';
+import { useCoreOrganization, useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton } from '../../elements';
 import { UserAdd } from '../../icons';
@@ -9,12 +9,15 @@ import { InvitedMembersList } from './InvitedMembersList';
 import { MembershipWidget } from './MembershipWidget';
 
 export const OrganizationMembersTabInvitations = () => {
+  const { organizationSettings } = useEnvironment();
   const { navigate } = useRouter();
   const { membership } = useCoreOrganization();
   //@ts-expect-error
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
 
   const isAdmin = membership?.role === 'admin';
+
+  const allowDomains = organizationSettings?.domains?.enabled;
 
   if (!isAdmin) {
     return null;
@@ -28,41 +31,45 @@ export const OrganizationMembersTabInvitations = () => {
       }}
     >
       {__unstable_manageBillingUrl && <MembershipWidget />}
-      <Col
-        gap={2}
-        sx={{
-          width: '100%',
-        }}
-      >
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys(
-              'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
-            )}
-            textVariant='largeMedium'
-          />
-          <Header.Subtitle
-            localizationKey={localizationKeys(
-              'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
-            )}
-            variant='regularRegular'
-          />
-        </Header.Root>
-        <DomainList
-          fallback={
-            <CalloutWithAction
-              text={localizationKeys('organizationProfile.membersPage.invitationsTab.autoInvitations.calloutTextLabel')}
-              actionLabel={localizationKeys(
-                'organizationProfile.membersPage.invitationsTab.autoInvitations.calloutActionLabel',
+
+      {allowDomains && (
+        <Col
+          gap={2}
+          sx={{
+            width: '100%',
+          }}
+        >
+          <Header.Root>
+            <Header.Title
+              localizationKey={localizationKeys(
+                'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
               )}
-              onClick={() => navigate('organization-settings/domain')}
+              textVariant='largeMedium'
             />
-          }
-          redirectSubPath={'organization-settings/domain/'}
-          verificationStatus={'verified'}
-          enrollmentMode={'automatic_invitation'}
-        />
-      </Col>
+            <Header.Subtitle
+              localizationKey={localizationKeys(
+                'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
+              )}
+              variant='regularRegular'
+            />
+          </Header.Root>
+          <DomainList
+            fallback={
+              <BlockButton
+                colorScheme='primary'
+                textLocalizationKey={localizationKeys(
+                  'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
+                )}
+                id='manageVerifiedDomains'
+                onClick={() => navigate('organization-settings/domain')}
+              />
+            }
+            redirectSubPath={'organization-settings/domain/'}
+            verificationStatus={'verified'}
+            enrollmentMode={'automatic_invitation'}
+          />
+        </Col>
+      )}
 
       <Flex
         direction='col'

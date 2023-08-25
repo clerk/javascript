@@ -1,36 +1,27 @@
-import type { MouseEvent } from 'react';
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Box, Button, Flex, Text } from '../customizables';
+import { Box, Flex, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
-type ArrowBlockButtonProps = PropsOfComponent<typeof Box> & {
-  actionSx?: ThemableCssProp;
+type BlockWithTrailingComponentProps = PropsOfComponent<typeof Box> & {
   badge?: React.ReactElement;
+  trailingComponent?: React.ReactElement;
   textElementDescriptor?: ElementDescriptor;
   textElementId?: ElementId;
   textLocalizationKey?: LocalizationKey;
-  actionLabel?: LocalizationKey;
-  onActionClick?: (e: MouseEvent<HTMLButtonElement>) => void | Promise<void | unknown>;
 };
 
-/**
- * Similar to ArrowBlockButton but just a container
- * - An action is expected instead of an icon
- */
-export const BlockWithAction = (props: ArrowBlockButtonProps) => {
+export const BlockWithTrailingComponent = (props: BlockWithTrailingComponentProps) => {
   const {
-    actionSx,
     isLoading,
     children,
+    trailingComponent,
     textElementDescriptor,
     textElementId,
     textLocalizationKey,
     badge,
-    onActionClick,
-    actionLabel,
     ...rest
   } = props;
 
@@ -47,12 +38,6 @@ export const BlockWithAction = (props: ArrowBlockButtonProps) => {
           position: 'relative',
           justifyContent: 'flex-start',
           borderColor: theme.colors.$blackAlpha200,
-          '--action-opacity': '0',
-          '--action-transform': `translateX(-${theme.space.$2});`,
-          '&:hover,&:focus ': {
-            '--action-opacity': '1',
-            '--action-transform': 'translateX(0px);',
-          },
         },
         props.sx,
       ]}
@@ -79,22 +64,7 @@ export const BlockWithAction = (props: ArrowBlockButtonProps) => {
         </Text>
         {badge}
       </Flex>
-      <Button
-        variant={'link'}
-        sx={[
-          theme => ({
-            whiteSpace: 'nowrap',
-            transition: 'all 100ms ease',
-            minWidth: theme.sizes.$4,
-            minHeight: theme.sizes.$4,
-            opacity: `var(--action-opacity)`,
-            transform: `var(--action-transform)`,
-          }),
-          actionSx,
-        ]}
-        onClick={onActionClick}
-        localizationKey={actionLabel}
-      />
+      {trailingComponent}
     </Box>
   );
 };

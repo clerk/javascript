@@ -44,6 +44,7 @@ import type {
   SignOut,
   SignOutCallback,
   SignOutOptions,
+  SignUpField,
   SignUpProps,
   SignUpResource,
   UnsubscribeCallback,
@@ -53,6 +54,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
+import { completeSignUpFlow } from '../ui/components/SignUp/util';
 import {
   appendAsQueryParams,
   buildURL,
@@ -65,7 +67,7 @@ import {
   ignoreEventValue,
   inActiveBrowserTab,
   inBrowser,
-  isAccountsHostedPages,
+  isDevAccountPortalOrigin,
   isDevOrStagingUrl,
   isError,
   isRedirectForFAPIInitiatedFlow,
@@ -668,9 +670,10 @@ export default class Clerk implements ClerkInterface {
       return clerkMissingDevBrowserJwt();
     }
 
-    const asQueryParam = !!options?.useQueryParam;
+    // Use query param for Account Portal pages so that SSR can access the dev_browser JWT
+    const asQueryParam = !!options?.useQueryParam || isDevAccountPortalOrigin(toURL.hostname);
 
-    return setDevBrowserJWTInURL(toURL.href, devBrowserJwt, asQueryParam);
+    return setDevBrowserJWTInURL(toURL, devBrowserJwt, asQueryParam).href;
   }
 
   public buildSignInUrl(options?: RedirectOptions): string {
@@ -834,6 +837,7 @@ export default class Clerk implements ClerkInterface {
     const { externalAccount } = signUp.verifications;
     const su = {
       status: signUp.status,
+      missingFields: signUp.missingFields,
       externalAccountStatus: externalAccount.status,
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
@@ -873,6 +877,23 @@ export default class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
     );
 
+    const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
+      if (missingFields.length) {
+        return navigateToContinueSignUp();
+      }
+
+      return completeSignUpFlow({
+        signUp,
+        verifyEmailPath:
+          params.verifyEmailAddressUrl ||
+          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-email-address' }, { stringify: true }),
+        verifyPhonePath:
+          params.verifyPhoneNumberUrl ||
+          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
+        navigate,
+      });
+    };
+
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
 
@@ -902,7 +923,7 @@ export default class Clerk implements ClerkInterface {
             beforeEmit: navigateAfterSignUp,
           });
         case 'missing_requirements':
-          return navigateToContinueSignUp();
+          return navigateToNextStepSignUp({ missingFields: res.missingFields });
         default:
           clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
@@ -938,7 +959,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
-      return navigateToContinueSignUp();
+      return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
     }
 
     return navigateToSignIn();
@@ -1008,6 +1029,9 @@ export default class Clerk implements ClerkInterface {
     return Organization.create({ name, slug });
   };
 
+  /**
+   * @deprecated use User.getOrganizationMemberships
+   */
   public getOrganizationMemberships = async (): Promise<OrganizationMembership[]> => {
     return await OrganizationMembership.retrieve();
   };
@@ -1231,7 +1255,7 @@ export default class Clerk implements ClerkInterface {
     this.#authService = new SessionCookieService(this);
     this.#pageLifecycle = createPageLifecycle();
 
-    const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
+    const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
 
     this.#setupListeners();
 

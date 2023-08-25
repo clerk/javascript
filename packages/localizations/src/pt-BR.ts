@@ -139,7 +139,7 @@ export const ptBR: LocalizationResource = {
     emailLink: {
       title: 'Verifique seu e-mail',
       subtitle: 'para continuar em {{applicationName}}',
-      formTitle: 'Link d',
+      formTitle: 'Link de verificação',
       formSubtitle: 'Utilize o link enviado no seu e-mail',
       resendButton: 'Reenviar link',
       unusedTab: {

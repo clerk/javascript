@@ -103,7 +103,7 @@ export default function createDevBrowserHandler({
 
   async function setUrlBasedSessionSyncBrowser(): Promise<void> {
     // 1. Get the JWT from hash search parameters when the redirection comes from Clerk Hosted Pages
-    const devBrowserToken = getDevBrowserJWTFromURL(window.location.href);
+    const devBrowserToken = getDevBrowserJWTFromURL(new URL(window.location.href));
     if (devBrowserToken) {
       setDevBrowserJWT(devBrowserToken);
       return;

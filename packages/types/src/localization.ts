@@ -45,7 +45,10 @@ type _LocalizationResource = {
   formFieldLabel__backupCode: LocalizationValue;
   formFieldLabel__organizationName: LocalizationValue;
   formFieldLabel__organizationSlug: LocalizationValue;
-  formFieldLabel__organizationEmailDomain: LocalizationValue;
+  formFieldLabel__organizationDomain: LocalizationValue;
+  formFieldLabel__organizationDomainEmailAddress: LocalizationValue;
+  formFieldLabel__organizationDomainEmailAddressDescription: LocalizationValue;
+  formFieldLabel__organizationDomainDeletePending: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
@@ -71,7 +74,8 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__backupCode: LocalizationValue;
   formFieldInputPlaceholder__organizationName: LocalizationValue;
   formFieldInputPlaceholder__organizationSlug: LocalizationValue;
-  formFieldInputPlaceholder__organizationEmailDomain: LocalizationValue;
+  formFieldInputPlaceholder__organizationDomain: LocalizationValue;
+  formFieldInputPlaceholder__organizationDomainEmailAddress: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
@@ -550,16 +554,21 @@ type _LocalizationResource = {
     action__manageOrganization: LocalizationValue;
     invitationCountLabel_single: LocalizationValue;
     invitationCountLabel_many: LocalizationValue;
-    invitationAccept: LocalizationValue;
+    action__invitationAccept: LocalizationValue;
     suggestionCountLabel_single: LocalizationValue;
     suggestionCountLabel_many: LocalizationValue;
-    suggestionsAccept: LocalizationValue;
+    action__suggestionsAccept: LocalizationValue;
+    suggestionsAcceptedLabel: LocalizationValue;
   };
   impersonationFab: {
     title: LocalizationValue;
     action__signOut: LocalizationValue;
   };
   organizationProfile: {
+    badge__unverified: LocalizationValue;
+    badge__automaticInvitation: LocalizationValue;
+    badge__automaticSuggestion: LocalizationValue;
+    badge__manualInvitation: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;
@@ -591,6 +600,8 @@ type _LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue;
         primaryButton: LocalizationValue;
+        unverifiedDomain_menuAction__verify: LocalizationValue;
+        unverifiedDomain_menuAction__remove: LocalizationValue;
       };
     };
     createDomainPage: {
@@ -599,17 +610,33 @@ type _LocalizationResource = {
     };
     verifyDomainPage: {
       title: LocalizationValue;
-      actionLabel__remove: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitleVerificationCodeScreen: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
     verifiedDomainPage: {
-      title: LocalizationValue;
-      actionLabel__remove: LocalizationValue;
-      formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue;
+      subtitle: LocalizationValue;
+      start: {
+        headerTitle__enrollment: LocalizationValue;
+        headerTitle__danger: LocalizationValue;
+      };
+      enrollmentTab: {
+        subtitle: LocalizationValue;
+        manualInvitationOption__label: LocalizationValue;
+        manualInvitationOption__description: LocalizationValue;
+        automaticInvitationOption__label: LocalizationValue;
+        automaticInvitationOption__description: LocalizationValue;
+        automaticSuggestionOption__label: LocalizationValue;
+        automaticSuggestionOption__description: LocalizationValue;
+        formButton__save: LocalizationValue;
+      };
+      dangerTab: {
+        removeDomainTitle: LocalizationValue;
+        removeDomainSubtitle: LocalizationValue;
+        removeDomainActionLabel__remove: LocalizationValue;
+      };
     };
     removeDomainPage: {
       title: LocalizationValue;
@@ -660,13 +687,13 @@ type _LocalizationResource = {
         autoInvitations: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
-          calloutTextLabel: LocalizationValue;
-          calloutActionLabel: LocalizationValue;
+          primaryButton: LocalizationValue;
         };
       };
       requestsTab: {
         tableHeader__requested: LocalizationValue;
         menuAction__approve: LocalizationValue;
+        menuAction__reject: LocalizationValue;
         table__emptyRow: LocalizationValue;
         requests: {
           headerTitle: LocalizationValue;
@@ -675,6 +702,7 @@ type _LocalizationResource = {
         autoSuggestions: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
+          primaryButton: LocalizationValue;
         };
       };
     };

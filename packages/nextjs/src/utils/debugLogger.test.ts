@@ -111,4 +111,24 @@ describe('withLogger', () => {
       expect(logger.commit).toHaveBeenCalled();
     }
   });
+
+  it('should truncate bytes to 4096 when deploying on vercel', () => {
+    // setup: mock vercel environment, mock console log so we can intercept its value
+    process.env.VERCEL = 'true';
+    const oldConsoleLog = console.log.bind(console);
+    const log = jest.fn();
+    console.log = log;
+
+    const veryLongString = new Array(6000).join('a');
+    const handler = withLogger('test-logger', logger => () => {
+      logger.enable();
+      logger.debug(veryLongString);
+    });
+    handler();
+    expect(log.mock.calls[0][0]).toHaveLength(4096);
+
+    // restore original console log and reset environment value
+    process.env.VERCEL = undefined;
+    console.log = oldConsoleLog;
+  });
 });

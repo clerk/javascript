@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
 
+/**
+ * Utility hook for delaying mounting of components for enter and exit animations.
+ * Delays to update the state when is switched from/to undefined.
+ * Immediate change for in-between changes
+ */
 export function useDelayedVisibility<T>(valueToDelay: T, delayInMs: number) {
   const [isVisible, setVisible] = useState<T | undefined>();
 

@@ -9,7 +9,7 @@ export type HTTPMethod = 'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PA
 
 export type FapiRequestInit = RequestInit & {
   path?: string;
-  search?: string | URLSearchParams | string[][] | Record<string, string> | undefined;
+  search?: string | URLSearchParams | string[][] | Record<string, string | string[]> | undefined;
   sessionId?: string;
   rotatingTokenNonce?: string;
   pathPrefix?: string;
@@ -93,7 +93,9 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
   }
 
   function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit) {
-    const searchParams = new URLSearchParams(search);
+    const searchParams = new URLSearchParams(search as any);
+    // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
+
     if (clerkInstance.version) {
       searchParams.append('_clerk_js_version', clerkInstance.version);
     }
@@ -119,11 +121,11 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
 
     // TODO: extract to generic helper
     const objParams = [...searchParams.entries()].reduce((acc, [k, v]) => {
-      acc[k] = v;
+      acc[k] = v.includes(',') ? v.split(',') : v;
       return acc;
-    }, {} as FapiQueryStringParameters & Record<string, string>);
+    }, {} as FapiQueryStringParameters & Record<string, string | string[]>);
 
-    return qs.stringify(objParams, { addQueryPrefix: true });
+    return qs.stringify(objParams, { addQueryPrefix: true, arrayFormat: 'repeat' });
   }
 
   function buildUrl(requestInit: FapiRequestInit): URL {

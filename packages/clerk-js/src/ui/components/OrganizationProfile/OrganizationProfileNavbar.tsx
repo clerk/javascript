@@ -51,8 +51,7 @@ export const OrganizationProfileNavbar = (
 
 const pageToRootNavbarRouteMap = {
   'invite-members': organizationProfileRoutes.find(r => r.id === 'members'),
-  'add-domain': organizationProfileRoutes.find(r => r.id === 'settings'),
-  'verify-domain/:id': organizationProfileRoutes.find(r => r.id === 'settings'),
+  domain: organizationProfileRoutes.find(r => r.id === 'settings'),
   profile: organizationProfileRoutes.find(r => r.id === 'settings'),
   leave: organizationProfileRoutes.find(r => r.id === 'settings'),
 };

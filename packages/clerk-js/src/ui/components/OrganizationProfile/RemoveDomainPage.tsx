@@ -2,7 +2,7 @@ import type { OrganizationDomainResource } from '@clerk/types';
 import React from 'react';
 
 import { RemoveResourcePage } from '../../common';
-import { useCoreOrganization } from '../../contexts';
+import { useCoreOrganization, useEnvironment } from '../../contexts';
 import { Flex, Spinner } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { localizationKeys } from '../../localization';
@@ -10,6 +10,7 @@ import { useRouter } from '../../router';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const RemoveDomainPage = () => {
+  const { organizationSettings } = useEnvironment();
   const { organization } = useCoreOrganization();
   const { params } = useRouter();
 
@@ -25,6 +26,16 @@ export const RemoveDomainPage = () => {
       },
     },
   );
+
+  const { domains } = useCoreOrganization({
+    domains: {
+      infinite: true,
+    },
+  });
+
+  if (!organization || !organizationSettings) {
+    return null;
+  }
 
   if (domainStatus.isLoading || !domain) {
     return (
@@ -55,7 +66,8 @@ export const RemoveDomainPage = () => {
       successMessage={localizationKeys('organizationProfile.removeDomainPage.successMessage', {
         domain: ref.current?.name,
       })}
-      deleteResource={() => Promise.resolve(domain?.delete())}
+      deleteResource={() => domain?.delete().then(() => (domains as any).unstable__mutate())}
+      breadcrumbTitle={localizationKeys('organizationProfile.profilePage.domainSection.title')}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     />
   );

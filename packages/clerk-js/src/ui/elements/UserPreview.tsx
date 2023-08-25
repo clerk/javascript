@@ -77,39 +77,42 @@ export const UserPreview = (props: UserPreviewProps) => {
       sx={[{ minWidth: '0px', width: '100%' }, sx]}
       {...rest}
     >
-      {showAvatar ? (
-        <Flex
-          elementDescriptor={descriptors.userPreviewAvatarContainer}
-          elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
-          justify='center'
-          sx={{ position: 'relative' }}
-        >
-          <UserAvatar
-            boxElementDescriptor={descriptors.userPreviewAvatarBox}
-            imageElementDescriptor={descriptors.userPreviewAvatarImage}
-            {...user}
-            {...externalAccount}
-            {...samlAccount}
-            name={name}
-            avatarUrl={imageUrl}
-            size={getAvatarSizes}
-            sx={avatarSx}
-            rounded={rounded}
-          />
+      {/*Do not attempt to render or reserve space based on height if image url is not defined*/}
+      {imageUrl ? (
+        showAvatar ? (
+          <Flex
+            elementDescriptor={descriptors.userPreviewAvatarContainer}
+            elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
+            justify='center'
+            sx={{ position: 'relative' }}
+          >
+            <UserAvatar
+              boxElementDescriptor={descriptors.userPreviewAvatarBox}
+              imageElementDescriptor={descriptors.userPreviewAvatarImage}
+              {...user}
+              {...externalAccount}
+              {...samlAccount}
+              name={name}
+              avatarUrl={imageUrl}
+              size={getAvatarSizes}
+              sx={avatarSx}
+              rounded={rounded}
+            />
 
-          {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
-        </Flex>
-      ) : (
-        // Reserve layout space when avatar is not visible
-        <Flex
-          elementDescriptor={descriptors.userPreviewAvatarContainer}
-          elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
-          justify='center'
-          sx={t => ({
-            height: getAvatarSizes(t),
-          })}
-        />
-      )}
+            {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
+          </Flex>
+        ) : (
+          // Reserve layout space when avatar is not visible
+          <Flex
+            elementDescriptor={descriptors.userPreviewAvatarContainer}
+            elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
+            justify='center'
+            sx={t => ({
+              height: getAvatarSizes(t),
+            })}
+          />
+        )
+      ) : null}
 
       <Flex
         elementDescriptor={descriptors.userPreviewTextContainer}

@@ -23,6 +23,12 @@ export class OrganizationMembershipRequest extends BaseResource implements Organ
     });
   };
 
+  reject = async (): Promise<OrganizationMembershipRequestResource> => {
+    return await this._basePost({
+      path: `/organizations/${this.organizationId}/membership_requests/${this.id}/reject`,
+    });
+  };
+
   protected fromJSON(data: OrganizationMembershipRequestJSON | null): this {
     if (data) {
       this.id = data.id;

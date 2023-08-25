@@ -6,20 +6,21 @@ import type { PropsOfComponent } from '../styledSystem';
 type BlockButtonProps = PropsOfComponent<typeof ArrowBlockButton>;
 
 export const BlockButton = (props: BlockButtonProps) => {
+  const { id, ...rest } = props;
   return (
     <ArrowBlockButton
       variant='ghost'
-      {...props}
+      elementDescriptor={descriptors.profileSectionPrimaryButton}
+      elementId={descriptors.profileSectionPrimaryButton?.setId(id as any)}
+      {...rest}
     />
   );
 };
 
 export const AddBlockButton = (props: BlockButtonProps) => {
-  const { id, leftIcon, ...rest } = props;
+  const { leftIcon, ...rest } = props;
   return (
     <BlockButton
-      elementDescriptor={descriptors.profileSectionPrimaryButton}
-      elementId={descriptors.profileSectionPrimaryButton?.setId(id as any)}
       colorScheme='primary'
       {...rest}
       sx={theme => ({ justifyContent: 'flex-start', gap: theme.space.$2 })}

@@ -100,6 +100,15 @@ describe('buildUrl(options)', () => {
     expect(fapiClient.buildUrl({ path: '/foo', search: 'test=2' }).href).toBe(
       'https://clerk.example.com/v1/foo?test=2&_clerk_js_version=42.0.0',
     );
+
+    expect(
+      fapiClient.buildUrl({
+        path: '/foo',
+        search: {
+          array: ['item1', 'item2'],
+        },
+      }).href,
+    ).toBe('https://clerk.example.com/v1/foo?array=item1&array=item2&_clerk_js_version=42.0.0');
   });
 
   const cases = [

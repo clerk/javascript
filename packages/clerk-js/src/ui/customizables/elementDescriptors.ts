@@ -78,6 +78,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formField',
   'formFieldLabelRow',
   'formFieldLabel',
+  'formFieldRadioGroup',
+  'formFieldRadioGroupItem',
+  'formFieldRadioInput',
+  'formFieldRadioLabel',
+  'formFieldRadioLabelTitle',
+  'formFieldRadioLabelDescription',
   'formFieldAction',
   'formFieldInput',
   'formFieldErrorText',
@@ -96,6 +102,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldInputCopyToClipboardIcon',
 
   'phoneInputBox',
+  'formInputGroup',
 
   'avatarBox',
   'avatarImage',
@@ -198,6 +205,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'profileSection',
   'profileSectionTitle',
   'profileSectionTitleText',
+  'profileSectionSubtitle',
+  'profileSectionSubtitleText',
   'profileSectionContent',
   'profileSectionPrimaryButton',
   'profilePage',
@@ -253,6 +262,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'qrCodeContainer',
 
   'badge',
+  'notificationBadge',
   'button',
   'providerIcon',
   // Decide if we want to keep the keys as camel cased in HTML as well,
