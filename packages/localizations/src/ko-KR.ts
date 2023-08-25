@@ -542,7 +542,7 @@ export const koKR: LocalizationResource = {
           messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다.',
           actionDescription: '계속하려면 아래에 {{organizationName}}을(를) 입력하세요.',
           successMessage: '조직을 삭제했습니다.',
-        }
+        },
       },
       domainSection: {
         title: '인증된 도메인',
@@ -550,7 +550,7 @@ export const koKR: LocalizationResource = {
         primaryButton: '도메인 추가',
         unverifiedDomain_menuAction__verify: '도메인 인증',
         unverifiedDomain_menuAction__remove: '도메인 삭제',
-      }
+      },
     },
     invitePage: {
       title: '회원 초대',
