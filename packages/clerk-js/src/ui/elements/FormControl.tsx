@@ -385,8 +385,6 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
 
   const Input = (
     <InputElement
-      // groupPreffix={groupPreffix}
-      // groupSuffix={groupSuffix}
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(id)}
       hasError={!!errorMessage}
