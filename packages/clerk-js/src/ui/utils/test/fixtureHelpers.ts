@@ -5,6 +5,7 @@ import type {
   EnvironmentJSON,
   ExternalAccountJSON,
   OAuthProvider,
+  OrganizationEnrollmentMode,
   OrganizationJSON,
   PhoneNumberJSON,
   SamlAccountJSON,
@@ -286,7 +287,12 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
   const withMaxAllowedMemberships = ({ max = 5 }) => {
     os.max_allowed_memberships = max;
   };
-  return { withOrganizations, withMaxAllowedMemberships };
+
+  const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[]) => {
+    os.domains.enabled = true;
+    os.domains.enrollment_modes = modes || ['automatic_invitation', 'automatic_invitation', 'manual_invitation'];
+  };
+  return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains };
 };
 
 const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
