@@ -1,7 +1,7 @@
 import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
 
-import { render } from '../../../../testUtils';
+import { render, runFakeTimers, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
 import { createFakeUserOrganizationInvitation, createFakeUserOrganizationSuggestion } from './utlis';
@@ -39,6 +39,37 @@ describe('OrganizationSwitcher', () => {
       await userEvent.click(getByRole('button'));
       expect(queryByText('Personal Workspace')).toBeNull();
       expect(getByText('No organization selected')).toBeDefined();
+    });
+  });
+
+  describe('OrganizationSwitcherTrigger', () => {
+    it('shows the counter for pending suggestions and invitations', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.dev'] });
+      });
+
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
+        Promise.resolve({
+          data: [],
+          total_count: 2,
+        }),
+      );
+
+      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
+        Promise.resolve({
+          data: [],
+          total_count: 3,
+        }),
+      );
+
+      await runFakeTimers(async () => {
+        const { getByText } = render(<OrganizationSwitcher />, { wrapper });
+
+        await waitFor(() => {
+          expect(getByText('5')).toBeInTheDocument();
+        });
+      });
     });
   });
 

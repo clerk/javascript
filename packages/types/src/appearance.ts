@@ -418,6 +418,7 @@ export type ElementsConfig = {
 
   // default descriptors
   badge: WithOptions<'primary' | 'actionRequired', never, never>;
+  notificationBadge: WithOptions<never, never, never>;
   button: WithOptions<never, LoadingState, never>;
   providerIcon: WithOptions<OAuthProvider | Web3Provider, never, never>;
 };

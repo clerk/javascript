@@ -262,6 +262,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'qrCodeContainer',
 
   'badge',
+  'notificationBadge',
   'button',
   'providerIcon',
   // Decide if we want to keep the keys as camel cased in HTML as well,
