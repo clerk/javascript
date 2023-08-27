@@ -146,6 +146,14 @@ export default function createDevBrowserHandler({
     const devOrStgApi = isDevOrStagingUrl(frontendApi);
     const devOrStgHost = isDevOrStagingUrl(window.location.host);
 
+    // If a cookie already exists, it might have SameSite=Strict
+    // Re-set it to make sure it has SameSite=Lax
+    const existingDevBrowserCookie = cookieHandler.getDevBrowserCookie();
+    if (existingDevBrowserCookie) {
+      cookieHandler.removeDevBrowserCookie();
+      cookieHandler.setDevBrowserCookie(existingDevBrowserCookie);
+    }
+
     if (devOrStgApi) {
       fapiClient.onBeforeRequest(request => {
         const devBrowserJWT = getDevBrowserJWT();

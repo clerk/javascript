@@ -67,7 +67,7 @@ export const createCookieHandler = () => {
 
   const setDevBrowserCookie = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = 'Strict';
+    const sameSite = DEFAULT_SAME_SITE;
     const secure = false;
 
     return devBrowserCookie.set(jwt, {
@@ -75,6 +75,10 @@ export const createCookieHandler = () => {
       sameSite,
       secure,
     });
+  };
+
+  const getDevBrowserCookie = () => {
+    return devBrowserCookie.get();
   };
 
   const removeDevBrowserCookie = () => devBrowserCookie.remove();
@@ -97,6 +101,7 @@ export const createCookieHandler = () => {
     removeSessionCookie,
     removeAllDevBrowserCookies,
     setDevBrowserCookie,
+    getDevBrowserCookie,
     removeDevBrowserCookie,
   };
 };
