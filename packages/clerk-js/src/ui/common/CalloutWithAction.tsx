@@ -1,6 +1,6 @@
-import type { MouseEvent, ReactNode } from 'react';
+import type { ComponentType, MouseEvent } from 'react';
 
-import { Col, Flex, Link, Text } from '../customizables';
+import { Col, Flex, Link, Text, Icon } from '../customizables';
 import type { LocalizationKey } from '../localization';
 import type { ThemableCssProp } from '../styledSystem';
 
@@ -9,7 +9,7 @@ type CalloutWithActionProps = {
   textSx?: ThemableCssProp;
   actionLabel?: LocalizationKey;
   onClick?: (e: MouseEvent<HTMLAnchorElement>) => Promise<any>;
-  icon: ReactNode;
+  icon: ComponentType;
 };
 export const CalloutWithAction = (props: CalloutWithActionProps) => {
   const { icon, text, textSx, actionLabel, onClick: onClickProp } = props;
@@ -31,7 +31,11 @@ export const CalloutWithAction = (props: CalloutWithActionProps) => {
       })}
     >
       <Flex gap={2}>
-        {icon}
+        <Icon
+          colorScheme='neutral'
+          icon={icon}
+          sx={t => ({ marginTop: t.space.$1 })}
+        />
         <Col gap={4}>
           <Text
             colorScheme='neutral'

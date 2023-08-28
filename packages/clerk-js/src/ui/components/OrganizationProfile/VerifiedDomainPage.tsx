@@ -2,7 +2,8 @@ import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '@cl
 
 import { CalloutWithAction } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
-import { Col, Flex, Icon, LocalizationKey, localizationKeys, Spinner, useLocalizations } from '../../customizables';
+import type { LocalizationKey } from '../../customizables';
+import { Col, Flex, localizationKeys, Spinner, useLocalizations } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -256,13 +257,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
               {calloutLabel && (
                 <CalloutWithAction
                   text={calloutLabel}
-                  icon={
-                    <Icon
-                      colorScheme='neutral'
-                      icon={InformationCircle}
-                      sx={t => ({ marginTop: t.space.$1 })}
-                    />
-                  }
+                  icon={InformationCircle}
                 />
               )}
               <Header.Root>
@@ -303,13 +298,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                 {dangerCalloutLabel && (
                   <CalloutWithAction
                     text={dangerCalloutLabel}
-                    icon={
-                      <Icon
-                        colorScheme='neutral'
-                        icon={InformationCircle}
-                        sx={t => ({ marginTop: t.space.$1 })}
-                      />
-                    }
+                    icon={InformationCircle}
                   />
                 )}
                 <Col
