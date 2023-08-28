@@ -1,5 +1,91 @@
 # Change Log
 
+## 3.50.0
+
+### Minor Changes
+
+- Introducing validatePassword for SignIn and SignUp resources ([#1445](https://github.com/clerkinc/javascript/pull/1445)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Validate a password based on the instance's configuration set in Password Policies in Dashboard
+
+- Introduce a new resource called OrganizationSuggestion along with retrieve() & accept() methods ([#1574](https://github.com/clerkinc/javascript/pull/1574)) by [@chanioxaris](https://github.com/chanioxaris)
+
+  Also make available the user's suggestions from the useOrganizationList hook
+
+- Introduces userInvitations from `useOrganizationList` ([#1520](https://github.com/clerkinc/javascript/pull/1520)) by [@panteliselef](https://github.com/panteliselef)
+
+  `userInvitations` is a paginated list of data. It can be used to create Paginated tables or Infinite lists.
+
+- Introduce `hasImage` in User / Organization / Session resources ([#1544](https://github.com/clerkinc/javascript/pull/1544)) by [@dimkl](https://github.com/dimkl)
+
+- Improve redirects on OAuth callback. Now, if you try to sign up with a provider that allows unverified accounts, it will ([#1563](https://github.com/clerkinc/javascript/pull/1563)) by [@kostaspt](https://github.com/kostaspt)
+
+  navigate to the appropriate change when needed, fixing the broken flow.
+
+- Introduce `logoLinkUrl` prop in `appearance.layout` ([#1449](https://github.com/clerkinc/javascript/pull/1449)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  A new `logoLinkUrl` prop has been added to `appearance.layout` and used in `ApplicationLogo` to change the `href` of the link.
+  By default, the logo link url will be the Home URL you've set in the Clerk Dashboard.
+
+### Patch Changes
+
+- Introduces a new resource called OrganizationMembership ([#1572](https://github.com/clerkinc/javascript/pull/1572)) by [@panteliselef](https://github.com/panteliselef)
+
+  - useOrganization has been updated in order to return a list of domain with the above type
+
+- Introduces Membership Requests in <OrganizationProfile /> ([#1576](https://github.com/clerkinc/javascript/pull/1576)) by [@panteliselef](https://github.com/panteliselef)
+
+  - This is a list of users that have requested to join the active organization
+
+- Updates signature of OrganizationMembership.retrieve to support backwards compatibility while allowing using the new paginated responses. ([#1606](https://github.com/clerkinc/javascript/pull/1606)) by [@panteliselef](https://github.com/panteliselef)
+
+  - userMemberships is now also part of the returned values of useOrganizationList
+
+- Introduces the accept method in UserOrganizationInvitation class ([#1550](https://github.com/clerkinc/javascript/pull/1550)) by [@panteliselef](https://github.com/panteliselef)
+
+- Display a notification counter for organization invitations in OrganizationSwitcher ([#1627](https://github.com/clerkinc/javascript/pull/1627)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduces a new resource called OrganizationDomain ([#1569](https://github.com/clerkinc/javascript/pull/1569)) by [@panteliselef](https://github.com/panteliselef)
+
+  - useOrganization has been updated in order to return a list of domain with the above type
+
+- Introduces domains and invitations in <OrganizationProfile /> ([#1560](https://github.com/clerkinc/javascript/pull/1560)) by [@panteliselef](https://github.com/panteliselef)
+
+  - The "Members" page now accommodates Domain and Individual invitations
+  - The "Settings" page allows for the addition, edit and removal of a domain
+
+- A OrganizationMembershipRequest can now be rejected ([#1612](https://github.com/clerkinc/javascript/pull/1612)) by [@panteliselef](https://github.com/panteliselef)
+
+  - New `OrganizationMembershipRequest.reject` method alongside `accept`
+  - As an organization admin, navigate to `Organization Profile` > `Members` > `Requests`. You can now reject a request from the table.
+
+- Introduces an invitation list within <OrganizationSwitcher/> ([#1554](https://github.com/clerkinc/javascript/pull/1554)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Users can accept the invitation that is sent to them
+
+- When updating enrollment mode of a domain uses can now delete any pending invitations or suggestions. ([#1632](https://github.com/clerkinc/javascript/pull/1632)) by [@panteliselef](https://github.com/panteliselef)
+
+- Construct urls based on context in <OrganizationSwitcher/> ([#1503](https://github.com/clerkinc/javascript/pull/1503)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Deprecate `afterSwitchOrganizationUrl`
+  - Introduce `afterSelectOrganizationUrl` & `afterSelectPersonalUrl`
+
+  `afterSelectOrganizationUrl` accepts
+
+  - Full URL -> 'https://clerk.com/'
+  - relative path -> '/organizations'
+  - relative path -> with param '/organizations/:id'
+  - function that returns a string -> (org) => `/org/${org.slug}`
+    `afterSelectPersonalUrl` accepts
+  - Full URL -> 'https://clerk.com/'
+  - relative path -> '/users'
+  - relative path -> with param '/users/:username'
+  - function that returns a string -> (user) => `/users/${user.id}`
+
+- Introduces list of suggestions within <OrganizationSwitcher/> ([#1577](https://github.com/clerkinc/javascript/pull/1577)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Users can request to join a suggested organization
+
 ## 3.49.0
 
 ### Minor Changes
