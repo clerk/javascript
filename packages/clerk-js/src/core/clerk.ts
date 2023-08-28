@@ -1,4 +1,4 @@
-import type { LocalStorageBroadcastChannel } from '@clerk/shared';
+import { isCrossOrigin, isRelativeUrl, LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
   handleValueOrFn,
@@ -646,7 +646,7 @@ export default class Clerk implements ClerkInterface {
     const customNavigate = this.#options.navigate;
 
     if (toURL.origin !== window.location.origin || !customNavigate) {
-      windowNavigate(toURL);
+      windowNavigate(this.buildUrlWithAuth(toURL.href));
       return;
     }
 
@@ -655,15 +655,18 @@ export default class Clerk implements ClerkInterface {
   };
 
   public buildUrlWithAuth(to: string, options?: BuildUrlWithAuthParams): string {
-    if (this.#instanceType === 'production' || !this.#devBrowserHandler?.usesUrlBasedSessionSync()) {
+    if (
+      this.#instanceType === 'production' ||
+      !this.#devBrowserHandler?.usesUrlBasedSessionSync() ||
+      isRelativeUrl(to) ||
+      !isCrossOrigin(to, window.location.href)
+    ) {
       return to;
     }
 
-    const toURL = new URL(to, window.location.origin);
-
-    if (toURL.origin === window.location.origin) {
-      return toURL.href;
-    }
+    // to is an absolute url but do this to keep the trailing slash
+    // (FAPI validation will throw otherwise, can remove when fixed)
+    const toURL = new URL(to, window.location.href);
 
     const devBrowserJwt = this.#devBrowserHandler?.getDevBrowserJWT();
     if (!devBrowserJwt) {
@@ -729,12 +732,12 @@ export default class Clerk implements ClerkInterface {
       { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
       { stringify: true },
     );
-    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl));
+    return this.navigate(backToSatelliteUrl);
   };
 
   public redirectWithAuth = async (to: string): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildUrlWithAuth(to));
+      return this.navigate(to);
     }
     return;
   };
@@ -1476,8 +1479,7 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    const buildUrlWithAuthParams: BuildUrlWithAuthParams = { useQueryParam: true };
-    await this.navigate(this.buildUrlWithAuth(redirectUrl, buildUrlWithAuthParams));
+    await this.navigate(this.buildUrlWithAuth(redirectUrl, { useQueryParam: true }));
     return true;
   };
 }
