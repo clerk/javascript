@@ -1,7 +1,8 @@
-import type { OrganizationEnrollmentMode } from '@clerk/types';
+import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '@clerk/types';
 
+import { CalloutWithAction } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
-import { Col, Flex, localizationKeys, Spinner } from '../../customizables';
+import { Col, Flex, Icon, LocalizationKey, localizationKeys, Spinner, useLocalizations } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -16,10 +17,67 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useFetch, useNavigateToFlowStart } from '../../hooks';
+import { InformationCircle } from '../../icons';
 import { useRouter } from '../../router';
-import { handleError, useFormControl } from '../../utils';
+import { createListFormat, handleError, useFormControl } from '../../utils';
 import { LinkButtonWithDescription } from '../UserProfile/LinkButtonWithDescription';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
+
+const useCalloutLabel = (
+  domain: OrganizationDomainResource | null,
+  {
+    prefix: prefixLocalKey,
+    suffix: suffixLocalKey,
+  }: {
+    prefix: LocalizationKey;
+    suffix: LocalizationKey;
+  },
+) => {
+  const { locale, t } = useLocalizations();
+
+  const totalInvitations = domain?.totalPendingInvitations || 0;
+  const totalSuggestions = domain?.totalPendingSuggestions || 0;
+  const totalPending = totalSuggestions + totalInvitations;
+
+  if (totalPending <= 0) {
+    return '';
+  }
+
+  const prefix = t(prefixLocalKey);
+
+  const suffix = t(suffixLocalKey);
+  const dynamicPart = [];
+
+  if (totalInvitations) {
+    dynamicPart.push(
+      t(
+        localizationKeys(
+          `organizationProfile.verifiedDomainPage.enrollmentTab.calloutLabels.${
+            totalInvitations > 1 ? 'pendingInvitationCount_many' : 'pendingInvitationCount_single'
+          }`,
+          { count: totalInvitations },
+        ),
+      ),
+    );
+  }
+
+  if (totalSuggestions) {
+    dynamicPart.push(
+      t(
+        localizationKeys(
+          `organizationProfile.verifiedDomainPage.enrollmentTab.calloutLabels.${
+            totalSuggestions > 1 ? 'pendingSuggestionCount_many' : 'pendingSuggestionCount_single'
+          }`,
+          { count: totalSuggestions },
+        ),
+      ),
+    );
+  }
+
+  const dynamicPartText = createListFormat(dynamicPart, locale);
+
+  return `${prefix} ${dynamicPartText} ${suffix}`;
+};
 
 export const VerifiedDomainPage = withCardStateProvider(() => {
   const card = useCardState();
@@ -30,6 +88,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
       infinite: true,
     },
   });
+
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const { params, navigate, queryParams } = useRouter();
   const mode = (queryParams.mode || 'edit') as 'select' | 'edit';
@@ -104,6 +163,24 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     domain: domain?.name,
   });
 
+  const calloutLabel = useCalloutLabel(domain, {
+    prefix: localizationKeys(
+      `organizationProfile.verifiedDomainPage.enrollmentTab.calloutLabels.${
+        (domain?.totalPendingInvitations || 0) > 1 ? 'prefix_many' : 'prefix_single'
+      }`,
+    ),
+    suffix: localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutLabels.suffix`),
+  });
+
+  const dangerCalloutLabel = useCalloutLabel(domain, {
+    prefix: localizationKeys(`organizationProfile.verifiedDomainPage.dangerTab.calloutLabels.prefix`),
+    suffix: localizationKeys(
+      `organizationProfile.verifiedDomainPage.dangerTab.calloutLabels.${
+        (domain?.totalPendingSuggestions || 0) > 1 ? 'suffix_many' : 'suffix_single'
+      }`,
+    ),
+  });
+
   const updateEnrollmentMode = async () => {
     if (!domain || !organization) {
       return;
@@ -149,6 +226,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   if (!(domain.verification && domain.verification.status === 'verified')) {
     void navigateToFlowStart();
   }
+
   return (
     <ContentPage
       headerTitle={domain.name}
@@ -175,6 +253,18 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
               direction={'col'}
               gap={4}
             >
+              {calloutLabel && (
+                <CalloutWithAction
+                  text={calloutLabel}
+                  icon={
+                    <Icon
+                      colorScheme='neutral'
+                      icon={InformationCircle}
+                      sx={t => ({ marginTop: t.space.$1 })}
+                    />
+                  }
+                />
+              )}
               <Header.Root>
                 <Header.Subtitle
                   localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
@@ -207,22 +297,36 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
             {allowsEdit && (
               <TabPanel
                 direction={'col'}
-                sx={[
-                  { width: '100%' },
-                  t => ({
-                    padding: `${t.space.$none} ${t.space.$4}`,
-                  }),
-                ]}
+                gap={4}
+                sx={{ width: '100%' }}
               >
-                <LinkButtonWithDescription
-                  title={localizationKeys('organizationProfile.verifiedDomainPage.dangerTab.removeDomainTitle')}
-                  subtitle={localizationKeys('organizationProfile.verifiedDomainPage.dangerTab.removeDomainSubtitle')}
-                  actionLabel={localizationKeys(
-                    'organizationProfile.verifiedDomainPage.dangerTab.removeDomainActionLabel__remove',
-                  )}
-                  colorScheme='danger'
-                  onClick={() => navigate(`../../domain/${domain.id}/remove`)}
-                />
+                {dangerCalloutLabel && (
+                  <CalloutWithAction
+                    text={dangerCalloutLabel}
+                    icon={
+                      <Icon
+                        colorScheme='neutral'
+                        icon={InformationCircle}
+                        sx={t => ({ marginTop: t.space.$1 })}
+                      />
+                    }
+                  />
+                )}
+                <Col
+                  sx={t => ({
+                    padding: `${t.space.$none} ${t.space.$4}`,
+                  })}
+                >
+                  <LinkButtonWithDescription
+                    title={localizationKeys('organizationProfile.verifiedDomainPage.dangerTab.removeDomainTitle')}
+                    subtitle={localizationKeys('organizationProfile.verifiedDomainPage.dangerTab.removeDomainSubtitle')}
+                    actionLabel={localizationKeys(
+                      'organizationProfile.verifiedDomainPage.dangerTab.removeDomainActionLabel__remove',
+                    )}
+                    colorScheme='danger'
+                    onClick={() => navigate(`../../domain/${domain.id}/remove`)}
+                  />
+                </Col>
               </TabPanel>
             )}
           </TabPanels>

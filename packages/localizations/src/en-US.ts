@@ -616,11 +616,25 @@ export const enUS: LocalizationResource = {
         automaticSuggestionOption__description:
           'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
         formButton__save: 'Save',
+        calloutLabels: {
+          prefix_single: 'There is',
+          prefix_many: 'There are',
+          pendingInvitationCount_single: '1 pending invitation',
+          pendingInvitationCount_many: '{{count}} pending invitations',
+          pendingSuggestionCount_single: '1 pending suggestion',
+          pendingSuggestionCount_many: '{{count}} pending suggestions',
+          suffix: 'sent to users. Changing the enrollment mode will only affect new users.',
+        },
       },
       dangerTab: {
         removeDomainTitle: 'Remove domain',
         removeDomainSubtitle: 'Remove this domain from your verified domains',
         removeDomainActionLabel__remove: 'Remove domain',
+        calloutLabels: {
+          prefix: 'Removing the domain will also remove',
+          suffix_single: 'that is already sent to users.',
+          suffix_many: 'that are already sent to users.',
+        },
       },
     },
     invitePage: {
