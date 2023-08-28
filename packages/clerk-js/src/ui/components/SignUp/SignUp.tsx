@@ -44,6 +44,8 @@ function SignUpRoutes(): JSX.Element {
             redirectUrl={signUpContext.redirectUrl}
             secondFactorUrl={signUpContext.secondFactorUrl}
             continueSignUpUrl='../continue'
+            verifyEmailAddressUrl='../verify-email-address'
+            verifyPhoneNumberUrl='../verify-phone-number'
           />
         </Route>
         <Route path='verify'>

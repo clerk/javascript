@@ -44,6 +44,7 @@ import type {
   SignOut,
   SignOutCallback,
   SignOutOptions,
+  SignUpField,
   SignUpProps,
   SignUpResource,
   UnsubscribeCallback,
@@ -53,6 +54,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
+import { completeSignUpFlow } from '../ui/components/SignUp/util';
 import {
   appendAsQueryParams,
   buildURL,
@@ -576,7 +578,7 @@ export default class Clerk implements ClerkInterface {
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
     //   id.
-    if (inActiveBrowserTab()) {
+    if (inActiveBrowserTab() || !this.#options.standardBrowser) {
       await this.#touchLastActiveSession(newSession);
       // reload session from updated client
       newSession = this.#getSessionFromClient(newSession?.id);
@@ -838,6 +840,7 @@ export default class Clerk implements ClerkInterface {
     const { externalAccount } = signUp.verifications;
     const su = {
       status: signUp.status,
+      missingFields: signUp.missingFields,
       externalAccountStatus: externalAccount.status,
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
@@ -877,6 +880,23 @@ export default class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
     );
 
+    const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
+      if (missingFields.length) {
+        return navigateToContinueSignUp();
+      }
+
+      return completeSignUpFlow({
+        signUp,
+        verifyEmailPath:
+          params.verifyEmailAddressUrl ||
+          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-email-address' }, { stringify: true }),
+        verifyPhonePath:
+          params.verifyPhoneNumberUrl ||
+          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
+        navigate,
+      });
+    };
+
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
 
@@ -906,7 +926,7 @@ export default class Clerk implements ClerkInterface {
             beforeEmit: navigateAfterSignUp,
           });
         case 'missing_requirements':
-          return navigateToContinueSignUp();
+          return navigateToNextStepSignUp({ missingFields: res.missingFields });
         default:
           clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
@@ -942,7 +962,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
-      return navigateToContinueSignUp();
+      return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
     }
 
     return navigateToSignIn();

@@ -50,12 +50,13 @@ export function determineActiveFields(fieldProps: FieldDeterminationProps): Fiel
 // If continuing with an existing sign-up, show only fields absolutely necessary to minimize fiction
 export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpResource) {
   if (signUp) {
+    const hasEmailFilled = !!signUp.emailAddress;
     const hasVerifiedEmail = signUp.verifications?.emailAddress?.status == 'verified';
     const hasVerifiedPhone = signUp.verifications?.phoneNumber?.status == 'verified';
     const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
     const hasVerifiedWeb3Wallet = signUp.verifications?.web3Wallet?.status == 'verified';
 
-    if (hasVerifiedEmail) {
+    if (hasEmailFilled || hasVerifiedEmail) {
       delete fields.emailAddress;
     }
 

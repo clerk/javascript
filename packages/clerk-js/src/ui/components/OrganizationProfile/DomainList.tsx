@@ -3,8 +3,8 @@ import type { OrganizationDomainVerificationStatus } from '@clerk/types';
 import React, { useMemo } from 'react';
 
 import { useCoreOrganization } from '../../contexts';
-import { Box, Col, descriptors, Spinner } from '../../customizables';
-import { ArrowBlockButton } from '../../elements';
+import { Box, Col, localizationKeys, Spinner } from '../../customizables';
+import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
 import { useInView } from '../../hooks';
 import { useRouter } from '../../router';
 import { EnrollmentBadge } from './EnrollmentBadge';
@@ -68,26 +68,60 @@ export const DomainList = (props: DomainListProps) => {
   return (
     <Col>
       {domainList.length === 0 && !domains?.isLoading && fallback}
-      {domainList.map(d => (
-        <ArrowBlockButton
-          key={d.id}
-          elementDescriptor={descriptors.accordionTriggerButton}
-          variant='ghost'
-          colorScheme='neutral'
-          badge={!verificationStatus ? <EnrollmentBadge organizationDomain={d} /> : undefined}
-          sx={t => ({
-            padding: `${t.space.$3} ${t.space.$4}`,
-            minHeight: t.sizes.$10,
-          })}
-          onClick={() => {
-            d.verification && d.verification.status === 'verified'
-              ? void navigate(`${redirectSubPath}${d.id}`)
-              : void navigate(`${redirectSubPath}${d.id}/verify`);
-          }}
-        >
-          {d.name}
-        </ArrowBlockButton>
-      ))}
+      {domainList.map(d => {
+        if (!(d.verification && d.verification.status === 'verified')) {
+          return (
+            <BlockWithTrailingComponent
+              key={d.id}
+              sx={t => ({
+                '&:hover': {
+                  backgroundColor: t.colors.$blackAlpha50,
+                },
+                padding: `${t.space.$none} ${t.space.$4}`,
+                minHeight: t.sizes.$10,
+              })}
+              badge={<EnrollmentBadge organizationDomain={d} />}
+              trailingComponent={
+                <ThreeDotsMenu
+                  actions={[
+                    {
+                      label: localizationKeys(
+                        'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify',
+                      ),
+                      onClick: () => navigate(`${redirectSubPath}${d.id}/verify`),
+                    },
+                    {
+                      label: localizationKeys(
+                        'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove',
+                      ),
+                      isDestructive: true,
+                      onClick: () => navigate(`${redirectSubPath}${d.id}/remove`),
+                    },
+                  ]}
+                />
+              }
+            >
+              {d.name}
+            </BlockWithTrailingComponent>
+          );
+        }
+
+        return (
+          <ArrowBlockButton
+            key={d.id}
+            variant='ghost'
+            colorScheme='neutral'
+            badge={!verificationStatus ? <EnrollmentBadge organizationDomain={d} /> : undefined}
+            sx={t => ({
+              padding: `${t.space.$3} ${t.space.$4}`,
+              minHeight: t.sizes.$10,
+            })}
+            onClick={() => navigate(`${redirectSubPath}${d.id}`)}
+          >
+            {d.name}
+          </ArrowBlockButton>
+        );
+      })}
       {(domains?.hasNextPage || domains?.isFetching) && (
         <Box
           ref={domains?.isFetching ? undefined : ref}

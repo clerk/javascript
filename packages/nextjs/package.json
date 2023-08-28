@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "4.23.2",
+  "version": "4.23.3",
   "license": "MIT",
   "description": "Clerk SDK for NextJS",
   "keywords": [
@@ -75,10 +75,10 @@
     "test:ci": "jest --maxWorkers=50%"
   },
   "dependencies": {
-    "@clerk/backend": "^0.27.0",
-    "@clerk/clerk-react": "^4.23.2",
-    "@clerk/clerk-sdk-node": "^4.12.2",
-    "@clerk/types": "^3.49.0",
+    "@clerk/backend": "^0.28.0",
+    "@clerk/clerk-react": "^4.24.0",
+    "@clerk/clerk-sdk-node": "^4.12.3",
+    "@clerk/types": "^3.50.0",
     "path-to-regexp": "6.2.1",
     "tslib": "2.4.1"
   },

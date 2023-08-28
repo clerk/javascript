@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import {
-  BlockWithAction,
   ContentPage,
   Form,
   FormButtonContainer,
@@ -15,10 +14,9 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { CodeForm } from '../../elements/CodeForm';
-import { useFetch, useLoadingStatus, useNavigateToFlowStart } from '../../hooks';
+import { useFetch, useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep, useFormControl } from '../../utils';
-import { EnrollmentBadge } from './EnrollmentBadge';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const VerifyDomainPage = withCardStateProvider(() => {
@@ -26,7 +24,6 @@ export const VerifyDomainPage = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const { organization } = useCoreOrganization();
   const { params, navigate } = useRouter();
-  const { navigateToFlowStart } = useNavigateToFlowStart();
 
   const [success, setSuccess] = React.useState(false);
 
@@ -37,6 +34,9 @@ export const VerifyDomainPage = withCardStateProvider(() => {
   const subtitle = localizationKeys('organizationProfile.verifyDomainPage.subtitle', {
     domainName: domain?.name ?? '',
   });
+
+  const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
+
   const status = useLoadingStatus();
 
   const codeControlState = useFormControl('code', '');
@@ -44,11 +44,21 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
-  const emailField = useFormControl('emailAddress', '', {
-    type: 'email',
-    label: localizationKeys('formFieldLabel__organizationEmailDomainEmailAddress'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationEmailDomainEmailAddress'),
+  const emailField = useFormControl('affiliationEmailAddress', '', {
+    type: 'text',
+    label: localizationKeys('formFieldLabel__organizationDomainEmailAddress'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationDomainEmailAddress'),
+    informationText: localizationKeys('formFieldLabel__organizationDomainEmailAddressDescription'),
   });
+
+  const affiliationEmailAddressRef = useRef<string>();
+
+  const subtitleVerificationCodeScreen = localizationKeys(
+    'organizationProfile.verifyDomainPage.subtitleVerificationCodeScreen',
+    {
+      emailAddress: affiliationEmailAddressRef.current,
+    },
+  );
 
   const resolve = async () => {
     setSuccess(true);
@@ -61,7 +71,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       .then(async res => {
         await resolve();
         if (res.verification?.status === 'verified') {
-          return navigateToFlowStart();
+          return navigate(`../../../domain/${res.id}?mode=select`);
         }
         return;
       })
@@ -94,12 +104,17 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   const dataChanged = organization.name !== emailField.value;
   const canSubmit = dataChanged;
+  const emailDomainSuffix = `@${domain?.name}`;
 
   const onSubmitPrepare = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!domain) {
+      return;
+    }
+    affiliationEmailAddressRef.current = `${emailField.value}${emailDomainSuffix}`;
     return domain
-      ?.prepareAffiliationVerification({
-        affiliationEmailAddress: emailField.value,
+      .prepareAffiliationVerification({
+        affiliationEmailAddress: affiliationEmailAddressRef.current,
       })
       .then(wizard.nextStep)
       .catch(err => {
@@ -130,31 +145,16 @@ export const VerifyDomainPage = withCardStateProvider(() => {
     <Wizard {...wizard.props}>
       <ContentPage
         headerTitle={title}
+        breadcrumbTitle={breadcrumbTitle}
         headerSubtitle={subtitle}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
-        <BlockWithAction
-          elementDescriptor={descriptors.accordionTriggerButton}
-          badge={<EnrollmentBadge organizationDomain={domain} />}
-          sx={t => ({
-            backgroundColor: t.colors.$blackAlpha50,
-            padding: `${t.space.$3} ${t.space.$4}`,
-            minHeight: t.sizes.$10,
-          })}
-          actionLabel={localizationKeys('organizationProfile.verifyDomainPage.actionLabel__remove')}
-          onActionClick={() => navigate(`../../../domain/${domain.id}/remove`)}
-          actionSx={t => ({
-            color: t.colors.$danger500,
-          })}
-        >
-          {domain.name}
-        </BlockWithAction>
-
         <Form.Root onSubmit={onSubmitPrepare}>
           <Form.ControlRow elementId={emailField.id}>
             <Form.Control
               {...emailField.props}
               autoFocus
+              groupSuffix={`@${domain.name}`}
               required
             />
           </Form.ControlRow>
@@ -164,7 +164,8 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
       <ContentPage
         headerTitle={title}
-        headerSubtitle={subtitle}
+        breadcrumbTitle={breadcrumbTitle}
+        headerSubtitle={subtitleVerificationCodeScreen}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <CodeForm

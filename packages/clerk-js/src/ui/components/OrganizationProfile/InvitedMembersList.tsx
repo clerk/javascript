@@ -66,7 +66,6 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRe
       <Td>
         <UserPreview
           sx={{ maxWidth: '30ch' }}
-          showAvatar={false}
           user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any}
         />
       </Td>

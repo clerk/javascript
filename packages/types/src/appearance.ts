@@ -74,7 +74,9 @@ export type FieldId =
   | 'role'
   | 'deleteConfirmation'
   | 'deleteOrganizationConfirmation'
-  | 'enrollmentMode';
+  | 'enrollmentMode'
+  | 'affiliationEmailAddress'
+  | 'deleteExistingInvitationsSuggestions';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -243,6 +245,7 @@ export type ElementsConfig = {
   formFieldInputCopyToClipboardIcon: WithOptions<never, never, never>;
 
   phoneInputBox: WithOptions<never, ControlState, never>;
+  formInputGroup: WithOptions<never, ControlState, never>;
 
   avatarBox: WithOptions<never, never, never>;
   avatarImage: WithOptions<never, never, never>;
@@ -415,6 +418,7 @@ export type ElementsConfig = {
 
   // default descriptors
   badge: WithOptions<'primary' | 'actionRequired', never, never>;
+  notificationBadge: WithOptions<never, never, never>;
   button: WithOptions<never, LoadingState, never>;
   providerIcon: WithOptions<OAuthProvider | Web3Provider, never, never>;
 };

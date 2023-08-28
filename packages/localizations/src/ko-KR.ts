@@ -350,6 +350,12 @@ export const koKR: LocalizationResource = {
         destructiveActionSubtitle: '이 web3 지갑을 계정에서 삭제',
         destructiveAction: '지갑 제거',
       },
+      dangerSection: {
+        title: '위험',
+        deleteAccountButton: '계정 삭제',
+        deleteAccountTitle: '계정 삭제',
+        deleteAccountDescription: '계정과 그와 연관된 모든 데이터 삭제',
+      },
     },
     profilePage: {
       title: '프로필 업데이트',
@@ -487,6 +493,13 @@ export const koKR: LocalizationResource = {
       actionLabel__download: '.txt 다운로드',
       actionLabel__print: '인쇄',
     },
+    deletePage: {
+      title: '계정 삭제',
+      messageLine1: '정말로 계정을 삭제하시겠습니까?',
+      messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다.',
+      actionDescription: '계속하려면 아래에 계정 삭제를 입력하세요.',
+      confirm: '계정 삭제',
+    },
   },
   userButton: {
     action__manageAccount: '계정 관리',
@@ -523,6 +536,20 @@ export const koKR: LocalizationResource = {
           messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다',
           successMessage: '조직을 탈퇴했습니다.',
         },
+        deleteOrganization: {
+          title: '조직 삭제',
+          messageLine1: '이 조직을 삭제하시겠습니까?',
+          messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다.',
+          actionDescription: '계속하려면 아래에 {{organizationName}}을(를) 입력하세요.',
+          successMessage: '조직을 삭제했습니다.',
+        },
+      },
+      domainSection: {
+        title: '인증된 도메인',
+        subtitle: '인증된 이메일 도메인을 기반으로 사용자가 조직에 자동으로 가입하거나 가입 요청을 할 수 있게 합니다.',
+        primaryButton: '도메인 추가',
+        unverifiedDomain_menuAction__verify: '도메인 인증',
+        unverifiedDomain_menuAction__remove: '도메인 삭제',
       },
     },
     invitePage: {

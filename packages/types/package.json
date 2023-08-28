@@ -1,6 +1,6 @@
 {
   "name": "@clerk/types",
-  "version": "3.49.0",
+  "version": "3.50.0",
   "license": "MIT",
   "description": "Typings for Clerk libraries.",
   "keywords": [
@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch",
+    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "clean": "rimraf ./dist",
     "lint": "eslint ."
   },

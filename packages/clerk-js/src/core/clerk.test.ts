@@ -1,6 +1,7 @@
 import type { ActiveSessionResource, SignInJSON, SignUpJSON, TokenResource } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 
+import { mockNativeRuntime } from '../testUtils';
 import Clerk from './clerk';
 import { eventBus, events } from './events';
 import type { AuthConfig, DisplayConfig, Organization } from './resources/internal';
@@ -91,7 +92,10 @@ describe('Clerk singleton', () => {
     };
 
     Object.defineProperty(global.window, 'location', { value: mockWindowLocation });
-    Object.defineProperty(global.window.document, 'hasFocus', { value: () => true, configurable: true });
+
+    if (typeof globalThis.document !== 'undefined') {
+      Object.defineProperty(global.window.document, 'hasFocus', { value: () => true, configurable: true });
+    }
 
     const mockAddEventListener = (type: string, callback: (e: any) => void) => {
       if (type === 'message') {
@@ -291,6 +295,39 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
         expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org-id');
         expect(cookieSpy).toBeCalledWith(mockSession);
+        expect(beforeEmitMock).toBeCalledWith(mockSession);
+        expect(sut.session).toMatchObject(mockSession);
+      });
+    });
+
+    mockNativeRuntime(() => {
+      it('calls session.touch in a non-standard browser', async () => {
+        mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+        const sut = new Clerk(frontendApi);
+        await sut.load({ standardBrowser: false });
+
+        const executionOrder: string[] = [];
+        mockSession.touch.mockImplementationOnce(() => {
+          sut.session = mockSession as any;
+          executionOrder.push('session.touch');
+          return Promise.resolve();
+        });
+        cookieSpy.mockImplementationOnce(() => {
+          executionOrder.push('set cookie');
+          return Promise.resolve();
+        });
+        const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
+          executionOrder.push('before emit');
+          return Promise.resolve();
+        });
+
+        await sut.setActive({ organization: { id: 'org-id' } as Organization, beforeEmit: beforeEmitMock });
+
+        expect(executionOrder).toEqual(['session.touch', 'before emit']);
+        expect(mockSession.touch).toHaveBeenCalled();
+        expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org-id');
+        expect(cookieSpy).not.toHaveBeenCalled();
         expect(beforeEmitMock).toBeCalledWith(mockSession);
         expect(sut.session).toMatchObject(mockSession);
       });
@@ -593,7 +630,14 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSignUpCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'missing_requirements' }));
+      const mockSignUpCreate = jest.fn().mockReturnValue(
+        Promise.resolve(
+          new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['phone_number'],
+          } as any as SignUpJSON),
+        ),
+      );
 
       const sut = new Clerk(frontendApi);
       await sut.load({
@@ -700,6 +744,7 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
+            missing_fields: [],
             verifications: {
               external_account: {
                 status: 'unverified',
@@ -1111,6 +1156,7 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
+            missing_fields: ['last_name'],
             verifications: {
               external_account: {
                 status: 'verified',
@@ -1132,6 +1178,55 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
+      });
+    });
+
+    it('redirects user to the verify-email-address url if the external account has unverified email and there are no missing requirements', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: [],
+            unverified_fields: ['email_address'],
+            verifications: {
+              email_address: {
+                status: 'unverified',
+                strategy: 'from_oauth_google',
+                next_action: 'needs_attempt',
+              },
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/verify-email-address');
       });
     });
   });

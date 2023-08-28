@@ -11,4 +11,5 @@ export interface OrganizationMembershipRequestResource extends ClerkResource {
   updatedAt: Date;
 
   accept: () => Promise<OrganizationMembershipRequestResource>;
+  reject: () => Promise<OrganizationMembershipRequestResource>;
 }

@@ -45,6 +45,10 @@ export const Badge = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitive
   defaultDescriptor: descriptors.badge,
 });
 
+export const NotificationBadge = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.NotificationBadge)), {
+  defaultDescriptor: descriptors.notificationBadge,
+});
+
 export const Table = makeCustomizable(sanitizeDomProps(Primitives.Table));
 export const Thead = makeCustomizable(sanitizeDomProps(Primitives.Thead));
 export const Tbody = makeCustomizable(sanitizeDomProps(Primitives.Tbody));

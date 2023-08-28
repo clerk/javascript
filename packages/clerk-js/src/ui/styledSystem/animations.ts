@@ -45,6 +45,23 @@ const inAnimation = keyframes`
   }
 `;
 
+const notificationAnimation = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(5px) scale(.5);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(0px) scale(1.2);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+`;
+
 const outAnimation = keyframes`
   20% {
     opacity: 1;
@@ -102,4 +119,5 @@ export const animations = {
   navbarSlideIn,
   inAnimation,
   outAnimation,
+  notificationAnimation,
 };

@@ -3,7 +3,7 @@ export * from './Header';
 export * from './Footer';
 export * from './Alert';
 export * from './Form';
-export * from './BlockWithAction';
+export * from './BlockWithTrailingComponent';
 export * from './BackLink';
 export * from './IdentityPreview';
 export * from './Avatar';

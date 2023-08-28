@@ -1,5 +1,35 @@
 # Change Log
 
+## 0.22.0
+
+### Minor Changes
+
+- Introduces userInvitations from `useOrganizationList` ([#1520](https://github.com/clerkinc/javascript/pull/1520)) by [@panteliselef](https://github.com/panteliselef)
+
+  `userInvitations` is a paginated list of data. It can be used to create Paginated tables or Infinite lists.
+
+### Patch Changes
+
+- Introduces a new resource called OrganizationMembership ([#1572](https://github.com/clerkinc/javascript/pull/1572)) by [@panteliselef](https://github.com/panteliselef)
+
+  - useOrganization has been updated in order to return a list of domain with the above type
+
+- Introduces Membership Requests in <OrganizationProfile /> ([#1576](https://github.com/clerkinc/javascript/pull/1576)) by [@panteliselef](https://github.com/panteliselef)
+
+  - This is a list of users that have requested to join the active organization
+
+- Updates signature of OrganizationMembership.retrieve to support backwards compatibility while allowing using the new paginated responses. ([#1606](https://github.com/clerkinc/javascript/pull/1606)) by [@panteliselef](https://github.com/panteliselef)
+
+  - userMemberships is now also part of the returned values of useOrganizationList
+
+- Introduces a new resource called OrganizationDomain ([#1569](https://github.com/clerkinc/javascript/pull/1569)) by [@panteliselef](https://github.com/panteliselef)
+
+  - useOrganization has been updated in order to return a list of domain with the above type
+
+- Introduces list of suggestions within <OrganizationSwitcher/> ([#1577](https://github.com/clerkinc/javascript/pull/1577)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Users can request to join a suggested organization
+
 ## 0.21.0
 
 ### Minor Changes

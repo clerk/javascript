@@ -35,8 +35,11 @@ export const enUS: LocalizationResource = {
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
   formFieldLabel__organizationSlug: 'Slug URL',
-  formFieldLabel__organizationEmailDomain: 'Email domain',
-  formFieldLabel__organizationEmailDomainEmailAddress: 'Verification email address',
+  formFieldLabel__organizationDomain: 'Domain',
+  formFieldLabel__organizationDomainEmailAddress: 'Verification email address',
+  formFieldLabel__organizationDomainEmailAddressDescription:
+    'Enter an email address under this domain to receive a code and verify this domain.',
+  formFieldLabel__organizationDomainDeletePending: 'Delete pending invitations and suggestions',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
@@ -54,8 +57,8 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
-  formFieldInputPlaceholder__organizationEmailDomain: '',
-  formFieldInputPlaceholder__organizationEmailDomainEmailAddress: '',
+  formFieldInputPlaceholder__organizationDomain: '',
+  formFieldInputPlaceholder__organizationDomainEmailAddress: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldAction__forgotPassword: 'Forgot password?',
@@ -545,7 +548,7 @@ export const enUS: LocalizationResource = {
     badge__unverified: 'Unverified',
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
-    badge__manualInvitation: 'Manual invitations',
+    badge__manualInvitation: 'No automatic enrollment',
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
@@ -575,38 +578,50 @@ export const enUS: LocalizationResource = {
         },
       },
       domainSection: {
-        title: 'Domain-based enrollment',
+        title: 'Verified domains',
         subtitle:
           'Allow users to join the organization automatically or request to join based on a verified email domain.',
-        primaryButton: 'Add email domain',
+        primaryButton: 'Add domain',
+        unverifiedDomain_menuAction__verify: 'Verify domain',
+        unverifiedDomain_menuAction__remove: 'Delete domain',
       },
     },
     createDomainPage: {
-      title: 'Add email domain',
+      title: 'Add domain',
       subtitle:
-        'Add the email domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
+        'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
     },
     verifyDomainPage: {
       title: 'Verify domain',
-      actionLabel__remove: 'Remove unverified domain',
-      subtitle: 'Add an email address under {{domainName}} to receive a code and verify this domain.',
+      subtitle: 'The domain {{domainName}} needs to be verified via email.',
+      subtitleVerificationCodeScreen: 'A verification code was sent to {{emailAddress}}. Enter the code to continue.',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your email address',
       resendButton: "Didn't receive a code? Resend",
     },
     verifiedDomainPage: {
-      title: 'Enrollment options',
-      actionLabel__remove: 'Remove email domain',
-      formTitle: 'Enrollment mode',
-      formSubtitle: 'Choose how users from this domain can join the organization.',
-      manualInvitationOption__label: 'No automatic enrollment',
-      manualInvitationOption__description: 'Users can only be invited manually to the organization.',
-      automaticInvitationOption__label: 'Automatic invitations',
-      automaticInvitationOption__description:
-        'Users are automatically invited to join the organization when they sign-up and can join anytime.',
-      automaticSuggestionOption__label: 'Automatic suggestions',
-      automaticSuggestionOption__description:
-        'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
+      subtitle: 'The domain {{domain}} is now verified. Continue by selecting enrollment mode.',
+      start: {
+        headerTitle__enrollment: 'Enrollment options',
+        headerTitle__danger: 'Danger',
+      },
+      enrollmentTab: {
+        subtitle: 'Choose how users from this domain can join the organization.',
+        manualInvitationOption__label: 'No automatic enrollment',
+        manualInvitationOption__description: 'Users can only be invited manually to the organization.',
+        automaticInvitationOption__label: 'Automatic invitations',
+        automaticInvitationOption__description:
+          'Users are automatically invited to join the organization when they sign-up and can join anytime.',
+        automaticSuggestionOption__label: 'Automatic suggestions',
+        automaticSuggestionOption__description:
+          'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
+        formButton__save: 'Save',
+      },
+      dangerTab: {
+        removeDomainTitle: 'Remove domain',
+        removeDomainSubtitle: 'Remove this domain from your verified domains',
+        removeDomainActionLabel__remove: 'Remove domain',
+      },
     },
     invitePage: {
       title: 'Invite members',
@@ -646,17 +661,19 @@ export const enUS: LocalizationResource = {
         table__emptyRow: 'No invitations to display',
         manualInvitations: {
           headerTitle: 'Individual invitations',
-          headerSubtitle: 'Browse and manage invited members.',
+          headerSubtitle: 'Manually invite members and manage existing invitations.',
         },
         autoInvitations: {
-          headerTitle: 'Domain invitations',
+          headerTitle: 'Automatic invitations',
           headerSubtitle:
-            'New and existing users will be able to join anytime as members and will get notified in-app.',
+            'Invite users by connecting an email domain with your organization. Anyone who signs up with a matching email domain will be able to join the organization anytime.',
+          primaryButton: 'Manage verified domains',
         },
       },
       requestsTab: {
         tableHeader__requested: 'Requested access',
         menuAction__approve: 'Approve',
+        menuAction__reject: 'Reject',
         table__emptyRow: 'No requests to display',
         requests: {
           headerTitle: 'Requests',
@@ -665,7 +682,8 @@ export const enUS: LocalizationResource = {
         autoSuggestions: {
           headerTitle: 'Automatic suggestions',
           headerSubtitle:
-            'Users with an email address on your verified domain will see a suggestion to request to join the organization.',
+            'Users who sign up with a matching email domain, will be able to see a suggestion to request to join your organization.',
+          primaryButton: 'Manage verified domains',
         },
       },
     },

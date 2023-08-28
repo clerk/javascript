@@ -3,8 +3,12 @@ import type {
   OrganizationDomainResource,
   OrganizationDomainVerification,
   OrganizationEnrollmentMode,
+  OrganizationInvitationResource,
+  OrganizationInvitationStatus,
+  OrganizationMembershipRequestResource,
   OrganizationMembershipResource,
   OrganizationResource,
+  PublicUserData,
 } from '@clerk/types';
 import { jest } from '@jest/globals';
 
@@ -65,4 +69,62 @@ export const createFakeDomain = (params: FakeDomainParams): OrganizationDomainRe
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
   } as any;
+};
+
+type FakeInvitationParams = {
+  id: string;
+  role?: MembershipRole;
+  status?: OrganizationInvitationStatus;
+  emailAddress: string;
+  organizationId: string;
+  createdAt?: Date;
+};
+
+export const createFakeOrganizationInvitation = (params: FakeInvitationParams): OrganizationInvitationResource => {
+  return {
+    pathRoot: '',
+    id: params.id,
+    emailAddress: params.emailAddress,
+    organizationId: params.organizationId,
+    publicMetadata: {} as any,
+    role: params.role || 'basic_member',
+    status: params.status || 'pending',
+    createdAt: params?.createdAt || new Date(),
+    updatedAt: new Date(),
+    revoke: jest.fn as any,
+    reload: jest.fn as any,
+  };
+};
+
+type FakeMemberRequestParams = {
+  id: string;
+  publicUserData: Pick<PublicUserData, 'userId' | 'identifier'>;
+  status?: OrganizationInvitationStatus;
+  organizationId: string;
+  createdAt?: Date;
+};
+
+export const createFakeOrganizationMembershipRequest = (
+  params: FakeMemberRequestParams,
+): OrganizationMembershipRequestResource => {
+  return {
+    pathRoot: '',
+    id: params.id,
+    organizationId: params.organizationId,
+    publicUserData: {
+      firstName: null,
+      lastName: null,
+      profileImageUrl: '',
+      imageUrl: '',
+      hasImage: false,
+      userId: params.publicUserData.userId || '',
+      identifier: params.publicUserData.identifier,
+    },
+    status: params.status || 'pending',
+    createdAt: params?.createdAt || new Date(),
+    updatedAt: new Date(),
+    accept: jest.fn as any,
+    reject: jest.fn as any,
+    reload: jest.fn as any,
+  };
 };

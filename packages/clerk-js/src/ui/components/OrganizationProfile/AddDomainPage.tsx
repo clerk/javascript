@@ -11,21 +11,22 @@ export const AddDomainPage = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const title = localizationKeys('organizationProfile.createDomainPage.title');
   const subtitle = localizationKeys('organizationProfile.createDomainPage.subtitle');
+  const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const card = useCardState();
   const { organization } = useCoreOrganization();
   const { navigate } = useRouter();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__organizationEmailDomain'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__organizationEmailDomain'),
+    label: localizationKeys('formFieldLabel__organizationDomain'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationDomain'),
   });
 
   if (!organization || !organizationSettings) {
     return null;
   }
 
-  const canSubmit = organization.name !== nameField.value;
+  const canSubmit = nameField.value.trim() !== '';
 
   const onSubmit = (e: React.FormEvent) => {
     nameField.setError(undefined);
@@ -34,7 +35,7 @@ export const AddDomainPage = withCardStateProvider(() => {
       .createDomain(nameField.value)
       .then(res => {
         if (res.verification && res.verification.status === 'verified') {
-          return navigate(`../domain/${res.id}`);
+          return navigate(`../domain/${res.id}?mode=select`);
         }
         return navigate(`../domain/${res.id}/verify`);
       })
@@ -47,6 +48,7 @@ export const AddDomainPage = withCardStateProvider(() => {
     <ContentPage
       headerTitle={title}
       headerSubtitle={subtitle}
+      breadcrumbTitle={breadcrumbTitle}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     >
       <Form.Root onSubmit={onSubmit}>
