@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.56.1
+
+### Patch Changes
+
+- Disable chunking for `@clerk/clerk-js/headless` to ensure the library doesn't attempt to dynamically load chunks in a non-browser environment. ([#1654](https://github.com/clerkinc/javascript/pull/1654)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 4.56.0
 
 ### Minor Changes
