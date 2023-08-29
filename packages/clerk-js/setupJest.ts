@@ -1,50 +1,48 @@
 import { jest } from '@jest/globals';
 
-if (typeof window !== 'undefined') {
-  window.ResizeObserver =
-    window.ResizeObserver ||
-    jest.fn().mockImplementation(() => ({
-      disconnect: jest.fn(),
-      observe: jest.fn(),
-      unobserve: jest.fn(),
-    }));
+window.ResizeObserver =
+  window.ResizeObserver ||
+  jest.fn().mockImplementation(() => ({
+    disconnect: jest.fn(),
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+  }));
 
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: jest.fn().mockImplementation(query => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: jest.fn(), // deprecated
-      removeListener: jest.fn(), // deprecated
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
-    })),
-  });
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
 
-  global.__PKG_NAME__ = '';
-  global.__PKG_VERSION__ = '';
+global.__PKG_NAME__ = '';
+global.__PKG_VERSION__ = '';
 
-  //@ts-expect-error
-  global.IntersectionObserver = class IntersectionObserver {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    constructor() {}
+//@ts-expect-error
+global.IntersectionObserver = class IntersectionObserver {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  constructor() {}
 
-    disconnect() {
-      return null;
-    }
+  disconnect() {
+    return null;
+  }
 
-    observe() {
-      return null;
-    }
+  observe() {
+    return null;
+  }
 
-    takeRecords() {
-      return null;
-    }
+  takeRecords() {
+    return null;
+  }
 
-    unobserve() {
-      return null;
-    }
-  };
-}
+  unobserve() {
+    return null;
+  }
+};
