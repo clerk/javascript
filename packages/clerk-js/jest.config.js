@@ -7,7 +7,11 @@ const config = {
   roots: ['<rootDir>/src'],
   setupFiles: ['./setupJest.ts'],
   setupFilesAfterEnv: ['./setupJestAfterEnv.ts'],
-  testRegex: ['/ui/.*/__tests__/.*.test.[jt]sx?$', '/(core|utils)/.*.test.[jt]sx?$'],
+  testRegex: [
+    '(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$',
+    '/ui/.*/__tests__/.*.test.[jt]sx?$',
+    '/(core|utils)/.*.test.[jt]sx?$',
+  ],
   testPathIgnorePatterns: ['/node_modules/'],
 
   collectCoverage: false,
