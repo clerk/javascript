@@ -94,7 +94,6 @@ const LogoMarkIconLink = () => {
         '&:hover': { color: 'inherit' },
       }}
       isExternal
-      useBuildUrlWithAuth={false}
     >
       <Icon
         icon={LogoMark}

@@ -114,7 +114,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       }
       await this.prepareEmailAddressVerification({
         strategy: 'email_link',
-        redirectUrl: BaseResource.clerk.buildUrlWithAuth(redirectUrl),
+        redirectUrl,
       });
 
       return new Promise((resolve, reject) => {
@@ -209,8 +209,8 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     const { verifications } = await authenticateFn({
       strategy,
-      redirectUrl: BaseResource.clerk.buildUrlWithAuth(redirectUrl),
-      actionCompleteRedirectUrl: BaseResource.clerk.buildUrlWithAuth(redirectUrlComplete),
+      redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
+      actionCompleteRedirectUrl: redirectUrlComplete,
       unsafeMetadata,
       emailAddress,
     });
