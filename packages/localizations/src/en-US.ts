@@ -528,7 +528,7 @@ export const enUS: LocalizationResource = {
     action__addAccount: 'Add account',
   },
   organizationSwitcher: {
-    personalWorkspace: 'Personal Workspace',
+    personalWorkspace: 'Personal account',
     notSelected: 'No organization selected',
     action__createOrganization: 'Create Organization',
     action__manageOrganization: 'Manage Organization',
