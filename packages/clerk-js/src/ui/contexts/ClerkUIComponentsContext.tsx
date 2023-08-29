@@ -34,24 +34,29 @@ export const useSignUpContext = (): SignUpContextType => {
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
   const options = useOptions();
+  const clerk = useCoreClerk();
 
   if (componentName !== 'SignUp') {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
-  const afterSignUpUrl = pickRedirectionProp('afterSignUpUrl', {
-    queryParams,
-    ctx,
-    options,
-    displayConfig,
-  });
+  const afterSignUpUrl = clerk.buildUrlWithAuth(
+    pickRedirectionProp('afterSignUpUrl', {
+      queryParams,
+      ctx,
+      options,
+      displayConfig,
+    }),
+  );
 
-  const afterSignInUrl = pickRedirectionProp('afterSignInUrl', {
-    queryParams,
-    ctx,
-    options,
-    displayConfig,
-  });
+  const afterSignInUrl = clerk.buildUrlWithAuth(
+    pickRedirectionProp('afterSignInUrl', {
+      queryParams,
+      ctx,
+      options,
+      displayConfig,
+    }),
+  );
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
@@ -99,24 +104,29 @@ export const useSignInContext = (): SignInContextType => {
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
   const options = useOptions();
+  const clerk = useCoreClerk();
 
   if (componentName !== 'SignIn') {
     throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
   }
 
-  const afterSignUpUrl = pickRedirectionProp('afterSignUpUrl', {
-    queryParams,
-    ctx,
-    options,
-    displayConfig,
-  });
+  const afterSignUpUrl = clerk.buildUrlWithAuth(
+    pickRedirectionProp('afterSignUpUrl', {
+      queryParams,
+      ctx,
+      options,
+      displayConfig,
+    }),
+  );
 
-  const afterSignInUrl = pickRedirectionProp('afterSignInUrl', {
-    queryParams,
-    ctx,
-    options,
-    displayConfig,
-  });
+  const afterSignInUrl = clerk.buildUrlWithAuth(
+    pickRedirectionProp('afterSignInUrl', {
+      queryParams,
+      ctx,
+      options,
+      displayConfig,
+    }),
+  );
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
