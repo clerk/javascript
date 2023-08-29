@@ -183,6 +183,17 @@ const prodConfig = ({ mode, env }) => {
     entryForVariant(variants.clerkHeadless),
     common({ mode }),
     commonForProd(),
+    // Disable chunking for the headless variant, since it's meant to be used in a non-browser environment and
+    // attempting to load chunks causes issues due to usage of a dynamic publicPath. We generally are only concerned with
+    // chunking in our browser bundles.
+    {
+      output: {
+        publicPath: '',
+      },
+      optimization: {
+        splitChunks: false,
+      },
+    },
     // externalsForHeadless(),
   );
 
