@@ -8,7 +8,7 @@ const config = {
   setupFiles: ['./setupJest.ts'],
   setupFilesAfterEnv: ['./setupJestAfterEnv.ts'],
   testRegex: [
-    '(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$',
+    '/__tests__/(.+/)*.*.test.[jt]sx?$',
     '/ui/.*/__tests__/.*.test.[jt]sx?$',
     '/(core|utils)/.*.test.[jt]sx?$',
   ],
