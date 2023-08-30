@@ -81,6 +81,7 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
 
   const captcha = await loadCaptcha(scriptUrl);
   let retries = 0;
+  const errorCodes: string[] = [];
 
   const handleCaptchaTokenGeneration = (): Promise<[string, string]> => {
     return new Promise((resolve, reject) => {
@@ -93,6 +94,7 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
             resolve([token, id]);
           },
           'error-callback': function (errorCode) {
+            errorCodes.push(errorCode);
             /**
              * By setting retry to 'never' the responsibility for implementing retrying is ours
              * https://developers.cloudflare.com/turnstile/reference/client-side-errors/#retrying
@@ -104,7 +106,7 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
               }, 250);
               return;
             }
-            reject([errorCode, id]);
+            reject([errorCodes.join(','), id]);
           },
         });
       } catch (e) {
