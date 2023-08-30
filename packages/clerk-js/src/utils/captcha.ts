@@ -52,6 +52,12 @@ declare global {
 
 const WIDGET_CLASSNAME = 'clerk-captcha';
 
+export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
+  const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300100', '600'];
+
+  return !!(codesWithRetries.includes(errorCode) || codesWithRetries.find(w => errorCode.startsWith(w)));
+};
+
 export async function loadCaptcha(url: string) {
   if (!window.turnstile) {
     try {
@@ -82,7 +88,6 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
         const id = captcha.render(`.${WIDGET_CLASSNAME}`, {
           sitekey,
           retry: 'never',
-          // 'retry-interval': 500,
           'refresh-expired': 'auto',
           callback: function (token: string) {
             resolve([token, id]);
@@ -92,11 +97,11 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
              * By setting retry to 'never' the responsibility for implementing retrying is ours
              * https://developers.cloudflare.com/turnstile/reference/client-side-errors/#retrying
              */
-            if (retries < 2) {
+            if (retries < 2 && shouldRetryTurnstileErrorCode(errorCode)) {
               setTimeout(() => {
                 captcha.reset(id);
                 retries++;
-              }, 500);
+              }, 250);
               return;
             }
             reject([errorCode, id]);
