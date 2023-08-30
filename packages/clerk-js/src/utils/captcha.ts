@@ -47,8 +47,6 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
 
   try {
     captchaToken = await handleCaptchaTokenGeneration();
-  } catch (e) {
-    console.warn(e);
   } finally {
     document.body.removeChild(div);
   }
