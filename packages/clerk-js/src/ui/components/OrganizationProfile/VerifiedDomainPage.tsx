@@ -3,7 +3,7 @@ import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '@cl
 import { CalloutWithAction } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Col, Flex, localizationKeys, Spinner, useLocalizations } from '../../customizables';
+import { Col, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -20,64 +20,35 @@ import {
 import { useFetch, useNavigateToFlowStart } from '../../hooks';
 import { InformationCircle } from '../../icons';
 import { useRouter } from '../../router';
-import { createListFormat, handleError, useFormControl } from '../../utils';
+import { handleError, useFormControl } from '../../utils';
 import { LinkButtonWithDescription } from '../UserProfile/LinkButtonWithDescription';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 const useCalloutLabel = (
   domain: OrganizationDomainResource | null,
   {
-    prefix: prefixLocalKey,
-    suffix: suffixLocalKey,
+    infoLabel: infoLabelKey,
   }: {
-    prefix: LocalizationKey;
-    suffix: LocalizationKey;
+    infoLabel: LocalizationKey;
   },
 ) => {
-  const { locale, t } = useLocalizations();
-
   const totalInvitations = domain?.totalPendingInvitations || 0;
   const totalSuggestions = domain?.totalPendingSuggestions || 0;
   const totalPending = totalSuggestions + totalInvitations;
 
-  if (totalPending <= 0) {
-    return '';
+  if (totalPending === 0) {
+    return [] as string[];
   }
 
-  const prefix = t(prefixLocalKey);
-
-  const suffix = t(suffixLocalKey);
-  const dynamicPart = [];
-
-  if (totalInvitations) {
-    dynamicPart.push(
-      t(
-        localizationKeys(
-          `organizationProfile.verifiedDomainPage.enrollmentTab.calloutLabels.${
-            totalInvitations > 1 ? 'pendingInvitationCount_many' : 'pendingInvitationCount_single'
-          }`,
-          { count: totalInvitations },
-        ),
-      ),
-    );
-  }
-
-  if (totalSuggestions) {
-    dynamicPart.push(
-      t(
-        localizationKeys(
-          `organizationProfile.verifiedDomainPage.enrollmentTab.calloutLabels.${
-            totalSuggestions > 1 ? 'pendingSuggestionCount_many' : 'pendingSuggestionCount_single'
-          }`,
-          { count: totalSuggestions },
-        ),
-      ),
-    );
-  }
-
-  const dynamicPartText = createListFormat(dynamicPart, locale);
-
-  return `${prefix} ${dynamicPartText} ${suffix}`;
+  return [
+    infoLabelKey,
+    localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutInvitationCountLabel`, {
+      count: totalInvitations,
+    }),
+    localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutSuggestionCountLabel`, {
+      count: totalInvitations,
+    }),
+  ];
 };
 
 export const VerifiedDomainPage = withCardStateProvider(() => {
@@ -165,21 +136,11 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   });
 
   const calloutLabel = useCalloutLabel(domain, {
-    prefix: localizationKeys(
-      `organizationProfile.verifiedDomainPage.enrollmentTab.calloutLabels.${
-        (domain?.totalPendingInvitations || 0) > 1 ? 'prefix_many' : 'prefix_single'
-      }`,
-    ),
-    suffix: localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutLabels.suffix`),
+    infoLabel: localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutInfoLabel`),
   });
 
   const dangerCalloutLabel = useCalloutLabel(domain, {
-    prefix: localizationKeys(`organizationProfile.verifiedDomainPage.dangerTab.calloutLabels.prefix`),
-    suffix: localizationKeys(
-      `organizationProfile.verifiedDomainPage.dangerTab.calloutLabels.${
-        (domain?.totalPendingSuggestions || 0) > 1 ? 'suffix_many' : 'suffix_single'
-      }`,
-    ),
+    infoLabel: localizationKeys(`organizationProfile.verifiedDomainPage.dangerTab.calloutInfoLabel`),
   });
 
   const updateEnrollmentMode = async () => {
@@ -254,11 +215,23 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
               direction={'col'}
               gap={4}
             >
-              {calloutLabel && (
-                <CalloutWithAction
-                  text={calloutLabel}
-                  icon={InformationCircle}
-                />
+              {calloutLabel.length > 0 && (
+                <CalloutWithAction icon={InformationCircle}>
+                  {calloutLabel.map((label, index) => (
+                    <Text
+                      key={index}
+                      as={'span'}
+                      sx={[
+                        t => ({
+                          lineHeight: t.lineHeights.$short,
+                          color: 'inherit',
+                          display: 'block',
+                        }),
+                      ]}
+                      localizationKey={label}
+                    />
+                  ))}
+                </CalloutWithAction>
               )}
               <Header.Root>
                 <Header.Subtitle
@@ -295,11 +268,23 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                 gap={4}
                 sx={{ width: '100%' }}
               >
-                {dangerCalloutLabel && (
-                  <CalloutWithAction
-                    text={dangerCalloutLabel}
-                    icon={InformationCircle}
-                  />
+                {dangerCalloutLabel.length > 0 && (
+                  <CalloutWithAction icon={InformationCircle}>
+                    {dangerCalloutLabel.map((label, index) => (
+                      <Text
+                        key={index}
+                        as={'span'}
+                        sx={[
+                          t => ({
+                            lineHeight: t.lineHeights.$short,
+                            color: 'inherit',
+                            display: 'block',
+                          }),
+                        ]}
+                        localizationKey={label}
+                      />
+                    ))}
+                  </CalloutWithAction>
                 )}
                 <Col
                   sx={t => ({

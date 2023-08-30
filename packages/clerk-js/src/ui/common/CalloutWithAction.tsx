@@ -1,17 +1,17 @@
-import type { ComponentType, MouseEvent } from 'react';
+import type { ComponentType, MouseEvent, PropsWithChildren } from 'react';
 
 import { Col, Flex, Link, Text, Icon } from '../customizables';
 import type { LocalizationKey } from '../localization';
 import type { ThemableCssProp } from '../styledSystem';
 
 type CalloutWithActionProps = {
-  text: LocalizationKey | string;
+  text?: LocalizationKey | string;
   textSx?: ThemableCssProp;
   actionLabel?: LocalizationKey;
   onClick?: (e: MouseEvent<HTMLAnchorElement>) => Promise<any>;
   icon: ComponentType;
 };
-export const CalloutWithAction = (props: CalloutWithActionProps) => {
+export const CalloutWithAction = (props: PropsWithChildren<CalloutWithActionProps>) => {
   const { icon, text, textSx, actionLabel, onClick: onClickProp } = props;
 
   const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -19,6 +19,8 @@ export const CalloutWithAction = (props: CalloutWithActionProps) => {
       void onClickProp?.(e);
     }
   };
+
+  console.log(props.children);
 
   return (
     <Flex
@@ -46,7 +48,9 @@ export const CalloutWithAction = (props: CalloutWithActionProps) => {
               textSx,
             ]}
             localizationKey={text}
-          />
+          >
+            {props.children}
+          </Text>
 
           {actionLabel && (
             <Link
