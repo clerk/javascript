@@ -79,7 +79,11 @@ export class SignUp extends BaseResource implements SignUpResource {
           scriptUrl: experimental_captchaURL,
         });
       } catch (e) {
-        captchaError = e;
+        if (e.captchaError) {
+          captchaError = e.captchaError;
+        } else {
+          throw e;
+        }
       }
     }
 

@@ -58,7 +58,7 @@ export async function loadCaptcha(url: string) {
       await loadScript(url, { defer: true });
     } catch (_) {
       // Rethrow with specific message
-      clerkFailedToLoadThirdPartyScript();
+      clerkFailedToLoadThirdPartyScript('Cloudflare Turnstile');
     }
   }
   return window.turnstile;
@@ -122,6 +122,9 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
       // After a failed challenge remove it
       captcha.remove(id);
     }
+    throw {
+      captchaError: e,
+    };
   } finally {
     // After challenge has run remove node element attached
     document.body.removeChild(div);
