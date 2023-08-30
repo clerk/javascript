@@ -34,20 +34,24 @@ export const getAuthAuthHeaderMissing = () =>
 export const authAuthHeaderMissing = () =>
   "Clerk: auth() was called but it looks like you aren't using `authMiddleware` in your middleware file. Please use `authMiddleware` and make sure your middleware matcher is configured correctly and it matches this route or page. See https://clerk.com/docs/quickstarts/get-started-with-nextjs";
 
+export const clockSkewDetected = (verifyMessage: string) =>
+  `Clerk: Clock skew detected. This usually means that your server's system clock is inaccurate. Clerk will continuously try to issue new tokens, as the existing ones will be treated as "expired" due to clock skew.
+
+To resolve this issue, make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
+
+---
+
+${verifyMessage}`;
+
 export const infiniteRedirectLoopDetected = () =>
   `Clerk: Infinite redirect loop detected. That usually means that we were not able to determine the auth state for this request. A list of common causes and solutions follows.
 
 Reason 1:
-Your server's system clock is inaccurate. Clerk will continuously try to issue new tokens, as the existing ones will be treated as "expired" due to clock skew.
-How to resolve:
--> Make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
-
-Reason 2:
 Your Clerk instance keys are incorrect, or you recently changed keys (Publishable Key, Secret Key).
 How to resolve:
 -> Make sure you're using the correct keys from the Clerk Dashboard. If you changed keys recently, make sure to clear your browser application data and cookies.
 
-Reason 3:
+Reason 2:
 A bug that may have already been fixed in the latest version of Clerk NextJS package.
 How to resolve:
 -> Make sure you are using the latest version of '@clerk/nextjs' and 'next'.
