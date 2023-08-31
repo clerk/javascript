@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.56.2
+
+### Patch Changes
+
+- Set SameSite=Lax for dev browser cookie, instead of Strict, so that it can be read from the server after redirects ([#1638](https://github.com/clerkinc/javascript/pull/1638)) by [@yourtallness](https://github.com/yourtallness)
+
 ## 4.56.1
 
 ### Patch Changes
