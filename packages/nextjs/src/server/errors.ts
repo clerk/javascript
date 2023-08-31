@@ -35,7 +35,7 @@ export const authAuthHeaderMissing = () =>
   "Clerk: auth() was called but it looks like you aren't using `authMiddleware` in your middleware file. Please use `authMiddleware` and make sure your middleware matcher is configured correctly and it matches this route or page. See https://clerk.com/docs/quickstarts/get-started-with-nextjs";
 
 export const clockSkewDetected = (verifyMessage: string) =>
-  `Clerk: Clock skew detected. This usually means that your server's system clock is inaccurate. Clerk will continuously try to issue new tokens, as the existing ones will be treated as "expired" due to clock skew.
+  `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will continuously try to issue new tokens, as the existing ones will be treated as "expired" due to clock skew.
 
 To resolve this issue, make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
 
