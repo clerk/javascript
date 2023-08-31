@@ -57,3 +57,4 @@ export * from './Section';
 export * from './PreviewButton';
 export * from './InformationBox';
 export * from './withAvatarShimmer';
+export * from './withAuthHref';
