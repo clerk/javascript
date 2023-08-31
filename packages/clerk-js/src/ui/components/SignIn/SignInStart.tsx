@@ -288,7 +288,7 @@ export function _SignInStart(): JSX.Element {
             <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
             <Footer.ActionLink
               localizationKey={localizationKeys('signIn.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signUpUrl)}
+              to={signUpUrl}
             />
           </Footer.Action>
           <Footer.Links />
