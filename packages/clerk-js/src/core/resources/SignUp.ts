@@ -67,30 +67,22 @@ export class SignUp extends BaseResource implements SignUpResource {
   }
 
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
-    let paramsWithCaptcha: Record<string, unknown> = params;
-    let captchaToken = '';
-    let captchaError = '';
+    const paramsWithCaptcha: Record<string, unknown> = params;
     const { experimental_captchaSiteKey, experimental_canUseCaptcha, experimental_captchaURL } = SignUp.clerk;
 
     if (experimental_canUseCaptcha && experimental_captchaSiteKey && experimental_captchaURL) {
       try {
-        captchaToken = await getCaptchaToken({
+        paramsWithCaptcha.captchaToken = await getCaptchaToken({
           siteKey: experimental_captchaSiteKey,
           scriptUrl: experimental_captchaURL,
         });
       } catch (e) {
         if (e.captchaError) {
-          captchaError = e.captchaError;
+          paramsWithCaptcha.captchaError = e.captchaError;
         } else {
           throw e;
         }
       }
-    }
-
-    if (captchaToken) {
-      paramsWithCaptcha = { ...paramsWithCaptcha, captchaToken };
-    } else if (captchaError) {
-      paramsWithCaptcha = { ...paramsWithCaptcha, captchaError };
     }
 
     return this._basePost({
