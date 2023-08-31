@@ -1,6 +1,6 @@
 import { shouldRetryTurnstileErrorCode } from '../captcha';
 
-describe('wow', () => {
+describe('shouldRetryTurnstileErrorCode', () => {
   it.each([
     ['crashed', true],
     ['undefined_error', true],
@@ -17,7 +17,7 @@ describe('wow', () => {
     ['100405', false],
     ['105001', false],
     ['110430', false],
-  ])('validates the frontendApi format', (str, expected) => {
+  ])('should the error code %s trigger a retry: %s', (str, expected) => {
     expect(shouldRetryTurnstileErrorCode(str)).toBe(expected);
   });
 });

@@ -55,7 +55,7 @@ const WIDGET_CLASSNAME = 'clerk-captcha';
 export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300100', '600'];
 
-  return !!(codesWithRetries.includes(errorCode) || codesWithRetries.find(w => errorCode.startsWith(w)));
+  return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
 export async function loadCaptcha(url: string) {
