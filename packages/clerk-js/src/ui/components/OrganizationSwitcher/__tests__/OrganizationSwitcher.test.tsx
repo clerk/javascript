@@ -26,7 +26,7 @@ describe('OrganizationSwitcher', () => {
       });
       props.setProps({ hidePersonal: false });
       const { getByText } = render(<OrganizationSwitcher />, { wrapper });
-      expect(getByText('Personal Workspace')).toBeDefined();
+      expect(getByText('Personal account')).toBeDefined();
     });
 
     it('does not show the personal workspace when disabled', async () => {
@@ -94,7 +94,7 @@ describe('OrganizationSwitcher', () => {
       const { getAllByText, getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
       expect(getAllByText('Org1')).not.toBeNull();
-      expect(getByText('Personal Workspace')).toBeDefined();
+      expect(getByText('Personal account')).toBeDefined();
       expect(getByText('Org2')).toBeDefined();
     });
 
@@ -293,7 +293,7 @@ describe('OrganizationSwitcher', () => {
       fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
       const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      await userEvent.click(getByText(/Personal workspace/i));
+      await userEvent.click(getByText(/Personal account/i));
 
       expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
         expect.objectContaining({
