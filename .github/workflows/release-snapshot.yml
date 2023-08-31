@@ -53,18 +53,28 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const fs = require('fs');
-            const files = await (await glob.create('./packages/*/package.json')).glob();
-            const descriptors = files.map(file => {
-              const { name, version } = JSON.parse(fs.readFileSync(file, 'utf8'));
-              return { name, version };
-            });
-
+            const fs = require("fs");
+            const files = await (await glob.create("./packages/*/package.json")).glob();
+            const descriptors = files
+              .map((file) => {
+                const { name, version } = JSON.parse(fs.readFileSync(file, "utf8"));
+                return { name, version };
+              })
+              .filter(({ version }) => version.includes("-snapshot"));
+            
             let table = `| Package | Version |\n| --- | --- |\n`;
-            descriptors.forEach(({ name, version }) => { table += `| ${name} | ${version} |\n` });
-            const snippets = descriptors.map(({ name, version }) => `\`\`\`sh\n# ${name}\nnpm i ${name}@${version}\n\`\`\``).join('\n');
-            core.setOutput('table', table);
-            core.setOutput('snippets', snippets);
+            descriptors.forEach(({ name, version }) => {
+              table += `| ${name} | ${version} |\n`;
+            });
+            const snippets = descriptors
+              .map(
+                ({ name, version }) =>
+                  `\`\`\`sh\n# ${name}\nnpm i ${name}@${version}\n\`\`\``
+              )
+              .join("\n");
+            core.setOutput("table", table);
+            core.setOutput("snippets", snippets);
+          
 
       - name: Update Comment
         if: steps.version-packages.outputs.success == '1'
