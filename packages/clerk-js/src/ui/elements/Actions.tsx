@@ -27,6 +27,7 @@ export const SecondaryActions = (props: PropsOfComponent<typeof Flex>) => {
 
 type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
   icon: React.ComponentType;
+  trailing?: React.ReactNode;
   label: LocalizationKey;
   iconBoxElementDescriptor?: ElementDescriptor;
   iconBoxElementId?: ElementId;
@@ -50,6 +51,7 @@ export const Action = (props: ActionProps) => {
     textElementId,
     iconBoxElementDescriptor,
     iconBoxElementId,
+    trailing,
     ...rest
   } = props;
 
@@ -115,6 +117,7 @@ export const Action = (props: ActionProps) => {
         variant='smallRegular'
         colorScheme='neutral'
       />
+      {trailing}
     </Button>
   );
 };
