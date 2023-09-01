@@ -1,17 +1,17 @@
 import { forwardRef } from 'react';
 
+import { NotificationCountBadge } from '../../common';
 import {
   useCoreOrganization,
   useCoreOrganizationList,
   useCoreUser,
+  useEnvironment,
   useOrganizationSwitcherContext,
 } from '../../contexts';
-import { Box, Button, descriptors, Icon, localizationKeys, NotificationBadge } from '../../customizables';
+import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview, withAvatarShimmer } from '../../elements';
-import { useDelayedVisibility, usePrefersReducedMotion } from '../../hooks';
 import { Selector } from '../../icons';
-import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
-import { animations } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { organizationListParams } from './utils';
 
 type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & {
@@ -58,7 +58,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
           />
         )}
 
-        <NotificationCountBadge />
+        <NotificationCountBadgeSwitcherTrigger />
 
         <Icon
           elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
@@ -69,35 +69,28 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
     );
   }),
 );
-
-const NotificationCountBadge = () => {
-  const prefersReducedMotion = usePrefersReducedMotion();
-
+const NotificationCountBadgeSwitcherTrigger = () => {
   /**
    * Prefetch user invitations and suggestions
    */
   const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
-  const notificationCount = (userInvitations.count || 0) + (userSuggestions.count || 0);
-  const showNotification = useDelayedVisibility(notificationCount > 0, 350) || false;
-
-  const enterExitAnimation: ThemableCssProp = t => ({
-    animation: prefersReducedMotion
-      ? 'none'
-      : `${notificationCount ? animations.notificationAnimation : animations.outAnimation} ${
-          t.transitionDuration.$textField
-        } ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`,
+  const { membership } = useCoreOrganization();
+  const { organizationSettings } = useEnvironment();
+  const isAdmin = membership?.role === 'admin';
+  const allowRequests = organizationSettings?.domains?.enabled && isAdmin;
+  const { membershipRequests } = useCoreOrganization({
+    membershipRequests: allowRequests || undefined,
   });
 
+  const notificationCount =
+    (userInvitations.count || 0) + (userSuggestions.count || 0) + (membershipRequests?.count || 0);
+
   return (
-    <Box
-      sx={t => ({
-        position: 'relative',
-        width: t.sizes.$4,
-        height: t.sizes.$4,
+    <NotificationCountBadge
+      containerSx={t => ({
         marginLeft: `${t.space.$2}`,
       })}
-    >
-      {showNotification && <NotificationBadge sx={enterExitAnimation}>{notificationCount}</NotificationBadge>}
-    </Box>
+      notificationCount={notificationCount}
+    />
   );
 };
