@@ -25,8 +25,6 @@ Please note we have a [code of conduct](https://github.com/clerkinc/javascript/b
 
 ## Developing locally
 
-This section is a work-in-progress. More details will be added soon.
-
 ### Monorepo setup
 
 The current monorepo setup is based on:
@@ -65,14 +63,6 @@ To set up your development environment, please follow these steps:
    ```
 
 For package specific setup, refer to the `Build` section of the specific package (eg packages/<package_name>/README.md#build).
-
-### Making changes to packages
-
-WIP
-
-### Making changes to the hot-loaded `clerk-js`
-
-WIP
 
 ## Opening a Pull Request
 
