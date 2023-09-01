@@ -2,11 +2,13 @@ import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { runIfFunctionOrReturn } from '../../../utils';
+import { NotificationCountBadge } from '../../common';
 import {
   useCoreClerk,
   useCoreOrganization,
   useCoreOrganizationList,
   useCoreUser,
+  useEnvironment,
   useOrganizationSwitcherContext,
 } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
@@ -112,6 +114,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         icon={CogFilled}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={handleManageOrganizationClicked}
+        trailing={<NotificationCountBadgeManageButton />}
       />
     );
 
@@ -167,3 +170,16 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     );
   },
 );
+
+const NotificationCountBadgeManageButton = () => {
+  const { membership } = useCoreOrganization();
+  const { organizationSettings } = useEnvironment();
+  const isAdmin = membership?.role === 'admin';
+  const allowRequests = organizationSettings?.domains?.enabled && isAdmin;
+
+  const { membershipRequests } = useCoreOrganization({
+    membershipRequests: allowRequests || undefined,
+  });
+
+  return <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />;
+};
