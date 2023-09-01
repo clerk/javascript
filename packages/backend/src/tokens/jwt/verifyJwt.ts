@@ -210,6 +210,7 @@ export async function verifyJwt(
     const early = notBeforeDate.getTime() > currentDate.getTime() + clockSkew;
     if (early) {
       throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.EnsureClockSync,
         reason: TokenVerificationErrorReason.TokenNotActiveYet,
         message: `JWT cannot be used prior to not before date claim (nbf). Not before date: ${notBeforeDate}; Current date: ${currentDate};`,
       });

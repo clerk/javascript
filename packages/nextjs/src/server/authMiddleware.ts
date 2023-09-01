@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/backend';
+import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
@@ -9,7 +9,12 @@ import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
 import { SECRET_KEY } from './clerkClient';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
-import { infiniteRedirectLoopDetected, informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
+import {
+  clockSkewDetected,
+  infiniteRedirectLoopDetected,
+  informAboutProtectedRouteInfo,
+  receivedRequestForIgnoredRoute,
+} from './errors';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
 import { isDevAccountPortalOrigin } from './url';
@@ -187,8 +192,11 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return handleUnknownState(requestState);
     } else if (requestState.isInterstitial) {
       logger.debug('authenticateRequest state is interstitial', requestState);
+
+      assertClockSkew(requestState, options);
+
       const res = handleInterstitialState(requestState, options);
-      return assertInfiniteRedirectionLoop(req, res, options);
+      return assertInfiniteRedirectionLoop(req, res, options, requestState);
     }
 
     const auth = Object.assign(requestState.toAuth(), {
@@ -334,6 +342,19 @@ const isRequestMethodIndicatingApiRoute = (req: NextRequest): boolean => {
   return !['get', 'head', 'options'].includes(requestMethod);
 };
 
+/**
+ * In development, attempt to detect clock skew based on the requestState. This check should run when requestState.isInterstitial is true. If detected, we throw an error.
+ */
+const assertClockSkew = (requestState: RequestState, opts: AuthMiddlewareParams): void => {
+  if (!isDevelopmentFromApiKey(opts.secretKey || SECRET_KEY)) {
+    return;
+  }
+
+  if (requestState.reason === 'token-not-active-yet') {
+    throw new Error(clockSkewDetected(requestState.message));
+  }
+};
+
 // When in development, we want to prevent infinite interstitial redirection loops.
 // We incrementally set a `__clerk_redirection_loop` cookie, and when it loops 6 times, we throw an error.
 // We also utilize the `referer` header to skip the prefetch requests.
@@ -341,6 +362,7 @@ const assertInfiniteRedirectionLoop = (
   req: NextRequest,
   res: NextResponse,
   opts: AuthMiddlewareParams,
+  requestState: RequestState,
 ): NextResponse => {
   if (!isDevelopmentFromApiKey(opts.secretKey || SECRET_KEY)) {
     return res;
@@ -348,6 +370,13 @@ const assertInfiniteRedirectionLoop = (
 
   const infiniteRedirectsCounter = Number(req.cookies.get(INFINITE_REDIRECTION_LOOP_COOKIE)?.value) || 0;
   if (infiniteRedirectsCounter === 6) {
+    // Infinite redirect detected, is it clock skew?
+    // We check for token-expired here because it can be a valid, recoverable scenario, but in a redirect loop a token-expired error likely indicates clock skew.
+    if (requestState.reason === 'token-expired') {
+      throw new Error(clockSkewDetected(requestState.message));
+    }
+
+    // Not clock skew, return general error
     throw new Error(infiniteRedirectLoopDetected());
   }
 
