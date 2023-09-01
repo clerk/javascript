@@ -20,6 +20,7 @@ export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'el
   rounded?: boolean;
   elementId?: UserPreviewId;
   avatarSx?: ThemableCssProp;
+  mainIdentifierSx?: ThemableCssProp;
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
   showAvatar?: boolean;
@@ -57,6 +58,7 @@ export const UserPreview = (props: UserPreviewProps) => {
     title,
     subtitle,
     avatarSx,
+    mainIdentifierSx,
     ...rest
   } = props;
   const { t } = useLocalizations();
@@ -126,7 +128,7 @@ export const UserPreview = (props: UserPreviewProps) => {
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
           colorScheme='inherit'
-          sx={theme => ({ display: 'flex', gap: theme.sizes.$1, alignItems: 'center' })}
+          sx={[theme => ({ display: 'flex', gap: theme.sizes.$1, alignItems: 'center' }), mainIdentifierSx]}
         >
           <Text
             as='span'

@@ -4,11 +4,15 @@ import { useCardState } from './contexts';
 
 type PreviewButtonProps = Omit<PropsOfComponent<typeof Button>, 'icon'> & {
   icon?: React.ComponentType;
+  iconProps?: Omit<PropsOfComponent<typeof Icon>, 'icon'>;
+  showIconOnHover?: boolean;
 };
 
 export const PreviewButton = (props: PreviewButtonProps) => {
-  const { sx, children, icon, ...rest } = props;
+  const { sx, children, icon, iconProps, showIconOnHover = true, ...rest } = props;
   const card = useCardState();
+
+  const { sx: iconSx, ...restIconProps } = iconProps || {};
 
   return (
     <Button
@@ -24,9 +28,13 @@ export const PreviewButton = (props: PreviewButtonProps) => {
           height: t.space.$12,
           justifyContent: 'space-between',
           padding: `${t.space.$3} ${t.space.$6}`,
-          ':hover > svg': {
-            visibility: 'initial',
-          },
+          ...(showIconOnHover
+            ? {
+                ':hover > svg': {
+                  visibility: 'initial',
+                },
+              }
+            : {}),
         }),
         sx,
       ]}
@@ -36,7 +44,15 @@ export const PreviewButton = (props: PreviewButtonProps) => {
       {icon && (
         <Icon
           icon={icon}
-          sx={t => ({ color: t.colors.$blackAlpha500, marginLeft: t.space.$2, visibility: 'hidden' })}
+          sx={[
+            t => ({
+              color: t.colors.$blackAlpha500,
+              marginLeft: t.space.$2,
+              visibility: showIconOnHover ? 'hidden' : 'initial',
+            }),
+            iconSx,
+          ]}
+          {...restIconProps}
         />
       )}
     </Button>

@@ -1,3 +1,4 @@
+import { NotificationCountBadge } from '../../common';
 import { useCoreOrganization, useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
@@ -21,11 +22,13 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
   const { membership } = useCoreOrganization();
+  const isAdmin = membership?.role === 'admin';
+  const allowRequests = organizationSettings?.domains?.enabled && isAdmin;
+  const { membershipRequests } = useCoreOrganization({
+    membershipRequests: allowRequests || undefined,
+  });
   //@ts-expect-error
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
-  const isAdmin = membership?.role === 'admin';
-
-  const allowRequests = organizationSettings?.domains?.enabled && isAdmin;
 
   return (
     <Col
@@ -55,7 +58,9 @@ export const OrganizationMembers = withCardStateProvider(() => {
               />
             )}
             {allowRequests && (
-              <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')} />
+              <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
+                <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />
+              </Tab>
             )}
           </TabsList>
           <TabPanels>

@@ -528,7 +528,7 @@ export const enUS: LocalizationResource = {
     action__addAccount: 'Add account',
   },
   organizationSwitcher: {
-    personalWorkspace: 'Personal Workspace',
+    personalWorkspace: 'Personal account',
     notSelected: 'No organization selected',
     action__createOrganization: 'Create Organization',
     action__manageOrganization: 'Manage Organization',
@@ -616,11 +616,15 @@ export const enUS: LocalizationResource = {
         automaticSuggestionOption__description:
           'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
         formButton__save: 'Save',
+        calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
+        calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
+        calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
       },
       dangerTab: {
         removeDomainTitle: 'Remove domain',
         removeDomainSubtitle: 'Remove this domain from your verified domains',
         removeDomainActionLabel__remove: 'Remove domain',
+        calloutInfoLabel: 'Removing this domain will affect invited users.',
       },
     },
     invitePage: {

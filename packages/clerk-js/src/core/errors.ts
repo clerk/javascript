@@ -103,3 +103,7 @@ export function clerkMissingSignInUrlAsSatellite(): never {
 export function clerkRedirectUrlIsMissingScheme(): never {
   throw new Error(`${errorPrefix} Invalid redirect_url. A valid http or https url should be used for the redirection.`);
 }
+
+export function clerkFailedToLoadThirdPartyScript(name?: string): never {
+  throw new Error(`${errorPrefix} Unable to retrieve a third party script${name ? ` ${name}` : ''}.`);
+}

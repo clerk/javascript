@@ -20,6 +20,7 @@ export type CreateAuthenticateRequestOptions = {
       | 'proxyUrl'
       | 'domain'
       | 'isSatellite'
+      | 'userAgent'
     >
   >;
   apiClient: ApiClient;
@@ -39,6 +40,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     isSatellite: buildtimeIsSatellite = false,
     domain: buildtimeDomain = '',
     audience: buildtimeAudience = '',
+    userAgent: buildUserAgent,
   } = params.options;
 
   const authenticateRequest = ({
@@ -94,6 +96,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     proxyUrl: runtimeProxyUrl,
     isSatellite: runtimeIsSatellite,
     domain: runtimeDomain,
+    userAgent: runtimeUserAgent,
     ...rest
   }: LoadInterstitialOptions) => {
     return loadInterstitialFromBAPI({
@@ -104,6 +107,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       proxyUrl: (runtimeProxyUrl || buildProxyUrl) as any,
       isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
       domain: (runtimeDomain || buildtimeDomain) as any,
+      userAgent: runtimeUserAgent || buildUserAgent,
     });
   };
 

@@ -11,6 +11,7 @@ export type OrganizationPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'elem
   user?: UserResource;
   size?: 'lg' | 'md' | 'sm';
   avatarSx?: ThemableCssProp;
+  mainIdentifierSx?: ThemableCssProp;
   icon?: React.ReactNode;
   badge?: React.ReactNode;
   rounded?: boolean;
@@ -18,7 +19,19 @@ export type OrganizationPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'elem
 };
 
 export const OrganizationPreview = (props: OrganizationPreviewProps) => {
-  const { organization, size = 'md', icon, rounded = false, badge, sx, user, avatarSx, elementId, ...rest } = props;
+  const {
+    organization,
+    size = 'md',
+    icon,
+    rounded = false,
+    badge,
+    sx,
+    user,
+    avatarSx,
+    mainIdentifierSx,
+    elementId,
+    ...rest
+  } = props;
   const role = user?.organizationMemberships.find(membership => membership.organization.id === organization.id)?.role;
 
   return (
@@ -56,9 +69,10 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         <Text
           elementDescriptor={descriptors.organizationPreviewMainIdentifier}
           elementId={descriptors.organizationPreviewMainIdentifier.setId(elementId)}
-          variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
+          variant={({ sm: 'smallMedium', md: 'regularMedium', lg: 'regularMedium' } as const)[size]}
           colorScheme='inherit'
           truncate
+          sx={mainIdentifierSx}
         >
           {organization.name} {badge}
         </Text>

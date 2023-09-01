@@ -2,7 +2,7 @@ import { createContextAndHook } from '@clerk/shared';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { Button, descriptors, Flex } from '../customizables';
+import { Button, descriptors, Flex, useLocalizations } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { getValidChildren } from '../utils';
 
@@ -87,7 +87,8 @@ export const TabsList = (props: TabsListProps) => {
 type TabProps = PropsOfComponent<typeof Button>;
 type TabPropsWithTabIndex = TabProps & { tabIndex?: number };
 export const Tab = (props: TabProps) => {
-  const { children, sx, tabIndex, isDisabled, ...rest } = props as TabPropsWithTabIndex;
+  const { t } = useLocalizations();
+  const { children, sx, tabIndex, isDisabled, localizationKey, ...rest } = props as TabPropsWithTabIndex;
 
   if (tabIndex === undefined) {
     throw new Error('Tab component must be a direct child of TabList.');
@@ -145,6 +146,7 @@ export const Tab = (props: TabProps) => {
       ]}
       {...rest}
     >
+      {t(localizationKey)}
       {children}
     </Button>
   );

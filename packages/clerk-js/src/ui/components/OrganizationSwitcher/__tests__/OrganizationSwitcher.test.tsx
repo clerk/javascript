@@ -26,7 +26,7 @@ describe('OrganizationSwitcher', () => {
       });
       props.setProps({ hidePersonal: false });
       const { getByText } = render(<OrganizationSwitcher />, { wrapper });
-      expect(getByText('Personal Workspace')).toBeDefined();
+      expect(getByText('Personal account')).toBeDefined();
     });
 
     it('does not show the personal workspace when disabled', async () => {
@@ -71,6 +71,46 @@ describe('OrganizationSwitcher', () => {
         });
       });
     });
+
+    it('shows the counter for pending suggestions and invitations and membership requests', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationDomains();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(
+        Promise.resolve({
+          data: [],
+          total_count: 2,
+        }),
+      );
+
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
+        Promise.resolve({
+          data: [],
+          total_count: 2,
+        }),
+      );
+
+      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
+        Promise.resolve({
+          data: [],
+          total_count: 3,
+        }),
+      );
+
+      await runFakeTimers(async () => {
+        const { getByText } = render(<OrganizationSwitcher />, { wrapper });
+
+        await waitFor(() => {
+          expect(getByText('7')).toBeInTheDocument();
+        });
+      });
+    });
   });
 
   describe('OrganizationSwitcherPopover', () => {
@@ -94,7 +134,7 @@ describe('OrganizationSwitcher', () => {
       const { getAllByText, getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
       expect(getAllByText('Org1')).not.toBeNull();
-      expect(getByText('Personal Workspace')).toBeDefined();
+      expect(getByText('Personal account')).toBeDefined();
       expect(getByText('Org2')).toBeDefined();
     });
 
@@ -293,7 +333,7 @@ describe('OrganizationSwitcher', () => {
       fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
       const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      await userEvent.click(getByText(/Personal workspace/i));
+      await userEvent.click(getByText(/Personal account/i));
 
       expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
         expect.objectContaining({
