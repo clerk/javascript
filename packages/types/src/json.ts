@@ -362,6 +362,8 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   affiliation_email_address: string | null;
   created_at: number;
   updated_at: number;
+  total_pending_invitations: number;
+  total_pending_suggestions: number;
 }
 
 export interface PublicOrganizationDataJSON {
