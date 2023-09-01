@@ -1,6 +1,7 @@
 export interface TokenCache {
   getToken: (key: string) => Promise<string | undefined | null>;
   saveToken: (key: string, token: string) => Promise<void>;
+  clearToken?: (key: string) => void;
 }
 
 const createMemoryTokenCache = (): TokenCache => {
@@ -12,6 +13,9 @@ const createMemoryTokenCache = (): TokenCache => {
     },
     getToken: key => {
       return Promise.resolve(cache[key]);
+    },
+    clearToken: key => {
+      delete cache[key];
     },
   };
 };

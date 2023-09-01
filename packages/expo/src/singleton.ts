@@ -14,7 +14,14 @@ type BuildClerkOptions = {
 };
 
 export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrowserClerk {
-  if (!clerk) {
+  // Support "hot-swapping" the Clerk instance at runtime. See JS-598 for additional details.
+  const hasKeyChanged = clerk && key !== clerk.publishableKey;
+
+  if (!clerk || hasKeyChanged) {
+    if (hasKeyChanged) {
+      tokenCache.clearToken?.(KEY);
+    }
+
     const getToken = tokenCache.getToken;
     const saveToken = tokenCache.saveToken;
     // TODO: DO NOT ACCEPT THIS

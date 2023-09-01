@@ -25,6 +25,8 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
   return (
     //@ts-expect-error
     <ClerkReactProvider
+      // Force reset the state when the provided key changes, this ensures that the provider does not retain stale state. See JS-598 for additional context.
+      key={key}
       {...rest}
       Clerk={buildClerk({ key, tokenCache })}
       standardBrowser={!isReactNative()}
