@@ -10,6 +10,7 @@ const componentImportPaths = {
     import(/* webpackChunkName: "organizationprofile" */ './../components/OrganizationProfile'),
   OrganizationSwitcher: () =>
     import(/* webpackChunkName: "organizationswitcher" */ './../components/OrganizationSwitcher'),
+  OrganizationList: () => import(/* webpackChunkName: "organizationlist" */ './../components/OrganizationList'),
   ImpersonationFab: () => import(/* webpackChunkName: "impersonationfab" */ './../components/ImpersonationFab'),
 } as const;
 
@@ -50,6 +51,10 @@ export const OrganizationSwitcher = lazy(() =>
   componentImportPaths.OrganizationSwitcher().then(module => ({ default: module.OrganizationSwitcher })),
 );
 
+export const OrganizationList = lazy(() =>
+  componentImportPaths.OrganizationList().then(module => ({ default: module.OrganizationList })),
+);
+
 export const ImpersonationFab = lazy(() =>
   componentImportPaths.ImpersonationFab().then(module => ({ default: module.ImpersonationFab })),
 );
@@ -64,6 +69,7 @@ export const ClerkComponents = {
   UserButton,
   UserProfile,
   OrganizationSwitcher,
+  OrganizationList,
   OrganizationProfile,
   CreateOrganization,
   SignInModal,

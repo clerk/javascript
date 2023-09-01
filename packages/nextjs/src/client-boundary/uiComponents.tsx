@@ -15,6 +15,7 @@ export {
   SignInButton,
   SignUpButton,
   SignOutButton,
+  OrganizationList,
 } from '@clerk/clerk-react';
 
 export const SignIn = (props: SignInProps) => {

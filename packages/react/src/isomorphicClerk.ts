@@ -11,6 +11,7 @@ import type {
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
+  OrganizationListProps,
   OrganizationMembershipResource,
   OrganizationResource,
   RedirectOptions,
@@ -71,6 +72,7 @@ export default class IsomorphicClerk {
   private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps>();
   private premountCreateOrganizationNodes = new Map<HTMLDivElement, CreateOrganizationProps>();
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
+  private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private loadedListeners: Array<() => void> = [];
 
@@ -264,6 +266,10 @@ export default class IsomorphicClerk {
 
     this.premountUserButtonNodes.forEach((props: UserButtonProps, node: HTMLDivElement) => {
       clerkjs.mountUserButton(node, props);
+    });
+
+    this.premountOrganizationListNodes.forEach((props: OrganizationListProps, node: HTMLDivElement) => {
+      clerkjs.mountOrganizationList(node, props);
     });
 
     this.#loaded = true;
@@ -525,6 +531,22 @@ export default class IsomorphicClerk {
       this.clerkjs.unmountOrganizationSwitcher(node);
     } else {
       this.premountOrganizationSwitcherNodes.delete(node);
+    }
+  };
+
+  mountOrganizationList = (node: HTMLDivElement, props: OrganizationListProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.mountOrganizationList(node, props);
+    } else {
+      this.premountOrganizationListNodes.set(node, props);
+    }
+  };
+
+  unmountOrganizationList = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.unmountOrganizationList(node);
+    } else {
+      this.premountOrganizationListNodes.delete(node);
     }
   };
 
