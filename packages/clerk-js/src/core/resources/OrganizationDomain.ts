@@ -20,6 +20,8 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
   affiliationEmailAddress!: string | null;
   createdAt!: Date;
   updatedAt!: Date;
+  totalPendingInvitations!: number;
+  totalPendingSuggestions!: number;
 
   constructor(data: OrganizationDomainJSON) {
     super();
@@ -77,6 +79,8 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
       this.organizationId = data.organization_id;
       this.enrollmentMode = data.enrollment_mode;
       this.affiliationEmailAddress = data.affiliation_email_address;
+      this.totalPendingSuggestions = data.total_pending_suggestions;
+      this.totalPendingInvitations = data.total_pending_invitations;
       if (data.verification) {
         this.verification = {
           status: data.verification.status,

@@ -631,11 +631,15 @@ type _LocalizationResource = {
         automaticSuggestionOption__label: LocalizationValue;
         automaticSuggestionOption__description: LocalizationValue;
         formButton__save: LocalizationValue;
+        calloutInfoLabel: LocalizationValue;
+        calloutInvitationCountLabel: LocalizationValue;
+        calloutSuggestionCountLabel: LocalizationValue;
       };
       dangerTab: {
         removeDomainTitle: LocalizationValue;
         removeDomainSubtitle: LocalizationValue;
         removeDomainActionLabel__remove: LocalizationValue;
+        calloutInfoLabel: LocalizationValue;
       };
     };
     removeDomainPage: {
