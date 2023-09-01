@@ -87,8 +87,9 @@ export default class IsomorphicClerk {
   static getOrCreateInstance(options: IsomorphicClerkOptions) {
     // During SSR: a new instance should be created for every request
     // During CSR: use the cached instance for the whole lifetime of the app
+    // Also will recreate the instance if the provided Clerk instance changes
     // This method should be idempotent in both scenarios
-    if (!inClientSide() || !this.#instance) {
+    if (!inClientSide() || !this.#instance || (options.Clerk && this.#instance.Clerk !== options.Clerk)) {
       this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
