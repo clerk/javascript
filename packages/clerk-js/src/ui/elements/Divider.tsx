@@ -1,10 +1,12 @@
 import { descriptors, Flex, localizationKeys, Text } from '../customizables';
+import type { PropsOfComponent } from '../styledSystem';
 
-export const Divider = () => {
+export const Divider = (props: Omit<PropsOfComponent<typeof Flex>, 'elementDescriptor'>) => {
   return (
     <Flex
       center
       elementDescriptor={descriptors.dividerRow}
+      {...props}
     >
       <DividerLine />
       <Text
