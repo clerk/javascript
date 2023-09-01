@@ -71,6 +71,46 @@ describe('OrganizationSwitcher', () => {
         });
       });
     });
+
+    it('shows the counter for pending suggestions and invitations and membership requests', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationDomains();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(
+        Promise.resolve({
+          data: [],
+          total_count: 2,
+        }),
+      );
+
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
+        Promise.resolve({
+          data: [],
+          total_count: 2,
+        }),
+      );
+
+      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
+        Promise.resolve({
+          data: [],
+          total_count: 3,
+        }),
+      );
+
+      await runFakeTimers(async () => {
+        const { getByText } = render(<OrganizationSwitcher />, { wrapper });
+
+        await waitFor(() => {
+          expect(getByText('7')).toBeInTheDocument();
+        });
+      });
+    });
   });
 
   describe('OrganizationSwitcherPopover', () => {

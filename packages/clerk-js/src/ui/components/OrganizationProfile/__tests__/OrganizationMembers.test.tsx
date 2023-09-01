@@ -3,6 +3,7 @@ import type { OrganizationInvitationResource, OrganizationMembershipResource } f
 import { describe, it } from '@jest/globals';
 
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { OrganizationMembers } from '../OrganizationMembers';
 import { createFakeMember, createFakeOrganizationInvitation, createFakeOrganizationMembershipRequest } from './utils';
 
@@ -130,6 +131,31 @@ describe('OrganizationMembers', () => {
     expect(queryByText('test_user2')).toBeDefined();
     expect(queryByText('First2 Last2')).toBeDefined();
     expect(queryByText('Member')).toBeDefined();
+  });
+
+  it('displays counter in requests tab', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withOrganizationDomains();
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+      });
+    });
+
+    fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(
+      Promise.resolve({
+        data: [],
+        total_count: 2,
+      }),
+    );
+
+    await runFakeTimers(async () => {
+      const { getByText } = render(<OrganizationMembers />, { wrapper });
+      await waitFor(() => {
+        expect(getByText('2')).toBeInTheDocument();
+      });
+    });
   });
 
   it.todo('removes member from organization when clicking the respective button on a user row');
