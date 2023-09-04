@@ -117,6 +117,9 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
   const canSubmit = actionDescription ? confirmationField.value === organizationName : true;
 
   const handleSubmit = async () => {
+    if (!canSubmit) {
+      return;
+    }
     try {
       await onConfirmation().then(() => wizard.nextStep());
     } catch (e) {
