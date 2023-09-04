@@ -101,12 +101,12 @@ const OrganizationDangerSection = () => {
   });
   const { navigate } = useRouter();
 
-  if (!organization || !membership || !adminMembers) {
+  if (!organization || !membership) {
     return null;
   }
 
   const adminDeleteEnabled = organization.adminDeleteEnabled;
-  const hasMoreThanOneAdmin = adminMembers.length > 1;
+  const hasMoreThanOneAdmin = (adminMembers?.length ?? 0) > 1;
   const isAdmin = membership.role === 'admin';
 
   return (
