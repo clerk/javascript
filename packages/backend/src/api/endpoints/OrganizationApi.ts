@@ -80,6 +80,11 @@ type GetPendingOrganizationInvitationListParams = {
   offset?: number;
 };
 
+type GetOrganizationInvitationParams = {
+  organizationId: string;
+  invitationId: string;
+};
+
 type RevokeOrganizationInvitationParams = {
   organizationId: string;
   invitationId: string;
@@ -242,6 +247,17 @@ export class OrganizationAPI extends AbstractAPI {
       method: 'POST',
       path: joinPaths(basePath, organizationId, 'invitations'),
       bodyParams: { ...bodyParams },
+    });
+  }
+
+  public async getOrganizationInvitation(params: GetOrganizationInvitationParams) {
+    const { organizationId, invitationId } = params;
+    this.requireId(organizationId);
+    this.requireId(invitationId);
+
+    return this.request<OrganizationInvitation>({
+      method: 'GET',
+      path: joinPaths(basePath, organizationId, 'invitations', invitationId),
     });
   }
 
