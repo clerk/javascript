@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "4.24.0",
+  "version": "4.24.1",
   "license": "MIT",
   "description": "Clerk React library",
   "keywords": [

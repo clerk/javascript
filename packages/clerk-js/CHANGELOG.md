@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.56.3
+
+### Patch Changes
+
+- Display a notification counter for admins with pending request in the active organization. The counter is it visible in OrganizationSwitcher and OrganizationProfile ("Requests" tab) ([#1670](https://github.com/clerkinc/javascript/pull/1670)) by [@panteliselef](https://github.com/panteliselef)
+
+- Previously users could leave or delete an organization by submiting the form without the macthing organization name ([#1677](https://github.com/clerkinc/javascript/pull/1677)) by [@panteliselef](https://github.com/panteliselef)
+
+- Support swapping the Clerk publishableKey at runtime to allow users to toggle the instance being used. ([#1655](https://github.com/clerkinc/javascript/pull/1655)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`169bc3d26`](https://github.com/clerkinc/javascript/commit/169bc3d26a0b5422183af07f57da742861225985)]:
+  - @clerk/localizations@1.25.1
+
 ## 4.56.2
 
 ### Patch Changes
