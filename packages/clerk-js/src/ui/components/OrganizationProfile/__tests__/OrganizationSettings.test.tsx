@@ -87,6 +87,92 @@ describe('OrganizationSettings', () => {
     });
   });
 
+  describe('Danger section', () => {
+    it('always displays danger section and the leave organization button', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve([]));
+      const { getByText, queryByRole } = render(<OrganizationSettings />, { wrapper });
+      await waitFor(() => {
+        expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
+        expect(getByText('Danger')).toBeDefined();
+        expect(getByText(/leave organization/i).closest('button')).toBeInTheDocument();
+        expect(queryByRole('button', { name: /delete organization/i })).not.toBeInTheDocument();
+      });
+    });
+
+    it('enabled leave organization button with delete organization button', async () => {
+      const adminsList: OrganizationMembershipResource[] = [
+        createFakeMember({
+          id: '1',
+          orgId: '1',
+          role: 'admin',
+        }),
+        createFakeMember({
+          id: '2',
+          orgId: '1',
+          role: 'admin',
+        }),
+      ];
+
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', role: 'admin', admin_delete_enabled: true }],
+        });
+      });
+
+      fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
+      const { getByText } = render(<OrganizationSettings />, { wrapper });
+      await waitFor(() => {
+        expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
+        expect(getByText('Danger')).toBeDefined();
+        expect(getByText(/leave organization/i).closest('button')).not.toHaveAttribute('disabled');
+        expect(getByText(/delete organization/i).closest('button')).toBeInTheDocument();
+      });
+    });
+
+    it('disabled leave organization button with delete organization button', async () => {
+      const adminsList: OrganizationMembershipResource[] = [
+        createFakeMember({
+          id: '1',
+          orgId: '1',
+          role: 'admin',
+        }),
+        createFakeMember({
+          id: '2',
+          orgId: '1',
+          role: 'admin',
+        }),
+      ];
+
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', role: 'admin', admin_delete_enabled: true }],
+        });
+      });
+
+      fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
+      const { getByText, getByRole } = render(<OrganizationSettings />, { wrapper });
+      await waitFor(() => {
+        expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
+        expect(getByText('Danger')).toBeDefined();
+        expect(getByText(/leave organization/i).closest('button')).toHaveAttribute('disabled');
+        expect(getByText(/delete organization/i).closest('button')).toBeInTheDocument();
+        expect(getByRole('button', { name: /delete organization/i })).toBeInTheDocument();
+      });
+    });
+  });
+
   describe('Navigation', () => {
     it('navigates to Organization Profile edit page when clicking on organization name and user is admin', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
