@@ -1,69 +1,43 @@
-import { camelToSnake } from '@clerk/shared';
-import type { ClerkOptions, DisplayConfigResource } from '@clerk/types';
-import type { ParsedQs } from 'qs';
+import type { DisplayConfigResource } from '@clerk/types';
 import qs from 'qs';
 
-import { hasBannedProtocol, isAllowedRedirectOrigin, isValidUrl } from './url';
+import { hasBannedProtocol, isValidUrl } from './url';
 
-type PickRedirectionUrlKey = 'afterSignUpUrl' | 'afterSignInUrl' | 'signInUrl' | 'signUpUrl';
-
-type PickRedirectionOptions = {
-  queryParams?: ParsedQs;
-  displayConfig?: DisplayConfigResource;
-  options?: ClerkOptions;
-  ctx?: any;
+type PickUrlOptions = {
+  validator?: (url: string) => boolean;
+  formatter?: (url: string) => string;
 };
 
 /**
- *
- * pickRedirectionProp(key, options, accessRedirectUrl)
- *
- * Retrieve auth redirect props passed through querystring parameters, component props, ClerkProvider props
- * or display config settings.
- *
- * The priority is:
- * 1. Querystring parameters
- * 2. ClerkJS component props
- * 3. ClerkProvider props
- * 4. Display configuration payload
+ * This function will pick the first value that is found inside a source using a key provided.
+ * There is a validator option which is used to validate that the value is acceptable. If it isn't, it will
+ * look for the next available value and repeat. The formatter is used to format the keys if provided.
+ * Example usage that looks through the sources for the value of any of the keys provided (with order priority)
+ * `pickUrl(['afterSignInUrl', 'redirectUrl'], [optionsA, optionsB])`
  */
-export const pickRedirectionProp = (
-  key: PickRedirectionUrlKey,
-  { ctx, queryParams, displayConfig, options }: PickRedirectionOptions,
-  accessRedirectUrl = true,
-): string => {
-  const snakeCaseField = camelToSnake(key);
-  const queryParamValue = queryParams?.[snakeCaseField];
+export const pickUrl = (key: string | string[], source: Record<string, any>, opts?: PickUrlOptions): string => {
+  const { validator = () => true, formatter } = opts || {};
+  const keys = (Array.isArray(key) ? key : [key]).map(k => formatter?.(k) || k);
+  const sources = Array.isArray(source) ? source : [source];
 
-  const primaryQueryParamRedirectUrl = typeof queryParamValue === 'string' ? queryParamValue : undefined;
-  const secondaryQueryParamRedirectUrl =
-    accessRedirectUrl && typeof queryParams?.redirect_url === 'string' ? queryParams.redirect_url : undefined;
+  let pickedUrl = '';
+  sources.some(s => {
+    keys.some(k => {
+      const url = s[k];
+      if (
+        typeof url === 'string' &&
+        validator(url) &&
+        isValidUrl(url, { includeRelativeUrls: true }) &&
+        !hasBannedProtocol(url)
+      ) {
+        pickedUrl = url;
+      }
+      return pickedUrl;
+    });
+    return pickedUrl;
+  });
 
-  let queryParamUrl: string | undefined;
-  if (
-    primaryQueryParamRedirectUrl &&
-    isAllowedRedirectOrigin(primaryQueryParamRedirectUrl, options?.allowedRedirectOrigins)
-  ) {
-    queryParamUrl = primaryQueryParamRedirectUrl;
-  } else if (
-    secondaryQueryParamRedirectUrl &&
-    isAllowedRedirectOrigin(secondaryQueryParamRedirectUrl, options?.allowedRedirectOrigins)
-  ) {
-    queryParamUrl = secondaryQueryParamRedirectUrl;
-  }
-
-  const url =
-    queryParamUrl ||
-    ctx?.[key] ||
-    (accessRedirectUrl ? ctx?.redirectUrl : undefined) ||
-    options?.[key] ||
-    displayConfig?.[key];
-
-  if (!isValidUrl(url, { includeRelativeUrls: true }) || hasBannedProtocol(url)) {
-    return '';
-  }
-
-  return url;
+  return pickedUrl;
 };
 
 interface BuildAuthQueryStringArgs {

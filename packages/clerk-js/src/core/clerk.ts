@@ -79,7 +79,7 @@ import {
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
   noUserExists,
-  pickRedirectionProp,
+  pickUrl,
   removeClerkQueryParam,
   requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
@@ -1586,15 +1586,11 @@ export default class Clerk implements ClerkInterface {
       return '';
     }
 
-    const signInOrUpUrl = pickRedirectionProp(
-      key,
-      { options: this.#options, displayConfig: this.#environment.displayConfig },
-      false,
-    );
+    const signInOrUpUrl = pickUrl(key, [this.#options, this.#environment.displayConfig]);
 
-    const urls: RedirectOptions = {
-      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
-      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
+    const opts: RedirectOptions = {
+      afterSignInUrl: pickUrl('afterSignInUrl', [options, this.#options]),
+      afterSignUpUrl: pickUrl('afterSignUpUrl', [options, this.#options]),
       redirectUrl: options?.redirectUrl || window.location.href,
     };
 
@@ -1605,7 +1601,7 @@ export default class Clerk implements ClerkInterface {
       }
     });
 
-    return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, { ...urls, ...options?.initialValues }));
+    return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, opts));
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {
