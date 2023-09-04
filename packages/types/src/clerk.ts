@@ -443,6 +443,12 @@ export type HandleOAuthCallbackParams = {
 
   /**
    * Full URL or path to navigate during sign in,
+   * if identifier verification is required.
+   */
+  firstFactorUrl?: string;
+
+  /**
+   * Full URL or path to navigate during sign in,
    * if 2FA is enabled.
    */
   secondFactorUrl?: string;
