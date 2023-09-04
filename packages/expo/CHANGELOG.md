@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.19.0
+
+### Minor Changes
+
+- Support swapping the Clerk publishableKey at runtime to allow users to toggle the instance being used. ([#1655](https://github.com/clerkinc/javascript/pull/1655)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Updated dependencies [[`6384ea8da`](https://github.com/clerkinc/javascript/commit/6384ea8dae85b3e1b58b0b70c761c0d2794e3aaa), [`b491dddae`](https://github.com/clerkinc/javascript/commit/b491dddae41030556b0be5c709f128838d4b1196), [`a102c21d4`](https://github.com/clerkinc/javascript/commit/a102c21d4762895a80a1ad846700763cc801b3f3)]:
+  - @clerk/clerk-js@4.56.3
+  - @clerk/clerk-react@4.24.1
+
 ## 0.18.20
 
 ### Patch Changes
