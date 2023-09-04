@@ -1,10 +1,10 @@
-import { withAuthHref } from '../elements';
 import { makeLocalizable } from '../localization';
 import * as Primitives from '../primitives';
 import { descriptors } from './elementDescriptors';
 import { makeCustomizable } from './makeCustomizable';
 import { makeResponsive } from './makeResponsive';
 import { sanitizeDomProps } from './sanitizeDomProps';
+import { withAuthHref } from './withAuthHref';
 
 export * from './Flow';
 export { AppearanceProvider, useAppearance } from './AppearanceContext';
