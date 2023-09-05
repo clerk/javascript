@@ -146,9 +146,9 @@ const SwitcherInvitationActions = (props: PropsOfComponent<typeof Flex> & { show
 
 export const UserInvitationSuggestionList = () => {
   const { ref, userSuggestions, userInvitations } = useFetchInvitations();
-  const isLoading = userInvitations?.isLoading || userSuggestions?.isLoading;
-  const hasNextPage = userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
-  const hasAnyData = !!(userInvitations?.count || userSuggestions?.count);
+  const isLoading = userInvitations.isLoading || userSuggestions.isLoading;
+  const hasNextPage = userInvitations.hasNextPage || userSuggestions.hasNextPage;
+  const hasAnyData = !!(userInvitations.count || userSuggestions.count);
   return (
     <SwitcherInvitationActions
       showBorder={hasAnyData || isLoading}
@@ -161,8 +161,8 @@ export const UserInvitationSuggestionList = () => {
           ...common.unstyledScrollbar(t),
         })}
       >
-        {(userInvitations?.count ?? 0) > 0 &&
-          userInvitations?.data?.map(inv => {
+        {(userInvitations.count || 0) > 0 &&
+          userInvitations.data?.map(inv => {
             return (
               <InvitationPreview
                 key={inv.id}
@@ -173,9 +173,9 @@ export const UserInvitationSuggestionList = () => {
             );
           })}
 
-        {(userSuggestions?.count ?? 0) > 0 &&
-          !userInvitations?.hasNextPage &&
-          userSuggestions?.data?.map(suggestion => {
+        {(userSuggestions.count || 0) > 0 &&
+          !userInvitations.hasNextPage &&
+          userSuggestions.data?.map(suggestion => {
             return (
               <InvitationPreview
                 key={suggestion.id}
