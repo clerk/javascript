@@ -1,2 +1,5 @@
 * @SokratisVidros @nikosdouvlis
 packages/backend/*       @dimkl
+
+# Require specific approval for the generated "Version Packages" PR, which triggers a release
+packages/*/CHANGELOG.md @clerkinc/team-leads @BRKalow
