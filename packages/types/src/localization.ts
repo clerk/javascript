@@ -552,11 +552,7 @@ type _LocalizationResource = {
     notSelected: LocalizationValue;
     action__createOrganization: LocalizationValue;
     action__manageOrganization: LocalizationValue;
-    invitationCountLabel_single: LocalizationValue;
-    invitationCountLabel_many: LocalizationValue;
     action__invitationAccept: LocalizationValue;
-    suggestionCountLabel_single: LocalizationValue;
-    suggestionCountLabel_many: LocalizationValue;
     action__suggestionsAccept: LocalizationValue;
     suggestionsAcceptedLabel: LocalizationValue;
   };
