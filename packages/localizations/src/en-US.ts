@@ -700,6 +700,17 @@ export const enUS: LocalizationResource = {
       formButtonReset: 'Skip',
     },
   },
+  organizationList: {
+    createOrganization: 'Create Organization',
+    title: 'Select an account',
+    titleWithoutPersonal: 'Select an organization',
+    subtitle: 'to continue to {{applicationName}}',
+    action__invitationAccept: 'Join',
+    invitationAcceptedLabel: 'Joined',
+    action__suggestionsAccept: 'Request to join',
+    suggestionsAcceptedLabel: 'Pending approval',
+    action__createOrganization: 'Create organization',
+  },
   unstable__errors: {
     identification_deletion_failed: 'You cannot delete your last identification.',
     phone_number_exists: 'This phone number is taken. Please try another.',

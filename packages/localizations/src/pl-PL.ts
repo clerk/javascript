@@ -329,6 +329,12 @@ export const plPL: LocalizationResource = {
         destructiveActionSubtitle: 'Usuń ten portfel Web3 z twojego konta',
         destructiveAction: 'Usuń portfel',
       },
+      dangerSection: {
+        title: 'Niebezpieczeństwo',
+        deleteAccountButton: 'Usuń konto',
+        deleteAccountTitle: 'Usuń konto',
+        deleteAccountDescription: 'Usuń konto i wszystkie dane z nim związane',
+      },
     },
 
     profilePage: {

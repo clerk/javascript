@@ -97,7 +97,7 @@ export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'o
 export type NavbarItemId = 'account' | 'security' | 'members' | 'settings';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
-export type OrganizationPreviewId = 'organizationSwitcher';
+export type OrganizationPreviewId = 'organizationSwitcher' | 'organizationList';
 
 export type FooterActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn';
 
@@ -297,6 +297,11 @@ export type ElementsConfig = {
   organizationSwitcherPopoverFooter: WithOptions<never, never, never>;
   organizationSwitcherPopoverFooterPages: WithOptions<never, never, never>;
   organizationSwitcherPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
+
+  organizationListPreviewItems: WithOptions<never, never, never>;
+  organizationListPreviewItem: WithOptions<never, never, never>;
+  organizationListPreviewButton: WithOptions<never, never, never>;
+  organizationListPreviewItemActionButton: WithOptions<never, never, never>;
 
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
@@ -639,6 +644,7 @@ export type SignUpTheme = Theme;
 export type UserButtonTheme = Theme;
 export type UserProfileTheme = Theme;
 export type OrganizationSwitcherTheme = Theme;
+export type OrganizationListTheme = Theme;
 export type OrganizationProfileTheme = Theme;
 export type CreateOrganizationTheme = Theme;
 
@@ -663,6 +669,10 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<OrganizationSwitcher/>` component
    */
   organizationSwitcher?: T;
+  /**
+   * Theme overrides that only apply to the `<OrganizationList/>` component
+   */
+  organizationList?: T;
   /**
    * Theme overrides that only apply to the `<OrganizationProfile/>` component
    */

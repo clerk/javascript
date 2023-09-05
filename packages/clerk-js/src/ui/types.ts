@@ -1,5 +1,6 @@
 import type {
   CreateOrganizationProps,
+  OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
   SignInProps,
@@ -16,6 +17,7 @@ export type {
   OrganizationSwitcherProps,
   OrganizationProfileProps,
   CreateOrganizationProps,
+  OrganizationListProps,
 };
 
 export type AvailableComponentProps =
@@ -25,7 +27,8 @@ export type AvailableComponentProps =
   | UserButtonProps
   | OrganizationSwitcherProps
   | OrganizationProfileProps
-  | CreateOrganizationProps;
+  | CreateOrganizationProps
+  | OrganizationListProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -64,6 +67,11 @@ export type OrganizationSwitcherCtx = OrganizationSwitcherProps & {
   mode?: ComponentMode;
 };
 
+export type OrganizationListCtx = OrganizationListProps & {
+  componentName: 'OrganizationList';
+  mode?: ComponentMode;
+};
+
 export type AvailableComponentCtx =
   | SignInCtx
   | SignUpCtx
@@ -71,4 +79,5 @@ export type AvailableComponentCtx =
   | UserProfileCtx
   | OrganizationProfileCtx
   | CreateOrganizationCtx
-  | OrganizationSwitcherCtx;
+  | OrganizationSwitcherCtx
+  | OrganizationListCtx;

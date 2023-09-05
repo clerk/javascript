@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.24.1
+
+### Patch Changes
+
+- Support swapping the Clerk publishableKey at runtime to allow users to toggle the instance being used. ([#1655](https://github.com/clerkinc/javascript/pull/1655)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 4.24.0
 
 ### Minor Changes

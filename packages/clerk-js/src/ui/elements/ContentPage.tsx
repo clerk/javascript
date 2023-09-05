@@ -7,13 +7,25 @@ import { CardAlert, Header, NavbarMenuButtonRow, useCardState } from './index';
 
 type PageProps = PropsOfComponent<typeof Col> & {
   headerTitle: LocalizationKey | string;
+  headerTitleTextVariant?: PropsOfComponent<typeof Header.Title>['textVariant'];
   breadcrumbTitle?: LocalizationKey;
   Breadcrumbs?: React.ComponentType<any> | null;
   headerSubtitle?: LocalizationKey;
+  headerSubtitleTextVariant?: PropsOfComponent<typeof Header.Subtitle>['variant'];
 };
 
 export const ContentPage = (props: PageProps) => {
-  const { headerTitle, headerSubtitle, breadcrumbTitle, children, Breadcrumbs, sx, ...rest } = props;
+  const {
+    headerTitle,
+    headerTitleTextVariant,
+    headerSubtitle,
+    headerSubtitleTextVariant,
+    breadcrumbTitle,
+    children,
+    Breadcrumbs,
+    sx,
+    ...rest
+  } = props;
   const card = useCardState();
 
   return (
@@ -35,11 +47,11 @@ export const ContentPage = (props: PageProps) => {
         <Header.Title
           // TODO: Align them between user profile and org profile
           localizationKey={headerTitle}
-          textVariant={'xxlargeMedium'}
+          textVariant={headerTitleTextVariant || 'xxlargeMedium'}
         />
         {headerSubtitle && (
           <Header.Subtitle
-            variant={'regularRegular'}
+            variant={headerSubtitleTextVariant || 'regularRegular'}
             localizationKey={headerSubtitle}
           />
         )}
