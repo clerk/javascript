@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "1.25.0",
+  "version": "1.25.1",
   "license": "MIT",
   "description": "Localizations for the Clerk components",
   "keywords": [

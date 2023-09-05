@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.25.1
+
+### Patch Changes
+
+- Update "personal workspace" label to "personal account" ([#1648](https://github.com/clerkinc/javascript/pull/1648)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 1.25.0
 
 ### Minor Changes

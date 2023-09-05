@@ -1229,6 +1229,40 @@ describe('Clerk singleton', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/verify-email-address');
       });
     });
+
+    it('redirects user to first-factor if the email is claimed but the external account has an unverified email', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+          } as unknown as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-one');
+      });
+    });
   });
 
   describe('.handleMagicLinkVerification()', () => {
