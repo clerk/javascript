@@ -1,9 +1,10 @@
-import type { ClerkPaginatedResponse, OrganizationSuggestionResource } from '@clerk/types';
+import type { OrganizationSuggestionResource } from '@clerk/types';
 
 import { useCoreOrganizationList } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
+import { updateCacheInPlace } from '../OrganizationSwitcher/utils';
 import { PreviewListItem, PreviewListItemButton } from './shared';
 import { organizationListParams } from './utils';
 
@@ -16,30 +17,7 @@ export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResou
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(result => {
-        (userSuggestions as any)?.unstable__mutate?.(result, {
-          populateCache: (
-            updatedSuggestion: OrganizationSuggestionResource,
-            suggestionInfinitePages: ClerkPaginatedResponse<OrganizationSuggestionResource>[],
-          ) => {
-            return suggestionInfinitePages.map(item => {
-              const newData = item.data.map(obj => {
-                if (obj.id === updatedSuggestion.id) {
-                  return {
-                    ...updatedSuggestion,
-                  };
-                }
-
-                return obj;
-              });
-              return { ...item, data: newData };
-            });
-          },
-          // Since `accept` gives back the updated information,
-          // we don't need to revalidate here.
-          revalidate: false,
-        });
-      })
+      .then(updateCacheInPlace(userSuggestions))
       .catch(err => handleError(err, [], card.setError));
   };
 
@@ -48,10 +26,8 @@ export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResou
       <Text
         variant='smallRegular'
         colorScheme='neutral'
-      >
-        {/*TODO: localize this*/}
-        Pending approval
-      </Text>
+        localizationKey={localizationKeys('organizationList.suggestionsAcceptedLabel')}
+      />
     );
   }
 

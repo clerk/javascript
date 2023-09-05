@@ -1,9 +1,10 @@
-import type { ClerkPaginatedResponse, UserOrganizationInvitationResource } from '@clerk/types';
+import type { UserOrganizationInvitationResource } from '@clerk/types';
 
 import { useCoreOrganizationList } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
+import { updateCacheInPlace } from '../OrganizationSwitcher/utils';
 import { PreviewListItem, PreviewListItemButton } from './shared';
 import { organizationListParams } from './utils';
 
@@ -16,30 +17,7 @@ export const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationR
   const handleAccept = () => {
     return card
       .runAsync(props.accept())
-      .then(result => {
-        (userInvitations as any)?.unstable__mutate?.(result, {
-          populateCache: (
-            updatedInvitation: UserOrganizationInvitationResource,
-            invitationInfinitePages: ClerkPaginatedResponse<UserOrganizationInvitationResource>[],
-          ) => {
-            return invitationInfinitePages.map(item => {
-              const newData = item.data.map(obj => {
-                if (obj.id === updatedInvitation.id) {
-                  return {
-                    ...updatedInvitation,
-                  };
-                }
-
-                return obj;
-              });
-              return { ...item, data: newData };
-            });
-          },
-          // Since `accept` gives back the updated information,
-          // we don't need to revalidate here.
-          revalidate: false,
-        });
-      })
+      .then(updateCacheInPlace(userInvitations))
       .catch(err => handleError(err, [], card.setError));
   };
 

@@ -4,7 +4,8 @@ import { useCoreOrganizationList, useEnvironment, useOrganizationListContext } f
 import { Box, Button, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { Card, CardAlert, Divider, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
-import { CreateOrganizationForm } from './CreateOrganization';
+import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
+
 import { PreviewListItems, PreviewListSpinner } from './shared';
 import { InvitationPreview } from './UserInvitationList';
 import { MembershipPreview, PersonalAccountPreview } from './UserMembershipList';
