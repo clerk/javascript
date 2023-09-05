@@ -722,6 +722,17 @@ type _LocalizationResource = {
       formButtonReset: LocalizationValue;
     };
   };
+  organizationList: {
+    createOrganization: LocalizationValue;
+    title: LocalizationValue;
+    titleWithoutPersonal: LocalizationValue;
+    subtitle: LocalizationValue;
+    action__createOrganization: LocalizationValue;
+    action__invitationAccept: LocalizationValue;
+    action__suggestionsAccept: LocalizationValue;
+    suggestionsAcceptedLabel: LocalizationValue;
+    invitationAcceptedLabel: LocalizationValue;
+  };
   unstable__errors: UnstableErrors;
   dates: {
     previous6Days: LocalizationValue;

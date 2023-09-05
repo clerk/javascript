@@ -9,7 +9,8 @@ type FlowMetadata = {
     | 'userProfile'
     | 'organizationProfile'
     | 'createOrganization'
-    | 'organizationSwitcher';
+    | 'organizationSwitcher'
+    | 'organizationList';
   part?:
     | 'start'
     | 'emailCode'
