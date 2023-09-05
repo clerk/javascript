@@ -110,9 +110,8 @@ export default (QUnit: QUnit) => {
     });
 
     test('is not CO for AWS CloudFront', assert => {
-      // CloudFront always sets origin protocol to http, and it's impossible to change
       const options = {
-        originURL: new URL('http://app.acme.com'),
+        originURL: new URL('https://app.acme.com'),
         host: 'app.acme.com',
         forwardedPort: '443',
         forwardedProto: 'https',

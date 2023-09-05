@@ -25,8 +25,13 @@ export function checkCrossOrigin({
   if (finalURL.origin === originURL.origin) {
     return false;
   }
-  // AWS CloudFront always sets origin protocol to http, and it's impossible to change
-  if (finalURL.host === originURL.host && finalURL.protocol === 'https:' && originURL.protocol === 'http:') {
+  // AWS CloudFront always sets final protocol to http, and it's impossible to change
+  if (
+    finalURL.host === originURL.host &&
+    forwardedProto === 'https' &&
+    finalURL.protocol === 'http:' &&
+    originURL.protocol === 'https:'
+  ) {
     return false;
   }
   return true;
