@@ -1,4 +1,5 @@
-import { parsePublishableKey } from './util/parsePublishableKey';
+import { missingPublishableKeyErrorMessage } from './shared';
+import { parsePublishableKey } from './shared';
 
 type RedirectAdapter = (url: string) => any;
 
@@ -35,9 +36,6 @@ type RedirectParams = {
    */
   frontendApi?: string;
 };
-
-// TODO: replace it with @clerk/shared errorThrower.throwMissingPublishableKeyError()
-const missingPublishableKeyErrorMessage = `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`;
 
 export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, publishableKey }: RedirectParams) {
   if (!frontendApi) {

@@ -1,4 +1,4 @@
-import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
+import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../shared';
 import { checkCrossOrigin } from '../util/request';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
