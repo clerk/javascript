@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.57.0
+
+### Minor Changes
+
+- Introduced a new `firstFactorUrl` property in sign-in callback to handle unverified emails. ([#1629](https://github.com/clerkinc/javascript/pull/1629)) by [@kostaspt](https://github.com/kostaspt)
+
+### Patch Changes
+
+- Organization Switcher now diplays organization invitations and suggestions in a more compact form. ([#1675](https://github.com/clerkinc/javascript/pull/1675)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`463ff84f5`](https://github.com/clerkinc/javascript/commit/463ff84f5bfb7114102ca6cb5a2ea2fce705164c), [`1426e5eb3`](https://github.com/clerkinc/javascript/commit/1426e5eb3730bb79e2ec5341fa4347d7fa957739), [`060b2bd6b`](https://github.com/clerkinc/javascript/commit/060b2bd6b18ff534736e2abb8a599f2a51308050)]:
+  - @clerk/types@3.51.0
+  - @clerk/localizations@1.25.2
+
 ## 4.56.3
 
 ### Patch Changes

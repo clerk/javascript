@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.29.0
+
+### Minor Changes
+
+- Introduce a new getOrganizationInvitation() method with which you can fetch a single organization invitation by providing the ID ([#1682](https://github.com/clerkinc/javascript/pull/1682)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Updated dependencies [[`463ff84f5`](https://github.com/clerkinc/javascript/commit/463ff84f5bfb7114102ca6cb5a2ea2fce705164c), [`1426e5eb3`](https://github.com/clerkinc/javascript/commit/1426e5eb3730bb79e2ec5341fa4347d7fa957739)]:
+  - @clerk/types@3.51.0
+
 ## 0.28.1
 
 ### Patch Changes
