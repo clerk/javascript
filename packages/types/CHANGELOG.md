@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.51.0
+
+### Minor Changes
+
+- Introduced a new `firstFactorUrl` property in sign-in callback to handle unverified emails. ([#1629](https://github.com/clerkinc/javascript/pull/1629)) by [@kostaspt](https://github.com/kostaspt)
+
+### Patch Changes
+
+- Organization Switcher now diplays organization invitations and suggestions in a more compact form. ([#1675](https://github.com/clerkinc/javascript/pull/1675)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.50.0
 
 ### Minor Changes

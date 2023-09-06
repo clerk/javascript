@@ -247,9 +247,11 @@ const createDefaultAfterAuth = (
 ) => {
   return (auth: AuthObject, req: WithClerkUrl<NextRequest>) => {
     if (!auth.userId && !isPublicRoute(req)) {
-      informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params);
       if (isApiRoute(req)) {
+        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, true);
         return apiEndpointUnauthorizedNextResponse();
+      } else {
+        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, false);
       }
       return redirectToSignIn({ returnBackUrl: req.experimental_clerkUrl.href });
     }
@@ -403,10 +405,16 @@ const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => 
   return Object.assign(req, { experimental_clerkUrl: clerkUrl });
 };
 
-const informAboutProtectedRoute = (path: string, params: AuthMiddlewareParams) => {
+const informAboutProtectedRoute = (path: string, params: AuthMiddlewareParams, isApiRoute: boolean) => {
   if (params.debug || isDevelopmentFromApiKey(params.secretKey || SECRET_KEY)) {
     console.warn(
-      informAboutProtectedRouteInfo(path, !!params.publicRoutes, !!params.ignoredRoutes, DEFAULT_IGNORED_ROUTES),
+      informAboutProtectedRouteInfo(
+        path,
+        !!params.publicRoutes,
+        !!params.ignoredRoutes,
+        isApiRoute,
+        DEFAULT_IGNORED_ROUTES,
+      ),
     );
   }
 };

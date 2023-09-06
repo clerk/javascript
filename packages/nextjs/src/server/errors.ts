@@ -61,21 +61,31 @@ export const informAboutProtectedRouteInfo = (
   path: string,
   hasPublicRoutes: boolean,
   hasIgnoredRoutes: boolean,
+  isApiRoute: boolean,
   defaultIgnoredRoutes: string[],
 ) => {
+  const infoText = isApiRoute
+    ? `INFO: Clerk: The request to ${path} is being protected (401) because there is no signed-in user, and the path is included in \`apiRoutes\`. To prevent this behavior, choose one of:`
+    : `INFO: Clerk: The request to ${path} is being redirected because there is no signed-in user, and the path is not included in \`ignoredRoutes\` or \`publicRoutes\`. To prevent this behavior, choose one of:`;
+  const apiRoutesText = isApiRoute
+    ? `To prevent Clerk authentication from protecting (401) the api route, remove the rule matching "${path}" from the \`apiRoutes\` array passed to authMiddleware`
+    : undefined;
   const publicRoutesText = hasPublicRoutes
-    ? `1. To make the route accessible to both signed in and signed out users, add "${path}" to the \`publicRoutes\` array passed to authMiddleware`
-    : `1. To make the route accessible to both signed in and signed out users, pass \`publicRoutes: ["${path}"]\` to authMiddleware`;
+    ? `To make the route accessible to both signed in and signed out users, add "${path}" to the \`publicRoutes\` array passed to authMiddleware`
+    : `To make the route accessible to both signed in and signed out users, pass \`publicRoutes: ["${path}"]\` to authMiddleware`;
   const ignoredRoutes = [...defaultIgnoredRoutes, path].map(r => `"${r}"`).join(', ');
   const ignoredRoutesText = hasIgnoredRoutes
-    ? `2. To prevent Clerk authentication from running at all, add "${path}" to the \`ignoredRoutes\` array passed to authMiddleware`
-    : `2. To prevent Clerk authentication from running at all, pass \`ignoredRoutes: [${ignoredRoutes}]\` to authMiddleware`;
+    ? `To prevent Clerk authentication from running at all, add "${path}" to the \`ignoredRoutes\` array passed to authMiddleware`
+    : `To prevent Clerk authentication from running at all, pass \`ignoredRoutes: [${ignoredRoutes}]\` to authMiddleware`;
   const afterAuthText =
-    "3. Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes";
+    "Pass a custom `afterAuth` to authMiddleware, and replace Clerk's default behavior of redirecting unless a route is included in publicRoutes";
 
-  return `INFO: Clerk: The request to ${path} is being redirected because there is no signed-in user, and the path is not included in \`ignoredRoutes\` or \`publicRoutes\`. To prevent this behavior, choose one of:
+  return `${infoText}
 
-${[publicRoutesText, ignoredRoutesText, afterAuthText].join('\n')}
+${[apiRoutesText, publicRoutesText, ignoredRoutesText, afterAuthText]
+  .filter(Boolean)
+  .map((text, index) => `${index + 1}. ${text}`)
+  .join('\n')}
 
 For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
 (This log only appears in development mode, or if \`debug: true\` is passed to authMiddleware)`;

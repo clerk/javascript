@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.25.2
+
+### Patch Changes
+
+- Organization Switcher now diplays organization invitations and suggestions in a more compact form. ([#1675](https://github.com/clerkinc/javascript/pull/1675)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update pl-Pl localization ([#1678](https://github.com/clerkinc/javascript/pull/1678)) by [@dawid-grabowski](https://github.com/dawid-grabowski)
+
+- Updated dependencies [[`463ff84f5`](https://github.com/clerkinc/javascript/commit/463ff84f5bfb7114102ca6cb5a2ea2fce705164c), [`1426e5eb3`](https://github.com/clerkinc/javascript/commit/1426e5eb3730bb79e2ec5341fa4347d7fa957739)]:
+  - @clerk/types@3.51.0
+
 ## 1.25.1
 
 ### Patch Changes
