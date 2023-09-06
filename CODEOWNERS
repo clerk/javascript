@@ -2,4 +2,4 @@
 packages/backend/*       @dimkl
 
 # Require specific approval for the generated "Version Packages" PR, which triggers a release
-packages/*/CHANGELOG.md @clerkinc/team-leads @clerkinc/team-js 
+packages/*/CHANGELOG.md @clerkinc/team-leads @clerkinc/team-js
