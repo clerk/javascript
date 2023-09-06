@@ -1,3 +1,5 @@
+import { deprecationWarning } from './deprecationWarning';
+
 export function isValidProxyUrl(key: string | undefined) {
   if (!key) {
     return true;
@@ -25,6 +27,8 @@ export function proxyUrlToAbsoluteURL(url: string | undefined): string {
  * @deprecated Use `buildRequestUrl` from @clerk/backend
  */
 export function getRequestUrl({ request, relativePath }: { request: Request; relativePath?: string }): URL {
+  deprecationWarning('getRequestUrl', 'Use `buildRequestUrl` from @clerk/backend');
+
   const { headers, url: initialUrl } = request;
   const url = new URL(initialUrl);
   const host = headers.get('X-Forwarded-Host') ?? headers.get('host') ?? (headers as any)['host'] ?? url.host;
