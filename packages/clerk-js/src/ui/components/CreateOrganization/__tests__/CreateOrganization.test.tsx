@@ -177,7 +177,7 @@ describe('CreateOrganization', () => {
 
       fixtures.clerk.createOrganization.mockReturnValue(Promise.resolve(createdOrg));
 
-      props.setProps({ afterCreateOrganizationUrl: org => `/org/${org.id}` });
+      props.setProps({ afterCreateOrganizationUrl: org => `/org/${org.id}`, skipInvitationScreen: true });
       const { getByRole, userEvent, getByLabelText } = render(<CreateOrganization />, {
         wrapper,
       });
@@ -201,7 +201,7 @@ describe('CreateOrganization', () => {
 
       fixtures.clerk.createOrganization.mockReturnValue(Promise.resolve(createdOrg));
 
-      props.setProps({ afterCreateOrganizationUrl: '/org/:slug' });
+      props.setProps({ afterCreateOrganizationUrl: '/org/:slug', skipInvitationScreen: true });
       const { getByRole, userEvent, getByLabelText } = render(<CreateOrganization />, {
         wrapper,
       });

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "0.28.0",
+  "version": "0.28.1",
   "license": "MIT",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "types": "./dist/types/index.d.ts",

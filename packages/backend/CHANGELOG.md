@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.28.1
+
+### Patch Changes
+
+- Improve error messaging when clock skew is detected. ([#1661](https://github.com/clerkinc/javascript/pull/1661)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 0.28.0
 
 ### Minor Changes

@@ -64,6 +64,22 @@ type UseOrganizationListReturn =
       userSuggestions: PaginatedResources<OrganizationSuggestionResource>;
     };
 
+const undefinedPaginatedResource = {
+  data: undefined,
+  count: undefined,
+  isLoading: false,
+  isFetching: false,
+  isError: false,
+  page: undefined,
+  pageCount: undefined,
+  fetchPage: undefined,
+  fetchNext: undefined,
+  fetchPrevious: undefined,
+  hasNextPage: false,
+  hasPreviousPage: false,
+  unstable__mutate: undefined,
+} as const;
+
 type UseOrganizationList = (params?: UseOrganizationListParams) => UseOrganizationListReturn;
 
 export const useOrganizationList: UseOrganizationList = params => {
@@ -188,51 +204,9 @@ export const useOrganizationList: UseOrganizationList = params => {
       organizationList: undefined,
       createOrganization: undefined,
       setActive: undefined,
-      userMemberships: {
-        data: undefined,
-        count: undefined,
-        isLoading: false,
-        isFetching: false,
-        isError: false,
-        page: undefined,
-        pageCount: undefined,
-        fetchPage: undefined,
-        fetchNext: undefined,
-        fetchPrevious: undefined,
-        hasNextPage: false,
-        hasPreviousPage: false,
-        unstable__mutate: undefined,
-      },
-      userInvitations: {
-        data: undefined,
-        count: undefined,
-        isLoading: false,
-        isFetching: false,
-        isError: false,
-        page: undefined,
-        pageCount: undefined,
-        fetchPage: undefined,
-        fetchNext: undefined,
-        fetchPrevious: undefined,
-        hasNextPage: false,
-        hasPreviousPage: false,
-        unstable__mutate: undefined,
-      },
-      userSuggestions: {
-        data: undefined,
-        count: undefined,
-        isLoading: false,
-        isFetching: false,
-        isError: false,
-        page: undefined,
-        pageCount: undefined,
-        fetchPage: undefined,
-        fetchNext: undefined,
-        fetchPrevious: undefined,
-        hasNextPage: false,
-        hasPreviousPage: false,
-        unstable__mutate: undefined,
-      },
+      userMemberships: undefinedPaginatedResource,
+      userInvitations: undefinedPaginatedResource,
+      userSuggestions: undefinedPaginatedResource,
     };
   }
 

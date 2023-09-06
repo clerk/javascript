@@ -864,6 +864,11 @@ export default class Clerk implements ClerkInterface {
 
     const navigateToSignUp = makeNavigate(displayConfig.signUpUrl);
 
+    const navigateToFactorOne = makeNavigate(
+      params.firstFactorUrl ||
+        buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-one' }, { stringify: true }),
+    );
+
     const navigateToFactorTwo = makeNavigate(
       params.secondFactorUrl ||
         buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
@@ -915,6 +920,12 @@ export default class Clerk implements ClerkInterface {
         default:
           clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
+    }
+
+    const userHasUnverifiedEmail = si.status === 'needs_first_factor';
+
+    if (userHasUnverifiedEmail) {
+      return navigateToFactorOne();
     }
 
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';

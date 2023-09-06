@@ -552,11 +552,7 @@ type _LocalizationResource = {
     notSelected: LocalizationValue;
     action__createOrganization: LocalizationValue;
     action__manageOrganization: LocalizationValue;
-    invitationCountLabel_single: LocalizationValue;
-    invitationCountLabel_many: LocalizationValue;
     action__invitationAccept: LocalizationValue;
-    suggestionCountLabel_single: LocalizationValue;
-    suggestionCountLabel_many: LocalizationValue;
     action__suggestionsAccept: LocalizationValue;
     suggestionsAcceptedLabel: LocalizationValue;
   };
@@ -721,6 +717,17 @@ type _LocalizationResource = {
     invitePage: {
       formButtonReset: LocalizationValue;
     };
+  };
+  organizationList: {
+    createOrganization: LocalizationValue;
+    title: LocalizationValue;
+    titleWithoutPersonal: LocalizationValue;
+    subtitle: LocalizationValue;
+    action__createOrganization: LocalizationValue;
+    action__invitationAccept: LocalizationValue;
+    action__suggestionsAccept: LocalizationValue;
+    suggestionsAcceptedLabel: LocalizationValue;
+    invitationAcceptedLabel: LocalizationValue;
   };
   unstable__errors: UnstableErrors;
   dates: {
