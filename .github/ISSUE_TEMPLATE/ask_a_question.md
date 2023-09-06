@@ -5,10 +5,4 @@ title: ''
 labels: 'Status: Question'
 ---
 
-<!-- You can find us on Discord https://clerk.com/discord -->
-
-<!-- Requirements: please go through this checklist before opening a new issue -->
-
-- [ ] Review the documentation: https://clerk.com/docs
-- [ ] Go through package changelog files. 
-
+If you have a question, please do not open a github issue, and instead [ask on our discord](https://clerk.com/discord)! If you are having an issue or think you have run into a bug, please hit the back button and select "bug report".
