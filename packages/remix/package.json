@@ -38,6 +38,8 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
+    "@remix-run/react": "^1.7.6",
+    "@remix-run/server-runtime": "^1.7.6",
     "@types/cookie": "^0.5.0",
     "@types/node": "^16.11.55",
     "@types/react": "*",

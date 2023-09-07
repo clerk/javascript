@@ -42,6 +42,7 @@
   "devDependencies": {
     "@types/cookie": "^0.5.0",
     "@types/node": "^16.11.55",
+    "gatsby": "^5.0.0",
     "typescript": "*"
   },
   "peerDependencies": {
