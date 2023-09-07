@@ -141,9 +141,17 @@ const validRoutes = [
   '/protected',
   '/protected/',
   '/protected/hello',
+  '/protected/hello.example/hello',
 ];
 
-const invalidRoutes = ['/_next', '/favicon.ico', '/_next/test.json', '/files/api.pdf', '/test/api/test.pdf'];
+const invalidRoutes = [
+  '/_next',
+  '/favicon.ico',
+  '/_next/test.json',
+  '/files/api.pdf',
+  '/test/api/test.pdf',
+  '/imgs/img.png',
+];
 
 describe('default config matcher', () => {
   it('compiles to regex using path-to-regex', () => {
