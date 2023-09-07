@@ -5,14 +5,13 @@ import { Box, Button, Col, descriptors, Flex, localizationKeys, Spinner } from '
 import { Card, CardAlert, Divider, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
-
 import { PreviewListItems, PreviewListSpinner } from './shared';
 import { InvitationPreview } from './UserInvitationList';
 import { MembershipPreview, PersonalAccountPreview } from './UserMembershipList';
 import { SuggestionPreview } from './UserSuggestionList';
 import { organizationListParams } from './utils';
 
-const useFetchList = () => {
+const useCoreOrganizationListInView = () => {
   const { userMemberships, userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
 
   const { ref } = useInView({
@@ -41,7 +40,7 @@ const useFetchList = () => {
 
 export const OrganizationListPage = withCardStateProvider(() => {
   const card = useCardState();
-  const { userMemberships, userSuggestions, userInvitations } = useFetchList();
+  const { userMemberships, userSuggestions, userInvitations } = useCoreOrganizationListInView();
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasAnyData = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
 
@@ -117,7 +116,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
 const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void }) => {
   const environment = useEnvironment();
 
-  const { ref, userMemberships, userSuggestions, userInvitations } = useFetchList();
+  const { ref, userMemberships, userSuggestions, userInvitations } = useCoreOrganizationListInView();
   const { hidePersonal } = useOrganizationListContext();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
