@@ -218,14 +218,14 @@ export interface Clerk {
 
   /**
    * Mount an organization profile component at the target element.
-   * @param targetNode Target to mount the UserProfile component.
+   * @param targetNode Target to mount the OrganizationProfile component.
    * @param props Configuration parameters.
    */
   mountOrganizationProfile: (targetNode: HTMLDivElement, props?: OrganizationProfileProps) => void;
 
   /**
    * Unmount the organization profile component from the target node.
-   * @param targetNode Target node to unmount the UserProfile component from.
+   * @param targetNode Target node to unmount the OrganizationProfile component from.
    */
   unmountOrganizationProfile: (targetNode: HTMLDivElement) => void;
 
@@ -244,27 +244,27 @@ export interface Clerk {
 
   /**
    * Mount an organization switcher component at the target element.
-   * @param targetNode Target to mount the UserProfile component.
+   * @param targetNode Target to mount the OrganizationSwitcher component.
    * @param props Configuration parameters.
    */
   mountOrganizationSwitcher: (targetNode: HTMLDivElement, props?: OrganizationSwitcherProps) => void;
 
   /**
    * Unmount the organization profile component from the target node.*
-   * @param targetNode Target node to unmount the UserProfile component from.
+   * @param targetNode Target node to unmount the OrganizationSwitcher component from.
    */
   unmountOrganizationSwitcher: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount an organization switcher component at the target element.
-   * @param targetNode Target to mount the UserProfile component.
+   * @param targetNode Target to mount the OrganizationList component.
    * @param props Configuration parameters.
    */
   mountOrganizationList: (targetNode: HTMLDivElement, props?: OrganizationListProps) => void;
 
   /**
    * Unmount the organization profile component from the target node.*
-   * @param targetNode Target node to unmount the UserProfile component from.
+   * @param targetNode Target node to unmount the OrganizationList component from.
    */
   unmountOrganizationList: (targetNode: HTMLDivElement) => void;
 
