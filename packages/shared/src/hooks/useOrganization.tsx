@@ -11,8 +11,10 @@ import type {
   OrganizationResource,
 } from '@clerk/types';
 import type { ClerkPaginatedResponse } from '@clerk/types';
-import useSWR from 'swr';
 
+import { disableSWRDevtools } from './clerk-swr';
+disableSWRDevtools();
+import { useSWR } from './clerk-swr';
 import { useClerkInstanceContext, useOrganizationContext, useSessionContext } from './contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
