@@ -1,11 +1,11 @@
-import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
+import type { OrganizationResource } from '@clerk/types';
 
 import { useCoreOrganizationList, useCoreUser, useOrganizationListContext } from '../../contexts';
 import { OrganizationPreview, PersonalWorkspacePreview, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { OrganizationListPreviewButton } from './shared';
 
-export const MembershipPreview = withCardStateProvider((props: OrganizationMembershipResource) => {
+export const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { isLoaded, setActive } = useCoreOrganizationList();
