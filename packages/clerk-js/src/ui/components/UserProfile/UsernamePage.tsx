@@ -52,7 +52,7 @@ export const UsernamePage = withCardStateProvider(() => {
               <Form.FieldLabelRow>
                 <Form.FieldLabel localizationKey={localizationKeys('formFieldLabel__username')} />
               </Form.FieldLabelRow>
-              <Form.FieldSimpleControl />
+              <Form.FieldInput />
               <Form.FieldFeedback />
             </Form.Field>
           </Form.ControlRow>

@@ -21,24 +21,19 @@ import {
   Text,
   useLocalizations,
 } from '../customizables';
+import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { useFieldMessageVisibility } from '../hooks';
 import { FormFieldContextProvider, useFormControl, useFormField } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { useFormControlFeedback } from '../utils';
 import { useCardState } from './contexts';
 import { useFormState } from './Form';
+import type { FormFeedbackDescriptorsKeys, FormFeedbackProps } from './FormControl';
+import { useCalculateErrorTextHeight, useFormTextAnimation } from './FormControl';
 import { InputGroup } from './InputGroup';
 import { PasswordInput } from './PasswordInput';
 import { PhoneInput } from './PhoneInput';
 import { RadioGroup } from './RadioGroup';
-import { ElementDescriptor } from '../customizables/elementDescriptors';
-import {
-  FormFeedbackDescriptorsKeys,
-  FormFeedbackProps,
-  useCalculateErrorTextHeight,
-  useFormTextAnimation,
-} from './FormControl';
-import { useFieldState } from '../common';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> & {
   id: FieldId;
@@ -359,8 +354,6 @@ const FieldFeedbackInternal = (props: FormFeedbackProps) => {
   const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
 
-  console.log('dwowowow', isSomeMessageVisible);
-
   const { calculateHeight, height } = useCalculateErrorTextHeight({
     recalculate: warningMessage || errorMessage || informationMessage,
   });
@@ -436,11 +429,50 @@ const FieldFeedbackInternal = (props: FormFeedbackProps) => {
     </Box>
   );
 };
+
+const InputElement = forwardRef<HTMLInputElement>((_, ref) => {
+  const { t } = useLocalizations();
+  const { placeholder, radioOptions, validatePassword, ...inputProps } = useFormField();
+  return (
+    <Input
+      ref={ref}
+      elementDescriptor={descriptors.formFieldInput}
+      elementId={descriptors.formFieldInput.setId(inputProps.id)}
+      {...inputProps}
+      placeholder={t(placeholder)}
+    />
+  );
+});
+
+const InputGroupElement = forwardRef<
+  HTMLInputElement,
+  {
+    groupPrefix?: string;
+    groupSuffix?: string;
+  }
+>((props, ref) => {
+  const { t } = useLocalizations();
+  const { placeholder, radioOptions, validatePassword, ...inputProps } = useFormField();
+  return (
+    <InputGroup
+      ref={ref}
+      elementDescriptor={descriptors.formFieldInput}
+      elementId={descriptors.formFieldInput.setId(inputProps.id)}
+      {...inputProps}
+      groupPreffix={props.groupPrefix}
+      groupSuffix={props.groupSuffix}
+      placeholder={t(placeholder)}
+    />
+  );
+});
+
 export const Field = {
   Root: Root,
   Control: Control,
   Label: FieldLabel,
   LabelRow: FieldLabelRow,
+  Input: InputElement,
+  InputGroup: InputGroupElement,
   Action: FieldAction,
   AsOptional: FieldOptionalLabel,
   LabelIcon: FieldLabelIcon,

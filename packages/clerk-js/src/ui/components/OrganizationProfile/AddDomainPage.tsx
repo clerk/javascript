@@ -61,7 +61,7 @@ export const AddDomainPage = withCardStateProvider(() => {
             <Form.FieldLabelRow>
               <Form.FieldLabel localizationKey={localizationKeys('formFieldLabel__organizationDomain')} />
             </Form.FieldLabelRow>
-            <Form.FieldSimpleControl />
+            <Form.FieldInput />
             <Form.FieldFeedback />
           </Form.Field>
         </Form.ControlRow>
