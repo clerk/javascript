@@ -53,10 +53,10 @@ export const AddDomainPage = withCardStateProvider(() => {
     >
       <Form.Root onSubmit={onSubmit}>
         <Form.ControlRow elementId={nameField.id}>
-          <Form.Control
+          <Form.PlainInput
             {...nameField.props}
             autoFocus
-            required
+            isRequired
           />
         </Form.ControlRow>
         <FormButtons isDisabled={!canSubmit} />

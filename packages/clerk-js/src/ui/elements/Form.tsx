@@ -1,11 +1,14 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { FieldId } from '@clerk/types';
+import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 
+import type { LocalizationKey } from '../customizables';
 import { Button, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
+import { Field } from './FieldControl';
 import { FormControl } from './FormControl';
 
 const [FormState, useFormState] = createContextAndHook<{
@@ -118,10 +121,53 @@ const FormControlRow = (props: Omit<PropsOfComponent<typeof Flex>, 'elementId'> 
   );
 };
 
+type CommonFieldRootProps = Omit<PropsOfComponent<typeof Field.Root>, 'children'>;
+
+type CommonInputProps = CommonFieldRootProps & {
+  isOptional?: boolean;
+  actionLabel?: string | LocalizationKey;
+  onActionClicked?: React.MouseEventHandler;
+  icon?: React.ComponentType;
+};
+
+const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
+  const { isOptional, icon, actionLabel, children, onActionClicked, ...fieldProps } = props;
+  return (
+    <Field.Root {...fieldProps}>
+      <Field.LabelRow>
+        <Field.Label />
+        <Field.LabelIcon icon={icon} />
+        {!actionLabel && isOptional && <Field.AsOptional />}
+        {actionLabel && (
+          <Field.Action
+            localizationKey={actionLabel}
+            onClick={onActionClicked}
+          />
+        )}
+        <Field.Action />
+      </Field.LabelRow>
+      {children}
+      <Field.Feedback />
+    </Field.Root>
+  );
+};
+
+const PlainInput = (props: CommonInputProps) => {
+  return (
+    <CommonInputWrapper {...props}>
+      <Field.Input />
+    </CommonInputWrapper>
+  );
+};
+
 export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
+  /**
+   * @deprecated Use Form.PlainInput
+   */
   Control: FormControl,
+  PlainInput,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };

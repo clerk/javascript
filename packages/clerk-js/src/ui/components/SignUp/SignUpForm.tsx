@@ -32,44 +32,36 @@ export const SignUpForm = (props: SignUpFormProps) => {
       {(shouldShow('firstName') || shouldShow('lastName')) && (
         <Form.ControlRow elementId='name'>
           {shouldShow('firstName') && (
-            <Form.Control
-              {...{
-                ...formState.firstName.props,
-                isRequired: fields.firstName!.required,
-                isOptional: !fields.firstName!.required,
-              }}
+            <Form.PlainInput
+              {...formState.firstName.props}
+              isRequired={fields.firstName!.required}
+              isOptional={!fields.firstName!.required}
             />
           )}
           {shouldShow('lastName') && (
-            <Form.Control
-              {...{
-                ...formState.lastName.props,
-                isRequired: fields.lastName!.required,
-                isOptional: !fields.lastName!.required,
-              }}
+            <Form.PlainInput
+              {...formState.lastName.props}
+              isRequired={fields.lastName!.required}
+              isOptional={!fields.lastName!.required}
             />
           )}
         </Form.ControlRow>
       )}
       {shouldShow('username') && (
         <Form.ControlRow elementId='username'>
-          <Form.Control
-            {...{
-              ...formState.username.props,
-              isRequired: fields.username!.required,
-              isOptional: !fields.username!.required,
-            }}
+          <Form.PlainInput
+            {...formState.username.props}
+            isRequired={fields.username!.required}
+            isOptional={!fields.username!.required}
           />
         </Form.ControlRow>
       )}
       {shouldShow('emailAddress') && (
         <Form.ControlRow elementId='emailAddress'>
-          <Form.Control
-            {...{
-              ...formState.emailAddress.props,
-              isRequired: fields.emailAddress!.required,
-              isOptional: !fields.emailAddress!.required,
-            }}
+          <Form.PlainInput
+            {...formState.emailAddress.props}
+            isRequired={fields.emailAddress!.required}
+            isOptional={!fields.emailAddress!.required}
             actionLabel={canToggleEmailPhone ? 'Use phone instead' : undefined}
             onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
           />
