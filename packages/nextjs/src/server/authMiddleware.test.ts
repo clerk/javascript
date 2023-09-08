@@ -142,6 +142,8 @@ const validRoutes = [
   '/protected/',
   '/protected/hello',
   '/protected/hello.example/hello',
+  '/my-protected-page',
+  '/my/$special/$pages',
 ];
 
 const invalidRoutes = [
@@ -151,6 +153,7 @@ const invalidRoutes = [
   '/files/api.pdf',
   '/test/api/test.pdf',
   '/imgs/img.png',
+  '/imgs/img-dash.jpg',
 ];
 
 describe('default config matcher', () => {

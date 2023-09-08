@@ -42,17 +42,20 @@ type RouteMatcherWithNextTypedRoutes =
 
 const INFINITE_REDIRECTION_LOOP_COOKIE = '__clerk_redirection_loop';
 
+// Characters we consider to be valid in filenames: [A-Za-z0-9_-\$\(\)], used for matching static files below
+const VALID_FILENAME_CHARS = '\\w-\\$\\(\\)';
+
 /**
  * The default ideal matcher that excludes the _next directory (internals) and all static files,
  * but it will match the root route (/) and any routes that start with /api or /trpc.
  */
-export const DEFAULT_CONFIG_MATCHER = ['/((?!.+[\\w]+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'];
+export const DEFAULT_CONFIG_MATCHER = [`/((?!.+[${VALID_FILENAME_CHARS}]+\\.[\\w]+$|_next).*)`, '/', '/(api|trpc)(.*)'];
 
 /**
  * Any routes matching this path will be ignored by the middleware.
  * This is the inverted version of DEFAULT_CONFIG_MATCHER.
  */
-export const DEFAULT_IGNORED_ROUTES = ['/((?!api|trpc))(_next.*|.+[\\w]+\\.[\\w]+$)'];
+export const DEFAULT_IGNORED_ROUTES = [`/((?!api|trpc))(_next.*|.+[${VALID_FILENAME_CHARS}]+\\.[\\w]+$)`];
 /**
  * Any routes matching this path will be treated as API endpoints by the middleware.
  */
