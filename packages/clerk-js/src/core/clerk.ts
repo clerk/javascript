@@ -915,6 +915,8 @@ export default class Clerk implements ClerkInterface {
             session: res.createdSessionId,
             beforeEmit: navigateAfterSignIn,
           });
+        case 'needs_first_factor':
+          return navigateToFactorOne();
         case 'needs_second_factor':
           return navigateToFactorTwo();
         default:
