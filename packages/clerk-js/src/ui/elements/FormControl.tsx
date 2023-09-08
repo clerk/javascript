@@ -92,7 +92,7 @@ const getInputElementForType = ({
   return CustomInputs[customInput] || Input;
 };
 
-function useFormTextAnimation() {
+export function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const getFormTextAnimation = useCallback(
@@ -121,7 +121,7 @@ type CalculateConfigProps = {
   recalculate?: LocalizationKey | string | undefined;
 };
 type Px = number;
-const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
+export const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
   const [height, setHeight] = useState<Px>(24);
 
   const calculateHeight = useCallback(
@@ -142,9 +142,9 @@ const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
   };
 };
 
-type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
+export type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
 
-type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
+export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
 };
 

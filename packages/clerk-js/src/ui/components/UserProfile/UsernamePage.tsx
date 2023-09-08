@@ -43,6 +43,18 @@ export const UsernamePage = withCardStateProvider(() => {
               required
               autoFocus
             />
+
+            <Form.Field
+              {...usernameField.props}
+              autoFocus
+              required
+            >
+              <Form.FieldLabelRow>
+                <Form.FieldLabel localizationKey={localizationKeys('formFieldLabel__username')} />
+              </Form.FieldLabelRow>
+              <Form.FieldSimpleControl />
+              <Form.FieldFeedback />
+            </Form.Field>
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>

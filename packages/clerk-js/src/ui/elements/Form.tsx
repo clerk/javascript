@@ -7,6 +7,7 @@ import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
 import { FormControl } from './FormControl';
+import { Field } from './FieldControl';
 
 const [FormState, useFormState] = createContextAndHook<{
   isLoading: boolean;
@@ -122,6 +123,11 @@ export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
   Control: FormControl,
+  Field: Field.Root,
+  FieldSimpleControl: Field.Control,
+  FieldLabel: Field.Label,
+  FieldLabelRow: Field.LabelRow,
+  FieldFeedback: Field.Feedback,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };
