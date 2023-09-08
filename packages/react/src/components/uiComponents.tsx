@@ -1,5 +1,6 @@
 import type {
   CreateOrganizationProps,
+  OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
   SignInProps,
@@ -142,3 +143,14 @@ export const OrganizationSwitcher = withClerk(({ clerk, ...props }: WithClerkPro
     />
   );
 }, 'OrganizationSwitcher');
+
+export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationListProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountOrganizationList}
+      unmount={clerk.unmountOrganizationList}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+}, 'OrganizationList');
