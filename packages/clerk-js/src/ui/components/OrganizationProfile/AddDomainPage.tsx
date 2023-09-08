@@ -56,7 +56,7 @@ export const AddDomainPage = withCardStateProvider(() => {
           <Form.Field
             {...nameField.props}
             autoFocus
-            required
+            isRequired
           >
             <Form.FieldLabelRow>
               <Form.FieldLabel localizationKey={localizationKeys('formFieldLabel__organizationDomain')} />

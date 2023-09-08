@@ -1,7 +1,7 @@
 import type { FieldId } from '@clerk/types';
 import type { ClerkAPIError } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { forwardRef, useMemo } from 'react';
+import React, { forwardRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -32,8 +32,7 @@ import type { FormFeedbackDescriptorsKeys, FormFeedbackProps } from './FormContr
 import { useCalculateErrorTextHeight, useFormTextAnimation } from './FormControl';
 import { InputGroup } from './InputGroup';
 import { PasswordInput } from './PasswordInput';
-import { PhoneInput } from './PhoneInput';
-import { RadioGroup } from './RadioGroup';
+import { RadioItem } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> & {
   id: FieldId;
@@ -63,33 +62,6 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
     description?: string | LocalizationKey;
   }[];
   isFocused: boolean;
-};
-
-// TODO: Convert this into a Component?
-const getInputElementForType = ({
-  type,
-  groupPreffix,
-  groupSuffix,
-}: {
-  type: FormControlProps['type'];
-  groupPreffix: string | undefined;
-  groupSuffix: string | undefined;
-}) => {
-  const CustomInputs = {
-    password: PasswordInput,
-    tel: PhoneInput,
-    radio: RadioGroup,
-  };
-
-  if (groupPreffix || groupSuffix) {
-    return InputGroup;
-  }
-  if (!type) {
-    return Input;
-  }
-
-  const customInput = type as keyof typeof CustomInputs;
-  return CustomInputs[customInput] || Input;
 };
 
 const delay = 350;
@@ -150,57 +122,6 @@ export const Root = (props: PropsWithChildren<FormControlProps>) => {
     </FormFieldContextProvider>
   );
 };
-
-export const Control = forwardRef<HTMLInputElement, { groupPreffix?: string; groupSuffix?: string }>((props, ref) => {
-  // const { t } = useLocalizations();
-
-  const { groupPreffix, groupSuffix } = props;
-
-  const { placeholder, radioOptions, ...restInputProps } = useFormField();
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { validatePassword, ...inputProps } = restInputProps;
-
-  const inputElementProps = useMemo(() => {
-    const propMap = {
-      password: restInputProps,
-      radio: {
-        ...inputProps,
-        radioOptions,
-      },
-    };
-
-    if (groupPreffix || groupSuffix) {
-      return {
-        ...inputProps,
-        groupPreffix,
-        groupSuffix,
-      };
-    }
-
-    if (!restInputProps.type) {
-      return inputProps;
-    }
-    const type = restInputProps.type as keyof typeof propMap;
-    return propMap[type] || inputProps;
-  }, [restInputProps]);
-
-  const InputElement = getInputElementForType({
-    type: restInputProps.type,
-    groupPreffix,
-    groupSuffix,
-  });
-
-  return (
-    <InputElement
-      elementDescriptor={descriptors.formFieldInput}
-      elementId={descriptors.formFieldInput.setId(restInputProps.id)}
-      {...inputElementProps}
-      ref={ref}
-      // placeholder={t(placeholder)}
-    />
-  );
-});
 
 const FieldAction = (
   props: PropsWithChildren<{ localizationKey?: LocalizationKey | string; onClick?: React.MouseEventHandler }>,
@@ -292,13 +213,13 @@ const FieldLabel = (props: PropsWithChildren<{ localizationKey?: LocalizationKey
 };
 
 const FieldLabelRow = (props: PropsWithChildren) => {
-  const { id } = useFormField();
+  const { fieldId } = useFormField();
   return (
     <Flex
       justify={'between'}
       align='center'
       elementDescriptor={descriptors.formFieldLabelRow}
-      elementId={descriptors.formFieldLabelRow.setId(id)}
+      elementId={descriptors.formFieldLabelRow.setId(fieldId)}
       sx={theme => ({
         marginBottom: theme.space.$1,
         marginLeft: 0,
@@ -446,6 +367,8 @@ const sanitizeInputProps = (obj: ReturnType<typeof useFormField>, keep?: (keyof 
     setSuccessful,
     setError,
     errorMessageId,
+    fieldId,
+    label,
     ...inputProps
   } = obj;
 
@@ -465,7 +388,7 @@ const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {
     <PasswordInput
       ref={ref}
       elementDescriptor={descriptors.formFieldInput}
-      elementId={descriptors.formFieldInput.setId(inputProps.id)}
+      elementId={descriptors.formFieldInput.setId(formField.fieldId)}
       {...inputProps}
       placeholder={t(placeholder)}
     />
@@ -480,7 +403,7 @@ const InputElement = forwardRef<HTMLInputElement>((_, ref) => {
     <Input
       ref={ref}
       elementDescriptor={descriptors.formFieldInput}
-      elementId={descriptors.formFieldInput.setId(inputProps.id)}
+      elementId={descriptors.formFieldInput.setId(formField.fieldId)}
       {...inputProps}
       placeholder={t(placeholder)}
     />
@@ -502,7 +425,7 @@ const InputGroupElement = forwardRef<
     <InputGroup
       ref={ref}
       elementDescriptor={descriptors.formFieldInput}
-      elementId={descriptors.formFieldInput.setId(inputProps.id)}
+      elementId={descriptors.formFieldInput.setId(formField.fieldId)}
       {...inputProps}
       groupPreffix={props.groupPrefix}
       groupSuffix={props.groupSuffix}
@@ -513,12 +436,12 @@ const InputGroupElement = forwardRef<
 
 export const Field = {
   Root: Root,
-  Control: Control,
   Label: FieldLabel,
   LabelRow: FieldLabelRow,
   PasswordInput: PasswordInputElement,
   Input: InputElement,
   InputGroup: InputGroupElement,
+  RadioItem: RadioItem,
   Action: FieldAction,
   AsOptional: FieldOptionalLabel,
   LabelIcon: FieldLabelIcon,

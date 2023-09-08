@@ -2,12 +2,12 @@ import { createContextAndHook } from '@clerk/shared';
 import type { FieldId } from '@clerk/types';
 import React, { useState } from 'react';
 
-import { Button, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
+import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
-import { FormControl } from './FormControl';
 import { Field } from './FieldControl';
+import { FormControl } from './FormControl';
 
 const [FormState, useFormState] = createContextAndHook<{
   isLoading: boolean;
@@ -119,6 +119,29 @@ const FormControlRow = (props: Omit<PropsOfComponent<typeof Flex>, 'elementId'> 
   );
 };
 
+const RadioGroup = (props: PropsOfComponent<typeof Field.Root>) => {
+  const { radioOptions, ...fieldProps } = props;
+  return (
+    <Field.Root {...fieldProps}>
+      <Col
+        elementDescriptor={descriptors.formFieldRadioGroup}
+        gap={2}
+      >
+        {radioOptions?.map(({ value, description, label }) => (
+          <Field.RadioItem
+            key={value}
+            value={value}
+            label={label}
+            description={description}
+          />
+        ))}
+      </Col>
+
+      <Field.Feedback />
+    </Field.Root>
+  );
+};
+
 export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
@@ -126,6 +149,7 @@ export const Form = {
   Field: Field.Root,
   // FieldSimpleControl: Field.Control,
   FieldInput: Field.Input,
+  RadioGroup: RadioGroup,
   FieldPasswordInput: Field.PasswordInput,
   FieldInputGroup: Field.InputGroup,
   FieldLabel: Field.Label,

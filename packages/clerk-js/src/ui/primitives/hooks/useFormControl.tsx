@@ -1,8 +1,9 @@
 import { createContextAndHook } from '@clerk/shared';
 import type { ClerkAPIError, FieldId } from '@clerk/types';
-import React, { HTMLInputTypeAttribute } from 'react';
-import { FormControlState } from '../../utils';
-import { LocalizationKey } from '../../localization';
+import type { HTMLInputTypeAttribute } from 'react';
+import React from 'react';
+
+import type { LocalizationKey } from '../../localization';
 
 export type FormControlProps = {
   /**
@@ -61,10 +62,12 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
   return <FormControlContext.Provider value={value}>{props.children}</FormControlContext.Provider>;
 };
 
-type FormFieldContextValue = FormFieldProps & {
+type FormFieldContextValue = Omit<FormFieldProps, 'id'> & {
   errorMessageId: string;
+  id?: string;
+  fieldId?: FieldId;
 };
-export const [FormFieldContext, , useFormField] = createContextAndHook<FormFieldContextValue>('FormFieldContext');
+export const [FormFieldContext, useFormField] = createContextAndHook<FormFieldContextValue>('FormFieldContext');
 
 type SelectOption = { value: string; label?: string };
 
@@ -134,6 +137,7 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       isRequired,
       hasError,
       id,
+      fieldId: propsId,
       errorMessageId,
       isDisabled,
       setError,

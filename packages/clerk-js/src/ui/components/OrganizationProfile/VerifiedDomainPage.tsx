@@ -68,49 +68,51 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const allowsEdit = mode === 'edit';
 
+  const radioOptions = [
+    ...(organizationSettings.domains.enrollmentModes.includes('manual_invitation')
+      ? [
+          {
+            value: 'manual_invitation',
+            label: localizationKeys(
+              'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__label',
+            ),
+            description: localizationKeys(
+              'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__description',
+            ),
+          },
+        ]
+      : []),
+    ...(organizationSettings.domains.enrollmentModes.includes('automatic_invitation')
+      ? [
+          {
+            value: 'automatic_invitation',
+            label: localizationKeys(
+              'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__label',
+            ),
+            description: localizationKeys(
+              'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__description',
+            ),
+          },
+        ]
+      : []),
+    ...(organizationSettings.domains.enrollmentModes.includes('automatic_suggestion')
+      ? [
+          {
+            value: 'automatic_suggestion',
+            label: localizationKeys(
+              'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__label',
+            ),
+            description: localizationKeys(
+              'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__description',
+            ),
+          },
+        ]
+      : []),
+  ];
+
   const enrollmentMode = useFormControl('enrollmentMode', '', {
     type: 'radio',
-    radioOptions: [
-      ...(organizationSettings.domains.enrollmentModes.includes('manual_invitation')
-        ? [
-            {
-              value: 'manual_invitation',
-              label: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__label',
-              ),
-              description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__description',
-              ),
-            },
-          ]
-        : []),
-      ...(organizationSettings.domains.enrollmentModes.includes('automatic_invitation')
-        ? [
-            {
-              value: 'automatic_invitation',
-              label: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__label',
-              ),
-              description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__description',
-              ),
-            },
-          ]
-        : []),
-      ...(organizationSettings.domains.enrollmentModes.includes('automatic_suggestion')
-        ? [
-            {
-              value: 'automatic_suggestion',
-              label: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__label',
-              ),
-              description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__description',
-              ),
-            },
-          ]
-        : []),
-    ],
+    radioOptions: radioOptions,
   });
 
   const deletePending = useFormControl('deleteExistingInvitationsSuggestions', '', {
@@ -244,7 +246,8 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                 gap={6}
               >
                 <Form.ControlRow elementId={enrollmentMode.id}>
-                  <Form.Control {...enrollmentMode.props} />
+                  {/*<Form.Control {...enrollmentMode.props} />*/}
+                  <Form.RadioGroup {...enrollmentMode.props} />
                 </Form.ControlRow>
 
                 {allowsEdit && (
