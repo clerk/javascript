@@ -38,11 +38,11 @@ export const UsernamePage = withCardStateProvider(() => {
       >
         <Form.Root onSubmit={updatePassword}>
           <Form.ControlRow elementId={usernameField.id}>
-            <Form.Control
-              {...usernameField.props}
-              required
-              autoFocus
-            />
+            {/*<Form.Control*/}
+            {/*  {...usernameField.props}*/}
+            {/*  required*/}
+            {/*  autoFocus*/}
+            {/*/>*/}
 
             <Form.Field
               {...usernameField.props}

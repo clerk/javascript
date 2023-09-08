@@ -267,15 +267,15 @@ const FieldLabelIcon = (props: { icon?: React.ComponentType }) => {
 };
 
 const FieldLabel = (props: PropsWithChildren<{ localizationKey?: LocalizationKey | string }>) => {
-  const { hasError, isDisabled, isRequired, id } = useFormField();
+  const { hasError, isDisabled, isRequired, id, label } = useFormField();
 
-  if (!props.localizationKey && !props.children) {
+  if (!(props.localizationKey || label) && !props.children) {
     return null;
   }
 
   return (
     <FormLabel
-      localizationKey={props.localizationKey}
+      localizationKey={props.localizationKey || label}
       elementDescriptor={descriptors.formFieldLabel}
       elementId={descriptors.formFieldLabel.setId(id as FieldId)}
       hasError={!!hasError}
@@ -332,7 +332,6 @@ const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors'>) => 
     warningText,
     skipBlur: submittedWithEnter,
   });
-  console.log('nice');
 
   return (
     <FieldFeedbackInternal
@@ -430,9 +429,53 @@ const FieldFeedbackInternal = (props: FormFeedbackProps) => {
   );
 };
 
+const sanitizeInputProps = (obj: ReturnType<typeof useFormField>, keep?: (keyof ReturnType<typeof useFormField>)[]) => {
+  const {
+    radioOptions,
+    validatePassword,
+    warningText,
+    informationText,
+    hasPassedComplexity,
+    enableErrorAfterBlur,
+    isFocused,
+    hasLostFocus,
+    successfulText,
+    errorText,
+    setHasPassedComplexity,
+    setWarning,
+    setSuccessful,
+    setError,
+    errorMessageId,
+    ...inputProps
+  } = obj;
+
+  keep?.forEach(key => {
+    // @ts-ignore
+    inputProps[key] = obj[key];
+  });
+
+  return inputProps;
+};
+
+const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {
+  const { t } = useLocalizations();
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField, ['validatePassword']);
+  return (
+    <PasswordInput
+      ref={ref}
+      elementDescriptor={descriptors.formFieldInput}
+      elementId={descriptors.formFieldInput.setId(inputProps.id)}
+      {...inputProps}
+      placeholder={t(placeholder)}
+    />
+  );
+});
+
 const InputElement = forwardRef<HTMLInputElement>((_, ref) => {
   const { t } = useLocalizations();
-  const { placeholder, radioOptions, validatePassword, ...inputProps } = useFormField();
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField);
   return (
     <Input
       ref={ref}
@@ -452,7 +495,9 @@ const InputGroupElement = forwardRef<
   }
 >((props, ref) => {
   const { t } = useLocalizations();
-  const { placeholder, radioOptions, validatePassword, ...inputProps } = useFormField();
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField);
+
   return (
     <InputGroup
       ref={ref}
@@ -471,6 +516,7 @@ export const Field = {
   Control: Control,
   Label: FieldLabel,
   LabelRow: FieldLabelRow,
+  PasswordInput: PasswordInputElement,
   Input: InputElement,
   InputGroup: InputGroupElement,
   Action: FieldAction,

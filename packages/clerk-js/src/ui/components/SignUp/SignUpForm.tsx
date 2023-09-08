@@ -97,6 +97,20 @@ export const SignUpForm = (props: SignUpFormProps) => {
               isOptional: !fields.password!.required,
             }}
           />
+
+          <Form.Field
+            {...{
+              ...formState.password.props,
+              isRequired: fields.password!.required,
+            }}
+          >
+            <Form.FieldLabelRow>
+              <Form.FieldLabel />
+              {!fields.password!.required && <Form.FieldAsOptional />}
+            </Form.FieldLabelRow>
+            <Form.FieldPasswordInput />
+            <Form.FieldFeedback />
+          </Form.Field>
         </Form.ControlRow>
       )}
       <Form.SubmitButton>Continue</Form.SubmitButton>
