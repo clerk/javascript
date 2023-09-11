@@ -5,7 +5,7 @@ import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { LoadedGuarantee } from '../contexts/StructureContext';
-import type { RedirectToProps, WithClerkProp } from '../types';
+import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
 export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
@@ -40,7 +40,7 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JS
   return <>{children}</>;
 };
 
-export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToProps>) => {
+export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;
   // TODO: Remove temp use of __unstable__environment
   const { __unstable__environment } = clerk as any;
@@ -59,7 +59,7 @@ export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<Re
   return null;
 }, 'RedirectToSignIn');
 
-export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToProps>) => {
+export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignUpProps>) => {
   React.useEffect(() => {
     void clerk.redirectToSignUp(props);
   }, []);
