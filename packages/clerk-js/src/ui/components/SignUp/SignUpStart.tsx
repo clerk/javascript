@@ -42,6 +42,7 @@ function _SignUpStart(): JSX.Element {
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
   const { t, locale } = useLocalizations();
+  const initialValues = ctx.initialValues || {};
 
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
@@ -51,27 +52,27 @@ function _SignUpStart(): JSX.Element {
   const { failedValidationsText } = usePasswordComplexity(passwordSettings);
 
   const formState = {
-    firstName: useFormControl('firstName', signUp.firstName || '', {
+    firstName: useFormControl('firstName', signUp.firstName || initialValues.firstName || '', {
       type: 'text',
       label: localizationKeys('formFieldLabel__firstName'),
       placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
     }),
-    lastName: useFormControl('lastName', signUp.lastName || '', {
+    lastName: useFormControl('lastName', signUp.lastName || initialValues.lastName || '', {
       type: 'text',
       label: localizationKeys('formFieldLabel__lastName'),
       placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
     }),
-    emailAddress: useFormControl('emailAddress', signUp.emailAddress || '', {
+    emailAddress: useFormControl('emailAddress', signUp.emailAddress || initialValues.emailAddress || '', {
       type: 'email',
       label: localizationKeys('formFieldLabel__emailAddress'),
       placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     }),
-    username: useFormControl('username', signUp.username || '', {
+    username: useFormControl('username', signUp.username || initialValues.username || '', {
       type: 'text',
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
     }),
-    phoneNumber: useFormControl('phoneNumber', signUp.phoneNumber || '', {
+    phoneNumber: useFormControl('phoneNumber', signUp.phoneNumber || initialValues.phoneNumber || '', {
       type: 'tel',
       label: localizationKeys('formFieldLabel__phoneNumber'),
       placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),

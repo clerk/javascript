@@ -358,14 +358,14 @@ export interface Clerk {
    *
    * @param opts A {@link RedirectOptions} object
    */
-  redirectToSignIn(opts?: RedirectOptions): Promise<unknown>;
+  redirectToSignIn(opts?: SignInRedirectOptions): Promise<unknown>;
 
   /**
    * Redirects to the configured URL where <SignUp/> is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
-  redirectToSignUp(opts?: RedirectOptions): Promise<unknown>;
+  redirectToSignUp(opts?: SignUpRedirectOptions): Promise<unknown>;
 
   /**
    * Redirects to the configured URL where <UserProfile/> is mounted.
@@ -559,7 +559,6 @@ export type SignUpInitialValues = {
   firstName?: string;
   lastName?: string;
   username?: string;
-  web3WalletAddress?: string;
 };
 
 export type RedirectOptions = {
@@ -582,6 +581,20 @@ export type RedirectOptions = {
    * to the same value.
    */
   redirectUrl?: string | null;
+};
+
+export type SignInRedirectOptions = RedirectOptions & {
+  /**
+   * Initial values that are used to prefill the sign in form.
+   */
+  initialValues?: SignInInitialValues;
+};
+
+export type SignUpRedirectOptions = RedirectOptions & {
+  /**
+   * Initial values that are used to prefill the sign up form.
+   */
+  initialValues?: SignUpInitialValues;
 };
 
 export type SetActiveParams = {
