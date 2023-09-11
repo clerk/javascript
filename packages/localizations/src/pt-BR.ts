@@ -77,6 +77,10 @@ export const ptBR: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       actionText: 'Possui uma conta?',
       actionLink: 'Entrar',
+      actionLink__use_email: 'Usar email',
+      actionLink__use_phone: 'Usar telefone',
+      actionLink__use_username: 'Usar nome de usuário',
+      actionLink__use_email_username: 'Usar email ou nome de usuário',
     },
     emailLink: {
       title: 'Verifique seu e-mail',
