@@ -7,14 +7,6 @@ import { createValidateComplexity } from './complexity';
 import { createValidatePasswordStrength } from './strength';
 
 export type UsePasswordConfig = PasswordSettingsData & {
-  /**
-   * @deprecated
-   */
-  strengthMeter?: boolean;
-  /**
-   * @deprecated
-   */
-  complexity?: boolean;
   validatePassword: boolean;
 };
 
