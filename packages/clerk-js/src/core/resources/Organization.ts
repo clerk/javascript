@@ -79,6 +79,17 @@ export class Organization extends BaseResource implements OrganizationResource {
     return new Organization(json);
   }
 
+  static async get(organizationId: string): Promise<OrganizationResource> {
+    const json = (
+      await BaseResource._fetch<OrganizationJSON>({
+        path: `/organizations/${organizationId}`,
+        method: 'GET',
+      })
+    )?.response as unknown as OrganizationJSON;
+
+    return new Organization(json);
+  }
+
   update = async (params: UpdateOrganizationParams): Promise<OrganizationResource> => {
     return this._basePatch({
       body: params,
