@@ -144,6 +144,39 @@ const RadioIndicator = forwardRef<HTMLInputElement, { value: string; id: string 
   );
 });
 
+export const RadioLabel = (props: {
+  label: string | LocalizationKey;
+  description?: string | LocalizationKey;
+  id?: string;
+}) => {
+  return (
+    <FormLabel
+      elementDescriptor={descriptors.formFieldRadioLabel}
+      htmlFor={props.id}
+      sx={t => ({
+        padding: `${t.space.$none} ${t.space.$2}`,
+        display: 'flex',
+        flexDirection: 'column',
+      })}
+    >
+      <Text
+        elementDescriptor={descriptors.formFieldRadioLabelTitle}
+        variant='regularMedium'
+        localizationKey={props.label}
+      />
+
+      {props.description && (
+        <Text
+          elementDescriptor={descriptors.formFieldRadioLabelDescription}
+          colorScheme='neutral'
+          variant='smallRegular'
+          localizationKey={props.description}
+        />
+      )}
+    </FormLabel>
+  );
+};
+
 export const RadioItem = forwardRef<
   HTMLInputElement,
   {
@@ -164,30 +197,11 @@ export const RadioItem = forwardRef<
         value={props.value}
       />
 
-      <FormLabel
-        elementDescriptor={descriptors.formFieldRadioLabel}
-        htmlFor={randomId}
-        sx={t => ({
-          padding: `${t.space.$none} ${t.space.$2}`,
-          display: 'flex',
-          flexDirection: 'column',
-        })}
-      >
-        <Text
-          elementDescriptor={descriptors.formFieldRadioLabelTitle}
-          variant='regularMedium'
-          localizationKey={props.label}
-        />
-
-        {props.description && (
-          <Text
-            elementDescriptor={descriptors.formFieldRadioLabelDescription}
-            colorScheme='neutral'
-            variant='smallRegular'
-            localizationKey={props.description}
-          />
-        )}
-      </FormLabel>
+      <RadioLabel
+        id={randomId}
+        label={props.label}
+        description={props.description}
+      />
     </Flex>
   );
 });

@@ -176,8 +176,10 @@ export const PasswordPage = withCardStateProvider(() => {
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={sessionsField.id}>
-            <Form.Control
+            <Form.Checkbox
               {...sessionsField.props}
+              //TODO: localize this
+              description={'It is advised to logout of all other devices that may user an old password'}
               isDisabled={passwordEditDisabled}
             />
           </Form.ControlRow>

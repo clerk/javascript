@@ -205,6 +205,21 @@ const PasswordInput = (props: CommonInputProps) => {
   );
 };
 
+const Checkbox = (
+  props: CommonFieldRootProps & {
+    description?: string | LocalizationKey;
+  },
+) => {
+  return (
+    <Field.Root {...props}>
+      <Flex align='start'>
+        <Field.CheckboxIndicator />
+        <Field.CheckboxLabel description={props.description} />
+      </Flex>
+    </Field.Root>
+  );
+};
+
 export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
@@ -216,6 +231,7 @@ export const Form = {
   PasswordInput,
   InputGroup,
   RadioGroup,
+  Checkbox,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };
