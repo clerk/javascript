@@ -38,23 +38,11 @@ export const UsernamePage = withCardStateProvider(() => {
       >
         <Form.Root onSubmit={updatePassword}>
           <Form.ControlRow elementId={usernameField.id}>
-            {/*<Form.Control*/}
-            {/*  {...usernameField.props}*/}
-            {/*  required*/}
-            {/*  autoFocus*/}
-            {/*/>*/}
-
-            <Form.Field
+            <Form.PlainInput
               {...usernameField.props}
-              autoFocus
               required
-            >
-              <Form.FieldLabelRow>
-                <Form.FieldLabel localizationKey={localizationKeys('formFieldLabel__username')} />
-              </Form.FieldLabelRow>
-              <Form.FieldInput />
-              <Form.FieldFeedback />
-            </Form.Field>
+              autoFocus
+            />
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>

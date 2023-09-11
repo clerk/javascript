@@ -123,7 +123,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             onAvatarRemove={file ? onAvatarRemove : null}
           />
           <Form.ControlRow elementId={nameField.id}>
-            <Form.Control
+            <Form.PlainInput
               sx={{ flexBasis: '80%' }}
               autoFocus
               {...nameField.props}
@@ -132,12 +132,12 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={slugField.id}>
-            <Form.Control
+            <Form.PlainInput
               sx={{ flexBasis: '80%' }}
               {...slugField.props}
               onChange={onChangeSlug}
               icon={QuestionMark}
-              required
+              isRequired
             />
           </Form.ControlRow>
           <FormButtonContainer>

@@ -53,17 +53,11 @@ export const AddDomainPage = withCardStateProvider(() => {
     >
       <Form.Root onSubmit={onSubmit}>
         <Form.ControlRow elementId={nameField.id}>
-          <Form.Field
+          <Form.PlainInput
             {...nameField.props}
             autoFocus
             isRequired
-          >
-            <Form.FieldLabelRow>
-              <Form.FieldLabel localizationKey={localizationKeys('formFieldLabel__organizationDomain')} />
-            </Form.FieldLabelRow>
-            <Form.FieldInput />
-            <Form.FieldFeedback />
-          </Form.Field>
+          />
         </Form.ControlRow>
         <FormButtons isDisabled={!canSubmit} />
       </Form.Root>

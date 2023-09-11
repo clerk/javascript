@@ -151,23 +151,11 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       >
         <Form.Root onSubmit={onSubmitPrepare}>
           <Form.ControlRow elementId={emailField.id}>
-            {/*<Form.Control*/}
-            {/*  {...emailField.props}*/}
-            {/*  autoFocus*/}
-            {/*  groupSuffix={`@${domain.name}`}*/}
-            {/*  required*/}
-            {/*/>*/}
-            <Form.Field
+            <Form.InputGroup
               {...emailField.props}
               autoFocus
               required
-            >
-              <Form.FieldLabelRow>
-                <Form.FieldLabel localizationKey={localizationKeys('formFieldLabel__organizationDomainEmailAddress')} />
-              </Form.FieldLabelRow>
-              <Form.FieldInputGroup groupSuffix={`@${domain.name}`} />
-              <Form.FieldFeedback />
-            </Form.Field>
+            />
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
