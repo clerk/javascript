@@ -35,7 +35,9 @@ export type RootAuthLoaderCallbackReturn =
   | Promise<Response>
   | Response
   | Promise<Record<string, unknown>>
-  | Record<string, unknown>;
+  | Record<string, unknown>
+  | Promise<null>
+  | null;
 
 export type LoaderFunctionArgs = DataFunctionArgs;
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
