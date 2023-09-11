@@ -547,6 +547,21 @@ export interface Resources {
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';
 
+export type SignInInitialValues = {
+  emailAddress?: string;
+  phoneNumber?: string;
+  username?: string;
+};
+
+export type SignUpInitialValues = {
+  emailAddress?: string;
+  phoneNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  web3WalletAddress?: string;
+};
+
 export type RedirectOptions = {
   /**
    * Full URL or path to navigate after successful sign in.
@@ -611,6 +626,10 @@ export type SignInProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: SignInTheme;
+  /**
+   * Initial values that are used to prefill the sign in form.
+   */
+  initialValues?: SignInInitialValues;
 } & RedirectOptions;
 
 export type SignUpProps = {
@@ -638,6 +657,10 @@ export type SignUpProps = {
    * Additional arbitrary metadata to be stored alongside the User object
    */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * Initial values that are used to prefill the sign up form.
+   */
+  initialValues?: SignUpInitialValues;
 } & RedirectOptions;
 
 export type UserProfileProps = {
