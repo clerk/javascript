@@ -2,7 +2,7 @@ import { forwardRef, useId } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Flex, FormLabel, Input, Text } from '../customizables';
-import { useFormField } from '../primitives/hooks';
+import { sanitizeInputProps, useFormField } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 
 /**
@@ -92,34 +92,6 @@ const RadioGroupItem = (props: {
       </FormLabel>
     </Flex>
   );
-};
-
-const sanitizeInputProps = (obj: ReturnType<typeof useFormField>, keep?: (keyof ReturnType<typeof useFormField>)[]) => {
-  const {
-    radioOptions,
-    validatePassword,
-    warningText,
-    informationText,
-    hasPassedComplexity,
-    enableErrorAfterBlur,
-    isFocused,
-    hasLostFocus,
-    successfulText,
-    errorText,
-    setHasPassedComplexity,
-    setWarning,
-    setSuccessful,
-    setError,
-    errorMessageId,
-    ...inputProps
-  } = obj;
-
-  keep?.forEach(key => {
-    // @ts-ignore
-    inputProps[key] = obj[key];
-  });
-
-  return inputProps;
 };
 
 const RadioIndicator = forwardRef<HTMLInputElement, { value: string; id: string }>((props, ref) => {

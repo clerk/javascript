@@ -148,7 +148,7 @@ export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
 };
 
-const delay = 350;
+export const delay = 350;
 
 export const FormFeedback = (props: FormFeedbackProps) => {
   const { id, elementDescriptors } = props;

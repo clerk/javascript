@@ -1,19 +1,13 @@
 import type { FieldId } from '@clerk/types';
-import type { ClerkAPIError } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import React, { forwardRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
-  Box,
   descriptors,
   Flex,
   FormControl as FormControlPrim,
-  FormErrorText,
-  FormInfoText,
   FormLabel,
-  FormSuccessText,
-  FormWarningText,
   Icon as IconCustomizable,
   Input,
   Link,
@@ -21,46 +15,23 @@ import {
   Text,
   useLocalizations,
 } from '../customizables';
-import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { useFieldMessageVisibility } from '../hooks';
-import { FormFieldContextProvider, useFormControl, useFormField } from '../primitives/hooks';
+import { FormFieldContextProvider, sanitizeInputProps, useFormControl, useFormField } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
+import type { useFormControl as useFormControlUtil } from '../utils';
 import { useFormControlFeedback } from '../utils';
 import { useCardState } from './contexts';
 import { useFormState } from './Form';
-import type { FormFeedbackDescriptorsKeys, FormFeedbackProps } from './FormControl';
-import { useCalculateErrorTextHeight, useFormTextAnimation } from './FormControl';
+import type { FormFeedbackProps } from './FormControl';
+import { delay, FormFeedback } from './FormControl';
 import { InputGroup } from './InputGroup';
 import { PasswordInput } from './PasswordInput';
 import { RadioItem, RadioLabel } from './RadioGroup';
 
-type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> & {
-  id: FieldId;
-  isRequired?: boolean;
-  errorText?: string;
-  isDisabled?: boolean;
-  label?: string | LocalizationKey;
-  placeholder?: string | LocalizationKey;
-  validatePassword?: boolean;
-  setError: (error: string | ClerkAPIError | undefined) => void;
-  warningText: string | undefined;
-  setWarning: (error: string) => void;
-  setSuccessful: (message: string) => void;
-  successfulText: string;
-  hasLostFocus: boolean;
-  setHasPassedComplexity: (b: boolean) => void;
-  hasPassedComplexity: boolean;
-  enableErrorAfterBlur?: boolean;
-  informationText?: string | LocalizationKey;
-  radioOptions?: {
-    value: string;
-    label: string | LocalizationKey;
-    description?: string | LocalizationKey;
-  }[];
-  isFocused: boolean;
-};
-
-const delay = 350;
+type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> &
+  ReturnType<typeof useFormControlUtil<FieldId>>['props'] & {
+    isDisabled?: boolean;
+  };
 
 export const Root = (props: PropsWithChildren<FormControlProps>) => {
   const card = useCardState();
@@ -100,6 +71,8 @@ export const Root = (props: PropsWithChildren<FormControlProps>) => {
 
   return (
     <FormFieldContextProvider {...props}>
+      {/*Most of our primitives still depend on this provider.*/}
+      {/*TODO: In follow-up PRs these will be removed*/}
       <FormControlPrim
         elementDescriptor={descriptors.formField}
         elementId={descriptors.formField.setId(id)}
@@ -187,7 +160,8 @@ const FieldLabelIcon = (props: { icon?: React.ComponentType }) => {
 };
 
 const FieldLabel = (props: PropsWithChildren<{ localizationKey?: LocalizationKey | string }>) => {
-  const { hasError, isDisabled, isRequired, id, label } = useFormField();
+  const { hasError, isDisabled } = useFormControl();
+  const { isRequired, id, label } = useFormField();
 
   if (!(props.localizationKey || label) && !props.children) {
     return null;
@@ -254,129 +228,13 @@ const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors'>) => 
   });
 
   return (
-    <FieldFeedbackInternal
+    <FormFeedback
       {...{
         ...debounced,
         elementDescriptors: props.elementDescriptors,
       }}
     />
   );
-};
-
-const FieldFeedbackInternal = (props: FormFeedbackProps) => {
-  const { id, elementDescriptors } = props;
-  const errorMessage = useFieldMessageVisibility(props.errorText, delay);
-  const successMessage = useFieldMessageVisibility(props.successfulText, delay);
-  const informationMessage = useFieldMessageVisibility(props.informationText, delay);
-  const warningMessage = useFieldMessageVisibility(props.warningText, delay);
-
-  const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
-  const isSomeMessageVisible = !!messageToDisplay;
-
-  const { calculateHeight, height } = useCalculateErrorTextHeight({
-    recalculate: warningMessage || errorMessage || informationMessage,
-  });
-  const { getFormTextAnimation } = useFormTextAnimation();
-  const defaultElementDescriptors = {
-    error: descriptors.formFieldErrorText,
-    warning: descriptors.formFieldWarningText,
-    info: descriptors.formFieldInfoText,
-    success: descriptors.formFieldSuccessText,
-  };
-
-  const getElementProps = (type: FormFeedbackDescriptorsKeys) => {
-    const descriptor = (elementDescriptors?.[type] || defaultElementDescriptors[type]) as ElementDescriptor | undefined;
-    return {
-      elementDescriptor: descriptor,
-      elementId: id ? descriptor?.setId?.(id) : undefined,
-    };
-  };
-
-  if (!isSomeMessageVisible) {
-    return null;
-  }
-
-  return (
-    <Box
-      style={{
-        height, // dynamic height
-        position: 'relative',
-      }}
-      sx={[
-        getFormTextAnimation(
-          !!props.informationText || !!props.successfulText || !!props.errorText || !!props.warningText,
-        ),
-      ]}
-    >
-      {/*Display the directions after the success message is unmounted*/}
-      {!successMessage && !warningMessage && !errorMessage && informationMessage && (
-        <FormInfoText
-          ref={calculateHeight}
-          sx={getFormTextAnimation(!!props.informationText && !props?.successfulText && !props.warningText)}
-          localizationKey={informationMessage}
-        />
-      )}
-      {/* Display the error message after the directions is unmounted*/}
-      {errorMessage && (
-        <FormErrorText
-          {...getElementProps('error')}
-          ref={calculateHeight}
-          sx={getFormTextAnimation(!!props?.errorText)}
-          localizationKey={errorMessage}
-        />
-      )}
-
-      {/* Display the success message after the error message is unmounted*/}
-      {!errorMessage && successMessage && (
-        <FormSuccessText
-          {...getElementProps('success')}
-          ref={calculateHeight}
-          sx={getFormTextAnimation(!!props?.successfulText)}
-          localizationKey={successMessage}
-        />
-      )}
-
-      {warningMessage && (
-        <FormWarningText
-          {...getElementProps('warning')}
-          ref={calculateHeight}
-          sx={getFormTextAnimation(!!props.warningText)}
-        >
-          {warningMessage}
-        </FormWarningText>
-      )}
-    </Box>
-  );
-};
-
-const sanitizeInputProps = (obj: ReturnType<typeof useFormField>, keep?: (keyof ReturnType<typeof useFormField>)[]) => {
-  const {
-    radioOptions,
-    validatePassword,
-    warningText,
-    informationText,
-    hasPassedComplexity,
-    enableErrorAfterBlur,
-    isFocused,
-    hasLostFocus,
-    successfulText,
-    errorText,
-    setHasPassedComplexity,
-    setWarning,
-    setSuccessful,
-    setError,
-    errorMessageId,
-    fieldId,
-    label,
-    ...inputProps
-  } = obj;
-
-  keep?.forEach(key => {
-    // @ts-ignore
-    inputProps[key] = obj[key];
-  });
-
-  return inputProps;
 };
 
 const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {

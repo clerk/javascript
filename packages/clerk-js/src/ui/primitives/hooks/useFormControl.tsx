@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createContextAndHook } from '@clerk/shared';
 import type { ClerkAPIError, FieldId } from '@clerk/types';
-import type { HTMLInputTypeAttribute } from 'react';
 import React from 'react';
 
-import type { LocalizationKey } from '../../localization';
+import type { useFormControl as useFormControlUtil } from '../../utils/useFormControl';
 
+/**
+ * @deprecated
+ */
 export type FormControlProps = {
   /**
    * The custom `id` to use for the form control. This is passed directly to the form element (e.g, Input).
@@ -20,11 +23,20 @@ export type FormControlProps = {
   setHasPassedComplexity: (b: boolean) => void;
 };
 
+/**
+ * @deprecated
+ */
 type FormControlContextValue = Required<FormControlProps> & { errorMessageId: string };
 
+/**
+ * @deprecated Use FormFieldContextProvider
+ */
 export const [FormControlContext, , useFormControl] =
   createContextAndHook<FormControlContextValue>('FormControlContext');
 
+/**
+ * @deprecated Use FormFieldContextProvider
+ */
 export const FormControlContextProvider = (props: React.PropsWithChildren<FormControlProps>) => {
   const {
     id: propsId,
@@ -62,61 +74,19 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
   return <FormControlContext.Provider value={value}>{props.children}</FormControlContext.Provider>;
 };
 
-type FormFieldContextValue = Omit<FormFieldProps, 'id'> & {
-  errorMessageId: string;
+type FormFieldProviderProps = ReturnType<typeof useFormControlUtil<FieldId>>['props'];
+
+type FormFieldContextValue = Omit<FormFieldProviderProps, 'id'> & {
+  errorMessageId?: string;
   id?: string;
   fieldId?: FieldId;
 };
 export const [FormFieldContext, useFormField] = createContextAndHook<FormFieldContextValue>('FormFieldContext');
 
-type SelectOption = { value: string; label?: string };
-
-type Options = {
-  isRequired?: boolean;
-  placeholder?: string | LocalizationKey;
-  options?: SelectOption[];
-  defaultChecked?: boolean;
-  enableErrorAfterBlur?: boolean;
-  informationText?: string | LocalizationKey;
-  type?: HTMLInputTypeAttribute;
-  label?: string | LocalizationKey;
-  validatePassword?: boolean;
-  buildErrorMessage?: (err: ClerkAPIError[]) => ClerkAPIError | string | undefined;
-  radioOptions?: {
-    value: string;
-    label: string | LocalizationKey;
-    description?: string | LocalizationKey;
-  }[];
-};
-
-type FormFieldProps = {
-  id?: FieldId;
-  name?: string;
-  value?: string | number | readonly string[];
-  checked?: boolean;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
-  onBlur?: React.FocusEventHandler<HTMLInputElement>;
-  onFocus?: React.FocusEventHandler<HTMLInputElement>;
-  hasLostFocus: boolean;
-  errorText?: string;
-  warningText?: string;
-  setError: (error: string | ClerkAPIError | undefined) => void;
-  setWarning: (message: string) => void;
-  setSuccessful: (message: string) => void;
-  setHasPassedComplexity: (b: boolean) => void;
-  hasPassedComplexity: boolean;
-  successfulText?: string;
-  isFocused: boolean;
-  isDisabled?: boolean;
-  hasError?: boolean;
-} & Omit<Options, 'defaultChecked'>;
-
-export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFieldProps>) => {
+export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFieldProviderProps>) => {
   const {
     id: propsId,
     isRequired = false,
-    hasError = false,
-    isDisabled = false,
     setError,
     setSuccessful,
     setWarning,
@@ -131,21 +101,19 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
    * Track whether the `FormErrorText` has been rendered.
    * We use this to append its id the `aria-describedby` of the `input`.
    */
-  const errorMessageId = hasError ? `error-${propsId}` : '';
+  const errorMessageId = rest.errorText ? `error-${propsId}` : '';
   const value = React.useMemo(
     () => ({
       isRequired,
-      hasError,
       id,
       fieldId: propsId,
       errorMessageId,
-      isDisabled,
       setError,
       setSuccessful,
       setWarning,
       setHasPassedComplexity,
     }),
-    [isRequired, hasError, id, errorMessageId, isDisabled, setError, setSuccessful, setHasPassedComplexity],
+    [isRequired, id, errorMessageId, setError, setSuccessful, setHasPassedComplexity],
   );
   return (
     <FormFieldContext.Provider
@@ -159,4 +127,37 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       {props.children}
     </FormFieldContext.Provider>
   );
+};
+
+export const sanitizeInputProps = (
+  obj: ReturnType<typeof useFormField>,
+  keep?: (keyof ReturnType<typeof useFormField>)[],
+) => {
+  const {
+    radioOptions,
+    validatePassword,
+    warningText,
+    informationText,
+    hasPassedComplexity,
+    enableErrorAfterBlur,
+    isFocused,
+    hasLostFocus,
+    successfulText,
+    errorText,
+    setHasPassedComplexity,
+    setWarning,
+    setSuccessful,
+    setError,
+    errorMessageId,
+    fieldId,
+    label,
+    ...inputProps
+  } = obj;
+
+  keep?.forEach(key => {
+    // @ts-ignore
+    inputProps[key] = obj[key];
+  });
+
+  return inputProps;
 };
