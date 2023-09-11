@@ -37,14 +37,10 @@ import { RadioItem } from './RadioGroup';
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> & {
   id: FieldId;
   isRequired?: boolean;
-  isOptional?: boolean;
   errorText?: string;
-  onActionClicked?: React.MouseEventHandler;
   isDisabled?: boolean;
   label?: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
-  actionLabel?: string | LocalizationKey;
-  icon?: React.ComponentType;
   validatePassword?: boolean;
   setError: (error: string | ClerkAPIError | undefined) => void;
   warningText: string | undefined;
@@ -173,6 +169,9 @@ const FieldLabelIcon = (props: { icon?: React.ComponentType }) => {
     <Flex
       as={'span'}
       title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'
+      sx={{
+        marginRight: 'auto',
+      }}
     >
       <IconCustomizable
         icon={props.icon}

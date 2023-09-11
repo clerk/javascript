@@ -1,7 +1,9 @@
 import { createContextAndHook } from '@clerk/shared';
 import type { FieldId } from '@clerk/types';
+import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 
+import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -119,7 +121,38 @@ const FormControlRow = (props: Omit<PropsOfComponent<typeof Flex>, 'elementId'> 
   );
 };
 
-const RadioGroup = (props: PropsOfComponent<typeof Field.Root>) => {
+type CommonFieldRootProps = Omit<PropsOfComponent<typeof Field.Root>, 'children'>;
+
+type CommonInputProps = CommonFieldRootProps & {
+  isOptional?: boolean;
+  actionLabel?: string | LocalizationKey;
+  onActionClicked?: React.MouseEventHandler;
+  icon?: React.ComponentType;
+};
+
+const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
+  const { isOptional, icon, actionLabel, children, onActionClicked, ...fieldProps } = props;
+  return (
+    <Field.Root {...fieldProps}>
+      <Field.LabelRow>
+        <Field.Label />
+        <Field.LabelIcon icon={icon} />
+        {!actionLabel && isOptional && <Field.AsOptional />}
+        {actionLabel && (
+          <Field.Action
+            localizationKey={actionLabel}
+            onClick={onActionClicked}
+          />
+        )}
+        <Field.Action />
+      </Field.LabelRow>
+      {children}
+      <Field.Feedback />
+    </Field.Root>
+  );
+};
+
+const RadioGroup = (props: CommonFieldRootProps) => {
   const { radioOptions, ...fieldProps } = props;
   return (
     <Field.Root {...fieldProps}>
@@ -142,20 +175,47 @@ const RadioGroup = (props: PropsOfComponent<typeof Field.Root>) => {
   );
 };
 
+const InputGroup = (
+  props: CommonInputProps & {
+    groupPrefix?: string;
+    groupSuffix?: string;
+  },
+) => {
+  const { groupSuffix, groupPrefix, ...fieldProps } = props;
+  return (
+    <CommonInputWrapper {...fieldProps}>
+      <Field.InputGroup {...{ groupSuffix, groupPrefix }} />
+    </CommonInputWrapper>
+  );
+};
+
+const PlainInput = (props: CommonInputProps) => {
+  return (
+    <CommonInputWrapper {...props}>
+      <Field.Input />
+    </CommonInputWrapper>
+  );
+};
+
+const PasswordInput = (props: CommonInputProps) => {
+  return (
+    <CommonInputWrapper {...props}>
+      <Field.Input />
+    </CommonInputWrapper>
+  );
+};
+
 export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
+  /**
+   * @deprecated Use Form.PlainInput, Form.InputGroup, Form.RadioGroup, Form.PasswordInput
+   */
   Control: FormControl,
-  Field: Field.Root,
-  // FieldSimpleControl: Field.Control,
-  FieldInput: Field.Input,
-  RadioGroup: RadioGroup,
-  FieldPasswordInput: Field.PasswordInput,
-  FieldInputGroup: Field.InputGroup,
-  FieldLabel: Field.Label,
-  FieldAsOptional: Field.AsOptional,
-  FieldLabelRow: Field.LabelRow,
-  FieldFeedback: Field.Feedback,
+  PlainInput,
+  PasswordInput,
+  InputGroup,
+  RadioGroup,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };
