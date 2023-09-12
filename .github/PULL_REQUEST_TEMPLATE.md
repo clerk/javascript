@@ -28,6 +28,7 @@
 <!-- Please make sure: -->
 - [ ] `npm test` runs as expected.
 - [ ] `npm run build` runs as expected.
+- [ ] (If applicable) [JSDoc comments](https://jsdoc.app/about-getting-started.html) have been added or updated for any package exports
 
 <!-- Description of the Pull Request -->
 
