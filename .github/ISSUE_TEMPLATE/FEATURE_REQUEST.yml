@@ -1,4 +1,4 @@
-name: "🐥 Feature Request"
+name: "💡 Feature Request"
 description: Describe a new capability you would like to see in Clerk's JavaScript packages.
 labels:
   - "feature-request"
