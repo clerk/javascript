@@ -43,7 +43,7 @@ export interface OrganizationResource extends ClerkResource {
   createdAt: Date;
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
-  getMemberships: (params?: GetMembershipsParams) => Promise<OrganizationMembershipResource[]>;
+  getMemberships: GetMemberships;
   getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   getMembershipRequests: (
@@ -60,9 +60,25 @@ export interface OrganizationResource extends ClerkResource {
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
 }
 
+/**
+ * @deprecated use GetMembersParams
+ */
 export type GetMembershipsParams = {
   role?: MembershipRole[];
 } & ClerkPaginationParams;
+
+export type GetMembersParams = {
+  /**
+   * This the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+
+  role?: MembershipRole[];
+};
 
 export type GetPendingInvitationsParams = ClerkPaginationParams;
 export type GetDomainsParams = {
@@ -119,3 +135,13 @@ export interface UpdateOrganizationParams {
 export interface SetOrganizationLogoParams {
   file: Blob | File | string | null;
 }
+
+type MembersParams = (GetMembershipsParams | GetMembersParams) & {
+  paginated?: boolean;
+};
+
+export type GetMemberships = <T extends MembersParams>(
+  params?: T,
+) => T['paginated'] extends true
+  ? Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>
+  : Promise<OrganizationMembershipResource[]>;
