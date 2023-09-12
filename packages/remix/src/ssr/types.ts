@@ -29,7 +29,16 @@ export type RootAuthLoaderOptions = {
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,
-) => LoaderFunctionReturn;
+) => RootAuthLoaderCallbackReturn;
+
+type ObjectLike = Record<string, unknown> | null;
+
+/**
+ * We are not using `LoaderFunctionReturn` here because we can't support non-object return values. We need to be able to decorate the return value with authentication state, and so we need something object-like.
+ *
+ * In the case of `null`, we will return an object containing only the authentication state.
+ */
+export type RootAuthLoaderCallbackReturn = Promise<Response> | Response | Promise<ObjectLike> | ObjectLike;
 
 export type LoaderFunctionArgs = DataFunctionArgs;
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
