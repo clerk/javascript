@@ -11,6 +11,7 @@ import type {
   OrganizationResource,
 } from '@clerk/types';
 import type { ClerkPaginatedResponse } from '@clerk/types';
+import type { GetMembersParams } from '@clerk/types';
 
 import { disableSWRDevtools } from './clerk-swr';
 disableSWRDevtools();
@@ -21,6 +22,9 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationParams = {
   invitationList?: GetPendingInvitationsParams;
+  /**
+   * @deprecated Use members instead
+   */
   membershipList?: GetMembershipsParams;
   domains?:
     | true
@@ -34,6 +38,12 @@ type UseOrganizationParams = {
         infinite?: boolean;
         keepPreviousData?: boolean;
       });
+  memberships?:
+    | true
+    | (GetMembersParams & {
+        infinite?: boolean;
+        keepPreviousData?: boolean;
+      });
 };
 
 type UseOrganizationReturn =
@@ -41,28 +51,40 @@ type UseOrganizationReturn =
       isLoaded: false;
       organization: undefined;
       invitationList: undefined;
+      /**
+       * @deprecated Use members instead
+       */
       membershipList: undefined;
       membership: undefined;
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
+      memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
     }
   | {
       isLoaded: true;
       organization: OrganizationResource;
       invitationList: undefined;
+      /**
+       * @deprecated Use members instead
+       */
       membershipList: undefined;
       membership: undefined;
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
+      memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
     }
   | {
       isLoaded: boolean;
       organization: OrganizationResource | null;
       invitationList: OrganizationInvitationResource[] | null | undefined;
+      /**
+       * @deprecated Use members instead
+       */
       membershipList: OrganizationMembershipResource[] | null | undefined;
       membership: OrganizationMembershipResource | null | undefined;
       domains: PaginatedResources<OrganizationDomainResource> | null;
       membershipRequests: PaginatedResources<OrganizationMembershipRequestResource> | null;
+      memberships: PaginatedResources<OrganizationMembershipResource> | null;
     };
 
 type UseOrganization = (params?: UseOrganizationParams) => UseOrganizationReturn;
@@ -88,6 +110,7 @@ export const useOrganization: UseOrganization = params => {
     membershipList: membershipListParams,
     domains: domainListParams,
     membershipRequests: membershipRequestsListParams,
+    memberships: membersListParams,
   } = params || {};
   const { organization, lastOrganizationMember, lastOrganizationInvitation } = useOrganizationContext();
   const session = useSessionContext();
@@ -104,6 +127,14 @@ export const useOrganization: UseOrganization = params => {
     initialPage: 1,
     pageSize: 10,
     status: 'pending',
+    keepPreviousData: false,
+    infinite: false,
+  });
+
+  const membersSafeValues = useWithSafeValues(membersListParams, {
+    initialPage: 1,
+    pageSize: 10,
+    role: ['admin'],
     keepPreviousData: false,
     infinite: false,
   });
@@ -128,6 +159,15 @@ export const useOrganization: UseOrganization = params => {
           initialPage: membershipRequestSafeValues.initialPage,
           pageSize: membershipRequestSafeValues.pageSize,
           status: membershipRequestSafeValues.status,
+        };
+
+  const membersParams =
+    typeof membersListParams === 'undefined'
+      ? undefined
+      : {
+          initialPage: membersSafeValues.initialPage,
+          pageSize: membersSafeValues.pageSize,
+          role: membersSafeValues.role,
         };
 
   const domains = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
@@ -161,6 +201,23 @@ export const useOrganization: UseOrganization = params => {
     },
     {
       type: 'membershipRequests',
+      organizationId: organization?.id,
+    },
+  );
+
+  const memberships = usePagesOrInfinite<GetMembersParams, ClerkPaginatedResponse<OrganizationMembershipResource>>(
+    {
+      ...membersParams,
+      paginated: true,
+    } as any,
+    organization?.getMemberships as unknown as any,
+    {
+      keepPreviousData: membersSafeValues.keepPreviousData,
+      infinite: membersSafeValues.infinite,
+      enabled: !!membersParams,
+    },
+    {
+      type: 'members',
       organizationId: organization?.id,
     },
   );
@@ -206,6 +263,7 @@ export const useOrganization: UseOrganization = params => {
       membership: undefined,
       domains: undefinedPaginatedResource,
       membershipRequests: undefinedPaginatedResource,
+      memberships: undefinedPaginatedResource,
     };
   }
 
@@ -218,6 +276,7 @@ export const useOrganization: UseOrganization = params => {
       membership: null,
       domains: null,
       membershipRequests: null,
+      memberships: null,
     };
   }
 
@@ -231,6 +290,7 @@ export const useOrganization: UseOrganization = params => {
       membership: undefined,
       domains: undefinedPaginatedResource,
       membershipRequests: undefinedPaginatedResource,
+      memberships: undefinedPaginatedResource,
     };
   }
 
@@ -246,6 +306,7 @@ export const useOrganization: UseOrganization = params => {
     },
     domains,
     membershipRequests,
+    memberships,
   };
 };
 
