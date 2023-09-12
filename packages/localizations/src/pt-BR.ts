@@ -3,10 +3,10 @@ import type { LocalizationResource } from '@clerk/types';
 const commonTexts = {
   signIn: {
     phoneCode: {
-      title: 'Verifique seu celular',
+      title: 'Verifique seu telefone',
       subtitle: 'para continuar em {{applicationName}}',
       formTitle: 'Código de verificação',
-      formSubtitle: 'Insira o código enviado para seu celular',
+      formSubtitle: 'Insira o código enviado para seu telefone',
       resendButton: 'Reenviar código',
     },
   },
@@ -18,12 +18,12 @@ export const ptBR: LocalizationResource = {
   dividerText: 'ou',
   formFieldLabel__emailAddress: 'Seu e-mail',
   formFieldLabel__emailAddresses: 'Endereços de e-mail',
-  formFieldLabel__phoneNumber: 'Celular',
+  formFieldLabel__phoneNumber: 'Telefone',
   formFieldLabel__username: 'Nome de usuário',
-  formFieldLabel__emailAddress_phoneNumber: 'E-mail ou Celular',
+  formFieldLabel__emailAddress_phoneNumber: 'E-mail ou Telefone',
   formFieldLabel__emailAddress_username: 'E-mail ou nome de usuário',
-  formFieldLabel__phoneNumber_username: 'celular ou nome de usuário',
-  formFieldLabel__emailAddress_phoneNumber_username: 'E-mail, celular ou nome de usuário',
+  formFieldLabel__phoneNumber_username: 'telefone ou nome de usuário',
+  formFieldLabel__emailAddress_phoneNumber_username: 'E-mail, telefone ou nome de usuário',
   formFieldLabel__password: 'Senha',
   formFieldLabel__currentPassword: 'Senha atual',
   formFieldLabel__newPassword: 'Nova senha',
@@ -289,7 +289,7 @@ export const ptBR: LocalizationResource = {
         detailsAction__unverified: 'Completar verificação',
         destructiveActionTitle: 'Remover',
         destructiveActionSubtitle: 'Remover este telefone desta conta',
-        destructiveAction: 'Remover celular',
+        destructiveAction: 'Remover telefone',
       },
       connectedAccountsSection: {
         title: 'Contas conectadas',
