@@ -38,6 +38,17 @@ body:
         - [How to record a Replay](https://docs.replay.io/bug-reports/recording-a-replay)
     validations:
       required: true
+  - type: input
+    id: publishable-key
+    attributes:
+      label: Publishable key
+      placeholder: "pk_test_123456789"
+      description: |
+        Go to your Clerk dashboard and to the **API Keys** section. Copy the **Publishable key** and paste it here.
+
+        This key should be used in your frontend code, can be safely shared, and does not need to be kept secret.
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Description
