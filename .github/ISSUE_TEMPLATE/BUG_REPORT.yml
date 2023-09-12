@@ -1,4 +1,4 @@
-name: "🐛 Issue Report"
+name: "🐛 Bug Report"
 description: Report a bug in Clerk's JavaScript packages.
 labels:
   - "needs-triage"
