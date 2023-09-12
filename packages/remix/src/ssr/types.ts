@@ -29,15 +29,7 @@ export type RootAuthLoaderOptions = {
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,
-) => RootAuthLoaderCallbackReturn;
-
-export type RootAuthLoaderCallbackReturn =
-  | Promise<Response>
-  | Response
-  | Promise<Record<string, unknown>>
-  | Record<string, unknown>
-  | Promise<null>
-  | null;
+) => LoaderFunctionReturn;
 
 export type LoaderFunctionArgs = DataFunctionArgs;
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
