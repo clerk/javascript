@@ -1,5 +1,10 @@
 import type { LocalizationResource } from '@clerk/types';
 
+// PT-BR Nomenclature
+// Phone Number  = "Telefone" instead of "Celular"
+// Email Address = "Endereço de E-mail" instead of "Email"
+// Sign-in       = "Fazer login" instead of "Conectar", "Sign-in", "Logar", "Entrar"
+
 const commonTexts = {
   signIn: {
     phoneCode: {
@@ -396,7 +401,7 @@ export const ptBR: LocalizationResource = {
         formTitle: 'Link de verificação',
         formSubtitle: 'Clique no link de verificação enviado para {{identifier}}',
         resendButton: 'Não recebeu um código? Reenviar',
-        successMessage: 'O e-email {{identifier}} foi adicionado na sua conta.',
+        successMessage: 'O e-mail {{identifier}} foi adicionado na sua conta.',
       },
       removeResource: {
         title: 'Remover e-mail',
