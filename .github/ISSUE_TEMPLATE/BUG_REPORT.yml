@@ -15,13 +15,13 @@ body:
       description: Please make sure that you verify each checkbox and follow the instructions for them.
       options:
         - label: |
-            I have reviewed [the documentation](https://clerk.com/docs)
+            I have reviewed the documentation: https://clerk.com/docs
           required: true
         - label: |
-            I have [searched for existing issues](https://github.com/clerkinc/javascript/issues)
+            I have searched for existing issues: https://github.com/clerkinc/javascript/issues
           required: true
         - label: |
-            This issue is not a question, general help request, or anything other than a bug report directly related to Clerk. Please ask questions in our [Discord community](https://clerk.com/discord).
+            This issue is not a question, general help request, or anything other than a bug report directly related to Clerk. Please ask questions in our Discord community: https://clerk.com/discord.
           required: true
   - type: input
     id: reproduction-link
