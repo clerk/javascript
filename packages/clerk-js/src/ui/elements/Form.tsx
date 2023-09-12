@@ -200,7 +200,7 @@ const PlainInput = (props: CommonInputProps) => {
 const PasswordInput = (props: CommonInputProps) => {
   return (
     <CommonInputWrapper {...props}>
-      <Field.Input />
+      <Field.PasswordInput />
     </CommonInputWrapper>
   );
 };
