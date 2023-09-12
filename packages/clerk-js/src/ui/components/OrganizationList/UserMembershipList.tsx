@@ -14,12 +14,12 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
     return null;
   }
   const handleOrganizationClicked = (organization: OrganizationResource) => {
-    return card.runAsync(() =>
-      setActive({
+    return card.runAsync(async () => {
+      await setActive({
         organization,
-        beforeEmit: () => navigateAfterSelectOrganization(organization),
-      }),
-    );
+      });
+      await navigateAfterSelectOrganization(organization);
+    });
   };
   return (
     <OrganizationListPreviewButton onClick={() => handleOrganizationClicked(props.organization)}>
@@ -47,12 +47,13 @@ export const PersonalAccountPreview = withCardStateProvider(() => {
     if (!isLoaded) {
       return;
     }
-    return card.runAsync(() =>
-      setActive({
+    return card.runAsync(async () => {
+      await setActive({
         organization: null,
-        beforeEmit: () => navigateAfterSelectPersonal(user),
-      }),
-    );
+      });
+
+      await navigateAfterSelectPersonal(user);
+    });
   };
 
   if (hidePersonal) {

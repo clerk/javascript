@@ -149,17 +149,19 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
       >
         <PreviewListItems>
           <PersonalAccountPreview />
-          {userMemberships?.data?.map(inv => {
-            return (
-              <MembershipPreview
-                key={inv.id}
-                {...inv}
-              />
-            );
-          })}
+          {(userMemberships.count || 0) > 0 &&
+            userMemberships.data?.map(inv => {
+              return (
+                <MembershipPreview
+                  key={inv.id}
+                  {...inv}
+                />
+              );
+            })}
 
-          {!userMemberships?.hasNextPage &&
-            userInvitations?.data?.map(inv => {
+          {!userMemberships.hasNextPage &&
+            (userInvitations.count || 0) > 0 &&
+            userInvitations.data?.map(inv => {
               return (
                 <InvitationPreview
                   key={inv.id}
@@ -168,9 +170,10 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
               );
             })}
 
-          {!userMemberships?.hasNextPage &&
-            !userInvitations?.hasNextPage &&
-            userSuggestions?.data?.map(inv => {
+          {!userMemberships.hasNextPage &&
+            !userInvitations.hasNextPage &&
+            (userSuggestions.count || 0) > 0 &&
+            userSuggestions.data?.map(inv => {
               return (
                 <SuggestionPreview
                   key={inv.id}
