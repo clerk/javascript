@@ -4,6 +4,7 @@ import { descriptors } from './elementDescriptors';
 import { makeCustomizable } from './makeCustomizable';
 import { makeResponsive } from './makeResponsive';
 import { sanitizeDomProps } from './sanitizeDomProps';
+import { withAuthHref } from './withAuthHref';
 
 export * from './Flow';
 export { AppearanceProvider, useAppearance } from './AppearanceContext';
@@ -23,7 +24,7 @@ export const SimpleButton = makeCustomizable(makeLocalizable(sanitizeDomProps(Pr
 
 // export const SimpleButton = makeCustomizable(sanitizeDomPropsPrimitives.SimpleButton, { defaultDescriptor: descriptors.button });
 export const Heading = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Heading)));
-export const Link = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Link)));
+export const Link = makeCustomizable(makeLocalizable(withAuthHref(sanitizeDomProps(Primitives.Link))));
 export const Text = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Text)));
 
 export const Image = makeCustomizable(sanitizeDomProps(makeResponsive(Primitives.Image)));

@@ -1,0 +1,56 @@
+name: "💡 Feature Request"
+description: Describe a new capability you would like to see in Clerk's JavaScript packages.
+labels:
+  - "feature-request"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Welcome 👋🏻
+
+        Thank you for taking the time to write up a feature request. Please fill out the information below to be able to help you faster. If you have a question or need general help, please join our [Discord community](https://clerk.com/discord).
+  - type: checkboxes
+    attributes:
+      label: Preliminary Checks
+      description: Please make sure that you verify each checkbox and follow the instructions for them.
+      options:
+        - label: |
+            I have reviewed https://clerk.com/docs for existing features that would solve my problem
+          required: true
+        - label: |
+            I have searched for existing feature requests: https://github.com/clerkinc/javascript/issues
+          required: true
+        - label: |
+            This issue is not a question, general help request, or anything other than a feature request directly related to Clerk. Please ask questions in our Discord community: https://clerk.com/discord.
+          required: true
+  - type: textarea
+    attributes:
+      label: Description
+      description: Describe the feature or capability you would like to see in Clerk's JavaScript packages.
+      placeholder: Make sure it's unique, describe your use case, and explain the problem and proposed solution.
+    validations:
+      required: true
+  - type: dropdown
+    id: affected-packages
+    attributes:
+      label: Affected Packages
+      multiple: true
+      options:
+        - "@clerk/clerk-js"
+        - "@clerk/clerk-react"
+        - "@clerk/nextjs"
+        - "@clerk/remix"
+        - "@clerk/types"
+        - "@clerk/themes"
+        - "@clerk/localizations"
+        - "@clerk/clerk-expo"
+        - "@clerk/backend"
+        - "@clerk/clerk-sdk-node"
+        - "@clerk/shared"
+        - "@clerk/fastify"
+        - "@clerk/chrome-extension"
+        - "gatsby-plugin-clerk"
+        - "build/tooling/chore"
+        - other
+    validations:
+      required: true

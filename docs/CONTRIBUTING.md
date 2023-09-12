@@ -7,11 +7,11 @@ Please note we have a [code of conduct](https://github.com/clerkinc/javascript/b
 <summary><strong>TABLE OF CONTENTS</strong></summary>
 
 - [Contributing guide](#contributing-guide)
-  - [Monorepo setup](#monorepo-setup)
   - [Developing locally](#developing-locally)
+    - [Monorepo setup](#monorepo-setup)
+    - [Prerequisites](#prerequisites)
     - [Setting up your local environment](#setting-up-your-local-environment)
-    - [Making changes to local packages](#making-changes-to-local-packages)
-    - [Making changes to hot-loaded clerk-js](#making-changes-to-hot-loaded-clerk-js)
+    - [Documenting your changes](#documenting-your-changes)
   - [Opening a Pull Request](#opening-a-pull-request)
     - [Changeset](#changeset)
     - [Commit messages](#commit-messages)
@@ -49,7 +49,7 @@ To set up your development environment, please follow these steps:
    git clone https://github.com/clerkinc/javascript
    ```
 
-2. Install the dependencies. We're using npm workspaces, so you **should always run `npm istall` from the root of the monorepo**, as it will install dependencies for all the packages:
+2. Install the dependencies. We're using npm workspaces, so you **should always run `npm install` from the root of the monorepo**, as it will install dependencies for all the packages:
 
    ```sh
    cd javascript
@@ -63,6 +63,12 @@ To set up your development environment, please follow these steps:
    ```
 
 For package specific setup, refer to the `Build` section of the specific package (eg packages/<package_name>/README.md#build).
+
+### Documenting your changes
+
+Updating documentation is an important part of the contribution process. If you are changing existing behavior or adding a new feature, make sure [Clerk's documentation](https://github.com/clerkinc/clerk-docs) is also updated.
+
+To improve the in-editor experience when using Clerk's SDKs, we do our best to add [JSDoc comments](https://jsdoc.app/about-getting-started.html) to our package's public exports. The JSDoc comments should not attempt to duplicate any existing type information, but should provide meaningful additional context or references. If you are adding a new export, make sure it has a JSDoc comment. If you are updating an existing export, make sure any existing comments are updated appropriately.
 
 ## Opening a Pull Request
 
@@ -115,7 +121,7 @@ Tips:
 
 Great release notes and changelogs are an incredibly important trait of good software. We are always working hard at Clerk to bring updates and improvements to our libraries. And while we believe that this is a good thing, it also means we need to be responsible to our users in making clear what these changes are in a way that is as brief, clear, and understandable as possible. We have all seen libraries that publish changelogs as a list of commits, and I don't think many would argue that while this makes it easy for library developers, it's far from ideal for library users. To reach the standards we have for our library users' experience with Clerk, there is nothing that beats hand-written changelogs by the developers who worked on the features, and this is exactly what changesets empowers us to provide.
 
-Changesets provides streamlined tooling and enforcement to ensure that developers working on features have as easy of a time as possible writing great changelogs, and puts together release notes for us at the quality bar that we strive for. Make sure to think from the perspecitve of a user when writing changesets to make it crystal clear what your feature is, what impact is has on the library, how to use it, and how to find more detail, if relevant.
+Changesets provides streamlined tooling and enforcement to ensure that developers working on features have as easy of a time as possible writing great changelogs, and puts together release notes for us at the quality bar that we strive for. Make sure to think from the perspective of a user when writing changesets to make it crystal clear what your feature is, what impact is has on the library, how to use it, and how to find more detail, if relevant.
 
 ### Commit messages
 
@@ -130,7 +136,7 @@ All of these are used to describe changes in the codebase, but they have differe
 
 - **Commit message**: Briefly describe what the commit is about. Intended to be seen by contributors.
 - **Commit description**: Describe in details why the change was made and include some details about the implementation if needed. Intended to be seen by contributors.
-- **PR description**: Describe in details what the PR is about. This is the first thing a reviewer will see when reviewing a PR, so make sure to explain why the change is needed and offer plenty of details about the actual implementation. It's always useful to include a screen recording or steps to reproduce the issue if the PR is related to a bug fix. Also try to include resources and extenral documentation if required. Intended to be seen by contributors and will be used as future reference.
+- **PR description**: Describe in details what the PR is about. This is the first thing a reviewer will see when reviewing a PR, so make sure to explain why the change is needed and offer plenty of details about the actual implementation. It's always useful to include a screen recording or steps to reproduce the issue if the PR is related to a bug fix. Also try to include resources and external documentation if required. Intended to be seen by contributors and will be used as future reference.
 - **Changeset description**: Describe in details how the change affects the user. This is the first thing a user will see when a new release is published, so make sure to explain how the change affects them. Try to provide usage examples and migration steps if required. Intended to be seen by users of the package.
 
 ### Notes on Pull Requests

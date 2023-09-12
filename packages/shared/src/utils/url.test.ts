@@ -1,4 +1,4 @@
-import { addClerkPrefix, parseSearchParams, stripScheme } from './url';
+import { addClerkPrefix, isRelativeUrl, parseSearchParams, stripScheme } from './url';
 
 describe('parseSearchParams(queryString)', () => {
   it('parses query string and returns a URLSearchParams object', () => {
@@ -54,5 +54,22 @@ describe('addClerkPrefix(str)', () => {
   ];
   it.each(cases)('attempts to add the prefix clerk. to %p', (urlInput, urlOutput) => {
     expect(addClerkPrefix(urlInput)).toBe(urlOutput);
+  });
+});
+
+describe('isRelativeUrl(str)', () => {
+  const cases = [
+    ['foo', true],
+    ['/foo', true],
+    ['/foo/bar', true],
+    ['/foo/bar?a=a', true],
+    ['http://example.com', false],
+    ['http://example.com/', false],
+    ['http://example.com/foo/bar', false],
+    ['https://example.com', false],
+  ];
+
+  it.each(cases)('determines if %p is a relative url', (urlInput, urlOutput) => {
+    expect(isRelativeUrl(urlInput as string)).toBe(urlOutput);
   });
 });

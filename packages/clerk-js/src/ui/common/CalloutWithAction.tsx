@@ -1,6 +1,6 @@
 import type { ComponentType, MouseEvent, PropsWithChildren } from 'react';
 
-import { Col, Flex, Link, Text, Icon } from '../customizables';
+import { Col, Flex, Icon, Link, Text } from '../customizables';
 import type { LocalizationKey } from '../localization';
 import type { ThemableCssProp } from '../styledSystem';
 
@@ -8,19 +8,15 @@ type CalloutWithActionProps = {
   text?: LocalizationKey | string;
   textSx?: ThemableCssProp;
   actionLabel?: LocalizationKey;
-  onClick?: (e: MouseEvent<HTMLAnchorElement>) => Promise<any>;
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => Promise<unknown>;
   icon: ComponentType;
 };
 export const CalloutWithAction = (props: PropsWithChildren<CalloutWithActionProps>) => {
   const { icon, text, textSx, actionLabel, onClick: onClickProp } = props;
 
   const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (onClickProp) {
-      void onClickProp?.(e);
-    }
+    void onClickProp?.(e);
   };
-
-  console.log(props.children);
 
   return (
     <Flex

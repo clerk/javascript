@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.10.2
+
+### Patch Changes
+
+- Updated dependencies [[`463ff84f5`](https://github.com/clerkinc/javascript/commit/463ff84f5bfb7114102ca6cb5a2ea2fce705164c), [`e6a388946`](https://github.com/clerkinc/javascript/commit/e6a38894640b6999b90ea44ef66acda34debe2c1), [`1426e5eb3`](https://github.com/clerkinc/javascript/commit/1426e5eb3730bb79e2ec5341fa4347d7fa957739)]:
+  - @clerk/types@3.51.0
+  - @clerk/backend@0.29.0
+  - @clerk/clerk-react@4.24.2
+
 ## 2.10.1
 
 ### Patch Changes

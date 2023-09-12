@@ -1230,7 +1230,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('redirects user to first-factor if the email is claimed but the external account has an unverified email', async () => {
+    it('redirects user to factor-one, if the email is claimed, but the external account has an unverified email', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -1256,6 +1256,56 @@ describe('Clerk singleton', () => {
       await sut.load({
         navigate: mockNavigate,
       });
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-one');
+      });
+    });
+
+    it('redirects user to factor-one, if we are doing a account transfer and the external account has an unverified email', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: [],
+            unverified_fields: ['email_address'],
+            verifications: {
+              external_account: {
+                status: 'transferable',
+                error: {
+                  code: 'external_account_exists',
+                },
+              },
+            },
+          } as unknown as SignUpJSON),
+        }),
+      );
+
+      const mockSignInCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'needs_first_factor' }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signIn.create = mockSignInCreate;
 
       await sut.handleRedirectCallback();
 
@@ -1587,13 +1637,13 @@ describe('Clerk singleton', () => {
   });
 
   describe('buildUrlWithAuth', () => {
-    it('builds an absolute url from a relative url in development for url based session syncing', async () => {
+    it('builds a relative url from a relative url in development for url based session syncing', async () => {
       mockUsesUrlBasedSessionSync.mockReturnValue(true);
       const sut = new Clerk(devFrontendApi);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('foo');
-      expect(url).toBe('http://test.host/foo');
+      expect(url).toBe('foo');
     });
 
     it('returns what was passed when in production', async () => {

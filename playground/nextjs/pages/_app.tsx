@@ -86,7 +86,7 @@ const AppBar = (props: AppBarProps) => {
         <option value='shadesOfPurple'>shadesOfPurple</option>
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
-      <UserButton  afterSignOutUrl='/'/>
+      <UserButton afterSignOutUrl="/"/>
 
       <SignedIn>
         <SignOutButton />
