@@ -48,7 +48,20 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
   return (
     <UserProfileAccordion
       title={email.emailAddress}
-      badge={isPrimary ? <Badge localizationKey={localizationKeys('badge__primary')} /> : undefined}
+      badge={
+        isPrimary ? (
+          <Badge
+            localizationKey={localizationKeys('badge__primary')}
+            textVariant={'extraSmallMedium'}
+          />
+        ) : !isVerified ? (
+          <Badge
+            localizationKey={localizationKeys('badge__unverified')}
+            colorScheme='danger'
+            textVariant={'extraSmallMedium'}
+          />
+        ) : undefined
+      }
     >
       <Col gap={4}>
         {isPrimary && isVerified && (
@@ -59,12 +72,6 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
         )}
         {isPrimary && !isVerified && (
           <LinkButtonWithDescription
-            titleLabel={
-              <Badge
-                localizationKey={localizationKeys('badge__unverified')}
-                colorScheme='warning'
-              />
-            }
             title={localizationKeys('userProfile.start.emailAddressesSection.detailsTitle__primary')}
             subtitle={localizationKeys('userProfile.start.emailAddressesSection.detailsSubtitle__primary')}
             actionLabel={localizationKeys('userProfile.start.emailAddressesSection.detailsAction__primary')}
@@ -81,12 +88,6 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
         )}
         {!isPrimary && !isVerified && (
           <LinkButtonWithDescription
-            titleLabel={
-              <Badge
-                localizationKey={localizationKeys('badge__unverified')}
-                colorScheme='warning'
-              />
-            }
             title={localizationKeys('userProfile.start.emailAddressesSection.detailsTitle__unverified')}
             subtitle={localizationKeys('userProfile.start.emailAddressesSection.detailsSubtitle__unverified')}
             actionLabel={localizationKeys('userProfile.start.emailAddressesSection.detailsAction__unverified')}

@@ -59,7 +59,20 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
         </Text>
       }
       title={formattedPhone}
-      badge={isPrimary ? <Badge localizationKey={localizationKeys('badge__primary')} /> : undefined}
+      badge={
+        isPrimary ? (
+          <Badge
+            localizationKey={localizationKeys('badge__primary')}
+            textVariant={'extraSmallMedium'}
+          />
+        ) : !isVerified ? (
+          <Badge
+            localizationKey={localizationKeys('badge__unverified')}
+            colorScheme='danger'
+            textVariant={'extraSmallMedium'}
+          />
+        ) : undefined
+      }
     >
       <Col gap={4}>
         {isPrimary && isVerified && (
@@ -70,12 +83,6 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
         )}
         {isPrimary && !isVerified && (
           <LinkButtonWithDescription
-            titleLabel={
-              <Badge
-                localizationKey={localizationKeys('badge__unverified')}
-                colorScheme='warning'
-              />
-            }
             title={localizationKeys('userProfile.start.phoneNumbersSection.detailsTitle__primary')}
             subtitle={localizationKeys('userProfile.start.phoneNumbersSection.detailsSubtitle__primary')}
             actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__primary')}
@@ -92,12 +99,6 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
         )}
         {!isPrimary && !isVerified && (
           <LinkButtonWithDescription
-            titleLabel={
-              <Badge
-                localizationKey={localizationKeys('badge__unverified')}
-                colorScheme='warning'
-              />
-            }
             title={localizationKeys('userProfile.start.phoneNumbersSection.detailsTitle__unverified')}
             subtitle={localizationKeys('userProfile.start.phoneNumbersSection.detailsSubtitle__unverified')}
             actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__unverified')}
