@@ -24,7 +24,7 @@ export const PreviewListItems = (props: PropsWithChildren) => {
 };
 
 const sharedStyles: ThemableCssProp = t => ({
-  height: t.space.$14,
+  height: t.space.$12,
   padding: `${t.space.$2} ${t.space.$8}`,
 });
 
@@ -108,7 +108,7 @@ export const OrganizationListPreviewButton = (props: PropsWithChildren<{ onClick
       sx={[sharedStyles]}
       icon={ArrowRightIcon}
       iconProps={{
-        size: 'lg',
+        size: 'md',
       }}
       showIconOnHover={false}
       {...props}
