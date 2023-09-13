@@ -24,8 +24,14 @@ export const PreviewListItems = (props: PropsWithChildren) => {
 };
 
 const sharedStyles: ThemableCssProp = t => ({
-  height: t.space.$14,
+  height: t.space.$12,
   padding: `${t.space.$2} ${t.space.$8}`,
+});
+
+export const sharedMainIdentifierSx: ThemableCssProp = t => ({
+  fontSize: t.fontSizes.$md,
+  fontWeight: t.fontWeights.$normal,
+  color: t.colors.$colorText,
 });
 
 export const PreviewListItem = (
@@ -48,11 +54,8 @@ export const PreviewListItem = (
     >
       <OrganizationPreview
         elementId='organizationList'
-        avatarSx={t => ({ width: t.sizes.$10, height: t.sizes.$10 })}
-        mainIdentifierSx={t => ({
-          fontSize: t.fontSizes.$xl,
-          color: t.colors.$colorText,
-        })}
+        size={'sm'}
+        mainIdentifierSx={sharedMainIdentifierSx}
         organization={props.organizationData}
       />
       {props.children}
@@ -108,7 +111,7 @@ export const OrganizationListPreviewButton = (props: PropsWithChildren<{ onClick
       sx={[sharedStyles]}
       icon={ArrowRightIcon}
       iconProps={{
-        size: 'lg',
+        size: 'md',
       }}
       showIconOnHover={false}
       {...props}
