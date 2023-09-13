@@ -28,6 +28,12 @@ const sharedStyles: ThemableCssProp = t => ({
   padding: `${t.space.$2} ${t.space.$8}`,
 });
 
+export const sharedMainIdentifierSx: ThemableCssProp = t => ({
+  fontSize: t.fontSizes.$md,
+  fontWeight: t.fontWeights.$normal,
+  color: t.colors.$colorText,
+});
+
 export const PreviewListItem = (
   props: PropsWithChildren<{
     organizationData: UserOrganizationInvitationResource['publicOrganizationData'];
@@ -48,11 +54,8 @@ export const PreviewListItem = (
     >
       <OrganizationPreview
         elementId='organizationList'
-        avatarSx={t => ({ width: t.sizes.$10, height: t.sizes.$10 })}
-        mainIdentifierSx={t => ({
-          fontSize: t.fontSizes.$xl,
-          color: t.colors.$colorText,
-        })}
+        size={'sm'}
+        mainIdentifierSx={sharedMainIdentifierSx}
         organization={props.organizationData}
       />
       {props.children}

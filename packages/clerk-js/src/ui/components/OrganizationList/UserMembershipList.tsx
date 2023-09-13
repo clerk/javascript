@@ -3,7 +3,7 @@ import type { OrganizationResource } from '@clerk/types';
 import { useCoreOrganizationList, useCoreUser, useOrganizationListContext } from '../../contexts';
 import { OrganizationPreview, PersonalWorkspacePreview, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
-import { OrganizationListPreviewButton } from './shared';
+import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared';
 
 export const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
@@ -26,11 +26,7 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
       <OrganizationPreview
         elementId='organizationList'
         size={'sm'}
-        mainIdentifierSx={t => ({
-          fontSize: t.fontSizes.$md,
-          fontWeight: t.fontWeights.$normal,
-          color: t.colors.$colorText,
-        })}
+        mainIdentifierSx={sharedMainIdentifierSx}
         organization={props.organization}
       />
     </OrganizationListPreviewButton>
@@ -66,11 +62,7 @@ export const PersonalAccountPreview = withCardStateProvider(() => {
       <PersonalWorkspacePreview
         user={userWithoutIdentifiers}
         size={'sm'}
-        mainIdentifierSx={t => ({
-          fontSize: t.fontSizes.$md,
-          fontWeight: t.fontWeights.$normal,
-          color: t.colors.$colorText,
-        })}
+        mainIdentifierSx={sharedMainIdentifierSx}
         title={localizationKeys('organizationSwitcher.personalWorkspace')}
       />
     </OrganizationListPreviewButton>
