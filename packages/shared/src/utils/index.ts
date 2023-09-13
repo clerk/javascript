@@ -22,3 +22,4 @@ export * from './runWithExponentialBackOff';
 export * from './isomorphicAtob';
 export * from './globs';
 export * from './loadScript';
+export { deprecate } from './deprecate';
