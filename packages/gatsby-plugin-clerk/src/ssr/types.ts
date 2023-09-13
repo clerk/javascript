@@ -1,5 +1,4 @@
-import type { AuthenticateRequestOptions, Organization } from '@clerk/backend';
-import type { Session, User } from '@clerk/clerk-sdk-node';
+import type { AuthenticateRequestOptions, Organization, Session, User } from '@clerk/backend';
 import type { ServerSideAuth } from '@clerk/types';
 import type { GetServerDataProps } from 'gatsby';
 
