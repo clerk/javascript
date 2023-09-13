@@ -1,4 +1,4 @@
-* @SokratisVidros @nikosdouvlis
+* @clerkinc/team-js
 packages/backend/*       @dimkl
 
 # Require specific approval for the generated "Version Packages" PR, which triggers a release
