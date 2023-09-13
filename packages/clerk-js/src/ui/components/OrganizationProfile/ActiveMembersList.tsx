@@ -98,7 +98,14 @@ const MemberRow = (props: {
           sx={{ maxWidth: '30ch' }}
           user={membership.publicUserData}
           subtitle={membership.publicUserData.identifier}
-          badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}
+          badge={
+            isCurrentUser && (
+              <Badge
+                textVariant={'extraSmallMedium'}
+                localizationKey={localizationKeys('badge__you')}
+              />
+            )
+          }
         />
       </Td>
       <Td>{membership.createdAt.toLocaleDateString()}</Td>
