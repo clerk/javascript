@@ -9,8 +9,10 @@ import type {
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import { SWRConfig } from 'swr';
 
+import { disableSWRDevtools } from './clerk-swr';
+disableSWRDevtools();
+import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './createContextAndHook';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
