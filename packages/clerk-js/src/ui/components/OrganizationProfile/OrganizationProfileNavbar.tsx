@@ -54,6 +54,7 @@ const pageToRootNavbarRouteMap = {
   domain: organizationProfileRoutes.find(r => r.id === 'settings'),
   profile: organizationProfileRoutes.find(r => r.id === 'settings'),
   leave: organizationProfileRoutes.find(r => r.id === 'settings'),
+  delete: organizationProfileRoutes.find(r => r.id === 'settings'),
 };
 
 export const OrganizationProfileBreadcrumbs = (props: Pick<PropsOfComponent<typeof Breadcrumbs>, 'title'>) => {
