@@ -50,7 +50,10 @@ export const EmailPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage headerTitle={title}>
+      <ContentPage
+        headerTitle={title}
+        Breadcrumbs={UserProfileBreadcrumbs}
+      >
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>
             <Form.Control
@@ -71,7 +74,10 @@ export const EmailPage = withCardStateProvider(() => {
         </Form.Root>
       </ContentPage>
 
-      <ContentPage headerTitle={title}>
+      <ContentPage
+        headerTitle={title}
+        Breadcrumbs={UserProfileBreadcrumbs}
+      >
         {preferMagicLinks ? (
           <VerifyWithLink
             nextStep={wizard.nextStep}
