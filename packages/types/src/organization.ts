@@ -69,7 +69,7 @@ export type GetMembershipsParams = {
 
 export type GetMembersParams = {
   /**
-   * This the starting point for your fetched results. The initial value persists between re-renders
+   * This is the starting point for your fetched results. The initial value persists between re-renders
    */
   initialPage?: number;
   /**
@@ -83,7 +83,7 @@ export type GetMembersParams = {
 export type GetPendingInvitationsParams = ClerkPaginationParams;
 export type GetDomainsParams = {
   /**
-   * This the starting point for your fetched results. The initial value persists between re-renders
+   * This is the starting point for your fetched results. The initial value persists between re-renders
    */
   initialPage?: number;
   /**
@@ -96,7 +96,7 @@ export type GetDomainsParams = {
 
 export type GetMembershipRequestParams = {
   /**
-   * This the starting point for your fetched results. The initial value persists between re-renders
+   * This is the starting point for your fetched results. The initial value persists between re-renders
    */
   initialPage?: number;
   /**
