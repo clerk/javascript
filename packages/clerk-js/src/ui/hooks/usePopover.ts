@@ -1,10 +1,10 @@
-import type { UseFloatingProps } from '@floating-ui/react';
+import type { UseFloatingOptions } from '@floating-ui/react';
 import { autoUpdate, flip, offset, shift, useDismiss, useFloating, useFloatingNodeId } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
 type UsePopoverProps = {
   defaultOpen?: boolean;
-  placement?: UseFloatingProps['placement'];
+  placement?: UseFloatingOptions['placement'];
   offset?: Parameters<typeof offset>[0];
   autoUpdate?: boolean;
   outsidePress?: boolean | ((event: MouseEvent) => boolean);
@@ -22,7 +22,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
   const { bubbles = true, outsidePress } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const nodeId = useFloatingNodeId();
-  const { update, reference, floating, strategy, x, y, context } = useFloating({
+  const { update, refs, strategy, x, y, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
     nodeId,
@@ -30,6 +30,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
     placement: props.placement || 'bottom-start',
     middleware: [offset(props.offset || 6), flip(), shift()],
   });
+  const { setReference: reference, setFloating: floating } = refs;
 
   useDismiss(context, {
     bubbles,
