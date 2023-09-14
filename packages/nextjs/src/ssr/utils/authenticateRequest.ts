@@ -1,6 +1,7 @@
 import type { GetServerSidePropsContext } from 'next';
 
-import { API_KEY, clerkClient, FRONTEND_API, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY } from '../../server';
+import { clerkClient } from '../../server';
+import { API_KEY, FRONTEND_API, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY } from '../../server/constants';
 import type { WithServerSideAuthOptions } from '../types';
 
 /**

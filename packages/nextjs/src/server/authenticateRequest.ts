@@ -2,16 +2,8 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { RequestState } from './clerkClient';
-import {
-  API_KEY,
-  CLERK_JS_URL,
-  CLERK_JS_VERSION,
-  clerkClient,
-  debugRequestState,
-  FRONTEND_API,
-  PUBLISHABLE_KEY,
-  SECRET_KEY,
-} from './clerkClient';
+import { clerkClient, debugRequestState } from './clerkClient';
+import { API_KEY, CLERK_JS_URL, CLERK_JS_VERSION, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 import type { WithAuthOptions } from './types';
 import { apiEndpointUnauthorizedNextResponse, handleMultiDomainAndProxy } from './utils';
 import { decorateResponseWithObservabilityHeaders } from './withClerkMiddleware';

@@ -49,11 +49,15 @@ jest.mock('./authenticateRequest', () => {
 
 // Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
-jest.mock('./clerkClient', () => {
-  const { debugRequestState } = jest.requireActual('./clerkClient');
+jest.mock('./constants', () => {
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
+  };
+});
+jest.mock('./clerkClient', () => {
+  const { debugRequestState } = jest.requireActual('./clerkClient');
+  return {
     clerkClient: {
       localInterstitial: jest.fn().mockResolvedValue('<html>interstitial</html>'),
     },

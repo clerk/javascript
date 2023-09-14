@@ -3,17 +3,15 @@ import { constants, debugRequestState } from '@clerk/backend';
 import type { ServerResponse } from 'http';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
+import { clerkClient, makeAuthObjectSerializable, sanitizeAuthObject } from '../server/clerkClient';
 import {
   API_URL,
   CLERK_JS_URL,
   CLERK_JS_VERSION,
-  clerkClient,
   FRONTEND_API,
   JS_VERSION,
-  makeAuthObjectSerializable,
   PUBLISHABLE_KEY,
-  sanitizeAuthObject,
-} from '../server/clerkClient';
+} from '../server/constants';
 import type { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
 import { authenticateRequest, injectAuthIntoRequest, injectSSRStateIntoProps } from './utils';
 

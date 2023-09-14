@@ -3,16 +3,16 @@ import { constants, debugRequestState } from '@clerk/backend';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { clerkClient } from './clerkClient';
 import {
   API_KEY,
   API_URL,
   CLERK_JS_URL,
   CLERK_JS_VERSION,
-  clerkClient,
   FRONTEND_API,
   PUBLISHABLE_KEY,
   SECRET_KEY,
-} from './clerkClient';
+} from './constants';
 import type { WithAuthOptions } from './types';
 import { decorateRequest, handleMultiDomainAndProxy, setCustomAttributeOnRequest } from './utils';
 
