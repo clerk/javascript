@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 import type { RequestState } from './clerkClient';
 import { clerkClient, debugRequestState } from './clerkClient';
-import { API_KEY, CLERK_JS_URL, CLERK_JS_VERSION, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from './constants';
+import { CLERK_JS_URL, CLERK_JS_VERSION } from './constants';
 import type { WithAuthOptions } from './types';
 import { apiEndpointUnauthorizedNextResponse, handleMultiDomainAndProxy } from './utils';
 import { decorateResponseWithObservabilityHeaders } from './withClerkMiddleware';
@@ -12,10 +12,6 @@ export const authenticateRequest = async (req: NextRequest, opts: WithAuthOption
   const { isSatellite, domain, signInUrl, proxyUrl } = handleMultiDomainAndProxy(req, opts);
   return await clerkClient.authenticateRequest({
     ...opts,
-    apiKey: opts.apiKey || API_KEY,
-    secretKey: opts.secretKey || SECRET_KEY,
-    frontendApi: opts.frontendApi || FRONTEND_API,
-    publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
     isSatellite,
     domain,
     signInUrl,
@@ -33,8 +29,8 @@ export const handleUnknownState = (requestState: RequestState) => {
 export const handleInterstitialState = (requestState: RequestState, opts: WithAuthOptions) => {
   const response = new NextResponse(
     clerkClient.localInterstitial({
-      frontendApi: opts.frontendApi || FRONTEND_API,
-      publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
+      frontendApi: opts.frontendApi as string,
+      publishableKey: opts.publishableKey as string,
       clerkJSUrl: CLERK_JS_URL,
       clerkJSVersion: CLERK_JS_VERSION,
       proxyUrl: requestState.proxyUrl,

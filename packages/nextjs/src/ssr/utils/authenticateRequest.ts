@@ -1,7 +1,6 @@
 import type { GetServerSidePropsContext } from 'next';
 
 import { clerkClient } from '../../server';
-import { API_KEY, FRONTEND_API, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY } from '../../server/constants';
 import type { WithServerSideAuthOptions } from '../types';
 
 /**
@@ -15,10 +14,6 @@ export async function authenticateRequest(ctx: GetServerSidePropsContext, opts: 
 
   return clerkClient.authenticateRequest({
     ...opts,
-    apiKey: API_KEY,
-    secretKey: SECRET_KEY,
-    frontendApi: FRONTEND_API,
-    publishableKey: PUBLISHABLE_KEY,
     cookieToken,
     headerToken,
     clientUat: cookies['__client_uat'],
@@ -28,6 +23,5 @@ export async function authenticateRequest(ctx: GetServerSidePropsContext, opts: 
     forwardedHost: headers['x-forwarded-host'] as string,
     referrer: headers.referer,
     userAgent: headers['user-agent'] as string,
-    proxyUrl: PROXY_URL,
   });
 }
