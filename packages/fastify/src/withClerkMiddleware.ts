@@ -21,13 +21,12 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
           (acc, key) => Object.assign(acc, { [key]: req?.headers[key] }),
           {},
         );
-        // Making some manual tests it seems that FastifyRequest populates the req protocol / hostname
-        // based on the forwarded headers. With that in mind we can use those attributes instead
-        // of using the headers to calculate them by our own.
-        const reqUrl = new URL(req.url, `${req.protocol}://${req.hostname}`);
         const headers = new Headers(requestHeaders);
-
-        return new Request(reqUrl, {
+        // Making some manual tests it seems that FastifyRequest populates the req protocol / hostname
+        // based on the forwarded headers. Nevertheless, we are gonna use a dummy base and the request
+        // will be fixed by the createIsomorphicRequest.
+        const dummyOriginReqUrl = new URL(req.url || '', `${req.protocol}://clerk-dummy`);
+        return new Request(dummyOriginReqUrl, {
           method: req.method,
           headers,
         });
