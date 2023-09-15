@@ -102,6 +102,7 @@ const MemberRow = (props: {
 
   const isAdmin = currentUserMembership?.role === 'admin';
   const isCurrentUser = user.id === membership.publicUserData.userId;
+  const isLastAdmin = adminCount <= 1 && membership.role === 'admin';
 
   return (
     <RowContainer>
@@ -124,7 +125,7 @@ const MemberRow = (props: {
       <Td>
         {isAdmin ? (
           <RoleSelect
-            isDisabled={card.isLoading || !onRoleChange || (adminCount <= 1 && membership.role === 'admin')}
+            isDisabled={card.isLoading || !onRoleChange || isLastAdmin}
             value={membership.role}
             onChange={onRoleChange}
           />
