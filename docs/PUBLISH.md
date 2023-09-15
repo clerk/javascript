@@ -18,7 +18,7 @@ An automated staging release will be take place every time a PR gets merged into
 
 - Staging versions use the following format: `@clerk/package@x.y.z-staging.commit`, where `package` is the package name, `x`,`y`,`z` are the major, minor and patch versions respectively, `staging` is a stable prerelease mame and `commit` is the id of the last commit in the branch.
 - Currently, staging version changes are _not_ committed to the repo and no git tags will be generated. Using this strategy, we avoid merge conflicts, allowing us to constantly deploy staging versions without switching the repo to a "prerelease" mode.
-- During a staging release, `@clerk/clerk-js` will also be released. If needed, use the `clerkJSVersion` prop to use a specific version, eg: `<ClerkProvider clerkJSVersion='@clerk/clerk-js@4.1.1-staging.90012' />`
+- During a staging release, `@clerk/clerk-js` will also be released. If needed, use the `clerkJSVersion` prop to use a specific version, eg: `<ClerkProvider clerkJSVersion='4.1.1-staging.90012' />`
 - A package will not be published if it's not affected by a changeset.
 
 ## Publishing snapshot package versions (`@snapshot`)
@@ -30,9 +30,8 @@ To perform a snapshot release, simply comment `!snapshot` in your PR. Once the p
 Notes:
 
 - Snapshot versions use the following format: `@clerk/package@x.y.z-snapshot.commit`, where `package` is the package name, `x`,`y`,`z` are the major, minor and patch versions respectively, `snapshot` is a stable prerelease mame and `commit` is the id of the last commit in the branch.
-- If you want to name your snapshot release, you can pass an argument to the snapshot comment, eg `!snapshot myname` will use myname instead of `snapshot`, eg: `@clerk/clerk-js@4.1.1-myname.90012`.
 - Snapshot version changes are _not_ committed to the repo and no git tags will be generated - they are meant to be used as "snapshots" of the repo at a particular state for testing purposes.
-- During a snapshot release, `@clerk/clerk-js` will also be released. If needed, use the `clerkJSVersion` prop to use a specific version, eg: `<ClerkProvider clerkJSVersion='@clerk/clerk-js@4.1.1-snapshot.90012' />`
+- During a snapshot release, `@clerk/clerk-js` will also be released. If needed, use the `clerkJSVersion` prop to use a specific version, eg: `<ClerkProvider clerkJSVersion='4.1.1-snapshot.90012' />`
 - To make iterations faster, tests will not run for snapshot versions.
 - A package will not be published if it's not affected by a changeset.
 
