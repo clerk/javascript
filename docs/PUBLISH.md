@@ -25,6 +25,9 @@ An automated staging release will be take place every time a PR gets merged into
 
 Snapshot releases are a way to release your changes for testing without updating the versions or waiting for your PR to be merged into `main`. This is especially useful when you want to test your changes in a cloud environment that does not offer a way to upload prebuilt artifacts of your app or if you want to test the end-to-end flow as a user, without relying on local linking to test. Snapshot releases can also be used as a tool for customers to verify a fix on their machines.
 
+**Important:**
+Before requesting a snapshot release, ensure that your Clerk organization membership status is set to "Public". Otherwise, the snapshot release will fail. To set your status to "Public", follow [these steps](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-membership-in-organizations/publicizing-or-hiding-organization-membership).
+
 To perform a snapshot release, simply comment `!snapshot` in your PR. Once the packages are built and published (~2mins), [clerk-cookie](https://github.com/clerk-cookie) will post a reply with the published versions ([example](https://github.com/clerkinc/javascript/pull/1329#issuecomment-1586970784)). Simply install the snap version using `npm install` as usual.
 
 Notes:
