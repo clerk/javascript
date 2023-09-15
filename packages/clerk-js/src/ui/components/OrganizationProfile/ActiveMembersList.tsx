@@ -15,9 +15,13 @@ export const ActiveMembersList = () => {
     organization,
     membershipList,
     membership: currentUserMembership,
+    memberships: adminMembers,
     ...rest
   } = useCoreOrganization({
     membershipList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
+    memberships: {
+      role: ['admin'],
+    },
   });
   const isAdmin = currentUserMembership?.role === 'admin';
 
@@ -32,14 +36,16 @@ export const ActiveMembersList = () => {
     return null;
   }
 
-  //TODO: calculate if user is the only admin
-  const canChangeOwnAdminRole = isAdmin && organization?.membersCount > 1;
-
   const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
     if (!isAdmin) {
       return;
     }
-    return card.runAsync(membership.update({ role: newRole })).catch(err => handleError(err, [], card.setError));
+    return card
+      .runAsync(async () => {
+        await membership.update({ role: newRole });
+        await (adminMembers as any).unstable__mutate?.();
+      })
+      .catch(err => handleError(err, [], card.setError));
   };
 
   const handleRemove = (membership: OrganizationMembershipResource) => () => {
@@ -47,7 +53,11 @@ export const ActiveMembersList = () => {
       return;
     }
     return card
-      .runAsync(membership.destroy())
+      .runAsync(async () => {
+        const destroyedMembership = membership.destroy();
+        await (adminMembers as any).unstable__mutate?.();
+        return destroyedMembership;
+      })
       .then(mutateSwrState)
       .catch(err => handleError(err, [], card.setError));
   };
@@ -70,8 +80,9 @@ export const ActiveMembersList = () => {
         <MemberRow
           key={m.id}
           membership={m}
-          onRoleChange={canChangeOwnAdminRole ? handleRoleChange(m) : undefined}
+          onRoleChange={handleRoleChange(m)}
           onRemove={handleRemove(m)}
+          adminCount={adminMembers?.count || 0}
         />
       ))}
     />
@@ -81,15 +92,17 @@ export const ActiveMembersList = () => {
 const MemberRow = (props: {
   membership: OrganizationMembershipResource;
   onRemove: () => unknown;
+  adminCount: number;
   onRoleChange?: (role: MembershipRole) => unknown;
 }) => {
-  const { membership, onRemove, onRoleChange } = props;
+  const { membership, onRemove, onRoleChange, adminCount } = props;
   const card = useCardState();
   const { membership: currentUserMembership } = useCoreOrganization();
   const user = useCoreUser();
 
   const isAdmin = currentUserMembership?.role === 'admin';
   const isCurrentUser = user.id === membership.publicUserData.userId;
+  const isLastAdmin = adminCount <= 1 && membership.role === 'admin';
 
   return (
     <RowContainer>
@@ -112,7 +125,7 @@ const MemberRow = (props: {
       <Td>
         {isAdmin ? (
           <RoleSelect
-            isDisabled={card.isLoading || !onRoleChange}
+            isDisabled={card.isLoading || !onRoleChange || isLastAdmin}
             value={membership.role}
             onChange={onRoleChange}
           />
