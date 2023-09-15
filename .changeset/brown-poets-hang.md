@@ -2,4 +2,4 @@
 '@clerk/nextjs': patch
 ---
 
-Exports SignInWithMetamaskButton for @clerk/nextjs package
+`SignInWithMetamaskButton` is now exported from the `@clerk/nextjs` package
