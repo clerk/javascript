@@ -30,6 +30,9 @@ export const usePopover = (props: UsePopoverProps = {}) => {
     placement: props.placement || 'bottom-start',
     middleware: [offset(props.offset || 6), flip(), shift()],
   });
+  // Names are aliased because in @floating-ui/react-dom@2.0.0 the top-level elements were removed
+  // This keeps the API shape for consumers of usePopover
+  // @see https://github.com/floating-ui/floating-ui/releases/tag/%40floating-ui%2Freact-dom%402.0.0
   const { setReference: reference, setFloating: floating } = refs;
 
   useDismiss(context, {
