@@ -231,11 +231,11 @@ describe('AppearanceProvider layout flows', () => {
         appearanceKey='signIn'
         globalAppearance={{
           layout: {
-            helpPageUrl: 'test',
-            logoImageUrl: 'test',
-            logoLinkUrl: 'test',
-            privacyPageUrl: 'test',
-            termsPageUrl: 'test',
+            helpPageUrl: 'https://example.com/help',
+            logoImageUrl: 'https://placehold.co/64x64.png',
+            logoLinkUrl: 'https://example.com/',
+            privacyPageUrl: 'https://example.com/privacy',
+            termsPageUrl: 'https://example.com/terms',
             logoPlacement: 'inside',
             showOptionalFields: false,
             socialButtonsPlacement: 'bottom',
@@ -248,11 +248,11 @@ describe('AppearanceProvider layout flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedLayout.helpPageUrl).toBe('test');
-    expect(result.current.parsedLayout.logoImageUrl).toBe('test');
-    expect(result.current.parsedLayout.logoLinkUrl).toBe('test');
-    expect(result.current.parsedLayout.privacyPageUrl).toBe('test');
-    expect(result.current.parsedLayout.termsPageUrl).toBe('test');
+    expect(result.current.parsedLayout.helpPageUrl).toBe('https://example.com/help');
+    expect(result.current.parsedLayout.logoImageUrl).toBe('https://placehold.co/64x64.png');
+    expect(result.current.parsedLayout.logoLinkUrl).toBe('https://example.com/');
+    expect(result.current.parsedLayout.privacyPageUrl).toBe('https://example.com/privacy');
+    expect(result.current.parsedLayout.termsPageUrl).toBe('https://example.com/terms');
     expect(result.current.parsedLayout.logoPlacement).toBe('inside');
     expect(result.current.parsedLayout.showOptionalFields).toBe(false);
     expect(result.current.parsedLayout.socialButtonsPlacement).toBe('bottom');
@@ -265,11 +265,11 @@ describe('AppearanceProvider layout flows', () => {
         appearanceKey='signIn'
         appearance={{
           layout: {
-            helpPageUrl: 'test2',
-            logoImageUrl: 'test2',
-            logoLinkUrl: 'test2',
-            privacyPageUrl: 'test2',
-            termsPageUrl: 'test2',
+            helpPageUrl: 'https://example.com/help',
+            logoImageUrl: 'https://placehold.co/64x64.png',
+            logoLinkUrl: 'https://example.com/',
+            privacyPageUrl: 'https://example.com/privacy',
+            termsPageUrl: 'https://example.com/terms',
             logoPlacement: 'outside',
             showOptionalFields: true,
             socialButtonsPlacement: 'top',
@@ -282,11 +282,11 @@ describe('AppearanceProvider layout flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedLayout.helpPageUrl).toBe('test2');
-    expect(result.current.parsedLayout.logoImageUrl).toBe('test2');
-    expect(result.current.parsedLayout.logoLinkUrl).toBe('test2');
-    expect(result.current.parsedLayout.privacyPageUrl).toBe('test2');
-    expect(result.current.parsedLayout.termsPageUrl).toBe('test2');
+    expect(result.current.parsedLayout.helpPageUrl).toBe('https://example.com/help');
+    expect(result.current.parsedLayout.logoImageUrl).toBe('https://placehold.co/64x64.png');
+    expect(result.current.parsedLayout.logoLinkUrl).toBe('https://example.com/');
+    expect(result.current.parsedLayout.privacyPageUrl).toBe('https://example.com/privacy');
+    expect(result.current.parsedLayout.termsPageUrl).toBe('https://example.com/terms');
     expect(result.current.parsedLayout.logoPlacement).toBe('outside');
     expect(result.current.parsedLayout.showOptionalFields).toBe(true);
     expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
@@ -299,11 +299,11 @@ describe('AppearanceProvider layout flows', () => {
         appearanceKey='signIn'
         globalAppearance={{
           layout: {
-            helpPageUrl: 'test',
-            logoImageUrl: 'test',
-            logoLinkUrl: 'test',
-            privacyPageUrl: 'test',
-            termsPageUrl: 'test',
+            helpPageUrl: 'https://example.com/help',
+            logoImageUrl: 'https://placehold.co/64x64.png',
+            logoLinkUrl: 'https://example.com/',
+            privacyPageUrl: 'https://example.com/privacy',
+            termsPageUrl: 'https://example.com/terms',
             logoPlacement: 'inside',
             showOptionalFields: false,
             socialButtonsPlacement: 'bottom',
@@ -312,11 +312,11 @@ describe('AppearanceProvider layout flows', () => {
         }}
         appearance={{
           layout: {
-            helpPageUrl: 'test2',
-            logoImageUrl: 'test2',
-            logoLinkUrl: 'test2',
-            privacyPageUrl: 'test2',
-            termsPageUrl: 'test2',
+            helpPageUrl: 'https://second.example.com/help',
+            logoImageUrl: 'https://placehold.co/32x32@2.png',
+            logoLinkUrl: 'https://second.example.com/',
+            privacyPageUrl: 'https://second.example.com/privacy',
+            termsPageUrl: 'https://second.example.com/terms',
             logoPlacement: 'outside',
             showOptionalFields: true,
             socialButtonsPlacement: 'top',
@@ -329,11 +329,11 @@ describe('AppearanceProvider layout flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedLayout.helpPageUrl).toBe('test2');
-    expect(result.current.parsedLayout.logoImageUrl).toBe('test2');
-    expect(result.current.parsedLayout.logoLinkUrl).toBe('test2');
-    expect(result.current.parsedLayout.privacyPageUrl).toBe('test2');
-    expect(result.current.parsedLayout.termsPageUrl).toBe('test2');
+    expect(result.current.parsedLayout.helpPageUrl).toBe('https://second.example.com/help');
+    expect(result.current.parsedLayout.logoImageUrl).toBe('https://placehold.co/32x32@2.png');
+    expect(result.current.parsedLayout.logoLinkUrl).toBe('https://second.example.com/');
+    expect(result.current.parsedLayout.privacyPageUrl).toBe('https://second.example.com/privacy');
+    expect(result.current.parsedLayout.termsPageUrl).toBe('https://second.example.com/terms');
     expect(result.current.parsedLayout.logoPlacement).toBe('outside');
     expect(result.current.parsedLayout.showOptionalFields).toBe(true);
     expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
