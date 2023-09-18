@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
+import { handleValueOrFn, isHttpOrHttps } from '../shared';
 import { API_KEY, DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './clerkClient';
 import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
 import type { NextMiddlewareResult, RequestLike } from './types';
@@ -146,32 +147,6 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
   ) as T;
   return { ...obj, __clerk_ssr_state };
 };
-
-// TODO: Use the same function defined in @clerk/shared once the package is tree shakeable
-type VOrFnReturnsV<T> = T | undefined | ((v: URL) => T);
-
-export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL): T | undefined;
-export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL, defaultValue: T): T;
-export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL, defaultValue?: unknown): unknown {
-  if (typeof value === 'function') {
-    return (value as (v: URL) => T)(url);
-  }
-
-  if (typeof value !== 'undefined') {
-    return value;
-  }
-
-  if (typeof defaultValue !== 'undefined') {
-    return defaultValue;
-  }
-
-  return undefined;
-}
-
-// TODO: use @clerk/shared once it is tree-shakeable
-export function isHttpOrHttps(key: string | undefined) {
-  return /^http(s)?:\/\//.test(key || '');
-}
 
 export function isDevelopmentFromApiKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
