@@ -11,7 +11,26 @@
     "tsconfig.json",
     "tsconfig.*.json"
   ],
-  "globalEnv": ["NODE_VERSION", "NPM_VERSION", "NODE_ENV", "VERCEL"],
+  "globalEnv": [
+    "NODE_VERSION",
+    "NPM_VERSION",
+    "NODE_ENV",
+    "VERCEL",
+    "CLERK_JS_VERSION",
+    "CLERK_API_URL",
+    "CLERK_API_VERSION",
+    "CLERK_API_KEY",
+    "CLERK_SECRET_KEY",
+    "NEXT_PUBLIC_CLERK_JS_VERSION",
+    "NEXT_PUBLIC_CLERK_JS",
+    "NEXT_PUBLIC_CLERK_FRONTEND_API",
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+    "NEXT_PUBLIC_CLERK_DOMAIN",
+    "NEXT_PUBLIC_CLERK_PROXY_URL",
+    "NEXT_PUBLIC_CLERK_IS_SATELLITE",
+    "NEXT_PUBLIC_CLERK_SIGN_IN_URL",
+    "NEXT_PUBLIC_CLERK_SIGN_UP_URL"
+  ],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
