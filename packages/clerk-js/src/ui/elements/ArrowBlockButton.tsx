@@ -73,21 +73,18 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         <Flex
           as='span'
           center
-          sx={[
-            theme => ({
-              flex: `0 0 ${theme.space.$4}`,
-            }),
-            theme =>
-              isLoading && {
-                padding: theme.space.$0x5,
-              },
-          ]}
+          sx={theme => ({ flex: `0 0 ${theme.space.$4}` })}
         >
           {isLoading ? (
             <Spinner
               elementDescriptor={spinnerElementDescriptor}
               elementId={spinnerElementId}
               size={'md'}
+              sx={theme => [
+                {
+                  padding: theme.space.$2,
+                },
+              ]}
             />
           ) : !isIconElement && leftIcon ? (
             <Icon
