@@ -134,7 +134,7 @@ export const useOrganization: UseOrganization = params => {
   const membersSafeValues = useWithSafeValues(membersListParams, {
     initialPage: 1,
     pageSize: 10,
-    role: ['admin'],
+    role: undefined,
     keepPreviousData: false,
     infinite: false,
   });
