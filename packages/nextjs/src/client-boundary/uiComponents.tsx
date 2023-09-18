@@ -15,6 +15,7 @@ export {
   SignInButton,
   SignUpButton,
   SignOutButton,
+  SignInWithMetamaskButton,
   OrganizationList,
 } from '@clerk/clerk-react';
 
