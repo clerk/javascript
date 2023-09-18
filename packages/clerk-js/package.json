@@ -46,7 +46,7 @@
     "@clerk/types": "^3.51.0",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
-    "@floating-ui/react": "0.19.0",
+    "@floating-ui/react": "0.25.4",
     "@zxcvbn-ts/core": "2.2.1",
     "@zxcvbn-ts/language-common": "3.0.2",
     "browser-tabs-lock": "1.2.15",
