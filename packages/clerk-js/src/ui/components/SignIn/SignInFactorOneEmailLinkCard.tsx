@@ -4,7 +4,7 @@ import React from 'react';
 import { EmailLinkStatusCard } from '../../common';
 import { buildMagicLinkRedirectUrl } from '../../common/redirects';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { Flow, localizationKeys } from '../../customizables';
+import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { VerificationLinkCard } from '../../elements';
 import { useCardState } from '../../elements/contexts';
@@ -19,6 +19,7 @@ type SignInFactorOneEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShow
 };
 
 export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCardProps) => {
+  const { t } = useLocalizations();
   const card = useCardState();
   const signIn = useCoreSignIn();
   const signInContext = useSignInContext();
@@ -50,7 +51,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const handleVerificationResult = async (si: SignInResource) => {
     const ver = si.firstFactorVerification;
     if (ver.status === 'expired') {
-      card.setError('The verification link expired. Please resend it.');
+      card.setError(t(localizationKeys('formFieldError__verificationLinkExpired')));
     } else if (ver.verifiedFromTheSameClient()) {
       setShowVerifyModal(true);
     } else {
