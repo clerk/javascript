@@ -13,8 +13,8 @@ type UseOrganizationsReturn =
       createOrganization: undefined;
 
       /**
-       * @deprecated Use `membershipList` from `useOrganization`
-       * Example const {membershipList} = useOrganization()
+       * @deprecated Use `memberships` from `useOrganization`
+       * Example const {memberships} = useOrganization()
        */
       getOrganizationMemberships: undefined;
 
@@ -33,8 +33,8 @@ type UseOrganizationsReturn =
       createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
 
       /**
-       * @deprecated Use `membershipList` from `useOrganization`
-       * Example const {membershipList} = useOrganization()
+       * @deprecated Use `memberships` from `useOrganization`
+       * Example const {memberships} = useOrganization()
        */
       getOrganizationMemberships: () => Promise<OrganizationMembershipResource[]>;
 

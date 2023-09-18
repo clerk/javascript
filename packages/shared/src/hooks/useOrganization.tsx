@@ -23,7 +23,7 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 type UseOrganizationParams = {
   invitationList?: GetPendingInvitationsParams;
   /**
-   * @deprecated Use members instead
+   * @deprecated Use memberships instead
    */
   membershipList?: GetMembershipsParams;
   domains?:
