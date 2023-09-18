@@ -20,7 +20,7 @@ describe('OrganizationSettings', () => {
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve({ data: adminsList, total_count: 1 }));
     fixtures.clerk.organization?.getDomains.mockReturnValue(
       Promise.resolve({
         data: domainList,
@@ -50,7 +50,7 @@ describe('OrganizationSettings', () => {
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve({ data: adminsList, total_count: 2 }));
     fixtures.clerk.organization?.getDomains.mockReturnValue(
       Promise.resolve({
         data: domainList,
@@ -129,7 +129,9 @@ describe('OrganizationSettings', () => {
         });
       });
 
-      fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
+      fixtures.clerk.organization?.getMemberships.mockReturnValue(
+        Promise.resolve({ data: adminsList, total_count: 2 }),
+      );
       const { getByText } = render(<OrganizationSettings />, { wrapper });
       await waitFor(() => {
         expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
