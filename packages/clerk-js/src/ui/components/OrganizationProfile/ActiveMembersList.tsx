@@ -2,27 +2,27 @@ import type { MembershipRole, OrganizationMembershipResource } from '@clerk/type
 
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
-import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../elements';
+import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { handleError, roleLocalizationKey } from '../../utils';
 import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
-const ITEMS_PER_PAGE = 10;
-
 export const ActiveMembersList = () => {
   const card = useCardState();
-  const { page, changePage } = usePagination({ defaultPage: 1 });
   const {
     organization,
-    membershipList,
     membership: currentUserMembership,
-    memberships: adminMembers,
+    memberships,
     ...rest
   } = useCoreOrganization({
-    membershipList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
+    memberships: true,
+  });
+
+  const { memberships: adminMembers } = useCoreOrganization({
     memberships: {
       role: ['admin'],
     },
   });
+
   const isAdmin = currentUserMembership?.role === 'admin';
 
   const mutateSwrState = () => {
@@ -64,11 +64,11 @@ export const ActiveMembersList = () => {
 
   return (
     <DataTable
-      page={page}
-      onPageChange={changePage}
-      itemCount={organization.membersCount}
-      itemsPerPage={ITEMS_PER_PAGE}
-      isLoading={!membershipList}
+      page={memberships?.page || 1}
+      onPageChange={n => memberships?.fetchPage?.(n)}
+      itemCount={memberships?.count || 0}
+      pageCount={memberships?.pageCount || 0}
+      isLoading={memberships?.isLoading}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
       headers={[
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
@@ -76,7 +76,7 @@ export const ActiveMembersList = () => {
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role'),
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
       ]}
-      rows={(membershipList || []).map(m => (
+      rows={(memberships?.data || []).map(m => (
         <MemberRow
           key={m.id}
           membership={m}
