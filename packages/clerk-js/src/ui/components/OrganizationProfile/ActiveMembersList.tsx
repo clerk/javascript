@@ -27,7 +27,7 @@ export const ActiveMembersList = () => {
   const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
     return card
       .runAsync(async () => {
-        await membership.update({ role: newRole });
+        return await membership.update({ role: newRole });
       })
       .catch(err => handleError(err, [], card.setError));
   };
@@ -35,8 +35,7 @@ export const ActiveMembersList = () => {
   const handleRemove = (membership: OrganizationMembershipResource) => () => {
     return card
       .runAsync(async () => {
-        const destroyedMembership = await membership.destroy();
-        return destroyedMembership;
+        return await membership.destroy();
       })
       .then(mutateSwrState)
       .catch(err => handleError(err, [], card.setError));

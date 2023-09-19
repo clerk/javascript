@@ -49,23 +49,29 @@ const RequestRow = withCardStateProvider(
   (props: { request: OrganizationMembershipRequestResource; onError: ReturnType<typeof useCardState>['setError'] }) => {
     const { request, onError } = props;
     const card = useCardState();
-    const { membershipRequests } = useCoreOrganization({
+    const { membership, membershipRequests } = useCoreOrganization({
       membershipRequests: membershipRequestsParams,
     });
 
     const onAccept = () => {
+      if (!membership || !membershipRequests) {
+        return;
+      }
       return card
         .runAsync(async () => {
           await request.accept();
-          await (membershipRequests as any).unstable__mutate?.();
+          await membershipRequests.mutate();
         }, 'accept')
         .catch(err => handleError(err, [], onError));
     };
     const onReject = () => {
+      if (!membership || !membershipRequests) {
+        return;
+      }
       return card
         .runAsync(async () => {
           await request.reject();
-          await (membershipRequests as any).unstable__mutate?.();
+          await membershipRequests.mutate();
         }, 'reject')
         .catch(err => handleError(err, [], onError));
     };
