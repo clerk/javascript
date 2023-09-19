@@ -8,19 +8,19 @@ type UseOrganizationsReturn =
 
       /**
        * @deprecated Use `createOrganization` from `useOrganizationList`
-       * Example const {createOrganization} = useOrganizationList()
+       * Example: `const {createOrganization} = useOrganizationList()`
        */
       createOrganization: undefined;
 
       /**
        * @deprecated Use `memberships` from `useOrganization`
-       * Example const {memberships} = useOrganization()
+       * Example: `const {memberships} = useOrganization()`
        */
       getOrganizationMemberships: undefined;
 
       /**
        * @deprecated Use `getOrganization` from `useClerk`
-       * Example const {getOrganization} = useClerk()
+       * Example: `const {getOrganization} = useClerk()`
        */
       getOrganization: undefined;
     }
@@ -28,19 +28,19 @@ type UseOrganizationsReturn =
       isLoaded: true;
       /**
        * @deprecated Use `createOrganization` from `useOrganizationList`
-       * Example const {createOrganization} = useOrganizationList()
+       * Example: `const {createOrganization} = useOrganizationList()`
        */
       createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
 
       /**
        * @deprecated Use `memberships` from `useOrganization`
-       * Example const {memberships} = useOrganization()
+       * Example: `const {memberships} = useOrganization()`
        */
       getOrganizationMemberships: () => Promise<OrganizationMembershipResource[]>;
 
       /**
        * @deprecated Use `getOrganization` from `useClerk`
-       * Example const {getOrganization} = useClerk()
+       * Example: `const {getOrganization} = useClerk()`
        */
       getOrganization: (organizationId: string) => Promise<OrganizationResource | undefined>;
     };
