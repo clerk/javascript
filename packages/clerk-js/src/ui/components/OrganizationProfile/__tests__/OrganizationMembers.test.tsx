@@ -131,12 +131,17 @@ describe('OrganizationMembers', () => {
 
     fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
       Promise.resolve({
-        data: [],
+        data: membersList,
         total_count: 2,
       }),
     );
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(Promise.resolve(membersList));
+    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+      Promise.resolve({
+        data: [],
+        total_count: 2,
+      }),
+    );
 
     const { queryByText, queryAllByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -184,13 +189,15 @@ describe('OrganizationMembers', () => {
     });
 
     fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+      Promise.resolve({ data: membersList, total_count: 0 }),
+    );
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
       Promise.resolve({
         data: [],
         total_count: 0,
       }),
     );
-
-    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(Promise.resolve(membersList));
 
     const { queryByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -327,7 +334,12 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(membersList));
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(
+      Promise.resolve({
+        data: membersList,
+        total_count: 2,
+      }),
+    );
     const { findByText } = render(<OrganizationMembers />, { wrapper });
     await waitFor(() => expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled());
     expect(await findByText('You')).toBeDefined();
