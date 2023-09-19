@@ -1,5 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { constants, debugRequestState } from '@clerk/backend';
+import { deprecated } from '@clerk/shared';
 import type { ServerResponse } from 'http';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
@@ -43,6 +44,10 @@ const decorateResponseWithObservabilityHeaders = (res: ServerResponse, requestSt
 export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options?: any): any => {
   const cb = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
   const opts = (options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {}) || {};
+  deprecated(
+    'withServerSideAuth',
+    'Use `authMiddleware` instead.\nFor more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware',
+  );
 
   // Support both loadOrganization and the older loadOrg option without breaking changes
   // TODO: Remove pre v5
