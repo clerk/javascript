@@ -21,6 +21,9 @@ import type { PaginatedResources, PaginatedResourcesWithDefault } from './types'
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationParams = {
+  /**
+   * @deprecated Use invitations instead
+   */
   invitationList?: GetPendingInvitationsParams;
   /**
    * @deprecated Use `memberships` instead
@@ -39,6 +42,13 @@ type UseOrganizationParams = {
         keepPreviousData?: boolean;
       });
   memberships?:
+    | true
+    | (GetMembersParams & {
+        infinite?: boolean;
+        keepPreviousData?: boolean;
+      });
+
+  invitations?:
     | true
     | (GetMembersParams & {
         infinite?: boolean;
