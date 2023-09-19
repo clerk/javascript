@@ -5,7 +5,7 @@ import { useCoreClerk, useCoreOrganizationList } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
-import { updateCacheInPlace } from '../OrganizationSwitcher/utils';
+import { populateCacheUpdateItem } from '../OrganizationSwitcher/utils';
 import { PreviewListItem, PreviewListItemButton } from './shared';
 import { MembershipPreview } from './UserMembershipList';
 import { organizationListParams } from './utils';
@@ -39,7 +39,12 @@ export const InvitationPreview = withCardStateProvider((props: UserOrganizationI
       })
       .then(([updatedItem, organization]) => {
         // Update cache in case another listener depends on it
-        updateCacheInPlace(userInvitations)(updatedItem);
+        userInvitations?.mutate?.(pages => populateCacheUpdateItem(updatedItem, pages), {
+          // Since `accept` gives back the updated information,
+          // we don't need to revalidate here.
+          revalidate: false,
+        });
+
         setAcceptedOrganization(organization);
       })
       .catch(err => handleError(err, [], card.setError));

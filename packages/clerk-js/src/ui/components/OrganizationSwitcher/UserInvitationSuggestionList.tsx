@@ -9,7 +9,7 @@ import { useInView } from '../../hooks';
 import type { PropsOfComponent } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { organizationListParams, removeItemFromPaginatedCache, updateCacheInPlace } from './utils';
+import { organizationListParams, populateCacheRemoveItem, populateCacheUpdateItem } from './utils';
 
 const useFetchInvitations = () => {
   const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
@@ -44,7 +44,13 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(updateCacheInPlace(userSuggestions))
+      .then(updatedItem => {
+        userSuggestions?.mutate?.(pages => populateCacheUpdateItem(updatedItem, pages), {
+          // Since `accept` gives back the updated information,
+          // we don't need to revalidate here.
+          revalidate: false,
+        });
+      })
       .catch(err => handleError(err, [], card.setError));
   };
 
@@ -81,7 +87,13 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(removeItemFromPaginatedCache(userInvitations))
+      .then(updatedItem => {
+        userInvitations?.mutate?.(pages => populateCacheRemoveItem(updatedItem, pages), {
+          // Since `accept` gives back the updated information,
+          // we don't need to revalidate here.
+          revalidate: false,
+        });
+      })
       .catch(err => handleError(err, [], card.setError));
   };
 
