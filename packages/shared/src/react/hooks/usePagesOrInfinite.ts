@@ -55,10 +55,26 @@ export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | 
 type ArrayType<DataArray> = DataArray extends Array<infer ElementType> ? ElementType : never;
 type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Data> : Type;
 
+type DefaultOptions = {
+  /**
+   * Persists the previous pages with new ones in the same array
+   */
+  infinite?: boolean;
+  /**
+   * Return the previous key's data until the new data has been loaded
+   */
+  keepPreviousData?: boolean;
+  /**
+   * Should a request be triggered
+   */
+  enabled?: boolean;
+};
+
 type UsePagesOrInfinite = <
   Params extends PagesOrInfiniteOptions,
   FetcherReturnData extends Record<string, any>,
   CacheKeys = Record<string, unknown>,
+  TOptions extends DefaultOptions = DefaultOptions,
 >(
   /**
    * The parameters will be passed to the fetcher
@@ -71,24 +87,9 @@ type UsePagesOrInfinite = <
   /**
    * Internal configuration of the hook
    */
-  options: {
-    /**
-     * Persists the previous pages with new ones in the same array
-     */
-    infinite?: boolean;
-    /**
-     * Return the previous key's data until the new data has been loaded
-     */
-    keepPreviousData?: boolean;
-    /**
-     * Should a request be triggered
-     */
-    enabled?: boolean;
-  },
+  options: TOptions,
   cacheKeys: CacheKeys,
-) => PaginatedResources<ExtractData<FetcherReturnData>> & {
-  unstable__mutate: () => Promise<unknown>;
-};
+) => PaginatedResources<ExtractData<FetcherReturnData>, TOptions['infinite'], FetcherReturnData>;
 
 export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
@@ -206,7 +207,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
   const hasNextPage = count - offsetCount * pageSizeRef.current > page * pageSizeRef.current;
   const hasPreviousPage = (page - 1) * pageSizeRef.current > offsetCount * pageSizeRef.current;
 
-  const unstable__mutate = triggerInfinite ? swrInfiniteMutate : swrMutate;
+  const mutate = triggerInfinite ? swrInfiniteMutate : swrMutate;
 
   return {
     data,
@@ -221,6 +222,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     fetchPrevious,
     hasNextPage,
     hasPreviousPage,
-    unstable__mutate,
+    // Let the hook return type define this type
+    mutate: mutate as any,
   };
 };

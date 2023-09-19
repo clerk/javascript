@@ -56,7 +56,9 @@ type UseOrganizationParams = {
       });
 };
 
-type UseOrganizationReturn =
+type UseOrganization = <T extends UseOrganizationParams>(
+  params?: T,
+) =>
   | {
       isLoaded: false;
       organization: undefined;
@@ -103,13 +105,35 @@ type UseOrganizationReturn =
        */
       membershipList: OrganizationMembershipResource[] | null | undefined;
       membership: OrganizationMembershipResource | null | undefined;
-      domains: PaginatedResources<OrganizationDomainResource> | null;
-      membershipRequests: PaginatedResources<OrganizationMembershipRequestResource> | null;
-      memberships: PaginatedResources<OrganizationMembershipResource> | null;
-      invitations: PaginatedResources<OrganizationInvitationResource> | null;
+      domains: PaginatedResources<
+        OrganizationDomainResource,
+        T['membershipRequests'] extends { infinite: true } ? true : false,
+        T['membershipRequests'] extends { infinite: true }
+          ? ClerkPaginatedResponse<OrganizationDomainResource>
+          : OrganizationDomainResource[]
+      > | null;
+      membershipRequests: PaginatedResources<
+        OrganizationMembershipRequestResource,
+        T['membershipRequests'] extends { infinite: true } ? true : false,
+        T['membershipRequests'] extends { infinite: true }
+          ? ClerkPaginatedResponse<OrganizationMembershipRequestResource>
+          : OrganizationMembershipRequestResource[]
+      > | null;
+      memberships: PaginatedResources<
+        OrganizationMembershipResource,
+        T['memberships'] extends { infinite: true } ? true : false,
+        T['memberships'] extends { infinite: true }
+          ? ClerkPaginatedResponse<OrganizationMembershipResource>
+          : OrganizationMembershipResource[]
+      > | null;
+      invitations: PaginatedResources<
+        OrganizationInvitationResource,
+        T['invitations'] extends { infinite: true } ? true : false,
+        T['invitations'] extends { infinite: true }
+          ? ClerkPaginatedResponse<OrganizationInvitationResource>
+          : OrganizationInvitationResource[]
+      > | null;
     };
-
-type UseOrganization = (params?: UseOrganizationParams) => UseOrganizationReturn;
 
 const undefinedPaginatedResource = {
   data: undefined,
@@ -124,6 +148,7 @@ const undefinedPaginatedResource = {
   fetchPrevious: undefined,
   hasNextPage: false,
   hasPreviousPage: false,
+  mutate: undefined,
 } as const;
 
 export const useOrganization: UseOrganization = params => {
@@ -371,10 +396,13 @@ export const useOrganization: UseOrganization = params => {
       void mutateMembershipList();
       void mutateInvitationList();
     },
-    domains,
-    membershipRequests,
-    memberships,
-    invitations,
+    // Let the hook return type define this type
+    domains: domains as any,
+    // Let the hook return type define this type
+    membershipRequests: membershipRequests as any,
+    // Let the hook return type define this type
+    memberships: memberships as any,
+    invitations: invitations as any,
   };
 };
 
