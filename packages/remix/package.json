@@ -50,6 +50,9 @@
     "@remix-run/react": "^2.0.0",
     "@remix-run/server-runtime": "^2.0.0"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "publishConfig": {
     "access": "public"
   },
