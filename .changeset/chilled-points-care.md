@@ -6,6 +6,11 @@ Remix released its second major version. Read their [announcement blogpost](http
 
 Thus `@clerk/remix` was updated to support Remix `^2.0.0` and later. If you want/need to continue using Remix `^1.0.0`, keep using the previous major `@clerk/remix` version.
 
+**Breaking changes:**
+
+- Renamed `V2_ClerkErrorBoundary` to `ClerkErrorBoundary`
+- Removed `ClerkCatchBoundary`
+
 **Migration guide:**
 
 - Rename `V2_ClerkErrorBoundary` to `ClerkErrorBoundary`
