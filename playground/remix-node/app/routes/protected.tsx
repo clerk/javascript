@@ -1,5 +1,5 @@
 import { UserButton } from '@clerk/remix';
-import { getAuth } from '@clerk/remix/ssr.server.js';
+import { getAuth } from '@clerk/remix/ssr.server';
 import type { LoaderFunction } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
 

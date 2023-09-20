@@ -1,6 +1,6 @@
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare';
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
-import { rootAuthLoader } from '@clerk/remix/ssr.server.js';
+import { rootAuthLoader } from '@clerk/remix/ssr.server';
 import { ClerkApp, ClerkErrorBoundary } from '@clerk/remix';
 
 export const loader: LoaderFunction = args => {

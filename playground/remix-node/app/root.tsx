@@ -1,7 +1,7 @@
 import type { DataFunctionArgs, Headers } from '@remix-run/node';
 import type { MetaFunction } from '@remix-run/react';
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
-import { getClerkDebugHeaders, rootAuthLoader } from '@clerk/remix/ssr.server.js';
+import { getClerkDebugHeaders, rootAuthLoader } from '@clerk/remix/ssr.server';
 import { ClerkApp, ClerkErrorBoundary } from '@clerk/remix';
 
 export const loader = (args: DataFunctionArgs) => {
