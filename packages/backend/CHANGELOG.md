@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.29.1
+
+### Patch Changes
+
+- Change `README` to include updated links to issue templates and update Discord link. ([#1750](https://github.com/clerkinc/javascript/pull/1750)) by [@LekoArts](https://github.com/LekoArts)
+
+- Fix missing members_count property for an Organization ([#1735](https://github.com/clerkinc/javascript/pull/1735)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e99df0a0d`](https://github.com/clerkinc/javascript/commit/e99df0a0de8ab91e9de4d32dfab46ad562f510d3), [`4327b91f9`](https://github.com/clerkinc/javascript/commit/4327b91f9ed65b440afaa5f76a6231aeacd3541a), [`01b024c57`](https://github.com/clerkinc/javascript/commit/01b024c57c80ae00d83801fe90b2992111dc1a68)]:
+  - @clerk/types@3.52.0
+
 ## 0.29.0
 
 ### Minor Changes
