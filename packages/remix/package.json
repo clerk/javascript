@@ -15,19 +15,34 @@
   ],
   "author": "Clerk",
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": "./dist/index.js",
+    "./ssr.server": "./dist/ssr/index.js",
+    "./api.server": "./dist/api/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*.d.ts",
+        "dist/index.d.ts"
+      ],
+      "ssr.server": [
+        "dist/ssr/index.d.ts"
+      ],
+      "api.server": [
+        "dist/api/index.d.ts"
+      ]
+    }
+  },
   "files": [
-    "dist",
-    "api.server.d.ts",
-    "api.server.js",
-    "ssr.server.d.ts",
-    "ssr.server.js"
+    "dist"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
-    "clean": "rimraf ./dist",
-    "lint": "eslint ."
+    "clean": "rimraf ./dist"
   },
   "dependencies": {
     "@clerk/backend": "^0.29.0",
