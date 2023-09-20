@@ -33,8 +33,8 @@ Clerk is the easiest way to add authentication and user management to your Remix
 
 ### Prerequisites
 
-- Remix v1.2+
-- Node.js v16+
+- Remix `^2.0.0` or later
+- Node.js `^18.0.0` or later
 
 ### Installation
 
@@ -71,15 +71,15 @@ You can get these from the [API Keys](https://dashboard.clerk.com/last-active?pa
 To initialize Clerk with your Remix application, you will need to make three modifications to `app/root.jsx`:
 
 1. Export `rootAuthLoader` as `loader`
-2. Export `ClerkCatchBoundary` as `CatchBoundary`
+2. Export `ClerkErrorBoundary` as `ErrorBoundary`
 3. Wrap the default export with `ClerkApp`
 
 ```jsx
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
-import { ClerkApp, ClerkCatchBoundary } from '@clerk/remix';
+import { ClerkApp, ClerkErrorBoundary } from '@clerk/remix';
 
 export const loader = args => rootAuthLoader(args);
-export const CatchBoundary = ClerkCatchBoundary();
+export const ErrorBoundary = ClerkErrorBoundary();
 
 function App() {
   return <html lang='en'>[...]</html>;
@@ -116,7 +116,7 @@ export default function Index() {
 }
 ```
 
-_For further details and examples, please refer to our [Documentation](https://clerk.com/docs/get-started/remix?utm_source=github&utm_medium=clerk_remix)._
+_For further details and examples, please refer to our [Documentation](https://clerk.com/docs/quickstarts/remix?utm_source=github&utm_medium=clerk_remix)._
 
 ## Support
 
