@@ -1637,13 +1637,13 @@ describe('Clerk singleton', () => {
   });
 
   describe('buildUrlWithAuth', () => {
-    it('builds a relative url from a relative url in development for url based session syncing', async () => {
+    it('builds an absolute url from a relative url in development for url based session syncing', async () => {
       mockUsesUrlBasedSessionSync.mockReturnValue(true);
       const sut = new Clerk(devFrontendApi);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('foo');
-      expect(url).toBe('foo');
+      expect(url).toBe('http://test.host/foo');
     });
 
     it('returns what was passed when in production', async () => {

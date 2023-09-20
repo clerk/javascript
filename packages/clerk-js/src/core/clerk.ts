@@ -1,5 +1,4 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
-import { isCrossOrigin, isRelativeUrl } from '@clerk/shared';
 import {
   addClerkPrefix,
   handleValueOrFn,
@@ -666,7 +665,7 @@ export default class Clerk implements ClerkInterface {
     const customNavigate = this.#options.navigate;
 
     if (toURL.origin !== window.location.origin || !customNavigate) {
-      windowNavigate(this.buildUrlWithAuth(toURL.href));
+      windowNavigate(toURL);
       return;
     }
 
@@ -675,18 +674,15 @@ export default class Clerk implements ClerkInterface {
   };
 
   public buildUrlWithAuth(to: string, options?: BuildUrlWithAuthParams): string {
-    if (
-      this.#instanceType === 'production' ||
-      !this.#devBrowserHandler?.usesUrlBasedSessionSync() ||
-      isRelativeUrl(to) ||
-      !isCrossOrigin(to, window.location.href)
-    ) {
+    if (this.#instanceType === 'production' || !this.#devBrowserHandler?.usesUrlBasedSessionSync()) {
       return to;
     }
 
-    // to is an absolute url but do this to keep the trailing slash
-    // (FAPI validation will throw otherwise, can remove when fixed)
-    const toURL = new URL(to, window.location.href);
+    const toURL = new URL(to, window.location.origin);
+
+    if (toURL.origin === window.location.origin) {
+      return toURL.href;
+    }
 
     const devBrowserJwt = this.#devBrowserHandler?.getDevBrowserJWT();
     if (!devBrowserJwt) {
@@ -752,12 +748,12 @@ export default class Clerk implements ClerkInterface {
       { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
       { stringify: true },
     );
-    return this.navigate(backToSatelliteUrl);
+    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl));
   };
 
   public redirectWithAuth = async (to: string): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(to);
+      return this.navigate(this.buildUrlWithAuth(to));
     }
     return;
   };
@@ -1512,7 +1508,8 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    await this.navigate(this.buildUrlWithAuth(redirectUrl, { useQueryParam: true }));
+    const buildUrlWithAuthParams: BuildUrlWithAuthParams = { useQueryParam: true };
+    await this.navigate(this.buildUrlWithAuth(redirectUrl, buildUrlWithAuthParams));
     return true;
   };
 }
