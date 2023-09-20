@@ -60,18 +60,21 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
       }
       title={formattedPhone}
       badge={
-        isPrimary ? (
-          <Badge
-            localizationKey={localizationKeys('badge__primary')}
-            textVariant={'extraSmallMedium'}
-          />
-        ) : !isVerified ? (
-          <Badge
-            localizationKey={localizationKeys('badge__unverified')}
-            colorScheme='danger'
-            textVariant={'extraSmallMedium'}
-          />
-        ) : undefined
+        <>
+          {isPrimary && (
+            <Badge
+              localizationKey={localizationKeys('badge__primary')}
+              textVariant={'extraSmallMedium'}
+            />
+          )}
+          {!isVerified && (
+            <Badge
+              localizationKey={localizationKeys('badge__unverified')}
+              colorScheme='danger'
+              textVariant={'extraSmallMedium'}
+            />
+          )}
+        </>
       }
     >
       <Col gap={4}>
