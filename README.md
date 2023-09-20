@@ -12,7 +12,7 @@
 </h1>
 <p align="center">
   <strong>
-    Clerk is the easiest way to add authentication and user management to your React app. It’s purpose-built for the modern web and designed to get you up and running in minutes.
+    Clerk helps developers build user management. We provide streamlined user experiences for your users to sign up, sign in, and manage their profile.
   </strong>
 </p>
 
