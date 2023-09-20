@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.10.3
+
+### Patch Changes
+
+- Change `README` to include updated links to issue templates and update Discord link. ([#1750](https://github.com/clerkinc/javascript/pull/1750)) by [@LekoArts](https://github.com/LekoArts)
+
+- Adjust return type of `rootAuthLoader`'s callback to allow returning `null`. ([#1704](https://github.com/clerkinc/javascript/pull/1704)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`e99df0a0d`](https://github.com/clerkinc/javascript/commit/e99df0a0de8ab91e9de4d32dfab46ad562f510d3), [`4327b91f9`](https://github.com/clerkinc/javascript/commit/4327b91f9ed65b440afaa5f76a6231aeacd3541a), [`8b9a7a360`](https://github.com/clerkinc/javascript/commit/8b9a7a36003f1b8622f444a139a811f1c35ca813), [`30bb9eccb`](https://github.com/clerkinc/javascript/commit/30bb9eccb95632fb1de02b756e818118ca6324f7), [`75be1d6b3`](https://github.com/clerkinc/javascript/commit/75be1d6b3d9bf7b5d71613b3f169a942b1d25e7e), [`01b024c57`](https://github.com/clerkinc/javascript/commit/01b024c57c80ae00d83801fe90b2992111dc1a68)]:
+  - @clerk/clerk-react@4.25.0
+  - @clerk/types@3.52.0
+  - @clerk/backend@0.29.1
+  - @clerk/shared@0.22.1
+
 ## 2.10.2
 
 ### Patch Changes

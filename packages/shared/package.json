@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.22.0",
+  "version": "0.22.1",
   "description": "Internal package utils used by the Clerk SDKs",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/cjs/index.js",
@@ -35,7 +35,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "devDependencies": {
-    "@clerk/types": "^3.51.0",
+    "@clerk/types": "^3.52.0",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
     "tsup": "*",
