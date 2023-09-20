@@ -7,10 +7,16 @@
   </a>
   <br />
 </p>
+<h1 align="center">
+  Official Clerk JavaScript SDKs
+</h1>
+<p align="center">
+  <strong>
+    Clerk helps developers build user management. We provide streamlined user experiences for your users to sign up, sign in, and manage their profile.
+  </strong>
+</p>
 
-# Official Clerk JavaScript SDKs
-
-This repository contains all the Clerk JavaScript SDKs under the `@clerk/` namespace. Visit [https://clerk.com](https://clerk.com) to signup for an account.
+This repository contains all the Clerk JavaScript SDKs under the `@clerk` namespace. Visit [clerk.com](https://clerk.com) to signup for an account.
 
 [![chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs)
@@ -24,53 +30,41 @@ Would you like to work on Open Source software and help maintain this repository
 
 ---
 
-## Documentation and Usage
+## 🚀 Get Started with Clerk
 
-For how to get started with Clerk, you can refer to the official [documentation page](https://clerk.com/docs).
+1. [Sign up for an account](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_js_repo_readme)
+1. Create an application in your Clerk dashboard
+1. Spin up a new codebase with one of the [quickstart guides](https://clerk.com/docs/quickstarts/overview?utm_source=github&utm_medium=clerk_js_repo_readme)
 
-For JavaScript environments/platforms that Clerk supports, there should be a specific package corresponding to the respective technology.
+This repository contains the SDKs for environment/platforms that Clerk supports. For example, if you want to use Clerk with Node.js you can install:
 
 ```sh
 npm install @clerk/clerk-sdk-node
 # or
 yarn add @clerk/clerk-sdk-node
+# or
+pnpm add @clerk/clerk-sdk-node
 ```
 
-## Packages
+## 🎓 Learning Clerk
 
-For package specific details on installation, architecture and usage usage, you can refer to the package's README file.
+Clerk's full documentation is available at [clerk.com/docs](https://clerk.com/docs?utm_source=github&utm_medium=clerk_js_repo_readme).
 
-- [`@clerk/backend`](./packages/backend): Functionalities regarded as "core" for Clerk to operate with. _Authentication resolution, API Resources etc._
-- [`@clerk/clerk-expo`](./packages/expo) Clerk package for the Expo universal app framework.
-- [`@clerk/clerk-js`](./packages/clerk-js): Core JavaScript implementation used by Clerk in the browser.
-- [`@clerk/clerk-react`](./packages/react) Clerk package for React applications.
-- [`@clerk/clerk-sdk-node`](./packages/sdk-node): SDK for native Node.js environment and frameworks.
-- [`@clerk/fastify`](./packages/fastify): Clerk package for Fastify.
-- [`@clerk/chrome-extension`](./packages/chrome-extension): Clerk package for Chrome extensions.
-- [`@clerk/nextjs`](./packages/nextjs): Clerk package for Next.js.
-- [`@clerk/remix`](./packages/remix): Clerk package for Remix.
-- [`@clerk/types`](./packages/types) Main TypeScript typings for Clerk libraries.
-- ...
+- **We recommend starting with the [Quickstart guides](https://clerk.com/docs/quickstarts/overview).** It'll enable you to quickly add Clerk to your application. If you're starting a new project and are not sure what to pick, use [Next.js](https://nextjs.org/docs/getting-started/installation) and [@clerk/nextjs](https://clerk.com/docs/quickstarts/nextjs).
+- **To learn more about Clerk's components and features, checkout the rest of the [Clerk documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_js_repo_readme).** You'll be able to e.g. browse the [component reference](https://clerk.com/docs/components/overview?utm_source=github&utm_medium=clerk_js_repo_readme) page.
 
-Additionally there are packages which act as shared utilities or building blocks.
+## 🚢 Release Notes
 
-## Setup
+Curious what we shipped recently? You can browse the [GitHub Releases](https://github.com/clerkinc/javascript/releases) page or look at the individual `CHANGELOG.md` files inside each package (e.g. [`clerk-js CHANGELOG`](https://github.com/clerkinc/javascript/blob/main/packages/clerk-js/CHANGELOG.md)).
 
-- Clone the repository.
-- `npm install`.
-- `npm run build`.
+## 🤝 How to Contribute
 
-\* See the [docs folder](./docs) for additional repository documentation.
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md). We'd love to have you as part of the Clerk community!
 
-## Cleanup
+It'll show you how to make changes to the SDKs, open pull requests, or submitting issues. If you want to add or edit localizations (e.g. how a button text is translated to your language), you can check out the [`localizations` README](./packages/localizations/README.md).
 
-To clean existing builds and installed dependencies of the monorepo and setup again, run `npm run nuke`.
+## 📝 License
 
-## How to add a new localization key
+This project is licensed under the **MIT license**.
 
-- Add the key types to the types [package](./packages/types/src/localization.ts).
-- Add the corresponding localization values for every supported language in the [localizations package](./packages/localizations/)
-- Replace the plain string (if there is one) with the localization value like so:  
-  `<Text>Role</Text>`  
-  becomes  
-  `<Text localizationKey={localizationKeys('formFieldLabel__role')} />`
+See [LICENSE](https://github.com/clerkinc/javascript/blob/main/LICENCE.md) for more information.

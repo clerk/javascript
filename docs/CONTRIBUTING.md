@@ -18,6 +18,7 @@ Please note we have a [code of conduct](https://github.com/clerkinc/javascript/b
     - [What is the difference between a commit message, a PR description and a changeset description?](#what-is-the-difference-between-a-commit-message-a-pr-description-and-a-changeset-description)
     - [Notes on Pull Requests](#notes-on-pull-requests)
   - [Issues and feature requests](#issues-and-feature-requests)
+  - [Localizations](#localizations)
   - [Publishing packages](#publishing-packages)
   - [License](#license)
 
@@ -34,6 +35,16 @@ The current monorepo setup is based on:
 - [Changesets](https://github.com/changesets/changesets), used for package versioning, publishing and changelog generation.
 - [GitHub Actions](https://docs.github.com/en/actions), used for quality checks and automated release orchestration.
 - [Yalc](https://github.com/wclr/yalc), used for to publish packages locally and test them in other local projects.
+
+All packages of the monorepo are inside [packages](../packages). For package specific details on installation, architecture and usage, you can refer to the package's README file.
+
+- [`@clerk/backend`](../packages/backend): Functionalities regarded as "core" for Clerk to operate with. _Authentication resolution, API Resources etc._
+- [`@clerk/clerk-js`](../packages/clerk-js): Core JavaScript implementation used by Clerk in the browser.
+- [`@clerk/clerk-react`](../packages/react) Clerk package for React applications.
+- [`@clerk/types`](../packages/types): Main TypeScript typings for Clerk libraries.
+- Browse [packages](../packages) to see more
+
+Additionally there are packages which act as shared utilities or building blocks.
 
 ### Prerequisites
 
@@ -153,6 +164,10 @@ You've found a bug in the source code, a mistake in the documentation or maybe y
 Issues that have the label `needs-triage` have been seen by our team and are queued for triage internally. Issues that have the label `prioritized` have been discussed and are either in our backlog or being worked on actively. We do our best to prioritize work across a wide variety of sources, only one of which is github issues. While we understand that it can be frustrating if it takes a while for a patch to land, we ask for your understanding in that we have quite a lot of things that need to be worked on at any given time and are still a small team. And remember, the best way to get something fixed in an open source library is to contribute the fix yourself!
 
 If you are a paying Clerk customer looking for support, please reach out directly to our support team by heading to https://www.clerk.com, clicking the chat bubble in the bottom right corner, and selecting "contact support".
+
+## Localizations
+
+If you want to add or edit localizations (e.g. how a button text is translated to your language), you can check out the [`localizations` README](../packages/localizations/README.md).
 
 ## Publishing packages
 
