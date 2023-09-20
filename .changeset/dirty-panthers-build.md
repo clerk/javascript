@@ -7,7 +7,7 @@
 '@clerk/types': minor
 ---
 
-Introduce the new brand new component <OrganizationList />
+Introduce the new brand-new component OrganizationList
 
 - Lists all the memberships, invitations or suggestions an active user may have
 - Powered by our `useOrganizationList` react hook
