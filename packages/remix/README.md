@@ -75,7 +75,7 @@ To initialize Clerk with your Remix application, you will need to make three mod
 3. Wrap the default export with `ClerkApp`
 
 ```jsx
-import { rootAuthLoader } from '@clerk/remix/ssr.server';
+import { rootAuthLoader } from '@clerk/remix/ssr.server.js';
 import { ClerkApp, ClerkErrorBoundary } from '@clerk/remix';
 
 export const loader = args => rootAuthLoader(args);

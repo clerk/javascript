@@ -1,5 +1,5 @@
 import type { LoaderFunction } from '@remix-run/node';
-import { getAuth } from '@clerk/remix/ssr.server';
+import { getAuth } from '@clerk/remix/ssr.server.js';
 import { ClerkLoaded, SignedIn, useUser } from '@clerk/remix';
 import { Link } from '@remix-run/react';
 
