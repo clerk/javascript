@@ -33,6 +33,7 @@ To perform a snapshot release, simply comment `!snapshot` in your PR. Once the p
 Notes:
 
 - Snapshot versions use the following format: `@clerk/package@x.y.z-snapshot.commit`, where `package` is the package name, `x`,`y`,`z` are the major, minor and patch versions respectively, `snapshot` is a stable prerelease mame and `commit` is the id of the last commit in the branch.
+- If you want to name your snapshot release, you can pass an argument to the snapshot comment, eg `!snapshot myname` will use `myname` instead of `snapshot`, eg: `@clerk/clerk-js@4.1.1-myname.90012`. Please note: When using a custom name, the underlying id stays the same and only the tag changes. This has the consequence that npm resolves versions alphabetically. You should pin your versions and not rely on resolving through `^` or `~`.
 - Snapshot version changes are _not_ committed to the repo and no git tags will be generated - they are meant to be used as "snapshots" of the repo at a particular state for testing purposes.
 - During a snapshot release, `@clerk/clerk-js` will also be released. If needed, use the `clerkJSVersion` prop to use a specific version, eg: `<ClerkProvider clerkJSVersion='4.1.1-snapshot.90012' />`
 - To make iterations faster, tests will not run for snapshot versions.
