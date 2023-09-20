@@ -67,4 +67,4 @@ It'll show you how to make changes to the SDKs, open pull requests, or submittin
 
 This project is licensed under the **MIT license**.
 
-See [LICENSE](https://github.com/clerkinc/javascript/blob/main/LICENCE.md) for more information.
+See [LICENSE](https://github.com/clerkinc/javascript/blob/main/LICENSE) for more information.
