@@ -191,7 +191,7 @@ function _SignUpContinue() {
             <Footer.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
             <Footer.ActionLink
               localizationKey={localizationKeys('signUp.continue.actionLink')}
-              to={signInUrl}
+              to={clerk.buildUrlWithAuth(signInUrl)}
             />
           </Footer.Action>
           <Footer.Links />

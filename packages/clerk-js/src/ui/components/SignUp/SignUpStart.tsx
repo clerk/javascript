@@ -28,6 +28,7 @@ import { completeSignUpFlow } from './util';
 
 function _SignUpStart(): JSX.Element {
   const card = useCardState();
+  const clerk = useCoreClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
   const { showOptionalFields } = useAppearance().parsedLayout;
@@ -278,7 +279,7 @@ function _SignUpStart(): JSX.Element {
             <Footer.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
             <Footer.ActionLink
               localizationKey={localizationKeys('signUp.start.actionLink')}
-              to={signInUrl}
+              to={clerk.buildUrlWithAuth(signInUrl)}
             />
           </Footer.Action>
           <Footer.Links />

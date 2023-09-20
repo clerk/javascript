@@ -48,7 +48,7 @@ type OwnProps = { isExternal?: boolean; isDisabled?: boolean };
 export type LinkProps = PrimitiveProps<'a'> & OwnProps & StyleVariants<typeof applyVariants>;
 
 export const Link = (props: LinkProps): JSX.Element => {
-  const { isExternal, children, href = '', onClick, ...rest } = props;
+  const { isExternal, children, href, onClick, ...rest } = props;
 
   const onClickHandler = onClick
     ? (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -63,7 +63,7 @@ export const Link = (props: LinkProps): JSX.Element => {
     <a
       {...applyDataStateProps(filterProps(rest))}
       onClick={onClickHandler}
-      href={href}
+      href={href || ''}
       target={href && isExternal ? '_blank' : undefined}
       rel={href && isExternal ? 'noopener' : undefined}
       css={applyVariants(props)}
