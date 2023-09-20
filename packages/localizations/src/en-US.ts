@@ -61,6 +61,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomainEmailAddress: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
+  formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldAction__forgotPassword: 'Forgot password?',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',

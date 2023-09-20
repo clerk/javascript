@@ -36,6 +36,10 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
+  formFieldError__notMatchingPasswords: `Passwörter stimmen nicht überein.`,
+  formFieldError__matchingPasswords: 'Passwörter stimmen überein.',
+  formFieldError__verificationLinkExpired:
+    'Der Bestätigungslink ist abgelaufen. Bitte fordern Sie einen neuen Link an.',
   formFieldAction__forgotPassword: 'Passwort vergessen?',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Fortsetzen',

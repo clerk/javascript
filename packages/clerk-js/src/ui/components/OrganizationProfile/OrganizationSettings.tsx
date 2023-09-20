@@ -95,9 +95,11 @@ const OrganizationDangerSection = () => {
   const {
     organization,
     membership,
-    membershipList: adminMembers,
+    memberships: adminMembers,
   } = useCoreOrganization({
-    membershipList: { role: ['admin'] },
+    memberships: {
+      role: ['admin'],
+    },
   });
   const { navigate } = useRouter();
 
@@ -106,7 +108,7 @@ const OrganizationDangerSection = () => {
   }
 
   const adminDeleteEnabled = organization.adminDeleteEnabled;
-  const hasMoreThanOneAdmin = (adminMembers?.length || 0) > 1;
+  const hasMoreThanOneAdmin = (adminMembers?.count || 0) > 1;
   const isAdmin = membership.role === 'admin';
 
   return (

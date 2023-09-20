@@ -23,7 +23,7 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 type UseOrganizationParams = {
   invitationList?: GetPendingInvitationsParams;
   /**
-   * @deprecated Use members instead
+   * @deprecated Use `memberships` instead
    */
   membershipList?: GetMembershipsParams;
   domains?:
@@ -52,7 +52,7 @@ type UseOrganizationReturn =
       organization: undefined;
       invitationList: undefined;
       /**
-       * @deprecated Use members instead
+       * @deprecated Use `memberships` instead
        */
       membershipList: undefined;
       membership: undefined;
@@ -65,7 +65,7 @@ type UseOrganizationReturn =
       organization: OrganizationResource;
       invitationList: undefined;
       /**
-       * @deprecated Use members instead
+       * @deprecated Use `memberships` instead
        */
       membershipList: undefined;
       membership: undefined;
@@ -78,7 +78,7 @@ type UseOrganizationReturn =
       organization: OrganizationResource | null;
       invitationList: OrganizationInvitationResource[] | null | undefined;
       /**
-       * @deprecated Use members instead
+       * @deprecated Use `memberships` instead
        */
       membershipList: OrganizationMembershipResource[] | null | undefined;
       membership: OrganizationMembershipResource | null | undefined;
@@ -134,7 +134,7 @@ export const useOrganization: UseOrganization = params => {
   const membersSafeValues = useWithSafeValues(membersListParams, {
     initialPage: 1,
     pageSize: 10,
-    role: ['admin'],
+    role: undefined,
     keepPreviousData: false,
     infinite: false,
   });
