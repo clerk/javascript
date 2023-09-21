@@ -468,6 +468,12 @@ export type HandleOAuthCallbackParams = {
   secondFactorUrl?: string;
 
   /**
+   * Full URL or path to navigate during sign in,
+   * if the user is required to reset their password.
+   */
+  resetPasswordUrl?: string;
+
+  /**
    * Full URL or path to navigate after an incomplete sign up.
    */
   continueSignUpUrl?: string | null;

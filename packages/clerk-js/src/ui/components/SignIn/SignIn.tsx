@@ -47,6 +47,7 @@ function SignInRoutes(): JSX.Element {
             continueSignUpUrl={signInContext.signUpContinueUrl}
             firstFactorUrl={'../factor-one'}
             secondFactorUrl={'../factor-two'}
+            resetPasswordUrl={'../reset-password'}
           />
         </Route>
         <Route path='choose'>
