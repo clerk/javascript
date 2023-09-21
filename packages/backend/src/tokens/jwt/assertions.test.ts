@@ -14,7 +14,7 @@ import {
 } from './assertions';
 
 export default (QUnit: QUnit) => {
-  const { module, test, hooks } = QUnit;
+  const { module, test } = QUnit;
 
   function formatToUTCString(ts: number) {
     const tsDate = new Date(0);
@@ -259,7 +259,16 @@ export default (QUnit: QUnit) => {
     });
   });
 
-  module('assertExpirationClaim(exp, clockSkewInMs)', () => {
+  module('assertExpirationClaim(exp, clockSkewInMs)', hooks => {
+    let fakeClock;
+    hooks.beforeEach(() => {
+      fakeClock = sinon.useFakeTimers();
+    });
+    hooks.afterEach(() => {
+      fakeClock.restore();
+      sinon.restore();
+    });
+
     test('throws err if exp is in the past', assert => {
       const nowInSeconds = Date.now() / 1000;
       const exp = nowInSeconds - 5;
@@ -300,7 +309,16 @@ export default (QUnit: QUnit) => {
     });
   });
 
-  module('assertActivationClaim(nbf, clockSkewInMs)', () => {
+  module('assertActivationClaim(nbf, clockSkewInMs)', hooks => {
+    let fakeClock;
+    hooks.beforeEach(() => {
+      fakeClock = sinon.useFakeTimers();
+    });
+    hooks.afterEach(() => {
+      fakeClock.restore();
+      sinon.restore();
+    });
+
     test('does not throw error if nbf is undefined', assert => {
       assert.equal(undefined, assertActivationClaim(undefined, 0));
     });
@@ -343,7 +361,16 @@ export default (QUnit: QUnit) => {
     });
   });
 
-  module('assertIssuedAtClaim(iat, clockSkewInMs)', () => {
+  module('assertIssuedAtClaim(iat, clockSkewInMs)', hooks => {
+    let fakeClock;
+    hooks.beforeEach(() => {
+      fakeClock = sinon.useFakeTimers();
+    });
+    hooks.afterEach(() => {
+      fakeClock.restore();
+      sinon.restore();
+    });
+
     test('does not throw error if iat is undefined', assert => {
       assert.equal(undefined, assertIssuedAtClaim(undefined, 0));
     });
