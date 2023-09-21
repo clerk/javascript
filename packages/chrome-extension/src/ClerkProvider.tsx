@@ -33,7 +33,7 @@ const WebSSOClerkProvider = (props: WebSSOClerkProviderProps): JSX.Element | nul
   const tokenCache = runtimeTokenCache || ChromeStorageCache;
 
   React.useEffect(() => {
-    (async () => {
+    void (async () => {
       setClerkInstance(await buildClerk({ publishableKey, tokenCache }));
     })();
   }, []);
