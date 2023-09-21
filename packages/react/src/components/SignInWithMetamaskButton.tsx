@@ -11,6 +11,8 @@ export const SignInWithMetamaskButton = withClerk(
     children = normalizeWithDefaultValue(children, 'Sign in with Metamask');
     const child = assertSingleChild(children)('SignInWithMetamaskButton');
 
+    // TODO: Properly fix this code
+    // eslint-disable-next-line @typescript-eslint/require-await
     const clickHandler = async () => {
       async function authenticate() {
         await clerk.authenticateWithMetamask({ redirectUrl });

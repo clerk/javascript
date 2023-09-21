@@ -1121,6 +1121,8 @@ export default class Clerk implements ClerkInterface {
     return this.#environment;
   }
 
+  // TODO: Fix this properly
+  // eslint-disable-next-line @typescript-eslint/require-await
   __unstable__setEnvironment = async (env: EnvironmentJSON) => {
     this.#environment = new Environment(env);
 
