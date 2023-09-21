@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import './polyfills';
 
 import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';

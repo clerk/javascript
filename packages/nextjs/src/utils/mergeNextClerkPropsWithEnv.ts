@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import type { NextClerkProviderProps } from '../types';
 
 export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, 'children'>) => {

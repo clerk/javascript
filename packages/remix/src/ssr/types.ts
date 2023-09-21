@@ -49,6 +49,6 @@ export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = a
 
 export type RequestWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
   auth: Omit<AuthObject, 'session' | 'user' | 'organization'>;
-} & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
-  (Options extends { loadUser: true } ? { user: User | null } : {}) &
-  (Options extends { loadOrganization: true } ? { organization: Organization | null } : {});
+} & (Options extends { loadSession: true } ? { session: Session | null } : object) &
+  (Options extends { loadUser: true } ? { user: User | null } : object) &
+  (Options extends { loadOrganization: true } ? { organization: Organization | null } : object);
