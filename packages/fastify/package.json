@@ -19,14 +19,16 @@
     "dist"
   ],
   "scripts": {
-    "dev": "tsup --watch",
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
     "lint": "eslint src/",
+    "publish:local": "npx yalc push --replace  --sig",
     "test": "jest"
   },
   "dependencies": {
     "@clerk/backend": "^0.29.2",
+    "@clerk/shared": "^0.23.0",
     "@clerk/types": "^3.52.0",
     "cookies": "0.8.0"
   },
