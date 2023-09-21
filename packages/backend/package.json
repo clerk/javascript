@@ -36,7 +36,7 @@
     "build:runtime": "rsync -r --include '*/' --include '*.js' --include '*.mjs' --exclude='*' src/runtime dist",
     "clean": "rimraf ./dist",
     "clean:tests": "rimraf ./tests/dist",
-    "lint": "eslint .",
+    "lint": "eslint src/",
     "test": "run-s clean:tests build:runtime build:tests test:node test:edge-runtime test:cloudflare-miniflare",
     "test:node": "./tests/node/run.sh",
     "test:edge-runtime": "./tests/edge-runtime/run.sh",

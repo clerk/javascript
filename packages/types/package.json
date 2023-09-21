@@ -23,7 +23,7 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "clean": "rimraf ./dist",
-    "lint": "eslint ."
+    "lint": "eslint src/"
   },
   "dependencies": {
     "csstype": "3.1.1"

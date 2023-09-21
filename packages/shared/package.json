@@ -29,7 +29,7 @@
     "build:declarations": "tsc -p tsconfig.json",
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
-    "lint": "eslint .",
+    "lint": "eslint src/",
     "test": "jest",
     "test:ci": "jest --maxWorkers=50%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"

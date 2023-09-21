@@ -24,7 +24,7 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
     "clean": "rimraf ./dist",
-    "lint": "eslint ."
+    "lint": "eslint src/"
   },
   "dependencies": {
     "@clerk/clerk-js": "^4.57.0",
