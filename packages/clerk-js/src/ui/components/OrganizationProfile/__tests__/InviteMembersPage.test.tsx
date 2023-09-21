@@ -126,9 +126,12 @@ describe('InviteMembersPage', () => {
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.dev,');
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       await waitFor(() =>
-        expect(getByText('The invitations could not be sent. Fix the following and try again:')).toBeDefined(),
+        expect(
+          getByText(
+            'The invitations could not be sent. There are already pending invitations for the following email addresses: test+5@clerk.dev, test+6@clerk.dev, and test+7@clerk.dev.',
+          ),
+        ).toBeInTheDocument(),
       );
-      await waitFor(() => expect(getByText('test+5@clerk.dev, test+6@clerk.dev, test+7@clerk.dev')).toBeDefined());
     });
   });
 

@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError } from '@clerk/shared';
+import { isClerkAPIResponseError } from '@clerk/shared';
 import type { MembershipRole, OrganizationResource } from '@clerk/types';
 import React from 'react';
 
@@ -16,7 +16,7 @@ import {
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys, useLocalizations } from '../../localization';
 import { useRouter } from '../../router';
-import { handleError, roleLocalizationKey, useFormControl } from '../../utils';
+import { createListFormat, handleError, roleLocalizationKey, useFormControl } from '../../utils';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 
@@ -32,9 +32,9 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const { navigate } = useRouter();
   const { onSuccess, onReset = () => navigate('..'), resetButtonLabel, organization } = props;
   const card = useCardState();
-  const { t } = useLocalizations();
+  const { t, locale } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = React.useState(false);
-  const [invalidEmails, setInvalidEmails] = React.useState<string[]>([]);
+  const [localizedEmails, setLocalizedEmails] = React.useState<string | null>(null);
 
   if (!organization) {
     return null;
@@ -81,15 +81,6 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     placeholder: '',
   });
 
-  React.useEffect(() => {
-    // Remove invalid emails from the tag input
-    if (invalidEmails.length) {
-      const invalids = new Set(invalidEmails);
-      const emails = emailAddressField.value.split(',');
-      emailAddressField.setValue(emails.filter(e => !invalids.has(e)).join(','));
-    }
-  }, [invalidEmails]);
-
   const canSubmit = !!emailAddressField.value.length || isValidUnsubmittedEmail;
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -98,26 +89,33 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       .inviteMembers({ emailAddresses: emailAddressField.value.split(','), role: roleField.value as MembershipRole })
       .then(onSuccess)
       .catch(err => {
-        if (err instanceof ClerkAPIResponseError) {
-          const invalids = err.errors[0].meta?.emailAddresses || [];
-          if (invalids.length) {
-            setInvalidEmails(invalids);
-          } else {
-            setInvalidEmails([]);
-            handleError(err, [], card.setError);
-          }
+        if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'duplicate_record') {
+          const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
+
+          // Create a localized list of email addresses
+          const localizedList = createListFormat(unlocalizedEmailsList, locale);
+          setLocalizedEmails(localizedList);
+
+          // Remove any invalid email address
+          const invalids = new Set(unlocalizedEmailsList);
+          const emails = emailAddressField.value.split(',');
+          emailAddressField.setValue(emails.filter(e => !invalids.has(e)).join(','));
+        } else {
+          setLocalizedEmails(null);
+          handleError(err, [], card.setError);
         }
       });
   };
 
   return (
     <>
-      {!!invalidEmails.length && (
+      {localizedEmails && (
         <Alert
           variant='danger'
           align='start'
-          title={localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed')}
-          subtitle={invalidEmails.join(', ')}
+          title={localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
+            email_addresses: localizedEmails,
+          })}
           sx={{ border: 0 }}
         />
       )}
