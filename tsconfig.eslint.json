@@ -10,6 +10,7 @@
     "packages/**/*.tsx",
     "packages/*/*.js",
     ".eslintrc.js",
+    "commitlint.config.js",
     "scripts/*.mjs"
   ]
 }
