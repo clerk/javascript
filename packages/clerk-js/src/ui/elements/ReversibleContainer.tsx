@@ -3,7 +3,7 @@ import React from 'react';
 import { useAppearance } from '../customizables';
 import { Divider } from './Divider';
 
-export const SocialButtonsReversibleContainerWithDivider = (props: React.PropsWithChildren<{}>) => {
+export const SocialButtonsReversibleContainerWithDivider = (props: React.PropsWithChildren) => {
   const appearance = useAppearance();
   const childrenWithDivider = interleaveElementInArray(React.Children.toArray(props.children), i => (
     <Divider key={`divider${i}`} />

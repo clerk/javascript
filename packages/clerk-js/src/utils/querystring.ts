@@ -6,6 +6,6 @@ export const getQueryParams = (queryString: string) => {
   });
 };
 
-export const stringifyQueryParams = (params: {}) => {
+export const stringifyQueryParams = (params: any) => {
   return qs.stringify(params || {});
 };

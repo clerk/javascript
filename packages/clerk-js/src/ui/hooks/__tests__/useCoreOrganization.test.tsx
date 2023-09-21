@@ -1,12 +1,12 @@
 import { describe } from '@jest/globals';
 
 import { act, bindCreateFixtures, renderHook, waitFor } from '../../../testUtils';
-import { createFakeUserOrganizationMembership } from '../../components/OrganizationSwitcher/__tests__/utlis';
-import { useCoreOrganization } from '../../contexts';
 import {
   createFakeDomain,
   createFakeOrganizationMembershipRequest,
 } from '../../components/OrganizationProfile/__tests__/utils';
+import { createFakeUserOrganizationMembership } from '../../components/OrganizationSwitcher/__tests__/utlis';
+import { useCoreOrganization } from '../../contexts';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
