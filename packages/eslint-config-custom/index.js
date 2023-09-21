@@ -3,6 +3,7 @@ module.exports = {
   env: {
     node: true,
     browser: true,
+    jest: true,
   },
   parserOptions: {
     tsconfigRootDir: __dirname,
@@ -14,9 +15,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'prettier',
-    // Incompatible with latest version of eslint,
-    // disabled until this is fixed: https://github.com/vercel/turbo/issues/4469
-    // 'turbo',
+    'turbo',
   ],
   rules: {
     curly: 'error',
@@ -36,6 +35,12 @@ module.exports = {
         fixStyle: 'separate-type-imports',
       },
     ],
+    '@typescript-eslint/no-floating-promises': [
+      'error',
+      {
+        ignoreVoid: true,
+      },
+    ],
     'simple-import-sort/imports': 'error',
     'no-restricted-imports': [
       'error',
@@ -50,4 +55,17 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    // Special overrides for test files
+    {
+      files: ['**/*.test.ts', '**/*.test.tsx', 'test/**', '__tests__/**'],
+      rules: {
+        '@typescript-eslint/no-floating-promises': 'off',
+        '@typescript-eslint/unbound-method': 'off',
+        'turbo/no-undeclared-env-vars': 'off',
+        '@typescript-eslint/require-await': 'off',
+        '@typescript-eslint/await-thenable': 'off',
+      },
+    },
+  ],
 };
