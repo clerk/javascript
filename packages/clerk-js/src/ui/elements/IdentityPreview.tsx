@@ -61,7 +61,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
   );
 };
 
-const IdentifierContainer = (props: React.PropsWithChildren<{}>) => {
+const IdentifierContainer = (props: React.PropsWithChildren) => {
   return (
     <Text
       elementDescriptor={descriptors.identityPreviewText}
@@ -108,7 +108,7 @@ const Authenticator = () => {
   );
 };
 
-const Container = (props: React.PropsWithChildren<{}>) => {
+const Container = (props: React.PropsWithChildren) => {
   return (
     <Flex
       elementDescriptor={descriptors.identityPreview}

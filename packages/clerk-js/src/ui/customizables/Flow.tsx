@@ -6,7 +6,7 @@ import { InternalThemeProvider } from '../styledSystem';
 import { generateFlowClassname } from './classGeneration';
 import { descriptors } from './index';
 
-type FlowRootProps = React.PropsWithChildren<{}> & FlowMetadata;
+type FlowRootProps = React.PropsWithChildren & FlowMetadata;
 
 const Root = (props: FlowRootProps) => {
   return (

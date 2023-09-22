@@ -28,6 +28,8 @@ function withRedirectToHome<P extends AvailableComponentProps>(
         if (warning && environment.displayConfig.instanceEnvironmentType === 'development') {
           console.info(warning);
         }
+        // TODO: Fix this properly
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         navigate(environment.displayConfig.homeUrl);
       }
     }, []);

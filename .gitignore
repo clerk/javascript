@@ -5,9 +5,13 @@ dist
 tmp
 out-tsc
 out
+**/dist/*
+**/build/*
+packages/*/dist/**
 
 # dependencies
 node_modules
+**/node_modules/**
 
 # IDEs and editors
 .idea
@@ -34,6 +38,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+**/coverage/**
 
 # System Files
 .DS_Store
@@ -51,7 +56,6 @@ Thumbs.db
 .turbo
 
 lerna-debug.log
-packages/*/coverage
 .next
 .dev.vars
 .env.local

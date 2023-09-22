@@ -57,7 +57,7 @@ type CreateUserParams = {
   totpSecret?: string;
   backupCodes?: string[];
 } & UserMetadataParams &
-  (UserPasswordHashingParams | {});
+  (UserPasswordHashingParams | object);
 
 interface UpdateUserParams extends UserMetadataParams {
   firstName?: string;

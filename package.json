@@ -32,7 +32,7 @@
     "conventional-changelog-conventionalcommits": "^4.6.3",
     "cross-spawn": "^7.0.3",
     "dotenv": "^16.3.1",
-    "eslint": "^8.38.0",
+    "eslint": "^8.49.0",
     "eslint-config-custom": "*",
     "execa": "^5.1.1",
     "expect-type": "^0.16.0",
@@ -57,14 +57,15 @@
     "zx": "^7.2.1"
   },
   "scripts": {
-    "dev": "turbo dev --filter=@clerk/* --filter=!@clerk/expo",
-    "build": "turbo build --concurrency=${TURBO_CONCURRENCY:-2}",
-    "test": "turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
-    "test:ci": "turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
+    "dev": "FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/expo",
+    "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-2}",
+    "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
+    "test:ci": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
     "test:integration": "npx playwright test --config integration/playwright.config.ts",
     "test:deployments": "npx playwright test --config integration/playwright.deployments.config.ts",
     "clean": "turbo clean",
-    "lint": "turbo lint",
+    "lint": "FORCE_COLOR=1 turbo lint",
+    "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",
     "bundlewatch": "turbo bundlewatch",
     "format": "npx prettier --write .",
     "format:check": "npx prettier --cache --check .",
@@ -76,9 +77,9 @@
     "version": "npx changeset version && ./scripts/version-info.sh",
     "version:snapshot": "./scripts/snapshot.mjs",
     "version:staging": "./scripts/staging.mjs",
-    "release": "TURBO_CONCURRENCY=4 npm run build -- --force && npm run test && npx changeset publish && git push --follow-tags",
-    "release:snapshot": "TURBO_CONCURRENCY=4 npm run build && npx changeset publish --tag snapshot --no-git-tag",
-    "release:staging": "TURBO_CONCURRENCY=4 npm run build && npx changeset publish --tag staging --no-git-tag",
+    "release": "FORCE_COLOR=1 TURBO_CONCURRENCY=4 npm run build -- --force && npm run test && npx changeset publish && git push --follow-tags",
+    "release:snapshot": "FORCE_COLOR=1 TURBO_CONCURRENCY=4 npm run build && npx changeset publish --tag snapshot --no-git-tag",
+    "release:staging": "FORCE_COLOR=1 TURBO_CONCURRENCY=4 npm run build && npx changeset publish --tag staging --no-git-tag",
     "update:lockfile": "npm run nuke && npm install -D --arch=x64 --platform=linux turbo && npm install -D --arch=arm64 --platform=darwin turbo"
   }
 }

@@ -15,7 +15,7 @@ export const useWizard = (params: UseWizardProps = {}) => {
 
   const nextStep = React.useCallback(() => {
     onNextStep?.();
-    setStep(s => s + 1);
+    setStep((s: number) => s + 1);
   }, []);
 
   const prevStep = React.useCallback(() => setStep(s => s - 1), []);

@@ -13,7 +13,7 @@ export const usePrintable = (): UsePrintableReturn => {
   return { print, printableProps: { onPrint } };
 };
 
-export const PrintableComponent = (props: UsePrintableReturn['printableProps'] & React.PropsWithChildren<{}>) => {
+export const PrintableComponent = (props: UsePrintableReturn['printableProps'] & React.PropsWithChildren) => {
   const { children, onPrint } = props;
   const ref = React.useRef<HTMLDivElement>(null);
 

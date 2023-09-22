@@ -26,12 +26,12 @@ export function fitTextInOneLine(text: string, containerEl: HTMLElement, default
   const decreaseSize = () => {
     const fontSizeWithUnit = getContainerFontSize();
     const newSize = (Number.parseInt(fontSizeWithUnit) - FONT_SIZE_STEP) * 0.85;
-    containerEl.style.fontSize = newSize + 'px';
+    containerEl.style.fontSize = `${newSize}px`;
   };
   const increaseSize = () => {
     const fontSizeWithUnit = getContainerFontSize();
     const newSize = Number.parseInt(fontSizeWithUnit) + FONT_SIZE_STEP / 2;
-    containerEl.style.fontSize = newSize + 'px';
+    containerEl.style.fontSize = `${newSize}px`;
   };
 
   containerEl.style.fontSize = defaultSize;

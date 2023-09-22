@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import type { IncomingMessage, ServerResponse } from 'http';
 
 // https://nextjs.org/docs/api-routes/api-middlewares#connectexpress-middleware-support

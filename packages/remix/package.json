@@ -43,7 +43,7 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
     "clean": "rimraf ./dist",
-    "lint": "eslint .",
+    "lint": "eslint src/",
     "publish:local": "npx yalc push --replace --sig"
   },
   "dependencies": {

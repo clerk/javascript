@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 /**
  * These helpers have been extracted from the following libraries,
  * converted to Typescript and adapted to our needs.

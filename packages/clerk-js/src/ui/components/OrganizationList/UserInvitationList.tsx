@@ -51,6 +51,8 @@ export const InvitationPreview = withCardStateProvider((props: UserOrganizationI
 
   return (
     <PreviewListItem organizationData={props.publicOrganizationData}>
+      {/* TODO: Fix this properly */}
+      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
       <AcceptRejectInvitationButtons onAccept={handleAccept} />
     </PreviewListItem>
   );

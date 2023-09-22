@@ -4,6 +4,7 @@ import { CardAlert, Header, useCardState, withCardStateProvider } from '../../el
 import { NavbarMenuButtonRow } from '../../elements/Navbar';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
+import { DeleteSection } from './DeleteSection';
 import { EmailsSection } from './EmailSection';
 import { EnterpriseAccountsSection } from './EnterpriseAccountsSection';
 import { MfaSection } from './MfaSection';
@@ -13,7 +14,6 @@ import { UsernameSection } from './UsernameSection';
 import { UserProfileSection } from './UserProfileSection';
 import { getSecondFactors } from './utils';
 import { Web3Section } from './Web3Section';
-import { DeleteSection } from './DeleteSection';
 
 export const RootPage = withCardStateProvider(() => {
   const { attributes, saml, social, instanceIsPasswordBased } = useEnvironment().userSettings;
