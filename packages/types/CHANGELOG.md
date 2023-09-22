@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.52.0
+
+### Minor Changes
+
+- Introduce the new brand-new component OrganizationList ([#1692](https://github.com/clerkinc/javascript/pull/1692)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Lists all the memberships, invitations or suggestions an active user may have
+  - Powered by our `useOrganizationList` react hook
+
+### Patch Changes
+
+- Change `README` to include updated links to issue templates and update Discord link. ([#1750](https://github.com/clerkinc/javascript/pull/1750)) by [@LekoArts](https://github.com/LekoArts)
+
+- This PR replaces `The verification link expired. Please resend it.` message with the localization key `formFieldError__verificationLinkExpired`. The english message was also adjust to `The verification link expired. Please request a new link.` to make the second sentence clearer. ([#1738](https://github.com/clerkinc/javascript/pull/1738)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 3.51.0
 
 ### Minor Changes

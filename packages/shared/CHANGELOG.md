@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.22.1
+
+### Patch Changes
+
+- Fix: swr devtools breaks applications with clerk ([#1694](https://github.com/clerkinc/javascript/pull/1694)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Force disable swr devtools for organization hooks
+  - Let the swr devtool to pick the correct react version
+
+- Deprecate `membershipList` in favor of `memberships` that supports paginated responses ([#1708](https://github.com/clerkinc/javascript/pull/1708)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 0.22.0
 
 ### Minor Changes

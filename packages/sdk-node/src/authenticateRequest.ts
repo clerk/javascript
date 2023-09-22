@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
-import { constants, createIsomorphicRequest } from '@clerk/backend';
-import type { IncomingMessage, ServerResponse } from 'http';
+import { buildRequestUrl, constants, createIsomorphicRequest } from '@clerk/backend';
+import type { ServerResponse } from 'http';
 
 import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from './shared';
 import type { AuthenticateRequestParams, ClerkClient } from './types';
@@ -39,7 +39,21 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
 
   const env = { ...loadApiEnv(), ...loadClientEnv() };
 
-  const requestUrl = getRequestUrl(req);
+  const isomorphicRequest = createIsomorphicRequest((Request, Headers) => {
+    const headers = Object.keys(req.headers).reduce((acc, key) => Object.assign(acc, { [key]: req?.headers[key] }), {});
+
+    // @ts-ignore Optimistic attempt to get the protocol in case
+    // req extends IncomingMessage in a useful way. No guarantee
+    // it'll work.
+    const protocol = req.connection?.encrypted ? 'https' : 'http';
+    const dummyOriginReqUrl = new URL(req.url || '', `${protocol}://clerk-dummy`);
+    return new Request(dummyOriginReqUrl, {
+      method: req.method,
+      headers: new Headers(headers),
+    });
+  });
+
+  const requestUrl = buildRequestUrl(isomorphicRequest);
   const isSatellite = handleValueOrFn(options?.isSatellite, requestUrl, env.isSatellite);
   const domain = handleValueOrFn(options?.domain, requestUrl) || env.domain;
   const signInUrl = options?.signInUrl || env.signInUrl;
@@ -68,16 +82,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     isSatellite,
     domain,
     signInUrl,
-    request: createIsomorphicRequest((Request, Headers) => {
-      const headers = Object.keys(req.headers).reduce(
-        (acc, key) => Object.assign(acc, { [key]: req?.headers[key] }),
-        {},
-      );
-      return new Request(requestUrl, {
-        method: req.method,
-        headers: new Headers(headers),
-      });
-    }),
+    request: isomorphicRequest,
   });
 };
 export const handleUnknownCase = (res: ServerResponse, requestState: RequestState) => {
@@ -103,25 +108,6 @@ export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, re
 const isDevelopmentFromApiKey = (apiKey: string): boolean =>
   apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
 
-const getRequestUrl = (req: IncomingMessage): URL => {
-  return new URL(req.url as string, `${getRequestProto(req)}://${req.headers.host}`);
-};
-
-const getRequestProto = (req: IncomingMessage): string => {
-  // @ts-ignore Optimistic attempt to get the protocol in case
-  // req extends IncomingMessage in a useful way. No guarantee
-  // it'll work.
-  const mightWork = req.connection?.encrypted ? 'https' : 'http';
-  // The x-forwarded-proto header takes precedence.
-  const proto = (req.headers[constants.Headers.ForwardedProto] as string) || mightWork;
-  if (!proto) {
-    throw new Error(missingProto);
-  }
-  // Sometimes the x-forwarded-proto header does not come as a
-  // single value.
-  return proto.split(',')[0].trim();
-};
-
 const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): string => {
   if (!relativeOrAbsoluteUrl || !isValidProxyUrl(relativeOrAbsoluteUrl) || !isProxyUrlRelative(relativeOrAbsoluteUrl)) {
     return relativeOrAbsoluteUrl;
@@ -134,5 +120,3 @@ const satelliteAndMissingProxyUrlAndDomain =
 const satelliteAndMissingSignInUrl = `
 Invalid signInUrl. A satellite application requires a signInUrl for development instances.
 Check if signInUrl is missing from your configuration or if it is not an absolute URL.`;
-const missingProto =
-  "Cannot determine the request protocol. Please ensure you've set the X-Forwarded-Proto header with the request protocol (http or https).";
