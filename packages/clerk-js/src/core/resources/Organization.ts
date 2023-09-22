@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import type {
   AddMemberParams,
   ClerkPaginatedResponse,
@@ -195,6 +196,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   getPendingInvitations = async (
     getPendingInvitationsParams?: GetPendingInvitationsParams,
   ): Promise<OrganizationInvitation[]> => {
+    deprecated('getPendingInvitations', 'Use the `getInvitations` method instead.');
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/invitations/pending`,
       method: 'GET',
