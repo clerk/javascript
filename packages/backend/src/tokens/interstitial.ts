@@ -4,6 +4,7 @@ import { API_VERSION, USER_AGENT } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
+import { joinPaths } from '../util/path';
 import {
   addClerkPrefix,
   callWithRetry,
@@ -11,8 +12,7 @@ import {
   getScriptUrl,
   isDevOrStagingUrl,
   parsePublishableKey,
-} from '../shared';
-import { joinPaths } from '../util/path';
+} from '../util/shared';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 import type { DebugRequestSate } from './request';
 

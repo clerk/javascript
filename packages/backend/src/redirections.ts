@@ -1,4 +1,4 @@
-import { errorThrower, parsePublishableKey } from './shared';
+import { errorThrower, parsePublishableKey } from './util/shared';
 
 type RedirectAdapter = (url: string) => any;
 
