@@ -1,10 +1,10 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
+import { handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { handleValueOrFn, isHttpOrHttps } from '../shared';
 import { API_KEY, DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './clerkClient';
 import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
 import type { NextMiddlewareResult, RequestLike } from './types';
