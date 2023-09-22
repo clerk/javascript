@@ -23,7 +23,7 @@ function App() {
   );
 }
 
-export default ClerkApp(App, { frontendApi: '...' });
+export default ClerkApp(App, { publishableKey: '...' });
 `;
 
 export const invalidClerkStatePropError = createErrorMessage(`

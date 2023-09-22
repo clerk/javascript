@@ -27,7 +27,8 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
     "clean": "rimraf ./dist",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "publish:local": "npx yalc push --replace --sig"
   },
   "dependencies": {
     "@clerk/backend": "^0.29.1",
