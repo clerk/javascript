@@ -9,6 +9,7 @@ Organization {
   "destroy": [Function],
   "getDomain": [Function],
   "getDomains": [Function],
+  "getInvitations": [Function],
   "getMembershipRequests": [Function],
   "getMemberships": [Function],
   "getPendingInvitations": [Function],
