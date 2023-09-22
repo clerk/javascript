@@ -21,6 +21,7 @@ import { useSWR } from './clerk-swr';
 import { useClerkInstanceContext, useOrganizationContext, useSessionContext } from './contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
+import { deprecated } from '../utils';
 
 type UseOrganizationParams = {
   /**
@@ -290,6 +291,10 @@ export const useOrganization: UseOrganization = params => {
     ? () => [] as OrganizationMembershipResource[]
     : () => clerk.organization?.getMemberships(membershipListParams);
 
+  if (invitationListParams) {
+    deprecated('invitationList in useOrganization', 'Use the `invitations` property and return value instead.');
+  }
+
   const {
     data: invitationList,
     isValidating: isInvitationsLoading,
@@ -300,6 +305,10 @@ export const useOrganization: UseOrganization = params => {
       : null,
     pendingInvitations,
   );
+
+  if (membershipListParams) {
+    deprecated('membershipList in useOrganization', 'Use the `memberships` property and return value instead.');
+  }
 
   const {
     data: membershipList,
