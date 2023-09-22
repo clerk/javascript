@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.23.0
+
+### Minor Changes
+
+- Introduce `deprecated()` and `deprecatedProperty()` helper methods to report deprecation warnings once on console ([#1743](https://github.com/clerkinc/javascript/pull/1743)) by [@dimkl](https://github.com/dimkl)
+
+- Introduce `isDevelopmentEnvironment()` helper method ([#1752](https://github.com/clerkinc/javascript/pull/1752)) by [@dimkl](https://github.com/dimkl)
+
 ## 0.22.1
 
 ### Patch Changes

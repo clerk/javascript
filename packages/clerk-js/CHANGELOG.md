@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.58.1
+
+### Patch Changes
+
+- Fixed a bug where the "Unverified" badge was missing on email or phone number fields when those where marked as "Primary" ([#1749](https://github.com/clerkinc/javascript/pull/1749)) by [@panteliselef](https://github.com/panteliselef)
+
+- Removing the `__clerk_referrer_primary` that was marked as deprecated. It was introduced to support the multi-domain featured, but was replaced shortly after. ([#1755](https://github.com/clerkinc/javascript/pull/1755)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`6706b154c`](https://github.com/clerkinc/javascript/commit/6706b154c0b41356c7feeb19c6340160a06466e5), [`086a2e0b7`](https://github.com/clerkinc/javascript/commit/086a2e0b7e71a9919393ca43efedbf3718ea5fe4)]:
+  - @clerk/shared@0.23.0
+
 ## 4.58.0
 
 ### Minor Changes
