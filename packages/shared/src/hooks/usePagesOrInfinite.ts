@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { disableSWRDevtools } from './clerk-swr';

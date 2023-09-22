@@ -1,3 +1,4 @@
+'use client';
 export const disableSWRDevtools = () => {
   if (typeof window !== 'undefined') {
     // @ts-ignore
