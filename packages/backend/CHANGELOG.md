@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.29.2
+
+### Patch Changes
+
+- Refactor the internal jwt assertions in separate module to improve testability and changed dates to UTC in jwt verification error messages ([#1724](https://github.com/clerkinc/javascript/pull/1724)) by [@dimkl](https://github.com/dimkl)
+
+- Removing the `__clerk_referrer_primary` that was marked as deprecated. It was introduced to support the multi-domain featured, but was replaced shortly after. ([#1755](https://github.com/clerkinc/javascript/pull/1755)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix 1 second flakiness in assertions tests ([#1758](https://github.com/clerkinc/javascript/pull/1758)) by [@dimkl](https://github.com/dimkl)
+
+- Refactor the internal generation of request URLs to use a shared helper from `@clerk/backend` ([#1532](https://github.com/clerkinc/javascript/pull/1532)) by [@dimkl](https://github.com/dimkl)
+
 ## 0.29.1
 
 ### Patch Changes

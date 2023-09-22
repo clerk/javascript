@@ -1,7 +1,7 @@
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare';
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
-import { ClerkApp, ClerkCatchBoundary } from '@clerk/remix';
+import { ClerkApp, ClerkErrorBoundary } from '@clerk/remix';
 
 export const loader: LoaderFunction = args => {
   return rootAuthLoader(args);
@@ -32,4 +32,4 @@ function App() {
 
 export default ClerkApp(App);
 
-export const CatchBoundary = ClerkCatchBoundary();
+export const ErrorBoundary = ClerkErrorBoundary();

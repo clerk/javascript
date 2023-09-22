@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.25.1
+
+### Patch Changes
+
+- Updated dependencies [[`6706b154c`](https://github.com/clerkinc/javascript/commit/6706b154c0b41356c7feeb19c6340160a06466e5), [`086a2e0b7`](https://github.com/clerkinc/javascript/commit/086a2e0b7e71a9919393ca43efedbf3718ea5fe4)]:
+  - @clerk/shared@0.23.0
+
 ## 4.25.0
 
 ### Minor Changes
