@@ -1,5 +1,29 @@
 # Change Log
 
+## 1.26.0
+
+### Minor Changes
+
+- Introduce the new brand-new component OrganizationList ([#1692](https://github.com/clerkinc/javascript/pull/1692)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Lists all the memberships, invitations or suggestions an active user may have
+  - Powered by our `useOrganizationList` react hook
+
+- Review PT-BR localizations, translate organization strings ([#1710](https://github.com/clerkinc/javascript/pull/1710)) by [@danilofuchs](https://github.com/danilofuchs)
+
+### Patch Changes
+
+- Improve README by adding instructions on how to add/edit localizations ([#1747](https://github.com/clerkinc/javascript/pull/1747)) by [@LekoArts](https://github.com/LekoArts)
+
+- Change `README` to include updated links to issue templates and update Discord link. ([#1750](https://github.com/clerkinc/javascript/pull/1750)) by [@LekoArts](https://github.com/LekoArts)
+
+- This PR replaces `The verification link expired. Please resend it.` message with the localization key `formFieldError__verificationLinkExpired`. The english message was also adjust to `The verification link expired. Please request a new link.` to make the second sentence clearer. ([#1738](https://github.com/clerkinc/javascript/pull/1738)) by [@LekoArts](https://github.com/LekoArts)
+
+- Update "unverified" email and phone labels ([#1716](https://github.com/clerkinc/javascript/pull/1716)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e99df0a0d`](https://github.com/clerkinc/javascript/commit/e99df0a0de8ab91e9de4d32dfab46ad562f510d3), [`4327b91f9`](https://github.com/clerkinc/javascript/commit/4327b91f9ed65b440afaa5f76a6231aeacd3541a), [`01b024c57`](https://github.com/clerkinc/javascript/commit/01b024c57c80ae00d83801fe90b2992111dc1a68)]:
+  - @clerk/types@3.52.0
+
 ## 1.25.2
 
 ### Patch Changes

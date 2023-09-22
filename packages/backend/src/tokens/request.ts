@@ -19,7 +19,6 @@ import {
   potentialFirstRequestOnProductionEnvironment,
   potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
   runInterstitialRules,
-  satelliteInDevReturningFromPrimary,
 } from './interstitialRule';
 import type { VerifyTokenOptions } from './verify';
 
@@ -161,7 +160,6 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         crossOriginRequestWithoutHeader,
         nonBrowserRequestInDevRule,
         isSatelliteAndNeedsSyncing,
-        satelliteInDevReturningFromPrimary,
         isPrimaryInDevAndRedirectsToSatellite,
         potentialFirstRequestOnProductionEnvironment,
         potentialFirstLoadInDevWhenUATMissing,

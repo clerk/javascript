@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.7.6
+
+### Patch Changes
+
+- Change `README` to include updated links to issue templates and update Discord link. ([#1750](https://github.com/clerkinc/javascript/pull/1750)) by [@LekoArts](https://github.com/LekoArts)
+
 ### [1.7.5](https://github.com/clerkinc/javascript/compare/@clerk/themes@1.7.5-staging.1...@clerk/themes@1.7.5) (2023-06-03)
 
 **Note:** Version bump only for package @clerk/themes

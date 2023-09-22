@@ -1,4 +1,4 @@
-import { CLERK_REFERRER_PRIMARY, CLERK_SATELLITE_URL, CLERK_SYNCED } from '../core/constants';
+import { CLERK_SATELLITE_URL, CLERK_SYNCED } from '../core/constants';
 
 const ClerkQueryParams = [
   '__clerk_status',
@@ -8,7 +8,6 @@ const ClerkQueryParams = [
   '__clerk_modal_state',
   CLERK_SYNCED,
   CLERK_SATELLITE_URL,
-  CLERK_REFERRER_PRIMARY,
 ] as const;
 
 type ClerkQueryParam = (typeof ClerkQueryParams)[number];
@@ -21,7 +20,6 @@ type ClerkQueryParamsToValuesMap = {
   __clerk_modal_state: string;
   __clerk_synced: string;
   __clerk_satellite_url: string;
-  __clerk_referrer_primary: string;
 };
 
 export type VerificationStatus = 'expired' | 'failed' | 'loading' | 'verified' | 'verified_switch_tab';
