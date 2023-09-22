@@ -166,6 +166,8 @@ export const enUS: LocalizationResource = {
       title: 'Reset Password',
       formButtonPrimary: 'Reset Password',
       successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
+      requiredMessage:
+        'An account already exists with an unverified email address. Please reset your password for security.',
     },
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',

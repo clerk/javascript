@@ -183,6 +183,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       formButtonPrimary: LocalizationValue;
       successMessage: LocalizationValue;
+      requiredMessage: LocalizationValue;
     };
     resetPasswordMfa: {
       detailsLabel: LocalizationValue;
