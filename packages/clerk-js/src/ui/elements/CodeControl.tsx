@@ -178,7 +178,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
         gap={2}
         align='center'
       >
-        {values.map((value, index) => (
+        {values.map((value, index: number) => (
           <SingleCharInput
             elementDescriptor={descriptors.otpCodeFieldInput}
             key={index}
@@ -191,7 +191,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
             ref={node => (refs.current[index] = node)}
             autoFocus={index === 0 || undefined}
             autoComplete='one-time-code'
-            aria-label={`${index === 0 ? 'Enter verification code. ' : ''} ${'Digit'} ${index + 1}`}
+            aria-label={`${index === 0 ? 'Enter verification code. ' : ''} Digit ${index + 1}`}
             isDisabled={isDisabled || isLoading || disabled || isSuccessfullyFilled}
             hasError={!!errorText}
             isSuccessfullyFilled={isSuccessfullyFilled}

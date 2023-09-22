@@ -6,7 +6,7 @@ import { colors, fromEntries, removeUndefinedProps } from '../utils';
 import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from './colorOptionToHslaScale';
 
 export const createColorScales = (theme: Theme) => {
-  const variables = (theme.variables || {}) as NonNullable<Theme['variables']>;
+  const variables = theme.variables || {};
   return removeUndefinedProps({
     ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
     ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
@@ -59,7 +59,7 @@ export const createSpaceScale = (theme: Theme) => {
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
       const percentage = (num / 0.5) * 0.125;
-      return [k, (numericValue * percentage).toString() + unit];
+      return [k, `${numericValue * percentage}${unit}`];
     }),
   );
 };

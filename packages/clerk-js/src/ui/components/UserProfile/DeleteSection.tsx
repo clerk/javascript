@@ -1,4 +1,4 @@
-import { localizationKeys, Flex, Text, Col, Button } from '../../customizables';
+import { Button, Col, Flex, localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { useRouter } from '../../router';
 

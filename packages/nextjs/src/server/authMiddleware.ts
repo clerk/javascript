@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
 import type Link from 'next/link';
@@ -38,7 +39,7 @@ type ExcludeRootPath<T> = T extends '/' ? never : T;
 type RouteMatcherWithNextTypedRoutes =
   | WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>>
   | NextTypedRoute
-  | (string & {});
+  | (string & object);
 
 const INFINITE_REDIRECTION_LOOP_COOKIE = '__clerk_redirection_loop';
 

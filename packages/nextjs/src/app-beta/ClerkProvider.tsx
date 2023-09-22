@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
 import type { InitialState, PublishableKeyOrFrontendApi } from '@clerk/types';
 import React from 'react';

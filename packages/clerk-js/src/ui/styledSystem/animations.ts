@@ -1,3 +1,5 @@
+// TODO: This is forbidden by ESLint
+// eslint-disable-next-line no-restricted-imports
 import { keyframes } from '@emotion/react';
 
 const spinning = keyframes`

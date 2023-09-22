@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { fetch, Blob, FormData, Headers, Request, Response, AbortController } = require('node-fetch-native');
 
 module.exports = fetch;
