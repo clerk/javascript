@@ -1,5 +1,5 @@
-import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../shared';
 import { checkCrossOrigin } from '../util/request';
+import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/shared';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
 import type { AuthenticateRequestOptions } from './request';
