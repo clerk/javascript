@@ -44,6 +44,7 @@
     "test:cloudflare-workerd": "tests/cloudflare-workerd/run.sh"
   },
   "dependencies": {
+    "@clerk/shared": "^0.23.1",
     "@clerk/types": "^3.52.1",
     "@peculiar/webcrypto": "1.4.1",
     "@types/node": "16.18.6",
