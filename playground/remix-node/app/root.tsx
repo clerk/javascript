@@ -1,8 +1,8 @@
 import type { DataFunctionArgs, Headers } from '@remix-run/node';
-import type { V2_MetaFunction } from '@remix-run/react';
+import type { MetaFunction } from '@remix-run/react';
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import { getClerkDebugHeaders, rootAuthLoader } from '@clerk/remix/ssr.server';
-import { ClerkApp, V2_ClerkErrorBoundary } from '@clerk/remix';
+import { ClerkApp, ClerkErrorBoundary } from '@clerk/remix';
 
 export const loader = (args: DataFunctionArgs) => {
   return rootAuthLoader(
@@ -33,7 +33,7 @@ export function headers({
   };
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       'script:ld+json': {
@@ -46,7 +46,7 @@ export const meta: V2_MetaFunction = () => {
   ];
 };
 
-export const ErrorBoundary = V2_ClerkErrorBoundary();
+export const ErrorBoundary = ClerkErrorBoundary();
 
 function App() {
   const loaderData = useLoaderData<typeof loader>();
