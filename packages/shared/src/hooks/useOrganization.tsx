@@ -1,6 +1,7 @@
 import type {
   ClerkPaginationParams,
   GetDomainsParams,
+  GetInvitationsParams,
   GetMembershipRequestParams,
   GetMembershipsParams,
   GetPendingInvitationsParams,
@@ -14,6 +15,7 @@ import type { ClerkPaginatedResponse } from '@clerk/types';
 import type { GetMembersParams } from '@clerk/types';
 
 import { disableSWRDevtools } from './clerk-swr';
+
 disableSWRDevtools();
 import { useSWR } from './clerk-swr';
 import { useClerkInstanceContext, useOrganizationContext, useSessionContext } from './contexts';
@@ -22,7 +24,7 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationParams = {
   /**
-   * @deprecated Use invitations instead
+   * @deprecated Use `invitations` instead
    */
   invitationList?: GetPendingInvitationsParams;
   /**
@@ -50,7 +52,7 @@ type UseOrganizationParams = {
 
   invitations?:
     | true
-    | (GetMembersParams & {
+    | (GetInvitationsParams & {
         infinite?: boolean;
         keepPreviousData?: boolean;
       });
@@ -60,6 +62,9 @@ type UseOrganizationReturn =
   | {
       isLoaded: false;
       organization: undefined;
+      /**
+       * @deprecated Use `invitations` instead
+       */
       invitationList: undefined;
       /**
        * @deprecated Use `memberships` instead
@@ -69,10 +74,14 @@ type UseOrganizationReturn =
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
+      invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
     }
   | {
       isLoaded: true;
       organization: OrganizationResource;
+      /**
+       * @deprecated Use `invitations` instead
+       */
       invitationList: undefined;
       /**
        * @deprecated Use `memberships` instead
@@ -82,10 +91,14 @@ type UseOrganizationReturn =
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
+      invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
     }
   | {
       isLoaded: boolean;
       organization: OrganizationResource | null;
+      /**
+       * @deprecated Use `invitations` instead
+       */
       invitationList: OrganizationInvitationResource[] | null | undefined;
       /**
        * @deprecated Use `memberships` instead
@@ -95,6 +108,7 @@ type UseOrganizationReturn =
       domains: PaginatedResources<OrganizationDomainResource> | null;
       membershipRequests: PaginatedResources<OrganizationMembershipRequestResource> | null;
       memberships: PaginatedResources<OrganizationMembershipResource> | null;
+      invitations: PaginatedResources<OrganizationInvitationResource> | null;
     };
 
 type UseOrganization = (params?: UseOrganizationParams) => UseOrganizationReturn;
@@ -121,6 +135,7 @@ export const useOrganization: UseOrganization = params => {
     domains: domainListParams,
     membershipRequests: membershipRequestsListParams,
     memberships: membersListParams,
+    invitations: invitationsListParams,
   } = params || {};
   const { organization, lastOrganizationMember, lastOrganizationInvitation } = useOrganizationContext();
   const session = useSessionContext();
@@ -145,6 +160,14 @@ export const useOrganization: UseOrganization = params => {
     initialPage: 1,
     pageSize: 10,
     role: undefined,
+    keepPreviousData: false,
+    infinite: false,
+  });
+
+  const invitationsSafeValues = useWithSafeValues(invitationsListParams, {
+    initialPage: 1,
+    pageSize: 10,
+    status: ['pending'],
     keepPreviousData: false,
     infinite: false,
   });
@@ -178,6 +201,15 @@ export const useOrganization: UseOrganization = params => {
           initialPage: membersSafeValues.initialPage,
           pageSize: membersSafeValues.pageSize,
           role: membersSafeValues.role,
+        };
+
+  const invitationsParams =
+    typeof invitationsListParams === 'undefined'
+      ? undefined
+      : {
+          initialPage: invitationsSafeValues.initialPage,
+          pageSize: invitationsSafeValues.pageSize,
+          status: invitationsSafeValues.status,
         };
 
   const domains = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
@@ -232,6 +264,22 @@ export const useOrganization: UseOrganization = params => {
     },
   );
 
+  const invitations = usePagesOrInfinite<GetInvitationsParams, ClerkPaginatedResponse<OrganizationInvitationResource>>(
+    {
+      ...invitationsParams,
+    },
+    organization?.getInvitations,
+    {
+      keepPreviousData: membersSafeValues.keepPreviousData,
+      infinite: membersSafeValues.infinite,
+      enabled: !!invitationsParams,
+    },
+    {
+      type: 'invitations',
+      organizationId: organization?.id,
+    },
+  );
+
   // Some gymnastics to adhere to the rules of hooks
   // We need to make sure useSWR is called on every render
   const pendingInvitations = !clerk.loaded
@@ -274,6 +322,7 @@ export const useOrganization: UseOrganization = params => {
       domains: undefinedPaginatedResource,
       membershipRequests: undefinedPaginatedResource,
       memberships: undefinedPaginatedResource,
+      invitations: undefinedPaginatedResource,
     };
   }
 
@@ -287,6 +336,7 @@ export const useOrganization: UseOrganization = params => {
       domains: null,
       membershipRequests: null,
       memberships: null,
+      invitations: null,
     };
   }
 
@@ -301,6 +351,7 @@ export const useOrganization: UseOrganization = params => {
       domains: undefinedPaginatedResource,
       membershipRequests: undefinedPaginatedResource,
       memberships: undefinedPaginatedResource,
+      invitations: undefinedPaginatedResource,
     };
   }
 
@@ -317,6 +368,7 @@ export const useOrganization: UseOrganization = params => {
     domains,
     membershipRequests,
     memberships,
+    invitations,
   };
 };
 
