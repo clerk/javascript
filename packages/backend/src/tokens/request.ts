@@ -124,6 +124,10 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     deprecated('frontentApi', 'Use `publishableKey` instead.');
   }
 
+  if (options.apiKey) {
+    deprecated('apiKey', 'Use `secretKey` instead.');
+  }
+
   options = {
     ...options,
     frontendApi: parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi,
