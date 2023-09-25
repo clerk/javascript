@@ -14,14 +14,32 @@ type MembersListTableProps = {
   page: number;
   onPageChange: (page: number) => void;
   itemCount: number;
-  itemsPerPage: number;
   emptyStateLocalizationKey: LocalizationKey;
-};
+} & (
+  | {
+      itemsPerPage?: never;
+      pageCount: number;
+    }
+  | {
+      itemsPerPage: number;
+      pageCount?: never;
+    }
+);
 
 export const DataTable = (props: MembersListTableProps) => {
-  const { headers, page, onPageChange, rows, isLoading, itemCount, itemsPerPage, emptyStateLocalizationKey } = props;
+  const {
+    headers,
+    page,
+    onPageChange,
+    rows,
+    isLoading,
+    itemCount,
+    itemsPerPage,
+    pageCount: pageCountProp,
+    emptyStateLocalizationKey,
+  } = props;
 
-  const pageCount = rows.length !== 0 ? Math.ceil(itemCount / itemsPerPage) : 1;
+  const pageCount = rows.length !== 0 ? pageCountProp ?? Math.ceil(itemCount / itemsPerPage) : 1;
   const startRowIndex = (page - 1) * rows.length;
   const endRowIndex = Math.min(page * rows.length);
 

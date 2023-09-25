@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import type { GatsbyBrowser } from 'gatsby';
 import React from 'react';
 

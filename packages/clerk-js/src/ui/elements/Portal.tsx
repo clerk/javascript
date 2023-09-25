@@ -1,7 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 
-type PortalProps = React.PropsWithChildren<{}>;
+type PortalProps = React.PropsWithChildren;
 
 // No longer In use
 export const Portal = (props: PortalProps) => {

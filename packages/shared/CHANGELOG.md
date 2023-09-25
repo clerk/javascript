@@ -1,5 +1,24 @@
 # Change Log
 
+## 0.23.0
+
+### Minor Changes
+
+- Introduce `deprecated()` and `deprecatedProperty()` helper methods to report deprecation warnings once on console ([#1743](https://github.com/clerkinc/javascript/pull/1743)) by [@dimkl](https://github.com/dimkl)
+
+- Introduce `isDevelopmentEnvironment()` helper method ([#1752](https://github.com/clerkinc/javascript/pull/1752)) by [@dimkl](https://github.com/dimkl)
+
+## 0.22.1
+
+### Patch Changes
+
+- Fix: swr devtools breaks applications with clerk ([#1694](https://github.com/clerkinc/javascript/pull/1694)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Force disable swr devtools for organization hooks
+  - Let the swr devtool to pick the correct react version
+
+- Deprecate `membershipList` in favor of `memberships` that supports paginated responses ([#1708](https://github.com/clerkinc/javascript/pull/1708)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 0.22.0
 
 ### Minor Changes

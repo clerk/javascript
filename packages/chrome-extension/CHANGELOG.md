@@ -1,5 +1,30 @@
 # Change Log
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`a2c7115dd`](https://github.com/clerkinc/javascript/commit/a2c7115dd3f4574e1970a985360916d954ad36cd), [`378a903ac`](https://github.com/clerkinc/javascript/commit/378a903ac4dc12e6ee708de20f0d9a5aa758bd18)]:
+  - @clerk/clerk-js@4.58.1
+  - @clerk/clerk-react@4.25.1
+
+## 0.4.0
+
+### Minor Changes
+
+- Introduce the new brand-new component OrganizationList ([#1692](https://github.com/clerkinc/javascript/pull/1692)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Lists all the memberships, invitations or suggestions an active user may have
+  - Powered by our `useOrganizationList` react hook
+
+### Patch Changes
+
+- Change `README` to include updated links to issue templates and update Discord link. ([#1750](https://github.com/clerkinc/javascript/pull/1750)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`30bb9eccb`](https://github.com/clerkinc/javascript/commit/30bb9eccb95632fb1de02b756e818118ca6324f7), [`e99df0a0d`](https://github.com/clerkinc/javascript/commit/e99df0a0de8ab91e9de4d32dfab46ad562f510d3), [`4327b91f9`](https://github.com/clerkinc/javascript/commit/4327b91f9ed65b440afaa5f76a6231aeacd3541a), [`a8eb4351a`](https://github.com/clerkinc/javascript/commit/a8eb4351a623b26a961c6968684e3a1f43ebd10d), [`23c073957`](https://github.com/clerkinc/javascript/commit/23c073957bc61cf27824e9c7e15e89f65c3eab35), [`01b024c57`](https://github.com/clerkinc/javascript/commit/01b024c57c80ae00d83801fe90b2992111dc1a68), [`b0f396bc5`](https://github.com/clerkinc/javascript/commit/b0f396bc5c75c9920df46e26d672c37f3cc3d974), [`16f667275`](https://github.com/clerkinc/javascript/commit/16f667275c7dd6f97ca94b247d72afa92c4ab4ce), [`7fa93644d`](https://github.com/clerkinc/javascript/commit/7fa93644d47252a472000633a939dc15d8d7f292), [`634948fda`](https://github.com/clerkinc/javascript/commit/634948fdaf9276b593f8fabcb2af45f3c3457048), [`43786f8d0`](https://github.com/clerkinc/javascript/commit/43786f8d0d89c3e8a827415aabba4020a928eeed)]:
+  - @clerk/clerk-js@4.58.0
+  - @clerk/clerk-react@4.25.0
+
 ## 0.3.31
 
 ### Patch Changes

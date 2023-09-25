@@ -1313,6 +1313,46 @@ describe('Clerk singleton', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-one');
       });
     });
+
+    it('redirects user to reset-password, if the user is required to set a new password', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn({
+            status: 'needs_new_password',
+          } as unknown as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSignInCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'needs_new_password' }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signIn.create = mockSignInCreate;
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/reset-password');
+      });
+    });
   });
 
   describe('.handleMagicLinkVerification()', () => {
@@ -1637,13 +1677,13 @@ describe('Clerk singleton', () => {
   });
 
   describe('buildUrlWithAuth', () => {
-    it('builds a relative url from a relative url in development for url based session syncing', async () => {
+    it('builds an absolute url from a relative url in development for url based session syncing', async () => {
       mockUsesUrlBasedSessionSync.mockReturnValue(true);
       const sut = new Clerk(devFrontendApi);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('foo');
-      expect(url).toBe('foo');
+      expect(url).toBe('http://test.host/foo');
     });
 
     it('returns what was passed when in production', async () => {

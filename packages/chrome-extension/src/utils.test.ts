@@ -1,4 +1,4 @@
-import { convertPublishableKeyToFrontendAPIOrigin, getClientCookie, setInStorage, getFromStorage } from './utils';
+import { convertPublishableKeyToFrontendAPIOrigin, getClientCookie, getFromStorage, setInStorage } from './utils';
 
 describe('utils', () => {
   const _chrome = globalThis.chrome;
@@ -51,8 +51,8 @@ describe('utils', () => {
   });
 
   describe('setInStorage(key, value)', () => {
-    test('sets value in chrome.storage', () => {
-      setInStorage('key', 'value');
+    test('sets value in chrome.storage', async () => {
+      await setInStorage('key', 'value');
 
       expect(globalThis.chrome.storage.local.set).toBeCalledTimes(1);
       expect(globalThis.chrome.storage.local.set).toBeCalledWith({ key: 'value' });

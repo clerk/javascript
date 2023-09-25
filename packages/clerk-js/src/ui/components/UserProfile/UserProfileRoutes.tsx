@@ -2,6 +2,7 @@ import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { ConnectedAccountsPage } from './ConnectedAccountsPage';
+import { DeletePage } from './DeletePage';
 import { EmailPage } from './EmailPage';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { MfaPage } from './MfaPage';
@@ -19,7 +20,6 @@ import {
 import { RootPage } from './RootPage';
 import { UsernamePage } from './UsernamePage';
 import { Web3Page } from './Web3Page';
-import { DeletePage } from './DeletePage';
 
 export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardContent>) => {
   return (

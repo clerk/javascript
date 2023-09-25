@@ -5,7 +5,7 @@ import type {
   CreateOrganizationParams,
   GetDomainsParams,
   GetMembershipRequestParams,
-  GetMembershipsParams,
+  GetMemberships,
   GetPendingInvitationsParams,
   InviteMemberParams,
   InviteMembersParams,
@@ -156,17 +156,38 @@ export class Organization extends BaseResource implements OrganizationResource {
     return OrganizationDomain.create(this.id, { name });
   };
 
-  getMemberships = async (getMemberhipsParams?: GetMembershipsParams): Promise<OrganizationMembership[]> => {
+  getMemberships: GetMemberships = async getMembershipsParams => {
+    const isDeprecatedParams = typeof getMembershipsParams === 'undefined' || !getMembershipsParams?.paginated;
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/memberships`,
       method: 'GET',
-      search: getMemberhipsParams as any,
+      search: isDeprecatedParams
+        ? getMembershipsParams
+        : (convertPageToOffset(getMembershipsParams as unknown as any) as any),
     })
       .then(res => {
-        const members = res?.response as unknown as OrganizationMembershipJSON[];
-        return members.map(member => new OrganizationMembership(member));
+        if (isDeprecatedParams) {
+          const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
+          return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem)) as any;
+        }
+
+        const { data: suggestions, total_count } =
+          res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
+
+        return {
+          total_count,
+          data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
+        } as any;
       })
-      .catch(() => []);
+      .catch(() => {
+        if (isDeprecatedParams) {
+          return [];
+        }
+        return {
+          total_count: 0,
+          data: [],
+        };
+      });
   };
 
   getPendingInvitations = async (

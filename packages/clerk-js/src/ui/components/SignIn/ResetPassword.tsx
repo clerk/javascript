@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
@@ -19,6 +21,17 @@ export const _ResetPassword = () => {
   const { failedValidationsText } = usePasswordComplexity(passwordSettings);
 
   const { t, locale } = useLocalizations();
+
+  const requiresNewPassword =
+    signIn.status === 'needs_new_password' &&
+    signIn.firstFactorVerification.strategy !== 'reset_password_email_code' &&
+    signIn.firstFactorVerification.strategy !== 'reset_password_phone_code';
+
+  React.useEffect(() => {
+    if (requiresNewPassword) {
+      card.setError(t(localizationKeys('signIn.resetPassword.requiredMessage')));
+    }
+  }, []);
 
   const passwordField = useFormControl('password', '', {
     type: 'password',
@@ -122,9 +135,11 @@ export const _ResetPassword = () => {
               }}
             />
           </Form.ControlRow>
-          <Form.ControlRow elementId={sessionsField.id}>
-            <Form.Control {...sessionsField.props} />
-          </Form.ControlRow>
+          {!requiresNewPassword && (
+            <Form.ControlRow elementId={sessionsField.id}>
+              <Form.Control {...sessionsField.props} />
+            </Form.ControlRow>
+          )}
           <Form.SubmitButton
             isDisabled={!canSubmit}
             localizationKey={localizationKeys('signIn.resetPassword.formButtonPrimary')}

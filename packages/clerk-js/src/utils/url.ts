@@ -222,13 +222,13 @@ export const appendAsQueryParams = (
     }
     const url = toURL(val);
     const sameOrigin = base.origin === url.origin;
-    params.append(camelToSnake(key), sameOrigin ? stripOrigin(url) : url + '');
+    params.append(camelToSnake(key), sameOrigin ? stripOrigin(url) : `${url}`);
   }
 
   // The following line will prepend the hash with a `/`.
   // This is required for ClerkJS Components Hash router to work as expected
   // as it treats the hash as sub-path with its nested querystring parameters.
-  return base + (params.toString() ? '#/?' + params.toString() : '');
+  return `${base}${params.toString() ? '#/?' + params.toString() : ''}`;
 };
 
 export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean => {

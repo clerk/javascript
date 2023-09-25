@@ -3,7 +3,7 @@ import type { OrganizationResource } from '@clerk/types';
 import { useCoreOrganizationList, useCoreUser, useOrganizationListContext } from '../../contexts';
 import { OrganizationPreview, PersonalWorkspacePreview, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
-import { OrganizationListPreviewButton } from './shared';
+import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared';
 
 export const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
@@ -25,11 +25,8 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
     <OrganizationListPreviewButton onClick={() => handleOrganizationClicked(props.organization)}>
       <OrganizationPreview
         elementId='organizationList'
-        avatarSx={t => ({ width: t.sizes.$10, height: t.sizes.$10 })}
-        mainIdentifierSx={t => ({
-          fontSize: t.fontSizes.$xl,
-          color: t.colors.$colorText,
-        })}
+        size={'sm'}
+        mainIdentifierSx={sharedMainIdentifierSx}
         organization={props.organization}
       />
     </OrganizationListPreviewButton>
@@ -64,11 +61,8 @@ export const PersonalAccountPreview = withCardStateProvider(() => {
     <OrganizationListPreviewButton onClick={handlePersonalClicked}>
       <PersonalWorkspacePreview
         user={userWithoutIdentifiers}
-        avatarSx={t => ({ width: t.sizes.$10, height: t.sizes.$10 })}
-        mainIdentifierSx={t => ({
-          fontSize: t.fontSizes.$xl,
-          color: t.colors.$colorText,
-        })}
+        size={'sm'}
+        mainIdentifierSx={sharedMainIdentifierSx}
         title={localizationKeys('organizationSwitcher.personalWorkspace')}
       />
     </OrganizationListPreviewButton>

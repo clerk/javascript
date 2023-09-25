@@ -1,5 +1,5 @@
 import { Clerk } from '@clerk/backend';
-import type {
+export type {
   ClerkMiddleware,
   ClerkMiddlewareOptions,
   LooseAuthProp,
@@ -16,8 +16,6 @@ const createClerkClient = Clerk;
 
 export { requireAuth } from './requireAuth';
 export { withAuth } from './withAuth';
-
-export { ClerkMiddleware, ClerkMiddlewareOptions, LooseAuthProp, RequireAuthProp, StrictAuthProp, WithAuthProp };
 
 const {
   users,

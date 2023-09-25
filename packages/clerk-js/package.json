@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.57.0",
+  "version": "4.58.1",
   "license": "MIT",
   "description": "Clerk JS library",
   "keywords": [
@@ -33,20 +33,19 @@
     "dev": "webpack serve --config webpack.config.js",
     "dev:headless": "webpack serve --config webpack.config.js --env variant=\"clerk.headless.browser\"",
     "clean": "rimraf ./dist",
-    "lint": "eslint .",
-    "start": "echo \"Noop\"",
+    "lint": "eslint src/",
     "test": "jest",
     "test:ci": "jest --maxWorkers=50%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "watch": "webpack --config webpack.config.js --env production --watch"
   },
   "dependencies": {
-    "@clerk/localizations": "^1.25.2",
-    "@clerk/shared": "^0.22.0",
-    "@clerk/types": "^3.51.0",
+    "@clerk/localizations": "^1.26.0",
+    "@clerk/shared": "^0.23.0",
+    "@clerk/types": "^3.52.0",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
-    "@floating-ui/react": "0.19.0",
+    "@floating-ui/react": "0.25.4",
     "@zxcvbn-ts/core": "2.2.1",
     "@zxcvbn-ts/language-common": "3.0.2",
     "browser-tabs-lock": "1.2.15",

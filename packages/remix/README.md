@@ -1,6 +1,9 @@
 <p align="center">
   <a href="https://clerk.com?utm_source=github&utm_medium=clerk_remix" target="_blank" rel="noopener noreferrer">
-    <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://images.clerk.com/static/logo-dark-mode-400x400.png">
+      <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
+    </picture>
   </a>
   <br />
 </p>
@@ -9,17 +12,17 @@
 
 <div align="center">
 
-[![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://discord.com/invite/b5rXHjAg7A)
+[![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_remix)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerkinc/javascript/blob/main/packages/remix/CHANGELOG.md)
 ·
-[Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=bug&template=bug_report.md&title=Bug%3A+)
+[Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=Feature%3A+)
+[Request a Feature](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
 ·
-[Ask a Question](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
+[Ask a Question](https://github.com/clerkinc/javascript/discussions)
 
 </div>
 
@@ -33,8 +36,8 @@ Clerk is the easiest way to add authentication and user management to your Remix
 
 ### Prerequisites
 
-- Remix v1.2+
-- Node.js v16+
+- Remix `^2.0.0` or later
+- Node.js `^18.0.0` or later
 
 ### Installation
 
@@ -71,15 +74,15 @@ You can get these from the [API Keys](https://dashboard.clerk.com/last-active?pa
 To initialize Clerk with your Remix application, you will need to make three modifications to `app/root.jsx`:
 
 1. Export `rootAuthLoader` as `loader`
-2. Export `ClerkCatchBoundary` as `CatchBoundary`
+2. Export `ClerkErrorBoundary` as `ErrorBoundary`
 3. Wrap the default export with `ClerkApp`
 
 ```jsx
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
-import { ClerkApp, ClerkCatchBoundary } from '@clerk/remix';
+import { ClerkApp, ClerkErrorBoundary } from '@clerk/remix';
 
 export const loader = args => rootAuthLoader(args);
-export const CatchBoundary = ClerkCatchBoundary();
+export const ErrorBoundary = ClerkErrorBoundary();
 
 function App() {
   return <html lang='en'>[...]</html>;
@@ -116,14 +119,14 @@ export default function Index() {
 }
 ```
 
-_For further details and examples, please refer to our [Documentation](https://clerk.com/docs/get-started/remix?utm_source=github&utm_medium=clerk_remix)._
+_For further details and examples, please refer to our [Documentation](https://clerk.com/docs/quickstarts/remix?utm_source=github&utm_medium=clerk_remix)._
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Open a [GitHub support issue](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
+- Create a [GitHub Discussion](https://github.com/clerkinc/javascript/discussions)
 - Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_remix)
 
 ## Contributing

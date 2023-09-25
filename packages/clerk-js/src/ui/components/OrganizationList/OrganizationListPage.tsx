@@ -51,6 +51,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
       sx={t => ({
         padding: `${t.space.$8} ${t.space.$none}`,
       })}
+      gap={6}
     >
       <CardAlert>{card.error}</CardAlert>
       {isLoading && (
@@ -145,7 +146,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
       </Header.Root>
       <Col
         elementDescriptor={descriptors.main}
-        gap={4}
+        gap={6}
       >
         <PreviewListItems>
           <PersonalAccountPreview />
@@ -203,7 +204,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
             elementDescriptor={descriptors.button}
             block
             colorScheme='neutral'
-            size='sm'
+            // size='sm'
             variant='outline'
             textVariant='buttonExtraSmallBold'
             onClick={handleCreateOrganizationClicked}

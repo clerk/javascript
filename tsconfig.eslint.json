@@ -1,7 +1,16 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "allowJs": true
   },
-  "include": ["packages/*/src", "packages/*/*.js", "packages/*/*.config.ts", "scripts/*.mjs", "integration"]
+  "include": [
+    "packages/*/src",
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "packages/*/*.js",
+    ".eslintrc.js",
+    "commitlint.config.js",
+    "scripts/*.mjs"
+  ]
 }

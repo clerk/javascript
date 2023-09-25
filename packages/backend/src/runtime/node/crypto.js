@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 let webcrypto;
 try {
   webcrypto = require('node:crypto').webcrypto;

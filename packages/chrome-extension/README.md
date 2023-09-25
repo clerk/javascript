@@ -1,6 +1,9 @@
 <p align="center">
   <a href="https://clerk.com?utm_source=github&utm_medium=clerk_chrome_extension" target="_blank" rel="noopener noreferrer">
-    <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://images.clerk.com/static/logo-dark-mode-400x400.png">
+      <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
+    </picture>
   </a>
   <br /> 
 </p>
@@ -15,11 +18,11 @@
 
 [Changelog](https://github.com/clerkinc/javascript/blob/main/packages/chrome-extension/CHANGELOG.md)
 ·
-[Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=bug&template=bug_report.md&title=Bug%3A+)
+[Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=Feature%3A+)
+[Request a Feature](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
 ·
-[Ask a Question](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
+[Ask a Question](https://github.com/clerkinc/javascript/discussions)
 
 </div>
 
@@ -175,7 +178,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Open a [GitHub support issue](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
+- Create a [GitHub Discussion](https://github.com/clerkinc/javascript/discussions)
 - Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_chrome_extension)
 
 ## Contributing

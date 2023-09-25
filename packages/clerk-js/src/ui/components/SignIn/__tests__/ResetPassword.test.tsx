@@ -138,5 +138,29 @@ describe('ResetPassword', () => {
       await userEvent.click(screen.getByText(/back/i));
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
     });
+
+    it('resets the password, when it is required for the user', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.clerk.client.signIn.status = 'needs_new_password';
+      fixtures.clerk.client.signIn.firstFactorVerification.strategy = 'oauth_google';
+      fixtures.signIn.resetPassword.mockResolvedValue({
+        status: 'complete',
+        createdSessionId: '1234_session_id',
+      } as SignInResource);
+      const { userEvent } = render(<ResetPassword />, { wrapper });
+
+      expect(screen.queryByText(/account already exists/i)).toBeInTheDocument();
+      expect(screen.queryByRole('checkbox', { name: /sign out of all other devices/i })).not.toBeInTheDocument();
+      await userEvent.type(screen.getByLabelText(/New password/i), 'testtest');
+      await userEvent.type(screen.getByLabelText(/Confirm password/i), 'testtest');
+      await userEvent.click(screen.getByRole('button', { name: /Reset Password/i }));
+      expect(fixtures.signIn.resetPassword).toHaveBeenCalledWith({
+        password: 'testtest',
+        signOutOfOtherSessions: true,
+      });
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(
+        '../reset-password-success?createdSessionId=1234_session_id',
+      );
+    });
   });
 });
