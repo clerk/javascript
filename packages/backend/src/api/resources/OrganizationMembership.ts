@@ -1,3 +1,4 @@
+import { deprecatedProperty } from '../../util/shared';
 import { Organization } from '../resources';
 import type { OrganizationMembershipRole } from './Enums';
 import type { OrganizationMembershipJSON, OrganizationMembershipPublicUserDataJSON } from './JSON';
@@ -54,3 +55,5 @@ export class OrganizationMembershipPublicUserData {
     );
   }
 }
+
+deprecatedProperty(OrganizationMembershipPublicUserData, 'profileImageUrl', 'Use `imageUrl` instead.');
