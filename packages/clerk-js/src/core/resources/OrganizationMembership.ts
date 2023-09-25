@@ -138,6 +138,9 @@ export class OrganizationMembership extends BaseResource implements Organization
   }
 }
 
+// TODO(@dimkl): deprecate nested property
+// deprecatedProperty(OrganizationMembership, 'publicUserData.profileImageUrl', 'Use `imageUrl` instead.');
+
 export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;
 };

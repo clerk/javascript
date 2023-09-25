@@ -1,3 +1,4 @@
+import { deprecatedProperty } from '@clerk/shared';
 import type { DisplayConfigJSON, DisplayConfigResource, DisplayThemeJSON, PreferredSignInStrategy } from '@clerk/types';
 
 import { BaseResource } from './internal';
@@ -18,9 +19,13 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   instanceEnvironmentType!: string;
   faviconImageUrl!: string;
   logoImageUrl!: string;
-  // TODO: Remove
+  /**
+   * @deprecated  Use `logoImageUrl` instead.
+   */
   logoUrl!: string;
-  // TODO: Remove
+  /**
+   * @deprecated  Use `faviconImageUrl` instead.
+   */
   faviconUrl!: string;
   preferredSignInStrategy!: PreferredSignInStrategy;
   signInUrl!: string;
@@ -52,9 +57,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.preferredSignInStrategy = data.preferred_sign_in_strategy;
     this.logoImageUrl = data.logo_image_url;
     this.faviconImageUrl = data.favicon_image_url;
-    // TODO: Remove
     this.logoUrl = data.logo_url;
-    // TODO: Remove
     this.faviconUrl = data.favicon_url;
     this.homeUrl = data.home_url;
     this.signInUrl = data.sign_in_url;
@@ -77,3 +80,6 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     return this;
   }
 }
+
+deprecatedProperty(DisplayConfig, 'logoUrl', 'Use `logoImageUrl` instead.');
+deprecatedProperty(DisplayConfig, 'faviconUrl', 'Use `faviconImageUrl` instead.');
