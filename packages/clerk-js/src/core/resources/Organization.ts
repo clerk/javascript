@@ -67,6 +67,11 @@ export class Organization extends BaseResource implements OrganizationResource {
     if (typeof paramsOrName === 'string') {
       // DX: Deprecated v3.5.2
       name = paramsOrName;
+      deprecated(
+        'create',
+        'Calling `create` with a string is deprecated. Use an object of type CreateOrganizationParams instead.',
+        'organization:create',
+      );
     } else {
       name = paramsOrName.name;
       slug = paramsOrName.slug;
