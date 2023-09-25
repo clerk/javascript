@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import type {
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
@@ -29,6 +30,22 @@ export class OrganizationMembership extends BaseResource implements Organization
   static retrieve: GetOrganizationMembershipsClass = async retrieveMembershipsParams => {
     const isDeprecatedParams =
       typeof retrieveMembershipsParams === 'undefined' || !retrieveMembershipsParams?.paginated;
+
+    if (!(retrieveMembershipsParams as RetrieveMembershipsParams)?.limit) {
+      deprecated(
+        'limit',
+        'Use `pageSize` instead in OrganizationMembership.retrieve.',
+        'organization-membership:limit',
+      );
+    }
+    if (!(retrieveMembershipsParams as RetrieveMembershipsParams)?.offset) {
+      deprecated(
+        'offset',
+        'Use `initialPage` instead in OrganizationMembership.retrieve.',
+        'organization-membership:offset',
+      );
+    }
+
     return await BaseResource._fetch({
       path: '/me/organization_memberships',
       method: 'GET',
