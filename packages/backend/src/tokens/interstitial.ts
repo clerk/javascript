@@ -37,6 +37,9 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
   if (options.frontendApi) {
     deprecated('frontentApi', 'Use `publishableKey` instead.');
   }
+  if (options.pkgVersion) {
+    deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
+  }
 
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const domainOnlyInProd = !isDevOrStagingUrl(options.frontendApi) ? addClerkPrefix(options.domain) : '';
@@ -133,6 +136,9 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
   if (options.frontendApi) {
     deprecated('frontentApi', 'Use `publishableKey` instead.');
+  }
+  if (options.pkgVersion) {
+    deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
   }
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
