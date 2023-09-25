@@ -1,4 +1,4 @@
-import { deprecated } from '@clerk/shared';
+import { deprecated, deprecatedProperty } from '@clerk/shared';
 import type {
   AddMemberParams,
   ClerkPaginatedResponse,
@@ -343,3 +343,5 @@ export class Organization extends BaseResource implements OrganizationResource {
     return this.fromJSON(currentOrganization?.organization as OrganizationJSON);
   }
 }
+
+deprecatedProperty(Organization, 'logoUrl', 'Use `imageUrl` instead.');
