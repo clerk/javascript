@@ -8,6 +8,7 @@ import { joinPaths } from '../util/path';
 import {
   addClerkPrefix,
   callWithRetry,
+  deprecated,
   getClerkJsMajorVersionOrTag,
   getScriptUrl,
   isDevOrStagingUrl,
@@ -33,6 +34,10 @@ export type LoadInterstitialOptions = {
 } & MultiDomainAndOrProxyPrimitives;
 
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
+  if (options.frontendApi) {
+    deprecated('frontentApi', 'Use `publishableKey` instead.');
+  }
+
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const domainOnlyInProd = !isDevOrStagingUrl(options.frontendApi) ? addClerkPrefix(options.domain) : '';
   const {
@@ -126,6 +131,9 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 
 // TODO: Add caching to Interstitial
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
+  if (options.frontendApi) {
+    deprecated('frontentApi', 'Use `publishableKey` instead.');
+  }
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
   const response = await callWithRetry(() =>
@@ -149,6 +157,10 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 }
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
+  if (options.frontendApi) {
+    deprecated('frontentApi', 'Use `publishableKey` instead.');
+  }
+
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const { apiUrl, frontendApi, pkgVersion, clerkJSVersion, publishableKey, proxyUrl, isSatellite, domain, signInUrl } =
     options;
