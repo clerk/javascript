@@ -9,6 +9,7 @@ export type OAuthProvider =
   | 'twitter'
   | 'twitch'
   | 'linkedin'
+  | 'linkedin_oidc'
   | 'dropbox'
   | 'bitbucket'
   | 'microsoft'
