@@ -1,6 +1,6 @@
 import type { ClerkAPIError } from '@clerk/types';
 import type { HTMLInputTypeAttribute } from 'react';
-import React, { useMemo } from 'react';
+import { useState } from 'react';
 
 import { useSetTimeout } from '../hooks';
 import type { LocalizationKey } from '../localization';
@@ -13,8 +13,7 @@ type Options = {
   placeholder?: string | LocalizationKey;
   options?: SelectOption[];
   defaultChecked?: boolean;
-  enableErrorAfterBlur?: boolean;
-  informationText?: string | LocalizationKey;
+  infoText?: LocalizationKey | string;
 } & (
   | {
       label: string | LocalizationKey;
@@ -49,27 +48,26 @@ type FieldStateProps<Id> = {
   value: string;
   checked?: boolean;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
-  onBlur: React.FocusEventHandler<HTMLInputElement>;
-  onFocus: React.FocusEventHandler<HTMLInputElement>;
-  hasLostFocus: boolean;
-  errorText: string | undefined;
-  warningText: string;
+  feedback: string;
+  feedbackType: FeedbackType;
   setError: (error: string | ClerkAPIError | undefined) => void;
-  setWarning: (message: string) => void;
-  setSuccessful: (message: string) => void;
+  setWarning: (warning: string) => void;
+  setSuccess: (message: string) => void;
+  setInfo: (info: string) => void;
   setHasPassedComplexity: (b: boolean) => void;
   hasPassedComplexity: boolean;
-  successfulText: string;
-  isFocused: boolean;
 } & Omit<Options, 'defaultChecked'>;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
   setError: (error: string | ClerkAPIError | undefined) => void;
-  setSuccessful: (message: string) => void;
+  setSuccess: (message: string) => void;
+  setInfo: (info: string) => void;
   setValue: (val: string | undefined) => void;
   setChecked: (isChecked: boolean) => void;
   props: FieldStateProps<Id>;
 };
+
+export type FeedbackType = 'success' | 'error' | 'warning' | 'info';
 
 export const useFormControl = <Id extends string>(
   id: Id,
@@ -82,20 +80,17 @@ export const useFormControl = <Id extends string>(
     isRequired: false,
     placeholder: '',
     options: [],
-    enableErrorAfterBlur: false,
-    informationText: '',
     defaultChecked: false,
   };
 
-  const { translateError } = useLocalizations();
-  const [value, setValueInternal] = React.useState<string>(initialState);
-  const [checked, setCheckedInternal] = React.useState<boolean>(opts?.defaultChecked || false);
-  const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
-  const [warningText, setWarningText] = React.useState('');
-  const [successfulText, setSuccessfulText] = React.useState('');
-  const [hasLostFocus, setHasLostFocus] = React.useState(false);
-  const [isFocused, setFocused] = React.useState(false);
-  const [hasPassedComplexity, setHasPassedComplexity] = React.useState(false);
+  const { translateError, t } = useLocalizations();
+  const [value, setValueInternal] = useState<string>(initialState);
+  const [checked, setCheckedInternal] = useState<boolean>(opts?.defaultChecked || false);
+  const [hasPassedComplexity, setHasPassedComplexity] = useState(false);
+  const [feedback, setFeedback] = useState<{ message: string; type: FeedbackType }>({
+    message: '',
+    type: 'info',
+  });
 
   const onChange: FormControlState['onChange'] = event => {
     if (opts?.type === 'checkbox') {
@@ -104,35 +99,28 @@ export const useFormControl = <Id extends string>(
     return setValueInternal(event.target.value || '');
   };
 
-  const onFocus: FormControlState['onFocus'] = () => {
-    setFocused(true);
-  };
-
-  const onBlur: FormControlState['onBlur'] = () => {
-    setFocused(false);
-    setHasLostFocus(true);
-  };
-
   const setValue: FormControlState['setValue'] = val => setValueInternal(val || '');
   const setChecked: FormControlState['setChecked'] = checked => setCheckedInternal(checked);
   const setError: FormControlState['setError'] = error => {
-    setErrorText(translateError(error || undefined));
-    if (typeof error !== 'undefined') {
-      setSuccessfulText('');
-      setWarningText('');
+    if (error) {
+      setFeedback({ message: translateError(error), type: 'error' });
     }
   };
-  const setSuccessful: FormControlState['setSuccessful'] = isSuccess => {
-    setErrorText('');
-    setWarningText('');
-    setSuccessfulText(isSuccess);
+  const setSuccess: FormControlState['setSuccess'] = message => {
+    if (message) {
+      setFeedback({ message, type: 'success' });
+    }
   };
 
   const setWarning: FormControlState['setWarning'] = warning => {
-    setWarningText(warning);
     if (warning) {
-      setSuccessfulText('');
-      setErrorText('');
+      setFeedback({ message: translateError(warning), type: 'warning' });
+    }
+  };
+
+  const setInfo: FormControlState['setInfo'] = info => {
+    if (info) {
+      setFeedback({ message: translateError(info), type: 'info' });
     }
   };
 
@@ -144,18 +132,13 @@ export const useFormControl = <Id extends string>(
     name: id,
     value,
     checked,
-    errorText,
-    successfulText,
-    hasLostFocus,
-    setSuccessful,
+    setSuccess,
     setError,
     onChange,
-    onBlur,
-    onFocus,
-    isFocused,
-    enableErrorAfterBlur: restOpts.enableErrorAfterBlur || false,
     setWarning,
-    warningText,
+    feedback: feedback.message || t(opts.infoText),
+    feedbackType: feedback.type,
+    setInfo,
     hasPassedComplexity,
     setHasPassedComplexity,
     validatePassword: opts.type === 'password' ? opts.validatePassword : undefined,
@@ -177,82 +160,26 @@ export const buildRequest = (fieldStates: Array<FormControlStateLike>): Record<s
 
 type DebouncedFeedback = {
   debounced: {
-    errorText: string;
-    warningText: string;
-    successfulText: string;
-    isFocused: boolean;
-    informationText: string | LocalizationKey;
+    feedback: string;
+    feedbackType: FeedbackType;
   };
 };
 
 type DebouncingOption = {
-  hasLostFocus: boolean;
-  warningText: string | undefined;
-  errorText: string | undefined;
-  enableErrorAfterBlur: boolean | undefined;
-  successfulText: string | undefined;
-  isFocused: boolean;
-  informationText: LocalizationKey | string | undefined;
-  hasPassedComplexity: boolean;
-  skipBlur?: boolean;
+  feedback?: string;
+  feedbackType?: FeedbackType;
+  isFocused?: boolean;
   delayInMs?: number;
 };
-export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedback => {
-  const {
-    hasLostFocus = false,
-    errorText = '',
-    warningText = '',
-    enableErrorAfterBlur = false,
-    successfulText = '',
-    isFocused = false,
-    informationText = '',
-    skipBlur = false,
-    delayInMs = 100,
-  } = opts;
+export const useFormControlFeedback = (opts?: DebouncingOption): DebouncedFeedback => {
+  const { feedback = '', delayInMs = 100, feedbackType = 'info', isFocused = false } = opts || {};
 
-  const canDisplayFeedback = useMemo(() => {
-    if (enableErrorAfterBlur) {
-      if (skipBlur) {
-        return true;
-      }
-      return hasLostFocus;
-    }
-    return true;
-  }, [enableErrorAfterBlur, hasLostFocus, skipBlur]);
+  const shouldHide = isFocused ? false : ['info', 'warning'].includes(feedbackType);
 
-  const feedbackMemo = useMemo(() => {
-    const shouldDisplayErrorAsWarning = errorText && !skipBlur;
-    const _errorText = !shouldDisplayErrorAsWarning && canDisplayFeedback ? errorText : '';
-    const _warningText = shouldDisplayErrorAsWarning ? errorText : warningText;
-    const _successfulText = successfulText;
-
-    /*
-     * On keyboard navigation avoid displaying the information text when an error is present.
-     * This is necessary in order to ensure that users will still be able to see the error message
-     *  even if they have pressed Enter (to submit form) and field still has focus.
-     */
-    const shouldShowInformationText = skipBlur
-      ? isFocused && !_successfulText && !_errorText
-      : isFocused && !_successfulText;
-    return {
-      errorText: _errorText,
-      successfulText: _successfulText,
-      warningText: _warningText,
-      isFocused,
-      informationText: shouldShowInformationText ? informationText : '',
-    };
-  }, [
-    informationText,
-    enableErrorAfterBlur,
-    isFocused,
-    successfulText,
-    hasLostFocus,
-    errorText,
-    canDisplayFeedback,
-    skipBlur,
-  ]);
-
-  const debouncedState = useSetTimeout(feedbackMemo, delayInMs);
+  const debouncedState = useSetTimeout(
+    { feedback: shouldHide ? '' : feedback, feedbackType: shouldHide ? 'info' : feedbackType },
+    delayInMs,
+  );
 
   return {
     debounced: debouncedState,

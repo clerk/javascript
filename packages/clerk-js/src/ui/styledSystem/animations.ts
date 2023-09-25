@@ -65,20 +65,17 @@ const notificationAnimation = keyframes`
 `;
 
 const outAnimation = keyframes`
-  20% {
-    opacity: 1;
-    transform: translateY(0px);
+  0% {
+    opacity:1;
+    translateY(0px);
     max-height: 6rem;
-  }
-  80% {
-    opacity: 0;
-    transform: translateY(5px);
-    max-height: 0;
-  }
+    visibility: visible;
+  }  
   100% {
     opacity: 0;
     transform: translateY(5px);
     max-height: 0;
+    visibility: visible;
   }
 `;
 

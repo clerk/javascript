@@ -11,9 +11,10 @@ export type UsePasswordConfig = PasswordSettingsData & {
 };
 
 export type UsePasswordCbs = {
-  onValidationFailed?: (errorMessage: string | undefined) => void;
+  onValidationError?: (error: string | undefined) => void;
   onValidationSuccess?: () => void;
-  onValidationWarning?: (warningMessage: string) => void;
+  onValidationWarning?: (warning: string) => void;
+  onValidationInfo?: (info: string) => void;
   onValidationComplexity?: (b: boolean) => void;
 };
 

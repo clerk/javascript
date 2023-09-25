@@ -12,8 +12,9 @@ export type FormControlProps = {
   hasError?: boolean;
   isDisabled?: boolean;
   setError: (error: string | ClerkAPIError | undefined) => void;
-  setSuccessful: (message: string) => void;
-  setWarning: (message: string) => void;
+  setSuccess: (message: string) => void;
+  setWarning: (warning: string) => void;
+  setInfo: (info: string) => void;
   setHasPassedComplexity: (b: boolean) => void;
 };
 
@@ -29,8 +30,9 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
     hasError = false,
     isDisabled = false,
     setError,
-    setSuccessful,
+    setSuccess,
     setWarning,
+    setInfo,
     setHasPassedComplexity,
   } = props;
   // TODO: This shouldnt be targettable
@@ -49,12 +51,24 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
         errorMessageId,
         isDisabled,
         setError,
-        setSuccessful,
+        setSuccess,
         setWarning,
+        setInfo,
         setHasPassedComplexity,
       },
     }),
-    [isRequired, hasError, id, errorMessageId, isDisabled, setError, setSuccessful, setHasPassedComplexity],
+    [
+      isRequired,
+      hasError,
+      id,
+      errorMessageId,
+      isDisabled,
+      setError,
+      setSuccess,
+      setInfo,
+      setWarning,
+      setHasPassedComplexity,
+    ],
   );
   return <FormControlContext.Provider value={value}>{props.children}</FormControlContext.Provider>;
 };

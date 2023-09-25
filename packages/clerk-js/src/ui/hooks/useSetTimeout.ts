@@ -9,7 +9,7 @@ export function useSetTimeout<T>(value: T, delayInMs?: number): T {
     return () => {
       clearTimeout(timer);
     };
-  }, [value, delayInMs]);
+  }, [JSON.stringify(value), delayInMs]);
 
   return timer;
 }

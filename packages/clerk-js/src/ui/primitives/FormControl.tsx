@@ -5,7 +5,8 @@ import type { FormControlProps } from './hooks';
 import { FormControlContextProvider } from './hooks';
 
 export const FormControl = (props: React.PropsWithChildren<FormControlProps>) => {
-  const { hasError, id, isRequired, setError, setSuccessful, setWarning, setHasPassedComplexity, ...rest } = props;
+  const { hasError, id, isRequired, setError, setInfo, setSuccess, setWarning, setHasPassedComplexity, ...rest } =
+    props;
   return (
     <Flex
       direction='col'
@@ -13,7 +14,7 @@ export const FormControl = (props: React.PropsWithChildren<FormControlProps>) =>
       css={{ position: 'relative', flex: '1 1 auto' }}
     >
       <FormControlContextProvider
-        {...{ hasError, id, isRequired, setError, setSuccessful, setWarning, setHasPassedComplexity }}
+        {...{ hasError, id, isRequired, setError, setInfo, setSuccess, setWarning, setHasPassedComplexity }}
       >
         {props.children}
       </FormControlContextProvider>
