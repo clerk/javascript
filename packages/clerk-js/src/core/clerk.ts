@@ -1,6 +1,7 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
+  deprecated,
   handleValueOrFn,
   inClientSide,
   is4xxError,
@@ -1077,6 +1078,7 @@ export default class Clerk implements ClerkInterface {
    * @deprecated use User.getOrganizationMemberships
    */
   public getOrganizationMemberships = async (): Promise<OrganizationMembership[]> => {
+    deprecated('getOrganizationMemberships', 'Use User.getOrganizationMemberships');
     return await OrganizationMembership.retrieve();
   };
 
