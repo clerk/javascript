@@ -11,7 +11,7 @@
     "tsconfig.json",
     "tsconfig.*.json"
   ],
-  "globalEnv": ["NODE_VERSION", "NPM_VERSION"],
+  "globalEnv": ["NODE_VERSION", "NPM_VERSION", "NODE_ENV", "VERCEL"],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],

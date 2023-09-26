@@ -1,17 +1,20 @@
+import { deprecated } from '@clerk/shared';
 import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
   CreateOrganizationParams,
   GetDomainsParams,
+  GetInvitationsParams,
   GetMembershipRequestParams,
-  GetMembershipsParams,
+  GetMemberships,
   GetPendingInvitationsParams,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,
   OrganizationDomainResource,
   OrganizationInvitationJSON,
+  OrganizationInvitationResource,
   OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationMembershipRequestJSON,
@@ -73,6 +76,17 @@ export class Organization extends BaseResource implements OrganizationResource {
         path: '/organizations',
         method: 'POST',
         body: { name, slug } as any,
+      })
+    )?.response as unknown as OrganizationJSON;
+
+    return new Organization(json);
+  }
+
+  static async get(organizationId: string): Promise<OrganizationResource> {
+    const json = (
+      await BaseResource._fetch<OrganizationJSON>({
+        path: `/organizations/${organizationId}`,
+        method: 'GET',
       })
     )?.response as unknown as OrganizationJSON;
 
@@ -145,22 +159,44 @@ export class Organization extends BaseResource implements OrganizationResource {
     return OrganizationDomain.create(this.id, { name });
   };
 
-  getMemberships = async (getMemberhipsParams?: GetMembershipsParams): Promise<OrganizationMembership[]> => {
+  getMemberships: GetMemberships = async getMembershipsParams => {
+    const isDeprecatedParams = typeof getMembershipsParams === 'undefined' || !getMembershipsParams?.paginated;
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/memberships`,
       method: 'GET',
-      search: getMemberhipsParams as any,
+      search: isDeprecatedParams
+        ? getMembershipsParams
+        : (convertPageToOffset(getMembershipsParams as unknown as any) as any),
     })
       .then(res => {
-        const members = res?.response as unknown as OrganizationMembershipJSON[];
-        return members.map(member => new OrganizationMembership(member));
+        if (isDeprecatedParams) {
+          const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
+          return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem)) as any;
+        }
+
+        const { data: suggestions, total_count } =
+          res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
+
+        return {
+          total_count,
+          data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
+        } as any;
       })
-      .catch(() => []);
+      .catch(() => {
+        if (isDeprecatedParams) {
+          return [];
+        }
+        return {
+          total_count: 0,
+          data: [],
+        };
+      });
   };
 
   getPendingInvitations = async (
     getPendingInvitationsParams?: GetPendingInvitationsParams,
   ): Promise<OrganizationInvitation[]> => {
+    deprecated('getPendingInvitations', 'Use the `getInvitations` method instead.');
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/invitations/pending`,
       method: 'GET',
@@ -171,6 +207,29 @@ export class Organization extends BaseResource implements OrganizationResource {
         return pendingInvitations.map(pendingInvitation => new OrganizationInvitation(pendingInvitation));
       })
       .catch(() => []);
+  };
+
+  getInvitations = async (
+    getInvitationsParams?: GetInvitationsParams,
+  ): Promise<ClerkPaginatedResponse<OrganizationInvitationResource>> => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/invitations`,
+      method: 'GET',
+      search: convertPageToOffset(getInvitationsParams) as any,
+    })
+      .then(res => {
+        const { data: requests, total_count } =
+          res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;
+
+        return {
+          total_count,
+          data: requests.map(request => new OrganizationInvitation(request)),
+        };
+      })
+      .catch(() => ({
+        total_count: 0,
+        data: [],
+      }));
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {

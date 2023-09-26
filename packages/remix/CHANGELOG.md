@@ -1,5 +1,61 @@
 # Change Log
 
+## 3.0.0
+
+### Major Changes
+
+- Remix released its second major version. Read their [announcement blogpost](https://remix.run/blog/remix-v2) and [upgrade guide](https://remix.run/docs/en/main/start/v2) to learn more. ([#1739](https://github.com/clerkinc/javascript/pull/1739)) by [@anagstef](https://github.com/anagstef)
+
+  Thus `@clerk/remix` was updated to support Remix `^2.0.0` and later. If you want/need to continue using Remix `^1.0.0`, keep using the previous major `@clerk/remix` version.
+
+  **Breaking changes:**
+
+  - Renamed `V2_ClerkErrorBoundary` to `ClerkErrorBoundary`
+  - Removed `ClerkCatchBoundary`
+
+  **Migration guide:**
+
+  - Rename `V2_ClerkErrorBoundary` to `ClerkErrorBoundary`
+
+    ```diff
+    - import { ClerkApp, V2_ClerkErrorBoundary } from "@clerk/remix";
+    + import { ClerkApp, ClerkErrorBoundary } from "@clerk/remix";
+
+    - export const ErrorBoundary = V2_ClerkErrorBoundary();
+    + export const ErrorBoundary = ClerkErrorBoundary();
+    ```
+
+  - Replace `ClerkCatchBoundary` with `ClerkErrorBoundary`. If you used `V2_ClerkErrorBoundary` you can skip this step.
+
+    ```diff
+    - import { ClerkApp, ClerkCatchBoundary } from '@clerk/remix';
+    + import { ClerkApp, ClerkErrorBoundary } from "@clerk/remix";
+
+    - export const CatchBoundary = ClerkCatchBoundary();
+    + export const ErrorBoundary = ClerkErrorBoundary();
+    ```
+
+### Patch Changes
+
+- Updated dependencies [[`40ea407ad`](https://github.com/clerkinc/javascript/commit/40ea407ad1042fee6871755f30de544200b1f0d8), [`378a903ac`](https://github.com/clerkinc/javascript/commit/378a903ac4dc12e6ee708de20f0d9a5aa758bd18), [`6706b154c`](https://github.com/clerkinc/javascript/commit/6706b154c0b41356c7feeb19c6340160a06466e5), [`27b611e47`](https://github.com/clerkinc/javascript/commit/27b611e47e4f1ad86e8dff42cb02c98bdc6ff6bd), [`4d0d90238`](https://github.com/clerkinc/javascript/commit/4d0d9023895c13290d5578ece218c24348c540fc), [`086a2e0b7`](https://github.com/clerkinc/javascript/commit/086a2e0b7e71a9919393ca43efedbf3718ea5fe4)]:
+  - @clerk/backend@0.29.2
+  - @clerk/shared@0.23.0
+  - @clerk/clerk-react@4.25.1
+
+## 2.10.3
+
+### Patch Changes
+
+- Change `README` to include updated links to issue templates and update Discord link. ([#1750](https://github.com/clerkinc/javascript/pull/1750)) by [@LekoArts](https://github.com/LekoArts)
+
+- Adjust return type of `rootAuthLoader`'s callback to allow returning `null`. ([#1704](https://github.com/clerkinc/javascript/pull/1704)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`e99df0a0d`](https://github.com/clerkinc/javascript/commit/e99df0a0de8ab91e9de4d32dfab46ad562f510d3), [`4327b91f9`](https://github.com/clerkinc/javascript/commit/4327b91f9ed65b440afaa5f76a6231aeacd3541a), [`8b9a7a360`](https://github.com/clerkinc/javascript/commit/8b9a7a36003f1b8622f444a139a811f1c35ca813), [`30bb9eccb`](https://github.com/clerkinc/javascript/commit/30bb9eccb95632fb1de02b756e818118ca6324f7), [`75be1d6b3`](https://github.com/clerkinc/javascript/commit/75be1d6b3d9bf7b5d71613b3f169a942b1d25e7e), [`01b024c57`](https://github.com/clerkinc/javascript/commit/01b024c57c80ae00d83801fe90b2992111dc1a68)]:
+  - @clerk/clerk-react@4.25.0
+  - @clerk/types@3.52.0
+  - @clerk/backend@0.29.1
+  - @clerk/shared@0.22.1
+
 ## 2.10.2
 
 ### Patch Changes

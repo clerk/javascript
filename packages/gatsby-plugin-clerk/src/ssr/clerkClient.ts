@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { Clerk } from '@clerk/backend';
 
 export const API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';

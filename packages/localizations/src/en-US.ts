@@ -61,6 +61,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomainEmailAddress: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
+  formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldAction__forgotPassword: 'Forgot password?',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',
@@ -165,6 +166,8 @@ export const enUS: LocalizationResource = {
       title: 'Reset Password',
       formButtonPrimary: 'Reset Password',
       successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
+      requiredMessage:
+        'An account already exists with an unverified email address. Please reset your password for security.',
     },
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
@@ -270,9 +273,9 @@ export const enUS: LocalizationResource = {
         detailsSubtitle__nonPrimary:
           'Set this email address as the primary to receive communications regarding your account.',
         detailsAction__nonPrimary: 'Set as primary',
-        detailsTitle__unverified: 'Unverified email address',
-        detailsSubtitle__unverified: 'This email address has not been verified and may be limited in functionality',
-        detailsAction__unverified: 'Complete verification',
+        detailsTitle__unverified: 'Verify email address',
+        detailsSubtitle__unverified: 'Complete verification to access all features with this email address',
+        detailsAction__unverified: 'Verify email address',
         destructiveActionTitle: 'Remove',
         destructiveActionSubtitle: 'Delete this email address and remove it from your account',
         destructiveAction: 'Remove email address',
@@ -287,9 +290,9 @@ export const enUS: LocalizationResource = {
         detailsSubtitle__nonPrimary:
           'Set this phone number as the primary to receive communications regarding your account.',
         detailsAction__nonPrimary: 'Set as primary',
-        detailsTitle__unverified: 'Unverified phone number',
-        detailsSubtitle__unverified: 'This phone number has not been verified and may be limited in functionality',
-        detailsAction__unverified: 'Complete verification',
+        detailsTitle__unverified: 'Verify phone number',
+        detailsSubtitle__unverified: 'Complete verification to access all features with this phone number',
+        detailsAction__unverified: 'Verify phone number',
         destructiveActionTitle: 'Remove',
         destructiveActionSubtitle: 'Delete this phone number and remove it from your account',
         destructiveAction: 'Remove phone number',

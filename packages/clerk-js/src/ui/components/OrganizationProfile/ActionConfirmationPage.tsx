@@ -131,6 +131,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     <Wizard {...wizard.props}>
       <ContentPage
         headerTitle={title}
+        breadcrumbTitle={localizationKeys('organizationProfile.profilePage.dangerSection.title')}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <Form.Root onSubmit={handleSubmit}>

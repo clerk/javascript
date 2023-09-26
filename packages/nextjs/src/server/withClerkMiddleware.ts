@@ -1,7 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { constants, debugRequestState } from '@clerk/backend';
-import type { NextMiddleware } from 'next/dist/server/web/types';
-import type { NextFetchEvent, NextRequest } from 'next/server';
+import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import {

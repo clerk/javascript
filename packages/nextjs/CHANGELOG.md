@@ -1,5 +1,37 @@
 # Change Log
 
+## 4.24.1
+
+### Patch Changes
+
+- Updated dependencies [[`40ea407ad`](https://github.com/clerkinc/javascript/commit/40ea407ad1042fee6871755f30de544200b1f0d8), [`378a903ac`](https://github.com/clerkinc/javascript/commit/378a903ac4dc12e6ee708de20f0d9a5aa758bd18), [`27b611e47`](https://github.com/clerkinc/javascript/commit/27b611e47e4f1ad86e8dff42cb02c98bdc6ff6bd), [`4d0d90238`](https://github.com/clerkinc/javascript/commit/4d0d9023895c13290d5578ece218c24348c540fc)]:
+  - @clerk/backend@0.29.2
+  - @clerk/clerk-sdk-node@4.12.7
+  - @clerk/clerk-react@4.25.1
+
+## 4.24.0
+
+### Minor Changes
+
+- Introduce the new brand-new component OrganizationList ([#1692](https://github.com/clerkinc/javascript/pull/1692)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Lists all the memberships, invitations or suggestions an active user may have
+  - Powered by our `useOrganizationList` react hook
+
+### Patch Changes
+
+- `SignInWithMetamaskButton` is now exported from the `@clerk/nextjs` package ([#1731](https://github.com/clerkinc/javascript/pull/1731)) by [@octoper](https://github.com/octoper)
+
+- Change `README` to include updated links to issue templates and update Discord link. ([#1750](https://github.com/clerkinc/javascript/pull/1750)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updates the default middleware config matcher to be more restrictive in how it detects static files. Paths with `.` in them are now allowed, as long as the `.` is not in the final path segment. ([#1695](https://github.com/clerkinc/javascript/pull/1695)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`e99df0a0d`](https://github.com/clerkinc/javascript/commit/e99df0a0de8ab91e9de4d32dfab46ad562f510d3), [`4327b91f9`](https://github.com/clerkinc/javascript/commit/4327b91f9ed65b440afaa5f76a6231aeacd3541a), [`75be1d6b3`](https://github.com/clerkinc/javascript/commit/75be1d6b3d9bf7b5d71613b3f169a942b1d25e7e), [`01b024c57`](https://github.com/clerkinc/javascript/commit/01b024c57c80ae00d83801fe90b2992111dc1a68)]:
+  - @clerk/clerk-react@4.25.0
+  - @clerk/types@3.52.0
+  - @clerk/clerk-sdk-node@4.12.6
+  - @clerk/backend@0.29.1
+
 ## 4.23.5
 
 ### Patch Changes

@@ -111,6 +111,15 @@ describe('OrganizationMembers', () => {
         lastName: 'Last2',
         createdAt: new Date('2022-01-01'),
       }),
+      createFakeMember({
+        id: '3',
+        orgId: '1',
+        role: 'admin',
+        identifier: 'test_user3',
+        firstName: 'First3',
+        lastName: 'Last3',
+        createdAt: new Date('2022-01-01'),
+      }),
     ];
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
@@ -120,17 +129,81 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(membersList));
-    const { queryByText } = render(<OrganizationMembers />, { wrapper });
-    expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
-    expect(fixtures.clerk.organization?.getPendingInvitations).not.toHaveBeenCalled();
-    expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
-    expect(queryByText('test_user1')).toBeDefined();
-    expect(queryByText('First1 Last1')).toBeDefined();
-    expect(queryByText('Admin')).toBeDefined();
-    expect(queryByText('test_user2')).toBeDefined();
-    expect(queryByText('First2 Last2')).toBeDefined();
-    expect(queryByText('Member')).toBeDefined();
+    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+      Promise.resolve({
+        data: membersList,
+        total_count: 2,
+      }),
+    );
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+      Promise.resolve({
+        data: [],
+        total_count: 2,
+      }),
+    );
+
+    const { queryByText, queryAllByRole } = render(<OrganizationMembers />, { wrapper });
+
+    await waitFor(() => {
+      expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
+      expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
+      expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
+      expect(queryByText('test_user1')).toBeInTheDocument();
+      expect(queryByText('First1 Last1')).toBeInTheDocument();
+      const buttons = queryAllByRole('button', { name: 'Admin' });
+      buttons.forEach(button => expect(button).not.toBeDisabled());
+      expect(queryByText('test_user2')).toBeInTheDocument();
+      expect(queryByText('First2 Last2')).toBeInTheDocument();
+      expect(queryByText('Member')).toBeInTheDocument();
+    });
+  });
+
+  it('Last admin cannot change to member', async () => {
+    const membersList: OrganizationMembershipResource[] = [
+      createFakeMember({
+        id: '1',
+        orgId: '1',
+        role: 'admin',
+        identifier: 'test_user1',
+        firstName: 'First1',
+        lastName: 'Last1',
+        createdAt: new Date('2022-01-01'),
+      }),
+      createFakeMember({
+        id: '2',
+        orgId: '1',
+        role: 'basic_member',
+        identifier: 'test_user2',
+        firstName: 'First2',
+        lastName: 'Last2',
+        createdAt: new Date('2022-01-01'),
+      }),
+    ];
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+      });
+    });
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+      Promise.resolve({ data: membersList, total_count: 0 }),
+    );
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+      Promise.resolve({
+        data: [],
+        total_count: 0,
+      }),
+    );
+
+    const { queryByRole } = render(<OrganizationMembers />, { wrapper });
+
+    await waitFor(() => {
+      expect(queryByRole('button', { name: 'Admin' })).toBeDisabled();
+    });
   });
 
   it('displays counter in requests tab', async () => {
@@ -185,14 +258,19 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getPendingInvitations.mockReturnValue(Promise.resolve(invitationList));
+    fixtures.clerk.organization?.getInvitations.mockReturnValue(
+      Promise.resolve({
+        data: invitationList,
+        total_count: 2,
+      }),
+    );
     const { queryByText, getByRole } = render(<OrganizationMembers />, { wrapper });
     await userEvent.click(getByRole('tab', { name: 'Invitations' }));
-    expect(fixtures.clerk.organization?.getPendingInvitations).toHaveBeenCalled();
-    expect(queryByText('admin1@clerk.dev')).toBeDefined();
-    expect(queryByText('Admin')).toBeDefined();
-    expect(queryByText('member2@clerk.dev')).toBeDefined();
-    expect(queryByText('Member')).toBeDefined();
+    expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
+    expect(queryByText('admin1@clerk.dev')).toBeInTheDocument();
+    expect(queryByText('Admin')).toBeInTheDocument();
+    expect(queryByText('member2@clerk.dev')).toBeInTheDocument();
+    expect(queryByText('Member')).toBeInTheDocument();
   });
 
   it('changes tab and renders pending requests', async () => {
@@ -261,9 +339,14 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(membersList));
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(
+      Promise.resolve({
+        data: membersList,
+        total_count: 2,
+      }),
+    );
     const { findByText } = render(<OrganizationMembers />, { wrapper });
     await waitFor(() => expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled());
-    expect(await findByText('You')).toBeDefined();
+    expect(await findByText('You')).toBeInTheDocument();
   });
 });

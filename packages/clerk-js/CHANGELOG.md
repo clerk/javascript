@@ -1,5 +1,56 @@
 # Change Log
 
+## 4.58.1
+
+### Patch Changes
+
+- Fixed a bug where the "Unverified" badge was missing on email or phone number fields when those where marked as "Primary" ([#1749](https://github.com/clerkinc/javascript/pull/1749)) by [@panteliselef](https://github.com/panteliselef)
+
+- Removing the `__clerk_referrer_primary` that was marked as deprecated. It was introduced to support the multi-domain featured, but was replaced shortly after. ([#1755](https://github.com/clerkinc/javascript/pull/1755)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`6706b154c`](https://github.com/clerkinc/javascript/commit/6706b154c0b41356c7feeb19c6340160a06466e5), [`086a2e0b7`](https://github.com/clerkinc/javascript/commit/086a2e0b7e71a9919393ca43efedbf3718ea5fe4)]:
+  - @clerk/shared@0.23.0
+
+## 4.58.0
+
+### Minor Changes
+
+- Introduce the new brand-new component OrganizationList ([#1692](https://github.com/clerkinc/javascript/pull/1692)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Lists all the memberships, invitations or suggestions an active user may have
+  - Powered by our `useOrganizationList` react hook
+
+### Patch Changes
+
+- Organization.getMemberships now supports paginated responses by passing `{paginated:true}` ([#1708](https://github.com/clerkinc/javascript/pull/1708)) by [@panteliselef](https://github.com/panteliselef)
+
+- Change `README` to include updated links to issue templates and update Discord link. ([#1750](https://github.com/clerkinc/javascript/pull/1750)) by [@LekoArts](https://github.com/LekoArts)
+
+- Add support for redirecting to "factor-one" during account transfer flow. ([#1696](https://github.com/clerkinc/javascript/pull/1696)) by [@kostaspt](https://github.com/kostaspt)
+
+- Disable role selection for the last admin in OrganizationProfile ([#1721](https://github.com/clerkinc/javascript/pull/1721)) by [@panteliselef](https://github.com/panteliselef)
+
+- This PR replaces `The verification link expired. Please resend it.` message with the localization key `formFieldError__verificationLinkExpired`. The english message was also adjust to `The verification link expired. Please request a new link.` to make the second sentence clearer. ([#1738](https://github.com/clerkinc/javascript/pull/1738)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve color contrast in Badges ([#1716](https://github.com/clerkinc/javascript/pull/1716)) by [@panteliselef](https://github.com/panteliselef)
+
+- The [issue #1557](https://github.com/clerkinc/javascript/issues/1557) uncovered that when using `@clerk/nextjs` together with `next-intl` the error `"Failed to execute 'removeChild' on 'Node'"` was thrown. ([#1726](https://github.com/clerkinc/javascript/pull/1726)) by [@LekoArts](https://github.com/LekoArts)
+
+  That error came from `@floating-ui/react` which `@clerk/clerk-js` used under the hood. Its version was upgraded from `0.19.0` to `0.25.4` to fix this error.
+
+  This error is probably not isolated to `next-intl` so if you encountered a similar error in the past, try upgrading.
+
+- Fix bug with missing or incorrect breadcrumbs in Organization and User profiles ([#1722](https://github.com/clerkinc/javascript/pull/1722)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fixes minor bug in UI of a success page ([#1725](https://github.com/clerkinc/javascript/pull/1725)) by [@panteliselef](https://github.com/panteliselef)
+
+- Improve spacing consistency OrganizationList ([#1717](https://github.com/clerkinc/javascript/pull/1717)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e6b52ae34`](https://github.com/clerkinc/javascript/commit/e6b52ae34fcfaf3266dde1334a8e95bc00624ee2), [`e99df0a0d`](https://github.com/clerkinc/javascript/commit/e99df0a0de8ab91e9de4d32dfab46ad562f510d3), [`4327b91f9`](https://github.com/clerkinc/javascript/commit/4327b91f9ed65b440afaa5f76a6231aeacd3541a), [`4e16d39f3`](https://github.com/clerkinc/javascript/commit/4e16d39f3e7a10442753d280abf1b9175784f623), [`8b9a7a360`](https://github.com/clerkinc/javascript/commit/8b9a7a36003f1b8622f444a139a811f1c35ca813), [`30bb9eccb`](https://github.com/clerkinc/javascript/commit/30bb9eccb95632fb1de02b756e818118ca6324f7), [`01b024c57`](https://github.com/clerkinc/javascript/commit/01b024c57c80ae00d83801fe90b2992111dc1a68), [`b0f396bc5`](https://github.com/clerkinc/javascript/commit/b0f396bc5c75c9920df46e26d672c37f3cc3d974)]:
+  - @clerk/localizations@1.26.0
+  - @clerk/types@3.52.0
+  - @clerk/shared@0.22.1
+
 ## 4.57.0
 
 ### Minor Changes

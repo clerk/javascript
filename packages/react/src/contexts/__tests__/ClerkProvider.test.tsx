@@ -1,17 +1,17 @@
 import {
+  csCZ,
   deDe,
   enUS,
   esES,
   frFR,
   itIT,
   jaJP,
+  koKR,
   ptBR,
   ruRU,
+  skSK,
   svSE,
   trTR,
-  csCZ,
-  koKR,
-  skSK,
   ukUA,
 } from '@clerk/localizations';
 import { dark } from '@clerk/themes';

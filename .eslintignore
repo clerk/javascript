@@ -1,8 +1,8 @@
-coverage
-node_modules
-dist
-build
-coverage
+**/coverage/**
+**/node_modules/**
+packages/*/dist/**
+**/dist/*
+**/build/*
 playground
 packages/*/examples
 .github

@@ -12,11 +12,16 @@ export class LocalStorageBroadcastChannel<E> {
   }
 
   public postMessage = (data: E): void => {
+    if (typeof window === 'undefined') {
+      // Silently do nothing
+      return;
+    }
+
     try {
-      localStorage.setItem(this.channelKey, JSON.stringify(data));
-      localStorage.removeItem(this.channelKey);
+      window.localStorage.setItem(this.channelKey, JSON.stringify(data));
+      window.localStorage.removeItem(this.channelKey);
     } catch (e) {
-      //
+      // Silently do nothing
     }
   };
 

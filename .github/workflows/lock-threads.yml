@@ -23,14 +23,39 @@ jobs:
         with:
           repo-token: ${{ secrets.CLERK_COOKIE_PAT }}
           days-before-issue-stale: 30
-          days-before-pr-stale: 45
+          days-before-pr-stale: 50
           days-before-issue-close: 10
           days-before-pr-close: 10
-          exempt-issue-labels: 'needs-triage,prioritized'
-          stale-issue-message: 'This issue is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 10 days.'
-          stale-pr-message: 'This PR is stale because it has been open 45 days with no activity. Remove stale label or comment or this will be closed in 10 days.'
-          close-issue-message: 'This issue was closed because it has been stalled for 10 days with no activity.'
-          close-pr-message: 'This PR was closed because it has been stalled for 10 days with no activity.'
+          exempt-all-assignees: true
+          exempt-issue-labels: 'needs-triage,prioritized,feature-request'
+          stale-issue-message: |
+            Hello 👋
+
+            We currently close issues after 40 days of inactivity. It's been 30 days since the last update here. If we missed this issue, please reply here. Otherwise, we'll close this issue in 10 days.
+
+            As a friendly reminder: The best way to see an issue fixed is to open a pull request. If you're not sure how to do that, please check out our [contributing guide](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
+
+            Thanks for being a part of the Clerk community! 🙏
+          stale-pr-message: |
+            Hello 👋
+
+            We currently close PRs after 60 days of inactivity. It's been 50 days since the last update here. If we missed this PR, please reply here. Otherwise, we'll close this PR in 10 days.
+
+            Thanks for being a part of the Clerk community! 🙏
+          close-issue-message: |
+            Hello again 👋
+
+            After 40 days of no activity, we'll close this issue. Keep in mind, I'm just a robot, so if I've closed this issue in error, please reply here and my human colleagues will reopen it.
+
+            As a friendly reminder: The best way to see an issue fixed is to open a pull request. If you're not sure how to do that, please check out our [contributing guide](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
+
+            Thanks for being a part of the Clerk community! 🙏
+          close-pr-message: |
+            Hello again 👋
+
+            After 60 days of no activity, we'll close this PR. Keep in mind, I'm just a robot, so if I've closed this PR in error, please reply here and my human colleagues will reopen it.
+
+            Thanks for being a part of the Clerk community! 🙏
       - uses: dessant/lock-threads@v4
         with:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}

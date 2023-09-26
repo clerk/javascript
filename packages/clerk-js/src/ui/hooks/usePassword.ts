@@ -8,8 +8,6 @@ import { localizationKeys, useLocalizations } from '../localization';
 import type { FormControlState } from '../utils';
 import { generateErrorTextUtil } from './usePasswordComplexity';
 
-export const MIN_PASSWORD_LENGTH = 8;
-
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {
   const { t, locale } = useLocalizations();
   const {

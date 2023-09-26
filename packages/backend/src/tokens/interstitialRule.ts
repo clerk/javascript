@@ -1,4 +1,4 @@
-import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
+import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../shared';
 import { checkCrossOrigin } from '../util/request';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
@@ -12,10 +12,6 @@ type InterstitialRule = <T extends AuthenticateRequestOptions>(
 
 const shouldRedirectToSatelliteUrl = (qp?: URLSearchParams) => !!qp?.get('__clerk_satellite_url');
 const hasJustSynced = (qp?: URLSearchParams) => qp?.get('__clerk_synced') === 'true';
-/**
- * @deprecated This will be removed in the next minor version
- */
-const isReturningFromPrimary = (qp?: URLSearchParams) => qp?.get('__clerk_referrer_primary') === 'true';
 
 const VALID_USER_AGENTS = /^Mozilla\/|(Amazon CloudFront)/;
 
@@ -86,20 +82,6 @@ export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: Interstitia
 
   if (isDevelopmentFromApiKey(key) && crossOriginReferrer) {
     return interstitial(options, AuthErrorReason.CrossOriginReferrer);
-  }
-  return undefined;
-};
-
-/**
- * @deprecated This will be removed in the next minor version
- */
-export const satelliteInDevReturningFromPrimary: InterstitialRule = options => {
-  const { apiKey, secretKey, isSatellite, searchParams } = options;
-
-  const key = secretKey || apiKey || '';
-
-  if (isSatellite && isReturningFromPrimary(searchParams) && isDevelopmentFromApiKey(key)) {
-    return interstitial(options, AuthErrorReason.SatelliteReturnsFromPrimary);
   }
   return undefined;
 };

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "1.25.2",
+  "version": "1.26.0",
   "license": "MIT",
   "description": "Localizations for the Clerk components",
   "keywords": [
@@ -25,10 +25,10 @@
     "dev": "tsup --watch",
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
-    "lint": "eslint ."
+    "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/types": "^3.51.0"
+    "@clerk/types": "^3.52.0"
   },
   "devDependencies": {
     "tsup": "*",

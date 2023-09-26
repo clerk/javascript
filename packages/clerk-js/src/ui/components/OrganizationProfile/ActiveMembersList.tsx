@@ -2,23 +2,27 @@ import type { MembershipRole, OrganizationMembershipResource } from '@clerk/type
 
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
-import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../elements';
+import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { handleError, roleLocalizationKey } from '../../utils';
 import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
-const ITEMS_PER_PAGE = 10;
-
 export const ActiveMembersList = () => {
   const card = useCardState();
-  const { page, changePage } = usePagination({ defaultPage: 1 });
   const {
     organization,
-    membershipList,
     membership: currentUserMembership,
+    memberships,
     ...rest
   } = useCoreOrganization({
-    membershipList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
+    memberships: true,
   });
+
+  const { memberships: adminMembers } = useCoreOrganization({
+    memberships: {
+      role: ['admin'],
+    },
+  });
+
   const isAdmin = currentUserMembership?.role === 'admin';
 
   const mutateSwrState = () => {
@@ -32,14 +36,16 @@ export const ActiveMembersList = () => {
     return null;
   }
 
-  //TODO: calculate if user is the only admin
-  const canChangeOwnAdminRole = isAdmin && organization?.membersCount > 1;
-
   const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
     if (!isAdmin) {
       return;
     }
-    return card.runAsync(membership.update({ role: newRole })).catch(err => handleError(err, [], card.setError));
+    return card
+      .runAsync(async () => {
+        await membership.update({ role: newRole });
+        await (adminMembers as any).unstable__mutate?.();
+      })
+      .catch(err => handleError(err, [], card.setError));
   };
 
   const handleRemove = (membership: OrganizationMembershipResource) => () => {
@@ -47,18 +53,22 @@ export const ActiveMembersList = () => {
       return;
     }
     return card
-      .runAsync(membership.destroy())
+      .runAsync(async () => {
+        const destroyedMembership = membership.destroy();
+        await (adminMembers as any).unstable__mutate?.();
+        return destroyedMembership;
+      })
       .then(mutateSwrState)
       .catch(err => handleError(err, [], card.setError));
   };
 
   return (
     <DataTable
-      page={page}
-      onPageChange={changePage}
-      itemCount={organization.membersCount}
-      itemsPerPage={ITEMS_PER_PAGE}
-      isLoading={!membershipList}
+      page={memberships?.page || 1}
+      onPageChange={n => memberships?.fetchPage?.(n)}
+      itemCount={memberships?.count || 0}
+      pageCount={memberships?.pageCount || 0}
+      isLoading={memberships?.isLoading}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
       headers={[
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
@@ -66,12 +76,13 @@ export const ActiveMembersList = () => {
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role'),
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
       ]}
-      rows={(membershipList || []).map(m => (
+      rows={(memberships?.data || []).map(m => (
         <MemberRow
           key={m.id}
           membership={m}
-          onRoleChange={canChangeOwnAdminRole ? handleRoleChange(m) : undefined}
+          onRoleChange={handleRoleChange(m)}
           onRemove={handleRemove(m)}
+          adminCount={adminMembers?.count || 0}
         />
       ))}
     />
@@ -81,15 +92,17 @@ export const ActiveMembersList = () => {
 const MemberRow = (props: {
   membership: OrganizationMembershipResource;
   onRemove: () => unknown;
+  adminCount: number;
   onRoleChange?: (role: MembershipRole) => unknown;
 }) => {
-  const { membership, onRemove, onRoleChange } = props;
+  const { membership, onRemove, onRoleChange, adminCount } = props;
   const card = useCardState();
   const { membership: currentUserMembership } = useCoreOrganization();
   const user = useCoreUser();
 
   const isAdmin = currentUserMembership?.role === 'admin';
   const isCurrentUser = user.id === membership.publicUserData.userId;
+  const isLastAdmin = adminCount <= 1 && membership.role === 'admin';
 
   return (
     <RowContainer>
@@ -98,14 +111,21 @@ const MemberRow = (props: {
           sx={{ maxWidth: '30ch' }}
           user={membership.publicUserData}
           subtitle={membership.publicUserData.identifier}
-          badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}
+          badge={
+            isCurrentUser && (
+              <Badge
+                textVariant={'extraSmallMedium'}
+                localizationKey={localizationKeys('badge__you')}
+              />
+            )
+          }
         />
       </Td>
       <Td>{membership.createdAt.toLocaleDateString()}</Td>
       <Td>
         {isAdmin ? (
           <RoleSelect
-            isDisabled={card.isLoading || !onRoleChange}
+            isDisabled={card.isLoading || !onRoleChange || isLastAdmin}
             value={membership.role}
             onChange={onRoleChange}
           />

@@ -53,22 +53,29 @@ type FakeDomainParams = {
   verification?: OrganizationDomainVerification | null;
   createdAt?: Date;
   affiliationEmailAddress?: string | null;
+  totalPendingInvitations?: number;
+  totalPendingSuggestions?: number;
 };
 
 export const createFakeDomain = (params: FakeDomainParams): OrganizationDomainResource => {
   return {
-    destroy: jest.fn() as any,
-    update: jest.fn() as any,
+    pathRoot: '',
     id: params.id,
     name: params.name,
-    verification: params.verification ?? null,
+    verification: params.verification || null,
     organizationId: params.organizationId,
-    enrollmentMode: params.enrollmentMode ?? 'manual_invitation',
-    prepareAffiliationVerification: jest.fn() as any,
-    attemptAffiliationVerification: jest.fn() as any,
-    createdAt: params?.createdAt || new Date(),
+    enrollmentMode: params.enrollmentMode || 'manual_invitation',
+    totalPendingInvitations: params.totalPendingInvitations || 0,
+    totalPendingSuggestions: params.totalPendingSuggestions || 0,
+    createdAt: params.createdAt || new Date(),
     updatedAt: new Date(),
-  } as any;
+    affiliationEmailAddress: params.affiliationEmailAddress || null,
+    attemptAffiliationVerification: jest.fn() as any,
+    delete: jest.fn() as any,
+    prepareAffiliationVerification: jest.fn() as any,
+    updateEnrollmentMode: jest.fn() as any,
+    reload: jest.fn() as any,
+  };
 };
 
 type FakeInvitationParams = {

@@ -1,5 +1,4 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
-import { isCrossOrigin, isRelativeUrl } from '@clerk/shared';
 import {
   addClerkPrefix,
   handleValueOrFn,
@@ -32,6 +31,7 @@ import type {
   InstanceType,
   ListenerCallback,
   OrganizationInvitationResource,
+  OrganizationListProps,
   OrganizationMembershipResource,
   OrganizationProfileProps,
   OrganizationResource,
@@ -76,7 +76,6 @@ import {
   noUserExists,
   pickRedirectionProp,
   removeClerkQueryParam,
-  replaceClerkQueryParam,
   requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
   setDevBrowserJWTInURL,
@@ -85,7 +84,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { CLERK_REFERRER_PRIMARY, CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
+import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
 import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
@@ -506,6 +505,23 @@ export default class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
+  public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationList' }).then(controls =>
+      controls.mountComponent({
+        name: 'OrganizationList',
+        appearanceKey: 'organizationList',
+        node,
+        props,
+      }),
+    );
+  };
+
+  public unmountOrganizationList = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
   public mountUserButton = (node: HTMLDivElement, props?: UserButtonProps) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted({ preloadHint: 'UserButton' }).then(controls =>
@@ -648,7 +664,7 @@ export default class Clerk implements ClerkInterface {
     const customNavigate = this.#options.navigate;
 
     if (toURL.origin !== window.location.origin || !customNavigate) {
-      windowNavigate(this.buildUrlWithAuth(toURL.href));
+      windowNavigate(toURL);
       return;
     }
 
@@ -657,18 +673,15 @@ export default class Clerk implements ClerkInterface {
   };
 
   public buildUrlWithAuth(to: string, options?: BuildUrlWithAuthParams): string {
-    if (
-      this.#instanceType === 'production' ||
-      !this.#devBrowserHandler?.usesUrlBasedSessionSync() ||
-      isRelativeUrl(to) ||
-      !isCrossOrigin(to, window.location.href)
-    ) {
+    if (this.#instanceType === 'production' || !this.#devBrowserHandler?.usesUrlBasedSessionSync()) {
       return to;
     }
 
-    // to is an absolute url but do this to keep the trailing slash
-    // (FAPI validation will throw otherwise, can remove when fixed)
-    const toURL = new URL(to, window.location.href);
+    const toURL = new URL(to, window.location.origin);
+
+    if (toURL.origin === window.location.origin) {
+      return toURL.href;
+    }
 
     const devBrowserJwt = this.#devBrowserHandler?.getDevBrowserJWT();
     if (!devBrowserJwt) {
@@ -734,12 +747,12 @@ export default class Clerk implements ClerkInterface {
       { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
       { stringify: true },
     );
-    return this.navigate(backToSatelliteUrl);
+    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl));
   };
 
   public redirectWithAuth = async (to: string): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(to);
+      return this.navigate(this.buildUrlWithAuth(to));
     }
     return;
   };
@@ -874,6 +887,11 @@ export default class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
     );
 
+    const navigateToResetPassword = makeNavigate(
+      params.resetPasswordUrl ||
+        buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
+    );
+
     const navigateAfterSignIn = makeNavigate(
       params.afterSignInUrl || params.redirectUrl || displayConfig.afterSignInUrl,
     );
@@ -915,8 +933,12 @@ export default class Clerk implements ClerkInterface {
             session: res.createdSessionId,
             beforeEmit: navigateAfterSignIn,
           });
+        case 'needs_first_factor':
+          return navigateToFactorOne();
         case 'needs_second_factor':
           return navigateToFactorTwo();
+        case 'needs_new_password':
+          return navigateToResetPassword();
         default:
           clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
@@ -926,6 +948,12 @@ export default class Clerk implements ClerkInterface {
 
     if (userHasUnverifiedEmail) {
       return navigateToFactorOne();
+    }
+
+    const userNeedsNewPassword = si.status === 'needs_new_password';
+
+    if (userNeedsNewPassword) {
+      return navigateToResetPassword();
     }
 
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
@@ -1101,6 +1129,8 @@ export default class Clerk implements ClerkInterface {
     return this.#environment;
   }
 
+  // TODO: Fix this properly
+  // eslint-disable-next-line @typescript-eslint/require-await
   __unstable__setEnvironment = async (env: EnvironmentJSON) => {
     this.#environment = new Environment(env);
 
@@ -1125,20 +1155,6 @@ export default class Clerk implements ClerkInterface {
 
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
   #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
-  /**
-   * @deprecated This will be removed in the next minor version
-   */
-  #isReturningFromPrimary = () => getClerkQueryParam(CLERK_REFERRER_PRIMARY) === 'true';
-  /**
-   * @deprecated This will be removed in the next minor version
-   */
-  #replacePrimaryReferrerWithClerkSynced = () => {
-    if (this.#options.isInterstitial) {
-      replaceClerkQueryParam(CLERK_REFERRER_PRIMARY, CLERK_SYNCED, 'true');
-    } else {
-      removeClerkQueryParam(CLERK_REFERRER_PRIMARY);
-    }
-  };
 
   #buildSyncUrlForDevelopmentInstances = (): string => {
     const searchParams = new URLSearchParams({
@@ -1163,12 +1179,6 @@ export default class Clerk implements ClerkInterface {
   };
 
   #shouldSyncWithPrimary = (): boolean => {
-    // TODO: Remove this in the minor release
-    if (this.#isReturningFromPrimary()) {
-      this.#replacePrimaryReferrerWithClerkSynced();
-      return false;
-    }
-
     if (this.#hasJustSynced()) {
       if (!this.#options.isInterstitial) {
         this.#clearJustSynced();
@@ -1492,7 +1502,8 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    await this.navigate(this.buildUrlWithAuth(redirectUrl, { useQueryParam: true }));
+    const buildUrlWithAuthParams: BuildUrlWithAuthParams = { useQueryParam: true };
+    await this.navigate(this.buildUrlWithAuth(redirectUrl, buildUrlWithAuthParams));
     return true;
   };
 }

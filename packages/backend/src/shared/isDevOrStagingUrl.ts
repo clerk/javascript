@@ -30,5 +30,6 @@ function createDevOrStagingUrlCache() {
     },
   };
 }
+
 const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 export { isDevOrStagingUrl };

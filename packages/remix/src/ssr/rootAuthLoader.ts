@@ -4,7 +4,7 @@ import { invalidRootLoaderCallbackReturn } from '../errors';
 import { authenticateRequest } from './authenticateRequest';
 import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
-  assertObject,
+  assertValidHandlerResult,
   injectAuthIntoRequest,
   injectRequestStateIntoResponse,
   interstitialJsonResponse,
@@ -15,7 +15,13 @@ import {
 
 interface RootAuthLoader {
   <Options extends RootAuthLoaderOptions, Callback extends RootAuthLoaderCallback<Options>>(
+    /**
+     * Arguments passed to the loader function.
+     */
     args: LoaderFunctionArgs,
+    /**
+     * A loader function with authentication state made available to it. Allows you to fetch route data based on the user's authentication state.
+     */
     callback: Callback,
     options?: Options,
   ): Promise<ReturnType<Callback>>;
@@ -23,6 +29,11 @@ interface RootAuthLoader {
   (args: LoaderFunctionArgs, options?: RootAuthLoaderOptions): Promise<LoaderFunctionReturn>;
 }
 
+/**
+ * Makes authorization state available in your application by wrapping the root loader.
+ *
+ * @see https://clerk.com/docs/quickstarts/remix
+ */
 export const rootAuthLoader: RootAuthLoader = async (
   args: LoaderFunctionArgs,
   handlerOrOptions: any,
@@ -51,7 +62,7 @@ export const rootAuthLoader: RootAuthLoader = async (
   }
 
   const handlerResult = await handler(injectAuthIntoRequest(args, sanitizeAuthObject(requestState.toAuth())));
-  assertObject(handlerResult, invalidRootLoaderCallbackReturn);
+  assertValidHandlerResult(handlerResult, invalidRootLoaderCallbackReturn);
 
   if (isResponse(handlerResult)) {
     try {
@@ -67,6 +78,8 @@ export const rootAuthLoader: RootAuthLoader = async (
     }
   }
 
-  // if the user returned a plain object, create an empty response and inject requestState and handlerResult
-  return injectRequestStateIntoResponse(new Response(JSON.stringify(handlerResult)), requestState);
+  // if the return value of the user's handler is null or a plain object, create an empty response to inject Clerk's state into
+  const responseBody = JSON.stringify(handlerResult ?? {});
+
+  return injectRequestStateIntoResponse(new Response(responseBody), requestState);
 };

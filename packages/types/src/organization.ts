@@ -43,8 +43,12 @@ export interface OrganizationResource extends ClerkResource {
   createdAt: Date;
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
-  getMemberships: (params?: GetMembershipsParams) => Promise<OrganizationMembershipResource[]>;
+  getMemberships: GetMemberships;
+  /**
+   * @deprecated Use `getInvitations` instead
+   */
   getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
+  getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   getMembershipRequests: (
     params?: GetMembershipRequestParams,
@@ -60,14 +64,33 @@ export interface OrganizationResource extends ClerkResource {
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
 }
 
+/**
+ * @deprecated use GetMembersParams
+ */
 export type GetMembershipsParams = {
   role?: MembershipRole[];
 } & ClerkPaginationParams;
 
+export type GetMembersParams = {
+  /**
+   * This is the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+
+  role?: MembershipRole[];
+};
+
+/**
+ * @deprecated use `getInvitations` instead
+ */
 export type GetPendingInvitationsParams = ClerkPaginationParams;
 export type GetDomainsParams = {
   /**
-   * This the starting point for your fetched results. The initial value persists between re-renders
+   * This is the starting point for your fetched results. The initial value persists between re-renders
    */
   initialPage?: number;
   /**
@@ -78,9 +101,22 @@ export type GetDomainsParams = {
   enrollmentMode?: OrganizationEnrollmentMode;
 };
 
+export type GetInvitationsParams = {
+  /**
+   * This is the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+
+  status?: OrganizationInvitationStatus[];
+};
+
 export type GetMembershipRequestParams = {
   /**
-   * This the starting point for your fetched results. The initial value persists between re-renders
+   * This is the starting point for your fetched results. The initial value persists between re-renders
    */
   initialPage?: number;
   /**
@@ -119,3 +155,13 @@ export interface UpdateOrganizationParams {
 export interface SetOrganizationLogoParams {
   file: Blob | File | string | null;
 }
+
+type MembersParams = (GetMembershipsParams | GetMembersParams) & {
+  paginated?: boolean;
+};
+
+export type GetMemberships = <T extends MembersParams>(
+  params?: T,
+) => T['paginated'] extends true
+  ? Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>
+  : Promise<OrganizationMembershipResource[]>;

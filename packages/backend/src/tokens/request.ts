@@ -1,8 +1,7 @@
 import { API_URL, API_VERSION, constants } from '../constants';
+import { isDevelopmentFromApiKey, parsePublishableKey } from '../shared';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
-import { isDevelopmentFromApiKey } from '../util/instance';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
-import { parsePublishableKey } from '../util/parsePublishableKey';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
@@ -20,7 +19,6 @@ import {
   potentialFirstRequestOnProductionEnvironment,
   potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
   runInterstitialRules,
-  satelliteInDevReturningFromPrimary,
 } from './interstitialRule';
 import type { VerifyTokenOptions } from './verify';
 
@@ -165,7 +163,6 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         crossOriginRequestWithoutHeader,
         nonBrowserRequestInDevRule,
         isSatelliteAndNeedsSyncing,
-        satelliteInDevReturningFromPrimary,
         isPrimaryInDevAndRedirectsToSatellite,
         potentialFirstRequestOnProductionEnvironment,
         potentialFirstLoadInDevWhenUATMissing,

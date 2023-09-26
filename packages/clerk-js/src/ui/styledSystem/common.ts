@@ -32,6 +32,14 @@ const textVariants = (t: InternalTheme) => {
     lineHeight: t.lineHeights.$none,
   } as const;
 
+  const extraSmallMedium = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$2xs,
+    letterSpacing: t.letterSpacings.$normal,
+    lineHeight: t.lineHeights.$shortest,
+  } as const;
+
   const regularRegular = {
     ...base,
     fontWeight: t.fontWeights.$normal,
@@ -102,6 +110,7 @@ const textVariants = (t: InternalTheme) => {
     buttonRegularRegular,
     buttonRegularMedium,
     extraSmallRegular,
+    extraSmallMedium,
     smallRegular,
     smallMedium,
     smallBold,

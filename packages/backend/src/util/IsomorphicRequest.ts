@@ -1,10 +1,14 @@
 import { parse } from 'cookie';
 
 import runtime from '../runtime';
+import { buildRequestUrl } from '../utils';
 
 type IsomorphicRequestOptions = (Request: typeof runtime.Request, Headers: typeof runtime.Headers) => Request;
 export const createIsomorphicRequest = (cb: IsomorphicRequestOptions): Request => {
-  return cb(runtime.Request, runtime.Headers);
+  const req = cb(runtime.Request, runtime.Headers);
+  // Used to fix request.url using the x-forwarded-* headers
+  const headersGeneratedURL = buildRequestUrl(req);
+  return new runtime.Request(headersGeneratedURL, req);
 };
 
 export const buildRequest = (req?: Request) => {
