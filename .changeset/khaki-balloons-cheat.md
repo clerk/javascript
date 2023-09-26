@@ -2,4 +2,4 @@
 "@clerk/backend": patch
 ---
 
-Fix incorrect cross-origin detection behind AWS CloudFront
+Respect CloudFront-Forwarded-Proto header for proto if it's present
