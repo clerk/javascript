@@ -22,6 +22,7 @@ body:
           required: true
         - label: |
             I have not already reached out to Clerk support via email or Discord (if you have, no need to open an issue here)
+          required: true
         - label: |
             This issue is not a question, general help request, or anything other than a bug report directly related to Clerk. Please ask questions in our Discord community: https://clerk.com/discord.
           required: true
