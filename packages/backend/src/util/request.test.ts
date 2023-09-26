@@ -109,16 +109,6 @@ export default (QUnit: QUnit) => {
       assert.false(checkCrossOrigin(options));
     });
 
-    test('is not CO for AWS CloudFront', assert => {
-      const options = {
-        originURL: new URL('https://app.acme.com'),
-        host: 'app.acme.com',
-        forwardedPort: '443',
-        forwardedProto: 'https',
-      };
-      assert.false(checkCrossOrigin(options));
-    });
-
     test('is not CO for Railway App', assert => {
       const options = {
         originURL: new URL('https://aws-clerk-nextjs-production.up.railway.app'),

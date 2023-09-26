@@ -134,7 +134,10 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     host: options.host || headers?.(constants.Headers.Host),
     forwardedHost: options.forwardedHost || headers?.(constants.Headers.ForwardedHost),
     forwardedPort: options.forwardedPort || headers?.(constants.Headers.ForwardedPort),
-    forwardedProto: options.forwardedProto || headers?.(constants.Headers.ForwardedProto),
+    forwardedProto:
+      options.forwardedProto ||
+      headers?.(constants.Headers.CloudFrontForwardedProto) ||
+      headers?.(constants.Headers.ForwardedProto),
     referrer: options.referrer || headers?.(constants.Headers.Referrer),
     userAgent: options.userAgent || headers?.(constants.Headers.UserAgent),
     searchParams: options.searchParams || searchParams || undefined,

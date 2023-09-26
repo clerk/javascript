@@ -25,6 +25,7 @@ const Headers = {
   Authorization: 'authorization',
   ForwardedPort: 'x-forwarded-port',
   ForwardedProto: 'x-forwarded-proto',
+  CloudFrontForwardedProto: 'cloudfront-forwarded-proto',
   ForwardedHost: 'x-forwarded-host',
   Referrer: 'referer',
   UserAgent: 'user-agent',
