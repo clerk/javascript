@@ -4,11 +4,7 @@ export const isDevelopmentEnvironment = (): boolean => {
     // eslint-disable-next-line no-empty
   } catch (err) {}
 
-  try {
-    // @ts-ignore
-    return import.meta.env.DEV || import.meta.env.MODE === 'development';
-    // eslint-disable-next-line no-empty
-  } catch (err) {}
+  // TODO: add support for import.meta.env.DEV that is being used by vite
 
   return false;
 };
