@@ -1,9 +1,12 @@
 jest.mock('./runtimeEnvironment', () => {
-  return { isDevelopmentEnvironment: jest.fn(() => true) };
+  return {
+    isTestEnvironment: jest.fn(() => false),
+    isProductionEnvironment: jest.fn(() => false),
+  };
 });
 
 import { deprecated, deprecatedProperty } from './deprecated';
-import { isDevelopmentEnvironment } from './runtimeEnvironment';
+import { isProductionEnvironment, isTestEnvironment } from './runtimeEnvironment';
 
 describe('deprecated(fnName, warning)', () => {
   let consoleWarnSpy;
@@ -130,12 +133,34 @@ describe('deprecated(fnName, warning)', () => {
     expect(consoleWarnSpy).toBeCalledTimes(1);
   });
 
-  describe('for non development environment', () => {
+  describe('for test environment', () => {
     beforeEach(() => {
-      (isDevelopmentEnvironment as jest.Mock).mockReturnValue(false);
+      (isTestEnvironment as jest.Mock).mockReturnValue(true);
     });
     afterEach(() => {
-      (isDevelopmentEnvironment as jest.Mock).mockReturnValue(true);
+      (isTestEnvironment as jest.Mock).mockReturnValue(false);
+    });
+
+    test('deprecate function does not show warning', () => {
+      const getSomeFunctionInProd = () => {
+        deprecated('getSomeFunctionInProd', 'Use `getSomeFunctionInProdElse` instead.');
+        return 'getSomeFunctionInProdValue';
+      };
+
+      expect(consoleWarnSpy).not.toBeCalled();
+      // call it twice to verify that it's never called
+      expect(getSomeFunctionInProd()).toEqual('getSomeFunctionInProdValue');
+      expect(getSomeFunctionInProd()).toEqual('getSomeFunctionInProdValue');
+      expect(consoleWarnSpy).toBeCalledTimes(0);
+    });
+  });
+
+  describe('for production environment', () => {
+    beforeEach(() => {
+      (isProductionEnvironment as jest.Mock).mockReturnValue(true);
+    });
+    afterEach(() => {
+      (isProductionEnvironment as jest.Mock).mockReturnValue(false);
     });
 
     test('deprecate function does not show warning', () => {
@@ -229,12 +254,40 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
     expect(consoleWarnSpy).toBeCalledTimes(1);
   });
 
-  describe('for non development environment', () => {
+  describe('for test environment', () => {
     beforeEach(() => {
-      (isDevelopmentEnvironment as jest.Mock).mockReturnValue(false);
+      (isTestEnvironment as jest.Mock).mockReturnValue(true);
     });
     afterEach(() => {
-      (isDevelopmentEnvironment as jest.Mock).mockReturnValue(true);
+      (isTestEnvironment as jest.Mock).mockReturnValue(false);
+    });
+
+    test('deprecate class readonly property does not show warning', () => {
+      class Example {
+        readonly someReadOnlyPropInProd: string;
+        constructor(someReadOnlyPropInProd: string) {
+          this.someReadOnlyPropInProd = someReadOnlyPropInProd;
+        }
+      }
+
+      deprecatedProperty(Example, 'someReadOnlyPropInProd', 'Use `someReadOnlyPropInProdElse` instead.');
+
+      const example = new Example('someReadOnlyPropInProd-value');
+
+      expect(consoleWarnSpy).not.toBeCalled();
+      // call it twice to verify that it's never called
+      expect(example.someReadOnlyPropInProd).toEqual('someReadOnlyPropInProd-value');
+      expect(example.someReadOnlyPropInProd).toEqual('someReadOnlyPropInProd-value');
+      expect(consoleWarnSpy).toBeCalledTimes(0);
+    });
+  });
+
+  describe('for production environment', () => {
+    beforeEach(() => {
+      (isProductionEnvironment as jest.Mock).mockReturnValue(true);
+    });
+    afterEach(() => {
+      (isProductionEnvironment as jest.Mock).mockReturnValue(false);
     });
 
     test('deprecate class readonly property does not show warning', () => {
