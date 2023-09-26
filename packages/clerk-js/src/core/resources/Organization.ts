@@ -1,9 +1,11 @@
+import { deprecated } from '@clerk/shared';
 import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
   CreateOrganizationParams,
   GetDomainsParams,
+  GetInvitationsParams,
   GetMembershipRequestParams,
   GetMemberships,
   GetPendingInvitationsParams,
@@ -12,6 +14,7 @@ import type {
   OrganizationDomainJSON,
   OrganizationDomainResource,
   OrganizationInvitationJSON,
+  OrganizationInvitationResource,
   OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationMembershipRequestJSON,
@@ -193,6 +196,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   getPendingInvitations = async (
     getPendingInvitationsParams?: GetPendingInvitationsParams,
   ): Promise<OrganizationInvitation[]> => {
+    deprecated('getPendingInvitations', 'Use the `getInvitations` method instead.');
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/invitations/pending`,
       method: 'GET',
@@ -203,6 +207,29 @@ export class Organization extends BaseResource implements OrganizationResource {
         return pendingInvitations.map(pendingInvitation => new OrganizationInvitation(pendingInvitation));
       })
       .catch(() => []);
+  };
+
+  getInvitations = async (
+    getInvitationsParams?: GetInvitationsParams,
+  ): Promise<ClerkPaginatedResponse<OrganizationInvitationResource>> => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/invitations`,
+      method: 'GET',
+      search: convertPageToOffset(getInvitationsParams) as any,
+    })
+      .then(res => {
+        const { data: requests, total_count } =
+          res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;
+
+        return {
+          total_count,
+          data: requests.map(request => new OrganizationInvitation(request)),
+        };
+      })
+      .catch(() => ({
+        total_count: 0,
+        data: [],
+      }));
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {

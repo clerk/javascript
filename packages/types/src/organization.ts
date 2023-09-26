@@ -44,7 +44,11 @@ export interface OrganizationResource extends ClerkResource {
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: GetMemberships;
+  /**
+   * @deprecated Use `getInvitations` instead
+   */
   getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
+  getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   getMembershipRequests: (
     params?: GetMembershipRequestParams,
@@ -80,6 +84,9 @@ export type GetMembersParams = {
   role?: MembershipRole[];
 };
 
+/**
+ * @deprecated use `getInvitations` instead
+ */
 export type GetPendingInvitationsParams = ClerkPaginationParams;
 export type GetDomainsParams = {
   /**
@@ -92,6 +99,19 @@ export type GetDomainsParams = {
   pageSize?: number;
 
   enrollmentMode?: OrganizationEnrollmentMode;
+};
+
+export type GetInvitationsParams = {
+  /**
+   * This is the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+
+  status?: OrganizationInvitationStatus[];
 };
 
 export type GetMembershipRequestParams = {

@@ -147,7 +147,7 @@ describe('OrganizationMembers', () => {
 
     await waitFor(() => {
       expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
-      expect(fixtures.clerk.organization?.getPendingInvitations).not.toHaveBeenCalled();
+      expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
       expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
       expect(queryByText('test_user1')).toBeInTheDocument();
       expect(queryByText('First1 Last1')).toBeInTheDocument();
@@ -258,14 +258,19 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getPendingInvitations.mockReturnValue(Promise.resolve(invitationList));
+    fixtures.clerk.organization?.getInvitations.mockReturnValue(
+      Promise.resolve({
+        data: invitationList,
+        total_count: 2,
+      }),
+    );
     const { queryByText, getByRole } = render(<OrganizationMembers />, { wrapper });
     await userEvent.click(getByRole('tab', { name: 'Invitations' }));
-    expect(fixtures.clerk.organization?.getPendingInvitations).toHaveBeenCalled();
-    expect(queryByText('admin1@clerk.dev')).toBeDefined();
-    expect(queryByText('Admin')).toBeDefined();
-    expect(queryByText('member2@clerk.dev')).toBeDefined();
-    expect(queryByText('Member')).toBeDefined();
+    expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
+    expect(queryByText('admin1@clerk.dev')).toBeInTheDocument();
+    expect(queryByText('Admin')).toBeInTheDocument();
+    expect(queryByText('member2@clerk.dev')).toBeInTheDocument();
+    expect(queryByText('Member')).toBeInTheDocument();
   });
 
   it('changes tab and renders pending requests', async () => {
@@ -342,6 +347,6 @@ describe('OrganizationMembers', () => {
     );
     const { findByText } = render(<OrganizationMembers />, { wrapper });
     await waitFor(() => expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled());
-    expect(await findByText('You')).toBeDefined();
+    expect(await findByText('You')).toBeInTheDocument();
   });
 });
