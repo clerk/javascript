@@ -22,5 +22,5 @@ export * from './runWithExponentialBackOff';
 export * from './isomorphicAtob';
 export * from './globs';
 export * from './loadScript';
-export { isDevelopmentEnvironment } from './runtimeEnvironment';
+export * from './runtimeEnvironment';
 export { deprecated, deprecatedProperty } from './deprecated';
