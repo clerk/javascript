@@ -17,13 +17,7 @@ export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResou
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(updatedItem => {
-        userSuggestions?.mutate?.(pages => populateCacheUpdateItem(updatedItem, pages), {
-          // Since `accept` gives back the updated information,
-          // we don't need to revalidate here.
-          revalidate: false,
-        });
-      })
+      .then(updatedItem => userSuggestions?.setCache?.(pages => populateCacheUpdateItem(updatedItem, pages)))
       .catch(err => handleError(err, [], card.setError));
   };
 

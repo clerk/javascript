@@ -157,7 +157,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         deletePending: deletePending.checked,
       });
 
-      await domains.mutate();
+      await domains.revalidate();
 
       await navigate('../../');
     } catch (e) {

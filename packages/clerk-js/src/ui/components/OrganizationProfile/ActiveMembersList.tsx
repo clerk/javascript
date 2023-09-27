@@ -13,13 +13,6 @@ export const ActiveMembersList = () => {
     memberships: true,
   });
 
-  const mutateSwrState = () => {
-    const unstable__mutate = (rest as any).unstable__mutate;
-    if (unstable__mutate && typeof unstable__mutate === 'function') {
-      unstable__mutate();
-    }
-  };
-
   if (!organization) {
     return null;
   }
@@ -35,9 +28,10 @@ export const ActiveMembersList = () => {
   const handleRemove = (membership: OrganizationMembershipResource) => () => {
     return card
       .runAsync(async () => {
-        return await membership.destroy();
+        const destroyedMembership = await membership.destroy();
+        await memberships?.revalidate?.();
+        return destroyedMembership;
       })
-      .then(mutateSwrState)
       .catch(err => handleError(err, [], card.setError));
   };
 

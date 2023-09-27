@@ -66,7 +66,7 @@ export const RemoveDomainPage = () => {
       successMessage={localizationKeys('organizationProfile.removeDomainPage.successMessage', {
         domain: ref.current?.name,
       })}
-      deleteResource={() => domain?.delete().then(() => domains?.mutate?.())}
+      deleteResource={() => domain?.delete().then(() => domains?.revalidate?.())}
       breadcrumbTitle={localizationKeys('organizationProfile.profilePage.domainSection.title')}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     />

@@ -60,7 +60,7 @@ const RequestRow = withCardStateProvider(
       return card
         .runAsync(async () => {
           await request.accept();
-          await membershipRequests.mutate();
+          await membershipRequests.revalidate();
         }, 'accept')
         .catch(err => handleError(err, [], onError));
     };
@@ -71,7 +71,7 @@ const RequestRow = withCardStateProvider(
       return card
         .runAsync(async () => {
           await request.reject();
-          await membershipRequests.mutate();
+          await membershipRequests.revalidate();
         }, 'reject')
         .catch(err => handleError(err, [], onError));
     };

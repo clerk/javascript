@@ -39,12 +39,7 @@ export const InvitationPreview = withCardStateProvider((props: UserOrganizationI
       })
       .then(([updatedItem, organization]) => {
         // Update cache in case another listener depends on it
-        userInvitations?.mutate?.(pages => populateCacheUpdateItem(updatedItem, pages), {
-          // Since `accept` gives back the updated information,
-          // we don't need to revalidate here.
-          revalidate: false,
-        });
-
+        void userInvitations?.setCache?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
         setAcceptedOrganization(organization);
       })
       .catch(err => handleError(err, [], card.setError));
