@@ -11,7 +11,7 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
-import { deprecated } from '../utils';
+import { deprecatedObjectProperty } from '../utils';
 import { useClerkInstanceContext, useUserContext } from './contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -211,7 +211,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     };
   }
 
-  return {
+  const result = {
     isLoaded: isClerkLoaded,
     organizationList: createOrganizationList(user.organizationMemberships),
     setActive: clerk.setActive,
@@ -220,10 +220,12 @@ export const useOrganizationList: UseOrganizationList = params => {
     userInvitations: invitations,
     userSuggestions: suggestions,
   };
+  deprecatedObjectProperty(result, 'organizationList', 'Use `userMemberships` instead.');
+
+  return result;
 };
 
 function createOrganizationList(organizationMemberships: OrganizationMembershipResource[]) {
-  deprecated('organizationList', 'Use `userMemberships` instead.');
   return organizationMemberships.map(organizationMembership => ({
     membership: organizationMembership,
     organization: organizationMembership.organization,
