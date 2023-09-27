@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
@@ -630,3 +631,12 @@ export const deDE: LocalizationResource = {
     numeric: "{{ date | numeric('de-DE') }}",
   },
 } as const;
+
+// This is a temporary solution to show the warning upon using an exported object
+// that will be removed in next major version.
+export const deDe = new Proxy(deDE, {
+  get(target, prop, receiver) {
+    deprecated('deDe', 'Use `deDE` instead.');
+    return Reflect.get(target, prop, receiver);
+  },
+});
