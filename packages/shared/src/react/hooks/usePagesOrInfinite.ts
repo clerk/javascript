@@ -2,9 +2,8 @@
 
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { useSWR, useSWRInfinite } from '../clerk-swr';
-import type { ValueOrSetter } from '../types';
-import type { PaginatedResources } from '../types';
+import { useSWR, useSWRInfinite } from './clerk-swr';
+import type { CacheSetter, PaginatedResources, ValueOrSetter } from './types';
 
 function getDifferentKeys(obj1: Record<string, unknown>, obj2: Record<string, unknown>): Record<string, unknown> {
   const keysSet = new Set(Object.keys(obj2));
@@ -207,7 +206,17 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
   const hasNextPage = count - offsetCount * pageSizeRef.current > page * pageSizeRef.current;
   const hasPreviousPage = (page - 1) * pageSizeRef.current > offsetCount * pageSizeRef.current;
 
-  const mutate = triggerInfinite ? swrInfiniteMutate : swrMutate;
+  const setCache: CacheSetter = triggerInfinite
+    ? value =>
+        swrInfiniteMutate(value, {
+          revalidate: false,
+        })
+    : value =>
+        swrMutate(value, {
+          revalidate: false,
+        });
+
+  const revalidate = triggerInfinite ? () => swrInfiniteMutate() : () => swrMutate();
 
   return {
     data,
@@ -223,6 +232,8 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     hasNextPage,
     hasPreviousPage,
     // Let the hook return type define this type
-    mutate: mutate as any,
+    revalidate: revalidate as any,
+    // Let the hook return type define this type
+    setCache: setCache as any,
   };
 };

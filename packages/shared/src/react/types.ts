@@ -1,6 +1,9 @@
-import type { KeyedMutator } from './clerk-swr';
-
 export type ValueOrSetter<T = unknown> = (size: T | ((_size: T) => T)) => void;
+
+export type CacheSetter<CData = any> = (
+  data?: CData | ((currentData?: CData) => Promise<undefined | CData> | undefined | CData),
+) => Promise<CData | undefined>;
+
 export type PaginatedResources<T = unknown, Infinite = false, ArrayOrPaginated = unknown> = {
   data: T[];
   count: number;
@@ -14,11 +17,12 @@ export type PaginatedResources<T = unknown, Infinite = false, ArrayOrPaginated =
   fetchNext: () => void;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
-  mutate: Infinite extends true
+  revalidate: () => Promise<void>;
+  setCache: Infinite extends true
     ? // Array of pages of data
-      KeyedMutator<(ArrayOrPaginated | undefined)[]>
+      CacheSetter<(ArrayOrPaginated | undefined)[]>
     : // Array of data
-      KeyedMutator<ArrayOrPaginated | undefined>;
+      CacheSetter<ArrayOrPaginated | undefined>;
 };
 
 // Utility type to convert PaginatedDataAPI to properties as undefined, except booleans set to false
