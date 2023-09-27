@@ -28,6 +28,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
+    "@clerk/shared": "^0.23.1",
     "@clerk/types": "^3.52.1"
   },
   "devDependencies": {
