@@ -26,6 +26,10 @@
   "files": [
     "dist"
   ],
+  "sideEffects": [
+    "./dist/**/index.js",
+    "./dist/**/polyfills.js"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
