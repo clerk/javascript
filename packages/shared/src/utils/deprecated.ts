@@ -1,4 +1,4 @@
-import { isDevelopmentEnvironment } from './runtimeEnvironment';
+import { isProductionEnvironment, isTestEnvironment } from './runtimeEnvironment';
 /**
  * Mark class methods or functions as deprecated.
  *
@@ -22,8 +22,9 @@ import { isDevelopmentEnvironment } from './runtimeEnvironment';
  */
 const displayedWarnings = new Set<string>();
 export const deprecated = (fnName: string, warning: string, key?: string): void => {
+  const hideWarning = isTestEnvironment() || isProductionEnvironment();
   const messageId = key ?? fnName;
-  if (displayedWarnings.has(messageId) || !isDevelopmentEnvironment()) {
+  if (displayedWarnings.has(messageId) || hideWarning) {
     return;
   }
   displayedWarnings.add(messageId);
