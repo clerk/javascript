@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import type { Attribute, Web3Provider } from '@clerk/types';
 
 import type { LocalizationKey } from '../localization/localizationKeys';
@@ -102,6 +103,7 @@ export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | unde
  * @deprecated In favor of iconImageUrl
  */
 export function svgUrl(id: string): string {
+  deprecated('svgUrl', 'Use `iconImageUrl` instead');
   return `https://images.clerk.com/static/${id}.svg`;
 }
 

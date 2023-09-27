@@ -1,4 +1,4 @@
-import { titleize } from '@clerk/shared';
+import { deprecatedProperty, titleize } from '@clerk/shared';
 import type {
   ExternalAccountJSON,
   ExternalAccountResource,
@@ -84,3 +84,5 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     return this.username || this.emailAddress || this.label;
   }
 }
+
+deprecatedProperty(ExternalAccount, 'avatarUrl', 'Use `imageUrl` instead.');
