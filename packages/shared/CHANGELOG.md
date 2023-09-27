@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.23.1
+
+### Patch Changes
+
+- Introduce `invitations` in useOrganization, which enables to fetch invitations as paginated lists. ([#1766](https://github.com/clerkinc/javascript/pull/1766)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecate `invitationList` in favor of the above introduction.
+
+- Safer usage of `localStorage` by checking if `window` is available in current environment ([#1774](https://github.com/clerkinc/javascript/pull/1774)) by [@LekoArts](https://github.com/LekoArts)
+
+- Fix SyntaxError on non-module imports by dropping support for import.meta (used in vite) ([#1782](https://github.com/clerkinc/javascript/pull/1782)) by [@dimkl](https://github.com/dimkl)
+
+- `deprecated()` & `deprecatedProperty` warnings will be hidden in test/production ([#1784](https://github.com/clerkinc/javascript/pull/1784)) by [@dimkl](https://github.com/dimkl)
+
+  environments and when there is no NODE_ENV environment variable defined.
+
 ## 0.23.0
 
 ### Minor Changes
