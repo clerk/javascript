@@ -11,6 +11,7 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
+import { deprecated } from '../utils';
 import { useClerkInstanceContext, useUserContext } from './contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -222,6 +223,7 @@ export const useOrganizationList: UseOrganizationList = params => {
 };
 
 function createOrganizationList(organizationMemberships: OrganizationMembershipResource[]) {
+  deprecated('organizationList', 'Use `userMemberships` instead.');
   return organizationMemberships.map(organizationMembership => ({
     membership: organizationMembership,
     organization: organizationMembership.organization,
