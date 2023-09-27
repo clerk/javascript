@@ -23,6 +23,6 @@ export * from './isomorphicAtob';
 export * from './globs';
 export * from './loadScript';
 export * from './runtimeEnvironment';
-export { deprecated, deprecatedProperty } from './deprecated';
+export { deprecated, deprecatedProperty, deprecatedObjectProperty } from './deprecated';
 export { callWithRetry } from './callWithRetry';
 export { isDevelopmentFromApiKey, isProductionFromApiKey, isStaging } from './instance';

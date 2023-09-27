@@ -5,7 +5,7 @@ jest.mock('./runtimeEnvironment', () => {
   };
 });
 
-import { deprecated, deprecatedProperty } from './deprecated';
+import { deprecated, deprecatedObjectProperty, deprecatedProperty } from './deprecated';
 import { isProductionEnvironment, isTestEnvironment } from './runtimeEnvironment';
 
 describe('deprecated(fnName, warning)', () => {
@@ -306,6 +306,77 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
       // call it twice to verify that it's never called
       expect(example.someReadOnlyPropInProd).toEqual('someReadOnlyPropInProd-value');
       expect(example.someReadOnlyPropInProd).toEqual('someReadOnlyPropInProd-value');
+      expect(consoleWarnSpy).toBeCalledTimes(0);
+    });
+  });
+});
+
+describe('deprecatedObjectProperty(obj, propName, warning)', () => {
+  let consoleWarnSpy;
+
+  beforeEach(() => {
+    consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation();
+  });
+  afterEach(() => {
+    consoleWarnSpy.mockRestore();
+  });
+
+  test('deprecate object property shows warning', () => {
+    const example = { objectProperty: 'objectProperty-value' };
+
+    deprecatedObjectProperty(example, 'objectProperty', 'Use `objectPropertyElse` instead.');
+
+    expect(consoleWarnSpy).not.toBeCalled();
+    expect(example.objectProperty).toEqual('objectProperty-value');
+    expect(consoleWarnSpy).toBeCalledTimes(1);
+    expect(consoleWarnSpy).toBeCalledWith(
+      'DEPRECATION WARNING: "objectProperty" is deprecated and will be removed in the next major release.\nUse `objectPropertyElse` instead.',
+    );
+
+    expect(example.objectProperty).toEqual('objectProperty-value');
+    expect(consoleWarnSpy).toBeCalledTimes(1);
+  });
+
+  describe('for test environment', () => {
+    beforeEach(() => {
+      (isTestEnvironment as jest.Mock).mockReturnValue(true);
+    });
+    afterEach(() => {
+      (isTestEnvironment as jest.Mock).mockReturnValue(false);
+    });
+
+    test('deprecate object property does not show warning', () => {
+      const example = { objectPropertyInTest: 'objectPropertyInTest-value' };
+
+      deprecatedObjectProperty(example, 'objectPropertyInTest', 'Use `objectPropertyInTestElse` instead.');
+
+      expect(consoleWarnSpy).not.toBeCalled();
+      expect(example.objectPropertyInTest).toEqual('objectPropertyInTest-value');
+      // call it twice to verify that it's never called
+      expect(example.objectPropertyInTest).toEqual('objectPropertyInTest-value');
+      expect(example.objectPropertyInTest).toEqual('objectPropertyInTest-value');
+      expect(consoleWarnSpy).toBeCalledTimes(0);
+    });
+  });
+
+  describe('for production environment', () => {
+    beforeEach(() => {
+      (isProductionEnvironment as jest.Mock).mockReturnValue(true);
+    });
+    afterEach(() => {
+      (isProductionEnvironment as jest.Mock).mockReturnValue(false);
+    });
+
+    test('deprecate object property does not show warning', () => {
+      const example = { objectPropertyInProd: 'objectPropertyInProd-value' };
+
+      deprecatedObjectProperty(example, 'objectPropertyInProd', 'Use `objectPropertyInProdElse` instead.');
+
+      expect(consoleWarnSpy).not.toBeCalled();
+      expect(example.objectPropertyInProd).toEqual('objectPropertyInProd-value');
+      // call it twice to verify that it's never called
+      expect(example.objectPropertyInProd).toEqual('objectPropertyInProd-value');
+      expect(example.objectPropertyInProd).toEqual('objectPropertyInProd-value');
       expect(consoleWarnSpy).toBeCalledTimes(0);
     });
   });

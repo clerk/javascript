@@ -1,5 +1,6 @@
 import type { CreateOrganizationParams, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
 
+import { deprecated } from '../utils';
 import { useClerkInstanceContext } from './contexts';
 
 type UseOrganizationsReturn =
@@ -51,6 +52,7 @@ type UseOrganizations = () => UseOrganizationsReturn;
  * @deprecated Use useOrganizationList, useOrganization, or useClerk instead
  */
 export const useOrganizations: UseOrganizations = () => {
+  deprecated('useOrganizations', 'Use useOrganizationList, useOrganization, or useClerk instead.');
   const clerk = useClerkInstanceContext();
   if (!clerk.loaded) {
     return {
