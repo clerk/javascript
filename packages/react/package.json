@@ -27,8 +27,10 @@
     "dist"
   ],
   "sideEffects": [
-    "./dist/**/index.js",
-    "./dist/**/polyfills.js"
+    "./dist/cjs/index.js",
+    "./dist/cjs/polyfills.js",
+    "./dist/esm/index.js",
+    "./dist/esm/polyfills.js"
   ],
   "scripts": {
     "build": "tsup",
