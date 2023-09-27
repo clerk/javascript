@@ -24,6 +24,7 @@ import type {
   UpdateMembershipParams,
   UpdateOrganizationParams,
 } from '@clerk/types';
+import type { GetMembershipsParams } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertPageToOffset } from '../../utils/pagesToOffset';
@@ -166,6 +167,18 @@ export class Organization extends BaseResource implements OrganizationResource {
 
   getMemberships: GetMemberships = async getMembershipsParams => {
     const isDeprecatedParams = typeof getMembershipsParams === 'undefined' || !getMembershipsParams?.paginated;
+
+    if (!(getMembershipsParams as GetMembershipsParams)?.limit) {
+      deprecated(
+        'limit',
+        'Use `pageSize` instead in Organization.getMemberships.',
+        'organization:getMemberships:limit',
+      );
+    }
+    if (!(getMembershipsParams as GetMembershipsParams)?.offset) {
+      deprecated('offset', 'Use `initialPage` instead in Organization.limit.', 'organization:getMemberships:offset');
+    }
+
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/memberships`,
       method: 'GET',
