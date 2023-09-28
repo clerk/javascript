@@ -28,7 +28,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/types": "^3.52.1"
+    "@clerk/types": "3.52.1"
   },
   "devDependencies": {
     "tsup": "*",
