@@ -80,7 +80,7 @@ export const PasswordPage = withCardStateProvider(() => {
     defaultChecked: true,
   });
 
-  const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
+  const { setConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
     passwordField,
     confirmPasswordField: confirmField,
   });
@@ -94,7 +94,7 @@ export const PasswordPage = withCardStateProvider(() => {
 
   const validateForm = () => {
     if (passwordField.value) {
-      displayConfirmPasswordFeedback(confirmField.value);
+      setConfirmPasswordFeedback(confirmField.value);
     }
   };
 
@@ -165,7 +165,9 @@ export const PasswordPage = withCardStateProvider(() => {
             <Form.Control
               {...confirmField.props}
               onChange={e => {
-                displayConfirmPasswordFeedback(e.target.value);
+                if (e.target.value) {
+                  setConfirmPasswordFeedback(e.target.value);
+                }
                 return confirmField.props.onChange(e);
               }}
               isDisabled={passwordEditDisabled}

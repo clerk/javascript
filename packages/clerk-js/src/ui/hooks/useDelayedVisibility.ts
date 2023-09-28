@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
  * Immediate change for in-between changes
  */
 export function useDelayedVisibility<T>(valueToDelay: T, delayInMs: number) {
-  const [isVisible, setVisible] = useState<T | undefined>();
+  const [isVisible, setVisible] = useState<T | undefined>(undefined);
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -23,6 +23,7 @@ export function useDelayedVisibility<T>(valueToDelay: T, delayInMs: number) {
     }
     return () => clearTimeout(timeoutId);
   }, [valueToDelay, delayInMs, isVisible]);
+
   return isVisible;
 }
 

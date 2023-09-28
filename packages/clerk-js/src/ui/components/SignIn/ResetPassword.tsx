@@ -52,7 +52,7 @@ export const _ResetPassword = () => {
     defaultChecked: true,
   });
 
-  const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
+  const { setConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
     passwordField,
     confirmPasswordField: confirmField,
   });
@@ -61,7 +61,7 @@ export const _ResetPassword = () => {
 
   const validateForm = () => {
     if (passwordField.value) {
-      displayConfirmPasswordFeedback(confirmField.value);
+      setConfirmPasswordFeedback(confirmField.value);
     }
   };
 
@@ -127,7 +127,9 @@ export const _ResetPassword = () => {
             <Form.Control
               {...confirmField.props}
               onChange={e => {
-                displayConfirmPasswordFeedback(e.target.value);
+                if (e.target.value) {
+                  setConfirmPasswordFeedback(e.target.value);
+                }
                 return confirmField.props.onChange(e);
               }}
             />

@@ -92,7 +92,7 @@ export const useConfirmPassword = ({
     [checkPasswordMatch, confirmPasswordField.value],
   );
 
-  const displayConfirmPasswordFeedback = useCallback(
+  const setConfirmPasswordFeedback = useCallback(
     (password: string) => {
       if (checkPasswordMatch(password)) {
         confirmPasswordField.setSuccess(t(localizationKeys('formFieldError__matchingPasswords')));
@@ -104,7 +104,7 @@ export const useConfirmPassword = ({
   );
 
   return {
-    displayConfirmPasswordFeedback,
+    setConfirmPasswordFeedback,
     isPasswordMatch,
   };
 };

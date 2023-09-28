@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRef } from 'react';
 import React, { forwardRef } from 'react';
 
+import { DEBOUNCE_MS } from '../../core/constants';
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Input, localizationKeys, useLocalizations } from '../customizables';
 import { usePassword } from '../hooks/usePassword';
@@ -15,8 +16,6 @@ import { IconButton } from './IconButton';
 type PasswordInputProps = PropsOfComponent<typeof Input> & {
   validatePassword?: boolean;
 };
-
-const DEBOUNCE_MS = 350;
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
   const [hidden, setHidden] = React.useState(true);

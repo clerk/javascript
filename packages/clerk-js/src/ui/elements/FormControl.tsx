@@ -1,7 +1,7 @@
 import type { FieldId } from '@clerk/types';
 import type { ClerkAPIError } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
@@ -52,6 +52,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   feedback: string;
   feedbackType: FeedbackType;
   setHasPassedComplexity: (b: boolean) => void;
+  clearFeedback: () => void;
   hasPassedComplexity: boolean;
   infoText?: string | LocalizationKey;
   radioOptions?: {
@@ -94,16 +95,20 @@ function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const getFormTextAnimation = useCallback(
-    (enterAnimation: boolean): ThemableCssProp => {
+    (enterAnimation: boolean, options?: { inDelay?: boolean }): ThemableCssProp => {
       if (prefersReducedMotion) {
         return {
           animation: 'none',
         };
       }
       return t => ({
-        animation: `${enterAnimation ? animations.inAnimation : animations.outAnimation} ${
-          t.transitionDuration.$textField
-        } ${t.transitionTiming.$common}`,
+        animation: `${
+          enterAnimation
+            ? options?.inDelay
+              ? animations.inDelayAnimation
+              : animations.inAnimation
+            : animations.outAnimation
+        } ${t.transitionDuration.$textField} ${t.transitionTiming.$common}`,
         transition: `height ${t.transitionDuration.$slow} ${t.transitionTiming.$common}`, // This is expensive but required for a smooth layout shift
       });
     },
@@ -121,7 +126,8 @@ const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) => {
   const calculateHeight = useCallback(
     (element: HTMLElement | null) => {
       if (element) {
-        setHeight(element.scrollHeight);
+        const computedStyles = getComputedStyle(element);
+        setHeight(element.scrollHeight + parseInt(computedStyles.marginTop.replace('px', '')));
       }
     },
     [feedback],
@@ -143,17 +149,10 @@ type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debo
 
 export const FormFeedback = (props: FormFeedbackProps) => {
   const { id, elementDescriptors, feedback, feedbackType = 'info' } = props;
-  const [feedbacks, setFeedbacks] = useState<{
+  const feedbacksRef = useRef<{
     a?: Feedback;
     b?: Feedback;
   }>({ a: { feedback, feedbackType, shouldEnter: true }, b: undefined });
-  const { calculateHeight: calculateHeightA, height: heightA } = useCalculateErrorTextHeight({
-    feedback: feedbacks.a?.feedback || '',
-  });
-  const { calculateHeight: calculateHeightB, height: heightB } = useCalculateErrorTextHeight({
-    feedback: feedbacks.b?.feedback || '',
-  });
-  const [heightMax, setHeightMax] = useState(Math.max(heightA, heightB));
 
   const { getFormTextAnimation } = useFormTextAnimation();
   const defaultElementDescriptors = {
@@ -163,32 +162,47 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     success: descriptors.formFieldSuccessText,
   };
 
-  useEffect(() => {
-    setFeedbacks(oldFeedbacks => {
-      if (oldFeedbacks.a?.shouldEnter) {
-        return {
-          a: { ...oldFeedbacks.a, shouldEnter: false },
-          b: {
-            feedback,
-            feedbackType,
-            shouldEnter: true,
-          },
-        };
-      } else {
-        return {
-          a: {
-            feedback,
-            feedbackType,
-            shouldEnter: true,
-          },
-          b: { ...oldFeedbacks.b, shouldEnter: false },
-        };
-      }
-    });
+  const feedbacks = useMemo(() => {
+    const oldFeedbacks = feedbacksRef.current;
+    let result: {
+      a?: Feedback;
+      b?: Feedback;
+    };
+    if (oldFeedbacks.a?.shouldEnter) {
+      result = {
+        a: { ...oldFeedbacks.a, shouldEnter: false },
+        b: {
+          feedback,
+          feedbackType,
+          shouldEnter: true,
+        },
+      };
+    } else {
+      result = {
+        a: {
+          feedback,
+          feedbackType,
+          shouldEnter: true,
+        },
+        b: { ...oldFeedbacks.b, shouldEnter: false },
+      };
+    }
+    feedbacksRef.current = result;
+    return result;
   }, [feedback, feedbackType]);
 
-  useEffect(() => {
-    setHeightMax(h => Math.max(heightA, heightB, h));
+  const { calculateHeight: calculateHeightA, height: heightA } = useCalculateErrorTextHeight({
+    feedback: feedbacks.a?.feedback || '',
+  });
+  const { calculateHeight: calculateHeightB, height: heightB } = useCalculateErrorTextHeight({
+    feedback: feedbacks.b?.feedback || '',
+  });
+  const maxHeightRef = useRef(Math.max(heightA, heightB));
+
+  const maxHeight = useMemo(() => {
+    const max = Math.max(heightA, heightB, maxHeightRef.current);
+    maxHeightRef.current = max;
+    return max;
   }, [heightA, heightB]);
 
   const getElementProps = (type: FormFeedbackDescriptorsKeys) => {
@@ -215,35 +229,33 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   return (
     <Box
       style={{
-        height: feedback ? heightMax : 0, // dynamic height
+        height: feedback ? maxHeight : 0, // dynamic height
         position: 'relative',
       }}
       sx={[getFormTextAnimation(!!feedback)]}
     >
-      <Box>
-        <InfoComponentA
-          {...(feedbacks.a?.feedbackType ? getElementProps(feedbacks.a.feedbackType) : {})}
-          ref={calculateHeightA}
-          sx={[
-            () => ({
-              visibility: feedbacks.a?.shouldEnter ? 'visible' : 'hidden',
-            }),
-            getFormTextAnimation(!!feedbacks.a?.shouldEnter),
-          ]}
-          localizationKey={feedbacks.a?.feedback}
-        />
-        <InfoComponentB
-          {...(feedbacks.b?.feedbackType ? getElementProps(feedbacks.b.feedbackType) : {})}
-          ref={calculateHeightB}
-          sx={[
-            () => ({
-              visibility: feedbacks.b?.shouldEnter ? 'visible' : 'hidden',
-            }),
-            getFormTextAnimation(!!feedbacks.b?.shouldEnter),
-          ]}
-          localizationKey={feedbacks.b?.feedback}
-        />
-      </Box>
+      <InfoComponentA
+        {...(feedbacks.a?.feedbackType ? getElementProps(feedbacks.a.feedbackType) : {})}
+        ref={calculateHeightA}
+        sx={[
+          () => ({
+            visibility: feedbacks.a?.shouldEnter ? 'visible' : 'hidden',
+          }),
+          getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
+        ]}
+        localizationKey={feedbacks.a?.feedback}
+      />
+      <InfoComponentB
+        {...(feedbacks.b?.feedbackType ? getElementProps(feedbacks.b.feedbackType) : {})}
+        ref={calculateHeightB}
+        sx={[
+          () => ({
+            visibility: feedbacks.b?.shouldEnter ? 'visible' : 'hidden',
+          }),
+          getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
+        ]}
+        localizationKey={feedbacks.b?.feedback}
+      />
     </Box>
   );
 };
@@ -255,6 +267,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
   const {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     hasPassedComplexity,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     infoText,
     id,
     isRequired,
@@ -272,6 +285,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     setWarning,
     setInfo,
     setHasPassedComplexity,
+    clearFeedback,
     radioOptions,
     groupPreffix,
     groupSuffix,
@@ -395,11 +409,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       }}
       onBlur={e => {
         inputElementProps.onBlur?.(e);
-        // set a timeout because new errors might appear
-        // and we don't want to spam layout shifts
-        setTimeout(() => {
-          setIsFocused(false);
-        }, 500);
+        setIsFocused(false);
       }}
       ref={ref}
       placeholder={t(placeholder)}
@@ -419,6 +429,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       setWarning={setWarning}
       setInfo={setInfo}
       setHasPassedComplexity={setHasPassedComplexity}
+      clearFeedback={clearFeedback}
       sx={sx}
     >
       {isCheckbox ? (

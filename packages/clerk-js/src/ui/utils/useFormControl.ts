@@ -2,7 +2,8 @@ import type { ClerkAPIError } from '@clerk/types';
 import type { HTMLInputTypeAttribute } from 'react';
 import { useState } from 'react';
 
-import { useSetTimeout } from '../hooks';
+import { DEBOUNCE_MS } from '../../core/constants';
+import { useDebounce } from '../hooks';
 import type { LocalizationKey } from '../localization';
 import { useLocalizations } from '../localization';
 
@@ -55,6 +56,7 @@ type FieldStateProps<Id> = {
   setSuccess: (message: string) => void;
   setInfo: (info: string) => void;
   setHasPassedComplexity: (b: boolean) => void;
+  clearFeedback: () => void;
   hasPassedComplexity: boolean;
 } & Omit<Options, 'defaultChecked'>;
 
@@ -64,6 +66,7 @@ export type FormControlState<Id = string> = FieldStateProps<Id> & {
   setInfo: (info: string) => void;
   setValue: (val: string | undefined) => void;
   setChecked: (isChecked: boolean) => void;
+  clearFeedback: () => void;
   props: FieldStateProps<Id>;
 };
 
@@ -120,8 +123,12 @@ export const useFormControl = <Id extends string>(
 
   const setInfo: FormControlState['setInfo'] = info => {
     if (info) {
-      setFeedback({ message: translateError(info), type: 'info' });
+      setFeedback({ message: info, type: 'info' });
     }
+  };
+
+  const clearFeedback: FormControlState['clearFeedback'] = () => {
+    setFeedback({ message: '', type: 'info' });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -139,6 +146,7 @@ export const useFormControl = <Id extends string>(
     feedback: feedback.message || t(opts.infoText),
     feedbackType: feedback.type,
     setInfo,
+    clearFeedback,
     hasPassedComplexity,
     setHasPassedComplexity,
     validatePassword: opts.type === 'password' ? opts.validatePassword : undefined,
@@ -174,9 +182,11 @@ type DebouncingOption = {
 export const useFormControlFeedback = (opts?: DebouncingOption): DebouncedFeedback => {
   const { feedback = '', delayInMs = 100, feedbackType = 'info', isFocused = false } = opts || {};
 
-  const shouldHide = isFocused ? false : ['info', 'warning'].includes(feedbackType);
+  const debouncedFocused = useDebounce(isFocused, DEBOUNCE_MS);
 
-  const debouncedState = useSetTimeout(
+  const shouldHide = debouncedFocused ? false : ['info', 'warning'].includes(feedbackType);
+
+  const debouncedState = useDebounce(
     { feedback: shouldHide ? '' : feedback, feedbackType: shouldHide ? 'info' : feedbackType },
     delayInMs,
   );

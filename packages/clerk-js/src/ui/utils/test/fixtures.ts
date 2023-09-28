@@ -4,6 +4,7 @@ import type {
   DisplayConfigJSON,
   EnvironmentJSON,
   OrganizationSettingsJSON,
+  PasswordSettingsData,
   UserJSON,
   UserSettingsJSON,
 } from '@clerk/types';
@@ -154,6 +155,19 @@ const createBaseUserSettings = (): UserSettingsJSON => {
     socials.map(social => [social, { enabled: false, required: false, authenticatable: false, strategy: social }]),
   ) as any as UserSettingsJSON['social'];
 
+  const passwordSettingsConfig = {
+    allowed_special_characters: '',
+    max_length: 0,
+    min_length: 8,
+    require_special_char: false,
+    require_numbers: false,
+    require_lowercase: false,
+    require_uppercase: false,
+    disable_hibp: true,
+    show_zxcvbn: false,
+    min_zxcvbn_strength: 0,
+  } as UserSettingsJSON['password_settings'];
+
   return {
     attributes: { ...attributeConfig },
     actions: { delete_self: false, create_organization: false },
@@ -177,6 +191,7 @@ const createBaseUserSettings = (): UserSettingsJSON => {
         enabled: false,
       },
     },
+    password_settings: passwordSettingsConfig,
   };
 };
 
