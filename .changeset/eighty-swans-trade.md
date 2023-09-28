@@ -2,7 +2,7 @@
 '@clerk/shared': patch
 ---
 
-Apply deprecation warnings:
+Apply deprecation warnings for `@clerk/shared`:
 - `OrganizationContext`
 - `organizationList`
 - `useOrganizations`

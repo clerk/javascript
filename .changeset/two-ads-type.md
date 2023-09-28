@@ -2,7 +2,7 @@
 "@clerk/backend": patch
 ---
 
-Apply deprecation warnings backend package for:
+Apply deprecation warnings for `@clerk/backend`:
 -  backend api return format
 - `clockSkewInSeconds`
 - `pkgVersion`
