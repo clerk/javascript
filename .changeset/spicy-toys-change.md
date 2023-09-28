@@ -2,4 +2,9 @@
 '@clerk/nextjs': patch
 ---
 
-Warn about deprecations that will be dropped in next major version
+Apply deprecation warnings for `@clerk/nextjs`:
+- `CLERK_JS_VERSION` environment variable
+- `CLERK_API_KEY` environment variable
+- `NEXT_PUBLIC_CLERK_FRONTEND_API` environment variable
+- `withClerkMiddleware`
+- `withServerSideAuth`

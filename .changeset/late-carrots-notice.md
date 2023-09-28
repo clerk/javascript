@@ -1,5 +1,5 @@
 ---
 '@clerk/clerk-react': patch
 ---
-
-Warn about `setSession` deprecation.
+Apply deprecation warnings for `@clerk/clerk-react`:
+- `setSession`
