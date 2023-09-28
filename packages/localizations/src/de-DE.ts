@@ -476,6 +476,13 @@ export const deDE: LocalizationResource = {
       actionLabel__download: 'Laden Sie .txt herunter',
       actionLabel__print: 'Drucken',
     },
+    deletePage: {
+      title: 'Konto löschen',
+      messageLine1: 'Sind Sie sich sicher, dass Sie ihr Konto löschen möchten?',
+      messageLine2: 'Dieser Vorgang ist dauerhaft und kann nicht rückgängig gemacht werden.',
+      actionDescription: 'Geben Sie "Konto löschen" ein, um fortzufahren.',
+      confirm: 'Konto löschen',
+    },
   },
   userButton: {
     action__manageAccount: 'Konto verwalten',
