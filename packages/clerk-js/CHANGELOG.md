@@ -1,5 +1,24 @@
 # Change Log
 
+## 4.58.2
+
+### Patch Changes
+
+- Safer usage of `localStorage` by checking if `window` is available in current environment ([#1774](https://github.com/clerkinc/javascript/pull/1774)) by [@LekoArts](https://github.com/LekoArts)
+
+- Some minor TypeScript type fixes to internal components. Also applying some ESLint recommendations. ([#1756](https://github.com/clerkinc/javascript/pull/1756)) by [@LekoArts](https://github.com/LekoArts)
+
+- Introduces a new method for fetching organization invitations called `Organization.getInvitations`. ([#1766](https://github.com/clerkinc/javascript/pull/1766)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecate `Organization.getPendingInvitations`
+
+- Adds the ability to force users to reset their password. ([#1757](https://github.com/clerkinc/javascript/pull/1757)) by [@kostaspt](https://github.com/kostaspt)
+
+- Updated dependencies [[`07ede0f95`](https://github.com/clerkinc/javascript/commit/07ede0f959f232f6cbecb596eb9352f8cb382cdc), [`0eb666118`](https://github.com/clerkinc/javascript/commit/0eb66611882e6c460cc6a6c5cfa1d9b086ec6917), [`3b85311c9`](https://github.com/clerkinc/javascript/commit/3b85311c9eb006f51a8642f193473a250de879fc), [`ffcc78c06`](https://github.com/clerkinc/javascript/commit/ffcc78c062d067738f617ea9b491c1d45677148c), [`c61ddf5bf`](https://github.com/clerkinc/javascript/commit/c61ddf5bf2664e38bbaba6572d421adac8a2eff7), [`0366e0b20`](https://github.com/clerkinc/javascript/commit/0366e0b208e9086896562af94f24cdbd401c702c)]:
+  - @clerk/shared@0.23.1
+  - @clerk/types@3.52.1
+  - @clerk/localizations@1.26.1
+
 ## 4.58.1
 
 ### Patch Changes

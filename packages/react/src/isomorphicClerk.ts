@@ -1,4 +1,4 @@
-import { handleValueOrFn, inClientSide } from '@clerk/shared';
+import { deprecated, handleValueOrFn, inClientSide } from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -355,6 +355,7 @@ export default class IsomorphicClerk {
   };
 
   setSession = (session: ActiveSessionResource | string | null, beforeEmit?: BeforeEmitCallback): Promise<void> => {
+    deprecated('setSession', 'Use `Clerk.setActive` instead');
     return this.setActive({ session, beforeEmit });
   };
 
