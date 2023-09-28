@@ -167,4 +167,36 @@ describe('SignUpStart', () => {
       expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveValue('(123) 456-789');
     });
   });
+
+  describe('initialValues', () => {
+    it('prefills the emailAddress field with the correct initial value', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      props.setProps({ initialValues: { emailAddress: 'foo@clerk.com' } });
+
+      render(<SignUpStart />, { wrapper });
+      screen.getByDisplayValue(/foo@clerk.com/i);
+    });
+
+    it('prefills the phoneNumber field with the correct initial value', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withPhoneNumber();
+      });
+      props.setProps({ initialValues: { phoneNumber: '+306911111111' } });
+
+      render(<SignUpStart />, { wrapper });
+      screen.getByDisplayValue(/691 1111111/i);
+    });
+
+    it('prefills the username field with the correct initial value', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withUsername();
+      });
+
+      props.setProps({ initialValues: { username: 'foo' } });
+      render(<SignUpStart />, { wrapper });
+      screen.getByDisplayValue(/foo/i);
+    });
+  });
 });
