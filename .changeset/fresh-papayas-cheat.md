@@ -4,4 +4,4 @@
 '@clerk/types': minor
 ---
 
-`<SignIn/>` and `<SignUp/>` input fields can now be prefilled with the `initialValues` prop.
+`<SignIn/>`, `<SignUp/>`, `<RedirectToSignin/>`, `<RedirectToSignUp/>`, `clerk.redirectToSignIn()` and `clerk.redirectToSignUp()` now accept the `initialValues` option, which will prefill the appropriate form fields with the values provided.
