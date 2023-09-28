@@ -18,7 +18,6 @@ Organization {
   "imageUrl": "https://clerk.com",
   "inviteMember": [Function],
   "inviteMembers": [Function],
-  "logoUrl": "https://url-for-logo.png",
   "maxAllowedMemberships": 3,
   "membersCount": 1,
   "name": "test_name",
