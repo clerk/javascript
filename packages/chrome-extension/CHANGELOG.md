@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [[`f3f643163`](https://github.com/clerkinc/javascript/commit/f3f643163a6163d89d3e3407358739d49db8b7f7), [`cc8851765`](https://github.com/clerkinc/javascript/commit/cc88517650100b0305e4d7a44db62daec3482a33), [`ea4aa67a3`](https://github.com/clerkinc/javascript/commit/ea4aa67a31675f1ca504cde63eec37a0e351140b), [`5c8754239`](https://github.com/clerkinc/javascript/commit/5c8754239e9ef13656fb73f30c9c6a6187b9aa81), [`b69fad0ce`](https://github.com/clerkinc/javascript/commit/b69fad0ceddc462f9071ee89db40485a0abd8528), [`14895e2dd`](https://github.com/clerkinc/javascript/commit/14895e2dde0fa15b594b1b7d89829d6013f5afc6)]:
+  - @clerk/clerk-js@4.59.0
+  - @clerk/clerk-react@4.26.0
+
 ## 0.4.2
 
 ### Patch Changes

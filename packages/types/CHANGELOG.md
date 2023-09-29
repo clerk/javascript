@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.53.0
+
+### Minor Changes
+
+- `<SignIn/>`, `<SignUp/>`, `<RedirectToSignin/>`, `<RedirectToSignUp/>`, `clerk.redirectToSignIn()` and `clerk.redirectToSignUp()` now accept the `initialValues` option, which will prefill the appropriate form fields with the values provided. ([#1701](https://github.com/clerkinc/javascript/pull/1701)) by [@desiprisg](https://github.com/desiprisg)
+
 ## 3.52.1
 
 ### Patch Changes

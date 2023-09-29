@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.26.2
+
+### Patch Changes
+
+- Fix: localized key for invalid email addreses in InviteMembers form. ([#1781](https://github.com/clerkinc/javascript/pull/1781)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`5c8754239`](https://github.com/clerkinc/javascript/commit/5c8754239e9ef13656fb73f30c9c6a6187b9aa81)]:
+  - @clerk/types@3.53.0
+
 ## 1.26.1
 
 ### Patch Changes
