@@ -204,10 +204,6 @@ export interface UserJSON extends ClerkResourceJSON {
 
   organization_memberships: OrganizationMembershipJSON[];
   password_enabled: boolean;
-  /**
-   * @deprecated This will be removed in the next major version
-   */
-  password: string;
   profile_image_id: string;
   first_name: string;
   last_name: string;
