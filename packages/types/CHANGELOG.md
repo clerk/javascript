@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.52.1
+
+### Patch Changes
+
+- Introduces a new method for fetching organization invitations called `Organization.getInvitations`. ([#1766](https://github.com/clerkinc/javascript/pull/1766)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecate `Organization.getPendingInvitations`
+
+- Adds the ability to force users to reset their password. ([#1757](https://github.com/clerkinc/javascript/pull/1757)) by [@kostaspt](https://github.com/kostaspt)
+
 ## 3.52.0
 
 ### Minor Changes

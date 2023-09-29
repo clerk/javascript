@@ -1,5 +1,5 @@
 import type { ClerkAPIError, SignInCreateParams } from '@clerk/types';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -64,42 +64,73 @@ export function _SignInStart(): JSX.Element {
     placeholder: localizationKeys('formFieldInputPlaceholder__password') as any,
   });
 
-  const identifierField = useFormControl('identifier', '', {
+  const ctxInitialValues = ctx.initialValues || {};
+  const initialValues: Record<SignInStartIdentifier, string | undefined> = useMemo(
+    () => ({
+      email_address: ctxInitialValues.emailAddress,
+      email_address_username: ctxInitialValues.emailAddress || ctxInitialValues.username,
+      username: ctxInitialValues.username,
+      phone_number: ctxInitialValues.phoneNumber,
+    }),
+    [ctx.initialValues],
+  );
+
+  const hasSocialOrWeb3Buttons = !!authenticatableSocialStrategies.length || !!web3FirstFactors.length;
+  const [shouldAutofocus, setShouldAutofocus] = useState(!isMobileDevice() && !hasSocialOrWeb3Buttons);
+  const textIdentifierField = useFormControl('identifier', initialValues[identifierAttribute] || '', {
     ...currentIdentifier,
     isRequired: true,
   });
+
+  const phoneIdentifierField = useFormControl('identifier', initialValues['phone_number'] || '', {
+    ...currentIdentifier,
+    isRequired: true,
+  });
+
+  const identifierField = identifierAttribute === 'phone_number' ? phoneIdentifierField : textIdentifierField;
+
+  const identifierFieldRef = useRef<HTMLInputElement>(null);
 
   const switchToNextIdentifier = () => {
     setIdentifierAttribute(
       i => identifierAttributes[(identifierAttributes.indexOf(i) + 1) % identifierAttributes.length],
     );
-    identifierField.setValue('');
+    setShouldAutofocus(true);
   };
 
-  const switchToPhoneInput = (value?: string) => {
+  const switchToPhoneInput = () => {
     setIdentifierAttribute('phone_number');
-    identifierField.setValue(value || '');
+    setShouldAutofocus(true);
   };
 
   // switch to the phone input (if available) if a "+" is entered
   // (either by the browser or the user)
   // this does not work in chrome as it does not fire the change event and the value is
   // not available via js
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (
       identifierField.value.startsWith('+') &&
       identifierAttributes.includes('phone_number') &&
       identifierAttribute !== 'phone_number' &&
       !hasSwitchedByAutofill
     ) {
-      switchToPhoneInput(identifierField.value);
+      switchToPhoneInput();
       // do not switch automatically on subsequent autofills
       // by the browser to avoid a switch loop
       setHasSwitchedByAutofill(true);
     }
   }, [identifierField.value, identifierAttributes]);
 
-  React.useEffect(() => {
+  useLayoutEffect(() => {
+    if (identifierAttribute === 'phone_number' && identifierField.value) {
+      //value should be kept as we have auto-switched to the phone input
+      return;
+    }
+
+    identifierField.setValue(initialValues[identifierAttribute] || '');
+  }, [identifierAttribute]);
+
+  useEffect(() => {
     if (!organizationTicket) {
       return;
     }
@@ -137,7 +168,7 @@ export function _SignInStart(): JSX.Element {
       });
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function handleOauthError() {
       const error = signIn?.firstFactorVerification?.error;
       if (error) {
@@ -244,9 +275,6 @@ export function _SignInStart(): JSX.Element {
     return <LoadingCard />;
   }
 
-  const hasSocialOrWeb3Buttons = !!authenticatableSocialStrategies.length || !!web3FirstFactors.length;
-  const shouldAutofocus = !isMobileDevice() && !hasSocialOrWeb3Buttons;
-
   return (
     <Flow.Part part='start'>
       <Card>
@@ -271,6 +299,7 @@ export function _SignInStart(): JSX.Element {
               <Form.Root onSubmit={handleFirstPartySubmit}>
                 <Form.ControlRow elementId={identifierField.id}>
                   <Form.Control
+                    ref={identifierFieldRef}
                     actionLabel={nextIdentifier?.action}
                     onActionClicked={switchToNextIdentifier}
                     {...identifierField.props}
@@ -303,7 +332,7 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   const ref = useRef<HTMLInputElement>(null);
 
   // show password if it's autofilled by the browser
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     const intervalId = setInterval(() => {
       if (ref?.current) {
         const autofilled = window.getComputedStyle(ref.current, ':autofill').animationName === 'onAutoFillStart';

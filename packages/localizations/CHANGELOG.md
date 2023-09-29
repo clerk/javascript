@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.26.1
+
+### Patch Changes
+
+- Adds the ability to force users to reset their password. ([#1757](https://github.com/clerkinc/javascript/pull/1757)) by [@kostaspt](https://github.com/kostaspt)
+
+- Updated dependencies [[`c61ddf5bf`](https://github.com/clerkinc/javascript/commit/c61ddf5bf2664e38bbaba6572d421adac8a2eff7), [`0366e0b20`](https://github.com/clerkinc/javascript/commit/0366e0b208e9086896562af94f24cdbd401c702c)]:
+  - @clerk/types@3.52.1
+
 ## 1.26.0
 
 ### Minor Changes

@@ -1,5 +1,19 @@
 # Change Log
 
+## 0.19.4
+
+### Patch Changes
+
+- The [issue #1680](https://github.com/clerkinc/javascript/issues/1608) has uncovered that the version `1.3.0` of `react-native-url-polyfill` did not had support for Expo Web. ([#1773](https://github.com/clerkinc/javascript/pull/1773)) by [@octoper](https://github.com/octoper)
+
+  The error was that because we rely on `react-native-url-polyfill/auto`, the would also apply the polyfill if executed on the web, which is not required as the `URL` has support for all modern browsers and there is no need to pollyfill it.
+
+  The version of `react-native-url-polyfill` was upgraded from `1.3.0` to `2.0.0` to fix the error.
+
+- Updated dependencies [[`0eb666118`](https://github.com/clerkinc/javascript/commit/0eb66611882e6c460cc6a6c5cfa1d9b086ec6917), [`53ccb27cf`](https://github.com/clerkinc/javascript/commit/53ccb27cfd195af65adde6694572ed523fc66d6d), [`3ceb2a734`](https://github.com/clerkinc/javascript/commit/3ceb2a734a43f134956164377399fec46e01e0a1), [`c61ddf5bf`](https://github.com/clerkinc/javascript/commit/c61ddf5bf2664e38bbaba6572d421adac8a2eff7), [`0366e0b20`](https://github.com/clerkinc/javascript/commit/0366e0b208e9086896562af94f24cdbd401c702c)]:
+  - @clerk/clerk-js@4.58.2
+  - @clerk/clerk-react@4.25.2
+
 ## 0.19.3
 
 ### Patch Changes

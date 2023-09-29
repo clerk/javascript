@@ -1,4 +1,4 @@
-import { handleValueOrFn, inClientSide } from '@clerk/shared';
+import { deprecated, handleValueOrFn, inClientSide } from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -14,13 +14,14 @@ import type {
   OrganizationListProps,
   OrganizationMembershipResource,
   OrganizationResource,
-  RedirectOptions,
   SetActiveParams,
   SignInProps,
+  SignInRedirectOptions,
   SignOut,
   SignOutCallback,
   SignOutOptions,
   SignUpProps,
+  SignUpRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -355,6 +356,7 @@ export default class IsomorphicClerk {
   };
 
   setSession = (session: ActiveSessionResource | string | null, beforeEmit?: BeforeEmitCallback): Promise<void> => {
+    deprecated('setSession', 'Use `Clerk.setActive` instead');
     return this.setActive({ session, beforeEmit });
   };
 
@@ -595,7 +597,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  redirectToSignIn = (opts: RedirectOptions): void => {
+  redirectToSignIn = (opts: SignInRedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignIn(opts as any);
     if (this.clerkjs && this.#loaded) {
       void callback();
@@ -604,7 +606,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  redirectToSignUp = (opts: RedirectOptions): void => {
+  redirectToSignUp = (opts: SignUpRedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignUp(opts as any);
     if (this.clerkjs && this.#loaded) {
       void callback();

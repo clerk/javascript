@@ -10,8 +10,7 @@ import type {
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { disableSWRDevtools } from './clerk-swr';
-disableSWRDevtools();
+import { deprecated } from '../utils';
 import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './createContextAndHook';
 
@@ -65,7 +64,10 @@ const OrganizationProvider = ({
 /**
  * @deprecated use OrganizationProvider instead
  */
-export const OrganizationContext = OrganizationProvider;
+export const OrganizationContext = (...args: Parameters<typeof OrganizationProvider>) => {
+  deprecated('OrganizationContext', 'Use `OrganizationProvider` instead');
+  return OrganizationProvider(...args);
+};
 
 export {
   ClientContext,

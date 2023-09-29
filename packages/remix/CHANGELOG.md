@@ -1,5 +1,17 @@
 # Change Log
 
+## 3.0.1
+
+### Patch Changes
+
+- Ensure the interstitial properly fires on client-side route transitions. ([#1720](https://github.com/clerkinc/javascript/pull/1720)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`07ede0f95`](https://github.com/clerkinc/javascript/commit/07ede0f959f232f6cbecb596eb9352f8cb382cdc), [`0eb666118`](https://github.com/clerkinc/javascript/commit/0eb66611882e6c460cc6a6c5cfa1d9b086ec6917), [`3b85311c9`](https://github.com/clerkinc/javascript/commit/3b85311c9eb006f51a8642f193473a250de879fc), [`ffcc78c06`](https://github.com/clerkinc/javascript/commit/ffcc78c062d067738f617ea9b491c1d45677148c), [`53ccb27cf`](https://github.com/clerkinc/javascript/commit/53ccb27cfd195af65adde6694572ed523fc66d6d), [`c61ddf5bf`](https://github.com/clerkinc/javascript/commit/c61ddf5bf2664e38bbaba6572d421adac8a2eff7), [`0366e0b20`](https://github.com/clerkinc/javascript/commit/0366e0b208e9086896562af94f24cdbd401c702c)]:
+  - @clerk/shared@0.23.1
+  - @clerk/clerk-react@4.25.2
+  - @clerk/types@3.52.1
+  - @clerk/backend@0.29.3
+
 ## 3.0.0
 
 ### Major Changes

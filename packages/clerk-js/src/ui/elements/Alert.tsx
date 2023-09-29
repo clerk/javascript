@@ -16,7 +16,7 @@ type AlertProps = Omit<PropsOfComponent<typeof AlertCust>, keyof _AlertProps> & 
 export const Alert = (props: AlertProps): JSX.Element | null => {
   const { children, title, subtitle, variant = 'warning', ...rest } = props;
 
-  if (!children && (!title || !subtitle)) {
+  if (!children && !title && !subtitle) {
     return null;
   }
 

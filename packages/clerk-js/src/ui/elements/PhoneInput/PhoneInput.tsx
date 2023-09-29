@@ -1,4 +1,4 @@
-import React, { forwardRef, useLayoutEffect, useState } from 'react';
+import { forwardRef, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useCoreClerk } from '../../contexts';
 import { descriptors, Flex, Input, Text } from '../../customizables';
@@ -24,7 +24,7 @@ type PhoneInputProps = PropsOfComponent<typeof Input> & { locationBasedCountryIs
 
 const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref) => {
   const { onChange: onChangeProp, value, locationBasedCountryIso, sx, ...rest } = props;
-  const phoneInputRef = React.useRef<HTMLInputElement>(null);
+  const phoneInputRef = useRef<HTMLInputElement>(null);
   const { setNumber, setIso, setNumberAndIso, numberWithCode, iso, formattedNumber } = useFormattedPhoneNumber({
     initPhoneWithCode: value as string,
     locationBasedCountryIso,
@@ -37,11 +37,11 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
     onChangeProp?.({ target: { value: numberWithCode } } as any);
   };
 
-  const selectedCountryOption = React.useMemo(() => {
+  const selectedCountryOption = useMemo(() => {
     return countryOptions.find(o => o.country.iso === iso) || countryOptions[0];
   }, [iso]);
 
-  React.useEffect(callOnChangeProp, [numberWithCode]);
+  useEffect(callOnChangeProp, [numberWithCode]);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -153,7 +153,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
 type CountryCodeListItemProps = PropsOfComponent<typeof Flex> & {
   country: CountryEntry;
 };
-const CountryCodeListItem = React.memo((props: CountryCodeListItemProps) => {
+const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
   const { country, sx, ...rest } = props;
   return (
     <Flex

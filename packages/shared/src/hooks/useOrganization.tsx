@@ -14,14 +14,11 @@ import type {
 import type { ClerkPaginatedResponse } from '@clerk/types';
 import type { GetMembersParams } from '@clerk/types';
 
-import { disableSWRDevtools } from './clerk-swr';
-
-disableSWRDevtools();
+import { deprecated } from '../utils';
 import { useSWR } from './clerk-swr';
 import { useClerkInstanceContext, useOrganizationContext, useSessionContext } from './contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
-import { deprecated } from '../utils';
 
 type UseOrganizationParams = {
   /**
