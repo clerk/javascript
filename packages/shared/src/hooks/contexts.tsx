@@ -11,8 +11,6 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { deprecated } from '../utils';
-import { disableSWRDevtools } from './clerk-swr';
-disableSWRDevtools();
 import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './createContextAndHook';
 

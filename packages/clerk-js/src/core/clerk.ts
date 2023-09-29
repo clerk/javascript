@@ -1,6 +1,7 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
+  deprecated,
   handleValueOrFn,
   inClientSide,
   is4xxError,
@@ -41,12 +42,14 @@ import type {
   Resources,
   SetActiveParams,
   SignInProps,
+  SignInRedirectOptions,
   SignInResource,
   SignOut,
   SignOutCallback,
   SignOutOptions,
   SignUpField,
   SignUpProps,
+  SignUpRedirectOptions,
   SignUpResource,
   UnsubscribeCallback,
   UserButtonProps,
@@ -58,6 +61,7 @@ import type { MountComponentRenderer } from '../ui/Components';
 import { completeSignUpFlow } from '../ui/components/SignUp/util';
 import {
   appendAsQueryParams,
+  appendUrlsAsQueryParams,
   buildURL,
   createBeforeUnloadTracker,
   createCookieHandler,
@@ -694,11 +698,11 @@ export default class Clerk implements ClerkInterface {
     return setDevBrowserJWTInURL(toURL, devBrowserJwt, asQueryParam).href;
   }
 
-  public buildSignInUrl(options?: RedirectOptions): string {
+  public buildSignInUrl(options?: SignInRedirectOptions): string {
     return this.#buildUrl('signInUrl', options);
   }
 
-  public buildSignUpUrl(options?: RedirectOptions): string {
+  public buildSignUpUrl(options?: SignUpRedirectOptions): string {
     return this.#buildUrl('signUpUrl', options);
   }
 
@@ -757,14 +761,14 @@ export default class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToSignIn = async (options?: RedirectOptions): Promise<unknown> => {
+  public redirectToSignIn = async (options?: SignInRedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildSignInUrl(options));
     }
     return;
   };
 
-  public redirectToSignUp = async (options?: RedirectOptions): Promise<unknown> => {
+  public redirectToSignUp = async (options?: SignUpRedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildSignUpUrl(options));
     }
@@ -1077,6 +1081,7 @@ export default class Clerk implements ClerkInterface {
    * @deprecated use User.getOrganizationMemberships
    */
   public getOrganizationMemberships = async (): Promise<OrganizationMembership[]> => {
+    deprecated('getOrganizationMemberships', 'Use User.getOrganizationMemberships');
     return await OrganizationMembership.retrieve();
   };
 
@@ -1456,7 +1461,7 @@ export default class Clerk implements ClerkInterface {
     });
   };
 
-  #buildUrl = (key: 'signInUrl' | 'signUpUrl', options?: RedirectOptions): string => {
+  #buildUrl = (key: 'signInUrl' | 'signUpUrl', options?: SignInRedirectOptions | SignUpRedirectOptions): string => {
     if (!this.#isReady || !this.#environment || !this.#environment.displayConfig) {
       return '';
     }
@@ -1472,7 +1477,10 @@ export default class Clerk implements ClerkInterface {
       { options: this.#options, displayConfig: this.#environment.displayConfig },
       false,
     );
-    return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, opts));
+
+    return this.buildUrlWithAuth(
+      appendUrlsAsQueryParams(appendAsQueryParams(signInOrUpUrl, options?.initialValues || {}), opts),
+    );
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {

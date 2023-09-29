@@ -55,6 +55,7 @@ export function isLegacyFrontendApiKey(key: string) {
 }
 
 export function createDevOrStagingUrlCache() {
+  // TODO: Check if we can merge it with `./instance.ts#isStaging()`
   const DEV_OR_STAGING_SUFFIXES = [
     '.lcl.dev',
     '.stg.dev',

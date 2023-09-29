@@ -1,3 +1,4 @@
+import { deprecatedProperty } from '@clerk/shared';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
@@ -347,3 +348,5 @@ export class User extends BaseResource implements UserResource {
     return this;
   }
 }
+
+deprecatedProperty(User, 'profileImageUrl', 'Use `imageUrl` instead.');

@@ -103,15 +103,14 @@ A changeset is a piece of information about changes made in a branch or commit. 
 - What version we are releasing packages at (using a semver bump type)
 - A changelog entry for the released packages
 
-The first of the changeset description is used as the changelog entry title, the rest of the description is used as the changelog entry body. For example:
+For example:
 
 ```markdown
 ---
 '@clerk/nextjs': minor
 ---
 
-Introduce `debug` prop in `authMiddleware`
-A new `debug` prop has been added to the `authMiddleware` function. When set to `true`, the middleware will log the request and response to the console.
+Description goes here
 ```
 
 Will generate the following changelog entry:
@@ -119,13 +118,27 @@ Will generate the following changelog entry:
 ```markdown
 ## Minor Changes
 
-- Introduce `debug` prop in `authMiddleware` (#123) by @johndoe
-  A new `debug` prop has been added to the `authMiddleware` function. When set to `true`, the middleware will log the request and response to the console.
+- Description goes here (#123) by @johndoe
 ```
 
-Tips:
+**Changelog entry framework**:
 
-- Changesets are just markdown files. Feel free to add as much markdown as you want to better describe the change.
+Keep it concise and as information-rich as possible. The most comprehensive changelog entry may include:
+
+- What’s the type of change? - type
+  - bug fix, feature, breaking change, chore, etc.
+- What’s the TL;DR? - summary
+- What more details can we share? - details
+- What user benefit has this change? - benefit
+- More information. Can we link to related things? - resources
+
+A changelog entry should at least contain the **type** of change and a **summary**.
+
+If your PR contains changes that require the user to update their code, explain **how** they can migrate.
+
+**Tips**:
+
+- Changesets are just markdown files. Feel free to add as much markdown as you want to better describe the change. If e.g. your changeset contains function or package names, use the `inline code` syntax to denote this.
 - Multiple changesets can be added in a single PR if needed, please see [Tips on adding changesets](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md#you-can-add-more-than-one-changeset-to-a-pull-request)
 
 #### Why We Use Changesets
@@ -141,14 +154,14 @@ Use of a `type` and a `scope` in commit message is **mandatory**.
 
 As per the conventional commits specification, the `type` can be one of the following: `feat`, `fix`, `chore`, `docs`. The `scope` can be one of the package names defined in `packages/{package}/package.json`, `repo` for repository level changes or `release` for releases.
 
-### What is the difference between a commit message, a PR description and a changeset description?
+### What is the difference between a commit message, a PR description, and a changeset description?
 
 All of these are used to describe changes in the codebase, but they have different purposes:
 
 - **Commit message**: Briefly describe what the commit is about. Intended to be seen by contributors.
 - **Commit description**: Describe in details why the change was made and include some details about the implementation if needed. Intended to be seen by contributors.
 - **PR description**: Describe in details what the PR is about. This is the first thing a reviewer will see when reviewing a PR, so make sure to explain why the change is needed and offer plenty of details about the actual implementation. It's always useful to include a screen recording or steps to reproduce the issue if the PR is related to a bug fix. Also try to include resources and external documentation if required. Intended to be seen by contributors and will be used as future reference.
-- **Changeset description**: Describe in details how the change affects the user. This is the first thing a user will see when a new release is published, so make sure to explain how the change affects them. Try to provide usage examples and migration steps if required. Intended to be seen by users of the package.
+- **Changeset description**: The target audience for these changelogs are other developers. So don’t shy away on including technical details or describing it with words that are generally known among developers. The goal of the changelog entry is to convey the benefit of upgrading to this version in a concise way. Try to provide usage examples and migration steps if required. Read the [changesets](#changesets) section to learn how to write great changesets.
 
 ### Notes on Pull Requests
 

@@ -1,3 +1,4 @@
+import { deprecatedProperty } from '../../util/shared';
 import { EmailAddress } from './EmailAddress';
 import { ExternalAccount } from './ExternalAccount';
 import type { ExternalAccountJSON, UserJSON } from './JSON';
@@ -72,3 +73,5 @@ export class User {
     );
   }
 }
+
+deprecatedProperty(User, 'profileImageUrl', 'Use `imageUrl` instead.');
