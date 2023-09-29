@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.59.0",
+  "version": "4.59.1",
   "license": "MIT",
   "description": "Clerk JS library",
   "keywords": [
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@clerk/localizations": "^1.26.2",
-    "@clerk/shared": "^0.24.0",
+    "@clerk/shared": "^0.24.1",
     "@clerk/types": "^3.53.0",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",

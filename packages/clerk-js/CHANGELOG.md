@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.59.1
+
+### Patch Changes
+
+- Apply deprecation warnings for `@clerk/clerk-js`: ([#1800](https://github.com/clerkinc/javascript/pull/1800)) by [@dimkl](https://github.com/dimkl)
+
+  - `Clerk.setSession`
+
+- Updated dependencies [[`cecf74d79`](https://github.com/clerkinc/javascript/commit/cecf74d79069662d25f73e4745aa01348d398afb)]:
+  - @clerk/shared@0.24.1
+
 ## 4.59.0
 
 ### Minor Changes
