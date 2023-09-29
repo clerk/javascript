@@ -631,10 +631,14 @@ export default class Clerk implements ClerkInterface {
     this.#resetComponentsState();
   };
 
+  /**
+   * @deprecated  Use `setActive` instead.
+   */
   public setSession = async (
     session: ActiveSessionResource | string | null,
     beforeEmit?: BeforeEmitCallback,
   ): Promise<void> => {
+    deprecated('setSession', 'Use `setActive` instead.', 'clerk:setSession');
     return this.setActive({ session, beforeEmit });
   };
 
