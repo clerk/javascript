@@ -190,6 +190,11 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tabButton',
   'tabListContainer',
 
+  'tableHead',
+
+  'paginationPageButton',
+  'paginationInfoText',
+
   'selectButton',
   'selectSearchInput',
   'selectButtonIcon',

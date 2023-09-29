@@ -344,6 +344,11 @@ export type ElementsConfig = {
   tabButton: WithOptions<never, never, never>;
   tabListContainer: WithOptions<never, never, never>;
 
+  tableHead: WithOptions<never, never, never>;
+
+  paginationPageButton: WithOptions<never, never, never>;
+  paginationInfoText: WithOptions<never, never, never>;
+
   selectButton: WithOptions<SelectId, never, never>;
   selectSearchInput: WithOptions<SelectId, never, never>;
   selectButtonIcon: WithOptions<SelectId, never, never>;

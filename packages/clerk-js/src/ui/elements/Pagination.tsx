@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button, Flex, localizationKeys, Text } from '../customizables';
+import { Button, descriptors, Flex, localizationKeys, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { mqu } from '../styledSystem';
 import { range } from '../utils';
@@ -31,6 +31,7 @@ const PageButton = (props: PropsOfComponent<typeof Button> & { isActive?: boolea
         },
         sx,
       ]}
+      elementDescriptor={descriptors.paginationPageButton}
       {...rest}
     />
   );
@@ -52,32 +53,27 @@ const RowInformation = (props: RowInfoProps) => {
   } = props;
 
   return (
-    <Text>
+    <Text elementDescriptor={descriptors.paginationInfoText}>
       <Text
         as='span'
-        sx={t => ({
-          color: t.colors.$blackAlpha700,
-        })}
+        colorScheme='inherit'
         localizationKey={localizationKeys('paginationRowText__displaying')}
       />{' '}
       <Text
         as='span'
+        colorScheme='inherit'
         sx={t => ({ fontWeight: t.fontWeights.$medium })}
       >
         {startingRow === endingRow && [0, 1].includes(startingRow) ? startingRow : `${startingRow} – ${endingRow}`}
       </Text>{' '}
       <Text
         as='span'
-        sx={t => ({
-          color: t.colors.$blackAlpha700,
-        })}
+        colorScheme='inherit'
         localizationKey={localizationKeys('paginationRowText__of')}
       />{' '}
       <Text
         as='span'
-        sx={t => ({
-          color: t.colors.$blackAlpha700,
-        })}
+        colorScheme='inherit'
       >
         {allRowsCount}
       </Text>
