@@ -1,5 +1,5 @@
 {
-  "version": "4.12.8",
+  "version": "4.12.9",
   "license": "MIT",
   "type": "commonjs",
   "main": "./dist/cjs/index.js",
@@ -58,8 +58,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@clerk/backend": "^0.29.3",
-    "@clerk/types": "^3.52.1",
+    "@clerk/backend": "^0.30.0",
+    "@clerk/types": "^3.53.0",
     "@types/cookies": "0.7.7",
     "@types/express": "4.17.14",
     "@types/node-fetch": "2.6.2",
