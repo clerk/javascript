@@ -1,4 +1,3 @@
-import { deprecatedProperty } from '../../util/shared';
 import type { ExternalAccountJSON } from './JSON';
 import { Verification } from './Verification';
 
@@ -42,5 +41,3 @@ export class ExternalAccount {
     );
   }
 }
-
-deprecatedProperty(ExternalAccount, 'picture', 'Use `imageUrl` instead.');

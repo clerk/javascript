@@ -4,7 +4,6 @@ import type { Jwt, JwtPayload } from '@clerk/types';
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../../runtime';
 import { base64url } from '../../util/rfc4648';
-import { deprecated } from '../../util/shared';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { IssuerResolver } from './assertions';
 import {
@@ -115,10 +114,6 @@ export async function verifyJwt(
   token: string,
   { audience, authorizedParties, clockSkewInSeconds, clockSkewInMs, issuer, key }: VerifyJwtOptions,
 ): Promise<JwtPayload> {
-  if (clockSkewInSeconds) {
-    deprecated('clockSkewInSeconds', 'Use `clockSkewInMs` instead.');
-  }
-
   const clockSkew = clockSkewInMs || clockSkewInSeconds || DEFAULT_CLOCK_SKEW_IN_SECONDS;
 
   const decoded = decodeJwt(token);
