@@ -1,4 +1,5 @@
-import { errorThrower, parsePublishableKey } from './shared';
+import { missingPublishableKeyErrorMessage } from './shared';
+import { parsePublishableKey } from './shared';
 
 type RedirectAdapter = (url: string) => any;
 
@@ -45,7 +46,7 @@ export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, p
 
   const redirectToSignUp = ({ returnBackUrl }: SignUpParams = {}) => {
     if (!signUpUrl && !accountsBaseUrl) {
-      errorThrower.throwMissingPublishableKeyError();
+      throw new Error(missingPublishableKeyErrorMessage);
     }
 
     const accountsSignUpUrl = `${accountsBaseUrl}/sign-up`;
@@ -54,7 +55,7 @@ export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, p
 
   const redirectToSignIn = ({ returnBackUrl }: SignInParams = {}) => {
     if (!signInUrl && !accountsBaseUrl) {
-      errorThrower.throwMissingPublishableKeyError();
+      throw new Error(missingPublishableKeyErrorMessage);
     }
 
     const accountsSignInUrl = `${accountsBaseUrl}/sign-in`;

@@ -1,21 +1,15 @@
-export {
-  addClerkPrefix,
-  buildPublishableKey,
-  callWithRetry,
-  getClerkJsMajorVersionOrTag,
-  getScriptUrl,
-  isDevelopmentFromApiKey,
-  isProductionFromApiKey,
-  isPublishableKey,
-  isStaging,
-  parsePublishableKey,
-  deprecated,
-  deprecatedProperty,
-} from '@clerk/shared';
+/*
+ * This module will contain functionality that will be copied
+ * from @clerk/shared and will be replaced by imports when the
+ * bundling issue is fixed.
+ */
+export { isDevelopmentFromApiKey, isProductionFromApiKey, isStaging } from './instance';
 
-import { buildErrorThrower } from '@clerk/shared';
-// TODO: replace packageName with `${PACKAGE_NAME}@${PACKAGE_VERSION}` from tsup.config.ts
-export const errorThrower = buildErrorThrower({ packageName: '@clerk/backend' });
+export { addClerkPrefix, getScriptUrl, getClerkJsMajorVersionOrTag } from './url';
+export { callWithRetry } from './callWithRetry';
 
-import { createDevOrStagingUrlCache } from '@clerk/shared';
-export const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
+// TODO: replace it with @clerk/shared errorThrower.throwMissingPublishableKeyError()
+export const missingPublishableKeyErrorMessage = `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`;
+
+export { isDevOrStagingUrl } from './isDevOrStagingUrl';
+export { buildPublishableKey, isPublishableKey, parsePublishableKey } from './parsePublishableKey';
