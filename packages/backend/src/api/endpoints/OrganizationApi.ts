@@ -1,3 +1,5 @@
+import { deprecated } from '@clerk/shared';
+
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type {
@@ -255,6 +257,8 @@ export class OrganizationAPI extends AbstractAPI {
    * @deprecated  Use `getOrganizationInvitationList` instead along with the status parameter.
    */
   public async getPendingOrganizationInvitationList(params: GetPendingOrganizationInvitationListParams) {
+    deprecated('getPendingOrganizationInvitationList', 'Use `getOrganizationInvitationList` instead.');
+
     const { organizationId, limit, offset } = params;
     this.requireId(organizationId);
 
