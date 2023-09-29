@@ -28,6 +28,13 @@ export function addClerkPrefix(str: string | undefined) {
   return `clerk.${stripped}`;
 }
 
+/**
+ *
+ * Retrieve the clerk-js major tag using the major version from the pkgVersion
+ * param or use the frontendApi to determine if the staging tag should be used.
+ * The default tag is `latest` and a `next` pkgVersion also exists to retrieve
+ * the next canary release.
+ */
 export const getClerkJsMajorVersionOrTag = (frontendApi: string, pkgVersion?: string) => {
   if (!pkgVersion && isStaging(frontendApi)) {
     return 'staging';
@@ -44,6 +51,11 @@ export const getClerkJsMajorVersionOrTag = (frontendApi: string, pkgVersion?: st
   return pkgVersion.split('.')[0] || 'latest';
 };
 
+/**
+ *
+ * Retrieve the clerk-js script url from the frontendApi and the major tag
+ * using the {@link getClerkJsMajorVersionOrTag} or a provided clerkJSVersion tag.
+ */
 export const getScriptUrl = (
   frontendApi: string,
   { pkgVersion, clerkJSVersion }: { pkgVersion?: string; clerkJSVersion?: string },
