@@ -478,8 +478,8 @@ export const deDE: LocalizationResource = {
     },
     deletePage: {
       title: 'Konto löschen',
-      messageLine1: 'Sind Sie sich sicher, dass Sie ihr Konto löschen möchten?',
-      messageLine2: 'Dieser Vorgang ist dauerhaft und kann nicht rückgängig gemacht werden.',
+      messageLine1: 'Sind Sie sicher, dass Sie ihr Konto löschen möchten?',
+      messageLine2: 'Diese Aktion ist endgültig und kann nicht rückgängig gemacht werden.',
       actionDescription: 'Geben Sie "Konto löschen" ein, um fortzufahren.',
       confirm: 'Konto löschen',
     },
