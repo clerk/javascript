@@ -1,16 +1,6 @@
 import { isStaging } from './instance';
 
-export function parseSearchParams(queryString = ''): URLSearchParams {
-  if (queryString.startsWith('?')) {
-    queryString = queryString.slice(1);
-  }
-  return new URLSearchParams(queryString);
-}
-
-export function stripScheme(url = ''): string {
-  return (url || '').replace(/^.+:\/\//, '');
-}
-
+// TODO: use the same function from @clerk/shared once treeshakable
 export function addClerkPrefix(str: string | undefined) {
   if (!str) {
     return '';
@@ -28,6 +18,7 @@ export function addClerkPrefix(str: string | undefined) {
   return `clerk.${stripped}`;
 }
 
+// TODO: Move to @clerk/shared as the same logic is used in @clerk/react
 export const getClerkJsMajorVersionOrTag = (frontendApi: string, pkgVersion?: string) => {
   if (!pkgVersion && isStaging(frontendApi)) {
     return 'staging';
