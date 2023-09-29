@@ -1,5 +1,5 @@
 ---
-'@clerk/localizations': major
+'@clerk/localizations': patch
 ---
 
-Added German translation of deletePage section
+Add German translation for `deletePage` section
