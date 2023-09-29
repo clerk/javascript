@@ -1,6 +1,7 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
+  deprecated,
   handleValueOrFn,
   inClientSide,
   is4xxError,
@@ -630,10 +631,14 @@ export default class Clerk implements ClerkInterface {
     this.#resetComponentsState();
   };
 
+  /**
+   * @deprecated  Use `setActive` instead.
+   */
   public setSession = async (
     session: ActiveSessionResource | string | null,
     beforeEmit?: BeforeEmitCallback,
   ): Promise<void> => {
+    deprecated('setSession', 'Use `setActive` instead.', 'clerk:setSession');
     return this.setActive({ session, beforeEmit });
   };
 
@@ -1080,6 +1085,7 @@ export default class Clerk implements ClerkInterface {
    * @deprecated use User.getOrganizationMemberships
    */
   public getOrganizationMemberships = async (): Promise<OrganizationMembership[]> => {
+    deprecated('getOrganizationMemberships', 'Use User.getOrganizationMemberships');
     return await OrganizationMembership.retrieve();
   };
 

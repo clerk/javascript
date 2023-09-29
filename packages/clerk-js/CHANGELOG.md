@@ -1,5 +1,32 @@
 # Change Log
 
+## 4.59.0
+
+### Minor Changes
+
+- `<SignIn/>`, `<SignUp/>`, `<RedirectToSignin/>`, `<RedirectToSignUp/>`, `clerk.redirectToSignIn()` and `clerk.redirectToSignUp()` now accept the `initialValues` option, which will prefill the appropriate form fields with the values provided. ([#1701](https://github.com/clerkinc/javascript/pull/1701)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Use our deprecate utility to log warnings about deprecated usage of Organization.getMemberships ([#1779](https://github.com/clerkinc/javascript/pull/1779)) by [@dimkl](https://github.com/dimkl)
+
+- Fix: localized key for invalid email addreses in InviteMembers form. ([#1781](https://github.com/clerkinc/javascript/pull/1781)) by [@panteliselef](https://github.com/panteliselef)
+
+- Apply deprecation warnings clerk-js package for: ([#1779](https://github.com/clerkinc/javascript/pull/1779)) by [@dimkl](https://github.com/dimkl)
+
+  - Organization.create() using string parameter
+  - Organization.retrieve() `limit` & `offset`
+  - Clerk.getOrganizationMemberships()
+  - `svgUrl`
+  - `avatarUrl`/`logoUrl`/`faviconUrl`/`profileImageUrl`
+
+- Updated the OAuth buttons in the SignIn and SignUp components to prevent layout shifts while loading. ([#1728](https://github.com/clerkinc/javascript/pull/1728)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`7ffa6fac3`](https://github.com/clerkinc/javascript/commit/7ffa6fac3762f6fb130ba2f2fcaa28e52b36b3b4), [`cc8851765`](https://github.com/clerkinc/javascript/commit/cc88517650100b0305e4d7a44db62daec3482a33), [`5c8754239`](https://github.com/clerkinc/javascript/commit/5c8754239e9ef13656fb73f30c9c6a6187b9aa81), [`2f6a6ac99`](https://github.com/clerkinc/javascript/commit/2f6a6ac9991469bf8532019bb22ff50adecdb434), [`753f7bbda`](https://github.com/clerkinc/javascript/commit/753f7bbda9bbb7444f96222a3b6cae815a09058f), [`55c8ebd39`](https://github.com/clerkinc/javascript/commit/55c8ebd390dd88036aee06866009be6a50c63138)]:
+  - @clerk/shared@0.24.0
+  - @clerk/localizations@1.26.2
+  - @clerk/types@3.53.0
+
 ## 4.58.2
 
 ### Patch Changes

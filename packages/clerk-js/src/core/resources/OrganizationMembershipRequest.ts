@@ -51,3 +51,6 @@ export class OrganizationMembershipRequest extends BaseResource implements Organ
     return this;
   }
 }
+
+// TODO(@dimkl): deprecate nested property
+// deprecatedProperty(OrganizationMembershipRequest, 'publicUserData.profileImageUrl', 'Use `imageUrl` instead.');

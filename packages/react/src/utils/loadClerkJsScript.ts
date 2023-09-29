@@ -3,6 +3,7 @@ import { addClerkPrefix, isValidProxyUrl, loadScript, parsePublishableKey, proxy
 import type { IsomorphicClerkOptions } from '../types';
 import { errorThrower } from './errorThrower';
 import { isDevOrStagingUrl } from './isDevOrStageUrl';
+import { versionSelector } from './versionSelector';
 
 const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
 
@@ -44,7 +45,7 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   }
 
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
-  const version = clerkJSVersion || getPrereleaseTag(PACKAGE_VERSION) || getMajorVersion(PACKAGE_VERSION);
+  const version = versionSelector(clerkJSVersion);
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
 };
 
@@ -64,7 +65,3 @@ const applyClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => (scr
     script.setAttribute('data-clerk-domain', domain);
   }
 };
-
-const getPrereleaseTag = (packageVersion: string) => packageVersion.match(/-(.*)\./)?.[1];
-
-const getMajorVersion = (packageVersion: string) => packageVersion.split('.')[0];

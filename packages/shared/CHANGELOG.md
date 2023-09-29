@@ -1,5 +1,26 @@
 # Change Log
 
+## 0.24.0
+
+### Minor Changes
+
+- Introduce `getClerkJsMajorVersionOrTag()`, `getScriptUrl()`, `callWithRetry()` ([#1769](https://github.com/clerkinc/javascript/pull/1769)) by [@dimkl](https://github.com/dimkl)
+
+- Add the `use client` directive in `@clerk/shared` to make the package compatible with an RSC environment. ([#1767](https://github.com/clerkinc/javascript/pull/1767)) by [@dimkl](https://github.com/dimkl)
+
+  Remove several helpers from `@clerk/nextjs` and import them from `@clerk/shared` instead.
+
+### Patch Changes
+
+- Apply deprecation warnings for `@clerk/shared`: ([#1789](https://github.com/clerkinc/javascript/pull/1789)) by [@dimkl](https://github.com/dimkl)
+
+  - `OrganizationContext`
+  - `organizationList`
+  - `useOrganizations`
+  - `getRequestUrl`
+
+- Removes the patch for disabling swr-devtools causing apps with swr and broswers with the devtools extention to break. ([#1794](https://github.com/clerkinc/javascript/pull/1794)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 0.23.1
 
 ### Patch Changes
