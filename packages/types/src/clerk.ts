@@ -795,13 +795,18 @@ export type UserButtonProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
-  appearance?: UserButtonTheme & { userProfile?: UserProfileTheme };
+  appearance?: UserButtonTheme & {
+    /**
+     * @deprecated Use `userProfileProps.appearance` instead.
+     */
+    userProfile?: UserProfileTheme;
+  };
 
   /*
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
 };
 
 type PrimitiveKeys<T> = {
@@ -886,6 +891,12 @@ export type OrganizationSwitcherProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: OrganizationSwitcherTheme;
+
+  /*
+   * Specify options for the underlying <OrganizationProfile /> component.
+   * e.g. <UserButton userProfileProps={{appearance: {...}}} />
+   */
+  organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
 };
 
 export type OrganizationListProps = {
