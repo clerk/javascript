@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 
-import { createLogger, fs } from '../utils';
+import { createLogger, fs } from '../scripts';
 import { application } from './application.js';
 import type { EnvironmentConfig } from './environment';
 import type { Helpers } from './helpers.js';

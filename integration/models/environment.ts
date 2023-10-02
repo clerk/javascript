@@ -1,9 +1,17 @@
 export type EnvironmentConfig = ReturnType<typeof environmentConfig>;
 
 export const environmentConfig = () => {
+  let id = '';
   const envVars = { public: new Map<string, string>(), private: new Map<string, string>() };
 
   const self = {
+    setId: (newId: string) => {
+      id = newId;
+      return self;
+    },
+    get id() {
+      return id;
+    },
     setEnvVariable: (type: keyof typeof envVars, name: string, value: string) => {
       envVars[type].set(name, value);
       return self;

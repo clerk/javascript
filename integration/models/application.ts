@@ -2,7 +2,7 @@ import * as path from 'node:path';
 
 import treekill from 'tree-kill';
 
-import { createLogger, fs, getPort, run, waitForIdleProcess } from '../utils';
+import { createLogger, fs, getPort, run, waitForIdleProcess } from '../scripts';
 import type { ApplicationConfig } from './applicationConfig.js';
 import type { EnvironmentConfig } from './environment.js';
 
@@ -14,7 +14,7 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
   // It is currently set by serve and dev
   const logger = createLogger({ prefix: `${appDirName}` });
   const state = { completedSetup: false, serverUrl: '', env: {} as EnvironmentConfig };
-  const cleanupFns: { (): any }[] = [];
+  const cleanupFns: { (): unknown }[] = [];
 
   const self = {
     name,

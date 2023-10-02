@@ -1,4 +1,4 @@
-import { applicationConfig } from '../adapters/applicationConfig.js';
+import { applicationConfig } from '../models/applicationConfig.js';
 import { templates } from '../templates/index.js';
 
 const appRouter = applicationConfig()

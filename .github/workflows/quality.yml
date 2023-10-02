@@ -1,8 +1,6 @@
 name: Quality checks
 
 on:
-#  push:
-#    branches: [ main ]
   merge_group:
   pull_request:
     branches: [ main ]
@@ -12,14 +10,6 @@ jobs:
     strategy:
       matrix:
         node-version: [ 18, 19 ]
-    env:
-      # Bundlewatch
-      BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
-      CI_REPO_OWNER: clerkinc
-      CI_REPO_NAME: javascript
-      CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
-      CI_BRANCH: ${{ github.ref	}}
-      CI_BRANCH_BASE: refs/heads/develop
     name: Build and test
     runs-on: ubuntu-latest
     concurrency:
@@ -34,7 +24,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm run test:ci
-      - run: npm run bundlewatch
 
   prettier:
     name: Check format

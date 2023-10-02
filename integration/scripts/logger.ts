@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { default as chalk } from 'chalk';
 
 const getRandomChalkBgColor = () => {
@@ -12,7 +13,6 @@ export const createLogger = (opts: CreateLoggerOptions) => {
   return {
     info: (msg: string) => {
       if (process.env.DEBUG) {
-        // @ts-ignore
         console.info(`${chalk[prefixBgColor](`[${prefix}]`)} ${msg}`);
       }
     },

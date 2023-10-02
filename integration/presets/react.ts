@@ -1,4 +1,4 @@
-import { applicationConfig } from '../adapters/applicationConfig';
+import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 
 const cra = applicationConfig()
