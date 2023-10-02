@@ -191,6 +191,7 @@ type PagesType = {
   routes: NavbarRoute[];
   contents: CustomPageContent[];
   isAccountPageRoot: boolean;
+  pageToRootNavbarRouteMap: Record<string, NavbarRoute>;
 };
 
 export type UserProfileContextType = UserProfileCtx & {
