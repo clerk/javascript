@@ -31,7 +31,7 @@ const PageButton = (props: PropsOfComponent<typeof Button> & { isActive?: boolea
         },
         sx,
       ]}
-      elementDescriptor={descriptors.paginationPageButton}
+      elementDescriptor={descriptors.paginationButton}
       {...rest}
     />
   );
@@ -53,7 +53,7 @@ const RowInformation = (props: RowInfoProps) => {
   } = props;
 
   return (
-    <Text elementDescriptor={descriptors.paginationInfoText}>
+    <Text elementDescriptor={descriptors.paginationRowText}>
       <Text
         as='span'
         colorScheme='inherit'

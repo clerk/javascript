@@ -192,8 +192,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'tableHead',
 
-  'paginationPageButton',
-  'paginationInfoText',
+  'paginationButton',
+  'paginationRowText',
 
   'selectButton',
   'selectSearchInput',
