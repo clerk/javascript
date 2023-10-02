@@ -52,6 +52,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       navigateOrganizationProfile,
       navigateAfterSelectPersonal,
       navigateAfterSelectOrganization,
+      organizationProfileProps,
     } = useOrganizationSwitcherContext();
 
     const user = useCoreUser();
@@ -93,6 +94,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         return navigateOrganizationProfile();
       }
       return openOrganizationProfile({
+        ...organizationProfileProps,
         afterLeaveOrganizationUrl,
         //@ts-expect-error
         __unstable_manageBillingUrl,

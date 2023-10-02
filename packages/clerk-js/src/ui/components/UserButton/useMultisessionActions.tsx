@@ -1,3 +1,4 @@
+import { deprecatedObjectProperty } from '@clerk/shared';
 import type { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
 import { windowNavigate } from '../../../utils/windowNavigate';
@@ -44,7 +45,18 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     }
 
     // The UserButton can also accept an appearance object for the nested UserProfile modal
-    openUserProfile({ ...opts.userProfileProps, appearance: opts.appearance?.userProfile });
+    if (opts.appearance?.userProfile) {
+      deprecatedObjectProperty(
+        opts.appearance,
+        'userProfile',
+        'Use `<UserButton userProfileProps={{appearance: {...}}} />` instead.',
+      );
+    }
+    openUserProfile({
+      appearance: opts.appearance?.userProfile,
+      // Prioritize the appearance of `userProfileProps`
+      ...opts.userProfileProps,
+    });
     return opts.actionCompleteCallback?.();
   };
 
