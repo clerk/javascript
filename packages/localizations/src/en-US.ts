@@ -64,6 +64,7 @@ export const enUS: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldAction__forgotPassword: 'Forgot password?',
   formFieldHintText__optional: 'Optional',
+  formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
   formButtonPrimary: 'Continue',
   signInEnterPasswordTitle: 'Enter your password',
   backButton: 'Back',

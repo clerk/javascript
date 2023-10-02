@@ -81,6 +81,7 @@ type _LocalizationResource = {
   formFieldError__verificationLinkExpired: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
+  formFieldHintText__slug: LocalizationValue;
   formButtonPrimary: LocalizationValue;
   signInEnterPasswordTitle: LocalizationValue;
   backButton: LocalizationValue;
