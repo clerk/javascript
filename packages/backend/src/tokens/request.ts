@@ -106,7 +106,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   const { cookies, headers, searchParams } = buildRequest(options?.request);
 
   if (options.frontendApi) {
-    deprecated('frontentApi', 'Use `publishableKey` instead.');
+    deprecated('frontendApi', 'Use `publishableKey` instead.');
   }
 
   if (options.apiKey) {

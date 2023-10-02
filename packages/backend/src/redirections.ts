@@ -40,7 +40,7 @@ export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, p
   if (!frontendApi) {
     frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
   } else {
-    deprecated('frontentApi', 'Use `publishableKey` instead.');
+    deprecated('frontendApi', 'Use `publishableKey` instead.');
   }
 
   const accountsBaseUrl = buildAccountsBaseUrl(frontendApi);

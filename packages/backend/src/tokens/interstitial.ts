@@ -35,7 +35,7 @@ export type LoadInterstitialOptions = {
 
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
   if (options.frontendApi) {
-    deprecated('frontentApi', 'Use `publishableKey` instead.');
+    deprecated('frontendApi', 'Use `publishableKey` instead.');
   }
   if (options.pkgVersion) {
     deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
@@ -135,7 +135,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 // TODO: Add caching to Interstitial
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
   if (options.frontendApi) {
-    deprecated('frontentApi', 'Use `publishableKey` instead.');
+    deprecated('frontendApi', 'Use `publishableKey` instead.');
   }
   if (options.pkgVersion) {
     deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
@@ -164,7 +164,7 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
   if (options.frontendApi) {
-    deprecated('frontentApi', 'Use `publishableKey` instead.');
+    deprecated('frontendApi', 'Use `publishableKey` instead.');
   }
 
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
