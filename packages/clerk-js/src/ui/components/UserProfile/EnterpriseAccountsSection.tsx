@@ -1,4 +1,4 @@
-import type { SamlAccountResource } from '@clerk/types/src';
+import type { SamlAccountResource } from '@clerk/types';
 
 import { useRouter } from '../../../ui/router';
 import { useCoreUser } from '../../contexts';

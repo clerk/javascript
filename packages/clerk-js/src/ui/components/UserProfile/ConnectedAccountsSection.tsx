@@ -1,5 +1,5 @@
 import type { OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
-import type { ExternalAccountResource } from '@clerk/types/src';
+import type { ExternalAccountResource } from '@clerk/types';
 
 import { useRouter } from '../../../ui/router';
 import { appendModalState } from '../../../utils';
