@@ -49,7 +49,10 @@ class Portal extends React.PureComponent<MountProps> {
   private portalRef = React.createRef<HTMLDivElement>();
 
   componentDidUpdate(prevProps: Readonly<MountProps>) {
-    if (prevProps.props.appearance !== this.props.props.appearance) {
+    if (
+      prevProps.props.appearance !== this.props.props.appearance ||
+      prevProps.props?.customPages?.length !== this.props.props?.customPages?.length
+    ) {
       this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
     }
   }
