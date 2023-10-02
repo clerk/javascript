@@ -1,5 +1,3 @@
-import { deprecated } from '@clerk/shared';
-
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type {
