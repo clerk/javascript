@@ -81,6 +81,20 @@ export const deprecatedProperty = (cls: AnyClass, propName: string, warning: str
  *
  * deprecatedObjectProperty(obj, 'something', 'Use `somethingElse` instead.');
  */
-export const deprecatedObjectProperty = (obj: Record<string, any>, propName: string, warning: string): void => {
-  deprecatedProperty(obj as any, propName, warning, true);
+export const deprecatedObjectProperty = (
+  obj: Record<string, any>,
+  propName: string,
+  warning: string,
+  key?: string,
+): void => {
+  let value = obj[propName];
+  Object.defineProperty(obj, propName, {
+    get() {
+      deprecated(propName, warning, key);
+      return value;
+    },
+    set(v: unknown) {
+      value = v;
+    },
+  });
 };
