@@ -17,15 +17,15 @@ import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 export const LeaveOrganizationPage = () => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
-  const { organization, membership } = useCoreOrganization();
+  const { organization } = useCoreOrganization();
   const user = useCoreUser();
 
-  if (!organization || !membership) {
+  if (!organization) {
     return null;
   }
 
   const leave = () => {
-    return card.runAsync(organization.removeMember(user.id)).then(navigateAfterLeaveOrganization);
+    return card.runAsync(user.leaveOrganization(organization.id)).then(navigateAfterLeaveOrganization);
   };
 
   return (
@@ -50,9 +50,9 @@ export const LeaveOrganizationPage = () => {
 export const DeleteOrganizationPage = () => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
-  const { organization, membership } = useCoreOrganization();
+  const { organization } = useCoreOrganization();
 
-  if (!organization || !membership) {
+  if (!organization) {
     return null;
   }
 
