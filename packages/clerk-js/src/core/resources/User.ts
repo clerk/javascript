@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import { deprecatedProperty } from '@clerk/shared';
 import type {
   BackupCodeJSON,
@@ -154,6 +155,9 @@ export class User extends BaseResource implements UserResource {
 
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
     const { strategy, redirectUrl, additionalScopes, redirect_url } = params || {};
+    if (redirect_url) {
+      deprecated('redirect_url', 'Use `redirectUrl` instead.');
+    }
 
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
