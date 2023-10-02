@@ -1,5 +1,5 @@
 import { is4xxError } from '@clerk/shared';
-import { deepSnakeToCamel, runWithExponentialBackOff } from '@clerk/shared';
+import { runWithExponentialBackOff } from '@clerk/shared';
 import type {
   ActJWTClaim,
   GetToken,
@@ -15,7 +15,7 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
-import { BaseResource, Token, User } from './internal';
+import { BaseResource, SessionPublicUserData, Token, User } from './internal';
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -138,8 +138,13 @@ export class Session extends BaseResource implements SessionResource {
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
-    this.publicUserData = deepSnakeToCamel(data.public_user_data) as PublicUserData;
+
+    if (data.public_user_data) {
+      this.publicUserData = new SessionPublicUserData(data.public_user_data);
+    }
+
     this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
+
     return this;
   }
 

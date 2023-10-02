@@ -21,6 +21,7 @@ export * from './OrganizationPublicUserData';
 export * from './OrganizationSuggestion';
 export * from './SamlAccount';
 export * from './Session';
+export * from './SessionPublicUserData';
 export * from './SessionWithActivities';
 export * from './SignIn';
 export * from './SignUp';
