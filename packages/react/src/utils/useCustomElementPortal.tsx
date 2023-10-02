@@ -1,24 +1,36 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 
+export type UseCustomElementPortalParams = {
+  component: React.ReactNode;
+  id: number;
+};
+
+export type UseCustomElementPortalReturn = {
+  portal: () => JSX.Element;
+  mount: (node: Element) => void;
+  unmount: () => void;
+  id: number;
+};
+
 // This function takes a component as prop, and returns functions that mount and unmount
 // the given component into a given node
+export const useCustomElementPortal = (elements: UseCustomElementPortalParams[]) => {
+  const [nodes, setNodes] = useState<(Element | null)[]>(Array(elements.length).fill(null));
 
-export const useCustomElementPortal = (component: JSX.Element) => {
-  const [node, setNode] = useState<Element | null>(null);
+  const portals: UseCustomElementPortalReturn[] = [];
 
-  const mount = (node: Element) => {
-    setNode(node);
-  };
-  const unmount = () => {
-    setNode(null);
-  };
+  elements.forEach((el, index) => {
+    const mount = (node: Element) => {
+      setNodes(prevState => prevState.map((n, i) => (i === index ? node : n)));
+    };
+    const unmount = () => {
+      setNodes(prevState => prevState.map((n, i) => (i === index ? null : n)));
+    };
 
-  // If mount has been called, CustomElementPortal returns a portal that renders `component`
-  // into the passed node
+    const portal = () => <>{nodes[index] ? createPortal(el.component, nodes[index] as Element) : null}</>;
+    portals.push({ portal, mount, unmount, id: el.id });
+  });
 
-  // Otherwise, CustomElementPortal returns nothing
-  const CustomElementPortal = () => <>{node ? createPortal(component, node) : null}</>;
-
-  return { CustomElementPortal, mount, unmount };
+  return portals;
 };
