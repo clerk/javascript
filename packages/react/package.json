@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "4.25.1",
+  "version": "4.26.1",
   "license": "MIT",
   "description": "Clerk React library",
   "keywords": [
@@ -26,6 +26,12 @@
   "files": [
     "dist"
   ],
+  "sideEffects": [
+    "./dist/cjs/index.js",
+    "./dist/cjs/polyfills.js",
+    "./dist/esm/index.js",
+    "./dist/esm/polyfills.js"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -38,8 +44,8 @@
     "test:ci": "jest --maxWorkers=50%"
   },
   "dependencies": {
-    "@clerk/shared": "^0.23.0",
-    "@clerk/types": "^3.52.0",
+    "@clerk/shared": "^0.24.1",
+    "@clerk/types": "^3.53.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {

@@ -1,9 +1,8 @@
-import { isDevelopmentEnvironment } from './runtimeEnvironment';
+import { isProductionEnvironment, isTestEnvironment } from './runtimeEnvironment';
 /**
- * Mark class methods or functions as deprecated.
+ * Mark class method / function as deprecated.
  *
- * A console WARNING will be displayed when class methods
- * or functions are invoked.
+ * A console WARNING will be displayed when class method / function is invoked.
  *
  * Examples
  * 1. Deprecate class method
@@ -22,8 +21,9 @@ import { isDevelopmentEnvironment } from './runtimeEnvironment';
  */
 const displayedWarnings = new Set<string>();
 export const deprecated = (fnName: string, warning: string, key?: string): void => {
+  const hideWarning = isTestEnvironment() || isProductionEnvironment();
   const messageId = key ?? fnName;
-  if (displayedWarnings.has(messageId) || !isDevelopmentEnvironment()) {
+  if (displayedWarnings.has(messageId) || hideWarning) {
     return;
   }
   displayedWarnings.add(messageId);
@@ -33,9 +33,9 @@ export const deprecated = (fnName: string, warning: string, key?: string): void 
   );
 };
 /**
- * Mark class properties as deprecated.
+ * Mark class property as deprecated.
  *
- * A console WARNING will be displayed when class properties are being accessed.
+ * A console WARNING will be displayed when class property is being accessed.
  *
  * 1. Deprecate class property
  * class Example {
@@ -59,13 +59,28 @@ type AnyClass = new (...args: any[]) => any;
 export const deprecatedProperty = (cls: AnyClass, propName: string, warning: string, isStatic = false): void => {
   const target = isStatic ? cls : cls.prototype;
 
+  let value = target[propName];
   Object.defineProperty(target, propName, {
     get() {
       deprecated(propName, warning, `${cls.name}:${propName}`);
-      return this['_' + propName];
+      return value;
     },
     set(v: unknown) {
-      this['_' + propName] = v;
+      value = v;
     },
   });
+};
+
+/**
+ * Mark object property as deprecated.
+ *
+ * A console WARNING will be displayed when object property is being accessed.
+ *
+ * 1. Deprecate object property
+ * const obj = { something: 'aloha' };
+ *
+ * deprecatedObjectProperty(obj, 'something', 'Use `somethingElse` instead.');
+ */
+export const deprecatedObjectProperty = (obj: Record<string, any>, propName: string, warning: string): void => {
+  deprecatedProperty(obj as any, propName, warning, true);
 };

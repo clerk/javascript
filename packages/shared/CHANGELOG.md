@@ -1,5 +1,48 @@
 # Change Log
 
+## 0.24.1
+
+### Patch Changes
+
+- Temporarily revert internal change to resolve RSC-related errors ([#1806](https://github.com/clerkinc/javascript/pull/1806)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 0.24.0
+
+### Minor Changes
+
+- Introduce `getClerkJsMajorVersionOrTag()`, `getScriptUrl()`, `callWithRetry()` ([#1769](https://github.com/clerkinc/javascript/pull/1769)) by [@dimkl](https://github.com/dimkl)
+
+- Add the `use client` directive in `@clerk/shared` to make the package compatible with an RSC environment. ([#1767](https://github.com/clerkinc/javascript/pull/1767)) by [@dimkl](https://github.com/dimkl)
+
+  Remove several helpers from `@clerk/nextjs` and import them from `@clerk/shared` instead.
+
+### Patch Changes
+
+- Apply deprecation warnings for `@clerk/shared`: ([#1789](https://github.com/clerkinc/javascript/pull/1789)) by [@dimkl](https://github.com/dimkl)
+
+  - `OrganizationContext`
+  - `organizationList`
+  - `useOrganizations`
+  - `getRequestUrl`
+
+- Removes the patch for disabling swr-devtools causing apps with swr and broswers with the devtools extention to break. ([#1794](https://github.com/clerkinc/javascript/pull/1794)) by [@panteliselef](https://github.com/panteliselef)
+
+## 0.23.1
+
+### Patch Changes
+
+- Introduce `invitations` in useOrganization, which enables to fetch invitations as paginated lists. ([#1766](https://github.com/clerkinc/javascript/pull/1766)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecate `invitationList` in favor of the above introduction.
+
+- Safer usage of `localStorage` by checking if `window` is available in current environment ([#1774](https://github.com/clerkinc/javascript/pull/1774)) by [@LekoArts](https://github.com/LekoArts)
+
+- Fix SyntaxError on non-module imports by dropping support for import.meta (used in vite) ([#1782](https://github.com/clerkinc/javascript/pull/1782)) by [@dimkl](https://github.com/dimkl)
+
+- `deprecated()` & `deprecatedProperty` warnings will be hidden in test/production ([#1784](https://github.com/clerkinc/javascript/pull/1784)) by [@dimkl](https://github.com/dimkl)
+
+  environments and when there is no NODE_ENV environment variable defined.
+
 ## 0.23.0
 
 ### Minor Changes

@@ -1,6 +1,11 @@
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
-import type { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
+import type {
+  Organization,
+  OrganizationInvitation,
+  OrganizationInvitationStatus,
+  OrganizationMembership,
+} from '../resources';
 import type { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractAPI } from './AbstractApi';
 
@@ -72,6 +77,13 @@ type CreateOrganizationInvitationParams = {
   role: OrganizationMembershipRole;
   redirectUrl?: string;
   publicMetadata?: OrganizationInvitationPublicMetadata;
+};
+
+type GetOrganizationInvitationListParams = {
+  organizationId: string;
+  status?: OrganizationInvitationStatus[];
+  limit?: number;
+  offset?: number;
 };
 
 type GetPendingOrganizationInvitationListParams = {
@@ -228,6 +240,20 @@ export class OrganizationAPI extends AbstractAPI {
     });
   }
 
+  public async getOrganizationInvitationList(params: GetOrganizationInvitationListParams) {
+    const { organizationId, status, limit, offset } = params;
+    this.requireId(organizationId);
+
+    return this.request<OrganizationInvitation[]>({
+      method: 'GET',
+      path: joinPaths(basePath, organizationId, 'invitations'),
+      queryParams: { status, limit, offset },
+    });
+  }
+
+  /**
+   * @deprecated  Use `getOrganizationInvitationList` instead along with the status parameter.
+   */
   public async getPendingOrganizationInvitationList(params: GetPendingOrganizationInvitationListParams) {
     const { organizationId, limit, offset } = params;
     this.requireId(organizationId);

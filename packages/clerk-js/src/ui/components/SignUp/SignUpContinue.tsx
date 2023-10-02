@@ -32,7 +32,7 @@ function _SignUpContinue() {
   const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
-  const { navigateAfterSignUp, signInUrl, unsafeMetadata } = useSignUpContext();
+  const { navigateAfterSignUp, signInUrl, unsafeMetadata, initialValues = {} } = useSignUpContext();
   const signUp = useCoreSignUp();
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
@@ -47,27 +47,27 @@ function _SignUpContinue() {
 
   // TODO: This form should be shared between SignUpStart and SignUpContinue
   const formState = {
-    firstName: useFormControl('firstName', '', {
+    firstName: useFormControl('firstName', initialValues.firstName || '', {
       type: 'text',
       label: localizationKeys('formFieldLabel__firstName'),
       placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
     }),
-    lastName: useFormControl('lastName', '', {
+    lastName: useFormControl('lastName', initialValues.lastName || '', {
       type: 'text',
       label: localizationKeys('formFieldLabel__lastName'),
       placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
     }),
-    emailAddress: useFormControl('emailAddress', '', {
+    emailAddress: useFormControl('emailAddress', initialValues.emailAddress || '', {
       type: 'email',
       label: localizationKeys('formFieldLabel__emailAddress'),
       placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     }),
-    username: useFormControl('username', '', {
+    username: useFormControl('username', initialValues.username || '', {
       type: 'text',
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
     }),
-    phoneNumber: useFormControl('phoneNumber', '', {
+    phoneNumber: useFormControl('phoneNumber', initialValues.phoneNumber || '', {
       type: 'tel',
       label: localizationKeys('formFieldLabel__phoneNumber'),
       placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),

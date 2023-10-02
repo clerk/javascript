@@ -15,7 +15,7 @@ import type {
   UserJSON,
   UserSettingsJSON,
 } from '@clerk/types';
-import type { MembershipRole, PublicUserDataJSON } from '@clerk/types/src';
+import type { MembershipRole, PublicUserDataJSON } from '@clerk/types';
 
 import { createUser, getOrganizationId } from '../../../core/test/fixtures';
 import { createUserFixture } from './fixtures';

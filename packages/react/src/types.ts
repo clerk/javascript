@@ -6,8 +6,9 @@ import type {
   LoadedClerk,
   MultiDomainAndOrProxy,
   PublishableKeyOrFrontendApi,
-  RedirectOptions,
   SessionResource,
+  SignInRedirectOptions,
+  SignUpRedirectOptions,
   UserResource,
 } from '@clerk/types';
 
@@ -83,4 +84,5 @@ export interface SignUpButtonProps extends ButtonProps {
 
 export type SignInWithMetamaskButtonProps = Pick<ButtonProps, 'redirectUrl' | 'children'>;
 
-export type RedirectToProps = RedirectOptions;
+export type RedirectToSignInProps = SignInRedirectOptions;
+export type RedirectToSignUpProps = SignUpRedirectOptions;

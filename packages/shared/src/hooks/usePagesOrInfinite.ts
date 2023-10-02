@@ -1,7 +1,7 @@
+'use client';
+
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { disableSWRDevtools } from './clerk-swr';
-disableSWRDevtools();
 import { useSWR, useSWRInfinite } from './clerk-swr';
 import type { ValueOrSetter } from './types';
 import type { PaginatedResources } from './types';

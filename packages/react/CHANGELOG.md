@@ -1,5 +1,40 @@
 # Change Log
 
+## 4.26.1
+
+### Patch Changes
+
+- Refactor our script loading logic to use a `versionSelector` helper function. No change in behavior should occur. This internal change allows versions tagged with `snapshot` and `staging` to use the exact corresponding NPM version of `@clerk/clerk-js`. ([#1780](https://github.com/clerkinc/javascript/pull/1780)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`cecf74d79`](https://github.com/clerkinc/javascript/commit/cecf74d79069662d25f73e4745aa01348d398afb)]:
+  - @clerk/shared@0.24.1
+
+## 4.26.0
+
+### Minor Changes
+
+- `<SignIn/>`, `<SignUp/>`, `<RedirectToSignin/>`, `<RedirectToSignUp/>`, `clerk.redirectToSignIn()` and `clerk.redirectToSignUp()` now accept the `initialValues` option, which will prefill the appropriate form fields with the values provided. ([#1701](https://github.com/clerkinc/javascript/pull/1701)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Apply deprecation warnings for `@clerk/clerk-react`: ([#1788](https://github.com/clerkinc/javascript/pull/1788)) by [@dimkl](https://github.com/dimkl)
+
+  - `setSession`
+
+- Updated dependencies [[`7ffa6fac3`](https://github.com/clerkinc/javascript/commit/7ffa6fac3762f6fb130ba2f2fcaa28e52b36b3b4), [`5c8754239`](https://github.com/clerkinc/javascript/commit/5c8754239e9ef13656fb73f30c9c6a6187b9aa81), [`2f6a6ac99`](https://github.com/clerkinc/javascript/commit/2f6a6ac9991469bf8532019bb22ff50adecdb434), [`753f7bbda`](https://github.com/clerkinc/javascript/commit/753f7bbda9bbb7444f96222a3b6cae815a09058f), [`55c8ebd39`](https://github.com/clerkinc/javascript/commit/55c8ebd390dd88036aee06866009be6a50c63138)]:
+  - @clerk/shared@0.24.0
+  - @clerk/types@3.53.0
+
+## 4.25.2
+
+### Patch Changes
+
+- Remove nested `package.json` files inside `dist/cjs` and `dist/esm` and move `sideEffects` property to top-level `package.json` file. This change won't change behavior. ([#1785](https://github.com/clerkinc/javascript/pull/1785)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`07ede0f95`](https://github.com/clerkinc/javascript/commit/07ede0f959f232f6cbecb596eb9352f8cb382cdc), [`0eb666118`](https://github.com/clerkinc/javascript/commit/0eb66611882e6c460cc6a6c5cfa1d9b086ec6917), [`3b85311c9`](https://github.com/clerkinc/javascript/commit/3b85311c9eb006f51a8642f193473a250de879fc), [`ffcc78c06`](https://github.com/clerkinc/javascript/commit/ffcc78c062d067738f617ea9b491c1d45677148c), [`c61ddf5bf`](https://github.com/clerkinc/javascript/commit/c61ddf5bf2664e38bbaba6572d421adac8a2eff7), [`0366e0b20`](https://github.com/clerkinc/javascript/commit/0366e0b208e9086896562af94f24cdbd401c702c)]:
+  - @clerk/shared@0.23.1
+  - @clerk/types@3.52.1
+
 ## 4.25.1
 
 ### Patch Changes

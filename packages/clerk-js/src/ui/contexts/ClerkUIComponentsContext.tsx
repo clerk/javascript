@@ -1,6 +1,8 @@
+import { snakeToCamel } from '@clerk/shared';
 import type { OrganizationResource, UserResource } from '@clerk/types';
-import React from 'react';
+import React, { useMemo } from 'react';
 
+import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
 import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import type { ParsedQs } from '../router';
@@ -21,6 +23,18 @@ const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 
 export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
+const getInitialValuesFromQueryParams = (queryString: string, params: string[]) => {
+  const props: Record<string, string> = {};
+  const searchParams = new URLSearchParams(queryString);
+  searchParams.forEach((value, key) => {
+    if (params.includes(key) && typeof value === 'string') {
+      props[snakeToCamel(key)] = value;
+    }
+  });
+
+  return props;
+};
+
 export type SignUpContextType = SignUpCtx & {
   navigateAfterSignUp: () => any;
   queryParams: ParsedQs;
@@ -33,9 +47,14 @@ export const useSignUpContext = (): SignUpContextType => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignUpCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
-  const { queryParams } = useRouter();
+  const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useCoreClerk();
+
+  const initialValuesFromQueryParams = useMemo(
+    () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),
+    [],
+  );
 
   if (componentName !== 'SignUp') {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
@@ -87,6 +106,7 @@ export const useSignUpContext = (): SignUpContextType => {
     afterSignInUrl,
     navigateAfterSignUp,
     queryParams,
+    initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString: authQs,
   };
 };
@@ -103,9 +123,14 @@ export const useSignInContext = (): SignInContextType => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignInCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
-  const { queryParams } = useRouter();
+  const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useCoreClerk();
+
+  const initialValuesFromQueryParams = useMemo(
+    () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
+    [],
+  );
 
   if (componentName !== 'SignIn') {
     throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
@@ -154,6 +179,7 @@ export const useSignInContext = (): SignInContextType => {
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,
+    initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString: authQs,
   };
 };

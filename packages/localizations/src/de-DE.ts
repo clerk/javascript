@@ -42,6 +42,8 @@ export const deDE: LocalizationResource = {
     'Der Bestätigungslink ist abgelaufen. Bitte fordern Sie einen neuen Link an.',
   formFieldAction__forgotPassword: 'Passwort vergessen?',
   formFieldHintText__optional: 'Optional',
+  formFieldHintText__slug:
+    'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formButtonPrimary: 'Fortsetzen',
   signInEnterPasswordTitle: 'Geben Sie Ihr Passwort ein',
   backButton: 'Zurück',

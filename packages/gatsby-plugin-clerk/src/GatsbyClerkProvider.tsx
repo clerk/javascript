@@ -1,9 +1,9 @@
+import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
 import {
   __internal__setErrorThrowerOptions,
   ClerkLoaded,
   ClerkProvider as ReactClerkProvider,
 } from '@clerk/clerk-react';
-import type { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import { navigate } from 'gatsby';
 import React from 'react';
 

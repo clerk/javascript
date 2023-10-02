@@ -1,5 +1,62 @@
 # Change Log
 
+## 4.59.1
+
+### Patch Changes
+
+- Apply deprecation warnings for `@clerk/clerk-js`: ([#1800](https://github.com/clerkinc/javascript/pull/1800)) by [@dimkl](https://github.com/dimkl)
+
+  - `Clerk.setSession`
+
+- Updated dependencies [[`cecf74d79`](https://github.com/clerkinc/javascript/commit/cecf74d79069662d25f73e4745aa01348d398afb)]:
+  - @clerk/shared@0.24.1
+
+## 4.59.0
+
+### Minor Changes
+
+- `<SignIn/>`, `<SignUp/>`, `<RedirectToSignin/>`, `<RedirectToSignUp/>`, `clerk.redirectToSignIn()` and `clerk.redirectToSignUp()` now accept the `initialValues` option, which will prefill the appropriate form fields with the values provided. ([#1701](https://github.com/clerkinc/javascript/pull/1701)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Use our deprecate utility to log warnings about deprecated usage of Organization.getMemberships ([#1779](https://github.com/clerkinc/javascript/pull/1779)) by [@dimkl](https://github.com/dimkl)
+
+- Fix: localized key for invalid email addreses in InviteMembers form. ([#1781](https://github.com/clerkinc/javascript/pull/1781)) by [@panteliselef](https://github.com/panteliselef)
+
+- Apply deprecation warnings clerk-js package for: ([#1779](https://github.com/clerkinc/javascript/pull/1779)) by [@dimkl](https://github.com/dimkl)
+
+  - Organization.create() using string parameter
+  - Organization.retrieve() `limit` & `offset`
+  - Clerk.getOrganizationMemberships()
+  - `svgUrl`
+  - `avatarUrl`/`logoUrl`/`faviconUrl`/`profileImageUrl`
+
+- Updated the OAuth buttons in the SignIn and SignUp components to prevent layout shifts while loading. ([#1728](https://github.com/clerkinc/javascript/pull/1728)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`7ffa6fac3`](https://github.com/clerkinc/javascript/commit/7ffa6fac3762f6fb130ba2f2fcaa28e52b36b3b4), [`cc8851765`](https://github.com/clerkinc/javascript/commit/cc88517650100b0305e4d7a44db62daec3482a33), [`5c8754239`](https://github.com/clerkinc/javascript/commit/5c8754239e9ef13656fb73f30c9c6a6187b9aa81), [`2f6a6ac99`](https://github.com/clerkinc/javascript/commit/2f6a6ac9991469bf8532019bb22ff50adecdb434), [`753f7bbda`](https://github.com/clerkinc/javascript/commit/753f7bbda9bbb7444f96222a3b6cae815a09058f), [`55c8ebd39`](https://github.com/clerkinc/javascript/commit/55c8ebd390dd88036aee06866009be6a50c63138)]:
+  - @clerk/shared@0.24.0
+  - @clerk/localizations@1.26.2
+  - @clerk/types@3.53.0
+
+## 4.58.2
+
+### Patch Changes
+
+- Safer usage of `localStorage` by checking if `window` is available in current environment ([#1774](https://github.com/clerkinc/javascript/pull/1774)) by [@LekoArts](https://github.com/LekoArts)
+
+- Some minor TypeScript type fixes to internal components. Also applying some ESLint recommendations. ([#1756](https://github.com/clerkinc/javascript/pull/1756)) by [@LekoArts](https://github.com/LekoArts)
+
+- Introduces a new method for fetching organization invitations called `Organization.getInvitations`. ([#1766](https://github.com/clerkinc/javascript/pull/1766)) by [@panteliselef](https://github.com/panteliselef)
+
+  Deprecate `Organization.getPendingInvitations`
+
+- Adds the ability to force users to reset their password. ([#1757](https://github.com/clerkinc/javascript/pull/1757)) by [@kostaspt](https://github.com/kostaspt)
+
+- Updated dependencies [[`07ede0f95`](https://github.com/clerkinc/javascript/commit/07ede0f959f232f6cbecb596eb9352f8cb382cdc), [`0eb666118`](https://github.com/clerkinc/javascript/commit/0eb66611882e6c460cc6a6c5cfa1d9b086ec6917), [`3b85311c9`](https://github.com/clerkinc/javascript/commit/3b85311c9eb006f51a8642f193473a250de879fc), [`ffcc78c06`](https://github.com/clerkinc/javascript/commit/ffcc78c062d067738f617ea9b491c1d45677148c), [`c61ddf5bf`](https://github.com/clerkinc/javascript/commit/c61ddf5bf2664e38bbaba6572d421adac8a2eff7), [`0366e0b20`](https://github.com/clerkinc/javascript/commit/0366e0b208e9086896562af94f24cdbd401c702c)]:
+  - @clerk/shared@0.23.1
+  - @clerk/types@3.52.1
+  - @clerk/localizations@1.26.1
+
 ## 4.58.1
 
 ### Patch Changes

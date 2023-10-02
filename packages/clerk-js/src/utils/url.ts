@@ -210,7 +210,7 @@ export const trimTrailingSlash = (path: string): string => {
   return (path || '').replace(/\/+$/, '');
 };
 
-export const appendAsQueryParams = (
+export const appendUrlsAsQueryParams = (
   baseUrl: string | URL,
   urls: Record<string, string | URL | null | undefined> = {},
 ): string => {
@@ -229,6 +229,21 @@ export const appendAsQueryParams = (
   // This is required for ClerkJS Components Hash router to work as expected
   // as it treats the hash as sub-path with its nested querystring parameters.
   return `${base}${params.toString() ? '#/?' + params.toString() : ''}`;
+};
+
+export const appendAsQueryParams = (
+  baseUrl: string | URL,
+  values: Record<string, string | null | undefined> = {},
+): string => {
+  const base = toURL(baseUrl);
+  for (const [key, val] of Object.entries(values)) {
+    if (!val) {
+      continue;
+    }
+    base.searchParams.append(camelToSnake(key), val);
+  }
+
+  return baseUrl.toString() + base.search;
 };
 
 export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean => {

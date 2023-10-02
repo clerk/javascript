@@ -64,6 +64,7 @@ export const enUS: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldAction__forgotPassword: 'Forgot password?',
   formFieldHintText__optional: 'Optional',
+  formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
   formButtonPrimary: 'Continue',
   signInEnterPasswordTitle: 'Enter your password',
   backButton: 'Back',
@@ -630,7 +631,8 @@ export const enUS: LocalizationResource = {
       title: 'Invite members',
       subtitle: 'Invite new members to this organization',
       successMessage: 'Invitations successfully sent',
-      detailsTitle__inviteFailed: 'The invitations could not be sent. Fix the following and try again:',
+      detailsTitle__inviteFailed:
+        'The invitations could not be sent. There are already pending invitations for the following email addresses: {{email_addresses}}.',
       formButtonPrimary__continue: 'Send invitations',
     },
     removeDomainPage: {

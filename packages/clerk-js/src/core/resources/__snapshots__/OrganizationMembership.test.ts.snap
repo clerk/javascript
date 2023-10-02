@@ -22,7 +22,6 @@ OrganizationMembership {
     "imageUrl": "https://clerk.com",
     "inviteMember": [Function],
     "inviteMembers": [Function],
-    "logoUrl": "https://path-to-logo.png",
     "maxAllowedMemberships": 3,
     "membersCount": 1,
     "name": "test_name",
@@ -42,13 +41,12 @@ OrganizationMembership {
   "publicMetadata": {
     "foo": "bar",
   },
-  "publicUserData": {
+  "publicUserData": OrganizationPublicUserData {
     "firstName": "test_first_name",
     "hasImage": true,
     "identifier": "test@identifier.gr",
     "imageUrl": "https://clerk.com",
     "lastName": "test_last_name",
-    "profileImageUrl": "test_url",
     "userId": undefined,
   },
   "role": "admin",
