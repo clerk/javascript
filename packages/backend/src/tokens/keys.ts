@@ -23,6 +23,10 @@ function getFromCache(kid: string) {
   return cache[kid];
 }
 
+function getCacheValues() {
+  return Object.values(cache);
+}
+
 function setInCache(
   jwk: JsonWebKeyWithKid,
   jwksCacheTtlInMs: number = 1000 * 60 * 60, // 1 hour
@@ -144,7 +148,7 @@ export async function loadClerkJWKFromRemote({
       });
     }
 
-    const { keys }: { keys: JsonWebKeyWithKid[] } = await callWithRetry(fetcher);
+    const { keys } = await callWithRetry<{ keys: JsonWebKeyWithKid[] }>(fetcher);
 
     if (!keys || !keys.length) {
       throw new TokenVerificationError({
@@ -160,9 +164,14 @@ export async function loadClerkJWKFromRemote({
   const jwk = getFromCache(kid);
 
   if (!jwk) {
+    const cacheValues = getCacheValues();
+    const jwkKeys = cacheValues.map(jwk => jwk.kid).join(', ');
+
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.ContactSupport,
-      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.`,
+      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.${
+        jwkKeys ? ` The following kid are available: ${jwkKeys}` : ''
+      }`,
       reason: TokenVerificationErrorReason.RemoteJWKMissing,
     });
   }
