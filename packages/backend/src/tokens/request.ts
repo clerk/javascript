@@ -122,19 +122,12 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
   options = {
     ...options,
+    ...loadOptionsFromHeaders(options, headers),
     frontendApi: parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi,
     apiUrl: options.apiUrl || API_URL,
     apiVersion: options.apiVersion || API_VERSION,
-    headerToken: stripAuthorizationHeader(options.headerToken || headers?.(constants.Headers.Authorization)),
     cookieToken: options.cookieToken || cookies?.(constants.Cookies.Session),
     clientUat: options.clientUat || cookies?.(constants.Cookies.ClientUat),
-    origin: options.origin || headers?.(constants.Headers.Origin),
-    host: options.host || headers?.(constants.Headers.Host),
-    forwardedHost: options.forwardedHost || headers?.(constants.Headers.ForwardedHost),
-    forwardedPort: options.forwardedPort || headers?.(constants.Headers.ForwardedPort),
-    forwardedProto: options.forwardedProto || headers?.(constants.Headers.ForwardedProto),
-    referrer: options.referrer || headers?.(constants.Headers.Referrer),
-    userAgent: options.userAgent || headers?.(constants.Headers.UserAgent),
     searchParams: options.searchParams || searchParams || undefined,
   };
 
@@ -208,3 +201,29 @@ export const debugRequestState = (params: RequestState) => {
 };
 
 export type DebugRequestSate = ReturnType<typeof debugRequestState>;
+
+/**
+ * Load authenticate request options from the options provided or fallback to headers.
+ */
+export const loadOptionsFromHeaders = (
+  options: AuthenticateRequestOptions,
+  headers: ReturnType<typeof buildRequest>['headers'],
+) => {
+  if (!headers) {
+    return {};
+  }
+
+  return {
+    headerToken: stripAuthorizationHeader(options.headerToken || headers(constants.Headers.Authorization)),
+    origin: options.origin || headers(constants.Headers.Origin),
+    host: options.host || headers(constants.Headers.Host),
+    forwardedHost: options.forwardedHost || headers(constants.Headers.ForwardedHost),
+    forwardedPort: options.forwardedPort || headers(constants.Headers.ForwardedPort),
+    forwardedProto:
+      options.forwardedProto ||
+      headers(constants.Headers.CloudFrontForwardedProto) ||
+      headers(constants.Headers.ForwardedProto),
+    referrer: options.referrer || headers(constants.Headers.Referrer),
+    userAgent: options.userAgent || headers(constants.Headers.UserAgent),
+  };
+};
