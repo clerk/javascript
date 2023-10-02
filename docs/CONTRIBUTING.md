@@ -13,7 +13,7 @@ Please note we have a [code of conduct](https://github.com/clerkinc/javascript/b
     - [Setting up your local environment](#setting-up-your-local-environment)
     - [Documenting your changes](#documenting-your-changes)
   - [Opening a Pull Request](#opening-a-pull-request)
-    - [Changeset](#changeset)
+    - [Changesets](#changesets)
     - [Commit messages](#commit-messages)
     - [What is the difference between a commit message, a PR description and a changeset description?](#what-is-the-difference-between-a-commit-message-a-pr-description-and-a-changeset-description)
     - [Notes on Pull Requests](#notes-on-pull-requests)
