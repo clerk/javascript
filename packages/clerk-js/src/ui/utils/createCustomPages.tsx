@@ -7,31 +7,6 @@ import { TickShield, User } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 
-const CLERK_ACCOUNT_ROUTE: NavbarRoute = {
-  name: localizationKeys('userProfile.start.headerTitle__account'),
-  id: 'account',
-  icon: User,
-  path: 'account',
-};
-
-const CLERK_SECURITY_ROUTE: NavbarRoute = {
-  name: localizationKeys('userProfile.start.headerTitle__security'),
-  id: 'security',
-  icon: TickShield,
-  path: 'account',
-};
-
-export const pageToRootNavbarRouteMap = {
-  profile: CLERK_ACCOUNT_ROUTE,
-  'email-address': CLERK_ACCOUNT_ROUTE,
-  'phone-number': CLERK_ACCOUNT_ROUTE,
-  'connected-account': CLERK_ACCOUNT_ROUTE,
-  'web3-wallet': CLERK_ACCOUNT_ROUTE,
-  username: CLERK_ACCOUNT_ROUTE,
-  'multi-factor': CLERK_SECURITY_ROUTE,
-  password: CLERK_SECURITY_ROUTE,
-};
-
 export type CustomPageContent = {
   url: string;
   mount: (el: HTMLDivElement) => void;
@@ -73,7 +48,12 @@ export const createCustomPages = (customPages: CustomPage[]) => {
     return true;
   });
 
-  const { allRoutes, contents } = getRoutesAndContents(validCustomPages);
+  const { USER_PROFILE_ROUTES, pageToRootNavbarRouteMap } = getUserProfileDefaultRoutes();
+
+  const { allRoutes, contents } = getRoutesAndContents({
+    customPages: validCustomPages,
+    defaultRoutes: USER_PROFILE_ROUTES,
+  });
 
   assertExternalLinkAsRoot(allRoutes);
 
@@ -83,15 +63,21 @@ export const createCustomPages = (customPages: CustomPage[]) => {
     warnForDuplicatePaths(routes);
   }
 
-  return { routes, contents, isAccountPageRoot: routes[0].id === 'account' || routes[0].id === 'security' };
+  return {
+    routes,
+    contents,
+    isAccountPageRoot: routes[0].id === 'account' || routes[0].id === 'security',
+    pageToRootNavbarRouteMap,
+  };
 };
 
-const getRoutesAndContents = (customPages: CustomPage[]) => {
-  let clerkDefaultRoutes: NavbarRoute[] = [{ ...CLERK_ACCOUNT_ROUTE }, { ...CLERK_SECURITY_ROUTE }];
-  const CLERK_ROUTES = {
-    account: CLERK_ACCOUNT_ROUTE,
-    security: CLERK_SECURITY_ROUTE,
-  };
+type GetRoutesAndContentsParams = {
+  customPages: CustomPage[];
+  defaultRoutes: NavbarRoute[];
+};
+
+const getRoutesAndContents = ({ customPages, defaultRoutes }: GetRoutesAndContentsParams) => {
+  let remainingDefaultRoutes: NavbarRoute[] = defaultRoutes.map(r => ({ ...r }));
   const contents: CustomPageContent[] = [];
 
   const routesWithoutDefaults: NavbarRoute[] = customPages.map((cp, index) => {
@@ -124,12 +110,12 @@ const getRoutesAndContents = (customPages: CustomPage[]) => {
         path: pageURL,
       };
     }
-    const reorderItem = CLERK_ROUTES[cp.label as 'account' | 'security'];
-    clerkDefaultRoutes = clerkDefaultRoutes.filter(({ id }) => id !== cp.label);
+    const reorderItem = defaultRoutes.find(r => r.id === cp.label) as NavbarRoute;
+    remainingDefaultRoutes = remainingDefaultRoutes.filter(({ id }) => id !== cp.label);
     return { ...reorderItem };
   });
 
-  const allRoutes = [...clerkDefaultRoutes, ...routesWithoutDefaults];
+  const allRoutes = [...remainingDefaultRoutes, ...routesWithoutDefaults];
 
   return { allRoutes, contents };
 };
@@ -214,4 +200,34 @@ const assertExternalLinkAsRoot = (routes: NavbarRoute[]) => {
   if (routes[0].external) {
     throw new Error('The first route cannot be a <UserProfile.Link /> component');
   }
+};
+
+const getUserProfileDefaultRoutes = () => {
+  const USER_PROFILE_ROUTES: NavbarRoute[] = [
+    {
+      name: localizationKeys('userProfile.start.headerTitle__account'),
+      id: 'account',
+      icon: User,
+      path: 'account',
+    },
+    {
+      name: localizationKeys('userProfile.start.headerTitle__security'),
+      id: 'security',
+      icon: TickShield,
+      path: 'account',
+    },
+  ];
+
+  const pageToRootNavbarRouteMap = {
+    profile: USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'email-address': USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'phone-number': USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'connected-account': USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'web3-wallet': USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    username: USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'multi-factor': USER_PROFILE_ROUTES.find(r => r.id === 'security') as NavbarRoute,
+    password: USER_PROFILE_ROUTES.find(r => r.id === 'security') as NavbarRoute,
+  };
+
+  return { USER_PROFILE_ROUTES, pageToRootNavbarRouteMap };
 };
