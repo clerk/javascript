@@ -4,6 +4,7 @@ function wait(ms: number) {
 
 const MAX_NUMBER_OF_RETRIES = 5;
 
+// TODO: Move this to @clerk/shared and reuse it with @clerk/clerk-js
 export async function callWithRetry<T>(
   fn: (...args: unknown[]) => Promise<T>,
   attempt = 1,

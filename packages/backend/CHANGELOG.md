@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.30.1
+
+### Patch Changes
+
+- Temporarily revert internal change to resolve RSC-related errors ([#1806](https://github.com/clerkinc/javascript/pull/1806)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 0.30.0
 
 ### Minor Changes

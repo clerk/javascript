@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.26.1
+
+### Patch Changes
+
+- Refactor our script loading logic to use a `versionSelector` helper function. No change in behavior should occur. This internal change allows versions tagged with `snapshot` and `staging` to use the exact corresponding NPM version of `@clerk/clerk-js`. ([#1780](https://github.com/clerkinc/javascript/pull/1780)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`cecf74d79`](https://github.com/clerkinc/javascript/commit/cecf74d79069662d25f73e4745aa01348d398afb)]:
+  - @clerk/shared@0.24.1
+
 ## 4.26.0
 
 ### Minor Changes

@@ -4,16 +4,15 @@ import { API_VERSION, USER_AGENT } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
-import { joinPaths } from '../util/path';
 import {
   addClerkPrefix,
   callWithRetry,
-  deprecated,
   getClerkJsMajorVersionOrTag,
   getScriptUrl,
   isDevOrStagingUrl,
   parsePublishableKey,
-} from '../util/shared';
+} from '../shared';
+import { joinPaths } from '../util/path';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 import type { DebugRequestSate } from './request';
 
@@ -34,13 +33,6 @@ export type LoadInterstitialOptions = {
 } & MultiDomainAndOrProxyPrimitives;
 
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
-  if (options.frontendApi) {
-    deprecated('frontentApi', 'Use `publishableKey` instead.');
-  }
-  if (options.pkgVersion) {
-    deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
-  }
-
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const domainOnlyInProd = !isDevOrStagingUrl(options.frontendApi) ? addClerkPrefix(options.domain) : '';
   const {
@@ -134,12 +126,6 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 
 // TODO: Add caching to Interstitial
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
-  if (options.frontendApi) {
-    deprecated('frontentApi', 'Use `publishableKey` instead.');
-  }
-  if (options.pkgVersion) {
-    deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
-  }
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
   const response = await callWithRetry(() =>
@@ -163,10 +149,6 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 }
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
-  if (options.frontendApi) {
-    deprecated('frontentApi', 'Use `publishableKey` instead.');
-  }
-
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const { apiUrl, frontendApi, pkgVersion, clerkJSVersion, publishableKey, proxyUrl, isSatellite, domain, signInUrl } =
     options;
