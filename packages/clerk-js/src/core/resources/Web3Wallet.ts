@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import type {
   AttemptWeb3WalletVerificationParams,
   PrepareWeb3WalletVerificationParams,
@@ -36,6 +37,10 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
 
   attemptVerification = (params: AttemptWeb3WalletVerificationParams): Promise<this> => {
     const { signature, generateSignature } = params || {};
+
+    if (generateSignature) {
+      deprecated('generateSignature', 'Use signature field instead.');
+    }
 
     if (signature) {
       return this._basePost<Web3WalletJSON>({
