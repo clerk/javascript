@@ -11,7 +11,7 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertPageToOffset } from '../../utils/pagesToOffset';
-import { BaseResource, Organization } from './internal';
+import { BaseResource, Organization, OrganizationPublicUserData } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
@@ -105,15 +105,7 @@ export class OrganizationMembership extends BaseResource implements Organization
     this.organization = new Organization(data.organization);
     this.publicMetadata = data.public_metadata;
     if (data.public_user_data) {
-      this.publicUserData = {
-        firstName: data.public_user_data.first_name,
-        lastName: data.public_user_data.last_name,
-        profileImageUrl: data.public_user_data.profile_image_url,
-        imageUrl: data.public_user_data.image_url,
-        hasImage: data.public_user_data.has_image,
-        identifier: data.public_user_data.identifier,
-        userId: data.public_user_data.user_id,
-      };
+      this.publicUserData = new OrganizationPublicUserData(data.public_user_data);
     }
     this.role = data.role;
     this.createdAt = unixEpochToDate(data.created_at);
@@ -137,9 +129,6 @@ export class OrganizationMembership extends BaseResource implements Organization
     return this.fromJSON(currentMembership as OrganizationMembershipJSON);
   }
 }
-
-// TODO(@dimkl): deprecate nested property
-// deprecatedProperty(OrganizationMembership, 'publicUserData.profileImageUrl', 'Use `imageUrl` instead.');
 
 export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;
