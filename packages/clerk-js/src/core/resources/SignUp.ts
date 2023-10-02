@@ -1,4 +1,4 @@
-import { Poller } from '@clerk/shared';
+import { ClerkRuntimeError, Poller } from '@clerk/shared';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,
@@ -80,7 +80,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         if (e.captchaError) {
           paramsWithCaptcha.captchaError = e.captchaError;
         } else {
-          throw e;
+          throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
         }
       }
     }

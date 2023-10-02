@@ -18,6 +18,11 @@ export interface ClerkAPIError {
   };
 }
 
+export interface ClerkRuntimeError {
+  code: string;
+  message: string;
+}
+
 /**
  * Pagination params
  */
