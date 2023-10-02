@@ -18,7 +18,7 @@ export type PaginatedResources<T = unknown, Infinite = false, ArrayOrPaginated =
   hasNextPage: boolean;
   hasPreviousPage: boolean;
   revalidate: () => Promise<void>;
-  setCache: Infinite extends true
+  setData: Infinite extends true
     ? // Array of pages of data
       CacheSetter<(ArrayOrPaginated | undefined)[]>
     : // Array of data

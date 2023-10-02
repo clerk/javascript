@@ -17,7 +17,7 @@ export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResou
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(updatedItem => userSuggestions?.setCache?.(pages => populateCacheUpdateItem(updatedItem, pages)))
+      .then(updatedItem => userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages)))
       .catch(err => handleError(err, [], card.setError));
   };
 

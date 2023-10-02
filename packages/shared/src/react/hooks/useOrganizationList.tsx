@@ -52,7 +52,7 @@ const undefinedPaginatedResource = {
   hasNextPage: false,
   hasPreviousPage: false,
   revalidate: undefined,
-  setCache: undefined,
+  setData: undefined,
 } as const;
 
 type UseOrganizationList = <T extends UseOrganizationListParams>(

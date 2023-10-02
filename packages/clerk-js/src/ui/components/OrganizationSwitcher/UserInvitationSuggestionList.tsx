@@ -44,7 +44,7 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(updatedItem => userSuggestions?.setCache?.(pages => populateCacheUpdateItem(updatedItem, pages)))
+      .then(updatedItem => userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages)))
       .catch(err => handleError(err, [], card.setError));
   };
 
@@ -81,7 +81,7 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(updatedItem => userInvitations?.setCache?.(pages => populateCacheRemoveItem(updatedItem, pages)))
+      .then(updatedItem => userInvitations?.setData?.(pages => populateCacheRemoveItem(updatedItem, pages)))
       .catch(err => handleError(err, [], card.setError));
   };
 

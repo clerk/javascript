@@ -206,7 +206,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
   const hasNextPage = count - offsetCount * pageSizeRef.current > page * pageSizeRef.current;
   const hasPreviousPage = (page - 1) * pageSizeRef.current > offsetCount * pageSizeRef.current;
 
-  const setCache: CacheSetter = triggerInfinite
+  const setData: CacheSetter = triggerInfinite
     ? value =>
         swrInfiniteMutate(value, {
           revalidate: false,
@@ -234,6 +234,6 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     // Let the hook return type define this type
     revalidate: revalidate as any,
     // Let the hook return type define this type
-    setCache: setCache as any,
+    setData: setData as any,
   };
 };

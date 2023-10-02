@@ -39,7 +39,7 @@ export const InvitationPreview = withCardStateProvider((props: UserOrganizationI
       })
       .then(([updatedItem, organization]) => {
         // Update cache in case another listener depends on it
-        void userInvitations?.setCache?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
+        void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
         setAcceptedOrganization(organization);
       })
       .catch(err => handleError(err, [], card.setError));

@@ -149,7 +149,7 @@ const undefinedPaginatedResource = {
   hasNextPage: false,
   hasPreviousPage: false,
   revalidate: undefined,
-  setCache: undefined,
+  setData: undefined,
 } as const;
 
 export const useOrganization: UseOrganization = params => {
