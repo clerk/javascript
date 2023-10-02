@@ -27,7 +27,7 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
+import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types';
 
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
 import type {

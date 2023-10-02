@@ -1,4 +1,4 @@
-import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk/types/src';
+import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk/types';
 import React from 'react';
 
 import { useCoreClerk } from '../contexts';
