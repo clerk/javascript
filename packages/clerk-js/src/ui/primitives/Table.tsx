@@ -10,7 +10,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
     base: {
       borderBottom: theme.borders.$normal,
       borderColor: theme.colors.$blackAlpha300,
-      borderCollapse: 'collapse',
+      borderCollapse: 'separate',
+      borderSpacing: '0',
       'td:not(:first-of-type)': {
         paddingLeft: theme.space.$2,
       },
