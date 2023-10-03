@@ -22,7 +22,6 @@ import type {
   SignInSecondFactor,
   SignInStartMagicLinkFlowParams,
   SignInStatus,
-  UserData as IUserData,
   VerificationResource,
   Web3SignatureConfig,
   Web3SignatureFactor,
@@ -51,7 +50,7 @@ export class SignIn extends BaseResource implements SignInResource {
   secondFactorVerification: VerificationResource = new Verification(null);
   identifier: string | null = null;
   createdSessionId: string | null = null;
-  userData: IUserData = {};
+  userData!: UserData;
 
   constructor(data: SignInJSON | null = null) {
     super();

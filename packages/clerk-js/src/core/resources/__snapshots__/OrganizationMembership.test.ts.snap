@@ -41,7 +41,7 @@ OrganizationMembership {
   "publicMetadata": {
     "foo": "bar",
   },
-  "publicUserData": OrganizationPublicUserData {
+  "publicUserData": PublicUserData {
     "firstName": "test_first_name",
     "hasImage": true,
     "identifier": "test@identifier.gr",

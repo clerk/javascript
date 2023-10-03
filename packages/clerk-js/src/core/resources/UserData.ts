@@ -1,6 +1,6 @@
 import { deprecatedProperty } from '@clerk/shared';
 import type { UserData as IUserData } from '@clerk/types';
-import type { UserDataJSON as IUserDataJSON } from '@clerk/types';
+import type { UserDataJSON } from '@clerk/types';
 
 export class UserData implements IUserData {
   firstName?: string;
@@ -9,14 +9,14 @@ export class UserData implements IUserData {
    * @deprecated  Use `imageUrl` instead.
    */
   profileImageUrl?: string;
-  imageUrl: string;
-  hasImage: boolean;
+  imageUrl?: string;
+  hasImage?: boolean;
 
-  constructor(data: IUserDataJSON) {
+  constructor(data: UserDataJSON) {
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: IUserDataJSON | null): this {
+  protected fromJSON(data: UserDataJSON | null): this {
     if (data) {
       this.firstName = data.first_name;
       this.lastName = data.last_name;

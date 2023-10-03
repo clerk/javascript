@@ -4,7 +4,6 @@ import type {
   ActJWTClaim,
   GetToken,
   GetTokenOptions,
-  PublicUserData,
   SessionJSON,
   SessionResource,
   SessionStatus,
@@ -15,7 +14,8 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
-import { BaseResource, SessionPublicUserData, Token, User } from './internal';
+import { PublicUserData } from './internal';
+import { BaseResource, Token, User } from './internal';
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -140,7 +140,7 @@ export class Session extends BaseResource implements SessionResource {
     this.user = new User(data.user);
 
     if (data.public_user_data) {
-      this.publicUserData = new SessionPublicUserData(data.public_user_data);
+      this.publicUserData = new PublicUserData(data.public_user_data);
     }
 
     this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;

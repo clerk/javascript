@@ -6,12 +6,11 @@ import type {
   MembershipRole,
   OrganizationMembershipJSON,
   OrganizationMembershipResource,
-  PublicUserData,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertPageToOffset } from '../../utils/pagesToOffset';
-import { BaseResource, Organization, OrganizationPublicUserData } from './internal';
+import { BaseResource, Organization, PublicUserData } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
@@ -105,7 +104,7 @@ export class OrganizationMembership extends BaseResource implements Organization
     this.organization = new Organization(data.organization);
     this.publicMetadata = data.public_metadata;
     if (data.public_user_data) {
-      this.publicUserData = new OrganizationPublicUserData(data.public_user_data);
+      this.publicUserData = new PublicUserData(data.public_user_data);
     }
     this.role = data.role;
     this.createdAt = unixEpochToDate(data.created_at);
