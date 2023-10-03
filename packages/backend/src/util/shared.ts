@@ -1,13 +1,10 @@
 export {
   addClerkPrefix,
-  buildPublishableKey,
   callWithRetry,
   getClerkJsMajorVersionOrTag,
   getScriptUrl,
   isDevelopmentFromApiKey,
   isProductionFromApiKey,
-  isPublishableKey,
-  isStaging,
   parsePublishableKey,
   deprecated,
   deprecatedProperty,
