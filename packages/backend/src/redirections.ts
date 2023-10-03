@@ -1,4 +1,4 @@
-import { errorThrower, parsePublishableKey } from './shared';
+import { deprecated, errorThrower, parsePublishableKey } from './util/shared';
 
 type RedirectAdapter = (url: string) => any;
 
@@ -39,6 +39,8 @@ type RedirectParams = {
 export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, publishableKey }: RedirectParams) {
   if (!frontendApi) {
     frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
+  } else {
+    deprecated('frontentApi', 'Use `publishableKey` instead.');
   }
 
   const accountsBaseUrl = buildAccountsBaseUrl(frontendApi);
