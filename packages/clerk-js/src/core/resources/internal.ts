@@ -24,6 +24,7 @@ export * from './Session';
 export * from './SessionPublicUserData';
 export * from './SessionWithActivities';
 export * from './SignIn';
+export * from './UserData';
 export * from './SignUp';
 export * from './Token';
 export * from './TOTP';
