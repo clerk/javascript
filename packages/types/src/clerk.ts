@@ -529,10 +529,6 @@ export interface ClerkOptions {
    * Defaults to false
    */
   isInterstitial?: boolean;
-
-  /**
-   * @experimental
-   */
   isSatellite?: boolean | ((url: URL) => boolean);
 }
 

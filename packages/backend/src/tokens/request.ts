@@ -79,25 +79,10 @@ export type AuthenticateRequestOptions = OptionalVerifyTokenOptions &
     referrer?: string;
     /* Request user-agent value */
     userAgent?: string;
-    /**
-     * @experimental
-     */
     domain?: string;
-    /**
-     * @experimental
-     */
     isSatellite?: boolean;
-    /**
-     * @experimental
-     */
     proxyUrl?: string;
-    /**
-     * @experimental
-     */
     searchParams?: URLSearchParams;
-    /**
-     * @experimental
-     */
     signInUrl?: string;
     signUpUrl?: string;
     afterSignInUrl?: string;
