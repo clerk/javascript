@@ -2,7 +2,18 @@ import type { InstanceType } from '@clerk/types';
 
 import type Clerk from './clerk';
 
-interface TelemetryEvent {
+type TelemetryCollectorConfig = {
+  /**
+   * Sampling rate, 0-1
+   */
+  samplingRate: number;
+  /**
+   * Determines whether or not events will be logged to the console.
+   */
+  verbose: boolean;
+};
+
+type TelemetryEvent = {
   event: string;
   /**
    * publishableKey
@@ -25,14 +36,22 @@ interface TelemetryEvent {
    */
   sdkv?: string;
   payload: Record<string, string | number | boolean>;
-}
+};
 
-// TODO: determine some type of debounce/dedupe heuristic to avoid sending excessive events for e.g. a component render
+const DEFAULT_CONFIG: TelemetryCollectorConfig = {
+  samplingRate: 1,
+  verbose: false,
+};
+
+// TODO: determine some type of throttle/dedupe heuristic to avoid sending excessive events for e.g. a component render
 export class TelemetryCollector {
   readonly #clerk: Clerk;
 
-  constructor(clerk: Clerk) {
+  #config: TelemetryCollectorConfig;
+
+  constructor(clerk: Clerk, config: Partial<TelemetryCollectorConfig> = {}) {
     this.#clerk = clerk;
+    this.#config = Object.assign(DEFAULT_CONFIG, config);
   }
 
   get isEnabled(): boolean {
@@ -47,6 +66,10 @@ export class TelemetryCollector {
 
     const preparedPayload = this.#preparePayload(event, payload);
     this.#logEvent(preparedPayload.event, preparedPayload);
+
+    if (!this.#shouldRecord()) {
+      return;
+    }
 
     // fetch(`http://localhost:8787/v0/events`, {
     //   method: 'POST',
@@ -71,7 +94,15 @@ export class TelemetryCollector {
     //   });
   }
 
+  #shouldRecord(): boolean {
+    return Math.random() <= this.#config.samplingRate;
+  }
+
   #logEvent(event: TelemetryEvent['event'], payload: Record<string, any>) {
+    if (!this.#config.verbose) {
+      return;
+    }
+
     console.groupCollapsed('[clerk/telemetry]', event);
     console.log(payload);
     console.groupEnd();
