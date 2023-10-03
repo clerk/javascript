@@ -270,6 +270,17 @@ export class User extends BaseResource implements UserResource {
   getOrganizationMemberships: GetOrganizationMemberships = retrieveMembership =>
     OrganizationMembership.retrieve(retrieveMembership);
 
+  leaveOrganization = async (organizationId: string): Promise<DeletedObjectResource> => {
+    const json = (
+      await BaseResource._fetch<DeletedObjectJSON>({
+        path: `${this.path()}/organization_memberships/${organizationId}`,
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
+  };
+
   get verifiedExternalAccounts() {
     return this.externalAccounts.filter(externalAccount => externalAccount.verification?.status == 'verified');
   }
