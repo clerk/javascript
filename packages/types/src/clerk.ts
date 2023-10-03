@@ -22,6 +22,11 @@ import type { DeepPartial, DeepSnakeToCamel } from './utils';
 
 export type InstanceType = 'production' | 'development';
 
+export type SDKData = {
+  name: string;
+  version: string;
+};
+
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: ActiveSessionResource | null) => void | Promise<any>;

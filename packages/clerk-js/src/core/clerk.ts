@@ -40,6 +40,7 @@ import type {
   PublishableKey,
   RedirectOptions,
   Resources,
+  SDKData,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -111,6 +112,7 @@ import {
   OrganizationMembership,
 } from './resources/internal';
 import { SessionCookieService } from './services';
+import { TelemetryCollector } from './telemetry';
 import { warnings } from './warnings';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -145,6 +147,7 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public __internal_country?: string | null;
+  public __internal_sdk?: SDKData;
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
 
@@ -156,6 +159,7 @@ export default class Clerk implements ClerkInterface {
   #devBrowserHandler: DevBrowserHandler | null = null;
   #environment?: EnvironmentResource | null;
   #fapiClient: FapiClient;
+  #telemetry: TelemetryCollector;
   #instanceType: InstanceType;
   #isReady = false;
   #lastOrganizationInvitation: OrganizationInvitationResource | null = null;
@@ -265,6 +269,7 @@ export default class Clerk implements ClerkInterface {
       this.#instanceType = instanceType;
     }
     this.#fapiClient = createFapiClient(this);
+    this.#telemetry = new TelemetryCollector(this);
     BaseResource.clerk = this;
   }
 
@@ -397,6 +402,7 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
+    this.#telemetry.record('COMPONENT_MOUNTED', { component: 'SignIn' });
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -1103,6 +1109,13 @@ export default class Clerk implements ClerkInterface {
     if (!this.__internal_country) {
       this.__internal_country = country;
     }
+  };
+
+  __internal_setSDK = (name: string, version: string) => {
+    this.__internal_sdk = {
+      name,
+      version,
+    };
   };
 
   updateClient = (newClient: ClientResource): void => {
