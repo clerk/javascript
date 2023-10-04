@@ -35,7 +35,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         ref={ref}
         aria-label='organization-switcher-trigger'
         aria-expanded={props.isOpen}
-        aria-haspopup='menu'
+        aria-haspopup='dialog'
         {...rest}
       >
         {organization && (
