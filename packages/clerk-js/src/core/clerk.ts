@@ -13,6 +13,7 @@ import {
   parsePublishableKey,
   proxyUrlToAbsoluteURL,
   stripScheme,
+  TelemetryCollector,
 } from '@clerk/shared';
 import type {
   ActiveSessionResource,
@@ -112,7 +113,6 @@ import {
   OrganizationMembership,
 } from './resources/internal';
 import { SessionCookieService } from './services';
-import { TelemetryCollector } from './telemetry';
 import { warnings } from './warnings';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -269,7 +269,14 @@ export default class Clerk implements ClerkInterface {
       this.#instanceType = instanceType;
     }
     this.#fapiClient = createFapiClient(this);
-    this.#telemetry = new TelemetryCollector(this);
+    this.#telemetry = new TelemetryCollector({
+      clerkVersion: Clerk.version,
+      verbose: true,
+      samplingRate: 1,
+      publishableKey: key,
+      sdk: 'clerk-js',
+      sdkVersion: Clerk.version,
+    });
     BaseResource.clerk = this;
   }
 
@@ -402,7 +409,7 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.#telemetry.record('COMPONENT_MOUNTED', { component: 'SignIn' });
+    this.#telemetry.record('COMPONENT_MOUNTED', { component: 'SignIn', appearanceProp: Boolean(props?.appearance) });
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {

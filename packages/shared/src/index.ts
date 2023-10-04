@@ -12,6 +12,11 @@ export * from './errors/Error';
 export * from './utils';
 
 /**
+ * Telemetry
+ */
+export * from './telemetry';
+
+/**
  * Hooks
  */
 export { assertContextExists, createContextAndHook } from './hooks/createContextAndHook';
