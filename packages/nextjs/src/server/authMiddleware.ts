@@ -1,6 +1,7 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
+import { TelemetryCollector } from '@clerk/shared';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -9,6 +10,7 @@ import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
 import { SECRET_KEY } from './clerkClient';
+import { PUBLISHABLE_KEY } from './constants';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import {
   clockSkewDetected,
@@ -26,6 +28,14 @@ import {
   isDevelopmentFromApiKey,
   setRequestHeadersOnNextResponse,
 } from './utils';
+
+const telemetry = new TelemetryCollector({
+  verbose: true,
+  samplingRate: 1,
+  publishableKey: PUBLISHABLE_KEY,
+  sdk: PACKAGE_NAME,
+  sdkVersion: PACKAGE_VERSION,
+});
 
 type WithPathPatternWildcard<T> = `${T & string}(.*)`;
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
@@ -148,6 +158,14 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(publicRoutes));
   const isApiRoute = createApiRoutes(apiRoutes);
   const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, params);
+
+  telemetry.record('METHOD_CALLED', {
+    method: 'authMiddleware',
+    publicRoutes: Boolean(publicRoutes),
+    ignoredRoutes: Boolean(ignoredRoutes),
+    beforeAuth: Boolean(beforeAuth),
+    afterAuth: Boolean(afterAuth),
+  });
 
   return withLogger('authMiddleware', logger => async (_req: NextRequest, evt: NextFetchEvent) => {
     if (options.debug) {
