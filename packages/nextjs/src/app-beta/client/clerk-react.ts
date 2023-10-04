@@ -1,6 +1,5 @@
-'use client';
-export { ClerkProvider } from './ClerkProvider';
-
+// HACK to show app-beta deprecation warning any of the below
+// There seems to be some issue when adding the deprecation in the index.ts
 export {
   useUser,
   useAuth,
@@ -23,14 +22,4 @@ export {
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   AuthenticateWithRedirectCallback,
-} from './clerk-react';
-
-export {
-  SignIn,
-  SignUp,
-  UserButton,
-  UserProfile,
-  OrganizationSwitcher,
-  CreateOrganization,
-  OrganizationProfile,
-} from './ui-components';
+} from '@clerk/clerk-react';

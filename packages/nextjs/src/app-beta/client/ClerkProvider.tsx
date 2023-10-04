@@ -1,4 +1,10 @@
 'use client';
+import { deprecated } from '@clerk/shared';
+
+deprecated(
+  '@clerk/nextjs/app-beta',
+  'Use imports from `@clerk/nextjs` instead.\nFor more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware',
+);
 // !!! Note the import from react
 import type { ClerkProviderProps } from '@clerk/clerk-react';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
