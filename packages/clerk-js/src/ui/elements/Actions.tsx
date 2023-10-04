@@ -86,6 +86,7 @@ export const Action = (props: ActionProps) => {
       ]}
       isDisabled={card.isLoading}
       onClick={onClick}
+      role='menuitem'
       {...rest}
     >
       <Flex

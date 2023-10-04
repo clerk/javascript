@@ -33,6 +33,9 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         colorScheme='neutral'
         sx={[t => ({ minHeight: 0, padding: `0 ${t.space.$2} 0 0`, position: 'relative' }), sx]}
         ref={ref}
+        aria-label='organization-switcher-trigger'
+        aria-expanded={props.isOpen}
+        aria-haspopup='menu'
         {...rest}
       >
         {organization && (
