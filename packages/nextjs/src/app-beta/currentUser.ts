@@ -8,7 +8,10 @@ deprecated(
 import { auth } from './auth';
 import { clerkClient } from './clerkClient';
 
-// eslint-disable-next-line @typescript-eslint/require-await
+/**
+ * @deprecated Use imports from `@clerk/nextjs` instead.
+ * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
+ */
 export async function currentUser(): Promise<User | null> {
   const { userId } = auth();
   return userId ? clerkClient.users.getUser(userId) : null;

@@ -18,6 +18,10 @@ declare global {
   }
 }
 
+/**
+ * @deprecated Use imports from `@clerk/nextjs` instead.
+ * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
+ */
 export const useAwaitableNavigate = () => {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { push, refresh } = useRouter();
@@ -49,6 +53,10 @@ export const useAwaitableNavigate = () => {
   }, []);
 };
 
+/**
+ * @deprecated Use imports from `@clerk/nextjs` instead.
+ * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
+ */
 export function ClerkProvider(props: ClerkProviderProps) {
   const navigate = useAwaitableNavigate();
   return (

@@ -14,10 +14,18 @@ const buildRequestLike = () => {
   return new NextRequest('https://placeholder.com', { headers: headers() });
 };
 
+/**
+ * @deprecated Use imports from `@clerk/nextjs` instead.
+ * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
+ */
 export const auth = () => {
   return getAuth(buildRequestLike());
 };
 
+/**
+ * @deprecated Use imports from `@clerk/nextjs` instead.
+ * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
+ */
 export const initialState = () => {
   return buildClerkProps(buildRequestLike());
 };
