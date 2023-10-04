@@ -94,6 +94,7 @@ const LogoMarkIconLink = () => {
         '&:hover': { color: 'inherit' },
       }}
       isExternal
+      aria-label='clerk-logo-url'
     >
       <Icon
         icon={LogoMark}

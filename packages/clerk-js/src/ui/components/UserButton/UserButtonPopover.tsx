@@ -69,10 +69,14 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       <PopoverCard.Root
         elementDescriptor={descriptors.userButtonPopoverCard}
         ref={ref}
-        role='menu'
+        role='dialog'
+        aria-label='user button popover'
         {...rest}
       >
-        <PopoverCard.Main elementDescriptor={descriptors.userButtonPopoverMain}>
+        <PopoverCard.Main
+          elementDescriptor={descriptors.userButtonPopoverMain}
+          role='menu'
+        >
           <UserPreview
             elementId={'userButton'}
             user={user}

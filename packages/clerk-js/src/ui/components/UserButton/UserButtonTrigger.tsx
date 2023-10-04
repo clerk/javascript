@@ -22,7 +22,7 @@ export const UserButtonTrigger = withAvatarShimmer(
         ref={ref}
         aria-label='user-button-trigger'
         aria-expanded={props.isOpen}
-        aria-haspopup='menu'
+        aria-haspopup='dialog'
         {...rest}
       >
         <UserAvatar

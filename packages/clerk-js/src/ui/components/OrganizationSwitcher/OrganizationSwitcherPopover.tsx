@@ -137,7 +137,10 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           aria-label='organization switcher popover'
           {...rest}
         >
-          <PopoverCard.Main elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
+          <PopoverCard.Main
+            elementDescriptor={descriptors.organizationSwitcherPopoverMain}
+            role='menu'
+          >
             {currentOrg ? (
               <>
                 <OrganizationPreview
@@ -148,7 +151,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                   sx={theme => t => ({ padding: `0 ${theme.space.$6}`, marginBottom: t.space.$2 })}
                   aria-hidden='true'
                 />
-                <Actions role='menu'>
+                <Actions role='group'>
                   {manageOrganizationButton}
                   {__unstable_manageBillingUrl && billingOrganizationButton}
                 </Actions>

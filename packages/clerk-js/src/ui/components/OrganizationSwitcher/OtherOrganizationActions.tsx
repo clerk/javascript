@@ -46,7 +46,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
       <UserInvitationSuggestionList />
       <SecondaryActions
         elementDescriptor={descriptors.organizationSwitcherPopoverActions}
-        role='menu'
+        role='group'
       >
         <UserMembershipList {...{ onPersonalWorkspaceClick, onOrganizationClick }} />
         <CreateOrganizationButton {...{ onCreateOrganizationClick }} />
