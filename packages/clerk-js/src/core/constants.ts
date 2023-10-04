@@ -17,3 +17,6 @@ export const ERROR_CODES = {
   NOT_ALLOWED_ACCESS: 'not_allowed_access',
   SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
 };
+
+export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];
+export const SIGN_UP_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username', 'first_name', 'last_name'];

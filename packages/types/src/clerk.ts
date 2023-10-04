@@ -358,14 +358,14 @@ export interface Clerk {
    *
    * @param opts A {@link RedirectOptions} object
    */
-  redirectToSignIn(opts?: RedirectOptions): Promise<unknown>;
+  redirectToSignIn(opts?: SignInRedirectOptions): Promise<unknown>;
 
   /**
    * Redirects to the configured URL where <SignUp/> is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
-  redirectToSignUp(opts?: RedirectOptions): Promise<unknown>;
+  redirectToSignUp(opts?: SignUpRedirectOptions): Promise<unknown>;
 
   /**
    * Redirects to the configured URL where <UserProfile/> is mounted.
@@ -529,10 +529,6 @@ export interface ClerkOptions {
    * Defaults to false
    */
   isInterstitial?: boolean;
-
-  /**
-   * @experimental
-   */
   isSatellite?: boolean | ((url: URL) => boolean);
 }
 
@@ -546,6 +542,20 @@ export interface Resources {
 }
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';
+
+export type SignInInitialValues = {
+  emailAddress?: string;
+  phoneNumber?: string;
+  username?: string;
+};
+
+export type SignUpInitialValues = {
+  emailAddress?: string;
+  phoneNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+};
 
 export type RedirectOptions = {
   /**
@@ -567,6 +577,20 @@ export type RedirectOptions = {
    * to the same value.
    */
   redirectUrl?: string | null;
+};
+
+export type SignInRedirectOptions = RedirectOptions & {
+  /**
+   * Initial values that are used to prefill the sign in form.
+   */
+  initialValues?: SignInInitialValues;
+};
+
+export type SignUpRedirectOptions = RedirectOptions & {
+  /**
+   * Initial values that are used to prefill the sign up form.
+   */
+  initialValues?: SignUpInitialValues;
 };
 
 export type SetActiveParams = {
@@ -611,6 +635,10 @@ export type SignInProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: SignInTheme;
+  /**
+   * Initial values that are used to prefill the sign in form.
+   */
+  initialValues?: SignInInitialValues;
 } & RedirectOptions;
 
 export type SignUpProps = {
@@ -638,6 +666,10 @@ export type SignUpProps = {
    * Additional arbitrary metadata to be stored alongside the User object
    */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * Initial values that are used to prefill the sign up form.
+   */
+  initialValues?: SignUpInitialValues;
 } & RedirectOptions;
 
 export type UserProfileProps = {
@@ -759,13 +791,18 @@ export type UserButtonProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
-  appearance?: UserButtonTheme & { userProfile?: UserProfileTheme };
+  appearance?: UserButtonTheme & {
+    /**
+     * @deprecated Use `userProfileProps.appearance` instead.
+     */
+    userProfile?: UserProfileTheme;
+  };
 
   /*
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
 };
 
 type PrimitiveKeys<T> = {
@@ -850,6 +887,12 @@ export type OrganizationSwitcherProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: OrganizationSwitcherTheme;
+
+  /*
+   * Specify options for the underlying <OrganizationProfile /> component.
+   * e.g. <UserButton userProfileProps={{appearance: {...}}} />
+   */
+  organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
 };
 
 export type OrganizationListProps = {

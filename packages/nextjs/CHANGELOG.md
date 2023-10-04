@@ -1,5 +1,40 @@
 # Change Log
 
+## 4.25.1
+
+### Patch Changes
+
+- Temporarily revert internal change to resolve RSC-related errors ([#1806](https://github.com/clerkinc/javascript/pull/1806)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`cecf74d79`](https://github.com/clerkinc/javascript/commit/cecf74d79069662d25f73e4745aa01348d398afb), [`a0b25671c`](https://github.com/clerkinc/javascript/commit/a0b25671cdee39cd0c2fca832b8c378fd445ec39)]:
+  - @clerk/backend@0.30.1
+  - @clerk/clerk-react@4.26.1
+  - @clerk/clerk-sdk-node@4.12.10
+
+## 4.25.0
+
+### Minor Changes
+
+- Add the `use client` directive in `@clerk/shared` to make the package compatible with an RSC environment. ([#1767](https://github.com/clerkinc/javascript/pull/1767)) by [@dimkl](https://github.com/dimkl)
+
+  Remove several helpers from `@clerk/nextjs` and import them from `@clerk/shared` instead.
+
+### Patch Changes
+
+- Apply deprecation warnings for `@clerk/nextjs`: ([#1767](https://github.com/clerkinc/javascript/pull/1767)) by [@dimkl](https://github.com/dimkl)
+
+  - `CLERK_JS_VERSION` environment variable
+  - `CLERK_API_KEY` environment variable
+  - `NEXT_PUBLIC_CLERK_FRONTEND_API` environment variable
+  - `withClerkMiddleware`
+  - `withServerSideAuth`
+
+- Updated dependencies [[`5c8754239`](https://github.com/clerkinc/javascript/commit/5c8754239e9ef13656fb73f30c9c6a6187b9aa81), [`14895e2dd`](https://github.com/clerkinc/javascript/commit/14895e2dde0fa15b594b1b7d89829d6013f5afc6), [`2f6a6ac99`](https://github.com/clerkinc/javascript/commit/2f6a6ac9991469bf8532019bb22ff50adecdb434), [`94c36c755`](https://github.com/clerkinc/javascript/commit/94c36c755b598eb68d22f42eb7f738050f390678), [`7406afe7f`](https://github.com/clerkinc/javascript/commit/7406afe7f550f702bd91cde9616fd26222833a87)]:
+  - @clerk/clerk-react@4.26.0
+  - @clerk/types@3.53.0
+  - @clerk/backend@0.30.0
+  - @clerk/clerk-sdk-node@4.12.9
+
 ## 4.24.2
 
 ### Patch Changes

@@ -75,7 +75,7 @@ export default (QUnit: QUnit) => {
       assert.raises(
         () => redirectToSignIn({ returnBackUrl }),
         new Error(
-          '@clerk/backend: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+          'Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
         ),
       );
     });
@@ -221,7 +221,7 @@ export default (QUnit: QUnit) => {
       assert.raises(
         () => redirectToSignUp({ returnBackUrl }),
         new Error(
-          '@clerk/backend: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+          'Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
         ),
       );
     });

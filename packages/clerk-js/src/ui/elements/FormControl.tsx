@@ -352,7 +352,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
   const Icon = icon ? (
     <Flex
       as={'span'}
-      title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'
+      title={t(localizationKeys('formFieldHintText__slug'))}
     >
       <IconCustomizable
         icon={icon}

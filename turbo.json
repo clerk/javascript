@@ -40,6 +40,11 @@
       "dependsOn": [],
       "cache": false
     },
+    "dev:current": {
+      "dependsOn": ["^build", "dev"],
+      "cache": false,
+      "persistent": true
+    },
     "clean": {
       "dependsOn": [],
       "cache": false

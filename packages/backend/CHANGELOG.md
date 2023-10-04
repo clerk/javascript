@@ -1,5 +1,37 @@
 # Change Log
 
+## 0.30.1
+
+### Patch Changes
+
+- Temporarily revert internal change to resolve RSC-related errors ([#1806](https://github.com/clerkinc/javascript/pull/1806)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 0.30.0
+
+### Minor Changes
+
+- Replace utilities with `@clerk/shared` exports ([#1769](https://github.com/clerkinc/javascript/pull/1769)) by [@dimkl](https://github.com/dimkl)
+
+- Introduce a new getOrganizationInvitationList() method, along with support for filtering by status and the regular limit & offset parameters, which it can be used in order to list the invitations of a specific organization. We also marked the old getPendingOrganizationInvitationList() method as deprecated ([#1796](https://github.com/clerkinc/javascript/pull/1796)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Apply deprecation warnings for `@clerk/backend`: ([#1777](https://github.com/clerkinc/javascript/pull/1777)) by [@dimkl](https://github.com/dimkl)
+
+  - backend api return format
+  - `clockSkewInSeconds`
+  - `pkgVersion`
+  - `picture`/`logoUrl`/`profileImageUrl`
+  - `InterstitialAPI`
+  - `httpOptions`
+  - `apiKey`
+  - `frontendApi`
+  - `__unstable_options`
+
+- Updated dependencies [[`7ffa6fac3`](https://github.com/clerkinc/javascript/commit/7ffa6fac3762f6fb130ba2f2fcaa28e52b36b3b4), [`5c8754239`](https://github.com/clerkinc/javascript/commit/5c8754239e9ef13656fb73f30c9c6a6187b9aa81), [`2f6a6ac99`](https://github.com/clerkinc/javascript/commit/2f6a6ac9991469bf8532019bb22ff50adecdb434), [`753f7bbda`](https://github.com/clerkinc/javascript/commit/753f7bbda9bbb7444f96222a3b6cae815a09058f), [`55c8ebd39`](https://github.com/clerkinc/javascript/commit/55c8ebd390dd88036aee06866009be6a50c63138)]:
+  - @clerk/shared@0.24.0
+  - @clerk/types@3.53.0
+
 ## 0.29.3
 
 ### Patch Changes

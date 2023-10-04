@@ -14,19 +14,20 @@ import type {
   OrganizationListProps,
   OrganizationMembershipResource,
   OrganizationResource,
-  RedirectOptions,
   SetActiveParams,
   SignInProps,
+  SignInRedirectOptions,
   SignOut,
   SignOutCallback,
   SignOutOptions,
   SignUpProps,
+  SignUpRedirectOptions,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
+import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types';
 
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
 import type {
@@ -596,7 +597,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  redirectToSignIn = (opts: RedirectOptions): void => {
+  redirectToSignIn = (opts: SignInRedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignIn(opts as any);
     if (this.clerkjs && this.#loaded) {
       void callback();
@@ -605,7 +606,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  redirectToSignUp = (opts: RedirectOptions): void => {
+  redirectToSignUp = (opts: SignUpRedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignUp(opts as any);
     if (this.clerkjs && this.#loaded) {
       void callback();

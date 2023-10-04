@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import type {
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
@@ -10,7 +11,7 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertPageToOffset } from '../../utils/pagesToOffset';
-import { BaseResource, Organization } from './internal';
+import { BaseResource, Organization, OrganizationPublicUserData } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
@@ -29,6 +30,22 @@ export class OrganizationMembership extends BaseResource implements Organization
   static retrieve: GetOrganizationMembershipsClass = async retrieveMembershipsParams => {
     const isDeprecatedParams =
       typeof retrieveMembershipsParams === 'undefined' || !retrieveMembershipsParams?.paginated;
+
+    if (!(retrieveMembershipsParams as RetrieveMembershipsParams)?.limit) {
+      deprecated(
+        'limit',
+        'Use `pageSize` instead in OrganizationMembership.retrieve.',
+        'organization-membership:limit',
+      );
+    }
+    if (!(retrieveMembershipsParams as RetrieveMembershipsParams)?.offset) {
+      deprecated(
+        'offset',
+        'Use `initialPage` instead in OrganizationMembership.retrieve.',
+        'organization-membership:offset',
+      );
+    }
+
     return await BaseResource._fetch({
       path: '/me/organization_memberships',
       method: 'GET',
@@ -88,15 +105,7 @@ export class OrganizationMembership extends BaseResource implements Organization
     this.organization = new Organization(data.organization);
     this.publicMetadata = data.public_metadata;
     if (data.public_user_data) {
-      this.publicUserData = {
-        firstName: data.public_user_data.first_name,
-        lastName: data.public_user_data.last_name,
-        profileImageUrl: data.public_user_data.profile_image_url,
-        imageUrl: data.public_user_data.image_url,
-        hasImage: data.public_user_data.has_image,
-        identifier: data.public_user_data.identifier,
-        userId: data.public_user_data.user_id,
-      };
+      this.publicUserData = new OrganizationPublicUserData(data.public_user_data);
     }
     this.role = data.role;
     this.createdAt = unixEpochToDate(data.created_at);

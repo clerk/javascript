@@ -108,6 +108,7 @@ export interface UserResource extends ClerkResource {
   getOrganizationSuggestions: (
     params?: GetUserOrganizationSuggestionsParams,
   ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
+  leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
@@ -140,7 +141,6 @@ export type VerifyTOTPParams = { code: string };
 type UpdateUserJSON = Pick<
   UserJSON,
   | 'username'
-  | 'password'
   | 'first_name'
   | 'last_name'
   | 'primary_email_address_id'
