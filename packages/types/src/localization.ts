@@ -749,6 +749,7 @@ type UnstableErrors = WithParamName<{
   identification_deletion_failed: LocalizationValue;
   phone_number_exists: LocalizationValue;
   form_identifier_not_found: LocalizationValue;
+  captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_username_invalid_length: LocalizationValue;

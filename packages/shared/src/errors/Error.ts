@@ -14,11 +14,35 @@ export interface MetamaskError extends Error {
 }
 
 export function isKnownError(error: any) {
-  return isClerkAPIResponseError(error) || isMetamaskError(error);
+  return isClerkAPIResponseError(error) || isMetamaskError(error) || isClerkRuntimeError(error);
 }
 
 export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
+  if (err instanceof ClerkAPIResponseError) {
+    return true;
+  }
+
   return 'clerkError' in err;
+}
+
+/**
+ * Checks if the provided error object is an instance of ClerkRuntimeError.
+ *
+ * @param {any} err - The error object to check.
+ * @returns {boolean} True if the error is a ClerkRuntimeError, false otherwise.
+ *
+ * @example
+ * const error = new ClerkRuntimeError('An error occurred');
+ * if (isClerkRuntimeError(error)) {
+ *   // Handle ClerkRuntimeError
+ *   console.error('ClerkRuntimeError:', error.message);
+ * } else {
+ *   // Handle other errors
+ *   console.error('Other error:', error.message);
+ * }
+ */
+export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
+  return err instanceof ClerkRuntimeError;
 }
 
 export function isMetamaskError(err: any): err is MetamaskError {
@@ -44,8 +68,6 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
 }
 
 export class ClerkAPIResponseError extends Error {
-  clerkError: true;
-
   status: number;
   message: string;
 
@@ -58,7 +80,6 @@ export class ClerkAPIResponseError extends Error {
 
     this.status = status;
     this.message = message;
-    this.clerkError = true;
     this.errors = parseErrors(data);
   }
 
@@ -66,6 +87,49 @@ export class ClerkAPIResponseError extends Error {
     return `[${this.name}]\nMessage:${this.message}\nStatus:${this.status}\nSerialized errors: ${this.errors.map(e =>
       JSON.stringify(e),
     )}`;
+  };
+}
+
+/**
+ * Custom error class for representing Clerk runtime errors.
+ *
+ * @class ClerkRuntimeError
+ * @example
+ *   throw new ClerkRuntimeError('An error occurred', { code: 'password_invalid' });
+ */
+export class ClerkRuntimeError extends Error {
+  /**
+   * The error message.
+   *
+   * @type {string}
+   * @memberof ClerkRuntimeError
+   */
+  message: string;
+
+  /**
+   * A unique code identifying the error, used for localization
+   *
+   * @type {string}
+   * @memberof ClerkRuntimeError
+   */
+  code: string;
+  constructor(message: string, { code }: { code: string }) {
+    super(message);
+
+    Object.setPrototypeOf(this, ClerkRuntimeError.prototype);
+
+    this.code = code;
+    this.message = message;
+  }
+
+  /**
+   * Returns a string representation of the error.
+   *
+   * @returns {string} A formatted string with the error name and message.
+   * @memberof ClerkRuntimeError
+   */
+  public toString = () => {
+    return `[${this.name}]\nMessage:${this.message}`;
   };
 }
 

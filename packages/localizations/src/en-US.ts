@@ -716,6 +716,8 @@ export const enUS: LocalizationResource = {
     identification_deletion_failed: 'You cannot delete your last identification.',
     phone_number_exists: 'This phone number is taken. Please try another.',
     form_identifier_not_found: '',
+    captcha_unavailable:
+      'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     form_password_pwned:

@@ -1,4 +1,5 @@
-import type { ClerkAPIError, LocalizationResource } from '@clerk/types';
+import { isClerkRuntimeError } from '@clerk/shared';
+import type { ClerkAPIError, ClerkRuntimeError, LocalizationResource } from '@clerk/types';
 import React from 'react';
 
 import { useOptions } from '../contexts';
@@ -70,11 +71,16 @@ export const useLocalizations = () => {
     return localizedStringFromKey(localizationKey, parsedResource, globalTokens);
   };
 
-  const translateError = (error: ClerkAPIError | string | undefined) => {
+  const translateError = (error: ClerkRuntimeError | ClerkAPIError | string | undefined) => {
     if (!error || typeof error === 'string') {
       return t(error);
     }
-    const { code, message, longMessage, meta } = error || {};
+
+    if (isClerkRuntimeError(error)) {
+      return t(localizationKeys(`unstable__errors.${error.code}` as any)) || error.message;
+    }
+
+    const { code, message, longMessage, meta } = (error || {}) as ClerkAPIError;
     const { paramName = '' } = meta || {};
 
     if (!code) {
