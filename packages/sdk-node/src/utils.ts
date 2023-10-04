@@ -33,6 +33,6 @@ export const loadApiEnv = () => {
     proxyUrl: process.env.CLERK_PROXY_URL || '',
     signInUrl: process.env.CLERK_SIGN_IN_URL || '',
     isSatellite: process.env.CLERK_IS_SATELLITE === 'true',
-    jwtKey: process.env.CLERK_JWT_KEY || '',
+    jwtKey: process.env.CLERK_JWT_KEY || process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '',
   };
 };
