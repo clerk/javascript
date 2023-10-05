@@ -12,10 +12,12 @@ const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('OrganizationMembers', () => {
   it('renders the Organization Members page', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
     });
+
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     const { getByText, getByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -32,11 +34,13 @@ describe('OrganizationMembers', () => {
   });
 
   it('shows requests if domains is turned on', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withOrganizationDomains();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
     });
+
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     const { getByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -46,32 +50,37 @@ describe('OrganizationMembers', () => {
   });
 
   it('shows an invite button inside invitations tab if the current user is an admin', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
-    const { getByRole, getByText } = render(<OrganizationMembers />, { wrapper });
-    await userEvent.click(getByRole('tab', { name: 'Invitations' }));
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
-    await waitFor(() => {
+    const { getByRole, getByText } = render(<OrganizationMembers />, { wrapper });
+
+    await waitFor(async () => {
+      await userEvent.click(getByRole('tab', { name: 'Invitations' }));
       expect(getByText('Invited')).toBeDefined();
       expect(getByRole('button', { name: 'Invite' })).toBeDefined();
     });
   });
 
   it('does not show invitations and requests if user is not an admin', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.dev'],
-        organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+        organization_memberships: [{ name: 'Org1' }],
       });
     });
+
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
 
     const { queryByRole } = render(<OrganizationMembers />, { wrapper });
 
     await waitFor(() => {
+      expect(queryByRole('tab', { name: 'Members' })).toBeInTheDocument();
       expect(queryByRole('tab', { name: 'Invitations' })).not.toBeInTheDocument();
       expect(queryByRole('tab', { name: 'Requests' })).not.toBeInTheDocument();
     });
@@ -83,11 +92,13 @@ describe('OrganizationMembers', () => {
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
-    const { getByRole } = render(<OrganizationMembers />, { wrapper });
-    await userEvent.click(getByRole('tab', { name: 'Invitations' }));
-    await userEvent.click(getByRole('button', { name: 'Invite' }));
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
-    await waitFor(() => {
+    const { getByRole } = render(<OrganizationMembers />, { wrapper });
+
+    await waitFor(async () => {
+      await userEvent.click(getByRole('tab', { name: 'Invitations' }));
+      await userEvent.click(getByRole('button', { name: 'Invite' }));
       expect(fixtures.router.navigate).toHaveBeenCalledWith('invite-members');
     });
   });
@@ -126,7 +137,7 @@ describe('OrganizationMembers', () => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.dev'],
-        organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
 
@@ -143,6 +154,8 @@ describe('OrganizationMembers', () => {
         total_count: 2,
       }),
     );
+
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     const { queryByText, queryAllByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -185,9 +198,11 @@ describe('OrganizationMembers', () => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.dev'],
-        organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
+
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
       Promise.resolve({ data: membersList, total_count: 0 }),
@@ -213,7 +228,7 @@ describe('OrganizationMembers', () => {
       f.withOrganizationDomains();
       f.withUser({
         email_addresses: ['test@clerk.dev'],
-        organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
 
@@ -223,6 +238,8 @@ describe('OrganizationMembers', () => {
         total_count: 2,
       }),
     );
+
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     await runFakeTimers(async () => {
       const { getByText } = render(<OrganizationMembers />, { wrapper });
@@ -255,9 +272,11 @@ describe('OrganizationMembers', () => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.dev'],
-        organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
+
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     fixtures.clerk.organization?.getInvitations.mockReturnValue(
       Promise.resolve({
@@ -266,7 +285,9 @@ describe('OrganizationMembers', () => {
       }),
     );
     const { queryByText, getByRole } = render(<OrganizationMembers />, { wrapper });
-    await userEvent.click(getByRole('tab', { name: 'Invitations' }));
+    await waitFor(async () => {
+      await userEvent.click(getByRole('tab', { name: 'Invitations' }));
+    });
     expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
     expect(queryByText('admin1@clerk.dev')).toBeInTheDocument();
     expect(queryByText('Admin')).toBeInTheDocument();
@@ -307,6 +328,8 @@ describe('OrganizationMembers', () => {
       });
     });
 
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
+
     fixtures.clerk.organization?.getDomains.mockReturnValue(
       Promise.resolve({
         data: [],
@@ -315,7 +338,11 @@ describe('OrganizationMembers', () => {
     );
     fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(Promise.resolve(requests));
     const { queryByText, getByRole } = render(<OrganizationMembers />, { wrapper });
-    await userEvent.click(getByRole('tab', { name: 'Requests' }));
+
+    await waitFor(async () => {
+      await userEvent.click(getByRole('tab', { name: 'Requests' }));
+    });
+
     expect(fixtures.clerk.organization?.getMembershipRequests).toHaveBeenCalledWith({
       initialPage: 1,
       pageSize: 10,
@@ -336,7 +363,7 @@ describe('OrganizationMembers', () => {
       f.withUser({
         id: '1',
         email_addresses: ['test@clerk.dev'],
-        organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
 
@@ -346,6 +373,8 @@ describe('OrganizationMembers', () => {
         total_count: 2,
       }),
     );
+
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
     const { findByText } = render(<OrganizationMembers />, { wrapper });
     await waitFor(() => expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled());
     expect(await findByText('You')).toBeInTheDocument();

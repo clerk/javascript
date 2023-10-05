@@ -1,4 +1,4 @@
-import { NotificationCountBadge } from '../../common';
+import { NotificationCountBadge, useGate } from '../../common';
 import { useCoreOrganization, useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
@@ -21,14 +21,18 @@ import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
-  const { membership } = useCoreOrganization();
-  const isAdmin = membership?.role === 'admin';
-  const allowRequests = organizationSettings?.domains?.enabled && isAdmin;
+  const { isAuthorizedUser: canManageMemberships } = useGate({ permission: 'org:memberships:manage' });
+  const isDomainsEnabled = organizationSettings?.domains?.enabled;
   const { membershipRequests } = useCoreOrganization({
-    membershipRequests: allowRequests || undefined,
+    membershipRequests: isDomainsEnabled || undefined,
   });
-  //@ts-expect-error
+
+  // @ts-expect-error
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
+
+  if (canManageMemberships === null) {
+    return null;
+  }
 
   return (
     <Col
@@ -52,12 +56,12 @@ export const OrganizationMembers = withCardStateProvider(() => {
         <Tabs>
           <TabsList>
             <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
-            {isAdmin && (
+            {canManageMemberships && (
               <Tab
                 localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
               />
             )}
-            {allowRequests && (
+            {canManageMemberships && isDomainsEnabled && (
               <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
                 <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />
               </Tab>
@@ -72,16 +76,16 @@ export const OrganizationMembers = withCardStateProvider(() => {
                   width: '100%',
                 }}
               >
-                {isAdmin && __unstable_manageBillingUrl && <MembershipWidget />}
+                {canManageMemberships && __unstable_manageBillingUrl && <MembershipWidget />}
                 <ActiveMembersList />
               </Flex>
             </TabPanel>
-            {isAdmin && (
+            {canManageMemberships && (
               <TabPanel sx={{ width: '100%' }}>
                 <OrganizationMembersTabInvitations />
               </TabPanel>
             )}
-            {allowRequests && (
+            {canManageMemberships && isDomainsEnabled && (
               <TabPanel sx={{ width: '100%' }}>
                 <OrganizationMembersTabRequests />
               </TabPanel>

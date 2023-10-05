@@ -1,5 +1,6 @@
 import type { MembershipRole, OrganizationMembershipResource } from '@clerk/types';
 
+import { Gate } from '../../common/Gate';
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
@@ -8,22 +9,16 @@ import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
 export const ActiveMembersList = () => {
   const card = useCardState();
-  const {
-    organization,
-    membership: currentUserMembership,
-    memberships,
-    ...rest
-  } = useCoreOrganization({
+  const { organization, memberships, ...rest } = useCoreOrganization({
     memberships: true,
   });
 
+  // TODO: Update this to support filter by permissions
   const { memberships: adminMembers } = useCoreOrganization({
     memberships: {
       role: ['admin'],
     },
   });
-
-  const isAdmin = currentUserMembership?.role === 'admin';
 
   const mutateSwrState = () => {
     const unstable__mutate = (rest as any).unstable__mutate;
@@ -37,9 +32,6 @@ export const ActiveMembersList = () => {
   }
 
   const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
-    if (!isAdmin) {
-      return;
-    }
     return card
       .runAsync(async () => {
         await membership.update({ role: newRole });
@@ -49,9 +41,6 @@ export const ActiveMembersList = () => {
   };
 
   const handleRemove = (membership: OrganizationMembershipResource) => () => {
-    if (!isAdmin) {
-      return;
-    }
     return card
       .runAsync(async () => {
         const destroyedMembership = membership.destroy();
@@ -97,10 +86,8 @@ const MemberRow = (props: {
 }) => {
   const { membership, onRemove, onRoleChange, adminCount } = props;
   const card = useCardState();
-  const { membership: currentUserMembership } = useCoreOrganization();
   const user = useCoreUser();
 
-  const isAdmin = currentUserMembership?.role === 'admin';
   const isCurrentUser = user.id === membership.publicUserData.userId;
   const isLastAdmin = adminCount <= 1 && membership.role === 'admin';
 
@@ -123,21 +110,24 @@ const MemberRow = (props: {
       </Td>
       <Td>{membership.createdAt.toLocaleDateString()}</Td>
       <Td>
-        {isAdmin ? (
+        <Gate
+          permission={'org:memberships:manage'}
+          fallback={
+            <Text
+              sx={t => ({ opacity: t.opacity.$inactive })}
+              localizationKey={roleLocalizationKey(membership.role)}
+            />
+          }
+        >
           <RoleSelect
             isDisabled={card.isLoading || !onRoleChange || isLastAdmin}
             value={membership.role}
             onChange={onRoleChange}
           />
-        ) : (
-          <Text
-            sx={t => ({ opacity: t.opacity.$inactive })}
-            localizationKey={roleLocalizationKey(membership.role)}
-          />
-        )}
+        </Gate>
       </Td>
       <Td>
-        {isAdmin && (
+        <Gate permission={'org:memberships:delete'}>
           <ThreeDotsMenu
             actions={[
               {
@@ -149,7 +139,7 @@ const MemberRow = (props: {
             ]}
             elementId={'member'}
           />
-        )}
+        </Gate>
       </Td>
     </RowContainer>
   );
