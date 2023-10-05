@@ -96,9 +96,12 @@ export function _SignInStart(): JSX.Element {
       i => identifierAttributes[(identifierAttributes.indexOf(i) + 1) % identifierAttributes.length],
     );
     setShouldAutofocus(true);
+    setHasSwitchedByAutofill(false);
   };
 
-  const switchToPhoneInput = () => {
+  const handlePhoneNumberPaste = (value: string) => {
+    textIdentifierField.setValue(initialValues[identifierAttribute] || '');
+    phoneIdentifierField.setValue(value);
     setIdentifierAttribute('phone_number');
     setShouldAutofocus(true);
   };
@@ -114,21 +117,12 @@ export function _SignInStart(): JSX.Element {
       identifierAttribute !== 'phone_number' &&
       !hasSwitchedByAutofill
     ) {
-      switchToPhoneInput();
+      handlePhoneNumberPaste(identifierField.value);
       // do not switch automatically on subsequent autofills
       // by the browser to avoid a switch loop
       setHasSwitchedByAutofill(true);
     }
   }, [identifierField.value, identifierAttributes]);
-
-  useLayoutEffect(() => {
-    if (identifierAttribute === 'phone_number' && identifierField.value) {
-      //value should be kept as we have auto-switched to the phone input
-      return;
-    }
-
-    identifierField.setValue(initialValues[identifierAttribute] || '');
-  }, [identifierAttribute]);
 
   useEffect(() => {
     if (!organizationTicket) {
