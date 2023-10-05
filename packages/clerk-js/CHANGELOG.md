@@ -1,5 +1,37 @@
 # Change Log
 
+## 4.60.0
+
+### Minor Changes
+
+- Introduce a new user resource method to leave an organization. You can now call 'user.leaveOrganization(<org_id>)' when a user chooses to leave an organization instead of 'organization.removeMember(<user_id>)' which is mostly meant for organization based actions. ([#1809](https://github.com/clerkinc/javascript/pull/1809)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- - Introduce organizationProfileProps as prop in `<OrganizationSwitcher/>`. ([#1801](https://github.com/clerkinc/javascript/pull/1801)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Introduce appearance in userProfileProps in `<UserButton/>`.
+  - Deprecate the usage of `appearance.userProfile` in `<UserButton/>`.
+
+- Introduce ClerkRuntimeError class for localizing error messages in ClerkJS components ([#1813](https://github.com/clerkinc/javascript/pull/1813)) by [@panteliselef](https://github.com/panteliselef)
+
+- Enables you to translate the tooltip hint while creating an organization through the `formFieldHintText__slug` key ([#1811](https://github.com/clerkinc/javascript/pull/1811)) by [@LekoArts](https://github.com/LekoArts)
+
+- Pins the internal dependency versions. This ensures that users installing our main framework SDKs will get consistent versions across all @clerk/ packages. ([#1798](https://github.com/clerkinc/javascript/pull/1798)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fixes a UI bug on Safari, that was causing the border of tables to be displayed incorrectly ([#1814](https://github.com/clerkinc/javascript/pull/1814)) by [@panteliselef](https://github.com/panteliselef)
+
+- Warn about `publicUserData.profileImageUrl` nested property deprecation in `OrganizationMembership` & `OrganizationMembershipRequest` resources. ([#1812](https://github.com/clerkinc/javascript/pull/1812)) by [@dimkl](https://github.com/dimkl)
+
+- Fix internal subpath imports by replacing them with top level imports. ([#1804](https://github.com/clerkinc/javascript/pull/1804)) by [@dimkl](https://github.com/dimkl)
+
+- Removes `it.skip` from the LeaveOrganizationPage tests. ([#1820](https://github.com/clerkinc/javascript/pull/1820)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`b59b6b75d`](https://github.com/clerkinc/javascript/commit/b59b6b75dc61bc4d7e61f7cca774f3731a2929b9), [`164f3aac7`](https://github.com/clerkinc/javascript/commit/164f3aac7928bc69301846130cc77986569d4e91), [`68259a2bb`](https://github.com/clerkinc/javascript/commit/68259a2bb8193befdde9101d4ec9bf305881d5e2), [`33e927c59`](https://github.com/clerkinc/javascript/commit/33e927c59fbf06436ff642ef9f846bd3b467e3e1), [`0636ff779`](https://github.com/clerkinc/javascript/commit/0636ff7799e126d1438d2738ce0e46c3b277f46a), [`9514618d6`](https://github.com/clerkinc/javascript/commit/9514618d65cfdde0ff011eabd41a992b61fc8dc1), [`ccf42105b`](https://github.com/clerkinc/javascript/commit/ccf42105bf20ae55ac03cdaf4e7b3d33913033db), [`c7c6912f3`](https://github.com/clerkinc/javascript/commit/c7c6912f34874467bc74104690fe9f95491cc10d), [`e3451443e`](https://github.com/clerkinc/javascript/commit/e3451443e5adad2b53e445e990e4ce84170686ab), [`71bb1c7b5`](https://github.com/clerkinc/javascript/commit/71bb1c7b570f7b0bbc377c8104c9abcc1af4cacf)]:
+  - @clerk/types@3.54.0
+  - @clerk/localizations@1.26.3
+  - @clerk/shared@0.24.2
+
 ## 4.59.1
 
 ### Patch Changes

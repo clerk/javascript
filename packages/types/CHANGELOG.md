@@ -1,5 +1,28 @@
 # Change Log
 
+## 3.54.0
+
+### Minor Changes
+
+- Introduce a new user resource method to leave an organization. You can now call 'user.leaveOrganization(<org_id>)' when a user chooses to leave an organization instead of 'organization.removeMember(<user_id>)' which is mostly meant for organization based actions. ([#1809](https://github.com/clerkinc/javascript/pull/1809)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- - Introduce organizationProfileProps as prop in `<OrganizationSwitcher/>`. ([#1801](https://github.com/clerkinc/javascript/pull/1801)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Introduce appearance in userProfileProps in `<UserButton/>`.
+  - Deprecate the usage of `appearance.userProfile` in `<UserButton/>`.
+
+- Introduce ClerkRuntimeError class for localizing error messages in ClerkJS components ([#1813](https://github.com/clerkinc/javascript/pull/1813)) by [@panteliselef](https://github.com/panteliselef)
+
+- Enables you to translate the tooltip hint while creating an organization through the `formFieldHintText__slug` key ([#1811](https://github.com/clerkinc/javascript/pull/1811)) by [@LekoArts](https://github.com/LekoArts)
+
+- Drop `password` property from `UserJSON` since it's not being returned by the Frontend API ([#1805](https://github.com/clerkinc/javascript/pull/1805)) by [@dimkl](https://github.com/dimkl)
+
+- Remove experimenta jsdoc tags from multi-domain types. ([#1819](https://github.com/clerkinc/javascript/pull/1819)) by [@panteliselef](https://github.com/panteliselef)
+
+- Warn about `publicUserData.profileImageUrl` nested property deprecation in `OrganizationMembership` & `OrganizationMembershipRequest` resources. ([#1812](https://github.com/clerkinc/javascript/pull/1812)) by [@dimkl](https://github.com/dimkl)
+
 ## 3.53.0
 
 ### Minor Changes
