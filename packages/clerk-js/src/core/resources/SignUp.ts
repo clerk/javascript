@@ -6,6 +6,7 @@ import type {
   AttemptWeb3WalletVerificationParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  CreateEmailLinkFlowReturn,
   CreateMagicLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
@@ -18,6 +19,7 @@ import type {
   SignUpResource,
   SignUpStatus,
   SignUpUpdateParams,
+  StartEmailLinkFlowParams,
   StartMagicLinkFlowParams,
 } from '@clerk/types';
 
@@ -113,6 +115,9 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptVerification({ ...params, strategy: 'email_code' });
   };
 
+  /**
+   * @deprecated Use `createEmailLinkFlow` instead.
+   */
   createMagicLinkFlow = (): CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource> => {
     const { run, stop } = Poller();
 
@@ -144,6 +149,39 @@ export class SignUp extends BaseResource implements SignUpResource {
     };
 
     return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
+  };
+
+  createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, SignUpResource> => {
+    const { run, stop } = Poller();
+
+    const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<SignUpResource> => {
+      if (!this.id) {
+        clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
+      }
+      await this.prepareEmailAddressVerification({
+        strategy: 'email_link',
+        redirectUrl,
+      });
+
+      return new Promise((resolve, reject) => {
+        void run(() => {
+          return this.reload()
+            .then(res => {
+              const status = res.verifications.emailAddress.status;
+              if (status === 'verified' || status === 'expired') {
+                stop();
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              stop();
+              reject(err);
+            });
+        });
+      });
+    };
+
+    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
   preparePhoneNumberVerification = (params?: PreparePhoneNumberVerificationParams): Promise<SignUpResource> => {

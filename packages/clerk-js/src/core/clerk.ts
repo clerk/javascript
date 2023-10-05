@@ -105,6 +105,8 @@ import createFapiClient from './fapiClient';
 import {
   BaseResource,
   Client,
+  EmailLinkError,
+  EmailLinkErrorCode,
   Environment,
   MagicLinkError,
   MagicLinkErrorCode,
@@ -810,6 +812,10 @@ export default class Clerk implements ClerkInterface {
     return;
   };
 
+  /**
+   *
+   * @deprecated Use `handleEmailLinkVerification` instead.
+   */
   public handleMagicLinkVerification = async (
     params: HandleMagicLinkVerificationParams,
     customNavigate?: (to: string) => Promise<unknown>,
@@ -823,6 +829,49 @@ export default class Clerk implements ClerkInterface {
       throw new MagicLinkError(MagicLinkErrorCode.Expired);
     } else if (verificationStatus !== 'verified') {
       throw new MagicLinkError(MagicLinkErrorCode.Failed);
+    }
+
+    const newSessionId = getClerkQueryParam('__clerk_created_session');
+    const { signIn, signUp, sessions } = this.client;
+
+    const shouldCompleteOnThisDevice = sessions.some(s => s.id === newSessionId);
+    const shouldContinueOnThisDevice =
+      signIn.status === 'needs_second_factor' || signUp.status === 'missing_requirements';
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+    const redirectComplete = params.redirectUrlComplete ? () => navigate(params.redirectUrlComplete as string) : noop;
+    const redirectContinue = params.redirectUrl ? () => navigate(params.redirectUrl as string) : noop;
+
+    if (shouldCompleteOnThisDevice) {
+      return this.setActive({
+        session: newSessionId,
+        beforeEmit: redirectComplete,
+      });
+    } else if (shouldContinueOnThisDevice) {
+      return redirectContinue();
+    }
+
+    if (typeof params.onVerifiedOnOtherDevice === 'function') {
+      params.onVerifiedOnOtherDevice();
+    }
+    return null;
+  };
+
+  public handleEmailLinkVerification = async (
+    params: HandleEmailLinkVerificationParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    if (!this.client) {
+      return;
+    }
+
+    const verificationStatus = getClerkQueryParam('__clerk_status');
+    if (verificationStatus === 'expired') {
+      throw new EmailLinkError(EmailLinkErrorCode.Expired);
+    } else if (verificationStatus !== 'verified') {
+      throw new EmailLinkError(EmailLinkErrorCode.Failed);
     }
 
     const newSessionId = getClerkQueryParam('__clerk_created_session');
