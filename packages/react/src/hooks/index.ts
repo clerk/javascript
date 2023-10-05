@@ -9,3 +9,4 @@ export * from './useOrganization';
 export * from './useOrganizationList';
 export * from './useOrganizations';
 export * from './useMagicLink';
+export * from './useEmailLink';
