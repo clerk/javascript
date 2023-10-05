@@ -79,7 +79,7 @@ const createCustomPages = ({
   const validCustomPages = customPages.filter(cp => {
     if (!isValidPageItem(cp, validReorderItemLabels)) {
       if (isDevelopmentEnvironment()) {
-        console.error('Invalid custom page data: ', cp);
+        console.error('Clerk: Invalid custom page data: ', cp);
       }
       return false;
     }
@@ -112,7 +112,7 @@ type GetRoutesAndContentsParams = {
 };
 
 const getRoutesAndContents = ({ customPages, defaultRoutes }: GetRoutesAndContentsParams) => {
-  let remainingDefaultRoutes: NavbarRoute[] = defaultRoutes.map(r => ({ ...r }));
+  let remainingDefaultRoutes: NavbarRoute[] = defaultRoutes.map(r => r);
   const contents: CustomPageContent[] = [];
 
   const routesWithoutDefaults: NavbarRoute[] = customPages.map((cp, index) => {
@@ -178,7 +178,7 @@ const checkForDuplicateUsageOfReorderingItems = (customPages: CustomPage[], vali
   reorderItems.reduce((acc, cp) => {
     if (acc.includes(cp.label)) {
       console.error(
-        `The "${cp.label}" item is used more than once when reordering UserProfile pages. This may cause unexpected behavior.`,
+        `Clerk: The "${cp.label}" item is used more than once when reordering UserProfile pages. This may cause unexpected behavior.`,
       );
     }
     return [...acc, cp.label];
@@ -191,7 +191,7 @@ const warnForDuplicatePaths = (routes: NavbarRoute[], pathsToFilter: string[]) =
     .map(({ path }) => path);
   const duplicatePaths = paths.filter((p, index) => paths.indexOf(p) !== index);
   duplicatePaths.forEach(p => {
-    console.error(`Duplicate path "${p}" found in custom pages. This may cause unexpected behavior.`);
+    console.error(`Clerk: Duplicate path "${p}" found in custom pages. This may cause unexpected behavior.`);
   });
 };
 
@@ -215,17 +215,17 @@ const isReorderItem = (cp: CustomPage, validItems: string[]): cp is UserProfileR
 
 const sanitizeCustomPageURL = (url: string): string => {
   if (!url) {
-    throw new Error('URL is required for custom pages');
+    throw new Error('Clerk: URL is required for custom pages');
   }
   if (isValidUrl(url)) {
-    throw new Error('Absolute URLs are not supported for custom pages');
+    throw new Error('Clerk: Absolute URLs are not supported for custom pages');
   }
   return (url as string).charAt(0) === '/' && (url as string).length > 1 ? (url as string).substring(1) : url;
 };
 
 const sanitizeCustomLinkURL = (url: string): string => {
   if (!url) {
-    throw new Error('URL is required for custom links');
+    throw new Error('Clerk: URL is required for custom links');
   }
   if (isValidUrl(url)) {
     return url;
@@ -235,7 +235,7 @@ const sanitizeCustomLinkURL = (url: string): string => {
 
 const assertExternalLinkAsRoot = (routes: NavbarRoute[]) => {
   if (routes[0].external) {
-    throw new Error('The first route cannot be a custom external link component');
+    throw new Error('Clerk: The first route cannot be a custom external link component');
   }
 };
 

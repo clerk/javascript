@@ -27,26 +27,26 @@ export const multipleChildrenInButtonComponent = (name: string) =>
   `Clerk: You've passed multiple children components to <${name}/>. You can only pass a single child component or text.`;
 
 export const invalidStateError =
-  'Invalid state. Feel free to submit a bug or reach out to support here: https://clerk.com/support';
+  'Clerk: Invalid state. Feel free to submit a bug or reach out to support here: https://clerk.com/support';
 
 export const unsupportedNonBrowserDomainOrProxyUrlFunction =
-  'Unsupported usage of domain or proxyUrl. The usage of domain or proxyUrl as function is not supported in non-browser environments.';
+  'Clerk: Unsupported usage of domain or proxyUrl. The usage of domain or proxyUrl as function is not supported in non-browser environments.';
 
 export const userProfilePageRenderedError =
-  '<UserProfile.Page /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.';
+  'Clerk: <UserProfile.Page /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.';
 export const userProfileLinkRenderedError =
-  '<UserProfile.Link /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.';
+  'Clerk: <UserProfile.Link /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.';
 
 export const organizationProfilePageRenderedError =
-  '<OrganizationProfile.Page /> component needs to be a direct child of `<OrganizationProfile />` or `<OrganizationSwitcher />`.';
+  'Clerk: <OrganizationProfile.Page /> component needs to be a direct child of `<OrganizationProfile />` or `<OrganizationSwitcher />`.';
 export const organizationProfileLinkRenderedError =
-  '<OrganizationProfile.Link /> component needs to be a direct child of `<OrganizationProfile />` or `<OrganizationSwitcher />`.';
+  'Clerk: <OrganizationProfile.Link /> component needs to be a direct child of `<OrganizationProfile />` or `<OrganizationSwitcher />`.';
 
 export const customPagesIgnoredComponent = (componentName: string) =>
-  `<${componentName} /> can only accept <${componentName}.Page /> and <${componentName}.Link /> as its children. Any other provided component will be ignored.`;
+  `Clerk: <${componentName} /> can only accept <${componentName}.Page /> and <${componentName}.Link /> as its children. Any other provided component will be ignored.`;
 
 export const customPageWrongProps = (componentName: string) =>
-  `Missing props. <${componentName}.Page /> component requires the following props: url, label, labelIcon, alongside with children to be rendered inside the page.`;
+  `Clerk: Missing props. <${componentName}.Page /> component requires the following props: url, label, labelIcon, alongside with children to be rendered inside the page.`;
 
 export const customLinkWrongProps = (componentName: string) =>
-  `Missing props. <${componentName}.Link /> component requires the following props: url, label and labelIcon.`;
+  `Clerk: Missing props. <${componentName}.Link /> component requires the following props: url, label and labelIcon.`;

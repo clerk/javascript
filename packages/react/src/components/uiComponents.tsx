@@ -1,4 +1,3 @@
-import { isDevelopmentEnvironment } from '@clerk/shared';
 import type {
   CreateOrganizationProps,
   OrganizationListProps,
@@ -26,8 +25,28 @@ import type {
   UserProfilePageProps,
   WithClerkProp,
 } from '../types';
-import { useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../utils';
+import { errorInDevMode, useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../utils';
 import { withClerk } from './withClerk';
+
+type UserProfileExportType = typeof _UserProfile & {
+  Page: typeof UserProfilePage;
+  Link: typeof UserProfileLink;
+};
+
+type UserButtonExportType = typeof _UserButton & {
+  UserProfilePage: typeof UserProfilePage;
+  UserProfileLink: typeof UserProfileLink;
+};
+
+type OrganizationProfileExportType = typeof _OrganizationProfile & {
+  Page: typeof OrganizationProfilePage;
+  Link: typeof OrganizationProfileLink;
+};
+
+type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
+  OrganizationProfilePage: typeof OrganizationProfilePage;
+  OrganizationProfileLink: typeof OrganizationProfileLink;
+};
 
 // README: <Portal/> should be a class pure component in order for mount and unmount
 // lifecycle props to be invoked correctly. Replacing the class component with a
@@ -114,16 +133,12 @@ export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>
 }, 'SignUp');
 
 export function UserProfilePage({ children }: PropsWithChildren<UserProfilePageProps>) {
-  if (isDevelopmentEnvironment()) {
-    console.error(userProfilePageRenderedError);
-  }
+  errorInDevMode(userProfilePageRenderedError);
   return <div>{children}</div>;
 }
 
 export function UserProfileLink({ children }: PropsWithChildren<UserProfileLinkProps>) {
-  if (isDevelopmentEnvironment()) {
-    console.error(userProfileLinkRenderedError);
-  }
+  errorInDevMode(userProfileLinkRenderedError);
   return <div>{children}</div>;
 }
 
@@ -140,10 +155,6 @@ const _UserProfile = withClerk(({ clerk, ...props }: WithClerkProp<PropsWithChil
   );
 }, 'UserProfile');
 
-type UserProfileExportType = typeof _UserProfile & {
-  Page: ({ children }: PropsWithChildren<UserProfilePageProps>) => React.JSX.Element;
-  Link: ({ children }: PropsWithChildren<UserProfileLinkProps>) => React.JSX.Element;
-};
 export const UserProfile: UserProfileExportType = Object.assign(_UserProfile, {
   Page: UserProfilePage,
   Link: UserProfileLink,
@@ -163,26 +174,18 @@ const _UserButton = withClerk(({ clerk, ...props }: WithClerkProp<PropsWithChild
   );
 }, 'UserButton');
 
-type UserButtonExportType = typeof _UserButton & {
-  UserProfilePage: ({ children }: PropsWithChildren<UserProfilePageProps>) => React.JSX.Element;
-  UserProfileLink: ({ children }: PropsWithChildren<UserProfileLinkProps>) => React.JSX.Element;
-};
 export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
   UserProfilePage: UserProfilePage,
   UserProfileLink: UserProfileLink,
 });
 
 export function OrganizationProfilePage({ children }: PropsWithChildren<OrganizationProfilePageProps>) {
-  if (isDevelopmentEnvironment()) {
-    console.error(organizationProfilePageRenderedError);
-  }
+  errorInDevMode(organizationProfilePageRenderedError);
   return <div>{children}</div>;
 }
 
 export function OrganizationProfileLink({ children }: PropsWithChildren<OrganizationProfileLinkProps>) {
-  if (isDevelopmentEnvironment()) {
-    console.error(organizationProfileLinkRenderedError);
-  }
+  errorInDevMode(organizationProfileLinkRenderedError);
   return <div>{children}</div>;
 }
 
@@ -202,10 +205,6 @@ const _OrganizationProfile = withClerk(
   'OrganizationProfile',
 );
 
-type OrganizationProfileExportType = typeof _OrganizationProfile & {
-  Page: ({ children }: PropsWithChildren<OrganizationProfilePageProps>) => React.JSX.Element;
-  Link: ({ children }: PropsWithChildren<OrganizationProfileLinkProps>) => React.JSX.Element;
-};
 export const OrganizationProfile: OrganizationProfileExportType = Object.assign(_OrganizationProfile, {
   Page: OrganizationProfilePage,
   Link: OrganizationProfileLink,
@@ -239,10 +238,6 @@ const _OrganizationSwitcher = withClerk(
   'OrganizationSwitcher',
 );
 
-type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
-  OrganizationProfilePage: ({ children }: PropsWithChildren<OrganizationProfilePageProps>) => React.JSX.Element;
-  OrganizationProfileLink: ({ children }: PropsWithChildren<OrganizationProfileLinkProps>) => React.JSX.Element;
-};
 export const OrganizationSwitcher: OrganizationSwitcherExportType = Object.assign(_OrganizationSwitcher, {
   OrganizationProfilePage: OrganizationProfilePage,
   OrganizationProfileLink: OrganizationProfileLink,

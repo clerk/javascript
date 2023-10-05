@@ -94,13 +94,13 @@ export type RedirectToSignUpProps = SignUpRedirectOptions;
 export type UserProfilePageProps = {
   url?: string;
   label: string;
-  labelIcon?: React.ReactElement;
+  labelIcon?: React.ReactNode;
 };
 
 export type UserProfileLinkProps = {
   url: string;
   label: string;
-  labelIcon: React.ReactElement;
+  labelIcon: React.ReactNode;
 };
 
 export type OrganizationProfilePageProps = UserProfilePageProps;

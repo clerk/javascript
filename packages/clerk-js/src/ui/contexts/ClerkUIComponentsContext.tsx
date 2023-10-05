@@ -207,7 +207,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
-  const pages = useMemo(() => createUserProfileCustomPages(customPages || []), [customPages]);
+  const pages = createUserProfileCustomPages(customPages || []);
 
   return {
     ...ctx,
@@ -422,7 +422,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
-  const pages = useMemo(() => createOrganizationProfileCustomPages(customPages || []), [customPages]);
+  const pages = createOrganizationProfileCustomPages(customPages || []);
 
   const navigateAfterLeaveOrganization = () =>
     navigate(ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl);

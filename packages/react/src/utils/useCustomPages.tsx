@@ -1,4 +1,3 @@
-import { isDevelopmentEnvironment } from '@clerk/shared';
 import type { CustomPage } from '@clerk/types';
 import type { ReactElement } from 'react';
 import React from 'react';
@@ -11,14 +10,9 @@ import {
 } from '../components/uiComponents';
 import { customLinkWrongProps, customPagesIgnoredComponent, customPageWrongProps } from '../errors';
 import type { UserProfilePageProps } from '../types';
+import { errorInDevMode } from './errorInDevMode';
 import type { UseCustomElementPortalParams, UseCustomElementPortalReturn } from './useCustomElementPortal';
 import { useCustomElementPortal } from './useCustomElementPortal';
-
-const errorInDevMode = (message: string) => {
-  if (isDevelopmentEnvironment()) {
-    console.error(message);
-  }
-};
 
 const isThatComponent = (v: any, component: React.ReactNode): v is React.ReactNode => {
   return !!v && React.isValidElement(v) && (v as React.ReactElement)?.type === component;
