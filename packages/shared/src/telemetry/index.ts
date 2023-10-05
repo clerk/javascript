@@ -119,27 +119,32 @@ export class TelemetryCollector {
     }
 
     const preparedPayload = this.#preparePayload(event, payload);
+
     this.#logEvent(preparedPayload.event, preparedPayload);
 
     if (!this.#shouldRecord()) {
       return;
     }
 
+    this.#sendEvent(preparedPayload);
+  }
+
+  #shouldRecord(): boolean {
+    return Math.random() <= this.#config.samplingRate;
+  }
+
+  #sendEvent(event: TelemetryEvent): void {
     fetch(new URL('/v0/events', this.#config.endpoint), {
       method: 'POST',
       // TODO: We send an array here with that idea that we can eventually send multiple events.
       body: JSON.stringify({
-        events: [preparedPayload],
+        events: [event],
       }),
       mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
       },
     }).catch(() => void 0);
-  }
-
-  #shouldRecord(): boolean {
-    return Math.random() <= this.#config.samplingRate;
   }
 
   /**
