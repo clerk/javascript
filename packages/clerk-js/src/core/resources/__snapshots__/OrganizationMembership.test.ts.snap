@@ -38,6 +38,7 @@ OrganizationMembership {
     "updatedAt": 1970-01-01T00:01:07.890Z,
   },
   "pathRoot": "",
+  "permissions": [],
   "publicMetadata": {
     "foo": "bar",
   },
