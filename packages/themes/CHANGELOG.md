@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.7.7
+
+### Patch Changes
+
+- Pins the internal dependency versions. This ensures that users installing our main framework SDKs will get consistent versions across all @clerk/ packages. ([#1798](https://github.com/clerkinc/javascript/pull/1798)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 1.7.6
 
 ### Patch Changes
