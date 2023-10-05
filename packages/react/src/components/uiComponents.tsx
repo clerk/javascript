@@ -12,9 +12,21 @@ import type {
 import type { PropsWithChildren } from 'react';
 import React, { createElement } from 'react';
 
-import { userProfileLinkRenderedError, userProfilePageRenderedError } from '../errors';
-import type { MountProps, UserProfileLinkProps, UserProfilePageProps, WithClerkProp } from '../types';
-import { useCustomPages } from '../utils/useCustomPages';
+import {
+  organizationProfileLinkRenderedError,
+  organizationProfilePageRenderedError,
+  userProfileLinkRenderedError,
+  userProfilePageRenderedError,
+} from '../errors';
+import type {
+  MountProps,
+  OrganizationProfileLinkProps,
+  OrganizationProfilePageProps,
+  UserProfileLinkProps,
+  UserProfilePageProps,
+  WithClerkProp,
+} from '../types';
+import { useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../utils';
 import { withClerk } from './withClerk';
 
 // README: <Portal/> should be a class pure component in order for mount and unmount
@@ -116,7 +128,7 @@ export function UserProfileLink({ children }: PropsWithChildren<UserProfileLinkP
 }
 
 const _UserProfile = withClerk(({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserProfileProps>>) => {
-  const { customPages, customPagesPortals } = useCustomPages(props.children);
+  const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
   return (
     <Portal
       mount={clerk.mountUserProfile}
@@ -138,7 +150,7 @@ export const UserProfile: UserProfileExportType = Object.assign(_UserProfile, {
 });
 
 const _UserButton = withClerk(({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserButtonProps>>) => {
-  const { customPages, customPagesPortals } = useCustomPages(props.children);
+  const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
   const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
   return (
     <Portal
@@ -160,16 +172,44 @@ export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
   UserProfileLink: UserProfileLink,
 });
 
-export const OrganizationProfile = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationProfileProps>) => {
-  return (
-    <Portal
-      mount={clerk.mountOrganizationProfile}
-      unmount={clerk.unmountOrganizationProfile}
-      updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
-    />
-  );
-}, 'OrganizationProfile');
+export function OrganizationProfilePage({ children }: PropsWithChildren<OrganizationProfilePageProps>) {
+  if (isDevelopmentEnvironment()) {
+    console.error(organizationProfilePageRenderedError);
+  }
+  return <div>{children}</div>;
+}
+
+export function OrganizationProfileLink({ children }: PropsWithChildren<OrganizationProfileLinkProps>) {
+  if (isDevelopmentEnvironment()) {
+    console.error(organizationProfileLinkRenderedError);
+  }
+  return <div>{children}</div>;
+}
+
+const _OrganizationProfile = withClerk(
+  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<OrganizationProfileProps>>) => {
+    const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children);
+    return (
+      <Portal
+        mount={clerk.mountOrganizationProfile}
+        unmount={clerk.unmountOrganizationProfile}
+        updateProps={(clerk as any).__unstable__updateProps}
+        props={{ ...props, customPages }}
+        customPagesPortals={customPagesPortals}
+      />
+    );
+  },
+  'OrganizationProfile',
+);
+
+type OrganizationProfileExportType = typeof _OrganizationProfile & {
+  Page: ({ children }: PropsWithChildren<OrganizationProfilePageProps>) => React.JSX.Element;
+  Link: ({ children }: PropsWithChildren<OrganizationProfileLinkProps>) => React.JSX.Element;
+};
+export const OrganizationProfile: OrganizationProfileExportType = Object.assign(_OrganizationProfile, {
+  Page: OrganizationProfilePage,
+  Link: OrganizationProfileLink,
+});
 
 export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<CreateOrganizationProps>) => {
   return (
@@ -182,16 +222,31 @@ export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<
   );
 }, 'CreateOrganization');
 
-export const OrganizationSwitcher = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationSwitcherProps>) => {
-  return (
-    <Portal
-      mount={clerk.mountOrganizationSwitcher}
-      unmount={clerk.unmountOrganizationSwitcher}
-      updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
-    />
-  );
-}, 'OrganizationSwitcher');
+const _OrganizationSwitcher = withClerk(
+  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<OrganizationSwitcherProps>>) => {
+    const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children);
+    const organizationProfileProps = Object.assign(props.organizationProfileProps || {}, { customPages });
+    return (
+      <Portal
+        mount={clerk.mountOrganizationSwitcher}
+        unmount={clerk.unmountOrganizationSwitcher}
+        updateProps={(clerk as any).__unstable__updateProps}
+        props={{ ...props, organizationProfileProps }}
+        customPagesPortals={customPagesPortals}
+      />
+    );
+  },
+  'OrganizationSwitcher',
+);
+
+type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
+  OrganizationProfilePage: ({ children }: PropsWithChildren<OrganizationProfilePageProps>) => React.JSX.Element;
+  OrganizationProfileLink: ({ children }: PropsWithChildren<OrganizationProfileLinkProps>) => React.JSX.Element;
+};
+export const OrganizationSwitcher: OrganizationSwitcherExportType = Object.assign(_OrganizationSwitcher, {
+  OrganizationProfilePage: OrganizationProfilePage,
+  OrganizationProfileLink: OrganizationProfileLink,
+});
 
 export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationListProps>) => {
   return (

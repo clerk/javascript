@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export type UseCustomElementPortalParams = {
@@ -16,11 +16,8 @@ export type UseCustomElementPortalReturn = {
 // This function takes a component as prop, and returns functions that mount and unmount
 // the given component into a given node
 export const useCustomElementPortal = (elements: UseCustomElementPortalParams[]) => {
-  const [nodes, setNodes] = useState<(Element | null)[]>([]);
-
-  useEffect(() => {
-    setNodes(Array(elements.length).fill(null));
-  }, [elements.length]);
+  const initialState = Array(elements.length).fill(null);
+  const [nodes, setNodes] = useState<(Element | null)[]>(initialState);
 
   const portals: UseCustomElementPortalReturn[] = [];
 

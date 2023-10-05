@@ -1,31 +1,14 @@
 import React from 'react';
 
-import { useCoreOrganization } from '../../contexts';
-import type { NavbarRoute } from '../../elements';
+import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Breadcrumbs, NavBar, NavbarContextProvider, OrganizationPreview } from '../../elements';
-import { CogFilled, User } from '../../icons';
-import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
-
-const organizationProfileRoutes: NavbarRoute[] = [
-  {
-    name: localizationKeys('organizationProfile.start.headerTitle__members'),
-    id: 'members',
-    icon: User,
-    path: '/',
-  },
-  {
-    name: localizationKeys('organizationProfile.start.headerTitle__settings'),
-    id: 'settings',
-    icon: CogFilled,
-    path: 'organization-settings',
-  },
-];
 
 export const OrganizationProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
 ) => {
   const { organization } = useCoreOrganization();
+  const { pages } = useOrganizationProfileContext();
 
   if (!organization) {
     return null;
@@ -41,7 +24,7 @@ export const OrganizationProfileNavbar = (
             sx={t => ({ margin: `0 0 ${t.space.$4} ${t.space.$2}` })}
           />
         }
-        routes={organizationProfileRoutes}
+        routes={pages.routes}
         contentRef={props.contentRef}
       />
       {props.children}
@@ -49,19 +32,12 @@ export const OrganizationProfileNavbar = (
   );
 };
 
-const pageToRootNavbarRouteMap = {
-  'invite-members': organizationProfileRoutes.find(r => r.id === 'members'),
-  domain: organizationProfileRoutes.find(r => r.id === 'settings'),
-  profile: organizationProfileRoutes.find(r => r.id === 'settings'),
-  leave: organizationProfileRoutes.find(r => r.id === 'settings'),
-  delete: organizationProfileRoutes.find(r => r.id === 'settings'),
-};
-
 export const OrganizationProfileBreadcrumbs = (props: Pick<PropsOfComponent<typeof Breadcrumbs>, 'title'>) => {
+  const { pages } = useOrganizationProfileContext();
   return (
     <Breadcrumbs
       {...props}
-      pageToRootNavbarRoute={pageToRootNavbarRouteMap}
+      pageToRootNavbarRoute={pages.pageToRootNavbarRouteMap}
     />
   );
 };

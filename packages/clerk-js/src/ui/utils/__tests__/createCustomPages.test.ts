@@ -1,14 +1,14 @@
-import type { CustomPage } from '../createCustomPages';
-import { createCustomPages } from '../createCustomPages';
+import type { CustomPage } from '@clerk/types';
 
-describe('createCustomPages', () => {
+import { createUserProfileCustomPages } from '../createCustomPages';
+
+describe('createUserProfileCustomPages', () => {
   it('should return the default pages if no custom pages are passed', () => {
-    const { routes, contents, isAccountPageRoot } = createCustomPages([]);
+    const { routes, contents } = createUserProfileCustomPages([]);
     expect(routes.length).toEqual(2);
     expect(routes[0].id).toEqual('account');
     expect(routes[1].id).toEqual('security');
     expect(contents.length).toEqual(0);
-    expect(isAccountPageRoot).toEqual(true);
   });
 
   it('should return the custom pages after the default pages', () => {
@@ -30,7 +30,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    const { routes, contents, isAccountPageRoot } = createCustomPages(customPages);
+    const { routes, contents } = createUserProfileCustomPages(customPages);
     expect(routes.length).toEqual(4);
     expect(routes[0].id).toEqual('account');
     expect(routes[1].id).toEqual('security');
@@ -39,7 +39,6 @@ describe('createCustomPages', () => {
     expect(contents.length).toEqual(2);
     expect(contents[0].url).toEqual('custom1');
     expect(contents[1].url).toEqual('custom2');
-    expect(isAccountPageRoot).toEqual(true);
   });
 
   it('should reorder the default pages when their label is used to target them', () => {
@@ -63,7 +62,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    const { routes, contents, isAccountPageRoot } = createCustomPages(customPages);
+    const { routes, contents } = createUserProfileCustomPages(customPages);
     expect(routes.length).toEqual(4);
     expect(routes[0].name).toEqual('Custom1');
     expect(routes[1].id).toEqual('account');
@@ -72,7 +71,6 @@ describe('createCustomPages', () => {
     expect(contents.length).toEqual(2);
     expect(contents[0].url).toEqual('custom1');
     expect(contents[1].url).toEqual('custom2');
-    expect(isAccountPageRoot).toEqual(false);
   });
 
   it('ignores invalid entries', () => {
@@ -98,7 +96,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    const { routes } = createCustomPages(customPages);
+    const { routes } = createUserProfileCustomPages(customPages);
     expect(routes.length).toEqual(4);
     expect(routes[0].name).toEqual('Custom1');
     expect(routes[1].id).toEqual('account');
@@ -127,7 +125,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    const { routes } = createCustomPages(customPages);
+    const { routes } = createUserProfileCustomPages(customPages);
     expect(routes.length).toEqual(4);
     expect(routes[0].path).toEqual('/');
     expect(routes[1].path).toEqual('account');
@@ -156,7 +154,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    const { routes } = createCustomPages(customPages);
+    const { routes } = createUserProfileCustomPages(customPages);
     expect(routes.length).toEqual(4);
     expect(routes[0].path).toEqual('/');
     expect(routes[1].path).toEqual('custom1');
@@ -185,7 +183,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    const { routes } = createCustomPages(customPages);
+    const { routes } = createUserProfileCustomPages(customPages);
     expect(routes.length).toEqual(4);
     expect(routes[0].path).toEqual('/');
     expect(routes[1].path).toEqual('custom1');
@@ -212,7 +210,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    expect(() => createCustomPages(customPages)).toThrow();
+    expect(() => createUserProfileCustomPages(customPages)).toThrow();
   });
 
   it('adds an external link to the navbar routes', () => {
@@ -232,7 +230,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    const { routes, contents, isAccountPageRoot } = createCustomPages(customPages);
+    const { routes, contents } = createUserProfileCustomPages(customPages);
     expect(routes.length).toEqual(4);
     expect(routes[0].id).toEqual('account');
     expect(routes[1].id).toEqual('security');
@@ -240,7 +238,6 @@ describe('createCustomPages', () => {
     expect(routes[3].name).toEqual('Link1');
     expect(contents.length).toEqual(1);
     expect(contents[0].url).toEqual('custom1');
-    expect(isAccountPageRoot).toEqual(true);
   });
 
   it('sanitizes the path for external links', () => {
@@ -264,7 +261,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    const { routes } = createCustomPages(customPages);
+    const { routes } = createUserProfileCustomPages(customPages);
     expect(routes.length).toEqual(5);
     expect(routes[2].path).toEqual('https://www.fullurl.com');
     expect(routes[3].path).toEqual('/url-with-slash');
@@ -290,7 +287,7 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    const { routes } = createCustomPages(customPages);
+    const { routes } = createUserProfileCustomPages(customPages);
     expect(routes.length).toEqual(4);
     expect(routes[2].path).toEqual('url-with-slash');
     expect(routes[3].path).toEqual('url-without-slash');
@@ -307,6 +304,6 @@ describe('createCustomPages', () => {
         unmountIcon: () => undefined,
       },
     ];
-    expect(() => createCustomPages(customPages)).toThrow();
+    expect(() => createUserProfileCustomPages(customPages)).toThrow();
   });
 });

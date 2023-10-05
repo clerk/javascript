@@ -3,8 +3,13 @@ import type { CustomPage } from '@clerk/types';
 import type { ReactElement } from 'react';
 import React from 'react';
 
-import { UserProfileLink, UserProfilePage } from '../components/uiComponents';
-import { customPagesIngoredComponent, userProfileLinkWrongProps, userProfilePageWrongProps } from '../errors';
+import {
+  OrganizationProfileLink,
+  OrganizationProfilePage,
+  UserProfileLink,
+  UserProfilePage,
+} from '../components/uiComponents';
+import { customLinkWrongProps, customPagesIgnoredComponent, customPageWrongProps } from '../errors';
 import type { UserProfilePageProps } from '../types';
 import type { UseCustomElementPortalParams, UseCustomElementPortalReturn } from './useCustomElementPortal';
 import { useCustomElementPortal } from './useCustomElementPortal';
@@ -15,23 +20,55 @@ const errorInDevMode = (message: string) => {
   }
 };
 
-const isPageComponent = (v: any): v is React.ReactNode => {
-  return !!v && React.isValidElement(v) && (v as React.ReactElement)?.type === UserProfilePage;
+const isThatComponent = (v: any, component: React.ReactNode): v is React.ReactNode => {
+  return !!v && React.isValidElement(v) && (v as React.ReactElement)?.type === component;
 };
 
-const isLinkComponent = (v: any): v is React.ReactNode => {
-  return !!v && React.isValidElement(v) && (v as React.ReactElement)?.type === UserProfileLink;
+export const useUserProfileCustomPages = (children: React.ReactNode | React.ReactNode[]) => {
+  const reorderItemsLabels = ['account', 'security'];
+  return useCustomPages({
+    children,
+    reorderItemsLabels,
+    LinkComponent: UserProfileLink,
+    PageComponent: UserProfilePage,
+    componentName: 'UserProfile',
+  });
+};
+
+export const useOrganizationProfileCustomPages = (children: React.ReactNode | React.ReactNode[]) => {
+  const reorderItemsLabels = ['members', 'settings'];
+  return useCustomPages({
+    children,
+    reorderItemsLabels,
+    LinkComponent: OrganizationProfileLink,
+    PageComponent: OrganizationProfilePage,
+    componentName: 'OrganizationProfile',
+  });
+};
+
+type UseCustomPagesParams = {
+  children: React.ReactNode | React.ReactNode[];
+  LinkComponent: any;
+  PageComponent: any;
+  reorderItemsLabels: string[];
+  componentName: string;
 };
 
 type CustomPageWithIdType = UserProfilePageProps & { children?: React.ReactNode };
 
-export const useCustomPages = (userProfileChildren: React.ReactNode | React.ReactNode[]) => {
-  const validUserProfileChildren: CustomPageWithIdType[] = [];
+const useCustomPages = ({
+  children,
+  LinkComponent,
+  PageComponent,
+  reorderItemsLabels,
+  componentName,
+}: UseCustomPagesParams) => {
+  const validChildren: CustomPageWithIdType[] = [];
 
-  React.Children.forEach(userProfileChildren, child => {
-    if (!isPageComponent(child) && !isLinkComponent(child)) {
+  React.Children.forEach(children, child => {
+    if (!isThatComponent(child, PageComponent) && !isThatComponent(child, LinkComponent)) {
       if (child) {
-        errorInDevMode(customPagesIngoredComponent);
+        errorInDevMode(customPagesIgnoredComponent(componentName));
       }
       return;
     }
@@ -40,25 +77,25 @@ export const useCustomPages = (userProfileChildren: React.ReactNode | React.Reac
 
     const { children, label, url, labelIcon } = props;
 
-    if (isPageComponent(child)) {
-      if (isReorderItem(props)) {
+    if (isThatComponent(child, PageComponent)) {
+      if (isReorderItem(props, reorderItemsLabels)) {
         // This is a reordering item
-        validUserProfileChildren.push({ label });
+        validChildren.push({ label });
       } else if (isCustomPage(props)) {
         // this is a custom page
-        validUserProfileChildren.push({ label, labelIcon, children, url });
+        validChildren.push({ label, labelIcon, children, url });
       } else {
-        errorInDevMode(userProfilePageWrongProps);
+        errorInDevMode(customPageWrongProps(componentName));
         return;
       }
     }
 
-    if (isLinkComponent(child)) {
+    if (isThatComponent(child, LinkComponent)) {
       if (isExternalLink(props)) {
         // This is an external link
-        validUserProfileChildren.push({ label, labelIcon, url });
+        validChildren.push({ label, labelIcon, url });
       } else {
-        errorInDevMode(userProfileLinkWrongProps);
+        errorInDevMode(customLinkWrongProps(componentName));
         return;
       }
     }
@@ -68,7 +105,7 @@ export const useCustomPages = (userProfileChildren: React.ReactNode | React.Reac
   const customPageLabelIcons: UseCustomElementPortalParams[] = [];
   const customLinkLabelIcons: UseCustomElementPortalParams[] = [];
 
-  validUserProfileChildren.forEach((cp, index) => {
+  validChildren.forEach((cp, index) => {
     if (isCustomPage(cp)) {
       customPageContents.push({ component: cp.children, id: index });
       customPageLabelIcons.push({ component: cp.labelIcon, id: index });
@@ -86,8 +123,8 @@ export const useCustomPages = (userProfileChildren: React.ReactNode | React.Reac
   const customPages: CustomPage[] = [];
   const customPagesPortals: React.ComponentType[] = [];
 
-  validUserProfileChildren.forEach((cp, index) => {
-    if (isReorderItem(cp)) {
+  validChildren.forEach((cp, index) => {
+    if (isReorderItem(cp, reorderItemsLabels)) {
       customPages.push({ label: cp.label });
       return;
     }
@@ -122,9 +159,9 @@ export const useCustomPages = (userProfileChildren: React.ReactNode | React.Reac
   return { customPages, customPagesPortals };
 };
 
-const isReorderItem = (childProps: any): boolean => {
+const isReorderItem = (childProps: any, validItems: string[]): boolean => {
   const { children, label, url, labelIcon } = childProps;
-  return !children && !url && !labelIcon && (label === 'account' || label === 'security');
+  return !children && !url && !labelIcon && validItems.some(v => v === label);
 };
 
 const isCustomPage = (childProps: any): boolean => {

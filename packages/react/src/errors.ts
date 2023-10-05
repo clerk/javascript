@@ -37,11 +37,16 @@ export const userProfilePageRenderedError =
 export const userProfileLinkRenderedError =
   '<UserProfile.Link /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.';
 
-export const customPagesIngoredComponent =
-  '<UserProfile /> can only accept <UserProfile.Page /> and <UserProfile.Link /> as its children. Any other provided component will be ignored.';
+export const organizationProfilePageRenderedError =
+  '<OrganizationProfile.Page /> component needs to be a direct child of `<OrganizationProfile />` or `<OrganizationSwitcher />`.';
+export const organizationProfileLinkRenderedError =
+  '<OrganizationProfile.Link /> component needs to be a direct child of `<OrganizationProfile />` or `<OrganizationSwitcher />`.';
 
-export const userProfilePageWrongProps =
-  'Missing props. <UserProfile.Page /> component requires the following props: url, label, labelIcon, alongside with children to be rendered inside the page.';
+export const customPagesIgnoredComponent = (componentName: string) =>
+  `<${componentName} /> can only accept <${componentName}.Page /> and <${componentName}.Link /> as its children. Any other provided component will be ignored.`;
 
-export const userProfileLinkWrongProps =
-  'Missing props. <UserProfile.Link /> component requires the following props: url, label and labelIcon.';
+export const customPageWrongProps = (componentName: string) =>
+  `Missing props. <${componentName}.Page /> component requires the following props: url, label, labelIcon, alongside with children to be rendered inside the page.`;
+
+export const customLinkWrongProps = (componentName: string) =>
+  `Missing props. <${componentName}.Link /> component requires the following props: url, label and labelIcon.`;

@@ -754,6 +754,16 @@ export type OrganizationProfileProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: OrganizationProfileTheme;
+  /*
+   * Provide addition custom route items and pages to be rendered inside the OrganizationProfile.
+   * e.g.
+   *  <OrganizationProfile>
+   *    <OrganizationProfile.Page label="Custom Page" url="custom-page" labelIcon={<div>C</div>}>
+   *      <div>Hello from custom page!</div>
+   *    </OrganizationProfile.Page>
+   *  </OrganizationProfile>
+   */
+  customPages?: CustomPage[];
 };
 
 export type CreateOrganizationProps = {
@@ -932,7 +942,7 @@ export type OrganizationSwitcherProps = {
    * Specify options for the underlying <OrganizationProfile /> component.
    * e.g. <UserButton userProfileProps={{appearance: {...}}} />
    */
-  organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
+  organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
 };
 
 export type OrganizationListProps = {

@@ -4,4 +4,4 @@
 '@clerk/types': minor
 ---
 
-Introduce Custom Pages in UserProfile
+Introduce Custom Pages in UserProfile and OrganizationProfile

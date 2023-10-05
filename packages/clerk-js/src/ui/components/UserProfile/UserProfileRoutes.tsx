@@ -25,15 +25,16 @@ import { Web3Page } from './Web3Page';
 
 export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardContent>) => {
   const { pages } = useUserProfileContext();
+  const isAccountPageRoot = pages.routes[0].id === 'account' || pages.routes[0].id === 'security';
   return (
     <ProfileCardContent contentRef={props.contentRef}>
       <Switch>
         {/* Custom Pages */}
         {pages.contents?.map((customPage, index) => (
           <Route
-            index={!pages.isAccountPageRoot && index === 0}
-            path={!pages.isAccountPageRoot && index === 0 ? undefined : customPage.url}
-            key={`custom-page-${index}`}
+            index={!isAccountPageRoot && index === 0}
+            path={!isAccountPageRoot && index === 0 ? undefined : customPage.url}
+            key={`custom-page-${customPage.url}`}
           >
             <ExternalElementMounter
               mount={customPage.mount}
@@ -41,7 +42,7 @@ export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardCont
             />
           </Route>
         ))}
-        <Route path={pages.isAccountPageRoot ? undefined : 'account'}>
+        <Route path={isAccountPageRoot ? undefined : 'account'}>
           <Route
             path='profile'
             flowStart

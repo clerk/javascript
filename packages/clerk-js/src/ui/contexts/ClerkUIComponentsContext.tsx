@@ -20,7 +20,7 @@ import type {
   UserProfileCtx,
 } from '../types';
 import type { CustomPageContent } from '../utils';
-import { createCustomPages } from '../utils';
+import { createOrganizationProfileCustomPages, createUserProfileCustomPages } from '../utils';
 
 const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 
@@ -190,7 +190,6 @@ export const useSignInContext = (): SignInContextType => {
 type PagesType = {
   routes: NavbarRoute[];
   contents: CustomPageContent[];
-  isAccountPageRoot: boolean;
   pageToRootNavbarRouteMap: Record<string, NavbarRoute>;
 };
 
@@ -208,7 +207,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
-  const pages = useMemo(() => createCustomPages(customPages || []), [customPages]);
+  const pages = useMemo(() => createUserProfileCustomPages(customPages || []), [customPages]);
 
   return {
     ...ctx,
@@ -409,8 +408,13 @@ export const useOrganizationListContext = () => {
   };
 };
 
-export const useOrganizationProfileContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
+export type OrganizationProfileContextType = OrganizationProfileCtx & {
+  pages: PagesType;
+  navigateAfterLeaveOrganization: () => Promise<unknown>;
+};
+
+export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
+  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -418,11 +422,14 @@ export const useOrganizationProfileContext = () => {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
+  const pages = useMemo(() => createOrganizationProfileCustomPages(customPages || []), [customPages]);
+
   const navigateAfterLeaveOrganization = () =>
     navigate(ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl);
 
   return {
     ...ctx,
+    pages,
     navigateAfterLeaveOrganization,
     componentName,
   };

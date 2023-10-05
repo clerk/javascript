@@ -102,3 +102,6 @@ export type UserProfileLinkProps = {
   label: string;
   labelIcon: React.ReactElement;
 };
+
+export type OrganizationProfilePageProps = UserProfilePageProps;
+export type OrganizationProfileLinkProps = UserProfileLinkProps;

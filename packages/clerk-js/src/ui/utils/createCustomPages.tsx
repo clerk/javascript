@@ -3,7 +3,7 @@ import type { CustomPage } from '@clerk/types';
 
 import { isValidUrl } from '../../utils';
 import type { NavbarRoute } from '../elements';
-import { TickShield, User } from '../icons';
+import { CogFilled, TickShield, User } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 
@@ -33,13 +33,51 @@ type UserProfileCustomLink = {
   unmountIcon: (el?: HTMLDivElement) => void;
 };
 
-export const createCustomPages = (customPages: CustomPage[]) => {
+type GetDefaultRoutesReturnType = {
+  INITIAL_ROUTES: NavbarRoute[];
+  pageToRootNavbarRouteMap: Record<string, NavbarRoute>;
+  validReorderItemLabels: string[];
+};
+
+type CreateCustomPagesParams = {
+  customPages: CustomPage[];
+  getDefaultRoutes: () => GetDefaultRoutesReturnType;
+  setFirstPathToRoot: (routes: NavbarRoute[]) => NavbarRoute[];
+  excludedPathsFromDuplicateWarning: string[];
+};
+
+export const createUserProfileCustomPages = (customPages: CustomPage[]) => {
+  return createCustomPages({
+    customPages,
+    getDefaultRoutes: getUserProfileDefaultRoutes,
+    setFirstPathToRoot: setFirstPathToUserProfileRoot,
+    excludedPathsFromDuplicateWarning: ['/', 'account'],
+  });
+};
+
+export const createOrganizationProfileCustomPages = (customPages: CustomPage[]) => {
+  return createCustomPages({
+    customPages,
+    getDefaultRoutes: getOrganizationProfileDefaultRoutes,
+    setFirstPathToRoot: setFirstPathToOrganizationProfileRoot,
+    excludedPathsFromDuplicateWarning: [],
+  });
+};
+
+const createCustomPages = ({
+  customPages,
+  getDefaultRoutes,
+  setFirstPathToRoot,
+  excludedPathsFromDuplicateWarning,
+}: CreateCustomPagesParams) => {
+  const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes();
+
   if (isDevelopmentEnvironment()) {
-    checkForDuplicateUsageOfReorderingItems(customPages);
+    checkForDuplicateUsageOfReorderingItems(customPages, validReorderItemLabels);
   }
 
   const validCustomPages = customPages.filter(cp => {
-    if (!isValidPageItem(cp)) {
+    if (!isValidPageItem(cp, validReorderItemLabels)) {
       if (isDevelopmentEnvironment()) {
         console.error('Invalid custom page data: ', cp);
       }
@@ -48,11 +86,9 @@ export const createCustomPages = (customPages: CustomPage[]) => {
     return true;
   });
 
-  const { USER_PROFILE_ROUTES, pageToRootNavbarRouteMap } = getUserProfileDefaultRoutes();
-
   const { allRoutes, contents } = getRoutesAndContents({
     customPages: validCustomPages,
-    defaultRoutes: USER_PROFILE_ROUTES,
+    defaultRoutes: INITIAL_ROUTES,
   });
 
   assertExternalLinkAsRoot(allRoutes);
@@ -60,13 +96,12 @@ export const createCustomPages = (customPages: CustomPage[]) => {
   const routes = setFirstPathToRoot(allRoutes);
 
   if (isDevelopmentEnvironment()) {
-    warnForDuplicatePaths(routes);
+    warnForDuplicatePaths(routes, excludedPathsFromDuplicateWarning);
   }
 
   return {
     routes,
     contents,
-    isAccountPageRoot: routes[0].id === 'account' || routes[0].id === 'security',
     pageToRootNavbarRouteMap,
   };
 };
@@ -121,7 +156,7 @@ const getRoutesAndContents = ({ customPages, defaultRoutes }: GetRoutesAndConten
 };
 
 // Set the path of the first route to '/' or if the first route is account or security, set the path of both account and security to '/'
-const setFirstPathToRoot = (routes: NavbarRoute[]) => {
+const setFirstPathToUserProfileRoot = (routes: NavbarRoute[]): NavbarRoute[] => {
   if (routes[0].id === 'account' || routes[0].id === 'security') {
     return routes.map(r => {
       if (r.id === 'account' || r.id === 'security') {
@@ -134,8 +169,12 @@ const setFirstPathToRoot = (routes: NavbarRoute[]) => {
   }
 };
 
-const checkForDuplicateUsageOfReorderingItems = (customPages: CustomPage[]) => {
-  const reorderItems = customPages.filter(cp => isAccountReorderItem(cp) || isSecurityReorderItem(cp));
+const setFirstPathToOrganizationProfileRoot = (routes: NavbarRoute[]): NavbarRoute[] => {
+  return routes.map((r, index) => (index === 0 ? { ...r, path: '/' } : r));
+};
+
+const checkForDuplicateUsageOfReorderingItems = (customPages: CustomPage[], validReorderItems: string[]) => {
+  const reorderItems = customPages.filter(cp => isReorderItem(cp, validReorderItems));
   reorderItems.reduce((acc, cp) => {
     if (acc.includes(cp.label)) {
       console.error(
@@ -145,10 +184,10 @@ const checkForDuplicateUsageOfReorderingItems = (customPages: CustomPage[]) => {
     return [...acc, cp.label];
   }, [] as string[]);
 };
-
-const warnForDuplicatePaths = (routes: NavbarRoute[]) => {
+//path !== '/' && path !== 'account'
+const warnForDuplicatePaths = (routes: NavbarRoute[], pathsToFilter: string[]) => {
   const paths = routes
-    .filter(({ external, path }) => !external && path !== '/' && path !== 'account')
+    .filter(({ external, path }) => !external && pathsToFilter.every(p => p !== path))
     .map(({ path }) => path);
   const duplicatePaths = paths.filter((p, index) => paths.indexOf(p) !== index);
   duplicatePaths.forEach(p => {
@@ -156,8 +195,8 @@ const warnForDuplicatePaths = (routes: NavbarRoute[]) => {
   });
 };
 
-const isValidPageItem = (cp: CustomPage): cp is CustomPage => {
-  return isCustomPage(cp) || isCustomLink(cp) || isAccountReorderItem(cp) || isSecurityReorderItem(cp);
+const isValidPageItem = (cp: CustomPage, validReorderItems: string[]): cp is CustomPage => {
+  return isCustomPage(cp) || isCustomLink(cp) || isReorderItem(cp, validReorderItems);
 };
 
 const isCustomPage = (cp: CustomPage): cp is UserProfileCustomPage => {
@@ -168,12 +207,10 @@ const isCustomLink = (cp: CustomPage): cp is UserProfileCustomLink => {
   return !!cp.url && !!cp.label && !cp.mount && !cp.unmount && !!cp.mountIcon && !!cp.unmountIcon;
 };
 
-const isAccountReorderItem = (cp: CustomPage): cp is UserProfileReorderItem => {
-  return !cp.url && !cp.mount && !cp.unmount && !cp.mountIcon && !cp.unmountIcon && cp.label === 'account';
-};
-
-const isSecurityReorderItem = (cp: CustomPage): cp is UserProfileReorderItem => {
-  return !cp.url && !cp.mount && !cp.unmount && !cp.mountIcon && !cp.unmountIcon && cp.label === 'security';
+const isReorderItem = (cp: CustomPage, validItems: string[]): cp is UserProfileReorderItem => {
+  return (
+    !cp.url && !cp.mount && !cp.unmount && !cp.mountIcon && !cp.unmountIcon && validItems.some(v => v === cp.label)
+  );
 };
 
 const sanitizeCustomPageURL = (url: string): string => {
@@ -198,12 +235,12 @@ const sanitizeCustomLinkURL = (url: string): string => {
 
 const assertExternalLinkAsRoot = (routes: NavbarRoute[]) => {
   if (routes[0].external) {
-    throw new Error('The first route cannot be a <UserProfile.Link /> component');
+    throw new Error('The first route cannot be a custom external link component');
   }
 };
 
-const getUserProfileDefaultRoutes = () => {
-  const USER_PROFILE_ROUTES: NavbarRoute[] = [
+const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
+  const INITIAL_ROUTES: NavbarRoute[] = [
     {
       name: localizationKeys('userProfile.start.headerTitle__account'),
       id: 'account',
@@ -218,16 +255,47 @@ const getUserProfileDefaultRoutes = () => {
     },
   ];
 
-  const pageToRootNavbarRouteMap = {
-    profile: USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'email-address': USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'phone-number': USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'connected-account': USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'web3-wallet': USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    username: USER_PROFILE_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'multi-factor': USER_PROFILE_ROUTES.find(r => r.id === 'security') as NavbarRoute,
-    password: USER_PROFILE_ROUTES.find(r => r.id === 'security') as NavbarRoute,
+  const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
+    profile: INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'email-address': INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'phone-number': INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'connected-account': INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'web3-wallet': INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    username: INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
+    'multi-factor': INITIAL_ROUTES.find(r => r.id === 'security') as NavbarRoute,
+    password: INITIAL_ROUTES.find(r => r.id === 'security') as NavbarRoute,
   };
 
-  return { USER_PROFILE_ROUTES, pageToRootNavbarRouteMap };
+  const validReorderItemLabels: string[] = INITIAL_ROUTES.map(r => r.id);
+
+  return { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels };
+};
+
+const getOrganizationProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
+  const INITIAL_ROUTES: NavbarRoute[] = [
+    {
+      name: localizationKeys('organizationProfile.start.headerTitle__members'),
+      id: 'members',
+      icon: User,
+      path: 'organization-members',
+    },
+    {
+      name: localizationKeys('organizationProfile.start.headerTitle__settings'),
+      id: 'settings',
+      icon: CogFilled,
+      path: 'organization-settings',
+    },
+  ];
+
+  const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
+    'invite-members': INITIAL_ROUTES.find(r => r.id === 'members') as NavbarRoute,
+    domain: INITIAL_ROUTES.find(r => r.id === 'settings') as NavbarRoute,
+    profile: INITIAL_ROUTES.find(r => r.id === 'settings') as NavbarRoute,
+    leave: INITIAL_ROUTES.find(r => r.id === 'settings') as NavbarRoute,
+    delete: INITIAL_ROUTES.find(r => r.id === 'settings') as NavbarRoute,
+  };
+
+  const validReorderItemLabels: string[] = INITIAL_ROUTES.map(r => r.id);
+
+  return { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels };
 };
