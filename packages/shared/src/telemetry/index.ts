@@ -100,8 +100,8 @@ export class TelemetryCollector {
     }
 
     // TODO: determine FAPI endpoint from the publishable key
-    this.#config.endpoint = 'https://telemetry-service-staging.bryce-clerk.workers.dev';
-    // this.#config.endpoint = 'http://localhost:8787';
+    // this.#config.endpoint = 'https://telemetry-service-staging.bryce-clerk.workers.dev';
+    this.#config.endpoint = 'http://localhost:8787';
   }
 
   get isEnabled(): boolean {
@@ -127,7 +127,10 @@ export class TelemetryCollector {
 
     fetch(new URL('/v0/events', this.#config.endpoint), {
       method: 'POST',
-      body: JSON.stringify(preparedPayload),
+      // TODO: We send an array here with that idea that we can eventually send multiple events.
+      body: JSON.stringify({
+        events: [preparedPayload],
+      }),
       mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',

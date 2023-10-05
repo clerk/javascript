@@ -431,6 +431,7 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
+    this.#telemetry.record('COMPONENT_MOUNTED', { component: 'SignUp', appearanceProp: Boolean(props?.appearance) });
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
