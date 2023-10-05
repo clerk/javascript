@@ -27,6 +27,7 @@ import type {
   DomainOrProxyUrl,
   EnvironmentJSON,
   EnvironmentResource,
+  HandleEmailLinkVerificationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,

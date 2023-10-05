@@ -17,7 +17,7 @@ export const EmailPage = withCardStateProvider(() => {
   const card = useCardState();
   const user = useCoreUser();
   const environment = useEnvironment();
-  const preferMagicLinks = magicLinksEnabledForInstance(environment);
+  const preferEmailLinks = magicLinksEnabledForInstance(environment);
 
   const { params } = useRouter();
   const { id } = params || {};
@@ -64,7 +64,7 @@ export const EmailPage = withCardStateProvider(() => {
           </Form.ControlRow>
           <Text
             localizationKey={
-              preferMagicLinks
+              preferEmailLinks
                 ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
                 : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
             }
@@ -78,7 +78,7 @@ export const EmailPage = withCardStateProvider(() => {
         headerTitle={title}
         Breadcrumbs={UserProfileBreadcrumbs}
       >
-        {preferMagicLinks ? (
+        {preferEmailLinks ? (
           <VerifyWithLink
             nextStep={wizard.nextStep}
             email={emailAddressRef.current as any}
@@ -96,7 +96,7 @@ export const EmailPage = withCardStateProvider(() => {
       <SuccessPage
         title={title}
         text={
-          preferMagicLinks
+          preferEmailLinks
             ? localizationKeys('userProfile.emailAddressPage.emailLink.successMessage', {
                 identifier: emailAddressRef.current?.emailAddress || '',
               })
