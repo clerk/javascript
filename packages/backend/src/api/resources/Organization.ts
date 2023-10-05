@@ -1,3 +1,4 @@
+import { deprecatedProperty } from '../../util/shared';
 import type { OrganizationJSON } from './JSON';
 
 export class Organization {
@@ -40,3 +41,5 @@ export class Organization {
     );
   }
 }
+
+deprecatedProperty(Organization, 'logoUrl', 'Use `imageUrl` instead.');

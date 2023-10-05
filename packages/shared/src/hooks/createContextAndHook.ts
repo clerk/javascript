@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 
 export function assertContextExists(contextVal: unknown, msgOrCtx: string | React.Context<any>): asserts contextVal {
