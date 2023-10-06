@@ -23,7 +23,7 @@ export {
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   AuthenticateWithRedirectCallback,
-} from '@clerk/clerk-react';
+} from './clerk-react';
 
 export {
   SignIn,
