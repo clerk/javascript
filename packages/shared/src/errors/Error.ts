@@ -18,10 +18,6 @@ export function isKnownError(error: any) {
 }
 
 export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
-  if (err instanceof ClerkAPIResponseError) {
-    return true;
-  }
-
   return 'clerkError' in err;
 }
 
@@ -42,7 +38,7 @@ export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError 
  * }
  */
 export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
-  return err instanceof ClerkRuntimeError;
+  return 'clerkRuntimeError' in err;
 }
 
 export function isMetamaskError(err: any): err is MetamaskError {
@@ -68,6 +64,8 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
 }
 
 export class ClerkAPIResponseError extends Error {
+  clerkError: true;
+
   status: number;
   message: string;
 
@@ -80,6 +78,7 @@ export class ClerkAPIResponseError extends Error {
 
     this.status = status;
     this.message = message;
+    this.clerkError = true;
     this.errors = parseErrors(data);
   }
 
@@ -98,6 +97,8 @@ export class ClerkAPIResponseError extends Error {
  *   throw new ClerkRuntimeError('An error occurred', { code: 'password_invalid' });
  */
 export class ClerkRuntimeError extends Error {
+  clerkRuntimeError: true;
+
   /**
    * The error message.
    *
@@ -113,6 +114,7 @@ export class ClerkRuntimeError extends Error {
    * @memberof ClerkRuntimeError
    */
   code: string;
+
   constructor(message: string, { code }: { code: string }) {
     super(message);
 
@@ -120,6 +122,7 @@ export class ClerkRuntimeError extends Error {
 
     this.code = code;
     this.message = message;
+    this.clerkRuntimeError = true;
   }
 
   /**
@@ -142,6 +145,7 @@ export class MagicLinkError extends Error {
     Object.setPrototypeOf(this, MagicLinkError.prototype);
   }
 }
+
 // Check if the error is a MagicLinkError.
 
 export function isMagicLinkError(err: Error): err is MagicLinkError {

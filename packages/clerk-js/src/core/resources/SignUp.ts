@@ -1,4 +1,4 @@
-import { ClerkRuntimeError, Poller } from '@clerk/shared';
+import { Poller } from '@clerk/shared';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,
@@ -30,7 +30,7 @@ import {
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
-import { BaseResource, SignUpVerifications } from './internal';
+import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
 
 declare global {
   interface Window {
@@ -211,7 +211,9 @@ export class SignUp extends BaseResource implements SignUpResource {
     continueSignUp = false,
     unsafeMetadata,
     emailAddress,
-  }: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata }): Promise<void> => {
+  }: AuthenticateWithRedirectParams & {
+    unsafeMetadata?: SignUpUnsafeMetadata;
+  }): Promise<void> => {
     const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
       continueSignUp && this.id ? this.update(args) : this.create(args);
 

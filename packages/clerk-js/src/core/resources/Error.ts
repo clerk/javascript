@@ -9,5 +9,6 @@ export {
   MagicLinkError,
   ClerkAPIResponseError,
   isClerkRuntimeError,
+  ClerkRuntimeError,
 } from '@clerk/shared';
 export type { MetamaskError } from '@clerk/shared';
