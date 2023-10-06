@@ -25,6 +25,7 @@
     "nuke": "./scripts/nuke.sh",
     "prepare": "husky install",
     "release": "TURBO_FORCE=true FORCE_COLOR=1 npm run build -- --force && changeset publish && git push --follow-tags",
+    "release:canary": "TURBO_FORCE=true FORCE_COLOR=1 npm run build && changeset publish --tag canary --no-git-tag",
     "release:snapshot": "TURBO_FORCE=true FORCE_COLOR=1 npm run build && changeset publish --tag snapshot --no-git-tag",
     "release:staging": "TURBO_FORCE=true FORCE_COLOR=1 npm run build && changeset publish --tag staging --no-git-tag",
     "release:verdaccio": "if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else TURBO_FORCE=true TURBO_CONCURRENCY=4 npm run build && changeset publish --no-git-tag; fi",
@@ -39,6 +40,7 @@
     "turbo:clean": "turbo daemon clean",
     "update:lockfile": "npm run nuke && npm install -D --arch=x64 --platform=linux turbo && npm install -D --arch=arm64 --platform=darwin turbo",
     "version": "changeset version && ./scripts/version-info.sh",
+    "version:canary": "./scripts/canary.mjs",
     "version:snapshot": "./scripts/snapshot.mjs",
     "version:staging": "./scripts/staging.mjs",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace --sig; cd '../../'; done"
