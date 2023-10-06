@@ -1,4 +1,4 @@
-import { deepSnakeToCamel, Poller } from '@clerk/shared';
+import { deepSnakeToCamel, deprecated, Poller } from '@clerk/shared';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -125,6 +125,8 @@ export class SignIn extends BaseResource implements SignInResource {
    * @deprecated Use `createEmailLinkFlow` instead.
    */
   createMagicLinkFlow = (): CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource> => {
+    deprecated('createMagicLinkFlow', 'Use `createEmailLinkFlow` instead.');
+
     const { run, stop } = Poller();
 
     const startMagicLinkFlow = async ({
