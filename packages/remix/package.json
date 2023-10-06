@@ -18,9 +18,18 @@
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.js",
-    "./ssr.server": "./dist/ssr/index.js",
-    "./api.server": "./dist/api/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./ssr.server": {
+      "types": "./dist/ssr/index.d.ts",
+      "default": "./dist/ssr/index.js"
+    },
+    "./api.server": {
+      "types": "./dist/api/index.d.ts",
+      "default": "./dist/api/index.js"
+    }
   },
   "typesVersions": {
     "*": {
