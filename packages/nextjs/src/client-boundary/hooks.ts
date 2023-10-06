@@ -11,6 +11,7 @@ export {
   useOrganization,
   useOrganizationList,
   useOrganizations,
+  useEmailLink,
   useMagicLink,
   withUser,
   withSession,
@@ -24,8 +25,10 @@ export type { WithUserProp, WithSessionProp, WithClerkProp } from '@clerk/clerk-
 
 export {
   isClerkAPIResponseError,
+  EmailLinkErrorCode,
   MagicLinkErrorCode,
   isKnownError,
   isMetamaskError,
+  isEmailLinkError,
   isMagicLinkError,
 } from '@clerk/clerk-react';

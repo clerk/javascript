@@ -8,6 +8,7 @@ import type {
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
+  HandleEmailLinkVerificationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
@@ -667,13 +668,24 @@ export default class IsomorphicClerk {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
     }
   };
-
+  /**
+   * @deprecated Use `handleEmailLinkVerification` instead.
+   */
   handleMagicLinkVerification = async (params: HandleMagicLinkVerificationParams): Promise<void> => {
     const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('handleMagicLinkVerification', callback);
+    }
+  };
+
+  handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams): Promise<void> => {
+    const callback = () => this.clerkjs?.handleEmailLinkVerification(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('handleEmailLinkVerification', callback);
     }
   };
 

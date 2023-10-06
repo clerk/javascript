@@ -4,6 +4,7 @@ import type {
   AttemptSecondFactorParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  CreateEmailLinkFlowReturn,
   CreateMagicLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
@@ -20,6 +21,7 @@ import type {
   SignInJSON,
   SignInResource,
   SignInSecondFactor,
+  SignInStartEmailLinkFlowParams,
   SignInStartMagicLinkFlowParams,
   SignInStatus,
   VerificationResource,
@@ -119,7 +121,9 @@ export class SignIn extends BaseResource implements SignInResource {
       action: 'attempt_first_factor',
     });
   };
-
+  /**
+   * @deprecated Use `createEmailLinkFlow` instead.
+   */
   createMagicLinkFlow = (): CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource> => {
     const { run, stop } = Poller();
 
@@ -154,6 +158,42 @@ export class SignIn extends BaseResource implements SignInResource {
     };
 
     return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
+  };
+
+  createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource> => {
+    const { run, stop } = Poller();
+
+    const startEmailLinkFlow = async ({
+      emailAddressId,
+      redirectUrl,
+    }: SignInStartEmailLinkFlowParams): Promise<SignInResource> => {
+      if (!this.id) {
+        clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
+      }
+      await this.prepareFirstFactor({
+        strategy: 'email_link',
+        emailAddressId: emailAddressId,
+        redirectUrl: redirectUrl,
+      });
+      return new Promise((resolve, reject) => {
+        void run(() => {
+          return this.reload()
+            .then(res => {
+              const status = res.firstFactorVerification.status;
+              if (status === 'verified' || status === 'expired') {
+                stop();
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              stop();
+              reject(err);
+            });
+        });
+      });
+    };
+
+    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
   prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {

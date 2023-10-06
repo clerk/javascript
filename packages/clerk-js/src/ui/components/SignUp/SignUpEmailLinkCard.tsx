@@ -2,12 +2,12 @@ import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
-import { buildMagicLinkRedirectUrl } from '../../common/redirects';
+import { buildEmailLinkRedirectUrl } from '../../common/redirects';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { VerificationLinkCard } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useMagicLink } from '../../hooks/useMagicLink';
+import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 import { completeSignUpFlow } from './util';
@@ -23,19 +23,19 @@ export const SignUpEmailLinkCard = () => {
   const { setActive } = useCoreClerk();
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
 
-  const { startMagicLinkFlow, cancelMagicLinkFlow } = useMagicLink(signUp);
+  const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signUp);
 
   React.useEffect(() => {
     void startEmailLinkVerification();
   }, []);
 
   const restartVerification = () => {
-    cancelMagicLinkFlow();
+    cancelEmailLinkFlow();
     void startEmailLinkVerification();
   };
 
   const startEmailLinkVerification = () => {
-    return startMagicLinkFlow({ redirectUrl: buildMagicLinkRedirectUrl(signUpContext, displayConfig.signUpUrl) })
+    return startEmailLinkFlow({ redirectUrl: buildEmailLinkRedirectUrl(signUpContext, displayConfig.signUpUrl) })
       .then(res => handleVerificationResult(res))
       .catch(err => {
         handleError(err, [], card.setError);

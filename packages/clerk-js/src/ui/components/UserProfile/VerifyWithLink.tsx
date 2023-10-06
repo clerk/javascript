@@ -2,11 +2,11 @@ import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
-import { buildMagicLinkRedirectUrl } from '../../common/redirects';
+import { buildEmailLinkRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import { FormButtonContainer, NavigateToFlowStartButton, useCardState, VerificationLink } from '../../elements';
-import { useMagicLink } from '../../hooks';
+import { useEmailLink } from '../../hooks';
 import { handleError } from '../../utils';
 
 type VerifyWithLinkProps = {
@@ -18,7 +18,7 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
   const { email, nextStep } = props;
   const card = useCardState();
   const profileContext = useUserProfileContext();
-  const { startMagicLinkFlow } = useMagicLink(email);
+  const { startEmailLinkFlow } = useEmailLink(email);
   const { displayConfig } = useEnvironment();
 
   React.useEffect(() => {
@@ -36,8 +36,8 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
     const { routing } = profileContext;
     const baseUrl = routing === 'virtual' ? displayConfig.userProfileUrl : '';
 
-    const redirectUrl = buildMagicLinkRedirectUrl(profileContext, baseUrl);
-    startMagicLinkFlow({ redirectUrl })
+    const redirectUrl = buildEmailLinkRedirectUrl(profileContext, baseUrl);
+    startEmailLinkFlow({ redirectUrl })
       .then(() => nextStep())
       .catch(err => handleError(err, [], card.setError));
   }

@@ -6,6 +6,7 @@ export {
   useAuth,
   useClerk,
   useMagicLink,
+  useEmailLink,
   useOrganization,
   useOrganizationList,
   useOrganizations,

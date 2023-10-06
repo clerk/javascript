@@ -13,6 +13,7 @@ import {
   SignedOut as _SignedOut,
   useAuth as _useAuth,
   useClerk as _useClerk,
+  useEmailLink as _useEmailLink,
   useMagicLink as _useMagicLink,
   useOrganization as _useOrganization,
   useOrganizationList as _useOrganizationList,
@@ -44,7 +45,11 @@ export const useClerk = _useClerk;
  * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
  */
 export const useMagicLink = _useMagicLink;
-
+/**
+ * @deprecated Use imports from `@clerk/nextjs` instead.
+ * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
+ */
+export const useEmailLink = _useEmailLink;
 /**
  * @deprecated Use imports from `@clerk/nextjs` instead.
  * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware

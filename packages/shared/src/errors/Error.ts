@@ -136,6 +136,9 @@ export class ClerkRuntimeError extends Error {
   };
 }
 
+/**
+ * @deprecated Use `EmailLinkError` instead.
+ */
 export class MagicLinkError extends Error {
   code: string;
 
@@ -146,13 +149,37 @@ export class MagicLinkError extends Error {
   }
 }
 
-// Check if the error is a MagicLinkError.
+export class EmailLinkError extends Error {
+  code: string;
 
+  constructor(code: string) {
+    super(code);
+    this.code = code;
+    Object.setPrototypeOf(this, EmailLinkError.prototype);
+  }
+}
+
+/**
+ * Check if the error is a MagicLinkError.
+ * @deprecated Use `isEmailLinkError` instead.
+ */
 export function isMagicLinkError(err: Error): err is MagicLinkError {
   return err instanceof MagicLinkError;
 }
 
+export function isEmailLinkError(err: Error): err is EmailLinkError {
+  return err instanceof EmailLinkError;
+}
+
+/**
+ * @deprecated Use `EmailLinkErrorCode` instead.
+ */
 export const MagicLinkErrorCode = {
+  Expired: 'expired',
+  Failed: 'failed',
+};
+
+export const EmailLinkErrorCode = {
   Expired: 'expired',
   Failed: 'failed',
 };

@@ -1,21 +1,21 @@
-import { buildMagicLinkRedirectUrl, buildSSOCallbackURL } from '../redirects';
+import { buildEmailLinkRedirectUrl, buildSSOCallbackURL } from '../redirects';
 
-describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
+describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
   it('handles empty routing strategy based routing ', function () {
-    expect(buildMagicLinkRedirectUrl({ path: '', authQueryString: '' } as any, '')).toBe('http://localhost/#/verify');
+    expect(buildEmailLinkRedirectUrl({ path: '', authQueryString: '' } as any, '')).toBe('http://localhost/#/verify');
   });
 
   it('returns the magic link redirect url for components using path based routing ', function () {
-    expect(buildMagicLinkRedirectUrl({ routing: 'path', authQueryString: '' } as any, '')).toBe(
+    expect(buildEmailLinkRedirectUrl({ routing: 'path', authQueryString: '' } as any, '')).toBe(
       'http://localhost/verify',
     );
 
-    expect(buildMagicLinkRedirectUrl({ routing: 'path', path: '/sign-in', authQueryString: '' } as any, '')).toBe(
+    expect(buildEmailLinkRedirectUrl({ routing: 'path', path: '/sign-in', authQueryString: '' } as any, '')).toBe(
       'http://localhost/sign-in/verify',
     );
 
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'path',
           path: '',
@@ -26,7 +26,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'path',
           path: '/sign-in',
@@ -37,7 +37,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/sign-in/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'path',
           path: '/sign-in',
@@ -50,7 +50,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
 
   it('returns the magic link redirect url for components using hash based routing ', function () {
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'hash',
           authQueryString: '',
@@ -60,7 +60,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify');
 
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'hash',
           path: '/sign-in',
@@ -71,7 +71,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify');
 
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'hash',
           path: '',
@@ -82,7 +82,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'hash',
           path: '/sign-in',
@@ -93,7 +93,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'hash',
           path: '/sign-in',
@@ -106,7 +106,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
 
   it('returns the magic link redirect url for components using virtual routing ', function () {
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'virtual',
           authQueryString: 'redirectUrl=https://clerk.com',
@@ -116,7 +116,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('https://accounts.clerk.com/sign-in#/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildMagicLinkRedirectUrl(
+      buildEmailLinkRedirectUrl(
         {
           routing: 'virtual',
         } as any,
