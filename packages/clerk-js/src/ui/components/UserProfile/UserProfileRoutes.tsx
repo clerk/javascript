@@ -1,8 +1,8 @@
+import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { useUserProfileContext } from '../../contexts';
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
-import { ExternalElementMounter } from '../../utils';
 import { ConnectedAccountsPage } from './ConnectedAccountsPage';
 import { DeletePage } from './DeletePage';
 import { EmailPage } from './EmailPage';
@@ -36,7 +36,7 @@ export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardCont
             path={!isAccountPageRoot && index === 0 ? undefined : customPage.url}
             key={`custom-page-${customPage.url}`}
           >
-            <ExternalElementMounter
+            <CustomPageContentContainer
               mount={customPage.mount}
               unmount={customPage.unmount}
             />

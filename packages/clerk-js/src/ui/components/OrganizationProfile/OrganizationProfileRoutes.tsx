@@ -1,9 +1,9 @@
+import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { Gate } from '../../common/Gate';
 import { useOrganizationProfileContext } from '../../contexts';
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
-import { ExternalElementMounter } from '../../utils';
 import { DeleteOrganizationPage, LeaveOrganizationPage } from './ActionConfirmationPage';
 import { AddDomainPage } from './AddDomainPage';
 import { InviteMembersPage } from './InviteMembersPage';
@@ -30,7 +30,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
             path={!isPredefinedPageRoot && index === 0 ? undefined : customPage.url}
             key={`custom-page-${customPage.url}`}
           >
-            <ExternalElementMounter
+            <CustomPageContentContainer
               mount={customPage.mount}
               unmount={customPage.unmount}
             />
