@@ -1,14 +1,5 @@
 # Change Log
 
-## 4.26.3
-
-### Patch Changes
-
-- Make `types` the first key in all `exports` maps defined in our packages' `package.json`. The [TypeScript docs](https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing) recommends so, as the the `exports` map is order-based. ([#1835](https://github.com/clerkinc/javascript/pull/1835)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
-
-- Updated dependencies [[`7636abc10`](https://github.com/clerkinc/javascript/commit/7636abc105c9436bc6ada93df3fa7da2b53ca340), [`bf66d7322`](https://github.com/clerkinc/javascript/commit/bf66d73228e404a36ea04426d95c2e084d81f2e4), [`7d3cbcb7d`](https://github.com/clerkinc/javascript/commit/7d3cbcb7d5ef954a89a62e051a493a0abf438e43)]:
-  - @clerk/shared@0.24.3
-
 ## 4.26.2
 
 ### Patch Changes

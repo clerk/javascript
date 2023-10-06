@@ -1,13 +1,5 @@
 # Change Log
 
-## 0.6.13
-
-### Patch Changes
-
-- Updated dependencies [[`7636abc10`](https://github.com/clerkinc/javascript/commit/7636abc105c9436bc6ada93df3fa7da2b53ca340), [`bf66d7322`](https://github.com/clerkinc/javascript/commit/bf66d73228e404a36ea04426d95c2e084d81f2e4), [`c38241110`](https://github.com/clerkinc/javascript/commit/c382411107391f0d0ecf1918295638af0ceb2b38), [`7d3cbcb7d`](https://github.com/clerkinc/javascript/commit/7d3cbcb7d5ef954a89a62e051a493a0abf438e43)]:
-  - @clerk/shared@0.24.3
-  - @clerk/backend@0.30.3
-
 ## 0.6.12
 
 ### Patch Changes
