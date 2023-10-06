@@ -8,7 +8,6 @@ import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
 import runtime from '../runtime';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { joinPaths } from '../util/path';
-import { deprecated } from '../util/shared';
 import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
@@ -51,11 +50,6 @@ type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) 
 const withLegacyReturn =
   (cb: any): LegacyRequestFunction =>
   async (...args) => {
-    deprecated(
-      '',
-      'Resources return format will switch to `{ data: any, errors: ClerkAPIError[] }` from `data | never` the next major version.',
-      'resources-legacy-return',
-    );
     // @ts-ignore
     const { data, errors, status, statusText } = await cb<T>(...args);
     if (errors === null) {
