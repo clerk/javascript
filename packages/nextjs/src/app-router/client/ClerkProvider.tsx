@@ -6,6 +6,7 @@ import React from 'react';
 import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
 import { useSafeLayoutEffect } from '../../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../../types';
+import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 declare global {
@@ -33,7 +34,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     };
   }, []);
 
-  const mergedProps = { ...props, navigate };
+  const mergedProps = mergeNextClerkPropsWithEnv({ ...props, navigate });
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
       {/*// @ts-ignore*/}
