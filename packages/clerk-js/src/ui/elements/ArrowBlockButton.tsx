@@ -80,11 +80,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
               elementDescriptor={spinnerElementDescriptor}
               elementId={spinnerElementId}
               size={'md'}
-              sx={theme => [
-                {
-                  padding: theme.space.$2,
-                },
-              ]}
             />
           ) : !isIconElement && leftIcon ? (
             <Icon
