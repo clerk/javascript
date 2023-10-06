@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.30.3
+
+### Patch Changes
+
+- Remove deprecation warning that is logging more than intended and not actionable for users of our SDKs. ([#1841](https://github.com/clerkinc/javascript/pull/1841)) by [@BRKalow](https://github.com/BRKalow)
+
+- Retry the implemented changes from [#1767](https://github.com/clerkinc/javascript/pull/1767) which were reverted in [#1806](https://github.com/clerkinc/javascript/pull/1806) due to RSC related errors (not all uses components had the `use client` directive). Restore the original PR and add additional `use client` directives to ensure it works correctly. ([#1807](https://github.com/clerkinc/javascript/pull/1807)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`7636abc10`](https://github.com/clerkinc/javascript/commit/7636abc105c9436bc6ada93df3fa7da2b53ca340), [`bf66d7322`](https://github.com/clerkinc/javascript/commit/bf66d73228e404a36ea04426d95c2e084d81f2e4), [`7d3cbcb7d`](https://github.com/clerkinc/javascript/commit/7d3cbcb7d5ef954a89a62e051a493a0abf438e43)]:
+  - @clerk/shared@0.24.3
+
 ## 0.30.2
 
 ### Patch Changes
