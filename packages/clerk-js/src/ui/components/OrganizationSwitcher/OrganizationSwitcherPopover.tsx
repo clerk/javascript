@@ -2,7 +2,7 @@ import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { runIfFunctionOrReturn } from '../../../utils';
-import { NotificationCountBadge } from '../../common';
+import { NotificationCountBadge, withGate } from '../../common';
 import {
   useCoreClerk,
   useCoreOrganization,
@@ -175,15 +175,20 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
   },
 );
 
-const NotificationCountBadgeManageButton = () => {
-  const { membership } = useCoreOrganization();
-  const { organizationSettings } = useEnvironment();
-  const isAdmin = membership?.role === 'admin';
-  const allowRequests = organizationSettings?.domains?.enabled && isAdmin;
+const NotificationCountBadgeManageButton = withGate(
+  () => {
+    const { organizationSettings } = useEnvironment();
 
-  const { membershipRequests } = useCoreOrganization({
-    membershipRequests: allowRequests || undefined,
-  });
+    const isDomainsEnabled = organizationSettings?.domains?.enabled;
 
-  return <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />;
-};
+    const { membershipRequests } = useCoreOrganization({
+      membershipRequests: isDomainsEnabled || undefined,
+    });
+
+    return <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />;
+  },
+  {
+    // if the user is not able to accept a request we should not notify them
+    permission: 'org:memberships:manage',
+  },
+);
