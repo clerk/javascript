@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "0.19.7",
+  "version": "0.19.8",
   "license": "MIT",
   "description": "Clerk React Native/Expo library",
   "keywords": [
@@ -27,8 +27,8 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/clerk-js": "4.60.0",
-    "@clerk/clerk-react": "4.26.2",
+    "@clerk/clerk-js": "4.60.1",
+    "@clerk/clerk-react": "4.26.3",
     "base-64": "1.0.0",
     "react-native-url-polyfill": "2.0.0"
   },
