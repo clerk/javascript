@@ -8,6 +8,7 @@ import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
 import runtime from '../runtime';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { joinPaths } from '../util/path';
+import { deprecated } from '../util/shared';
 import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
