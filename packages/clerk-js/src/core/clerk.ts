@@ -245,6 +245,8 @@ export default class Clerk implements ClerkInterface {
     this.#proxyUrl = options?.proxyUrl;
 
     if (isLegacyFrontendApiKey(key)) {
+      deprecated('frontendApi', 'Use `publishableKey` instead.');
+
       if (!validateFrontendApi(key)) {
         errorThrower.throwInvalidFrontendApiError({ key });
       }

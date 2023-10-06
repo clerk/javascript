@@ -1,8 +1,8 @@
 import { deprecatedProperty } from '@clerk/shared';
-import type { PublicUserData } from '@clerk/types';
+import type { PublicUserData as IPublicUserData } from '@clerk/types';
 import type { PublicUserDataJSON } from '@clerk/types';
 
-export class OrganizationPublicUserData implements PublicUserData {
+export class PublicUserData implements IPublicUserData {
   firstName!: string | null;
   lastName!: string | null;
   /**
@@ -33,4 +33,4 @@ export class OrganizationPublicUserData implements PublicUserData {
   }
 }
 
-deprecatedProperty(OrganizationPublicUserData, 'profileImageUrl', 'Use `imageUrl` instead.');
+deprecatedProperty(PublicUserData, 'profileImageUrl', 'Use `imageUrl` instead.');

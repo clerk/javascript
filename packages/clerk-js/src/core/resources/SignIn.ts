@@ -22,7 +22,6 @@ import type {
   SignInSecondFactor,
   SignInStartMagicLinkFlowParams,
   SignInStatus,
-  UserData,
   VerificationResource,
   Web3SignatureConfig,
   Web3SignatureFactor,
@@ -37,7 +36,7 @@ import {
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
-import { BaseResource, Verification } from './internal';
+import { BaseResource, UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -51,7 +50,7 @@ export class SignIn extends BaseResource implements SignInResource {
   secondFactorVerification: VerificationResource = new Verification(null);
   identifier: string | null = null;
   createdSessionId: string | null = null;
-  userData: UserData = {};
+  userData!: UserData;
 
   constructor(data: SignInJSON | null = null) {
     super();
@@ -255,7 +254,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
-      this.userData = deepSnakeToCamel(data.user_data || {}) as UserData;
+      this.userData = new UserData(data.user_data);
     }
     return this;
   }
