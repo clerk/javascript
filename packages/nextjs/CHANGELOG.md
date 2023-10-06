@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.25.3
+
+### Patch Changes
+
+- Add deprecation warning for `@clerk/nextjs/app-beta` export. Use the `@clerk/nextjs` instead. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Retry the implemented changes from [#1767](https://github.com/clerkinc/javascript/pull/1767) which were reverted in [#1806](https://github.com/clerkinc/javascript/pull/1806) due to RSC related errors (not all uses components had the `use client` directive). Restore the original PR and add additional `use client` directives to ensure it works correctly. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1e212c19d`](https://github.com/clerkinc/javascript/commit/1e212c19d1cbfbcf6bc6718f5aec0a3cb893b96f), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679)]:
+  - @clerk/clerk-react@4.26.3
+  - @clerk/shared@0.24.3
+  - @clerk/backend@0.30.3
+  - @clerk/clerk-sdk-node@4.12.12
+
 ## 4.25.2
 
 ### Patch Changes
