@@ -1,5 +1,6 @@
 import type { JwtPayload } from '@clerk/types';
 
+import { deprecated } from '../util/shared';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 import type { VerifyJwtOptions } from './jwt';
 import { decodeJwt, verifyJwt } from './jwt';
@@ -32,6 +33,10 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
     jwtKey,
     skipJwksCache,
   } = options;
+
+  if (options.apiKey) {
+    deprecated('apiKey', 'Use `secretKey` instead.');
+  }
 
   const { header } = decodeJwt(token);
   const { kid } = header;

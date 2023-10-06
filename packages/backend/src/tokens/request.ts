@@ -1,7 +1,7 @@
 import { API_URL, API_VERSION, constants } from '../constants';
-import { isDevelopmentFromApiKey, parsePublishableKey } from '../shared';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
+import { deprecated, isDevelopmentFromApiKey, parsePublishableKey } from '../util/shared';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
@@ -104,6 +104,14 @@ function assertProxyUrlOrDomain(proxyUrlOrDomain: string | undefined) {
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   const { cookies, headers, searchParams } = buildRequest(options?.request);
+
+  if (options.frontendApi) {
+    deprecated('frontentApi', 'Use `publishableKey` instead.');
+  }
+
+  if (options.apiKey) {
+    deprecated('apiKey', 'Use `secretKey` instead.');
+  }
 
   options = {
     ...options,
