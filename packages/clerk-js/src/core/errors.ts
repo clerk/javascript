@@ -94,6 +94,14 @@ export function clerkMissingProxyUrlAndDomain(): never {
   );
 }
 
+export function clerkInvalidSignInUrlOrigin(): never {
+  throw new Error(`${errorPrefix} The signInUrl needs to be on a different origin than your satellite application.`);
+}
+
+export function clerkInvalidSignInUrlFormat(): never {
+  throw new Error(`${errorPrefix} The signInUrl needs to have a absolute url format.`);
+}
+
 export function clerkMissingSignInUrlAsSatellite(): never {
   throw new Error(
     `${errorPrefix} Missing signInUrl. A satellite application needs to specify the signInUrl for development instances.`,
