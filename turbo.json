@@ -61,6 +61,10 @@
       "dependsOn": [],
       "outputs": []
     },
+    "lint:publint": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
     "bundlewatch": {
       "dependsOn": ["build"],
       "outputs": []

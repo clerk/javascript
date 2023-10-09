@@ -4,8 +4,12 @@ on:
   merge_group:
   pull_request:
     branches: [ main ]
+  push:
+    branches:
+      - main
 
 jobs:
+
   test:
     strategy:
       matrix:
@@ -15,7 +19,6 @@ jobs:
     concurrency:
       group: tests-${{ github.ref }}-${{ matrix.node-version }}
       cancel-in-progress: true
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -23,7 +26,11 @@ jobs:
         uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm run test:ci
+      - name: Run tests
+        run: npm run test:ci
+        # TODO: Separate this step once build cache is in place
+      - name: Lint packages using publint
+        run: npm run publint
 
   prettier:
     name: Check format
