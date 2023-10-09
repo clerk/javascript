@@ -75,21 +75,22 @@ const AddMfa = (props: AddMfaProps) => {
   const user = useCoreUser();
   const availableMethods = user.phoneNumbers.filter(p => !p.reservedForSecondFactor);
 
-  const enableMfa = (phone: PhoneNumberResource) => {
+  const enableMfa = async (phone: PhoneNumberResource) => {
     if (phone.verification.status !== 'verified') {
       return onUnverifiedPhoneClick(phone);
     }
 
     card.setLoading(phone.id);
-    phone
-      .setReservedForSecondFactor({ reserved: true })
-      .then(() => {
-        card.setIdle();
+    try {
+      await phone.setReservedForSecondFactor({ reserved: true }).then(() => {
+        resourceRef.current = phone;
         onSuccess();
-      })
-      .catch(err => handleError(err, [], card.setError));
-
-    resourceRef.current = phone;
+      });
+    } catch (err) {
+      handleError(err, [], card.setError);
+    } finally {
+      card.setIdle();
+    }
   };
 
   return (
