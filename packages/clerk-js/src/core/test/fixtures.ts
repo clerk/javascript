@@ -5,6 +5,7 @@ import type {
   OAuthProvider,
   OrganizationJSON,
   OrganizationMembershipJSON,
+  OrganizationPermission,
   PhoneNumberJSON,
   UserJSON,
 } from '@clerk/types';
@@ -12,7 +13,7 @@ import type {
 export const mockJwt =
   'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yR0lvUWhiVXB5MGhYN0IyY1ZrdVRNaW5Yb0QiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FjY291bnRzLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsImV4cCI6MTY2NjY0ODMxMCwiaWF0IjoxNjY2NjQ4MjUwLCJpc3MiOiJodHRwczovL2NsZXJrLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsIm5iZiI6MTY2NjY0ODI0MCwic2lkIjoic2Vzc18yR2JEQjRlbk5kQ2E1dlMxenBDM1h6Zzl0SzkiLCJzdWIiOiJ1c2VyXzJHSXBYT0VwVnlKdzUxcmtabjlLbW5jNlN4ciJ9.n1Usc-DLDftqA0Xb-_2w8IGs4yjCmwc5RngwbSRvwevuZOIuRoeHmE2sgCdEvjfJEa7ewL6EVGVcM557TWPW--g_J1XQPwBy8tXfz7-S73CEuyRFiR97L2AHRdvRtvGtwR-o6l8aHaFxtlmfWbQXfg4kFJz2UGe9afmh3U9-f_4JOZ5fa3mI98UMy1-bo20vjXeWQ9aGrqaxHQxjnzzC-1Kpi5LdPvhQ16H0dPB8MHRTSM5TAuLKTpPV7wqixmbtcc2-0k6b9FKYZNqRVTaIyV-lifZloBvdzlfOF8nW1VVH_fx-iW5Q3hovHFcJIULHEC1kcAYTubbxzpgeVQepGg';
 
-type OrgParams = Partial<OrganizationJSON> & { role?: MembershipRole };
+type OrgParams = Partial<OrganizationJSON> & { role?: MembershipRole; permissions?: OrganizationPermission[] };
 
 type WithUserParams = Omit<
   Partial<UserJSON>,
@@ -26,8 +27,8 @@ type WithUserParams = Omit<
 
 export const getOrganizationId = (orgParams: OrgParams) => orgParams?.id || orgParams?.name || 'test_id';
 
-export const createOrganization = (params: OrgParams): OrganizationMembershipJSON => {
-  const { role, ...orgParams } = params;
+export const createOrganizationMembership = (params: OrgParams): OrganizationMembershipJSON => {
+  const { role, permissions, ...orgParams } = params;
   return {
     created_at: new Date().getTime(),
     id: getOrganizationId(orgParams),
@@ -49,6 +50,16 @@ export const createOrganization = (params: OrgParams): OrganizationMembershipJSO
     } as OrganizationJSON,
     public_metadata: {},
     role: role || 'admin',
+    permissions: permissions || [
+      'org:domains:delete',
+      'org:domains:manage',
+      'org:domains:read',
+      'org:memberships:delete',
+      'org:memberships:manage',
+      'org:memberships:read',
+      'org:profile:delete',
+      'org:profile:manage',
+    ],
     updated_at: new Date().getTime(),
   } as OrganizationMembershipJSON;
 };
@@ -145,7 +156,7 @@ export const createUser = (params: WithUserParams): UserJSON => {
       typeof p === 'string' ? createExternalAccount({ provider: p }) : createExternalAccount(p),
     ),
     organization_memberships: (params.organization_memberships || []).map(o =>
-      typeof o === 'string' ? createOrganization({ name: o }) : createOrganization(o),
+      typeof o === 'string' ? createOrganizationMembership({ name: o }) : createOrganizationMembership(o),
     ),
   } as any as UserJSON;
   res.primary_email_address_id = res.email_addresses[0]?.id;

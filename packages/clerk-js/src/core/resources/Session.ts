@@ -4,6 +4,7 @@ import type {
   ActJWTClaim,
   GetToken,
   GetTokenOptions,
+  IsAuthorized,
   SessionJSON,
   SessionResource,
   SessionStatus,
@@ -72,6 +73,38 @@ export class Session extends BaseResource implements SessionResource {
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
     return runWithExponentialBackOff(() => this._getToken(options), {
       shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,
+    });
+  };
+
+  /**
+   * @experimental The method is experimental and subject to change in future releases.
+   */
+  isAuthorized: IsAuthorized = async params => {
+    return new Promise(resolve => {
+      // if there is no active organization user can not be authorized
+      if (!this.lastActiveOrganizationId || !this.user) {
+        return resolve(false);
+      }
+
+      // loop through organizationMemberships from client piggybacking
+      const orgMemberships = this.user.organizationMemberships || [];
+      const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
+
+      // Based on FAPI this should never happen, but we handle it anyway
+      if (!activeMembership) {
+        return resolve(false);
+      }
+
+      const activeOrganizationPermissions = activeMembership.permissions;
+      const activeOrganizationRole = activeMembership.role;
+
+      if (params.permission) {
+        return resolve(activeOrganizationPermissions.includes(params.permission));
+      }
+      if (params.role) {
+        return resolve(activeOrganizationRole === params.role);
+      }
+      return resolve(false);
     });
   };
 

@@ -56,4 +56,46 @@ describe('Session', () => {
       expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
     });
   });
+
+  describe('isAuthorized()', () => {
+    it('user with permission to delete the organization should be able to delete the  organization', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({
+          organization_memberships: [{ name: 'Org1', id: 'org1' }],
+        }),
+        last_active_organization_id: 'org1',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const isAuthorized = await session.isAuthorized({ permission: 'org:profile:delete' });
+
+      expect(isAuthorized).toBe(true);
+    });
+
+    it('user with permission to read memberships should not be deleting the organization', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({
+          organization_memberships: [{ name: 'Org1', id: 'org1', permissions: ['org:memberships:read'] }],
+        }),
+        last_active_organization_id: 'org1',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const isAuthorized = await session.isAuthorized({ permission: 'org:profile:delete' });
+
+      expect(isAuthorized).toBe(false);
+    });
+  });
 });
