@@ -12,7 +12,7 @@ export const common = {
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : '70%',
-  reporter: 'line',
+  reporter: [[process.env.CI ? 'html' : 'line', { open: 'never' }]] as any,
   use: {
     trace: 'on-first-retry',
     bypassCSP: true, // We probably need to limit this to specific tests
