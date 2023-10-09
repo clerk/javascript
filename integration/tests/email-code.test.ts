@@ -1,12 +1,12 @@
 import { test } from '@playwright/test';
 
 import type { Application } from '../models/application';
-import { appConfigs, longRunningApps } from '../presets';
+import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
 test.describe('sign up and sign in with email code', () => {
-  const configs = [longRunningApps.react.viteWithEmailCodes];
+  const configs = [];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {

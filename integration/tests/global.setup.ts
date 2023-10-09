@@ -3,13 +3,14 @@ import { test as setup } from '@playwright/test';
 
 import { constants } from '../constants';
 import type { LongRunningApplication } from '../models/longRunningApplication';
-import { fs, getLongRunningAppsById, parseEnvOptions } from '../scripts';
+import { appConfigs } from '../presets';
+import { fs, parseEnvOptions } from '../scripts';
 
 setup('start long running apps', async () => {
   const { appIds } = parseEnvOptions();
   if (appIds.length) {
     // start all apps with the given ids
-    const apps = getLongRunningAppsById(appIds);
+    const apps = appConfigs.longRunningApps.getByPattern(appIds);
     await startLongRunningApps(apps);
   } else {
     // start a single app using the available env variables

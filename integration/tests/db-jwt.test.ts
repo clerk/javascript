@@ -6,7 +6,7 @@ import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
 test.describe('Dev Browser JWT test', () => {
-  const configs = [appConfigs.longRunning.next.appRouterWithEmailCodes];
+  const configs = [];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {

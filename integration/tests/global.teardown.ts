@@ -12,8 +12,11 @@ setup('teardown long running apps', async () => {
     console.log('Skipping cleanup');
     return;
   }
-  const runningApps = Object.values(stateFile.getLongRunningApps());
-  await Promise.all(runningApps.map(app => appConfigs.longRunning.getById(app.id).destroy()));
+  const runningAppsFoundInStateFile = Object.values(stateFile.getLongRunningApps());
+  const matchingLongRunningApps = appConfigs.longRunningApps.getByPattern(
+    runningAppsFoundInStateFile.map(app => app.id),
+  );
+  await Promise.all(matchingLongRunningApps.map(app => app.destroy()));
   stateFile.remove();
   console.log('Long running apps destroyed');
 });

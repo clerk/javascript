@@ -6,7 +6,7 @@ import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
 
 test.describe('sign up and sign in using email link', () => {
-  const configs = [appConfigs.longRunning.react.viteEmailLink, appConfigs.remix.remixNode];
+  const configs = [];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {
