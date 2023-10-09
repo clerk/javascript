@@ -53,7 +53,8 @@
     "dev": "tsc -p tsconfig.build.json --watch",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
-    "lint:publint": "publint ",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "publish:local": "npx yalc push --replace --sig"
   },
   "dependencies": {

@@ -65,6 +65,10 @@
       "dependsOn": ["build"],
       "outputs": []
     },
+    "lint:attw": {
+      "dependsOn": [],
+      "outputs": []
+    },
     "bundlewatch": {
       "dependsOn": ["build"],
       "outputs": []

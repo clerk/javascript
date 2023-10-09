@@ -14,6 +14,7 @@
     "npm": ">=8.5.0"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.12.1",
     "@changesets/cli": "^2.26.1",
     "@changesets/get-github-info": "^0.5.2",
     "@commitlint/cli": "^16.0.2",
@@ -68,6 +69,7 @@
     "clean": "turbo clean",
     "lint": "FORCE_COLOR=1 turbo lint",
     "lint:publint": "FORCE_COLOR=1 turbo lint:publint",
+    "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
     "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",
     "bundlewatch": "turbo bundlewatch",
     "format": "npx prettier --write .",
