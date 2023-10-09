@@ -1,0 +1,96 @@
+name: Quality checks and tests
+on:
+  push:
+  pull_request:
+    branches: [ main, master ]
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build packages and upload artifacts
+    uses: ./.github/workflows/build-base.yml
+
+  unit-tests:
+    name: Run unit tests
+    needs: build
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    strategy:
+      matrix:
+        node-version: [ 18, 19 ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Download turbo cache
+        uses: actions/download-artifact@v3
+        with:
+          name: package-artifacts
+          path: ./node_modules/.cache/turbo
+      - name: Run tests
+        run: npm run test:ci
+
+  publint:
+    name: Run publint
+    needs: build
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Download turbo cache
+        uses: actions/download-artifact@v3
+        with:
+          name: package-artifacts
+          path: ./node_modules/.cache/turbo
+      - name: Lint packages using publint
+        run: npm run lint:publint
+
+  attw:
+    name: Run attw
+    needs: build
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Download turbo cache
+        uses: actions/download-artifact@v3
+        with:
+          name: package-artifacts
+          path: ./node_modules/.cache/turbo
+      - name: Lint types using attw
+        # Remove this when all related errors are fixed
+        continue-on-error: true
+        run: npm run lint:attw
+
+  registry:
+    name: Publish in private registry
+    needs: build
+    uses: ./.github/workflows/registry-base.yml
+
+  integration-generic:
+    name: Integration (Generic)
+    needs: registry
+    uses: ./.github/workflows/e2e-base.yml
+    with:
+      SCRIPT: 'npm run test:integration:generic'
+    secrets: inherit
+
+  integration-nextjs:
+    name: Integration (NextJS)
+    needs: registry
+    uses: ./.github/workflows/e2e-base.yml
+    with:
+      SCRIPT: 'npm run test:integration:nextjs'
+    secrets: inherit
+
+  integration-remix:
+    name: Integration (Remix)
+    needs: registry
+    uses: ./.github/workflows/e2e-base.yml
+    with:
+      SCRIPT: 'npm run test:integration:remix'
+    secrets: inherit

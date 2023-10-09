@@ -8,37 +8,14 @@ on:
     branches:
       - main
 
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-
-  test:
-    if: ${{ github.repository == 'clerkinc/javascript' }}
-    strategy:
-      matrix:
-        node-version: [ 18, 19 ]
-    name: Build and test
-    runs-on: ubuntu-latest
-    concurrency:
-      group: tests-${{ github.ref }}-${{ matrix.node-version }}
-      cancel-in-progress: true
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Setup
-        uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Run tests
-        run: npm run test:ci
-        # TODO: Separate this step once build cache is in place
-      - name: Lint packages using publint
-        run: npm run publint
-
   prettier:
     name: Check format
-    runs-on: ubuntu-latest
-    concurrency:
-      group: formatter-${{ github.ref }}
-      cancel-in-progress: true
+    runs-on: ${{ vars.RUNNER_NORMAL }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -48,7 +25,7 @@ jobs:
 
   changeset:
       name: Require changeset
-      runs-on: ubuntu-latest
+      runs-on: ${{ vars.RUNNER_NORMAL }}
       concurrency:
         group: require-changeset-${{ github.ref }}
         cancel-in-progress: true

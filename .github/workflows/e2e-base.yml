@@ -1,32 +1,22 @@
-name: Playwright Tests
+name: Integration reusable workflow
 on:
-  push:
-  pull_request:
-    branches: [ main, master ]
-jobs:
-  build:
-    name: Build local packages
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Setup
-        uses: ./.github/actions/setup
-      - name: Build
-        run: npm run build
-      - name: Upload package artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: package-artifacts
-          path: ./node_modules/.cache/turbo
-          retention-days: 1
+  workflow_call:
+    inputs:
+      SCRIPT:
+        required: true
+        type: string
+    secrets:
+      INTEGRATION_INSTANCE_KEYS:
+        required: true
+      MAILSAC_API_KEY:
+        required: true
 
-  integration-test:
+jobs:
+  run:
     timeout-minutes: 60
-    runs-on: ubuntu-latest
-    needs: build
+    runs-on: ${{ vars.RUNNER_NORMAL }}
     concurrency:
-      group: integration-${{ github.ref }}
+      group: integration-${{ github.ref }}-${{ inputs.script }}
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v3
@@ -52,7 +42,7 @@ jobs:
       - name: Build packages
         run: npm run build
       - name: Run Playwright tests
-        run: npm run test:integration:generic
+        run: ${{ inputs.SCRIPT }}
         env:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}

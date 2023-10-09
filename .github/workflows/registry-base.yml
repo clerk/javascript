@@ -1,0 +1,17 @@
+on:
+  workflow_call:
+
+jobs:
+  registry:
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Download turbo cache
+        uses: actions/download-artifact@v3
+        with:
+          name: package-artifacts
+          path: ./node_modules/.cache/turbo
+      - name: Publish locally
+        run: echo 'Verdaccio placeholder'

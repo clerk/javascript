@@ -1,0 +1,21 @@
+on:
+  workflow_call:
+
+jobs:
+  build:
+    name: Build packages
+    # if: ${{ github.repository == 'clerkinc/javascript' }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Build
+        run: npm run build
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: package-artifacts
+          path: ./node_modules/.cache/turbo
+          retention-days: 1
