@@ -1,5 +1,7 @@
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 
+import { deprecated } from '../utils';
+
 interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
   status: number;
@@ -146,6 +148,7 @@ export class MagicLinkError extends Error {
     super(code);
     this.code = code;
     Object.setPrototypeOf(this, MagicLinkError.prototype);
+    deprecated('MagicLinkError', 'Use `EmailLinkError` instead.');
   }
 }
 
@@ -164,6 +167,7 @@ export class EmailLinkError extends Error {
  * @deprecated Use `isEmailLinkError` instead.
  */
 export function isMagicLinkError(err: Error): err is MagicLinkError {
+  deprecated('isMagicLinkError', 'Use `isEmailLinkError` instead.');
   return err instanceof MagicLinkError;
 }
 
@@ -171,13 +175,19 @@ export function isEmailLinkError(err: Error): err is EmailLinkError {
   return err instanceof EmailLinkError;
 }
 
-/**
- * @deprecated Use `EmailLinkErrorCode` instead.
- */
-export const MagicLinkErrorCode = {
+const _MagicLinkErrorCode = {
   Expired: 'expired',
   Failed: 'failed',
 };
+/**
+ * @deprecated Use `EmailLinkErrorCode` instead.
+ */
+export const MagicLinkErrorCode = new Proxy(_MagicLinkErrorCode, {
+  get(target, prop, receiver) {
+    deprecated('MagicLinkErrorCode', 'Use `EmailLinkErrorCode` instead.');
+    return Reflect.get(target, prop, receiver);
+  },
+});
 
 export const EmailLinkErrorCode = {
   Expired: 'expired',

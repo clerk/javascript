@@ -672,6 +672,7 @@ export default class IsomorphicClerk {
    * @deprecated Use `handleEmailLinkVerification` instead.
    */
   handleMagicLinkVerification = async (params: HandleMagicLinkVerificationParams): Promise<void> => {
+    deprecated('handleMagicLinkVerification', 'Use `handleEmailLinkVerification` instead.');
     const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;

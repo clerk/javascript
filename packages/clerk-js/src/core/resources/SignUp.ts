@@ -119,6 +119,8 @@ export class SignUp extends BaseResource implements SignUpResource {
    * @deprecated Use `createEmailLinkFlow` instead.
    */
   createMagicLinkFlow = (): CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource> => {
+    deprecated('createMagicLinkFlow', 'Use `createEmailLinkFlow` instead.');
+
     const { run, stop } = Poller();
 
     const startMagicLinkFlow = async ({ redirectUrl }: StartMagicLinkFlowParams): Promise<SignUpResource> => {

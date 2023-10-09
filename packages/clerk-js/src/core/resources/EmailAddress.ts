@@ -1,4 +1,4 @@
-import { Poller } from '@clerk/shared';
+import { deprecated, Poller } from '@clerk/shared';
 import type {
   AttemptEmailAddressVerificationParams,
   CreateEmailLinkFlowReturn,
@@ -52,6 +52,8 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
    * @deprecated Use `createEmailLinkFlow` instead.
    */
   createMagicLinkFlow = (): CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, EmailAddressResource> => {
+    deprecated('createMagicLinkFlow', 'Use `createEmailLinkFlow` instead.');
+
     const { run, stop } = Poller();
 
     const startMagicLinkFlow = async ({ redirectUrl }: StartMagicLinkFlowParams): Promise<EmailAddressResource> => {

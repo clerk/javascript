@@ -820,6 +820,8 @@ export default class Clerk implements ClerkInterface {
     params: HandleMagicLinkVerificationParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
+    deprecated('handleMagicLinkVerification', 'Use `handleEmailLinkVerification` instead.');
+
     if (!this.client) {
       return;
     }
