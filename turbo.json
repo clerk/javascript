@@ -3,6 +3,7 @@
   "remoteCache": {
     "signature": true
   },
+
   "globalDependencies": [
     "packages/eslint-config-custom/index.js",
     "package.json",

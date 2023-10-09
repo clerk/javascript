@@ -1,4 +1,4 @@
-import type { LongRunningApplication} from '../models/longRunningApplication';
+import type { LongRunningApplication } from '../models/longRunningApplication';
 import { longRunningApplication } from '../models/longRunningApplication';
 import { envs } from './envs';
 import { next } from './next';

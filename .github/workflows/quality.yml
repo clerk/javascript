@@ -11,6 +11,7 @@ on:
 jobs:
 
   test:
+    if: ${{ github.repository == 'clerkinc/javascript' }}
     strategy:
       matrix:
         node-version: [ 18, 19 ]

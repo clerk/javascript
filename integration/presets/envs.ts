@@ -5,13 +5,22 @@ import fs from 'fs-extra';
 
 import { environmentConfig } from '../models/environment.js';
 
-const envKeys: Record<string, { pk: string; sk: string }> = process.env.INTEGRATION_INSTANCE_KEYS
-  ? JSON.parse(process.env.INTEGRATION_INSTANCE_KEYS)
-  : fs.readJSONSync(resolve(__dirname, '..', '.keys.json')) || null;
+const getInstanceKeys = () => {
+  let keys: Record<string, { pk: string; sk: string }>;
+  try {
+    keys = process.env.INTEGRATION_INSTANCE_KEYS
+      ? JSON.parse(process.env.INTEGRATION_INSTANCE_KEYS)
+      : fs.readJSONSync(resolve(__dirname, '..', '.keys.json')) || null;
+  } catch (e) {
+    console.log('Could not find .keys.json file', e);
+  }
+  if (!keys) {
+    throw new Error('Missing instance keys. Is your env or .keys.json file populated?');
+  }
+  return keys;
+};
 
-if (!envKeys) {
-  throw new Error('Missing INTEGRATION_INSTANCE_KEYS environment variable. Is your env or .keys.json file populated?');
-}
+const envKeys = getInstanceKeys();
 
 const withEmailCodes = environmentConfig()
   .setId('withEmailCodes')

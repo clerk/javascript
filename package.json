@@ -65,7 +65,7 @@
     "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
     "test:ci": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
     "test:integration": "DEBUG=1 npx playwright test --config integration/playwright.config.ts",
-    "test:deployments": "DEBUG=1 npx playwright test --config integration/playwright.deployments.config.ts",
+    "test:integration:generic": "APP_ID=react.vite.* npm run test:integration -- --grep @generic",
     "clean": "turbo clean",
     "lint": "FORCE_COLOR=1 turbo lint",
     "lint:publint": "FORCE_COLOR=1 turbo lint:publint",
