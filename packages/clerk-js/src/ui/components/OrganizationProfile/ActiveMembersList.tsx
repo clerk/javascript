@@ -13,13 +13,6 @@ export const ActiveMembersList = () => {
     memberships: true,
   });
 
-  // TODO: Update this to support filter by permissions
-  const { memberships: adminMembers } = useCoreOrganization({
-    memberships: {
-      role: ['admin'],
-    },
-  });
-
   const mutateSwrState = () => {
     const unstable__mutate = (rest as any).unstable__mutate;
     if (unstable__mutate && typeof unstable__mutate === 'function') {
@@ -35,7 +28,6 @@ export const ActiveMembersList = () => {
     return card
       .runAsync(async () => {
         await membership.update({ role: newRole });
-        await (adminMembers as any).unstable__mutate?.();
       })
       .catch(err => handleError(err, [], card.setError));
   };
@@ -43,8 +35,7 @@ export const ActiveMembersList = () => {
   const handleRemove = (membership: OrganizationMembershipResource) => () => {
     return card
       .runAsync(async () => {
-        const destroyedMembership = membership.destroy();
-        await (adminMembers as any).unstable__mutate?.();
+        const destroyedMembership = await membership.destroy();
         return destroyedMembership;
       })
       .then(mutateSwrState)
@@ -71,25 +62,23 @@ export const ActiveMembersList = () => {
           membership={m}
           onRoleChange={handleRoleChange(m)}
           onRemove={handleRemove(m)}
-          adminCount={adminMembers?.count || 0}
         />
       ))}
     />
   );
 };
 
+// TODO: Find a way to disable Role select based on last admin by using permissions
 const MemberRow = (props: {
   membership: OrganizationMembershipResource;
   onRemove: () => unknown;
-  adminCount: number;
   onRoleChange?: (role: MembershipRole) => unknown;
 }) => {
-  const { membership, onRemove, onRoleChange, adminCount } = props;
+  const { membership, onRemove, onRoleChange } = props;
   const card = useCardState();
   const user = useCoreUser();
 
   const isCurrentUser = user.id === membership.publicUserData.userId;
-  const isLastAdmin = adminCount <= 1 && membership.role === 'admin';
 
   return (
     <RowContainer>
@@ -120,7 +109,7 @@ const MemberRow = (props: {
           }
         >
           <RoleSelect
-            isDisabled={card.isLoading || !onRoleChange || isLastAdmin}
+            isDisabled={card.isLoading || !onRoleChange}
             value={membership.role}
             onChange={onRoleChange}
           />
