@@ -94,6 +94,8 @@ import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
+  clerkInvalidSignInUrlFormat,
+  clerkInvalidSignInUrlOrigin,
   clerkMissingDevBrowserJwt,
   clerkMissingProxyUrlAndDomain,
   clerkMissingSignInUrlAsSatellite,
@@ -1278,16 +1280,34 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
+  #assertSignInFormatAndOrigin = (_signInUrl: string, origin: string) => {
+    let signInUrl: URL;
+    try {
+      signInUrl = new URL(_signInUrl);
+    } catch {
+      clerkInvalidSignInUrlFormat();
+    }
+
+    if (signInUrl.origin === origin) {
+      clerkInvalidSignInUrlOrigin();
+    }
+  };
+
   #validateMultiDomainOptions = () => {
     if (!this.isSatellite) {
       return;
     }
+
     if (this.#instanceType === 'development' && !this.#options.signInUrl) {
       clerkMissingSignInUrlAsSatellite();
     }
 
     if (!this.proxyUrl && !this.domain) {
       clerkMissingProxyUrlAndDomain();
+    }
+
+    if (this.#options.signInUrl) {
+      this.#assertSignInFormatAndOrigin(this.#options.signInUrl, window.location.origin);
     }
   };
 

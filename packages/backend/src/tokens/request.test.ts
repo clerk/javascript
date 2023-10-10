@@ -319,12 +319,14 @@ export default (QUnit: QUnit) => {
         apiKey: 'deadbeef',
         clientUat: '0',
         isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
       });
 
       assertInterstitial(assert, requestState, {
         reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
         isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
       });
       assert.equal(requestState.message, '');
@@ -337,6 +339,7 @@ export default (QUnit: QUnit) => {
         apiKey: 'deadbeef',
         clientUat: '0',
         isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
         userAgent: '[some-agent]',
       });
@@ -344,6 +347,7 @@ export default (QUnit: QUnit) => {
       assertSignedOut(assert, requestState, {
         reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
         isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
       });
       assertSignedOutToAuth(assert, requestState);
