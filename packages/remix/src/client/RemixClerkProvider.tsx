@@ -2,12 +2,18 @@ import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 
+import { name, version } from '../../package.json';
 import { assertValidClerkState, warnForSsr } from '../utils';
 import { ClerkRemixOptionsProvider } from './RemixOptionsContext';
 import type { ClerkState } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
+
+const SDK_METADATA = {
+  name,
+  version,
+};
 
 export type RemixClerkProviderProps = {
   children: React.ReactNode;
@@ -20,7 +26,7 @@ export type RemixClerkProviderProps = {
  * In the case of a hydration error, the first `navigate` function we get from the `useNavigate` hook will not work
  * because the RemixClerkProvider (which is part of the host app) will unmount before the following useEffect within `navigate` fires:
  * https://github.com/remix-run/react-router/blob/main/packages/react-router/lib/hooks.tsx#L175
- * so isomorphicClerk will initialise with a `navigate` function that will never have `activeRef.current` set to true.
+ * so isomorphicClerk will initialize with a `navigate` function that will never have `activeRef.current` set to true.
  * This variable is just an object ref/cache outside the React rendering cycle that holds a reference to the
  * latest `navigate` function. After a hydration error occurs, RemixClerkProvider will *remount* and this variable
  * will finally get a `navigate` function that has a `activeRef.current` to true so navigation will function as it should.
@@ -81,6 +87,7 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
       <ReactClerkProvider
         navigate={(to: string) => awaitableNavigateRef.current?.(to)}
         initialState={__clerk_ssr_state}
+        sdkMetadata={SDK_METADATA}
         {...mergedProps}
         {...restProps}
       >

@@ -6,6 +6,9 @@ declare global {
 }
 
 declare global {
+  const __PACKAGE_NAME__: string;
+  const __PACKAGE_VERSION__: string;
+
   namespace NodeJS {
     interface ProcessEnv {
       NEXT_PUBLIC_CLERK_FRONTEND_API: string | undefined;

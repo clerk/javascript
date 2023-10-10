@@ -7,6 +7,13 @@ import {
 import { navigate } from 'gatsby';
 import React from 'react';
 
+import { name, version } from '../package.json';
+
+const SDK_METADATA = {
+  name,
+  version,
+};
+
 __internal__setErrorThrowerOptions({ packageName: 'gatsby-plugin-clerk' });
 
 export type GatsbyClerkProviderProps = {
@@ -22,6 +29,7 @@ export function ClerkProvider({ children, ...rest }: GatsbyClerkProviderProps) {
     <ReactClerkProvider
       navigate={to => navigate(to)}
       initialState={__clerk_ssr_state || {}}
+      sdkMetadata={SDK_METADATA}
       {...restProps}
     >
       {__clerk_ssr_interstitial_html ? (

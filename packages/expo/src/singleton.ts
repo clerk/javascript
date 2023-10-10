@@ -2,7 +2,13 @@ import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/c
 import Clerk from '@clerk/clerk-js/headless';
 import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
+import { name, version } from '../package.json';
 import type { TokenCache } from './cache';
+
+const SDK_METADATA = {
+  name,
+  version,
+};
 
 const KEY = '__clerk_client_jwt';
 
@@ -26,6 +32,8 @@ export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrow
     const saveToken = tokenCache.saveToken;
     // TODO: DO NOT ACCEPT THIS
     clerk = new Clerk(key);
+
+    clerk.sdkMetadata = SDK_METADATA;
 
     // @ts-expect-error
     clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {

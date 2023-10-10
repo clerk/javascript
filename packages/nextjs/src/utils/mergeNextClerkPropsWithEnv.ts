@@ -15,5 +15,9 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
     signUpUrl: props.signUpUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '',
     afterSignInUrl: props.afterSignInUrl || process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL || '',
     afterSignUpUrl: props.afterSignUpUrl || process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || '',
+    sdkMetadata: {
+      name: __PACKAGE_NAME__,
+      version: __PACKAGE_VERSION__,
+    },
   };
 };
