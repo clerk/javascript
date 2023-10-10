@@ -8,9 +8,9 @@ declare global {
   }
 }
 
-// const clerk = new Clerk({ apiKey: secrets.CLERK_API_KEY });
+// const clerk = new Clerk({ secretKey: secrets.CLERK_SECRET_KEY });
 // For better type support, prefer the newest createClerkClient:
-const clerk = createClerkClient({ apiKey: secrets.CLERK_API_KEY });
+const clerk = createClerkClient({ secretKey: secrets.CLERK_SECRET_KEY });
 
 const port = process.env.PORT || 3000;
 
