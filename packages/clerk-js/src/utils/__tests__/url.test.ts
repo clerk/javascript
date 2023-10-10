@@ -1,7 +1,7 @@
 import type { SignUpResource } from '@clerk/types';
 
 import {
-  appendUrlsAsQueryParams,
+  appendAsQueryParams,
   buildURL,
   getAllETLDs,
   getETLDPlusOneFromFrontendApi,
@@ -242,30 +242,29 @@ describe('trimTrailingSlash(string)', () => {
 describe('appendQueryParams(base,url)', () => {
   it('returns the same url if no params provided', () => {
     const base = new URL('https://dashboard.clerk.com');
-    const res = appendUrlsAsQueryParams(base);
+    const res = appendAsQueryParams(base);
     expect(res).toBe('https://dashboard.clerk.com/');
   });
 
   it('handles URL objects', () => {
     const base = new URL('https://dashboard.clerk.com');
     const url = new URL('https://dashboard.clerk.com/applications/appid/instances/');
-    const res = appendUrlsAsQueryParams(base, { redirect_url: url });
+    const res = appendAsQueryParams(base, { urls: { redirect_url: url } });
     expect(res).toBe('https://dashboard.clerk.com/#/?redirect_url=%2Fapplications%2Fappid%2Finstances%2F');
   });
 
   it('handles plain strings', () => {
     const base = 'https://dashboard.clerk.com';
     const url = 'https://dashboard.clerk.com/applications/appid/instances/';
-    const res = appendUrlsAsQueryParams(base, { redirect_url: url });
+    const res = appendAsQueryParams(base, { urls: { redirect_url: url } });
     expect(res).toBe('https://dashboard.clerk.com/#/?redirect_url=%2Fapplications%2Fappid%2Finstances%2F');
   });
 
   it('handles multiple params', () => {
     const base = 'https://dashboard.clerk.com';
     const url = 'https://dashboard.clerk.com/applications/appid/instances/';
-    const res = appendUrlsAsQueryParams(base, {
-      redirect_url: url,
-      after_sign_in_url: url,
+    const res = appendAsQueryParams(base, {
+      urls: { redirect_url: url, after_sign_in_url: url },
     });
     expect(res).toBe(
       'https://dashboard.clerk.com/#/?redirect_url=%2Fapplications%2Fappid%2Finstances%2F&after_sign_in_url=%2Fapplications%2Fappid%2Finstances%2F',
@@ -274,26 +273,26 @@ describe('appendQueryParams(base,url)', () => {
 
   it('skips falsy values', () => {
     const base = new URL('https://dashboard.clerk.com');
-    const res = appendUrlsAsQueryParams(base, { redirect_url: undefined });
+    const res = appendAsQueryParams(base, { urls: { redirect_url: undefined } });
     expect(res).toBe('https://dashboard.clerk.com/');
   });
 
   it('converts relative to absolute urls', () => {
     const base = new URL('https://dashboard.clerk.com');
-    const res = appendUrlsAsQueryParams(base, { redirect_url: '/test' });
+    const res = appendAsQueryParams(base, { urls: { redirect_url: '/test' } });
     expect(res).toBe('https://dashboard.clerk.com/#/?redirect_url=http%3A%2F%2Flocalhost%2Ftest');
   });
 
   it('converts keys from camel to snake case', () => {
     const base = new URL('https://dashboard.clerk.com');
-    const res = appendUrlsAsQueryParams(base, { redirectUrl: '/test' });
+    const res = appendAsQueryParams(base, { urls: { redirectUrl: '/test' } });
     expect(res).toBe('https://dashboard.clerk.com/#/?redirect_url=http%3A%2F%2Flocalhost%2Ftest');
   });
 
   it('keeps origin before appending if base and url have different origin', () => {
     const base = new URL('https://dashboard.clerk.com');
     const url = new URL('https://www.google.com/something');
-    const res = appendUrlsAsQueryParams(base, { redirect_url: url });
+    const res = appendAsQueryParams(base, { urls: { redirect_url: url } });
     expect(res).toBe('https://dashboard.clerk.com/#/?redirect_url=https%3A%2F%2Fwww.google.com%2Fsomething');
   });
 });
