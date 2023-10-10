@@ -30,8 +30,13 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const secretKey = opts.secretKey || getEnvVariable('CLERK_SECRET_KEY') || (context?.CLERK_SECRET_KEY as string) || '';
   const apiKey = opts.apiKey || getEnvVariable('CLERK_API_KEY') || (context?.CLERK_API_KEY as string) || '';
   if (apiKey) {
-    deprecated('CLERK_API_KEY', 'Use `CLERK_PUBLISHABLE_KEY` instead.');
+    if (getEnvVariable('CLERK_API_KEY')) {
+      deprecated('CLERK_API_KEY', 'Use `CLERK_SECRET_KEY` instead.');
+    } else {
+      deprecated('apiKey', 'Use `secretKey` instead.');
+    }
   }
+
   if (!secretKey && !apiKey) {
     throw new Error(noSecretKeyOrApiKeyError);
   }
