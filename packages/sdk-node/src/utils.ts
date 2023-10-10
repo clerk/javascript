@@ -16,6 +16,10 @@ export function runMiddleware(req: IncomingMessage, res: ServerResponse, fn: (..
 }
 
 export const loadClientEnv = () => {
+  if (process.env.CLERK_FRONTEND_API) {
+    deprecated('CLERK_FRONTEND_API', 'Use `CLERK_PUBLISHABLE_KEY` instead.');
+  }
+
   return {
     publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
     frontendApi: process.env.CLERK_FRONTEND_API || '',
