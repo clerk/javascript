@@ -83,7 +83,7 @@ export const PreviewListSpinner = forwardRef<HTMLDivElement>((_, ref) => {
         }}
       >
         <Spinner
-          size='md'
+          size='sm'
           colorScheme='primary'
         />
       </Box>

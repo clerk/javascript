@@ -144,7 +144,7 @@ export const DomainList = (props: DomainListProps) => {
             }}
           >
             <Spinner
-              size='md'
+              size='sm'
               colorScheme='primary'
             />
           </Box>

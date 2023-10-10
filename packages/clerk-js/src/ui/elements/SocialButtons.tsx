@@ -84,7 +84,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
               isDisabled={card.isLoading}
               src={strategyToDisplayData[strategy].iconUrl}
               alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-              sx={theme => ({ width: theme.sizes.$5 })}
+              sx={theme => ({ width: theme.sizes.$5, height: 'auto', maxWidth: '100%' })}
             />
           }
         />
