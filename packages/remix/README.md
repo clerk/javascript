@@ -64,7 +64,7 @@ npm run dev
 Make sure the following environment variables are set in a `.env` file:
 
 ```sh
-CLERK_FRONTEND_API=[frontend-api-key]
+CLERK_PUBLISHABLE_KEY=[publishable-key]
 CLERK_SECRET_KEY=[backend-secret-key]
 ```
 

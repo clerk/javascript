@@ -43,6 +43,13 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const frontendApi =
     opts.frontendApi || getEnvVariable('CLERK_FRONTEND_API') || (context?.CLERK_FRONTEND_API as string) || '';
+  if (frontendApi) {
+    if (getEnvVariable('CLERK_FRONTEND_API')) {
+      deprecated('CLERK_FRONTEND_API', 'Use `CLERK_PUBLISHABLE_KEY` instead.');
+    } else {
+      deprecated('frontendApi', 'Use `publishableKey` instead.');
+    }
+  }
 
   const publishableKey =
     opts.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY') || (context?.CLERK_PUBLISHABLE_KEY as string) || '';
