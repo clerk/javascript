@@ -20,7 +20,9 @@ export async function loadInterstitial({
    */
   if (requestState.publishableKey || requestState.frontendApi) {
     return clerkClient.localInterstitial({
-      frontendApi: requestState.frontendApi,
+      // Use frontendApi only when legacy frontendApi is used to avoid showing deprecation warning
+      // since the requestState always contains the frontendApi constructed by publishableKey.
+      frontendApi: requestState.publishableKey ? '' : requestState.frontendApi,
       publishableKey: requestState.publishableKey,
       proxyUrl: requestState.proxyUrl,
       signInUrl: requestState.signInUrl,
