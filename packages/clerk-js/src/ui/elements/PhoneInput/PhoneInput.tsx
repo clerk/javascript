@@ -111,6 +111,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
               borderBottomRightRadius: '0',
               borderTopRightRadius: '0',
             })}
+            isDisabled={rest.isDisabled}
           >
             <Flag iso={iso} />
             <Text
