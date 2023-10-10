@@ -65,8 +65,7 @@ Make sure the following environment variables are set in a `.env` file:
 
 ```sh
 CLERK_FRONTEND_API=[frontend-api-key]
-CLERK_API_KEY=[backend-api-key]
-CLERK_JWT_KEY=[jwt-verification-key]
+CLERK_SECRET_KEY=[backend-secret-key]
 ```
 
 You can get these from the [API Keys](https://dashboard.clerk.com/last-active?path=api-keys) screen in your Clerk dashboard.
