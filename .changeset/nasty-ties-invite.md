@@ -1,5 +1,6 @@
 ---
 'gatsby-plugin-clerk': patch
+'@clerk/clerk-js': patch
 '@clerk/chrome-extension': patch
 '@clerk/fastify': patch
 '@clerk/nextjs': patch
