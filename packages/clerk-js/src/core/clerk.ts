@@ -41,6 +41,7 @@ import type {
   PublishableKey,
   RedirectOptions,
   Resources,
+  SDKMetadata,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -144,7 +145,13 @@ const defaultOptions: ClerkOptions = {
 
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
+
   public static version: string = __PKG_VERSION__;
+  public static sdkMetadata: SDKMetadata = {
+    name: __PKG_NAME__,
+    version: __PKG_VERSION__,
+  };
+
   public client?: ClientResource;
   public session?: ActiveSessionResource | null;
   public organization?: OrganizationResource | null;
