@@ -1,4 +1,4 @@
-import Clerk from '../dist/types/src/index.headless';
+import Clerk from '../dist/types/index.headless';
 
 export default Clerk;
-export * from '../dist/types/src/index.headless';
+export * from '../dist/types/index.headless';
