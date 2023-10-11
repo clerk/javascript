@@ -85,6 +85,8 @@ import {
   sessionExistsAndSingleSessionModeEnabled,
   setDevBrowserJWTInURL,
   stripOrigin,
+  stripSameOrigin,
+  toURL,
   validateFrontendApi,
   windowNavigate,
 } from '../utils';
@@ -1571,19 +1573,26 @@ export default class Clerk implements ClerkInterface {
       return '';
     }
 
-    const urls: RedirectOptions = {
-      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
-      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
-      redirectUrl: options?.redirectUrl || window.location.href,
-    };
-
     const signInOrUpUrl = pickRedirectionProp(
       key,
       { options: this.#options, displayConfig: this.#environment.displayConfig },
       false,
     );
 
-    return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, { values: options?.initialValues, urls }));
+    const urls: RedirectOptions = {
+      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
+      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
+      redirectUrl: options?.redirectUrl || window.location.href,
+    };
+
+    (Object.keys(urls) as Array<keyof typeof urls>).forEach(function (key) {
+      const url = urls[key];
+      if (url) {
+        urls[key] = stripSameOrigin(toURL(url), toURL(signInOrUpUrl));
+      }
+    });
+
+    return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, { ...urls, ...options?.initialValues }));
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {

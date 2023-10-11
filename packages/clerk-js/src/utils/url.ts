@@ -210,25 +210,17 @@ export const trimTrailingSlash = (path: string): string => {
   return (path || '').replace(/\/+$/, '');
 };
 
+export const stripSameOrigin = (url: URL, baseUrl: URL): string => {
+  const sameOrigin = baseUrl.origin === url.origin;
+  return sameOrigin ? stripOrigin(url) : `${url}`;
+};
+
 export const appendAsQueryParams = (
   baseUrl: string | URL,
-  options?: {
-    values?: Record<string, string | null | undefined>;
-    urls?: Record<string, string | URL | null | undefined>;
-  },
+  values: Record<string, string | null | undefined> = {},
 ): string => {
-  const { values = {}, urls = {} } = options || {};
   const base = toURL(baseUrl);
   const params = new URLSearchParams();
-  for (const [key, val] of Object.entries(urls)) {
-    if (!val) {
-      continue;
-    }
-    const url = toURL(val);
-    const sameOrigin = base.origin === url.origin;
-    params.append(camelToSnake(key), sameOrigin ? stripOrigin(url) : `${url}`);
-  }
-
   for (const [key, val] of Object.entries(values)) {
     if (!val) {
       continue;
