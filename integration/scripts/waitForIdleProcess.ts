@@ -1,7 +1,7 @@
 import type { ChildProcess } from 'node:child_process';
 
 const createWaitForIdle = (opts?: { delayInMs: number }) => {
-  const { delayInMs = 3000 } = opts || {};
+  const { delayInMs = 5000 } = opts || {};
   let id;
   let idler;
 

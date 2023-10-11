@@ -12,3 +12,4 @@ export { range } from './range';
 export { chunkLogger, run } from './run';
 
 export * from './setup';
+export * from './waitForServer';
