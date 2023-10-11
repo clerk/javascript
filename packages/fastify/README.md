@@ -39,7 +39,7 @@ To use this plugin you should first create a Clerk application and retrieve a `S
 
 ### Prerequisites
 
-- Node.js v14+
+- Node.js `^18.18` or later
 - Fastify v4+
 
 ### Installation

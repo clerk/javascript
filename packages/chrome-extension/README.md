@@ -39,7 +39,7 @@ To use this package you should first create a Clerk application and retrieve a `
 
 ### Prerequisites
 
-- Node.js v14+
+- Node.js `^18.18` or later
 
 ### Installation
 

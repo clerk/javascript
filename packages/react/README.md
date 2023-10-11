@@ -37,7 +37,7 @@ Clerk is the easiest way to add authentication and user management to your React
 ### Prerequisites
 
 - React v16+
-- Node.js v14+
+- Node.js `^18.18` or later
 
 ### Installation
 
