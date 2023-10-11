@@ -27,8 +27,8 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   // 2. Then try from process.env if exists (Node).
   // 3. Then try from globalThis (Cloudflare Workers).
   // 4. Then from loader context (Cloudflare Pages).
-  const secretKey = opts.secretKey || getEnvVariable('CLERK_SECRET_KEY') || (context?.CLERK_SECRET_KEY as string) || '';
-  const apiKey = opts.apiKey || getEnvVariable('CLERK_API_KEY') || (context?.CLERK_API_KEY as string) || '';
+  const secretKey = opts.secretKey || getEnvVariable('CLERK_SECRET_KEY', context) || '';
+  const apiKey = opts.apiKey || getEnvVariable('CLERK_API_KEY', context) || '';
   if (apiKey) {
     if (getEnvVariable('CLERK_API_KEY')) {
       deprecated('CLERK_API_KEY', 'Use `CLERK_SECRET_KEY` instead.');
@@ -41,8 +41,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(noSecretKeyOrApiKeyError);
   }
 
-  const frontendApi =
-    opts.frontendApi || getEnvVariable('CLERK_FRONTEND_API') || (context?.CLERK_FRONTEND_API as string) || '';
+  const frontendApi = opts.frontendApi || getEnvVariable('CLERK_FRONTEND_API', context) || '';
   if (frontendApi) {
     if (getEnvVariable('CLERK_FRONTEND_API')) {
       deprecated('CLERK_FRONTEND_API', 'Use `CLERK_PUBLISHABLE_KEY` instead.');
@@ -51,23 +50,17 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     }
   }
 
-  const publishableKey =
-    opts.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY') || (context?.CLERK_PUBLISHABLE_KEY as string) || '';
+  const publishableKey = opts.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY', context) || '';
 
-  const jwtKey = opts.jwtKey || getEnvVariable('CLERK_JWT_KEY') || (context?.CLERK_JWT_KEY as string);
+  const jwtKey = opts.jwtKey || getEnvVariable('CLERK_JWT_KEY', context);
 
-  const apiUrl = getEnvVariable('CLERK_API_URL') || (context?.CLERK_API_URL as string);
+  const apiUrl = getEnvVariable('CLERK_API_URL', context);
 
-  const domain =
-    handleValueOrFn(opts.domain, new URL(request.url)) ||
-    getEnvVariable('CLERK_DOMAIN') ||
-    (context?.CLERK_DOMAIN as string) ||
-    '';
+  const domain = handleValueOrFn(opts.domain, new URL(request.url)) || getEnvVariable('CLERK_DOMAIN', context) || '';
 
   const isSatellite =
     handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
-    getEnvVariable('CLERK_IS_SATELLITE') === 'true' ||
-    (context?.CLERK_IS_SATELLITE as string) === 'true' ||
+    getEnvVariable('CLERK_IS_SATELLITE', context) === 'true' ||
     false;
 
   const requestURL = buildRequestUrl(request);
@@ -75,7 +68,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(
     opts?.proxyUrl,
     requestURL,
-    getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string),
+    getEnvVariable('CLERK_PROXY_URL', context),
   );
 
   let proxyUrl;
@@ -85,23 +78,13 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  const signInUrl =
-    opts.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL') || (context?.CLERK_SIGN_IN_URL as string) || '';
+  const signInUrl = opts.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL', context) || '';
 
-  const signUpUrl =
-    opts.signUpUrl || getEnvVariable('CLERK_SIGN_UP_URL') || (context?.CLERK_SIGN_UP_URL as string) || '';
+  const signUpUrl = opts.signUpUrl || getEnvVariable('CLERK_SIGN_UP_URL', context) || '';
 
-  const afterSignInUrl =
-    opts.afterSignInUrl ||
-    getEnvVariable('CLERK_AFTER_SIGN_IN_URL') ||
-    (context?.CLERK_AFTER_SIGN_IN_URL as string) ||
-    '';
+  const afterSignInUrl = opts.afterSignInUrl || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context) || '';
 
-  const afterSignUpUrl =
-    opts.afterSignUpUrl ||
-    getEnvVariable('CLERK_AFTER_SIGN_UP_URL') ||
-    (context?.CLERK_AFTER_SIGN_UP_URL as string) ||
-    '';
+  const afterSignUpUrl = opts.afterSignUpUrl || getEnvVariable('CLERK_AFTER_SIGN_UP_URL', context) || '';
 
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
