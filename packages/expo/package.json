@@ -42,12 +42,10 @@
     "@clerk/clerk-js": "5.0.0-alpha-v5.2",
     "@clerk/clerk-react": "5.0.0-alpha-v5.2",
     "@clerk/shared": "2.0.0-alpha-v5.2",
-    "base-64": "1.0.0",
     "react-native-url-polyfill": "2.0.0"
   },
   "devDependencies": {
     "@clerk/types": "^4.0.0-alpha-v5.2",
-    "@types/base-64": "^1.0.0",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
