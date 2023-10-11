@@ -99,6 +99,9 @@
   "peerDependencies": {
     "react": ">=18"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "publishConfig": {
     "access": "public"
   }

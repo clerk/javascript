@@ -45,7 +45,7 @@
     "react": ">=16"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "publishConfig": {
     "access": "public"
