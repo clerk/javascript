@@ -6,8 +6,8 @@ declare global {
 }
 
 declare global {
-  const __PACKAGE_NAME__: string;
-  const __PACKAGE_VERSION__: string;
+  const PACKAGE_NAME: string;
+  const PACKAGE_VERSION: string;
 
   namespace NodeJS {
     interface ProcessEnv {
