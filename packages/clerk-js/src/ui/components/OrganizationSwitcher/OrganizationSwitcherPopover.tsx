@@ -134,7 +134,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           elementDescriptor={descriptors.organizationSwitcherPopoverCard}
           ref={ref}
           role='dialog'
-          aria-label='organization switcher popover'
+          aria-label='Organization switcher popover'
           {...rest}
         >
           <PopoverCard.Main

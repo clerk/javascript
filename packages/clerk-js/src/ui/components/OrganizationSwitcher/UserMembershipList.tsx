@@ -37,7 +37,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         ...common.unstyledScrollbar(t),
       })}
       role='group'
-      aria-label={hidePersonal ? 'memberships' : 'accounts'}
+      aria-label={hidePersonal ? 'List of all organization memberships' : 'List of all accounts'}
     >
       {currentOrg && !hidePersonal && (
         <PreviewButton
