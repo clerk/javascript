@@ -134,8 +134,7 @@ export class Session extends BaseResource implements SessionResource {
     return (template || '').replace('integration_', '');
   };
 
-  // Can be removed once `integration_firebase` and `integration_hasura`
-  // are no longer supported
+  // Can be removed once `integration_firebase` are no longer supported
   #handleLegacyIntegrationToken = async (options: GetTokenOptions): Promise<string> => {
     const { template, leewayInSeconds } = options;
     const cachedEntry = SessionTokenCache.get({ tokenId: this.user!.id, audience: template }, leewayInSeconds);
