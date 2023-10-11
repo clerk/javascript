@@ -2,12 +2,11 @@ import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/c
 import Clerk from '@clerk/clerk-js/headless';
 import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
-import { name, version } from '../package.json';
 import type { TokenCache } from './cache';
 
 const SDK_METADATA = {
-  name,
-  version,
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
 };
 
 const KEY = '__clerk_client_jwt';

@@ -7,11 +7,9 @@ import {
 import { navigate } from 'gatsby';
 import React from 'react';
 
-import { name, version } from '../package.json';
-
 const SDK_METADATA = {
-  name,
-  version,
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
 };
 
 __internal__setErrorThrowerOptions({ packageName: 'gatsby-plugin-clerk' });

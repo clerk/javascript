@@ -2,7 +2,6 @@ import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 
-import { name, version } from '../../package.json';
 import { assertValidClerkState, warnForSsr } from '../utils';
 import { ClerkRemixOptionsProvider } from './RemixOptionsContext';
 import type { ClerkState } from './types';
@@ -11,8 +10,8 @@ import { useAwaitableNavigate } from './useAwaitableNavigate';
 export * from '@clerk/clerk-react';
 
 const SDK_METADATA = {
-  name,
-  version,
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
 };
 
 export type RemixClerkProviderProps = {
