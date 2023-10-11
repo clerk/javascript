@@ -6,6 +6,7 @@ import type {
   LoadedClerk,
   MultiDomainAndOrProxy,
   PublishableKeyOrFrontendApi,
+  SDKMetadata,
   SessionResource,
   SignInRedirectOptions,
   SignUpRedirectOptions,
@@ -26,6 +27,7 @@ export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite'> & {
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
   clerkJSVersion?: string;
+  sdkMetadata?: SDKMetadata;
 } & PublishableKeyOrFrontendApi &
   MultiDomainAndOrProxy;
 

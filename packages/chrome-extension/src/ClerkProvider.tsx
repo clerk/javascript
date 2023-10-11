@@ -7,6 +7,11 @@ import type { TokenCache } from './cache';
 import { ChromeStorageCache } from './cache';
 import { buildClerk } from './singleton';
 
+Clerk.sdkMetadata = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+};
+
 __internal__setErrorThrowerOptions({
   packageName: '@clerk/chrome-extension',
 });
