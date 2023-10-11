@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build packages and upload artifacts
+    name: Build packages
     uses: ./.github/workflows/build-base.yml
 
   unit-tests:
@@ -67,12 +67,11 @@ jobs:
         run: npm run lint:attw
 
   registry:
-    name: Publish in private registry
+    name: Publish (Verdaccio)
     needs: build
     uses: ./.github/workflows/registry-base.yml
 
   integration-generic:
-    continue-on-error: true
     name: Integration (Generic)
     needs: registry
     uses: ./.github/workflows/e2e-base.yml
@@ -81,7 +80,6 @@ jobs:
     secrets: inherit
 
   integration-nextjs:
-    continue-on-error: true
     name: Integration (NextJS)
     needs: registry
     uses: ./.github/workflows/e2e-base.yml
@@ -90,7 +88,6 @@ jobs:
     secrets: inherit
 
   integration-remix:
-    continue-on-error: true
     name: Integration (Remix)
     needs: registry
     uses: ./.github/workflows/e2e-base.yml

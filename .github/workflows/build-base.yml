@@ -3,7 +3,6 @@ on:
 
 jobs:
   build:
-    name: Build packages
     # if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE }}
     steps:
