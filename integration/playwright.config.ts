@@ -11,7 +11,7 @@ export const common = {
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : '70%',
+  workers: process.env.CI ? '50%' : '70%',
   reporter: [[process.env.CI ? 'html' : 'line', { open: 'never' }]] as any,
   use: {
     trace: 'on-first-retry',

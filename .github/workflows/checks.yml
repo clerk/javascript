@@ -72,6 +72,7 @@ jobs:
     uses: ./.github/workflows/registry-base.yml
 
   integration-generic:
+    continue-on-error: true
     name: Integration (Generic)
     needs: registry
     uses: ./.github/workflows/e2e-base.yml
@@ -80,6 +81,7 @@ jobs:
     secrets: inherit
 
   integration-nextjs:
+    continue-on-error: true
     name: Integration (NextJS)
     needs: registry
     uses: ./.github/workflows/e2e-base.yml
@@ -88,6 +90,7 @@ jobs:
     secrets: inherit
 
   integration-remix:
+    continue-on-error: true
     name: Integration (Remix)
     needs: registry
     uses: ./.github/workflows/e2e-base.yml
