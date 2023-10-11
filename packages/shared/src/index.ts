@@ -21,6 +21,7 @@ export * from './error';
 export * from './file';
 export { handleValueOrFn } from './handleValueOrFn';
 export { isomorphicAtob } from './isomorphicAtob';
+export { isomorphicBtoa } from './isomorphicBtoa';
 export * from './keys';
 export { loadScript } from './loadScript';
 export { LocalStorageBroadcastChannel } from './localStorageBroadcastChannel';

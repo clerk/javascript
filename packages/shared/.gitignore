@@ -9,6 +9,7 @@ file
 globs
 handleValueOrFn
 isomorphicAtob
+isomorphicBtoa
 keys
 loadScript
 localStorageBroadcastChannel
