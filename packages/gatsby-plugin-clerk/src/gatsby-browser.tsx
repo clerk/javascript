@@ -2,6 +2,7 @@
 import type { GatsbyBrowser } from 'gatsby';
 import React from 'react';
 
+import { CLERK_JS, FRONTEND_API, PROXY_URL, PUBLISHABLE_KEY } from './constants';
 import { ClerkProvider } from './GatsbyClerkProvider';
 
 export const wrapPageElement: GatsbyBrowser['wrapPageElement'] = ({ element, props }, pluginOptions) => {
@@ -14,10 +15,10 @@ export const wrapPageElement: GatsbyBrowser['wrapPageElement'] = ({ element, pro
   return (
     // @ts-expect-error
     <ClerkProvider
-      frontendApi={process.env.GATSBY_CLERK_FRONTEND_API || ''}
-      publishableKey={process.env.GATSBY_CLERK_PUBLISHABLE_KEY || ''}
-      clerkJSUrl={process.env.GATSBY_CLERK_JS}
-      proxyUrl={process.env.GATSBY_CLERK_PROXY_URL}
+      frontendApi={FRONTEND_API || ''}
+      publishableKey={PUBLISHABLE_KEY || ''}
+      clerkJSUrl={CLERK_JS}
+      proxyUrl={PROXY_URL}
       clerkState={clerkSsrState || {}}
       {...pluginOptions}
     >

@@ -1,14 +1,7 @@
 import type { GetServerDataProps } from 'gatsby';
 
-import {
-  API_KEY,
-  clerkClient,
-  constants,
-  createIsomorphicRequest,
-  FRONTEND_API,
-  PUBLISHABLE_KEY,
-  SECRET_KEY,
-} from './clerkClient';
+import { API_KEY, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
+import { clerkClient, constants, createIsomorphicRequest } from './clerkClient';
 import type { WithServerAuthOptions } from './types';
 
 export function authenticateRequest(context: GetServerDataProps, options: WithServerAuthOptions) {

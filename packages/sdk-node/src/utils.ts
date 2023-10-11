@@ -1,4 +1,5 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
+import { deprecated } from '@clerk/shared';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 // https://nextjs.org/docs/api-routes/api-middlewares#connectexpress-middleware-support
@@ -15,6 +16,10 @@ export function runMiddleware(req: IncomingMessage, res: ServerResponse, fn: (..
 }
 
 export const loadClientEnv = () => {
+  if (process.env.CLERK_FRONTEND_API) {
+    deprecated('CLERK_FRONTEND_API', 'Use `CLERK_PUBLISHABLE_KEY` instead.');
+  }
+
   return {
     publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
     frontendApi: process.env.CLERK_FRONTEND_API || '',
@@ -24,6 +29,10 @@ export const loadClientEnv = () => {
 };
 
 export const loadApiEnv = () => {
+  if (process.env.CLERK_API_KEY) {
+    deprecated('CLERK_API_KEY', 'Use `CLERK_SECRET_KEY` instead.');
+  }
+
   return {
     secretKey: process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '',
     apiKey: process.env.CLERK_API_KEY || '',
