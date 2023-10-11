@@ -1,3 +1,4 @@
+import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 
@@ -5,10 +6,12 @@ const cra = applicationConfig()
   .setName('react-cra')
   .useTemplate(templates['react-cra'])
   .setEnvFormatter('public', key => `REACT_APP_${key}`)
-  .addScript('setup', 'npm ci --prefer-offline')
+  .addScript('setup', 'npm i --prefer-offline')
   .addScript('dev', 'npm run start')
   .addScript('build', 'npm run build')
-  .addScript('serve', 'npm run start');
+  .addScript('serve', 'npm run start')
+  .addDependency('@clerk/clerk-react', constants.E2E_CLERK_VERSION)
+  .addDependency('@clerk/themes', constants.E2E_CLERK_VERSION);
 
 const vite = cra
   .clone()

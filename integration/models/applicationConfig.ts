@@ -16,6 +16,7 @@ export const applicationConfig = () => {
   const scripts: Scripts = { dev: 'npm run dev', serve: 'npm run serve', build: 'npm run build', setup: 'npm i' };
   const envFormatters = { public: (key: string) => key, private: (key: string) => key };
   const logger = createLogger({ prefix: 'appConfig', color: 'bgYellow' });
+  const dependencies = new Map<string, string>();
 
   const self = {
     clone: () => {
@@ -24,6 +25,7 @@ export const applicationConfig = () => {
       clone.setEnvFormatter('public', envFormatters.public);
       clone.setEnvFormatter('private', envFormatters.private);
       templates.forEach(t => clone.useTemplate(t));
+      dependencies.forEach((v, k) => clone.addDependency(k, v));
       Object.entries(scripts).forEach(([k, v]) => clone.addScript(k as keyof typeof scripts, v));
       files.forEach((v, k) => clone.addFile(k, () => v));
       return clone;
@@ -51,6 +53,12 @@ export const applicationConfig = () => {
       scripts[name] = cmd;
       return self;
     },
+    addDependency: (name: string, version: string | undefined) => {
+      if (version) {
+        dependencies.set(name, version);
+      }
+      return self;
+    },
     commit: async (opts?: { stableHash?: string }) => {
       const { stableHash } = opts || {};
       logger.info(`Creating project "${name}"`);
@@ -75,6 +83,15 @@ export const applicationConfig = () => {
           await fs.writeFile(dest, contents);
         }),
       );
+
+      // Adjust package.json dependencies
+      if (dependencies.size > 0) {
+        const packageJsonPath = path.resolve(appDirPath, 'package.json');
+        logger.info(`Modifying dependencies in "${packageJsonPath}"`);
+        const contents = await fs.readJSON(packageJsonPath);
+        contents.dependencies = { ...contents.dependencies, ...Object.fromEntries(dependencies) };
+        await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
+      }
 
       return application(self, appDirPath, appDirName);
     },

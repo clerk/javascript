@@ -10,4 +10,8 @@ export const constants = {
   DEBUG: process.env.DEBUG === 'true' || process.env.DEBUG === '1',
   E2E_APP_PK: process.env.E2E_APP_PK,
   E2E_APP_SK: process.env.E2E_APP_SK,
+  E2E_NEXTJS_VERSION: process.env.E2E_NEXTJS_VERSION,
+  E2E_REMIX_VERSION: process.env.E2E_REMIX_VERSION,
+  E2E_VITE_VERSION: process.env.E2E_VITE_VERSION,
+  E2E_CLERK_VERSION: process.env.E2E_CLERK_VERSION,
 } as const;

@@ -5,7 +5,7 @@ const remixNode = applicationConfig()
   .setName('remix-node')
   .useTemplate(templates['remix-node'])
   .setEnvFormatter('public', key => `${key}`)
-  .addScript('setup', 'npm ci --prefer-offline')
+  .addScript('setup', 'npm i --prefer-offline')
   .addScript('dev', 'npm run dev')
   .addScript('build', 'npm run build');
 // .addScript('serve', 'npm run start');
