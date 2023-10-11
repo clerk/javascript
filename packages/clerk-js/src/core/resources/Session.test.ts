@@ -73,7 +73,7 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      const isAuthorized = await session.isAuthorized({ permission: 'org:profile:delete' });
+      const isAuthorized = await session.isAuthorized({ permission: 'org:sys_profile:delete' });
 
       expect(isAuthorized).toBe(true);
     });
@@ -84,7 +84,7 @@ describe('Session', () => {
         id: 'session_1',
         object: 'session',
         user: createUser({
-          organization_memberships: [{ name: 'Org1', id: 'org1', permissions: ['org:memberships:read'] }],
+          organization_memberships: [{ name: 'Org1', id: 'org1', permissions: ['org:sys_memberships:read'] }],
         }),
         last_active_organization_id: 'org1',
         last_active_token: { object: 'token', jwt: mockJwt },
@@ -93,7 +93,7 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      const isAuthorized = await session.isAuthorized({ permission: 'org:profile:delete' });
+      const isAuthorized = await session.isAuthorized({ permission: 'org:sys_profile:delete' });
 
       expect(isAuthorized).toBe(false);
     });
