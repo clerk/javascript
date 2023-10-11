@@ -4,7 +4,7 @@ import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
 import type { TokenCache } from './cache';
 
-const SDK_METADATA = {
+Clerk.sdkMetadata = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
 };
@@ -31,8 +31,6 @@ export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrow
     const saveToken = tokenCache.saveToken;
     // TODO: DO NOT ACCEPT THIS
     clerk = new Clerk(key);
-
-    clerk.sdkMetadata = SDK_METADATA;
 
     // @ts-expect-error
     clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {
