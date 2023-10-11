@@ -43,7 +43,7 @@ Each application is described by its name, a `pk` and an `sk` key:
 
 Currently, we have two Clerk applications configured:
 
-- **all-enabled**: a single session application with most toggles enabled
+- **with-email-codes**: a single session application with most toggles enabled
 - **email-links**: a single session app with email links enabled and email codes disabled. Useful to test email links flows as the SignUp component currently does not support switching between email links and email codes.
 
 **Email service:**

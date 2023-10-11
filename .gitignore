@@ -80,3 +80,6 @@ playground/*/yarn.lock
 .temp_integration
 playwright-report
 test-results
+
+# verdaccio
+.verdaccio_storage

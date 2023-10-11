@@ -1,0 +1,9 @@
+# This is a publish only configuration file for Verdaccio
+
+storage: ./.verdaccio_storage
+packages:
+  '**':
+    access: $anonymous
+    publish: $anonymous
+    proxy: npmjs
+log: { type: stdout, format: pretty, level: http }

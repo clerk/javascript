@@ -13,5 +13,19 @@ jobs:
         with:
           name: package-artifacts
           path: ./node_modules/.cache/turbo
-      - name: Publish locally
-        run: echo 'Verdaccio placeholder'
+      - name: Configure npm to use Verdaccio
+        run: |
+          npm set registry http://localhost:4873/
+      # The command below includes a sanity check
+      # and fails early if the default npm registry is used
+      - name: Publish to Verdaccio
+        run: |
+          nohup verdaccio --config ./verdaccio.publish.yaml &
+          npm run release:verdaccio
+      - name: List published packages
+        run: |
+          ls -all .verdaccio_storage/@clerk
+      - uses: actions/upload-artifact@v3
+        with:
+          name: verdaccio-storage
+          path: .verdaccio_storage

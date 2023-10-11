@@ -2,7 +2,7 @@ name: Quality checks and tests
 on:
   push:
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 concurrency:
   group: checks-${{ github.ref }}

@@ -35,18 +35,21 @@ jobs:
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
-      - name: Download turbo cache
-        uses: actions/download-artifact@v3
+      - uses: actions/upload-artifact@v3
         with:
-          name: package-artifacts
-          path: ./node_modules/.cache/turbo
-      - name: Build packages
-        run: npm run build
+          name: verdaccio-storage
+          path: .verdaccio_storage
+      - name: Run Verdaccio
+        run: |
+          npm set registry http://localhost:4873/
+          nohup verdaccio --config ./verdaccio.install.yaml &
+          sleep 5
       - name: Run Playwright tests
         run: ${{ inputs.SCRIPT }}
         env:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+          E2E_CLERK_VERSION: 'latest'
       - uses: actions/upload-artifact@v3
         if: always()
         with:

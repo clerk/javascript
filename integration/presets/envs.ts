@@ -24,8 +24,8 @@ const envKeys = getInstanceKeys();
 
 const withEmailCodes = environmentConfig()
   .setId('withEmailCodes')
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['all-enabled'].sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['all-enabled'].pk)
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-email-codes'].sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk)
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up');
 

@@ -56,6 +56,7 @@
     "tsup": "^6.7.0",
     "turbo": "^1.10.14",
     "typescript": "4.9.4",
+    "verdaccio": "^5.26.3",
     "zx": "^7.2.1"
   },
   "scripts": {
@@ -68,6 +69,7 @@
     "test:integration:generic": "E2E_APP_ID=react.vite.* npm run test:integration:base -- --grep @generic",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.withEmailCodes npm run test:integration:base -- --grep @generic",
     "test:integration:remix": "echo 'placeholder'",
+    "test:integration:deployment:nextjs": "DEBUG=1 npx playwright test --config integration/playwright.deployments.config.ts",
     "clean": "turbo clean",
     "lint": "FORCE_COLOR=1 turbo lint",
     "lint:publint": "FORCE_COLOR=1 turbo lint:publint",
@@ -77,7 +79,7 @@
     "format": "npx prettier --write .",
     "format:check": "npx prettier --cache --check .",
     "nuke": "./scripts/nuke.sh",
-    "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done",
+    "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace --sig; cd '../../'; done",
     "prepare": "husky install",
     "changeset": "npx changeset",
     "changeset:empty": "npm run changeset -- --empty",
@@ -87,6 +89,7 @@
     "release": "FORCE_COLOR=1 TURBO_CONCURRENCY=4 npm run build -- --force && npm run test && npx changeset publish && git push --follow-tags",
     "release:snapshot": "FORCE_COLOR=1 TURBO_CONCURRENCY=4 npm run build && npx changeset publish --tag snapshot --no-git-tag",
     "release:staging": "FORCE_COLOR=1 TURBO_CONCURRENCY=4 npm run build && npx changeset publish --tag staging --no-git-tag",
+    "release:verdaccio": "if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else TURBO_CONCURRENCY=4 npm run build && npx changeset publish --no-git-tag; fi",
     "update:lockfile": "npm run nuke && npm install -D --arch=x64 --platform=linux turbo && npm install -D --arch=arm64 --platform=darwin turbo"
   }
 }
