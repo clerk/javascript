@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, Clerk } from '@clerk/backend';
-import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared';
+import { deprecated, handleValueOrFn, isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared';
 
 import {
   noSecretKeyOrApiKeyError,
@@ -29,12 +29,27 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   // 4. Then from loader context (Cloudflare Pages).
   const secretKey = opts.secretKey || getEnvVariable('CLERK_SECRET_KEY') || (context?.CLERK_SECRET_KEY as string) || '';
   const apiKey = opts.apiKey || getEnvVariable('CLERK_API_KEY') || (context?.CLERK_API_KEY as string) || '';
+  if (apiKey) {
+    if (getEnvVariable('CLERK_API_KEY')) {
+      deprecated('CLERK_API_KEY', 'Use `CLERK_SECRET_KEY` instead.');
+    } else {
+      deprecated('apiKey', 'Use `secretKey` instead.');
+    }
+  }
+
   if (!secretKey && !apiKey) {
     throw new Error(noSecretKeyOrApiKeyError);
   }
 
   const frontendApi =
     opts.frontendApi || getEnvVariable('CLERK_FRONTEND_API') || (context?.CLERK_FRONTEND_API as string) || '';
+  if (frontendApi) {
+    if (getEnvVariable('CLERK_FRONTEND_API')) {
+      deprecated('CLERK_FRONTEND_API', 'Use `CLERK_PUBLISHABLE_KEY` instead.');
+    } else {
+      deprecated('frontendApi', 'Use `publishableKey` instead.');
+    }
+  }
 
   const publishableKey =
     opts.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY') || (context?.CLERK_PUBLISHABLE_KEY as string) || '';
