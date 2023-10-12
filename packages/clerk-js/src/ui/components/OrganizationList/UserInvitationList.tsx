@@ -1,8 +1,7 @@
 import type { OrganizationResource, UserOrganizationInvitationResource } from '@clerk/types';
 import { useState } from 'react';
 
-import { Organization } from '../../../core/resources/Organization';
-import { useCoreOrganizationList } from '../../contexts';
+import { useCoreClerk, useCoreOrganizationList } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
@@ -25,6 +24,7 @@ export const AcceptRejectInvitationButtons = (props: { onAccept: () => void }) =
 
 export const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
   const card = useCardState();
+  const { getOrganization } = useCoreClerk();
   const [acceptedOrganization, setAcceptedOrganization] = useState<OrganizationResource | null>(null);
   const { userInvitations } = useCoreOrganizationList({
     userInvitations: organizationListParams.userInvitations,
@@ -34,7 +34,7 @@ export const InvitationPreview = withCardStateProvider((props: UserOrganizationI
     return card
       .runAsync(async () => {
         const updatedItem = await props.accept();
-        const organization = await Organization.get(props.publicOrganizationData.id);
+        const organization = await getOrganization(props.publicOrganizationData.id);
         return [updatedItem, organization] as const;
       })
       .then(([updatedItem, organization]) => {

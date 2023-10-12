@@ -1152,10 +1152,8 @@ export default class Clerk implements ClerkInterface {
     return await OrganizationMembership.retrieve();
   };
 
-  public getOrganization = async (organizationId: string): Promise<Organization | undefined> => {
-    return (await OrganizationMembership.retrieve()).find(orgMem => orgMem.organization.id === organizationId)
-      ?.organization;
-  };
+  public getOrganization = async (organizationId: string): Promise<OrganizationResource> =>
+    Organization.get(organizationId);
 
   public updateEnvironment(environment: EnvironmentResource) {
     this.#environment = environment;
