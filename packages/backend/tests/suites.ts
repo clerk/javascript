@@ -7,6 +7,7 @@ import redirectTest from './dist/redirections.test.js';
 import interstitialRequestTest from './dist/tokens/interstitial.test.js';
 import jwtAssertionsTest from './dist/tokens/jwt/assertions.test.js';
 import cryptoKeysTest from './dist/tokens/jwt/cryptoKeys.test.js';
+import signJwtTest from './dist/tokens/jwt/signJwt.test.js';
 import verifyJwtTest from './dist/tokens/jwt/verifyJwt.test.js';
 import keysTest from './dist/tokens/keys.test.js';
 import requestTest from './dist/tokens/request.test.js';
@@ -26,6 +27,7 @@ const suites = [
   verifyTest,
   pathTest,
   verifyJwtTest,
+  signJwtTest,
   cryptoKeysTest,
   factoryTest,
   redirectTest,

@@ -63,6 +63,7 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "redirectToSignIn",
   "redirectToSignUp",
   "sanitizeAuthObject",
+  "signJwt",
   "signedInAuthObject",
   "signedOutAuthObject",
   "verifyJwt",
