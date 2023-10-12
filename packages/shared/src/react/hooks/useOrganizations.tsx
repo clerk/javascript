@@ -1,7 +1,7 @@
 import type { CreateOrganizationParams, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
 
-import { deprecated } from '../utils';
-import { useClerkInstanceContext } from './contexts';
+import { deprecated } from '../../deprecated';
+import { useClerkInstanceContext } from '../contexts';
 
 type UseOrganizationsReturn =
   | {

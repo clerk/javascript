@@ -11,9 +11,9 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
-import { deprecatedObjectProperty } from '../utils';
-import { useClerkInstanceContext, useUserContext } from './contexts';
-import type { PaginatedResources, PaginatedResourcesWithDefault } from './types';
+import { deprecatedObjectProperty } from '../../deprecated';
+import { useClerkInstanceContext, useUserContext } from '../contexts';
+import type { PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationListParams = {

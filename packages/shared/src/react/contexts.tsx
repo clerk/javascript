@@ -12,9 +12,9 @@ import type {
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { deprecated } from '../utils';
+import { deprecated } from '../deprecated';
 import { SWRConfig } from './clerk-swr';
-import { createContextAndHook } from './createContextAndHook';
+import { createContextAndHook } from './hooks/createContextAndHook';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
