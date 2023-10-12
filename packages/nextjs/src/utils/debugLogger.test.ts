@@ -125,7 +125,7 @@ describe('withLogger', () => {
       logger.debug(veryLongString);
     });
     handler();
-    expect(log.mock.calls[0][0]).toHaveLength(4096);
+    expect(log.mock.calls[1][0]).toHaveLength(4096);
 
     // restore original console log and reset environment value
     process.env.VERCEL = undefined;
