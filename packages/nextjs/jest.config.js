@@ -1,5 +1,8 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
+  globals: {
+    PACKAGE_VERSION: '0.0.0-test',
+  },
   displayName: 'nextjs',
   injectGlobals: true,
   roots: ['<rootDir>/src'],
