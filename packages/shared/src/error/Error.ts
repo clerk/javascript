@@ -1,6 +1,6 @@
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 
-import { deprecated } from '../utils';
+import { deprecated } from '../deprecated';
 
 interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
