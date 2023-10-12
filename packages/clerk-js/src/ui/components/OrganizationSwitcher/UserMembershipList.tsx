@@ -36,6 +36,8 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         overflowY: 'auto',
         ...common.unstyledScrollbar(t),
       })}
+      role='group'
+      aria-label={hidePersonal ? 'List of all organization memberships' : 'List of all accounts'}
     >
       {currentOrg && !hidePersonal && (
         <PreviewButton
@@ -43,6 +45,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           icon={SwitchArrows}
           sx={{ borderRadius: 0 }}
           onClick={onPersonalWorkspaceClick}
+          role='menuitem'
         >
           <PersonalWorkspacePreview
             user={userWithoutIdentifiers}
@@ -59,6 +62,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           icon={SwitchArrows}
           sx={{ borderRadius: 0 }}
           onClick={() => onOrganizationClick(organization)}
+          role='menuitem'
         >
           <OrganizationPreview
             elementId='organizationSwitcher'
