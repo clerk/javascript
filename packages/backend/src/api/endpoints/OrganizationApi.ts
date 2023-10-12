@@ -1,4 +1,4 @@
-import { deprecated } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
 
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';

@@ -1,4 +1,4 @@
-import { deprecatedObjectProperty } from '@clerk/shared';
+import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import type { Jwt, JwtPayload } from '@clerk/types';
 
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
