@@ -8,7 +8,7 @@
     "isolatedModules": true,
     "jsx": "react",
     "lib": ["es6", "dom"],
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "noUnusedParameters": true,

@@ -6,7 +6,7 @@ export {
   isMetamaskError,
   isMagicLinkError,
   isEmailLinkError,
-} from '@clerk/shared';
+} from '@clerk/shared/error';
 
 export const noFrontendApiError = 'Clerk: You must add the frontendApi prop to your <ClerkProvider>';
 
