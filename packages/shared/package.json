@@ -14,11 +14,6 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
-    },
-    "./testUtils": {
-      "types": "./dist/types/testUtils/index.d.ts",
-      "import": "./dist/esm/testUtils/index.js",
-      "require": "./dist/cjs/testUtils/index.js"
     }
   },
   "scripts": {

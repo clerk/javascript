@@ -1,6 +1,7 @@
-import { render, userEvent, waitFor } from '@clerk/shared/testUtils';
 import type { OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
+import { render, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSettings } from '../OrganizationSettings';
