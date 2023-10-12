@@ -2,9 +2,6 @@
   "name": "@clerk/shared",
   "version": "0.24.3",
   "description": "Internal package utils used by the Clerk SDKs",
-  "types": "./dist/index.d.ts",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "sideEffects": false,
   "files": [
     "dist"
@@ -30,14 +27,24 @@
         "default": "./dist/*.js"
       }
     },
-    "./dist/*": {
+    "./react": {
       "import": {
-        "types": "./dist/*.d.mts",
-        "default": "./dist/*.mjs"
+        "types": "./dist/react/index.d.mts",
+        "default": "./dist/react/index.mjs"
       },
       "require": {
-        "types": "./dist/*.d.ts",
-        "default": "./dist/*.js"
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      }
+    },
+    "./react/hooks": {
+      "import": {
+        "types": "./dist/react/hooks/index.d.mts",
+        "default": "./dist/react/hooks/index.mjs"
+      },
+      "require": {
+        "types": "./dist/react/hooks/index.d.ts",
+        "default": "./dist/react/hooks/index.js"
       }
     }
   },
