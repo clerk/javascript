@@ -1,4 +1,4 @@
-import { inBrowser, isValidBrowserOnline, userAgentIsRobot } from './browser';
+import { inBrowser, isValidBrowserOnline, userAgentIsRobot } from '../browser';
 
 describe('inBrowser()', () => {
   it('returns true if window is defined', () => {
