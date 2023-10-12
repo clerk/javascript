@@ -6,7 +6,6 @@ const config = {
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
   setupFiles: ['./setupJest.ts'],
-  // setupFilesAfterEnv: ['./setupJestAfterEnv.ts'],
   testRegex: ['/ui/.*/__tests__/.*.test.[jt]sx?$', '/(core|utils)/.*.test.[jt]sx?$'],
   testPathIgnorePatterns: ['/node_modules/'],
 
@@ -18,7 +17,6 @@ const config = {
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {
     '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
-    // '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
 };
 
