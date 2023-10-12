@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 import { getFullName, getIdentifier } from '../../../utils/user';
 import { useCoreUser, useUserButtonContext, withCoreUserGuard } from '../../contexts';
 import { descriptors, Flex, Flow, Text } from '../../customizables';
@@ -14,6 +16,8 @@ const _UserButton = withFloatingTree(() => {
     offset: 8,
   });
 
+  const userButtonMenuId = useId();
+
   return (
     <Flow.Root flow='userButton'>
       <Flex
@@ -27,6 +31,7 @@ const _UserButton = withFloatingTree(() => {
           ref={reference}
           onClick={toggle}
           isOpen={isOpen}
+          aria-controls={userButtonMenuId}
         />
         <Popover
           nodeId={nodeId}
@@ -34,6 +39,7 @@ const _UserButton = withFloatingTree(() => {
           isOpen={isOpen}
         >
           <UserButtonPopover
+            id={userButtonMenuId}
             close={toggle}
             ref={floating}
             style={{ ...styles }}
