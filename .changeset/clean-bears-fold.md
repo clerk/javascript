@@ -1,6 +1,6 @@
 ---
 '@clerk/clerk-js': minor
-'@clerk/themes': minor
+'@clerk/themes': patch
 '@clerk/types': minor
 ---
 
