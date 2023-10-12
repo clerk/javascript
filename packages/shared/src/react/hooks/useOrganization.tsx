@@ -107,31 +107,19 @@ type UseOrganization = <T extends UseOrganizationParams>(
       membership: OrganizationMembershipResource | null | undefined;
       domains: PaginatedResources<
         OrganizationDomainResource,
-        T['membershipRequests'] extends { infinite: true } ? true : false,
-        T['membershipRequests'] extends { infinite: true }
-          ? ClerkPaginatedResponse<OrganizationDomainResource>
-          : OrganizationDomainResource[]
+        T['membershipRequests'] extends { infinite: true } ? true : false
       > | null;
       membershipRequests: PaginatedResources<
         OrganizationMembershipRequestResource,
-        T['membershipRequests'] extends { infinite: true } ? true : false,
-        T['membershipRequests'] extends { infinite: true }
-          ? ClerkPaginatedResponse<OrganizationMembershipRequestResource>
-          : OrganizationMembershipRequestResource[]
+        T['membershipRequests'] extends { infinite: true } ? true : false
       > | null;
       memberships: PaginatedResources<
         OrganizationMembershipResource,
-        T['memberships'] extends { infinite: true } ? true : false,
-        T['memberships'] extends { infinite: true }
-          ? ClerkPaginatedResponse<OrganizationMembershipResource>
-          : OrganizationMembershipResource[]
+        T['memberships'] extends { infinite: true } ? true : false
       > | null;
       invitations: PaginatedResources<
         OrganizationInvitationResource,
-        T['invitations'] extends { infinite: true } ? true : false,
-        T['invitations'] extends { infinite: true }
-          ? ClerkPaginatedResponse<OrganizationInvitationResource>
-          : OrganizationInvitationResource[]
+        T['invitations'] extends { infinite: true } ? true : false
       > | null;
     };
 
@@ -397,13 +385,10 @@ export const useOrganization: UseOrganization = params => {
       void mutateMembershipList();
       void mutateInvitationList();
     },
-    // Let the hook return type define this type
-    domains: domains as any,
-    // Let the hook return type define this type
-    membershipRequests: membershipRequests as any,
-    // Let the hook return type define this type
-    memberships: memberships as any,
-    invitations: invitations as any,
+    domains,
+    membershipRequests,
+    memberships,
+    invitations,
   };
 };
 

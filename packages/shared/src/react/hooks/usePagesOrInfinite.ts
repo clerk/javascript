@@ -88,7 +88,7 @@ type UsePagesOrInfinite = <
    */
   options: TOptions,
   cacheKeys: CacheKeys,
-) => PaginatedResources<ExtractData<FetcherReturnData>, TOptions['infinite'], FetcherReturnData>;
+) => PaginatedResources<ExtractData<FetcherReturnData>, TOptions['infinite']>;
 
 export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);

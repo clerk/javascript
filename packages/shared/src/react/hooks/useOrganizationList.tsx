@@ -80,24 +80,15 @@ type UseOrganizationList = <T extends UseOrganizationListParams>(
       setActive: SetActive;
       userMemberships: PaginatedResources<
         OrganizationMembershipResource,
-        T['userMemberships'] extends { infinite: true } ? true : false,
-        T['userMemberships'] extends { infinite: true }
-          ? ClerkPaginatedResponse<OrganizationMembershipResource>
-          : OrganizationMembershipResource[]
+        T['userMemberships'] extends { infinite: true } ? true : false
       >;
       userInvitations: PaginatedResources<
         UserOrganizationInvitationResource,
-        T['userInvitations'] extends { infinite: true } ? true : false,
-        T['userInvitations'] extends { infinite: true }
-          ? ClerkPaginatedResponse<UserOrganizationInvitationResource>
-          : UserOrganizationInvitationResource[]
+        T['userInvitations'] extends { infinite: true } ? true : false
       >;
       userSuggestions: PaginatedResources<
         OrganizationSuggestionResource,
-        T['userSuggestions'] extends { infinite: true } ? true : false,
-        T['userSuggestions'] extends { infinite: true }
-          ? ClerkPaginatedResponse<OrganizationSuggestionResource>
-          : OrganizationSuggestionResource[]
+        T['userSuggestions'] extends { infinite: true } ? true : false
       >;
     };
 
@@ -234,12 +225,9 @@ export const useOrganizationList: UseOrganizationList = params => {
     organizationList: createOrganizationList(user.organizationMemberships),
     setActive: clerk.setActive,
     createOrganization: clerk.createOrganization,
-    // Let the hook return type define this type
-    userMemberships: memberships as any,
-    // Let the hook return type define this type
-    userInvitations: invitations as any,
-    // Let the hook return type define this type
-    userSuggestions: suggestions as any,
+    userMemberships: memberships,
+    userInvitations: invitations,
+    userSuggestions: suggestions,
   };
   deprecatedObjectProperty(result, 'organizationList', 'Use `userMemberships` instead.');
 
