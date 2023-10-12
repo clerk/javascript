@@ -4,7 +4,7 @@ import {
   isLegacyFrontendApiKey,
   isPublishableKey,
   parsePublishableKey,
-} from './keys';
+} from '../keys';
 
 describe('buildPublishableKey(key)', () => {
   const cases = [
@@ -37,7 +37,9 @@ describe('parsePublishableKey(key)', () => {
     ],
   ];
 
+  // @ts-ignore
   test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expectedPublishableKey) => {
+    // @ts-ignore
     const result = parsePublishableKey(publishableKeyStr);
     expect(result).toEqual(expectedPublishableKey);
   });
