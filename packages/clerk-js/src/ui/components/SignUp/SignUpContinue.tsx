@@ -143,8 +143,8 @@ function _SignUpContinue() {
       .then(res =>
         completeSignUpFlow({
           signUp: res,
-          verifyEmailPath: '../verify-email-address',
-          verifyPhonePath: '../verify-phone-number',
+          verifyEmailPath: './verify-email-address',
+          verifyPhonePath: './verify-phone-number',
           handleComplete: () => clerk.setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
           navigate,
         }),
