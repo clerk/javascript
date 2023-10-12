@@ -12,13 +12,14 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['./src/**/*.{ts,tsx,js,jsx}'],
+    entry: ['./src/**/*.{ts,tsx}', '!./src/**/*.test.{ts,tsx}'],
     bundle: false,
     clean: true,
     minify: false,
     sourcemap: true,
     legacyOutput: true,
-    external: ['@testing-library', 'react', 'jest', 'jest-environment-jsdom', 'react-dom'],
+    dts: true,
+    external: ['react', 'react-dom'],
     esbuildPlugins: [WebWorkerMinifyPlugin as any],
     define: {
       PACKAGE_NAME: `"${name}"`,
@@ -38,7 +39,7 @@ export default defineConfig(overrideOptions => {
     outDir: './dist/cjs',
   };
 
-  return runAfterLast(['npm run build:declarations', shouldPublish && 'npm run publish:local'])(esm, cjs);
+  return runAfterLast([shouldPublish && 'npm run publish:local'])(esm, cjs);
 });
 
 // Read transform and minify any files ending in .worker.ts
