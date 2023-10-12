@@ -1,5 +1,28 @@
 # Change Log
 
+## 4.26.4
+
+### Patch Changes
+
+- Warn about _MagicLink_ deprecations: ([#1836](https://github.com/clerkinc/javascript/pull/1836)) by [@dimkl](https://github.com/dimkl)
+
+  - `MagicLinkError`
+  - `isMagicLinkError`
+  - `MagicLinkErrorCode`
+  - `handleMagicLinkVerification`
+  - `createMagicLinkFlow`
+  - `useMagicLink`
+
+- Introduce a new property on the core Clerk singleton, `sdkMetadata`. This will be populated by each host SDK. This metadata will be used to make logging and debugging easier. ([#1857](https://github.com/clerkinc/javascript/pull/1857)) by [@BRKalow](https://github.com/BRKalow)
+
+- Introduce new `*EmailLink*` helpers that will replace the `*MagicLink*` helpers. ([#1833](https://github.com/clerkinc/javascript/pull/1833)) by [@dimkl](https://github.com/dimkl)
+
+  Also marked all the `*MagicLink*` as deprecated using JSDocs.
+
+- Updated dependencies [[`977336f79`](https://github.com/clerkinc/javascript/commit/977336f793cd4ce5984f98dac3cedf9f5ec363f5), [`997b8e256`](https://github.com/clerkinc/javascript/commit/997b8e256c8f83d68d0ae4243c7ea5640573d1ae), [`91e9a55f4`](https://github.com/clerkinc/javascript/commit/91e9a55f4b9f1a8f8d843a788597026015ddeafd), [`91014880d`](https://github.com/clerkinc/javascript/commit/91014880df71c2618d0b1e513da4dd19ccd809e3), [`7f4d4b942`](https://github.com/clerkinc/javascript/commit/7f4d4b942e8834462cdc0976b106d9739c345f6b)]:
+  - @clerk/shared@0.24.4
+  - @clerk/types@3.55.0
+
 ## 4.26.3
 
 ### Patch Changes
