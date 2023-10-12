@@ -442,7 +442,7 @@ export interface Clerk {
   /**
    * Retrieves a single organization by id.
    */
-  getOrganization: (organizationId: string) => Promise<OrganizationResource | undefined>;
+  getOrganization: (organizationId: string) => Promise<OrganizationResource>;
 
   /**
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
