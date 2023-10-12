@@ -35,13 +35,14 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
 
   const sessionActions = authConfig.singleSessionMode ? null : otherSessions.length > 0 ? (
     <>
-      <SecondaryActions>
+      <SecondaryActions role='menu'>
         {otherSessions.map(session => (
           <PreviewButton
             key={session.id}
             icon={SwitchArrows}
             sx={t => ({ height: t.sizes.$14, borderRadius: 0 })}
             onClick={handleSessionClicked(session)}
+            role='menuitem'
           >
             <UserPreview
               user={session.user}
@@ -52,7 +53,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         ))}
         {addAccountButton}
       </SecondaryActions>
-      <Actions>
+      <Actions role='menu'>
         <Action
           icon={SignOutDouble}
           label={localizationKeys('userButton.action__signOutAll')}
@@ -61,7 +62,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       </Actions>
     </>
   ) : (
-    <SecondaryActions>{addAccountButton}</SecondaryActions>
+    <SecondaryActions role='menu'>{addAccountButton}</SecondaryActions>
   );
 
   return (
@@ -73,16 +74,16 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         aria-label='User button popover'
         {...rest}
       >
-        <PopoverCard.Main
-          elementDescriptor={descriptors.userButtonPopoverMain}
-          role='menu'
-        >
+        <PopoverCard.Main elementDescriptor={descriptors.userButtonPopoverMain}>
           <UserPreview
             elementId={'userButton'}
             user={user}
             sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$2 })}
           />
-          <Actions elementDescriptor={descriptors.userButtonPopoverActions}>
+          <Actions
+            role='menu'
+            elementDescriptor={descriptors.userButtonPopoverActions}
+          >
             <Action
               elementDescriptor={descriptors.userButtonPopoverActionButton}
               elementId={descriptors.userButtonPopoverActionButton.setId('manageAccount')}
