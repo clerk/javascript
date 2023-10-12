@@ -1,4 +1,4 @@
-import { createCookieHandler } from '@clerk/shared';
+import { createCookieHandler } from '@clerk/shared/cookie';
 
 const CLIENT_COOKIE_NAME = '__client';
 

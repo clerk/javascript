@@ -7,7 +7,7 @@
     "isolatedModules": true,
     "module": "esnext",
     "lib": ["es2021.intl"],
-    "moduleResolution": "Node",
+    "moduleResolution": "NodeNext",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,

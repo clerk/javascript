@@ -1,5 +1,4 @@
-import { deprecated } from '@clerk/shared';
-import { deprecatedProperty } from '@clerk/shared';
+import { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
 import type {
   BackupCodeJSON,
   BackupCodeResource,

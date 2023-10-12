@@ -1,4 +1,4 @@
-import { deprecated, deprecatedProperty } from '@clerk/shared';
+import { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
 import type {
   AddMemberParams,
   ClerkPaginatedResponse,

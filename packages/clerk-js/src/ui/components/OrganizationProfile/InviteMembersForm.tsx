@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError } from '@clerk/shared';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { MembershipRole, OrganizationResource } from '@clerk/types';
 import React from 'react';
 

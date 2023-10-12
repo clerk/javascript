@@ -1,4 +1,5 @@
-import { deprecated, Poller } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
+import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
   CreateEmailLinkFlowReturn,

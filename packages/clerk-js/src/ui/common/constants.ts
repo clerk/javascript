@@ -1,4 +1,4 @@
-import { deprecated } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
 import type { Attribute, Web3Provider } from '@clerk/types';
 
 import type { LocalizationKey } from '../localization/localizationKeys';
