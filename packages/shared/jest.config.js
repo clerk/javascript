@@ -6,13 +6,10 @@ const config = {
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
   setupFiles: ['./setupJest.ts'],
-  testRegex: ['/ui/.*/__tests__/.*.test.[jt]sx?$', '/(core|utils)/.*.test.[jt]sx?$'],
-  testPathIgnorePatterns: ['/node_modules/'],
 
   collectCoverage: false,
   coverageProvider: 'v8',
   coverageDirectory: 'coverage',
-  coveragePathIgnorePatterns: ['/node_modules/'],
 
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {
