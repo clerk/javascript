@@ -34,8 +34,9 @@ type DateFormatRelativeParams = {
   relativeTo: Date | string | number;
 };
 
-type RelativeDateCase = 'previous6Days' | 'lastDay' | 'sameDay' | 'nextDay' | 'next6Days' | 'other';
+export type RelativeDateCase = 'previous6Days' | 'lastDay' | 'sameDay' | 'nextDay' | 'next6Days' | 'other';
 type RelativeDateReturn = { relativeDateCase: RelativeDateCase; date: Date } | null;
+
 export function formatRelative(props: DateFormatRelativeParams): RelativeDateReturn {
   const { date, relativeTo } = props;
   if (!date || !relativeTo) {
