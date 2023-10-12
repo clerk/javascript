@@ -1,4 +1,4 @@
-import { addClerkPrefix, parseSearchParams, stripScheme } from './url';
+import { addClerkPrefix, parseSearchParams, stripScheme } from '../url';
 
 describe('parseSearchParams(queryString)', () => {
   it('parses query string and returns a URLSearchParams object', () => {

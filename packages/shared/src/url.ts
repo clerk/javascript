@@ -1,4 +1,4 @@
-import { isStaging } from './instance';
+import { isStaging } from './utils/instance';
 
 export function parseSearchParams(queryString = ''): URLSearchParams {
   if (queryString.startsWith('?')) {
