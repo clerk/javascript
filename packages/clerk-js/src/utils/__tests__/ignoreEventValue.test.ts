@@ -1,6 +1,7 @@
-import { noop } from '@clerk/shared/testUtils';
-
 import { ignoreEventValue } from '../ignoreEventValue';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = (..._args: any[]): void => {};
 
 describe('ignoreNonEventValue', () => {
   it('allows non event values', () => {

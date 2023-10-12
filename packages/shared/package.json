@@ -7,19 +7,13 @@
   "module": "./dist/esm/index.js",
   "sideEffects": false,
   "files": [
-    "dist",
-    "testUtils"
+    "dist"
   ],
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
-    },
-    "./testUtils": {
-      "types": "./dist/types/testUtils/index.d.ts",
-      "import": "./dist/esm/testUtils/index.js",
-      "require": "./dist/cjs/testUtils/index.js"
     }
   },
   "scripts": {
@@ -34,6 +28,11 @@
     "test:ci": "jest --maxWorkers=50%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
+  "dependencies": {
+    "glob-to-regexp": "0.4.1",
+    "js-cookie": "3.0.1",
+    "swr": "2.2.0"
+  },
   "devDependencies": {
     "@clerk/types": "3.55.0",
     "@types/glob-to-regexp": "0.4.1",
@@ -44,14 +43,14 @@
   "peerDependencies": {
     "react": ">=16"
   },
-  "author": "",
-  "license": "ISC",
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "author": "Clerk",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "glob-to-regexp": "0.4.1",
-    "js-cookie": "3.0.1",
-    "swr": "2.2.0"
   }
 }
