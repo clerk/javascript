@@ -1,16 +1,19 @@
-import type { TokenResource } from '@clerk/types';
+import type { OrganizationInvitationResource, TokenResource } from '@clerk/types';
 
 export const events = {
   TokenUpdate: 'token:update',
+  InvitationUpdate: 'invitation:update',
 } as const;
 
 type ClerkEvent = (typeof events)[keyof typeof events];
 type EventHandler<E extends ClerkEvent> = (payload: EventPayload[E]) => void;
 
 type TokenUpdatePayload = { token: TokenResource | null };
+type InvitationUpdatePayload = { invitation: OrganizationInvitationResource };
 
 type EventPayload = {
   [events.TokenUpdate]: TokenUpdatePayload;
+  [events.InvitationUpdate]: InvitationUpdatePayload;
 };
 
 const createEventBus = () => {

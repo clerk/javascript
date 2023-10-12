@@ -8,6 +8,7 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { eventBus, events } from '../events';
 import { BaseResource } from './internal';
 
 export class OrganizationInvitation extends BaseResource implements OrganizationInvitationResource {
@@ -32,7 +33,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
       })
     )?.response as unknown as OrganizationInvitationJSON;
     const newInvitation = new OrganizationInvitation(json);
-    this.clerk.__unstable__invitationUpdate(newInvitation);
+    eventBus.dispatch(events.InvitationUpdate, { invitation: newInvitation });
     return newInvitation;
   }
 
@@ -48,10 +49,11 @@ export class OrganizationInvitation extends BaseResource implements Organization
         body: { email_address: emailAddresses, role } as any,
       })
     )?.response as unknown as OrganizationInvitationJSON[];
-    // const newInvitation = new OrganizationInvitation(json);
-    // TODO: Figure out what this is...
-    // this.clerk.__unstable__invitationUpdate(newInvitation);
-    return json.map(invitationJson => new OrganizationInvitation(invitationJson));
+    return json.map(invitationJson => {
+      const newInvitation = new OrganizationInvitation(invitationJson);
+      eventBus.dispatch(events.InvitationUpdate, { invitation: newInvitation });
+      return newInvitation;
+    });
   }
 
   constructor(data: OrganizationInvitationJSON) {
@@ -63,7 +65,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
     const revokedInvitation = await this._basePost({
       path: `/organizations/${this.organizationId}/invitations/${this.id}/revoke`,
     });
-    OrganizationInvitation.clerk.__unstable__invitationUpdate(revokedInvitation);
+    eventBus.dispatch(events.InvitationUpdate, { invitation: revokedInvitation });
     return revokedInvitation;
   };
 

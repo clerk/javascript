@@ -103,6 +103,7 @@ import {
   clerkOAuthCallbackDidNotCompleteSignInSignUp,
   clerkRedirectUrlIsMissingScheme,
 } from './errors';
+import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import createFapiClient from './fapiClient';
 import {
@@ -301,6 +302,12 @@ export default class Clerk implements ClerkInterface {
     } else {
       this.#isReady = await this.#loadInNonStandardBrowser();
     }
+
+    // setup global events for standard/non-standard browser
+    eventBus.on(events.InvitationUpdate, ({ invitation }) => {
+      this.#lastOrganizationInvitation = invitation;
+      this.#emit();
+    });
   };
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
@@ -1186,11 +1193,6 @@ export default class Clerk implements ClerkInterface {
 
     this.#emit();
   };
-
-  __unstable__invitationUpdate(invitation: OrganizationInvitationResource) {
-    this.#lastOrganizationInvitation = invitation;
-    this.#emit();
-  }
 
   __unstable__membershipUpdate(membership: OrganizationMembershipResource) {
     this.#lastOrganizationMember = membership;
