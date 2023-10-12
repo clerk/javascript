@@ -7,8 +7,7 @@
   "module": "./dist/esm/index.js",
   "sideEffects": false,
   "files": [
-    "dist",
-    "testUtils"
+    "dist"
   ],
   "exports": {
     ".": {
@@ -34,6 +33,11 @@
     "test:ci": "jest --maxWorkers=50%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
+  "dependencies": {
+    "glob-to-regexp": "0.4.1",
+    "js-cookie": "3.0.1",
+    "swr": "2.2.0"
+  },
   "devDependencies": {
     "@clerk/types": "3.54.0",
     "@types/glob-to-regexp": "0.4.1",
@@ -44,14 +48,14 @@
   "peerDependencies": {
     "react": ">=16"
   },
-  "author": "",
-  "license": "ISC",
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "author": "Clerk",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "glob-to-regexp": "0.4.1",
-    "js-cookie": "3.0.1",
-    "swr": "2.2.0"
   }
 }
