@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "sourceMap": false,
     "strict": true,
     "esModuleInterop": true,
