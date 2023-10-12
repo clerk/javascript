@@ -1,4 +1,39 @@
-import { deepCamelToSnake, deepSnakeToCamel } from './object';
+import { deepCamelToSnake, deepSnakeToCamel, isIPV4Address, titleize, toSentence } from '../underscore';
+
+describe('toSentence', () => {
+  it('returns a single item as-is', () => {
+    expect(toSentence(['xyz'])).toBe('xyz');
+    expect(toSentence(['abc'])).toBe('abc');
+  });
+
+  it('joins multiple items but the last with a comma and the last with ", or"', () => {
+    expect(toSentence(['abc', 'def'])).toBe('abc, or def');
+    expect(toSentence(['qwe', 'zxc', 'asd'])).toBe('qwe, zxc, or asd');
+  });
+
+  it('returns empty string if passed an empty array', () => {
+    expect(toSentence([])).toBe('');
+  });
+});
+
+describe('isIPV4Address(str)', () => {
+  it('checks if as string is an IP V4', () => {
+    expect(isIPV4Address(null)).toBe(false);
+    expect(isIPV4Address(undefined)).toBe(false);
+    expect(isIPV4Address('')).toBe(false);
+    expect(isIPV4Address('127.0.0.1')).toBe(true);
+  });
+});
+
+describe('titleize(str)', () => {
+  it('titleizes the string', () => {
+    expect(titleize(null)).toBe('');
+    expect(titleize(undefined)).toBe('');
+    expect(titleize('')).toBe('');
+    expect(titleize('foo')).toBe('Foo');
+    expect(titleize('foo bar')).toBe('Foo bar');
+  });
+});
 
 describe('camelToSnakeKeys', () => {
   it('creates a copy and does not modify the original', () => {
