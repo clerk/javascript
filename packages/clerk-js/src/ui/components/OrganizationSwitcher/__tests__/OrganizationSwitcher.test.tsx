@@ -1,7 +1,7 @@
 import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
 
-import { render, runFakeTimers, waitFor } from '../../../../testUtils';
+import { act, render, runFakeTimers, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
 import { createFakeUserOrganizationInvitation, createFakeUserOrganizationSuggestion } from './utlis';
@@ -14,7 +14,7 @@ describe('OrganizationSwitcher', () => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'] });
     });
-    const { queryByRole } = render(<OrganizationSwitcher />, { wrapper });
+    const { queryByRole } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
     expect(queryByRole('button')).toBeDefined();
   });
 
@@ -25,7 +25,7 @@ describe('OrganizationSwitcher', () => {
         f.withUser({ email_addresses: ['test@clerk.dev'] });
       });
       props.setProps({ hidePersonal: false });
-      const { getByText } = render(<OrganizationSwitcher />, { wrapper });
+      const { getByText } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
       expect(getByText('Personal account')).toBeDefined();
     });
 
@@ -168,7 +168,7 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      await userEvent.click(getByRole('button', { name: 'Manage Organization' }));
+      await userEvent.click(getByRole('menuitem', { name: 'Manage Organization' }));
       expect(fixtures.clerk.openOrganizationProfile).toHaveBeenCalled();
     });
 
@@ -183,8 +183,8 @@ describe('OrganizationSwitcher', () => {
       });
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
-      await userEvent.click(getByRole('button'));
-      await userEvent.click(getByRole('button', { name: 'Create Organization' }));
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+      await userEvent.click(getByRole('menuitem', { name: 'Create Organization' }));
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
     });
 
@@ -198,7 +198,7 @@ describe('OrganizationSwitcher', () => {
         });
       });
       props.setProps({ hidePersonal: true });
-      const { queryByRole } = render(<OrganizationSwitcher />, { wrapper });
+      const { queryByRole } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
       expect(queryByRole('button', { name: 'Create Organization' })).not.toBeInTheDocument();
     });
 

@@ -45,6 +45,7 @@ export default (QUnit: QUnit) => {
         'prunePrivateMetadata',
         'redirect',
         'sanitizeAuthObject',
+        'signJwt',
         'signedInAuthObject',
         'signedOutAuthObject',
         'verifyJwt',

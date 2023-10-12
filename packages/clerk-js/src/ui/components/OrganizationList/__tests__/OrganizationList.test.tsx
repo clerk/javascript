@@ -2,7 +2,11 @@ import { describe } from '@jest/globals';
 
 import { render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { createFakeUserOrganizationMembership } from '../../OrganizationSwitcher/__tests__/utlis';
+import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
+import {
+  createFakeUserOrganizationInvitation,
+  createFakeUserOrganizationMembership,
+} from '../../OrganizationSwitcher/__tests__/utlis';
 import { OrganizationList } from '../OrganizationList';
 
 const { createFixtures } = bindCreateFixtures('OrganizationList');
@@ -107,6 +111,85 @@ describe('OrganizationList', () => {
 
         expect(queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
         expect(queryByRole('button', { name: 'Create organization' })).toBeInTheDocument();
+      });
+    });
+
+    it('lists invitations', async () => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+        });
+      });
+
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationMembership({
+              id: '1',
+              organization: {
+                id: '1',
+                name: 'Org1',
+                slug: 'org1',
+                membersCount: 1,
+                adminDeleteEnabled: false,
+                maxAllowedMemberships: 1,
+                pendingInvitationsCount: 1,
+              },
+            }),
+          ],
+          total_count: 1,
+        }),
+      );
+
+      const invitation = createFakeUserOrganizationInvitation({
+        id: '1',
+        emailAddress: 'one@clerk.com',
+        publicOrganizationData: {
+          name: 'OrgOne',
+        },
+      });
+
+      invitation.accept = jest.fn().mockResolvedValue(
+        createFakeUserOrganizationInvitation({
+          id: '1',
+          emailAddress: 'one@clerk.com',
+          publicOrganizationData: {
+            name: 'OrgOne',
+          },
+          status: 'accepted',
+        }),
+      );
+
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
+        Promise.resolve({
+          data: [invitation],
+          total_count: 1,
+        }),
+      );
+
+      fixtures.clerk.getOrganization.mockResolvedValue(
+        createFakeOrganization({
+          adminDeleteEnabled: false,
+          id: '2',
+          maxAllowedMemberships: 0,
+          membersCount: 1,
+          name: 'OrgOne',
+          pendingInvitationsCount: 0,
+          slug: '',
+        }),
+      );
+
+      props.setProps({ hidePersonal: true });
+      const { queryByText, userEvent, getByRole, queryByRole } = render(<OrganizationList />, { wrapper });
+
+      await waitFor(async () => {
+        // Display membership
+        expect(queryByText('Org1')).toBeInTheDocument();
+        // Display invitation
+        expect(queryByText('OrgOne')).toBeInTheDocument();
+        await userEvent.click(getByRole('button', { name: 'Join' }));
+        expect(queryByRole('button', { name: 'Join' })).not.toBeInTheDocument();
       });
     });
   });

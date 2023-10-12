@@ -1,17 +1,7 @@
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
+import { algs } from './algorithms';
 
 export type IssuerResolver = string | ((iss: string) => boolean);
-
-export const algToHash: Record<string, string> = {
-  RS256: 'SHA-256',
-  RS384: 'SHA-384',
-  RS512: 'SHA-512',
-  ES256: 'SHA-256',
-  ES384: 'SHA-384',
-  ES512: 'SHA-512',
-};
-
-const algs = Object.keys(algToHash);
 
 const isArrayString = (s: unknown): s is string[] => {
   return Array.isArray(s) && s.length > 0 && s.every(a => typeof a === 'string');
@@ -72,7 +62,7 @@ export const assertHeaderType = (typ?: unknown) => {
 };
 
 export const assertHeaderAlgorithm = (alg: string) => {
-  if (!algToHash[alg]) {
+  if (!algs.includes(alg)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenInvalidAlgorithm,
