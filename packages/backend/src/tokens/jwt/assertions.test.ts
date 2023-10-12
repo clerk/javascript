@@ -153,26 +153,35 @@ export default (QUnit: QUnit) => {
       assert.equal(undefined, assertHeaderAlgorithm('RS256'));
       assert.equal(undefined, assertHeaderAlgorithm('RS384'));
       assert.equal(undefined, assertHeaderAlgorithm('RS512'));
-      assert.equal(undefined, assertHeaderAlgorithm('ES256'));
-      assert.equal(undefined, assertHeaderAlgorithm('ES384'));
-      assert.equal(undefined, assertHeaderAlgorithm('ES512'));
     });
 
     test('throws error if algorithm is missing', assert => {
       assert.raises(
         () => assertHeaderAlgorithm(''),
-        new Error(`Invalid JWT algorithm "". Supported: RS256,RS384,RS512,ES256,ES384,ES512.`),
+        new Error(`Invalid JWT algorithm "". Supported: RS256,RS384,RS512.`),
       );
     });
 
     test('throws error if algorithm is not supported', assert => {
       assert.raises(
+        () => assertHeaderAlgorithm('ES256'),
+        new Error(`Invalid JWT algorithm "ES256". Supported: RS256,RS384,RS512.`),
+      );
+      assert.raises(
+        () => assertHeaderAlgorithm('ES384'),
+        new Error(`Invalid JWT algorithm "ES384". Supported: RS256,RS384,RS512.`),
+      );
+      assert.raises(
+        () => assertHeaderAlgorithm('ES512'),
+        new Error(`Invalid JWT algorithm "ES512". Supported: RS256,RS384,RS512.`),
+      );
+      assert.raises(
         () => assertHeaderAlgorithm('PS512'),
-        new Error(`Invalid JWT algorithm "PS512". Supported: RS256,RS384,RS512,ES256,ES384,ES512.`),
+        new Error(`Invalid JWT algorithm "PS512". Supported: RS256,RS384,RS512.`),
       );
       assert.raises(
         () => assertHeaderAlgorithm('Aloha'),
-        new Error(`Invalid JWT algorithm "Aloha". Supported: RS256,RS384,RS512,ES256,ES384,ES512.`),
+        new Error(`Invalid JWT algorithm "Aloha". Supported: RS256,RS384,RS512.`),
       );
     });
   });
