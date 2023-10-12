@@ -1,4 +1,4 @@
-import { LocalStorageBroadcastChannel } from './localStorageBroadcastChannel';
+import { LocalStorageBroadcastChannel } from '../localStorageBroadcastChannel';
 
 const bcName = 'clerk';
 

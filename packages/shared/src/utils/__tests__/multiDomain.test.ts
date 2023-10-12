@@ -1,4 +1,4 @@
-import { handleValueOrFn } from './multiDomain';
+import { handleValueOrFn } from '../multiDomain';
 
 const url = new URL('https://example.com');
 
