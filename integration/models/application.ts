@@ -62,7 +62,7 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
         log: opts.detached ? undefined : log,
       });
-      await waitForServer(serverUrl, { log });
+      await waitForServer(serverUrl, { log, maxAttempts: Infinity });
       log(`Server started at ${serverUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => treekill(proc.pid, 'SIGKILL'));
       state.serverUrl = serverUrl;

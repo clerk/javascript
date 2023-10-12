@@ -1,6 +1,5 @@
-name: Nightly upstream checks
+name: Nightly upstream tests
 on:
-#  push:
   workflow_dispatch:
   schedule:
     - cron: '0 7 * * *'
@@ -8,17 +7,12 @@ on:
 jobs:
   build:
     name: Build packages and upload artifacts
-    uses: ./.github/workflows/build-base.yml
-
-  registry:
-    name: Publish (Verdaccio)
-    needs: build
-    uses: ./.github/workflows/registry-base.yml
+    uses: ./.github/workflows/base-build.yml
 
   integration-nextjs:
     name: Integration (NextJS canary)
-    needs: registry
-    uses: ./.github/workflows/e2e-base.yml
+    needs: build
+    uses: ./.github/workflows/base-e2e.yml
     with:
       SCRIPT: 'E2E_NEXTJS_VERSION=canary npm run test:integration:nextjs'
     secrets: inherit
@@ -27,7 +21,7 @@ jobs:
     name: Notify Slack
     needs: integration-nextjs
     if: ${{ contains(needs.*.result, 'failure') }}
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
     steps:
       - name: Report Status
         uses: ravsamhq/notify-slack-action@v1

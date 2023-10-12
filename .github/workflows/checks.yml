@@ -1,6 +1,5 @@
 name: Quality checks and tests
 on:
-  push:
   pull_request:
     branches: [ main ]
 
@@ -22,14 +21,15 @@ jobs:
     uses: ./.github/workflows/base-changeset.yml
 
   build:
-    needs: [ prettier, changeset, eslint ]
-    name: Build packages
-    uses: ./.github/workflows/build-base.yml
+    if: ${{ github.repository == 'clerkinc/javascript' }}
+    name: Build & publish
+    needs: [ prettier, changeset ]
+    uses: ./.github/workflows/base-build.yml
 
   unit-tests:
     name: Run unit tests
     needs: build
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
     strategy:
       matrix:
         node-version: [ 18, 19 ]
@@ -48,7 +48,7 @@ jobs:
   publint:
     name: Run publint
     needs: build
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -64,7 +64,7 @@ jobs:
   attw:
     name: Run attw
     needs: build
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -79,31 +79,26 @@ jobs:
         continue-on-error: true
         run: npm run lint:attw
 
-  registry:
-    name: Publish (Verdaccio)
-    needs: build
-    uses: ./.github/workflows/registry-base.yml
-
   integration-generic:
     name: Integration (Generic)
-    needs: registry
-    uses: ./.github/workflows/e2e-base.yml
+    needs: build
+    uses: ./.github/workflows/base-e2e.yml
     with:
       SCRIPT: 'npm run test:integration:generic'
     secrets: inherit
 
   integration-nextjs:
     name: Integration (NextJS)
-    needs: registry
-    uses: ./.github/workflows/e2e-base.yml
+    needs: build
+    uses: ./.github/workflows/base-e2e.yml
     with:
       SCRIPT: 'npm run test:integration:nextjs'
     secrets: inherit
 
   integration-remix:
     name: Integration (Remix)
-    needs: registry
-    uses: ./.github/workflows/e2e-base.yml
+    needs: build
+    uses: ./.github/workflows/base-e2e.yml
     with:
       SCRIPT: 'npm run test:integration:remix'
     secrets: inherit

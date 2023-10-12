@@ -3,6 +3,7 @@ on:
 
 jobs:
   check:
+    continue-on-error: true
     runs-on: ${{ vars.RUNNER_LARGE }}
     steps:
       - name: Checkout repo

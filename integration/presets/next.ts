@@ -10,7 +10,8 @@ const appRouter = applicationConfig()
   .addScript('dev', 'npm run dev')
   .addScript('build', 'npm run build')
   .addScript('serve', 'npm run start')
-  .addDependency('next', constants.E2E_NEXTJS_VERSION);
+  .addDependency('next', constants.E2E_NEXTJS_VERSION)
+  .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION);
 
 const appRouterTurbo = appRouter
   .clone()

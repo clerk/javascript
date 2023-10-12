@@ -15,7 +15,7 @@ jobs:
   run:
     continue-on-error: true
     timeout-minutes: 60
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
     concurrency:
       group: integration-${{ github.ref }}-${{ inputs.script }}
       cancel-in-progress: true
@@ -35,15 +35,19 @@ jobs:
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
-      - uses: actions/upload-artifact@v3
+      - name: Download Verdaccio artifacts
+        uses: actions/download-artifact@v3
         with:
-          name: verdaccio-storage
-          path: .verdaccio_storage
+          name: verdaccio
+          path: .verdaccio
       - name: Run Verdaccio
         run: |
           npm set registry http://localhost:4873/
-          nohup verdaccio --config ./verdaccio.install.yaml &
+          nohup ./node_modules/.bin/verdaccio --config ./verdaccio.install.yaml &
           sleep 5
+      - name: Install @clerk/backend in /integration
+        run: |
+          cd integration && npm init -y && npm install @clerk/backend && cd ..
       - name: Run Playwright tests
         run: ${{ inputs.SCRIPT }}
         env:

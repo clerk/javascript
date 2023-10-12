@@ -3,7 +3,7 @@ on:
 
 jobs:
   check:
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
