@@ -18,24 +18,27 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
   const { pages } = useOrganizationProfileContext();
   const isMembersPageRoot = pages.routes[0].id === 'members';
   const isSettingsPageRoot = pages.routes[0].id === 'settings';
-  const isPredefinedPageRoot = isSettingsPageRoot || isMembersPageRoot;
+
+  const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
+    const shouldFirstCustomItemBeOnRoot = !isSettingsPageRoot && !isMembersPageRoot && index === 0;
+    return (
+      <Route
+        index={shouldFirstCustomItemBeOnRoot}
+        path={shouldFirstCustomItemBeOnRoot ? undefined : customPage.url}
+        key={`custom-page-${customPage.url}`}
+      >
+        <CustomPageContentContainer
+          mount={customPage.mount}
+          unmount={customPage.unmount}
+        />
+      </Route>
+    );
+  });
 
   return (
     <ProfileCardContent contentRef={props.contentRef}>
       <Switch>
-        {/* Custom Pages */}
-        {pages.contents?.map((customPage, index) => (
-          <Route
-            index={!isPredefinedPageRoot && index === 0}
-            path={!isPredefinedPageRoot && index === 0 ? undefined : customPage.url}
-            key={`custom-page-${customPage.url}`}
-          >
-            <CustomPageContentContainer
-              mount={customPage.mount}
-              unmount={customPage.unmount}
-            />
-          </Route>
-        ))}
+        {customPageRoutesWithContents}
         <Route>
           <Route path={isSettingsPageRoot ? undefined : 'organization-settings'}>
             <Switch>
