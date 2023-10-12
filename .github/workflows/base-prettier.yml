@@ -1,0 +1,12 @@
+on:
+  workflow_call:
+
+jobs:
+  check:
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - run: npm run format:check

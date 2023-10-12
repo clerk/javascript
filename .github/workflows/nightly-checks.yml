@@ -1,6 +1,6 @@
 name: Nightly upstream checks
 on:
-  push:
+#  push:
   workflow_dispatch:
   schedule:
     - cron: '0 7 * * *'

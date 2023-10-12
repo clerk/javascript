@@ -9,7 +9,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  prettier:
+    name: Prettier
+    uses: ./.github/workflows/base-prettier.yml
+
+  eslint:
+    name: Eslint
+    uses: ./.github/workflows/base-lint.yml
+
+  changeset:
+    name: Require changeset
+    uses: ./.github/workflows/base-changeset.yml
+
   build:
+    needs: [ prettier, changeset, eslint ]
     name: Build packages
     uses: ./.github/workflows/build-base.yml
 
