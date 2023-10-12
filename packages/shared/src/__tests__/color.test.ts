@@ -1,6 +1,6 @@
 import type { Color } from '@clerk/types';
 
-import { colorToSameTypeString, hexStringToRgbaColor, stringToHslaColor, stringToSameTypeColor } from './cssColorUtils';
+import { colorToSameTypeString, hexStringToRgbaColor, stringToHslaColor, stringToSameTypeColor } from '../color';
 
 describe('stringToHslaColor(color)', function () {
   const hsla = { h: 195, s: 1, l: 0.5 };
