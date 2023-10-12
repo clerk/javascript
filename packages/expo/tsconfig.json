@@ -5,7 +5,7 @@
     "lib": ["es6", "dom"],
     "jsx": "react",
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "importHelpers": true,
     "declaration": true,
     "declarationMap": false,
