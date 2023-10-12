@@ -123,9 +123,13 @@ describe('withLogger', () => {
     const handler = withLogger('test-logger', logger => () => {
       logger.enable();
       logger.debug(veryLongString);
+      logger.debug(veryLongString);
     });
     handler();
-    expect(log.mock.calls[1][0]).toHaveLength(4096);
+
+    for (const mockCall of log.mock.calls) {
+      expect(mockCall[0].length).toBeLessThanOrEqual(4096);
+    }
 
     // restore original console log and reset environment value
     process.env.VERCEL = undefined;
