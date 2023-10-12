@@ -1,4 +1,4 @@
-import { isProductionEnvironment, isTestEnvironment } from './runtimeEnvironment';
+import { isProductionEnvironment, isTestEnvironment } from './utils/runtimeEnvironment';
 /**
  * Mark class method / function as deprecated.
  *

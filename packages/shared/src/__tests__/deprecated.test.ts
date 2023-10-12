@@ -1,12 +1,12 @@
-jest.mock('./runtimeEnvironment', () => {
+jest.mock('../utils/runtimeEnvironment', () => {
   return {
     isTestEnvironment: jest.fn(() => false),
     isProductionEnvironment: jest.fn(() => false),
   };
 });
 
-import { deprecated, deprecatedObjectProperty, deprecatedProperty } from './deprecated';
-import { isProductionEnvironment, isTestEnvironment } from './runtimeEnvironment';
+import { deprecated, deprecatedObjectProperty, deprecatedProperty } from '../deprecated';
+import { isProductionEnvironment, isTestEnvironment } from '../utils/runtimeEnvironment';
 
 describe('deprecated(fnName, warning)', () => {
   let consoleWarnSpy;
