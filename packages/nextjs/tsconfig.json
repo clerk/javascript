@@ -10,7 +10,7 @@
     "jsx": "react",
     "lib": ["es6", "dom"],
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
