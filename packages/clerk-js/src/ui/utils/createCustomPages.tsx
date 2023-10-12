@@ -13,11 +13,11 @@ export type CustomPageContent = {
   unmount: (el?: HTMLDivElement) => void;
 };
 
-type UserProfileReorderItem = {
+type ProfileReorderItem = {
   label: 'account' | 'security';
 };
 
-type UserProfileCustomPage = {
+type ProfileCustomPage = {
   label: string;
   url: string;
   mountIcon: (el: HTMLDivElement) => void;
@@ -26,7 +26,7 @@ type UserProfileCustomPage = {
   unmount: (el?: HTMLDivElement) => void;
 };
 
-type UserProfileCustomLink = {
+type ProfileCustomLink = {
   label: string;
   url: string;
   mountIcon: (el: HTMLDivElement) => void;
@@ -178,7 +178,7 @@ const checkForDuplicateUsageOfReorderingItems = (customPages: CustomPage[], vali
   reorderItems.reduce((acc, cp) => {
     if (acc.includes(cp.label)) {
       console.error(
-        `Clerk: The "${cp.label}" item is used more than once when reordering UserProfile pages. This may cause unexpected behavior.`,
+        `Clerk: The "${cp.label}" item is used more than once when reordering pages. This may cause unexpected behavior.`,
       );
     }
     return [...acc, cp.label];
@@ -199,15 +199,15 @@ const isValidPageItem = (cp: CustomPage, validReorderItems: string[]): cp is Cus
   return isCustomPage(cp) || isCustomLink(cp) || isReorderItem(cp, validReorderItems);
 };
 
-const isCustomPage = (cp: CustomPage): cp is UserProfileCustomPage => {
+const isCustomPage = (cp: CustomPage): cp is ProfileCustomPage => {
   return !!cp.url && !!cp.label && !!cp.mount && !!cp.unmount && !!cp.mountIcon && !!cp.unmountIcon;
 };
 
-const isCustomLink = (cp: CustomPage): cp is UserProfileCustomLink => {
+const isCustomLink = (cp: CustomPage): cp is ProfileCustomLink => {
   return !!cp.url && !!cp.label && !cp.mount && !cp.unmount && !!cp.mountIcon && !!cp.unmountIcon;
 };
 
-const isReorderItem = (cp: CustomPage, validItems: string[]): cp is UserProfileReorderItem => {
+const isReorderItem = (cp: CustomPage, validItems: string[]): cp is ProfileReorderItem => {
   return (
     !cp.url && !cp.mount && !cp.unmount && !cp.mountIcon && !cp.unmountIcon && validItems.some(v => v === cp.label)
   );

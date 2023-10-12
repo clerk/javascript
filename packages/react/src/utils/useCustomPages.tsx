@@ -10,7 +10,7 @@ import {
 } from '../components/uiComponents';
 import { customLinkWrongProps, customPagesIgnoredComponent, customPageWrongProps } from '../errors';
 import type { UserProfilePageProps } from '../types';
-import { errorInDevMode } from './errorInDevMode';
+import { logErrorInDevMode } from './logErrorInDevMode';
 import type { UseCustomElementPortalParams, UseCustomElementPortalReturn } from './useCustomElementPortal';
 import { useCustomElementPortal } from './useCustomElementPortal';
 
@@ -62,7 +62,7 @@ const useCustomPages = ({
   React.Children.forEach(children, child => {
     if (!isThatComponent(child, PageComponent) && !isThatComponent(child, LinkComponent)) {
       if (child) {
-        errorInDevMode(customPagesIgnoredComponent(componentName));
+        logErrorInDevMode(customPagesIgnoredComponent(componentName));
       }
       return;
     }
@@ -79,7 +79,7 @@ const useCustomPages = ({
         // this is a custom page
         validChildren.push({ label, labelIcon, children, url });
       } else {
-        errorInDevMode(customPageWrongProps(componentName));
+        logErrorInDevMode(customPageWrongProps(componentName));
         return;
       }
     }
@@ -89,7 +89,7 @@ const useCustomPages = ({
         // This is an external link
         validChildren.push({ label, labelIcon, url });
       } else {
-        errorInDevMode(customLinkWrongProps(componentName));
+        logErrorInDevMode(customLinkWrongProps(componentName));
         return;
       }
     }

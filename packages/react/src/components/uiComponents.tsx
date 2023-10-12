@@ -25,7 +25,7 @@ import type {
   UserProfilePageProps,
   WithClerkProp,
 } from '../types';
-import { errorInDevMode, useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../utils';
+import { logErrorInDevMode, useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../utils';
 import { withClerk } from './withClerk';
 
 type UserProfileExportType = typeof _UserProfile & {
@@ -141,13 +141,13 @@ export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>
 }, 'SignUp');
 
 export function UserProfilePage({ children }: PropsWithChildren<UserProfilePageProps>) {
-  errorInDevMode(userProfilePageRenderedError);
-  return <div>{children}</div>;
+  logErrorInDevMode(userProfilePageRenderedError);
+  return <>{children}</>;
 }
 
 export function UserProfileLink({ children }: PropsWithChildren<UserProfileLinkProps>) {
-  errorInDevMode(userProfileLinkRenderedError);
-  return <div>{children}</div>;
+  logErrorInDevMode(userProfileLinkRenderedError);
+  return <>{children}</>;
 }
 
 const _UserProfile = withClerk(
@@ -189,18 +189,18 @@ const _UserButton = withClerk(
 );
 
 export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
-  UserProfilePage: UserProfilePage,
-  UserProfileLink: UserProfileLink,
+  UserProfilePage,
+  UserProfileLink,
 });
 
 export function OrganizationProfilePage({ children }: PropsWithChildren<OrganizationProfilePageProps>) {
-  errorInDevMode(organizationProfilePageRenderedError);
-  return <div>{children}</div>;
+  logErrorInDevMode(organizationProfilePageRenderedError);
+  return <>{children}</>;
 }
 
 export function OrganizationProfileLink({ children }: PropsWithChildren<OrganizationProfileLinkProps>) {
-  errorInDevMode(organizationProfileLinkRenderedError);
-  return <div>{children}</div>;
+  logErrorInDevMode(organizationProfileLinkRenderedError);
+  return <>{children}</>;
 }
 
 const _OrganizationProfile = withClerk(
@@ -253,8 +253,8 @@ const _OrganizationSwitcher = withClerk(
 );
 
 export const OrganizationSwitcher: OrganizationSwitcherExportType = Object.assign(_OrganizationSwitcher, {
-  OrganizationProfilePage: OrganizationProfilePage,
-  OrganizationProfileLink: OrganizationProfileLink,
+  OrganizationProfilePage,
+  OrganizationProfileLink,
 });
 
 export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationListProps>) => {

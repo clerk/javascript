@@ -1,6 +1,6 @@
 import { isDevelopmentEnvironment } from '@clerk/shared';
 
-export const errorInDevMode = (message: string) => {
+export const logErrorInDevMode = (message: string) => {
   if (isDevelopmentEnvironment()) {
     console.error(message);
   }
