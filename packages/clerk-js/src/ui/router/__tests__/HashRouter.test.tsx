@@ -1,4 +1,5 @@
-import { render, screen, userEvent } from '@clerk/shared/testUtils';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import type Clerk from '../../../core/clerk';

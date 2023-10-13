@@ -198,6 +198,8 @@ export default class IsomorphicClerk {
         await global.Clerk.load(this.options);
       }
 
+      global.Clerk.sdkMetadata = this.options.sdkMetadata ?? { name: PACKAGE_NAME, version: PACKAGE_VERSION };
+
       if (global.Clerk?.loaded || global.Clerk?.isReady()) {
         return this.hydrateClerkJS(global.Clerk);
       }
@@ -717,10 +719,10 @@ export default class IsomorphicClerk {
     }
   };
 
-  getOrganization = async (organizationId: string): Promise<OrganizationResource | undefined | void> => {
+  getOrganization = async (organizationId: string): Promise<OrganizationResource | void> => {
     const callback = () => this.clerkjs?.getOrganization(organizationId);
     if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<OrganizationResource | undefined>;
+      return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('getOrganization', callback);
     }

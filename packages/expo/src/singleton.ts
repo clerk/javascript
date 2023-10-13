@@ -4,6 +4,11 @@ import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
 import type { TokenCache } from './cache';
 
+Clerk.sdkMetadata = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+};
+
 const KEY = '__clerk_client_jwt';
 
 export let clerk: HeadlessBrowserClerk;

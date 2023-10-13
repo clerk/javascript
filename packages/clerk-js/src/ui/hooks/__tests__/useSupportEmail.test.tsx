@@ -1,4 +1,4 @@
-import { renderHook } from '@clerk/shared/testUtils';
+import { renderHook } from '@testing-library/react';
 
 import { useSupportEmail } from '../useSupportEmail';
 

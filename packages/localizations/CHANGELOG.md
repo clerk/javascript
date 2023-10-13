@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.26.4
+
+### Patch Changes
+
+- Add missing strings in Hebrew localization ([#1852](https://github.com/clerkinc/javascript/pull/1852)) by [@shadoworion](https://github.com/shadoworion)
+
+- Updated dependencies [[`997b8e256`](https://github.com/clerkinc/javascript/commit/997b8e256c8f83d68d0ae4243c7ea5640573d1ae), [`91e9a55f4`](https://github.com/clerkinc/javascript/commit/91e9a55f4b9f1a8f8d843a788597026015ddeafd), [`91014880d`](https://github.com/clerkinc/javascript/commit/91014880df71c2618d0b1e513da4dd19ccd809e3), [`7f4d4b942`](https://github.com/clerkinc/javascript/commit/7f4d4b942e8834462cdc0976b106d9739c345f6b)]:
+  - @clerk/types@3.55.0
+
 ## 1.26.3
 
 ### Patch Changes

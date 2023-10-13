@@ -22,6 +22,11 @@ import type { DeepPartial, DeepSnakeToCamel } from './utils';
 
 export type InstanceType = 'production' | 'development';
 
+export type SDKMetadata = {
+  name: string;
+  version: string;
+};
+
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: ActiveSessionResource | null) => void | Promise<any>;
@@ -55,6 +60,12 @@ export interface Clerk {
    * Clerk SDK version number.
    */
   version?: string;
+
+  /**
+   * If present, contains information about the SDK that the host application is using.
+   * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
+   */
+  sdkMetadata?: SDKMetadata;
 
   loaded: boolean;
 
@@ -431,7 +442,7 @@ export interface Clerk {
   /**
    * Retrieves a single organization by id.
    */
-  getOrganization: (organizationId: string) => Promise<OrganizationResource | undefined>;
+  getOrganization: (organizationId: string) => Promise<OrganizationResource>;
 
   /**
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly

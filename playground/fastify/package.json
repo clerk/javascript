@@ -8,6 +8,7 @@
   "dependencies": {
     "@clerk/backend": "file:.yalc/@clerk/backend",
     "@clerk/fastify": "file:.yalc/@clerk/fastify",
+    "@clerk/shared": "file:.yalc/@clerk/shared",
     "@clerk/types": "file:.yalc/@clerk/types",
     "@fastify/view": "^8.0.0",
     "dotenv": "^16.0.3",

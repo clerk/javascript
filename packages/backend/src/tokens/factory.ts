@@ -104,7 +104,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiUrl,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
-      proxyUrl: (runtimeProxyUrl || buildProxyUrl) as any,
+      proxyUrl: runtimeProxyUrl || buildProxyUrl,
       isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
       domain: (runtimeDomain || buildtimeDomain) as any,
       userAgent: runtimeUserAgent || buildUserAgent,

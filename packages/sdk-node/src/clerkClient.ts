@@ -5,12 +5,18 @@ import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import { loadApiEnv, loadClientEnv } from './utils';
 
+type ExtendedClerk = ReturnType<typeof _Clerk> & {
+  expressWithAuth: ReturnType<typeof createClerkExpressWithAuth>;
+  expressRequireAuth: ReturnType<typeof createClerkExpressRequireAuth>;
+  verifyToken: typeof _verifyToken;
+} & ReturnType<typeof createBasePropForRedwoodCompatibility>;
+
 /**
  * This needs to be a *named* function in order to support the older
  * new Clerk() syntax for v4 compatibility.
  * Arrow functions can never be called with the new keyword because they do not have the [[Construct]] method
  */
-export function Clerk(options: ClerkOptions) {
+export function Clerk(options: ClerkOptions): ExtendedClerk {
   const clerkClient = _Clerk(options);
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
@@ -19,13 +25,12 @@ export function Clerk(options: ClerkOptions) {
     return _verifyToken(token, { issuer, ...options, ...verifyOpts });
   };
 
-  return {
-    ...clerkClient,
+  return Object.assign(clerkClient, {
     expressWithAuth,
     expressRequireAuth,
     verifyToken,
     ...createBasePropForRedwoodCompatibility(),
-  };
+  });
 }
 
 const createBasePropForRedwoodCompatibility = () => {

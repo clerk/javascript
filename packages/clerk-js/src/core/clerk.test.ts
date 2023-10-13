@@ -5,7 +5,15 @@ import { mockNativeRuntime } from '../testUtils';
 import Clerk from './clerk';
 import { eventBus, events } from './events';
 import type { AuthConfig, DisplayConfig, Organization } from './resources/internal';
-import { Client, EmailLinkErrorCode, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
+import {
+  BaseResource,
+  Client,
+  EmailLinkErrorCode,
+  Environment,
+  MagicLinkErrorCode,
+  SignIn,
+  SignUp,
+} from './resources/internal';
 import { SessionCookieService } from './services';
 import { mockJwt } from './test/fixtures';
 
@@ -2010,6 +2018,22 @@ describe('Clerk singleton', () => {
 
       const url = sut.buildUrlWithAuth('https://rested-anemone-14.accounts.dev');
       expect(url).toBe('https://rested-anemone-14.accounts.dev/?__dev_session=deadbeef');
+    });
+  });
+
+  describe('Organizations', () => {
+    it('getOrganization', async () => {
+      // @ts-ignore
+      BaseResource._fetch = jest.fn().mockResolvedValue({});
+      const sut = new Clerk(devFrontendApi);
+
+      await sut.getOrganization('some-org-id');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'GET',
+        path: '/organizations/some-org-id',
+      });
     });
   });
 });

@@ -41,6 +41,7 @@ import type {
   PublishableKey,
   RedirectOptions,
   Resources,
+  SDKMetadata,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -144,7 +145,13 @@ const defaultOptions: ClerkOptions = {
 
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
+
   public static version: string = __PKG_VERSION__;
+  public static sdkMetadata: SDKMetadata = {
+    name: __PKG_NAME__,
+    version: __PKG_VERSION__,
+  };
+
   public client?: ClientResource;
   public session?: ActiveSessionResource | null;
   public organization?: OrganizationResource | null;
@@ -1145,10 +1152,8 @@ export default class Clerk implements ClerkInterface {
     return await OrganizationMembership.retrieve();
   };
 
-  public getOrganization = async (organizationId: string): Promise<Organization | undefined> => {
-    return (await OrganizationMembership.retrieve()).find(orgMem => orgMem.organization.id === organizationId)
-      ?.organization;
-  };
+  public getOrganization = async (organizationId: string): Promise<OrganizationResource> =>
+    Organization.get(organizationId);
 
   public updateEnvironment(environment: EnvironmentResource) {
     this.#environment = environment;

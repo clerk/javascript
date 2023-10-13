@@ -71,7 +71,7 @@ If you are using the previous version of Clerk keys, set `NEXT_PUBLIC_CLERK_FRON
 your `.env.local` file.
 
 ```sh
-NEXT_PUBLIC_CLERK_FRONTEND_API=clerk.[your-domain].[tld]
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
 ```
 
 An implementation of `<ClerkProvider />` with our flexible Control Components to build an authentication flow

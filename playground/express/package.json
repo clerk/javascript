@@ -12,6 +12,7 @@
   "dependencies": {
     "@clerk/backend": "file:.yalc/@clerk/backend",
     "@clerk/clerk-sdk-node": "file:.yalc/@clerk/clerk-sdk-node",
+    "@clerk/shared": "file:.yalc/@clerk/shared",
     "@clerk/types": "file:.yalc/@clerk/types",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.6",

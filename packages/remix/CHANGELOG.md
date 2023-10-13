@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.0.6
+
+### Patch Changes
+
+- Warn about environment variables deprecations: ([#1859](https://github.com/clerkinc/javascript/pull/1859)) by [@dimkl](https://github.com/dimkl)
+
+  - `CLERK_API_KEY`
+  - `CLERK_FRONTEND_API`
+  - `NEXT_PUBLIC_CLERK_FRONTEND_API`
+
+- Introduce a new property on the core Clerk singleton, `sdkMetadata`. This will be populated by each host SDK. This metadata will be used to make logging and debugging easier. ([#1857](https://github.com/clerkinc/javascript/pull/1857)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`977336f79`](https://github.com/clerkinc/javascript/commit/977336f793cd4ce5984f98dac3cedf9f5ec363f5), [`997b8e256`](https://github.com/clerkinc/javascript/commit/997b8e256c8f83d68d0ae4243c7ea5640573d1ae), [`91e9a55f4`](https://github.com/clerkinc/javascript/commit/91e9a55f4b9f1a8f8d843a788597026015ddeafd), [`c9b17f5a7`](https://github.com/clerkinc/javascript/commit/c9b17f5a72cb27786cfc7f1fb42be1233fb10d5c), [`91014880d`](https://github.com/clerkinc/javascript/commit/91014880df71c2618d0b1e513da4dd19ccd809e3), [`3848f8dbe`](https://github.com/clerkinc/javascript/commit/3848f8dbe094226c6062341405a32a9621042fd6), [`7f4d4b942`](https://github.com/clerkinc/javascript/commit/7f4d4b942e8834462cdc0976b106d9739c345f6b)]:
+  - @clerk/shared@0.24.4
+  - @clerk/clerk-react@4.26.4
+  - @clerk/types@3.55.0
+  - @clerk/backend@0.31.0
+
 ## 3.0.5
 
 ### Patch Changes
