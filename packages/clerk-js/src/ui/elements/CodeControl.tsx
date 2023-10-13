@@ -177,6 +177,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
         elementDescriptor={descriptors.otpCodeFieldInputs}
         gap={2}
         align='center'
+        sx={{ direction: 'ltr', width: 'max-content' }}
       >
         {values.map((value, index: number) => (
           <SingleCharInput
