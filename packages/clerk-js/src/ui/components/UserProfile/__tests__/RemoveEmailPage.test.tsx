@@ -8,7 +8,7 @@ const { createFixtures } = bindCreateFixtures('UserProfile');
 
 const initConfig = createFixtures.config(f => {
   f.withEmailAddress();
-  f.withUser({ email_addresses: [{ email_address: 'test@clerk.dev', id: 'id' }] });
+  f.withUser({ email_addresses: [{ email_address: 'test@clerk.com', id: 'id' }] });
 });
 
 describe('RemoveEmailPage', () => {
@@ -35,7 +35,7 @@ describe('RemoveEmailPage', () => {
       fixtures.router.params.id = 'id';
       render(<RemoveEmailPage />, { wrapper });
 
-      screen.getByText(/test@clerk.dev/);
+      screen.getByText(/test@clerk.com/);
     });
   });
 

@@ -9,7 +9,7 @@ if (JS_VERSION) {
 }
 export const CLERK_JS_VERSION = process.env.NEXT_PUBLIC_CLERK_JS_VERSION || '';
 export const CLERK_JS_URL = process.env.NEXT_PUBLIC_CLERK_JS || '';
-export const API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
+export const API_URL = process.env.CLERK_API_URL || 'https://api.clerk.com';
 export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 /**
  * @deprecated Use `CLERK_SECRET_KEY` instead.

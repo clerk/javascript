@@ -43,7 +43,7 @@ describe('ResetPassword', () => {
   });
 
   it('renders a hidden identifier field', async () => {
-    const identifier = 'test@clerk.dev';
+    const identifier = 'test@clerk.com';
     const { wrapper } = await createFixtures(f => {
       f.startSignInWithEmailAddress({ identifier });
     });

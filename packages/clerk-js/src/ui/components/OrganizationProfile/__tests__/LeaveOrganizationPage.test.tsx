@@ -13,7 +13,7 @@ describe('LeaveOrganizationPage', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
       });
     });
@@ -36,7 +36,7 @@ describe('LeaveOrganizationPage', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
       });
     });

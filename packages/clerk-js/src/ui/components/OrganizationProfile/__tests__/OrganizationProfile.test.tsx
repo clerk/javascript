@@ -12,7 +12,7 @@ describe('OrganizationProfile', () => {
   it('includes buttons for the bigger sections', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
     });
 
     const { getByText } = render(<OrganizationProfile />, { wrapper });

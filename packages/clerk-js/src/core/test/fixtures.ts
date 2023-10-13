@@ -68,7 +68,7 @@ export const createEmail = (params?: Partial<EmailAddressJSON>): EmailAddressJSO
   return {
     object: 'email_address',
     id: params?.email_address || '',
-    email_address: 'test@clerk.dev',
+    email_address: 'test@clerk.com',
     reserved: false,
     verification: {
       status: 'verified',
@@ -106,7 +106,7 @@ export const createExternalAccount = (params?: Partial<ExternalAccountJSON>): Ex
     identification_id: '98675202',
     provider_user_id: '3232',
     approved_scopes: '',
-    email_address: 'test@clerk.dev',
+    email_address: 'test@clerk.com',
     first_name: 'First name',
     last_name: 'Last name',
     avatar_url: '',

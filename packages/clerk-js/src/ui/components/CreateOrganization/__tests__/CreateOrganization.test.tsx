@@ -72,7 +72,7 @@ describe('CreateOrganization', () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
       });
     });
     const { getByText } = render(<CreateOrganization />, { wrapper });
@@ -83,7 +83,7 @@ describe('CreateOrganization', () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
       });
     });
 
@@ -111,7 +111,7 @@ describe('CreateOrganization', () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
       });
     });
 
@@ -139,7 +139,7 @@ describe('CreateOrganization', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
       });
     });
 
@@ -167,7 +167,7 @@ describe('CreateOrganization', () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
 
@@ -191,7 +191,7 @@ describe('CreateOrganization', () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
 

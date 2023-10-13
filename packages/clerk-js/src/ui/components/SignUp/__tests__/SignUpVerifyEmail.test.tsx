@@ -15,16 +15,16 @@ describe('SignUpVerifyEmail', () => {
   it('shows the email associated with the sign up', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
-      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
     render(<SignUpVerifyEmail />, { wrapper });
-    screen.getByText('test@clerk.dev');
+    screen.getByText('test@clerk.com');
   });
 
   it('shows the verify with link message', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true, verifications: ['email_link'] });
-      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
     fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
@@ -41,7 +41,7 @@ describe('SignUpVerifyEmail', () => {
   it('shows the verify with code message', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true, verifications: ['email_code'] });
-      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
     fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
@@ -58,7 +58,7 @@ describe('SignUpVerifyEmail', () => {
   it('clicking on the edit icon navigates to the previous route', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
-      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
     const { userEvent } = render(<SignUpVerifyEmail />, { wrapper });
     await userEvent.click(
@@ -72,7 +72,7 @@ describe('SignUpVerifyEmail', () => {
   it('Resend link button exists', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true, verifications: ['email_link'] });
-      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
     fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
@@ -90,7 +90,7 @@ describe('SignUpVerifyEmail', () => {
   it('Resend code button exists', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true, verifications: ['email_code'] });
-      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
     fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
