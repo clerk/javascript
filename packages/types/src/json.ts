@@ -267,6 +267,7 @@ export interface ClerkAPIErrorJSON {
     param_name?: string;
     session_id?: string;
     email_addresses?: string[];
+    identifiers?: string[];
     zxcvbn?: {
       suggestions: {
         code: string;

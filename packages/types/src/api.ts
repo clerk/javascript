@@ -9,6 +9,7 @@ export interface ClerkAPIError {
     paramName?: string;
     sessionId?: string;
     emailAddresses?: string[];
+    identifiers?: string[];
     zxcvbn?: {
       suggestions: {
         code: string;
