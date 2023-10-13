@@ -44,7 +44,7 @@
     "lint:publint": "publint",
     "lint:attw": "attw --pack .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%"
+    "test:ci": "jest --maxWorkers=70%"
   },
   "name": "@clerk/clerk-sdk-node",
   "author": {
