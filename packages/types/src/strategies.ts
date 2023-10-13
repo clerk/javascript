@@ -14,7 +14,4 @@ export type ResetPasswordEmailCodeStrategy = 'reset_password_email_code';
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 export type Web3Strategy = `web3_${Web3Provider}_signature`;
 
-/**
- * @experimental
- */
 export type SamlStrategy = 'saml';

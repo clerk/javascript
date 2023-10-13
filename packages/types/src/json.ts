@@ -164,9 +164,6 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   verification?: VerificationJSON;
 }
 
-/**
- * @experimental
- */
 export interface SamlAccountJSON extends ClerkResourceJSON {
   object: 'saml_account';
   provider: SamlIdpSlug;
@@ -197,9 +194,6 @@ export interface UserJSON extends ClerkResourceJSON {
   web3_wallets: Web3WalletJSON[];
   external_accounts: ExternalAccountJSON[];
 
-  /**
-   * @experimental
-   */
   saml_accounts: SamlAccountJSON[];
 
   organization_memberships: OrganizationMembershipJSON[];

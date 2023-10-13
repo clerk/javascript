@@ -28,9 +28,6 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   id = undefined;
   social!: OAuthProviders;
 
-  /**
-   * @experimental
-   */
   saml!: SamlSettings;
 
   attributes!: Attributes;

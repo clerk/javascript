@@ -3,9 +3,6 @@ import type { SamlAccountJSON, SamlAccountResource, SamlIdpSlug, VerificationRes
 import { BaseResource } from './Base';
 import { Verification } from './Verification';
 
-/**
- * @experimental
- */
 export class SamlAccount extends BaseResource implements SamlAccountResource {
   id!: string;
   provider: SamlIdpSlug = 'saml_custom';
