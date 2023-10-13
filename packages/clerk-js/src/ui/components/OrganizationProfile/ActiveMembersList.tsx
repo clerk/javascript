@@ -100,7 +100,7 @@ const MemberRow = (props: {
       <Td>{membership.createdAt.toLocaleDateString()}</Td>
       <Td>
         <Gate
-          permission={'org:memberships:manage'}
+          permission={'org:sys_memberships:manage'}
           fallback={
             <Text
               sx={t => ({ opacity: t.opacity.$inactive })}
@@ -116,7 +116,7 @@ const MemberRow = (props: {
         </Gate>
       </Td>
       <Td>
-        <Gate permission={'org:memberships:delete'}>
+        <Gate permission={'org:sys_memberships:delete'}>
           <ThreeDotsMenu
             actions={[
               {

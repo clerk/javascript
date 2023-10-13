@@ -325,7 +325,7 @@ describe('OrganizationMembers', () => {
       f.withOrganizationDomains();
       f.withUser({
         email_addresses: ['test@clerk.dev'],
-        organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
 

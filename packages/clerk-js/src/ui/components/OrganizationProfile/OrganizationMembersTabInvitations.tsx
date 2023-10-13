@@ -26,7 +26,7 @@ export const OrganizationMembersTabInvitations = () => {
       {__unstable_manageBillingUrl && <MembershipWidget />}
 
       {isDomainsEnabled && (
-        <Gate permission={'org:domains:manage'}>
+        <Gate permission={'org:sys_domains:manage'}>
           <Col
             gap={2}
             sx={{

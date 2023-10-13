@@ -21,7 +21,7 @@ import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
-  const { isAuthorizedUser: canManageMemberships } = useGate({ permission: 'org:memberships:manage' });
+  const { isAuthorizedUser: canManageMemberships } = useGate({ permission: 'org:sys_memberships:manage' });
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
   const { membershipRequests } = useCoreOrganization({
     membershipRequests: isDomainsEnabled || undefined,
