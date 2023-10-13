@@ -26,7 +26,7 @@ export const OrganizationSettings = () => {
           <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__settings')} />
         </Header.Root>
         <OrganizationProfileSection />
-        <Gate permission='org:domains:manage'>
+        <Gate permission='org:sys_domains:manage'>
           <OrganizationDomainsSection />
         </Gate>
         <OrganizationDangerSection />
@@ -56,7 +56,7 @@ const OrganizationProfileSection = () => {
       id='organizationProfile'
     >
       <Gate
-        permission={'org:profile:manage'}
+        permission={'org:sys_profile:manage'}
         fallback={<>{profile}</>}
       >
         <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton>
@@ -97,21 +97,15 @@ const OrganizationDomainsSection = () => {
 };
 
 const OrganizationDangerSection = () => {
-  // TODO: update this in order to filter by permissions
-  const { organization, memberships: adminMembers } = useCoreOrganization({
-    memberships: {
-      role: ['admin'],
-    },
-  });
+  const { organization } = useCoreOrganization();
   const { navigate } = useRouter();
-  const { isAuthorizedUser: canDeleteOrganization } = useGate({ permission: 'org:profile:delete' });
+  const { isAuthorizedUser: canDeleteOrganization } = useGate({ permission: 'org:sys_profile:delete' });
 
   if (!organization) {
     return null;
   }
 
   const adminDeleteEnabled = organization.adminDeleteEnabled;
-  const hasMoreThanOneAdmin = (adminMembers?.count || 0) > 1;
 
   return (
     <ProfileSection
@@ -133,8 +127,6 @@ const OrganizationDangerSection = () => {
           colorScheme='danger'
           textVariant='buttonExtraSmallBold'
           onClick={() => navigate('leave')}
-          // TODO: rewrite to check if user has all clerk permissions and there are more than 1 admins
-          isDisabled={!!canDeleteOrganization && !hasMoreThanOneAdmin}
           localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
         />
         {canDeleteOrganization && adminDeleteEnabled && (

@@ -22,7 +22,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
             flowStart
           >
             <Gate
-              permission={'org:profile:manage'}
+              permission={'org:sys_profile:manage'}
               redirectTo='../'
             >
               <ProfileSettingsPage />
@@ -35,7 +35,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
             <Switch>
               <Route path=':id/verify'>
                 <Gate
-                  permission={'org:domains:manage'}
+                  permission={'org:sys_domains:manage'}
                   redirectTo='../../'
                 >
                   <VerifyDomainPage />
@@ -43,7 +43,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
               </Route>
               <Route path=':id/remove'>
                 <Gate
-                  permission={'org:domains:delete'}
+                  permission={'org:sys_domains:delete'}
                   redirectTo='../../'
                 >
                   <RemoveDomainPage />
@@ -51,7 +51,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
               </Route>
               <Route path=':id'>
                 <Gate
-                  permission={'org:domains:manage'}
+                  permission={'org:sys_domains:manage'}
                   redirectTo='../../'
                 >
                   <VerifiedDomainPage />
@@ -59,7 +59,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
               </Route>
               <Route index>
                 <Gate
-                  permission={'org:domains:manage'}
+                  permission={'org:sys_domains:manage'}
                   redirectTo='../'
                 >
                   <AddDomainPage />
@@ -78,7 +78,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
             flowStart
           >
             <Gate
-              permission={'org:profile:delete'}
+              permission={'org:sys_profile:delete'}
               redirectTo='../'
             >
               <DeleteOrganizationPage />
@@ -96,7 +96,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
             flowStart
           >
             <Gate
-              permission={'org:memberships:manage'}
+              permission={'org:sys_memberships:manage'}
               redirectTo='../'
             >
               <InviteMembersPage />

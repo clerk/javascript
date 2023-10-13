@@ -296,8 +296,7 @@ describe('OrganizationMembers', () => {
     expect(queryByText('Member')).toBeInTheDocument();
   });
 
-  // TODO: remove skip once OrganizationMembers uses permission based checks
-  it.skip('changes tab and renders pending requests', async () => {
+  it('changes tab and renders pending requests', async () => {
     const requests = {
       data: [
         createFakeOrganizationMembershipRequest({

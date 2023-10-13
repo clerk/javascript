@@ -154,6 +154,6 @@ export const DomainList = withGate(
     );
   },
   {
-    permission: 'org:domains:manage',
+    permission: 'org:sys_domains:manage',
   },
 );
