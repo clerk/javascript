@@ -1,0 +1,10 @@
+storage: ./.verdaccio/storage
+auth:
+  htpasswd:
+    file: ./.verdaccio/htpasswd
+packages:
+  '**':
+    access: $all
+    publish: $all
+    proxy: npmjs
+log: { type: stdout, format: pretty, level: http }

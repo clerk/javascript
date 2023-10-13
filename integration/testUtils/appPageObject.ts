@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-import type { Application } from '../adapters/application';
+import type { Application } from '../models/application';
 
 export const createAppPageObject = (testArgs: { page: Page }, app: Application) => {
   const { page } = testArgs;

@@ -1,0 +1,32 @@
+name: Nightly upstream tests
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * *'
+
+jobs:
+  build:
+    name: Build packages and upload artifacts
+    uses: ./.github/workflows/base-build.yml
+
+  integration-nextjs:
+    name: Integration (NextJS canary)
+    needs: build
+    uses: ./.github/workflows/base-e2e.yml
+    with:
+      SCRIPT: 'E2E_NEXTJS_VERSION=canary npm run test:integration:nextjs'
+    secrets: inherit
+
+  notify-slack:
+    name: Notify Slack
+    needs: integration-nextjs
+    if: ${{ contains(needs.*.result, 'failure') }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    steps:
+      - name: Report Status
+        uses: ravsamhq/notify-slack-action@v1
+        with:
+          status: 'failure'
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SDK_E2E_ALERTS_WEBHOOK_URL }}

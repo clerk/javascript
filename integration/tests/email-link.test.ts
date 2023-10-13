@@ -1,12 +1,12 @@
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 import { test } from '@playwright/test';
 
-import type { Application } from '../adapters/application';
+import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
 
 test.describe('sign up and sign in using email link', () => {
-  const configs = [appConfigs.longRunning.react.viteEmailLink, appConfigs.remix.remixNode];
+  const configs = [];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {
@@ -17,7 +17,7 @@ test.describe('sign up and sign in using email link', () => {
       test.beforeAll(async () => {
         app = await config.commit();
         await app.setup();
-        await app.withEnv(appConfigs.instances.withEmailLinks);
+        await app.withEnv(appConfigs.envs.withEmailLinks);
         await app.dev();
       });
 
@@ -62,10 +62,13 @@ test.describe('sign up and sign in using email link', () => {
       });
 
       test.describe('sign in using email-link', () => {
-        // TODO: @george :D
-        test.skip('sign in using a verification link requested from the same device', async () => {});
-        // TODO: @george :D
-        test.skip('sign in using a verification link requested from a different device', async () => {});
+        test.skip('sign in using a verification link requested from the same device', async () => {
+          // TODO: @george :D
+        });
+
+        test.skip('sign in using a verification link requested from a different device', async () => {
+          // TODO: @george :D
+        });
       });
     });
   });

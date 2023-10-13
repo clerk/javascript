@@ -12,7 +12,7 @@ concurrency:
 jobs:
   snapshot-release:
     if: ${{ startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerkinc/javascript' && github.event.issue.pull_request }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNNER_LARGE }}
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}

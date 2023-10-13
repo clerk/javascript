@@ -37,6 +37,8 @@
     "clean": "rimraf ./dist",
     "clean:tests": "rimraf ./tests/dist",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "test": "run-s clean:tests build:runtime build:tests test:node test:edge-runtime test:cloudflare-miniflare",
     "test:node": "./tests/node/run.sh",
     "test:edge-runtime": "./tests/edge-runtime/run.sh",

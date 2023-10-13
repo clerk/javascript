@@ -1,7 +1,7 @@
 import { Clerk } from '@clerk/backend';
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 
-import type { Application } from '../adapters/application';
+import type { Application } from '../models/application';
 import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
@@ -92,3 +92,5 @@ export const createTestUtils = <
 
   return { page, services, po: pageObjects, tabs: browserHelpers } as any;
 };
+
+export { testAgainstRunningApps } from './testAgainstRunningApps';

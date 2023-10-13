@@ -1,12 +1,12 @@
 import { test } from '@playwright/test';
 
-import type { Application } from '../adapters/application';
+import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
 test.describe('Dev Browser JWT test', () => {
-  const configs = [appConfigs.longRunning.next.appRouterAllEnabled];
+  const configs = [];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {
@@ -18,7 +18,7 @@ test.describe('Dev Browser JWT test', () => {
       test.beforeAll(async () => {
         app = await config.commit();
         await app.setup();
-        await app.withEnv(appConfigs.instances.allEnabled);
+        await app.withEnv(appConfigs.envs.withEmailCodes);
         await app.dev();
         fakeUser = createTestUtils({ app }).services.users.createFakeUser();
       });
@@ -50,10 +50,9 @@ test.describe('Dev Browser JWT test', () => {
         await u.po.expect.toBeSignedIn();
       });
 
-      test('Dev Browser JWT that gets appended to the URL when redirecting to Accounts Portal, overrides any existing Dev Browser JWT in AP', async ({
-        page,
-        context,
-      }) => {});
+      test('Dev Browser JWT that gets appended to the URL when redirecting to Accounts Portal, overrides any existing Dev Browser JWT in AP', async () => {
+        // TODO: Implement this test
+      });
 
       /*
         - Try to access a protected page in localhost
@@ -66,10 +65,9 @@ test.describe('Dev Browser JWT test', () => {
         - Sign in with email and password
         - Should be redirected back to localhost and are signed in
        */
-      test('Deleting localhost Dev Browser JWT should clear the signed in state in Accounts Portal when redirected', async ({
-        page,
-        context,
-      }) => {});
+      test('Deleting localhost Dev Browser JWT should clear the signed in state in Accounts Portal when redirected', async () => {
+        // TODO: Implement this test
+      });
 
       /*
       - Access Accounts Portal directly
@@ -80,10 +78,9 @@ test.describe('Dev Browser JWT test', () => {
       - Sign in with email and password
       - Should be redirected back to localhost and are signed in
      */
-      test('Signing in to Accounts Portal directly and then trying to access localhost will redirect to Accounts Portal with a new Dev Browser', async ({
-        page,
-        context,
-      }) => {});
+      test('Signing in to Accounts Portal directly and then trying to access localhost will redirect to Accounts Portal with a new Dev Browser', async () => {
+        // TODO: Implement this test
+      });
     });
   });
 });

@@ -2,7 +2,7 @@ import * as path from 'node:path';
 
 import treekill from 'tree-kill';
 
-import { createLogger, fs, getPort, run, waitForIdleProcess } from '../utils';
+import { createLogger, fs, getPort, run, waitForIdleProcess, waitForServer } from '../scripts';
 import type { ApplicationConfig } from './applicationConfig.js';
 import type { EnvironmentConfig } from './environment.js';
 
@@ -10,11 +10,12 @@ export type Application = ReturnType<typeof application>;
 
 export const application = (config: ApplicationConfig, appDirPath: string, appDirName: string) => {
   const { name, scripts, envWriter } = config;
-  // TODO: Revise how serverUrl is set
-  // It is currently set by serve and dev
   const logger = createLogger({ prefix: `${appDirName}` });
   const state = { completedSetup: false, serverUrl: '', env: {} as EnvironmentConfig };
-  const cleanupFns: { (): any }[] = [];
+  const cleanupFns: { (): unknown }[] = [];
+  const now = Date.now();
+  const stdoutFilePath = path.resolve(appDirPath, `e2e.${now}.log`);
+  const stderrFilePath = path.resolve(appDirPath, `e2e.${now}.err.log`);
 
   const self = {
     name,
@@ -52,9 +53,18 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
         state.serverUrl = serverUrl;
         return { port, serverUrl };
       }
-      const proc = run(scripts.dev, { cwd: appDirPath, env: { PORT: port.toString() }, log, detached: opts.detached });
+
+      const proc = run(scripts.dev, {
+        cwd: appDirPath,
+        env: { PORT: port.toString() },
+        detached: opts.detached,
+        stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
+        stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
+        log: opts.detached ? undefined : log,
+      });
+      await waitForServer(serverUrl, { log, maxAttempts: Infinity });
+      log(`Server started at ${serverUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => treekill(proc.pid, 'SIGKILL'));
-      await waitForIdleProcess(proc);
       state.serverUrl = serverUrl;
       return { port, serverUrl, pid: proc.pid };
     },
@@ -66,7 +76,9 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
       const port = opts.port || (await getPort());
       const serverUrl = `http://localhost:${port}`;
       const log = logger.child({ prefix: 'serve' }).info;
-      const proc = run(scripts.serve, { cwd: appDirPath, env: { PORT: port.toString() }, log });
+      // If this is ever used as a background process, we need to make sure
+      // it's not using the log function. See the dev() method above
+      const proc = run(scripts.serve, { cwd: appDirPath, env: { PORT: port.toString() } });
       cleanupFns.push(() => treekill(proc.pid, 'SIGKILL'));
       await waitForIdleProcess(proc);
       state.serverUrl = serverUrl;

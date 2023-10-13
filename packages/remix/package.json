@@ -55,7 +55,9 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack ."
   },
   "dependencies": {
     "@clerk/backend": "0.31.0",

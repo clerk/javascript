@@ -3,6 +3,7 @@
   "remoteCache": {
     "signature": true
   },
+
   "globalDependencies": [
     "packages/eslint-config-custom/index.js",
     "package.json",
@@ -62,6 +63,14 @@
       "outputs": []
     },
     "lint": {
+      "dependsOn": [],
+      "outputs": []
+    },
+    "lint:publint": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "lint:attw": {
       "dependsOn": [],
       "outputs": []
     },
