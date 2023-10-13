@@ -2,6 +2,7 @@ import { isDevelopmentEnvironment } from '@clerk/shared';
 import type { CustomPage } from '@clerk/types';
 
 import { isValidUrl } from '../../utils';
+import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements';
 import { CogFilled, TickShield, User } from '../icons';
 import { localizationKeys } from '../localization';
@@ -14,7 +15,7 @@ export type CustomPageContent = {
 };
 
 type ProfileReorderItem = {
-  label: 'account' | 'security';
+  label: 'account' | 'security' | 'members' | 'settings';
 };
 
 type ProfileCustomPage = {
@@ -184,6 +185,7 @@ const checkForDuplicateUsageOfReorderingItems = (customPages: CustomPage[], vali
     return [...acc, cp.label];
   }, [] as string[]);
 };
+
 //path !== '/' && path !== 'account'
 const warnForDuplicatePaths = (routes: NavbarRoute[], pathsToFilter: string[]) => {
   const paths = routes
@@ -243,27 +245,27 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
       name: localizationKeys('userProfile.start.headerTitle__account'),
-      id: 'account',
+      id: USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT,
       icon: User,
       path: 'account',
     },
     {
       name: localizationKeys('userProfile.start.headerTitle__security'),
-      id: 'security',
+      id: USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
       icon: TickShield,
       path: 'account',
     },
   ];
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
-    profile: INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'email-address': INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'phone-number': INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'connected-account': INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'web3-wallet': INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    username: INITIAL_ROUTES.find(r => r.id === 'account') as NavbarRoute,
-    'multi-factor': INITIAL_ROUTES.find(r => r.id === 'security') as NavbarRoute,
-    password: INITIAL_ROUTES.find(r => r.id === 'security') as NavbarRoute,
+    profile: INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT) as NavbarRoute,
+    'email-address': INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT) as NavbarRoute,
+    'phone-number': INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT) as NavbarRoute,
+    'connected-account': INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT) as NavbarRoute,
+    'web3-wallet': INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT) as NavbarRoute,
+    username: INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT) as NavbarRoute,
+    'multi-factor': INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY) as NavbarRoute,
+    password: INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY) as NavbarRoute,
   };
 
   const validReorderItemLabels: string[] = INITIAL_ROUTES.map(r => r.id);
@@ -275,24 +277,24 @@ const getOrganizationProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
       name: localizationKeys('organizationProfile.start.headerTitle__members'),
-      id: 'members',
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS,
       icon: User,
       path: 'organization-members',
     },
     {
       name: localizationKeys('organizationProfile.start.headerTitle__settings'),
-      id: 'settings',
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS,
       icon: CogFilled,
       path: 'organization-settings',
     },
   ];
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
-    'invite-members': INITIAL_ROUTES.find(r => r.id === 'members') as NavbarRoute,
-    domain: INITIAL_ROUTES.find(r => r.id === 'settings') as NavbarRoute,
-    profile: INITIAL_ROUTES.find(r => r.id === 'settings') as NavbarRoute,
-    leave: INITIAL_ROUTES.find(r => r.id === 'settings') as NavbarRoute,
-    delete: INITIAL_ROUTES.find(r => r.id === 'settings') as NavbarRoute,
+    'invite-members': INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS) as NavbarRoute,
+    domain: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS) as NavbarRoute,
+    profile: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS) as NavbarRoute,
+    leave: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS) as NavbarRoute,
+    delete: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS) as NavbarRoute,
   };
 
   const validReorderItemLabels: string[] = INITIAL_ROUTES.map(r => r.id);

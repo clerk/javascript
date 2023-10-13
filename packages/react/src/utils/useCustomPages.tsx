@@ -1,3 +1,4 @@
+import { logErrorInDevMode } from '@clerk/shared';
 import type { CustomPage } from '@clerk/types';
 import type { ReactElement } from 'react';
 import React from 'react';
@@ -10,7 +11,6 @@ import {
 } from '../components/uiComponents';
 import { customLinkWrongProps, customPagesIgnoredComponent, customPageWrongProps } from '../errors';
 import type { UserProfilePageProps } from '../types';
-import { logErrorInDevMode } from './logErrorInDevMode';
 import type { UseCustomElementPortalParams, UseCustomElementPortalReturn } from './useCustomElementPortal';
 import { useCustomElementPortal } from './useCustomElementPortal';
 

@@ -1,3 +1,4 @@
+import { logErrorInDevMode } from '@clerk/shared';
 import type {
   CreateOrganizationProps,
   OrganizationListProps,
@@ -25,7 +26,7 @@ import type {
   UserProfilePageProps,
   WithClerkProp,
 } from '../types';
-import { logErrorInDevMode, useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../utils';
+import { useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../utils';
 import { withClerk } from './withClerk';
 
 type UserProfileExportType = typeof _UserProfile & {

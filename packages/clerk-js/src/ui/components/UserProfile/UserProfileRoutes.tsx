@@ -1,4 +1,5 @@
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
+import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useUserProfileContext } from '../../contexts';
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
@@ -25,7 +26,9 @@ import { Web3Page } from './Web3Page';
 
 export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardContent>) => {
   const { pages } = useUserProfileContext();
-  const isAccountPageRoot = pages.routes[0].id === 'account' || pages.routes[0].id === 'security';
+  const isAccountPageRoot =
+    pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT ||
+    pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isAccountPageRoot && index === 0;

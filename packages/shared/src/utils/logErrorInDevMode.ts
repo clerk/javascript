@@ -1,4 +1,4 @@
-import { isDevelopmentEnvironment } from '@clerk/shared';
+import { isDevelopmentEnvironment } from './runtimeEnvironment';
 
 export const logErrorInDevMode = (message: string) => {
   if (isDevelopmentEnvironment()) {
