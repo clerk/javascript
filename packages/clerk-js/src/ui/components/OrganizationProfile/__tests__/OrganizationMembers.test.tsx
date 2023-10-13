@@ -285,10 +285,8 @@ describe('OrganizationMembers', () => {
         total_count: 2,
       }),
     );
-    const { queryByText, getByRole } = render(<OrganizationMembers />, { wrapper });
-    await waitFor(async () => {
-      await userEvent.click(getByRole('tab', { name: 'Invitations' }));
-    });
+    const { queryByText, findByRole } = render(<OrganizationMembers />, { wrapper });
+    await userEvent.click(await findByRole('tab', { name: 'Invitations' }));
     expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
     expect(queryByText('admin1@clerk.dev')).toBeInTheDocument();
     expect(queryByText('Admin')).toBeInTheDocument();
