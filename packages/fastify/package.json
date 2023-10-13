@@ -26,7 +26,8 @@
     "lint:publint": "publint",
     "lint:attw": "attw --pack .",
     "publish:local": "npx yalc push --replace  --sig",
-    "test": "jest"
+    "test": "jest",
+    "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
     "@clerk/backend": "0.31.2",

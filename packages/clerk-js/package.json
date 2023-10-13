@@ -37,6 +37,7 @@
     "lint:publint": "publint",
     "lint:attw": "attw --pack .",
     "test": "jest",
+    "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "watch": "webpack --config webpack.config.js --env production --watch"

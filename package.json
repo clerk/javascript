@@ -66,6 +66,7 @@
     "dev:js": "FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
     "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%}",
+    "test:cache:clear": "FORCE_COLOR=1 turbo test:cache:clear --continue --concurrency=${TURBO_CONCURRENCY:-80%}",
     "test:ci": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%}",
     "test:integration:base": "DEBUG=1 npx playwright test --config integration/playwright.config.ts",
     "test:integration:generic": "E2E_APP_ID=react.vite.* npm run test:integration:base -- --grep @generic",

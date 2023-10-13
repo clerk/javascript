@@ -58,6 +58,9 @@
       "dependsOn": ["build"],
       "outputs": []
     },
+    "test:cache:clear": {
+      "cache": false
+    },
     "test:ci": {
       "dependsOn": ["build"],
       "outputs": []
