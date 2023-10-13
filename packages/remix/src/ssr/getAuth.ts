@@ -18,7 +18,7 @@ export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): 
   }
 
   if (requestState.isInterstitial) {
-    throw interstitialJsonResponse(requestState, { loader: 'nested' });
+    throw interstitialJsonResponse(requestState, { loader: 'nested' }, args.context);
   }
 
   return sanitizeAuthObject(requestState.toAuth());

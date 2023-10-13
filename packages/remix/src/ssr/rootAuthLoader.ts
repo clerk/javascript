@@ -53,12 +53,12 @@ export const rootAuthLoader: RootAuthLoader = async (
   }
 
   if (requestState.isInterstitial) {
-    throw interstitialJsonResponse(requestState, { loader: 'root' });
+    throw interstitialJsonResponse(requestState, { loader: 'root' }, args.context);
   }
 
   if (!handler) {
     // if the user did not provide a handler, simply inject requestState into an empty response
-    return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState);
+    return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState, args.context);
   }
 
   const handlerResult = await handler(injectAuthIntoRequest(args, sanitizeAuthObject(requestState.toAuth())));
@@ -72,7 +72,7 @@ export const rootAuthLoader: RootAuthLoader = async (
       }
       // clone and try to inject requestState into all json-like responses
       // if this fails, the user probably didn't return a json object or a valid json string
-      return injectRequestStateIntoResponse(handlerResult, requestState);
+      return injectRequestStateIntoResponse(handlerResult, requestState, args.context);
     } catch (e) {
       throw new Error(invalidRootLoaderCallbackReturn);
     }
@@ -81,5 +81,5 @@ export const rootAuthLoader: RootAuthLoader = async (
   // if the return value of the user's handler is null or a plain object, create an empty response to inject Clerk's state into
   const responseBody = JSON.stringify(handlerResult ?? {});
 
-  return injectRequestStateIntoResponse(new Response(responseBody), requestState);
+  return injectRequestStateIntoResponse(new Response(responseBody), requestState, args.context);
 };

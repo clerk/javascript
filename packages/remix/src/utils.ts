@@ -31,14 +31,14 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
  * @param name
  * @returns
  */
-export const getEnvVariable = (name: string, context?: AppLoadContext): string => {
+export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string => {
   // Node envs
   if (typeof process !== 'undefined') {
     return (process.env && process.env[name]) || '';
   }
 
   // Cloudflare pages
-  if (context) {
+  if (typeof context !== 'undefined') {
     const contextEnv = context?.env as Record<string, string>;
 
     return contextEnv[name] || (context[name] as string) || '';

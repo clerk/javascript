@@ -30,7 +30,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const secretKey = opts.secretKey || getEnvVariable('CLERK_SECRET_KEY', context) || '';
   const apiKey = opts.apiKey || getEnvVariable('CLERK_API_KEY', context) || '';
   if (apiKey) {
-    if (getEnvVariable('CLERK_API_KEY')) {
+    if (getEnvVariable('CLERK_API_KEY', context)) {
       deprecated('CLERK_API_KEY', 'Use `CLERK_SECRET_KEY` instead.');
     } else {
       deprecated('apiKey', 'Use `secretKey` instead.');
@@ -43,7 +43,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const frontendApi = opts.frontendApi || getEnvVariable('CLERK_FRONTEND_API', context) || '';
   if (frontendApi) {
-    if (getEnvVariable('CLERK_FRONTEND_API')) {
+    if (getEnvVariable('CLERK_FRONTEND_API', context)) {
       deprecated('CLERK_FRONTEND_API', 'Use `CLERK_PUBLISHABLE_KEY` instead.');
     } else {
       deprecated('frontendApi', 'Use `publishableKey` instead.');
