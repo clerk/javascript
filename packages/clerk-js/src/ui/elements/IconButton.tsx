@@ -20,7 +20,7 @@ export const IconButton = (
   ) : (
     <Icon
       elementDescriptor={iconElementDescriptor}
-      icon={icon}
+      icon={icon as React.ComponentType}
       size='md'
     />
   );
