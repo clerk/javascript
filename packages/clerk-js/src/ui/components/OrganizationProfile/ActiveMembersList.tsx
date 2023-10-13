@@ -1,5 +1,6 @@
 import type { MembershipRole, OrganizationMembershipResource } from '@clerk/types';
 
+import { Gate } from '../../common/Gate';
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
@@ -8,22 +9,9 @@ import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
 export const ActiveMembersList = () => {
   const card = useCardState();
-  const {
-    organization,
-    membership: currentUserMembership,
-    memberships,
-    ...rest
-  } = useCoreOrganization({
+  const { organization, memberships, ...rest } = useCoreOrganization({
     memberships: true,
   });
-
-  const { memberships: adminMembers } = useCoreOrganization({
-    memberships: {
-      role: ['admin'],
-    },
-  });
-
-  const isAdmin = currentUserMembership?.role === 'admin';
 
   const mutateSwrState = () => {
     const unstable__mutate = (rest as any).unstable__mutate;
@@ -37,25 +25,17 @@ export const ActiveMembersList = () => {
   }
 
   const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
-    if (!isAdmin) {
-      return;
-    }
     return card
       .runAsync(async () => {
         await membership.update({ role: newRole });
-        await (adminMembers as any).unstable__mutate?.();
       })
       .catch(err => handleError(err, [], card.setError));
   };
 
   const handleRemove = (membership: OrganizationMembershipResource) => () => {
-    if (!isAdmin) {
-      return;
-    }
     return card
       .runAsync(async () => {
-        const destroyedMembership = membership.destroy();
-        await (adminMembers as any).unstable__mutate?.();
+        const destroyedMembership = await membership.destroy();
         return destroyedMembership;
       })
       .then(mutateSwrState)
@@ -82,27 +62,23 @@ export const ActiveMembersList = () => {
           membership={m}
           onRoleChange={handleRoleChange(m)}
           onRemove={handleRemove(m)}
-          adminCount={adminMembers?.count || 0}
         />
       ))}
     />
   );
 };
 
+// TODO: Find a way to disable Role select based on last admin by using permissions
 const MemberRow = (props: {
   membership: OrganizationMembershipResource;
   onRemove: () => unknown;
-  adminCount: number;
   onRoleChange?: (role: MembershipRole) => unknown;
 }) => {
-  const { membership, onRemove, onRoleChange, adminCount } = props;
+  const { membership, onRemove, onRoleChange } = props;
   const card = useCardState();
-  const { membership: currentUserMembership } = useCoreOrganization();
   const user = useCoreUser();
 
-  const isAdmin = currentUserMembership?.role === 'admin';
   const isCurrentUser = user.id === membership.publicUserData.userId;
-  const isLastAdmin = adminCount <= 1 && membership.role === 'admin';
 
   return (
     <RowContainer>
@@ -123,21 +99,24 @@ const MemberRow = (props: {
       </Td>
       <Td>{membership.createdAt.toLocaleDateString()}</Td>
       <Td>
-        {isAdmin ? (
+        <Gate
+          permission={'org:sys_memberships:manage'}
+          fallback={
+            <Text
+              sx={t => ({ opacity: t.opacity.$inactive })}
+              localizationKey={roleLocalizationKey(membership.role)}
+            />
+          }
+        >
           <RoleSelect
-            isDisabled={card.isLoading || !onRoleChange || isLastAdmin}
+            isDisabled={card.isLoading || !onRoleChange}
             value={membership.role}
             onChange={onRoleChange}
           />
-        ) : (
-          <Text
-            sx={t => ({ opacity: t.opacity.$inactive })}
-            localizationKey={roleLocalizationKey(membership.role)}
-          />
-        )}
+        </Gate>
       </Td>
       <Td>
-        {isAdmin && (
+        <Gate permission={'org:sys_memberships:delete'}>
           <ThreeDotsMenu
             actions={[
               {
@@ -149,7 +128,7 @@ const MemberRow = (props: {
             ]}
             elementId={'member'}
           />
-        )}
+        </Gate>
       </Td>
     </RowContainer>
   );
