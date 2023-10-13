@@ -9,6 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "moduleResolution": "NodeNext",
+    "module": "NodeNext",
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "noUnusedParameters": true,

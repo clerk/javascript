@@ -9,7 +9,7 @@
     "isolatedModules": true,
     "jsx": "react",
     "lib": ["es6", "dom"],
-    "module": "commonjs",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noImplicitReturns": true,
     "noUnusedLocals": true,

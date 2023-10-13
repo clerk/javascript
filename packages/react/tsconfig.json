@@ -9,6 +9,7 @@
     "jsx": "react",
     "lib": ["es6", "dom"],
     "moduleResolution": "NodeNext",
+    "module": "NodeNext",
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "noUnusedParameters": true,
