@@ -509,9 +509,6 @@ export type HandleOAuthCallbackParams = {
   verifyPhoneNumberUrl?: string | null;
 };
 
-/**
- * @experimental
- */
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
 
 export type BuildUrlWithAuthParams = {

@@ -62,9 +62,6 @@ export class User extends BaseResource implements UserResource {
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
 
-  /**
-   * @experimental
-   */
   samlAccounts: SamlAccountResource[] = [];
 
   organizationMemberships: OrganizationMembershipResource[] = [];

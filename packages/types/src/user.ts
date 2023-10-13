@@ -72,9 +72,6 @@ export interface UserResource extends ClerkResource {
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
 
-  /**
-   * @experimental
-   */
   samlAccounts: SamlAccountResource[];
 
   organizationMemberships: OrganizationMembershipResource[];
