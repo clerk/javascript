@@ -29,7 +29,7 @@ const common = ({ mode }) => {
   return {
     mode,
     resolve: {
-      extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
     },
     plugins: [
       new webpack.DefinePlugin({
@@ -100,7 +100,7 @@ const svgLoader = () => {
 /** @type { () => (import('webpack').RuleSetRule) } */
 const typescriptLoaderProd = () => {
   return {
-    test: /\.(ts|js)x?$/,
+    test: /\.(js|mjs|jsx|ts|tsx)$/,
     exclude: /node_modules/,
     resolve: {
       fullySpecified: false,
@@ -117,7 +117,7 @@ const typescriptLoaderProd = () => {
 /** @type { () => (import('webpack').RuleSetRule) } */
 const typescriptLoaderDev = () => {
   return {
-    test: /\.(ts|js)x?$/,
+    test: /\.(js|mjs|jsx|ts|tsx)$/,
     exclude: /node_modules/,
     resolve: {
       fullySpecified: false,
