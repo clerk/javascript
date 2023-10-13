@@ -189,6 +189,6 @@ const NotificationCountBadgeManageButton = withGate(
   },
   {
     // if the user is not able to accept a request we should not notify them
-    permission: 'org:memberships:manage',
+    permission: 'org:sys_memberships:manage',
   },
 );
