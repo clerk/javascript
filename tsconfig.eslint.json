@@ -5,16 +5,16 @@
     "allowJs": true
   },
   "include": [
-    "packages/*/src",
-    "packages/**/*.ts",
-    "packages/**/*.tsx",
-    "packages/*/*.js",
-    "integration/**/*.ts",
-    "integration/**/*.tsx",
-    "integration/*/*.js",
     ".eslintrc.js",
     "commitlint.config.js",
-    "scripts/*.mjs",
-    "setupJest.afterEnv.ts"
+    "jest.*.ts",
+    "integration/*/*.js",
+    "integration/**/*.ts",
+    "integration/**/*.tsx",
+    "packages/*/src",
+    "packages/*/*.js",
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "scripts/*.mjs"
   ]
 }
