@@ -3,32 +3,66 @@
   "pipeline": {
     "build": {
       "inputs": [
-        "src/**",
-        "headless/**",
+        "*.d.ts",
+        "**/package.json",
         "bundlewatch.config.json",
+        "headless/**",
+        "src/**",
         "tsconfig.json",
+        "tsconfig.build.json",
         "tsconfig.declarations.json",
+        "tsup.config.ts",
         "webpack.config.js",
+
         "!**/**/*.test.*",
         "!**/test/**",
         "!**/tests/**",
         "!**/__tests__/**",
         "!**/__mocks__/**",
         "!**/__snapshots__/**",
-        "!coverage/**"
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
       ]
     },
     "test": {
       "inputs": [
-        "src/**",
-        "headless/**",
+        "*.d.ts",
+        "**/package.json",
+        "bundlewatch.config.json",
         "jest.*",
+        "src/**",
         "svgTransform.js",
-        "webpack.config.js",
+        "tests/**",
         "tsconfig.json",
-        "tsconfig.test.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+        "webpack.config.js",
+
         "!**/__snapshots__/**",
-        "!coverage/**"
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ]
+    },
+    "test:ci": {
+      "dependsOn": ["build"],
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "bundlewatch.config.json",
+        "jest.*",
+        "src/**",
+        "tests/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+        "webpack.config.js",
+
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
       ]
     }
   }
