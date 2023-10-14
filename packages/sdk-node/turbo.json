@@ -3,29 +3,25 @@
   "pipeline": {
     "build": {
       "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "cjs/**",
+        "esm/**",
         "src/**",
         "scripts/**",
-        "tsup.config.ts",
         "tsconfig.json",
         "tsconfig.declarations.json",
+        "tsup.config.ts",
+
         "!**/**/*.test.*",
         "!**/test/**",
         "!**/tests/**",
         "!**/__tests__/**",
         "!**/__mocks__/**",
         "!**/__snapshots__/**",
-        "!coverage/**"
-      ]
-    },
-    "test": {
-      "inputs": [
-        "src/**",
-        "jest.*",
-        "tsup.config.ts",
-        "tsconfig.json",
-        "tsconfig.*.json",
-        "!**/__snapshots__/**",
-        "!coverage/**"
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
       ]
     }
   }

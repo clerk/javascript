@@ -3,7 +3,7 @@ const config = {
   displayName: 'clerk-js',
   injectGlobals: true,
 
-  testEnvironment: '<rootDir>/jsdom-with-timezone.ts',
+  testEnvironment: '<rootDir>/jest.jsdom-with-timezone.ts',
   roots: ['<rootDir>/src'],
   setupFiles: ['./jest.setup.ts'],
   setupFilesAfterEnv: ['./jest.setup-after-env.ts'],

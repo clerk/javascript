@@ -25,11 +25,32 @@
     "RUNNER_ARCH",
     "RUNNER_DEBUG",
     "RUNNER_OS",
+    "TZ",
     "VERCEL"
   ],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "bundlewatch.config.json",
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.build.json",
+        "tsconfig.declarations.json",
+        "tsup.config.ts",
+
+        "!**/**/*.test.*",
+        "!**/test/**",
+        "!**/tests/**",
+        "!**/__tests__/**",
+        "!**/__mocks__/**",
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
       "outputMode": "new-only",
       "outputs": ["dist/**"]
     },
@@ -48,11 +69,43 @@
     },
     "test": {
       "dependsOn": ["build"],
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "bundlewatch.config.json",
+        "jest.*",
+        "src/**",
+        "tests/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
       "outputMode": "new-only",
       "outputs": []
     },
     "test:ci": {
       "dependsOn": ["build"],
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "bundlewatch.config.json",
+        "jest.*",
+        "src/**",
+        "tests/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
       "outputMode": "new-only",
       "outputs": []
     },

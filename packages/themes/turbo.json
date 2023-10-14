@@ -1,8 +1,0 @@
-{
-  "extends": ["//"],
-  "pipeline": {
-    "build": {
-      "inputs": ["src/**", "tsconfig.json", "tsconfig.buid.json"]
-    }
-  }
-}
