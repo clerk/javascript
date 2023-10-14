@@ -1,0 +1,18 @@
+{
+  "extends": ["//"],
+  "pipeline": {
+    "build": {
+      "inputs": ["src/**", "tsup.config.ts", "tsconfig.json", "tsconfig.declarations.json"]
+    },
+    "test": {
+      "inputs": [
+        "src/**",
+        "tests/**",
+        "tsup.config.ts",
+        "tsconfig.json",
+        "tsconfig.declarations.json",
+        "tsconfig.test.json"
+      ]
+    }
+  }
+}

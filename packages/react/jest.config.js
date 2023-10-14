@@ -4,7 +4,7 @@ module.exports = {
 
   roots: ['<rootDir>/src'],
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>../../setupJest.afterEnv.ts'],
+  setupFilesAfterEnv: ['<rootDir>../../jest.setup-after-env.ts'],
 
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {

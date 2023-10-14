@@ -5,8 +5,8 @@ const config = {
 
   testEnvironment: '<rootDir>/jsdom-with-timezone.ts',
   roots: ['<rootDir>/src'],
-  setupFiles: ['./setupJest.ts'],
-  setupFilesAfterEnv: ['./setupJestAfterEnv.ts'],
+  setupFiles: ['./jest.setup.ts'],
+  setupFilesAfterEnv: ['./jest.setup-after-env.ts'],
   testRegex: [
     '/__tests__/(.+/)*.*.test.[jt]sx?$',
     '/ui/.*/__tests__/.*.test.[jt]sx?$',
