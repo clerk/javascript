@@ -12,6 +12,7 @@ type LoadClerkJsScriptOptions = Omit<IsomorphicClerkOptions, 'proxyUrl' | 'domai
   domain: string;
 };
 
+// eslint-disable-next-line @typescript-eslint/require-await
 export const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
   const { frontendApi, publishableKey } = opts;
 

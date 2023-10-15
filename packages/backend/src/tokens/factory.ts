@@ -106,6 +106,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
       proxyUrl: runtimeProxyUrl || buildProxyUrl,
       isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       domain: (runtimeDomain || buildtimeDomain) as any,
       userAgent: runtimeUserAgent || buildUserAgent,
     });
