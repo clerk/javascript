@@ -42,8 +42,8 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JS
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;
-  // TODO: Remove temp use of __unstable__environment
-  const { __unstable__environment } = clerk as any;
+  // @ts-expect-error - TODO: Remove temp use of __unstable__environment
+  const { __unstable__environment } = clerk;
 
   const hasActiveSessions = client.activeSessions && client.activeSessions.length > 0;
 

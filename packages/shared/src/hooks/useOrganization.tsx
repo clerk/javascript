@@ -1,4 +1,5 @@
 import type {
+  ActiveSessionResource,
   ClerkPaginationParams,
   GetDomainsParams,
   GetInvitationsParams,
@@ -365,7 +366,10 @@ export const useOrganization: UseOrganization = params => {
     isLoaded: !isMembershipsLoading && !isInvitationsLoading,
     organization,
     membershipList,
-    membership: getCurrentOrganizationMembership(session!.user.organizationMemberships, organization.id), // your membership in the current org
+    membership: getCurrentOrganizationMembership(
+      (session as ActiveSessionResource).user.organizationMemberships,
+      organization.id,
+    ), // your membership in the current org
     invitationList,
     unstable__mutate: () => {
       void mutateMembershipList();
