@@ -4,4 +4,4 @@
 '@clerk/types': patch
 ---
 
-Deprecate `__unstable` methods for organizations.
+Deprecate the `organization.__unstable__invitationUpdate` and `organization.__unstable__membershipUpdate` methods.
