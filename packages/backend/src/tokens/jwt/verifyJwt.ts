@@ -1,4 +1,3 @@
-import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import type { Jwt, JwtPayload } from '@clerk/types';
 
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
@@ -65,13 +64,6 @@ export function decodeJwt(token: string): Jwt {
   const header = JSON.parse(decoder.decode(base64url.parse(rawHeader, { loose: true })));
   const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
   const signature = base64url.parse(rawSignature, { loose: true });
-
-  deprecatedObjectProperty(
-    payload,
-    'orgs',
-    'Add orgs to your session token using the "user.organizations" shortcode in JWT Templates instead.',
-    'decodeJwt:orgs',
-  );
 
   return {
     header,
