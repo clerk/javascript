@@ -1,8 +1,8 @@
 import type { OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSettings } from '../OrganizationSettings';
 import { createFakeDomain, createFakeMember } from './utils';
@@ -83,6 +83,43 @@ describe('OrganizationSettings', () => {
       expect(getByText('Org1', { exact: false }).closest('button')).toBeNull();
       expect(getByText(/leave organization/i, { exact: false }).closest('button')).not.toHaveAttribute('disabled');
     });
+  });
+
+  it('hides domains when `read` permission is missing', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withOrganizationDomains();
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', permissions: ['org:sys_memberships:read'] }],
+      });
+    });
+    const { queryByText } = render(<OrganizationSettings />, { wrapper });
+    await new Promise(r => setTimeout(r, 100));
+    expect(queryByText('Verified domains')).not.toBeInTheDocument();
+    expect(fixtures.clerk.organization?.getDomains).not.toBeCalled();
+  });
+
+  it('shows domains when `read` permission exists', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withOrganizationDomains();
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', permissions: ['org:sys_domains:read'] }],
+      });
+    });
+    fixtures.clerk.organization?.getDomains.mockReturnValue(
+      Promise.resolve({
+        data: [],
+        total_count: 0,
+      }),
+    );
+    const { queryByText } = render(<OrganizationSettings />, { wrapper });
+
+    await new Promise(r => setTimeout(r, 100));
+    expect(queryByText('Verified domains')).toBeInTheDocument();
+    expect(fixtures.clerk.organization?.getDomains).toBeCalled();
   });
 
   describe('Danger section', () => {

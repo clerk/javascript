@@ -6,7 +6,6 @@ import type {
   ExternalAccountJSON,
   OAuthProvider,
   OrganizationEnrollmentMode,
-  OrganizationJSON,
   PhoneNumberJSON,
   SamlAccountJSON,
   SessionJSON,
@@ -15,8 +14,9 @@ import type {
   UserJSON,
   UserSettingsJSON,
 } from '@clerk/types';
-import type { MembershipRole, PublicUserDataJSON } from '@clerk/types';
+import type { PublicUserDataJSON } from '@clerk/types';
 
+import type { OrgParams } from '../../../core/test/fixtures';
 import { createUser, getOrganizationId } from '../../../core/test/fixtures';
 import { createUserFixture } from './fixtures';
 
@@ -38,8 +38,6 @@ export const createClientFixtureHelpers = (baseClient: ClientJSON) => {
 };
 
 const createUserFixtureHelpers = (baseClient: ClientJSON) => {
-  type OrgParams = Partial<OrganizationJSON> & { role?: MembershipRole };
-
   type WithUserParams = Omit<
     Partial<UserJSON>,
     'email_addresses' | 'phone_numbers' | 'external_accounts' | 'saml_accounts' | 'organization_memberships'
