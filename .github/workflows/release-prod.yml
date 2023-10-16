@@ -15,6 +15,9 @@ jobs:
     name: Release
     if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE }}
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Echo github context
         run: echo "$GITHUB_CONTEXT"

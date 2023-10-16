@@ -16,6 +16,9 @@ jobs:
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Limit action to Clerk members
         uses: actions/github-script@v6

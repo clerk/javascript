@@ -4,6 +4,9 @@ on:
 jobs:
   registry:
     runs-on: ${{ vars.RUNNER_LARGE }}
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v3
       - name: Setup

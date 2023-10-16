@@ -5,6 +5,9 @@ jobs:
   build:
     # if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE }}
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
