@@ -53,27 +53,33 @@ const RowInformation = (props: RowInfoProps) => {
   } = props;
 
   return (
-    <Text elementDescriptor={descriptors.paginationRowText}>
+    <Text>
       <Text
         as='span'
-        colorScheme='inherit'
+        elementDescriptor={descriptors.paginationRowText}
+        elementId={descriptors.paginationRowText?.setId('displaying')}
+        sx={t => ({ opacity: t.opacity.$inactive })}
         localizationKey={localizationKeys('paginationRowText__displaying')}
       />{' '}
       <Text
         as='span'
-        colorScheme='inherit'
+        elementDescriptor={descriptors.paginationRowText}
+        elementId={descriptors.paginationRowText?.setId('rowsCount')}
         sx={t => ({ fontWeight: t.fontWeights.$medium })}
       >
         {startingRow === endingRow && [0, 1].includes(startingRow) ? startingRow : `${startingRow} – ${endingRow}`}
       </Text>{' '}
       <Text
         as='span'
-        colorScheme='inherit'
+        elementDescriptor={descriptors.paginationRowText}
+        elementId={descriptors.paginationRowText?.setId('displaying')}
+        sx={t => ({ opacity: t.opacity.$inactive })}
         localizationKey={localizationKeys('paginationRowText__of')}
       />{' '}
       <Text
         as='span'
-        colorScheme='inherit'
+        elementDescriptor={descriptors.paginationRowText}
+        elementId={descriptors.paginationRowText?.setId('allRowsCount')}
       >
         {allRowsCount}
       </Text>

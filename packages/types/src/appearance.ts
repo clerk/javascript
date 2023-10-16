@@ -347,7 +347,7 @@ export type ElementsConfig = {
   tableHead: WithOptions<never, never, never>;
 
   paginationButton: WithOptions<never, never, never>;
-  paginationRowText: WithOptions<never, never, never>;
+  paginationRowText: WithOptions<'allRowsCount' | 'rowsCount' | 'displaying', never, never>;
 
   selectButton: WithOptions<SelectId, never, never>;
   selectSearchInput: WithOptions<SelectId, never, never>;
