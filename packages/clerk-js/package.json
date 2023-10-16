@@ -100,6 +100,5 @@
   "homepage": "https://clerk.com/",
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "gitHead": "6f990357a7da3c5224587b4add4a626308468d27"
+  }
 }
