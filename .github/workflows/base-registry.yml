@@ -4,9 +4,6 @@ on:
 jobs:
   registry:
     runs-on: ${{ vars.RUNNER_LARGE }}
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v3
       - name: Setup
@@ -28,6 +25,8 @@ jobs:
         # and fails early if the default npm registry is used
         run: |
           npm run release:verdaccio
+        env:
+          NPM_CONFIG_PROVENANCE: false
       - name: List published packages
         run: |
           ls -all .verdaccio/storage/@clerk
