@@ -6,7 +6,7 @@ import type { FapiClient } from './fapiClient';
 export interface DevBrowserHandler {
   clear(): Promise<void>;
 
-  setup(): Promise<void>;
+  setup(initialDbJwt?: string | undefined): Promise<void>;
 
   getDevBrowserJWT(): string | null;
 
@@ -101,7 +101,7 @@ export default function createDevBrowserHandler({
     }
   }
 
-  async function setUrlBasedSessionSyncBrowser(): Promise<void> {
+  async function setUrlBasedSessionSyncBrowser(initialDbJwt: string | undefined): Promise<void> {
     // 1. Get the JWT from hash search parameters when the redirection comes from Clerk Hosted Pages
     const devBrowserToken = getDevBrowserJWTFromURL(new URL(window.location.href));
     if (devBrowserToken) {
@@ -114,21 +114,21 @@ export default function createDevBrowserHandler({
       return;
     }
 
-    // 3. Otherwise, fetch a new DevBrowser JWT from FAPI and cache it
-    const createDevBrowserUrl = fapiClient.buildUrl({
-      path: '/dev_browser',
-    });
-
-    const resp = await fetch(createDevBrowserUrl.toString(), {
-      method: 'POST',
-    });
-
-    if (resp.status === 200) {
+    if (initialDbJwt) {
       usesUrlBasedSessionSyncing = true;
-      const data = await resp.json();
-      setDevBrowserJWT(data?.token);
+      setDevBrowserJWT(initialDbJwt);
     } else {
-      usesUrlBasedSessionSyncing = false;
+      // 3. Otherwise, fetch a new DevBrowser JWT from FAPI and cache it
+      const createDevBrowserUrl = fapiClient.buildUrl({ path: '/dev_browser' });
+      const resp = await fetch(createDevBrowserUrl.toString(), { method: 'POST' });
+
+      if (resp.status === 200) {
+        usesUrlBasedSessionSyncing = true;
+        const data = await resp.json();
+        setDevBrowserJWT(data?.token);
+      } else {
+        usesUrlBasedSessionSyncing = false;
+      }
     }
   }
 
@@ -142,7 +142,7 @@ export default function createDevBrowserHandler({
     return usesUrlBasedSessionSyncing;
   }
 
-  async function setup(): Promise<void> {
+  async function setup(initialDbJwt: string | undefined): Promise<void> {
     const devOrStgApi = isDevOrStagingUrl(frontendApi);
     const devOrStgHost = isDevOrStagingUrl(window.location.host);
 
@@ -170,7 +170,7 @@ export default function createDevBrowserHandler({
       });
     }
 
-    await setUrlBasedSessionSyncBrowser();
+    await setUrlBasedSessionSyncBrowser(initialDbJwt);
 
     if (usesUrlBasedSessionSync()) {
       return;

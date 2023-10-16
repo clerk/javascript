@@ -1340,6 +1340,10 @@ export default class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
+    // @ts-ignore - this is a POC
+    const serialisedInitialState = window.__clerk_initial_state || {};
+    console.log({ serialisedInitialState });
+
     /**
      * 1. Create the devBrowser.
      * At this point the devBrowser is not yet setup, but its API is ready for use
@@ -1371,7 +1375,7 @@ export default class Clerk implements ClerkInterface {
     if (this.#instanceType === 'production') {
       await this.#devBrowserHandler.clear();
     } else {
-      await this.#devBrowserHandler.setup();
+      await this.#devBrowserHandler.setup(serialisedInitialState.devBrowser);
     }
 
     /**
@@ -1404,8 +1408,12 @@ export default class Clerk implements ClerkInterface {
         const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
 
         const [environment, client] = await Promise.all([
-          Environment.getInstance().fetch({ touch: shouldTouchEnv }),
-          Client.getInstance().fetch(),
+          serialisedInitialState.environment
+            ? Environment.getInstance().init(serialisedInitialState.environment)
+            : Environment.getInstance().fetch({ touch: shouldTouchEnv }),
+          serialisedInitialState.client
+            ? Client.getInstance().init(serialisedInitialState.client)
+            : Client.getInstance().fetch(),
         ]);
 
         this.updateClient(client);

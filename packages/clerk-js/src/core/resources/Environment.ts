@@ -39,6 +39,10 @@ export class Environment extends BaseResource implements EnvironmentResource {
     return this._baseGet();
   }
 
+  init(data: EnvironmentJSON): Promise<Environment> {
+    return Promise.resolve(this.fromJSON(data));
+  }
+
   isSingleSession = (): boolean => {
     return this.authConfig.singleSessionMode;
   };

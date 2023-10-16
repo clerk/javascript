@@ -44,6 +44,10 @@ export class Client extends BaseResource implements ClientResource {
     return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
   }
 
+  init(data: ClientJSON): Promise<Client> {
+    return Promise.resolve(this.fromJSON(data));
+  }
+
   create(): Promise<this> {
     return this._basePut();
   }

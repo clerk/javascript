@@ -19,13 +19,25 @@ export const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
     errorThrower.throwMissingPublishableKeyError();
   }
 
-  return loadScript(clerkJsScriptUrl(opts), {
+  const scriptUrl = appendDevBrowserJwt(clerkJsScriptUrl(opts));
+  return loadScript(scriptUrl, {
     async: true,
     crossOrigin: 'anonymous',
     beforeLoad: applyClerkJsScriptAttributes(opts),
   }).catch(() => {
     throw new Error(FAILED_TO_LOAD_ERROR);
   });
+};
+
+const appendDevBrowserJwt = (_url: string) => {
+  const existingDbJwt = localStorage.getItem('clerk-db-jwt');
+  if (!existingDbJwt) {
+    return _url;
+  }
+  const url = new URL(_url);
+  const DEV_BROWSER_SSO_JWT_PARAMETER = '__dev_session';
+  url.searchParams.append(DEV_BROWSER_SSO_JWT_PARAMETER, existingDbJwt);
+  return url.toString();
 };
 
 const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
