@@ -81,7 +81,7 @@
   "homepage": "https://clerk.com/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git",
+    "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/backend"
   },
   "bugs": {
