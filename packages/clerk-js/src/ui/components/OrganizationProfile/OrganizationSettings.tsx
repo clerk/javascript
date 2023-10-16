@@ -26,7 +26,7 @@ export const OrganizationSettings = () => {
           <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__settings')} />
         </Header.Root>
         <OrganizationProfileSection />
-        <Gate permission='org:sys_domains:manage'>
+        <Gate permission='org:sys_domains:read'>
           <OrganizationDomainsSection />
         </Gate>
         <OrganizationDangerSection />

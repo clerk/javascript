@@ -77,7 +77,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
                   </Route>
                   <Route path=':id'>
                     <Gate
-                      permission={'org:sys_domains:manage'}
+                      any={['org:sys_domains:manage', 'org:sys_domains:delete']}
                       redirectTo='../../'
                     >
                       <VerifiedDomainPage />

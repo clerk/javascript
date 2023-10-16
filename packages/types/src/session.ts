@@ -11,6 +11,9 @@ interface IsAuthorizedParams {
   // eslint-disable-next-line
   permission?: OrganizationPermission | (string & {});
   role?: string;
+  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+  // eslint-disable-next-line
+  any?: (OrganizationPermission | (string & {}))[];
 }
 
 type IsAuthorizedReturnValues = boolean;

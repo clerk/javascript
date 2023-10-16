@@ -1,8 +1,8 @@
-import type { GetDomainsParams, OrganizationEnrollmentMode } from '@clerk/types';
+import type { GetDomainsParams, OrganizationDomainResource, OrganizationEnrollmentMode } from '@clerk/types';
 import type { OrganizationDomainVerificationStatus } from '@clerk/types';
 import React, { useMemo } from 'react';
 
-import { withGate } from '../../common';
+import { useGate, withGate } from '../../common';
 import { useCoreOrganization } from '../../contexts';
 import { Box, Col, localizationKeys, Spinner } from '../../customizables';
 import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
@@ -21,6 +21,54 @@ type DomainListProps = GetDomainsParams & {
   fallback?: React.ReactNode;
 };
 
+const useDomainList = () => {
+  const { isAuthorizedUser: canDeleteDomain } = useGate({ permission: 'org:sys_domains:delete' });
+  const { isAuthorizedUser: canVerifyDomain } = useGate({ permission: 'org:sys_domains:manage' });
+
+  return {
+    showDotMenu: canDeleteDomain || canVerifyDomain,
+  };
+};
+
+const DomainListDotMenu = ({
+  redirectSubPath,
+  domainId,
+}: Pick<DomainListProps, 'redirectSubPath'> & {
+  domainId: OrganizationDomainResource['id'];
+}) => {
+  const { navigate } = useRouter();
+  const { isAuthorizedUser: canDeleteDomain } = useGate({ permission: 'org:sys_domains:delete' });
+  const { isAuthorizedUser: canVerifyDomain } = useGate({ permission: 'org:sys_domains:manage' });
+
+  return (
+    <ThreeDotsMenu
+      actions={[
+        ...(canVerifyDomain
+          ? [
+              {
+                label: localizationKeys(
+                  'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify',
+                ),
+                onClick: () => navigate(`${redirectSubPath}${domainId}/verify`),
+              },
+            ]
+          : []),
+        ...(canDeleteDomain
+          ? [
+              {
+                label: localizationKeys(
+                  'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove',
+                ),
+                isDestructive: true,
+                onClick: () => navigate(`${redirectSubPath}${domainId}/remove`),
+              },
+            ]
+          : []),
+      ]}
+    />
+  );
+};
+
 export const DomainList = withGate(
   (props: DomainListProps) => {
     const { verificationStatus, enrollmentMode, redirectSubPath, fallback, ...rest } = props;
@@ -31,6 +79,7 @@ export const DomainList = withGate(
       },
     });
 
+    const { showDotMenu } = useDomainList();
     const { ref } = useInView({
       threshold: 0,
       onChange: inView => {
@@ -69,7 +118,7 @@ export const DomainList = withGate(
       <Col>
         {domainList.length === 0 && !domains?.isLoading && fallback}
         {domainList.map(d => {
-          if (!(d.verification && d.verification.status === 'verified')) {
+          if (!(d.verification && d.verification.status === 'verified') || !showDotMenu) {
             return (
               <BlockWithTrailingComponent
                 key={d.id}
@@ -82,23 +131,12 @@ export const DomainList = withGate(
                 })}
                 badge={<EnrollmentBadge organizationDomain={d} />}
                 trailingComponent={
-                  <ThreeDotsMenu
-                    actions={[
-                      {
-                        label: localizationKeys(
-                          'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify',
-                        ),
-                        onClick: () => navigate(`${redirectSubPath}${d.id}/verify`),
-                      },
-                      {
-                        label: localizationKeys(
-                          'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove',
-                        ),
-                        isDestructive: true,
-                        onClick: () => navigate(`${redirectSubPath}${d.id}/remove`),
-                      },
-                    ]}
-                  />
+                  showDotMenu ? (
+                    <DomainListDotMenu
+                      redirectSubPath={redirectSubPath}
+                      domainId={d.id}
+                    />
+                  ) : undefined
                 }
               >
                 {d.name}
@@ -154,6 +192,6 @@ export const DomainList = withGate(
     );
   },
   {
-    permission: 'org:sys_domains:manage',
+    permission: 'org:sys_domains:read',
   },
 );

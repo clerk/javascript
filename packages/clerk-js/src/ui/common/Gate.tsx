@@ -6,7 +6,7 @@ import { useCoreSession } from '../contexts';
 import { useFetch } from '../hooks';
 import { useRouter } from '../router';
 
-type GateParams = Omit<Parameters<IsAuthorized>[0], 'permission'> & { permission: OrganizationPermission };
+type GateParams = Omit<Parameters<IsAuthorized>[0], 'permission'> & { permission?: OrganizationPermission };
 type GateProps = PropsWithChildren<
   GateParams & {
     fallback?: ReactNode;
