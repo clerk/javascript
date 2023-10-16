@@ -1,5 +1,3 @@
-import { deprecated } from '@clerk/shared/deprecated';
-
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type {
@@ -84,12 +82,6 @@ type CreateOrganizationInvitationParams = {
 type GetOrganizationInvitationListParams = {
   organizationId: string;
   status?: OrganizationInvitationStatus[];
-  limit?: number;
-  offset?: number;
-};
-
-type GetPendingOrganizationInvitationListParams = {
-  organizationId: string;
   limit?: number;
   offset?: number;
 };
@@ -250,22 +242,6 @@ export class OrganizationAPI extends AbstractAPI {
       method: 'GET',
       path: joinPaths(basePath, organizationId, 'invitations'),
       queryParams: { status, limit, offset },
-    });
-  }
-
-  /**
-   * @deprecated  Use `getOrganizationInvitationList` instead along with the status parameter.
-   */
-  public async getPendingOrganizationInvitationList(params: GetPendingOrganizationInvitationListParams) {
-    deprecated('getPendingOrganizationInvitationList', 'Use `getOrganizationInvitationList` instead.');
-
-    const { organizationId, limit, offset } = params;
-    this.requireId(organizationId);
-
-    return this.request<OrganizationInvitation[]>({
-      method: 'GET',
-      path: joinPaths(basePath, organizationId, 'invitations', 'pending'),
-      queryParams: { limit, offset },
     });
   }
 
