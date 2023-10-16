@@ -1,6 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
-import deepmerge from 'deepmerge';
 import snakecaseKeys from 'snakecase-keys';
 
 import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
@@ -9,7 +8,6 @@ import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
 import runtime from '../runtime';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { joinPaths } from '../util/path';
-import { deprecated } from '../util/shared';
 import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
@@ -68,14 +66,7 @@ const withLegacyReturn =
 
 export function buildRequest(options: CreateBackendApiOptions) {
   const request = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
-    const { secretKey, httpOptions, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
-    if (httpOptions) {
-      deprecated(
-        'httpOptions',
-        'This option has been deprecated and will be removed with the next major release.\nA RequestInit init object used by the `request` method.',
-      );
-    }
-
+    const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
     assertValidSecretKey(secretKey);
@@ -108,7 +99,6 @@ export function buildRequest(options: CreateBackendApiOptions) {
     try {
       if (formData) {
         res = await runtime.fetch(finalUrl.href, {
-          ...httpOptions,
           method,
           headers,
           body: formData,
@@ -120,14 +110,11 @@ export function buildRequest(options: CreateBackendApiOptions) {
         const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
         const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
 
-        res = await runtime.fetch(
-          finalUrl.href,
-          deepmerge(httpOptions || {}, {
-            method,
-            headers,
-            ...body,
-          }),
-        );
+        res = await runtime.fetch(finalUrl.href, {
+          method,
+          headers,
+          ...body,
+        });
       }
 
       // TODO: Parse JSON or Text response based on a response header
