@@ -75,7 +75,8 @@
     "workerd": "^1.20230518.0"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "homepage": "https://clerk.com/",
   "repository": {

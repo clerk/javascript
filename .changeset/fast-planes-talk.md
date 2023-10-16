@@ -15,4 +15,4 @@
 '@clerk/clerk-expo': patch
 ---
 
-Update "repository" key in package.json to add "directory" value. Also publish packages with [npm provenance](https://docs.npmjs.com/generating-provenance-statements) now.
+Publish packages with [npm provenance](https://docs.npmjs.com/generating-provenance-statements) enabled
