@@ -10,7 +10,7 @@
   "ignore": [],
   "snapshot": {
     "useCalculatedVersion": true,
-    "prereleaseTemplate": "{tag}.{commit}"
+    "prereleaseTemplate": "{tag}.v{commit}"
   },
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "onlyUpdatePeerDependentsWhenOutOfRange": true,
