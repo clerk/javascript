@@ -106,7 +106,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "https://github.com/clerkinc/javascript.git",
+    "directory": "packages/nextjs"
   },
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"

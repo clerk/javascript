@@ -80,7 +80,8 @@
   "homepage": "https://clerk.com/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "https://github.com/clerkinc/javascript.git",
+    "directory": "packages/backend"
   },
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"

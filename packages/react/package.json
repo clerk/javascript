@@ -67,7 +67,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "https://github.com/clerkinc/javascript.git",
+    "directory": "packages/react"
   },
   "homepage": "https://clerk.com/",
   "bugs": {

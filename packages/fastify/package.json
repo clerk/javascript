@@ -50,7 +50,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "https://github.com/clerkinc/javascript.git",
+    "directory": "packages/fastify"
   },
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"

@@ -50,7 +50,7 @@
   "author": {
     "name": "Clerk, Inc.",
     "email": "support@clerk.com",
-    "url": "https://github.com/clerkinc/clerk-sdk-node"
+    "url": "https://github.com/clerkinc/javascript.git"
   },
   "devDependencies": {
     "nock": "^13.0.7",
@@ -73,7 +73,8 @@
   "description": "Clerk server SDK for usage with node",
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "https://github.com/clerkinc/javascript.git",
+    "directory": "packages/sdk-node"
   },
   "keywords": [
     "clerk",

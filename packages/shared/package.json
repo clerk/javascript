@@ -54,5 +54,10 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git",
+    "directory": "packages/shared"
   }
 }

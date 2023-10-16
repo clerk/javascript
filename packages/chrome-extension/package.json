@@ -53,7 +53,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "https://github.com/clerkinc/javascript.git",
+    "directory": "packages/chrome-extension"
   },
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
