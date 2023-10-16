@@ -5,7 +5,7 @@ type ExternalElementMounterProps = {
   unmount: (el?: HTMLDivElement) => void;
 };
 
-export const ExternalElementMounter = ({ mount, unmount }: ExternalElementMounterProps) => {
+export const ExternalElementMounter = ({ mount, unmount, ...rest }: ExternalElementMounterProps) => {
   const nodeRef = useRef(null);
 
   useEffect(() => {
@@ -19,5 +19,10 @@ export const ExternalElementMounter = ({ mount, unmount }: ExternalElementMounte
     };
   }, [nodeRef.current]);
 
-  return <div ref={nodeRef}></div>;
+  return (
+    <div
+      ref={nodeRef}
+      {...rest}
+    ></div>
+  );
 };

@@ -121,10 +121,11 @@ const getRoutesAndContents = ({ customPages, defaultRoutes }: GetRoutesAndConten
       return {
         name: cp.label,
         id: `custom-page-${index}`,
-        icon: () => (
+        icon: props => (
           <ExternalElementMounter
             mount={cp.mountIcon}
             unmount={cp.unmountIcon}
+            {...props}
           />
         ),
         path: sanitizeCustomLinkURL(cp.url),
@@ -137,10 +138,11 @@ const getRoutesAndContents = ({ customPages, defaultRoutes }: GetRoutesAndConten
       return {
         name: cp.label,
         id: `custom-page-${index}`,
-        icon: () => (
+        icon: props => (
           <ExternalElementMounter
             mount={cp.mountIcon}
             unmount={cp.unmountIcon}
+            {...props}
           />
         ),
         path: pageURL,
