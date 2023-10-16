@@ -1,0 +1,104 @@
+name: Quality checks and tests
+on:
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prettier:
+    name: Prettier
+    uses: ./.github/workflows/base-prettier.yml
+
+  eslint:
+    name: Eslint
+    uses: ./.github/workflows/base-lint.yml
+
+  changeset:
+    name: Require changeset
+    uses: ./.github/workflows/base-changeset.yml
+
+  build:
+    if: ${{ github.repository == 'clerkinc/javascript' }}
+    name: Build & publish
+    needs: [ prettier, changeset ]
+    uses: ./.github/workflows/base-build.yml
+
+  unit-tests:
+    name: Run unit tests
+    needs: build
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    strategy:
+      matrix:
+        node-version: [ 18, 19 ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Download turbo cache
+        uses: actions/download-artifact@v3
+        with:
+          name: package-artifacts
+          path: ./node_modules/.cache/turbo
+      - name: Run tests
+        run: npm run test:ci
+
+  publint:
+    name: Run publint
+    needs: build
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Download turbo cache
+        uses: actions/download-artifact@v3
+        with:
+          name: package-artifacts
+          path: ./node_modules/.cache/turbo
+      - name: Lint packages using publint
+        run: npm run lint:publint
+
+  attw:
+    name: Run attw
+    needs: build
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Download turbo cache
+        uses: actions/download-artifact@v3
+        with:
+          name: package-artifacts
+          path: ./node_modules/.cache/turbo
+      - name: Lint types using attw
+        # Remove this when all related errors are fixed
+        continue-on-error: true
+        run: npm run lint:attw
+
+  integration-generic:
+    name: Integration (Generic)
+    needs: build
+    uses: ./.github/workflows/base-e2e.yml
+    with:
+      SCRIPT: 'npm run test:integration:generic'
+    secrets: inherit
+
+  integration-nextjs:
+    name: Integration (NextJS)
+    needs: build
+    uses: ./.github/workflows/base-e2e.yml
+    with:
+      SCRIPT: 'npm run test:integration:nextjs'
+    secrets: inherit
+
+  integration-remix:
+    name: Integration (Remix)
+    needs: build
+    uses: ./.github/workflows/base-e2e.yml
+    with:
+      SCRIPT: 'npm run test:integration:remix'
+    secrets: inherit

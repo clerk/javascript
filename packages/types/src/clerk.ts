@@ -22,6 +22,11 @@ import type { DeepPartial, DeepSnakeToCamel } from './utils';
 
 export type InstanceType = 'production' | 'development';
 
+export type SDKMetadata = {
+  name: string;
+  version: string;
+};
+
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: ActiveSessionResource | null) => void | Promise<any>;
@@ -55,6 +60,12 @@ export interface Clerk {
    * Clerk SDK version number.
    */
   version?: string;
+
+  /**
+   * If present, contains information about the SDK that the host application is using.
+   * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
+   */
+  sdkMetadata?: SDKMetadata;
 
   loaded: boolean;
 
@@ -398,9 +409,18 @@ export interface Clerk {
 
   /**
    * Completes a Magic Link flow  started by {@link Clerk.client.signIn.createMagicLinkFlow} or {@link Clerk.client.signUp.createMagicLinkFlow}
+   * @deprecated Use `handleEmailLinkVerification` instead.
    */
   handleMagicLinkVerification: (
     params: HandleMagicLinkVerificationParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
+   * Completes a Email Link flow  started by {@link Clerk.client.signIn.createEmailLinkFlow} or {@link Clerk.client.signUp.createEmailLinkFlow}
+   */
+  handleEmailLinkVerification: (
+    params: HandleEmailLinkVerificationParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ) => Promise<unknown>;
 
@@ -422,7 +442,7 @@ export interface Clerk {
   /**
    * Retrieves a single organization by id.
    */
-  getOrganization: (organizationId: string) => Promise<OrganizationResource | undefined>;
+  getOrganization: (organizationId: string) => Promise<OrganizationResource>;
 
   /**
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
@@ -489,9 +509,6 @@ export type HandleOAuthCallbackParams = {
   verifyPhoneNumberUrl?: string | null;
 };
 
-/**
- * @experimental
- */
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
 
 export type BuildUrlWithAuthParams = {
@@ -537,7 +554,15 @@ export interface Resources {
   session?: ActiveSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
+  /**
+   * @deprecated This property will be dropped in the next major release.
+   * This property is only used in another deprecated part: `invitationList` from useOrganization
+   */
   lastOrganizationInvitation?: OrganizationInvitationResource | null;
+  /**
+   * @deprecated This property will be dropped in the next major release.
+   * This property is only used in another deprecated part: `membershipList` from useOrganization
+   */
   lastOrganizationMember?: OrganizationMembershipResource | null;
 }
 
@@ -939,7 +964,28 @@ export type OrganizationListProps = {
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
 };
 
+/**
+ * @deprecated Use `HandleEmailLinkVerificationParams` instead.
+ */
 export interface HandleMagicLinkVerificationParams {
+  /**
+   * Full URL or path to navigate after successful magic link verification
+   * on completed sign up or sign in on the same device.
+   */
+  redirectUrlComplete?: string;
+  /**
+   * Full URL or path to navigate after successful magic link verification
+   * on the same device, but not completed sign in or sign up.
+   */
+  redirectUrl?: string;
+  /**
+   * Callback function to be executed after successful magic link
+   * verification on another device.
+   */
+  onVerifiedOnOtherDevice?: () => void;
+}
+
+export interface HandleEmailLinkVerificationParams {
   /**
    * Full URL or path to navigate after successful magic link verification
    * on completed sign up or sign in on the same device.

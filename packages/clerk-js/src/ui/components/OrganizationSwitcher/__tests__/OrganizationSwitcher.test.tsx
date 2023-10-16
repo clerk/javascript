@@ -1,7 +1,7 @@
 import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
 
-import { render, runFakeTimers, waitFor } from '../../../../testUtils';
+import { act, render, runFakeTimers, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
 import { createFakeUserOrganizationInvitation, createFakeUserOrganizationSuggestion } from './utlis';
@@ -10,30 +10,33 @@ const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
 describe('OrganizationSwitcher', () => {
   it('renders component', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'] });
     });
-    const { queryByRole } = render(<OrganizationSwitcher />, { wrapper });
+    fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
+    const { queryByRole } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
     expect(queryByRole('button')).toBeDefined();
   });
 
   describe('Personal Workspace', () => {
     it('shows the personal workspace when enabled', async () => {
-      const { wrapper, props } = await createFixtures(f => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.dev'] });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       props.setProps({ hidePersonal: false });
-      const { getByText } = render(<OrganizationSwitcher />, { wrapper });
+      const { getByText } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
       expect(getByText('Personal account')).toBeDefined();
     });
 
     it('does not show the personal workspace when disabled', async () => {
-      const { wrapper, props } = await createFixtures(f => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.dev'] });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       props.setProps({ hidePersonal: true });
       const { queryByText, getByRole, userEvent, getByText } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
@@ -62,6 +65,8 @@ describe('OrganizationSwitcher', () => {
           total_count: 3,
         }),
       );
+
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
       await runFakeTimers(async () => {
         const { getByText } = render(<OrganizationSwitcher />, { wrapper });
@@ -103,6 +108,8 @@ describe('OrganizationSwitcher', () => {
         }),
       );
 
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
+
       await runFakeTimers(async () => {
         const { getByText } = render(<OrganizationSwitcher />, { wrapper });
 
@@ -115,10 +122,11 @@ describe('OrganizationSwitcher', () => {
 
   describe('OrganizationSwitcherPopover', () => {
     it('opens the organization switcher popover when clicked', async () => {
-      const { wrapper, props } = await createFixtures(f => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.dev'], create_organization_enabled: true });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       props.setProps({ hidePersonal: true });
       const { getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
@@ -126,10 +134,11 @@ describe('OrganizationSwitcher', () => {
     });
 
     it('lists all organizations the user belongs to', async () => {
-      const { wrapper, props } = await createFixtures(f => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1', 'Org2'] });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       props.setProps({ hidePersonal: false });
       const { getAllByText, getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
@@ -143,13 +152,14 @@ describe('OrganizationSwitcher', () => {
       ['Member', 'basic_member'],
       ['Guest', 'guest_member'],
     ])('shows the text "%s" for the %s role in the active organization', async (text, role) => {
-      const { wrapper, props } = await createFixtures(f => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.dev'],
           organization_memberships: [{ name: 'Org1', role: role as MembershipRole }],
         });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       props.setProps({ hidePersonal: true });
       const { getAllByText, getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
@@ -165,10 +175,11 @@ describe('OrganizationSwitcher', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      await userEvent.click(getByRole('button', { name: 'Manage Organization' }));
+      await userEvent.click(getByRole('menuitem', { name: 'Manage Organization' }));
       expect(fixtures.clerk.openOrganizationProfile).toHaveBeenCalled();
     });
 
@@ -181,15 +192,16 @@ describe('OrganizationSwitcher', () => {
           create_organization_enabled: true,
         });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
-      await userEvent.click(getByRole('button'));
-      await userEvent.click(getByRole('button', { name: 'Create Organization' }));
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+      await userEvent.click(getByRole('menuitem', { name: 'Create Organization' }));
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
     });
 
     it('does not display create organization button if permissions not present', async () => {
-      const { wrapper, props } = await createFixtures(f => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.dev'],
@@ -197,8 +209,9 @@ describe('OrganizationSwitcher', () => {
           create_organization_enabled: false,
         });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       props.setProps({ hidePersonal: true });
-      const { queryByRole } = render(<OrganizationSwitcher />, { wrapper });
+      const { queryByRole } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
       expect(queryByRole('button', { name: 'Create Organization' })).not.toBeInTheDocument();
     });
 
@@ -211,6 +224,7 @@ describe('OrganizationSwitcher', () => {
           create_organization_enabled: false,
         });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
         Promise.resolve({
           data: [
@@ -254,6 +268,7 @@ describe('OrganizationSwitcher', () => {
           create_organization_enabled: false,
         });
       });
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
         Promise.resolve({
           data: [
@@ -303,6 +318,7 @@ describe('OrganizationSwitcher', () => {
         });
       });
       fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
 
       props.setProps({ hidePersonal: true });
       const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
@@ -330,6 +346,7 @@ describe('OrganizationSwitcher', () => {
         });
       });
 
+      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
       const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));

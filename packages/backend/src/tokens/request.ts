@@ -102,11 +102,24 @@ function assertProxyUrlOrDomain(proxyUrlOrDomain: string | undefined) {
   }
 }
 
+function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
+  let signInUrl: URL;
+  try {
+    signInUrl = new URL(_signInUrl);
+  } catch {
+    throw new Error(`The signInUrl needs to have a absolute url format.`);
+  }
+
+  if (signInUrl.origin === origin) {
+    throw new Error(`The signInUrl needs to be on a different origin than your satellite application.`);
+  }
+}
+
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   const { cookies, headers, searchParams } = buildRequest(options?.request);
 
   if (options.frontendApi) {
-    deprecated('frontentApi', 'Use `publishableKey` instead.');
+    deprecated('frontendApi', 'Use `publishableKey` instead.');
   }
 
   if (options.apiKey) {
@@ -128,6 +141,9 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
   if (options.isSatellite) {
     assertSignInUrlExists(options.signInUrl, (options.secretKey || options.apiKey) as string);
+    if (options.signInUrl && options.origin /* could this actually be undefined? */) {
+      assertSignInUrlFormatAndOrigin(options.signInUrl, options.origin);
+    }
     assertProxyUrlOrDomain(options.proxyUrl || options.domain);
   }
 

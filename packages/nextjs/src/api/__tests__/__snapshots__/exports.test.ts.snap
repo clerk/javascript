@@ -50,6 +50,7 @@ exports[`/api public exports should not include a breaking change 1`] = `
   "requireAuth",
   "sanitizeAuthObject",
   "sessions",
+  "signJwt",
   "signedInAuthObject",
   "signedOutAuthObject",
   "smsMessages",

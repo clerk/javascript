@@ -1,5 +1,5 @@
 import { BlockButton } from '../../common';
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
+import { useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
 import { useRouter } from '../../router';
@@ -9,15 +9,9 @@ import { RequestToJoinList } from './RequestToJoinList';
 
 export const OrganizationMembersTabRequests = () => {
   const { navigate } = useRouter();
-  const { membership } = useCoreOrganization();
   //@ts-expect-error
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
 
-  const isAdmin = membership?.role === 'admin';
-
-  if (!isAdmin) {
-    return null;
-  }
   return (
     <Col
       gap={8}

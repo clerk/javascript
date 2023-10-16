@@ -1,5 +1,42 @@
 # Change Log
 
+## 4.25.4
+
+### Patch Changes
+
+- Warn about environment variables deprecations: ([#1859](https://github.com/clerkinc/javascript/pull/1859)) by [@dimkl](https://github.com/dimkl)
+
+  - `CLERK_API_KEY`
+  - `CLERK_FRONTEND_API`
+  - `NEXT_PUBLIC_CLERK_FRONTEND_API`
+
+- Introduce a new property on the core Clerk singleton, `sdkMetadata`. This will be populated by each host SDK. This metadata will be used to make logging and debugging easier. ([#1857](https://github.com/clerkinc/javascript/pull/1857)) by [@BRKalow](https://github.com/BRKalow)
+
+- Introduce new `*EmailLink*` helpers that will replace the `*MagicLink*` helpers. ([#1833](https://github.com/clerkinc/javascript/pull/1833)) by [@dimkl](https://github.com/dimkl)
+
+  Also marked all the `*MagicLink*` as deprecated using JSDocs.
+
+- Updated dependencies [[`977336f79`](https://github.com/clerkinc/javascript/commit/977336f793cd4ce5984f98dac3cedf9f5ec363f5), [`997b8e256`](https://github.com/clerkinc/javascript/commit/997b8e256c8f83d68d0ae4243c7ea5640573d1ae), [`d89c09bb0`](https://github.com/clerkinc/javascript/commit/d89c09bb0ec9d23ea75ca10f208fe23bb124d87b), [`91e9a55f4`](https://github.com/clerkinc/javascript/commit/91e9a55f4b9f1a8f8d843a788597026015ddeafd), [`c9b17f5a7`](https://github.com/clerkinc/javascript/commit/c9b17f5a72cb27786cfc7f1fb42be1233fb10d5c), [`91014880d`](https://github.com/clerkinc/javascript/commit/91014880df71c2618d0b1e513da4dd19ccd809e3), [`451fc332a`](https://github.com/clerkinc/javascript/commit/451fc332a06b20482fc1c7345d2f606511144241), [`3848f8dbe`](https://github.com/clerkinc/javascript/commit/3848f8dbe094226c6062341405a32a9621042fd6), [`7f4d4b942`](https://github.com/clerkinc/javascript/commit/7f4d4b942e8834462cdc0976b106d9739c345f6b)]:
+  - @clerk/shared@0.24.4
+  - @clerk/clerk-react@4.26.4
+  - @clerk/types@3.55.0
+  - @clerk/clerk-sdk-node@4.12.13
+  - @clerk/backend@0.31.0
+
+## 4.25.3
+
+### Patch Changes
+
+- Add deprecation warning for `@clerk/nextjs/app-beta` export. Use the `@clerk/nextjs` instead. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Retry the implemented changes from [#1767](https://github.com/clerkinc/javascript/pull/1767) which were reverted in [#1806](https://github.com/clerkinc/javascript/pull/1806) due to RSC related errors (not all uses components had the `use client` directive). Restore the original PR and add additional `use client` directives to ensure it works correctly. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1e212c19d`](https://github.com/clerkinc/javascript/commit/1e212c19d1cbfbcf6bc6718f5aec0a3cb893b96f), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679)]:
+  - @clerk/clerk-react@4.26.3
+  - @clerk/shared@0.24.3
+  - @clerk/backend@0.30.3
+  - @clerk/clerk-sdk-node@4.12.12
+
 ## 4.25.2
 
 ### Patch Changes

@@ -51,11 +51,6 @@ type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) 
 const withLegacyReturn =
   (cb: any): LegacyRequestFunction =>
   async (...args) => {
-    deprecated(
-      '',
-      'Resources return format will switch to `{ data: any, errors: ClerkAPIError[] }` from `data | never` the next major version.',
-      'resources-legacy-return',
-    );
     // @ts-ignore
     const { data, errors, status, statusText } = await cb<T>(...args);
     if (errors === null) {

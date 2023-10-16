@@ -1,5 +1,5 @@
-import { renderHook } from '@clerk/shared/testUtils';
 import { waitFor } from '@testing-library/dom';
+import { renderHook } from '@testing-library/react';
 
 import { useFormattedPhoneNumber } from '../useFormattedPhoneNumber';
 

@@ -12,6 +12,7 @@
     "yalc": "yalc add -- @clerk/clerk-react @clerk/types @clerk/shared"
   },
   "dependencies": {
+    "@clerk/clerk-js": "file:.yalc/@clerk/clerk-js",
     "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
     "@clerk/shared": "file:.yalc/@clerk/shared",
     "@clerk/types": "file:.yalc/@clerk/types",

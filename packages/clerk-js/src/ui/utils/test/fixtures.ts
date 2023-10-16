@@ -116,6 +116,7 @@ const socials = Object.freeze(
     'oauth_twitter',
     'oauth_twitch',
     'oauth_linkedin',
+    'oauth_linkedin_oidc',
     'oauth_dropbox',
     'oauth_atlassian',
     'oauth_bitbucket',

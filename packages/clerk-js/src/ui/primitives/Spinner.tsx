@@ -37,8 +37,9 @@ const { applyVariants, filterProps } = createVariants(theme => {
         md: { [thickness]: theme.sizes.$1 },
       },
       size: {
-        sm: { [size]: theme.sizes.$3 },
-        md: { [size]: theme.sizes.$4 },
+        xs: { [size]: theme.sizes.$3 },
+        sm: { [size]: theme.sizes.$4 },
+        md: { [size]: theme.sizes.$5 },
         lg: { [size]: theme.sizes.$6 },
         xl: { [size]: theme.sizes.$8 },
       },
@@ -50,7 +51,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
     defaultVariants: {
       speed: 'normal',
       thickness: 'sm',
-      size: 'md',
+      size: 'sm',
     },
   };
 });

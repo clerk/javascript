@@ -1,5 +1,69 @@
 # Change Log
 
+## 4.61.0
+
+### Minor Changes
+
+- The sign-in form will now switch to the phone input if the only initial value provided was that of the phone number. ([#1861](https://github.com/clerkinc/javascript/pull/1861)) by [@desiprisg](https://github.com/desiprisg)
+
+- Add support for LinkedIn OIDC ([#1772](https://github.com/clerkinc/javascript/pull/1772)) by [@fragoulis](https://github.com/fragoulis)
+
+### Patch Changes
+
+- Warn about _MagicLink_ deprecations: ([#1836](https://github.com/clerkinc/javascript/pull/1836)) by [@dimkl](https://github.com/dimkl)
+
+  - `MagicLinkError`
+  - `isMagicLinkError`
+  - `MagicLinkErrorCode`
+  - `handleMagicLinkVerification`
+  - `createMagicLinkFlow`
+  - `useMagicLink`
+
+- Updated the OAuth buttons in the SignIn and SignUp components to prevent layout shifts while loading. ([#1838](https://github.com/clerkinc/javascript/pull/1838)) by [@octoper](https://github.com/octoper)
+
+- Introduces a new `isAuthorized()` method in the `Session` class. Returns a promise and checks whether the active user is allowed to perform an action based on the passed (required) permission and the ones attached to the membership. ([#1834](https://github.com/clerkinc/javascript/pull/1834)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce a new property on the core Clerk singleton, `sdkMetadata`. This will be populated by each host SDK. This metadata will be used to make logging and debugging easier. ([#1857](https://github.com/clerkinc/javascript/pull/1857)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fix incorrect path of types for the clerk-js headless variant. ([#1848](https://github.com/clerkinc/javascript/pull/1848)) by [@panteliselef](https://github.com/panteliselef)
+
+- Throw an error if the `signInUrl` is on the same origin of a satellite application or if it is of invalid format ([#1845](https://github.com/clerkinc/javascript/pull/1845)) by [@desiprisg](https://github.com/desiprisg)
+
+- Introduces an internal `<Gate/>` component (supporting hook and HOC) which enables us to conditionally render parts of our components based on a users permissions. ([#1834](https://github.com/clerkinc/javascript/pull/1834)) by [@panteliselef](https://github.com/panteliselef)
+
+- Correctly set idle card state when an error occurs during the MFA set up phase. ([#1825](https://github.com/clerkinc/javascript/pull/1825)) by [@desiprisg](https://github.com/desiprisg)
+
+- Introduce new `*EmailLink*` helpers that will replace the `*MagicLink*` helpers. ([#1833](https://github.com/clerkinc/javascript/pull/1833)) by [@dimkl](https://github.com/dimkl)
+
+  Also marked all the `*MagicLink*` as deprecated using JSDocs.
+
+- Disable country picker button when form is submitted ([#1853](https://github.com/clerkinc/javascript/pull/1853)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`977336f79`](https://github.com/clerkinc/javascript/commit/977336f793cd4ce5984f98dac3cedf9f5ec363f5), [`997b8e256`](https://github.com/clerkinc/javascript/commit/997b8e256c8f83d68d0ae4243c7ea5640573d1ae), [`7fb229688`](https://github.com/clerkinc/javascript/commit/7fb229688020d51c9b6d1721a9b0d039abe4c59d), [`91e9a55f4`](https://github.com/clerkinc/javascript/commit/91e9a55f4b9f1a8f8d843a788597026015ddeafd), [`91014880d`](https://github.com/clerkinc/javascript/commit/91014880df71c2618d0b1e513da4dd19ccd809e3), [`7f4d4b942`](https://github.com/clerkinc/javascript/commit/7f4d4b942e8834462cdc0976b106d9739c345f6b)]:
+  - @clerk/shared@0.24.4
+  - @clerk/types@3.55.0
+  - @clerk/localizations@1.26.4
+
+## 4.60.1
+
+### Patch Changes
+
+- Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerkinc/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
+
+  - `orgs` jwt claims
+  - `apiKey`
+  - `frontendApi`
+  - `redirect_url`
+  - `password`
+  - `generateSignature`
+  - `afterSwitchOrganizationUrl`
+  - `profileImageUrl`
+
+- Fixes an issue where the phone number value was not properly copied onto the input when pasting on the email or username field in the `<SignIn/>` component after autoswitching to the phone number field. The issue was introduced with the changes for the Prefill `<SignIn/>` and `<SignUp/>` feature. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1e212c19d`](https://github.com/clerkinc/javascript/commit/1e212c19d1cbfbcf6bc6718f5aec0a3cb893b96f), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679)]:
+  - @clerk/shared@0.24.3
+
 ## 4.60.0
 
 ### Minor Changes

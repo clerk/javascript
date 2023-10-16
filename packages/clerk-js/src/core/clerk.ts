@@ -27,6 +27,7 @@ import type {
   DomainOrProxyUrl,
   EnvironmentJSON,
   EnvironmentResource,
+  HandleEmailLinkVerificationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
@@ -40,6 +41,7 @@ import type {
   PublishableKey,
   RedirectOptions,
   Resources,
+  SDKMetadata,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -93,6 +95,8 @@ import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
+  clerkInvalidSignInUrlFormat,
+  clerkInvalidSignInUrlOrigin,
   clerkMissingDevBrowserJwt,
   clerkMissingProxyUrlAndDomain,
   clerkMissingSignInUrlAsSatellite,
@@ -104,6 +108,8 @@ import createFapiClient from './fapiClient';
 import {
   BaseResource,
   Client,
+  EmailLinkError,
+  EmailLinkErrorCode,
   Environment,
   MagicLinkError,
   MagicLinkErrorCode,
@@ -139,7 +145,13 @@ const defaultOptions: ClerkOptions = {
 
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
+
   public static version: string = __PKG_VERSION__;
+  public static sdkMetadata: SDKMetadata = {
+    name: __PKG_NAME__,
+    version: __PKG_VERSION__,
+  };
+
   public client?: ClientResource;
   public session?: ActiveSessionResource | null;
   public organization?: OrganizationResource | null;
@@ -158,7 +170,14 @@ export default class Clerk implements ClerkInterface {
   #fapiClient: FapiClient;
   #instanceType: InstanceType;
   #isReady = false;
+
+  /**
+   * @deprecated Although this being a private field, this is a reminder to drop it with the next major release
+   */
   #lastOrganizationInvitation: OrganizationInvitationResource | null = null;
+  /**
+   * @deprecated Although this being a private field, this is a reminder to drop it with the next major release
+   */
   #lastOrganizationMember: OrganizationMembershipResource | null = null;
   #listeners: Array<(emission: Resources) => void> = [];
   #options: ClerkOptions = {};
@@ -245,6 +264,8 @@ export default class Clerk implements ClerkInterface {
     this.#proxyUrl = options?.proxyUrl;
 
     if (isLegacyFrontendApiKey(key)) {
+      deprecated('frontendApi', 'Use `publishableKey` instead.');
+
       if (!validateFrontendApi(key)) {
         errorThrower.throwInvalidFrontendApiError({ key });
       }
@@ -807,10 +828,16 @@ export default class Clerk implements ClerkInterface {
     return;
   };
 
+  /**
+   *
+   * @deprecated Use `handleEmailLinkVerification` instead.
+   */
   public handleMagicLinkVerification = async (
     params: HandleMagicLinkVerificationParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
+    deprecated('handleMagicLinkVerification', 'Use `handleEmailLinkVerification` instead.');
+
     if (!this.client) {
       return;
     }
@@ -820,6 +847,49 @@ export default class Clerk implements ClerkInterface {
       throw new MagicLinkError(MagicLinkErrorCode.Expired);
     } else if (verificationStatus !== 'verified') {
       throw new MagicLinkError(MagicLinkErrorCode.Failed);
+    }
+
+    const newSessionId = getClerkQueryParam('__clerk_created_session');
+    const { signIn, signUp, sessions } = this.client;
+
+    const shouldCompleteOnThisDevice = sessions.some(s => s.id === newSessionId);
+    const shouldContinueOnThisDevice =
+      signIn.status === 'needs_second_factor' || signUp.status === 'missing_requirements';
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+    const redirectComplete = params.redirectUrlComplete ? () => navigate(params.redirectUrlComplete as string) : noop;
+    const redirectContinue = params.redirectUrl ? () => navigate(params.redirectUrl as string) : noop;
+
+    if (shouldCompleteOnThisDevice) {
+      return this.setActive({
+        session: newSessionId,
+        beforeEmit: redirectComplete,
+      });
+    } else if (shouldContinueOnThisDevice) {
+      return redirectContinue();
+    }
+
+    if (typeof params.onVerifiedOnOtherDevice === 'function') {
+      params.onVerifiedOnOtherDevice();
+    }
+    return null;
+  };
+
+  public handleEmailLinkVerification = async (
+    params: HandleEmailLinkVerificationParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    if (!this.client) {
+      return;
+    }
+
+    const verificationStatus = getClerkQueryParam('__clerk_status');
+    if (verificationStatus === 'expired') {
+      throw new EmailLinkError(EmailLinkErrorCode.Expired);
+    } else if (verificationStatus !== 'verified') {
+      throw new EmailLinkError(EmailLinkErrorCode.Failed);
     }
 
     const newSessionId = getClerkQueryParam('__clerk_created_session');
@@ -1089,10 +1159,8 @@ export default class Clerk implements ClerkInterface {
     return await OrganizationMembership.retrieve();
   };
 
-  public getOrganization = async (organizationId: string): Promise<Organization | undefined> => {
-    return (await OrganizationMembership.retrieve()).find(orgMem => orgMem.organization.id === organizationId)
-      ?.organization;
-  };
+  public getOrganization = async (organizationId: string): Promise<OrganizationResource> =>
+    Organization.get(organizationId);
 
   public updateEnvironment(environment: EnvironmentResource) {
     this.#environment = environment;
@@ -1124,12 +1192,28 @@ export default class Clerk implements ClerkInterface {
     this.#emit();
   };
 
+  /**
+   * @deprecated This method will be dropped in the next major release.
+   * This method is only used in another deprecated part: `invitationList` from useOrganization
+   */
   __unstable__invitationUpdate(invitation: OrganizationInvitationResource) {
+    deprecated(
+      '__unstable__invitationUpdate',
+      'We are completely dropping this method as it was introduced for internal use only',
+    );
     this.#lastOrganizationInvitation = invitation;
     this.#emit();
   }
 
+  /**
+   * @deprecated This method will be dropped in the next major release.
+   * This method is only used in another deprecated part: `membershipList` from useOrganization
+   */
   __unstable__membershipUpdate(membership: OrganizationMembershipResource) {
+    deprecated(
+      '__unstable__membershipUpdate',
+      'We are completely dropping this method as it was introduced for internal use only',
+    );
     this.#lastOrganizationMember = membership;
     this.#emit();
   }
@@ -1224,16 +1308,34 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
+  #assertSignInFormatAndOrigin = (_signInUrl: string, origin: string) => {
+    let signInUrl: URL;
+    try {
+      signInUrl = new URL(_signInUrl);
+    } catch {
+      clerkInvalidSignInUrlFormat();
+    }
+
+    if (signInUrl.origin === origin) {
+      clerkInvalidSignInUrlOrigin();
+    }
+  };
+
   #validateMultiDomainOptions = () => {
     if (!this.isSatellite) {
       return;
     }
+
     if (this.#instanceType === 'development' && !this.#options.signInUrl) {
       clerkMissingSignInUrlAsSatellite();
     }
 
     if (!this.proxyUrl && !this.domain) {
       clerkMissingProxyUrlAndDomain();
+    }
+
+    if (this.#options.signInUrl) {
+      this.#assertSignInFormatAndOrigin(this.#options.signInUrl, window.location.origin);
     }
   };
 

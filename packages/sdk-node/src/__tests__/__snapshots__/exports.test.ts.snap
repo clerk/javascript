@@ -60,6 +60,7 @@ exports[`module exports should not change unless explicitly set 1`] = `
   "setClerkApiVersion",
   "setClerkHttpOptions",
   "setClerkServerApiUrl",
+  "signJwt",
   "signedInAuthObject",
   "signedOutAuthObject",
   "smsMessages",

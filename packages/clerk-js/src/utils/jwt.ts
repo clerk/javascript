@@ -1,3 +1,4 @@
+import { deprecatedObjectProperty } from '@clerk/shared';
 import type { JWT, JWTClaims } from '@clerk/types';
 
 import { urlDecodeB64 } from './encoders';
@@ -17,9 +18,18 @@ export function decode(token: string): JWT {
     claims[k] = payloadJSON[k];
   });
 
-  return {
+  const decodedToken = {
     encoded: { header, payload, signature },
     header: JSON.parse(urlDecodeB64(header)),
     claims,
   };
+
+  deprecatedObjectProperty(
+    decodedToken,
+    'orgs',
+    'Add orgs to your session token using the "user.organizations" shortcode in JWT Templates instead.',
+    'decode:orgs',
+  );
+
+  return decodedToken;
 }

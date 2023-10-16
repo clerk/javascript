@@ -1,3 +1,4 @@
+import { deprecatedObjectProperty } from '@clerk/shared';
 import type { Jwt, JwtPayload } from '@clerk/types';
 
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
@@ -6,9 +7,9 @@ import runtime from '../../runtime';
 import { base64url } from '../../util/rfc4648';
 import { deprecated } from '../../util/shared';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
+import { getCryptoAlgorithm } from './algorithms';
 import type { IssuerResolver } from './assertions';
 import {
-  algToHash,
   assertActivationClaim,
   assertAudienceClaim,
   assertAuthorizedPartiesClaim,
@@ -19,38 +20,19 @@ import {
   assertIssuerClaim,
   assertSubClaim,
 } from './assertions';
+import { importKey } from './cryptoKeys';
 
 const DEFAULT_CLOCK_SKEW_IN_SECONDS = 5 * 1000;
 
-const RSA_ALGORITHM_NAME = 'RSASSA-PKCS1-v1_5';
-const EC_ALGORITHM_NAME = 'ECDSA';
-
-const jwksAlgToCryptoAlg: Record<string, string> = {
-  RS256: RSA_ALGORITHM_NAME,
-  RS384: RSA_ALGORITHM_NAME,
-  RS512: RSA_ALGORITHM_NAME,
-  ES256: EC_ALGORITHM_NAME,
-  ES384: EC_ALGORITHM_NAME,
-  ES512: EC_ALGORITHM_NAME,
-};
-
-export async function hasValidSignature(jwt: Jwt, jwk: JsonWebKey) {
+export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string) {
   const { header, signature, raw } = jwt;
   const encoder = new TextEncoder();
   const data = encoder.encode([raw.header, raw.payload].join('.'));
+  const algorithm = getCryptoAlgorithm(header.alg);
 
-  const cryptoKey = await runtime.crypto.subtle.importKey(
-    'jwk',
-    jwk,
-    {
-      name: jwksAlgToCryptoAlg[header.alg],
-      hash: algToHash[header.alg],
-    },
-    false,
-    ['verify'],
-  );
+  const cryptoKey = await importKey(key, algorithm, 'verify');
 
-  return runtime.crypto.subtle.verify('RSASSA-PKCS1-v1_5', cryptoKey, signature, data);
+  return runtime.crypto.subtle.verify(algorithm.name, cryptoKey, signature, data);
 }
 
 export function decodeJwt(token: string): Jwt {
@@ -85,6 +67,13 @@ export function decodeJwt(token: string): Jwt {
   const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
   const signature = base64url.parse(rawSignature, { loose: true });
 
+  deprecatedObjectProperty(
+    payload,
+    'orgs',
+    'Add orgs to your session token using the "user.organizations" shortcode in JWT Templates instead.',
+    'decodeJwt:orgs',
+  );
+
   return {
     header,
     payload,
@@ -107,7 +96,7 @@ export type VerifyJwtOptions = {
   clockSkewInSeconds?: number;
   clockSkewInMs?: number;
   issuer: IssuerResolver | string | null;
-  key: JsonWebKey;
+  key: JsonWebKey | string;
 };
 
 // TODO: Revise the return types. Maybe it's better to throw an error instead of return an object with a reason

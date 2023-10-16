@@ -1,25 +1,19 @@
 {
   "name": "@clerk/shared",
-  "version": "0.24.2",
+  "version": "0.24.4",
   "description": "Internal package utils used by the Clerk SDKs",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "sideEffects": false,
   "files": [
-    "dist",
-    "testUtils"
+    "dist"
   ],
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
-    },
-    "./testUtils": {
-      "types": "./dist/types/testUtils/index.d.ts",
-      "import": "./dist/esm/testUtils/index.js",
-      "require": "./dist/cjs/testUtils/index.js"
     }
   },
   "scripts": {
@@ -30,12 +24,19 @@
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%",
+    "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
+  "dependencies": {
+    "glob-to-regexp": "0.4.1",
+    "js-cookie": "3.0.1",
+    "swr": "2.2.0"
+  },
   "devDependencies": {
-    "@clerk/types": "3.54.0",
+    "@clerk/types": "3.55.0",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
     "tsup": "*",
@@ -44,14 +45,14 @@
   "peerDependencies": {
     "react": ">=16"
   },
-  "author": "",
-  "license": "ISC",
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "author": "Clerk",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "glob-to-regexp": "0.4.1",
-    "js-cookie": "3.0.1",
-    "swr": "2.2.0"
   }
 }

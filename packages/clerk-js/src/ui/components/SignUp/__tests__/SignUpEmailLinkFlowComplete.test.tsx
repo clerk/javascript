@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { MagicLinkError, MagicLinkErrorCode } from '../../../../core/resources';
+import { EmailLinkError, EmailLinkErrorCode } from '../../../../core/resources';
 import { bindCreateFixtures, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
 import { SignUpEmailLinkFlowComplete } from '../../../common/EmailLinkCompleteFlowCard';
 
@@ -24,7 +24,7 @@ describe('SignUpEmailLinkFlowComplete', () => {
     await runFakeTimers(async timers => {
       render(<SignUpEmailLinkFlowComplete />, { wrapper });
       timers.runOnlyPendingTimers();
-      await waitFor(() => expect(fixtures.clerk.handleMagicLinkVerification).toHaveBeenCalled());
+      await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
     });
   });
 
@@ -36,7 +36,7 @@ describe('SignUpEmailLinkFlowComplete', () => {
       await runFakeTimers(async timers => {
         render(<SignUpEmailLinkFlowComplete />, { wrapper });
         timers.runOnlyPendingTimers();
-        await waitFor(() => expect(fixtures.clerk.handleMagicLinkVerification).toHaveBeenCalled());
+        await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
         screen.getByText(/success/i);
       });
     });
@@ -47,16 +47,16 @@ describe('SignUpEmailLinkFlowComplete', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
       });
-      fixtures.clerk.handleMagicLinkVerification.mockImplementationOnce(
+      fixtures.clerk.handleEmailLinkVerification.mockImplementationOnce(
         await Promise.resolve(() => {
-          throw new MagicLinkError(MagicLinkErrorCode.Expired);
+          throw new EmailLinkError(EmailLinkErrorCode.Expired);
         }),
       );
 
       await runFakeTimers(async timers => {
         render(<SignUpEmailLinkFlowComplete />, { wrapper });
         timers.runOnlyPendingTimers();
-        await waitFor(() => expect(fixtures.clerk.handleMagicLinkVerification).toHaveBeenCalled());
+        await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
         screen.getByText(/expired/i);
       });
     });
@@ -65,15 +65,15 @@ describe('SignUpEmailLinkFlowComplete', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
       });
-      fixtures.clerk.handleMagicLinkVerification.mockImplementationOnce(
+      fixtures.clerk.handleEmailLinkVerification.mockImplementationOnce(
         await Promise.resolve(() => {
-          throw new MagicLinkError(MagicLinkErrorCode.Failed);
+          throw new EmailLinkError(EmailLinkErrorCode.Failed);
         }),
       );
       await runFakeTimers(async timers => {
         render(<SignUpEmailLinkFlowComplete />, { wrapper });
         timers.runOnlyPendingTimers();
-        await waitFor(() => expect(fixtures.clerk.handleMagicLinkVerification).toHaveBeenCalled());
+        await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
         screen.getByText(/invalid/i);
       });
     });

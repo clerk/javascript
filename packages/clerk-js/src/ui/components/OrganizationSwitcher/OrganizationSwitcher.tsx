@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 import { withOrganizationsEnabledGuard } from '../../common';
 import { withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -12,12 +14,15 @@ const _OrganizationSwitcher = withFloatingTree(() => {
     offset: 8,
   });
 
+  const switcherButtonMenuId = useId();
+
   return (
     <Flow.Root flow='organizationSwitcher'>
       <OrganizationSwitcherTrigger
         ref={reference}
         onClick={toggle}
         isOpen={isOpen}
+        aria-controls={switcherButtonMenuId}
       />
       <Popover
         nodeId={nodeId}
@@ -25,6 +30,7 @@ const _OrganizationSwitcher = withFloatingTree(() => {
         isOpen={isOpen}
       >
         <OrganizationSwitcherPopover
+          id={switcherButtonMenuId}
           close={toggle}
           ref={floating}
           style={{ ...styles }}

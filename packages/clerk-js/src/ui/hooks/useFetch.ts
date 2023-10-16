@@ -24,11 +24,11 @@ export const useFetch = <T>(
     requestStatus.setLoading();
     fetcherRef
       .current(params)
-      .then(domain => {
+      .then(result => {
         requestStatus.setIdle();
-        if (domain) {
-          setData({ ...domain });
-          callbacks?.onSuccess?.({ ...domain });
+        if (typeof result !== 'undefined') {
+          setData(typeof result === 'object' ? { ...result } : result);
+          callbacks?.onSuccess?.(typeof result === 'object' ? { ...result } : result);
         }
       })
       .catch(() => {

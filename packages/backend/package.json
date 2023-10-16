@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "0.30.2",
+  "version": "0.31.0",
   "license": "MIT",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "types": "./dist/types/index.d.ts",
@@ -37,6 +37,8 @@
     "clean": "rimraf ./dist",
     "clean:tests": "rimraf ./tests/dist",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "test": "run-s clean:tests build:runtime build:tests test:node test:edge-runtime test:cloudflare-miniflare",
     "test:node": "./tests/node/run.sh",
     "test:edge-runtime": "./tests/edge-runtime/run.sh",
@@ -44,8 +46,8 @@
     "test:cloudflare-workerd": "tests/cloudflare-workerd/run.sh"
   },
   "dependencies": {
-    "@clerk/shared": "0.24.2",
-    "@clerk/types": "3.54.0",
+    "@clerk/shared": "0.24.4",
+    "@clerk/types": "3.55.0",
     "@peculiar/webcrypto": "1.4.1",
     "@types/node": "16.18.6",
     "cookie": "0.5.0",

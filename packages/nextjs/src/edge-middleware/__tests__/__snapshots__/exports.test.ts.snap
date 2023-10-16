@@ -52,6 +52,7 @@ exports[`/edge-middleware public exports should not include a breaking change 1`
   "requireEdgeMiddlewareAuth",
   "sanitizeAuthObject",
   "sessions",
+  "signJwt",
   "signedInAuthObject",
   "signedOutAuthObject",
   "smsMessages",

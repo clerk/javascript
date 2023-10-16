@@ -60,7 +60,8 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
 
     const authSessionResult = await WebBrowser.openAuthSessionAsync(
-      externalVerificationRedirectURL!.toString(),
+      // @ts-ignore
+      externalVerificationRedirectURL.toString(),
       oauthRedirectUrl,
     );
 

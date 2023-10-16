@@ -8,7 +8,7 @@ import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
 import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
-import type { MembershipRole } from './organizationMembership';
+import type { MembershipRole, OrganizationPermission } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
@@ -164,9 +164,6 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   verification?: VerificationJSON;
 }
 
-/**
- * @experimental
- */
 export interface SamlAccountJSON extends ClerkResourceJSON {
   object: 'saml_account';
   provider: SamlIdpSlug;
@@ -197,9 +194,6 @@ export interface UserJSON extends ClerkResourceJSON {
   web3_wallets: Web3WalletJSON[];
   external_accounts: ExternalAccountJSON[];
 
-  /**
-   * @experimental
-   */
   saml_accounts: SamlAccountJSON[];
 
   organization_memberships: OrganizationMembershipJSON[];
@@ -273,6 +267,7 @@ export interface ClerkAPIErrorJSON {
     param_name?: string;
     session_id?: string;
     email_addresses?: string[];
+    identifiers?: string[];
     zxcvbn?: {
       suggestions: {
         code: string;
@@ -322,6 +317,12 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: 'organization_membership';
   id: string;
   organization: OrganizationJSON;
+  /**
+   * @experimental The property is experimental and subject to change in future releases.
+   */
+  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+  // eslint-disable-next-line
+  permissions: (OrganizationPermission | (string & {}))[];
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;

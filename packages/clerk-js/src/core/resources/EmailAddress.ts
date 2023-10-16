@@ -1,11 +1,13 @@
-import { Poller } from '@clerk/shared';
+import { deprecated, Poller } from '@clerk/shared';
 import type {
   AttemptEmailAddressVerificationParams,
+  CreateEmailLinkFlowReturn,
   CreateMagicLinkFlowReturn,
   EmailAddressJSON,
   EmailAddressResource,
   IdentificationLinkResource,
   PrepareEmailAddressVerificationParams,
+  StartEmailLinkFlowParams,
   StartMagicLinkFlowParams,
   VerificationResource,
 } from '@clerk/types';
@@ -46,8 +48,12 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
       body: { code },
     });
   };
-
+  /**
+   * @deprecated Use `createEmailLinkFlow` instead.
+   */
   createMagicLinkFlow = (): CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, EmailAddressResource> => {
+    deprecated('createMagicLinkFlow', 'Use `createEmailLinkFlow` instead.');
+
     const { run, stop } = Poller();
 
     const startMagicLinkFlow = async ({ redirectUrl }: StartMagicLinkFlowParams): Promise<EmailAddressResource> => {
@@ -75,6 +81,36 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
       });
     };
     return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
+  };
+
+  createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource> => {
+    const { run, stop } = Poller();
+
+    const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<EmailAddressResource> => {
+      if (!this.id) {
+        clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
+      }
+      await this.prepareVerification({
+        strategy: 'email_link',
+        redirectUrl: redirectUrl,
+      });
+      return new Promise((resolve, reject) => {
+        void run(() => {
+          return this.reload()
+            .then(res => {
+              if (res.verification.status === 'verified') {
+                stop();
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              stop();
+              reject(err);
+            });
+        });
+      });
+    };
+    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
   destroy = (): Promise<void> => this._baseDelete();

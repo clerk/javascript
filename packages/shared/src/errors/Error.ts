@@ -1,5 +1,7 @@
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 
+import { deprecated } from '../utils';
+
 interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
   status: number;
@@ -18,10 +20,6 @@ export function isKnownError(error: any) {
 }
 
 export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
-  if (err instanceof ClerkAPIResponseError) {
-    return true;
-  }
-
   return 'clerkError' in err;
 }
 
@@ -42,7 +40,7 @@ export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError 
  * }
  */
 export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
-  return err instanceof ClerkRuntimeError;
+  return 'clerkRuntimeError' in err;
 }
 
 export function isMetamaskError(err: any): err is MetamaskError {
@@ -62,12 +60,15 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
       paramName: error?.meta?.param_name,
       sessionId: error?.meta?.session_id,
       emailAddresses: error?.meta?.email_addresses,
+      identifiers: error?.meta?.identifiers,
       zxcvbn: error?.meta?.zxcvbn,
     },
   };
 }
 
 export class ClerkAPIResponseError extends Error {
+  clerkError: true;
+
   status: number;
   message: string;
 
@@ -80,6 +81,7 @@ export class ClerkAPIResponseError extends Error {
 
     this.status = status;
     this.message = message;
+    this.clerkError = true;
     this.errors = parseErrors(data);
   }
 
@@ -98,6 +100,8 @@ export class ClerkAPIResponseError extends Error {
  *   throw new ClerkRuntimeError('An error occurred', { code: 'password_invalid' });
  */
 export class ClerkRuntimeError extends Error {
+  clerkRuntimeError: true;
+
   /**
    * The error message.
    *
@@ -113,6 +117,7 @@ export class ClerkRuntimeError extends Error {
    * @memberof ClerkRuntimeError
    */
   code: string;
+
   constructor(message: string, { code }: { code: string }) {
     super(message);
 
@@ -120,6 +125,7 @@ export class ClerkRuntimeError extends Error {
 
     this.code = code;
     this.message = message;
+    this.clerkRuntimeError = true;
   }
 
   /**
@@ -133,6 +139,9 @@ export class ClerkRuntimeError extends Error {
   };
 }
 
+/**
+ * @deprecated Use `EmailLinkError` instead.
+ */
 export class MagicLinkError extends Error {
   code: string;
 
@@ -140,15 +149,48 @@ export class MagicLinkError extends Error {
     super(code);
     this.code = code;
     Object.setPrototypeOf(this, MagicLinkError.prototype);
+    deprecated('MagicLinkError', 'Use `EmailLinkError` instead.');
   }
 }
-// Check if the error is a MagicLinkError.
 
+export class EmailLinkError extends Error {
+  code: string;
+
+  constructor(code: string) {
+    super(code);
+    this.code = code;
+    Object.setPrototypeOf(this, EmailLinkError.prototype);
+  }
+}
+
+/**
+ * Check if the error is a MagicLinkError.
+ * @deprecated Use `isEmailLinkError` instead.
+ */
 export function isMagicLinkError(err: Error): err is MagicLinkError {
+  deprecated('isMagicLinkError', 'Use `isEmailLinkError` instead.');
   return err instanceof MagicLinkError;
 }
 
-export const MagicLinkErrorCode = {
+export function isEmailLinkError(err: Error): err is EmailLinkError {
+  return err instanceof EmailLinkError;
+}
+
+const _MagicLinkErrorCode = {
+  Expired: 'expired',
+  Failed: 'failed',
+};
+/**
+ * @deprecated Use `EmailLinkErrorCode` instead.
+ */
+export const MagicLinkErrorCode = new Proxy(_MagicLinkErrorCode, {
+  get(target, prop, receiver) {
+    deprecated('MagicLinkErrorCode', 'Use `EmailLinkErrorCode` instead.');
+    return Reflect.get(target, prop, receiver);
+  },
+});
+
+export const EmailLinkErrorCode = {
   Expired: 'expired',
   Failed: 'failed',
 };

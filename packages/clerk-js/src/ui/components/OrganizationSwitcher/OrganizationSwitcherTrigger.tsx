@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 
-import { NotificationCountBadge } from '../../common';
+import { NotificationCountBadge, withGate } from '../../common';
 import {
   useCoreOrganization,
   useCoreOrganizationList,
@@ -33,6 +33,9 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         colorScheme='neutral'
         sx={[t => ({ minHeight: 0, padding: `0 ${t.space.$2} 0 0`, position: 'relative' }), sx]}
         ref={ref}
+        aria-label={`${props.isOpen ? 'Close' : 'Open'} organization switcher`}
+        aria-expanded={props.isOpen}
+        aria-haspopup='dialog'
         {...rest}
       >
         {organization && (
@@ -69,28 +72,32 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
     );
   }),
 );
-const NotificationCountBadgeSwitcherTrigger = () => {
-  /**
-   * Prefetch user invitations and suggestions
-   */
-  const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
-  const { membership } = useCoreOrganization();
-  const { organizationSettings } = useEnvironment();
-  const isAdmin = membership?.role === 'admin';
-  const allowRequests = organizationSettings?.domains?.enabled && isAdmin;
-  const { membershipRequests } = useCoreOrganization({
-    membershipRequests: allowRequests || undefined,
-  });
+const NotificationCountBadgeSwitcherTrigger = withGate(
+  () => {
+    /**
+     * Prefetch user invitations and suggestions
+     */
+    const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
+    const { organizationSettings } = useEnvironment();
+    const isDomainsEnabled = organizationSettings?.domains?.enabled;
+    const { membershipRequests } = useCoreOrganization({
+      membershipRequests: isDomainsEnabled || undefined,
+    });
 
-  const notificationCount =
-    (userInvitations.count || 0) + (userSuggestions.count || 0) + (membershipRequests?.count || 0);
+    const notificationCount =
+      (userInvitations.count || 0) + (userSuggestions.count || 0) + (membershipRequests?.count || 0);
 
-  return (
-    <NotificationCountBadge
-      containerSx={t => ({
-        marginLeft: `${t.space.$2}`,
-      })}
-      notificationCount={notificationCount}
-    />
-  );
-};
+    return (
+      <NotificationCountBadge
+        containerSx={t => ({
+          marginLeft: `${t.space.$2}`,
+        })}
+        notificationCount={notificationCount}
+      />
+    );
+  },
+  {
+    // if the user is not able to accept a request we should not notify them
+    permission: 'org:sys_memberships:manage',
+  },
+);

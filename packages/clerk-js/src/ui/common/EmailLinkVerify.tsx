@@ -1,4 +1,4 @@
-import { isMagicLinkError, MagicLinkErrorCode } from '@clerk/shared';
+import { EmailLinkErrorCode, isEmailLinkError } from '@clerk/shared';
 import React from 'react';
 
 import type { VerificationStatus } from '../../utils/getClerkQueryParam';
@@ -19,7 +19,7 @@ export type EmailLinkVerifyProps = {
 
 export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
   const { redirectUrl, redirectUrlComplete, verifyEmailPath, verifyPhonePath } = props;
-  const { handleMagicLinkVerification } = useCoreClerk();
+  const { handleEmailLinkVerification } = useCoreClerk();
   const { navigate } = useRouter();
   const signUp = useCoreSignUp();
   const [verificationStatus, setVerificationStatus] = React.useState<VerificationStatus>('loading');
@@ -28,7 +28,7 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
     try {
       // Avoid loading flickering
       await sleep(750);
-      await handleMagicLinkVerification({ redirectUrlComplete, redirectUrl }, navigate);
+      await handleEmailLinkVerification({ redirectUrlComplete, redirectUrl }, navigate);
       setVerificationStatus('verified_switch_tab');
       await sleep(750);
       return completeSignUpFlow({
@@ -39,7 +39,7 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
       });
     } catch (err) {
       let status: VerificationStatus = 'failed';
-      if (isMagicLinkError(err) && err.code === MagicLinkErrorCode.Expired) {
+      if (isEmailLinkError(err) && err.code === EmailLinkErrorCode.Expired) {
         status = 'expired';
       }
       setVerificationStatus(status);

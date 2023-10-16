@@ -45,7 +45,14 @@ export function _SignInStart(): JSX.Element {
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
   );
-  const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(identifierAttributes[0] || '');
+
+  const onlyPhoneNumberInitialValueExists =
+    !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
+  const shouldStartWithPhoneNumberIdentifier =
+    onlyPhoneNumberInitialValueExists && identifierAttributes.includes('phone_number');
+  const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(
+    shouldStartWithPhoneNumberIdentifier ? 'phone_number' : identifierAttributes[0] || '',
+  );
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';

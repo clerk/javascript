@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import { deprecatedProperty } from '@clerk/shared';
 import type {
   BackupCodeJSON,
@@ -61,9 +62,6 @@ export class User extends BaseResource implements UserResource {
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
 
-  /**
-   * @experimental
-   */
   samlAccounts: SamlAccountResource[] = [];
 
   organizationMemberships: OrganizationMembershipResource[] = [];
@@ -154,6 +152,9 @@ export class User extends BaseResource implements UserResource {
 
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
     const { strategy, redirectUrl, additionalScopes, redirect_url } = params || {};
+    if (redirect_url) {
+      deprecated('redirect_url', 'Use `redirectUrl` instead.');
+    }
 
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
@@ -216,6 +217,12 @@ export class User extends BaseResource implements UserResource {
   };
 
   update = (params: UpdateUserParams): Promise<UserResource> => {
+    if (params.password) {
+      deprecated(
+        'password',
+        'This will be removed in the next major version. Please use `updatePassword(params)` instead.',
+      );
+    }
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });

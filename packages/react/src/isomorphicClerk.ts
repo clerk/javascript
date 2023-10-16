@@ -8,6 +8,7 @@ import type {
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
+  HandleEmailLinkVerificationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
@@ -196,6 +197,8 @@ export default class IsomorphicClerk {
 
         await global.Clerk.load(this.options);
       }
+
+      global.Clerk.sdkMetadata = this.options.sdkMetadata ?? { name: PACKAGE_NAME, version: PACKAGE_VERSION };
 
       if (global.Clerk?.loaded || global.Clerk?.isReady()) {
         return this.hydrateClerkJS(global.Clerk);
@@ -667,13 +670,25 @@ export default class IsomorphicClerk {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
     }
   };
-
+  /**
+   * @deprecated Use `handleEmailLinkVerification` instead.
+   */
   handleMagicLinkVerification = async (params: HandleMagicLinkVerificationParams): Promise<void> => {
+    deprecated('handleMagicLinkVerification', 'Use `handleEmailLinkVerification` instead.');
     const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('handleMagicLinkVerification', callback);
+    }
+  };
+
+  handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams): Promise<void> => {
+    const callback = () => this.clerkjs?.handleEmailLinkVerification(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('handleEmailLinkVerification', callback);
     }
   };
 
@@ -704,10 +719,10 @@ export default class IsomorphicClerk {
     }
   };
 
-  getOrganization = async (organizationId: string): Promise<OrganizationResource | undefined | void> => {
+  getOrganization = async (organizationId: string): Promise<OrganizationResource | void> => {
     const callback = () => this.clerkjs?.getOrganization(organizationId);
     if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<OrganizationResource | undefined>;
+      return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('getOrganization', callback);
     }

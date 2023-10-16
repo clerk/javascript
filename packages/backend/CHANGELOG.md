@@ -1,5 +1,43 @@
 # Change Log
 
+## 0.31.0
+
+### Minor Changes
+
+- Add support for LinkedIn OIDC ([#1772](https://github.com/clerkinc/javascript/pull/1772)) by [@fragoulis](https://github.com/fragoulis)
+
+### Patch Changes
+
+- Throw an error if the `signInUrl` is on the same origin of a satellite application or if it is of invalid format ([#1845](https://github.com/clerkinc/javascript/pull/1845)) by [@desiprisg](https://github.com/desiprisg)
+
+- Avoid always showing deprecation warnings for `frontendApi` and `apiKey` in `@clerk/clerk-sdk-node` ([#1856](https://github.com/clerkinc/javascript/pull/1856)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`977336f79`](https://github.com/clerkinc/javascript/commit/977336f793cd4ce5984f98dac3cedf9f5ec363f5), [`997b8e256`](https://github.com/clerkinc/javascript/commit/997b8e256c8f83d68d0ae4243c7ea5640573d1ae), [`91e9a55f4`](https://github.com/clerkinc/javascript/commit/91e9a55f4b9f1a8f8d843a788597026015ddeafd), [`91014880d`](https://github.com/clerkinc/javascript/commit/91014880df71c2618d0b1e513da4dd19ccd809e3), [`7f4d4b942`](https://github.com/clerkinc/javascript/commit/7f4d4b942e8834462cdc0976b106d9739c345f6b)]:
+  - @clerk/shared@0.24.4
+  - @clerk/types@3.55.0
+
+## 0.30.3
+
+### Patch Changes
+
+- Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerkinc/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
+
+  - `orgs` jwt claims
+  - `apiKey`
+  - `frontendApi`
+  - `redirect_url`
+  - `password`
+  - `generateSignature`
+  - `afterSwitchOrganizationUrl`
+  - `profileImageUrl`
+
+- Remove deprecation warning that is logging more than intended and not actionable for users of our SDKs. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Retry the implemented changes from [#1767](https://github.com/clerkinc/javascript/pull/1767) which were reverted in [#1806](https://github.com/clerkinc/javascript/pull/1806) due to RSC related errors (not all uses components had the `use client` directive). Restore the original PR and add additional `use client` directives to ensure it works correctly. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1e212c19d`](https://github.com/clerkinc/javascript/commit/1e212c19d1cbfbcf6bc6718f5aec0a3cb893b96f), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679)]:
+  - @clerk/shared@0.24.3
+
 ## 0.30.2
 
 ### Patch Changes
