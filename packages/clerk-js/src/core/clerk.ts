@@ -1211,7 +1211,7 @@ export default class Clerk implements ClerkInterface {
    */
   __unstable__membershipUpdate(membership: OrganizationMembershipResource) {
     deprecated(
-      '__unstable__invitationUpdate',
+      '__unstable__membershipUpdate',
       'We are completely dropping this method as it was introduced for internal use only',
     );
     this.#lastOrganizationMember = membership;
