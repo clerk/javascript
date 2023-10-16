@@ -12,7 +12,7 @@ import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
  */
 export type VerifyTokenOptions = Pick<
   VerifyJwtOptions,
-  'authorizedParties' | 'audience' | 'issuer' | 'clockSkewInSeconds' | 'clockSkewInMs'
+  'authorizedParties' | 'audience' | 'issuer' | 'clockSkewInMs'
 > & { jwtKey?: string; proxyUrl?: string } & Pick<
     LoadClerkJWKFromRemoteOptions,
     'apiKey' | 'secretKey' | 'apiUrl' | 'apiVersion' | 'jwksCacheTtlInMs' | 'skipJwksCache'
@@ -26,7 +26,6 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
     apiVersion,
     audience,
     authorizedParties,
-    clockSkewInSeconds,
     clockSkewInMs,
     issuer,
     jwksCacheTtlInMs,
@@ -62,7 +61,6 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
   return await verifyJwt(token, {
     audience,
     authorizedParties,
-    clockSkewInSeconds,
     clockSkewInMs,
     key,
     issuer,

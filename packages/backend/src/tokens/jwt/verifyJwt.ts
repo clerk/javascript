@@ -5,7 +5,6 @@ import type { Jwt, JwtPayload } from '@clerk/types';
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../../runtime';
 import { base64url } from '../../util/rfc4648';
-import { deprecated } from '../../util/shared';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import { getCryptoAlgorithm } from './algorithms';
 import type { IssuerResolver } from './assertions';
@@ -90,10 +89,6 @@ export function decodeJwt(token: string): Jwt {
 export type VerifyJwtOptions = {
   audience?: string | string[];
   authorizedParties?: string[];
-  /**
-   * @deprecated This option incorrectly accepts milliseconds instead of seconds and has been deprecated. Use clockSkewInMs instead.
-   */
-  clockSkewInSeconds?: number;
   clockSkewInMs?: number;
   issuer: IssuerResolver | string | null;
   key: JsonWebKey | string;
@@ -102,13 +97,9 @@ export type VerifyJwtOptions = {
 // TODO: Revise the return types. Maybe it's better to throw an error instead of return an object with a reason
 export async function verifyJwt(
   token: string,
-  { audience, authorizedParties, clockSkewInSeconds, clockSkewInMs, issuer, key }: VerifyJwtOptions,
+  { audience, authorizedParties, clockSkewInMs, issuer, key }: VerifyJwtOptions,
 ): Promise<JwtPayload> {
-  if (clockSkewInSeconds) {
-    deprecated('clockSkewInSeconds', 'Use `clockSkewInMs` instead.');
-  }
-
-  const clockSkew = clockSkewInMs || clockSkewInSeconds || DEFAULT_CLOCK_SKEW_IN_SECONDS;
+  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
 
   const decoded = decodeJwt(token);
 
