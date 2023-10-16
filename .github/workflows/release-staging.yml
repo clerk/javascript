@@ -18,7 +18,6 @@ jobs:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
       TURBO_REMOTE_ONLY: true
-      NPM_CONFIG_PROVENANCE: true
     permissions:
       contents: read
       id-token: write
@@ -38,6 +37,7 @@ jobs:
         run: npm run release:staging
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
         uses: actions/github-script@v6
