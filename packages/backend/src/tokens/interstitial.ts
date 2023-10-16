@@ -8,7 +8,6 @@ import { joinPaths } from '../util/path';
 import {
   addClerkPrefix,
   callWithRetry,
-  deprecated,
   getClerkJsMajorVersionOrTag,
   getScriptUrl,
   isDevOrStagingUrl,
@@ -23,25 +22,16 @@ export type LoadInterstitialOptions = {
   clerkJSUrl?: string;
   clerkJSVersion?: string;
   userAgent?: string;
-  /**
-   * @deprecated
-   */
-  pkgVersion?: string;
   debugData?: DebugRequestSate;
   isSatellite?: boolean;
   signInUrl?: string;
 } & MultiDomainAndOrProxyPrimitives;
 
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
-  if (options.pkgVersion) {
-    deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
-  }
-
   const frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || '';
   const domainOnlyInProd = !isDevOrStagingUrl(frontendApi) ? addClerkPrefix(options.domain) : '';
   const {
     debugData,
-    pkgVersion,
     clerkJSUrl,
     clerkJSVersion,
     publishableKey,
@@ -114,11 +104,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                 ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
                 script.src = '${
-                  clerkJSUrl ||
-                  getScriptUrl(proxyUrl || domainOnlyInProd || frontendApi, {
-                    pkgVersion,
-                    clerkJSVersion,
-                  })
+                  clerkJSUrl || getScriptUrl(proxyUrl || domainOnlyInProd || frontendApi, { clerkJSVersion })
                 }';
                 script.crossOrigin = 'anonymous';
                 script.addEventListener('load', startClerk);
@@ -131,10 +117,6 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 
 // TODO: Add caching to Interstitial
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
-  if (options.pkgVersion) {
-    deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
-  }
-
   const url = buildPublicInterstitialUrl(options);
   const response = await callWithRetry(() =>
     runtime.fetch(buildPublicInterstitialUrl(options), {
@@ -158,11 +140,11 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
   const frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || '';
-  const { apiUrl, pkgVersion, clerkJSVersion, publishableKey, proxyUrl, isSatellite, domain, signInUrl } = options;
+  const { apiUrl, clerkJSVersion, publishableKey, proxyUrl, isSatellite, domain, signInUrl } = options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
 
-  url.searchParams.append('clerk_js_version', clerkJSVersion || getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
+  url.searchParams.append('clerk_js_version', clerkJSVersion || getClerkJsMajorVersionOrTag(frontendApi));
   if (publishableKey) {
     url.searchParams.append('publishable_key', publishableKey);
   }

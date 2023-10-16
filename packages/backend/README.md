@@ -174,7 +174,7 @@ import { loadInterstitialFromLocal } from '@clerk/backend';
 
 loadInterstitialFromLocal({
   frontendApi: '...',
-  pkgVersion: '...',
+  clerkJSVersion: '...',
   debugData: {},
 });
 ```
