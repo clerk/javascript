@@ -1,5 +1,3 @@
-import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
-
 import type { CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
 import type { CreateAuthenticateRequestOptions } from './tokens';
@@ -28,22 +26,8 @@ export function Clerk(options: ClerkOptions) {
   const apiClient = createBackendApiClient(opts);
   const requestState = createAuthenticateRequest({ options: opts, apiClient });
 
-  const clerkInstance = {
+  return {
     ...apiClient,
     ...requestState,
-    /**
-     * @deprecated This prop has been deprecated and will be removed in the next major release.
-     */
-    __unstable_options: opts,
   };
-
-  // The __unstable_options is not being used internally and
-  // it's only being set in packages/sdk-node/src/clerkClient.ts#L86
-  deprecatedObjectProperty(
-    clerkInstance,
-    '__unstable_options',
-    'Use `createClerkClient({...})` to create a new clerk instance instead.',
-  );
-
-  return clerkInstance;
 }
