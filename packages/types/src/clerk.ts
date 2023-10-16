@@ -554,7 +554,15 @@ export interface Resources {
   session?: ActiveSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
+  /**
+   * @deprecated This property will be dropped in the next major release.
+   * This property is only used in another deprecated part: `invitationList` from useOrganization
+   */
   lastOrganizationInvitation?: OrganizationInvitationResource | null;
+  /**
+   * @deprecated This property will be dropped in the next major release.
+   * This property is only used in another deprecated part: `membershipList` from useOrganization
+   */
   lastOrganizationMember?: OrganizationMembershipResource | null;
 }
 
