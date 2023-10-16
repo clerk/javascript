@@ -1,7 +1,7 @@
 import { API_URL, API_VERSION, constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
-import { deprecated, isDevelopmentFromApiKey, parsePublishableKey } from '../util/shared';
+import { isDevelopmentFromApiKey } from '../util/shared';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
@@ -28,9 +28,7 @@ export type LoadResourcesOptions = {
   loadOrganization?: boolean;
 };
 
-export type RequiredVerifyTokenOptions = Required<
-  Pick<VerifyTokenOptions, 'apiKey' | 'secretKey' | 'apiUrl' | 'apiVersion'>
->;
+export type RequiredVerifyTokenOptions = Required<Pick<VerifyTokenOptions, 'secretKey' | 'apiUrl' | 'apiVersion'>>;
 
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
@@ -43,10 +41,6 @@ export type AuthenticateRequestOptions = OptionalVerifyTokenOptions &
   LoadResourcesOptions & {
     publishableKey?: string;
     secretKey?: string;
-    /**
-     * @deprecated Use `secretKey` instead.
-     */
-    apiKey?: string;
     apiVersion?: string;
     apiUrl?: string;
     /* Client token cookie value */
@@ -107,9 +101,6 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   const { cookies, headers, searchParams } = buildRequest(options?.request);
-  if (options.apiKey) {
-    deprecated('apiKey', 'Use `secretKey` instead.');
-  }
 
   options = {
     ...options,
@@ -121,10 +112,10 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     searchParams: options.searchParams || searchParams || undefined,
   };
 
-  assertValidSecretKey(options.secretKey || options.apiKey);
+  assertValidSecretKey(options.secretKey);
 
   if (options.isSatellite) {
-    assertSignInUrlExists(options.signInUrl, (options.secretKey || options.apiKey) as string);
+    assertSignInUrlExists(options.signInUrl, options.secretKey);
     if (options.signInUrl && options.origin /* could this actually be undefined? */) {
       assertSignInUrlFormatAndOrigin(options.signInUrl, options.origin);
     }

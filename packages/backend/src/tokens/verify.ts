@@ -1,6 +1,5 @@
 import type { JwtPayload } from '@clerk/types';
 
-import { deprecated } from '../util/shared';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 import type { VerifyJwtOptions } from './jwt';
 import { decodeJwt, verifyJwt } from './jwt';
@@ -15,12 +14,11 @@ export type VerifyTokenOptions = Pick<
   'authorizedParties' | 'audience' | 'issuer' | 'clockSkewInMs'
 > & { jwtKey?: string; proxyUrl?: string } & Pick<
     LoadClerkJWKFromRemoteOptions,
-    'apiKey' | 'secretKey' | 'apiUrl' | 'apiVersion' | 'jwksCacheTtlInMs' | 'skipJwksCache'
+    'secretKey' | 'apiUrl' | 'apiVersion' | 'jwksCacheTtlInMs' | 'skipJwksCache'
   >;
 
 export async function verifyToken(token: string, options: VerifyTokenOptions): Promise<JwtPayload> {
   const {
-    apiKey,
     secretKey,
     apiUrl,
     apiVersion,
@@ -33,10 +31,6 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
     skipJwksCache,
   } = options;
 
-  if (options.apiKey) {
-    deprecated('apiKey', 'Use `secretKey` instead.');
-  }
-
   const { header } = decodeJwt(token);
   const { kid } = header;
 
@@ -47,9 +41,9 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
   } else if (typeof issuer === 'string') {
     // Fetch JWKS from Frontend API if an issuer of type string has been provided
     key = await loadClerkJWKFromRemote({ issuer, kid, jwksCacheTtlInMs, skipJwksCache });
-  } else if (apiKey || secretKey) {
+  } else if (secretKey) {
     // Fetch JWKS from Backend API using the key
-    key = await loadClerkJWKFromRemote({ apiKey, secretKey, apiUrl, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache });
+    key = await loadClerkJWKFromRemote({ secretKey, apiUrl, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache });
   } else {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.SetClerkJWTKey,

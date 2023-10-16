@@ -13,7 +13,7 @@ export default (QUnit: QUnit) => {
   module('api.client', hooks => {
     const apiClient = createBackendApiClient({
       apiUrl: 'https://api.clerk.test',
-      apiKey: 'deadbeef',
+      secretKey: 'deadbeef',
     });
 
     let fakeFetch;

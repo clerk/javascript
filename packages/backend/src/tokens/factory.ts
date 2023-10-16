@@ -10,7 +10,6 @@ export type CreateAuthenticateRequestOptions = {
     Pick<
       AuthenticateRequestOptions,
       | 'audience'
-      | 'apiKey'
       | 'secretKey'
       | 'apiUrl'
       | 'apiVersion'
@@ -28,7 +27,6 @@ export type CreateAuthenticateRequestOptions = {
 export function createAuthenticateRequest(params: CreateAuthenticateRequestOptions) {
   const { apiClient } = params;
   const {
-    apiKey: buildtimeApiKey = '',
     secretKey: buildtimeSecretKey = '',
     jwtKey: buildtimeJwtKey = '',
     apiUrl = API_URL,
@@ -42,7 +40,6 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   } = params.options;
 
   const authenticateRequest = ({
-    apiKey: runtimeApiKey,
     secretKey: runtimeSecretKey,
     audience: runtimeAudience,
     proxyUrl: runtimeProxyUrl,
@@ -55,7 +52,6 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) => {
     return authenticateRequestOriginal({
       ...rest,
-      apiKey: runtimeApiKey || buildtimeApiKey,
       secretKey: runtimeSecretKey || buildtimeSecretKey,
       audience: runtimeAudience || buildtimeAudience,
       apiUrl,

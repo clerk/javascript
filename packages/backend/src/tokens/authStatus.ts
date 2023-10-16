@@ -83,7 +83,6 @@ export type RequestState = SignedInState | SignedOutState | InterstitialState | 
 
 export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promise<SignedInState> {
   const {
-    apiKey,
     secretKey,
     apiUrl,
     apiVersion,
@@ -105,7 +104,6 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
   const { sid: sessionId, org_id: orgId, sub: userId } = sessionClaims;
 
   const { sessions, users, organizations } = createBackendApiClient({
-    apiKey,
     secretKey,
     apiUrl,
     apiVersion,
@@ -128,7 +126,6 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     sessionClaims,
     {
       secretKey,
-      apiKey,
       apiUrl,
       apiVersion,
       token: cookieToken || headerToken || '',

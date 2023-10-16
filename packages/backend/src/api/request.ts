@@ -68,17 +68,7 @@ const withLegacyReturn =
 
 export function buildRequest(options: CreateBackendApiOptions) {
   const request = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
-    const {
-      apiKey,
-      secretKey,
-      httpOptions,
-      apiUrl = API_URL,
-      apiVersion = API_VERSION,
-      userAgent = USER_AGENT,
-    } = options;
-    if (apiKey) {
-      deprecated('apiKey', 'Use `secretKey` instead.');
-    }
+    const { secretKey, httpOptions, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
     if (httpOptions) {
       deprecated(
         'httpOptions',
@@ -87,9 +77,8 @@ export function buildRequest(options: CreateBackendApiOptions) {
     }
 
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
-    const key = secretKey || apiKey;
 
-    assertValidSecretKey(key);
+    assertValidSecretKey(secretKey);
 
     const url = joinPaths(apiUrl, apiVersion, path);
 
@@ -110,7 +99,7 @@ export function buildRequest(options: CreateBackendApiOptions) {
 
     // Build headers
     const headers: Record<string, any> = {
-      Authorization: `Bearer ${key}`,
+      Authorization: `Bearer ${secretKey}`,
       'Clerk-Backend-SDK': userAgent,
       ...headerParams,
     };

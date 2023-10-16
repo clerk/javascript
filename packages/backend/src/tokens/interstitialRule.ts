@@ -24,9 +24,8 @@ const isBrowser = (userAgent: string | undefined) => VALID_USER_AGENTS.test(user
 // In production, script requests will be missing both uat and session cookies, which will be
 // automatically treated as signed out. This exception is needed for development, because the any // missing uat throws an interstitial in development.
 export const nonBrowserRequestInDevRule: InterstitialRule = options => {
-  const { apiKey, secretKey, userAgent } = options;
-  const key = secretKey || apiKey || '';
-  if (isDevelopmentFromApiKey(key) && !isBrowser(userAgent)) {
+  const { secretKey, userAgent } = options;
+  if (isDevelopmentFromApiKey(secretKey as string) && !isBrowser(userAgent)) {
     return signedOut(options, AuthErrorReason.HeaderMissingNonBrowser);
   }
   return undefined;
@@ -50,9 +49,8 @@ export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
 };
 
 export const isPrimaryInDevAndRedirectsToSatellite: InterstitialRule = options => {
-  const { apiKey, secretKey, isSatellite, searchParams } = options;
-  const key = secretKey || apiKey || '';
-  const isDev = isDevelopmentFromApiKey(key);
+  const { secretKey, isSatellite, searchParams } = options;
+  const isDev = isDevelopmentFromApiKey(secretKey as string);
 
   if (isDev && !isSatellite && shouldRedirectToSatelliteUrl(searchParams)) {
     return interstitial(options, AuthErrorReason.PrimaryRespondsToSyncing);
@@ -61,9 +59,8 @@ export const isPrimaryInDevAndRedirectsToSatellite: InterstitialRule = options =
 };
 
 export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options => {
-  const { apiKey, secretKey, clientUat } = options;
-  const key = secretKey || apiKey || '';
-  const res = isDevelopmentFromApiKey(key);
+  const { secretKey, clientUat } = options;
+  const res = isDevelopmentFromApiKey(secretKey as string);
   if (res && !clientUat) {
     return interstitial(options, AuthErrorReason.CookieUATMissing);
   }
@@ -75,22 +72,20 @@ export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options =
  * It is expected that a primary app will trigger a redirect back to the satellite app.
  */
 export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: InterstitialRule = options => {
-  const { apiKey, secretKey, referrer, host, forwardedHost, forwardedProto } = options;
+  const { secretKey, referrer, host, forwardedHost, forwardedProto } = options;
   const crossOriginReferrer =
     referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedProto });
-  const key = secretKey || apiKey || '';
 
-  if (isDevelopmentFromApiKey(key) && crossOriginReferrer) {
+  if (isDevelopmentFromApiKey(secretKey as string) && crossOriginReferrer) {
     return interstitial(options, AuthErrorReason.CrossOriginReferrer);
   }
   return undefined;
 };
 
 export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = options => {
-  const { apiKey, secretKey, clientUat, cookieToken } = options;
-  const key = secretKey || apiKey || '';
+  const { secretKey, clientUat, cookieToken } = options;
 
-  if (isProductionFromApiKey(key) && !clientUat && !cookieToken) {
+  if (isProductionFromApiKey(secretKey as string) && !clientUat && !cookieToken) {
     return signedOut(options, AuthErrorReason.CookieAndUATMissing);
   }
   return undefined;
