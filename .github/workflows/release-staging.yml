@@ -37,6 +37,7 @@ jobs:
         run: npm run release:staging
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
         uses: actions/github-script@v6

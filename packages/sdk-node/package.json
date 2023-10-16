@@ -86,7 +86,6 @@
   },
   "homepage": "https://clerk.com/",
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }

@@ -21,8 +21,7 @@
     "headless"
   ],
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "scripts": {
     "build": "npm run build:bundle && npm run build:declarations",

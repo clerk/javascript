@@ -30,8 +30,6 @@ jobs:
         # and fails early if the default npm registry is used
         run: |
           npm run release:verdaccio
-        env:
-          NPM_CONFIG_PROVENANCE: false
       - name: List published packages
         run: |
           ls -all .verdaccio/storage/@clerk
