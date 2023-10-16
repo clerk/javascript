@@ -21,8 +21,7 @@ function assertSignedOut(
   },
 ) {
   assert.propEqual(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.SignedOut,
     isSignedIn: false,
@@ -66,8 +65,7 @@ function assertInterstitial(
   },
 ) {
   assert.propContains(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.Interstitial,
     isSignedIn: false,
@@ -86,8 +84,7 @@ function assertInterstitial(
 
 function assertUnknown(assert, requestState: RequestState, reason: AuthReason) {
   assert.propContains(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     status: AuthStatus.Unknown,
     isSignedIn: false,
     isInterstitial: false,
@@ -128,8 +125,7 @@ function assertSignedIn(
   },
 ) {
   assert.propContains(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.SignedIn,
     isSignedIn: true,
@@ -154,8 +150,7 @@ export default (QUnit: QUnit) => {
     secretKey: '',
     apiUrl: 'https://api.clerk.test',
     apiVersion: 'v1',
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     host: 'example.com',
     userAgent: 'Mozilla/TestAgent',

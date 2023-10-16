@@ -19,7 +19,6 @@ import type { DebugRequestSate } from './request';
 
 export type LoadInterstitialOptions = {
   apiUrl: string;
-  frontendApi: string;
   publishableKey: string;
   clerkJSUrl?: string;
   clerkJSVersion?: string;
@@ -34,18 +33,14 @@ export type LoadInterstitialOptions = {
 } & MultiDomainAndOrProxyPrimitives;
 
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
-  if (options.frontendApi) {
-    deprecated('frontendApi', 'Use `publishableKey` instead.');
-  }
   if (options.pkgVersion) {
     deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
   }
 
-  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const domainOnlyInProd = !isDevOrStagingUrl(options.frontendApi) ? addClerkPrefix(options.domain) : '';
+  const frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || '';
+  const domainOnlyInProd = !isDevOrStagingUrl(frontendApi) ? addClerkPrefix(options.domain) : '';
   const {
     debugData,
-    frontendApi,
     pkgVersion,
     clerkJSUrl,
     clerkJSVersion,
@@ -68,7 +63,6 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
     </head>
     <body>
         <script>
-            window.__clerk_frontend_api = '${frontendApi}';
             window.__clerk_debug = ${JSON.stringify(debugData || {})};
             ${proxyUrl ? `window.__clerk_proxy_url = '${proxyUrl}'` : ''}
             ${domain ? `window.__clerk_domain = '${domain}'` : ''}
@@ -114,11 +108,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
             };
             (() => {
                 const script = document.createElement('script');
-                ${
-                  publishableKey
-                    ? `script.setAttribute('data-clerk-publishable-key', '${publishableKey}');`
-                    : `script.setAttribute('data-clerk-frontend-api', '${frontendApi}');`
-                }
+                script.setAttribute('data-clerk-publishable-key', '${publishableKey}');
 
                 ${domain ? `script.setAttribute('data-clerk-domain', '${domain}');` : ''}
                 ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
@@ -141,13 +131,10 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 
 // TODO: Add caching to Interstitial
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
-  if (options.frontendApi) {
-    deprecated('frontendApi', 'Use `publishableKey` instead.');
-  }
   if (options.pkgVersion) {
     deprecated('pkgVersion', 'Use `clerkJSVersion` instead.');
   }
-  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
+
   const url = buildPublicInterstitialUrl(options);
   const response = await callWithRetry(() =>
     runtime.fetch(buildPublicInterstitialUrl(options), {
@@ -170,21 +157,16 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 }
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
-  if (options.frontendApi) {
-    deprecated('frontendApi', 'Use `publishableKey` instead.');
-  }
-
-  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const { apiUrl, frontendApi, pkgVersion, clerkJSVersion, publishableKey, proxyUrl, isSatellite, domain, signInUrl } =
-    options;
+  const frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || '';
+  const { apiUrl, pkgVersion, clerkJSVersion, publishableKey, proxyUrl, isSatellite, domain, signInUrl } = options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
+
   url.searchParams.append('clerk_js_version', clerkJSVersion || getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
   if (publishableKey) {
     url.searchParams.append('publishable_key', publishableKey);
-  } else {
-    url.searchParams.append('frontend_api', frontendApi);
   }
+
   if (proxyUrl) {
     url.searchParams.append('proxy_url', proxyUrl);
   }
@@ -195,7 +177,7 @@ export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
 
   url.searchParams.append('sign_in_url', signInUrl || '');
 
-  if (!isDevOrStagingUrl(options.frontendApi)) {
+  if (!isDevOrStagingUrl(frontendApi)) {
     url.searchParams.append('use_domain_for_script', 'true');
   }
 

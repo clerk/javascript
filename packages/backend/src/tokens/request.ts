@@ -50,10 +50,6 @@ export type AuthenticateRequestOptions = OptionalVerifyTokenOptions &
     publishableKey?: string;
     secretKey?: string;
     /**
-     * @deprecated Use `publishableKey` instead.
-     */
-    frontendApi?: string;
-    /**
      * @deprecated Use `secretKey` instead.
      */
     apiKey?: string;
@@ -117,11 +113,6 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   const { cookies, headers, searchParams } = buildRequest(options?.request);
-
-  if (options.frontendApi) {
-    deprecated('frontendApi', 'Use `publishableKey` instead.');
-  }
-
   if (options.apiKey) {
     deprecated('apiKey', 'Use `secretKey` instead.');
   }
@@ -129,7 +120,6 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   options = {
     ...options,
     ...loadOptionsFromHeaders(options, headers),
-    frontendApi: parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi,
     apiUrl: options.apiUrl || API_URL,
     apiVersion: options.apiVersion || API_VERSION,
     cookieToken: options.cookieToken || cookies?.(constants.Cookies.Session),
@@ -204,9 +194,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 }
 
 export const debugRequestState = (params: RequestState) => {
-  const { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain } =
-    params;
-  return { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain };
+  const { isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain } = params;
+  return { isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain };
 };
 
 export type DebugRequestSate = ReturnType<typeof debugRequestState>;
