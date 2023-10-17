@@ -31,6 +31,7 @@
     "@clerk/types": "3.56.1"
   },
   "devDependencies": {
+    "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
   },

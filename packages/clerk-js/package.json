@@ -79,6 +79,7 @@
     "babel-loader": "^9.1.2",
     "babel-plugin-module-resolver": "^5.0.0",
     "bundlewatch": "^0.3.3",
+    "eslint-config-custom": "*",
     "node-fetch": "^2.6.0",
     "react-refresh": "^0.14.0",
     "react-refresh-typescript": "^2.0.5",

@@ -63,6 +63,7 @@
     "@clerk/types": "3.56.1",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
+    "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
   },

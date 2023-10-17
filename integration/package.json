@@ -1,0 +1,31 @@
+{
+  "name": "integration",
+  "private": true,
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "Clerk Integration Tests",
+  "scripts": {
+    "lint": "eslint .",
+    "test:integration:base": "DEBUG=1 npx playwright test --config ./playwright.config.ts",
+    "test:integration:deployment:nextjs": "DEBUG=1 npx playwright test --config ./playwright.deployments.config.ts",
+    "test:integration:nextjs": "E2E_APP_ID=next.appRouter.withEmailCodes npm run test:integration:base -- --grep \"@generic|@nextjs\"",
+    "test:integration:generic": "E2E_APP_ID=react.vite.* npm run test:integration:base -- --grep @generic",
+    "test:integration:remix": "echo 'placeholder'"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.38.1"
+  },
+  "devDependencies": {
+    "eslint-config-custom": "*",
+    "tsup": "*",
+    "typescript": "*"
+  },
+  "homepage": "https://clerk.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}

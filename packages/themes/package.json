@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@clerk/types": "3.56.1",
+    "eslint-config-custom": "*",
     "typescript": "*"
   },
   "peerDependencies": {
