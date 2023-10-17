@@ -11,7 +11,7 @@ export default defineConfig(overrideOptions => {
   return {
     entry: ['./src/**/*.{ts,tsx}', '!./src/**/*.test.{ts,tsx}'],
     format: ['cjs', 'esm'],
-    bundle: false,
+    bundle: true,
     clean: true,
     minify: false,
     sourcemap: true,
