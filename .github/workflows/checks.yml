@@ -1,5 +1,6 @@
 name: Quality checks and tests
 on:
+  merge_group:
   pull_request:
     branches: [ main ]
 
