@@ -380,15 +380,6 @@ export interface OrganizationSuggestionJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface OrganizationSuggestionJSON extends ClerkResourceJSON {
-  object: 'organization_suggestion';
-  id: string;
-  public_organization_data: PublicOrganizationDataJSON;
-  status: OrganizationSuggestionStatus;
-  created_at: number;
-  updated_at: number;
-}
-
 export interface OrganizationMembershipRequestJSON extends ClerkResourceJSON {
   object: 'organization_membership_request';
   id: string;
