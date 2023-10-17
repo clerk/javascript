@@ -27,6 +27,8 @@ const useDomainList = () => {
 
   return {
     showDotMenu: canDeleteDomain || canVerifyDomain,
+    canVerifyDomain,
+    canDeleteDomain,
   };
 };
 
@@ -37,8 +39,7 @@ const DomainListDotMenu = ({
   domainId: OrganizationDomainResource['id'];
 }) => {
   const { navigate } = useRouter();
-  const { isAuthorizedUser: canDeleteDomain } = useGate({ permission: 'org:sys_domains:delete' });
-  const { isAuthorizedUser: canVerifyDomain } = useGate({ permission: 'org:sys_domains:manage' });
+  const { canDeleteDomain, canVerifyDomain } = useDomainList();
 
   return (
     <ThreeDotsMenu
