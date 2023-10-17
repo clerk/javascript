@@ -85,7 +85,7 @@ jobs:
             const snippets = descriptors
               .map(
                 ({ name, version }) =>
-                  `\`\`\`sh\n# ${name}\nnpm i ${name}@${version}\n\`\`\``
+                  `\`${name}\`\n\`\`\`sh\nnpm i ${name}@${version} --save-exact\n\`\`\``
               )
               .join("\n");
             core.setOutput("table", table);
@@ -109,5 +109,5 @@ jobs:
           body: |
             Hey @${{ github.event.comment.user.login }} - the snapshot version command generated the following package versions:
             ${{ steps.package-info.outputs.table }}
-            Tip: use the snippet copy button below to quickly install the required packages.
+            Tip: Use the snippet copy button below to quickly install the required packages.
             ${{ steps.package-info.outputs.snippets }}
