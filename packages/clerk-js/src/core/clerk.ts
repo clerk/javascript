@@ -224,7 +224,15 @@ export default class Clerk implements ClerkInterface {
     return this.#instanceType;
   }
 
+  get isStandardBrowser(): boolean {
+    return this.#options.standardBrowser || false;
+  }
+
+  /**
+   * @deprecated This getter is no longer used internally and will be dropped in the next major version
+   */
   get experimental_canUseCaptcha(): boolean | undefined {
+    deprecated('experimental_canUseCaptcha', 'This is will be dropped in the next major version');
     if (this.#environment) {
       return (
         this.#environment.userSettings.signUp.captcha_enabled &&
@@ -236,7 +244,11 @@ export default class Clerk implements ClerkInterface {
     return false;
   }
 
+  /**
+   * @deprecated This getter is no longer used internally and will be dropped in the next major version
+   */
   get experimental_captchaSiteKey(): string | null {
+    deprecated('experimental_captchaSiteKey', 'This is will be dropped in the next major version');
     if (this.#environment) {
       return this.#environment.displayConfig.captchaPublicKey;
     }
@@ -244,7 +256,11 @@ export default class Clerk implements ClerkInterface {
     return null;
   }
 
+  /**
+   * @deprecated This getter is no longer used internally and will be dropped in the next major version
+   */
   get experimental_captchaURL(): string | null {
+    deprecated('experimental_captchaURL', 'This is will be dropped in the next major version');
     if (this.#fapiClient) {
       return this.#fapiClient
         .buildUrl({
