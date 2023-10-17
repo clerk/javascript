@@ -23,9 +23,20 @@ jobs:
     uses: ./.github/workflows/base-build.yml
 
   eslint:
-    name: Eslint
+    name: ESLint
     needs: build
-    uses: ./.github/workflows/base-lint.yml
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Download turbo cache
+        uses: actions/download-artifact@v3
+        with:
+          name: package-artifacts
+          path: ./node_modules/.cache/turbo
+      - name: Run lint
+        run: npm run lint
 
   unit-tests:
     name: Run unit tests
