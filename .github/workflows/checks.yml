@@ -30,11 +30,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         uses: ./.github/actions/setup
-      - name: Download turbo cache
-        uses: actions/download-artifact@v3
-        with:
-          name: package-artifacts
-          path: ./node_modules/.cache/turbo
       - name: Run lint
         run: npm run lint
 
@@ -49,11 +44,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         uses: ./.github/actions/setup
-      - name: Download turbo cache
-        uses: actions/download-artifact@v3
-        with:
-          name: package-artifacts
-          path: ./node_modules/.cache/turbo
       - name: Run tests
         run: npm run test:ci
 
@@ -65,11 +55,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         uses: ./.github/actions/setup
-      - name: Download turbo cache
-        uses: actions/download-artifact@v3
-        with:
-          name: package-artifacts
-          path: ./node_modules/.cache/turbo
       - name: Lint packages using publint
         run: npm run lint:publint
 
@@ -81,11 +66,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         uses: ./.github/actions/setup
-      - name: Download turbo cache
-        uses: actions/download-artifact@v3
-        with:
-          name: package-artifacts
-          path: ./node_modules/.cache/turbo
       - name: Lint types using attw
         # Remove this when all related errors are fixed
         continue-on-error: true
