@@ -23,7 +23,7 @@ export const createValidatePassword = (config: UsePasswordConfig, callbacks?: Va
   const { show_zxcvbn, validatePassword: validatePasswordProp } = config;
   const getComplexity = createValidateComplexity(config);
   const getScore = createValidatePasswordStrength(config);
-  let result = {} satisfies PasswordValidation;
+  let result: PasswordValidation = {} satisfies PasswordValidation;
 
   return (password: string, internalCallbacks?: ValidatePasswordCallbacks) => {
     const {
@@ -65,9 +65,10 @@ export const createValidatePassword = (config: UsePasswordConfig, callbacks?: Va
       });
     }
 
-    internalOnValidation({
-      ...result,
-      complexity: failedValidationsComplexity,
-    });
+    if (result.complexity && Object.keys(result.complexity).length === 0 && show_zxcvbn) {
+      return;
+    }
+
+    internalOnValidation(result);
   };
 };

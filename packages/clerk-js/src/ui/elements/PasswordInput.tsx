@@ -21,7 +21,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   const [hidden, setHidden] = React.useState(true);
   const { id, onChange: onChangeProp, validatePassword: validatePasswordProp = false, ...rest } = props;
   const inputRef = useRef<HTMLInputElement>(null);
-  const [timeoutState, setTimeoutState] = useState<NodeJS.Timeout | null>(null);
+  const [timeoutState, setTimeoutState] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     userSettings: { passwordSettings },
@@ -41,6 +41,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         if (inputRef.current === document.activeElement) {
           formControlProps?.setInfo?.(message);
         } else {
+          // Turn the suggestion into an error if not focused.
           formControlProps?.setError?.(message);
         }
       },
@@ -72,11 +73,13 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         onChange={onChange}
         onBlur={e => {
           rest.onBlur?.(e);
-          onChange(e);
+          // Call validate password because to calculate the new feedbackType as the element is now blurred
+          validatePassword(e.target.value);
         }}
         onFocus={e => {
           rest.onFocus?.(e);
-          onChange(e);
+          // Call validate password because to calculate the new feedbackType as the element is now focused
+          validatePassword(e.target.value);
         }}
         //@ts-expect-error
         ref={mergeRefs(ref, inputRef)}

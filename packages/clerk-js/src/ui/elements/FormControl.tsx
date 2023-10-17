@@ -101,14 +101,13 @@ function useFormTextAnimation() {
           animation: 'none',
         };
       }
+
+      const inAnimation = options?.inDelay ? animations.inDelayAnimation : animations.inAnimation;
+
       return t => ({
-        animation: `${
-          enterAnimation
-            ? options?.inDelay
-              ? animations.inDelayAnimation
-              : animations.inAnimation
-            : animations.outAnimation
-        } ${t.transitionDuration.$textField} ${t.transitionTiming.$common}`,
+        animation: `${enterAnimation ? inAnimation : animations.outAnimation} ${t.transitionDuration.$textField} ${
+          t.transitionTiming.$common
+        }`,
         transition: `height ${t.transitionDuration.$slow} ${t.transitionTiming.$common}`, // This is expensive but required for a smooth layout shift
       });
     },
@@ -205,7 +204,10 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return max;
   }, [heightA, heightB]);
 
-  const getElementProps = (type: FormFeedbackDescriptorsKeys) => {
+  const getElementProps = (type?: FormFeedbackDescriptorsKeys) => {
+    if (!type) {
+      return {};
+    }
     const descriptor = (elementDescriptors?.[type] || defaultElementDescriptors[type]) as ElementDescriptor | undefined;
     return {
       elementDescriptor: descriptor,
@@ -235,7 +237,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
       sx={[getFormTextAnimation(!!feedback)]}
     >
       <InfoComponentA
-        {...(feedbacks.a?.feedbackType ? getElementProps(feedbacks.a.feedbackType) : {})}
+        {...getElementProps(feedbacks.a?.feedbackType)}
         ref={calculateHeightA}
         sx={[
           () => ({
@@ -246,7 +248,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
         localizationKey={feedbacks.a?.feedback}
       />
       <InfoComponentB
-        {...(feedbacks.b?.feedbackType ? getElementProps(feedbacks.b.feedbackType) : {})}
+        {...getElementProps(feedbacks.b?.feedbackType)}
         ref={calculateHeightB}
         sx={[
           () => ({
