@@ -1,5 +1,62 @@
 # Change Log
 
+## 4.62.0
+
+### Minor Changes
+
+- Introduces three new element appearence descriptors: ([#1803](https://github.com/clerkinc/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
+
+  - `tableHead` let's you customize the tables head styles.
+  - `paginationButton` let's you customize the pagination buttons.
+  - `paginationRowText` let's you customize the pagination text.
+
+- Add new `/sign-up/continue/verify-phone-number` and `/sign-up/continue/verify-email-address` routes in order to allow navigating back to the `/sign-up/continue` step when editing the extra identifier that is provided in the `/sign-up/continue` step. ([#1870](https://github.com/clerkinc/javascript/pull/1870)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Improve accessibility of `<UserButton />` and `<OrganizationSwitcher />` by using `aria-*` attributes (where appropriate) and roles like `menu` and `menuitem`. ([#1826](https://github.com/clerkinc/javascript/pull/1826)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update default organization permissions with a `sys_` prefix as part of the entitlement. This changes makes it easy to distinguish between clerk reserved permissions and custom permissions created by developers. ([#1865](https://github.com/clerkinc/javascript/pull/1865)) by [@mzhong9723](https://github.com/mzhong9723)
+
+- Mark the following SAML related types as stable: ([#1876](https://github.com/clerkinc/javascript/pull/1876)) by [@dimkl](https://github.com/dimkl)
+
+  - `User.samlAccounts`
+  - `SamlAccount`
+  - `UserSettingsResource.saml`
+  - `UserSettingsJSON.saml`
+  - `SamlSettings`
+  - `UserResource.samlAccounts`
+  - `SamlAccountResource`
+  - `SamlStrategy`
+  - `UserJSON.saml_accounts`
+  - `SamlAccountJSON`
+  - `SamlConfig`
+  - `SamlFactor`
+  - `HandleSamlCallbackParams`
+
+- Deprecate the `organization.__unstable__invitationUpdate` and `organization.__unstable__membershipUpdate` methods. ([#1879](https://github.com/clerkinc/javascript/pull/1879)) by [@panteliselef](https://github.com/panteliselef)
+
+- Enforce LTR direction in code inputs ([#1873](https://github.com/clerkinc/javascript/pull/1873)) by [@desiprisg](https://github.com/desiprisg)
+
+- Replace role based check with permission based checks inside the OrganizationSwitcher component. ([#1851](https://github.com/clerkinc/javascript/pull/1851)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update `@emotion/react` from `11.10.5` to `11.11.1` to allow internal usage of TypeScript v5 ([Emotion commit](https://github.com/emotion-js/emotion/commit/9357f337200ef38f9c6df5d4dd7c20772478ea42)) ([#1877](https://github.com/clerkinc/javascript/pull/1877)) by [@LekoArts](https://github.com/LekoArts)
+
+- Replace role based check with permission based checks inside the OrganizationSettings component. ([#1850](https://github.com/clerkinc/javascript/pull/1850)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix methods in clerk-js that consumede paginated endpoints in order to retrieve single resources. ([#1871](https://github.com/clerkinc/javascript/pull/1871)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix incorrect deprecation message for `__unstable__membershipUpdate`. ([#1889](https://github.com/clerkinc/javascript/pull/1889)) by [@panteliselef](https://github.com/panteliselef)
+
+- Replace role based check with permission based checks inside the OrganizationMembers component. ([#1849](https://github.com/clerkinc/javascript/pull/1849)) by [@panteliselef](https://github.com/panteliselef)
+
+- In invite members screen of the <OrganizationProfile /> component, consume any invalid email addresses as they are returned in the API error and remove them from the input automatically. ([#1869](https://github.com/clerkinc/javascript/pull/1869)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`35be8709d`](https://github.com/clerkinc/javascript/commit/35be8709d88f1d1eef043acdba4d49b07578c7b2), [`e38488c92`](https://github.com/clerkinc/javascript/commit/e38488c929e437583296c34cde23f76218f78caf), [`a11f962bc`](https://github.com/clerkinc/javascript/commit/a11f962bcbcf225fb927122267de1e8f5faccf53), [`9b644d799`](https://github.com/clerkinc/javascript/commit/9b644d7991b8cba4b385e9443f87798cde5c9989), [`a9894b445`](https://github.com/clerkinc/javascript/commit/a9894b445bf1e463176b0442fb73c48f89d9fed8), [`834dadb36`](https://github.com/clerkinc/javascript/commit/834dadb36c30b2a8f052784de4ad1026b0083b4e), [`70f251007`](https://github.com/clerkinc/javascript/commit/70f2510074352206bbe7bdadf2c28ccf3c074c12), [`a46d6fe99`](https://github.com/clerkinc/javascript/commit/a46d6fe99bd9b80671b60347b4c35d558012200f)]:
+  - @clerk/types@3.56.0
+  - @clerk/shared@0.24.5
+  - @clerk/localizations@1.26.5
+
 ## 4.61.0
 
 ### Minor Changes
