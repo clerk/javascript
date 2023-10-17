@@ -12,10 +12,6 @@ jobs:
     name: Prettier
     uses: ./.github/workflows/base-prettier.yml
 
-  eslint:
-    name: Eslint
-    uses: ./.github/workflows/base-lint.yml
-
   changeset:
     name: Require changeset
     uses: ./.github/workflows/base-changeset.yml
@@ -25,6 +21,11 @@ jobs:
     name: Build & publish
     needs: [ prettier, changeset ]
     uses: ./.github/workflows/base-build.yml
+
+  eslint:
+    name: Eslint
+    needs: build
+    uses: ./.github/workflows/base-lint.yml
 
   unit-tests:
     name: Run unit tests

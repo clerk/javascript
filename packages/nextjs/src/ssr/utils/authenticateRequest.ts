@@ -6,7 +6,7 @@ import type { WithServerSideAuthOptions } from '../types';
 /**
  * @internal
  */
-export async function authenticateRequest(ctx: GetServerSidePropsContext, opts: WithServerSideAuthOptions = {}) {
+export function authenticateRequest(ctx: GetServerSidePropsContext, opts: WithServerSideAuthOptions = {}) {
   const { headers, cookies } = ctx.req;
 
   const cookieToken = cookies['__session'];
