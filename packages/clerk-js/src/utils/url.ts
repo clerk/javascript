@@ -210,25 +210,9 @@ export const trimTrailingSlash = (path: string): string => {
   return (path || '').replace(/\/+$/, '');
 };
 
-export const appendUrlsAsQueryParams = (
-  baseUrl: string | URL,
-  urls: Record<string, string | URL | null | undefined> = {},
-): string => {
-  const base = toURL(baseUrl);
-  const params = new URLSearchParams();
-  for (const [key, val] of Object.entries(urls)) {
-    if (!val) {
-      continue;
-    }
-    const url = toURL(val);
-    const sameOrigin = base.origin === url.origin;
-    params.append(camelToSnake(key), sameOrigin ? stripOrigin(url) : `${url}`);
-  }
-
-  // The following line will prepend the hash with a `/`.
-  // This is required for ClerkJS Components Hash router to work as expected
-  // as it treats the hash as sub-path with its nested querystring parameters.
-  return `${base}${params.toString() ? '#/?' + params.toString() : ''}`;
+export const stripSameOrigin = (url: URL, baseUrl: URL): string => {
+  const sameOrigin = baseUrl.origin === url.origin;
+  return sameOrigin ? stripOrigin(url) : `${url}`;
 };
 
 export const appendAsQueryParams = (
@@ -236,14 +220,18 @@ export const appendAsQueryParams = (
   values: Record<string, string | null | undefined> = {},
 ): string => {
   const base = toURL(baseUrl);
+  const params = new URLSearchParams();
   for (const [key, val] of Object.entries(values)) {
     if (!val) {
       continue;
     }
-    base.searchParams.append(camelToSnake(key), val);
+    params.append(camelToSnake(key), val);
   }
 
-  return baseUrl.toString() + base.search;
+  // The following line will prepend the hash with a `/`.
+  // This is required for ClerkJS Components Hash router to work as expected
+  // as it treats the hash as sub-path with its nested querystring parameters.
+  return `${base}${params.toString() ? '#/?' + params.toString() : ''}`;
 };
 
 export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean => {
