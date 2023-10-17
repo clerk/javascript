@@ -6,9 +6,8 @@ inputs:
     required: false
     default: '18'
   use-turbo-cache:
-    description: 'Whether or not the turbo cache should be restored. Defaults to true'
+    description: 'Whether or not the turbo cache should be restored. Defaults to false.'
     required: false
-    default: 'true'
 
 runs:
   using: "composite"
