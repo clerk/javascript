@@ -39,6 +39,8 @@ jobs:
           ref: refs/pull/${{ github.event.issue.number }}/head
       - name: Setup
         uses: ./.github/actions/setup
+        with:
+          use-turbo-cache: 'false'
 
       - name: Extract snapshot name
         id: extract-snapshot-name
