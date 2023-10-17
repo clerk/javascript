@@ -1,4 +1,3 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import { constants } from '@clerk/backend';
 import { deprecated } from '@clerk/shared/deprecated';
 

@@ -36,6 +36,7 @@
     "cookies": "0.8.0"
   },
   "devDependencies": {
+    "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
   },
