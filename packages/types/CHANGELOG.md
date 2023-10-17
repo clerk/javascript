@@ -1,5 +1,41 @@
 # Change Log
 
+## 3.56.0
+
+### Minor Changes
+
+- Introduces three new element appearence descriptors: ([#1803](https://github.com/clerkinc/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
+
+  - `tableHead` let's you customize the tables head styles.
+  - `paginationButton` let's you customize the pagination buttons.
+  - `paginationRowText` let's you customize the pagination text.
+
+### Patch Changes
+
+- Update default organization permissions with a `sys_` prefix as part of the entitlement. This changes makes it easy to distinguish between clerk reserved permissions and custom permissions created by developers. ([#1865](https://github.com/clerkinc/javascript/pull/1865)) by [@mzhong9723](https://github.com/mzhong9723)
+
+- Mark the following SAML related types as stable: ([#1876](https://github.com/clerkinc/javascript/pull/1876)) by [@dimkl](https://github.com/dimkl)
+
+  - `User.samlAccounts`
+  - `SamlAccount`
+  - `UserSettingsResource.saml`
+  - `UserSettingsJSON.saml`
+  - `SamlSettings`
+  - `UserResource.samlAccounts`
+  - `SamlAccountResource`
+  - `SamlStrategy`
+  - `UserJSON.saml_accounts`
+  - `SamlAccountJSON`
+  - `SamlConfig`
+  - `SamlFactor`
+  - `HandleSamlCallbackParams`
+
+- Deprecate the `organization.__unstable__invitationUpdate` and `organization.__unstable__membershipUpdate` methods. ([#1879](https://github.com/clerkinc/javascript/pull/1879)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix methods in clerk-js that consumede paginated endpoints in order to retrieve single resources. ([#1871](https://github.com/clerkinc/javascript/pull/1871)) by [@panteliselef](https://github.com/panteliselef)
+
+- In invite members screen of the <OrganizationProfile /> component, consume any invalid email addresses as they are returned in the API error and remove them from the input automatically. ([#1869](https://github.com/clerkinc/javascript/pull/1869)) by [@chanioxaris](https://github.com/chanioxaris)
+
 ## 3.55.0
 
 ### Minor Changes

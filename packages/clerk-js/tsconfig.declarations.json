@@ -8,6 +8,7 @@
     "declarationMap": false,
     "sourceMap": false,
     "outDir": "./dist",
-    "declarationDir": "./dist/types"
+    "declarationDir": "./dist/types",
+    "noImplicitReturns": false
   }
 }
