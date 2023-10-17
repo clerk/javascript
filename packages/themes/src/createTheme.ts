@@ -4,12 +4,12 @@ import type { Appearance, BaseTheme, DeepPartial, Elements, Theme } from '@clerk
 
 import type { InternalTheme } from '../../clerk-js/src/ui/foundations';
 
-type CreateClerkThemeParams = DeepPartial<Theme> & {
+interface CreateClerkThemeParams extends DeepPartial<Theme> {
   /**
    * {@link Theme.elements}
    */
   elements?: Elements | ((params: { theme: InternalTheme }) => Elements);
-};
+}
 
 export const unstable_createTheme = (appearance: Appearance<CreateClerkThemeParams>): BaseTheme => {
   // Placeholder method that might hande more transformations in the future

@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.24.5
+
+### Patch Changes
+
+- Add `Clerk - ` prefix to deprecation warnings ([#1890](https://github.com/clerkinc/javascript/pull/1890)) by [@dimkl](https://github.com/dimkl)
+
+- Deprecate the `organization.__unstable__invitationUpdate` and `organization.__unstable__membershipUpdate` methods. ([#1879](https://github.com/clerkinc/javascript/pull/1879)) by [@panteliselef](https://github.com/panteliselef)
+
+- Internal updates and improvements, with the only public change that npm should no longer complain about missing `react` peerDependency. ([#1868](https://github.com/clerkinc/javascript/pull/1868)) by [@LekoArts](https://github.com/LekoArts)
+
+  Updates:
+
+  - Remove `@clerk/shared/testUtils` export (which was only used for internal usage)
+  - Add `peerDependenciesMeta` to make `react` peerDep optional
+
+- In invite members screen of the <OrganizationProfile /> component, consume any invalid email addresses as they are returned in the API error and remove them from the input automatically. ([#1869](https://github.com/clerkinc/javascript/pull/1869)) by [@chanioxaris](https://github.com/chanioxaris)
+
 ## 0.24.4
 
 ### Patch Changes

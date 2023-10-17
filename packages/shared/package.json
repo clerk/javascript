@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.24.4",
+  "version": "0.24.5",
   "description": "Internal package utils used by the Clerk SDKs",
   "sideEffects": false,
   "files": [
@@ -69,7 +69,7 @@
     "swr": "2.2.0"
   },
   "devDependencies": {
-    "@clerk/types": "3.55.0",
+    "@clerk/types": "3.56.0",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
     "tsup": "*",

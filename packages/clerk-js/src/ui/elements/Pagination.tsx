@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button, Flex, localizationKeys, Text } from '../customizables';
+import { Button, descriptors, Flex, localizationKeys, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { mqu } from '../styledSystem';
 import { range } from '../utils';
@@ -31,6 +31,7 @@ const PageButton = (props: PropsOfComponent<typeof Button> & { isActive?: boolea
         },
         sx,
       ]}
+      elementDescriptor={descriptors.paginationButton}
       {...rest}
     />
   );
@@ -55,29 +56,30 @@ const RowInformation = (props: RowInfoProps) => {
     <Text>
       <Text
         as='span'
-        sx={t => ({
-          color: t.colors.$blackAlpha700,
-        })}
+        elementDescriptor={descriptors.paginationRowText}
+        elementId={descriptors.paginationRowText?.setId('displaying')}
+        sx={t => ({ opacity: t.opacity.$inactive })}
         localizationKey={localizationKeys('paginationRowText__displaying')}
       />{' '}
       <Text
         as='span'
+        elementDescriptor={descriptors.paginationRowText}
+        elementId={descriptors.paginationRowText?.setId('rowsCount')}
         sx={t => ({ fontWeight: t.fontWeights.$medium })}
       >
         {startingRow === endingRow && [0, 1].includes(startingRow) ? startingRow : `${startingRow} – ${endingRow}`}
       </Text>{' '}
       <Text
         as='span'
-        sx={t => ({
-          color: t.colors.$blackAlpha700,
-        })}
+        elementDescriptor={descriptors.paginationRowText}
+        elementId={descriptors.paginationRowText?.setId('displaying')}
+        sx={t => ({ opacity: t.opacity.$inactive })}
         localizationKey={localizationKeys('paginationRowText__of')}
       />{' '}
       <Text
         as='span'
-        sx={t => ({
-          color: t.colors.$blackAlpha700,
-        })}
+        elementDescriptor={descriptors.paginationRowText}
+        elementId={descriptors.paginationRowText?.setId('allRowsCount')}
       >
         {allRowsCount}
       </Text>

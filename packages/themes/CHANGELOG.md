@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.7.8
+
+### Patch Changes
+
+- Introduces three new element appearence descriptors: ([#1803](https://github.com/clerkinc/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
+
+  - `tableHead` let's you customize the tables head styles.
+  - `paginationButton` let's you customize the pagination buttons.
+  - `paginationRowText` let's you customize the pagination text.
+
 ## 1.7.7
 
 ### Patch Changes
