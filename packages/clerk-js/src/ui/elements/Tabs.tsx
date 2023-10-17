@@ -1,4 +1,4 @@
-import { createContextAndHook } from '@clerk/shared/react/hooks';
+import { createContextAndHook } from '@clerk/shared/react';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 

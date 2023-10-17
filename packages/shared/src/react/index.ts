@@ -1,3 +1,5 @@
+export * from './hooks';
+
 export {
   ClerkInstanceContext,
   ClientContext,

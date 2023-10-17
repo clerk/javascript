@@ -38,16 +38,6 @@
         "types": "./dist/react/index.d.ts",
         "default": "./dist/react/index.js"
       }
-    },
-    "./react/hooks": {
-      "import": {
-        "types": "./dist/react/hooks/index.d.mts",
-        "default": "./dist/react/hooks/index.mjs"
-      },
-      "require": {
-        "types": "./dist/react/hooks/index.d.ts",
-        "default": "./dist/react/hooks/index.js"
-      }
     }
   },
   "scripts": {

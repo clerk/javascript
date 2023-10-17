@@ -1,5 +1,5 @@
 import { createDeferredPromise } from '@clerk/shared';
-import { useSafeLayoutEffect } from '@clerk/shared/react/hooks';
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import type {
   Appearance,
   Clerk,

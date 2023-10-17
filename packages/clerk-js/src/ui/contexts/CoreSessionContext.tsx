@@ -1,5 +1,4 @@
-import { SessionContext, useSessionContext } from '@clerk/shared/react';
-import { assertContextExists } from '@clerk/shared/react/hooks';
+import { assertContextExists, SessionContext, useSessionContext } from '@clerk/shared/react';
 import type { SessionResource } from '@clerk/types';
 import React from 'react';
 

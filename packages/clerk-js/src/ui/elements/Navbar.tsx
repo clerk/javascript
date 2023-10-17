@@ -1,4 +1,4 @@
-import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared/react/hooks';
+import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared/react';
 import type { NavbarItemId } from '@clerk/types';
 import React, { useEffect } from 'react';
 

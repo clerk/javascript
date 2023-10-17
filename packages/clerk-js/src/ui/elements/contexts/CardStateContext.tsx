@@ -1,4 +1,4 @@
-import { createContextAndHook } from '@clerk/shared/react/hooks';
+import { createContextAndHook } from '@clerk/shared/react';
 import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
 import React from 'react';
 

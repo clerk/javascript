@@ -1,1 +1,1 @@
-export { useOrganizations } from '@clerk/shared/react/hooks';
+export { useOrganizations } from '@clerk/shared/react';

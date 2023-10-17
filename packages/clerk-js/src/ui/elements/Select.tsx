@@ -1,4 +1,4 @@
-import { createContextAndHook } from '@clerk/shared/react/hooks';
+import { createContextAndHook } from '@clerk/shared/react';
 import type { SelectId } from '@clerk/types';
 import type { PropsWithChildren, ReactElement } from 'react';
 import React, { useState } from 'react';
