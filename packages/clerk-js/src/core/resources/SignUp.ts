@@ -26,6 +26,7 @@ import type {
 import { generateSignatureWithMetamask, getCaptchaToken, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { retrieveCaptchaInfo } from '../../utils/retrieveCaptchaInfo';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -70,13 +71,13 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
     const paramsWithCaptcha: Record<string, unknown> = params;
-    const { experimental_captchaSiteKey, experimental_canUseCaptcha, experimental_captchaURL } = SignUp.clerk;
+    const { captchaSiteKey, canUseCaptcha, captchaURL } = retrieveCaptchaInfo(SignUp.clerk);
 
-    if (experimental_canUseCaptcha && experimental_captchaSiteKey && experimental_captchaURL) {
+    if (canUseCaptcha && captchaSiteKey && captchaURL) {
       try {
         paramsWithCaptcha.captchaToken = await getCaptchaToken({
-          siteKey: experimental_captchaSiteKey,
-          scriptUrl: experimental_captchaURL,
+          siteKey: captchaSiteKey,
+          scriptUrl: captchaURL,
         });
       } catch (e) {
         if (e.captchaError) {

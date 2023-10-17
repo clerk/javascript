@@ -87,7 +87,11 @@ export interface Clerk {
   /** Clerk Flag for satellite apps. */
   isSatellite: boolean;
 
+  /** Clerk Instance type is defined from the Publishable key */
   instanceType?: InstanceType;
+
+  /** Clerk flag for loading Clerk in a standard browser setup */
+  isStandardBrowser?: boolean;
 
   /** Client handling most Clerk operations. */
   client?: ClientResource;
@@ -777,8 +781,8 @@ export type UserButtonProps = {
    */
   showName?: boolean;
   /**
-   Controls the default state of the UserButton
-   */
+     Controls the default state of the UserButton
+     */
   defaultOpen?: boolean;
   /**
    * Full URL or path to navigate after sign out is complete
@@ -838,8 +842,8 @@ type LooseExtractedParams<T extends string> = `:${T}` | (string & NonNullable<un
 
 export type OrganizationSwitcherProps = {
   /**
-   Controls the default state of the OrganizationSwitcher
-   */
+     Controls the default state of the OrganizationSwitcher
+     */
   defaultOpen?: boolean;
   /**
    * By default, users can switch between organization and their personal account.
