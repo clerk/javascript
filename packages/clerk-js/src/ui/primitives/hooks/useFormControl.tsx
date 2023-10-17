@@ -1,6 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { ClerkAPIError, FieldId } from '@clerk/types';
-import type { ClerkAPIError } from '@clerk/types';
 import React from 'react';
 
 import type { useFormControl as useFormControlUtil } from '../../utils/useFormControl';
@@ -111,9 +110,11 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
     isDisabled = false,
     hasError = false,
     setError,
-    setSuccessful,
+    setSuccess,
     setWarning,
     setHasPassedComplexity,
+    setInfo,
+    clearFeedback,
     children,
     ...rest
   } = props;
@@ -124,7 +125,7 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
    * Track whether the `FormErrorText` has been rendered.
    * We use this to append its id the `aria-describedby` of the `input`.
    */
-  const errorMessageId = rest.errorText ? `error-${propsId}` : '';
+  const errorMessageId = hasError ? `error-${propsId}` : '';
   const value = React.useMemo(
     () => ({
       isRequired,
@@ -134,11 +135,26 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       fieldId: propsId,
       errorMessageId,
       setError,
-      setSuccessful,
+      setSuccess,
       setWarning,
+      setInfo,
+      clearFeedback,
       setHasPassedComplexity,
     }),
-    [isRequired, isDisabled, hasError, id, errorMessageId, setError, setSuccessful, setHasPassedComplexity],
+    [
+      isRequired,
+      hasError,
+      id,
+      propsId,
+      errorMessageId,
+      isDisabled,
+      setError,
+      setSuccess,
+      setWarning,
+      setInfo,
+      clearFeedback,
+      setHasPassedComplexity,
+    ],
   );
   return (
     <FormFieldContext.Provider
@@ -158,28 +174,30 @@ export const sanitizeInputProps = (
   obj: ReturnType<typeof useFormField>,
   keep?: (keyof ReturnType<typeof useFormField>)[],
 ) => {
+  /* eslint-disable */
   const {
     radioOptions,
     validatePassword,
-    warningText,
-    informationText,
     hasPassedComplexity,
-    enableErrorAfterBlur,
     isFocused,
-    hasLostFocus,
-    successfulText,
-    errorText,
+    feedback,
+    feedbackType,
     setHasPassedComplexity,
     setWarning,
-    setSuccessful,
+    setSuccess,
     setError,
+    setInfo,
     errorMessageId,
     fieldId,
     label,
     ...inputProps
   } = obj;
+  /* eslint-enable */
 
   keep?.forEach(key => {
+    /**
+     * Ignore error for the index type as we have defined it explicitly above
+     */
     // @ts-ignore
     inputProps[key] = obj[key];
   });

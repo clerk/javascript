@@ -4,9 +4,6 @@ import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Flex, FormLabel, Input, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 
-/**
- * @deprecated
- */
 export const RadioGroup = (
   props: PropsOfComponent<typeof Input> & {
     radioOptions?: {
@@ -33,9 +30,6 @@ export const RadioGroup = (
   );
 };
 
-/**
- * @deprecated
- */
 const RadioGroupItem = (props: {
   inputProps: PropsOfComponent<typeof Input>;
   value: string;

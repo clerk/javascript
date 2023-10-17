@@ -43,7 +43,6 @@ export const SignUpForm = (props: SignUpFormProps) => {
               {...formState.lastName.props}
               isRequired={fields.lastName!.required}
               isOptional={!fields.lastName!.required}
-              isDisabled={true}
             />
           )}
         </Form.ControlRow>

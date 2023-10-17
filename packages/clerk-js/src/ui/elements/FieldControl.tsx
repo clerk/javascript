@@ -15,53 +15,36 @@ import {
   Text,
   useLocalizations,
 } from '../customizables';
-import { useFieldMessageVisibility } from '../hooks';
 import { FormFieldContextProvider, sanitizeInputProps, useFormField } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import type { useFormControl as useFormControlUtil } from '../utils';
 import { useFormControlFeedback } from '../utils';
 import { useCardState } from './contexts';
-import { useFormState } from './Form';
 import type { FormFeedbackProps } from './FormControl';
-import { delay, FormFeedback } from './FormControl';
+import { FormFeedback } from './FormControl';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder' | 'disabled' | 'required'> &
   ReturnType<typeof useFormControlUtil<FieldId>>['props'];
 
-export const Root = (props: PropsWithChildren<FormControlProps>) => {
+const Root = (props: PropsWithChildren<FormControlProps>) => {
   const card = useCardState();
-  const { submittedWithEnter } = useFormState();
   const {
     id,
-    errorText,
     isRequired,
     sx,
     setError,
-    successfulText,
-    setSuccessful,
-    hasLostFocus,
-    enableErrorAfterBlur,
-    informationText,
-    isFocused: _isFocused,
+    setInfo,
+    setSuccess,
     setWarning,
     setHasPassedComplexity,
-    hasPassedComplexity,
-    warningText,
+    clearFeedback,
+    feedbackType,
+    feedback,
+    isFocused,
   } = props;
 
-  const { debounced: debouncedState } = useFormControlFeedback({
-    errorText,
-    informationText,
-    enableErrorAfterBlur,
-    hasPassedComplexity,
-    isFocused: _isFocused,
-    hasLostFocus,
-    successfulText,
-    warningText,
-    skipBlur: submittedWithEnter,
-  });
+  const { debounced: debouncedState } = useFormControlFeedback({ feedback, feedbackType, isFocused });
 
-  const errorMessage = useFieldMessageVisibility(debouncedState.errorText, delay);
   const isDisabled = props.isDisabled || card.isLoading;
 
   return (
@@ -72,13 +55,15 @@ export const Root = (props: PropsWithChildren<FormControlProps>) => {
         elementDescriptor={descriptors.formField}
         elementId={descriptors.formField.setId(id)}
         id={id}
-        hasError={!!errorMessage}
+        hasError={debouncedState.feedbackType === 'error'}
         isDisabled={isDisabled}
         isRequired={isRequired}
         setError={setError}
-        setSuccessful={setSuccessful}
+        setSuccess={setSuccess}
         setWarning={setWarning}
+        setInfo={setInfo}
         setHasPassedComplexity={setHasPassedComplexity}
+        clearFeedback={clearFeedback}
         sx={sx}
       >
         {props.children}
@@ -199,34 +184,15 @@ const FieldLabelRow = (props: PropsWithChildren) => {
 };
 
 const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors'>) => {
-  const {
-    errorText,
-    informationText,
-    enableErrorAfterBlur,
-    hasPassedComplexity,
-    isFocused,
-    hasLostFocus,
-    successfulText,
-    warningText,
-  } = useFormField();
-  const { submittedWithEnter } = useFormState();
-  const { debounced } = useFormControlFeedback({
-    errorText,
-    informationText,
-    enableErrorAfterBlur,
-    hasPassedComplexity,
-    isFocused,
-    hasLostFocus,
-    successfulText,
-    warningText,
-    skipBlur: submittedWithEnter,
-  });
+  const { feedback, feedbackType, isFocused, fieldId } = useFormField();
+  const { debounced } = useFormControlFeedback({ feedback, feedbackType, isFocused });
 
   return (
     <FormFeedback
       {...{
         ...debounced,
         elementDescriptors: props.elementDescriptors,
+        id: fieldId,
       }}
     />
   );

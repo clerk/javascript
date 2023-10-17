@@ -48,6 +48,8 @@ type FieldStateProps<Id> = {
   value: string;
   checked?: boolean;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur: React.FocusEventHandler<HTMLInputElement>;
+  onFocus: React.FocusEventHandler<HTMLInputElement>;
   feedback: string;
   feedbackType: FeedbackType;
   setError: (error: string | ClerkAPIError | undefined) => void;
@@ -57,6 +59,7 @@ type FieldStateProps<Id> = {
   setHasPassedComplexity: (b: boolean) => void;
   clearFeedback: () => void;
   hasPassedComplexity: boolean;
+  isFocused: boolean;
 } & Omit<Options, 'defaultChecked'>;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
@@ -87,6 +90,7 @@ export const useFormControl = <Id extends string>(
 
   const { translateError, t } = useLocalizations();
   const [value, setValueInternal] = useState<string>(initialState);
+  const [isFocused, setFocused] = useState(false);
   const [checked, setCheckedInternal] = useState<boolean>(opts?.defaultChecked || false);
   const [hasPassedComplexity, setHasPassedComplexity] = useState(false);
   const [feedback, setFeedback] = useState<{ message: string; type: FeedbackType }>({
@@ -130,6 +134,14 @@ export const useFormControl = <Id extends string>(
     setFeedback({ message: '', type: 'info' });
   };
 
+  const onFocus: FormControlState['onFocus'] = () => {
+    setFocused(true);
+  };
+
+  const onBlur: FormControlState['onBlur'] = () => {
+    setFocused(false);
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { defaultChecked, validatePassword: validatePasswordProp, buildErrorMessage, ...restOpts } = opts;
 
@@ -141,6 +153,8 @@ export const useFormControl = <Id extends string>(
     setSuccess,
     setError,
     onChange,
+    onBlur,
+    onFocus,
     setWarning,
     feedback: feedback.message || t(opts.infoText),
     feedbackType: feedback.type,
@@ -149,6 +163,7 @@ export const useFormControl = <Id extends string>(
     hasPassedComplexity,
     setHasPassedComplexity,
     validatePassword: opts.type === 'password' ? opts.validatePassword : undefined,
+    isFocused,
     ...restOpts,
   };
 
@@ -178,10 +193,8 @@ type DebouncingOption = {
   isFocused?: boolean;
   delayInMs?: number;
 };
-
 export const useFormControlFeedback = (opts?: DebouncingOption): DebouncedFeedback => {
   const { feedback = '', delayInMs = 100, feedbackType = 'info', isFocused = false } = opts || {};
-
   const shouldHide = isFocused ? false : ['info', 'warning'].includes(feedbackType);
 
   const debouncedState = useDebounce(
