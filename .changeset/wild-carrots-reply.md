@@ -1,5 +1,5 @@
 ---
-"@clerk/shared": minor
+"@clerk/shared": major
 ---
 
 TODO
