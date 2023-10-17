@@ -1,5 +1,6 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { appConfigs } from '../presets';
-import { createLogger, run } from '../utils';
+import { createLogger, run } from '../scripts';
 import type { ApplicationConfig } from './applicationConfig';
 
 const createVercelApiClient = () => {
@@ -31,7 +32,7 @@ const createVercelApiClient = () => {
 export const vercelDeployment = async (config: ApplicationConfig) => {
   const app = await config.commit();
   await app.setup();
-  await app.withEnv(appConfigs.instances.allEnabled);
+  await app.withEnv(appConfigs.envs.withEmailCodes);
   const logger = createLogger({ prefix: `vercel-deployment-${app.name}`, color: 'bgBlue' });
   const localEnv = { VERCEL_PROJECT_ID: process.env.VERCEL_PROJECT_ID, VERCEL_ORG_ID: process.env.VERCEL_ORG_ID };
   const procConfig = { cwd: app.appDir, log: logger.info, env: localEnv };

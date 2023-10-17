@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import type { Application } from '../adapters/application';
+import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
 
@@ -36,7 +36,7 @@ test.describe('appearance prop', () => {
       )
       .commit();
     await app.setup();
-    await app.withEnv(appConfigs.instances.allEnabled);
+    await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.dev();
   });
 

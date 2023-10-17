@@ -1,0 +1,21 @@
+on:
+  workflow_call:
+
+jobs:
+  check:
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          ref: ${{github.event.pull_request.head.sha}}
+          fetch-depth: 0
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github.event.pull_request ) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+      - name: Setup
+        uses: ./.github/actions/setup
+      - run: |
+          if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi

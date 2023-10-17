@@ -43,14 +43,14 @@ export interface OrganizationMembershipResource extends ClerkResource {
 export type MembershipRole = 'admin' | 'basic_member' | 'guest_member';
 
 export type OrganizationPermission =
-  | 'org:domains:manage'
-  | 'org:domains:delete'
-  | 'org:profile:manage'
-  | 'org:profile:delete'
-  | 'org:memberships:read'
-  | 'org:memberships:manage'
-  | 'org:memberships:delete'
-  | 'org:domains:read';
+  | 'org:sys_domains:manage'
+  | 'org:sys_domains:delete'
+  | 'org:sys_profile:manage'
+  | 'org:sys_profile:delete'
+  | 'org:sys_memberships:read'
+  | 'org:sys_memberships:manage'
+  | 'org:sys_memberships:delete'
+  | 'org:sys_domains:read';
 
 export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;

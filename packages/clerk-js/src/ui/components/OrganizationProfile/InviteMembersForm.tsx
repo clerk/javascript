@@ -1,5 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { MembershipRole, OrganizationResource } from '@clerk/types';
+import type { ClerkAPIError, MembershipRole, OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { Flex, Text } from '../../customizables';
@@ -89,22 +89,27 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       .inviteMembers({ emailAddresses: emailAddressField.value.split(','), role: roleField.value as MembershipRole })
       .then(onSuccess)
       .catch(err => {
+        if (isClerkAPIResponseError(err)) {
+          removeInvalidEmails(err.errors[0]);
+        }
+
         if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'duplicate_record') {
           const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
 
           // Create a localized list of email addresses
           const localizedList = createListFormat(unlocalizedEmailsList, locale);
           setLocalizedEmails(localizedList);
-
-          // Remove any invalid email address
-          const invalids = new Set(unlocalizedEmailsList);
-          const emails = emailAddressField.value.split(',');
-          emailAddressField.setValue(emails.filter(e => !invalids.has(e)).join(','));
         } else {
           setLocalizedEmails(null);
           handleError(err, [], card.setError);
         }
       });
+  };
+
+  const removeInvalidEmails = (err: ClerkAPIError) => {
+    const invalidEmails = new Set([...(err.meta?.emailAddresses ?? []), ...(err.meta?.identifiers ?? [])]);
+    const emails = emailAddressField.value.split(',');
+    emailAddressField.setValue(emails.filter(e => !invalidEmails.has(e)).join(','));
   };
 
   return (

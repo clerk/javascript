@@ -1,7 +1,7 @@
 import type { Clerk } from '@clerk/backend';
 import { faker } from '@faker-js/faker';
 
-import { hash } from '../adapters/helpers';
+import { hash } from '../models/helpers';
 
 export type FakeUser = ReturnType<ReturnType<typeof createUserService>['createFakeUser']>;
 

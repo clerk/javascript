@@ -29,7 +29,7 @@ export const deprecated = (fnName: string, warning: string, key?: string): void 
   displayedWarnings.add(messageId);
 
   console.warn(
-    `DEPRECATION WARNING: "${fnName}" is deprecated and will be removed in the next major release.\n${warning}`,
+    `Clerk - DEPRECATION WARNING: "${fnName}" is deprecated and will be removed in the next major release.\n${warning}`,
   );
 };
 /**

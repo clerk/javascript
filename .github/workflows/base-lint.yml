@@ -1,0 +1,13 @@
+on:
+  workflow_call:
+
+jobs:
+  check:
+    continue-on-error: true
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - run: npm run lint

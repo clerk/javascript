@@ -41,8 +41,10 @@
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%"
+    "test:ci": "jest --maxWorkers=70%"
   },
   "name": "@clerk/clerk-sdk-node",
   "author": {
@@ -84,6 +86,5 @@
   "homepage": "https://clerk.com/",
   "publishConfig": {
     "access": "public"
-  },
-  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce"
+  }
 }

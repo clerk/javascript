@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 
-import type { Application } from '../adapters/application';
-import { vercelDeployment } from '../adapters/deployment';
+import type { Application } from '../models/application';
+import { vercelDeployment } from '../models/deployment';
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';

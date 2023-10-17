@@ -1,4 +1,4 @@
-import { AddBlockButton, BlockButton } from '../../common';
+import { AddBlockButton, BlockButton, Gate, useGate } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
@@ -26,7 +26,9 @@ export const OrganizationSettings = () => {
           <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__settings')} />
         </Header.Root>
         <OrganizationProfileSection />
-        <OrganizationDomainsSection />
+        <Gate permission='org:sys_domains:manage'>
+          <OrganizationDomainsSection />
+        </Gate>
         <OrganizationDangerSection />
       </Col>
     </Col>
@@ -34,9 +36,8 @@ export const OrganizationSettings = () => {
 };
 
 const OrganizationProfileSection = () => {
-  const { organization, membership } = useCoreOrganization();
+  const { organization } = useCoreOrganization();
   const { navigate } = useRouter();
-  const isAdmin = membership?.role === 'admin';
 
   if (!organization) {
     return null;
@@ -54,19 +55,23 @@ const OrganizationProfileSection = () => {
       title={localizationKeys('organizationProfile.profilePage.title')}
       id='organizationProfile'
     >
-      {isAdmin ? <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton> : profile}
+      <Gate
+        permission={'org:sys_profile:manage'}
+        fallback={<>{profile}</>}
+      >
+        <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton>
+      </Gate>
     </ProfileSection>
   );
 };
 
 const OrganizationDomainsSection = () => {
   const { organizationSettings } = useEnvironment();
-  const { organization, membership } = useCoreOrganization();
+  const { organization } = useCoreOrganization();
 
   const { navigate } = useRouter();
-  const isAdmin = membership?.role === 'admin';
 
-  if (!organizationSettings || !organization || !isAdmin) {
+  if (!organizationSettings || !organization) {
     return null;
   }
 
@@ -92,24 +97,15 @@ const OrganizationDomainsSection = () => {
 };
 
 const OrganizationDangerSection = () => {
-  const {
-    organization,
-    membership,
-    memberships: adminMembers,
-  } = useCoreOrganization({
-    memberships: {
-      role: ['admin'],
-    },
-  });
+  const { organization } = useCoreOrganization();
   const { navigate } = useRouter();
+  const { isAuthorizedUser: canDeleteOrganization } = useGate({ permission: 'org:sys_profile:delete' });
 
-  if (!organization || !membership) {
+  if (!organization) {
     return null;
   }
 
   const adminDeleteEnabled = organization.adminDeleteEnabled;
-  const hasMoreThanOneAdmin = (adminMembers?.count || 0) > 1;
-  const isAdmin = membership.role === 'admin';
 
   return (
     <ProfileSection
@@ -131,10 +127,9 @@ const OrganizationDangerSection = () => {
           colorScheme='danger'
           textVariant='buttonExtraSmallBold'
           onClick={() => navigate('leave')}
-          isDisabled={isAdmin && !hasMoreThanOneAdmin}
           localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
         />
-        {isAdmin && adminDeleteEnabled && (
+        {canDeleteOrganization && adminDeleteEnabled && (
           <IconButton
             aria-label='Delete organization'
             icon={

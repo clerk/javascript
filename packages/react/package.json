@@ -40,8 +40,10 @@
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%"
+    "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
     "@clerk/shared": "0.24.4",
@@ -70,6 +72,5 @@
   "homepage": "https://clerk.com/",
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce"
+  }
 }

@@ -32,7 +32,7 @@ describe('deprecated(fnName, warning)', () => {
     expect(example.getSomeMethod('a', 'b')).toEqual('getSomeMethodValue:a:b');
     expect(consoleWarnSpy).toBeCalledTimes(1);
     expect(consoleWarnSpy).toBeCalledWith(
-      'DEPRECATION WARNING: "getSomeMethod" is deprecated and will be removed in the next major release.\nUse `getSomeMethodElse` instead.',
+      'Clerk - DEPRECATION WARNING: "getSomeMethod" is deprecated and will be removed in the next major release.\nUse `getSomeMethodElse` instead.',
     );
 
     expect(example.getSomeMethod()).toEqual('getSomeMethodValue:-:-');
@@ -51,7 +51,7 @@ describe('deprecated(fnName, warning)', () => {
     expect(Example.getSomeStaticMethod()).toEqual('getSomeStaticMethodValue');
     expect(consoleWarnSpy).toBeCalledTimes(1);
     expect(consoleWarnSpy).toBeCalledWith(
-      'DEPRECATION WARNING: "getSomeStaticMethod" is deprecated and will be removed in the next major release.\nUse `getSomeStaticMethodElse` instead.',
+      'Clerk - DEPRECATION WARNING: "getSomeStaticMethod" is deprecated and will be removed in the next major release.\nUse `getSomeStaticMethodElse` instead.',
     );
 
     expect(Example.getSomeStaticMethod()).toEqual('getSomeStaticMethodValue');
@@ -68,7 +68,7 @@ describe('deprecated(fnName, warning)', () => {
     expect(getSomeFunction()).toEqual('getSomeFunctionValue');
     expect(consoleWarnSpy).toBeCalledTimes(1);
     expect(consoleWarnSpy).toBeCalledWith(
-      'DEPRECATION WARNING: "getSomeFunction" is deprecated and will be removed in the next major release.\nUse `getSomeFunctionElse` instead.',
+      'Clerk - DEPRECATION WARNING: "getSomeFunction" is deprecated and will be removed in the next major release.\nUse `getSomeFunctionElse` instead.',
     );
 
     expect(getSomeFunction()).toEqual('getSomeFunctionValue');
@@ -85,7 +85,7 @@ describe('deprecated(fnName, warning)', () => {
     expect(getSomeFunctionWithKey()).toEqual('getSomeFunctionWithKeyValue');
     expect(consoleWarnSpy).toBeCalledTimes(1);
     expect(consoleWarnSpy).toBeCalledWith(
-      'DEPRECATION WARNING: "getSomeFunctionWithKey" is deprecated and will be removed in the next major release.\nUse `getSomeFunctionWithKeyElse` instead.',
+      'Clerk - DEPRECATION WARNING: "getSomeFunctionWithKey" is deprecated and will be removed in the next major release.\nUse `getSomeFunctionWithKeyElse` instead.',
     );
 
     expect(getSomeFunctionWithKey()).toEqual('getSomeFunctionWithKeyValue');
@@ -204,7 +204,7 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
     expect(example.someProp).toEqual('someProp-value');
     expect(consoleWarnSpy).toBeCalledTimes(1);
     expect(consoleWarnSpy).toBeCalledWith(
-      'DEPRECATION WARNING: "someProp" is deprecated and will be removed in the next major release.\nUse `somePropElse` instead.',
+      'Clerk - DEPRECATION WARNING: "someProp" is deprecated and will be removed in the next major release.\nUse `somePropElse` instead.',
     );
 
     expect(example.someProp).toEqual('someProp-value');
@@ -224,7 +224,7 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
     expect(Example.someStaticProp).toEqual('someStaticProp-value');
     expect(consoleWarnSpy).toBeCalledTimes(1);
     expect(consoleWarnSpy).toBeCalledWith(
-      'DEPRECATION WARNING: "someStaticProp" is deprecated and will be removed in the next major release.\nUse `someStaticPropElse` instead.',
+      'Clerk - DEPRECATION WARNING: "someStaticProp" is deprecated and will be removed in the next major release.\nUse `someStaticPropElse` instead.',
     );
 
     expect(Example.someStaticProp).toEqual('someStaticProp-value');
@@ -247,7 +247,7 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
     expect(example.someReadOnlyProp).toEqual('someReadOnlyProp-value');
     expect(consoleWarnSpy).toBeCalledTimes(1);
     expect(consoleWarnSpy).toBeCalledWith(
-      'DEPRECATION WARNING: "someReadOnlyProp" is deprecated and will be removed in the next major release.\nUse `someReadOnlyPropElse` instead.',
+      'Clerk - DEPRECATION WARNING: "someReadOnlyProp" is deprecated and will be removed in the next major release.\nUse `someReadOnlyPropElse` instead.',
     );
 
     expect(example.someReadOnlyProp).toEqual('someReadOnlyProp-value');
@@ -330,7 +330,7 @@ describe('deprecatedObjectProperty(obj, propName, warning)', () => {
     expect(example.objectProperty).toEqual('objectProperty-value');
     expect(consoleWarnSpy).toBeCalledTimes(1);
     expect(consoleWarnSpy).toBeCalledWith(
-      'DEPRECATION WARNING: "objectProperty" is deprecated and will be removed in the next major release.\nUse `objectPropertyElse` instead.',
+      'Clerk - DEPRECATION WARNING: "objectProperty" is deprecated and will be removed in the next major release.\nUse `objectPropertyElse` instead.',
     );
 
     expect(example.objectProperty).toEqual('objectProperty-value');

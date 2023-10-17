@@ -1,3 +1,5 @@
+import type { AppLoadContext } from '@remix-run/server-runtime';
+
 import type { ClerkState } from './client/types';
 import { invalidClerkStatePropError, noClerkStateError } from './errors';
 
@@ -29,16 +31,22 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
  * @param name
  * @returns
  */
-export const getEnvVariable = (name: string): string => {
+export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string => {
   // Node envs
   if (typeof process !== 'undefined') {
     return (process.env && process.env[name]) || '';
   }
 
+  // Cloudflare pages
+  if (typeof context !== 'undefined') {
+    const contextEnv = context?.env as Record<string, string>;
+
+    return contextEnv[name] || (context[name] as string) || '';
+  }
+
   // Cloudflare workers
   try {
-    // @ts-expect-error
-    return globalThis[name];
+    return globalThis[name as keyof typeof globalThis];
   } catch (_) {
     // This will raise an error in Cloudflare Pages
   }
