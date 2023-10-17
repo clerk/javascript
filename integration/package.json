@@ -12,10 +12,9 @@
     "test:integration:generic": "E2E_APP_ID=react.vite.* npm run test:integration:base -- --grep @generic",
     "test:integration:remix": "echo 'placeholder'"
   },
-  "dependencies": {
-    "@playwright/test": "^1.38.1"
-  },
   "devDependencies": {
+    "@clerk/backend": "*",
+    "@playwright/test": "^1.38.1",
     "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
