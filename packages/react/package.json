@@ -49,7 +49,6 @@
   "dependencies": {
     "@clerk/shared": "0.24.5",
     "@clerk/types": "3.56.1",
-    "eslint-config-custom": "*",
     "tslib": "2.4.1"
   },
   "devDependencies": {
@@ -57,6 +56,7 @@
     "@types/node": "^16.11.55",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "eslint-config-custom": "*",
     "typescript": "*"
   },
   "peerDependencies": {
