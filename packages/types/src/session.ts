@@ -6,15 +6,35 @@ import type { UserResource } from './user';
 
 export type IsAuthorized = (isAuthorizedParams: IsAuthorizedParams) => Promise<IsAuthorizedReturnValues>;
 
-interface IsAuthorizedParams {
-  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-  // eslint-disable-next-line
-  permission?: OrganizationPermission | (string & {});
-  role?: string;
-  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-  // eslint-disable-next-line
-  any?: (OrganizationPermission | (string & {}))[];
-}
+type IsAuthorizedParams =
+  | {
+      any: (
+        | {
+            role: string;
+            permission?: never;
+          }
+        | {
+            role?: never;
+            // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+            // eslint-disable-next-line
+            permission: OrganizationPermission | (string & {});
+          }
+      )[];
+      role?: never;
+      permission?: never;
+    }
+  | {
+      any?: never;
+      role: string;
+      permission?: never;
+    }
+  | {
+      any?: never;
+      role?: never;
+      // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+      // eslint-disable-next-line
+      permission: OrganizationPermission | (string & {});
+    };
 
 type IsAuthorizedReturnValues = boolean;
 

@@ -1,4 +1,4 @@
-import type { IsAuthorized, OrganizationPermission } from '@clerk/types';
+import type { IsAuthorized } from '@clerk/types';
 import type { ComponentType, PropsWithChildren, ReactNode } from 'react';
 import React, { useEffect } from 'react';
 
@@ -6,7 +6,7 @@ import { useCoreSession } from '../contexts';
 import { useFetch } from '../hooks';
 import { useRouter } from '../router';
 
-type GateParams = Omit<Parameters<IsAuthorized>[0], 'permission'> & { permission?: OrganizationPermission };
+type GateParams = Parameters<IsAuthorized>[0];
 type GateProps = PropsWithChildren<
   GateParams & {
     fallback?: ReactNode;

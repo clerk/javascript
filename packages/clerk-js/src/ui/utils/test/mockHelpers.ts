@@ -31,7 +31,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
   clerk.client.sessions.forEach(session => {
     mockMethodsOf(session);
     session.isAuthorized = jest.fn(args => {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         // if there is no active organization user can not be authorized
         if (!session.lastActiveOrganizationId || !session.user) {
           return resolve(false);
@@ -57,8 +57,17 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
         }
 
         if (args.any) {
-          return resolve(args.any.filter(perm => activeOrganizationPermissions.includes(perm)).length > 0);
+          return resolve(
+            args.any.filter(permObj => {
+              if (permObj.permission) {
+                return activeOrganizationPermissions.includes(permObj.permission);
+              }
+              return activeOrganizationRole === permObj.role;
+            }).length > 0,
+          );
         }
+
+        return reject(false);
       });
     });
     mockMethodsOf(session.user);
