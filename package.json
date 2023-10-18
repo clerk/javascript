@@ -57,7 +57,7 @@
     "ts-jest": "^29.0.3",
     "tsup": "^7.2.0",
     "turbo": "^1.10.15",
-    "typescript": "4.9.4",
+    "typescript": "^5.2.2",
     "verdaccio": "^5.26.3",
     "zx": "^7.2.3"
   },

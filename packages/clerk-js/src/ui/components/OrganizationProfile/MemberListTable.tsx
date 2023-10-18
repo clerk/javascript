@@ -2,7 +2,20 @@ import type { MembershipRole } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { Col, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr, useLocalizations } from '../../customizables';
+import {
+  Col,
+  descriptors,
+  Flex,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useLocalizations,
+} from '../../customizables';
 import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
 import { roleLocalizationKey } from '../../utils';
@@ -54,6 +67,7 @@ export const DataTable = (props: MembersListTableProps) => {
             <Tr>
               {headers.map((h, index) => (
                 <Th
+                  elementDescriptor={descriptors.tableHead}
                   key={index}
                   localizationKey={h}
                 />

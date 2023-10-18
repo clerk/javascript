@@ -85,7 +85,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
             <Icon
               elementDescriptor={leftIconElementDescriptor}
               elementId={leftIconElementId}
-              icon={leftIcon}
+              icon={leftIcon as React.ComponentType}
               sx={[
                 theme => ({
                   color: theme.colors.$blackAlpha600,
