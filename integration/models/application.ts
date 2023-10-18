@@ -68,9 +68,9 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
       state.serverUrl = serverUrl;
       return { port, serverUrl, pid: proc.pid };
     },
-    build: async () => {
-      const log = logger.child({ prefix: 'build' }).info;
-      await run(scripts.build, { cwd: appDirPath, log });
+    build: async ({ log }: { log?: (msg: string) => void } = {}) => {
+      const finalLog = log ?? logger.child({ prefix: 'build' }).info;
+      await run(scripts.build, { cwd: appDirPath, log: finalLog });
     },
     serve: async (opts: { port?: number; manualStart?: boolean } = {}) => {
       const port = opts.port || (await getPort());
