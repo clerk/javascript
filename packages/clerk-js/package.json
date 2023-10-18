@@ -93,7 +93,8 @@
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/clerk-js"
   },
   "homepage": "https://clerk.com/",
   "bugs": {

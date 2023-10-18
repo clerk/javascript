@@ -15,6 +15,9 @@ jobs:
     name: Release
     if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE }}
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Echo github context
         run: echo "$GITHUB_CONTEXT"
@@ -38,6 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'

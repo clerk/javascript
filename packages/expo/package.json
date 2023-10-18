@@ -60,7 +60,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/expo"
   },
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"

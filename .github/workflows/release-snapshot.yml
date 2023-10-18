@@ -16,6 +16,9 @@ jobs:
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Limit action to Clerk members
         uses: actions/github-script@v6
@@ -62,6 +65,7 @@ jobs:
         run: npm run release:snapshot
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Package info
         if: steps.version-packages.outputs.success == '1'
