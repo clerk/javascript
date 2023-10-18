@@ -13,11 +13,17 @@
     "session",
     "jwt"
   ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/nextjs"
+  },
   "author": "Clerk",
   "sideEffects": false,
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
@@ -55,6 +61,9 @@
       "require": "./dist/cjs/app-beta/client/index.js"
     }
   },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
     "server",
@@ -65,14 +74,14 @@
   ],
   "scripts": {
     "build": "npm run clean && tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
-    "publish:local": "npx yalc push --replace --sig",
-    "clean": "rimraf ./dist",
     "lint": "eslint src/",
-    "lint:publint": "publint",
     "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "publish:local": "npx yalc push --replace --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%"
@@ -105,14 +114,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/nextjs"
-  },
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "homepage": "https://clerk.com/"
+  }
 }

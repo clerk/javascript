@@ -1,11 +1,11 @@
 {
   "name": "react-vite",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port $PORT --no-open",
     "build": "tsc && vite build",
+    "dev": "vite --port $PORT --no-open",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview --port $PORT --no-open"
   },
