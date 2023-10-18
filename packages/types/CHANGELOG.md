@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.56.1
+
+### Patch Changes
+
+- Deprecate experimental captcha from Clerk singleton. ([#1905](https://github.com/clerkinc/javascript/pull/1905)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.56.0
 
 ### Minor Changes
