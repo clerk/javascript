@@ -9,7 +9,7 @@ import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
 export const ActiveMembersList = () => {
   const card = useCardState();
-  const { organization, memberships, ...rest } = useCoreOrganization({
+  const { organization, memberships } = useCoreOrganization({
     memberships: true,
   });
 

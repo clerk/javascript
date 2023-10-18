@@ -2,8 +2,8 @@
 
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { useSWR, useSWRInfinite } from './clerk-swr';
-import type { CacheSetter, PaginatedResources, ValueOrSetter } from './types';
+import { useSWR, useSWRInfinite } from '../clerk-swr';
+import type { CacheSetter, PaginatedResources, ValueOrSetter } from '../types';
 
 function getDifferentKeys(obj1: Record<string, unknown>, obj2: Record<string, unknown>): Record<string, unknown> {
   const keysSet = new Set(Object.keys(obj2));
