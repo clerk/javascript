@@ -58,7 +58,7 @@ export const OrganizationMembersTabInvitations = () => {
                   onClick={() => navigate('organization-settings/domain')}
                 />
               }
-              redirectSubPath={'organization-settings/domain/'}
+              redirectSubPath={'organization-settings/domain'}
               verificationStatus={'verified'}
               enrollmentMode={'automatic_invitation'}
             />

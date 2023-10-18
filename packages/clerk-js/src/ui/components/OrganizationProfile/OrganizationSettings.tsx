@@ -85,7 +85,7 @@ const OrganizationDomainsSection = () => {
       subtitle={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
       id='organizationDomains'
     >
-      <DomainList redirectSubPath={'domain/'} />
+      <DomainList redirectSubPath={'domain'} />
 
       <AddBlockButton
         textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}

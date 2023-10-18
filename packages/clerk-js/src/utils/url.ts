@@ -211,6 +211,18 @@ export const trimTrailingSlash = (path: string): string => {
   return (path || '').replace(/\/+$/, '');
 };
 
+/**
+ * trimLeadingSlash(path: string): string
+ *
+ * Strips the leading slashes from a string
+ *
+ * @returns {string} Returns the string without leading slashes
+ * @param path
+ */
+export const trimLeadingSlash = (path: string): string => {
+  return (path || '').replace(/^\/+/, '');
+};
+
 export const stripSameOrigin = (url: URL, baseUrl: URL): string => {
   const sameOrigin = baseUrl.origin === url.origin;
   return sameOrigin ? stripOrigin(url) : `${url}`;
