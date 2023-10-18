@@ -3,11 +3,11 @@ module.exports = {
     'no-label-var': 'error',
     'no-undef-init': 'warn',
     'no-unused-vars': [
-      'error',
+      'warn',
       {
         args: 'after-used',
         argsIgnorePattern: '^_',
-        ignoreRestSiblings: false,
+        ignoreRestSiblings: true,
         vars: 'all',
         varsIgnorePattern: '^_',
       },

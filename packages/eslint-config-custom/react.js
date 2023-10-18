@@ -8,7 +8,12 @@ const disabledRules = {
   'jsx-a11y/alt-text': 'warn',
   'jsx-a11y/html-has-lang': 'warn',
   'jsx-a11y/no-autofocus': 'warn',
-  'react/display-name': 'warn',
+  'react/button-has-type': 'warn',
+  'react/display-name': 'off',
+  'react/jsx-curly-brace-presence': 'off',
+  'react/jsx-no-leaked-render': 'off',
+  'react/jsx-no-useless-fragment': 'warn',
+  'react/jsx-sort-props': 'off',
   'react-hooks/rules-of-hooks': 'warn',
 };
 
@@ -34,7 +39,7 @@ module.exports = {
       },
     ],
     'react/button-has-type': 'warn',
-    'react/function-component-definition': 'warn',
+    'react/function-component-definition': 'off',
     'react/hook-use-state': 'warn',
     'react/jsx-boolean-value': 'warn',
     'react/jsx-curly-brace-presence': 'warn',

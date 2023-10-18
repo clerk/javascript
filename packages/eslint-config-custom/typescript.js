@@ -25,6 +25,7 @@ const disabledRules = {
 
   // TODO: All rules below should be set to their defaults
   // when we're able to make the appropriate changes.
+  '@typescript-eslint/no-explicit-any': 'off',
   '@typescript-eslint/await-thenable': 'warn',
   '@typescript-eslint/no-misused-promises': 'warn',
   '@typescript-eslint/no-floating-promises': [
@@ -33,7 +34,6 @@ const disabledRules = {
       ignoreVoid: true,
     },
   ],
-  '@typescript-eslint/no-unused-vars': 'warn',
   '@typescript-eslint/require-await': 'warn',
 };
 
@@ -58,7 +58,14 @@ module.exports = {
         'prettier',
       ],
       rules: {
-        '@typescript-eslint/ban-ts-comment': [`warn`, { 'ts-ignore': `allow-with-description` }],
+        '@typescript-eslint/ban-ts-comment': [
+          `warn`,
+          {
+            'ts-ignore': 'allow-with-description',
+            'ts-expect-error': 'allow-with-description',
+            'ts-check': 'allow-with-description',
+          },
+        ],
         '@typescript-eslint/consistent-type-imports': [
           'error',
           {
