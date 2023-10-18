@@ -28,11 +28,16 @@ Alternatively, you can set your own ignoredRoutes. See https://clerk.com/docs/ne
 (This log only appears in development mode)
 `;
 
-export const getAuthAuthHeaderMissing = () =>
-  'You need to use "authMiddleware" (or the deprecated "withClerkMiddleware") in your Next.js middleware file. You also need to make sure that your middleware matcher is configured correctly and matches this route or page. See https://clerk.com/docs/quickstarts/get-started-with-nextjs';
+export const getAuthAuthHeaderMissing = () => authAuthHeaderMissing('getAuth');
 
-export const authAuthHeaderMissing = () =>
-  "Clerk: auth() was called but it looks like you aren't using `authMiddleware` in your middleware file. Please use `authMiddleware` and make sure your middleware matcher is configured correctly and it matches this route or page. See https://clerk.com/docs/quickstarts/get-started-with-nextjs";
+export const authAuthHeaderMissing = (helperName = 'auth') =>
+  `Clerk: ${helperName}() was called but Clerk can't detect usage of authMiddleware(). Please ensure the following:
+- authMiddleware() is used in your Next.js Middleware.
+- Your Middleware matcher is configured to match this route or page.
+- If you are using the src directory, make sure the Middleware file is inside of it.
+
+For more details, see https://clerk.com/docs/quickstarts/get-started-with-nextjs.
+`;
 
 export const clockSkewDetected = (verifyMessage: string) =>
   `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will continuously try to issue new tokens, as the existing ones will be treated as "expired" due to clock skew.

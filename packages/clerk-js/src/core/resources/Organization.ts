@@ -168,14 +168,14 @@ export class Organization extends BaseResource implements OrganizationResource {
   getMemberships: GetMemberships = async getMembershipsParams => {
     const isDeprecatedParams = typeof getMembershipsParams === 'undefined' || !getMembershipsParams?.paginated;
 
-    if (!(getMembershipsParams as GetMembershipsParams)?.limit) {
+    if ((getMembershipsParams as GetMembershipsParams)?.limit) {
       deprecated(
         'limit',
         'Use `pageSize` instead in Organization.getMemberships.',
         'organization:getMemberships:limit',
       );
     }
-    if (!(getMembershipsParams as GetMembershipsParams)?.offset) {
+    if ((getMembershipsParams as GetMembershipsParams)?.offset) {
       deprecated('offset', 'Use `initialPage` instead in Organization.limit.', 'organization:getMemberships:offset');
     }
 

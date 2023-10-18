@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.25.6
+
+### Patch Changes
+
+- Update the error thrown by auth() or getAuth() to indicate that if the /src directory exists, then the middleware.ts file needs to be placed inside it, otherwise the middleware will not run. ([#1908](https://github.com/clerkinc/javascript/pull/1908)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`9ca215702`](https://github.com/clerkinc/javascript/commit/9ca215702d1b816217d2c06c812f7d653ec2da11)]:
+  - @clerk/types@3.56.1
+  - @clerk/backend@0.31.2
+  - @clerk/clerk-react@4.26.6
+  - @clerk/clerk-sdk-node@4.12.15
+
 ## 4.25.5
 
 ### Patch Changes
