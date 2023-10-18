@@ -13,7 +13,7 @@ type Seconds = number;
 
 interface TokenCacheValue {
   entry: TokenCacheEntry;
-  createdAt: Seconds;
+  createdAt?: Seconds;
   expiresIn?: Seconds;
 }
 
@@ -69,8 +69,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     const key = cacheKey.toKey();
 
-    const createdAt = Math.floor(Date.now() / 1000);
-    const value: TokenCacheValue = { entry, createdAt };
+    const value: TokenCacheValue = { entry };
 
     const deleteKey = () => {
       if (cache.get(key) === value) {
@@ -86,6 +85,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
         // Mutate cached value and set expirations
         value.expiresIn = expiresIn;
+        value.createdAt = issuedAt;
         timer = setTimeout(deleteKey, expiresIn * 1000);
 
         // Teach ClerkJS not to block the exit of the event loop when used in Node environments.
@@ -110,7 +110,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     }
 
     const nowSeconds = Math.floor(Date.now() / 1000);
-    const elapsedSeconds = nowSeconds - value.createdAt;
+    const elapsedSeconds = nowSeconds - value.createdAt!;
     // We will include the authentication poller interval as part of the leeway to ensure
     // that the cache value will be valid for more than the SYNC_LEEWAY or the leeway in the next poll.
     const expiresSoon = value.expiresIn! - elapsedSeconds < (leeway || 1) + SYNC_LEEWAY;
