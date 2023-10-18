@@ -72,9 +72,8 @@ const createBaseDisplayConfig = (): DisplayConfigJSON => {
     create_organization_url: 'https://accounts.clerk.com/create-organization',
     after_leave_organization_url: 'https://dashboard.clerk.com',
     after_create_organization_url: 'https://dashboard.clerk.com',
-    support_email: null,
+    support_email: '',
     branded: true,
-    experimental_force_oauth_first: false,
     clerk_js_version: '4',
   };
 };

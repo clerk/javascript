@@ -29,7 +29,6 @@ export interface DisplayConfigJSON {
   theme: DisplayThemeJSON;
   user_profile_url: string;
   clerk_js_version?: string;
-  experimental_force_oauth_first?: boolean;
   organization_profile_url: string;
   create_organization_url: string;
   after_leave_organization_url: string;
