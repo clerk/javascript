@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       .commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);
-    await app.build({ log: msg => output.push(msg) });
+    await app.build();
   });
 
   test.afterAll(async () => {
@@ -65,7 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
      * Using /_not-found as it is an internal page that should statically render by default.
      * This is a good indicator of whether or not the entire app has been opted-in to dynamic rendering.
      */
-    const notFoundPageLine = output.find(msg => msg.includes('/_not-found'));
+    const notFoundPageLine = app.buildOutput.split('\n').find(msg => msg.includes('/_not-found'));
 
     expect(notFoundPageLine).not.toContain(dynamicIndicator);
   });

@@ -16,6 +16,7 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
   const now = Date.now();
   const stdoutFilePath = path.resolve(appDirPath, `e2e.${now}.log`);
   const stderrFilePath = path.resolve(appDirPath, `e2e.${now}.err.log`);
+  let buildOutput = '';
 
   const self = {
     name,
@@ -68,9 +69,18 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
       state.serverUrl = serverUrl;
       return { port, serverUrl, pid: proc.pid };
     },
-    build: async ({ log }: { log?: (msg: string) => void } = {}) => {
-      const finalLog = log ?? logger.child({ prefix: 'build' }).info;
-      await run(scripts.build, { cwd: appDirPath, log: finalLog });
+    build: async () => {
+      const log = logger.child({ prefix: 'build' }).info;
+      await run(scripts.build, {
+        cwd: appDirPath,
+        log: (msg: string) => {
+          buildOutput += `\n${msg}`;
+          log(msg);
+        },
+      });
+    },
+    get buildOutput() {
+      return buildOutput;
     },
     serve: async (opts: { port?: number; manualStart?: boolean } = {}) => {
       const port = opts.port || (await getPort());
