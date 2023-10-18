@@ -24,6 +24,7 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
   const passwordControl = useFormControl('password', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__password'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__password'),
   });
 
   return {
