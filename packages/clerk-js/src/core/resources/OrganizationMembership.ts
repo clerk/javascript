@@ -37,14 +37,14 @@ export class OrganizationMembership extends BaseResource implements Organization
     const isDeprecatedParams =
       typeof retrieveMembershipsParams === 'undefined' || !retrieveMembershipsParams?.paginated;
 
-    if (!(retrieveMembershipsParams as RetrieveMembershipsParams)?.limit) {
+    if ((retrieveMembershipsParams as RetrieveMembershipsParams)?.limit) {
       deprecated(
         'limit',
         'Use `pageSize` instead in OrganizationMembership.retrieve.',
         'organization-membership:limit',
       );
     }
-    if (!(retrieveMembershipsParams as RetrieveMembershipsParams)?.offset) {
+    if ((retrieveMembershipsParams as RetrieveMembershipsParams)?.offset) {
       deprecated(
         'offset',
         'Use `initialPage` instead in OrganizationMembership.retrieve.',
