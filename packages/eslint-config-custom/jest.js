@@ -5,7 +5,10 @@ const disabledRules = {
 
   // TODO: All rules below should be set to their defaults
   // when we're able to make the appropriate changes.
+  'jest/expect-expect': 'off',
   'jest/no-alias-methods': 'off',
+  'jest/no-commented-out-tests': 'off',
+  'jest/no-disabled-tests': 'off',
   'jest/no-conditional-expect': 'off',
   'jest/no-duplicate-hooks': 'off',
   'jest/no-export': 'off',

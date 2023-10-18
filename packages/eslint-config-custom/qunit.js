@@ -1,3 +1,7 @@
+const disabledRules = {
+  'qunit/no-assert-equal': 'off',
+};
+
 module.exports = {
   extends: ['plugin:qunit/recommended'],
   env: {
@@ -8,5 +12,6 @@ module.exports = {
     'qunit/no-assert-equal': 'warn',
     'qunit/no-conditional-assertions': 'warn',
     'qunit/no-early-return': 'warn',
+    ...disabledRules,
   },
 };
