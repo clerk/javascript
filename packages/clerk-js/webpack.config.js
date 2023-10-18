@@ -29,6 +29,8 @@ const common = ({ mode }) => {
   return {
     mode,
     resolve: {
+      // Attempt to resolve these extensions in order
+      // @see https://webpack.js.org/configuration/resolve/#resolveextensions
       extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
     },
     plugins: [
