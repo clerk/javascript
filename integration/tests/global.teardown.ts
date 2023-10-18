@@ -12,11 +12,13 @@ setup('teardown long running apps', async () => {
     console.log('Skipping cleanup');
     return;
   }
-  const runningAppsFoundInStateFile = Object.values(stateFile.getLongRunningApps());
-  const matchingLongRunningApps = appConfigs.longRunningApps.getByPattern(
-    runningAppsFoundInStateFile.map(app => app.id),
-  );
-  await Promise.all(matchingLongRunningApps.map(app => app.destroy()));
+  const runningAppsFoundInStateFile = Object.values(stateFile.getLongRunningApps() ?? {});
+  if (runningAppsFoundInStateFile.length > 0) {
+    const matchingLongRunningApps = appConfigs.longRunningApps.getByPattern(
+      runningAppsFoundInStateFile.map(app => app.id),
+    );
+    await Promise.all(matchingLongRunningApps.map(app => app.destroy()));
+  }
   stateFile.remove();
   console.log('Long running apps destroyed');
 });
