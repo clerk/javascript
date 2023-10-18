@@ -31,10 +31,11 @@ Alternatively, you can set your own ignoredRoutes. See https://clerk.com/docs/ne
 export const getAuthAuthHeaderMissing = () => authAuthHeaderMissing('getAuth');
 
 export const authAuthHeaderMissing = (helperName = 'auth') =>
-  `Clerk: ${helperName}() was called but it looks like you aren't using authMiddleware in your middleware file. Please ensure the following:
-- Use authMiddleware in your middleware file.
-- Make sure your middleware matcher is configured correctly and it matches this route or page.
-- If you are using the /src directory, ensure that the middleware.ts file is located under it.
+  `Clerk: ${helperName}() was called but Clerk can't detect usage of authMiddleware(). Please ensure the following:
+- authMiddleware() is used in your Next.js Middleware.
+- Your Middleware matcher is configured to match this route or page.
+- If you are using the src directory, make sure the Middleware file is inside of it.
+
 For more details, see https://clerk.com/docs/quickstarts/get-started-with-nextjs.
 `;
 
