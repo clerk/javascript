@@ -1,5 +1,23 @@
 # Change Log
 
+## 4.62.1
+
+### Patch Changes
+
+- Added `formFieldInputPlaceholder__password` to the placeholder of the password input in the `<SignInFactorOnePasswordCard/>` component ([#1909](https://github.com/clerkinc/javascript/pull/1909)) by [@octoper](https://github.com/octoper)
+
+- Internal fix for deprecation warning when using limi & offset. ([#1904](https://github.com/clerkinc/javascript/pull/1904)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove custom Alert from invitation page and display it as a global error instead (at the top of the component). ([#1903](https://github.com/clerkinc/javascript/pull/1903)) by [@panteliselef](https://github.com/panteliselef)
+
+- Deprecate experimental captcha from Clerk singleton. ([#1905](https://github.com/clerkinc/javascript/pull/1905)) by [@panteliselef](https://github.com/panteliselef)
+
+- Append query params for sign-in and sign-up initial values after the hash in order to be readable via hash routing. ([#1855](https://github.com/clerkinc/javascript/pull/1855)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`ccfb0e8ed`](https://github.com/clerkinc/javascript/commit/ccfb0e8ed43c7857bfd5cb4dcb732fe6cf2d40d5), [`9ca215702`](https://github.com/clerkinc/javascript/commit/9ca215702d1b816217d2c06c812f7d653ec2da11)]:
+  - @clerk/localizations@1.26.6
+  - @clerk/types@3.56.1
+
 ## 4.62.0
 
 ### Minor Changes

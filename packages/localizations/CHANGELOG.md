@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.26.6
+
+### Patch Changes
+
+- Introduce zh-TW localization ([#1884](https://github.com/clerkinc/javascript/pull/1884)) by [@15077693d](https://github.com/15077693d)
+
+- Updated dependencies [[`9ca215702`](https://github.com/clerkinc/javascript/commit/9ca215702d1b816217d2c06c812f7d653ec2da11)]:
+  - @clerk/types@3.56.1
+
 ## 1.26.5
 
 ### Patch Changes
