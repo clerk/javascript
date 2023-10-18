@@ -40,8 +40,8 @@ export const UsernamePage = withCardStateProvider(() => {
           <Form.ControlRow elementId={usernameField.id}>
             <Form.PlainInput
               {...usernameField.props}
-              required
               autoFocus
+              isRequired
             />
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />

@@ -16,7 +16,7 @@ import {
   useLocalizations,
 } from '../customizables';
 import { useFieldMessageVisibility } from '../hooks';
-import { FormFieldContextProvider, sanitizeInputProps, useFormControl, useFormField } from '../primitives/hooks';
+import { FormFieldContextProvider, sanitizeInputProps, useFormField } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import type { useFormControl as useFormControlUtil } from '../utils';
 import { useFormControlFeedback } from '../utils';
@@ -25,10 +25,8 @@ import { useFormState } from './Form';
 import type { FormFeedbackProps } from './FormControl';
 import { delay, FormFeedback } from './FormControl';
 
-type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> &
-  ReturnType<typeof useFormControlUtil<FieldId>>['props'] & {
-    isDisabled?: boolean;
-  };
+type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder' | 'disabled' | 'required'> &
+  ReturnType<typeof useFormControlUtil<FieldId>>['props'];
 
 export const Root = (props: PropsWithChildren<FormControlProps>) => {
   const card = useCardState();
@@ -67,7 +65,7 @@ export const Root = (props: PropsWithChildren<FormControlProps>) => {
   const isDisabled = props.isDisabled || card.isLoading;
 
   return (
-    <FormFieldContextProvider {...props}>
+    <FormFieldContextProvider {...{ ...props, isDisabled }}>
       {/*Most of our primitives still depend on this provider.*/}
       {/*TODO: In follow-up PRs these will be removed*/}
       <FormControlPrim
@@ -92,7 +90,7 @@ export const Root = (props: PropsWithChildren<FormControlProps>) => {
 const FieldAction = (
   props: PropsWithChildren<{ localizationKey?: LocalizationKey | string; onClick?: React.MouseEventHandler }>,
 ) => {
-  const { isDisabled, id } = useFormControl();
+  const { fieldId, isDisabled } = useFormField();
 
   if (!props.localizationKey && !props.children) {
     return null;
@@ -102,7 +100,7 @@ const FieldAction = (
     <Link
       localizationKey={props.localizationKey}
       elementDescriptor={descriptors.formFieldAction}
-      elementId={descriptors.formFieldLabel.setId(id as FieldId)}
+      elementId={descriptors.formFieldLabel.setId(fieldId)}
       isDisabled={isDisabled}
       colorScheme='primary'
       onClick={e => {
@@ -116,12 +114,12 @@ const FieldAction = (
 };
 
 const FieldOptionalLabel = () => {
-  const { isDisabled, id } = useFormControl();
+  const { fieldId, isDisabled } = useFormField();
   return (
     <Text
       localizationKey={localizationKeys('formFieldHintText__optional')}
       elementDescriptor={descriptors.formFieldHintText}
-      elementId={descriptors.formFieldHintText.setId(id as FieldId)}
+      elementId={descriptors.formFieldHintText.setId(fieldId)}
       as='span'
       colorScheme='neutral'
       variant='smallRegular'
@@ -158,8 +156,7 @@ const FieldLabelIcon = (props: { icon?: React.ComponentType }) => {
 };
 
 const FieldLabel = (props: PropsWithChildren<{ localizationKey?: LocalizationKey | string }>) => {
-  const { hasError, isDisabled } = useFormControl();
-  const { isRequired, id, label } = useFormField();
+  const { isRequired, id, label, isDisabled, hasError } = useFormField();
 
   if (!(props.localizationKey || label) && !props.children) {
     return null;
