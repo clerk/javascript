@@ -12,8 +12,25 @@ jest.mock('./resources/Base', () => {
   };
 });
 
-const jwt =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzU4NzY3OTAsImRhdGEiOiJmb29iYXIiLCJpYXQiOjE2NzU4NzY3MzB9.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
+const mockJwtToken = (now: number): string => {
+  const nowInSeconds = Math.floor(now / 1000);
+  const payload = {
+    iat: nowInSeconds,
+    exp: nowInSeconds + 60,
+    data: 'foobar',
+  };
+
+  const header = {
+    alg: 'HS256',
+    typ: 'JWT',
+  };
+
+  const base64Header = Buffer.from(JSON.stringify(header)).toString('base64');
+  const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
+  const signature = 'Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
+
+  return `${base64Header}.${base64Payload}.${signature}`;
+};
 
 describe('MemoryTokenCache', () => {
   beforeAll(() => {
@@ -30,7 +47,7 @@ describe('MemoryTokenCache', () => {
       const token = new Token({
         object: 'token',
         id: 'foo',
-        jwt,
+        jwt: mockJwtToken(Date.now()),
       });
 
       const tokenResolver = new Promise<TokenResource>(resolve => setTimeout(() => resolve(token), 100));
@@ -57,7 +74,7 @@ describe('MemoryTokenCache', () => {
     const token = new Token({
       object: 'token',
       id: 'foo',
-      jwt,
+      jwt: mockJwtToken(Date.now()),
     });
 
     let isResolved = false;
@@ -113,7 +130,7 @@ describe('MemoryTokenCache', () => {
       const token = new Token({
         object: 'token',
         id: 'foo',
-        jwt,
+        jwt: mockJwtToken(Date.now()),
       });
 
       const tokenResolver = Promise.resolve(token);
@@ -138,7 +155,7 @@ describe('MemoryTokenCache', () => {
       const token = new Token({
         object: 'token',
         id: 'foo',
-        jwt,
+        jwt: mockJwtToken(Date.now()),
       });
 
       const tokenResolver = Promise.resolve(token);
