@@ -346,9 +346,6 @@ export default class IsomorphicClerk {
 
   /**
    * `setActive` can be used to set the active session and/or organization.
-   * It will eventually replace `setSession`.
-   *
-   * @experimental
    */
   setActive = ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
     if (this.clerkjs) {

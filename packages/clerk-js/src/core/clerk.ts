@@ -583,9 +583,6 @@ export default class Clerk implements ClerkInterface {
 
   /**
    * `setActive` can be used to set the active session and/or organization.
-   * It will eventually replace `setSession`.
-   *
-   * @experimental
    */
   public setActive = async ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
     if (!this.client) {
