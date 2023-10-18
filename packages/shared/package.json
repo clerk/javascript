@@ -2,12 +2,14 @@
   "name": "@clerk/shared",
   "version": "0.24.5",
   "description": "Internal package utils used by the Clerk SDKs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/shared"
+  },
+  "license": "MIT",
+  "author": "Clerk",
   "sideEffects": false,
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "exports": {
     ".": {
       "import": {
@@ -40,15 +42,20 @@
       }
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
+    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "publish:local": "npx yalc push --replace  --sig",
-    "clean": "rimraf ./dist",
     "lint": "eslint src/",
-    "lint:publint": "publint",
     "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "publish:local": "npx yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
@@ -75,14 +82,7 @@
       "optional": true
     }
   },
-  "author": "Clerk",
-  "license": "MIT",
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/shared"
   }
 }
