@@ -12,27 +12,37 @@
     "chrome",
     "extension"
   ],
-  "types": "./dist/types/index.d.ts",
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/chrome-extension"
+  },
+  "sideEffects": false,
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
-    "publish:local": "npx yalc push --replace  --sig",
-    "clean": "rimraf ./dist",
     "lint": "eslint src/",
-    "lint:publint": "publint",
     "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "prepublishOnly": "npm run build",
+    "publish:local": "npx yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
-    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
-    "prepublishOnly": "npm run build"
+    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
     "@clerk/clerk-js": "4.63.0",
@@ -52,15 +62,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/chrome-extension"
-  },
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "homepage": "https://clerk.com/",
-  "sideEffects": false
+  }
 }

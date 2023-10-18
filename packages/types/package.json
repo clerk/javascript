@@ -13,6 +13,15 @@
     "jwt",
     "types"
   ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/types"
+  },
   "author": "Clerk",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -21,8 +30,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "clean": "rimraf ./dist",
+    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
     "lint": "eslint src/"
   },
   "dependencies": {
@@ -37,14 +46,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/types"
-  },
-  "homepage": "https://clerk.com/",
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
   }
 }

@@ -3,9 +3,15 @@
   "version": "0.31.3",
   "license": "MIT",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
-  "types": "./dist/types/index.d.ts",
-  "main": "./dist/index.js",
-  "module": "./dist/esm/index.js",
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/backend"
+  },
   "imports": {
     "#crypto": {
       "edge-light": "./dist/runtime/browser/crypto.mjs",
@@ -22,6 +28,9 @@
       "default": "./dist/runtime/browser/fetch.mjs"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist"
   ],
@@ -60,7 +69,7 @@
     "@cloudflare/workers-types": "^3.18.0",
     "@types/chai": "^4.3.3",
     "@types/cookie": "^0.5.1",
-    "@types/qunit": "^2.19.3",
+    "@types/qunit": "^2.19.7",
     "@types/sinon": "^10.0.13",
     "chai": "^4.3.6",
     "edge-runtime": "^2.0.0",
@@ -75,19 +84,10 @@
     "typescript": "*",
     "workerd": "^1.20230518.0"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "homepage": "https://clerk.com/",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/backend"
-  },
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
-  },
   "engines": {
     "node": ">=14"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

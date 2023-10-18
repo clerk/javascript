@@ -2,29 +2,14 @@
   "name": "@clerk/shared",
   "version": "1.0.0",
   "description": "Internal package utils used by the Clerk SDKs",
-  "files": [
-    "dist",
-    "browser",
-    "callWithRetry",
-    "color",
-    "cookie",
-    "date",
-    "deprecated",
-    "error",
-    "file",
-    "globs",
-    "handleValueOrFn",
-    "isomorphicAtob",
-    "keys",
-    "loadScript",
-    "localStorageBroadcastChannel",
-    "poller",
-    "proxy",
-    "underscore",
-    "url",
-    "react"
-  ],
-  "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/shared"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
   "exports": {
     ".": {
       "import": {
@@ -58,16 +43,39 @@
     },
     "./package.json": "./package.json"
   },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "browser",
+    "callWithRetry",
+    "color",
+    "cookie",
+    "date",
+    "deprecated",
+    "error",
+    "file",
+    "globs",
+    "handleValueOrFn",
+    "isomorphicAtob",
+    "keys",
+    "loadScript",
+    "localStorageBroadcastChannel",
+    "poller",
+    "proxy",
+    "underscore",
+    "url",
+    "react"
+  ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
-    "publish:local": "npx yalc push --replace  --sig",
     "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
     "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "dev:publish": "npm run dev -- --env.publish",
     "lint": "eslint src/",
-    "lint:publint": "publint",
     "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "publish:local": "npx yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
@@ -94,14 +102,7 @@
       "optional": true
     }
   },
-  "author": "Clerk",
-  "license": "MIT",
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/shared"
   }
 }
