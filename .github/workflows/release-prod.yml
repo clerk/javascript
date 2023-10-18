@@ -16,8 +16,13 @@ jobs:
     if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE }}
     permissions:
-      contents: read
+      contents: write
       id-token: write
+      packages: write
+      pull-requests: write
+      issues: read
+      statuses: write
+      checks: write
     steps:
       - name: Echo github context
         run: echo "$GITHUB_CONTEXT"
