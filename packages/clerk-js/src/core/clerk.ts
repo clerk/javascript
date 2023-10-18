@@ -63,7 +63,6 @@ import type { MountComponentRenderer } from '../ui/Components';
 import { completeSignUpFlow } from '../ui/components/SignUp/util';
 import {
   appendAsQueryParams,
-  appendUrlsAsQueryParams,
   buildURL,
   createBeforeUnloadTracker,
   createCookieHandler,
@@ -86,6 +85,8 @@ import {
   sessionExistsAndSingleSessionModeEnabled,
   setDevBrowserJWTInURL,
   stripOrigin,
+  stripSameOrigin,
+  toURL,
   validateFrontendApi,
   windowNavigate,
 } from '../utils';
@@ -224,7 +225,15 @@ export default class Clerk implements ClerkInterface {
     return this.#instanceType;
   }
 
+  get isStandardBrowser(): boolean {
+    return this.#options.standardBrowser || false;
+  }
+
+  /**
+   * @deprecated This getter is no longer used internally and will be dropped in the next major version
+   */
   get experimental_canUseCaptcha(): boolean | undefined {
+    deprecated('experimental_canUseCaptcha', 'This is will be dropped in the next major version');
     if (this.#environment) {
       return (
         this.#environment.userSettings.signUp.captcha_enabled &&
@@ -236,7 +245,11 @@ export default class Clerk implements ClerkInterface {
     return false;
   }
 
+  /**
+   * @deprecated This getter is no longer used internally and will be dropped in the next major version
+   */
   get experimental_captchaSiteKey(): string | null {
+    deprecated('experimental_captchaSiteKey', 'This is will be dropped in the next major version');
     if (this.#environment) {
       return this.#environment.displayConfig.captchaPublicKey;
     }
@@ -244,7 +257,11 @@ export default class Clerk implements ClerkInterface {
     return null;
   }
 
+  /**
+   * @deprecated This getter is no longer used internally and will be dropped in the next major version
+   */
   get experimental_captchaURL(): string | null {
+    deprecated('experimental_captchaURL', 'This is will be dropped in the next major version');
     if (this.#fapiClient) {
       return this.#fapiClient
         .buildUrl({
@@ -1572,21 +1589,26 @@ export default class Clerk implements ClerkInterface {
       return '';
     }
 
-    const opts: RedirectOptions = {
-      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
-      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
-      redirectUrl: options?.redirectUrl || window.location.href,
-    };
-
     const signInOrUpUrl = pickRedirectionProp(
       key,
       { options: this.#options, displayConfig: this.#environment.displayConfig },
       false,
     );
 
-    return this.buildUrlWithAuth(
-      appendUrlsAsQueryParams(appendAsQueryParams(signInOrUpUrl, options?.initialValues || {}), opts),
-    );
+    const urls: RedirectOptions = {
+      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
+      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
+      redirectUrl: options?.redirectUrl || window.location.href,
+    };
+
+    (Object.keys(urls) as Array<keyof typeof urls>).forEach(function (key) {
+      const url = urls[key];
+      if (url) {
+        urls[key] = stripSameOrigin(toURL(url), toURL(signInOrUpUrl));
+      }
+    });
+
+    return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, { ...urls, ...options?.initialValues }));
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {

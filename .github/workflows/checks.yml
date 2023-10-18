@@ -1,5 +1,6 @@
 name: Quality checks and tests
 on:
+  merge_group:
   pull_request:
     branches: [ main ]
 
@@ -12,10 +13,6 @@ jobs:
     name: Prettier
     uses: ./.github/workflows/base-prettier.yml
 
-  eslint:
-    name: Eslint
-    uses: ./.github/workflows/base-lint.yml
-
   changeset:
     name: Require changeset
     uses: ./.github/workflows/base-changeset.yml
@@ -25,6 +22,19 @@ jobs:
     name: Build & publish
     needs: [ prettier, changeset ]
     uses: ./.github/workflows/base-build.yml
+
+  eslint:
+    name: ESLint
+    needs: build
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          use-turbo-cache: 'true'
+      - name: Run lint
+        run: npm run lint
 
   unit-tests:
     name: Run unit tests
@@ -37,11 +47,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         uses: ./.github/actions/setup
-      - name: Download turbo cache
-        uses: actions/download-artifact@v3
         with:
-          name: package-artifacts
-          path: ./node_modules/.cache/turbo
+          use-turbo-cache: 'true'
       - name: Run tests
         run: npm run test:ci
 
@@ -53,11 +60,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         uses: ./.github/actions/setup
-      - name: Download turbo cache
-        uses: actions/download-artifact@v3
         with:
-          name: package-artifacts
-          path: ./node_modules/.cache/turbo
+          use-turbo-cache: 'true'
       - name: Lint packages using publint
         run: npm run lint:publint
 
@@ -69,11 +73,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup
         uses: ./.github/actions/setup
-      - name: Download turbo cache
-        uses: actions/download-artifact@v3
         with:
-          name: package-artifacts
-          path: ./node_modules/.cache/turbo
+          use-turbo-cache: 'true'
       - name: Lint types using attw
         # Remove this when all related errors are fixed
         continue-on-error: true
