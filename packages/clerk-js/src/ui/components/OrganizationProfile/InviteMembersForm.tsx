@@ -72,8 +72,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 
   const roleField = useFormControl('role', 'basic_member', {
     options: roles,
-    // TODO: localize this
-    label: 'Role',
+    label: localizationKeys('formFieldLabel__role'),
     placeholder: '',
   });
 
@@ -141,8 +140,8 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           direction='col'
           gap={2}
         >
-          <Text localizationKey={localizationKeys('formFieldLabel__role')} />
-          {/* @ts-expect-error */}
+          <Text localizationKey={roleField.label} />
+          {/*@ts-expect-error  Select expects options to be an array but useFormControl returns an optional field. */}
           <Select
             elementId='role'
             {...roleField.props}
