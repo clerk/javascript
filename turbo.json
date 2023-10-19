@@ -121,7 +121,6 @@
     },
     "lint": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**"],
       "outputs": []
     },
     "lint:publint": {

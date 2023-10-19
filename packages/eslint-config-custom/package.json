@@ -4,8 +4,7 @@
   "private": true,
   "license": "MIT",
   "dependencies": {
-    "@next/eslint-plugin-next": "^12.3.0",
-    "@vercel/style-guide": "^4.0.2",
+    "@vercel/style-guide": "^5.0.1",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-turbo": "^1.10.14",
     "eslint-plugin-playwright": "^0.17.0",
