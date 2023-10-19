@@ -13,7 +13,8 @@
     "NODE_VERSION",
     "NPM_VERSION",
     "TZ",
-    "VERCEL"
+    "VERCEL",
+    "VITE_CLERK_*"
   ],
   "pipeline": {
     "build": {
@@ -27,7 +28,6 @@
         "tsconfig.build.json",
         "tsconfig.declarations.json",
         "tsup.config.ts",
-
         "!**/**/*.test.*",
         "!**/test/**",
         "!**/tests/**",
@@ -67,7 +67,6 @@
         "tsconfig.json",
         "tsconfig.*.json",
         "tsup.config.ts",
-
         "!**/__snapshots__/**",
         "!CHANGELOG.md",
         "!coverage/**",
