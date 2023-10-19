@@ -1,6 +1,4 @@
-import { isClerkAPIResponseError } from '@clerk/shared';
-import { isNetworkError } from '@clerk/shared';
-import { is4xxError } from '@clerk/shared';
+import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
 import type { CookieHandler } from '../../../utils';

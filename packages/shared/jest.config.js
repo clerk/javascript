@@ -14,7 +14,6 @@ const config = {
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {
     '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
-    // '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
 };
 

@@ -54,12 +54,12 @@ export const useEmailLink = _useEmailLink;
  * @deprecated Use imports from `@clerk/nextjs` instead.
  * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
  */
-export const useOrganization = _useOrganization;
+export const useOrganization: typeof _useOrganization = _useOrganization;
 /**
  * @deprecated Use imports from `@clerk/nextjs` instead.
  * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware
  */
-export const useOrganizationList = _useOrganizationList;
+export const useOrganizationList: typeof _useOrganizationList = _useOrganizationList;
 /**
  * @deprecated Use imports from `@clerk/nextjs` instead.
  * For more details, consult the middleware documentation: https://clerk.com/docs/nextjs/middleware

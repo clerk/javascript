@@ -1,7 +1,7 @@
 {
+  "name": "@clerk/clerk-sdk-node",
   "version": "4.12.15",
   "license": "MIT",
-  "type": "commonjs",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.mjs",
   "types": "./dist/types/index.d.ts",
@@ -46,7 +46,6 @@
     "test": "jest",
     "test:ci": "jest --maxWorkers=70%"
   },
-  "name": "@clerk/clerk-sdk-node",
   "author": {
     "name": "Clerk, Inc.",
     "email": "support@clerk.com",

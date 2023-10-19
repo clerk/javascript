@@ -1,4 +1,5 @@
-import { camelToSnake, createDevOrStagingUrlCache, globs } from '@clerk/shared';
+import { camelToSnake, createDevOrStagingUrlCache } from '@clerk/shared';
+import { globs } from '@clerk/shared/globs';
 import type { SignUpResource } from '@clerk/types';
 
 import { joinPaths } from './path';

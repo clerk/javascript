@@ -12,9 +12,9 @@
  * TODO: Support TS runtime modules
  */
 
-// @ts-expect-error
+// @ts-ignore - These are package subpaths
 import crypto from '#crypto';
-// @ts-expect-error
+// @ts-ignore - These are package subpaths
 import * as fetchApisPolyfill from '#fetch';
 
 const {

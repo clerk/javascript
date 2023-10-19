@@ -1,4 +1,4 @@
-import { deprecatedProperty } from '@clerk/shared';
+import { deprecatedProperty } from '@clerk/shared/deprecated';
 import type { PublicUserData as IPublicUserData } from '@clerk/types';
 import type { PublicUserDataJSON } from '@clerk/types';
 

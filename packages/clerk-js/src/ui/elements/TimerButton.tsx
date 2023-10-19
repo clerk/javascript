@@ -1,4 +1,4 @@
-import { useSafeLayoutEffect } from '@clerk/shared';
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import React, { useEffect } from 'react';
 
 import { Button, useLocalizations } from '../customizables';

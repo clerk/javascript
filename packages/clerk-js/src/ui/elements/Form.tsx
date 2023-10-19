@@ -1,4 +1,4 @@
-import { createContextAndHook } from '@clerk/shared';
+import { createContextAndHook } from '@clerk/shared/react';
 import type { FieldId } from '@clerk/types';
 import React, { useState } from 'react';
 

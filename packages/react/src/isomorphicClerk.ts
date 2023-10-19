@@ -1,4 +1,4 @@
-import { deprecated, handleValueOrFn, inClientSide } from '@clerk/shared';
+import { deprecated, handleValueOrFn, inBrowser } from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -93,7 +93,7 @@ export default class IsomorphicClerk {
     // During CSR: use the cached instance for the whole lifetime of the app
     // Also will recreate the instance if the provided Clerk instance changes
     // This method should be idempotent in both scenarios
-    if (!inClientSide() || !this.#instance || (options.Clerk && this.#instance.Clerk !== options.Clerk)) {
+    if (!inBrowser() || !this.#instance || (options.Clerk && this.#instance.Clerk !== options.Clerk)) {
       this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
@@ -131,7 +131,7 @@ export default class IsomorphicClerk {
     this.#domain = options?.domain;
     this.options = options;
     this.Clerk = Clerk;
-    this.mode = inClientSide() ? 'browser' : 'server';
+    this.mode = inBrowser() ? 'browser' : 'server';
     void this.loadClerkJS();
   }
 

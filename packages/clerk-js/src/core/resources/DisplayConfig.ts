@@ -1,4 +1,4 @@
-import { deprecatedProperty } from '@clerk/shared';
+import { deprecatedProperty } from '@clerk/shared/deprecated';
 import type { DisplayConfigJSON, DisplayConfigResource, DisplayThemeJSON, PreferredSignInStrategy } from '@clerk/types';
 
 import { BaseResource } from './internal';

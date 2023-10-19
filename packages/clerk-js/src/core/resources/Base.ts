@@ -1,4 +1,4 @@
-import { isValidBrowserOnline } from '@clerk/shared';
+import { isValidBrowserOnline } from '@clerk/shared/browser';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 
 import { clerkMissingFapiClientInResources } from '../errors';

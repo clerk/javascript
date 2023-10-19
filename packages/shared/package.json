@@ -2,25 +2,48 @@
   "name": "@clerk/shared",
   "version": "0.24.5",
   "description": "Internal package utils used by the Clerk SDKs",
-  "types": "./dist/types/index.d.ts",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
   "sideEffects": false,
   "files": [
     "dist"
   ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./*": {
+      "import": {
+        "types": "./dist/*.d.mts",
+        "default": "./dist/*.mjs"
+      },
+      "require": {
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.js"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react/index.d.mts",
+        "default": "./dist/react/index.mjs"
+      },
+      "require": {
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      }
     }
   },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.json",
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
