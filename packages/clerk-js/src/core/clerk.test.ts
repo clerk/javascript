@@ -501,7 +501,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('destroyes the current client after sign out', async () => {
+    it('destroys the current client after sign out', async () => {
       const spyOnDestroy = jest.fn().mockImplementation(() => {
         return Promise.resolve().then(async () => {
           const clientInstance = await Client.getInstance().fetch();
