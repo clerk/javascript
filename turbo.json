@@ -3,42 +3,55 @@
   "remoteCache": {
     "signature": true
   },
-
   "globalDependencies": [
+    ".*",
+    "jest.*.ts",
     "packages/eslint-config-custom/index.js",
     "package.json",
     "package-lock.json",
-    "setupJest.afterEnv.ts",
     "tsconfig.json",
-    "tsconfig.*.json"
+    "tsconfig.*.json",
+    "verdaccio.*.yaml"
   ],
   "globalEnv": [
+    "CI",
+    "CLERK_*",
+    "GATSBY_CLERK_*",
+    "NEXT_PUBLIC_CLERK_*",
+    "NODE_ENV",
+    "NODE_EXTRA_CA_CERTS",
     "NODE_VERSION",
     "NPM_VERSION",
-    "NODE_ENV",
-    "VERCEL",
-    "CLERK_JS_VERSION",
-    "CLERK_API_URL",
-    "CLERK_API_VERSION",
-    "CLERK_API_KEY",
-    "CLERK_SECRET_KEY",
-    "GATSBY_CLERK_JS",
-    "GATSBY_CLERK_FRONTEND_API",
-    "GATSBY_CLERK_PROXY_URL",
-    "GATSBY_CLERK_PUBLISHABLE_KEY",
-    "NEXT_PUBLIC_CLERK_JS_VERSION",
-    "NEXT_PUBLIC_CLERK_JS",
-    "NEXT_PUBLIC_CLERK_FRONTEND_API",
-    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
-    "NEXT_PUBLIC_CLERK_DOMAIN",
-    "NEXT_PUBLIC_CLERK_PROXY_URL",
-    "NEXT_PUBLIC_CLERK_IS_SATELLITE",
-    "NEXT_PUBLIC_CLERK_SIGN_IN_URL",
-    "NEXT_PUBLIC_CLERK_SIGN_UP_URL"
+    "RUNNER_ARCH",
+    "RUNNER_DEBUG",
+    "RUNNER_OS",
+    "TZ",
+    "VERCEL"
   ],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "bundlewatch.config.json",
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.build.json",
+        "tsconfig.declarations.json",
+        "tsup.config.ts",
+
+        "!**/**/*.test.*",
+        "!**/test/**",
+        "!**/tests/**",
+        "!**/__tests__/**",
+        "!**/__mocks__/**",
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
+      "outputMode": "new-only",
       "outputs": ["dist/**"]
     },
     "dev": {
@@ -46,8 +59,8 @@
       "cache": false
     },
     "dev:current": {
-      "dependsOn": ["^build", "dev"],
       "cache": false,
+      "dependsOn": ["^build", "dev"],
       "persistent": true
     },
     "clean": {
@@ -56,14 +69,49 @@
     },
     "test": {
       "dependsOn": ["build"],
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "bundlewatch.config.json",
+        "jest.*",
+        "src/**",
+        "tests/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
+      "outputMode": "new-only",
       "outputs": []
     },
     "test:ci": {
       "dependsOn": ["build"],
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "bundlewatch.config.json",
+        "jest.*",
+        "src/**",
+        "tests/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
+      "outputMode": "new-only",
       "outputs": []
     },
     "lint": {
-      "dependsOn": ["build"],
+      "dependsOn": ["^build"],
+      "inputs": ["src/**"],
       "outputs": []
     },
     "lint:publint": {

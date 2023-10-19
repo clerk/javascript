@@ -5,7 +5,7 @@ const config = {
 
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
-  setupFiles: ['./setupJest.ts'],
+  setupFiles: ['./jest.setup.ts'],
 
   collectCoverage: false,
   coverageProvider: 'v8',
