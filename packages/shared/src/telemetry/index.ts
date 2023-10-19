@@ -1,6 +1,12 @@
-import type { InstanceType } from '@clerk/types';
+import type { Clerk, InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from '../utils/keys';
+
+declare global {
+  interface Window {
+    Clerk: Clerk;
+  }
+}
 
 type TelemetryCollectorOptions = {
   /**
@@ -22,11 +28,11 @@ type TelemetryCollectorOptions = {
   /**
    * The SDK being used, e.g. `@clerk/nextjs` or `@clerk/remix`.
    */
-  sdk: string;
+  sdk?: string;
   /**
    * The version of the SDK being used.
    */
-  sdkVersion: string;
+  sdkVersion?: string;
 };
 
 type TelemetryCollectorConfig = Pick<TelemetryCollectorOptions, 'samplingRate' | 'verbose'> & { endpoint: string };
@@ -89,8 +95,9 @@ export class TelemetryCollector {
       this.#metadata.clerkVersion = options.clerkVersion ?? '';
     }
 
-    this.#metadata.sdk = options.sdk;
-    this.#metadata.sdkVersion = options.sdkVersion;
+    // We will try to grab the SDK data lazily when an event is triggered, so it should always be defined once the event is sent.
+    this.#metadata.sdk = options.sdk!;
+    this.#metadata.sdkVersion = options.sdkVersion!;
 
     this.#metadata.publishableKey = options.publishableKey;
 
@@ -165,15 +172,35 @@ export class TelemetryCollector {
   }
 
   /**
+   * If in browser, attempt to lazily grab the SDK metadata from the Clerk singleton, otherwise fallback to the initially passed in values.
+   *
+   * This is necessary because the sdkMetadata can be set by the host SDK after the TelemetryCollector is instantiated.
+   */
+  #getSDKMetadata() {
+    let sdkMetadata = {
+      name: this.#metadata.sdk,
+      version: this.#metadata.sdkVersion,
+    };
+
+    if (typeof window !== 'undefined' && window.Clerk) {
+      sdkMetadata = { ...sdkMetadata, ...window.Clerk.sdkMetadata };
+    }
+
+    return sdkMetadata;
+  }
+
+  /**
    * Append relevant metadata from the Clerk singleton to the event payload.
    */
   #preparePayload(event: TelemetryEvent['event'], payload: TelemetryEvent['payload']): TelemetryEvent {
+    const sdkMetadata = this.#getSDKMetadata();
+
     return {
       event,
       cv: this.#metadata.clerkVersion,
       it: this.#metadata.instanceType,
-      sdk: this.#metadata.sdk,
-      sdkv: this.#metadata.sdkVersion,
+      sdk: sdkMetadata.name,
+      sdkv: sdkMetadata.version,
       ...(this.#metadata.publishableKey ? { pk: this.#metadata.publishableKey } : {}),
       payload,
     };

@@ -8,6 +8,7 @@ import type {
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
+  HandleEmailLinkVerificationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
@@ -39,6 +40,8 @@ import type {
   IsomorphicClerkOptions,
 } from './types';
 import { isConstructor, loadClerkJsScript } from './utils';
+
+const SDK_METADATA = { name: PACKAGE_NAME, version: PACKAGE_VERSION };
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
@@ -167,6 +170,8 @@ export default class IsomorphicClerk {
             proxyUrl: this.proxyUrl,
             domain: this.domain,
           } as any);
+
+          c.sdkMetadata = this.options.sdkMetadata ?? SDK_METADATA;
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
@@ -193,6 +198,8 @@ export default class IsomorphicClerk {
         if (!global.Clerk) {
           throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
+
+        global.Clerk.sdkMetadata = this.options.sdkMetadata ?? SDK_METADATA;
 
         await global.Clerk.load(this.options);
       }
@@ -343,9 +350,6 @@ export default class IsomorphicClerk {
 
   /**
    * `setActive` can be used to set the active session and/or organization.
-   * It will eventually replace `setSession`.
-   *
-   * @experimental
    */
   setActive = ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
     if (this.clerkjs) {
@@ -667,13 +671,25 @@ export default class IsomorphicClerk {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
     }
   };
-
+  /**
+   * @deprecated Use `handleEmailLinkVerification` instead.
+   */
   handleMagicLinkVerification = async (params: HandleMagicLinkVerificationParams): Promise<void> => {
+    deprecated('handleMagicLinkVerification', 'Use `handleEmailLinkVerification` instead.');
     const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('handleMagicLinkVerification', callback);
+    }
+  };
+
+  handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams): Promise<void> => {
+    const callback = () => this.clerkjs?.handleEmailLinkVerification(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('handleEmailLinkVerification', callback);
     }
   };
 
@@ -704,10 +720,10 @@ export default class IsomorphicClerk {
     }
   };
 
-  getOrganization = async (organizationId: string): Promise<OrganizationResource | undefined | void> => {
+  getOrganization = async (organizationId: string): Promise<OrganizationResource | void> => {
     const callback = () => this.clerkjs?.getOrganization(organizationId);
     if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<OrganizationResource | undefined>;
+      return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('getOrganization', callback);
     }
