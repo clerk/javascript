@@ -1,5 +1,5 @@
 'use client';
-import { deprecated } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
 
 deprecated(
   '@clerk/nextjs/app-beta',

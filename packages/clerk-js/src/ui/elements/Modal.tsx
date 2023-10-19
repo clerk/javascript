@@ -1,4 +1,4 @@
-import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared';
+import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared/react';
 import React, { useRef } from 'react';
 
 import { descriptors, Flex } from '../customizables';

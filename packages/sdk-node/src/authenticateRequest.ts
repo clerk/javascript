@@ -1,8 +1,9 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants, createIsomorphicRequest } from '@clerk/backend';
+import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import type { ServerResponse } from 'http';
 
-import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from './shared';
 import type { AuthenticateRequestParams, ClerkClient } from './types';
 import { loadApiEnv, loadClientEnv } from './utils';
 

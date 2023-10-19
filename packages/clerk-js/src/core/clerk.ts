@@ -3,7 +3,7 @@ import {
   addClerkPrefix,
   deprecated,
   handleValueOrFn,
-  inClientSide,
+  inBrowser as inClientSide,
   is4xxError,
   isHttpOrHttps,
   isLegacyFrontendApiKey,

@@ -1,4 +1,4 @@
-import { deprecated } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
 import type {
   AttemptWeb3WalletVerificationParams,
   PrepareWeb3WalletVerificationParams,

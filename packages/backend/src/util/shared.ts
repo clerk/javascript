@@ -6,11 +6,10 @@ export {
   isDevelopmentFromApiKey,
   isProductionFromApiKey,
   parsePublishableKey,
-  deprecated,
-  deprecatedProperty,
 } from '@clerk/shared';
+export { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
 
-import { buildErrorThrower } from '@clerk/shared';
+import { buildErrorThrower } from '@clerk/shared/error';
 // TODO: replace packageName with `${PACKAGE_NAME}@${PACKAGE_VERSION}` from tsup.config.ts
 export const errorThrower = buildErrorThrower({ packageName: '@clerk/backend' });
 

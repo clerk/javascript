@@ -1,1 +1,1 @@
-export { ClientContext, useClientContext } from '@clerk/shared';
+export { ClientContext, useClientContext } from '@clerk/shared/react';

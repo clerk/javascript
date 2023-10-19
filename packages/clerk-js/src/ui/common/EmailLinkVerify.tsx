@@ -1,4 +1,4 @@
-import { EmailLinkErrorCode, isEmailLinkError } from '@clerk/shared';
+import { EmailLinkErrorCode, isEmailLinkError } from '@clerk/shared/error';
 import React from 'react';
 
 import type { VerificationStatus } from '../../utils/getClerkQueryParam';

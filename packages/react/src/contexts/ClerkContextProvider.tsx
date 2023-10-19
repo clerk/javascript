@@ -1,4 +1,4 @@
-import { deprecated } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React from 'react';
 

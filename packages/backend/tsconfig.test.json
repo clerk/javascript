@@ -7,7 +7,10 @@
     "moduleResolution": "Node",
     "noImplicitAny": false,
     "outDir": "./tests/dist",
-    "target": "ES2020"
+    "target": "ES2020",
+    "paths": {
+      "@clerk/shared/*": ["../shared/dist/*.js"]
+    }
   },
   "include": ["src/**/*.test.ts"],
   "exclude": ["node_modules", "dist", "src/__tests__"]

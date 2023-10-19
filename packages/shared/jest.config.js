@@ -5,7 +5,7 @@ const config = {
 
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
-  setupFiles: ['./setupJest.ts'],
+  setupFiles: ['./jest.setup.ts'],
 
   collectCoverage: false,
   coverageProvider: 'v8',
@@ -14,7 +14,6 @@ const config = {
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {
     '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
-    // '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
 };
 

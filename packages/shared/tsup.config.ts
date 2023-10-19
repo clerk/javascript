@@ -1,24 +1,22 @@
 import type { Plugin } from 'esbuild';
 import { transform } from 'esbuild';
 import { readFile } from 'fs/promises';
-import type { Options } from 'tsup';
 import { defineConfig } from 'tsup';
 
-import { runAfterLast } from '../../scripts/utils';
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
-  const shouldPublish = !!overrideOptions.env?.publish;
 
-  const common: Options = {
-    entry: ['./src/**/*.{ts,tsx,js,jsx}'],
-    bundle: false,
+  return {
+    entry: ['./src/*.{ts,tsx}', './src/react/index.ts', '!./src/**/*.test.{ts,tsx}'],
+    format: ['cjs', 'esm'],
+    bundle: true,
     clean: true,
     minify: false,
     sourcemap: true,
-    legacyOutput: true,
-    external: ['@testing-library', 'react', 'jest', 'jest-environment-jsdom', 'react-dom'],
+    dts: true,
+    external: ['react', 'react-dom'],
     esbuildPlugins: [WebWorkerMinifyPlugin as any],
     define: {
       PACKAGE_NAME: `"${name}"`,
@@ -26,19 +24,6 @@ export default defineConfig(overrideOptions => {
       __DEV__: `${isWatch}`,
     },
   };
-
-  const esm: Options = {
-    ...common,
-    format: 'esm',
-  };
-
-  const cjs: Options = {
-    ...common,
-    format: 'cjs',
-    outDir: './dist/cjs',
-  };
-
-  return runAfterLast(['npm run build:declarations', shouldPublish && 'npm run publish:local'])(esm, cjs);
 });
 
 // Read transform and minify any files ending in .worker.ts

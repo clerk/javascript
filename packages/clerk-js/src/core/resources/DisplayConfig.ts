@@ -1,4 +1,4 @@
-import { deprecatedProperty } from '@clerk/shared';
+import { deprecatedProperty } from '@clerk/shared/deprecated';
 import type { DisplayConfigJSON, DisplayConfigResource, DisplayThemeJSON, PreferredSignInStrategy } from '@clerk/types';
 
 import { BaseResource } from './internal';
@@ -72,7 +72,6 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.captchaPublicKey = data.captcha_public_key;
     this.supportEmail = data.support_email || '';
     this.clerkJSVersion = data.clerk_js_version;
-    this.experimental__forceOauthFirst = data.experimental_force_oauth_first || false;
     this.organizationProfileUrl = data.organization_profile_url;
     this.createOrganizationUrl = data.create_organization_url;
     this.afterLeaveOrganizationUrl = data.after_leave_organization_url;

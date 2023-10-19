@@ -1,4 +1,4 @@
-import { isClerkRuntimeError } from '@clerk/shared';
+import { isClerkRuntimeError } from '@clerk/shared/error';
 import type { ClerkAPIError, ClerkRuntimeError, LocalizationResource } from '@clerk/types';
 import React from 'react';
 

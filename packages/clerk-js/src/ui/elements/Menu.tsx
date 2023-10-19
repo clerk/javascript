@@ -1,4 +1,4 @@
-import { createContextAndHook } from '@clerk/shared';
+import { createContextAndHook } from '@clerk/shared/react';
 import type { MenuId } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';

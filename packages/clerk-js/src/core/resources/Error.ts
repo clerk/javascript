@@ -13,5 +13,5 @@ export {
   MagicLinkErrorCode,
   parseError,
   parseErrors,
-} from '@clerk/shared';
-export type { MetamaskError } from '@clerk/shared';
+} from '@clerk/shared/error';
+export type { MetamaskError } from '@clerk/shared/error';

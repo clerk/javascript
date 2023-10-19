@@ -1,5 +1,5 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import { deprecated } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 // https://nextjs.org/docs/api-routes/api-middlewares#connectexpress-middleware-support

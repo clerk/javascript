@@ -1,4 +1,4 @@
-import { deprecatedObjectProperty } from '@clerk/shared';
+import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 
 import type { CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';

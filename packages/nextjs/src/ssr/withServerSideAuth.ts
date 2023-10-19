@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { constants, debugRequestState } from '@clerk/backend';
-import { deprecated } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
 import type { ServerResponse } from 'http';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 

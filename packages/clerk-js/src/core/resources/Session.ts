@@ -1,5 +1,5 @@
-import { is4xxError } from '@clerk/shared';
 import { runWithExponentialBackOff } from '@clerk/shared';
+import { is4xxError } from '@clerk/shared/error';
 import type {
   ActJWTClaim,
   GetToken,
@@ -70,6 +70,8 @@ export class Session extends BaseResource implements SessionResource {
     return SessionTokenCache.clear();
   };
 
+  // TODO: Fix this eslint error
+  // eslint-disable-next-line @typescript-eslint/require-await
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
     return runWithExponentialBackOff(() => this._getToken(options), {
       shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,

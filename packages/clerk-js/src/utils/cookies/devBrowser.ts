@@ -1,4 +1,4 @@
-import { createCookieHandler } from '@clerk/shared';
+import { createCookieHandler } from '@clerk/shared/cookie';
 
 import { DEV_BROWSER_JWT_MARKER } from '../devBrowser';
 

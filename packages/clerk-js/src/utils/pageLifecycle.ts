@@ -1,4 +1,4 @@
-import { inClientSide } from '@clerk/shared';
+import { inBrowser } from '@clerk/shared/browser';
 
 const noop = () => {
   //
@@ -15,7 +15,7 @@ const noop = () => {
  * @internal
  */
 export const createPageLifecycle = () => {
-  if (!inClientSide()) {
+  if (!inBrowser()) {
     return { isUnloading: noop, onPageVisible: noop };
   }
 

@@ -1,4 +1,4 @@
-import { createContextAndHook } from '@clerk/shared';
+import { createContextAndHook } from '@clerk/shared/react';
 import React from 'react';
 
 import { useDeepEqualMemo } from '../hooks';

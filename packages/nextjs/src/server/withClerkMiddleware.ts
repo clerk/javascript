@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { constants, debugRequestState } from '@clerk/backend';
-import { deprecated } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
