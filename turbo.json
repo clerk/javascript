@@ -10,7 +10,7 @@
     ".github/**",
     ".jit",
     ".nvmrc",
-    ".pretter*",
+    ".prettier*",
     "jest.*.ts",
     "packages/eslint-config-custom/index.js",
     "package.json",
