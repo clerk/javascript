@@ -51,6 +51,7 @@ export const ProfilePage = withCardStateProvider(() => {
 
   const nameEditDisabled = user.samlAccounts.some(sa => sa.active);
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

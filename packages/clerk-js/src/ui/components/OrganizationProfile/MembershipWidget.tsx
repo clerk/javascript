@@ -14,6 +14,9 @@ export const MembershipWidget = () => {
     return null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+  const totalCount = organization?.membersCount + organization?.pendingInvitationsCount;
+
   return (
     <Flex
       sx={theme => ({
@@ -57,7 +60,7 @@ export const MembershipWidget = () => {
             color: t.colors.$blackAlpha600,
           })}
         >
-          {organization?.membersCount + organization?.pendingInvitationsCount} of{' '}
+          {totalCount} of{' '}
           {__unstable_manageBillingMembersLimit
             ? `${runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)} members`
             : 'unlimited'}
