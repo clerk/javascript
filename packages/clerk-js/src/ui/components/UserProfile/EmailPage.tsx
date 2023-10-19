@@ -37,6 +37,7 @@ export const EmailPage = withCardStateProvider(() => {
 
   const canSubmit = emailField.value.length > 1 && user.username !== emailField.value;
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const addEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     return user

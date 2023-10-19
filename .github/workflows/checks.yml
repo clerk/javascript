@@ -34,7 +34,7 @@ jobs:
         with:
           use-turbo-cache: 'true'
       - name: Run lint
-        run: npm run lint
+        run: npm run lint -- --output-logs=errors-only -- --quiet
 
   unit-tests:
     name: Run unit tests

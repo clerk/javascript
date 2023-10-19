@@ -51,7 +51,7 @@ const AddConnectedAccount = () => {
   const isModal = mode === 'modal';
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
-  const connectedStrategies = user.verifiedExternalAccounts.map(a => 'oauth_' + a.provider) as OAuthStrategy[];
+  const connectedStrategies = user.verifiedExternalAccounts.map(a => `oauth_${a.provider}`) as OAuthStrategy[];
 
   const unconnectedStrategies = enabledStrategies.filter(provider => {
     return !connectedStrategies.includes(provider);
