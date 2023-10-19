@@ -38,7 +38,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in s
     await u.page.pause();
   });
 
-  test('access protected page', async ({ page, context }) => {
+  test('access protected page @express', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
