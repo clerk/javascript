@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React from 'react';
 
@@ -22,6 +23,10 @@ export type ClerkContextProviderState = Resources;
 export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element | null {
   const { isomorphicClerkOptions, initialState, children } = props;
   const { isomorphicClerk: clerk, loaded: clerkLoaded } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+
+  if (isomorphicClerkOptions.frontendApi) {
+    deprecated('frontendApi', 'Use `publishableKey` instead.');
+  }
 
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,

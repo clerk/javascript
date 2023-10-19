@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-clerk",
-  "version": "4.4.12",
+  "version": "4.4.17",
   "license": "MIT",
   "description": "Clerk SDK for Gatsby",
   "keywords": [
@@ -26,16 +26,19 @@
     "api.d.ts"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "dev:publish": "npm run dev -- --env.publish",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/backend": "0.30.1",
-    "@clerk/clerk-react": "4.26.1",
-    "@clerk/clerk-sdk-node": "4.12.10",
-    "@clerk/types": "3.53.0",
+    "@clerk/backend": "0.31.2",
+    "@clerk/clerk-react": "4.26.6",
+    "@clerk/clerk-sdk-node": "4.12.15",
+    "@clerk/types": "3.56.1",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
   },
@@ -56,11 +59,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/gatsby-plugin-clerk"
   },
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
   },
-  "homepage": "https://clerk.com/",
-  "gitHead": "6f990357a7da3c5224587b4add4a626308468d27"
+  "homepage": "https://clerk.com/"
 }

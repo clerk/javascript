@@ -204,6 +204,8 @@ export default class IsomorphicClerk {
         await global.Clerk.load(this.options);
       }
 
+      global.Clerk.sdkMetadata = this.options.sdkMetadata ?? { name: PACKAGE_NAME, version: PACKAGE_VERSION };
+
       if (global.Clerk?.loaded || global.Clerk?.isReady()) {
         return this.hydrateClerkJS(global.Clerk);
       }

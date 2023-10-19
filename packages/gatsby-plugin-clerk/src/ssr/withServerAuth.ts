@@ -1,7 +1,8 @@
 import type { GetServerDataProps, GetServerDataReturn } from 'gatsby';
 
+import { FRONTEND_API, PUBLISHABLE_KEY } from '../constants';
 import { authenticateRequest } from './authenticateRequest';
-import { clerkClient, constants, FRONTEND_API, PUBLISHABLE_KEY } from './clerkClient';
+import { clerkClient, constants } from './clerkClient';
 import type { WithServerAuthCallback, WithServerAuthOptions, WithServerAuthResult } from './types';
 import { injectAuthIntoContext, injectSSRStateIntoProps, sanitizeAuthObject } from './utils';
 

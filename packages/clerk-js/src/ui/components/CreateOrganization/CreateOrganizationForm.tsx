@@ -46,7 +46,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
   });
 
   const dataChanged = !!nameField.value;
-  const canSubmit = dataChanged || !!file;
+  const canSubmit = dataChanged;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

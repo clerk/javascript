@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "0.4.4",
+  "version": "0.4.9",
   "license": "MIT",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
@@ -26,14 +26,16 @@
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%",
+    "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@clerk/clerk-js": "4.59.1",
-    "@clerk/clerk-react": "4.26.1"
+    "@clerk/clerk-js": "4.62.1",
+    "@clerk/clerk-react": "4.26.6"
   },
   "devDependencies": {
     "@types/chrome": "*",
@@ -51,7 +53,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/chrome-extension"
   },
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"

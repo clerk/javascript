@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared';
-import type { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
 import React from 'react';
 
 import { useLocalizations } from '../../customizables';
@@ -31,7 +31,8 @@ const useCardState = () => {
   const { translateError } = useLocalizations();
 
   const setIdle = (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata }));
-  const setError = (metadata: ClerkAPIError | Metadata) => setState(s => ({ ...s, error: translateError(metadata) }));
+  const setError = (metadata: ClerkRuntimeError | ClerkAPIError | Metadata | string) =>
+    setState(s => ({ ...s, error: translateError(metadata) }));
   const setLoading = (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata }));
   const runAsync = async <T = unknown,>(cb: Promise<T> | (() => Promise<T>), metadata?: Metadata) => {
     setLoading(metadata);

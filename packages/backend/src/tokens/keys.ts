@@ -2,9 +2,9 @@ import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../cons
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
-import { callWithRetry } from '../shared';
 import { joinPaths } from '../util/path';
 import { getErrorObjectByCode } from '../util/request';
+import { callWithRetry } from '../util/shared';
 import {
   TokenVerificationError,
   TokenVerificationErrorAction,
@@ -21,6 +21,10 @@ let lastUpdatedAt = 0;
 
 function getFromCache(kid: string) {
   return cache[kid];
+}
+
+function getCacheValues() {
+  return Object.values(cache);
 }
 
 function setInCache(
@@ -144,7 +148,7 @@ export async function loadClerkJWKFromRemote({
       });
     }
 
-    const { keys }: { keys: JsonWebKeyWithKid[] } = await callWithRetry(fetcher);
+    const { keys } = await callWithRetry<{ keys: JsonWebKeyWithKid[] }>(fetcher);
 
     if (!keys || !keys.length) {
       throw new TokenVerificationError({
@@ -160,9 +164,14 @@ export async function loadClerkJWKFromRemote({
   const jwk = getFromCache(kid);
 
   if (!jwk) {
+    const cacheValues = getCacheValues();
+    const jwkKeys = cacheValues.map(jwk => jwk.kid).join(', ');
+
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.ContactSupport,
-      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.`,
+      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.${
+        jwkKeys ? ` The following kid are available: ${jwkKeys}` : ''
+      }`,
       reason: TokenVerificationErrorReason.RemoteJWKMissing,
     });
   }

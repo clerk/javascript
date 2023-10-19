@@ -168,14 +168,14 @@ export class Organization extends BaseResource implements OrganizationResource {
   getMemberships: GetMemberships = async getMembershipsParams => {
     const isDeprecatedParams = typeof getMembershipsParams === 'undefined' || !getMembershipsParams?.paginated;
 
-    if (!(getMembershipsParams as GetMembershipsParams)?.limit) {
+    if ((getMembershipsParams as GetMembershipsParams)?.limit) {
       deprecated(
         'limit',
         'Use `pageSize` instead in Organization.getMemberships.',
         'organization:getMemberships:limit',
       );
     }
-    if (!(getMembershipsParams as GetMembershipsParams)?.offset) {
+    if ((getMembershipsParams as GetMembershipsParams)?.offset) {
       deprecated('offset', 'Use `initialPage` instead in Organization.limit.', 'organization:getMemberships:offset');
     }
 
@@ -342,18 +342,19 @@ export class Organization extends BaseResource implements OrganizationResource {
 
   public async reload(params?: ClerkResourceReloadParams): Promise<this> {
     const { rotatingTokenNonce } = params || {};
-    const json = await BaseResource._fetch(
-      {
-        method: 'GET',
-        path: `/me/organization_memberships`,
-        rotatingTokenNonce,
-      },
-      { forceUpdateClient: true },
-    );
-    const currentOrganization = (json?.response as unknown as OrganizationMembershipJSON[]).find(
-      orgMem => orgMem.organization.id === this.id,
-    );
-    return this.fromJSON(currentOrganization?.organization as OrganizationJSON);
+
+    const json = (
+      await BaseResource._fetch<OrganizationJSON>(
+        {
+          path: `/organizations/${this.id}`,
+          method: 'GET',
+          rotatingTokenNonce,
+        },
+        { forceUpdateClient: true },
+      )
+    )?.response as unknown as OrganizationJSON;
+
+    return this.fromJSON(json);
   }
 }
 

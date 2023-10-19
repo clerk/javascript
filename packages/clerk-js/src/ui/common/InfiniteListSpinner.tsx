@@ -22,7 +22,7 @@ export const InfiniteListSpinner = forwardRef<HTMLDivElement>((_, ref) => {
         }}
       >
         <Spinner
-          size='md'
+          size='sm'
           colorScheme='primary'
         />
       </Box>

@@ -1,10 +1,10 @@
 import { is4xxError } from '@clerk/shared';
-import { deepSnakeToCamel, runWithExponentialBackOff } from '@clerk/shared';
+import { runWithExponentialBackOff } from '@clerk/shared';
 import type {
   ActJWTClaim,
   GetToken,
   GetTokenOptions,
-  PublicUserData,
+  IsAuthorized,
   SessionJSON,
   SessionResource,
   SessionStatus,
@@ -15,6 +15,7 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
+import { PublicUserData } from './internal';
 import { BaseResource, Token, User } from './internal';
 
 export class Session extends BaseResource implements SessionResource {
@@ -75,6 +76,38 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
+  /**
+   * @experimental The method is experimental and subject to change in future releases.
+   */
+  isAuthorized: IsAuthorized = async params => {
+    return new Promise(resolve => {
+      // if there is no active organization user can not be authorized
+      if (!this.lastActiveOrganizationId || !this.user) {
+        return resolve(false);
+      }
+
+      // loop through organizationMemberships from client piggybacking
+      const orgMemberships = this.user.organizationMemberships || [];
+      const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
+
+      // Based on FAPI this should never happen, but we handle it anyway
+      if (!activeMembership) {
+        return resolve(false);
+      }
+
+      const activeOrganizationPermissions = activeMembership.permissions;
+      const activeOrganizationRole = activeMembership.role;
+
+      if (params.permission) {
+        return resolve(activeOrganizationPermissions.includes(params.permission));
+      }
+      if (params.role) {
+        return resolve(activeOrganizationRole === params.role);
+      }
+      return resolve(false);
+    });
+  };
+
   #hydrateCache = (token: TokenResource | null) => {
     if (token) {
       SessionTokenCache.set({
@@ -101,8 +134,7 @@ export class Session extends BaseResource implements SessionResource {
     return (template || '').replace('integration_', '');
   };
 
-  // Can be removed once `integration_firebase` and `integration_hasura`
-  // are no longer supported
+  // Can be removed once `integration_firebase` are no longer supported
   #handleLegacyIntegrationToken = async (options: GetTokenOptions): Promise<string> => {
     const { template, leewayInSeconds } = options;
     const cachedEntry = SessionTokenCache.get({ tokenId: this.user!.id, audience: template }, leewayInSeconds);
@@ -138,8 +170,13 @@ export class Session extends BaseResource implements SessionResource {
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
-    this.publicUserData = deepSnakeToCamel(data.public_user_data) as PublicUserData;
+
+    if (data.public_user_data) {
+      this.publicUserData = new PublicUserData(data.public_user_data);
+    }
+
     this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
+
     return this;
   }
 

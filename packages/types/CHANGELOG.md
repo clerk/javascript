@@ -1,5 +1,86 @@
 # Change Log
 
+## 3.56.1
+
+### Patch Changes
+
+- Deprecate experimental captcha from Clerk singleton. ([#1905](https://github.com/clerkinc/javascript/pull/1905)) by [@panteliselef](https://github.com/panteliselef)
+
+## 3.56.0
+
+### Minor Changes
+
+- Introduces three new element appearence descriptors: ([#1803](https://github.com/clerkinc/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
+
+  - `tableHead` let's you customize the tables head styles.
+  - `paginationButton` let's you customize the pagination buttons.
+  - `paginationRowText` let's you customize the pagination text.
+
+### Patch Changes
+
+- Update default organization permissions with a `sys_` prefix as part of the entitlement. This changes makes it easy to distinguish between clerk reserved permissions and custom permissions created by developers. ([#1865](https://github.com/clerkinc/javascript/pull/1865)) by [@mzhong9723](https://github.com/mzhong9723)
+
+- Mark the following SAML related types as stable: ([#1876](https://github.com/clerkinc/javascript/pull/1876)) by [@dimkl](https://github.com/dimkl)
+
+  - `User.samlAccounts`
+  - `SamlAccount`
+  - `UserSettingsResource.saml`
+  - `UserSettingsJSON.saml`
+  - `SamlSettings`
+  - `UserResource.samlAccounts`
+  - `SamlAccountResource`
+  - `SamlStrategy`
+  - `UserJSON.saml_accounts`
+  - `SamlAccountJSON`
+  - `SamlConfig`
+  - `SamlFactor`
+  - `HandleSamlCallbackParams`
+
+- Deprecate the `organization.__unstable__invitationUpdate` and `organization.__unstable__membershipUpdate` methods. ([#1879](https://github.com/clerkinc/javascript/pull/1879)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix methods in clerk-js that consumede paginated endpoints in order to retrieve single resources. ([#1871](https://github.com/clerkinc/javascript/pull/1871)) by [@panteliselef](https://github.com/panteliselef)
+
+- In invite members screen of the <OrganizationProfile /> component, consume any invalid email addresses as they are returned in the API error and remove them from the input automatically. ([#1869](https://github.com/clerkinc/javascript/pull/1869)) by [@chanioxaris](https://github.com/chanioxaris)
+
+## 3.55.0
+
+### Minor Changes
+
+- Add support for LinkedIn OIDC ([#1772](https://github.com/clerkinc/javascript/pull/1772)) by [@fragoulis](https://github.com/fragoulis)
+
+### Patch Changes
+
+- Introduces a new `isAuthorized()` method in the `Session` class. Returns a promise and checks whether the active user is allowed to perform an action based on the passed (required) permission and the ones attached to the membership. ([#1834](https://github.com/clerkinc/javascript/pull/1834)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce a new property on the core Clerk singleton, `sdkMetadata`. This will be populated by each host SDK. This metadata will be used to make logging and debugging easier. ([#1857](https://github.com/clerkinc/javascript/pull/1857)) by [@BRKalow](https://github.com/BRKalow)
+
+- Introduce new `*EmailLink*` helpers that will replace the `*MagicLink*` helpers. ([#1833](https://github.com/clerkinc/javascript/pull/1833)) by [@dimkl](https://github.com/dimkl)
+
+  Also marked all the `*MagicLink*` as deprecated using JSDocs.
+
+## 3.54.0
+
+### Minor Changes
+
+- Introduce a new user resource method to leave an organization. You can now call 'user.leaveOrganization(<org_id>)' when a user chooses to leave an organization instead of 'organization.removeMember(<user_id>)' which is mostly meant for organization based actions. ([#1809](https://github.com/clerkinc/javascript/pull/1809)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- - Introduce organizationProfileProps as prop in `<OrganizationSwitcher/>`. ([#1801](https://github.com/clerkinc/javascript/pull/1801)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Introduce appearance in userProfileProps in `<UserButton/>`.
+  - Deprecate the usage of `appearance.userProfile` in `<UserButton/>`.
+
+- Introduce ClerkRuntimeError class for localizing error messages in ClerkJS components ([#1813](https://github.com/clerkinc/javascript/pull/1813)) by [@panteliselef](https://github.com/panteliselef)
+
+- Enables you to translate the tooltip hint while creating an organization through the `formFieldHintText__slug` key ([#1811](https://github.com/clerkinc/javascript/pull/1811)) by [@LekoArts](https://github.com/LekoArts)
+
+- Drop `password` property from `UserJSON` since it's not being returned by the Frontend API ([#1805](https://github.com/clerkinc/javascript/pull/1805)) by [@dimkl](https://github.com/dimkl)
+
+- Remove experimenta jsdoc tags from multi-domain types. ([#1819](https://github.com/clerkinc/javascript/pull/1819)) by [@panteliselef](https://github.com/panteliselef)
+
+- Warn about `publicUserData.profileImageUrl` nested property deprecation in `OrganizationMembership` & `OrganizationMembershipRequest` resources. ([#1812](https://github.com/clerkinc/javascript/pull/1812)) by [@dimkl](https://github.com/dimkl)
+
 ## 3.53.0
 
 ### Minor Changes

@@ -340,7 +340,7 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
-  const withMagicLink = () => {
+  const withEmailLink = () => {
     withEmailAddress({ first_factors: ['email_link'], verifications: ['email_link'] });
   };
 
@@ -420,7 +420,7 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
 
   return {
     withEmailAddress,
-    withMagicLink,
+    withEmailLink,
     withPhoneNumber,
     withUsername,
     withWeb3Wallet,

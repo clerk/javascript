@@ -63,7 +63,7 @@ CLERK_SECRET_KEY=sk_******
 You will then be able to access all the available methods.
 
 ```js
-import 'dotenv/config'; // To read CLERK_API_KEY
+import 'dotenv/config'; // To read CLERK_SECRET_KEY
 import clerk from '@clerk/clerk-sdk-node';
 
 const userList = await clerk.users.getUserList();

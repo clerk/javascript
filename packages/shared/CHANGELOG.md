@@ -1,5 +1,68 @@
 # Change Log
 
+## 0.24.5
+
+### Patch Changes
+
+- Add `Clerk - ` prefix to deprecation warnings ([#1890](https://github.com/clerkinc/javascript/pull/1890)) by [@dimkl](https://github.com/dimkl)
+
+- Deprecate the `organization.__unstable__invitationUpdate` and `organization.__unstable__membershipUpdate` methods. ([#1879](https://github.com/clerkinc/javascript/pull/1879)) by [@panteliselef](https://github.com/panteliselef)
+
+- Internal updates and improvements, with the only public change that npm should no longer complain about missing `react` peerDependency. ([#1868](https://github.com/clerkinc/javascript/pull/1868)) by [@LekoArts](https://github.com/LekoArts)
+
+  Updates:
+
+  - Remove `@clerk/shared/testUtils` export (which was only used for internal usage)
+  - Add `peerDependenciesMeta` to make `react` peerDep optional
+
+- In invite members screen of the <OrganizationProfile /> component, consume any invalid email addresses as they are returned in the API error and remove them from the input automatically. ([#1869](https://github.com/clerkinc/javascript/pull/1869)) by [@chanioxaris](https://github.com/chanioxaris)
+
+## 0.24.4
+
+### Patch Changes
+
+- Warn about _MagicLink_ deprecations: ([#1836](https://github.com/clerkinc/javascript/pull/1836)) by [@dimkl](https://github.com/dimkl)
+
+  - `MagicLinkError`
+  - `isMagicLinkError`
+  - `MagicLinkErrorCode`
+  - `handleMagicLinkVerification`
+  - `createMagicLinkFlow`
+  - `useMagicLink`
+
+- Introduce new `*EmailLink*` helpers that will replace the `*MagicLink*` helpers. ([#1833](https://github.com/clerkinc/javascript/pull/1833)) by [@dimkl](https://github.com/dimkl)
+
+  Also marked all the `*MagicLink*` as deprecated using JSDocs.
+
+## 0.24.3
+
+### Patch Changes
+
+- Make `types` the first key in all `exports` maps defined in our packages' `package.json`. The [TypeScript docs](https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing) recommends so, as the the `exports` map is order-based. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerkinc/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
+
+  - `orgs` jwt claims
+  - `apiKey`
+  - `frontendApi`
+  - `redirect_url`
+  - `password`
+  - `generateSignature`
+  - `afterSwitchOrganizationUrl`
+  - `profileImageUrl`
+
+- Revert the removal of the `clerkError` property from `ClerkAPIError` class. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Retry the implemented changes from [#1767](https://github.com/clerkinc/javascript/pull/1767) which were reverted in [#1806](https://github.com/clerkinc/javascript/pull/1806) due to RSC related errors (not all uses components had the `use client` directive). Restore the original PR and add additional `use client` directives to ensure it works correctly. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 0.24.2
+
+### Patch Changes
+
+- Introduce ClerkRuntimeError class for localizing error messages in ClerkJS components ([#1813](https://github.com/clerkinc/javascript/pull/1813)) by [@panteliselef](https://github.com/panteliselef)
+
+- Pins the internal dependency versions. This ensures that users installing our main framework SDKs will get consistent versions across all @clerk/ packages. ([#1798](https://github.com/clerkinc/javascript/pull/1798)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 0.24.1
 
 ### Patch Changes

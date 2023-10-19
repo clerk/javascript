@@ -1,4 +1,4 @@
-import { Poller } from '@clerk/shared';
+import { deprecated, Poller } from '@clerk/shared';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,
@@ -6,6 +6,7 @@ import type {
   AttemptWeb3WalletVerificationParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  CreateEmailLinkFlowReturn,
   CreateMagicLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
@@ -18,19 +19,21 @@ import type {
   SignUpResource,
   SignUpStatus,
   SignUpUpdateParams,
+  StartEmailLinkFlowParams,
   StartMagicLinkFlowParams,
 } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getCaptchaToken, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { retrieveCaptchaInfo } from '../../utils/retrieveCaptchaInfo';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
-import { BaseResource, SignUpVerifications } from './internal';
+import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
 
 declare global {
   interface Window {
@@ -68,19 +71,19 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
     const paramsWithCaptcha: Record<string, unknown> = params;
-    const { experimental_captchaSiteKey, experimental_canUseCaptcha, experimental_captchaURL } = SignUp.clerk;
+    const { captchaSiteKey, canUseCaptcha, captchaURL } = retrieveCaptchaInfo(SignUp.clerk);
 
-    if (experimental_canUseCaptcha && experimental_captchaSiteKey && experimental_captchaURL) {
+    if (canUseCaptcha && captchaSiteKey && captchaURL) {
       try {
         paramsWithCaptcha.captchaToken = await getCaptchaToken({
-          siteKey: experimental_captchaSiteKey,
-          scriptUrl: experimental_captchaURL,
+          siteKey: captchaSiteKey,
+          scriptUrl: captchaURL,
         });
       } catch (e) {
         if (e.captchaError) {
           paramsWithCaptcha.captchaError = e.captchaError;
         } else {
-          throw e;
+          throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
         }
       }
     }
@@ -113,7 +116,12 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptVerification({ ...params, strategy: 'email_code' });
   };
 
+  /**
+   * @deprecated Use `createEmailLinkFlow` instead.
+   */
   createMagicLinkFlow = (): CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource> => {
+    deprecated('createMagicLinkFlow', 'Use `createEmailLinkFlow` instead.');
+
     const { run, stop } = Poller();
 
     const startMagicLinkFlow = async ({ redirectUrl }: StartMagicLinkFlowParams): Promise<SignUpResource> => {
@@ -146,6 +154,39 @@ export class SignUp extends BaseResource implements SignUpResource {
     return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
   };
 
+  createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, SignUpResource> => {
+    const { run, stop } = Poller();
+
+    const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<SignUpResource> => {
+      if (!this.id) {
+        clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
+      }
+      await this.prepareEmailAddressVerification({
+        strategy: 'email_link',
+        redirectUrl,
+      });
+
+      return new Promise((resolve, reject) => {
+        void run(() => {
+          return this.reload()
+            .then(res => {
+              const status = res.verifications.emailAddress.status;
+              if (status === 'verified' || status === 'expired') {
+                stop();
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              stop();
+              reject(err);
+            });
+        });
+      });
+    };
+
+    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
+  };
+
   preparePhoneNumberVerification = (params?: PreparePhoneNumberVerificationParams): Promise<SignUpResource> => {
     return this.prepareVerification(params || { strategy: 'phone_code' });
   };
@@ -160,6 +201,10 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   attemptWeb3WalletVerification = async (params: AttemptWeb3WalletVerificationParams): Promise<SignUpResource> => {
     const { signature, generateSignature } = params || {};
+
+    if (generateSignature) {
+      deprecated('generateSignature', 'Use signature field instead.');
+    }
 
     if (signature) {
       return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
@@ -211,7 +256,9 @@ export class SignUp extends BaseResource implements SignUpResource {
     continueSignUp = false,
     unsafeMetadata,
     emailAddress,
-  }: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata }): Promise<void> => {
+  }: AuthenticateWithRedirectParams & {
+    unsafeMetadata?: SignUpUnsafeMetadata;
+  }): Promise<void> => {
     const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
       continueSignUp && this.id ? this.update(args) : this.create(args);
 

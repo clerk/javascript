@@ -1,7 +1,12 @@
 import { snakeToCamel } from '@clerk/shared';
-import type { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
 
-import { isClerkAPIResponseError, isKnownError, isMetamaskError } from '../../core/resources/internal';
+import {
+  isClerkAPIResponseError,
+  isClerkRuntimeError,
+  isKnownError,
+  isMetamaskError,
+} from '../../core/resources/internal';
 import type { FormControlState } from './useFormControl';
 
 interface ParserErrors {
@@ -52,7 +57,7 @@ type HandleError = {
   (
     err: Error,
     fieldStates: Array<FormControlState<string>>,
-    setGlobalError?: (err: ClerkAPIError | string | undefined) => void,
+    setGlobalError?: (err: ClerkRuntimeError | ClerkAPIError | string | undefined) => void,
   ): void;
 };
 
@@ -68,6 +73,10 @@ export const handleError: HandleError = (err, fieldStates, setGlobalError) => {
 
   if (isClerkAPIResponseError(err)) {
     return handleClerkApiError(err, fieldStates, setGlobalError);
+  }
+
+  if (isClerkRuntimeError(err)) {
+    return handleClerkRuntimeError(err, fieldStates, setGlobalError);
   }
 };
 
@@ -118,6 +127,20 @@ const handleClerkApiError: HandleError = (err, fieldStates, setGlobalError) => {
     // Show only the first global error until we have snack bar stacks if applicable
     // TODO: Make global errors localizable
     const firstGlobalError = globalErrors[0];
+    if (firstGlobalError) {
+      setGlobalError(firstGlobalError);
+    }
+  }
+};
+
+const handleClerkRuntimeError: HandleError = (err, _, setGlobalError) => {
+  if (!isClerkRuntimeError(err)) {
+    return;
+  }
+
+  if (setGlobalError) {
+    setGlobalError(undefined);
+    const firstGlobalError = err;
     if (firstGlobalError) {
       setGlobalError(firstGlobalError);
     }

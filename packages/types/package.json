@@ -1,6 +1,6 @@
 {
   "name": "@clerk/types",
-  "version": "3.53.0",
+  "version": "3.56.1",
   "license": "MIT",
   "description": "Typings for Clerk libraries.",
   "keywords": [
@@ -39,7 +39,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/types"
   },
   "homepage": "https://clerk.com/",
   "bugs": {

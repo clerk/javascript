@@ -7,7 +7,7 @@ OrganizationMembershipRequest {
   "id": "test_id",
   "organizationId": "test_org_id",
   "pathRoot": "",
-  "publicUserData": OrganizationPublicUserData {
+  "publicUserData": PublicUserData {
     "firstName": "test_first_name",
     "hasImage": true,
     "identifier": "test@identifier.gr",

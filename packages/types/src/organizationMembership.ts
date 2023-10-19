@@ -25,6 +25,12 @@ declare global {
 export interface OrganizationMembershipResource extends ClerkResource {
   id: string;
   organization: OrganizationResource;
+  /**
+   * @experimental The property is experimental and subject to change in future releases.
+   */
+  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+  // eslint-disable-next-line
+  permissions: (OrganizationPermission | (string & {}))[];
   publicMetadata: OrganizationMembershipPublicMetadata;
   publicUserData: PublicUserData;
   role: MembershipRole;
@@ -35,6 +41,16 @@ export interface OrganizationMembershipResource extends ClerkResource {
 }
 
 export type MembershipRole = 'admin' | 'basic_member' | 'guest_member';
+
+export type OrganizationPermission =
+  | 'org:sys_domains:manage'
+  | 'org:sys_domains:delete'
+  | 'org:sys_profile:manage'
+  | 'org:sys_profile:delete'
+  | 'org:sys_memberships:read'
+  | 'org:sys_memberships:manage'
+  | 'org:sys_memberships:delete'
+  | 'org:sys_domains:read';
 
 export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;

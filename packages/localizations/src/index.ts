@@ -1,3 +1,4 @@
+export { arSA } from './ar-SA';
 export { enUS } from './en-US';
 export { frFR } from './fr-FR';
 export { daDK } from './da-DK';

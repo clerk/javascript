@@ -1,12 +1,17 @@
 export {
+  ClerkRuntimeError,
+  ClerkAPIResponseError,
+  EmailLinkError,
+  EmailLinkErrorCode,
+  isClerkAPIResponseError,
+  isClerkRuntimeError,
+  isEmailLinkError,
   isKnownError,
   isMagicLinkError,
   isMetamaskError,
-  isClerkAPIResponseError,
+  MagicLinkError,
   MagicLinkErrorCode,
   parseError,
   parseErrors,
-  MagicLinkError,
-  ClerkAPIResponseError,
 } from '@clerk/shared';
 export type { MetamaskError } from '@clerk/shared';

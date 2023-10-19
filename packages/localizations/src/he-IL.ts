@@ -298,6 +298,9 @@ export const heIL: LocalizationResource = {
         destructiveActionSubtitle: 'הסר את החשבון המחובר מהחשבון שלך',
         destructiveActionAccordionSubtitle: 'הסר חשבון מחובר',
       },
+      enterpriseAccountsSection: {
+        title: 'חשבונות ארגוניים',
+      },
       passwordSection: {
         title: 'סיסמה',
         primaryButton__changePassword: 'שנה סיסמה',
@@ -346,6 +349,12 @@ export const heIL: LocalizationResource = {
         destructiveActionTitle: 'הסר',
         destructiveActionSubtitle: 'הסר ארנק Web3 זה מהחשבון שלך',
         destructiveAction: 'הסר ארנק',
+      },
+      dangerSection: {
+        title: 'מסוכן',
+        deleteAccountButton: 'מחק חשבון',
+        deleteAccountTitle: 'מחיקת חשבון',
+        deleteAccountDescription: 'מחק את החשבון שלך ואת כל המידע הקשור אליו',
       },
     },
     profilePage: {

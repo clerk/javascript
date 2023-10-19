@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "4.26.1",
+  "version": "4.26.6",
   "license": "MIT",
   "description": "Clerk React library",
   "keywords": [
@@ -18,9 +18,9 @@
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
-      "types": "./dist/types/index.d.ts"
+      "require": "./dist/cjs/index.js"
     }
   },
   "files": [
@@ -40,12 +40,14 @@
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%"
+    "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "0.24.1",
-    "@clerk/types": "3.53.0",
+    "@clerk/shared": "0.24.5",
+    "@clerk/types": "3.56.1",
     "tslib": "2.4.1"
   },
   "devDependencies": {
@@ -65,11 +67,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/react"
   },
   "homepage": "https://clerk.com/",
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce"
+  }
 }

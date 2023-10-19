@@ -1,5 +1,6 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
+import type { AppLoadContext } from '@remix-run/server-runtime';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
@@ -75,7 +76,11 @@ export const unknownResponse = (requestState: RequestState) => {
   return json(null, { status: 401, headers: observabilityHeadersFromRequestState(requestState) });
 };
 
-export const interstitialJsonResponse = (requestState: RequestState, opts: { loader: 'root' | 'nested' }) => {
+export const interstitialJsonResponse = (
+  requestState: RequestState,
+  opts: { loader: 'root' | 'nested' },
+  context: AppLoadContext,
+) => {
   return json(
     wrapWithClerkState({
       __loader: opts.loader,
@@ -85,8 +90,8 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
         publishableKey: requestState.publishableKey,
         // TODO: This needs to be the version of clerk/remix not clerk/react
         // pkgVersion: LIB_VERSION,
-        clerkJSUrl: getEnvVariable('CLERK_JS'),
-        clerkJSVersion: getEnvVariable('CLERK_JS_VERSION'),
+        clerkJSUrl: getEnvVariable('CLERK_JS', context),
+        clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),
         proxyUrl: requestState.proxyUrl,
         isSatellite: requestState.isSatellite,
         domain: requestState.domain,
@@ -97,7 +102,11 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
   );
 };
 
-export const injectRequestStateIntoResponse = async (response: Response, requestState: RequestState) => {
+export const injectRequestStateIntoResponse = async (
+  response: Response,
+  requestState: RequestState,
+  context: AppLoadContext,
+) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { reason, message, isSignedIn, isInterstitial, ...rest } = requestState;
   const clone = response.clone();
@@ -114,8 +123,8 @@ export const injectRequestStateIntoResponse = async (response: Response, request
     __afterSignInUrl: requestState.afterSignInUrl,
     __afterSignUpUrl: requestState.afterSignUpUrl,
     __clerk_debug: debugRequestState(requestState),
-    __clerkJSUrl: getEnvVariable('CLERK_JS'),
-    __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION'),
+    __clerkJSUrl: getEnvVariable('CLERK_JS', context),
+    __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),
   });
   // set the correct content-type header in case the user returned a `Response` directly
   // without setting the header, instead of using the `json()` helper

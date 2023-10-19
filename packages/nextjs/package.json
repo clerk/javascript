@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "4.25.1",
+  "version": "4.25.6",
   "license": "MIT",
   "description": "Clerk SDK for NextJS",
   "keywords": [
@@ -71,15 +71,17 @@
     "publish:local": "npx yalc push --replace --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%"
+    "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/backend": "0.30.1",
-    "@clerk/clerk-react": "4.26.1",
-    "@clerk/clerk-sdk-node": "4.12.10",
-    "@clerk/shared": "0.24.1",
-    "@clerk/types": "3.53.0",
+    "@clerk/backend": "0.31.2",
+    "@clerk/clerk-react": "4.26.6",
+    "@clerk/clerk-sdk-node": "4.12.15",
+    "@clerk/shared": "0.24.5",
+    "@clerk/types": "3.56.1",
     "path-to-regexp": "6.2.1",
     "tslib": "2.4.1"
   },
@@ -104,11 +106,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/nextjs"
   },
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
   },
-  "homepage": "https://clerk.com/",
-  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce"
+  "homepage": "https://clerk.com/"
 }

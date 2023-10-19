@@ -48,9 +48,6 @@ export type OauthFactor = {
   strategy: OAuthStrategy;
 };
 
-/**
- * @experimental
- */
 export type SamlFactor = {
   strategy: SamlStrategy;
 };
@@ -93,9 +90,6 @@ export type OAuthConfig = OauthFactor & {
   actionCompleteRedirectUrl: string;
 };
 
-/**
- * @experimental
- */
 export type SamlConfig = SamlFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;

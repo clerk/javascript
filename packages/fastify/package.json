@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "0.6.11",
+  "version": "0.6.16",
   "license": "MIT",
   "description": "Clerk SDK for Fastify",
   "keywords": [
@@ -23,13 +23,15 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "publish:local": "npx yalc push --replace  --sig",
     "test": "jest"
   },
   "dependencies": {
-    "@clerk/backend": "0.30.1",
-    "@clerk/shared": "0.24.1",
-    "@clerk/types": "3.53.0",
+    "@clerk/backend": "0.31.2",
+    "@clerk/shared": "0.24.5",
+    "@clerk/types": "3.56.1",
     "cookies": "0.8.0"
   },
   "devDependencies": {
@@ -48,7 +50,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/fastify"
   },
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"

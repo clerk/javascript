@@ -9,8 +9,12 @@
     "packages/**/*.ts",
     "packages/**/*.tsx",
     "packages/*/*.js",
+    "integration/**/*.ts",
+    "integration/**/*.tsx",
+    "integration/*/*.js",
     ".eslintrc.js",
     "commitlint.config.js",
-    "scripts/*.mjs"
+    "scripts/*.mjs",
+    "setupJest.afterEnv.ts"
   ]
 }

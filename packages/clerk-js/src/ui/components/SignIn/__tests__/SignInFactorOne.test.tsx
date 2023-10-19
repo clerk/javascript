@@ -276,16 +276,16 @@ describe('SignInFactorOne', () => {
       it('shows message to use the magic link in their email', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
-          f.withMagicLink();
+          f.withEmailLink();
           f.startSignInWithEmailAddress({ supportEmailLink: true, supportPassword: false });
         });
 
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-        fixtures.signIn.createMagicLinkFlow.mockImplementation(
+        fixtures.signIn.createEmailLinkFlow.mockImplementation(
           () =>
             ({
-              startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
-              cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+              startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+              cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
             } as any),
         );
 
@@ -298,16 +298,16 @@ describe('SignInFactorOne', () => {
 
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
-          f.withMagicLink();
+          f.withEmailLink();
           f.startSignInWithEmailAddress({ supportEmailLink: true, supportPassword: false });
         });
 
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-        fixtures.signIn.createMagicLinkFlow.mockImplementation(
+        fixtures.signIn.createEmailLinkFlow.mockImplementation(
           () =>
             ({
-              startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
-              cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+              startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+              cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
             } as any),
         );
 
@@ -594,11 +594,11 @@ describe('SignInFactorOne', () => {
         f.startSignInWithEmailAddress({ supportEmailLink: true, identifier: email });
       });
       fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-      fixtures.signIn.createMagicLinkFlow.mockImplementation(
+      fixtures.signIn.createEmailLinkFlow.mockImplementation(
         () =>
           ({
-            startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
-            cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+            startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+            cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
           } as any),
       );
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
@@ -618,9 +618,9 @@ describe('SignInFactorOne', () => {
         f.startSignInWithEmailAddress({ supportEmailCode: true, identifier: email });
       });
       fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-      fixtures.signIn.createMagicLinkFlow.mockReturnValue({
-        startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
-        cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+      fixtures.signIn.createEmailLinkFlow.mockReturnValue({
+        startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+        cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
@@ -638,9 +638,9 @@ describe('SignInFactorOne', () => {
         f.startSignInWithPhoneNumber({ supportPhoneCode: true });
       });
       fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-      fixtures.signIn.createMagicLinkFlow.mockReturnValue({
-        startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
-        cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+      fixtures.signIn.createEmailLinkFlow.mockReturnValue({
+        startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+        cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));

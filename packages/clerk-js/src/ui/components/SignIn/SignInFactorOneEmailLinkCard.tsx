@@ -2,13 +2,13 @@ import type { EmailLinkFactor, SignInResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
-import { buildMagicLinkRedirectUrl } from '../../common/redirects';
+import { buildEmailLinkRedirectUrl } from '../../common/redirects';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { VerificationLinkCard } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useMagicLink } from '../../hooks/useMagicLink';
+import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router/RouteContext';
 import { handleError } from '../../utils';
 
@@ -27,7 +27,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const { navigate } = useRouter();
   const { navigateAfterSignIn } = useSignInContext();
   const { setActive } = useCoreClerk();
-  const { startMagicLinkFlow, cancelMagicLinkFlow } = useMagicLink(signIn);
+  const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
 
   React.useEffect(() => {
@@ -35,14 +35,14 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   }, []);
 
   const restartVerification = () => {
-    cancelMagicLinkFlow();
+    cancelEmailLinkFlow();
     void startEmailLinkVerification();
   };
 
   const startEmailLinkVerification = () => {
-    startMagicLinkFlow({
+    startEmailLinkFlow({
       emailAddressId: props.factor.emailAddressId,
-      redirectUrl: buildMagicLinkRedirectUrl(signInContext, signInUrl),
+      redirectUrl: buildEmailLinkRedirectUrl(signInContext, signInUrl),
     })
       .then(res => handleVerificationResult(res))
       .catch(err => handleError(err, [], card.setError));

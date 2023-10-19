@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { createVariants } from '../styledSystem';
+import { colors } from '../utils';
 import type { BoxProps } from './Box';
 import { Box } from './Box';
 
@@ -10,8 +11,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     textAlign: 'left',
     fontSize: theme.fontSizes.$xs,
     fontWeight: theme.fontWeights.$normal,
-    color: theme.colors.$colorText,
-    opacity: theme.opacity.$inactive,
+    color: colors.setAlpha(theme.colors.$colorText, 0.62),
     borderBottom: theme.borders.$normal,
     borderColor: theme.colors.$blackAlpha300,
     paddingBottom: theme.space.$2,

@@ -6,6 +6,7 @@ export {
   useAuth,
   useClerk,
   useMagicLink,
+  useEmailLink,
   useOrganization,
   useOrganizationList,
   useOrganizations,
@@ -23,7 +24,7 @@ export {
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   AuthenticateWithRedirectCallback,
-} from '@clerk/clerk-react';
+} from './clerk-react';
 
 export {
   SignIn,

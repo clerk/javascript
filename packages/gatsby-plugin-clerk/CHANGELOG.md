@@ -1,5 +1,66 @@
 # Change Log
 
+## 4.4.17
+
+### Patch Changes
+
+- Updated dependencies [[`9ca215702`](https://github.com/clerkinc/javascript/commit/9ca215702d1b816217d2c06c812f7d653ec2da11)]:
+  - @clerk/types@3.56.1
+  - @clerk/backend@0.31.2
+  - @clerk/clerk-react@4.26.6
+  - @clerk/clerk-sdk-node@4.12.15
+
+## 4.4.16
+
+### Patch Changes
+
+- Updated dependencies [[`35be8709d`](https://github.com/clerkinc/javascript/commit/35be8709d88f1d1eef043acdba4d49b07578c7b2), [`13e9dfbaa`](https://github.com/clerkinc/javascript/commit/13e9dfbaa5b7b7e72f63e4b8ecfc1c1918517cd8), [`e38488c92`](https://github.com/clerkinc/javascript/commit/e38488c929e437583296c34cde23f76218f78caf), [`a11f962bc`](https://github.com/clerkinc/javascript/commit/a11f962bcbcf225fb927122267de1e8f5faccf53), [`a9894b445`](https://github.com/clerkinc/javascript/commit/a9894b445bf1e463176b0442fb73c48f89d9fed8), [`70f251007`](https://github.com/clerkinc/javascript/commit/70f2510074352206bbe7bdadf2c28ccf3c074c12), [`a46d6fe99`](https://github.com/clerkinc/javascript/commit/a46d6fe99bd9b80671b60347b4c35d558012200f)]:
+  - @clerk/types@3.56.0
+  - @clerk/backend@0.31.1
+  - @clerk/clerk-react@4.26.5
+  - @clerk/clerk-sdk-node@4.12.14
+
+## 4.4.15
+
+### Patch Changes
+
+- Warn about environment variables deprecations: ([#1859](https://github.com/clerkinc/javascript/pull/1859)) by [@dimkl](https://github.com/dimkl)
+
+  - `CLERK_API_KEY`
+  - `CLERK_FRONTEND_API`
+  - `NEXT_PUBLIC_CLERK_FRONTEND_API`
+
+- Introduce a new property on the core Clerk singleton, `sdkMetadata`. This will be populated by each host SDK. This metadata will be used to make logging and debugging easier. ([#1857](https://github.com/clerkinc/javascript/pull/1857)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`977336f79`](https://github.com/clerkinc/javascript/commit/977336f793cd4ce5984f98dac3cedf9f5ec363f5), [`997b8e256`](https://github.com/clerkinc/javascript/commit/997b8e256c8f83d68d0ae4243c7ea5640573d1ae), [`d89c09bb0`](https://github.com/clerkinc/javascript/commit/d89c09bb0ec9d23ea75ca10f208fe23bb124d87b), [`91e9a55f4`](https://github.com/clerkinc/javascript/commit/91e9a55f4b9f1a8f8d843a788597026015ddeafd), [`c9b17f5a7`](https://github.com/clerkinc/javascript/commit/c9b17f5a72cb27786cfc7f1fb42be1233fb10d5c), [`91014880d`](https://github.com/clerkinc/javascript/commit/91014880df71c2618d0b1e513da4dd19ccd809e3), [`451fc332a`](https://github.com/clerkinc/javascript/commit/451fc332a06b20482fc1c7345d2f606511144241), [`3848f8dbe`](https://github.com/clerkinc/javascript/commit/3848f8dbe094226c6062341405a32a9621042fd6), [`7f4d4b942`](https://github.com/clerkinc/javascript/commit/7f4d4b942e8834462cdc0976b106d9739c345f6b)]:
+  - @clerk/clerk-react@4.26.4
+  - @clerk/types@3.55.0
+  - @clerk/clerk-sdk-node@4.12.13
+  - @clerk/backend@0.31.0
+
+## 4.4.14
+
+### Patch Changes
+
+- Updated dependencies [[`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1e212c19d`](https://github.com/clerkinc/javascript/commit/1e212c19d1cbfbcf6bc6718f5aec0a3cb893b96f), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679)]:
+  - @clerk/clerk-react@4.26.3
+  - @clerk/backend@0.30.3
+  - @clerk/clerk-sdk-node@4.12.12
+
+## 4.4.13
+
+### Patch Changes
+
+- Pins the internal dependency versions. This ensures that users installing our main framework SDKs will get consistent versions across all @clerk/ packages. ([#1798](https://github.com/clerkinc/javascript/pull/1798)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fix internal subpath imports by replacing them with top level imports. ([#1804](https://github.com/clerkinc/javascript/pull/1804)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`b59b6b75d`](https://github.com/clerkinc/javascript/commit/b59b6b75dc61bc4d7e61f7cca774f3731a2929b9), [`fed24f1bf`](https://github.com/clerkinc/javascript/commit/fed24f1bf3e2b8c3f3e3327178f77b57c391c62c), [`164f3aac7`](https://github.com/clerkinc/javascript/commit/164f3aac7928bc69301846130cc77986569d4e91), [`68259a2bb`](https://github.com/clerkinc/javascript/commit/68259a2bb8193befdde9101d4ec9bf305881d5e2), [`33e927c59`](https://github.com/clerkinc/javascript/commit/33e927c59fbf06436ff642ef9f846bd3b467e3e1), [`0636ff779`](https://github.com/clerkinc/javascript/commit/0636ff7799e126d1438d2738ce0e46c3b277f46a), [`9514618d6`](https://github.com/clerkinc/javascript/commit/9514618d65cfdde0ff011eabd41a992b61fc8dc1), [`bb2ec9373`](https://github.com/clerkinc/javascript/commit/bb2ec93738f92c89f008c6a275a986593816c4d3), [`c7c6912f3`](https://github.com/clerkinc/javascript/commit/c7c6912f34874467bc74104690fe9f95491cc10d), [`71bb1c7b5`](https://github.com/clerkinc/javascript/commit/71bb1c7b570f7b0bbc377c8104c9abcc1af4cacf), [`e592565e0`](https://github.com/clerkinc/javascript/commit/e592565e0d7707626587f5e0ae7fb7279c84f050)]:
+  - @clerk/types@3.54.0
+  - @clerk/backend@0.30.2
+  - @clerk/clerk-react@4.26.2
+  - @clerk/clerk-sdk-node@4.12.11
+
 ## 4.4.12
 
 ### Patch Changes

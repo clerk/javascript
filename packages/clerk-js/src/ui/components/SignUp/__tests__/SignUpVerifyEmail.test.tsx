@@ -26,11 +26,11 @@ describe('SignUpVerifyEmail', () => {
       f.withEmailAddress({ required: true, verifications: ['email_link'] });
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
     });
-    fixtures.signUp.createMagicLinkFlow.mockImplementation(
+    fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
         ({
-          startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
-          cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
         } as any),
     );
 
@@ -43,11 +43,11 @@ describe('SignUpVerifyEmail', () => {
       f.withEmailAddress({ required: true, verifications: ['email_code'] });
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
     });
-    fixtures.signUp.createMagicLinkFlow.mockImplementation(
+    fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
         ({
-          startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
-          cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
         } as any),
     );
 
@@ -74,11 +74,11 @@ describe('SignUpVerifyEmail', () => {
       f.withEmailAddress({ required: true, verifications: ['email_link'] });
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
     });
-    fixtures.signUp.createMagicLinkFlow.mockImplementation(
+    fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
         ({
-          startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
-          cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
         } as any),
     );
 
@@ -92,11 +92,11 @@ describe('SignUpVerifyEmail', () => {
       f.withEmailAddress({ required: true, verifications: ['email_code'] });
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
     });
-    fixtures.signUp.createMagicLinkFlow.mockImplementation(
+    fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
         ({
-          startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
-          cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
         } as any),
     );
 

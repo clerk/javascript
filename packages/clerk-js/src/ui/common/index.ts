@@ -2,6 +2,7 @@ export * from './BlockButtons';
 export * from './constants';
 export * from './CalloutWithAction';
 export * from './forms';
+export * from './Gate';
 export * from './InfiniteListSpinner';
 export * from './redirects';
 export * from './verification';

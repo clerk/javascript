@@ -56,7 +56,21 @@ function SignUpRoutes(): JSX.Element {
           />
         </Route>
         <Route path='continue'>
-          <SignUpContinue />
+          <Route
+            path='verify-email-address'
+            canActivate={clerk => !!clerk.client.signUp.emailAddress}
+          >
+            <SignUpVerifyEmail />
+          </Route>
+          <Route
+            path='verify-phone-number'
+            canActivate={clerk => !!clerk.client.signUp.phoneNumber}
+          >
+            <SignUpVerifyPhone />
+          </Route>
+          <Route index>
+            <SignUpContinue />
+          </Route>
         </Route>
         <Route index>
           <SignUpStart />

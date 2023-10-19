@@ -1,34 +1,34 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { test as setup } from '@playwright/test';
 
-import type { LongRunningApplication } from '../adapters/longRunningApplication';
 import { constants } from '../constants';
-import { longRunningApps } from '../presets';
-import { fs } from '../utils';
-
-/**
- * State cannot be shared using playwright,
- * so we save the state in a file using a strategy similar to `storageState`
- */
-const startAllLongRunningApps = async (apps: LongRunningApplication[]) => {
-  await fs.remove(constants.TMP_DIR);
-  const contents = { longRunningApps: {} };
-  await Promise.all(
-    apps.map(async app => {
-      if (contents.longRunningApps[app.name]) {
-        throw new Error(`Long running app with name ${app.name} already exists`);
-      }
-      contents.longRunningApps[app.name] = await app.init();
-    }),
-  );
-  await fs.ensureFile(constants.APPS_STATE_FILE);
-  await fs.writeJson(constants.APPS_STATE_FILE, contents, { spaces: 2 });
-};
+import { appConfigs } from '../presets';
+import { fs, parseEnvOptions } from '../scripts';
 
 setup('start long running apps', async () => {
-  const apps = Object.values(longRunningApps)
-    .map(type => Object.values(type))
-    .flat();
-
-  await startAllLongRunningApps(apps);
-  console.log('Long running apps started');
+  const { appIds } = parseEnvOptions();
+  if (appIds.length) {
+    // await cleanupOldProcesses();
+    await fs.remove(constants.TMP_DIR);
+    const apps = appConfigs.longRunningApps.getByPattern(appIds);
+    // state cannot be shared using playwright,
+    // so we save the state in a file using a strategy similar to `storageState`
+    await Promise.all(apps.map(app => app.init()));
+  } else {
+    // start a single app using the available env variables
+  }
+  console.log('Apps started');
 });
+
+// Useful to make sure that older processes are killed before starting new ones
+// not meant to be run under normal circumstances
+// only used for cases where the test runner is not able to kill the process
+// eg debugging the e2e infra itself
+// const cleanupOldProcesses = async () => {
+//   const apps = (await stateFile.getLongRunningApps()) || {};
+//   const pids = Object.values(apps).map(app => app.pid);
+//   pids.forEach(pid => {
+//     console.log('Killing old process', pid);
+//     treekill(pid, 'SIGKILL');
+//   });
+// };

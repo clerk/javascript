@@ -98,7 +98,7 @@ export default (QUnit: QUnit) => {
       assert.false(checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost }));
     });
 
-    test('is not CO for AWS', assert => {
+    test('is not CO for AWS Amplify', assert => {
       const options = {
         originURL: new URL('https://main.d38v5rl8fqcx2i.amplifyapp.com'),
         host: 'prod.eu-central-1.gateway.amplify.aws.dev',

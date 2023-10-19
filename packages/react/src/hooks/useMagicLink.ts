@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared';
 import type {
   CreateMagicLinkFlowReturn,
   EmailAddressResource,
@@ -13,12 +14,23 @@ type UseMagicLinkSignInReturn = CreateMagicLinkFlowReturn<SignInStartMagicLinkFl
 type UseMagicLinkSignUpReturn = CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource>;
 type UseMagicLinkEmailAddressReturn = CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, EmailAddressResource>;
 
+/**
+ * @deprecated Use `useEmailLink` instead.
+ */
 function useMagicLink(resource: SignInResource): UseMagicLinkSignInReturn;
+/**
+ * @deprecated Use `useEmailLink` instead.
+ */
 function useMagicLink(resource: SignUpResource): UseMagicLinkSignUpReturn;
+/**
+ * @deprecated Use `useEmailLink` instead.
+ */
 function useMagicLink(resource: EmailAddressResource): UseMagicLinkEmailAddressReturn;
 function useMagicLink(
   resource: MagicLinkable,
 ): UseMagicLinkSignInReturn | UseMagicLinkSignUpReturn | UseMagicLinkEmailAddressReturn {
+  deprecated('useMagicLink', 'Use `useEmailLink` instead.');
+
   const { startMagicLinkFlow, cancelMagicLinkFlow } = React.useMemo(() => resource.createMagicLinkFlow(), [resource]);
 
   React.useEffect(() => {

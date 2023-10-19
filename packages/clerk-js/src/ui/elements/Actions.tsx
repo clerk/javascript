@@ -86,6 +86,7 @@ export const Action = (props: ActionProps) => {
       ]}
       isDisabled={card.isLoading}
       onClick={onClick}
+      role='menuitem'
       {...rest}
     >
       <Flex
@@ -95,7 +96,7 @@ export const Action = (props: ActionProps) => {
         sx={theme => ({ flex: `0 0 ${theme.sizes.$11}` })}
       >
         {status.isLoading ? (
-          <Spinner size='sm' />
+          <Spinner size='xs' />
         ) : (
           <Icon
             elementDescriptor={iconElementDescriptor}

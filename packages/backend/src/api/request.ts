@@ -8,6 +8,7 @@ import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
 import runtime from '../runtime';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { joinPaths } from '../util/path';
+import { deprecated } from '../util/shared';
 import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
@@ -67,11 +68,21 @@ export function buildRequest(options: CreateBackendApiOptions) {
     const {
       apiKey,
       secretKey,
+      httpOptions,
       apiUrl = API_URL,
       apiVersion = API_VERSION,
       userAgent = USER_AGENT,
-      httpOptions = {},
     } = options;
+    if (apiKey) {
+      deprecated('apiKey', 'Use `secretKey` instead.');
+    }
+    if (httpOptions) {
+      deprecated(
+        'httpOptions',
+        'This option has been deprecated and will be removed with the next major release.\nA RequestInit init object used by the `request` method.',
+      );
+    }
+
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
     const key = secretKey || apiKey;
 
@@ -119,7 +130,7 @@ export function buildRequest(options: CreateBackendApiOptions) {
 
         res = await runtime.fetch(
           finalUrl.href,
-          deepmerge(httpOptions, {
+          deepmerge(httpOptions || {}, {
             method,
             headers,
             ...body,

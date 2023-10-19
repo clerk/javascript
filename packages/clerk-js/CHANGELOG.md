@@ -1,5 +1,176 @@
 # Change Log
 
+## 4.62.1
+
+### Patch Changes
+
+- Added `formFieldInputPlaceholder__password` to the placeholder of the password input in the `<SignInFactorOnePasswordCard/>` component ([#1909](https://github.com/clerkinc/javascript/pull/1909)) by [@octoper](https://github.com/octoper)
+
+- Internal fix for deprecation warning when using limi & offset. ([#1904](https://github.com/clerkinc/javascript/pull/1904)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove custom Alert from invitation page and display it as a global error instead (at the top of the component). ([#1903](https://github.com/clerkinc/javascript/pull/1903)) by [@panteliselef](https://github.com/panteliselef)
+
+- Deprecate experimental captcha from Clerk singleton. ([#1905](https://github.com/clerkinc/javascript/pull/1905)) by [@panteliselef](https://github.com/panteliselef)
+
+- Append query params for sign-in and sign-up initial values after the hash in order to be readable via hash routing. ([#1855](https://github.com/clerkinc/javascript/pull/1855)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`ccfb0e8ed`](https://github.com/clerkinc/javascript/commit/ccfb0e8ed43c7857bfd5cb4dcb732fe6cf2d40d5), [`9ca215702`](https://github.com/clerkinc/javascript/commit/9ca215702d1b816217d2c06c812f7d653ec2da11)]:
+  - @clerk/localizations@1.26.6
+  - @clerk/types@3.56.1
+
+## 4.62.0
+
+### Minor Changes
+
+- Introduces three new element appearence descriptors: ([#1803](https://github.com/clerkinc/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
+
+  - `tableHead` let's you customize the tables head styles.
+  - `paginationButton` let's you customize the pagination buttons.
+  - `paginationRowText` let's you customize the pagination text.
+
+- Add new `/sign-up/continue/verify-phone-number` and `/sign-up/continue/verify-email-address` routes in order to allow navigating back to the `/sign-up/continue` step when editing the extra identifier that is provided in the `/sign-up/continue` step. ([#1870](https://github.com/clerkinc/javascript/pull/1870)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Improve accessibility of `<UserButton />` and `<OrganizationSwitcher />` by using `aria-*` attributes (where appropriate) and roles like `menu` and `menuitem`. ([#1826](https://github.com/clerkinc/javascript/pull/1826)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update default organization permissions with a `sys_` prefix as part of the entitlement. This changes makes it easy to distinguish between clerk reserved permissions and custom permissions created by developers. ([#1865](https://github.com/clerkinc/javascript/pull/1865)) by [@mzhong9723](https://github.com/mzhong9723)
+
+- Mark the following SAML related types as stable: ([#1876](https://github.com/clerkinc/javascript/pull/1876)) by [@dimkl](https://github.com/dimkl)
+
+  - `User.samlAccounts`
+  - `SamlAccount`
+  - `UserSettingsResource.saml`
+  - `UserSettingsJSON.saml`
+  - `SamlSettings`
+  - `UserResource.samlAccounts`
+  - `SamlAccountResource`
+  - `SamlStrategy`
+  - `UserJSON.saml_accounts`
+  - `SamlAccountJSON`
+  - `SamlConfig`
+  - `SamlFactor`
+  - `HandleSamlCallbackParams`
+
+- Deprecate the `organization.__unstable__invitationUpdate` and `organization.__unstable__membershipUpdate` methods. ([#1879](https://github.com/clerkinc/javascript/pull/1879)) by [@panteliselef](https://github.com/panteliselef)
+
+- Enforce LTR direction in code inputs ([#1873](https://github.com/clerkinc/javascript/pull/1873)) by [@desiprisg](https://github.com/desiprisg)
+
+- Replace role based check with permission based checks inside the OrganizationSwitcher component. ([#1851](https://github.com/clerkinc/javascript/pull/1851)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update `@emotion/react` from `11.10.5` to `11.11.1` to allow internal usage of TypeScript v5 ([Emotion commit](https://github.com/emotion-js/emotion/commit/9357f337200ef38f9c6df5d4dd7c20772478ea42)) ([#1877](https://github.com/clerkinc/javascript/pull/1877)) by [@LekoArts](https://github.com/LekoArts)
+
+- Replace role based check with permission based checks inside the OrganizationSettings component. ([#1850](https://github.com/clerkinc/javascript/pull/1850)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix methods in clerk-js that consumede paginated endpoints in order to retrieve single resources. ([#1871](https://github.com/clerkinc/javascript/pull/1871)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix incorrect deprecation message for `__unstable__membershipUpdate`. ([#1889](https://github.com/clerkinc/javascript/pull/1889)) by [@panteliselef](https://github.com/panteliselef)
+
+- Replace role based check with permission based checks inside the OrganizationMembers component. ([#1849](https://github.com/clerkinc/javascript/pull/1849)) by [@panteliselef](https://github.com/panteliselef)
+
+- In invite members screen of the <OrganizationProfile /> component, consume any invalid email addresses as they are returned in the API error and remove them from the input automatically. ([#1869](https://github.com/clerkinc/javascript/pull/1869)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`35be8709d`](https://github.com/clerkinc/javascript/commit/35be8709d88f1d1eef043acdba4d49b07578c7b2), [`e38488c92`](https://github.com/clerkinc/javascript/commit/e38488c929e437583296c34cde23f76218f78caf), [`a11f962bc`](https://github.com/clerkinc/javascript/commit/a11f962bcbcf225fb927122267de1e8f5faccf53), [`9b644d799`](https://github.com/clerkinc/javascript/commit/9b644d7991b8cba4b385e9443f87798cde5c9989), [`a9894b445`](https://github.com/clerkinc/javascript/commit/a9894b445bf1e463176b0442fb73c48f89d9fed8), [`834dadb36`](https://github.com/clerkinc/javascript/commit/834dadb36c30b2a8f052784de4ad1026b0083b4e), [`70f251007`](https://github.com/clerkinc/javascript/commit/70f2510074352206bbe7bdadf2c28ccf3c074c12), [`a46d6fe99`](https://github.com/clerkinc/javascript/commit/a46d6fe99bd9b80671b60347b4c35d558012200f)]:
+  - @clerk/types@3.56.0
+  - @clerk/shared@0.24.5
+  - @clerk/localizations@1.26.5
+
+## 4.61.0
+
+### Minor Changes
+
+- The sign-in form will now switch to the phone input if the only initial value provided was that of the phone number. ([#1861](https://github.com/clerkinc/javascript/pull/1861)) by [@desiprisg](https://github.com/desiprisg)
+
+- Add support for LinkedIn OIDC ([#1772](https://github.com/clerkinc/javascript/pull/1772)) by [@fragoulis](https://github.com/fragoulis)
+
+### Patch Changes
+
+- Warn about _MagicLink_ deprecations: ([#1836](https://github.com/clerkinc/javascript/pull/1836)) by [@dimkl](https://github.com/dimkl)
+
+  - `MagicLinkError`
+  - `isMagicLinkError`
+  - `MagicLinkErrorCode`
+  - `handleMagicLinkVerification`
+  - `createMagicLinkFlow`
+  - `useMagicLink`
+
+- Updated the OAuth buttons in the SignIn and SignUp components to prevent layout shifts while loading. ([#1838](https://github.com/clerkinc/javascript/pull/1838)) by [@octoper](https://github.com/octoper)
+
+- Introduces a new `isAuthorized()` method in the `Session` class. Returns a promise and checks whether the active user is allowed to perform an action based on the passed (required) permission and the ones attached to the membership. ([#1834](https://github.com/clerkinc/javascript/pull/1834)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce a new property on the core Clerk singleton, `sdkMetadata`. This will be populated by each host SDK. This metadata will be used to make logging and debugging easier. ([#1857](https://github.com/clerkinc/javascript/pull/1857)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fix incorrect path of types for the clerk-js headless variant. ([#1848](https://github.com/clerkinc/javascript/pull/1848)) by [@panteliselef](https://github.com/panteliselef)
+
+- Throw an error if the `signInUrl` is on the same origin of a satellite application or if it is of invalid format ([#1845](https://github.com/clerkinc/javascript/pull/1845)) by [@desiprisg](https://github.com/desiprisg)
+
+- Introduces an internal `<Gate/>` component (supporting hook and HOC) which enables us to conditionally render parts of our components based on a users permissions. ([#1834](https://github.com/clerkinc/javascript/pull/1834)) by [@panteliselef](https://github.com/panteliselef)
+
+- Correctly set idle card state when an error occurs during the MFA set up phase. ([#1825](https://github.com/clerkinc/javascript/pull/1825)) by [@desiprisg](https://github.com/desiprisg)
+
+- Introduce new `*EmailLink*` helpers that will replace the `*MagicLink*` helpers. ([#1833](https://github.com/clerkinc/javascript/pull/1833)) by [@dimkl](https://github.com/dimkl)
+
+  Also marked all the `*MagicLink*` as deprecated using JSDocs.
+
+- Disable country picker button when form is submitted ([#1853](https://github.com/clerkinc/javascript/pull/1853)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`977336f79`](https://github.com/clerkinc/javascript/commit/977336f793cd4ce5984f98dac3cedf9f5ec363f5), [`997b8e256`](https://github.com/clerkinc/javascript/commit/997b8e256c8f83d68d0ae4243c7ea5640573d1ae), [`7fb229688`](https://github.com/clerkinc/javascript/commit/7fb229688020d51c9b6d1721a9b0d039abe4c59d), [`91e9a55f4`](https://github.com/clerkinc/javascript/commit/91e9a55f4b9f1a8f8d843a788597026015ddeafd), [`91014880d`](https://github.com/clerkinc/javascript/commit/91014880df71c2618d0b1e513da4dd19ccd809e3), [`7f4d4b942`](https://github.com/clerkinc/javascript/commit/7f4d4b942e8834462cdc0976b106d9739c345f6b)]:
+  - @clerk/shared@0.24.4
+  - @clerk/types@3.55.0
+  - @clerk/localizations@1.26.4
+
+## 4.60.1
+
+### Patch Changes
+
+- Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerkinc/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
+
+  - `orgs` jwt claims
+  - `apiKey`
+  - `frontendApi`
+  - `redirect_url`
+  - `password`
+  - `generateSignature`
+  - `afterSwitchOrganizationUrl`
+  - `profileImageUrl`
+
+- Fixes an issue where the phone number value was not properly copied onto the input when pasting on the email or username field in the `<SignIn/>` component after autoswitching to the phone number field. The issue was introduced with the changes for the Prefill `<SignIn/>` and `<SignUp/>` feature. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1e212c19d`](https://github.com/clerkinc/javascript/commit/1e212c19d1cbfbcf6bc6718f5aec0a3cb893b96f), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679), [`1136c7c15`](https://github.com/clerkinc/javascript/commit/1136c7c15043ffe917b4918e9e33f55b496cd679)]:
+  - @clerk/shared@0.24.3
+
+## 4.60.0
+
+### Minor Changes
+
+- Introduce a new user resource method to leave an organization. You can now call 'user.leaveOrganization(<org_id>)' when a user chooses to leave an organization instead of 'organization.removeMember(<user_id>)' which is mostly meant for organization based actions. ([#1809](https://github.com/clerkinc/javascript/pull/1809)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- - Introduce organizationProfileProps as prop in `<OrganizationSwitcher/>`. ([#1801](https://github.com/clerkinc/javascript/pull/1801)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Introduce appearance in userProfileProps in `<UserButton/>`.
+  - Deprecate the usage of `appearance.userProfile` in `<UserButton/>`.
+
+- Introduce ClerkRuntimeError class for localizing error messages in ClerkJS components ([#1813](https://github.com/clerkinc/javascript/pull/1813)) by [@panteliselef](https://github.com/panteliselef)
+
+- Enables you to translate the tooltip hint while creating an organization through the `formFieldHintText__slug` key ([#1811](https://github.com/clerkinc/javascript/pull/1811)) by [@LekoArts](https://github.com/LekoArts)
+
+- Pins the internal dependency versions. This ensures that users installing our main framework SDKs will get consistent versions across all @clerk/ packages. ([#1798](https://github.com/clerkinc/javascript/pull/1798)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fixes a UI bug on Safari, that was causing the border of tables to be displayed incorrectly ([#1814](https://github.com/clerkinc/javascript/pull/1814)) by [@panteliselef](https://github.com/panteliselef)
+
+- Warn about `publicUserData.profileImageUrl` nested property deprecation in `OrganizationMembership` & `OrganizationMembershipRequest` resources. ([#1812](https://github.com/clerkinc/javascript/pull/1812)) by [@dimkl](https://github.com/dimkl)
+
+- Fix internal subpath imports by replacing them with top level imports. ([#1804](https://github.com/clerkinc/javascript/pull/1804)) by [@dimkl](https://github.com/dimkl)
+
+- Removes `it.skip` from the LeaveOrganizationPage tests. ([#1820](https://github.com/clerkinc/javascript/pull/1820)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`b59b6b75d`](https://github.com/clerkinc/javascript/commit/b59b6b75dc61bc4d7e61f7cca774f3731a2929b9), [`164f3aac7`](https://github.com/clerkinc/javascript/commit/164f3aac7928bc69301846130cc77986569d4e91), [`68259a2bb`](https://github.com/clerkinc/javascript/commit/68259a2bb8193befdde9101d4ec9bf305881d5e2), [`33e927c59`](https://github.com/clerkinc/javascript/commit/33e927c59fbf06436ff642ef9f846bd3b467e3e1), [`0636ff779`](https://github.com/clerkinc/javascript/commit/0636ff7799e126d1438d2738ce0e46c3b277f46a), [`9514618d6`](https://github.com/clerkinc/javascript/commit/9514618d65cfdde0ff011eabd41a992b61fc8dc1), [`ccf42105b`](https://github.com/clerkinc/javascript/commit/ccf42105bf20ae55ac03cdaf4e7b3d33913033db), [`c7c6912f3`](https://github.com/clerkinc/javascript/commit/c7c6912f34874467bc74104690fe9f95491cc10d), [`e3451443e`](https://github.com/clerkinc/javascript/commit/e3451443e5adad2b53e445e990e4ce84170686ab), [`71bb1c7b5`](https://github.com/clerkinc/javascript/commit/71bb1c7b570f7b0bbc377c8104c9abcc1af4cacf)]:
+  - @clerk/types@3.54.0
+  - @clerk/localizations@1.26.3
+  - @clerk/shared@0.24.2
+
 ## 4.59.1
 
 ### Patch Changes

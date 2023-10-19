@@ -6,18 +6,24 @@ import type {
   MembershipRole,
   OrganizationMembershipJSON,
   OrganizationMembershipResource,
-  PublicUserData,
+  OrganizationPermission,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertPageToOffset } from '../../utils/pagesToOffset';
-import { BaseResource, Organization, OrganizationPublicUserData } from './internal';
+import { BaseResource, Organization, PublicUserData } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
   publicMetadata: OrganizationMembershipPublicMetadata = {};
   publicUserData!: PublicUserData;
   organization!: Organization;
+  /**
+   * @experimental The property is experimental and subject to change in future releases.
+   */
+  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+  // eslint-disable-next-line
+  permissions: (OrganizationPermission | (string & {}))[] = [];
   role!: MembershipRole;
   createdAt!: Date;
   updatedAt!: Date;
@@ -31,14 +37,14 @@ export class OrganizationMembership extends BaseResource implements Organization
     const isDeprecatedParams =
       typeof retrieveMembershipsParams === 'undefined' || !retrieveMembershipsParams?.paginated;
 
-    if (!(retrieveMembershipsParams as RetrieveMembershipsParams)?.limit) {
+    if ((retrieveMembershipsParams as RetrieveMembershipsParams)?.limit) {
       deprecated(
         'limit',
         'Use `pageSize` instead in OrganizationMembership.retrieve.',
         'organization-membership:limit',
       );
     }
-    if (!(retrieveMembershipsParams as RetrieveMembershipsParams)?.offset) {
+    if ((retrieveMembershipsParams as RetrieveMembershipsParams)?.offset) {
       deprecated(
         'offset',
         'Use `initialPage` instead in OrganizationMembership.retrieve.',
@@ -105,8 +111,9 @@ export class OrganizationMembership extends BaseResource implements Organization
     this.organization = new Organization(data.organization);
     this.publicMetadata = data.public_metadata;
     if (data.public_user_data) {
-      this.publicUserData = new OrganizationPublicUserData(data.public_user_data);
+      this.publicUserData = new PublicUserData(data.public_user_data);
     }
+    this.permissions = Array.isArray(data.permissions) ? [...data.permissions] : [];
     this.role = data.role;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);

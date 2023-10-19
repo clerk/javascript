@@ -7,6 +7,7 @@ export {
   useAuth,
   useClerk,
   useMagicLink,
+  useEmailLink,
   useOrganization,
   useOrganizationList,
   useOrganizations,
@@ -23,8 +24,10 @@ export {
   WithUser,
   isClerkAPIResponseError,
   isMagicLinkError,
+  isEmailLinkError,
   isMetamaskError,
   isKnownError,
+  EmailLinkErrorCode,
   MagicLinkErrorCode,
 } from '@clerk/clerk-react';
 

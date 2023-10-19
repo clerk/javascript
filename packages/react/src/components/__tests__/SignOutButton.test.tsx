@@ -1,4 +1,5 @@
-import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import { SignOutButton } from '../SignOutButton';

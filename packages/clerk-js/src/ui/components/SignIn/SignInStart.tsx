@@ -45,7 +45,14 @@ export function _SignInStart(): JSX.Element {
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
   );
-  const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(identifierAttributes[0] || '');
+
+  const onlyPhoneNumberInitialValueExists =
+    !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
+  const shouldStartWithPhoneNumberIdentifier =
+    onlyPhoneNumberInitialValueExists && identifierAttributes.includes('phone_number');
+  const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(
+    shouldStartWithPhoneNumberIdentifier ? 'phone_number' : identifierAttributes[0] || '',
+  );
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
@@ -96,9 +103,12 @@ export function _SignInStart(): JSX.Element {
       i => identifierAttributes[(identifierAttributes.indexOf(i) + 1) % identifierAttributes.length],
     );
     setShouldAutofocus(true);
+    setHasSwitchedByAutofill(false);
   };
 
-  const switchToPhoneInput = () => {
+  const handlePhoneNumberPaste = (value: string) => {
+    textIdentifierField.setValue(initialValues[identifierAttribute] || '');
+    phoneIdentifierField.setValue(value);
     setIdentifierAttribute('phone_number');
     setShouldAutofocus(true);
   };
@@ -114,21 +124,12 @@ export function _SignInStart(): JSX.Element {
       identifierAttribute !== 'phone_number' &&
       !hasSwitchedByAutofill
     ) {
-      switchToPhoneInput();
+      handlePhoneNumberPaste(identifierField.value);
       // do not switch automatically on subsequent autofills
       // by the browser to avoid a switch loop
       setHasSwitchedByAutofill(true);
     }
   }, [identifierField.value, identifierAttributes]);
-
-  useLayoutEffect(() => {
-    if (identifierAttribute === 'phone_number' && identifierField.value) {
-      //value should be kept as we have auto-switched to the phone input
-      return;
-    }
-
-    identifierField.setValue(initialValues[identifierAttribute] || '');
-  }, [identifierAttribute]);
 
   useEffect(() => {
     if (!organizationTicket) {

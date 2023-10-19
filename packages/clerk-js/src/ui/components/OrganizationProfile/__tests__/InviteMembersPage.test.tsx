@@ -133,6 +133,65 @@ describe('InviteMembersPage', () => {
         ).toBeInTheDocument(),
       );
     });
+
+    it('removes duplicate emails from input after error', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.inviteMembers.mockRejectedValueOnce(
+        new ClerkAPIResponseError('Error', {
+          data: [
+            {
+              code: 'duplicate_record',
+              long_message:
+                'There are already pending invitations for the following email addresses: invalid@clerk.dev',
+              message: 'duplicate invitation',
+              meta: { email_addresses: ['invalid@clerk.dev'] },
+            },
+          ],
+          status: 400,
+        }),
+      );
+      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      await userEvent.type(getByTestId('tag-input'), 'invalid@clerk.dev');
+      await userEvent.click(getByRole('button', { name: 'Send invitations' }));
+
+      expect(getByTestId('tag-input')).not.toHaveValue();
+    });
+
+    it('removes blocked/not allowed emails from input after error', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.inviteMembers.mockRejectedValueOnce(
+        new ClerkAPIResponseError('Error', {
+          data: [
+            {
+              code: 'not_allowed_access',
+              long_message: 'blocked@clerk.dev is not allowed to access this application.',
+              message: 'Access not allowed.',
+              meta: { identifiers: ['blocked@clerk.dev'] },
+            },
+          ],
+          status: 403,
+        }),
+      );
+      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      await userEvent.type(getByTestId('tag-input'), 'blocked@clerk.dev');
+      await userEvent.click(getByRole('button', { name: 'Send invitations' }));
+
+      expect(getByTestId('tag-input')).not.toHaveValue();
+    });
   });
 
   describe('Navigation', () => {

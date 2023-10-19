@@ -72,9 +72,6 @@ export interface UserResource extends ClerkResource {
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
 
-  /**
-   * @experimental
-   */
   samlAccounts: SamlAccountResource[];
 
   organizationMemberships: OrganizationMembershipResource[];
@@ -108,6 +105,7 @@ export interface UserResource extends ClerkResource {
   getOrganizationSuggestions: (
     params?: GetUserOrganizationSuggestionsParams,
   ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
+  leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;

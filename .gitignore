@@ -39,6 +39,7 @@ yarn-error.log
 testem.log
 /typings
 **/coverage/**
+*.tsbuildinfo
 
 # System Files
 .DS_Store
@@ -80,3 +81,6 @@ playground/*/yarn.lock
 .temp_integration
 playwright-report
 test-results
+
+# verdaccio
+.verdaccio

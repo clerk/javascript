@@ -1,5 +1,6 @@
-import { beforeAll, afterAll } from '@jest/globals';
+import { afterAll, beforeAll } from '@jest/globals';
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const ogToLocaleDateString = Date.prototype.toLocaleDateString;
 
 beforeAll(() => {

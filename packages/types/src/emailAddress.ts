@@ -1,7 +1,8 @@
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
 import type { EmailCodeStrategy, EmailLinkStrategy } from './strategies';
-import type { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
+import type { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams } from './verification';
+import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams, VerificationResource } from './verification';
 
 export type PrepareEmailAddressVerificationParams =
   | {
@@ -24,7 +25,12 @@ export interface EmailAddressResource extends ClerkResource {
   toString: () => string;
   prepareVerification: (params: PrepareEmailAddressVerificationParams) => Promise<EmailAddressResource>;
   attemptVerification: (params: AttemptEmailAddressVerificationParams) => Promise<EmailAddressResource>;
+  /**
+   *
+   * @deprecated Use `createEmailLinkFlow` instead.
+   */
   createMagicLinkFlow: () => CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, EmailAddressResource>;
+  createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource>;
   destroy: () => Promise<void>;
   create: () => Promise<EmailAddressResource>;
 }

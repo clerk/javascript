@@ -1,5 +1,7 @@
 import { defineConfig } from 'tsup';
 
+import { name, version } from './package.json';
+
 export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
 
@@ -11,5 +13,10 @@ export default defineConfig(overrideOptions => {
     sourcemap: true,
     format: ['cjs', 'esm'],
     legacyOutput: true,
+    define: {
+      PACKAGE_NAME: `"${name}"`,
+      PACKAGE_VERSION: `"${version}"`,
+      __DEV__: `${!isProd}`,
+    },
   };
 });

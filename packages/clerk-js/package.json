@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.59.1",
+  "version": "4.62.1",
   "license": "MIT",
   "description": "Clerk JS library",
   "keywords": [
@@ -34,17 +34,19 @@
     "dev:headless": "webpack serve --config webpack.config.js --env variant=\"clerk.headless.browser\"",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
     "test": "jest",
-    "test:ci": "jest --maxWorkers=50%",
+    "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "watch": "webpack --config webpack.config.js --env production --watch"
   },
   "dependencies": {
-    "@clerk/localizations": "1.26.2",
-    "@clerk/shared": "0.24.1",
-    "@clerk/types": "3.53.0",
-    "@emotion/cache": "11.10.5",
-    "@emotion/react": "11.10.5",
+    "@clerk/localizations": "1.26.6",
+    "@clerk/shared": "0.24.5",
+    "@clerk/types": "3.56.1",
+    "@emotion/cache": "11.11.0",
+    "@emotion/react": "11.11.1",
     "@floating-ui/react": "0.25.4",
     "@zxcvbn-ts/core": "2.2.1",
     "@zxcvbn-ts/language-common": "3.0.2",
@@ -91,11 +93,11 @@
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerkinc/javascript.git",
+    "directory": "packages/clerk-js"
   },
   "homepage": "https://clerk.com/",
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "gitHead": "6f990357a7da3c5224587b4add4a626308468d27"
+  }
 }

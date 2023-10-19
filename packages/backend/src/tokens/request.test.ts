@@ -7,7 +7,7 @@ import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from 
 import { TokenVerificationErrorReason } from './errors';
 import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from './fixtures';
 import type { AuthenticateRequestOptions } from './request';
-import { authenticateRequest } from './request';
+import { authenticateRequest, loadOptionsFromHeaders } from './request';
 
 function assertSignedOut(
   assert,
@@ -319,12 +319,14 @@ export default (QUnit: QUnit) => {
         apiKey: 'deadbeef',
         clientUat: '0',
         isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
       });
 
       assertInterstitial(assert, requestState, {
         reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
         isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
       });
       assert.equal(requestState.message, '');
@@ -337,6 +339,7 @@ export default (QUnit: QUnit) => {
         apiKey: 'deadbeef',
         clientUat: '0',
         isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
         userAgent: '[some-agent]',
       });
@@ -344,6 +347,7 @@ export default (QUnit: QUnit) => {
       assertSignedOut(assert, requestState, {
         reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
         isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
       });
       assertSignedOutToAuth(assert, requestState);
@@ -564,6 +568,57 @@ export default (QUnit: QUnit) => {
 
       assertSignedIn(assert, requestState);
       assertSignedInToAuth(assert, requestState);
+    });
+  });
+
+  module('tokens.loadOptionsFromHeaders', () => {
+    const defaultOptions = {
+      headerToken: '',
+      origin: '',
+      host: '',
+      forwardedHost: '',
+      forwardedPort: '',
+      forwardedProto: '',
+      referrer: '',
+      userAgent: '',
+    };
+
+    test('returns options even if headers exist', async assert => {
+      const headers = key => (key === 'x-forwarded-proto' ? 'https' : '');
+      const options = { forwardedProto: 'http' };
+      assert.propEqual(loadOptionsFromHeaders(options, headers), {
+        ...defaultOptions,
+        forwardedProto: 'http',
+      });
+    });
+
+    test('returns forwarded headers from headers', async assert => {
+      const headersData = { 'x-forwarded-proto': 'http', 'x-forwarded-port': '80', 'x-forwarded-host': 'example.com' };
+      const headers = key => headersData[key] || '';
+
+      assert.propEqual(loadOptionsFromHeaders({}, headers), {
+        ...defaultOptions,
+        forwardedProto: 'http',
+        forwardedPort: '80',
+        forwardedHost: 'example.com',
+      });
+    });
+
+    test('returns Cloudfront forwarded proto from headers even if forwarded proto header exists', async assert => {
+      const headersData = {
+        'cloudfront-forwarded-proto': 'https',
+        'x-forwarded-proto': 'http',
+        'x-forwarded-port': '80',
+        'x-forwarded-host': 'example.com',
+      };
+      const headers = key => headersData[key] || '';
+
+      assert.propEqual(loadOptionsFromHeaders({}, headers), {
+        ...defaultOptions,
+        forwardedProto: 'https',
+        forwardedPort: '80',
+        forwardedHost: 'example.com',
+      });
     });
   });
 };
