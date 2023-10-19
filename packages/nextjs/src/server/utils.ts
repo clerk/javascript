@@ -1,6 +1,7 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
-import { handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
+import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
