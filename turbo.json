@@ -88,6 +88,9 @@
       "outputMode": "new-only",
       "outputs": []
     },
+    "test:cache:clear": {
+      "cache": false
+    },
     "test:ci": {
       "dependsOn": ["build"],
       "inputs": [
