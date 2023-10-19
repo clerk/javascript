@@ -500,6 +500,40 @@ describe('Clerk singleton', () => {
         expect(sut.setActive).toHaveBeenCalledWith({ session: null });
       });
     });
+
+    it('destroyes the current client after sign out', async () => {
+      const spyOnDestroy = jest.fn().mockImplementation(() => {
+        return Promise.resolve().then(async () => {
+          const clientInstance = await Client.getInstance().fetch();
+          clientInstance.id = undefined;
+          clientInstance.sessions = [];
+          clientInstance.signUp = new SignUp();
+          clientInstance.signIn = new SignIn();
+          clientInstance.lastActiveSessionId = null;
+          clientInstance.createdAt = null;
+          clientInstance.updatedAt = null;
+        });
+      });
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          id: '1',
+          activeSessions: [mockSession1],
+          sessions: [mockSession1],
+          destroy: spyOnDestroy,
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      sut.setActive = jest.fn();
+      await sut.load();
+      await sut.signOut();
+      await waitFor(() => {
+        expect(sut.client?.id).toBeUndefined();
+        expect(sut.client?.sessions.length).toBe(0);
+        expect(spyOnDestroy).toHaveBeenCalled();
+        expect(mockClientFetch).toHaveBeenCalled();
+      });
+    });
   });
 
   describe('.navigate(to)', () => {

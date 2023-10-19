@@ -57,7 +57,11 @@ export class Client extends BaseResource implements ClientResource {
     return this._baseDelete({ path: '/client' }).then(() => {
       SessionTokenCache.clear();
       this.sessions = [];
-      Client.instance = new Client();
+      this.signUp = new SignUp();
+      this.signIn = new SignIn();
+      this.lastActiveSessionId = null;
+      this.createdAt = null;
+      this.updatedAt = null;
     });
   }
 
