@@ -14,6 +14,7 @@ jest.mock('./resources/Base', () => {
 
 const mockJwtToken = (now: number): string => {
   const nowInSeconds = Math.floor(now / 1000);
+
   const payload = {
     iat: nowInSeconds,
     exp: nowInSeconds + 60,
@@ -47,7 +48,7 @@ describe('MemoryTokenCache', () => {
       const token = new Token({
         object: 'token',
         id: 'foo',
-        jwt: mockJwtToken(Date.now()),
+        jwt: mockJwtToken(jest.now()),
       });
 
       const tokenResolver = new Promise<TokenResource>(resolve => setTimeout(() => resolve(token), 100));
@@ -74,7 +75,7 @@ describe('MemoryTokenCache', () => {
     const token = new Token({
       object: 'token',
       id: 'foo',
-      jwt: mockJwtToken(Date.now()),
+      jwt: mockJwtToken(jest.now()),
     });
 
     let isResolved = false;
@@ -130,7 +131,7 @@ describe('MemoryTokenCache', () => {
       const token = new Token({
         object: 'token',
         id: 'foo',
-        jwt: mockJwtToken(Date.now()),
+        jwt: mockJwtToken(jest.now()),
       });
 
       const tokenResolver = Promise.resolve(token);
@@ -155,7 +156,7 @@ describe('MemoryTokenCache', () => {
       const token = new Token({
         object: 'token',
         id: 'foo',
-        jwt: mockJwtToken(Date.now()),
+        jwt: mockJwtToken(jest.now()),
       });
 
       const tokenResolver = Promise.resolve(token);
