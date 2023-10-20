@@ -1,4 +1,4 @@
-import { isLegacyFrontendApiKey, isPublishableKey } from '@clerk/shared';
+import { isLegacyFrontendApiKey, isPublishableKey } from '@clerk/shared/keys';
 import type { InitialState } from '@clerk/types';
 import React from 'react';
 
