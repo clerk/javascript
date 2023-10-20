@@ -5,11 +5,9 @@ on:
   merge_group:
   pull_request:
     branches:
-      - main
       - build/turbo-ci-poc
 env:
   NODE_VERSION: '18'
-  SINCE_BRANCH: 'build/turbo-ci-poc' # origin/main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -36,11 +34,11 @@ jobs:
         with:
           cache-prefix: turbo-
 
-      - name: Require Changeset
-        run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=${{ env.SINCE_BRANCH }}; fi
-
       - name: Install NPM Dependencies
         run: npm ci --audit=false --fund=false
+
+      - name: Require Changeset
+        run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
       - name: Check Formatting
         run: npm run format:check
