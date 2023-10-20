@@ -7,7 +7,6 @@ import { authenticateRequest } from './authenticateRequest';
 import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertValidHandlerResult,
-  getResponseClerkState,
   injectAuthIntoRequest,
   injectRequestStateIntoDeferredData,
   injectRequestStateIntoResponse,
