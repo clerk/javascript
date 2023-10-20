@@ -36,7 +36,7 @@ jobs:
         with:
           cache-prefix: ${{ env.TURBO_CACHE_PREFIX }}
 
-      - name: Cache node modules
+      - name: Cache node_modules
         uses: actions/cache@v3
         id: npm-cache
         with:
@@ -88,7 +88,7 @@ jobs:
         with:
           cache-prefix: ${{ env.TURBO_CACHE_PREFIX }}
 
-      - name: Cache node modules
+      - name: Cache node_modules
         uses: actions/cache@v3
         id: npm-cache
         with:
@@ -111,12 +111,6 @@ jobs:
       matrix:
         test-name: [ 'generic', 'nextjs', 'remix' ]
 
-    services:
-      verdaccio:
-        image: verdaccio/verdaccio:5
-        ports:
-          - 4873:4873
-
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -133,7 +127,7 @@ jobs:
         with:
           cache-prefix: ${{ env.TURBO_CACHE_PREFIX }}
 
-      - name: Cache node modules
+      - name: Cache node_modules
         uses: actions/cache@v3
         id: npm-cache
         with:
@@ -147,6 +141,9 @@ jobs:
       - name: Update NPM Registry
         run: npm set registry http://localhost:4873/
 
+      - name: Run Verdaccio
+        run: nohup ./node_modules/.bin/verdaccio --config ./verdaccio.yaml & sleep 5
+
       - name: Get Playwright Version
         id: playwright-version
         run: echo "VERSION=$(node -e "console.log($(npm ls @playwright/test --json).dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
@@ -156,7 +153,7 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
 
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
@@ -166,7 +163,8 @@ jobs:
         run: npm run release:verdaccio # Fails early if the default npm registry is used
 
       - name: Install @clerk/backend in /integration
-        run: (cd integration && npm init -y && npm install @clerk/backend)
+        working-directory: ./integration
+        run: npm init -y && npm install @clerk/backend
 
       - name: Run Playwright tests
         run: npm run test:integration:${{ matrix.test-name }}
@@ -175,10 +173,10 @@ jobs:
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           E2E_CLERK_VERSION: 'latest'
 
-      - name: Upload Playwright Report for ${{ matrix.test-name }}
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-report-${{ github.ref }}-${{ matrix.test-name }}
-          path: playwright-report/
-          retention-days: 30
+      # - name: Upload Playwright Report for ${{ matrix.test-name }}
+      #   uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: playwright-report-${{ github.ref }}-${{ matrix.test-name }}
+      #     path: playwright-report/
+      #     retention-days: 30
