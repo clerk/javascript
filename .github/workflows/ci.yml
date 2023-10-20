@@ -106,7 +106,7 @@ jobs:
         run: npm ci --audit=false --fund=false
 
       - name: Run tests
-        run: npm run test -- ${{ env.TURBO_ARGS }}
+        run: npx turbo test ${{ env.TURBO_ARGS }}
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
@@ -167,7 +167,7 @@ jobs:
 
       - name: Publish to Verdaccio
         run: |
-          if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else npm run build -- ${{ env.TURBO_ARGS }} && changeset publish --no-git-tag; fi",
+          if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build ${{ env.TURBO_ARGS }} && changeset publish --no-git-tag; fi",
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
