@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  merge_group:
+  pull_request:
+    branches:
+      - main
+      - build/turbo-ci-poc
+env:
+  NODE_VERSION: '18'
+  SINCE_BRANCH: 'build/turbo-ci-poc' # origin/main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  formatting-linting:
+    name: Formatting & Linting
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup NodeJS ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Turborepo Remote Server
+        uses: dtinth/setup-github-actions-caching-for-turbo@v1
+        with:
+          cache-prefix: turbo-
+
+      - name: Require Changeset
+        run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=${{ env.SINCE_BRANCH }}; fi
+
+      - name: Install NPM Dependencies
+        run: npm ci --audit=false --fund=false
+
+      - name: Check Formatting
+        run: npm run format:check
+
+      - name: Lint packages using publint
+        run: npm run lint:publint
+
+      - name: Lint types using attw
+        run: npm run lint:attw
+        continue-on-error: true  # TODO: Remove this when all related errors are fixed
+
+      - name: Run lint
+        run: npm run lint -- --output-logs=errors-only -- --quiet
+
+  # unit-tests:
+  #   name: Unit Tests
+  #   needs: formatting-linting
+  #   runs-on: ${{ vars.RUNNER_LARGE }}
+  #   strategy:
+  #     matrix:
+  #       node-version: [ 18, 19 ]
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+
+  #     - name: Setup NodeJS ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{  matrix.node-version }}
+  #         cache: "npm"
+
+  #     - name: Install NPM Dependencies
+  #       run: npm ci --audit=false --fund=false
+
+  #     - name: Run tests
+  #       run: npm run test:ci
+
+  # integration-tests:
+  #   name: Integration Tests
+  #   needs: formatting-linting
+  #   runs-on: ${{ vars.RUNNER_LARGE }}
+  #   strategy:
+  #     matrix:
+  #       test-name: [ 'generic', 'nextjs', 'remix' ]
+  #   services:
+  #     verdaccio:
+  #       image: verdaccio/verdaccio:5
+  #       ports:
+  #         - 4873:4873
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+
+  #     - name: Setup NodeJS ${{ env.NODE_VERSION }}
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ env.NODE_VERSION }}
+  #         cache: "npm"
+
+  #     - name: Install NPM Dependencies
+  #       run: |
+  #         npm ci --audit=false --fund=false
+  #         npm set @clerk:registry http://localhost:4873/
+
+  #     - name: Get Playwright Version
+  #       id: playwright-version
+  #       run: echo "VERSION=$(node -e "console.log($(npm ls @playwright/test --json).dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
+
+  #     - name: Cache Playwright Binaries
+  #       uses: actions/cache@v3
+  #       id: playwright-cache
+  #       with:
+  #         path: ~/.cache/ms-playwright
+  #         key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.VERSION }}}}
+
+  #     - name: Install Playwright Browsers
+  #       if: steps.playwright-cache.outputs.cache-hit != 'true'
+  #       run: npx playwright install --with-deps
+
+  #     - name: Publish to Verdaccio
+  #       run: npm run release:verdaccio # Fails early if the default npm registry is used
+
+  #     - name: Install @clerk/backend in /integration
+  #       run: (cd integration && npm init -y && npm install @clerk/backend)
+
+  #     - name: Run Playwright tests
+  #       run: 'npm run test:integration:${{ matrix.test-name }}'
+  #       env:
+  #         INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+  #         MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+  #         E2E_CLERK_VERSION: 'latest'
+
+  #     - name: Upload Playwright Report for ${{ matrix.test-name }}
+  #       uses: actions/upload-artifact@v3
+  #       if: always()
+  #       with:
+  #         name: playwright-report-${{ matrix.test-name }}
+  #         path: playwright-report/
+  #         retention-days: 30
