@@ -53,30 +53,30 @@ jobs:
       - name: Run lint
         run: npm run lint -- --output-logs=errors-only -- --quiet
 
-  # unit-tests:
-  #   name: Unit Tests
-  #   needs: formatting-linting
-  #   runs-on: ${{ vars.RUNNER_LARGE }}
-  #   strategy:
-  #     matrix:
-  #       node-version: [ 18, 19 ]
-  #   steps:
-  #     - name: Checkout Repo
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 0
+  unit-tests:
+    name: Unit Tests
+    needs: formatting-linting
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    strategy:
+      matrix:
+        node-version: [ 18 ] # [ 18, 19 ]
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-  #     - name: Setup NodeJS ${{ matrix.node-version }}
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: ${{  matrix.node-version }}
-  #         cache: "npm"
+      - name: Setup NodeJS ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{  matrix.node-version }}
+          cache: "npm"
 
-  #     - name: Install NPM Dependencies
-  #       run: npm ci --audit=false --fund=false
+      - name: Install NPM Dependencies
+        run: npm ci --audit=false --fund=false
 
-  #     - name: Run tests
-  #       run: npm run test:ci
+      - name: Run tests
+        run: npm run test:ci
 
   # integration-tests:
   #   name: Integration Tests
