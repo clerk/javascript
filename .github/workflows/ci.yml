@@ -142,7 +142,10 @@ jobs:
         run: npm set registry http://localhost:4873/
 
       - name: Run Verdaccio
-        run: nohup ./node_modules/.bin/verdaccio --config ./verdaccio.yaml & sleep 5
+        run: |
+          nohup ./node_modules/.bin/verdaccio --config ./verdaccio.yaml & sleep 5
+          ./node_modules/.bin/npm-cli-adduser -u user -p pass -e test@test.com -r http://localhost:4873/
+          ./node_modules/.bin/npm-cli-login -u user -p pass -e test@test.com -r http://localhost:4873/
 
       - name: Get Playwright Version
         id: playwright-version
