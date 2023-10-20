@@ -8,6 +8,8 @@ on:
       - build/turbo-ci-poc
 env:
   NODE_VERSION: '18'
+  TURBO_CACHE_DIR: ./.turbo-cache
+  TURBO_CACHE_PREFIX: turbo-
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,14 +29,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
 
       - name: Turborepo Remote Server
         uses: dtinth/setup-github-actions-caching-for-turbo@v1
         with:
-          cache-prefix: turbo-
+          cache-prefix: ${{ env.TURBO_CACHE_PREFIX }}
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-node-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install NPM Dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci --audit=false --fund=false
 
       - name: Require Changeset
@@ -44,14 +53,14 @@ jobs:
         run: npm run format:check
 
       - name: Lint packages using publint
-        run: npm run lint:publint
+        run: npm run lint:publint -- --output-logs=errors-only --cache-dir=${{ env.TURBO_CACHE_DIR }}
 
       - name: Lint types using attw
-        run: npm run lint:attw
+        run: npm run lint:attw -- --output-logs=errors-only --cache-dir=${{ env.TURBO_CACHE_DIR }}
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
-        run: npm run lint -- --output-logs=errors-only -- --quiet
+        run: npm run lint -- --output-logs=errors-only --cache-dir=${{ env.TURBO_CACHE_DIR }} -- --quiet
 
   unit-tests:
     name: Unit Tests
@@ -70,13 +79,25 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{  matrix.node-version }}
-          cache: "npm"
+
+      - name: Turborepo Remote Server
+        uses: dtinth/setup-github-actions-caching-for-turbo@v1
+        with:
+          cache-prefix: ${{ env.TURBO_CACHE_PREFIX }}
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-node-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install NPM Dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci --audit=false --fund=false
 
       - name: Run tests
-        run: npm run test:ci
+        run: npm run test:ci -- --output-logs=errors-only --cache-dir=${{ env.TURBO_CACHE_DIR }}
 
   # integration-tests:
   #   name: Integration Tests
