@@ -12,6 +12,7 @@ export * from './utils';
 
 export { createWorkerTimers } from './workerTimers';
 export * from './browser';
+export { callWithRetry } from './callWithRetry';
 export * from './color';
 export * from './date';
 export * from './deprecated';

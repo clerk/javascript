@@ -86,3 +86,11 @@ export function createDevOrStagingUrlCache() {
     },
   };
 }
+
+export function isDevelopmentFromApiKey(apiKey: string): boolean {
+  return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
+}
+
+export function isProductionFromApiKey(apiKey: string): boolean {
+  return apiKey.startsWith('live_') || apiKey.startsWith('sk_live_');
+}

@@ -1,4 +1,6 @@
-import { deprecated, handleValueOrFn, inBrowser } from '@clerk/shared';
+import { inBrowser } from '@clerk/shared/browser';
+import { deprecated } from '@clerk/shared/deprecated';
+import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,

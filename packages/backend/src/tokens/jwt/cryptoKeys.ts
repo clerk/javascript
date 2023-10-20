@@ -1,4 +1,4 @@
-import { isomorphicAtob } from '@clerk/shared';
+import { isomorphicAtob } from '@clerk/shared/isomorphicAtob';
 
 import runtime from '../../runtime';
 
