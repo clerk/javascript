@@ -19,6 +19,7 @@ jobs:
   formatting-linting:
     name: Formatting & Linting
     runs-on: ${{ vars.RUNNER_LARGE }}
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -66,9 +67,11 @@ jobs:
     name: Unit Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE }}
+
     strategy:
       matrix:
         node-version: [ 18, 19 ]
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -99,67 +102,83 @@ jobs:
       - name: Run tests
         run: npm run test:ci -- --output-logs=errors-only --cache-dir=${{ env.TURBO_CACHE_DIR }}
 
-  # integration-tests:
-  #   name: Integration Tests
-  #   needs: formatting-linting
-  #   runs-on: ${{ vars.RUNNER_LARGE }}
-  #   strategy:
-  #     matrix:
-  #       test-name: [ 'generic', 'nextjs', 'remix' ]
-  #   services:
-  #     verdaccio:
-  #       image: verdaccio/verdaccio:5
-  #       ports:
-  #         - 4873:4873
-  #   steps:
-  #     - name: Checkout Repo
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 0
+  integration-tests:
+    name: Integration Tests
+    needs: formatting-linting
+    runs-on: ${{ vars.RUNNER_LARGE }}
 
-  #     - name: Setup NodeJS ${{ env.NODE_VERSION }}
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: ${{ env.NODE_VERSION }}
-  #         cache: "npm"
+    strategy:
+      matrix:
+        test-name: [ 'generic', 'nextjs', 'remix' ]
 
-  #     - name: Install NPM Dependencies
-  #       run: |
-  #         npm ci --audit=false --fund=false
-  #         npm set @clerk:registry http://localhost:4873/
+    services:
+      verdaccio:
+        image: verdaccio/verdaccio:5
+        ports:
+          - 4873:4873
 
-  #     - name: Get Playwright Version
-  #       id: playwright-version
-  #       run: echo "VERSION=$(node -e "console.log($(npm ls @playwright/test --json).dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-  #     - name: Cache Playwright Binaries
-  #       uses: actions/cache@v3
-  #       id: playwright-cache
-  #       with:
-  #         path: ~/.cache/ms-playwright
-  #         key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.VERSION }}}}
+      - name: Setup NodeJS ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-  #     - name: Install Playwright Browsers
-  #       if: steps.playwright-cache.outputs.cache-hit != 'true'
-  #       run: npx playwright install --with-deps
+      - name: Turborepo Remote Server
+        uses: dtinth/setup-github-actions-caching-for-turbo@v1
+        with:
+          cache-prefix: ${{ env.TURBO_CACHE_PREFIX }}
 
-  #     - name: Publish to Verdaccio
-  #       run: npm run release:verdaccio # Fails early if the default npm registry is used
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-node-modules-${{ hashFiles('**/package-lock.json') }}
 
-  #     - name: Install @clerk/backend in /integration
-  #       run: (cd integration && npm init -y && npm install @clerk/backend)
+      - name: Install NPM Dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci --audit=false --fund=false
 
-  #     - name: Run Playwright tests
-  #       run: 'npm run test:integration:${{ matrix.test-name }}'
-  #       env:
-  #         INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
-  #         MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
-  #         E2E_CLERK_VERSION: 'latest'
+      - name: Update NPM Registry
+        run: npm set registry http://localhost:4873/
 
-  #     - name: Upload Playwright Report for ${{ matrix.test-name }}
-  #       uses: actions/upload-artifact@v3
-  #       if: always()
-  #       with:
-  #         name: playwright-report-${{ matrix.test-name }}
-  #         path: playwright-report/
-  #         retention-days: 30
+      - name: Get Playwright Version
+        id: playwright-version
+        run: echo "VERSION=$(node -e "console.log($(npm ls @playwright/test --json).dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright Binaries
+        uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
+
+      - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: Publish to Verdaccio
+        run: npm run release:verdaccio # Fails early if the default npm registry is used
+
+      - name: Install @clerk/backend in /integration
+        run: (cd integration && npm init -y && npm install @clerk/backend)
+
+      - name: Run Playwright tests
+        run: npm run test:integration:${{ matrix.test-name }}
+        env:
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+          E2E_CLERK_VERSION: 'latest'
+
+      - name: Upload Playwright Report for ${{ matrix.test-name }}
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report-${{ github.ref }}-${{ matrix.test-name }}
+          path: playwright-report/
+          retention-days: 30
