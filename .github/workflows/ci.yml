@@ -6,10 +6,14 @@ on:
   pull_request:
     branches:
       - build/turbo-ci-poc
+
 env:
   NODE_VERSION: '18'
   TURBO_CACHE_DIR: ./.turbo-cache
   TURBO_CACHE_PREFIX: turbo-
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_REMOTE_ONLY: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,11 +34,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Turborepo Remote Server
-        uses: dtinth/setup-github-actions-caching-for-turbo@v1
-        with:
-          cache-prefix: ${{ env.TURBO_CACHE_PREFIX }}
 
       - name: Cache node_modules
         uses: actions/cache@v3
@@ -83,11 +82,6 @@ jobs:
         with:
           node-version: ${{  matrix.node-version }}
 
-      - name: Turborepo Remote Server
-        uses: dtinth/setup-github-actions-caching-for-turbo@v1
-        with:
-          cache-prefix: ${{ env.TURBO_CACHE_PREFIX }}
-
       - name: Cache node_modules
         uses: actions/cache@v3
         id: npm-cache
@@ -121,11 +115,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Turborepo Remote Server
-        uses: dtinth/setup-github-actions-caching-for-turbo@v1
-        with:
-          cache-prefix: ${{ env.TURBO_CACHE_PREFIX }}
 
       - name: Cache node_modules
         uses: actions/cache@v3
