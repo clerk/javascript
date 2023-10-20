@@ -1,6 +1,6 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
-import type { AppLoadContext } from '@remix-run/server-runtime';
+import type { AppLoadContext, defer } from '@remix-run/server-runtime';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
@@ -108,9 +108,51 @@ export const injectRequestStateIntoResponse = async (
   context: AppLoadContext,
 ) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { reason, message, isSignedIn, isInterstitial, ...rest } = requestState;
   const clone = response.clone();
   const data = await clone.json();
+
+  const { clerkState, headers } = getResponseClerkState(requestState, context);
+
+  // set the correct content-type header in case the user returned a `Response` directly
+  // without setting the header, instead of using the `json()` helper
+  clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
+  headers.forEach((value, key) => {
+    clone.headers.set(key, value);
+  });
+
+  return json({ ...(data || {}), ...clerkState }, clone);
+};
+
+export function injectRequestStateIntoDeferredData(
+  data: ReturnType<typeof defer>,
+  requestState: RequestState,
+  context: AppLoadContext,
+) {
+  const { clerkState, headers } = getResponseClerkState(requestState, context);
+
+  // Avoid creating a new object here to retain referential equality.
+  data.data.clerkState = clerkState.clerkState;
+
+  if (typeof data.init !== 'undefined') {
+    data.init.headers = new Headers(data.init.headers);
+
+    headers.forEach((value, key) => {
+      // @ts-expect-error -- We are ensuring headers is defined above
+      data.init.headers.set(key, value);
+    });
+  }
+
+  return data;
+}
+
+/**
+ * Returns the clerk state object and observability headers to be injected into a loader response.
+ *
+ * @internal
+ */
+export function getResponseClerkState(requestState: RequestState, context: AppLoadContext) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { reason, message, isSignedIn, isInterstitial, ...rest } = requestState;
   const clerkState = wrapWithClerkState({
     __clerk_ssr_state: rest.toAuth(),
     __frontendApi: requestState.frontendApi,
@@ -126,15 +168,14 @@ export const injectRequestStateIntoResponse = async (
     __clerkJSUrl: getEnvVariable('CLERK_JS', context),
     __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),
   });
-  // set the correct content-type header in case the user returned a `Response` directly
-  // without setting the header, instead of using the `json()` helper
-  clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
-  observabilityHeadersFromRequestState(requestState).forEach((value, key) => {
-    clone.headers.set(key, value);
-  });
 
-  return json({ ...(data || {}), ...clerkState }, clone);
-};
+  const headers = observabilityHeadersFromRequestState(requestState);
+
+  return {
+    clerkState,
+    headers,
+  };
+}
 
 /**
  * Wraps obscured clerk internals with a readable `clerkState` key.
