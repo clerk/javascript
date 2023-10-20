@@ -1,15 +1,20 @@
-import { cssBundleHref } from '@remix-run/css-bundle';
-import type { LinksFunction } from '@remix-run/node';
 import { LoaderFunction } from '@remix-run/node';
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import { Await, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
-import { ClerkApp, ClerkCatchBoundary } from '@clerk/remix';
+import { ClerkApp, ClerkErrorBoundary } from '@clerk/remix';
+import { defer } from '@remix-run/server-runtime';
+import { Suspense } from 'react';
 
-export const loader: LoaderFunction = args => rootAuthLoader(args);
+export const loader: LoaderFunction = args =>
+  rootAuthLoader(args, () => {
+    const data: Promise<{ foo: string }> = new Promise(r => r({ foo: 'bar' }));
 
-export const links: LinksFunction = () => [...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : [])];
+    return defer({ data });
+  });
 
 function App() {
+  const loaderData = useLoaderData<typeof loader>();
+
   return (
     <html lang='en'>
       <head>
@@ -23,6 +28,9 @@ function App() {
       </head>
       <body>
         <Outlet />
+        <Suspense fallback='Loading...'>
+          <Await resolve={loaderData.data}>{val => <>Deferred value: {val.foo}</>}</Await>
+        </Suspense>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
@@ -32,4 +40,4 @@ function App() {
 }
 
 export default ClerkApp(App);
-export const CatchBoundary = ClerkCatchBoundary();
+export const ErrorBoundary = ClerkErrorBoundary();
