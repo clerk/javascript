@@ -68,7 +68,7 @@ jobs:
     runs-on: ${{ vars.RUNNER_LARGE }}
     strategy:
       matrix:
-        node-version: [ 18 ] # [ 18, 19 ]
+        node-version: [ 18, 19 ]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
