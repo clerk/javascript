@@ -14,7 +14,7 @@ export const loader = (args: DataFunctionArgs) => {
 
       console.log('root User:', user);
 
-      return defer({ user, data }, { headers: { 'x-bryce': 'cool guy' } })
+      return defer({ user, data }, { headers: { 'x-clerk': '1' } })
     },
     { loadUser: true },
   );
