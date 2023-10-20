@@ -50,7 +50,7 @@ jobs:
         with:
           use-turbo-cache: 'true'
       - name: Run tests
-        run: npm run test:ci
+        run: npm run test -- -- --maxWorkers=70% # TODO: Remove test:ci
 
   publint:
     name: Run publint

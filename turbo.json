@@ -6,32 +6,25 @@
   "globalDependencies": [
     ".changeset/changelog.js",
     ".changeset/config.json",
-    ".dockerignore",
     ".github/**",
     ".jit",
     ".nvmrc",
     ".prettier*",
     "jest.*.ts",
-    "packages/eslint-config-custom/index.js",
-    "package.json",
     "package-lock.json",
     "tsconfig.json",
     "tsconfig.*.json",
-    "verdaccio.*.yaml"
+    "verdaccio.yaml"
   ],
+  "globalDotEnv": ["**/.env.local", "**/.env"],
   "globalEnv": [
-    "CI",
     "CLERK_*",
     "GATSBY_CLERK_*",
     "NEXT_PUBLIC_CLERK_*",
     "MAILSAC_API_KEY",
     "NODE_ENV",
-    "NODE_EXTRA_CA_CERTS",
     "NODE_VERSION",
     "NPM_VERSION",
-    "RUNNER_ARCH",
-    "RUNNER_DEBUG",
-    "RUNNER_OS",
     "TZ",
     "VERCEL"
   ],
@@ -72,6 +65,7 @@
     },
     "clean": {
       "dependsOn": [],
+
       "cache": false
     },
     "test": {
@@ -97,27 +91,6 @@
     },
     "test:cache:clear": {
       "cache": false
-    },
-    "test:ci": {
-      "dependsOn": ["build"],
-      "inputs": [
-        "*.d.ts",
-        "**/package.json",
-        "bundlewatch.config.json",
-        "jest.*",
-        "src/**",
-        "tests/**",
-        "tsconfig.json",
-        "tsconfig.*.json",
-        "tsup.config.ts",
-
-        "!**/__snapshots__/**",
-        "!coverage/**",
-        "!examples/**",
-        "!node_modules/**"
-      ],
-      "outputMode": "new-only",
-      "outputs": []
     },
     "lint": {
       "dependsOn": ["^build"],

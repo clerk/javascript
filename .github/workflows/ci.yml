@@ -8,12 +8,13 @@ on:
       - build/turbo-ci-poc
 
 env:
+  FORCE_COLOR: '1'
   NODE_VERSION: '18'
-  TURBO_CACHE_DIR: ./.turbo-cache
-  TURBO_CACHE_PREFIX: turbo-
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_ARGS: --output-logs=new-only --cache-dir=./.turbo-cache --concurrency=8
+  TURBO_TOKEN: ${{ secrets.TEST_TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TEST_TURBO_TEAM }}
   TURBO_REMOTE_ONLY: true
+  TURBO_CONCURRENCY: 8 # Available CPU in RUNNER_LARGE
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -42,6 +43,17 @@ jobs:
           path: ./node_modules
           key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-node-modules-${{ hashFiles('**/package-lock.json') }}
 
+      - name: List Environment Details
+        run: |
+          echo "NODE_VERSION=${{ env.NODE_VERSION }}"
+          echo "NODE_ENV = $NODE_ENV"
+          echo "NODE_VERSION = $NODE_VERSION"
+          echo "NODE_VERSION (GH) = ${{ env.NODE_VERSION }}"
+          echo "NPM_VERSION = $NPM_VERSION"
+          echo "TURBO_ARGS = ${{ env.TURBO_ARGS}}"
+          echo "TURBO_TEAM = ${{ env.TURBO_TEAM }}"
+          echo "TURBO_TOKEN = ${{ env.TURBO_TOKEN}}"
+
       - name: Install NPM Dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci --audit=false --fund=false
@@ -53,14 +65,14 @@ jobs:
         run: npm run format:check
 
       - name: Lint packages using publint
-        run: npm run lint:publint -- --output-logs=errors-only --cache-dir=${{ env.TURBO_CACHE_DIR }}
+        run: npm run lint:publint -- ${{ env.TURBO_ARGS }}
 
       - name: Lint types using attw
-        run: npm run lint:attw -- --output-logs=errors-only --cache-dir=${{ env.TURBO_CACHE_DIR }}
+        run: npm run lint:attw -- ${{ env.TURBO_ARGS }}
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
-        run: npm run lint -- --output-logs=errors-only --cache-dir=${{ env.TURBO_CACHE_DIR }} -- --quiet
+        run: npm run lint -- ${{ env.TURBO_ARGS }} -- --quiet
 
   unit-tests:
     name: Unit Tests
@@ -87,14 +99,16 @@ jobs:
         id: npm-cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-node-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install NPM Dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci --audit=false --fund=false
 
       - name: Run tests
-        run: npm run test:ci -- --output-logs=errors-only --cache-dir=${{ env.TURBO_CACHE_DIR }}
+        run: npm run test -- ${{ env.TURBO_ARGS }}
+        env:
+          NODE_VERSION: ${{ matrix.node-version }}
 
   integration-tests:
     name: Integration Tests
@@ -127,15 +141,6 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci --audit=false --fund=false
 
-      - name: Update NPM Registry
-        run: npm set registry http://localhost:4873/
-
-      - name: Run Verdaccio
-        run: |
-          nohup ./node_modules/.bin/verdaccio --config ./verdaccio.yaml & sleep 5
-          ./node_modules/.bin/npm-cli-adduser -u user -p pass -e test@test.com -r http://localhost:4873/
-          ./node_modules/.bin/npm-cli-login -u user -p pass -e test@test.com -r http://localhost:4873/
-
       - name: Get Playwright Version
         id: playwright-version
         run: echo "VERSION=$(node -e "console.log($(npm ls @playwright/test --json).dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
@@ -151,8 +156,18 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
+      - name: Update NPM Registry
+        run: npm set registry http://localhost:4873/
+
+      - name: Run Verdaccio
+        run: |
+          nohup ./node_modules/.bin/verdaccio --config ./verdaccio.yaml & sleep 5
+          ./node_modules/.bin/npm-cli-adduser -u user -p pass -e test@test.com -r http://localhost:4873/
+          ./node_modules/.bin/npm-cli-login -u user -p pass -e test@test.com -r http://localhost:4873/
+
       - name: Publish to Verdaccio
-        run: npm run release:verdaccio # Fails early if the default npm registry is used
+        run: |
+          if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; npm run build -- ${{ env.TURBO_ARGS }} && changeset publish --no-git-tag; fi",
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
