@@ -1,3 +1,3 @@
-import { createDevOrStagingUrlCache } from '@clerk/shared';
+import { createDevOrStagingUrlCache } from '@clerk/shared/keys';
 const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 export { isDevOrStagingUrl };

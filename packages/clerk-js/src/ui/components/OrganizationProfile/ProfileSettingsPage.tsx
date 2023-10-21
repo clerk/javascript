@@ -37,6 +37,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
   const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value;
   const canSubmit = (dataChanged || avatarChanged) && !slugField.errorText;
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     return (dataChanged ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())

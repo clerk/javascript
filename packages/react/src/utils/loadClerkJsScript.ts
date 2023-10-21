@@ -1,4 +1,7 @@
-import { addClerkPrefix, isValidProxyUrl, loadScript, parsePublishableKey, proxyUrlToAbsoluteURL } from '@clerk/shared';
+import { parsePublishableKey } from '@clerk/shared/keys';
+import { loadScript } from '@clerk/shared/loadScript';
+import { isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
+import { addClerkPrefix } from '@clerk/shared/url';
 
 import type { IsomorphicClerkOptions } from '../types';
 import { errorThrower } from './errorThrower';
@@ -12,7 +15,7 @@ type LoadClerkJsScriptOptions = Omit<IsomorphicClerkOptions, 'proxyUrl' | 'domai
   domain: string;
 };
 
-export const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
+export const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
   const { frontendApi, publishableKey } = opts;
 
   if (!publishableKey && !frontendApi) {
