@@ -1,10 +1,11 @@
-import type { HandleOAuthCallbackParams } from '@clerk/types';
+import type { CheckAuthorization, HandleOAuthCallbackParams } from '@clerk/types';
 import React from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { LoadedGuarantee } from '../contexts/StructureContext';
+import { useAuth } from '../hooks';
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
@@ -38,6 +39,25 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JS
     return null;
   }
   return <>{children}</>;
+};
+
+type GateProps = React.PropsWithChildren<
+  Parameters<CheckAuthorization>[0] & {
+    fallback?: React.ReactNode;
+  }
+>;
+
+/**
+ * @experimental The component is experimental and subject to change in future releases.
+ */
+export const experimental__Gate = ({ children, fallback, ...restAuthorizedParams }: GateProps) => {
+  const { experimental__has } = useAuth();
+
+  if (experimental__has(restAuthorizedParams)) {
+    return <>{children}</>;
+  }
+
+  return <>{fallback ?? null}</>;
 };
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
