@@ -2,9 +2,9 @@ import { runWithExponentialBackOff } from '@clerk/shared';
 import { is4xxError } from '@clerk/shared/error';
 import type {
   ActJWTClaim,
+  CheckAuthorization,
   GetToken,
   GetTokenOptions,
-  IsAuthorized,
   SessionJSON,
   SessionResource,
   SessionStatus,
@@ -81,33 +81,43 @@ export class Session extends BaseResource implements SessionResource {
   /**
    * @experimental The method is experimental and subject to change in future releases.
    */
-  isAuthorized: IsAuthorized = async params => {
-    return new Promise(resolve => {
-      // if there is no active organization user can not be authorized
-      if (!this.lastActiveOrganizationId || !this.user) {
-        return resolve(false);
-      }
+  experimental__checkAuthorization: CheckAuthorization = params => {
+    // if there is no active organization user can not be authorized
+    if (!this.lastActiveOrganizationId || !this.user) {
+      return false;
+    }
 
-      // loop through organizationMemberships from client piggybacking
-      const orgMemberships = this.user.organizationMemberships || [];
-      const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
+    // loop through organizationMemberships from client piggybacking
+    const orgMemberships = this.user.organizationMemberships || [];
+    const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
 
-      // Based on FAPI this should never happen, but we handle it anyway
-      if (!activeMembership) {
-        return resolve(false);
-      }
+    // Based on FAPI this should never happen, but we handle it anyway
+    if (!activeMembership) {
+      return false;
+    }
 
-      const activeOrganizationPermissions = activeMembership.permissions;
-      const activeOrganizationRole = activeMembership.role;
+    const activeOrganizationPermissions = activeMembership.permissions;
+    const activeOrganizationRole = activeMembership.role;
 
-      if (params.permission) {
-        return resolve(activeOrganizationPermissions.includes(params.permission));
-      }
-      if (params.role) {
-        return resolve(activeOrganizationRole === params.role);
-      }
-      return resolve(false);
-    });
+    if (params.permission) {
+      return activeOrganizationPermissions.includes(params.permission);
+    }
+    if (params.role) {
+      return activeOrganizationRole === params.role;
+    }
+
+    if (params.some) {
+      return (
+        params.some.filter(permObj => {
+          if (permObj.permission) {
+            return activeOrganizationPermissions.includes(permObj.permission);
+          }
+          return activeOrganizationRole === permObj.role;
+        }).length > 0
+      );
+    }
+
+    return false;
   };
 
   #hydrateCache = (token: TokenResource | null) => {

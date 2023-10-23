@@ -1,4 +1,11 @@
-import type { ActiveSessionResource, InitialState, OrganizationResource, Resources, UserResource } from '@clerk/types';
+import type {
+  ActiveSessionResource,
+  InitialState,
+  OrganizationPermission,
+  OrganizationResource,
+  Resources,
+  UserResource,
+} from '@clerk/types';
 import type { MembershipRole } from '@clerk/types';
 
 export const deriveState = (clerkLoaded: boolean, state: Resources, initialState: InitialState | undefined) => {
@@ -18,6 +25,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
   const orgRole = initialState.orgRole as MembershipRole;
   const orgSlug = initialState.orgSlug;
   const actor = initialState.actor;
+  const orgPermissions = initialState.orgPermissions as OrganizationPermission[];
 
   return {
     userId,
@@ -28,6 +36,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
     orgId,
     orgRole,
     orgSlug,
+    orgPermissions,
     actor,
     lastOrganizationInvitation: null,
     lastOrganizationMember: null,
@@ -46,6 +55,7 @@ const deriveFromClientSideState = (state: Resources) => {
   const membership = organization
     ? user?.organizationMemberships?.find(om => om.organization.id === orgId)
     : organization;
+  const orgPermissions = membership ? membership.permissions : membership;
   const orgRole = membership ? membership.role : membership;
 
   const lastOrganizationInvitation = state.lastOrganizationInvitation;
@@ -60,6 +70,7 @@ const deriveFromClientSideState = (state: Resources) => {
     orgId,
     orgRole,
     orgSlug,
+    orgPermissions,
     actor,
     lastOrganizationInvitation,
     lastOrganizationMember,

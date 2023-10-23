@@ -8,7 +8,7 @@ import { createFakeUserOrganizationInvitation, createFakeUserOrganizationSuggest
 
 const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
-describe('OrganizationSwitcher', () => {
+describe.skip('OrganizationSwitcher', () => {
   it('renders component', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();

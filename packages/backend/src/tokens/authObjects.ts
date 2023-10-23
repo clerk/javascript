@@ -1,5 +1,12 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type { ActClaim, JwtPayload, ServerGetToken, ServerGetTokenOptions } from '@clerk/types';
+import type {
+  ActClaim,
+  CheckAuthorization,
+  JwtPayload,
+  OrganizationPermission,
+  ServerGetToken,
+  ServerGetTokenOptions,
+} from '@clerk/types';
 
 import type { Organization, Session, User } from '../api';
 import { createBackendApiClient } from '../api';
@@ -34,8 +41,13 @@ export type SignedInAuthObject = {
   orgId: string | undefined;
   orgRole: string | undefined;
   orgSlug: string | undefined;
+  orgPermissions: OrganizationPermission[] | undefined;
   organization: Organization | undefined;
   getToken: ServerGetToken;
+  /**
+   * @experimental The method is experimental and subject to change in future releases.
+   */
+  experimental__has: CheckAuthorization;
   debug: AuthObjectDebug;
 };
 
@@ -50,7 +62,12 @@ export type SignedOutAuthObject = {
   orgRole: null;
   orgSlug: null;
   organization: null;
+  orgPermissions: null;
   getToken: ServerGetToken;
+  /**
+   * @experimental The method is experimental and subject to change in future releases.
+   */
+  experimental__has: CheckAuthorization;
   debug: AuthObjectDebug;
 };
 
@@ -77,6 +94,7 @@ export function signedInAuthObject(
     org_id: orgId,
     org_role: orgRole,
     org_slug: orgSlug,
+    org_permissions: orgPermissions,
     sub: userId,
   } = sessionClaims;
   const { apiKey, secretKey, apiUrl, apiVersion, token, session, user, organization } = options;
@@ -109,7 +127,9 @@ export function signedInAuthObject(
     orgRole,
     orgSlug,
     organization,
+    orgPermissions,
     getToken,
+    experimental__has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
     debug: createDebug({ ...options, ...debugData }),
   };
 }
@@ -130,7 +150,9 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgRole: null,
     orgSlug: null,
     organization: null,
+    orgPermissions: null,
     getToken: () => Promise.resolve(null),
+    experimental__has: () => false,
     debug: createDebug(debugData),
   };
 }
@@ -190,3 +212,28 @@ const createGetToken: CreateGetToken = params => {
     return sessionToken;
   };
 };
+
+const createHasAuthorization =
+  ({
+    orgId,
+    orgRole,
+    orgPermissions,
+    userId,
+  }: {
+    userId: string;
+    orgId: string | undefined;
+    orgRole: string | undefined;
+    orgPermissions: string[] | undefined;
+  }): CheckAuthorization =>
+  params => {
+    if (!orgId || !userId || !orgPermissions) {
+      return false;
+    }
+    if (params.permission) {
+      return orgPermissions.includes(params.permission);
+    }
+    if (params.role) {
+      return orgRole === params.role;
+    }
+    return false;
+  };
