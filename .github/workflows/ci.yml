@@ -13,7 +13,8 @@ env:
   TURBO_ARGS: --output-logs=new-only --cache-dir=./.turbo-cache --concurrency=8
   TURBO_TOKEN: ${{ secrets.TEST_TURBO_TOKEN }}
   TURBO_TEAM: ${{ secrets.TEST_TURBO_TEAM }}
-  TURBO_REMOTE_ONLY: false
+  TURBO_REMOTE_CACHE_SIGNATURE_KEY: 'foobar-8121639a-9e90-4a8c-9021-689a769e4945' # TODO: secrets.TEST_TURBO_REMOTE_CACHE_SIGNATURE_KEY
+  TURBO_REMOTE_ONLY: true
   TURBO_CONCURRENCY: 8 # Available CPU in RUNNER_LARGE
 
 concurrency:
@@ -24,6 +25,8 @@ jobs:
   formatting-linting:
     name: Formatting & Linting
     runs-on: ${{ vars.RUNNER_LARGE }}
+    env:
+      TURBO_REMOTE_ONLY: false
 
     steps:
       - name: Checkout Repo
