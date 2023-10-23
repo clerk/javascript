@@ -39,7 +39,9 @@ type ExcludeRootPath<T> = T extends '/' ? never : T;
 type RouteMatcherWithNextTypedRoutes =
   | WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>>
   | NextTypedRoute
-  | (string & object);
+  // This is necessary to allow all string, using something other than `{}` here WILL break types!
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  | (string & {});
 
 const INFINITE_REDIRECTION_LOOP_COOKIE = '__clerk_redirection_loop';
 
