@@ -1,7 +1,9 @@
 import {
   buildPublishableKey,
   createDevOrStagingUrlCache,
+  isDevelopmentFromApiKey,
   isLegacyFrontendApiKey,
+  isProductionFromApiKey,
   isPublishableKey,
   parsePublishableKey,
 } from '../keys';
@@ -88,5 +90,33 @@ describe('isDevOrStagingUrl(url)', () => {
   test.each([...goodUrls, ...badUrls])('.isDevOrStagingUrl(%s)', (a, expected) => {
     // @ts-ignore
     expect(isDevOrStagingUrl(a)).toBe(expected);
+  });
+});
+
+describe('isDevelopmentFromApiKey(key)', () => {
+  const cases: Array<[string, boolean]> = [
+    ['sk_live_Y2xlcmsuY2xlcmsuZGV2JA==', false],
+    ['sk_test_Y2xlcmsuY2xlcmsuZGV2JA==', true],
+    ['live_Y2xlcmsuY2xlcmsuZGV2JA==', false],
+    ['test_Y2xlcmsuY2xlcmsuZGV2JA==', true],
+  ];
+
+  test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expected) => {
+    const result = isDevelopmentFromApiKey(publishableKeyStr);
+    expect(result).toEqual(expected);
+  });
+});
+
+describe('isProductionFromApiKey(key)', () => {
+  const cases: Array<[string, boolean]> = [
+    ['sk_live_Y2xlcmsuY2xlcmsuZGV2JA==', true],
+    ['sk_test_Y2xlcmsuY2xlcmsuZGV2JA==', false],
+    ['live_Y2xlcmsuY2xlcmsuZGV2JA==', true],
+    ['test_Y2xlcmsuY2xlcmsuZGV2JA==', false],
+  ];
+
+  test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expected) => {
+    const result = isProductionFromApiKey(publishableKeyStr);
+    expect(result).toEqual(expected);
   });
 });

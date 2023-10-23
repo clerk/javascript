@@ -1,3 +1,6 @@
+/**
+ * Check if the frontendApi ends with a staging domain
+ */
 export function isStaging(frontendApi: string): boolean {
   return (
     frontendApi.endsWith('.lclstage.dev') ||

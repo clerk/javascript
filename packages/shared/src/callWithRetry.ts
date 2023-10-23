@@ -23,6 +23,6 @@ export async function callWithRetry<T>(
     }
     await wait(2 ** attempt * 100);
 
-    return callWithRetry(fn, attempt + 1);
+    return callWithRetry(fn, attempt + 1, maxAttempts);
   }
 }

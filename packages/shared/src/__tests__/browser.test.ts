@@ -1,8 +1,65 @@
-import { inBrowser, isValidBrowserOnline, userAgentIsRobot } from '../browser';
+import { inBrowser, isValidBrowser, isValidBrowserOnline, userAgentIsRobot } from '../browser';
 
 describe('inBrowser()', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('returns true if window is defined', () => {
     expect(inBrowser()).toBe(true);
+  });
+  it('returns false if window is undefined', () => {
+    const windowSpy = jest.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+    expect(inBrowser()).toBe(false);
+  });
+});
+
+describe('isValidBrowser', () => {
+  let userAgentGetter: any;
+  let webdriverGetter: any;
+
+  beforeEach(() => {
+    userAgentGetter = jest.spyOn(window.navigator, 'userAgent', 'get');
+    webdriverGetter = jest.spyOn(window.navigator, 'webdriver', 'get');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('returns false if not in browser', () => {
+    const windowSpy = jest.spyOn(global, 'window', 'get');
+    // @ts-ignore - Test
+    windowSpy.mockReturnValue(undefined);
+
+    expect(isValidBrowser()).toBe(false);
+  });
+
+  it('returns true if in browser, navigator is not a bot, and webdriver is not enabled', () => {
+    userAgentGetter.mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
+    );
+    webdriverGetter.mockReturnValue(false);
+
+    expect(isValidBrowser()).toBe(true);
+  });
+
+  it('returns false if navigator is a bot', () => {
+    userAgentGetter.mockReturnValue('msnbot-NewsBlogs/2.0b (+http://search.msn.com/msnbot.htm)');
+    webdriverGetter.mockReturnValue(false);
+
+    expect(isValidBrowser()).toBe(false);
+  });
+
+  it('returns false if webdriver is enabled', () => {
+    userAgentGetter.mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
+    );
+    webdriverGetter.mockReturnValue(true);
+
+    expect(isValidBrowser()).toBe(false);
   });
 });
 
