@@ -13,7 +13,7 @@ env:
   TURBO_ARGS: --output-logs=new-only --cache-dir=./.turbo-cache --concurrency=8
   TURBO_TOKEN: ${{ secrets.TEST_TURBO_TOKEN }}
   TURBO_TEAM: ${{ secrets.TEST_TURBO_TEAM }}
-  TURBO_REMOTE_ONLY: true
+  TURBO_REMOTE_ONLY: false
   TURBO_CONCURRENCY: 8 # Available CPU in RUNNER_LARGE
 
 concurrency:
@@ -167,7 +167,7 @@ jobs:
 
       - name: Publish to Verdaccio
         run: |
-          if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build ${{ env.TURBO_ARGS }} && changeset publish --no-git-tag; fi"
+          if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build ${{ env.TURBO_ARGS }} && changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
