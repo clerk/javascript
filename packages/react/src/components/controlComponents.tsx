@@ -1,4 +1,4 @@
-import type { experimental__CheckAuthorizationWithoutPermission, HandleOAuthCallbackParams } from '@clerk/types';
+import type { experimental__CheckAuthorizationWithCustomPermissions, HandleOAuthCallbackParams } from '@clerk/types';
 import React from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -42,7 +42,7 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JS
 };
 
 type GateProps = React.PropsWithChildren<
-  Parameters<experimental__CheckAuthorizationWithoutPermission>[0] & {
+  Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0] & {
     fallback?: React.ReactNode;
   }
 >;

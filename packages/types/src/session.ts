@@ -6,20 +6,34 @@ import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
-export type experimental__CheckAuthorizationWithoutPermission = (
-  isAuthorizedParams: CheckAuthorizationParamsWithoutPermission,
+export type experimental__CheckAuthorizationWithCustomPermissions = (
+  isAuthorizedParams: CheckAuthorizationParamsWithCustomPermissions,
 ) => boolean;
 
-type CheckAuthorizationParamsWithoutPermission =
+type CheckAuthorizationParamsWithCustomPermissions =
   | {
-      some: {
-        role: string;
-      }[];
+      some: (
+        | {
+            role: string;
+            permission?: never;
+          }
+        | {
+            role?: never;
+            permission: Autocomplete<OrganizationPermission>;
+          }
+      )[];
       role?: never;
+      permission?: never;
     }
   | {
       some?: never;
       role: string;
+      permission?: never;
+    }
+  | {
+      some?: never;
+      role?: never;
+      permission: Autocomplete<OrganizationPermission>;
     };
 
 export type CheckAuthorization = (isAuthorizedParams: CheckAuthorizationParams) => boolean;
