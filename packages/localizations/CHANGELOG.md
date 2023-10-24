@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.26.7
+
+### Patch Changes
+
+- Publish packages with [npm provenance](https://docs.npmjs.com/generating-provenance-statements) enabled ([#1891](https://github.com/clerkinc/javascript/pull/1891)) by [@LekoArts](https://github.com/LekoArts)
+
+- Add `dangerSection` translations to the `trTr` translation file ([#1920](https://github.com/clerkinc/javascript/pull/1920)) by [@EdizKeskin](https://github.com/EdizKeskin)
+
+- Updated dependencies [[`3bf64107e`](https://github.com/clerkinc/javascript/commit/3bf64107e1d0f9fce55163276d157da7849a390f), [`b09b66eec`](https://github.com/clerkinc/javascript/commit/b09b66eec6ed0fbf99d93cd6843826f19c911099), [`51861addf`](https://github.com/clerkinc/javascript/commit/51861addff911615035fdc74718a1deff3f5cd62)]:
+  - @clerk/types@3.57.0
+
 ## 1.26.6
 
 ### Patch Changes
