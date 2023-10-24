@@ -15,7 +15,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useLoadingStatus, usePasswordComplexity } from '../../hooks';
+import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { createPasswordError } from '../../utils';
@@ -49,7 +49,6 @@ function _SignUpStart(): JSX.Element {
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
-  const { failedValidationsText } = usePasswordComplexity(passwordSettings);
 
   const formState = {
     firstName: useFormControl('firstName', signUp.firstName || initialValues.firstName || '', {
@@ -81,7 +80,6 @@ function _SignUpStart(): JSX.Element {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
-      informationText: failedValidationsText,
       validatePassword: true,
       buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
     }),

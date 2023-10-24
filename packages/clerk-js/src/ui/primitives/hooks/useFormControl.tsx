@@ -12,9 +12,11 @@ export type FormControlProps = {
   hasError?: boolean;
   isDisabled?: boolean;
   setError: (error: string | ClerkAPIError | undefined) => void;
-  setSuccessful: (message: string) => void;
-  setWarning: (message: string) => void;
+  setSuccess: (message: string) => void;
+  setWarning: (warning: string) => void;
+  setInfo: (info: string) => void;
   setHasPassedComplexity: (b: boolean) => void;
+  clearFeedback: () => void;
 };
 
 type FormControlContextValue = Required<FormControlProps> & { errorMessageId: string };
@@ -29,9 +31,11 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
     hasError = false,
     isDisabled = false,
     setError,
-    setSuccessful,
+    setSuccess,
     setWarning,
+    setInfo,
     setHasPassedComplexity,
+    clearFeedback,
   } = props;
   // TODO: This shouldnt be targettable
   const id = `${propsId}-field`;
@@ -49,12 +53,26 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
         errorMessageId,
         isDisabled,
         setError,
-        setSuccessful,
+        setSuccess,
         setWarning,
+        setInfo,
         setHasPassedComplexity,
+        clearFeedback,
       },
     }),
-    [isRequired, hasError, id, errorMessageId, isDisabled, setError, setSuccessful, setHasPassedComplexity],
+    [
+      isRequired,
+      hasError,
+      id,
+      errorMessageId,
+      isDisabled,
+      setError,
+      setSuccess,
+      setInfo,
+      setWarning,
+      setHasPassedComplexity,
+      clearFeedback,
+    ],
   );
   return <FormControlContext.Provider value={value}>{props.children}</FormControlContext.Provider>;
 };

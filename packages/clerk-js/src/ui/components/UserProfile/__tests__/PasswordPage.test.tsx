@@ -269,22 +269,25 @@ describe('PasswordPage', () => {
 
     it(`Displays "Password match" when password match and removes it if they stop`, async () => {
       const { wrapper } = await createFixtures(initConfig);
+
       await runFakeTimers(async () => {
         const { userEvent } = render(<PasswordPage />, { wrapper });
         const passwordField = screen.getByLabelText(/new password/i);
 
         await userEvent.type(passwordField, 'testewrewr');
         const confirmField = screen.getByLabelText(/confirm password/i);
-        expect(screen.queryByText(`Passwords match.`)).not.toBeInTheDocument();
+        await waitFor(() => {
+          expect(screen.queryByText(`Passwords match.`)).not.toBeInTheDocument();
+        });
 
         await userEvent.type(confirmField, 'testewrewr');
         await waitFor(() => {
-          screen.getByText(`Passwords match.`);
+          expect(screen.getByText(`Passwords match.`)).toBeInTheDocument();
         });
 
         await userEvent.type(confirmField, 'testrwerrwqrwe');
         await waitFor(() => {
-          expect(screen.queryByText(`Passwords match.`)).not.toBeInTheDocument();
+          expect(screen.queryByText(`Passwords match.`)).not.toBeVisible();
         });
 
         await userEvent.type(passwordField, 'testrwerrwqrwe');

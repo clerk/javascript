@@ -20,3 +20,5 @@ export const ERROR_CODES = {
 
 export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];
 export const SIGN_UP_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username', 'first_name', 'last_name'];
+
+export const DEBOUNCE_MS = 350;

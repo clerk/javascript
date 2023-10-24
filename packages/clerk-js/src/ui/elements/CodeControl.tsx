@@ -19,7 +19,7 @@ export const useCodeControl = (formControl: FormControlState, options?: UseCodeI
   const otpControlRef = React.useRef<any>();
   const userOnCodeEnteredCallback = React.useRef<onCodeEntryFinishedCallback>();
   const defaultValue = formControl.value;
-  const { errorText, onChange } = formControl;
+  const { feedback, feedbackType, onChange } = formControl;
   const { length = 6 } = options || {};
   const [values, setValues] = React.useState(() =>
     defaultValue ? defaultValue.split('').slice(0, length) : Array.from({ length }, () => ''),
@@ -40,7 +40,7 @@ export const useCodeControl = (formControl: FormControlState, options?: UseCodeI
     }
   }, [values.toString()]);
 
-  const otpInputProps = { length, values, setValues, errorText, ref: otpControlRef };
+  const otpInputProps = { length, values, setValues, feedback, feedbackType, ref: otpControlRef };
   return { otpInputProps, onCodeEntryFinished, reset: () => otpControlRef.current?.reset() };
 };
 
@@ -55,7 +55,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
   const [disabled, setDisabled] = React.useState(false);
   const refs = React.useRef<Array<HTMLInputElement | null>>([]);
   const firstClickRef = React.useRef(false);
-  const { values, setValues, isDisabled, errorText, isSuccessfullyFilled, isLoading, length } = props;
+  const { values, setValues, isDisabled, feedback, feedbackType, isSuccessfullyFilled, isLoading, length } = props;
 
   React.useImperativeHandle(ref, () => ({
     reset: () => {
@@ -70,10 +70,10 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
   }, []);
 
   React.useEffect(() => {
-    if (errorText) {
+    if (feedback) {
       setDisabled(true);
     }
-  }, [errorText]);
+  }, [feedback]);
 
   const handleMultipleCharValue = ({ eventValue, inputPosition }: { eventValue: string; inputPosition: number }) => {
     const eventValues = (eventValue || '').split('');
@@ -168,12 +168,12 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
     <Flex
       elementDescriptor={descriptors.otpCodeField}
       isLoading={isLoading}
-      hasError={!!errorText}
+      hasError={feedbackType === 'error'}
       direction='col'
     >
       <Flex
         isLoading={isLoading}
-        hasError={!!errorText}
+        hasError={feedbackType === 'error'}
         elementDescriptor={descriptors.otpCodeFieldInputs}
         gap={2}
         align='center'
@@ -194,7 +194,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
             autoComplete='one-time-code'
             aria-label={`${index === 0 ? 'Enter verification code. ' : ''} Digit ${index + 1}`}
             isDisabled={isDisabled || isLoading || disabled || isSuccessfullyFilled}
-            hasError={!!errorText}
+            hasError={feedbackType === 'error'}
             isSuccessfullyFilled={isSuccessfullyFilled}
             type='text'
             inputMode='numeric'
@@ -209,7 +209,8 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
         )}
       </Flex>
       <FormFeedback
-        errorText={errorText}
+        feedback={feedback}
+        feedbackType={feedbackType}
         elementDescriptors={{
           error: descriptors.otpCodeFieldErrorText,
         }}
