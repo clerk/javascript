@@ -30,6 +30,7 @@ export * from './organizationSettings';
 export * from './organizationSuggestion';
 export * from './passwords';
 export * from './phoneNumber';
+export * from './providers';
 export * from './redirects';
 export * from './resource';
 export * from './saml';

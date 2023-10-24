@@ -1,6 +1,8 @@
+import type { ProviderData } from './providers';
+import { ProviderType } from './providers';
 import type { Web3Strategy } from './strategies';
 
-export interface Web3ProviderData {
+export interface Web3ProviderData extends ProviderData {
   provider: Web3Provider;
   strategy: Web3Strategy;
   name: string;
@@ -13,6 +15,7 @@ export type Web3Provider = MetamaskWeb3Provider;
 export const WEB3_PROVIDERS: Web3ProviderData[] = [
   {
     provider: 'metamask',
+    providerType: ProviderType.Web3,
     strategy: 'web3_metamask_signature',
     name: 'MetaMask',
   },
