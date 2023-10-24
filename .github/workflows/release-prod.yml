@@ -4,7 +4,7 @@ run-name: Production release PR
 on:
   push:
     branches:
-      - main
+      - main-v4
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

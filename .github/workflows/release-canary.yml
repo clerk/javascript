@@ -1,0 +1,36 @@
+name: Canary release
+run-name: Canary release from ${{ github.ref_name }}
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  canary-release:
+    if: ${{ github.repository == 'clerkinc/javascript' }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      TURBO_REMOTE_ONLY: true
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Version packages for canary
+        id: version-packages
+        run: npm run version:canary | tail -1 >> "$GITHUB_OUTPUT"
+
+      - name: Canary release
+        if: steps.version-packages.outputs.success == '1'
+        run: npm run release:canary
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
