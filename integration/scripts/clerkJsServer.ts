@@ -3,6 +3,7 @@
 import os from 'node:os';
 import path from 'node:path';
 
+import { constants } from '../constants';
 import { stateFile } from '../models/stateFile';
 import { awaitableTreekill, fs, waitForServer } from './index';
 import { run } from './run';
@@ -40,9 +41,8 @@ const serveFromTempDir = async () => {
   const port = 18211;
   const serverUrl = `http://localhost:${port}`;
   const now = Date.now();
-  const TMP_DIR = path.join(process.cwd(), '.temp_integration');
-  const stdoutFilePath = path.resolve(TMP_DIR, `clerkJsHttpServer.${now}.log`);
-  const stderrFilePath = path.resolve(TMP_DIR, `clerkJsHttpServer.${now}.err.log`);
+  const stdoutFilePath = path.resolve(constants.TMP_DIR, `clerkJsHttpServer.${now}.log`);
+  const stderrFilePath = path.resolve(constants.TMP_DIR, `clerkJsHttpServer.${now}.err.log`);
   const clerkJsTempDir = getClerkJsTempDir();
   const proc = run(`node_modules/.bin/http-server ${clerkJsTempDir} -d --gzip --cors -a localhost`, {
     cwd: process.cwd(),

@@ -1,9 +1,10 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
+import * as os from 'node:os';
 import * as path from 'node:path';
 
 export const constants = {
-  TMP_DIR: path.join(process.cwd(), '.temp_integration'),
-  APPS_STATE_FILE: path.join(process.cwd(), '.temp_integration', 'state.json'),
+  TMP_DIR: path.join(os.tmpdir(), '.temp_integration'),
+  APPS_STATE_FILE: path.join(os.tmpdir(), '.temp_integration', 'state.json'),
   /**
    * A URL to a running app that will be used to run the tests against.
    * This is usually used when running the app has been started manually,
