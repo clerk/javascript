@@ -5,6 +5,7 @@ import React, { useMemo } from 'react';
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
 import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
+import type { NavbarRoute } from '../elements';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
 import type {
@@ -18,6 +19,8 @@ import type {
   UserButtonCtx,
   UserProfileCtx,
 } from '../types';
+import type { CustomPageContent } from '../utils';
+import { createOrganizationProfileCustomPages, createUserProfileCustomPages } from '../utils';
 
 const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 
@@ -184,24 +187,31 @@ export const useSignInContext = (): SignInContextType => {
   };
 };
 
+type PagesType = {
+  routes: NavbarRoute[];
+  contents: CustomPageContent[];
+  pageToRootNavbarRouteMap: Record<string, NavbarRoute>;
+};
+
 export type UserProfileContextType = UserProfileCtx & {
   queryParams: ParsedQs;
   authQueryString: string | null;
+  pages: PagesType;
 };
 
-// UserProfile does not accept any props except for
-// `routing` and `path`
-// TODO: remove if not needed during the components v2 overhaul
 export const useUserProfileContext = (): UserProfileContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserProfileCtx;
+  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as UserProfileCtx;
   const { queryParams } = useRouter();
 
   if (componentName !== 'UserProfile') {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
+  const pages = createUserProfileCustomPages(customPages || []);
+
   return {
     ...ctx,
+    pages,
     componentName,
     queryParams,
     authQueryString: '',
@@ -398,8 +408,13 @@ export const useOrganizationListContext = () => {
   };
 };
 
-export const useOrganizationProfileContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
+export type OrganizationProfileContextType = OrganizationProfileCtx & {
+  pages: PagesType;
+  navigateAfterLeaveOrganization: () => Promise<unknown>;
+};
+
+export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
+  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -407,11 +422,14 @@ export const useOrganizationProfileContext = () => {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
+  const pages = createOrganizationProfileCustomPages(customPages || []);
+
   const navigateAfterLeaveOrganization = () =>
     navigate(ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl);
 
   return {
     ...ctx,
+    pages,
     navigateAfterLeaveOrganization,
     componentName,
   };

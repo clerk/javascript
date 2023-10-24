@@ -2,7 +2,7 @@
   "files": [
     { "path": "./dist/clerk.browser.js", "maxSize": "62kB" },
     { "path": "./dist/clerk.headless.js", "maxSize": "43kB" },
-    { "path": "./dist/ui-common*.js", "maxSize": "75KB" },
+    { "path": "./dist/ui-common*.js", "maxSize": "76KB" },
     { "path": "./dist/vendors*.js", "maxSize": "70KB" },
     { "path": "./dist/createorganization*.js", "maxSize": "5KB" },
     { "path": "./dist/impersonationfab*.js", "maxSize": "5KB" },

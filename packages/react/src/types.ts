@@ -12,6 +12,7 @@ import type {
   SignUpRedirectOptions,
   UserResource,
 } from '@clerk/types';
+import type React from 'react';
 
 declare global {
   interface Window {
@@ -51,6 +52,7 @@ export interface MountProps {
   unmount: (node: HTMLDivElement) => void;
   updateProps: (props: any) => void;
   props?: any;
+  customPagesPortals?: any[];
 }
 
 export interface HeadlessBrowserClerk extends Clerk {
@@ -88,3 +90,18 @@ export type SignInWithMetamaskButtonProps = Pick<ButtonProps, 'redirectUrl' | 'c
 
 export type RedirectToSignInProps = SignInRedirectOptions;
 export type RedirectToSignUpProps = SignUpRedirectOptions;
+
+export type UserProfilePageProps = {
+  url?: string;
+  label: string;
+  labelIcon?: React.ReactNode;
+};
+
+export type UserProfileLinkProps = {
+  url: string;
+  label: string;
+  labelIcon: React.ReactNode;
+};
+
+export type OrganizationProfilePageProps = UserProfilePageProps;
+export type OrganizationProfileLinkProps = UserProfileLinkProps;
