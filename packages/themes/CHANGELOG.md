@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.7.9
+
+### Patch Changes
+
+- Publish packages with [npm provenance](https://docs.npmjs.com/generating-provenance-statements) enabled ([#1891](https://github.com/clerkinc/javascript/pull/1891)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 1.7.8
 
 ### Patch Changes

@@ -1,5 +1,24 @@
 # Change Log
 
+## 4.25.7
+
+### Patch Changes
+
+- Fix an issue where only static routes would be allowed by `publicRoutes` prop from `authMiddleware`. ([#1928](https://github.com/clerkinc/javascript/pull/1928)) by [@desiprisg](https://github.com/desiprisg)
+
+- Publish packages with [npm provenance](https://docs.npmjs.com/generating-provenance-statements) enabled ([#1891](https://github.com/clerkinc/javascript/pull/1891)) by [@LekoArts](https://github.com/LekoArts)
+
+- Update `<ClerkProvider />` to work in client components within the app router. This allows rendering of the provider in client components, previously the pages router provider was being imported and throwing an error. ([#1840](https://github.com/clerkinc/javascript/pull/1840)) by [@BRKalow](https://github.com/BRKalow)
+
+- Update imports of `@clerk/shared` to granular entrypoints. This addresses warnings during a Next.js build that are the result of unsupported APIs being included in the module graph of builds for the edge runtime. ([#1924](https://github.com/clerkinc/javascript/pull/1924)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`3bf64107e`](https://github.com/clerkinc/javascript/commit/3bf64107e1d0f9fce55163276d157da7849a390f), [`52f8553d2`](https://github.com/clerkinc/javascript/commit/52f8553d22f9454ee1194fd162410db15da7a4be), [`92727eec3`](https://github.com/clerkinc/javascript/commit/92727eec39566278263ffa118a085493f964eb94), [`b09b66eec`](https://github.com/clerkinc/javascript/commit/b09b66eec6ed0fbf99d93cd6843826f19c911099), [`51861addf`](https://github.com/clerkinc/javascript/commit/51861addff911615035fdc74718a1deff3f5cd62), [`37d8856ba`](https://github.com/clerkinc/javascript/commit/37d8856babb9db8edf763455172c4d22d6035036), [`aa4cd7615`](https://github.com/clerkinc/javascript/commit/aa4cd761585b888706a36a6eed7436a8f0476dbf)]:
+  - @clerk/clerk-sdk-node@4.12.16
+  - @clerk/backend@0.31.3
+  - @clerk/shared@1.0.0
+  - @clerk/clerk-react@4.27.0
+  - @clerk/types@3.57.0
+
 ## 4.25.6
 
 ### Patch Changes

@@ -1,5 +1,67 @@
 # Change Log
 
+## 3.57.0
+
+### Minor Changes
+
+- Introduce customization in `UserProfile` and `OrganizationProfile` ([#1822](https://github.com/clerkinc/javascript/pull/1822)) by [@anagstef](https://github.com/anagstef)
+
+  The `<UserProfile />` component now allows the addition of custom pages and external links to the navigation sidebar. Custom pages can be created using the `<UserProfile.Page>` component, and external links can be added using the `<UserProfile.Link>` component. The default routes, such as `Account` and `Security`, can be reordered.
+
+  Example React API usage:
+
+  ```tsx
+  <UserProfile>
+    <UserProfile.Page
+      label='Custom Page'
+      url='custom'
+      labelIcon={<CustomIcon />}
+    >
+      <MyCustomPageContent />
+    </UserProfile.Page>
+    <UserProfile.Link
+      label='External'
+      url='/home'
+      labelIcon={<Icon />}
+    />
+    <UserProfile.Page label='account' />
+    <UserProfile.Page label='security' />
+  </UserProfile>
+  ```
+
+  Custom pages and links should be provided as children using the `<UserButton.UserProfilePage>` and `<UserButton.UserProfileLink>` components when using the `UserButton` component.
+
+  The `<OrganizationProfile />` component now supports the addition of custom pages and external links to the navigation sidebar. Custom pages can be created using the `<OrganizationProfile.Page>` component, and external links can be added using the `<OrganizationProfile.Link>` component. The default routes, such as `Members` and `Settings`, can be reordered.
+
+  Example React API usage:
+
+  ```tsx
+  <OrganizationProfile>
+    <OrganizationProfile.Page
+      label='Custom Page'
+      url='custom'
+      labelIcon={<CustomIcon />}
+    >
+      <MyCustomPageContent />
+    </OrganizationProfile.Page>
+    <OrganizationProfile.Link
+      label='External'
+      url='/home'
+      labelIcon={<Icon />}
+    />
+    <OrganizationProfile.Page label='members' />
+    <OrganizationProfile.Page label='settings' />
+  </OrganizationProfile>
+  ```
+
+  Custom pages and links should be provided as children using the `<OrganizationSwitcher.OrganizationProfilePage>` and `<OrganizationSwitcher.OrganizationProfileLink>` components when using the `OrganizationSwitcher` component.
+
+### Patch Changes
+
+- Publish packages with [npm provenance](https://docs.npmjs.com/generating-provenance-statements) enabled ([#1891](https://github.com/clerkinc/javascript/pull/1891)) by [@LekoArts](https://github.com/LekoArts)
+
+- Drop `experimental_force_oauth_first` & `experimental__forceOauthFirst` from `DisplayConfig` ([#1918](https://github.com/clerkinc/javascript/pull/1918)) by [@dimkl](https://github.com/dimkl)
+
 ## 3.56.1
 
 ### Patch Changes
