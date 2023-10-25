@@ -5,6 +5,7 @@ import React, { useMemo } from 'react';
 import { stripOrigin, toURL, trimLeadingSlash } from '../../../utils';
 import { useGate, withGate } from '../../common';
 import { useCoreOrganization } from '../../contexts';
+import type { LocalizationKey } from '../../customizables';
 import { Box, Col, localizationKeys, Spinner } from '../../customizables';
 import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
 import { useInView } from '../../hooks';
@@ -36,33 +37,31 @@ const useDomainList = () => {
 const buildDomainListRelativeURL = (parentPath: string, domainId: string, mode?: 'verify' | 'remove') =>
   trimLeadingSlash(stripOrigin(toURL(`${parentPath}/${domainId}/${mode || ''}`)));
 
-const useMenuActions = (parentPath: string, domainId: string) => {
+const useMenuActions = (
+  parentPath: string,
+  domainId: string,
+): { label: LocalizationKey; onClick: () => Promise<unknown>; isDestructive?: boolean }[] => {
   const { canDeleteDomain, canVerifyDomain } = useDomainList();
   const { navigate } = useRouter();
 
-  return [
-    ...(canVerifyDomain
-      ? [
-          {
-            label: localizationKeys(
-              'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify',
-            ),
-            onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'verify')),
-          },
-        ]
-      : []),
-    ...(canDeleteDomain
-      ? [
-          {
-            label: localizationKeys(
-              'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove',
-            ),
-            isDestructive: true,
-            onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'remove')),
-          },
-        ]
-      : []),
-  ];
+  const menuActions = [];
+
+  if (canVerifyDomain) {
+    menuActions.push({
+      label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify'),
+      onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'verify')),
+    });
+  }
+
+  if (canDeleteDomain) {
+    menuActions.push({
+      label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove'),
+      isDestructive: true,
+      onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'remove')),
+    });
+  }
+
+  return menuActions;
 };
 
 const DomainListDotMenu = ({

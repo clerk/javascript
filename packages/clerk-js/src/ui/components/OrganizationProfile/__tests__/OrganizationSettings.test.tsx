@@ -2,7 +2,7 @@ import type { OrganizationDomainResource, OrganizationMembershipResource } from 
 import { describe, it } from '@jest/globals';
 import userEvent from '@testing-library/user-event';
 
-import { render, waitFor } from '../../../../testUtils';
+import { act, render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSettings } from '../OrganizationSettings';
 import { createFakeDomain, createFakeMember } from './utils';
@@ -28,7 +28,7 @@ describe('OrganizationSettings', () => {
         total_count: 1,
       }),
     );
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
+
     const { getByText } = render(<OrganizationSettings />, { wrapper });
     await waitFor(() => {
       expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
@@ -54,7 +54,6 @@ describe('OrganizationSettings', () => {
         total_count: 1,
       }),
     );
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
     const { getByText } = render(<OrganizationSettings />, { wrapper });
     await waitFor(() => {
       expect(getByText('Settings')).toBeDefined();
@@ -75,7 +74,6 @@ describe('OrganizationSettings', () => {
     });
 
     fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
     const { getByText } = render(<OrganizationSettings />, { wrapper });
     await waitFor(() => {
       expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
@@ -94,7 +92,7 @@ describe('OrganizationSettings', () => {
         organization_memberships: [{ name: 'Org1', permissions: ['org:sys_memberships:read'] }],
       });
     });
-    const { queryByText } = render(<OrganizationSettings />, { wrapper });
+    const { queryByText } = await act(() => render(<OrganizationSettings />, { wrapper }));
     await new Promise(r => setTimeout(r, 100));
     expect(queryByText('Verified domains')).not.toBeInTheDocument();
     expect(fixtures.clerk.organization?.getDomains).not.toBeCalled();
@@ -115,7 +113,7 @@ describe('OrganizationSettings', () => {
         total_count: 0,
       }),
     );
-    const { queryByText } = render(<OrganizationSettings />, { wrapper });
+    const { queryByText } = await act(() => render(<OrganizationSettings />, { wrapper }));
 
     await new Promise(r => setTimeout(r, 100));
     expect(queryByText('Verified domains')).toBeInTheDocument();
@@ -124,7 +122,7 @@ describe('OrganizationSettings', () => {
 
   describe('Danger section', () => {
     it('always displays danger section and the leave organization button', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.dev'],
@@ -132,8 +130,7 @@ describe('OrganizationSettings', () => {
         });
       });
 
-      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
-      const { getByText, queryByRole } = render(<OrganizationSettings />, { wrapper });
+      const { getByText, queryByRole } = await act(() => render(<OrganizationSettings />, { wrapper }));
       await waitFor(() => {
         expect(getByText('Danger')).toBeDefined();
         expect(getByText(/leave organization/i).closest('button')).toBeInTheDocument();
@@ -142,7 +139,7 @@ describe('OrganizationSettings', () => {
     });
 
     it('enabled leave organization button with delete organization button', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.dev'],
@@ -150,7 +147,6 @@ describe('OrganizationSettings', () => {
         });
       });
 
-      fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
       const { getByText } = render(<OrganizationSettings />, { wrapper });
       await waitFor(() => {
         expect(getByText('Danger')).toBeDefined();
@@ -181,7 +177,6 @@ describe('OrganizationSettings', () => {
         });
       });
 
-      fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
       fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
       const { getByText, getByRole } = render(<OrganizationSettings />, { wrapper });
       await waitFor(() => {
@@ -210,7 +205,6 @@ describe('OrganizationSettings', () => {
           total_count: 0,
         }),
       );
-      fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
       const { getByText } = render(<OrganizationSettings />, { wrapper });
       await waitFor(async () => {
         await userEvent.click(getByText('Org1', { exact: false }));
@@ -230,7 +224,6 @@ describe('OrganizationSettings', () => {
       });
 
       fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
-      fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
       const { findByText } = render(<OrganizationSettings />, { wrapper });
       await waitFor(async () => {
         // expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();

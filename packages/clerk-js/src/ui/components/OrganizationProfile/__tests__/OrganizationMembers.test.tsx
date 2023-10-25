@@ -12,12 +12,10 @@ const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('OrganizationMembers', () => {
   it('renders the Organization Members page', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
     });
-
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     const { getByText, getByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -34,13 +32,11 @@ describe('OrganizationMembers', () => {
   });
 
   it('shows requests if domains is turned on', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withOrganizationDomains();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
     });
-
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     const { getByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -50,12 +46,10 @@ describe('OrganizationMembers', () => {
   });
 
   it('shows an invite button inside invitations tab if the current user is an admin', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
-
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     const { getByRole, getByText } = render(<OrganizationMembers />, { wrapper });
 
@@ -67,15 +61,13 @@ describe('OrganizationMembers', () => {
   });
 
   it('does not show invitations and requests if user is not an admin', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.dev'],
-        organization_memberships: [{ name: 'Org1' }],
+        organization_memberships: [{ name: 'Org1', permissions: [] }],
       });
     });
-
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(false);
 
     const { queryByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -91,8 +83,6 @@ describe('OrganizationMembers', () => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
-
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     const { getByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -155,8 +145,6 @@ describe('OrganizationMembers', () => {
       }),
     );
 
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
-
     const { queryByText, queryAllByRole } = render(<OrganizationMembers />, { wrapper });
 
     await waitFor(() => {
@@ -203,8 +191,6 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
-
     fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
       Promise.resolve({ data: membersList, total_count: 0 }),
     );
@@ -240,8 +226,6 @@ describe('OrganizationMembers', () => {
       }),
     );
 
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
-
     await runFakeTimers(async () => {
       const { getByText } = render(<OrganizationMembers />, { wrapper });
       await waitFor(() => {
@@ -276,8 +260,6 @@ describe('OrganizationMembers', () => {
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
-
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
 
     fixtures.clerk.organization?.getInvitations.mockReturnValue(
       Promise.resolve({
@@ -327,8 +309,6 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
-
     fixtures.clerk.organization?.getDomains.mockReturnValue(
       Promise.resolve({
         data: [],
@@ -373,7 +353,6 @@ describe('OrganizationMembers', () => {
       }),
     );
 
-    fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
     const { findByText } = render(<OrganizationMembers />, { wrapper });
     await waitFor(() => expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled());
     expect(await findByText('You')).toBeInTheDocument();
