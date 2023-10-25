@@ -1,8 +1,6 @@
-import type { FieldId } from '@clerk/types';
-import type { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError, FieldId } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import { useRef } from 'react';
-import React, { forwardRef, useCallback, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -151,7 +149,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const feedbacksRef = useRef<{
     a?: Feedback;
     b?: Feedback;
-  }>({ a: { feedback, feedbackType, shouldEnter: true }, b: undefined });
+  }>({ a: undefined, b: undefined });
 
   const { getFormTextAnimation } = useFormTextAnimation();
   const defaultElementDescriptors = {
