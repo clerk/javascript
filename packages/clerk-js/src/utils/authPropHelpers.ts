@@ -8,6 +8,8 @@ type PickUrlOptions = {
   formatter?: (url: string) => string;
 };
 
+type PickUrlSource = { from: object | object[]; options?: PickUrlOptions };
+
 /**
  * This function will pick the first value that is found inside a source using a key provided.
  * There is a validator option which is used to validate that the value is acceptable. If it isn't, it will
@@ -15,24 +17,27 @@ type PickUrlOptions = {
  * Example usage that looks through the sources for the value of any of the keys provided (with order priority)
  * `pickUrl(['afterSignInUrl', 'redirectUrl'], [optionsA, optionsB])`
  */
-export const pickUrl = (key: string | string[], source: Record<string, any>, opts?: PickUrlOptions): string => {
-  const { validator = () => true, formatter } = opts || {};
-  const keys = (Array.isArray(key) ? key : [key]).map(k => formatter?.(k) || k);
+export const pickUrl = (key: string | string[], source: PickUrlSource | PickUrlSource[]): string => {
   const sources = Array.isArray(source) ? source : [source];
 
   let pickedUrl = '';
   sources.some(s => {
+    const from = Array.isArray(s.from) ? s.from : [s.from];
+    const { validator = () => true, formatter } = s.options || {};
+    const keys = (Array.isArray(key) ? key : [key]).map(k => formatter?.(k) || k);
     keys.some(k => {
-      const url = s[k];
-      if (
-        typeof url === 'string' &&
-        validator(url) &&
-        isValidUrl(url, { includeRelativeUrls: true }) &&
-        !hasBannedProtocol(url)
-      ) {
-        pickedUrl = url;
-      }
-      return pickedUrl;
+      from.some(f => {
+        const url = f[k];
+        if (
+          typeof url === 'string' &&
+          validator(url) &&
+          isValidUrl(url, { includeRelativeUrls: true }) &&
+          !hasBannedProtocol(url)
+        ) {
+          pickedUrl = url;
+        }
+        return pickedUrl;
+      });
     });
     return pickedUrl;
   });
