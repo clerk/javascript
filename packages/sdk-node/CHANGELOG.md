@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.12.17
+
+### Patch Changes
+
+- Fix types of ClerkExpressWithAuth/ClerkExpressRequireAuth args ([#1939](https://github.com/clerkinc/javascript/pull/1939)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`088724324`](https://github.com/clerkinc/javascript/commit/088724324403dbbb06f28ba6538b8bec1fd7ae9f)]:
+  - @clerk/backend@0.32.0
+
 ## 4.12.16
 
 ### Patch Changes

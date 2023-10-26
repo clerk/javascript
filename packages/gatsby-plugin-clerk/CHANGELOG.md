@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.4.19
+
+### Patch Changes
+
+- Updated dependencies [[`088724324`](https://github.com/clerkinc/javascript/commit/088724324403dbbb06f28ba6538b8bec1fd7ae9f), [`5d379bcbf`](https://github.com/clerkinc/javascript/commit/5d379bcbfeec074cb9b9c7c18f84158af22caa61)]:
+  - @clerk/backend@0.32.0
+  - @clerk/clerk-sdk-node@4.12.17
+
 ## 4.4.18
 
 ### Patch Changes
