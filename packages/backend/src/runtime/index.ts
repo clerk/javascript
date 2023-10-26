@@ -15,12 +15,17 @@
 // @ts-ignore - These are package subpaths
 import crypto from '#crypto';
 // @ts-ignore - These are package subpaths
-import fetch from '#fetch';
-// @ts-ignore - These are package subpaths
 import * as fetchApisPolyfill from '#fetch';
 
-const { RuntimeAbortController, RuntimeBlob, RuntimeFormData, RuntimeHeaders, RuntimeRequest, RuntimeResponse } =
-  fetchApisPolyfill;
+const {
+  RuntimeFetch,
+  RuntimeAbortController,
+  RuntimeBlob,
+  RuntimeFormData,
+  RuntimeHeaders,
+  RuntimeRequest,
+  RuntimeResponse,
+} = fetchApisPolyfill;
 
 type Runtime = {
   crypto: Crypto;
@@ -39,7 +44,7 @@ type Runtime = {
 // The globalThis object is supported for Node >= 12.0.
 //
 // https://github.com/supabase/supabase/issues/4417
-const globalFetch = fetch.bind(globalThis);
+const globalFetch = RuntimeFetch.bind(globalThis);
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 const runtime: Runtime = {
