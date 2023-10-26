@@ -10,7 +10,7 @@ const { createFixtures } = bindCreateFixtures('UserProfile');
 describe('RootPage', () => {
   it('renders the component', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.dev'] });
+      f.withUser({ email_addresses: ['test@clerk.com'] });
     });
     fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
 
@@ -21,7 +21,7 @@ describe('RootPage', () => {
   describe('Sections', () => {
     it('shows the bigger sections', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['test@clerk.dev'] });
+        f.withUser({ email_addresses: ['test@clerk.com'] });
       });
       fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
@@ -33,7 +33,7 @@ describe('RootPage', () => {
 
     it('shows the profile section along with the identifier of the user and has a button', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['test@clerk.dev'], first_name: 'George', last_name: 'Clerk' });
+        f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'George', last_name: 'Clerk' });
       });
       fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
@@ -46,7 +46,7 @@ describe('RootPage', () => {
 
     it('shows the profile section along with the identifier of the user and has a button', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['test@clerk.dev'], first_name: 'George', last_name: 'Clerk' });
+        f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'George', last_name: 'Clerk' });
       });
       fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
@@ -58,7 +58,7 @@ describe('RootPage', () => {
     });
 
     it('shows the email addresses section with the email addresses of the user and has appropriate buttons', async () => {
-      const emails = ['test@clerk.dev', 'test2@clerk.dev'];
+      const emails = ['test@clerk.com', 'test2@clerk.com'];
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
         f.withUser({
@@ -109,7 +109,7 @@ describe('RootPage', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
         f.withUser({
-          external_accounts: [{ provider: 'google', email_address: 'testgoogle@clerk.dev' }],
+          external_accounts: [{ provider: 'google', email_address: 'testgoogle@clerk.com' }],
           first_name: 'George',
           last_name: 'Clerk',
         });
@@ -119,7 +119,7 @@ describe('RootPage', () => {
       render(<RootPage />, { wrapper });
       await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
       screen.getByText(/Connected Accounts/i);
-      screen.getByText(/testgoogle@clerk.dev/i);
+      screen.getByText(/testgoogle@clerk.com/i);
       const externalAccountButton = screen.getByText(/google/i);
       expect(externalAccountButton.closest('button')).not.toBeNull();
     });

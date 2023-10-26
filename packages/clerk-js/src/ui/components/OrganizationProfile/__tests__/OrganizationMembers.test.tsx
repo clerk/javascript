@@ -14,7 +14,7 @@ describe('OrganizationMembers', () => {
   it('renders the Organization Members page', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
     });
 
     fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
@@ -37,7 +37,7 @@ describe('OrganizationMembers', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withOrganizationDomains();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
     });
 
     fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
@@ -52,7 +52,7 @@ describe('OrganizationMembers', () => {
   it('shows an invite button inside invitations tab if the current user is an admin', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
     fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
@@ -70,7 +70,7 @@ describe('OrganizationMembers', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1' }],
       });
     });
@@ -89,7 +89,7 @@ describe('OrganizationMembers', () => {
   it('navigates to invite screen when user clicks on Invite button', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
     fixtures.clerk.session?.isAuthorized.mockResolvedValue(true);
@@ -136,7 +136,7 @@ describe('OrganizationMembers', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
@@ -198,7 +198,7 @@ describe('OrganizationMembers', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
@@ -228,7 +228,7 @@ describe('OrganizationMembers', () => {
       f.withOrganizations();
       f.withOrganizationDomains();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
@@ -257,14 +257,14 @@ describe('OrganizationMembers', () => {
       createFakeOrganizationInvitation({
         id: '1',
         role: 'admin',
-        emailAddress: 'admin1@clerk.dev',
+        emailAddress: 'admin1@clerk.com',
         organizationId: '1',
         createdAt: new Date('2022-01-01'),
       }),
       createFakeOrganizationInvitation({
         id: '2',
         role: 'basic_member',
-        emailAddress: 'member2@clerk.dev',
+        emailAddress: 'member2@clerk.com',
         organizationId: '1',
         createdAt: new Date('2022-01-01'),
       }),
@@ -272,7 +272,7 @@ describe('OrganizationMembers', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
@@ -288,9 +288,9 @@ describe('OrganizationMembers', () => {
     const { queryByText, findByRole } = render(<OrganizationMembers />, { wrapper });
     await userEvent.click(await findByRole('tab', { name: 'Invitations' }));
     expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
-    expect(queryByText('admin1@clerk.dev')).toBeInTheDocument();
+    expect(queryByText('admin1@clerk.com')).toBeInTheDocument();
     expect(queryByText('Admin')).toBeInTheDocument();
-    expect(queryByText('member2@clerk.dev')).toBeInTheDocument();
+    expect(queryByText('member2@clerk.com')).toBeInTheDocument();
     expect(queryByText('Member')).toBeInTheDocument();
   });
 
@@ -301,7 +301,7 @@ describe('OrganizationMembers', () => {
           id: '1',
           publicUserData: {
             userId: '1',
-            identifier: 'admin1@clerk.dev',
+            identifier: 'admin1@clerk.com',
           },
           organizationId: '1',
           createdAt: new Date('2022-01-01'),
@@ -310,7 +310,7 @@ describe('OrganizationMembers', () => {
           id: '2',
           publicUserData: {
             userId: '1',
-            identifier: 'member2@clerk.dev',
+            identifier: 'member2@clerk.com',
           },
           organizationId: '1',
           createdAt: new Date('2022-01-01'),
@@ -322,7 +322,7 @@ describe('OrganizationMembers', () => {
       f.withOrganizations();
       f.withOrganizationDomains();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
@@ -348,8 +348,8 @@ describe('OrganizationMembers', () => {
       status: 'pending',
     });
 
-    expect(queryByText('admin1@clerk.dev')).toBeInTheDocument();
-    expect(queryByText('member2@clerk.dev')).toBeInTheDocument();
+    expect(queryByText('admin1@clerk.com')).toBeInTheDocument();
+    expect(queryByText('member2@clerk.com')).toBeInTheDocument();
   });
 
   it('shows the "You" badge when the member id from the list matches the current session user id', async () => {
@@ -361,7 +361,7 @@ describe('OrganizationMembers', () => {
       f.withOrganizations();
       f.withUser({
         id: '1',
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });

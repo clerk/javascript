@@ -9,14 +9,14 @@ const { createFixtures } = bindCreateFixtures('UserProfile');
 describe('ProfilePage', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.dev'] });
+      f.withUser({ email_addresses: ['test@clerk.com'] });
     });
     render(<ProfilePage />, { wrapper });
   });
 
   it('shows the title', async () => {
     const { wrapper } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.dev'] });
+      f.withUser({ email_addresses: ['test@clerk.com'] });
     });
     render(<ProfilePage />, { wrapper });
 
@@ -28,7 +28,7 @@ describe('ProfilePage', () => {
       const { wrapper } = await createFixtures(f => {
         f.withName();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
           first_name: 'F',
           last_name: 'L',
         });
@@ -120,7 +120,7 @@ describe('ProfilePage', () => {
     it('shows the image', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
           profile_image_url: 'https://clerk.com',
           image_url: 'https://clerk.com',
           first_name: 'F',
@@ -135,7 +135,7 @@ describe('ProfilePage', () => {
     it('clicking "Upload image" opens the "Upload" section', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
       const { userEvent } = render(<ProfilePage />, { wrapper });
@@ -148,7 +148,7 @@ describe('ProfilePage', () => {
     it('clicking "Remove image" calls the appropriate function', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
           profile_image_url: 'https://clerk.com',
           image_url:
             'https://img.clerkstage.dev/70726f78792f68747470733a2f2f696d616765732e6c636c636c65726b2e636f6d2f75706c6f616465642f696d675f324f4559646f346e575263766579536c6a366b7775757a336e79472e6a706567',
@@ -164,7 +164,7 @@ describe('ProfilePage', () => {
     xit('"Remove image" is not shown when a default image exists', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
           image_url:
             'https://img.clerkstage.dev/64656661756c742f696e735f3248326461375851494c494b727555654e464967456b73396878362f757365725f3249454d6b59705573514465427162327564677843717565345757?initials=GD',
         });
@@ -181,7 +181,7 @@ describe('ProfilePage', () => {
       const { wrapper } = await createFixtures(f => {
         f.withName();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
       render(<ProfilePage />, { wrapper });
@@ -194,7 +194,7 @@ describe('ProfilePage', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withName();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
       const { userEvent } = render(<ProfilePage />, { wrapper });
@@ -207,7 +207,7 @@ describe('ProfilePage', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withName();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
       const { userEvent } = render(<ProfilePage />, { wrapper });
@@ -220,7 +220,7 @@ describe('ProfilePage', () => {
       const { wrapper } = await createFixtures(f => {
         f.withName();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
       render(<ProfilePage />, { wrapper });
@@ -232,7 +232,7 @@ describe('ProfilePage', () => {
       const { wrapper } = await createFixtures(f => {
         f.withName();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
       const { userEvent } = render(<ProfilePage />, { wrapper });
@@ -246,7 +246,7 @@ describe('ProfilePage', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withName();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
           first_name: 'F',
           last_name: 'L',
         });

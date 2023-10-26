@@ -90,7 +90,7 @@ describe('SignInStart', () => {
       });
       fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
       const { userEvent } = render(<SignInStart />, { wrapper });
-      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
     });
@@ -101,7 +101,7 @@ describe('SignInStart', () => {
       });
       fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
       const { userEvent } = render(<SignInStart />, { wrapper });
-      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one');
@@ -114,7 +114,7 @@ describe('SignInStart', () => {
       fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_second_factor' } as SignInResource));
       const { userEvent } = render(<SignInStart />, { wrapper });
       expect(screen.getByText('Continue')).toBeInTheDocument();
-      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-two');
@@ -133,7 +133,7 @@ describe('SignInStart', () => {
         } as unknown as SignInResource),
       );
       const { userEvent } = render(<SignInStart />, { wrapper });
-      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({

@@ -8,7 +8,7 @@ const { createFixtures } = bindCreateFixtures('UserProfile');
 
 const initConfig = createFixtures.config(f => {
   f.withPhoneNumber();
-  f.withUser({ email_addresses: ['test@clerk.dev'] });
+  f.withUser({ email_addresses: ['test@clerk.com'] });
 });
 
 describe('PhonePage', () => {

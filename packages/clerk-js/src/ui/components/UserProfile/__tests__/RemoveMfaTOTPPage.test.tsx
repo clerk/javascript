@@ -8,7 +8,7 @@ import { RemoveMfaTOTPPage } from '../RemoveResourcePage';
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
 const initConfig = createFixtures.config(f => {
-  f.withUser({ email_addresses: ['test@clerk.dev'] });
+  f.withUser({ email_addresses: ['test@clerk.com'] });
 });
 
 describe('RemoveMfaTOTPPAge', () => {

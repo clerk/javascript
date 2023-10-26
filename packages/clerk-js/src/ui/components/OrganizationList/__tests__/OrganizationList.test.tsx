@@ -16,7 +16,7 @@ describe('OrganizationList', () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
       });
     });
 
@@ -40,7 +40,7 @@ describe('OrganizationList', () => {
       const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
 
@@ -88,7 +88,7 @@ describe('OrganizationList', () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
           organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
         });
       });
@@ -118,7 +118,7 @@ describe('OrganizationList', () => {
       const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
 
@@ -198,7 +198,7 @@ describe('OrganizationList', () => {
     it('display CreateOrganization within OrganizationList', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
-        f.withUser({ email_addresses: ['test@clerk.dev'] });
+        f.withUser({ email_addresses: ['test@clerk.com'] });
       });
 
       const { queryByLabelText, getByRole, userEvent, queryByRole } = render(<OrganizationList />, { wrapper });
@@ -224,7 +224,7 @@ describe('OrganizationList', () => {
     it('display CreateOrganization and navigates to Invite Members', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
-        f.withUser({ email_addresses: ['test@clerk.dev'] });
+        f.withUser({ email_addresses: ['test@clerk.com'] });
       });
 
       const { getByLabelText, getByRole, userEvent, queryByText } = render(<OrganizationList />, { wrapper });
@@ -247,7 +247,7 @@ describe('OrganizationList', () => {
           f.withOrganizations();
           f.withUser({
             id: 'test_user_id',
-            email_addresses: ['test@clerk.dev'],
+            email_addresses: ['test@clerk.com'],
           });
         });
 
@@ -276,7 +276,7 @@ describe('OrganizationList', () => {
           f.withOrganizations();
           f.withUser({
             id: 'test_user_id',
-            email_addresses: ['test@clerk.dev'],
+            email_addresses: ['test@clerk.com'],
           });
         });
 

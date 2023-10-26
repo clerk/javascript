@@ -5,7 +5,7 @@ describe('OrganizationDomain', () => {
     const organization = new OrganizationDomain({
       object: 'organization_domain',
       id: 'test_domain_id',
-      name: 'clerk.dev',
+      name: 'clerk.com',
       organization_id: 'test_org_id',
       enrollment_mode: 'manual_invitation',
       verification: {
@@ -14,7 +14,7 @@ describe('OrganizationDomain', () => {
         strategy: 'email_code',
         status: 'verified',
       },
-      affiliation_email_address: 'some@clerk.dev',
+      affiliation_email_address: 'some@clerk.com',
       created_at: 12345,
       updated_at: 5678,
     });
@@ -26,7 +26,7 @@ describe('OrganizationDomain', () => {
     const organization = new OrganizationDomain({
       object: 'organization_domain',
       id: 'test_domain_id',
-      name: 'clerk.dev',
+      name: 'clerk.com',
       organization_id: 'test_org_id',
       enrollment_mode: 'manual_invitation',
       verification: null,

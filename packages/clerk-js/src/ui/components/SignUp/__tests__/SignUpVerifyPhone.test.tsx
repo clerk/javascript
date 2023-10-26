@@ -47,7 +47,7 @@ describe('SignUpVerifyPhone', () => {
   it('Resend code button exists', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withPhoneNumber({ required: true });
-      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
     render(<SignUpVerifyPhone />, { wrapper });
     const resendButton = screen.getByText(/Resend/i);

@@ -15,7 +15,7 @@ describe('UserButton', () => {
 
   it('renders button when there is a user', async () => {
     const { wrapper } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.dev'] });
+      f.withUser({ email_addresses: ['test@clerk.com'] });
     });
     const { queryByRole } = render(<UserButton />, { wrapper });
     expect(queryByRole('button')).not.toBeNull();
@@ -27,7 +27,7 @@ describe('UserButton', () => {
         first_name: 'First',
         last_name: 'Last',
         username: 'username1',
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
       });
     });
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
@@ -41,7 +41,7 @@ describe('UserButton', () => {
         first_name: 'First',
         last_name: 'Last',
         username: 'username1',
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
       });
     });
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
@@ -56,7 +56,7 @@ describe('UserButton', () => {
         first_name: 'First',
         last_name: 'Last',
         username: 'username1',
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
       });
     });
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
@@ -75,21 +75,21 @@ describe('UserButton', () => {
         first_name: 'First1',
         last_name: 'Last1',
         username: 'username1',
-        email_addresses: ['test1@clerk.dev'],
+        email_addresses: ['test1@clerk.com'],
       });
       f.withUser({
         id: '2',
         first_name: 'First2',
         last_name: 'Last2',
         username: 'username2',
-        email_addresses: ['test2@clerk.dev'],
+        email_addresses: ['test2@clerk.com'],
       });
       f.withUser({
         id: '3',
         first_name: 'First3',
         last_name: 'Last3',
         username: 'username3',
-        email_addresses: ['test3@clerk.dev'],
+        email_addresses: ['test3@clerk.com'],
       });
     });
 
@@ -130,7 +130,7 @@ describe('UserButton', () => {
           first_name: 'TestFirstName',
           last_name: 'TestLastName',
           username: 'username1',
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
       props.setProps({ showName: true });
@@ -140,7 +140,7 @@ describe('UserButton', () => {
 
     it('gives priority to showing username next to the button over email', async () => {
       const { wrapper, props } = await createFixtures(f => {
-        f.withUser({ first_name: '', last_name: '', username: 'username1', email_addresses: ['test@clerk.dev'] });
+        f.withUser({ first_name: '', last_name: '', username: 'username1', email_addresses: ['test@clerk.com'] });
       });
       props.setProps({ showName: true });
       const { getByText } = render(<UserButton />, { wrapper });
@@ -149,11 +149,11 @@ describe('UserButton', () => {
 
     it('shows email next to the button if there is no username or first/last name', async () => {
       const { wrapper, props } = await createFixtures(f => {
-        f.withUser({ first_name: '', last_name: '', username: '', email_addresses: ['test@clerk.dev'] });
+        f.withUser({ first_name: '', last_name: '', username: '', email_addresses: ['test@clerk.com'] });
       });
       props.setProps({ showName: true });
       const { getByText } = render(<UserButton />, { wrapper });
-      expect(getByText('test@clerk.dev')).toBeDefined();
+      expect(getByText('test@clerk.com')).toBeDefined();
     });
 
     it('does not show an identifier next to the button', async () => {
@@ -162,7 +162,7 @@ describe('UserButton', () => {
           first_name: 'TestFirstName',
           last_name: 'TestLastName',
           username: 'username1',
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
         });
       });
       props.setProps({ showName: false });
