@@ -6,31 +6,24 @@
   "globalDependencies": [
     ".changeset/changelog.js",
     ".changeset/config.json",
-    ".dockerignore",
     ".github/**",
     ".jit",
     ".nvmrc",
     ".prettier*",
     "jest.*.ts",
-    "packages/eslint-config-custom/index.js",
     "package.json",
     "package-lock.json",
     "tsconfig.json",
     "tsconfig.*.json",
-    "verdaccio.*.yaml"
+    "verdaccio.yaml"
   ],
   "globalEnv": [
-    "CI",
     "CLERK_*",
     "GATSBY_CLERK_*",
     "NEXT_PUBLIC_CLERK_*",
     "NODE_ENV",
-    "NODE_EXTRA_CA_CERTS",
     "NODE_VERSION",
     "NPM_VERSION",
-    "RUNNER_ARCH",
-    "RUNNER_DEBUG",
-    "RUNNER_OS",
     "TZ",
     "VERCEL"
   ],
