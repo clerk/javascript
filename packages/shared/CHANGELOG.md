@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.1
+
+### Patch Changes
+
+- Improve compatibility with Expo ([#1950](https://github.com/clerkinc/javascript/pull/1950)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 1.0.0
 
 ### Major Changes
