@@ -1,0 +1,129 @@
+
+name: Setup Action
+description: Checkout, setup node and dependencies
+inputs:
+  checkout-ref:
+    description: >
+      The branch, tag or SHA to checkout. When checking out the repository that
+      triggered a workflow, this defaults to the reference or SHA for that
+      event.  Otherwise, uses the default branch.
+  node-version:
+    description: 'The node version to use'
+    required: false
+    default: '18'
+  playwright-enabled:
+    description: 'Enable Playwright?'
+    required: false
+    default: 'false'
+  turbo-enabled:
+    description: 'Enable Turbo?'
+    required: false
+    default: 'true'
+  turbo-cache-dir:
+    description: 'The cache dir to use for Turbo'
+    required: false
+    default: './.turbo-cache'
+  turbo-signature:
+    description: 'The signature to use for Turbo'
+    required: false
+  turbo-remote-only:
+    description: 'Only use remote cache?'
+    required: false
+    default: 'true'
+  turbo-team:
+    description: 'The team to use for Turbo remote auth'
+    required: true
+  turbo-token:
+    description: 'The token to use for Turbo remote auth'
+    required: true
+
+outputs:
+  turbo-args:
+    description: 'The args to use for Turbo'
+    value: ${{ steps.env-vars.outputs.turbo-args }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure Turborepo
+      id: turbo
+      uses: actions/github-script@v6
+      with:
+        result-encoding: string
+        script: |
+          const os = require('os')
+          const numCPUs =
+            typeof os.availableParallelism === "function"
+              ? os.availableParallelism()
+              : os.cpus().length;
+
+          const turboArgs = [
+            '--output-logs=new-only',
+            '--cache-dir=${core.getInput('turbo-cache-dir')}',
+            `--concurrency=${numCPUs}`
+          ];
+
+          const turboEnabled = core.getInput('turbo-enabled') === 'true'
+          if (turboEnabled) {
+            turboArgs.push(`--team=${core.getInput('turbo-team', { required: true })}`)
+            turboArgs.push(`--token=${core.getInput('turbo-token', { required: true })}`)
+            turboArgs.push(`--remote-only=${core.getInput('turbo-remote-only')}`)
+          }
+
+          core.setOutput('turbo-args', turboArgs.join(' '));
+
+          const turboSignature = core.getInput('turbo-signature')
+          if (turboSignature && turboSignature !== '') {
+            core.exportVariable('TURBO_REMOTE_CACHE_SIGNATURE_KEY')
+          }
+
+          core.exportVariable('FORCE_COLOR', '1')
+
+    - name: Checkout Repo (${{ inputs.checkout-ref }})
+      if: inputs.checkout-ref != ''
+      uses: actions/checkout@v4
+      with:
+        show-progress: false
+
+    - name: Checkout Repo
+      if: inputs.checkout-ref == ''
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        show-progress: false
+
+    - name: Setup NodeJS ${{ inputs.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      id: npm-cache
+      with:
+        path: ./node_modules
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+    - name: Install NPM Dependencies
+      if: steps.npm-cache.outputs.cache-hit != 'true'
+      run: npm ci --audit=false --fund=false
+      shell: bash
+
+    - name: Get Playwright Version
+      if: inputs.playwright-enabled == 'true'
+      shell: bash
+      id: playwright-version
+      run: echo "VERSION=$(node -e "console.log($(npm ls @playwright/test --json).dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
+
+    - name: Cache Playwright Binaries
+      if: inputs.playwright-enabled == 'true'
+      uses: actions/cache@v3
+      id: playwright-cache
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
+
+    - name: Install Playwright Browsers
+      if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: npx playwright install --with-deps
