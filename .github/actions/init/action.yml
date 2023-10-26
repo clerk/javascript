@@ -2,11 +2,6 @@
 name: Setup Action
 description: Checkout, setup node and dependencies
 inputs:
-  checkout-ref:
-    description: >
-      The branch, tag or SHA to checkout. When checking out the repository that
-      triggered a workflow, this defaults to the reference or SHA for that
-      event.  Otherwise, uses the default branch.
   node-version:
     description: 'The node version to use'
     required: false
@@ -78,19 +73,6 @@ runs:
           }
 
           core.exportVariable('FORCE_COLOR', '1')
-
-    - name: Checkout Repo (${{ inputs.checkout-ref }})
-      if: inputs.checkout-ref != ''
-      uses: actions/checkout@v4
-      with:
-        show-progress: false
-
-    - name: Checkout Repo
-      if: inputs.checkout-ref == ''
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        show-progress: false
 
     - name: Setup NodeJS ${{ inputs.node-version }}
       uses: actions/setup-node@v3

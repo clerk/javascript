@@ -19,6 +19,12 @@ jobs:
     runs-on: ${{ vars.RUNNER_LARGE }}
 
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
       - name: Setup
         id: config
         uses: ./.github/actions/init
