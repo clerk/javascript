@@ -20,8 +20,6 @@ export const subpathNames = [
   'proxy',
   'underscore',
   'url',
-]
+];
 
-export const subpathFoldersBarrel = [
-  'react'
-]
+export const subpathFoldersBarrel = ['react'];

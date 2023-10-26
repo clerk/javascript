@@ -44,7 +44,7 @@
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
     "publish:local": "npx yalc push --replace  --sig",
-    "prepublishOnly": "node ../../scripts/subpath-workaround.mjs shared",
+    "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
     "lint:publint": "publint",
