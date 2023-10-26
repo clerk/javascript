@@ -2,20 +2,12 @@ name: CI
 
 on:
   workflow_dispatch:
-  merge_group:
+  # merge_group:
   pull_request:
     branches:
       - main
-
-env:
-  FORCE_COLOR: '1'
-  NODE_VERSION: '18'
-  TURBO_ARGS: --output-logs=new-only --cache-dir=./.turbo-cache --concurrency=8
-  TURBO_TOKEN: ${{ secrets.TEST_TURBO_TOKEN }}
-  TURBO_TEAM: ${{ secrets.TEST_TURBO_TEAM }}
-  TURBO_REMOTE_CACHE_SIGNATURE_KEY: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-  TURBO_REMOTE_ONLY: true
-  TURBO_CONCURRENCY: 8 # Available CPU in RUNNER_LARGE
+      - main-v4
+      - ci-updates
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,8 +17,6 @@ jobs:
   formatting-linting:
     name: Formatting & Linting
     runs-on: ${{ vars.RUNNER_LARGE }}
-    env:
-      TURBO_REMOTE_ONLY: false
 
     steps:
       - name: Checkout Repo
@@ -35,21 +25,23 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
-      - name: Setup NodeJS ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          turbo-remote-only: false
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Cache node_modules
-        uses: actions/cache@v3
-        id: npm-cache
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install NPM Dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: npm ci --audit=false --fund=false
+      - name: Test Envs
+        run: |
+          echo "TURBO_ARGS: $TURBO_ARGS"
+          echo "TURBO_TEAM: $TURBO_TEAM"
+          echo "TURBO_TOKEN: $TURBO_TOKEN"
+          echo "TURBO_REMOTE_ONLY: $TURBO_REMOTE_ONLY"
+          echo "TURBO_REMOTE_CACHE_SIGNATURE_KEY: $TURBO_REMOTE_CACHE_SIGNATURE_KEY"
+          echo "FORCE_COLOR: $FORCE_COLOR"
 
       - name: Require Changeset
         run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
@@ -58,14 +50,14 @@ jobs:
         run: npm run format:check
 
       - name: Lint packages using publint
-        run: npm run lint:publint -- ${{ env.TURBO_ARGS }}
+        run: npm run lint:publint -- $TURBO_ARGS
 
       - name: Lint types using attw
-        run: npm run lint:attw -- ${{ env.TURBO_ARGS }}
+        run: npm run lint:attw -- $TURBO_ARGS
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
-        run: npm run lint -- ${{ env.TURBO_ARGS }} -- --quiet
+        run: npm run lint -- $TURBO_ARGS -- --quiet
 
   unit-tests:
     name: Unit Tests
@@ -83,24 +75,17 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
-      - name: Setup NodeJS ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
         with:
-          node-version: ${{  matrix.node-version }}
-
-      - name: Cache node_modules
-        uses: actions/cache@v3
-        id: npm-cache
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install NPM Dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: npm ci --audit=false --fund=false
+          node-version: ${{ matrix.node-version }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Run tests
-        run: npx turbo test ${{ env.TURBO_ARGS }}
+        run: npx turbo test $TURBO_ARGS
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
@@ -120,65 +105,36 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
-      - name: Setup NodeJS ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
 
-      - name: Cache node_modules
-        uses: actions/cache@v3
-        id: npm-cache
+      - name: Verdaccio
+        uses: ./.github/actions/verdaccio
         with:
-          path: ./node_modules
-          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install NPM Dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: npm ci --audit=false --fund=false
-
-      - name: Get Playwright Version
-        id: playwright-version
-        run: echo "VERSION=$(node -e "console.log($(npm ls @playwright/test --json).dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Playwright Binaries
-        uses: actions/cache@v3
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
-
-      - name: Install Playwright Browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
-
-      - name: Update NPM Registry
-        run: npm set registry http://localhost:4873/
-
-      - name: Run Verdaccio
-        run: |
-          nohup ./node_modules/.bin/verdaccio --config ./verdaccio.yaml & sleep 5
-          ./node_modules/.bin/npm-cli-adduser -u user -p pass -e test@test.com -r http://localhost:4873/
-          ./node_modules/.bin/npm-cli-login -u user -p pass -e test@test.com -r http://localhost:4873/
-
-      - name: Publish to Verdaccio
-        run: |
-          if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build ${{ env.TURBO_ARGS }} && npx changeset publish --no-git-tag; fi
+          publish-cmd: |
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
         run: npm init -y && npm install @clerk/backend
 
-      - name: Run Playwright tests
+      - name: Run Integration Tests
         run: npm run test:integration:${{ matrix.test-name }}
         env:
+          E2E_CLERK_VERSION: 'latest'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
-          E2E_CLERK_VERSION: 'latest'
 
-      - name: Upload Playwright Report for ${{ matrix.test-name }}
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-report-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
-          path: playwright-report/
-          retention-days: 1
+      # - name: Upload Integration Report for ${{ matrix.test-name }}
+      #   uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: integration-report-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+      #     path: playwright-report/
+      #     retention-days: 1
