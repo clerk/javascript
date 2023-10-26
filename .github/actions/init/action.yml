@@ -47,32 +47,40 @@ runs:
         result-encoding: string
         script: |
           const os = require('os')
-          const numCPUs =
+          const cpus =
             typeof os.availableParallelism === "function"
               ? os.availableParallelism()
               : os.cpus().length;
 
+          const turbo = {
+            enabled: core.getInput('turbo-enabled') === 'true',
+            cacheDir: core.getInput('turbo-cache-dir'),
+            signature: core.getInput('turbo-signature'),
+            remoteOnly: core.getInput('turbo-remote-only'),
+            team: core.getInput('turbo-team', { required: true }),
+            token: core.getInput('turbo-token', { required: true }),
+          }
+
           const turboArgs = [
             '--output-logs=new-only',
-            '--cache-dir=${core.getInput('turbo-cache-dir')}',
-            `--concurrency=${numCPUs}`
+            `--cache-dir=${turbo.cacheDir}`,
+            `--concurrency=${cpus}`
           ];
 
-          const turboEnabled = core.getInput('turbo-enabled') === 'true'
-          if (turboEnabled) {
-            turboArgs.push(`--team=${core.getInput('turbo-team', { required: true })}`)
-            turboArgs.push(`--token=${core.getInput('turbo-token', { required: true })}`)
-            turboArgs.push(`--remote-only=${core.getInput('turbo-remote-only')}`)
+          if (turbo.enabled) {
+            turboArgs.push(
+              `--team=${turbo.team}`,
+              `--token=${turbo.token}`,
+              `--remote-only=${turbo.remoteOnly}`,
+            )
           }
 
           core.setOutput('turbo-args', turboArgs.join(' '));
+          core.exportVariable('FORCE_COLOR', '1')
 
-          const turboSignature = core.getInput('turbo-signature')
-          if (turboSignature && turboSignature !== '') {
+          if (turbo.signature && turbo.signature !== '') {
             core.exportVariable('TURBO_REMOTE_CACHE_SIGNATURE_KEY')
           }
-
-          core.exportVariable('FORCE_COLOR', '1')
 
     - name: Setup NodeJS ${{ inputs.node-version }}
       uses: actions/setup-node@v3
