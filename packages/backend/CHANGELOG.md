@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.32.0
+
+### Minor Changes
+
+- Add support for NextJS 14 ([#1948](https://github.com/clerkinc/javascript/pull/1948)) by [@desiprisg](https://github.com/desiprisg)
+
 ## 0.31.3
 
 ### Patch Changes

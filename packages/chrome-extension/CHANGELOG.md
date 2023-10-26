@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.4.11
+
+### Patch Changes
+
+- Updated dependencies [[`9e57e94d2`](https://github.com/clerkinc/javascript/commit/9e57e94d25b96c11889f49e7e4d4827e5134927d)]:
+  - @clerk/clerk-js@4.64.0
+
 ## 0.4.10
 
 ### Patch Changes

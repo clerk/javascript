@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "0.6.17",
+  "version": "0.6.18",
   "license": "MIT",
   "description": "Clerk SDK for Fastify",
   "keywords": [
@@ -30,7 +30,7 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/backend": "0.31.3",
+    "@clerk/backend": "0.32.0",
     "@clerk/shared": "1.0.0",
     "@clerk/types": "3.57.0",
     "cookies": "0.8.0"

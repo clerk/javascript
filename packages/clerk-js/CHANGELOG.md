@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.64.0
+
+### Minor Changes
+
+- Greatly improve the UX when users are creating their passwords. The hints below the input fields now have smoother animations and show more types of feedback based on different conditions. Additionally, the password validation is now debounced. ([#1776](https://github.com/clerkinc/javascript/pull/1776)) by [@desiprisg](https://github.com/desiprisg)
+
 ## 4.63.0
 
 ### Minor Changes
