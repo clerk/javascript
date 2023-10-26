@@ -13,10 +13,11 @@ export function is4xxError(e: any): boolean {
   return !!status && status >= 400 && status < 500;
 }
 
+export const NETWORK_ERROR_STRING = 'networkerror';
 export function isNetworkError(e: any): boolean {
   // TODO: revise during error handling epic
   const message = (`${e.message}${e.name}` || '').toLowerCase().replace(/\s+/g, '');
-  return message.includes('networkerror');
+  return message.includes(NETWORK_ERROR_STRING);
 }
 
 interface ClerkAPIResponseOptions {

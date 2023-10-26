@@ -24,7 +24,7 @@ type FapiQueryStringParameters = {
 };
 
 export type FapiResponse<T> = Response & {
-  payload: FapiResponseJSON<T> | null;
+  payload: FapiResponseJSON<T>;
 };
 
 export type FapiRequestCallback<T> = (

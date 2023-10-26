@@ -165,7 +165,7 @@ export class User extends BaseResource implements UserResource {
           additional_scope: additionalScopes,
         } as any,
       })
-    )?.response as unknown as ExternalAccountJSON;
+    ).response;
 
     return new ExternalAccount(json, this.path() + '/external_accounts');
   };
@@ -176,19 +176,19 @@ export class User extends BaseResource implements UserResource {
         path: '/me/totp',
         method: 'POST',
       })
-    )?.response as unknown as TOTPJSON;
+    ).response;
 
     return new TOTP(json);
   };
 
   verifyTOTP = async ({ code }: VerifyTOTPParams): Promise<TOTPResource> => {
     const json = (
-      await BaseResource._fetch<ExternalAccountJSON>({
+      await BaseResource._fetch<TOTPJSON>({
         path: '/me/totp/attempt_verification',
         method: 'POST',
         body: { code } as any,
       })
-    )?.response as unknown as TOTPJSON;
+    ).response;
 
     return new TOTP(json);
   };
@@ -199,7 +199,7 @@ export class User extends BaseResource implements UserResource {
         path: '/me/totp',
         method: 'DELETE',
       })
-    )?.response as unknown as DeletedObjectJSON;
+    ).response;
 
     return new DeletedObject(json);
   };
@@ -210,7 +210,7 @@ export class User extends BaseResource implements UserResource {
         path: this.path() + '/backup_codes/',
         method: 'POST',
       })
-    )?.response as unknown as BackupCodeJSON;
+    ).response;
 
     return new BackupCode(json);
   };
@@ -282,7 +282,7 @@ export class User extends BaseResource implements UserResource {
         path: `${this.path()}/organization_memberships/${organizationId}`,
         method: 'DELETE',
       })
-    )?.response as unknown as DeletedObjectJSON;
+    ).response;
 
     return new DeletedObject(json);
   };

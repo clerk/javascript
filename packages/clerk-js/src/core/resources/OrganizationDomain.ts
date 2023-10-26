@@ -35,7 +35,7 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
         method: 'POST',
         body: { name } as any,
       })
-    )?.response as unknown as OrganizationDomainJSON;
+    ).response;
     return new OrganizationDomain(json);
   }
 

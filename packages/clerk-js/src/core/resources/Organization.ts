@@ -86,7 +86,7 @@ export class Organization extends BaseResource implements OrganizationResource {
         method: 'POST',
         body: { name, slug } as any,
       })
-    )?.response as unknown as OrganizationJSON;
+    )?.response;
 
     return new Organization(json);
   }
@@ -97,7 +97,7 @@ export class Organization extends BaseResource implements OrganizationResource {
         path: `/organizations/${organizationId}`,
         method: 'GET',
       })
-    )?.response as unknown as OrganizationJSON;
+    )?.response;
 
     return new Organization(json);
   }
@@ -126,14 +126,13 @@ export class Organization extends BaseResource implements OrganizationResource {
   getDomains = async (
     getDomainParams?: GetDomainsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationDomainResource>> => {
-    return await BaseResource._fetch({
+    return await BaseResource._fetch<ClerkPaginatedResponse<OrganizationDomainJSON>>({
       path: `/organizations/${this.id}/domains`,
       method: 'GET',
       search: convertPageToOffset(getDomainParams) as any,
     })
       .then(res => {
-        const { data: invites, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationDomainJSON>;
+        const { data: invites, total_count } = res.response;
 
         return {
           total_count,
@@ -152,21 +151,20 @@ export class Organization extends BaseResource implements OrganizationResource {
         path: `/organizations/${this.id}/domains/${domainId}`,
         method: 'GET',
       })
-    )?.response as unknown as OrganizationDomainJSON;
+    )?.response;
     return new OrganizationDomain(json);
   };
 
   getMembershipRequests = async (
     getRequestParam?: GetMembershipRequestParams,
   ): Promise<ClerkPaginatedResponse<OrganizationMembershipRequestResource>> => {
-    return await BaseResource._fetch({
+    return await BaseResource._fetch<ClerkPaginatedResponse<OrganizationMembershipRequestJSON>>({
       path: `/organizations/${this.id}/membership_requests`,
       method: 'GET',
       search: convertPageToOffset(getRequestParam) as any,
     })
       .then(res => {
-        const { data: requests, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipRequestJSON>;
+        const { data: requests, total_count } = res.response;
 
         return {
           total_count,
@@ -197,7 +195,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       deprecated('offset', 'Use `initialPage` instead in Organization.limit.', 'organization:getMemberships:offset');
     }
 
-    return await BaseResource._fetch({
+    return await BaseResource._fetch<OrganizationMembershipJSON[]>({
       path: `/organizations/${this.id}/memberships`,
       method: 'GET',
       search: isDeprecatedParams
@@ -206,7 +204,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     })
       .then(res => {
         if (isDeprecatedParams) {
-          const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
+          const organizationMembershipsJSON = res.response;
           return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem)) as any;
         }
 
@@ -233,13 +231,13 @@ export class Organization extends BaseResource implements OrganizationResource {
     getPendingInvitationsParams?: GetPendingInvitationsParams,
   ): Promise<OrganizationInvitation[]> => {
     deprecated('getPendingInvitations', 'Use the `getInvitations` method instead.');
-    return await BaseResource._fetch({
+    return await BaseResource._fetch<OrganizationInvitationJSON[]>({
       path: `/organizations/${this.id}/invitations/pending`,
       method: 'GET',
       search: getPendingInvitationsParams as any,
     })
       .then(res => {
-        const pendingInvitations = res?.response as unknown as OrganizationInvitationJSON[];
+        const pendingInvitations = res?.response;
         return pendingInvitations.map(pendingInvitation => new OrganizationInvitation(pendingInvitation));
       })
       .catch(() => []);
@@ -248,14 +246,13 @@ export class Organization extends BaseResource implements OrganizationResource {
   getInvitations = async (
     getInvitationsParams?: GetInvitationsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationInvitationResource>> => {
-    return await BaseResource._fetch({
+    return await BaseResource._fetch<ClerkPaginatedResponse<OrganizationInvitationJSON>>({
       path: `/organizations/${this.id}/invitations`,
       method: 'GET',
       search: convertPageToOffset(getInvitationsParams) as any,
     })
       .then(res => {
-        const { data: requests, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;
+        const { data: requests, total_count } = res.response;
 
         return {
           total_count,
@@ -269,11 +266,11 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {
-    const newMember = await BaseResource._fetch({
+    const newMember = await BaseResource._fetch<OrganizationMembershipJSON>({
       method: 'POST',
       path: `/organizations/${this.id}/memberships`,
       body: { userId, role } as any,
-    }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
+    }).then(res => new OrganizationMembership(res.response));
     OrganizationMembership.clerk.__unstable__membershipUpdate(newMember);
     return newMember;
   };
@@ -287,20 +284,20 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   updateMember = async ({ userId, role }: UpdateMembershipParams): Promise<OrganizationMembership> => {
-    const updatedMember = await BaseResource._fetch({
+    const updatedMember = await BaseResource._fetch<OrganizationMembershipJSON>({
       method: 'PATCH',
       path: `/organizations/${this.id}/memberships/${userId}`,
       body: { role } as any,
-    }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
+    }).then(res => new OrganizationMembership(res.response));
     OrganizationMembership.clerk.__unstable__membershipUpdate(updatedMember);
     return updatedMember;
   };
 
   removeMember = async (userId: string): Promise<OrganizationMembership> => {
-    const deletedMember = await BaseResource._fetch({
+    const deletedMember = await BaseResource._fetch<OrganizationMembershipJSON>({
       method: 'DELETE',
       path: `/organizations/${this.id}/memberships/${userId}`,
-    }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
+    }).then(res => new OrganizationMembership(res.response));
     OrganizationMembership.clerk.__unstable__membershipUpdate(deletedMember);
     return deletedMember;
   };
@@ -311,10 +308,10 @@ export class Organization extends BaseResource implements OrganizationResource {
 
   setLogo = async ({ file }: SetOrganizationLogoParams): Promise<OrganizationResource> => {
     if (file === null) {
-      return await BaseResource._fetch({
+      return await BaseResource._fetch<OrganizationJSON>({
         path: `/organizations/${this.id}/logo`,
         method: 'DELETE',
-      }).then(res => new Organization(res?.response as OrganizationJSON));
+      }).then(res => new Organization(res.response));
     }
 
     let body;
@@ -329,12 +326,12 @@ export class Organization extends BaseResource implements OrganizationResource {
       body.append('file', file);
     }
 
-    return await BaseResource._fetch({
+    return await BaseResource._fetch<OrganizationJSON>({
       path: `/organizations/${this.id}/logo`,
       method: 'PUT',
       body,
       headers,
-    }).then(res => new Organization(res?.response as OrganizationJSON));
+    }).then(res => new Organization(res.response));
   };
 
   protected fromJSON(data: OrganizationJSON | null): this {
@@ -370,7 +367,7 @@ export class Organization extends BaseResource implements OrganizationResource {
         },
         { forceUpdateClient: true },
       )
-    )?.response as unknown as OrganizationJSON;
+    ).response;
 
     return this.fromJSON(json);
   }

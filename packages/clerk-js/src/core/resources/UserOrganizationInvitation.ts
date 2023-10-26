@@ -24,14 +24,13 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
   static async retrieve(
     params?: GetUserOrganizationInvitationsParams,
   ): Promise<ClerkPaginatedResponse<UserOrganizationInvitation>> {
-    return await BaseResource._fetch({
+    return await BaseResource._fetch<ClerkPaginatedResponse<UserOrganizationInvitationJSON>>({
       path: '/me/organization_invitations',
       method: 'GET',
       search: convertPageToOffset(params) as any,
     })
       .then(res => {
-        const { data: invites, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<UserOrganizationInvitationJSON>;
+        const { data: invites, total_count } = res.response;
 
         return {
           total_count,

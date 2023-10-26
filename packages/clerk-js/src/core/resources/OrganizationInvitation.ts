@@ -30,7 +30,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
         method: 'POST',
         body: { email_address: emailAddress, role } as any,
       })
-    )?.response as unknown as OrganizationInvitationJSON;
+    ).response;
     const newInvitation = new OrganizationInvitation(json);
     this.clerk.__unstable__invitationUpdate(newInvitation);
     return newInvitation;
@@ -42,12 +42,12 @@ export class OrganizationInvitation extends BaseResource implements Organization
   ): Promise<OrganizationInvitationResource[]> {
     const { emailAddresses, role } = params;
     const json = (
-      await BaseResource._fetch<OrganizationInvitationJSON>({
+      await BaseResource._fetch<OrganizationInvitationJSON[]>({
         path: `/organizations/${organizationId}/invitations/bulk`,
         method: 'POST',
         body: { email_address: emailAddresses, role } as any,
       })
-    )?.response as unknown as OrganizationInvitationJSON[];
+    ).response;
     // const newInvitation = new OrganizationInvitation(json);
     // TODO: Figure out what this is...
     // this.clerk.__unstable__invitationUpdate(newInvitation);

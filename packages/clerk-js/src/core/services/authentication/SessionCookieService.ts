@@ -1,4 +1,4 @@
-import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
+import { is4xxError, isClerkAPIResponseError, isKnownError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
 import type { CookieHandler } from '../../../utils';
@@ -95,6 +95,11 @@ export class SessionCookieService {
   }
 
   private handleGetTokenError(e: any) {
+    //return if network error
+    if (isNetworkError(e)) {
+      return;
+    }
+
     //throw if not a clerk error
     if (!isClerkAPIResponseError(e)) {
       clerkCoreErrorTokenRefreshFailed(e.message || e);
@@ -103,10 +108,6 @@ export class SessionCookieService {
     //sign user out if a 4XX error
     if (is4xxError(e)) {
       void this.clerk.handleUnauthenticated();
-      return;
-    }
-
-    if (isNetworkError(e)) {
       return;
     }
 

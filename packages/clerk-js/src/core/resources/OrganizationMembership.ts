@@ -52,7 +52,7 @@ export class OrganizationMembership extends BaseResource implements Organization
       );
     }
 
-    return await BaseResource._fetch({
+    return await BaseResource._fetch<OrganizationMembershipJSON[]>({
       path: '/me/organization_memberships',
       method: 'GET',
       search: isDeprecatedParams
@@ -61,7 +61,7 @@ export class OrganizationMembership extends BaseResource implements Organization
     })
       .then(res => {
         if (isDeprecatedParams) {
-          const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
+          const organizationMembershipsJSON = res.response;
           return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem)) as any;
         }
 

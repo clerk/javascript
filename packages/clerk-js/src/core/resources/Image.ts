@@ -27,7 +27,7 @@ export class Image extends BaseResource implements ImageResource {
         body: fd,
         headers,
       })
-    )?.response as unknown as ImageJSON;
+    )?.response;
 
     return new Image(json);
   }
@@ -38,7 +38,7 @@ export class Image extends BaseResource implements ImageResource {
         path,
         method: 'DELETE',
       })
-    )?.response as unknown as ImageJSON;
+    )?.response;
 
     return new Image(json);
   }

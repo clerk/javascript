@@ -26,14 +26,13 @@ export class OrganizationSuggestion extends BaseResource implements Organization
   static async retrieve(
     params?: GetUserOrganizationSuggestionsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationSuggestion>> {
-    return await BaseResource._fetch({
+    return await BaseResource._fetch<ClerkPaginatedResponse<OrganizationSuggestionJSON>>({
       path: '/me/organization_suggestions',
       method: 'GET',
       search: convertPageToOffset(params) as any,
     })
       .then(res => {
-        const { data: suggestions, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationSuggestionJSON>;
+        const { data: suggestions, total_count } = res.response;
 
         return {
           total_count,
