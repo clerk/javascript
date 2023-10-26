@@ -34,6 +34,15 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Test Envs
+        run: |
+          echo "TURBO_ARGS: $TURBO_ARGS"
+          echo "TURBO_TEAM: $TURBO_TEAM"
+          echo "TURBO_TOKEN: $TURBO_TOKEN"
+          echo "TURBO_REMOTE_ONLY: $TURBO_REMOTE_ONLY"
+          echo "TURBO_REMOTE_CACHE_SIGNATURE_KEY: $TURBO_REMOTE_CACHE_SIGNATURE_KEY"
+          echo "FORCE_COLOR: $FORCE_COLOR"
+
       - name: Require Changeset
         run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
@@ -41,14 +50,14 @@ jobs:
         run: npm run format:check
 
       - name: Lint packages using publint
-        run: npm run lint:publint -- ${{ steps.config.outputs.turbo-args }}
+        run: npm run lint:publint -- $TURBO_ARGS
 
       - name: Lint types using attw
-        run: npm run lint:attw -- ${{ steps.config.outputs.turbo-args }}
+        run: npm run lint:attw -- $TURBO_ARGS
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
-        run: npm run lint -- ${{ steps.config.outputs.turbo-args }} -- --quiet
+        run: npm run lint -- $TURBO_ARGS -- --quiet
 
   unit-tests:
     name: Unit Tests
@@ -60,6 +69,12 @@ jobs:
         node-version: [ 18, 20 ]
 
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
       - name: Setup
         id: config
         uses: ./.github/actions/init
@@ -70,7 +85,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Run tests
-        run: npx turbo test ${{ steps.config.outputs.turbo-args }}
+        run: npx turbo test $TURBO_ARGS
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
@@ -84,6 +99,12 @@ jobs:
         test-name: [ 'generic', 'nextjs', 'remix' ]
 
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
       - name: Setup
         id: config
         uses: ./.github/actions/init
@@ -97,7 +118,7 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build ${{ steps.config.outputs.turbo-args }} && npx changeset publish --no-git-tag; fi
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
@@ -110,10 +131,10 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
-      - name: Upload Integration Report for ${{ matrix.test-name }}
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: integration-report-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
-          path: playwright-report/
-          retention-days: 1
+      # - name: Upload Integration Report for ${{ matrix.test-name }}
+      #   uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: integration-report-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+      #     path: playwright-report/
+      #     retention-days: 1

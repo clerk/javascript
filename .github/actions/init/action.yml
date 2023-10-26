@@ -32,11 +32,6 @@ inputs:
     description: 'The token to use for Turbo remote auth'
     required: true
 
-outputs:
-  turbo-args:
-    description: 'The args to use for Turbo'
-    value: ${{ steps.env-vars.outputs.turbo-args }}
-
 runs:
   using: "composite"
   steps:
@@ -44,10 +39,11 @@ runs:
       id: turbo
       uses: actions/github-script@v6
       env:
+        # envs are required to pass inputs to the script
         ENABLED: ${{ inputs.turbo-enabled }}
         CACHE_DIR: ${{ inputs.turbo-cache-dir }}
-        SIGNATURE: ${{ inputs.turbo-signature }}
         REMOTE_ONLY: ${{ inputs.turbo-remote-only }}
+        SIGNATURE: ${{ inputs.turbo-signature }}
         TEAM: ${{ inputs.turbo-team }}
         TOKEN: ${{ inputs.turbo-token }}
       with:
@@ -60,29 +56,29 @@ runs:
 
           const { ENABLED, CACHE_DIR, SIGNATURE, REMOTE_ONLY, TEAM, TOKEN } = process.env
 
-          const turboArgs = [
-            '--output-logs=new-only',
-            `--cache-dir=${CACHE_DIR}`,
-            `--concurrency=${cpus}`
-          ];
+          core.exportVariable('TURBO_ARGS',
+            [
+              '--output-logs=new-only',
+              `--cache-dir=${CACHE_DIR}`,
+              `--concurrency=${cpus}`
+            ].join(' ')
+          )
 
           if (ENABLED === 'true') {
             core.exportVariable('TURBO_TEAM', TEAM)
             core.exportVariable('TURBO_TOKEN', TOKEN)
-            core.exportVariable('TURBO_REMOTE_CACHE_SIGNATURE_KEY', REMOTE_ONLY)
-            // turboArgs.push(
-            //   `--team=${TEAM}`,
-            //   `--token=${TOKEN}`,
-            //   `--remote-only=${REMOTE_ONLY}`,
-            // )
+            core.exportVariable('TURBO_REMOTE_ONLY', REMOTE_ONLY)
           }
 
           if (SIGNATURE && SIGNATURE !== '') {
             core.exportVariable('TURBO_REMOTE_CACHE_SIGNATURE_KEY', SIGNATURE)
           }
 
-          core.setOutput('turbo-args', turboArgs.join(' '));
           core.exportVariable('FORCE_COLOR', '1')
+
+    - name: Turborepo CLI Args
+      shell: bash
+      run: echo $TURBO_ARGS
 
     - name: Setup NodeJS ${{ inputs.node-version }}
       uses: actions/setup-node@v3
