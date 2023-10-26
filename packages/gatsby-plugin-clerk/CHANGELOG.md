@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.4.20
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/backend@0.32.1
+  - @clerk/clerk-react@4.27.1
+  - @clerk/clerk-sdk-node@4.12.18
+
 ## 4.4.19
 
 ### Patch Changes
