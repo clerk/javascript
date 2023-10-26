@@ -8,3 +8,4 @@ module.exports.RuntimeHeaders = Headers;
 module.exports.RuntimeRequest = Request;
 module.exports.RuntimeResponse = Response;
 module.exports.RuntimeAbortController = AbortController;
+module.exports.RuntimeFetch = fetch;

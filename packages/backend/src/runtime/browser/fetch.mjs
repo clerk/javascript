@@ -5,3 +5,4 @@ export const RuntimeHeaders = Headers;
 export const RuntimeRequest = Request;
 export const RuntimeResponse = Response;
 export const RuntimeAbortController = AbortController;
+export const RuntimeFetch = fetch;
