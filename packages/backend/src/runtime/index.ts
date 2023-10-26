@@ -15,17 +15,12 @@
 // @ts-ignore - These are package subpaths
 import crypto from '#crypto';
 // @ts-ignore - These are package subpaths
+import fetch from '#fetch';
+// @ts-ignore - These are package subpaths
 import * as fetchApisPolyfill from '#fetch';
 
-const {
-  default: fetch,
-  RuntimeAbortController,
-  RuntimeBlob,
-  RuntimeFormData,
-  RuntimeHeaders,
-  RuntimeRequest,
-  RuntimeResponse,
-} = fetchApisPolyfill;
+const { RuntimeAbortController, RuntimeBlob, RuntimeFormData, RuntimeHeaders, RuntimeRequest, RuntimeResponse } =
+  fetchApisPolyfill;
 
 type Runtime = {
   crypto: Crypto;
