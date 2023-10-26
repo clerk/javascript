@@ -2,4 +2,4 @@
 "@clerk/shared": patch
 ---
 
-TODO
+Improve compatibility with Expo
