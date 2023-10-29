@@ -1,7 +1,6 @@
 {
   "name": "@clerk/backend",
   "version": "0.31.3",
-  "license": "MIT",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -12,6 +11,7 @@
     "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/backend"
   },
+  "license": "MIT",
   "imports": {
     "#crypto": {
       "edge-light": "./dist/runtime/browser/crypto.mjs",

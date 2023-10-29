@@ -1,7 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
   "version": "0.4.10",
-  "license": "MIT",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -21,6 +20,7 @@
     "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/chrome-extension"
   },
+  "license": "MIT",
   "sideEffects": false,
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

@@ -1,7 +1,6 @@
 {
   "name": "@clerk/clerk-js",
   "version": "4.63.0",
-  "license": "MIT",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -20,6 +19,7 @@
     "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/clerk-js"
   },
+  "license": "MIT",
   "author": "Clerk",
   "main": "dist/clerk.js",
   "jsdelivr": "dist/clerk.browser.js",

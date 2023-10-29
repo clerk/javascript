@@ -1,7 +1,6 @@
 {
   "name": "gatsby-plugin-clerk",
   "version": "4.4.18",
-  "license": "MIT",
   "description": "Clerk SDK for Gatsby",
   "keywords": [
     "clerk",
@@ -22,6 +21,7 @@
     "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/gatsby-plugin-clerk"
   },
+  "license": "MIT",
   "author": "Clerk",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

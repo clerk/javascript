@@ -1,7 +1,6 @@
 {
   "name": "@clerk/themes",
   "version": "1.7.9",
-  "license": "MIT",
   "description": "Themes for the Clerk auth components",
   "keywords": [
     "react",
@@ -23,6 +22,7 @@
     "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/themes"
   },
+  "license": "MIT",
   "author": "Clerk",
   "main": "dist/themes/src/index.js",
   "source": "src/index.js",
