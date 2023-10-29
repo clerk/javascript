@@ -1,7 +1,6 @@
 {
   "name": "@clerk/remix",
   "version": "3.1.0",
-  "license": "MIT",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -22,6 +21,7 @@
     "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/remix"
   },
+  "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
   "exports": {

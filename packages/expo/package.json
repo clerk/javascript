@@ -1,7 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
   "version": "0.19.12",
-  "license": "MIT",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -22,6 +21,7 @@
     "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/expo"
   },
+  "license": "MIT",
   "author": "Clerk",
   "main": "dist/index.js",
   "source": "src/index.js",

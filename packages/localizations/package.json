@@ -1,7 +1,6 @@
 {
   "name": "@clerk/localizations",
   "version": "1.26.7",
-  "license": "MIT",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -23,6 +22,7 @@
     "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/localizations"
   },
+  "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
   "main": "./dist/index.js",

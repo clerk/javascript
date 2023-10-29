@@ -1,7 +1,6 @@
 {
   "name": "@clerk/clerk-react",
   "version": "4.27.0",
-  "license": "MIT",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -21,6 +20,7 @@
     "url": "git+https://github.com/clerkinc/javascript.git",
     "directory": "packages/react"
   },
+  "license": "MIT",
   "author": "Clerk",
   "sideEffects": [
     "./dist/cjs/index.js",
