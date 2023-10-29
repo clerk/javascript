@@ -51,7 +51,8 @@ export function getDevBrowserJWTFromURL(url: URL): string {
 
   const jwt = jwtFromHash || jwtFromSearch;
 
-  if (jwt && typeof globalThis.history !== 'undefined') {
+  // eslint-disable-next-line valid-typeof
+  if (jwt && typeof globalThis.history !== undefined) {
     globalThis.history.replaceState(null, '', resultURL.href);
   }
 
