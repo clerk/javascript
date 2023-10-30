@@ -14,7 +14,6 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       ...options,
       secretKey,
       publishableKey,
-      frontendApi: constants.FRONTEND_API,
       request: createIsomorphicRequest((Request, Headers) => {
         const requestHeaders = Object.keys(req.headers).reduce(
           (acc, key) => Object.assign(acc, { [key]: req?.headers[key] }),
@@ -42,10 +41,8 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
     }
 
     if (requestState.isInterstitial) {
-      const interstitialHtmlPage = clerkClient.localInterstitial({
-        publishableKey,
-        frontendApi: constants.FRONTEND_API,
-      });
+      // TODO(@dimkl): use empty string for frontendApi until type is fixed in @clerk/backend to drop it
+      const interstitialHtmlPage = clerkClient.localInterstitial({ publishableKey, frontendApi: '' });
 
       return reply
         .code(401)

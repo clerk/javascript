@@ -8,7 +8,6 @@ exports[`constants from environment variables 1`] = `
     "ClientUat": "__client_uat",
     "Session": "__session",
   },
-  "FRONTEND_API": "CLERK_FRONTEND_API",
   "Headers": {
     "AuthMessage": "x-clerk-auth-message",
     "AuthReason": "x-clerk-auth-reason",
