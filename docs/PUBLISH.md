@@ -2,8 +2,6 @@
 
 _Note: Only core maintainers can publish packages._
 
-_Package versioning and publishing is currently handled by @clerkinc/frontend-team._
-
 ## Publishing stable package versions (`@latest`)
 
 We are using [changesets](https://github.com/changesets/changesets), so our CICD is using [`changesets/action`](https://github.com/changesets/action) to automate the release process when releasing stable package versions targeting the `@latest` tag.
@@ -42,3 +40,17 @@ Notes:
 ## Publishing canary package versions (`@canary`)
 
 We're still considering whether switching the repo into a `canary` mode for big, experimental features makes sense. There is no use case for this right now, however, we might experiment with the [changesets prerelease mode](https://github.com/changesets/changesets/blob/main/docs/prereleases.md) in the future.
+
+## Backporting PRs
+
+> Backporting is the action of taking parts from a newer version of a software system or software component and porting them to an older version of the same software.
+
+If a PR got merged into `main` that should also be released in older versions (e.g. critical security fixes), you'll need to backport said PR. You can do this by using the [`backport` script](https://github.com/clerkinc/javascript/blob/main/scripts/backport.mjs) inside `scripts`.
+
+Duplicate the `.env.example` file inside `scripts` and rename it to `.env`. Fill out the `GITHUB_ACCESS_TOKEN` variable. Afterwards, you'll be able to run the CLI like so:
+
+```shell
+node backports.mjs main-v4 1234
+```
+
+The command above will backport the PR `1234` to the branch `main-v4`.
