@@ -1,8 +1,8 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# ESLint via Turborepo
-# npm run lint -- -- --fix
+# Build changed packages
+npx turbo build
 
 # Prettier Standalone
 npx lint-staged
