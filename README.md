@@ -26,7 +26,7 @@ This repository contains all the Clerk JavaScript SDKs under the `@clerk` namesp
 
 **Clerk is Hiring!**
 
-Would you like to work on Open Source software and help maintain this repository? [Apply today!](https://apply.workable.com/clerk-dev/).
+Would you like to work on Open Source software and help maintain this repository? [Apply today!](https://jobs.ashbyhq.com/clerk).
 
 ---
 
