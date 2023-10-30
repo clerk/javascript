@@ -56,9 +56,13 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       setError,
       setWarning,
       setSuccess,
+      setInfo,
       validatePassword,
       setHasPassedComplexity,
       hasPassedComplexity,
+      feedback,
+      feedbackType,
+      clearFeedback,
       ...restEmailAddressProps
     },
   } = emailAddressField;
