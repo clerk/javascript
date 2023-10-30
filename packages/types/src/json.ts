@@ -363,6 +363,17 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   total_pending_suggestions: number;
 }
 
+export interface RoleJSON extends ClerkResourceJSON {
+  object: 'role';
+  id: string;
+  key: string;
+  name: string;
+  description: string;
+  permissions: string[];
+  created_at: number;
+  updated_at: number;
+}
+
 export interface PublicOrganizationDataJSON {
   id: string;
   name: string;

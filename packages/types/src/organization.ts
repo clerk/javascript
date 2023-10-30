@@ -4,6 +4,7 @@ import type { OrganizationInvitationResource, OrganizationInvitationStatus } fro
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationMembershipRequestResource } from './organizationMembershipRequest';
 import type { ClerkResource } from './resource';
+import type { RoleResource } from './role';
 
 declare global {
   /**
@@ -49,6 +50,7 @@ export interface OrganizationResource extends ClerkResource {
    */
   getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
   getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
+  getRoles: (params?: GetRolesParams) => Promise<ClerkPaginatedResponse<RoleResource>>;
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   getMembershipRequests: (
     params?: GetMembershipRequestParams,
@@ -70,6 +72,17 @@ export interface OrganizationResource extends ClerkResource {
 export type GetMembershipsParams = {
   role?: MembershipRole[];
 } & ClerkPaginationParams;
+
+export type GetRolesParams = {
+  /**
+   * This is the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+};
 
 export type GetMembersParams = {
   /**

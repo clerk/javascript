@@ -9,6 +9,16 @@ const roleToLocalizationKey: Record<MembershipRole, LocalizationKey> = {
   admin: localizationKeys('membershipRole__admin'),
 };
 
-export const roleLocalizationKey = (role: MembershipRole): LocalizationKey => {
+export const roleLocalizationKey = (role: MembershipRole | undefined): LocalizationKey | undefined => {
+  if (!role) {
+    return undefined;
+  }
   return roleToLocalizationKey[role];
+};
+
+export const customRoleLocalizationKey = (role: MembershipRole | undefined): LocalizationKey | undefined => {
+  if (!role) {
+    return undefined;
+  }
+  return localizationKeys(`roles.${role}`);
 };
