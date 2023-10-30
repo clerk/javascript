@@ -41,7 +41,10 @@ async function run() {
 
   // Create directories for each subpath name using the pkgJsonPlaceholder
   subpathHelperFile.subpathNames.forEach(name => {
-    fs.mkdirSync(new URL(`../packages/${pkgName}/${name}`, import.meta.url));
+    const directoryURL = new URL(`../packages/${pkgName}/${name}`, import.meta.url);
+    if (!fs.existsSync(directoryURL)) {
+      fs.mkdirSync(directoryURL);
+    }
     writeJSON(`../packages/${pkgName}/${name}/package.json`, pkgJsonPlaceholder(name));
   });
 
