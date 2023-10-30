@@ -13,7 +13,7 @@ export default defineConfig(overrideOptions => {
     format: 'cjs',
     outDir: './dist',
     entry: ['./src/**/*.{ts,tsx,js,jsx}'],
-    bundle: true,
+    bundle: false,
     clean: true,
     minify: false,
     sourcemap: true,
