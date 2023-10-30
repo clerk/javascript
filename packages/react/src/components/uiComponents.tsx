@@ -8,6 +8,7 @@ import type {
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
+  Without,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import React, { createElement } from 'react';
@@ -39,7 +40,7 @@ type UserButtonExportType = typeof _UserButton & {
   UserProfileLink: typeof UserProfileLink;
 };
 
-type UserButtonPropsWithoutCustomPages = Omit<UserButtonProps, 'userProfileProps'> & {
+type UserButtonPropsWithoutCustomPages = Without<UserButtonProps, 'userProfileProps'> & {
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
 };
 
@@ -53,7 +54,7 @@ type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
   OrganizationProfileLink: typeof OrganizationProfileLink;
 };
 
-type OrganizationSwitcherPropsWithoutCustomPages = Omit<OrganizationSwitcherProps, 'organizationProfileProps'> & {
+type OrganizationSwitcherPropsWithoutCustomPages = Without<OrganizationSwitcherProps, 'organizationProfileProps'> & {
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
 };
 
