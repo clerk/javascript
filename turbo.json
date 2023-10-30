@@ -25,7 +25,8 @@
     "NODE_VERSION",
     "NPM_VERSION",
     "TZ",
-    "VERCEL"
+    "VERCEL",
+    "GITHUB_ACCESS_TOKEN"
   ],
   "pipeline": {
     "build": {
