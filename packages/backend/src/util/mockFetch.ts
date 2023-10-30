@@ -42,4 +42,14 @@ export function jsonError(body: unknown, status = 500) {
   return Promise.resolve(mockResponse);
 }
 
-const mockHeadersGet = (key: string) => (key === constants.Headers.ContentType ? constants.ContentTypes.Json : null);
+const mockHeadersGet = (key: string) => {
+  if (key === constants.Headers.ContentType) {
+    return constants.ContentTypes.Json;
+  }
+
+  if (key === 'cf-ray') {
+    return 'mock_cf_ray';
+  }
+
+  return null;
+};
