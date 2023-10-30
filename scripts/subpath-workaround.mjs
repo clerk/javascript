@@ -25,16 +25,16 @@ async function run() {
     `Found ${subpathHelperFile.subpathNames.length} subpaths and ${subpathHelperFile.subpathFoldersBarrel.length} subpath barrels`,
   );
 
-  const allFilesNames = [...subpathHelperFile.subpathNames, ...subpathHelperFile.subpathFoldersBarrel, 'dist']
+  const allFilesNames = [...subpathHelperFile.subpathNames, ...subpathHelperFile.subpathFoldersBarrel, 'dist'];
   const hasAllSubpathsInFiles = pkgFile.files.every(name => allFilesNames.includes(name));
 
   if (!hasAllSubpathsInFiles) {
-    throw new Error('Not all subpaths from the package.json "files" array are in the subpaths.mjs')
+    throw new Error('Not all subpaths from the package.json "files" array are in the subpaths.mjs');
   }
 
   // Create directories for each subpath name using the pkgJsonPlaceholder
   subpathHelperFile.subpathNames.forEach(name => {
-    const dir = new URL(`../packages/${pkgName}/${name}`, import.meta.url)
+    const dir = new URL(`../packages/${pkgName}/${name}`, import.meta.url);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
@@ -43,7 +43,7 @@ async function run() {
 
   // Create directories for each subpath barrel file using the pkgJsonBarrelPlaceholder
   subpathHelperFile.subpathFoldersBarrel.forEach(name => {
-    const dir = new URL(`../packages/${pkgName}/${name}`, import.meta.url)
+    const dir = new URL(`../packages/${pkgName}/${name}`, import.meta.url);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
