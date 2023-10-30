@@ -45,7 +45,26 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "files": [
-    "dist"
+    "dist",
+    "browser",
+    "callWithRetry",
+    "color",
+    "cookie",
+    "date",
+    "deprecated",
+    "error",
+    "file",
+    "globs",
+    "handleValueOrFn",
+    "isomorphicAtob",
+    "keys",
+    "loadScript",
+    "localStorageBroadcastChannel",
+    "poller",
+    "proxy",
+    "underscore",
+    "url",
+    "react"
   ],
   "scripts": {
     "build": "tsup",
