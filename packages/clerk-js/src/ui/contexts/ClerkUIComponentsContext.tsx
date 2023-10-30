@@ -241,7 +241,8 @@ export const useUserButtonContext = () => {
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
-  const userProfileMode = !!userProfileUrl && ctx.userProfileMode === undefined ? 'navigation' : ctx.userProfileMode;
+  const userProfileMode =
+    !!ctx.userProfileUrl && ctx.userProfileMode === undefined ? 'navigation' : ctx.userProfileMode;
 
   return {
     ...ctx,
@@ -254,7 +255,7 @@ export const useUserButtonContext = () => {
     afterMultiSessionSingleSignOutUrl,
     afterSignOutUrl,
     afterSwitchSessionUrl,
-    userProfileMode,
+    userProfileMode: userProfileMode || 'modal',
   };
 };
 
