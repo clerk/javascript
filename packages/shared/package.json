@@ -63,7 +63,9 @@
     "proxy",
     "underscore",
     "url",
-    "react"
+    "react",
+    "constants",
+    "apiUrlFromPublishableKey"
   ],
   "scripts": {
     "build": "tsup",

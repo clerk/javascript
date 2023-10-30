@@ -1,3 +1,4 @@
+import { CURRENT_DEV_INSTANCE_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
 import { isStaging } from './utils/instance';
 
 export function parseSearchParams(queryString = ''): URLSearchParams {
@@ -64,3 +65,25 @@ export const getScriptUrl = (
   const major = getClerkJsMajorVersionOrTag(frontendApi, pkgVersion);
   return `https://${noSchemeFrontendApi}/npm/@clerk/clerk-js@${clerkJSVersion || major}/dist/clerk.browser.js`;
 };
+
+// Returns true for hosts such as:
+// * accounts.foo.bar-13.lcl.dev
+// * accounts.foo.bar-13.lclstage.dev
+// * accounts.foo.bar-13.dev.lclclerk.com
+export function isLegacyDevAccountPortalOrigin(host: string): boolean {
+  return LEGACY_DEV_INSTANCE_SUFFIXES.some(legacyDevSuffix => {
+    return host.startsWith('accounts.') && host.endsWith(legacyDevSuffix);
+  });
+}
+
+// Returns true for hosts such as:
+// * foo-bar-13.accounts.dev
+// * foo-bar-13.accountsstage.dev
+// * foo-bar-13.accounts.lclclerk.com
+// But false for:
+// * foo-bar-13.clerk.accounts.lclclerk.com
+export function isCurrentDevAccountPortalOrigin(host: string): boolean {
+  return CURRENT_DEV_INSTANCE_SUFFIXES.some(currentDevSuffix => {
+    return host.endsWith(currentDevSuffix) && !host.endsWith('.clerk' + currentDevSuffix);
+  });
+}

@@ -20,6 +20,8 @@ export const subpathNames = [
   'proxy',
   'underscore',
   'url',
+  'constants',
+  'apiUrlFromPublishableKey',
 ];
 
 export const subpathFoldersBarrel = ['react'];
