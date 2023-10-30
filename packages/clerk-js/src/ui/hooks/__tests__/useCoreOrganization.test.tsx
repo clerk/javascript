@@ -40,7 +40,7 @@ describe('useOrganization', () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
       });
     });
@@ -69,7 +69,7 @@ describe('useOrganization', () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
       });
     });
 
@@ -91,7 +91,7 @@ describe('useOrganization', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
@@ -221,7 +221,7 @@ describe('useOrganization', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
@@ -323,7 +323,7 @@ describe('useOrganization', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
-          email_addresses: ['test@clerk.dev'],
+          email_addresses: ['test@clerk.com'],
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
@@ -336,7 +336,7 @@ describe('useOrganization', () => {
               organizationId: '1',
               publicUserData: {
                 userId: 'test_user1',
-                identifier: 'test1@clerk.dev',
+                identifier: 'test1@clerk.com',
               },
             }),
             createFakeOrganizationMembershipRequest({
@@ -344,7 +344,7 @@ describe('useOrganization', () => {
               organizationId: '1',
               publicUserData: {
                 userId: 'test_user2',
-                identifier: 'test2@clerk.dev',
+                identifier: 'test2@clerk.com',
               },
             }),
           ],
@@ -372,7 +372,7 @@ describe('useOrganization', () => {
               organizationId: '1',
               publicUserData: {
                 userId: 'test_user3',
-                identifier: 'test3@clerk.dev',
+                identifier: 'test3@clerk.com',
               },
             }),
             createFakeOrganizationMembershipRequest({
@@ -380,7 +380,7 @@ describe('useOrganization', () => {
               organizationId: '1',
               publicUserData: {
                 userId: 'test_user4',
-                identifier: 'test4@clerk.dev',
+                identifier: 'test4@clerk.com',
               },
             }),
           ],

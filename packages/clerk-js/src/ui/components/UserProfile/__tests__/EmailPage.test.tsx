@@ -8,7 +8,7 @@ const { createFixtures } = bindCreateFixtures('UserProfile');
 
 const initConfig = createFixtures.config(f => {
   f.withEmailAddress();
-  f.withUser({ email_addresses: [{ email_address: 'test@clerk.dev' }] });
+  f.withUser({ email_addresses: [{ email_address: 'test@clerk.com' }] });
 });
 
 describe('EmailPage', () => {
@@ -58,9 +58,9 @@ describe('EmailPage', () => {
       fixtures.clerk.user!.createEmailAddress.mockReturnValueOnce(Promise.resolve({} as any));
       const { userEvent } = render(<EmailPage />, { wrapper });
 
-      await userEvent.type(screen.getByLabelText(/email address/i), 'test+2@clerk.dev');
+      await userEvent.type(screen.getByLabelText(/email address/i), 'test+2@clerk.com');
       await userEvent.click(screen.getByText(/continue/i));
-      expect(fixtures.clerk.user?.createEmailAddress).toHaveBeenCalledWith({ email: 'test+2@clerk.dev' });
+      expect(fixtures.clerk.user?.createEmailAddress).toHaveBeenCalledWith({ email: 'test+2@clerk.com' });
     });
   });
 

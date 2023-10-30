@@ -20,7 +20,7 @@ import {
 
 describe('isDevAccountPortalOrigin(url)', () => {
   const goodUrls: Array<[string | URL, boolean]> = [
-    ['clerk.dev.lclclerk.com', false],
+    ['clerk.com.lclclerk.com', false],
     ['clerk.prod.lclclerk.com', false],
     ['clerk.abc.efg.lclstage.dev', false],
     ['clerk.abc.efg.stgstage.dev', false],

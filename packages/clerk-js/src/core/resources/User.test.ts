@@ -74,7 +74,7 @@ describe('User', () => {
     const userWithUnverifiedEmail = new User({
       email_addresses: [
         {
-          emailAddress: 'unverified@clerk.dev',
+          emailAddress: 'unverified@clerk.com',
           verification: null,
         },
       ],
@@ -88,7 +88,7 @@ describe('User', () => {
     const userWithVerifiedEmail = new User({
       email_addresses: [
         {
-          emailAddress: 'unverified@clerk.dev',
+          emailAddress: 'unverified@clerk.com',
           verification: {
             status: 'verified',
           },

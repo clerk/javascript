@@ -71,7 +71,7 @@ describe('isDevOrStagingUrl(url)', () => {
 
   const goodUrls: Array<[string | URL, boolean]> = [
     ['https://www.google.com', false],
-    ['https://www.clerk.dev', false],
+    ['https://www.clerk.com', false],
     ['https://www.lclclerk.com', false],
     ['clerk.prod.lclclerk.com', false],
     ['something.dev.lclclerk.com', true],

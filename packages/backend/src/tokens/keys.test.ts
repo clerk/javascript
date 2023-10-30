@@ -54,7 +54,7 @@ export default (QUnit: QUnit) => {
         skipJwksCache: true,
       });
 
-      fakeFetch.calledOnceWith('https://api.clerk.dev/v1/jwks', {
+      fakeFetch.calledOnceWith('https://api.clerk.com/v1/jwks', {
         method: 'GET',
         headers: {
           Authorization: 'Bearer deadbeef',
@@ -73,7 +73,7 @@ export default (QUnit: QUnit) => {
         skipJwksCache: true,
       });
 
-      fakeFetch.calledOnceWith('https://api.clerk.dev/v1/jwks', {
+      fakeFetch.calledOnceWith('https://api.clerk.com/v1/jwks', {
         method: 'GET',
         headers: {
           Authorization: 'Bearer deadbeef',

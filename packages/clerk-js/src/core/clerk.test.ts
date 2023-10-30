@@ -1121,7 +1121,7 @@ describe('Clerk singleton', () => {
                 external_verification_redirect_url: '',
                 error: {
                   code: 'not_allowed_to_sign_up',
-                  long_message: 'You cannot sign up with test@clerk.dev since this is a restricted application.',
+                  long_message: 'You cannot sign up with test@clerk.com since this is a restricted application.',
                   message: 'Not allowed to sign up',
                   meta: {
                     session_id: 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe',

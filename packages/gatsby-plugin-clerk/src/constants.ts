@@ -1,6 +1,6 @@
 import { deprecated } from '@clerk/shared/deprecated';
 
-export const API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
+export const API_URL = process.env.CLERK_API_URL || 'https://api.clerk.com';
 export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 /**
  * @deprecated Use `CLERK_SECRET_KEY` instead.

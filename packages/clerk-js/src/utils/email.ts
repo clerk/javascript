@@ -4,6 +4,6 @@ export type BuildEmailAddressParams = {
 };
 
 export function buildEmailAddress({ localPart, frontendApi }: BuildEmailAddressParams): string {
-  const domain = frontendApi ? frontendApi.replace('clerk.', '') : 'clerk.dev';
+  const domain = frontendApi ? frontendApi.replace('clerk.', '') : 'clerk.com';
   return `${localPart}@${domain}`;
 }
