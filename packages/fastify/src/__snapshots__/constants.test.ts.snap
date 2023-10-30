@@ -2,7 +2,6 @@
 
 exports[`constants from environment variables 1`] = `
 {
-  "API_KEY": "CLERK_API_KEY",
   "API_URL": "CLERK_API_URL",
   "API_VERSION": "CLERK_API_VERSION",
   "Cookies": {

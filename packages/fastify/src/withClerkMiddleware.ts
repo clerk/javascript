@@ -14,7 +14,6 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       ...options,
       secretKey,
       publishableKey,
-      apiKey: constants.API_KEY,
       frontendApi: constants.FRONTEND_API,
       request: createIsomorphicRequest((Request, Headers) => {
         const requestHeaders = Object.keys(req.headers).reduce(
