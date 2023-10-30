@@ -7,26 +7,28 @@ import React from 'react';
 import { useClerkNextOptions } from './NextOptionsContext';
 
 export {
-  UserProfile,
-  UserButton,
-  OrganizationSwitcher,
-  OrganizationProfile,
   CreateOrganization,
-  SignInButton,
-  SignUpButton,
-  SignOutButton,
-  SignInWithMetamaskButton,
   OrganizationList,
+  OrganizationProfile,
+  OrganizationSwitcher,
+  SignInButton,
+  SignInWithMetamaskButton,
+  SignOutButton,
+  SignUpButton,
+  UserButton,
+  UserProfile,
 } from '@clerk/clerk-react';
 
 export const SignIn = (props: SignInProps) => {
   const { signInUrl: repoLevelSignInUrl } = useClerkNextOptions();
+  const { routing: _routing, path: _path, ...restProps } = props;
+
   if (repoLevelSignInUrl) {
     return (
       <BaseSignIn
         routing='path'
         path={repoLevelSignInUrl}
-        {...props}
+        {...restProps}
       />
     );
   }
@@ -35,12 +37,14 @@ export const SignIn = (props: SignInProps) => {
 
 export const SignUp = (props: SignUpProps) => {
   const { signUpUrl: repoLevelSignUpUrl } = useClerkNextOptions();
+  const { routing, path, ...restProps } = props;
+
   if (repoLevelSignUpUrl) {
     return (
       <BaseSignUp
         routing='path'
         path={repoLevelSignUpUrl}
-        {...props}
+        {...restProps}
       />
     );
   }

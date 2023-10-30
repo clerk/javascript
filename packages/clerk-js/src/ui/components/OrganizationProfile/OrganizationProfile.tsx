@@ -48,7 +48,7 @@ export const OrganizationProfile = withRedirectToHomeOrganizationGuard(
   }),
 );
 
-export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.Element => {
+export const OrganizationProfileModal = (props: Omit<OrganizationProfileProps, 'path'>): JSX.Element => {
   const organizationProfileProps: OrganizationProfileCtx = {
     ...props,
     routing: 'virtual',

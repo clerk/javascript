@@ -74,7 +74,7 @@ SignInRoutes.displayName = 'SignIn';
 
 export const SignIn: React.ComponentType<SignInProps> = withCoreSessionSwitchGuard(SignInRoutes);
 
-export const SignInModal = (props: SignInProps): JSX.Element => {
+export const SignInModal = (props: Omit<SignInProps, 'path'>): JSX.Element => {
   const signInProps = {
     signUpUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/sign-up`,
     ...props,

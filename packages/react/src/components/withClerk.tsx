@@ -1,4 +1,4 @@
-import type { LoadedClerk } from '@clerk/types';
+import type { LoadedClerk, Without } from '@clerk/types';
 import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -12,7 +12,7 @@ export const withClerk = <P extends { clerk: LoadedClerk }>(
 ) => {
   displayName = displayName || Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
-  const HOC = (props: Omit<P, 'clerk'>) => {
+  const HOC = (props: Without<P, 'clerk'>) => {
     const clerk = useIsomorphicClerkContext();
 
     if (!clerk.loaded) {

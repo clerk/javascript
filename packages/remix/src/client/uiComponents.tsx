@@ -6,12 +6,14 @@ import { useClerkRemixOptions } from './RemixOptionsContext';
 
 export const SignIn = (props: SignInProps) => {
   const { signInUrl } = useClerkRemixOptions();
+  const { routing: _routing, path: _path, ...restProps } = props;
+
   if (signInUrl) {
     return (
       <BaseSignIn
         routing='path'
         path={signInUrl}
-        {...props}
+        {...restProps}
       />
     );
   }
@@ -20,12 +22,14 @@ export const SignIn = (props: SignInProps) => {
 
 export const SignUp = (props: SignUpProps) => {
   const { signUpUrl } = useClerkRemixOptions();
+  const { routing: _routing, path: _path, ...restProps } = props;
+
   if (signUpUrl) {
     return (
       <BaseSignUp
         routing='path'
         path={signUpUrl}
-        {...props}
+        {...restProps}
       />
     );
   }
