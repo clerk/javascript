@@ -9,6 +9,7 @@ import type {
   GetMembershipRequestParams,
   GetMemberships,
   GetPendingInvitationsParams,
+  GetRolesParams,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,
@@ -20,6 +21,7 @@ import type {
   OrganizationMembershipRequestJSON,
   OrganizationMembershipRequestResource,
   OrganizationResource,
+  RoleJSON,
   SetOrganizationLogoParams,
   UpdateMembershipParams,
   UpdateOrganizationParams,
@@ -31,6 +33,7 @@ import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
+import { Role } from './Role';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
@@ -102,6 +105,21 @@ export class Organization extends BaseResource implements OrganizationResource {
   update = async (params: UpdateOrganizationParams): Promise<OrganizationResource> => {
     return this._basePatch({
       body: params,
+    });
+  };
+
+  getRoles = async (getRolesParams?: GetRolesParams) => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/roles`,
+      method: 'GET',
+      search: convertPageToOffset(getRolesParams) as any,
+    }).then(res => {
+      const { data: roles, total_count } = res?.response as unknown as ClerkPaginatedResponse<RoleJSON>;
+
+      return {
+        total_count,
+        data: roles.map(role => new Role(role)),
+      };
     });
   };
 

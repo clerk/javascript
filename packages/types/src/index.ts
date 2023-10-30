@@ -32,6 +32,7 @@ export * from './passwords';
 export * from './phoneNumber';
 export * from './redirects';
 export * from './resource';
+export * from './role';
 export * from './saml';
 export * from './samlAccount';
 export * from './session';
