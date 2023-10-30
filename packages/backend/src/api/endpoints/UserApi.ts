@@ -37,7 +37,8 @@ type PasswordHasher =
   | 'pbkdf2_sha256'
   | 'pbkdf2_sha256_django'
   | 'pbkdf2_sha1'
-  | 'scrypt_firebase';
+  | 'scrypt_firebase'
+  | 'sha256';
 
 type UserPasswordHashingParams = {
   passwordDigest: string;
