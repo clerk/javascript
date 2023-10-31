@@ -89,7 +89,7 @@ const getInputElementForType = ({
   return CustomInputs[customInput] || Input;
 };
 
-function useFormTextAnimation() {
+export function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const getFormTextAnimation = useCallback(
@@ -117,7 +117,7 @@ function useFormTextAnimation() {
   };
 }
 
-const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) => {
+export const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) => {
   const [height, setHeight] = useState(0);
 
   const calculateHeight = useCallback(
@@ -136,11 +136,11 @@ const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) => {
   };
 };
 
-type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
+export type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
 
 type Feedback = { feedback?: string; feedbackType?: FeedbackType; shouldEnter: boolean };
 
-type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
+export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
 };
 
