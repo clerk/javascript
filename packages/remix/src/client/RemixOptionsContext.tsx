@@ -9,7 +9,7 @@ ClerkRemixOptionsCtx.displayName = 'ClerkRemixOptionsCtx';
 
 const useClerkRemixOptions = () => {
   const ctx = React.useContext(ClerkRemixOptionsCtx)!;
-  return ctx.value as ClerkRemixContextValue;
+  return ctx.value;
 };
 
 const ClerkRemixOptionsProvider = (props: React.PropsWithChildren<{ options: ClerkRemixContextValue }>) => {

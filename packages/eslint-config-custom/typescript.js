@@ -26,7 +26,7 @@ const disabledRules = {
   // TODO: All rules below should be set to their defaults
   // when we're able to make the appropriate changes.
   '@typescript-eslint/await-thenable': 'warn',
-  '@typescript-eslint/no-duplicate-type-constituents': 'warn',
+  '@typescript-eslint/no-duplicate-type-constituents': 'off',
   '@typescript-eslint/no-explicit-any': 'off',
   '@typescript-eslint/no-misused-promises': 'warn',
   '@typescript-eslint/no-floating-promises': [
