@@ -1,4 +1,4 @@
-import type { Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
+import type { AuthObject, Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
 import {
   AuthStatus,
   constants,
@@ -18,6 +18,8 @@ import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject }
 
 type GetAuthOpts = Partial<SecretKeyOrApiKey>;
 
+type AuthObjectWithoutResources<T extends AuthObject> = Omit<T, 'user' | 'organization' | 'session'>;
+
 export const createGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
@@ -26,7 +28,10 @@ export const createGetAuth = ({
   debugLoggerName: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (req: RequestLike, opts?: GetAuthOpts): SignedInAuthObject | SignedOutAuthObject => {
+    return (
+      req: RequestLike,
+      opts?: GetAuthOpts,
+    ): AuthObjectWithoutResources<SignedInAuthObject | SignedOutAuthObject> => {
       const debug = getHeader(req, constants.Headers.EnableDebug) === 'true';
       if (debug) {
         logger.enable();
