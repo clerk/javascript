@@ -2,9 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  experimental: {
-    appDir: true,
-  },
   // Configure webpack NOT to ignore node_modules changes for HMR
   webpack: config => {
     config.snapshot = {

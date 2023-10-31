@@ -7,7 +7,7 @@ import {
   SignedOut,
   SignIn,
   UserButton,
-} from '@clerk/nextjs/app-beta';
+} from '@clerk/nextjs';
 import Link from 'next/link';
 
 export default async function Page() {
