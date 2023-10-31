@@ -7,6 +7,7 @@ import type {
   OrganizationMembershipJSON,
   OrganizationPermission,
   PhoneNumberJSON,
+  SessionJSON,
   UserJSON,
 } from '@clerk/types';
 
@@ -158,9 +159,38 @@ export const createUser = (params: WithUserParams): UserJSON => {
     organization_memberships: (params.organization_memberships || []).map(o =>
       typeof o === 'string' ? createOrganizationMembership({ name: o }) : createOrganizationMembership(o),
     ),
-  } as any as UserJSON;
+  } as UserJSON;
   res.primary_email_address_id = res.email_addresses[0]?.id;
   return res;
+};
+
+export const createSession = (params: WithUserParams) => {
+  const user = createUser(params);
+  return {
+    object: 'session',
+    id: 'session_1',
+    status: 'active',
+    expire_at: jest.now() + 5000,
+    abandon_at: jest.now() + 5000,
+    last_active_at: jest.now(),
+    last_active_organization_id: null,
+    actor: null,
+    user: createUser({}),
+    public_user_data: {
+      first_name: user.first_name,
+      last_name: user.last_name,
+      image_url: user.image_url,
+      has_image: user.has_image,
+      identifier: user.email_addresses.find(e => e.id === user.primary_email_address_id)?.email_address || '',
+      profile_image_url: user.profile_image_url,
+    },
+    created_at: 1697449745962,
+    updated_at: 1698763366892,
+    last_active_token: {
+      object: 'token',
+      jwt: mockJwt,
+    },
+  } as SessionJSON;
 };
 
 export const clerkMock = () => {
