@@ -49,16 +49,6 @@
       "types": "./dist/types/edge-middleware/index.d.ts",
       "import": "./dist/esm/edge-middleware/index.js",
       "require": "./dist/cjs/edge-middleware/index.js"
-    },
-    "./app-beta": {
-      "types": "./dist/types/app-beta/index.d.ts",
-      "import": "./dist/esm/app-beta/index.js",
-      "require": "./dist/cjs/app-beta/index.js"
-    },
-    "./app-beta/client": {
-      "types": "./dist/types/app-beta/client/index.d.ts",
-      "import": "./dist/esm/app-beta/client/index.js",
-      "require": "./dist/cjs/app-beta/client/index.js"
     }
   },
   "main": "./dist/cjs/index.js",
@@ -69,8 +59,7 @@
     "server",
     "api",
     "edge-middleware",
-    "ssr",
-    "app-beta"
+    "ssr"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
