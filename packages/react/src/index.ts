@@ -1,25 +1,24 @@
 import './polyfills';
 
-export * from './contexts';
 export * from './components';
+export * from './contexts';
+export {
+  EmailLinkErrorCode,
+  MagicLinkErrorCode,
+  isClerkAPIResponseError,
+  isEmailLinkError,
+  isKnownError,
+  isMagicLinkError,
+  isMetamaskError,
+} from './errors';
 export * from './hooks';
+export { useEmailLink } from './hooks/useEmailLink';
 export type {
   BrowserClerk,
   ClerkProp,
   HeadlessBrowserClerk,
-  WithUserProp,
+  IsomorphicClerkOptions,
   WithClerkProp,
   WithSessionProp,
-  IsomorphicClerkOptions,
+  WithUserProp,
 } from './types';
-export {
-  MagicLinkErrorCode,
-  EmailLinkErrorCode,
-  isClerkAPIResponseError,
-  isKnownError,
-  isMetamaskError,
-  isMagicLinkError,
-  isEmailLinkError,
-} from './errors';
-export { useMagicLink } from './hooks/useMagicLink';
-export { useEmailLink } from './hooks/useEmailLink';
