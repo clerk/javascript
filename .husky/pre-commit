@@ -15,8 +15,8 @@ for file in $staged_files; do
   # Extract the first two folders from the file path
   folder=$(echo $file | awk -F'/' '{print $1 "/" $2}')
 
-  # Filter files which end with .js, .jsx, .ts, or .tsx [NOTE: Should match ./.lintstagedrc.json]
-  if [[ $file =~ \.(js|jsx|ts|tsx)$ ]]; then
+  # Filter files which end with .mjs, .js, .jsx, .ts, or .tsx [NOTE: Should match ./.lintstagedrc.json]
+  if [[ $file =~ \.(mjs|js|jsx|ts|tsx)$ ]]; then
     # Check if this folder is already in the list of unique folders
     if [[ $folder == packages/* ]] && [[ ! " $unique_folders " =~ "$folder" ]]; then
       # Append the folder to the list of unique folders
