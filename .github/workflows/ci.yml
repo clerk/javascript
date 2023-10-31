@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   formatting-linting:
-    name: Formatting & Linting
+    name: Formatting, linting & changeset checks
     runs-on: ${{ vars.RUNNER_LARGE }}
 
     steps:
