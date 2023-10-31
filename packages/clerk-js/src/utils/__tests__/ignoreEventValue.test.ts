@@ -1,7 +1,8 @@
 import { ignoreEventValue } from '../ignoreEventValue';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop = (..._args: any[]): void => {};
+const noop = (..._args: any[]): void => {
+  // do nothing.
+};
 
 describe('ignoreNonEventValue', () => {
   it('allows non event values', () => {

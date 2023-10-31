@@ -16,7 +16,7 @@ export const ClipboardInput = (props: PropsOfComponent<typeof Input>) => {
       <Input
         {...rest}
         value={value}
-        isDisabled={true}
+        isDisabled
         sx={theme => ({ paddingRight: theme.space.$8 })}
       />
 

@@ -1,7 +1,5 @@
 import type { ChangeEvent } from 'react';
-import { useState } from 'react';
-import { useRef } from 'react';
-import React, { forwardRef } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 
 import { DEBOUNCE_MS } from '../../core/constants';
 import { useEnvironment } from '../contexts';
@@ -18,7 +16,7 @@ type PasswordInputProps = PropsOfComponent<typeof Input> & {
 };
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
-  const [hidden, setHidden] = React.useState(true);
+  const [hidden, setHidden] = useState(true);
   const { id, onChange: onChangeProp, validatePassword: validatePasswordProp = false, ...rest } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const [timeoutState, setTimeoutState] = useState<ReturnType<typeof setTimeout> | null>(null);

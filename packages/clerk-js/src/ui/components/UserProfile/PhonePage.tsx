@@ -62,7 +62,6 @@ export const AddPhone = (props: AddPhoneProps) => {
 
   const canSubmit = phoneField.value.length > 1 && user.username !== phoneField.value;
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   const addPhone = async (e: React.FormEvent) => {
     e.preventDefault();
     return user

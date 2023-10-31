@@ -1,6 +1,7 @@
 import type { OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 import { act, render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
@@ -30,12 +31,14 @@ describe('OrganizationSettings', () => {
     );
 
     const { getByText } = render(<OrganizationSettings />, { wrapper });
+
     await waitFor(() => {
       expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
-      expect(getByText('Settings')).toBeDefined();
-      expect(getByText('Org1', { exact: false }).closest('button')).not.toBeNull();
-      expect(getByText(/leave organization/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
     });
+
+    expect(getByText('Settings')).toBeDefined();
+    expect(getByText('Org1', { exact: false }).closest('button')).not.toBeNull();
+    expect(getByText(/leave organization/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
   });
 
   it('enables organization profile button and enables leave when user is admin and there is more', async () => {
