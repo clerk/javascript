@@ -16,7 +16,6 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "Email",
   "EmailAddress",
   "ExternalAccount",
-  "FRONTEND_API",
   "IS_SATELLITE",
   "IdentificationLink",
   "Invitation",

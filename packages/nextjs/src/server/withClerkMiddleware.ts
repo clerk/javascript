@@ -10,7 +10,6 @@ import {
   CLERK_JS_URL,
   CLERK_JS_VERSION,
   clerkClient,
-  FRONTEND_API,
   PUBLISHABLE_KEY,
   SECRET_KEY,
 } from './clerkClient';
@@ -50,7 +49,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       ...opts,
       apiKey: opts.apiKey || API_KEY,
       secretKey: opts.secretKey || SECRET_KEY,
-      frontendApi: opts.frontendApi || FRONTEND_API,
       publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
       isSatellite,
       domain,
@@ -71,7 +69,8 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       const response = NextResponse.rewrite(
         clerkClient.remotePublicInterstitialUrl({
           apiUrl: API_URL,
-          frontendApi: opts.frontendApi || FRONTEND_API,
+          // TODO(@dimkl): use empty string for frontendApi until type is fixed in @clerk/backend to drop it
+          frontendApi: '',
           publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
           clerkJSUrl: CLERK_JS_URL,
           clerkJSVersion: CLERK_JS_VERSION,

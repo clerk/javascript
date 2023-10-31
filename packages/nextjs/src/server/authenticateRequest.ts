@@ -8,7 +8,6 @@ import {
   CLERK_JS_VERSION,
   clerkClient,
   debugRequestState,
-  FRONTEND_API,
   PUBLISHABLE_KEY,
   SECRET_KEY,
 } from './clerkClient';
@@ -22,7 +21,6 @@ export const authenticateRequest = async (req: NextRequest, opts: WithAuthOption
     ...opts,
     apiKey: opts.apiKey || API_KEY,
     secretKey: opts.secretKey || SECRET_KEY,
-    frontendApi: opts.frontendApi || FRONTEND_API,
     publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
     isSatellite,
     domain,
@@ -41,7 +39,8 @@ export const handleUnknownState = (requestState: RequestState) => {
 export const handleInterstitialState = (requestState: RequestState, opts: WithAuthOptions) => {
   const response = new NextResponse(
     clerkClient.localInterstitial({
-      frontendApi: opts.frontendApi || FRONTEND_API,
+      // TODO(@dimkl): use empty string for frontendApi until type is fixed in @clerk/backend to drop it
+      frontendApi: '',
       publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
       clerkJSUrl: CLERK_JS_URL,
       clerkJSVersion: CLERK_JS_VERSION,

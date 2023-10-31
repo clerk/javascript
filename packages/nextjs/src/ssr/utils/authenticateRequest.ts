@@ -1,6 +1,6 @@
 import type { GetServerSidePropsContext } from 'next';
 
-import { API_KEY, clerkClient, FRONTEND_API, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY } from '../../server';
+import { API_KEY, clerkClient, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY } from '../../server';
 import type { WithServerSideAuthOptions } from '../types';
 
 /**
@@ -16,7 +16,6 @@ export function authenticateRequest(ctx: GetServerSidePropsContext, opts: WithSe
     ...opts,
     apiKey: API_KEY,
     secretKey: SECRET_KEY,
-    frontendApi: FRONTEND_API,
     publishableKey: PUBLISHABLE_KEY,
     cookieToken,
     headerToken,

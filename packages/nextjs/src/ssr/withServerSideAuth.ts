@@ -9,7 +9,6 @@ import {
   CLERK_JS_URL,
   CLERK_JS_VERSION,
   clerkClient,
-  FRONTEND_API,
   JS_VERSION,
   makeAuthObjectSerializable,
   PUBLISHABLE_KEY,
@@ -68,7 +67,6 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
       const interstitial = await clerkClient.remotePublicInterstitial({
         apiUrl: API_URL,
         publishableKey: PUBLISHABLE_KEY,
-        frontendApi: FRONTEND_API,
         pkgVersion: JS_VERSION,
         clerkJSUrl: CLERK_JS_URL,
         clerkJSVersion: CLERK_JS_VERSION,

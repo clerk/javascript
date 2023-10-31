@@ -67,9 +67,6 @@ Clerk requires your application to be wrapped in the `<ClerkProvider/>` context.
 Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` to your Publishable Key in your `.env.local` file to make the environment
 variable accessible to the Provider.
 
-If you are using the previous version of Clerk keys, set `NEXT_PUBLIC_CLERK_FRONTEND_API` to your Frontend API in
-your `.env.local` file.
-
 ```sh
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
 ```
