@@ -1,5 +1,4 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { deprecated } from '@clerk/shared/deprecated';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import type {
   ActiveSessionResource,
@@ -10,7 +9,6 @@ import type {
   CreateOrganizationProps,
   DomainOrProxyUrl,
   HandleEmailLinkVerificationParams,
-  HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
   OrganizationListProps,
@@ -662,18 +660,6 @@ export default class IsomorphicClerk {
       });
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
-    }
-  };
-  /**
-   * @deprecated Use `handleEmailLinkVerification` instead.
-   */
-  handleMagicLinkVerification = async (params: HandleMagicLinkVerificationParams): Promise<void> => {
-    deprecated('handleMagicLinkVerification', 'Use `handleEmailLinkVerification` instead.');
-    const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<void>;
-    } else {
-      this.premountMethodCalls.set('handleMagicLinkVerification', callback);
     }
   };
 
