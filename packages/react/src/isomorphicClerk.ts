@@ -57,7 +57,6 @@ type MethodCallback = () => Promise<unknown> | unknown;
 
 export default class IsomorphicClerk {
   private readonly mode: 'browser' | 'server';
-  private readonly frontendApi?: string;
   private readonly publishableKey?: string;
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
@@ -124,8 +123,7 @@ export default class IsomorphicClerk {
   }
 
   constructor(options: IsomorphicClerkOptions) {
-    const { Clerk = null, frontendApi, publishableKey } = options || {};
-    this.frontendApi = frontendApi;
+    const { Clerk = null, publishableKey } = options || {};
     this.publishableKey = publishableKey;
     this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
@@ -151,7 +149,6 @@ export default class IsomorphicClerk {
     // - https://github.com/remix-run/remix/issues/2947
     // - https://github.com/facebook/react/issues/24430
     if (typeof window !== 'undefined') {
-      window.__clerk_frontend_api = this.frontendApi;
       window.__clerk_publishable_key = this.publishableKey;
       window.__clerk_proxy_url = this.proxyUrl;
       window.__clerk_domain = this.domain;
@@ -164,7 +161,7 @@ export default class IsomorphicClerk {
 
         if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
-          c = new this.Clerk(this.publishableKey || this.frontendApi || '', {
+          c = new this.Clerk(this.publishableKey || '', {
             proxyUrl: this.proxyUrl,
             domain: this.domain,
           } as any);
@@ -184,7 +181,6 @@ export default class IsomorphicClerk {
         if (!global.Clerk) {
           await loadClerkJsScript({
             ...this.options,
-            frontendApi: this.frontendApi,
             publishableKey: this.publishableKey,
             proxyUrl: this.proxyUrl,
             domain: this.domain,
