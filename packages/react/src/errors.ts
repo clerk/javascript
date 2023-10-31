@@ -1,10 +1,8 @@
 export {
   EmailLinkErrorCode,
-  MagicLinkErrorCode,
   isClerkAPIResponseError,
   isEmailLinkError,
   isKnownError,
-  isMagicLinkError,
   isMetamaskError,
 } from '@clerk/shared/error';
 

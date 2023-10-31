@@ -2,15 +2,7 @@ import './polyfills';
 
 export * from './components';
 export * from './contexts';
-export {
-  EmailLinkErrorCode,
-  MagicLinkErrorCode,
-  isClerkAPIResponseError,
-  isEmailLinkError,
-  isKnownError,
-  isMagicLinkError,
-  isMetamaskError,
-} from './errors';
+export { EmailLinkErrorCode, isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from './errors';
 export * from './hooks';
 export { useEmailLink } from './hooks/useEmailLink';
 export type {
