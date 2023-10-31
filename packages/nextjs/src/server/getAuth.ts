@@ -8,7 +8,7 @@ import {
   signedInAuthObject,
   signedOutAuthObject,
 } from '@clerk/backend';
-import { deprecatedObjectProperty } from '@clerk/shared';
+import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import type { SecretKeyOrApiKey } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
