@@ -17,6 +17,7 @@ OrganizationMembership {
     "getMembershipRequests": [Function],
     "getMemberships": [Function],
     "getPendingInvitations": [Function],
+    "getRoles": [Function],
     "hasImage": true,
     "id": "test_org_id",
     "imageUrl": "https://clerk.com",
