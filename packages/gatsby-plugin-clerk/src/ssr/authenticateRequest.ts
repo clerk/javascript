@@ -1,6 +1,6 @@
 import type { GetServerDataProps } from 'gatsby';
 
-import { FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
+import { PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import { clerkClient, constants, createIsomorphicRequest } from './clerkClient';
 import type { WithServerAuthOptions } from './types';
 
@@ -8,7 +8,6 @@ export function authenticateRequest(context: GetServerDataProps, options: WithSe
   return clerkClient.authenticateRequest({
     ...options,
     secretKey: SECRET_KEY,
-    frontendApi: FRONTEND_API,
     publishableKey: PUBLISHABLE_KEY,
     request: createIsomorphicRequest((Request, Headers) => {
       const headers = new Headers(Object.fromEntries(context.headers) as Record<string, string>);
