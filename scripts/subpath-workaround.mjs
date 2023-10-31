@@ -25,29 +25,28 @@ async function run() {
     `Found ${subpathHelperFile.subpathNames.length} subpaths and ${subpathHelperFile.subpathFoldersBarrel.length} subpath barrels`,
   );
 
-  // Check if pkgFile.files already contains the subpaths. This means that the script has already been run and we should exit early
-  const subpathsAlreadyAdded = subpathHelperFile.subpathNames.some(name => pkgFile.files.includes(name));
+  const allFilesNames = [...subpathHelperFile.subpathNames, ...subpathHelperFile.subpathFoldersBarrel, 'dist'];
+  const hasAllSubpathsInFiles = pkgFile.files.every(name => allFilesNames.includes(name));
 
-  if (subpathsAlreadyAdded) {
-    return console.log(`Subpaths already added to ${pkgName} package.json. Exiting early`);
+  if (!hasAllSubpathsInFiles) {
+    throw new Error('Not all subpaths from the package.json "files" array are in the subpaths.mjs');
   }
-
-  // Add all subpaths to the "files" property on package.json
-  pkgFile.files = [...pkgFile.files, ...subpathHelperFile.subpathNames, ...subpathHelperFile.subpathFoldersBarrel];
-
-  writeJSON(`../packages/${pkgName}/package.json`, pkgFile);
-
-  console.log(`Overwrote package.json for ${pkgName} with subpaths`);
 
   // Create directories for each subpath name using the pkgJsonPlaceholder
   subpathHelperFile.subpathNames.forEach(name => {
-    fs.mkdirSync(new URL(`../packages/${pkgName}/${name}`, import.meta.url));
+    const dir = new URL(`../packages/${pkgName}/${name}`, import.meta.url);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
     writeJSON(`../packages/${pkgName}/${name}/package.json`, pkgJsonPlaceholder(name));
   });
 
   // Create directories for each subpath barrel file using the pkgJsonBarrelPlaceholder
   subpathHelperFile.subpathFoldersBarrel.forEach(name => {
-    fs.mkdirSync(new URL(`../packages/${pkgName}/${name}`, import.meta.url));
+    const dir = new URL(`../packages/${pkgName}/${name}`, import.meta.url);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
     writeJSON(`../packages/${pkgName}/${name}/package.json`, pkgJsonBarrelPlaceholder(name));
   });
 
