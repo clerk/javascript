@@ -4,7 +4,6 @@ import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
-  BeforeEmitCallback,
   Clerk,
   ClientResource,
   CreateOrganizationParams,
@@ -16,7 +15,9 @@ import type {
   ListenerCallback,
   OrganizationListProps,
   OrganizationMembershipResource,
+  OrganizationProfileProps,
   OrganizationResource,
+  OrganizationSwitcherProps,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -30,7 +31,6 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types';
 
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
 import type {
@@ -355,11 +355,6 @@ export default class IsomorphicClerk {
     } else {
       return Promise.reject();
     }
-  };
-
-  setSession = (session: ActiveSessionResource | string | null, beforeEmit?: BeforeEmitCallback): Promise<void> => {
-    deprecated('setSession', 'Use `Clerk.setActive` instead');
-    return this.setActive({ session, beforeEmit });
   };
 
   openSignIn = (props?: SignInProps): void => {
