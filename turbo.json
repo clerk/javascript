@@ -21,6 +21,7 @@
     "CLERK_*",
     "GATSBY_CLERK_*",
     "NEXT_PUBLIC_CLERK_*",
+    "MAILSAC_API_KEY",
     "NODE_ENV",
     "NODE_VERSION",
     "NPM_VERSION",
@@ -114,7 +115,6 @@
     },
     "lint": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**"],
       "outputs": []
     },
     "lint:publint": {

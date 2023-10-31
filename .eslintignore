@@ -1,6 +1,7 @@
 **/coverage/**
 **/node_modules/**
 packages/*/dist/**
+packages/eslint-config-custom/**
 **/dist/*
 **/build/*
 playground
