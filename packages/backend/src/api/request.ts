@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import deepmerge from 'deepmerge';
 import snakecaseKeys from 'snakecase-keys';
@@ -37,6 +38,7 @@ export type ClerkBackendApiResponse<T> =
   | {
       data: null;
       errors: ClerkAPIError[];
+      clerkTraceId?: string;
     };
 
 export type RequestFunction = ReturnType<typeof buildRequest>;
@@ -52,13 +54,14 @@ const withLegacyReturn =
   (cb: any): LegacyRequestFunction =>
   async (...args) => {
     // @ts-ignore
-    const { data, errors, status, statusText } = await cb<T>(...args);
+    const { data, errors, status, statusText, clerkTraceId } = await cb<T>(...args);
     if (errors === null) {
       return data;
     } else {
       throw new ClerkAPIResponseError(statusText || '', {
         data: errors,
         status: status || '',
+        clerkTraceId,
       });
     }
   };
@@ -161,6 +164,7 @@ export function buildRequest(options: CreateBackendApiOptions) {
               message: err.message || 'Unexpected error',
             },
           ],
+          clerkTraceId: getTraceId(err, res?.headers),
         };
       }
 
@@ -171,11 +175,23 @@ export function buildRequest(options: CreateBackendApiOptions) {
         // @ts-expect-error
         status: res?.status,
         statusText: res?.statusText,
+        clerkTraceId: getTraceId(err, res?.headers),
       };
     }
   };
 
   return withLegacyReturn(request);
+}
+
+// Returns either clerk_trace_id if present in response json, otherwise defaults to CF-Ray header
+// If the request failed before receiving a response, returns undefined
+function getTraceId(data: unknown, headers?: Headers): string {
+  if (data && typeof data === 'object' && 'clerk_trace_id' in data && typeof data.clerk_trace_id === 'string') {
+    return data.clerk_trace_id;
+  }
+
+  const cfRay = headers?.get('cf-ray');
+  return cfRay || '';
 }
 
 function parseErrors(data: unknown): ClerkAPIError[] {
@@ -196,24 +212,4 @@ function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
       sessionId: error?.meta?.session_id,
     },
   };
-}
-
-class ClerkAPIResponseError extends Error {
-  clerkError: true;
-
-  status: number;
-  message: string;
-
-  errors: ClerkAPIError[];
-
-  constructor(message: string, { data, status }: { data: ClerkAPIError[]; status: number }) {
-    super(message);
-
-    Object.setPrototypeOf(this, ClerkAPIResponseError.prototype);
-
-    this.clerkError = true;
-    this.message = message;
-    this.status = status;
-    this.errors = data;
-  }
 }

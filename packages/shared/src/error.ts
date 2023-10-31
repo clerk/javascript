@@ -22,6 +22,7 @@ export function isNetworkError(e: any): boolean {
 interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
   status: number;
+  clerkTraceId?: string;
 }
 
 // For a comprehensive Metamask error list, please see
@@ -88,24 +89,32 @@ export class ClerkAPIResponseError extends Error {
 
   status: number;
   message: string;
+  clerkTraceId?: string;
 
   errors: ClerkAPIError[];
 
-  constructor(message: string, { data, status }: ClerkAPIResponseOptions) {
+  constructor(message: string, { data, status, clerkTraceId }: ClerkAPIResponseOptions) {
     super(message);
 
     Object.setPrototypeOf(this, ClerkAPIResponseError.prototype);
 
     this.status = status;
     this.message = message;
+    this.clerkTraceId = clerkTraceId;
     this.clerkError = true;
     this.errors = parseErrors(data);
   }
 
   public toString = () => {
-    return `[${this.name}]\nMessage:${this.message}\nStatus:${this.status}\nSerialized errors: ${this.errors.map(e =>
-      JSON.stringify(e),
+    let message = `[${this.name}]\nMessage:${this.message}\nStatus:${this.status}\nSerialized errors: ${this.errors.map(
+      e => JSON.stringify(e),
     )}`;
+
+    if (this.clerkTraceId) {
+      message += `\nClerk Trace ID: ${this.clerkTraceId}`;
+    }
+
+    return message;
   };
 }
 

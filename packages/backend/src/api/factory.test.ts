@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import emailJson from '../fixtures/responses/email.json';
 import userJson from '../fixtures/responses/user.json';
 import runtime from '../runtime';
-import { jsonNotOk, jsonOk } from '../util/mockFetch';
+import { jsonError, jsonNotOk, jsonOk } from '../util/mockFetch';
 import { createBackendApiClient } from './factory';
 
 export default (QUnit: QUnit) => {
@@ -151,15 +151,41 @@ export default (QUnit: QUnit) => {
 
     test('executes a failed backend API request and parses the error response', async assert => {
       const mockErrorPayload = { code: 'whatever_error', message: 'whatever error', meta: {} };
+      const traceId = 'trace_id_123';
       fakeFetch = sinon.stub(runtime, 'fetch');
-      fakeFetch.onCall(0).returns(jsonNotOk({ errors: [mockErrorPayload] }));
+      fakeFetch.onCall(0).returns(jsonNotOk({ errors: [mockErrorPayload], clerk_trace_id: traceId }));
+
+      try {
+        await apiClient.users.getUser('user_deadbeef');
+      } catch (e: any) {
+        assert.equal(e.clerkTraceId, traceId);
+        assert.equal(e.clerkError, true);
+        assert.equal(e.status, 422);
+        assert.equal(e.errors[0].code, 'whatever_error');
+      }
+
+      assert.ok(
+        fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {
+          method: 'GET',
+          headers: {
+            Authorization: 'Bearer deadbeef',
+            'Content-Type': 'application/json',
+            'Clerk-Backend-SDK': '@clerk/backend',
+          },
+        }),
+      );
+    });
+
+    test('executes a failed backend API request and include cf ray id when trace not present', async assert => {
+      fakeFetch = sinon.stub(runtime, 'fetch');
+      fakeFetch.onCall(0).returns(jsonError({ errors: [] }));
 
       try {
         await apiClient.users.getUser('user_deadbeef');
       } catch (e: any) {
         assert.equal(e.clerkError, true);
-        assert.equal(e.status, 422);
-        assert.equal(e.errors[0].code, 'whatever_error');
+        assert.equal(e.status, 500);
+        assert.equal(e.clerkTraceId, 'mock_cf_ray');
       }
 
       assert.ok(
