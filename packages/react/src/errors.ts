@@ -1,5 +1,6 @@
 export {
   EmailLinkErrorCode,
+  MagicLinkErrorCode,
   isClerkAPIResponseError,
   isEmailLinkError,
   isKnownError,
