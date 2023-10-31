@@ -75,13 +75,13 @@ export const clerkClient = new Proxy(clerkClientSingleton, {
 /**
  * Stand-alone express middlewares bound to the pre-initialised clerkClient
  */
-export const ClerkExpressRequireAuth = (...args: any) => {
+export const ClerkExpressRequireAuth = (...args: Parameters<ReturnType<typeof createClerkExpressRequireAuth>>) => {
   const env = { ...loadApiEnv(), ...loadClientEnv() };
   const fn = createClerkExpressRequireAuth({ clerkClient, ...env });
   return fn(...args);
 };
 
-export const ClerkExpressWithAuth = (...args: any) => {
+export const ClerkExpressWithAuth = (...args: Parameters<ReturnType<typeof createClerkExpressWithAuth>>) => {
   const env = { ...loadApiEnv(), ...loadClientEnv() };
   const fn = createClerkExpressWithAuth({ clerkClient, ...env });
   return fn(...args);
