@@ -172,7 +172,7 @@ All of these are used to describe changes in the codebase, but they have differe
 
 ## Issues and feature requests
 
-You've found a bug in the source code, a mistake in the documentation or maybe you'd like a new feature? You can help us by [submitting an issue on GitHub](https://github.com/clerkinc/javascript/issues). Before you create an issue, make sure to search the issue archive - your issue may have already been addressed! Please ensure that you have read and followed the bug report template, otherwise we will have to close the issue.
+You've found a bug in the source code, a mistake in the documentation or maybe you'd like a new feature? You can help us by [submitting an issue on GitHub](https://github.com/clerkinc/javascript/issues). Before you create an issue, make sure to search the issue archive - your issue may have already been addressed! Please ensure that you have read and followed the bug report template, otherwise we will have to close the issue. You can submit a feature request by visiting [feedback.clerk.com](https://feedback.clerk.com).
 
 Issues that have the label `needs-triage` have been seen by our team and are queued for triage internally. Issues that have the label `prioritized` have been discussed and are either in our backlog or being worked on actively. We do our best to prioritize work across a wide variety of sources, only one of which is github issues. While we understand that it can be frustrating if it takes a while for a patch to land, we ask for your understanding in that we have quite a lot of things that need to be worked on at any given time and are still a small team. And remember, the best way to get something fixed in an open source library is to contribute the fix yourself!
 

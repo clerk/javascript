@@ -30,18 +30,18 @@
 
 ## Packages affected
 
-- [ ] `@clerk/clerk-js`
-- [ ] `@clerk/clerk-react`
-- [ ] `@clerk/nextjs`
-- [ ] `@clerk/remix`
-- [ ] `@clerk/types`
-- [ ] `@clerk/themes`
-- [ ] `@clerk/localizations`
-- [ ] `@clerk/clerk-expo`
 - [ ] `@clerk/backend`
+- [ ] `@clerk/chrome-extension`
+- [ ] `@clerk/clerk-js`
+- [ ] `@clerk/clerk-expo`
+- [ ] `@clerk/fastify`
+- [ ] `gatsby-plugin-clerk`
+- [ ] `@clerk/localizations`
+- [ ] `@clerk/nextjs`
+- [ ] `@clerk/clerk-react`
+- [ ] `@clerk/remix`
 - [ ] `@clerk/clerk-sdk-node`
 - [ ] `@clerk/shared`
-- [ ] `@clerk/fastify`
-- [ ] `@clerk/chrome-extension`
-- [ ] `gatsby-plugin-clerk`
+- [ ] `@clerk/themes`
+- [ ] `@clerk/types`
 - [ ] `build/tooling/chore`

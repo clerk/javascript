@@ -7,7 +7,6 @@
     "dist"
   ],
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "exports": {
     ".": {
       "import": {
@@ -45,6 +44,7 @@
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
     "publish:local": "npx yalc push --replace  --sig",
+    "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
     "lint:publint": "publint",
