@@ -1,9 +1,11 @@
-import type { GetDomainsParams, OrganizationEnrollmentMode } from '@clerk/types';
+import type { GetDomainsParams, OrganizationDomainResource, OrganizationEnrollmentMode } from '@clerk/types';
 import type { OrganizationDomainVerificationStatus } from '@clerk/types';
 import React, { useMemo } from 'react';
 
-import { withGate } from '../../common';
+import { stripOrigin, toURL, trimLeadingSlash } from '../../../utils';
+import { useGate, withGate } from '../../common';
 import { useCoreOrganization } from '../../contexts';
+import type { LocalizationKey } from '../../customizables';
 import { Box, Col, localizationKeys, Spinner } from '../../customizables';
 import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
 import { useInView } from '../../hooks';
@@ -17,8 +19,59 @@ type DomainListProps = GetDomainsParams & {
    * Enables internal links to navigate to the correct page
    * based on when this component is used
    */
-  redirectSubPath: string;
+  redirectSubPath: 'organization-settings/domain' | 'domain';
   fallback?: React.ReactNode;
+};
+
+const useDomainList = () => {
+  const { isAuthorizedUser: canDeleteDomain } = useGate({ permission: 'org:sys_domains:delete' });
+  const { isAuthorizedUser: canVerifyDomain } = useGate({ permission: 'org:sys_domains:manage' });
+
+  return {
+    showDotMenu: canDeleteDomain || canVerifyDomain,
+    canVerifyDomain,
+    canDeleteDomain,
+  };
+};
+
+const buildDomainListRelativeURL = (parentPath: string, domainId: string, mode?: 'verify' | 'remove') =>
+  trimLeadingSlash(stripOrigin(toURL(`${parentPath}/${domainId}/${mode || ''}`)));
+
+const useMenuActions = (
+  parentPath: string,
+  domainId: string,
+): { label: LocalizationKey; onClick: () => Promise<unknown>; isDestructive?: boolean }[] => {
+  const { canDeleteDomain, canVerifyDomain } = useDomainList();
+  const { navigate } = useRouter();
+
+  const menuActions = [];
+
+  if (canVerifyDomain) {
+    menuActions.push({
+      label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify'),
+      onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'verify')),
+    });
+  }
+
+  if (canDeleteDomain) {
+    menuActions.push({
+      label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove'),
+      isDestructive: true,
+      onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'remove')),
+    });
+  }
+
+  return menuActions;
+};
+
+const DomainListDotMenu = ({
+  redirectSubPath,
+  domainId,
+}: Pick<DomainListProps, 'redirectSubPath'> & {
+  domainId: OrganizationDomainResource['id'];
+}) => {
+  const actions = useMenuActions(redirectSubPath, domainId);
+  return <ThreeDotsMenu actions={actions} />;
 };
 
 export const DomainList = withGate(
@@ -31,6 +84,7 @@ export const DomainList = withGate(
       },
     });
 
+    const { showDotMenu } = useDomainList();
     const { ref } = useInView({
       threshold: 0,
       onChange: inView => {
@@ -69,7 +123,7 @@ export const DomainList = withGate(
       <Col>
         {domainList.length === 0 && !domains?.isLoading && fallback}
         {domainList.map(d => {
-          if (!(d.verification && d.verification.status === 'verified')) {
+          if (!(d.verification && d.verification.status === 'verified') || !showDotMenu) {
             return (
               <BlockWithTrailingComponent
                 key={d.id}
@@ -82,23 +136,12 @@ export const DomainList = withGate(
                 })}
                 badge={<EnrollmentBadge organizationDomain={d} />}
                 trailingComponent={
-                  <ThreeDotsMenu
-                    actions={[
-                      {
-                        label: localizationKeys(
-                          'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify',
-                        ),
-                        onClick: () => navigate(`${redirectSubPath}${d.id}/verify`),
-                      },
-                      {
-                        label: localizationKeys(
-                          'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove',
-                        ),
-                        isDestructive: true,
-                        onClick: () => navigate(`${redirectSubPath}${d.id}/remove`),
-                      },
-                    ]}
-                  />
+                  showDotMenu ? (
+                    <DomainListDotMenu
+                      redirectSubPath={redirectSubPath}
+                      domainId={d.id}
+                    />
+                  ) : undefined
                 }
               >
                 {d.name}
@@ -116,7 +159,7 @@ export const DomainList = withGate(
                 padding: `${t.space.$3} ${t.space.$4}`,
                 minHeight: t.sizes.$10,
               })}
-              onClick={() => navigate(`${redirectSubPath}${d.id}`)}
+              onClick={() => navigate(buildDomainListRelativeURL(redirectSubPath, d.id))}
             >
               {d.name}
             </ArrowBlockButton>
@@ -154,6 +197,6 @@ export const DomainList = withGate(
     );
   },
   {
-    permission: 'org:sys_domains:manage',
+    permission: 'org:sys_domains:read',
   },
 );

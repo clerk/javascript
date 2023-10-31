@@ -26,7 +26,7 @@ export const OrganizationSettings = () => {
           <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__settings')} />
         </Header.Root>
         <OrganizationProfileSection />
-        <Gate permission='org:sys_domains:manage'>
+        <Gate permission='org:sys_domains:read'>
           <OrganizationDomainsSection />
         </Gate>
         <OrganizationDangerSection />
@@ -85,7 +85,7 @@ const OrganizationDomainsSection = () => {
       subtitle={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
       id='organizationDomains'
     >
-      <DomainList redirectSubPath={'domain/'} />
+      <DomainList redirectSubPath={'domain'} />
 
       <AddBlockButton
         textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}

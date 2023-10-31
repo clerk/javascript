@@ -82,7 +82,7 @@ export class Session extends BaseResource implements SessionResource {
    * @experimental The method is experimental and subject to change in future releases.
    */
   isAuthorized: IsAuthorized = async params => {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       // if there is no active organization user can not be authorized
       if (!this.lastActiveOrganizationId || !this.user) {
         return resolve(false);
@@ -106,7 +106,22 @@ export class Session extends BaseResource implements SessionResource {
       if (params.role) {
         return resolve(activeOrganizationRole === params.role);
       }
-      return resolve(false);
+
+      if (params.any) {
+        return resolve(
+          !!params.any.find(permObj => {
+            if (permObj.permission) {
+              return activeOrganizationPermissions.includes(permObj.permission);
+            }
+            if (permObj.role) {
+              return activeOrganizationRole === permObj.role;
+            }
+            return false;
+          }),
+        );
+      }
+
+      return reject();
     });
   };
 
