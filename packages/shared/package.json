@@ -2,9 +2,27 @@
   "name": "@clerk/shared",
   "version": "1.0.1",
   "description": "Internal package utils used by the Clerk SDKs",
-  "sideEffects": false,
   "files": [
-    "dist"
+    "dist",
+    "browser",
+    "callWithRetry",
+    "color",
+    "cookie",
+    "date",
+    "deprecated",
+    "error",
+    "file",
+    "globs",
+    "handleValueOrFn",
+    "isomorphicAtob",
+    "keys",
+    "loadScript",
+    "localStorageBroadcastChannel",
+    "poller",
+    "proxy",
+    "underscore",
+    "url",
+    "react"
   ],
   "main": "./dist/index.js",
   "exports": {
@@ -37,7 +55,8 @@
         "types": "./dist/react/index.d.ts",
         "default": "./dist/react/index.js"
       }
-    }
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsup",
