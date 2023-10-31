@@ -15,8 +15,7 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
-import { PublicUserData } from './internal';
-import { BaseResource, Token, User } from './internal';
+import { BaseResource, PublicUserData, Token, User } from './internal';
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -71,7 +70,7 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   // TODO: Fix this eslint error
-  // eslint-disable-next-line @typescript-eslint/require-await
+
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
     return runWithExponentialBackOff(() => this._getToken(options), {
       shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,
@@ -82,7 +81,7 @@ export class Session extends BaseResource implements SessionResource {
    * @experimental The method is experimental and subject to change in future releases.
    */
   isAuthorized: IsAuthorized = async params => {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       // if there is no active organization user can not be authorized
       if (!this.lastActiveOrganizationId || !this.user) {
         return resolve(false);
@@ -106,7 +105,22 @@ export class Session extends BaseResource implements SessionResource {
       if (params.role) {
         return resolve(activeOrganizationRole === params.role);
       }
-      return resolve(false);
+
+      if (params.any) {
+        return resolve(
+          !!params.any.find(permObj => {
+            if (permObj.permission) {
+              return activeOrganizationPermissions.includes(permObj.permission);
+            }
+            if (permObj.role) {
+              return activeOrganizationRole === permObj.role;
+            }
+            return false;
+          }),
+        );
+      }
+
+      return reject();
     });
   };
 
