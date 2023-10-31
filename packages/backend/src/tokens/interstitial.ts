@@ -58,6 +58,13 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
   return `
     <head>
         <meta charset="UTF-8" />
+        <style>
+          @media (prefers-color-scheme: dark) {
+            body {
+              background-color: black;
+            }
+          }
+        </style>
     </head>
     <body>
         <script>
