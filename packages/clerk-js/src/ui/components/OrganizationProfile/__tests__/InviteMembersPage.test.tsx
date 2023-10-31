@@ -12,18 +12,19 @@ const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('InviteMembersPage', () => {
   it('renders the component', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
     const { getByText } = render(<InviteMembersPage />, { wrapper });
     expect(getByText('Invite new members to this organization')).toBeDefined();
   });
 
   describe('Submitting', () => {
     it('enables the Send button when one or more email has been entered', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.dev'],
@@ -31,6 +32,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
       const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
       expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
 
@@ -47,9 +49,12 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.dev,');
+      await userEvent.click(getByRole('button', { name: 'Select an option' }));
+      await userEvent.click(getByText('Member'));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
         emailAddresses: ['test+1@clerk.dev'],
@@ -66,12 +71,15 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(
         getByTestId('tag-input'),
         'test+1@clerk.dev,test+2@clerk.dev,test+3@clerk.dev,test+4@clerk.dev,',
       );
+      await userEvent.click(getByRole('button', { name: 'Select an option' }));
+      await userEvent.click(getByText('Member'));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
         emailAddresses: ['test+1@clerk.dev', 'test+2@clerk.dev', 'test+3@clerk.dev', 'test+4@clerk.dev'],
@@ -88,10 +96,11 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
       const { getByRole, userEvent, getByText, getByTestId } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.dev,');
-      await userEvent.click(getByRole('button', { name: 'Member' }));
+      await userEvent.click(getByRole('button', { name: 'Select an option' }));
       await userEvent.click(getByText('Admin'));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
@@ -109,6 +118,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
       fixtures.clerk.organization?.inviteMembers.mockRejectedValueOnce(
         new ClerkAPIResponseError('Error', {
           data: [
@@ -143,6 +153,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
       fixtures.clerk.organization?.inviteMembers.mockRejectedValueOnce(
         new ClerkAPIResponseError('Error', {
           data: [
@@ -173,6 +184,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
       fixtures.clerk.organization?.inviteMembers.mockRejectedValueOnce(
         new ClerkAPIResponseError('Error', {
           data: [
@@ -203,6 +215,7 @@ describe('InviteMembersPage', () => {
           organization_memberships: [{ name: 'Org1', role: 'admin' }],
         });
       });
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
       const { getByRole, userEvent } = render(<InviteMembersPage />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Cancel' }));
