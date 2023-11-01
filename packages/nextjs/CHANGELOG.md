@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.26.2
+
+### Patch Changes
+
+- Deprecate `user`, `session`, and `organization` resources from the returned value of `auth()`. ([#1960](https://github.com/clerkinc/javascript/pull/1960)) by [@panteliselef](https://github.com/panteliselef)
+
+- Imports `deprecatedObjectProperty` from `@clerk/shared` as subpath. ([#1997](https://github.com/clerkinc/javascript/pull/1997)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`f6f67f9ab`](https://github.com/clerkinc/javascript/commit/f6f67f9abb858aa2d12aa5a6afcc0091fa89225f), [`a8d7a687e`](https://github.com/clerkinc/javascript/commit/a8d7a687e7771f24735ca6ff05da86441193a591), [`7b91aca54`](https://github.com/clerkinc/javascript/commit/7b91aca548f323891888180c0ac9b54d3143151c), [`bc19fe025`](https://github.com/clerkinc/javascript/commit/bc19fe025d8b1ee9339dcffdb1dd785d00c4e766)]:
+  - @clerk/types@3.57.1
+  - @clerk/shared@1.0.2
+  - @clerk/backend@0.33.0
+  - @clerk/clerk-react@4.27.2
+  - @clerk/clerk-sdk-node@4.12.19
+
 ## 4.26.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.57.1
+
+### Patch Changes
+
+- Shows list of domains if member has the `org:sys_domain:read` permission. ([#1896](https://github.com/clerkinc/javascript/pull/1896)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.57.0
 
 ### Minor Changes
