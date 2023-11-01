@@ -8,7 +8,7 @@ import {
   signedInAuthObject,
   signedOutAuthObject,
 } from '@clerk/backend';
-import { deprecatedObjectProperty } from '@clerk/shared';
+import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import type { SecretKeyOrApiKey } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
@@ -54,7 +54,7 @@ export const createGetAuth = ({
       // When the auth status is set, we trust that the middleware has already run
       // Then, we don't have to re-verify the JWT here,
       // we can just strip out the claims manually.
-      const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+      const authStatus = getAuthKeyFromRequest(req, 'AuthStatus') as AuthStatus;
       const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
       const authReason = getAuthKeyFromRequest(req, 'AuthReason');
       logger.debug('Headers debug', { authStatus, authMessage, authReason });
@@ -125,7 +125,7 @@ type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; 
 type BuildClerkProps = (req: RequestLike, authState?: BuildClerkPropsInitState) => Record<string, unknown>;
 
 export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
-  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus') as AuthStatus;
   const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
   const authReason = getAuthKeyFromRequest(req, 'AuthReason');
 
