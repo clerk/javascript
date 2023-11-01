@@ -1,6 +1,6 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
+import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -23,7 +23,6 @@ import {
   apiEndpointUnauthorizedNextResponse,
   decorateRequest,
   isCrossOrigin,
-  isDevelopmentFromApiKey,
   setRequestHeadersOnNextResponse,
 } from './utils';
 

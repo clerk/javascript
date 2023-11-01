@@ -1,6 +1,7 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -147,10 +148,6 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
   ) as T;
   return { ...obj, __clerk_ssr_state };
 };
-
-export function isDevelopmentFromApiKey(apiKey: string): boolean {
-  return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
-}
 
 // Auth result will be set as both a query param & header when applicable
 export function decorateRequest(
