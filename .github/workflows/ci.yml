@@ -6,8 +6,7 @@ on:
   pull_request:
     branches:
       - main
-      - main-v4
-      - ci-updates
+      - release/v4
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
