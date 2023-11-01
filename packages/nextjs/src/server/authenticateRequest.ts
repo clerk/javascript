@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 
 import type { RequestState } from './clerkClient';
 import {
-  API_KEY,
   CLERK_JS_URL,
   CLERK_JS_VERSION,
   clerkClient,
@@ -19,7 +18,6 @@ export const authenticateRequest = async (req: NextRequest, opts: WithAuthOption
   const { isSatellite, domain, signInUrl, proxyUrl } = handleMultiDomainAndProxy(req, opts);
   return await clerkClient.authenticateRequest({
     ...opts,
-    apiKey: opts.apiKey || API_KEY,
     secretKey: opts.secretKey || SECRET_KEY,
     publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
     isSatellite,

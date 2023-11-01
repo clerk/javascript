@@ -6,10 +6,9 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { API_KEY, DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './clerkClient';
+import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './clerkClient';
 import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
-import type { NextMiddlewareResult, RequestLike } from './types';
-import type { WithAuthOptions } from './types';
+import type { NextMiddlewareResult, RequestLike, WithAuthOptions } from './types';
 
 type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
 
@@ -243,7 +242,7 @@ export const handleMultiDomainAndProxy = (req: NextRequest, opts: WithAuthOption
     throw new Error(missingDomainAndProxy);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(SECRET_KEY || API_KEY)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(SECRET_KEY)) {
     throw new Error(missingSignInUrlInDev);
   }
 

@@ -4,15 +4,7 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import {
-  API_KEY,
-  API_URL,
-  CLERK_JS_URL,
-  CLERK_JS_VERSION,
-  clerkClient,
-  PUBLISHABLE_KEY,
-  SECRET_KEY,
-} from './clerkClient';
+import { API_URL, CLERK_JS_URL, CLERK_JS_VERSION, clerkClient, PUBLISHABLE_KEY, SECRET_KEY } from './clerkClient';
 import type { WithAuthOptions } from './types';
 import { decorateRequest, handleMultiDomainAndProxy, setCustomAttributeOnRequest } from './utils';
 
@@ -47,7 +39,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     // get auth state, check if we need to return an interstitial
     const requestState = await clerkClient.authenticateRequest({
       ...opts,
-      apiKey: opts.apiKey || API_KEY,
       secretKey: opts.secretKey || SECRET_KEY,
       publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
       isSatellite,

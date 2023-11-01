@@ -1,17 +1,9 @@
-import { deprecated } from '@clerk/shared/deprecated';
 import { isTruthy } from '@clerk/shared/underscore';
 
 export const CLERK_JS_VERSION = process.env.NEXT_PUBLIC_CLERK_JS_VERSION || '';
 export const CLERK_JS_URL = process.env.NEXT_PUBLIC_CLERK_JS || '';
 export const API_URL = process.env.CLERK_API_URL || 'https://api.clerk.com';
 export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
-/**
- * @deprecated Use `CLERK_SECRET_KEY` instead.
- */
-export const API_KEY = process.env.CLERK_API_KEY || '';
-if (API_KEY) {
-  deprecated('CLERK_API_KEY', 'Use `CLERK_SECRET_KEY` environment variable instead.');
-}
 export const SECRET_KEY = process.env.CLERK_SECRET_KEY || '';
 export const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
 export const DOMAIN = process.env.NEXT_PUBLIC_CLERK_DOMAIN || '';

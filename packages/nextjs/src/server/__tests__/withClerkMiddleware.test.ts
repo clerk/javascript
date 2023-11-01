@@ -16,8 +16,8 @@ describe('withClerkMiddleware', () => {
       it('can receive the appropriate keys', () => {
         expectTypeOf({ publishableKey: '', secretKey: '' }).toMatchTypeOf<WithAuthOptions>();
         expectTypeOf({ secretKey: '' }).toMatchTypeOf<WithAuthOptions>();
-        expectTypeOf({ publishableKey: '', apiKey: '' }).toMatchTypeOf<WithAuthOptions>();
-        expectTypeOf({ apiKey: '' }).toMatchTypeOf<WithAuthOptions>();
+        expectTypeOf({ publishableKey: '', secretKey: '' }).toMatchTypeOf<WithAuthOptions>();
+        expectTypeOf({ secretKey: '' }).toMatchTypeOf<WithAuthOptions>();
       });
 
       describe('Multi domain', () => {
