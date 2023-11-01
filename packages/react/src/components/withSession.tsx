@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useSessionContext } from '../contexts/SessionContext';
 import { hocChildrenNotAFunctionError } from '../errors';
+import { errorThrower } from '../utils';
 
 export const withSession = <P extends { session: SessionResource }>(
   Component: React.ComponentType<P>,
@@ -35,7 +36,7 @@ export const WithSession: React.FC<{
   const session = useSessionContext();
 
   if (typeof children !== 'function') {
-    throw new Error(hocChildrenNotAFunctionError);
+    errorThrower.throw(hocChildrenNotAFunctionError);
   }
 
   if (!session) {

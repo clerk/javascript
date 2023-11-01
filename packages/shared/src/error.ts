@@ -256,6 +256,7 @@ export interface ErrorThrower {
   throwInvalidProxyUrl(params: { url?: string }): never;
 
   throwMissingPublishableKeyError(): never;
+  throw(message: string): never;
 }
 
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
@@ -309,6 +310,10 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     throwMissingPublishableKeyError(): never {
       throw new Error(buildMessage(messages.MissingPublishableKeyErrorMessage));
+    },
+
+    throw(message: string): never {
+      throw new Error(buildMessage(message));
     },
   };
 }

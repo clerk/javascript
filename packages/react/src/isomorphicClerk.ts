@@ -39,7 +39,7 @@ import type {
   HeadlessBrowserClerkConstrutor,
   IsomorphicClerkOptions,
 } from './types';
-import { isConstructor, loadClerkJsScript } from './utils';
+import { errorThrower, isConstructor, loadClerkJsScript } from './utils';
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
@@ -105,7 +105,7 @@ export default class IsomorphicClerk {
       return handleValueOrFn(this.#domain, new URL(window.location.href), '');
     }
     if (typeof this.#domain === 'function') {
-      throw new Error(unsupportedNonBrowserDomainOrProxyUrlFunction);
+      return errorThrower.throw(unsupportedNonBrowserDomainOrProxyUrlFunction);
     }
     return this.#domain || '';
   }
@@ -117,7 +117,7 @@ export default class IsomorphicClerk {
       return handleValueOrFn(this.#proxyUrl, new URL(window.location.href), '');
     }
     if (typeof this.#proxyUrl === 'function') {
-      throw new Error(unsupportedNonBrowserDomainOrProxyUrlFunction);
+      return errorThrower.throw(unsupportedNonBrowserDomainOrProxyUrlFunction);
     }
     return this.#proxyUrl || '';
   }

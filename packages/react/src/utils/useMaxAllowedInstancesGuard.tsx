@@ -1,12 +1,14 @@
 import React from 'react';
 
+import { errorThrower } from './errorThrower';
+
 const counts = new Map<string, number>();
 
 export function useMaxAllowedInstancesGuard(name: string, error: string, maxCount = 1): void {
   React.useEffect(() => {
     const count = counts.get(name) || 0;
     if (count == maxCount) {
-      throw new Error(error);
+      errorThrower.throw(error);
     }
     counts.set(name, count + 1);
 

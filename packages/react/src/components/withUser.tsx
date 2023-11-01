@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useUserContext } from '../contexts/UserContext';
 import { hocChildrenNotAFunctionError } from '../errors';
+import { errorThrower } from '../utils';
 
 export const withUser = <P extends { user: UserResource }>(Component: React.ComponentType<P>, displayName?: string) => {
   displayName = displayName || Component.displayName || Component.name || 'Component';
@@ -32,7 +33,7 @@ export const WithUser: React.FC<{
   const user = useUserContext();
 
   if (typeof children !== 'function') {
-    throw new Error(hocChildrenNotAFunctionError);
+    errorThrower.throw(hocChildrenNotAFunctionError);
   }
 
   if (!user) {
