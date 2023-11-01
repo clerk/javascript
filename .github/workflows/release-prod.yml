@@ -40,8 +40,6 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          title: Version Packages
-          commit: "chore(repo): Version packages"
           publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
