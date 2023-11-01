@@ -174,7 +174,6 @@ export const sanitizeInputProps = (
   obj: ReturnType<typeof useFormField>,
   keep?: (keyof ReturnType<typeof useFormField>)[],
 ) => {
-  /* eslint-disable */
   const {
     radioOptions,
     validatePassword,
@@ -190,6 +189,7 @@ export const sanitizeInputProps = (
     errorMessageId,
     fieldId,
     label,
+    clearFeedback,
     ...inputProps
   } = obj;
   /* eslint-enable */

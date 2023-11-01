@@ -36,6 +36,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   id: FieldId;
   isRequired?: boolean;
   isOptional?: boolean;
+  isFocused?: boolean;
   onActionClicked?: React.MouseEventHandler;
   isDisabled?: boolean;
   label?: string | LocalizationKey;
@@ -263,15 +264,13 @@ export const FormFeedback = (props: FormFeedbackProps) => {
 export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormControlProps>>((props, ref) => {
   const { t } = useLocalizations();
   const card = useCardState();
-  const [isFocused, setIsFocused] = useState(false);
   const {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     hasPassedComplexity,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     infoText,
     id,
     isRequired,
     isOptional,
+    isFocused,
     label,
     actionLabel,
     onActionClicked,
@@ -294,7 +293,6 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
 
   const isDisabled = props.isDisabled || card.isLoading;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { validatePassword, ...inputProps } = restInputProps;
 
   const inputElementProps = useMemo(() => {
@@ -405,11 +403,9 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       {...inputElementProps}
       onFocus={e => {
         inputElementProps.onFocus?.(e);
-        setIsFocused(true);
       }}
       onBlur={e => {
         inputElementProps.onBlur?.(e);
-        setIsFocused(false);
       }}
       ref={ref}
       placeholder={t(placeholder)}
