@@ -4,7 +4,7 @@ on:
 jobs:
   build:
     # if: ${{ github.repository == 'clerkinc/javascript' }}
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ${{ vars.RUNNER_NORMAL }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3

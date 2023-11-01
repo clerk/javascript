@@ -21,7 +21,7 @@ jobs:
     name: Notify Slack
     needs: integration-nextjs
     if: ${{ contains(needs.*.result, 'failure') }}
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ${{ vars.RUNNER_NORMAL }}
     steps:
       - name: Report Status
         uses: ravsamhq/notify-slack-action@v1

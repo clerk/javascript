@@ -15,7 +15,7 @@ jobs:
   run:
     continue-on-error: true
     timeout-minutes: 60
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ${{ vars.RUNNER_NORMAL }}
     concurrency:
       group: integration-${{ github.ref }}-${{ inputs.script }}
       cancel-in-progress: true
