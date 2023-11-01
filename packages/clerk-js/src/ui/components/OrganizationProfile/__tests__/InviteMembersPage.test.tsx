@@ -1,6 +1,7 @@
 import type { MembershipRole, OrganizationInvitationResource } from '@clerk/types';
 import { describe } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
+import { act } from '@testing-library/react';
 import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
@@ -18,7 +19,7 @@ describe('InviteMembersPage', () => {
     });
 
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
-    const { getByText } = render(<InviteMembersPage />, { wrapper });
+    const { getByText } = await act(() => render(<InviteMembersPage />, { wrapper }));
     expect(getByText('Invite new members to this organization')).toBeDefined();
   });
 
@@ -59,6 +60,43 @@ describe('InviteMembersPage', () => {
       expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
         emailAddresses: ['test+1@clerk.dev'],
         role: 'basic_member' as MembershipRole,
+      });
+    });
+
+    it('fetches custom role and sends invite to email entered and teacher role when clicking Send', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockResolvedValueOnce({
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: '1',
+            description: '',
+            updatedAt: new Date(),
+            createdAt: new Date(),
+            permissions: [],
+            name: 'Teacher',
+            key: 'org:teacher',
+          },
+        ],
+        total_count: 1,
+      });
+      fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
+      const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersPage />, { wrapper });
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
+      await userEvent.click(getByRole('button', { name: 'Select an option' }));
+      await userEvent.click(getByText('Teacher'));
+      await userEvent.click(getByRole('button', { name: 'Send invitations' }));
+      expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
+        emailAddresses: ['test+1@clerk.com'],
+        role: 'org:teacher' as MembershipRole,
       });
     });
 
