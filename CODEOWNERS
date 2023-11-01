@@ -1,2 +1,1 @@
-# Require specific approval for the generated "Version Packages" PR, which triggers a release
-packages/*/CHANGELOG.md @clerkinc/team-sdk
+* @clerkinc/team-sdk
