@@ -23,6 +23,10 @@ export const populateCacheUpdateItem = <T extends { id: string }>(
     return [{ data: [updatedItem], total_count: 1 }];
   }
 
+  /**
+   * We should "preserve" an undefined page if one is found. For example if swr triggers 2 requests, page 1 & page2, and the request for page2 resolves first, at that point in memory itemsInfinitePages would look like this [undefined, {....}]
+   * if SWR says that has fetched 2 pages but the first result of is undefined, we should not return back an array with 1 item as this will end up having cacheKeys that point nowhere.
+   */
   return itemsInfinitePages.map(item => {
     if (typeof item === 'undefined') {
       return item;
@@ -50,6 +54,10 @@ export const populateCacheRemoveItem = <T extends { id: string }>(
     return undefined;
   }
 
+  /**
+   * We should "preserve" an undefined page if one is found. For example if swr triggers 2 requests, page 1 & page2, and the request for page2 resolves first, at that point in memory itemsInfinitePages would look like this [undefined, {....}]
+   * if SWR says that has fetched 2 pages but the first result of is undefined, we should not return back an array with 1 item as this will end up having cacheKeys that point nowhere.
+   */
   return itemsInfinitePages?.map(item => {
     if (typeof item === 'undefined') {
       return item;
