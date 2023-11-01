@@ -2,14 +2,12 @@
 
 exports[`constants from environment variables 1`] = `
 {
-  "API_KEY": "CLERK_API_KEY",
   "API_URL": "CLERK_API_URL",
   "API_VERSION": "CLERK_API_VERSION",
   "Cookies": {
     "ClientUat": "__client_uat",
     "Session": "__session",
   },
-  "FRONTEND_API": "CLERK_FRONTEND_API",
   "Headers": {
     "AuthMessage": "x-clerk-auth-message",
     "AuthReason": "x-clerk-auth-reason",
