@@ -26,6 +26,8 @@ type WithUserParams = Omit<
   organization_memberships?: Array<string | OrgParams>;
 };
 
+type WithSessionParams = Partial<SessionJSON>;
+
 export const getOrganizationId = (orgParams: OrgParams) => orgParams?.id || orgParams?.name || 'test_id';
 
 export const createOrganizationMembership = (params: OrgParams): OrganizationMembershipJSON => {
@@ -164,17 +166,17 @@ export const createUser = (params: WithUserParams): UserJSON => {
   return res;
 };
 
-export const createSession = (params: WithUserParams) => {
-  const user = createUser(params);
+export const createSession = (sessionParams: WithSessionParams = {}, userParams: WithUserParams = {}) => {
+  const user = createUser(userParams);
   return {
     object: 'session',
-    id: 'session_1',
-    status: 'active',
-    expire_at: jest.now() + 5000,
-    abandon_at: jest.now() + 5000,
-    last_active_at: jest.now(),
-    last_active_organization_id: null,
-    actor: null,
+    id: sessionParams.id,
+    status: sessionParams.status,
+    expire_at: sessionParams.expire_at || jest.now() + 5000,
+    abandon_at: sessionParams.abandon_at,
+    last_active_at: sessionParams.last_active_at || jest.now(),
+    last_active_organization_id: sessionParams.last_active_organization_id,
+    actor: sessionParams.actor,
     user: createUser({}),
     public_user_data: {
       first_name: user.first_name,
@@ -184,8 +186,8 @@ export const createSession = (params: WithUserParams) => {
       identifier: user.email_addresses.find(e => e.id === user.primary_email_address_id)?.email_address || '',
       profile_image_url: user.profile_image_url,
     },
-    created_at: 1697449745962,
-    updated_at: 1698763366892,
+    created_at: sessionParams.created_at || jest.now() - 1000,
+    updated_at: sessionParams.updated_at || jest.now(),
     last_active_token: {
       object: 'token',
       jwt: mockJwt,
