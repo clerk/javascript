@@ -2,18 +2,20 @@ import React from 'react';
 
 import { Col, descriptors } from '../customizables';
 import { Caret } from '../icons';
+import type { PropsOfComponent } from '../styledSystem';
 import { animations } from '../styledSystem';
 import { ArrowBlockButton } from './ArrowBlockButton';
 
-type AccordionItemProps = React.PropsWithChildren<{
-  title: React.ReactElement | string;
-  icon?: React.ReactElement;
-  badge?: React.ReactElement;
-  defaultOpen?: boolean;
-  toggleable?: boolean;
-  scrollOnOpen?: boolean;
-  onCloseCallback?: () => void;
-}>;
+type AccordionItemProps = Omit<PropsOfComponent<typeof Col>, 'title'> &
+  React.PropsWithChildren<{
+    title: React.ReactElement | string;
+    icon?: React.ReactElement;
+    badge?: React.ReactElement;
+    defaultOpen?: boolean;
+    toggleable?: boolean;
+    scrollOnOpen?: boolean;
+    onCloseCallback?: () => void;
+  }>;
 
 export const AccordionItem = (props: AccordionItemProps) => {
   const {
@@ -25,6 +27,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
     scrollOnOpen = false,
     badge,
     onCloseCallback = null,
+    ...rest
   } = props;
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
   const contentRef = React.useRef<HTMLDivElement>(null);
@@ -52,10 +55,10 @@ export const AccordionItem = (props: AccordionItemProps) => {
     }
 
     return () => cancelAnimationFrame(requestRef);
-  }, [isOpen]);
+  }, [isOpen, scrollOnOpen]);
 
   return (
-    <Col>
+    <Col {...rest}>
       <ArrowBlockButton
         elementDescriptor={descriptors.accordionTriggerButton}
         variant='ghost'
