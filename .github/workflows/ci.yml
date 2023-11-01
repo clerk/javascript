@@ -6,7 +6,7 @@ on:
   pull_request:
     branches:
       - main
-      - main-v4
+      - release/v4
       - ci-updates
 
 concurrency:

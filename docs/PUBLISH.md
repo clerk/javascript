@@ -50,7 +50,7 @@ If a PR got merged into `main` that should also be released in older versions (e
 Duplicate the `.env.example` file inside `scripts` and rename it to `.env`. Fill out the `GITHUB_ACCESS_TOKEN` variable. Afterwards, you'll be able to run the CLI like so:
 
 ```shell
-node backports.mjs main-v4 1234
+node backports.mjs release/v4 1234
 ```
 
-The command above will backport the PR `1234` to the branch `main-v4`.
+The command above will backport the PR `1234` to the branch `release/v4`.
