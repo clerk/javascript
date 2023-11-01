@@ -1,24 +1,23 @@
-import type { RoleJSON, RoleResource } from '@clerk/types';
+import type { PermissionJSON, PermissionResource } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
-import { Permission } from './Permission';
 
-export class Role extends BaseResource implements RoleResource {
+export class Permission extends BaseResource implements PermissionResource {
   id!: string;
   key!: string;
   name!: string;
   description!: string;
-  permissions: Permission[] = [];
+  type!: 'system';
   createdAt!: Date;
   updatedAt!: Date;
 
-  constructor(data: RoleJSON) {
+  constructor(data: PermissionJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: RoleJSON | null): this {
+  protected fromJSON(data: PermissionJSON | null): this {
     if (!data) {
       return this;
     }
@@ -27,7 +26,7 @@ export class Role extends BaseResource implements RoleResource {
     this.key = data.key;
     this.name = data.name;
     this.description = data.description;
-    this.permissions = data.permissions.map(perm => new Permission(perm));
+    this.type = data.type;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
