@@ -87,7 +87,7 @@ export const deepSnakeToCamel = createDeepObjectTransformer(snakeToCamel);
  * Returns true for `true`, true, positive numbers.
  * Returns false for `false`, false, 0, negative integers and anything else.
  */
-export function isTruthy(value: any): boolean {
+export function isTruthy(value: unknown): boolean {
   // Return if Boolean
   if (typeof value === `boolean`) return value;
 
@@ -95,11 +95,13 @@ export function isTruthy(value: any): boolean {
   if (value === undefined || value === null) return false;
 
   // If the String is true or false
-  if (value.toLowerCase() === `true`) return true;
-  if (value.toLowerCase() === `false`) return false;
+  if (typeof value === `string`) {
+    if (value.toLowerCase() === `true`) return true;
+    if (value.toLowerCase() === `false`) return false;
+  }
 
   // Now check if it's a number
-  const number = parseInt(value, 10);
+  const number = parseInt(value as string, 10);
   if (isNaN(number)) return false;
   if (number > 0) return true;
 
