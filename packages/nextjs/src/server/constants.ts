@@ -1,4 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
+import { isTruthy } from '@clerk/shared/underscore';
 
 /**
  * @deprecated Use `CLERK_JS_VERSION` instead.
@@ -29,6 +30,6 @@ if (FRONTEND_API) {
 export const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
 export const DOMAIN = process.env.NEXT_PUBLIC_CLERK_DOMAIN || '';
 export const PROXY_URL = process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '';
-export const IS_SATELLITE = process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true' || false;
+export const IS_SATELLITE = isTruthy(process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE) || false;
 export const SIGN_IN_URL = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '';
 export const SIGN_UP_URL = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '';

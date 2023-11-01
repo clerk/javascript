@@ -1,6 +1,9 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, Clerk } from '@clerk/backend';
-import { deprecated, handleValueOrFn, isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared';
+import { deprecated } from '@clerk/shared/deprecated';
+import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
+import { isTruthy } from '@clerk/shared/underscore';
 
 import {
   noSecretKeyOrApiKeyError,
@@ -60,7 +63,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const isSatellite =
     handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
-    getEnvVariable('CLERK_IS_SATELLITE', context) === 'true' ||
+    isTruthy(getEnvVariable('CLERK_IS_SATELLITE', context)) ||
     false;
 
   const requestURL = buildRequestUrl(request);

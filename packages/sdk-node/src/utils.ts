@@ -1,5 +1,5 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import { deprecated } from '@clerk/shared/deprecated';
+import { isTruthy } from '@clerk/shared/underscore';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 // https://nextjs.org/docs/api-routes/api-middlewares#connectexpress-middleware-support
@@ -41,7 +41,7 @@ export const loadApiEnv = () => {
     domain: process.env.CLERK_DOMAIN || '',
     proxyUrl: process.env.CLERK_PROXY_URL || '',
     signInUrl: process.env.CLERK_SIGN_IN_URL || '',
-    isSatellite: process.env.CLERK_IS_SATELLITE === 'true',
+    isSatellite: isTruthy(process.env.CLERK_IS_SATELLITE),
     jwtKey: process.env.CLERK_JWT_KEY || '',
   };
 };
