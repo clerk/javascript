@@ -4,7 +4,7 @@ run-name: Staging release from ${{ github.ref_name }}
 on:
   push:
     branches:
-      - main-v4
+      - release/v4
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

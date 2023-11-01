@@ -10,7 +10,7 @@
   "fixed": [],
   "linked": [],
   "access": "public",
-  "baseBranch": "origin/main-v4",
+  "baseBranch": "origin/release/v4",
   "updateInternalDependencies": "patch",
   "ignore": [],
   "snapshot": {
