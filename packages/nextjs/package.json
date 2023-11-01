@@ -34,11 +34,6 @@
       "types": "./dist/types/server/index.d.ts",
       "import": "./dist/esm/server/index.js",
       "require": "./dist/cjs/server/index.js"
-    },
-    "./api": {
-      "types": "./dist/types/api/index.d.ts",
-      "import": "./dist/esm/api/index.js",
-      "require": "./dist/cjs/api/index.js"
     }
   },
   "main": "./dist/cjs/index.js",
@@ -46,8 +41,7 @@
   "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
-    "server",
-    "api"
+    "server"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
