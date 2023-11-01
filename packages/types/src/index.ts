@@ -29,6 +29,7 @@ export * from './organizationMembershipRequest';
 export * from './organizationSettings';
 export * from './organizationSuggestion';
 export * from './passwords';
+export * from './permission';
 export * from './phoneNumber';
 export * from './redirects';
 export * from './resource';

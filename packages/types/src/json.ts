@@ -369,7 +369,18 @@ export interface RoleJSON extends ClerkResourceJSON {
   key: string;
   name: string;
   description: string;
-  permissions: string[];
+  permissions: PermissionJSON[];
+  created_at: number;
+  updated_at: number;
+}
+
+export interface PermissionJSON extends ClerkResourceJSON {
+  object: 'permission';
+  id: string;
+  key: string;
+  name: string;
+  description: string;
+  type: 'system';
   created_at: number;
   updated_at: number;
 }
