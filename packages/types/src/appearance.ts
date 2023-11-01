@@ -399,6 +399,8 @@ export type ElementsConfig = {
   page: WithOptions;
   pageHeader: WithOptions;
 
+  activeDevice: WithOptions<'current'>;
+  activeDeviceListItem: WithOptions<'current'>;
   activeDeviceIcon: WithOptions<'mobile' | 'desktop'>;
 
   impersonationFab: WithOptions;

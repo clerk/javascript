@@ -47,21 +47,25 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
   };
 
   return (
-    <UserProfileAccordion title={<DeviceInfo session={props.session} />}>
+    <UserProfileAccordion
+      elementDescriptor={descriptors.activeDeviceListItem}
+      elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
+      title={<DeviceInfo session={props.session} />}
+    >
       <Col gap={4}>
         {isCurrent && (
           <LinkButtonWithDescription
-            title={localizationKeys('userProfile.start.activeDevicesSection.detailsTitle')}
             subtitle={localizationKeys('userProfile.start.activeDevicesSection.detailsSubtitle')}
+            title={localizationKeys('userProfile.start.activeDevicesSection.detailsTitle')}
           />
         )}
         {!isCurrent && (
           <LinkButtonWithDescription
-            title={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionTitle')}
-            subtitle={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionSubtitle')}
             actionLabel={localizationKeys('userProfile.start.activeDevicesSection.destructiveAction')}
             colorScheme='danger'
             onClick={revoke}
+            subtitle={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionSubtitle')}
+            title={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionTitle')}
           />
         )}
       </Col>
@@ -82,6 +86,8 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
 
   return (
     <Flex
+      elementDescriptor={descriptors.activeDevice}
+      elementId={isCurrent ? descriptors.activeDevice.setId('current') : undefined}
       align='center'
       sx={t => ({
         gap: t.space.$8,
