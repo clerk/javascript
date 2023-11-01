@@ -50,6 +50,9 @@ export interface OrganizationResource extends ClerkResource {
    */
   getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
   getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
+  /**
+   * @experimental
+   */
   getRoles: (params?: GetRolesParams) => Promise<ClerkPaginatedResponse<RoleResource>>;
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   getMembershipRequests: (
@@ -73,6 +76,9 @@ export type GetMembershipsParams = {
   role?: MembershipRole[];
 } & ClerkPaginationParams;
 
+/**
+ * @experimental
+ */
 export type GetRolesParams = {
   /**
    * This is the starting point for your fetched results. The initial value persists between re-renders
