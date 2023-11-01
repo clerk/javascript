@@ -40,11 +40,6 @@
       "import": "./dist/esm/api/index.js",
       "require": "./dist/cjs/api/index.js"
     },
-    "./ssr": {
-      "types": "./dist/types/ssr/index.d.ts",
-      "import": "./dist/esm/ssr/index.js",
-      "require": "./dist/cjs/ssr/index.js"
-    },
     "./edge-middlewarefiles": {
       "types": "./dist/types/edge-middleware/index.d.ts",
       "import": "./dist/esm/edge-middleware/index.js",
@@ -58,8 +53,7 @@
     "dist",
     "server",
     "api",
-    "edge-middleware",
-    "ssr"
+    "edge-middleware"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
