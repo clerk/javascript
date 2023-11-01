@@ -1,5 +1,25 @@
 # Change Log
 
+## 4.64.2
+
+### Patch Changes
+
+- Shows list of domains if member has the `org:sys_domain:read` permission. ([#1896](https://github.com/clerkinc/javascript/pull/1896)) by [@panteliselef](https://github.com/panteliselef)
+
+- Avoid passing some of the new feedback properties down to the HTML basic elements to avoid react warnings in the console. ([#1951](https://github.com/clerkinc/javascript/pull/1951)) by [@desiprisg](https://github.com/desiprisg)
+
+- Introduces new element appearance descriptors: ([#2010](https://github.com/clerkinc/javascript/pull/2010)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+  - `activeDeviceListItem` allows you to customize the appearance of the active device list (accordion) item
+    - `activeDeviceListItem__current` allows you to customize the appearance of the _current_ active device list (accordion) item
+  - `activeDevice` allows you to customize the appearance of the active device item
+    - `activeDevice__current` allows you to customize the appearance of the _current_ active device item
+
+- Updated dependencies [[`f6f67f9ab`](https://github.com/clerkinc/javascript/commit/f6f67f9abb858aa2d12aa5a6afcc0091fa89225f), [`a8d7a687e`](https://github.com/clerkinc/javascript/commit/a8d7a687e7771f24735ca6ff05da86441193a591), [`0f8aedd62`](https://github.com/clerkinc/javascript/commit/0f8aedd621dde78d6304b51668a9b06272c5d540), [`bc19fe025`](https://github.com/clerkinc/javascript/commit/bc19fe025d8b1ee9339dcffdb1dd785d00c4e766), [`60ea712fa`](https://github.com/clerkinc/javascript/commit/60ea712fa389dd43ffe72454c1fa9b7784bca2c4)]:
+  - @clerk/types@3.57.1
+  - @clerk/shared@1.0.2
+  - @clerk/localizations@1.26.8
+
 ## 4.64.1
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.57.1
+
+### Patch Changes
+
+- Shows list of domains if member has the `org:sys_domain:read` permission. ([#1896](https://github.com/clerkinc/javascript/pull/1896)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduces new element appearance descriptors: ([#2010](https://github.com/clerkinc/javascript/pull/2010)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+  - `activeDeviceListItem` allows you to customize the appearance of the active device list (accordion) item
+    - `activeDeviceListItem__current` allows you to customize the appearance of the _current_ active device list (accordion) item
+  - `activeDevice` allows you to customize the appearance of the active device item
+    - `activeDevice__current` allows you to customize the appearance of the _current_ active device item
+
+- Simplify the WithOptions generic type ([#2008](https://github.com/clerkinc/javascript/pull/2008)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
 ## 3.57.0
 
 ### Minor Changes
