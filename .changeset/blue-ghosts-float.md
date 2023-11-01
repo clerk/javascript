@@ -1,6 +1,6 @@
 ---
-'@clerk/shared': patch
+'@clerk/shared': minor
 ---
 
-Expose mutate for paginated lists of data in organization hooks.
-`const {userMemberships:{mutate}} = useOrganizationList({userMemberships:true})`
+Expose `revalidate` and `setData` for paginated lists of data in organization hooks.
+`const {userMemberships:{revalidate, setData}} = useOrganizationList({userMemberships:true})`
