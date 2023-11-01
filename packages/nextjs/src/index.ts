@@ -99,5 +99,3 @@ export const redirectToSignIn =
   ServerHelperModule.redirectToSignIn as ServerHelpersServerModuleTypes['redirectToSignIn'];
 export const redirectToSignUp =
   ServerHelperModule.redirectToSignUp as ServerHelpersServerModuleTypes['redirectToSignUp'];
-export const withClerkMiddleware =
-  ServerHelperModule.withClerkMiddleware as ServerHelpersServerModuleTypes['withClerkMiddleware'];
