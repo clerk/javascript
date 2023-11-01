@@ -1,0 +1,40 @@
+name: Run Verdaccio
+description: Checkout, setup node and dependencies
+inputs:
+  auth-email:
+    description: 'The email to use for auth'
+    required: false
+    default: 'test@test.com'
+  auth-password:
+    description: 'The pass to use for auth'
+    required: false
+    default: 'pass'
+  auth-user:
+    description: 'The user to use for auth'
+    required: false
+    default: 'user'
+  publish-cmd:
+    description: 'The command to use to publish'
+    required: true
+  registry:
+    description: 'The registry to use'
+    required: false
+    default: 'http://localhost:4873'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update NPM Registry to Verdaccio
+      shell: bash
+      run: npm set registry ${{ inputs.registry }}
+
+    - name: Run Verdaccio
+      shell: bash
+      run: |
+        nohup ./node_modules/.bin/verdaccio --config ./verdaccio.yaml & sleep 5
+        ./node_modules/.bin/npm-cli-adduser -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}
+        ./node_modules/.bin/npm-cli-login -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}
+
+    - name: Publish to Verdaccio
+      shell: bash
+      run: ${{ inputs.publish-cmd }}

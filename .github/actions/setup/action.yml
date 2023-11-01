@@ -30,7 +30,7 @@ runs:
       name: Install dependencies
       shell: bash
       run: npm ci
-    - if: ${{ inputs.use-turbo-cache == 'true' }} 
+    - if: ${{ inputs.use-turbo-cache == 'true' }}
       name: Download turbo cache
       uses: actions/download-artifact@v3
       with:

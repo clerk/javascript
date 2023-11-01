@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  merge_group:
+  pull_request:
+    branches:
+      - main
+      - release/v4
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  formatting-linting:
+    name: Formatting, linting & changeset checks
+    runs-on: ${{ vars.RUNNER_LARGE }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-remote-only: false
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Test Envs
+        run: |
+          echo "TURBO_ARGS: $TURBO_ARGS"
+          echo "TURBO_TEAM: $TURBO_TEAM"
+          echo "TURBO_TOKEN: $TURBO_TOKEN"
+          echo "TURBO_REMOTE_ONLY: $TURBO_REMOTE_ONLY"
+          echo "TURBO_REMOTE_CACHE_SIGNATURE_KEY: $TURBO_REMOTE_CACHE_SIGNATURE_KEY"
+          echo "FORCE_COLOR: $FORCE_COLOR"
+
+      - name: Require Changeset
+        run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
+
+      - name: Check Formatting
+        run: npm run format:check
+
+      - name: Lint packages using publint
+        run: npm run lint:publint -- $TURBO_ARGS
+
+      - name: Lint types using attw
+        run: npm run lint:attw -- $TURBO_ARGS
+        continue-on-error: true  # TODO: Remove this when all related errors are fixed
+
+      - name: Run lint
+        run: npm run lint -- $TURBO_ARGS -- --quiet
+
+  unit-tests:
+    name: Unit Tests
+    needs: formatting-linting
+    runs-on: ${{ vars.RUNNER_LARGE }}
+
+    strategy:
+      matrix:
+        node-version: [ 18, 20 ]
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          node-version: ${{ matrix.node-version }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Run tests
+        run: npx turbo test $TURBO_ARGS
+        env:
+          NODE_VERSION: ${{ matrix.node-version }}
+
+  integration-tests:
+    name: Integration Tests
+    needs: formatting-linting
+    runs-on: ${{ vars.RUNNER_LARGE }}
+
+    strategy:
+      matrix:
+        test-name: [ 'generic', 'nextjs', 'remix' ]
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
+
+      - name: Verdaccio
+        uses: ./.github/actions/verdaccio
+        with:
+          publish-cmd: |
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS && npx changeset publish --no-git-tag; fi
+
+      - name: Install @clerk/backend in /integration
+        working-directory: ./integration
+        run: npm init -y && npm install @clerk/backend
+
+      - name: Run Integration Tests
+        run: npm run test:integration:${{ matrix.test-name }}
+        env:
+          E2E_CLERK_VERSION: 'latest'
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+
+      # - name: Upload Integration Report for ${{ matrix.test-name }}
+      #   uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: integration-report-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+      #     path: playwright-report/
+      #     retention-days: 1
