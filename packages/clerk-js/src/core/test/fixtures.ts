@@ -8,6 +8,8 @@ import type {
   OrganizationPermission,
   PhoneNumberJSON,
   SessionJSON,
+  SignInJSON,
+  SignUpJSON,
   UserJSON,
 } from '@clerk/types';
 
@@ -166,8 +168,7 @@ export const createUser = (params: WithUserParams): UserJSON => {
   return res;
 };
 
-export const createSession = (sessionParams: WithSessionParams = {}, userParams: WithUserParams = {}) => {
-  const user = createUser(userParams);
+export const createSession = (sessionParams: WithSessionParams = {}, user: Partial<UserJSON> = {}) => {
   return {
     object: 'session',
     id: sessionParams.id,
@@ -183,7 +184,7 @@ export const createSession = (sessionParams: WithSessionParams = {}, userParams:
       last_name: user.last_name,
       image_url: user.image_url,
       has_image: user.has_image,
-      identifier: user.email_addresses.find(e => e.id === user.primary_email_address_id)?.email_address || '',
+      identifier: user.email_addresses?.find(e => e.id === user.primary_email_address_id)?.email_address || '',
       profile_image_url: user.profile_image_url,
     },
     created_at: sessionParams.created_at || jest.now() - 1000,
@@ -193,6 +194,56 @@ export const createSession = (sessionParams: WithSessionParams = {}, userParams:
       jwt: mockJwt,
     },
   } as SessionJSON;
+};
+
+export const createSignIn = (signInParams: Partial<SignInJSON> = {}, user: Partial<UserJSON> = {}) => {
+  return {
+    id: signInParams.id,
+    created_session_id: signInParams.created_session_id,
+    status: signInParams.status,
+    first_factor_verification: signInParams.first_factor_verification,
+    identifier: signInParams.identifier,
+    object: 'sign_in',
+    second_factor_verification: signInParams.second_factor_verification,
+    supported_external_accounts: signInParams.supported_external_accounts,
+    supported_first_factors: signInParams.supported_first_factors,
+    supported_identifiers: signInParams.supported_identifiers,
+    supported_second_factors: signInParams.supported_second_factors,
+    user_data: {
+      first_name: user.first_name,
+      last_name: user.last_name,
+      image_url: user.image_url,
+      has_image: user.has_image,
+      profile_image_url: user.profile_image_url,
+    },
+  } as SignInJSON;
+};
+
+export const createSignUp = (signUpParams: Partial<SignUpJSON> = {}) => {
+  return {
+    id: signUpParams.id,
+    created_session_id: signUpParams.created_session_id,
+    status: signUpParams.status,
+    abandon_at: signUpParams.abandon_at,
+    created_user_id: signUpParams.created_user_id,
+    email_address: signUpParams.email_address,
+    external_account: signUpParams.external_account,
+    external_account_strategy: signUpParams.external_account_strategy,
+    first_name: signUpParams.first_name,
+    has_password: signUpParams.has_password,
+    last_name: signUpParams.last_name,
+    missing_fields: signUpParams.missing_fields,
+    object: 'sign_up',
+    optional_fields: signUpParams.optional_fields,
+    phone_number: signUpParams.phone_number,
+    required_fields: signUpParams.required_fields,
+    supported_external_accounts: signUpParams.supported_external_accounts,
+    unsafe_metadata: signUpParams.unsafe_metadata,
+    unverified_fields: signUpParams.unverified_fields,
+    username: signUpParams.username,
+    verifications: signUpParams.verifications,
+    web3_wallet: signUpParams.web3_wallet,
+  } as SignUpJSON;
 };
 
 export const clerkMock = () => {

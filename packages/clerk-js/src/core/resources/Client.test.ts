@@ -1,29 +1,33 @@
 import type { ClientJSON } from '@clerk/types';
 
-import { createSession } from '../test/fixtures';
+import { createSession, createSignIn, createSignUp, createUser } from '../test/fixtures';
 import { BaseResource, Client } from './internal';
 
 describe('Client Singleton', () => {
   it('destroy', async () => {
-    const session = createSession();
+    const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
+    const session = createSession({ id: 'session_1' }, user);
     const clientObjectJSON: ClientJSON = {
       object: 'client',
       id: 'test_id',
       status: 'active',
       last_active_session_id: 'test_session_id',
-      sign_in: null,
-      sign_up: null,
+      sign_in: createSignIn({ id: 'test_sign_in_id' }, user),
+      sign_up: createSignUp({ id: 'test_sign_up_id' }), //  This is only for testing purposes, this will never happen
       sessions: [session],
       created_at: jest.now() - 1000,
       updated_at: jest.now(),
     };
 
-    const destroyedSession = createSession({
-      id: 'test_session_id',
-      abandon_at: jest.now(),
-      status: 'ended',
-      last_active_token: undefined,
-    });
+    const destroyedSession = createSession(
+      {
+        id: 'test_session_id',
+        abandon_at: jest.now(),
+        status: 'ended',
+        last_active_token: undefined,
+      },
+      user,
+    );
 
     const clientObjectDeletedJSON = {
       id: 'test_id_deleted',
@@ -49,6 +53,8 @@ describe('Client Singleton', () => {
     expect(client.createdAt).not.toBeNull();
     expect(client.updatedAt).not.toBeNull();
     expect(client.lastActiveSessionId).not.toBeNull();
+    expect(client.signUp.id).toBe('test_sign_up_id');
+    expect(client.signIn.id).toBe('test_sign_in_id');
 
     await client.destroy();
 
@@ -56,6 +62,8 @@ describe('Client Singleton', () => {
     expect(client.createdAt).toBeNull();
     expect(client.updatedAt).toBeNull();
     expect(client.lastActiveSessionId).toBeNull();
+    expect(client.signUp.id).toBeUndefined();
+    expect(client.signIn.id).toBeUndefined();
 
     // @ts-expect-error This is a private method that we are mocking
     expect(BaseResource._fetch).toHaveBeenCalledWith({
