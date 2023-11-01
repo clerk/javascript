@@ -1,6 +1,6 @@
 import type { GetServerDataProps, GetServerDataReturn } from 'gatsby';
 
-import { FRONTEND_API, PUBLISHABLE_KEY } from '../constants';
+import { PUBLISHABLE_KEY } from '../constants';
 import { authenticateRequest } from './authenticateRequest';
 import { clerkClient, constants } from './clerkClient';
 import type { WithServerAuthCallback, WithServerAuthOptions, WithServerAuthResult } from './types';
@@ -25,8 +25,9 @@ export const withServerAuth: WithServerAuth = (cbOrOptions: any, options?: any):
         [constants.Headers.AuthMessage]: requestState.message,
         [constants.Headers.AuthStatus]: requestState.status,
       };
+      // TODO(@dimkl): use empty string for frontendApi until type is fixed in @clerk/backend to drop it
       const interstitialHtml = clerkClient.localInterstitial({
-        frontendApi: FRONTEND_API,
+        frontendApi: '',
         publishableKey: PUBLISHABLE_KEY,
       });
       return injectSSRStateIntoProps({ headers }, { __clerk_ssr_interstitial_html: interstitialHtml });
