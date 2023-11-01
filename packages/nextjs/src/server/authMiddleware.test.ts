@@ -50,15 +50,10 @@ jest.mock('./authenticateRequest', () => {
 
 // Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
-jest.mock('./clerkClient', () => {
-  const { debugRequestState } = jest.requireActual('./clerkClient');
+jest.mock('./constants', () => {
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
-    clerkClient: {
-      localInterstitial: jest.fn().mockResolvedValue('<html>interstitial</html>'),
-    },
-    debugRequestState,
   };
 });
 
@@ -202,11 +197,13 @@ describe('default ignored routes matcher', () => {
 });
 
 describe('authMiddleware(params)', () => {
+  beforeAll(() => {
+    clerkClient.localInterstitial = jest.fn().mockResolvedValue('<html>interstitial</html>');
+  });
+
   beforeEach(() => {
-    // @ts-ignore
-    authenticateRequest.mockClear();
-    // @ts-ignore
-    clerkClient.localInterstitial.mockClear();
+    (authenticateRequest as jest.Mock).mockClear();
+    (clerkClient.localInterstitial as jest.Mock).mockClear();
   });
 
   describe('without params', function () {

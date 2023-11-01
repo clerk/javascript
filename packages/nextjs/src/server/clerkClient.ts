@@ -18,8 +18,3 @@ const createClerkClient = Clerk;
 export { Clerk, clerkClient, createClerkClient };
 
 export * from '@clerk/backend';
-
-/**
- * @deprecated Don't export the constants. Should be marked as internal
- */
-export * from './constants';

@@ -2,7 +2,7 @@ import { constants, redirect } from '@clerk/backend';
 import { NextResponse } from 'next/server';
 
 import { setHeader } from '../utils';
-import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from './clerkClient';
+import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 
 const redirectAdapter = (url: string) => {
   const res = NextResponse.redirect(url);

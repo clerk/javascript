@@ -3,7 +3,8 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { RequestState } from './clerkClient';
-import { CLERK_JS_URL, CLERK_JS_VERSION, clerkClient, PUBLISHABLE_KEY, SECRET_KEY } from './clerkClient';
+import { clerkClient } from './clerkClient';
+import { CLERK_JS_URL, CLERK_JS_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 import type { WithAuthOptions } from './types';
 import { apiEndpointUnauthorizedNextResponse, handleMultiDomainAndProxy } from './utils';
 

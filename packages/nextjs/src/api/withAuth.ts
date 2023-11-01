@@ -2,7 +2,8 @@ import type { ClerkMiddlewareOptions, WithAuthProp } from '@clerk/clerk-sdk-node
 import { createClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { API_URL, clerkClient, PUBLISHABLE_KEY } from '../server';
+import { clerkClient } from '../server';
+import { API_URL, PUBLISHABLE_KEY } from '../server/constants';
 import { runMiddleware } from './utils';
 
 type NextApiHandlerWithAuth<T = any> = (
