@@ -1,5 +1,11 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type { ActClaim, CheckAuthorization, JwtPayload, ServerGetToken, ServerGetTokenOptions } from '@clerk/types';
+import type {
+  ActClaim,
+  experimental__CheckAuthorizationWithoutPermission,
+  JwtPayload,
+  ServerGetToken,
+  ServerGetTokenOptions,
+} from '@clerk/types';
 
 import type { Organization, Session, User } from '../api';
 import { createBackendApiClient } from '../api';
@@ -39,7 +45,7 @@ export type SignedInAuthObject = {
   /**
    * @experimental The method is experimental and subject to change in future releases.
    */
-  experimental__has: CheckAuthorization;
+  experimental__has: experimental__CheckAuthorizationWithoutPermission;
   debug: AuthObjectDebug;
 };
 
@@ -58,7 +64,7 @@ export type SignedOutAuthObject = {
   /**
    * @experimental The method is experimental and subject to change in future releases.
    */
-  experimental__has: CheckAuthorization;
+  experimental__has: experimental__CheckAuthorizationWithoutPermission;
   debug: AuthObjectDebug;
 };
 
@@ -148,11 +154,9 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
 export function prunePrivateMetadata(
   resource?:
     | {
-        // eslint-disable-next-line
         private_metadata: any;
       }
     | {
-        // eslint-disable-next-line
         privateMetadata: any;
       }
     | null,
@@ -168,7 +172,6 @@ export function prunePrivateMetadata(
   return resource;
 }
 
-// eslint-disable-next-line
 export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T {
   const user = authObject.user ? { ...authObject.user } : authObject.user;
   const organization = authObject.organization ? { ...authObject.organization } : authObject.organization;
@@ -188,7 +191,7 @@ export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T
  */
 export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(obj: T): T => {
   // remove any non-serializable props from the returned object
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const { debug, getToken, ...rest } = obj as unknown as AuthObject;
   return rest as unknown as T;
 };
@@ -222,7 +225,7 @@ const createHasAuthorization =
     userId: string;
     orgId: string | undefined;
     orgRole: string | undefined;
-  }): CheckAuthorization =>
+  }): experimental__CheckAuthorizationWithoutPermission =>
   params => {
     if (!orgId || !userId) {
       return false;

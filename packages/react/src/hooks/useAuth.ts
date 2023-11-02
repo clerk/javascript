@@ -1,4 +1,10 @@
-import type { ActJWTClaim, CheckAuthorization, GetToken, MembershipRole, SignOut } from '@clerk/types';
+import type {
+  ActJWTClaim,
+  experimental__CheckAuthorizationWithoutPermission,
+  GetToken,
+  MembershipRole,
+  SignOut,
+} from '@clerk/types';
 import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -7,7 +13,9 @@ import { invalidStateError } from '../errors';
 import type IsomorphicClerk from '../isomorphicClerk';
 import { createGetToken, createSignOut } from './utils';
 
-type CheckAuthorizationSignedOut = (params?: Parameters<CheckAuthorization>[0]) => false;
+type experimental__CheckAuthorizationSignedOut = (
+  params?: Parameters<experimental__CheckAuthorizationWithoutPermission>[0],
+) => false;
 
 type UseAuthReturn =
   | {
@@ -22,7 +30,7 @@ type UseAuthReturn =
       /**
        * @experimental The method is experimental and subject to change in future releases.
        */
-      experimental__has: CheckAuthorizationSignedOut;
+      experimental__has: experimental__CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -38,7 +46,7 @@ type UseAuthReturn =
       /**
        * @experimental The method is experimental and subject to change in future releases.
        */
-      experimental__has: CheckAuthorizationSignedOut;
+      experimental__has: experimental__CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -54,7 +62,7 @@ type UseAuthReturn =
       /**
        * @experimental The method is experimental and subject to change in future releases.
        */
-      experimental__has: CheckAuthorizationSignedOut;
+      experimental__has: experimental__CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -70,7 +78,7 @@ type UseAuthReturn =
       /**
        * @experimental The method is experimental and subject to change in future releases.
        */
-      experimental__has: CheckAuthorization;
+      experimental__has: experimental__CheckAuthorizationWithoutPermission;
       signOut: SignOut;
       getToken: GetToken;
     };
@@ -124,7 +132,7 @@ export const useAuth: UseAuth = () => {
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
   const has = useCallback(
-    (params?: Parameters<CheckAuthorization>[0]) => {
+    (params?: Parameters<experimental__CheckAuthorizationWithoutPermission>[0]) => {
       if (!orgId || !userId || !orgRole) {
         return false;
       }

@@ -4,6 +4,22 @@ import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
+export type experimental__CheckAuthorizationWithoutPermission = (
+  isAuthorizedParams: CheckAuthorizationParamsWithoutPermission,
+) => boolean;
+
+type CheckAuthorizationParamsWithoutPermission =
+  | {
+      some: {
+        role: string;
+      }[];
+      role?: never;
+    }
+  | {
+      some?: never;
+      role: string;
+    };
+
 export type CheckAuthorization = (isAuthorizedParams: CheckAuthorizationParams) => boolean;
 
 type CheckAuthorizationParams =
