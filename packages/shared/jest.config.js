@@ -1,6 +1,8 @@
+const { name } = require('./package.json');
+
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 const config = {
-  displayName: 'shared',
+  displayName: name.replace('@clerk', ''),
   injectGlobals: true,
 
   testEnvironment: 'jsdom',

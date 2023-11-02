@@ -1,9 +1,11 @@
+const { name } = require('./package.json');
+
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   globals: {
     PACKAGE_VERSION: '0.0.0-test',
   },
-  displayName: 'nextjs',
+  displayName: name.replace('@clerk', ''),
   injectGlobals: true,
   roots: ['<rootDir>/src'],
   testMatch: ['**/?(*.)+(spec|test).+(ts|tsx|js)'],

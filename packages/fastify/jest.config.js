@@ -1,6 +1,8 @@
+const { name } = require('./package.json');
+
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  displayName: 'fastify',
+  displayName: name.replace('@clerk', ''),
   injectGlobals: true,
   roots: ['<rootDir>/src'],
   testMatch: ['**/?(*.)+(spec|test).+(ts|tsx|js)'],

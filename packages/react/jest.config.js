@@ -1,5 +1,7 @@
+const { name } = require('./package.json');
+
 module.exports = {
-  displayName: 'clerk-js',
+  displayName: name.replace('@clerk', ''),
   injectGlobals: true,
 
   roots: ['<rootDir>/src'],
