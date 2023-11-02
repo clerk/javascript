@@ -34,8 +34,7 @@ describe('authenticateRequest', () => {
     };
 
     const clerkClient = mockClerkClient();
-    const apiKey = 'apiKey';
-    const secretKey = '';
+    const secretKey = 'secretKey';
     const frontendApi = 'frontendApi';
     const publishableKey = 'publishableKey';
     const searchParams = new URLSearchParams();
@@ -51,7 +50,6 @@ describe('authenticateRequest', () => {
 
     await authenticateRequest({
       clerkClient: clerkClient as any,
-      apiKey,
       secretKey,
       frontendApi,
       publishableKey,
@@ -61,7 +59,6 @@ describe('authenticateRequest', () => {
     expect(clerkClient.authenticateRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         authorizedParties: ['party1'],
-        apiKey: apiKey,
         secretKey: secretKey,
         frontendApi: frontendApi,
         publishableKey: publishableKey,

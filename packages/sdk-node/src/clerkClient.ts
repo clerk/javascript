@@ -90,9 +90,6 @@ export const ClerkExpressWithAuth = (...args: Parameters<ReturnType<typeof creat
 /**
  * Stand-alone setters bound to the pre-initialised clerkClient
  */
-export const setClerkApiKey = (value: string) => {
-  clerkClient.__unstable_options.apiKey = value;
-};
 
 export const setClerkServerApiUrl = (value: string) => {
   clerkClient.__unstable_options.apiUrl = value;

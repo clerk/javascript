@@ -4,7 +4,6 @@ import {
   ClerkExpressRequireAuth,
   ClerkExpressWithAuth,
   createClerkClient,
-  setClerkApiKey,
   setClerkApiVersion,
   setClerkHttpOptions,
   setClerkServerApiUrl,
@@ -27,15 +26,14 @@ export * from '@clerk/backend';
  * 2 additional apis: clerk.expressWithAuth, clerk.expressRequireAuth
  */
 export {
-  createClerkClient,
+  Clerk,
   clerkClient,
-  setClerkApiKey,
+  ClerkExpressRequireAuth,
+  ClerkExpressWithAuth,
+  createClerkClient,
   setClerkApiVersion,
   setClerkHttpOptions,
   setClerkServerApiUrl,
-  Clerk,
-  ClerkExpressRequireAuth,
-  ClerkExpressWithAuth,
 };
 
 const {
@@ -53,25 +51,24 @@ const {
 } = clerkClient;
 
 export {
-  users,
-  smsMessages,
-  sessions,
+  allowlistIdentifiers,
+  clients,
+  domains,
   emailAddresses,
-  phoneNumbers,
   emails,
   invitations,
   organizations,
-  clients,
-  allowlistIdentifiers,
-  domains,
+  phoneNumbers,
+  sessions,
+  smsMessages,
+  users,
 };
 
 export default clerkClient;
 
-export type { LooseAuthProp, StrictAuthProp, WithAuthProp, RequireAuthProp, ClerkMiddleware, ClerkMiddlewareOptions };
+export type { ClerkMiddleware, ClerkMiddlewareOptions, LooseAuthProp, RequireAuthProp, StrictAuthProp, WithAuthProp };
 
-export { createClerkExpressRequireAuth };
-export { createClerkExpressWithAuth };
+export { createClerkExpressRequireAuth, createClerkExpressWithAuth };
 
-export { withAuth } from './withAuth';
 export { requireAuth } from './requireAuth';
+export { withAuth } from './withAuth';

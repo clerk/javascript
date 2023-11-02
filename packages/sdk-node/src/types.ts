@@ -46,10 +46,6 @@ export type AuthenticateRequestParams = {
    * @deprecated Use `publishableKey` instead.
    */
   frontendApi?: string;
-  /**
-   * @deprecated Use `secretKey` instead.
-   */
-  apiKey?: string;
   req: IncomingMessage;
   options?: ClerkMiddlewareOptions;
 };

@@ -56,7 +56,6 @@ exports[`module exports should not change unless explicitly set 1`] = `
   "requireAuth",
   "sanitizeAuthObject",
   "sessions",
-  "setClerkApiKey",
   "setClerkApiVersion",
   "setClerkHttpOptions",
   "setClerkServerApiUrl",

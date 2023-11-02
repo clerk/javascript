@@ -37,7 +37,7 @@ export async function loadInterstitial({
 }
 
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
-  const { clerkClient, apiKey, secretKey, frontendApi, publishableKey, req, options } = opts;
+  const { clerkClient, secretKey, frontendApi, publishableKey, req, options } = opts;
   const { jwtKey, authorizedParties, audience } = options || {};
 
   const env = { ...loadApiEnv(), ...loadClientEnv() };
@@ -69,13 +69,12 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || apiKey || '')) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || '')) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
   return clerkClient.authenticateRequest({
     audience,
-    apiKey,
     secretKey,
     frontendApi,
     publishableKey,
@@ -108,8 +107,7 @@ export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, re
   requestState.status && res.setHeader(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
 
-const isDevelopmentFromApiKey = (apiKey: string): boolean =>
-  apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
+const isDevelopmentFromApiKey = (secretKey: string): boolean => secretKey.startsWith('sk_test_');
 
 const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): string => {
   if (!relativeOrAbsoluteUrl || !isValidProxyUrl(relativeOrAbsoluteUrl) || !isProxyUrlRelative(relativeOrAbsoluteUrl)) {

@@ -29,13 +29,8 @@ export const loadClientEnv = () => {
 };
 
 export const loadApiEnv = () => {
-  if (process.env.CLERK_API_KEY) {
-    deprecated('CLERK_API_KEY', 'Use `CLERK_SECRET_KEY` instead.');
-  }
-
   return {
-    secretKey: process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '',
-    apiKey: process.env.CLERK_API_KEY || '',
+    secretKey: process.env.CLERK_SECRET_KEY || '',
     apiUrl: process.env.CLERK_API_URL || 'https://api.clerk.com',
     apiVersion: process.env.CLERK_API_VERSION || 'v1',
     domain: process.env.CLERK_DOMAIN || '',
