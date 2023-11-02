@@ -108,3 +108,12 @@ export function isTruthy(value: unknown): boolean {
   // Default to false
   return false;
 }
+
+export function getNonUndefinedValues<T>(obj: Record<string, T>): Record<string, T> {
+  return Object.keys(obj).reduce((result, key) => {
+    if (obj[key] !== undefined) {
+      result[key] = obj[key];
+    }
+    return result;
+  }, {} as Record<string, T>);
+}

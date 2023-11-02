@@ -1,13 +1,7 @@
+import { getNonUndefinedValues } from '@clerk/shared';
 import type { ClerkPaginationParams, ClerkPaginationRequest } from '@clerk/types';
 
-function getNonUndefinedValues<T>(obj: Record<string, T>): Record<string, T> {
-  return Object.keys(obj).reduce((result, key) => {
-    if (obj[key] !== undefined) {
-      result[key] = obj[key];
-    }
-    return result;
-  }, {} as Record<string, T>);
-}
+
 export function convertPageToOffset<T extends ClerkPaginationParams | undefined>(
   pageParams: T,
 ): ClerkPaginationRequest {

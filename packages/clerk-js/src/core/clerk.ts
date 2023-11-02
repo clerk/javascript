@@ -1,5 +1,6 @@
 import {
   addClerkPrefix,
+  getNonUndefinedValues,
   handleValueOrFn,
   inBrowser as inClientSide,
   is4xxError,
@@ -132,8 +133,8 @@ const defaultOptions: ClerkOptions = {
   isSatellite: false,
   signInUrl: undefined,
   signUpUrl: undefined,
-  afterSignInUrl: undefined,
-  afterSignUpUrl: undefined,
+  afterSignInUrl: '/hello',
+  afterSignUpUrl: '/',
   isInterstitial: false,
 };
 
@@ -273,7 +274,7 @@ export class Clerk implements ClerkInterface {
 
     this.#options = {
       ...defaultOptions,
-      ...options,
+      ...getNonUndefinedValues(options),
     };
 
     if (this.#options.sdkMetadata) {
