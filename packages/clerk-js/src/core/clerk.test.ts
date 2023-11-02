@@ -1,7 +1,9 @@
+import { parsePublishableKey } from '@clerk/shared';
 import type { ActiveSessionResource, SignInJSON, SignUpJSON, TokenResource } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 
 import { mockNativeRuntime } from '../testUtils';
+import { getETLDPlusOneFromFrontendApi } from '../utils';
 import { Clerk } from './clerk';
 import { eventBus, events } from './events';
 import type { AuthConfig, DisplayConfig, Organization } from './resources/internal';
@@ -401,6 +403,29 @@ describe('Clerk singleton', () => {
       eventBus.dispatch(events.TokenUpdate, { token });
 
       expect(document.cookie).toContain(mockJwt);
+    });
+
+    it('contains the default allowed origin values', async () => {
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+
+      const frontendApiStr = parsePublishableKey(sut.publishableKey)?.frontendApi || sut.frontendApi;
+
+      expect(sut.allowedRedirectOrigins).toEqual([
+        window.location.origin,
+        `${window.location.origin}/*`,
+        `https://*.${getETLDPlusOneFromFrontendApi(frontendApiStr)}`,
+        `https://*.${getETLDPlusOneFromFrontendApi(frontendApiStr)}/*`,
+      ]);
+    });
+
+    it('contains only the allowedRedirectOrigins options given', async () => {
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        allowedRedirectOrigins: ['https://test.host'],
+      });
+
+      expect(sut.allowedRedirectOrigins).toEqual(['https://test.host']);
     });
   });
 
