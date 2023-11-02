@@ -19,13 +19,6 @@
       "browser": "./dist/runtime/browser/crypto.mjs",
       "node": "./dist/runtime/node/crypto.js",
       "default": "./dist/runtime/browser/crypto.mjs"
-    },
-    "#fetch": {
-      "edge-light": "./dist/runtime/browser/fetch.mjs",
-      "worker": "./dist/runtime/browser/fetch.mjs",
-      "browser": "./dist/runtime/browser/fetch.mjs",
-      "node": "./dist/runtime/node/fetch.js",
-      "default": "./dist/runtime/browser/fetch.mjs"
     }
   },
   "main": "./dist/index.js",
@@ -56,10 +49,8 @@
   },
   "dependencies": {
     "@clerk/shared": "1.0.0",
-    "@peculiar/webcrypto": "1.4.1",
     "cookie": "0.5.0",
     "deepmerge": "4.2.2",
-    "node-fetch-native": "1.0.1",
     "snakecase-keys": "5.4.4",
     "tslib": "2.4.1"
   },
