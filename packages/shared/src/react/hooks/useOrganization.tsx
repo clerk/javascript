@@ -56,7 +56,9 @@ type UseOrganizationParams = {
       });
 };
 
-type UseOrganizationReturn =
+type UseOrganization = <T extends UseOrganizationParams>(
+  params?: T,
+) =>
   | {
       isLoaded: false;
       organization: undefined;
@@ -103,13 +105,23 @@ type UseOrganizationReturn =
        */
       membershipList: OrganizationMembershipResource[] | null | undefined;
       membership: OrganizationMembershipResource | null | undefined;
-      domains: PaginatedResources<OrganizationDomainResource> | null;
-      membershipRequests: PaginatedResources<OrganizationMembershipRequestResource> | null;
-      memberships: PaginatedResources<OrganizationMembershipResource> | null;
-      invitations: PaginatedResources<OrganizationInvitationResource> | null;
+      domains: PaginatedResources<
+        OrganizationDomainResource,
+        T['membershipRequests'] extends { infinite: true } ? true : false
+      > | null;
+      membershipRequests: PaginatedResources<
+        OrganizationMembershipRequestResource,
+        T['membershipRequests'] extends { infinite: true } ? true : false
+      > | null;
+      memberships: PaginatedResources<
+        OrganizationMembershipResource,
+        T['memberships'] extends { infinite: true } ? true : false
+      > | null;
+      invitations: PaginatedResources<
+        OrganizationInvitationResource,
+        T['invitations'] extends { infinite: true } ? true : false
+      > | null;
     };
-
-type UseOrganization = (params?: UseOrganizationParams) => UseOrganizationReturn;
 
 const undefinedPaginatedResource = {
   data: undefined,
@@ -124,6 +136,8 @@ const undefinedPaginatedResource = {
   fetchPrevious: undefined,
   hasNextPage: false,
   hasPreviousPage: false,
+  revalidate: undefined,
+  setData: undefined,
 } as const;
 
 export const useOrganization: UseOrganization = params => {
