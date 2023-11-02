@@ -133,7 +133,7 @@ const defaultOptions: ClerkOptions = {
   isSatellite: false,
   signInUrl: undefined,
   signUpUrl: undefined,
-  afterSignInUrl: '/hello',
+  afterSignInUrl: '/',
   afterSignUpUrl: '/',
   isInterstitial: false,
 };
