@@ -59,6 +59,7 @@
     "@clerk/shared": "1.0.0",
     "@clerk/types": "3.57.0",
     "eslint-config-custom": "*",
+    "semver": "^7.5.4",
     "tslib": "2.4.1"
   },
   "devDependencies": {
@@ -66,6 +67,7 @@
     "@types/node": "^16.11.55",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "@types/semver": "^7.5.4",
     "eslint-config-custom": "*",
     "typescript": "*"
   },
