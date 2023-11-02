@@ -13,3 +13,4 @@ export { chunkLogger, run } from './run';
 
 export * from './setup';
 export * from './waitForServer';
+export { awaitableTreekill } from './awaitableTreekill';
