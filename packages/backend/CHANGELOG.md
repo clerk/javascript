@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.33.0
+
+### Minor Changes
+
+- Added prefers-color-scheme to interstitial ([#1985](https://github.com/clerkinc/javascript/pull/1985)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+### Patch Changes
+
+- Add clerkTraceId to ClerkBackendApiResponse and ClerkAPIResponseError to allow for better tracing and debugging API error responses. ([#1894](https://github.com/clerkinc/javascript/pull/1894)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  Uses `clerk_trace_id` when available in a response and defaults to [`cf-ray` identifier](https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/) if missing.
+
+- Updated dependencies [[`f6f67f9ab`](https://github.com/clerkinc/javascript/commit/f6f67f9abb858aa2d12aa5a6afcc0091fa89225f), [`a8d7a687e`](https://github.com/clerkinc/javascript/commit/a8d7a687e7771f24735ca6ff05da86441193a591), [`0f8aedd62`](https://github.com/clerkinc/javascript/commit/0f8aedd621dde78d6304b51668a9b06272c5d540), [`bc19fe025`](https://github.com/clerkinc/javascript/commit/bc19fe025d8b1ee9339dcffdb1dd785d00c4e766), [`60ea712fa`](https://github.com/clerkinc/javascript/commit/60ea712fa389dd43ffe72454c1fa9b7784bca2c4)]:
+  - @clerk/types@3.57.1
+  - @clerk/shared@1.0.2
+
 ## 0.32.1
 
 ### Patch Changes
