@@ -1,5 +1,5 @@
-name: Staging release
-run-name: Staging release from ${{ github.ref_name }}
+name: Canary release
+run-name: Canary release from ${{ github.ref_name }}
 
 on:
   push:
@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  staging-release:
+  canary-release:
     if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
@@ -29,13 +29,13 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Version packages for staging
+      - name: Version packages for canary
         id: version-packages
-        run: npm run version:staging | tail -1 >> "$GITHUB_OUTPUT"
+        run: npm run version:canary | tail -1 >> "$GITHUB_OUTPUT"
 
-      - name: Staging release
+      - name: Canary release
         if: steps.version-packages.outputs.success == '1'
-        run: npm run release:staging
+        run: npm run release:canary
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
@@ -51,23 +51,23 @@ jobs:
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-            if (clerkjsVersion.includes('staging')) {
+            if (clerkjsVersion.includes('canary')) {
               console.log('clerk-js changed, will notify clerk/cloudflare-workers');
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
                 repo: 'cloudflare-workers',
-                workflow_id: 'release-staging-clerkjs-proxy.yml',
+                workflow_id: 'release-canary-clerkjs-proxy.yml',
                 ref: 'main',
                 inputs: { version: clerkjsVersion }
               })
             }
 
-            if (nextjsVersion.includes('staging')) {
+            if (nextjsVersion.includes('canary')) {
               console.log('clerk/nextjs changed, will notify clerk/accounts');
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
                 repo: 'accounts',
-                workflow_id: 'release-staging.yml',
+                workflow_id: 'release-canary.yml',
                 ref: 'main',
                 inputs: { version: nextjsVersion }
               })
