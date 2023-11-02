@@ -55,7 +55,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
 
-  const { organization, domains } = useCoreOrganization({
+  const { membership, organization, domains } = useCoreOrganization({
     domains: {
       infinite: true,
     },
@@ -147,7 +147,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   });
 
   const updateEnrollmentMode = async () => {
-    if (!domain || !organization) {
+    if (!domain || !organization || !membership || !domains) {
       return;
     }
 
@@ -157,7 +157,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         deletePending: deletePending.checked,
       });
 
-      await (domains as any).unstable__mutate();
+      await domains.revalidate();
 
       await navigate('../../');
     } catch (e) {

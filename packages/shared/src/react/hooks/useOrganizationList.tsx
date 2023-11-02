@@ -38,8 +38,26 @@ type UseOrganizationListParams = {
 };
 
 type OrganizationList = ReturnType<typeof createOrganizationList>;
+const undefinedPaginatedResource = {
+  data: undefined,
+  count: undefined,
+  isLoading: false,
+  isFetching: false,
+  isError: false,
+  page: undefined,
+  pageCount: undefined,
+  fetchPage: undefined,
+  fetchNext: undefined,
+  fetchPrevious: undefined,
+  hasNextPage: false,
+  hasPreviousPage: false,
+  revalidate: undefined,
+  setData: undefined,
+} as const;
 
-type UseOrganizationListReturn =
+type UseOrganizationList = <T extends UseOrganizationListParams>(
+  params?: T,
+) =>
   | {
       isLoaded: false;
       /**
@@ -60,28 +78,19 @@ type UseOrganizationListReturn =
       organizationList: OrganizationList;
       createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
       setActive: SetActive;
-      userMemberships: PaginatedResources<OrganizationMembershipResource>;
-      userInvitations: PaginatedResources<UserOrganizationInvitationResource>;
-      userSuggestions: PaginatedResources<OrganizationSuggestionResource>;
+      userMemberships: PaginatedResources<
+        OrganizationMembershipResource,
+        T['userMemberships'] extends { infinite: true } ? true : false
+      >;
+      userInvitations: PaginatedResources<
+        UserOrganizationInvitationResource,
+        T['userInvitations'] extends { infinite: true } ? true : false
+      >;
+      userSuggestions: PaginatedResources<
+        OrganizationSuggestionResource,
+        T['userSuggestions'] extends { infinite: true } ? true : false
+      >;
     };
-
-const undefinedPaginatedResource = {
-  data: undefined,
-  count: undefined,
-  isLoading: false,
-  isFetching: false,
-  isError: false,
-  page: undefined,
-  pageCount: undefined,
-  fetchPage: undefined,
-  fetchNext: undefined,
-  fetchPrevious: undefined,
-  hasNextPage: false,
-  hasPreviousPage: false,
-  unstable__mutate: undefined,
-} as const;
-
-type UseOrganizationList = (params?: UseOrganizationListParams) => UseOrganizationListReturn;
 
 export const useOrganizationList: UseOrganizationList = params => {
   const { userMemberships, userInvitations, userSuggestions } = params || {};

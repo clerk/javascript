@@ -9,16 +9,9 @@ import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
 export const ActiveMembersList = () => {
   const card = useCardState();
-  const { organization, memberships, ...rest } = useCoreOrganization({
+  const { organization, memberships } = useCoreOrganization({
     memberships: true,
   });
-
-  const mutateSwrState = () => {
-    const unstable__mutate = (rest as any).unstable__mutate;
-    if (unstable__mutate && typeof unstable__mutate === 'function') {
-      unstable__mutate();
-    }
-  };
 
   if (!organization) {
     return null;
@@ -27,7 +20,7 @@ export const ActiveMembersList = () => {
   const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
     return card
       .runAsync(async () => {
-        await membership.update({ role: newRole });
+        return await membership.update({ role: newRole });
       })
       .catch(err => handleError(err, [], card.setError));
   };
@@ -36,9 +29,9 @@ export const ActiveMembersList = () => {
     return card
       .runAsync(async () => {
         const destroyedMembership = await membership.destroy();
+        await memberships?.revalidate?.();
         return destroyedMembership;
       })
-      .then(mutateSwrState)
       .catch(err => handleError(err, [], card.setError));
   };
 

@@ -4,7 +4,7 @@ import { useCoreOrganizationList } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
-import { updateCacheInPlace } from '../OrganizationSwitcher/utils';
+import { populateCacheUpdateItem } from '../OrganizationSwitcher/utils';
 import { PreviewListItem, PreviewListItemButton } from './shared';
 import { organizationListParams } from './utils';
 
@@ -17,7 +17,7 @@ export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResou
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(updateCacheInPlace(userSuggestions))
+      .then(updatedItem => userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages)))
       .catch(err => handleError(err, [], card.setError));
   };
 
