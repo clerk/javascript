@@ -14,7 +14,7 @@ jobs:
     needs: build
     uses: ./.github/workflows/base-e2e.yml
     with:
-      SCRIPT: 'E2E_NEXTJS_VERSION=canary npm run test:integration:nextjs'
+      SCRIPT: 'E2E_APP_CLERK_JS_DIR=$RUNNER_TEMP E2E_NEXTJS_VERSION=canary npm run test:integration:nextjs'
     secrets: inherit
 
   notify-slack:

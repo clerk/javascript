@@ -14,7 +14,6 @@ export const startClerkJsHttpServer = async () => {
   if (!process.env.CI) {
     await copyClerkJsToTempDir();
   }
-  await startClerkJsHttpServer();
   return serveFromTempDir();
 };
 
@@ -37,6 +36,7 @@ const copyClerkJsToTempDir = async () => {
 };
 
 const serveFromTempDir = async () => {
+  console.log('Serving clerkJs from temp dir');
   const port = 18211;
   const serverUrl = `http://localhost:${port}`;
   const now = Date.now();
@@ -53,6 +53,7 @@ const serveFromTempDir = async () => {
   });
   stateFile.setClerkJsHttpServerPid(proc.pid);
   await waitForServer(serverUrl, { log: console.log, maxAttempts: Infinity });
+  console.log('clerk.browser.js is being served from', serverUrl);
 };
 
 // The location where the clerk.browser.js is served from

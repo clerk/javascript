@@ -48,6 +48,9 @@ jobs:
       - name: Install @clerk/backend in /integration
         run: |
           cd integration && npm init -y && npm install @clerk/backend && cd ..
+      - name: Install @clerk/clerk-js in os temp
+        working-directory: ${{runner.temp}}
+        run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
       - name: Run Playwright tests
         run: ${{ inputs.SCRIPT }}
         env:
