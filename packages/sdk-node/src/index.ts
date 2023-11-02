@@ -1,13 +1,4 @@
-import {
-  Clerk,
-  clerkClient,
-  ClerkExpressRequireAuth,
-  ClerkExpressWithAuth,
-  createClerkClient,
-  setClerkApiVersion,
-  setClerkHttpOptions,
-  setClerkServerApiUrl,
-} from './clerkClient';
+import { Clerk, clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, createClerkClient } from './clerkClient';
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import type {
@@ -25,16 +16,7 @@ export * from '@clerk/backend';
  * to shadow the Clerk export from clerk/backend, because it needs to support
  * 2 additional apis: clerk.expressWithAuth, clerk.expressRequireAuth
  */
-export {
-  Clerk,
-  clerkClient,
-  ClerkExpressRequireAuth,
-  ClerkExpressWithAuth,
-  createClerkClient,
-  setClerkApiVersion,
-  setClerkHttpOptions,
-  setClerkServerApiUrl,
-};
+export { Clerk, clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, createClerkClient };
 
 const {
   users,

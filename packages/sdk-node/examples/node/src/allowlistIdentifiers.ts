@@ -1,13 +1,6 @@
 // Usage:
 // From examples/node, run files with "npm test ./src/allowlistIdentifiers.ts"
-import {
-  allowlistIdentifiers,
-  setClerkServerApiUrl,
-} from '@clerk/clerk-sdk-node';
-
-const serverApiUrl = process.env.CLERK_API_URL || '';
-
-setClerkServerApiUrl(serverApiUrl);
+import { allowlistIdentifiers } from '@clerk/clerk-sdk-node';
 
 // Add an allowlist identifier
 await allowlistIdentifiers.createAllowlistIdentifier({

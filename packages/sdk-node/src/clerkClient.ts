@@ -73,19 +73,3 @@ export const ClerkExpressWithAuth = (...args: Parameters<ReturnType<typeof creat
   const fn = createClerkExpressWithAuth({ clerkClient, ...env });
   return fn(...args);
 };
-
-/**
- * Stand-alone setters bound to the pre-initialised clerkClient
- */
-
-export const setClerkServerApiUrl = (value: string) => {
-  clerkClient.__unstable_options.apiUrl = value;
-};
-
-export const setClerkApiVersion = (value: string) => {
-  clerkClient.__unstable_options.apiVersion = value;
-};
-
-export const setClerkHttpOptions = (value: RequestInit) => {
-  clerkClient.__unstable_options.httpOptions = value;
-};
