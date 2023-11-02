@@ -10,7 +10,7 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['./src/**/*.{ts,tsx,js,jsx}'],
+    entry: ['./src/**/*.{ts,tsx,js,jsx}', '!./src/**/*.test.{ts,tsx}'],
     // We want to preserve original file structure
     // so that the "use client" directives are not lost
     // and make debugging easier via node_modules easier
