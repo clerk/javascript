@@ -13,23 +13,18 @@ export type CreateClerkExpressMiddlewareOptions = {
   clerkClient: ReturnType<typeof Clerk>;
   /* Secret Key */
   secretKey?: string;
-  /**
-   * @deprecated Use `publishableKey` instead.
-   */
-  frontendApi?: string;
   publishableKey?: string;
   apiUrl?: string;
 };
 
 export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMiddlewareOptions) => {
-  const { clerkClient, frontendApi = '', secretKey = '', publishableKey = '' } = createOpts;
+  const { clerkClient, secretKey = '', publishableKey = '' } = createOpts;
 
   return (options: ClerkMiddlewareOptions = {}): MiddlewareRequireAuthProp => {
     return async (req, res, next) => {
       const requestState = await authenticateRequest({
         clerkClient,
         secretKey,
-        frontendApi,
         publishableKey,
         req,
         options,

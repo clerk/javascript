@@ -1,4 +1,3 @@
-import { deprecated } from '@clerk/shared/deprecated';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { IncomingMessage, ServerResponse } from 'http';
 
@@ -16,13 +15,8 @@ export function runMiddleware(req: IncomingMessage, res: ServerResponse, fn: (..
 }
 
 export const loadClientEnv = () => {
-  if (process.env.CLERK_FRONTEND_API) {
-    deprecated('CLERK_FRONTEND_API', 'Use `CLERK_PUBLISHABLE_KEY` instead.');
-  }
-
   return {
     publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
-    frontendApi: process.env.CLERK_FRONTEND_API || '',
     clerkJSUrl: process.env.CLERK_JS || '',
     clerkJSVersion: process.env.CLERK_JS_VERSION || '',
   };
