@@ -1,4 +1,7 @@
+const { name } = require('./package.json');
+
 module.exports = {
+  displayName: name.replace('@clerk', ''),
   roots: ['<rootDir>/src'],
   testMatch: ['**/?(*.)+(spec|test).+(ts|tsx|js)'],
   transform: {
