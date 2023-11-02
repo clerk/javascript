@@ -1,4 +1,4 @@
-import type { CheckAuthorization } from '@clerk/types';
+import type { experimental__CheckAuthorizationWithoutPermission } from '@clerk/types';
 import { redirect } from 'next/navigation';
 import React from 'react';
 
@@ -17,7 +17,7 @@ export function SignedOut(props: React.PropsWithChildren) {
 }
 
 type GateServerComponentProps = React.PropsWithChildren<
-  Parameters<CheckAuthorization>[0] & {
+  Parameters<experimental__CheckAuthorizationWithoutPermission>[0] & {
     fallback?: React.ReactNode;
     redirectTo?: string;
   }
@@ -41,12 +41,12 @@ export function experimental__Gate(gateProps: GateServerComponentProps) {
       return redirect(redirectTo);
     }
 
-    return fallback;
+    return <>{fallback}</>;
   };
 
   if (!isAuthorizedUser) {
     return handleFallback();
   }
 
-  return children;
+  return <>{children}</>;
 }
