@@ -9,7 +9,7 @@ import { useInView } from '../../hooks';
 import type { PropsOfComponent } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { organizationListParams, removeItemFromPaginatedCache, updateCacheInPlace } from './utils';
+import { organizationListParams, populateCacheRemoveItem, populateCacheUpdateItem } from './utils';
 
 const useFetchInvitations = () => {
   const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
@@ -44,7 +44,7 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(updateCacheInPlace(userSuggestions))
+      .then(updatedItem => userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages)))
       .catch(err => handleError(err, [], card.setError));
   };
 
@@ -81,7 +81,7 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(removeItemFromPaginatedCache(userInvitations))
+      .then(updatedItem => userInvitations?.setData?.(pages => populateCacheRemoveItem(updatedItem, pages)))
       .catch(err => handleError(err, [], card.setError));
   };
 
