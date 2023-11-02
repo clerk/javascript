@@ -34,16 +34,3 @@ export const createSignOut = (isomorphicClerk: IsomorphicClerk) => {
     return isomorphicClerk.signOut(...args);
   };
 };
-
-/**
- * @internal
- */
-export const createHasAuthorization = (isomorphicClerk: IsomorphicClerk) => {
-  return async (options: any) => {
-    await clerkLoaded(isomorphicClerk);
-    if (!isomorphicClerk.session) {
-      return null;
-    }
-    return isomorphicClerk.session.getToken(options);
-  };
-};

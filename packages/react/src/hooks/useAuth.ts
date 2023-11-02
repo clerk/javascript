@@ -117,7 +117,7 @@ type UseAuth = () => UseAuthReturn;
  * }
  */
 export const useAuth: UseAuth = () => {
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useAuthContext();
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -125,7 +125,7 @@ export const useAuth: UseAuth = () => {
 
   const has = useCallback(
     (params?: Parameters<CheckAuthorization>[0]) => {
-      if (!orgId || !userId || !orgRole || !orgPermissions) {
+      if (!orgId || !userId || !orgRole) {
         return false;
       }
 
@@ -133,15 +133,12 @@ export const useAuth: UseAuth = () => {
         return false;
       }
 
-      if (params.permission) {
-        return orgPermissions.includes(params.permission);
-      }
       if (params.role) {
         return orgRole === params.role;
       }
       return false;
     },
-    [orgId, orgRole, userId, orgPermissions],
+    [orgId, orgRole, userId],
   );
 
   if (sessionId === undefined && userId === undefined) {
