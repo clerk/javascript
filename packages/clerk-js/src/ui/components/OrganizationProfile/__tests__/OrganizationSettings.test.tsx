@@ -9,7 +9,7 @@ import { createFakeDomain, createFakeMember } from './utils';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
-describe.skip('OrganizationSettings', () => {
+describe('OrganizationSettings', () => {
   it.skip('enables organization profile button and disables leave when user is the only admin', async () => {
     const adminsList: OrganizationMembershipResource[] = [createFakeMember({ id: '1', orgId: '1', role: 'admin' })];
     const domainList: OrganizationDomainResource[] = [

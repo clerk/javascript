@@ -35,7 +35,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
   mockMethodsOf(clerk.client.signUp);
   clerk.client.sessions.forEach(session => {
     mockMethodsOf(session, {
-      exclude: ['isAuthorized'],
+      exclude: ['experimental__checkAuthorization'],
     });
     mockMethodsOf(session.user);
     session.user?.emailAddresses.forEach(m => mockMethodsOf(m));

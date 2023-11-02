@@ -11,7 +11,7 @@ import { createFakeMember, createFakeOrganizationInvitation, createFakeOrganizat
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
-describe.skip('OrganizationMembers', () => {
+describe('OrganizationMembers', () => {
   it('renders the Organization Members page', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
