@@ -1,5 +1,5 @@
 // @ts-nocheck
-import {createRequire} from 'module';
+import { createRequire } from 'module';
 import fetch from 'node-fetch';
 import semver from 'semver';
 
