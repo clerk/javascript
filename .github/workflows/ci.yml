@@ -18,6 +18,7 @@ jobs:
     name: Formatting, linting & changeset checks
     runs-on: ${{ vars.RUNNER_LARGE }}
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+
     env:
       TURBO_SUMMARIZE: true
 
@@ -75,15 +76,18 @@ jobs:
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:
-          name: turbo-summary-report-${{ github.run_id }}-${{ github.run_attempt }}
+          name: turbo-summary-report-lint-${{ github.run_id }}-${{ github.run_attempt }}
           path: .turbo/runs
-          retention-days: 1
+          retention-days: 3
 
   unit-tests:
     name: Unit Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE }}
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+
+    env:
+      TURBO_SUMMARIZE: true
 
     strategy:
       matrix:
@@ -102,6 +106,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
@@ -109,6 +114,15 @@ jobs:
         run: npx turbo test $TURBO_ARGS
         env:
           NODE_VERSION: ${{ matrix.node-version }}
+
+      - name: Upload Turbo Summary
+        uses: actions/upload-artifact@v3
+        if: ${{ env.TURBO_SUMMARIZE == 'true' }}
+        continue-on-error: true
+        with:
+          name: turbo-summary-report-unit-${{ github.run_id }}-${{ github.run_attempt }}-node-${{ matrix.node-version }}
+          path: .turbo/runs
+          retention-days: 3
 
   integration-tests:
     name: Integration Tests
