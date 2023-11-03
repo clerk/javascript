@@ -162,6 +162,6 @@ jobs:
   #     #   uses: actions/upload-artifact@v3
   #     #   if: always()
   #     #   with:
-  #     #     name: integration-report-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+  #     #     name: integration-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
   #     #     path: playwright-report/
   #     #     retention-days: 1
