@@ -5,7 +5,7 @@ on:
 
 jobs:
   triage:
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
     permissions:
       contents: read
       pull-requests: write
