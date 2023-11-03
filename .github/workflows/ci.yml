@@ -17,11 +17,11 @@ jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
     runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
     steps:
       - name: Checkout Repo
-        timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT }}
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -47,31 +47,31 @@ jobs:
           echo "FORCE_COLOR: $FORCE_COLOR"
 
       - name: Require Changeset
-        timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT }}
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
       - name: Check Formatting
-        timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT }}
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run format:check
 
       - name: Lint packages using publint
-        timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT }}
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run lint:publint -- $TURBO_ARGS
 
       - name: Lint types using attw
-        timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT }}
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run lint:attw -- $TURBO_ARGS
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
-        timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT }}
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run lint -- $TURBO_ARGS -- --quiet
 
   unit-tests:
     name: Unit Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
     strategy:
       matrix:
@@ -102,7 +102,7 @@ jobs:
     name: Integration Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
     strategy:
       matrix:

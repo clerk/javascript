@@ -14,7 +14,7 @@ jobs:
   staging-release:
     if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
