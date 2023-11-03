@@ -69,7 +69,7 @@ export const ActiveMembersList = () => {
 const MemberRow = (props: {
   membership: OrganizationMembershipResource;
   onRemove: () => unknown;
-  options: Parameters<typeof RoleSelect>[0]['roles'];
+  options: any;
   onRoleChange: (role: string) => unknown;
 }) => {
   const { membership, onRemove, onRoleChange, options } = props;
