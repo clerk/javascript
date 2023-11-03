@@ -3,7 +3,8 @@ import type { OrganizationInvitationResource } from '@clerk/types';
 import { useCoreOrganization } from '../../contexts';
 import { localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
-import { handleError, roleLocalizationKey } from '../../utils';
+import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
+import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';
 
 export const InvitedMembersList = () => {
@@ -52,6 +53,7 @@ export const InvitedMembersList = () => {
 
 const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRevoke: () => unknown }) => {
   const { invitation, onRevoke } = props;
+  const { localizeCustomRole } = useLocalizeCustomRoles();
   return (
     <RowContainer>
       <Td>
@@ -64,7 +66,7 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRe
       <Td>
         <Text
           colorScheme={'neutral'}
-          localizationKey={roleLocalizationKey(invitation.role)}
+          localizationKey={localizeCustomRole(invitation.role)}
         />
       </Td>
       <Td>
