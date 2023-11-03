@@ -3,20 +3,7 @@
   "remoteCache": {
     "signature": true
   },
-  "globalDependencies": [
-    ".changeset/changelog.js",
-    ".changeset/config.json",
-    ".github/**",
-    ".jit",
-    ".nvmrc",
-    ".prettier*",
-    "jest.*.ts",
-    "package.json",
-    "package-lock.json",
-    "tsconfig.json",
-    "tsconfig.*.json",
-    "verdaccio.yaml"
-  ],
+  "globalDependencies": ["jest.*.ts", "package.json", "package-lock.json", "tsconfig.json", "tsconfig.*.json"],
   "globalEnv": [
     "CLERK_*",
     "GATSBY_CLERK_*",
@@ -26,8 +13,7 @@
     "NODE_VERSION",
     "NPM_VERSION",
     "TZ",
-    "VERCEL",
-    "GITHUB_ACCESS_TOKEN"
+    "VERCEL"
   ],
   "pipeline": {
     "build": {
