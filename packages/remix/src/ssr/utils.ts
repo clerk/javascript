@@ -86,7 +86,8 @@ export const interstitialJsonResponse = (
       __loader: opts.loader,
       __clerk_ssr_interstitial_html: loadInterstitialFromLocal({
         debugData: debugRequestState(requestState),
-        frontendApi: requestState.frontendApi,
+        // TODO(@dimkl): use empty string for frontendApi until type is fixed in @clerk/backend to drop it
+        frontendApi: '',
         publishableKey: requestState.publishableKey,
         // TODO: This needs to be the version of clerk/remix not clerk/react
         // pkgVersion: LIB_VERSION,
@@ -107,7 +108,6 @@ export const injectRequestStateIntoResponse = async (
   requestState: RequestState,
   context: AppLoadContext,
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const clone = response.clone();
   const data = await clone.json();
 
@@ -151,11 +151,9 @@ export function injectRequestStateIntoDeferredData(
  * @internal
  */
 export function getResponseClerkState(requestState: RequestState, context: AppLoadContext) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { reason, message, isSignedIn, isInterstitial, ...rest } = requestState;
   const clerkState = wrapWithClerkState({
     __clerk_ssr_state: rest.toAuth(),
-    __frontendApi: requestState.frontendApi,
     __publishableKey: requestState.publishableKey,
     __proxyUrl: requestState.proxyUrl,
     __domain: requestState.domain,
