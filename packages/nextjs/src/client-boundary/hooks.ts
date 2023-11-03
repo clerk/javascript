@@ -1,34 +1,31 @@
 'use client';
 
 export {
-  useUser,
+  WithClerk,
+  WithSession,
+  WithUser,
   useAuth,
-  useSession,
   useClerk,
-  useSignIn,
-  useSignUp,
-  useSessionList,
+  useEmailLink,
   useOrganization,
   useOrganizationList,
   useOrganizations,
-  useEmailLink,
-  useMagicLink,
-  withUser,
-  withSession,
+  useSession,
+  useSessionList,
+  useSignIn,
+  useSignUp,
+  useUser,
   withClerk,
-  WithUser,
-  WithSession,
-  WithClerk,
+  withSession,
+  withUser,
 } from '@clerk/clerk-react';
 
-export type { WithUserProp, WithSessionProp, WithClerkProp } from '@clerk/clerk-react';
+export type { WithClerkProp, WithSessionProp, WithUserProp } from '@clerk/clerk-react';
 
 export {
-  isClerkAPIResponseError,
   EmailLinkErrorCode,
-  MagicLinkErrorCode,
+  isClerkAPIResponseError,
+  isEmailLinkError,
   isKnownError,
   isMetamaskError,
-  isEmailLinkError,
-  isMagicLinkError,
 } from '@clerk/clerk-react';

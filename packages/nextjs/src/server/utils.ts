@@ -1,15 +1,15 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { API_KEY, DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './clerkClient';
+import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
-import type { NextMiddlewareResult, RequestLike } from './types';
-import type { WithAuthOptions } from './types';
+import type { NextMiddlewareResult, RequestLike, WithAuthOptions } from './types';
 
 type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
 
@@ -149,10 +149,6 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
   return { ...obj, __clerk_ssr_state };
 };
 
-export function isDevelopmentFromApiKey(apiKey: string): boolean {
-  return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
-}
-
 // Auth result will be set as both a query param & header when applicable
 export function decorateRequest(
   req: NextRequest,
@@ -243,7 +239,7 @@ export const handleMultiDomainAndProxy = (req: NextRequest, opts: WithAuthOption
     throw new Error(missingDomainAndProxy);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(SECRET_KEY || API_KEY)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(SECRET_KEY)) {
     throw new Error(missingSignInUrlInDev);
   }
 

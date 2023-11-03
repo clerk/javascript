@@ -1,6 +1,6 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
+import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
-import { SECRET_KEY } from './clerkClient';
+import { SECRET_KEY } from './constants';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import {
   clockSkewDetected,
@@ -23,7 +23,6 @@ import {
   apiEndpointUnauthorizedNextResponse,
   decorateRequest,
   isCrossOrigin,
-  isDevelopmentFromApiKey,
   setRequestHeadersOnNextResponse,
 } from './utils';
 

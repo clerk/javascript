@@ -34,31 +34,6 @@
       "types": "./dist/types/server/index.d.ts",
       "import": "./dist/esm/server/index.js",
       "require": "./dist/cjs/server/index.js"
-    },
-    "./api": {
-      "types": "./dist/types/api/index.d.ts",
-      "import": "./dist/esm/api/index.js",
-      "require": "./dist/cjs/api/index.js"
-    },
-    "./ssr": {
-      "types": "./dist/types/ssr/index.d.ts",
-      "import": "./dist/esm/ssr/index.js",
-      "require": "./dist/cjs/ssr/index.js"
-    },
-    "./edge-middlewarefiles": {
-      "types": "./dist/types/edge-middleware/index.d.ts",
-      "import": "./dist/esm/edge-middleware/index.js",
-      "require": "./dist/cjs/edge-middleware/index.js"
-    },
-    "./app-beta": {
-      "types": "./dist/types/app-beta/index.d.ts",
-      "import": "./dist/esm/app-beta/index.js",
-      "require": "./dist/cjs/app-beta/index.js"
-    },
-    "./app-beta/client": {
-      "types": "./dist/types/app-beta/client/index.d.ts",
-      "import": "./dist/esm/app-beta/client/index.js",
-      "require": "./dist/cjs/app-beta/client/index.js"
     }
   },
   "main": "./dist/cjs/index.js",
@@ -66,11 +41,7 @@
   "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
-    "server",
-    "api",
-    "edge-middleware",
-    "ssr",
-    "app-beta"
+    "server"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
@@ -89,7 +60,6 @@
   "dependencies": {
     "@clerk/backend": "0.31.3",
     "@clerk/clerk-react": "4.27.0",
-    "@clerk/clerk-sdk-node": "4.12.16",
     "@clerk/shared": "1.0.0",
     "@clerk/types": "3.57.0",
     "path-to-regexp": "6.2.1",

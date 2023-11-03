@@ -11,7 +11,7 @@ import {
 import type { SecretKeyOrApiKey } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
-import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerkClient';
+import { API_URL, API_VERSION, SECRET_KEY } from './constants';
 import { getAuthAuthHeaderMissing } from './errors';
 import type { RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
@@ -50,7 +50,6 @@ export const createGetAuth = ({
       }
 
       const options = {
-        apiKey: opts?.apiKey || API_KEY,
         secretKey: opts?.secretKey || SECRET_KEY,
         apiUrl: API_URL,
         apiVersion: API_VERSION,
@@ -101,7 +100,6 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
   const authReason = getAuthKeyFromRequest(req, 'AuthReason');
 
   const options = {
-    apiKey: API_KEY,
     secretKey: SECRET_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
