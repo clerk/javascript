@@ -1,5 +1,41 @@
 import { inBrowser, isValidBrowser, isValidBrowserOnline, userAgentIsRobot } from '../browser';
 
+describe('Globals', () => {
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  describe('Browser Environment', () => {
+    it('returns true if window is defined', () => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const mod = require('../browser');
+
+      expect(mod.browser.window).toEqual(window);
+      expect(mod.browser.window.document).toEqual(window.document);
+    });
+  });
+
+  describe('Non-Browser Environment', () => {
+    it('throws when accessing `document` or `window`', () => {
+      const windowSpy = jest.spyOn(global, 'window', 'get');
+      // @ts-expect-error - Testing
+      windowSpy.mockReturnValue(undefined);
+
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const mod = require('../browser');
+
+      expect(() => mod.browser.document).toThrowError(
+        /not running in a browser environment. Trying to access `document`/,
+      );
+      expect(() => mod.browser.window).toThrowError(/not running in a browser environment. Trying to access `window`/);
+    });
+  });
+});
+
 describe('inBrowser()', () => {
   afterEach(() => {
     jest.restoreAllMocks();

@@ -28,6 +28,7 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
+    // 'no-restricted-globals': ['warn', { name: 'window' }, { name: 'document' }],
     'simple-import-sort/imports': 'error',
   },
   overrides: [

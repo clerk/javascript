@@ -43,6 +43,7 @@ module.exports = {
       rules: {
         '@typescript-eslint/unbound-method': 'off',
         'jest/unbound-method': 'off', // TODO: Set to `error` when we're able to make the appropriate changes.
+        'no-restricted-globals': 'off', // Use globals as needed in tests.
 
         ...disabledOverrideRules,
       },
