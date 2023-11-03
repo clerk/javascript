@@ -1,3 +1,4 @@
+import { isUserLockedError } from '@clerk/shared/error';
 import type { EmailLinkFactor, SignInResource } from '@clerk/types';
 import React from 'react';
 
@@ -29,6 +30,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const { setActive } = useCoreClerk();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
+  const clerk = useCoreClerk();
 
   React.useEffect(() => {
     void startEmailLinkVerification();
@@ -45,7 +47,14 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
       redirectUrl: buildEmailLinkRedirectUrl(signInContext, signInUrl),
     })
       .then(res => handleVerificationResult(res))
-      .catch(err => handleError(err, [], card.setError));
+      .catch(err => {
+        if (isUserLockedError(err)) {
+          // @ts-expect-error -- private method for the time being
+          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        }
+
+        handleError(err, [], card.setError);
+      });
   };
 
   const handleVerificationResult = async (si: SignInResource) => {
