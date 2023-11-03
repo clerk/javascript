@@ -3,7 +3,7 @@
   "changelog": [
     "./changelog.js",
     {
-      "repo": "clerkinc/javascript"
+      "repo": "clerk/javascript"
     }
   ],
   "commit": false,

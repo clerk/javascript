@@ -8,7 +8,7 @@ export type LocalizationValue = string;
  * Users aiming to customise a few strings can also peak at the `data-localization-key` attribute by inspecting
  * the DOM and updating the corresponding key.
  * Users aiming to completely localize the components by providing a complete translation can use
- * the default english resource object from {@link https://github.com/clerkinc/javascript Clerk's open source repo}
+ * the default english resource object from {@link https://github.com/clerk/javascript Clerk's open source repo}
  * as a starting point.
  */
 export type LocalizationResource = DeepPartial<_LocalizationResource>;

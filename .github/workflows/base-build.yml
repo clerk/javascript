@@ -3,7 +3,7 @@ on:
 
 jobs:
   build:
-    # if: ${{ github.repository == 'clerkinc/javascript' }}
+    # if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
     steps:
       - name: Checkout repo

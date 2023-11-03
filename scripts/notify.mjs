@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import { globby as glob } from 'globby';
 
 const { GITHUB_REF = 'main' } = process.env;
-const baseUrl = new URL(`https://github.com/clerkinc/javascript/blob/${GITHUB_REF}/`);
+const baseUrl = new URL(`https://github.com/clerk/javascript/blob/${GITHUB_REF}/`);
 
 /**
  * @typedef {Object} PackageData
@@ -139,9 +139,9 @@ const createPackageData = (releasedPackages, packageToPathMap) => {
 const createReleasePrUrl = () => {
   // TODO: Get PR number using the GitHub API
   // if (prNumber) {
-  //   message += `\nView <https://github.com/clerkinc/javascript/pull/${prNumber}|release PR>`;
+  //   message += `\nView <https://github.com/clerk/javascript/pull/${prNumber}|release PR>`;
   // }
-  return `https://github.com/clerkinc/javascript/pulls?q=is%3Apr+is%3Aclosed+Version+Packages+in%3Atitle+merged%3A${new Date()
+  return `https://github.com/clerk/javascript/pulls?q=is%3Apr+is%3Aclosed+Version+Packages+in%3Atitle+merged%3A${new Date()
     .toISOString()
     .slice(0, 10)}`;
 };

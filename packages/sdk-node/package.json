@@ -9,18 +9,18 @@
   ],
   "homepage": "https://clerk.com/",
   "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
+    "url": "https://github.com/clerk/javascript/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
+    "url": "git+https://github.com/clerk/javascript.git",
     "directory": "packages/sdk-node"
   },
   "license": "MIT",
   "author": {
     "name": "Clerk, Inc.",
     "email": "support@clerk.com",
-    "url": "git+https://github.com/clerkinc/javascript.git"
+    "url": "git+https://github.com/clerk/javascript.git"
   },
   "exports": {
     ".": {

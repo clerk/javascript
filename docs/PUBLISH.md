@@ -26,7 +26,7 @@ Snapshot releases are a way to release your changes for testing without updating
 **Important:**
 Before requesting a snapshot release, ensure that your Clerk organization membership status is set to "Public". Otherwise, the snapshot release will fail. To set your status to "Public", follow [these steps](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-membership-in-organizations/publicizing-or-hiding-organization-membership).
 
-To perform a snapshot release, simply comment `!snapshot` in your PR. Once the packages are built and published (~2mins), [clerk-cookie](https://github.com/clerk-cookie) will post a reply with the published versions ([example](https://github.com/clerkinc/javascript/pull/1329#issuecomment-1586970784)). Simply install the snap version using `npm install` as usual.
+To perform a snapshot release, simply comment `!snapshot` in your PR. Once the packages are built and published (~2mins), [clerk-cookie](https://github.com/clerk-cookie) will post a reply with the published versions ([example](https://github.com/clerk/javascript/pull/1329#issuecomment-1586970784)). Simply install the snap version using `npm install` as usual.
 
 Notes:
 
@@ -45,7 +45,7 @@ We're still considering whether switching the repo into a `canary` mode for big,
 
 > Backporting is the action of taking parts from a newer version of a software system or software component and porting them to an older version of the same software.
 
-If a PR got merged into `main` that should also be released in older versions (e.g. critical security fixes), you'll need to backport said PR. You can do this by using the [`backport` script](https://github.com/clerkinc/javascript/blob/main/scripts/backport.mjs) inside `scripts`.
+If a PR got merged into `main` that should also be released in older versions (e.g. critical security fixes), you'll need to backport said PR. You can do this by using the [`backport` script](https://github.com/clerk/javascript/blob/main/scripts/backport.mjs) inside `scripts`.
 
 Duplicate the `.env.example` file inside `scripts` and rename it to `.env`. Fill out the `GITHUB_ACCESS_TOKEN` variable. Afterwards, you'll be able to run the CLI like so:
 

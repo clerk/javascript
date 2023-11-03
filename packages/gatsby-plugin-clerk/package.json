@@ -14,11 +14,11 @@
   ],
   "homepage": "https://clerk.com/",
   "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
+    "url": "https://github.com/clerk/javascript/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
+    "url": "git+https://github.com/clerk/javascript.git",
     "directory": "packages/gatsby-plugin-clerk"
   },
   "license": "MIT",
