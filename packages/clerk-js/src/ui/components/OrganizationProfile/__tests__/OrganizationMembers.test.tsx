@@ -12,11 +12,11 @@ const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('OrganizationMembers', () => {
   it('renders the Organization Members page', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
     });
-
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
     const { getByText, getByRole } = render(<OrganizationMembers />, { wrapper });
 
     await waitFor(() => {
@@ -32,11 +32,13 @@ describe('OrganizationMembers', () => {
   });
 
   it('shows requests if domains is turned on', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withOrganizationDomains();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: ['Org1'] });
     });
+
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { getByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -46,10 +48,12 @@ describe('OrganizationMembers', () => {
   });
 
   it('shows an invite button inside invitations tab if the current user is an admin', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
+
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { getByRole, getByText } = render(<OrganizationMembers />, { wrapper });
 
@@ -61,13 +65,15 @@ describe('OrganizationMembers', () => {
   });
 
   it('does not show invitations and requests if user is not an admin', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.dev'],
         organization_memberships: [{ name: 'Org1', permissions: [] }],
       });
     });
+
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { queryByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -83,6 +89,8 @@ describe('OrganizationMembers', () => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
+
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { getByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -144,6 +152,8 @@ describe('OrganizationMembers', () => {
         total_count: 2,
       }),
     );
+
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { queryByText, queryAllByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -219,6 +229,7 @@ describe('OrganizationMembers', () => {
       });
     });
 
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
     fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(
       Promise.resolve({
         data: [],
@@ -260,6 +271,8 @@ describe('OrganizationMembers', () => {
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
+
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     fixtures.clerk.organization?.getInvitations.mockReturnValue(
       Promise.resolve({
@@ -309,6 +322,8 @@ describe('OrganizationMembers', () => {
       });
     });
 
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
     fixtures.clerk.organization?.getDomains.mockReturnValue(
       Promise.resolve({
         data: [],
@@ -346,6 +361,7 @@ describe('OrganizationMembers', () => {
       });
     });
 
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
     fixtures.clerk.organization?.getMemberships.mockReturnValue(
       Promise.resolve({
         data: membersList,

@@ -15,6 +15,14 @@ export type LocalizationResource = DeepPartial<_LocalizationResource>;
 
 type _LocalizationResource = {
   locale: string;
+  /**
+   * @experimental
+   * Add role keys and their localized value
+   * e.g. roles:{ 'org:teacher': 'Teacher'}
+   */
+  roles: {
+    [r: string]: LocalizationValue;
+  };
   socialButtonsBlockButton: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;

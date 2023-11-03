@@ -2,23 +2,10 @@ import type { MembershipRole } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import {
-  Col,
-  descriptors,
-  Flex,
-  Spinner,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  useLocalizations,
-} from '../../customizables';
+import { Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
-import type { PropsOfComponent } from '../../styledSystem';
-import { roleLocalizationKey } from '../../utils';
+import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
+import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 
 type MembersListTableProps = {
   headers: LocalizationKey[];
@@ -139,38 +126,61 @@ export const RowContainer = (props: PropsOfComponent<typeof Tr>) => {
   );
 };
 
-export const RoleSelect = (props: { value: MembershipRole; onChange: any; isDisabled?: boolean }) => {
-  const { value, onChange, isDisabled } = props;
-  const { t } = useLocalizations();
+export const RoleSelect = (props: {
+  roles: { label: string; value: string }[] | undefined;
+  value: MembershipRole;
+  onChange: (params: string) => unknown;
+  isDisabled?: boolean;
+  triggerSx?: ThemableCssProp;
+  optionListSx?: ThemableCssProp;
+}) => {
+  const { value, roles, onChange, isDisabled, triggerSx, optionListSx } = props;
 
-  const roles: Array<{ label: string; value: MembershipRole }> = [
-    { label: t(roleLocalizationKey('admin')), value: 'admin' },
-    { label: t(roleLocalizationKey('basic_member')), value: 'basic_member' },
+  const shouldDisplayLegacyRoles = !roles;
+
+  const legacyRoles: Array<{ label: string; value: MembershipRole }> = [
+    { label: 'admin', value: 'admin' },
+    { label: 'basic_member', value: 'basic_member' },
   ];
 
-  const excludedRoles: Array<{ label: string; value: MembershipRole }> = [
-    { label: t(roleLocalizationKey('guest_member')), value: 'guest_member' },
+  const legacyExcludedRoles: Array<{ label: string; value: MembershipRole }> = [
+    { label: 'guest_member', value: 'guest_member' },
   ];
+  const { localizeCustomRole } = useLocalizeCustomRoles();
 
-  const selectedRole = [...roles, ...excludedRoles].find(r => r.value === value);
+  const selectedRole = [...(roles || []), ...legacyRoles, ...legacyExcludedRoles].find(r => r.value === value);
+
+  const localizedOptions = (!shouldDisplayLegacyRoles ? roles : legacyRoles).map(role => ({
+    value: role.value,
+    label: localizeCustomRole(role.value) || role.label,
+  }));
 
   return (
     <Select
       elementId='role'
-      options={roles}
+      options={localizedOptions}
       value={value}
       onChange={role => onChange(role.value)}
     >
+      {/*Store value inside an input in order to be accessible as form data*/}
+      <input
+        name='role'
+        type='hidden'
+        value={value}
+      />
       <SelectButton
-        sx={t => ({
-          color: t.colors.$colorTextSecondary,
-          backgroundColor: 'transparent',
-        })}
+        sx={
+          triggerSx ||
+          (t => ({
+            color: t.colors.$colorTextSecondary,
+            backgroundColor: 'transparent',
+          }))
+        }
         isDisabled={isDisabled}
       >
-        {selectedRole?.label}
+        {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
       </SelectButton>
-      <SelectOptionList />
+      <SelectOptionList sx={optionListSx} />
     </Select>
   );
 };

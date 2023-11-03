@@ -165,7 +165,6 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
       >
         {organization && (
           <InviteMembersForm
-            organization={organization}
             resetButtonLabel={localizationKeys('createOrganization.invitePage.formButtonReset')}
             onSuccess={wizard.nextStep}
             onReset={completeFlow}
