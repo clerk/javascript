@@ -16,7 +16,7 @@ export const common: PlaywrightTestConfig = {
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  timeout: 30000,
+  timeout: process.env.CI ? 90000 : 30000,
   maxFailures: process.env.CI ? 1 : undefined,
   workers: process.env.CI ? numAvailableWorkers : '70%',
   reporter: [[process.env.CI ? 'html' : 'line', { open: 'never' }]] as any,

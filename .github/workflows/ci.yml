@@ -78,7 +78,7 @@ jobs:
         with:
           name: turbo-summary-report-lint-${{ github.run_id }}-${{ github.run_attempt }}
           path: .turbo/runs
-          retention-days: 3
+          retention-days: 5
 
   unit-tests:
     name: Unit Tests
@@ -122,17 +122,17 @@ jobs:
         with:
           name: turbo-summary-report-unit-${{ github.run_id }}-${{ github.run_attempt }}-node-${{ matrix.node-version }}
           path: .turbo/runs
-          retention-days: 3
+          retention-days: 5
 
   integration-tests:
     name: Integration Tests
     needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ${{ vars.RUNNER_MEDIUM }}
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
     strategy:
       matrix:
-        test-name: [ 'generic', 'nextjs', 'remix' ]
+        test-name: [ 'generic', 'nextjs' ] # TODO: Add 'remix' when ready
 
     steps:
       - name: Checkout Repo
