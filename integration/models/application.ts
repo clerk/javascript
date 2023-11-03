@@ -61,6 +61,7 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
         log: opts.detached ? undefined : log,
       });
+      // TODO @dimitris: Fail early if server exits
       // const shouldRetry = () => proc.exitCode !== 0 && proc.exitCode !== null;
       await waitForServer(serverUrl, { log, maxAttempts: Infinity });
       log(`Server started at ${serverUrl}, pid: ${proc.pid}`);
