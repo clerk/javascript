@@ -11,10 +11,6 @@ export type RootAuthLoaderOptions = {
   frontendApi?: string;
   publishableKey?: string;
   jwtKey?: string;
-  /**
-   * @deprecated Use `secretKey` instead.
-   */
-  apiKey?: string;
   secretKey?: string;
   loadUser?: boolean;
   loadSession?: boolean;

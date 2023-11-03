@@ -2,6 +2,7 @@ import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, Clerk } from '@clerk/backend';
 import { deprecated } from '@clerk/shared/deprecated';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { isTruthy } from '@clerk/shared/underscore';
 
@@ -12,10 +13,6 @@ import {
 } from '../errors';
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
-
-function isDevelopmentFromApiKey(apiKey: string): boolean {
-  return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
-}
 
 /**
  * @internal
@@ -31,16 +28,8 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   // 3. Then try from globalThis (Cloudflare Workers).
   // 4. Then from loader context (Cloudflare Pages).
   const secretKey = opts.secretKey || getEnvVariable('CLERK_SECRET_KEY', context) || '';
-  const apiKey = opts.apiKey || getEnvVariable('CLERK_API_KEY', context) || '';
-  if (apiKey) {
-    if (getEnvVariable('CLERK_API_KEY', context)) {
-      deprecated('CLERK_API_KEY', 'Use `CLERK_SECRET_KEY` instead.');
-    } else {
-      deprecated('apiKey', 'Use `secretKey` instead.');
-    }
-  }
 
-  if (!secretKey && !apiKey) {
+  if (!secretKey) {
     throw new Error(noSecretKeyOrApiKeyError);
   }
 
@@ -93,12 +82,11 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || apiKey)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey)) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
-  return Clerk({ apiUrl, apiKey, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({
-    apiKey,
+  return Clerk({ apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({
     audience,
     secretKey,
     jwtKey,
