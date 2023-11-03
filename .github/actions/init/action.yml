@@ -97,10 +97,12 @@ runs:
       with:
         path: ./node_modules
         key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('package-lock.json') }}
 
     - name: Install NPM Dependencies
       if: steps.npm-cache.outputs.cache-hit != 'true'
-      run: npm ci --audit=false --fund=false
+      run: '[ ! -d "./node_modules" ] && npm ci --audit=false --fund=false' # only run if node_modules is not present
       shell: bash
 
     - name: Get Playwright Version
@@ -116,8 +118,10 @@ runs:
       with:
         path: ~/.cache/ms-playwright
         key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
 
     - name: Install Playwright Browsers
       if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
       shell: bash
-      run: npx playwright install --with-deps
+      run: npx playwright install --with-deps chromium
