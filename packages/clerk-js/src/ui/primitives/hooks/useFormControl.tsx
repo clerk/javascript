@@ -190,6 +190,7 @@ export const sanitizeInputProps = (
     fieldId,
     label,
     clearFeedback,
+    infoText,
     ...inputProps
   } = obj;
   /* eslint-enable */
