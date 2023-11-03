@@ -15,7 +15,7 @@ jobs:
   run:
     continue-on-error: true
     runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_LONG) }}
     concurrency:
       group: integration-${{ github.ref }}-${{ inputs.script }}
       cancel-in-progress: true
