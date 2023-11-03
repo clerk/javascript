@@ -1,7 +1,7 @@
 import { constants, createIsomorphicRequest } from '@clerk/backend';
 import type { Request } from 'express';
 
-import { authenticateRequest } from './authenticateRequest';
+import { authenticateRequest } from '../authenticateRequest';
 
 const mockNext = jest.fn();
 
