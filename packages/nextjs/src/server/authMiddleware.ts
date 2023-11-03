@@ -132,6 +132,10 @@ type AuthMiddlewareParams = WithAuthOptions & {
    */
   apiRoutes?: ApiRoutesParam;
   /**
+   * A function that transforms the 401 Unauthorized response returned by the middleware when hitting an API endpoint.
+   */
+  apiUnauthorizedResponseTransformer?: (res: NextResponse) => NextResponse;
+  /**
    * Enables extra debug logging.
    */
   debug?: boolean;
@@ -143,12 +147,21 @@ export interface AuthMiddleware {
 
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
-  const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...options } = params;
+  const {
+    beforeAuth,
+    afterAuth,
+    publicRoutes,
+    ignoredRoutes,
+    apiRoutes,
+    apiUnauthorizedResponseTransformer,
+    ...options
+  } = params;
 
   const isIgnoredRoute = createRouteMatcher(ignoredRoutes || DEFAULT_IGNORED_ROUTES);
   const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(publicRoutes));
   const isApiRoute = createApiRoutes(apiRoutes);
-  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, params);
+  const unknownStateTransformer = apiUnauthorizedResponseTransformer || defaultUnknowStateTransformer;
+  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, unknownStateTransformer, params);
 
   return withLogger('authMiddleware', logger => async (_req: NextRequest, evt: NextFetchEvent) => {
     if (options.debug) {
@@ -188,10 +201,10 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     const requestState = await authenticateRequest(req, options);
     if (requestState.isUnknown) {
       logger.debug('authenticateRequest state is unknown', requestState);
-      return handleUnknownState(requestState);
+      return handleUnknownState(requestState, unknownStateTransformer);
     } else if (requestState.isInterstitial && isApiRoute(req)) {
       logger.debug('authenticateRequest state is interstitial in an API route', requestState);
-      return handleUnknownState(requestState);
+      return handleUnknownState(requestState, unknownStateTransformer);
     } else if (requestState.isInterstitial) {
       logger.debug('authenticateRequest state is interstitial', requestState);
 
@@ -245,13 +258,14 @@ export const createRouteMatcher = (routes: RouteMatcherParam) => {
 const createDefaultAfterAuth = (
   isPublicRoute: ReturnType<typeof createRouteMatcher>,
   isApiRoute: ReturnType<typeof createApiRoutes>,
+  unknownStateTransformer: (res: NextResponse) => NextResponse,
   params: AuthMiddlewareParams,
 ) => {
   return (auth: AuthObject, req: WithClerkUrl<NextRequest>) => {
     if (!auth.userId && !isPublicRoute(req)) {
       if (isApiRoute(req)) {
         informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, true);
-        return apiEndpointUnauthorizedNextResponse();
+        return unknownStateTransformer(apiEndpointUnauthorizedNextResponse());
       } else {
         informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, false);
       }
@@ -420,3 +434,5 @@ const informAboutProtectedRoute = (path: string, params: AuthMiddlewareParams, i
     );
   }
 };
+
+const defaultUnknowStateTransformer = (res: NextResponse) => res;

@@ -449,6 +449,33 @@ describe('authMiddleware(params)', () => {
       expect(clerkClient.localInterstitial).not.toBeCalled();
     });
   });
+
+  describe('apiUnauthorizedResponseTransformer', function () {
+    it('returns 401 for unknown requestState and null response body if no transformer is passed', async () => {
+      // @ts-ignore
+      authenticateRequest.mockResolvedValueOnce({ isUnknown: true });
+      const resp = await authMiddleware()(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get('content-type')).toEqual('application/json');
+      const json = await resp?.json();
+      expect(json).toEqual(null);
+    });
+
+    it('returns manipulated custom response if transformer is passed', async () => {
+      // @ts-ignore
+      authenticateRequest.mockResolvedValueOnce({ isUnknown: true });
+      const resp = await authMiddleware({
+        apiUnauthorizedResponseTransformer: res =>
+          NextResponse.json({ errorCode: 401, message: 'This is an Unknown auth state error' }, res),
+      })(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get('content-type')).toEqual('application/json');
+      const json = await resp?.json();
+      expect(json).toEqual({ errorCode: 401, message: 'This is an Unknown auth state error' });
+    });
+  });
 });
 
 describe('Dev Browser JWT when redirecting to cross origin', function () {

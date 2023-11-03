@@ -28,8 +28,11 @@ const decorateResponseWithObservabilityHeaders = (res: NextResponse, requestStat
   requestState.status && res.headers.set(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
 
-export const handleUnknownState = (requestState: RequestState) => {
-  const response = apiEndpointUnauthorizedNextResponse();
+export const handleUnknownState = (
+  requestState: RequestState,
+  unknownStateTransformer: (res: NextResponse) => NextResponse,
+) => {
+  const response = unknownStateTransformer(apiEndpointUnauthorizedNextResponse());
   decorateResponseWithObservabilityHeaders(response, requestState);
   return response;
 };
