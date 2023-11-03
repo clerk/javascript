@@ -1,5 +1,6 @@
 import type { PublishableKey } from '@clerk/types';
 
+import { DEV_OR_STAGING_SUFFIXES } from './constants';
 import { isomorphicAtob } from './isomorphicAtob';
 
 const PUBLISHABLE_KEY_LIVE_PREFIX = 'pk_live_';
@@ -55,19 +56,6 @@ export function isLegacyFrontendApiKey(key: string) {
 }
 
 export function createDevOrStagingUrlCache() {
-  // TODO: Check if we can merge it with `./instance.ts#isStaging()`
-  const DEV_OR_STAGING_SUFFIXES = [
-    '.lcl.dev',
-    '.stg.dev',
-    '.lclstage.dev',
-    '.stgstage.dev',
-    '.dev.lclclerk.com',
-    '.stg.lclclerk.com',
-    '.accounts.lclclerk.com',
-    'accountsstage.dev',
-    'accounts.dev',
-  ];
-
   const devOrStagingUrlCache = new Map<string, boolean>();
 
   return {

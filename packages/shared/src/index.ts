@@ -10,10 +10,11 @@
 
 export * from './utils';
 
-export { createWorkerTimers } from './workerTimers';
+export { apiUrlFromPublishableKey } from './apiUrlFromPublishableKey';
 export * from './browser';
 export { callWithRetry } from './callWithRetry';
 export * from './color';
+export * from './constants';
 export * from './date';
 export * from './deprecated';
 export * from './error';
@@ -27,3 +28,4 @@ export * from './poller';
 export * from './proxy';
 export * from './underscore';
 export * from './url';
+export { createWorkerTimers } from './workerTimers';
