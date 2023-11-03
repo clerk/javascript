@@ -63,7 +63,7 @@ type OrganizationSwitcherPropsWithoutCustomPages = Omit<OrganizationSwitcherProp
 // class implementation due to React intricacies such as the useEffect’s cleanup
 // seems to run AFTER unmount, while componentWillUnmount runs BEFORE.
 
-// More information can be found at https://clerkinc.slack.com/archives/C015S0BGH8R/p1624891993016300
+// More information can be found at https://clerk.slack.com/archives/C015S0BGH8R/p1624891993016300
 
 // The function Portal implementation is commented out for future reference.
 

@@ -9,7 +9,7 @@ if (!process.env.GITHUB_ACCESS_TOKEN) {
 }
 
 const repo = 'javascript';
-const owner = 'clerkinc';
+const owner = 'clerk';
 
 const octokit = new Octokit({
   auth: `token ${process.env.GITHUB_ACCESS_TOKEN}`,

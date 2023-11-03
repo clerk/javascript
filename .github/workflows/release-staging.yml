@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   staging-release:
-    if: ${{ github.repository == 'clerkinc/javascript' }}
+    if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -51,9 +51,9 @@ jobs:
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
             if (clerkjsVersion.includes('staging')) {
-              console.log('clerk-js changed, will notify clerkinc/cloudflare-workers');
+              console.log('clerk-js changed, will notify clerk/cloudflare-workers');
               github.rest.actions.createWorkflowDispatch({
-                owner: 'clerkinc',
+                owner: 'clerk',
                 repo: 'cloudflare-workers',
                 workflow_id: 'release-staging-clerkjs-proxy.yml',
                 ref: 'main',
@@ -62,9 +62,9 @@ jobs:
             }
 
             if (nextjsVersion.includes('staging')) {
-              console.log('clerk/nextjs changed, will notify clerkinc/accounts');
+              console.log('clerk/nextjs changed, will notify clerk/accounts');
               github.rest.actions.createWorkflowDispatch({
-                owner: 'clerkinc',
+                owner: 'clerk',
                 repo: 'accounts',
                 workflow_id: 'release-staging.yml',
                 ref: 'main',
