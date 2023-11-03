@@ -84,6 +84,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: LocalizationValue;
   formFieldInputPlaceholder__organizationDomain: LocalizationValue;
   formFieldInputPlaceholder__organizationDomainEmailAddress: LocalizationValue;
+  formFieldInputPlaceholder__confirmDeletionUserAccount: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;

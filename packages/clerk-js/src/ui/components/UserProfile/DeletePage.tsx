@@ -29,8 +29,7 @@ export const DeletePage = withCardStateProvider(() => {
     type: 'text',
     label: localizationKeys('formFieldLabel__confirmDeletion'),
     isRequired: true,
-    // TODO: localize this
-    placeholder: 'Delete account',
+    placeholder: localizationKeys('formFieldInputPlaceholder__confirmDeletionUserAccount'),
   });
 
   const canSubmit = confirmationField.value === 'Delete account';
