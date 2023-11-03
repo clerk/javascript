@@ -17,8 +17,21 @@ type StandaloneAppParams = {
 };
 
 type StateFile = Partial<{
+  /**
+   * This prop describes a running application started manually by the
+   * e2e suite user by providing the E2E_APP_URL, E2E_APP_ID, E2E_APP_PK, E2E_APP_SK variables
+   **/
   standaloneApp: StandaloneAppParams;
+  /**
+   * This prop describes all long-running apps started by the e2e suite itself
+   **/
   longRunningApps: Record<string, AppParams>;
+  /**
+   * This prop describes the pid of the http server that serves the clerk-js hotloaded lib.
+   * The http-server replaces the production clerk-js delivery mechanism.
+   * The PID is used to teardown the http-server after the tests are done.
+   */
+  clerkJsHttpServerPid: number;
 }>;
 
 const createStateFile = () => {
@@ -60,10 +73,22 @@ const createStateFile = () => {
     return json.longRunningApps;
   };
 
+  const setClerkJsHttpServerPid = (pid: number) => {
+    const json = read();
+    json.clerkJsHttpServerPid = pid;
+    write(json);
+  };
+
+  const getClerkJsHttpServerPid = () => {
+    return read().clerkJsHttpServerPid;
+  };
+
   return {
     remove,
     setStandAloneApp,
     getStandAloneApp,
+    setClerkJsHttpServerPid,
+    getClerkJsHttpServerPid,
     addLongRunningApp,
     getLongRunningApps,
   };

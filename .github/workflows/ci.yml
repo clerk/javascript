@@ -124,8 +124,12 @@ jobs:
         working-directory: ./integration
         run: npm init -y && npm install @clerk/backend
 
+      - name: Install @clerk/clerk-js in os temp
+        working-directory: ${{runner.temp}}
+        run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
+
       - name: Run Integration Tests
-        run: npm run test:integration:${{ matrix.test-name }}
+        run: E2E_APP_CLERK_JS_DIR=$RUNNER_TEMP npm run test:integration:${{ matrix.test-name }}
         env:
           E2E_CLERK_VERSION: 'latest'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}

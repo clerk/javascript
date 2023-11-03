@@ -31,5 +31,6 @@ function App() {
   );
 }
 
+// TODO: Add clerkJsUrl
 export default ClerkApp(App);
 export const CatchBoundary = ClerkCatchBoundary();
