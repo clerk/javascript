@@ -40,10 +40,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
             __unstable_manageBillingMembersLimit={__unstable_manageBillingMembersLimit}
           />
         )}
-        <InviteMembersForm
-          organization={organization}
-          onSuccess={wizard.nextStep}
-        />
+        <InviteMembersForm onSuccess={wizard.nextStep} />
       </ContentPage>
       <SuccessPage
         title={title}
