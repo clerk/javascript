@@ -16,7 +16,7 @@ concurrency:
 jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ${{ vars.RUNNER_MEDIUM }}
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
     steps:
