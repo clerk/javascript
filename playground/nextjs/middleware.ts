@@ -7,4 +7,6 @@ export default authMiddleware({
   publicRoutes: publicPaths,
 });
 
-export const config = { matcher: '/((?!.*\\.).*)' };
+export const config = {
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+};
