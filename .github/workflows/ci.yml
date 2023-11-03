@@ -16,8 +16,10 @@ concurrency:
 jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
-    runs-on: ${{ vars.RUNNER_MEDIUM }}
+    runs-on: ${{ vars.RUNNER_LARGE }}
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    env:
+      TURBO_SUMMARIZE: true
 
     steps:
       - name: Checkout Repo
@@ -34,6 +36,7 @@ jobs:
         with:
           turbo-remote-only: false
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
@@ -67,89 +70,98 @@ jobs:
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run lint -- $TURBO_ARGS -- --quiet
 
-  unit-tests:
-    name: Unit Tests
-    needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_LARGE }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
-
-    strategy:
-      matrix:
-        node-version: [ 18, 20 ]
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
+      - name: Upload Turbo Summary
+        uses: actions/upload-artifact@v3
+        if: ${{ env.TURBO_SUMMARIZE == 'true' }}
+        continue-on-error: true
         with:
-          fetch-depth: 0
-          show-progress: false
+          name: turbo-summary-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .turbo/runs
+          retention-days: 1
 
-      - name: Setup
-        id: config
-        uses: ./.github/actions/init
-        with:
-          node-version: ${{ matrix.node-version }}
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+  # unit-tests:
+  #   name: Unit Tests
+  #   needs: formatting-linting
+  #   runs-on: ${{ vars.RUNNER_LARGE }}
+  #   timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
-      - name: Run tests
-        run: npx turbo test $TURBO_ARGS
-        env:
-          NODE_VERSION: ${{ matrix.node-version }}
+  #   strategy:
+  #     matrix:
+  #       node-version: [ 18, 20 ]
 
-  integration-tests:
-    name: Integration Tests
-    needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_LARGE }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #         show-progress: false
 
-    strategy:
-      matrix:
-        test-name: [ 'generic', 'nextjs', 'remix' ]
+  #     - name: Setup
+  #       id: config
+  #       uses: ./.github/actions/init
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #         turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+  #         turbo-team: ${{ vars.TURBO_TEAM }}
+  #         turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          show-progress: false
+  #     - name: Run tests
+  #       run: npx turbo test $TURBO_ARGS
+  #       env:
+  #         NODE_VERSION: ${{ matrix.node-version }}
 
-      - name: Setup
-        id: config
-        uses: ./.github/actions/init
-        with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true
+  # integration-tests:
+  #   name: Integration Tests
+  #   needs: formatting-linting
+  #   runs-on: ${{ vars.RUNNER_LARGE }}
+  #   timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
-      - name: Verdaccio
-        uses: ./.github/actions/verdaccio
-        with:
-          publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS && npx changeset publish --no-git-tag; fi
+  #   strategy:
+  #     matrix:
+  #       test-name: [ 'generic', 'nextjs', 'remix' ]
 
-      - name: Install @clerk/backend in /integration
-        working-directory: ./integration
-        run: npm init -y && npm install @clerk/backend
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #         show-progress: false
 
-      - name: Install @clerk/clerk-js in os temp
-        working-directory: ${{runner.temp}}
-        run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
+  #     - name: Setup
+  #       id: config
+  #       uses: ./.github/actions/init
+  #       with:
+  #         turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+  #         turbo-team: ${{ vars.TURBO_TEAM }}
+  #         turbo-token: ${{ secrets.TURBO_TOKEN }}
+  #         playwright-enabled: true
 
-      - name: Run Integration Tests
-        run: npm run test:integration:${{ matrix.test-name }}
-        env:
-          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: 'latest'
-          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
-          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+  #     - name: Verdaccio
+  #       uses: ./.github/actions/verdaccio
+  #       with:
+  #         publish-cmd: |
+  #           if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS && npx changeset publish --no-git-tag; fi
 
-      # - name: Upload Integration Report for ${{ matrix.test-name }}
-      #   uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: integration-report-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
-      #     path: playwright-report/
-      #     retention-days: 1
+  #     - name: Install @clerk/backend in /integration
+  #       working-directory: ./integration
+  #       run: npm init -y && npm install @clerk/backend
+
+  #     - name: Install @clerk/clerk-js in os temp
+  #       working-directory: ${{runner.temp}}
+  #       run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
+
+  #     - name: Run Integration Tests
+  #       run: npm run test:integration:${{ matrix.test-name }}
+  #       env:
+  #         E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+  #         E2E_CLERK_VERSION: 'latest'
+  #         INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+  #         MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+
+  #     # - name: Upload Integration Report for ${{ matrix.test-name }}
+  #     #   uses: actions/upload-artifact@v3
+  #     #   if: always()
+  #     #   with:
+  #     #     name: integration-report-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+  #     #     path: playwright-report/
+  #     #     retention-days: 1

@@ -10,6 +10,10 @@ inputs:
     description: 'Enable Playwright?'
     required: false
     default: 'false'
+  turbo-summarize:
+    description: 'The token to use for Turbo task summaries'
+    required: false
+    default: 'false'
   turbo-enabled:
     description: 'Enable Turbo?'
     required: false
@@ -44,6 +48,7 @@ runs:
         CACHE_DIR: ${{ inputs.turbo-cache-dir }}
         REMOTE_ONLY: ${{ inputs.turbo-remote-only }}
         SIGNATURE: ${{ inputs.turbo-signature }}
+        SUMMARIZE: ${{ inputs.turbo-summarize }}
         TEAM: ${{ inputs.turbo-team }}
         TOKEN: ${{ inputs.turbo-token }}
       with:
@@ -54,13 +59,14 @@ runs:
               ? os.availableParallelism()
               : os.cpus().length;
 
-          const { ENABLED, CACHE_DIR, SIGNATURE, REMOTE_ONLY, TEAM, TOKEN } = process.env
+          const { ENABLED, CACHE_DIR, SIGNATURE, REMOTE_ONLY, SUMMARIZE, TEAM, TOKEN } = process.env
 
           core.exportVariable('TURBO_ARGS',
             [
               '--output-logs=new-only',
               `--cache-dir=${CACHE_DIR}`,
-              `--concurrency=${cpus}`
+              `--concurrency=${cpus}`,
+              `--summarize=${SUMMARIZE}`,
             ].join(' ')
           )
 
