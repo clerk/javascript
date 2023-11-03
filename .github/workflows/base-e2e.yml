@@ -20,7 +20,7 @@ jobs:
       group: integration-${{ github.ref }}-${{ inputs.script }}
       cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup
         uses: ./.github/actions/setup
       - name: Get installed Playwright version

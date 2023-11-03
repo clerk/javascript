@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ vars.RUNNER_NORMAL }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup
         uses: ./.github/actions/setup
       - name: Build

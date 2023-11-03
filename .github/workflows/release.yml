@@ -31,7 +31,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup
         uses: ./.github/actions/setup

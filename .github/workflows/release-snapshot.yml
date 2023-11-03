@@ -37,7 +37,7 @@ jobs:
             }
 
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
       - name: Setup
