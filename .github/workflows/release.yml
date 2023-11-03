@@ -1,5 +1,5 @@
-name: Production release PR
-run-name: Production release PR
+name: Release
+run-name: Release
 
 on:
   push:
@@ -40,6 +40,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
+          commit: "chore(repo): Version packages"
           publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
