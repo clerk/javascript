@@ -138,19 +138,19 @@ export const RoleSelect = (props: {
 
   const shouldDisplayLegacyRoles = !roles;
 
-  const legacy_roles: Array<{ label: string; value: MembershipRole }> = [
+  const legacyRoles: Array<{ label: string; value: MembershipRole }> = [
     { label: 'admin', value: 'admin' },
     { label: 'basic_member', value: 'basic_member' },
   ];
 
-  const legacy_excludedRoles: Array<{ label: string; value: MembershipRole }> = [
+  const legacyExcludedRoles: Array<{ label: string; value: MembershipRole }> = [
     { label: 'guest_member', value: 'guest_member' },
   ];
   const { localizeCustomRole } = useLocalizeCustomRoles();
 
-  const selectedRole = [...(roles || []), ...legacy_roles, ...legacy_excludedRoles].find(r => r.value === value);
+  const selectedRole = [...(roles || []), ...legacyRoles, ...legacyExcludedRoles].find(r => r.value === value);
 
-  const localizedOptions = (!shouldDisplayLegacyRoles ? roles : legacy_roles).map(role => ({
+  const localizedOptions = (!shouldDisplayLegacyRoles ? roles : legacyRoles).map(role => ({
     value: role.value,
     label: localizeCustomRole(role.value) || role.label,
   }));

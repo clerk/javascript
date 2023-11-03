@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useLoadingStatus } from './useLoadingStatus';
 import { useSafeState } from './useSafeState';
@@ -17,7 +17,7 @@ export const useFetch = <T>(
 
   const fetcherRef = useRef(fetcher);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!fetcherRef.current) {
       return;
     }

@@ -386,7 +386,7 @@ export interface PermissionJSON extends ClerkResourceJSON {
   key: string;
   name: string;
   description: string;
-  type: 'system';
+  type: 'system' | 'user';
   created_at: number;
   updated_at: number;
 }

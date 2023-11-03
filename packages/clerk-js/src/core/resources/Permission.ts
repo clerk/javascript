@@ -11,7 +11,7 @@ export class Permission extends BaseResource implements PermissionResource {
   key!: string;
   name!: string;
   description!: string;
-  type!: 'system';
+  type!: 'system' | 'user';
   createdAt!: Date;
   updatedAt!: Date;
 
