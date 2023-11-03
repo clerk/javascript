@@ -7,7 +7,6 @@ export type ClerkState = {
   __internal_clerk_state: {
     __clerk_ssr_interstitial: string;
     __clerk_ssr_state: InitialState;
-    __frontendApi: string | undefined;
     __publishableKey: string | undefined;
     __proxyUrl: string | undefined;
     __domain: string | undefined;
