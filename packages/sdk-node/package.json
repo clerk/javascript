@@ -24,37 +24,25 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "require": "./dist/cjs/index.js",
-      "import": "./dist/esm/index.mjs",
-      "default": "./dist/cjs/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
     },
-    "./esm/instance": {
-      "types": "./dist/types/instance.d.ts",
-      "require": "./dist/cjs/instance.js",
-      "import": "./dist/esm/instance.mjs",
-      "default": "./dist/cjs/instance.js"
-    },
-    "./cjs/instance": {
-      "types": "./dist/types/instance.d.ts",
-      "require": "./dist/cjs/instance.js",
-      "import": "./dist/esm/instance.mjs",
-      "default": "./dist/cjs/instance.js"
-    }
+    "./package.json": "./package.json"
   },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.mjs",
-  "types": "./dist/types/index.d.ts",
+  "main": "./dist/index.js",
   "files": [
-    "dist",
-    "esm",
-    "cjs"
+    "dist"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
