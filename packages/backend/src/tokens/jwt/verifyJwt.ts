@@ -86,7 +86,6 @@ export type VerifyJwtOptions = {
   key: JsonWebKey | string;
 };
 
-// TODO: Revise the return types. Maybe it's better to throw an error instead of return an object with a reason
 export async function verifyJwt(
   token: string,
   { audience, authorizedParties, clockSkewInMs, issuer, key }: VerifyJwtOptions,
