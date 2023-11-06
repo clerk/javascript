@@ -68,7 +68,7 @@ jobs:
 
       - name: Snapshot release
         if: steps.version-packages.outputs.success == '1'
-        run: npx turbo build $TURBO_ARGS && changeset publish --tag snapshot --no-git-tag
+        run: npx turbo build $TURBO_ARGS && npx changeset publish --tag snapshot --no-git-tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
