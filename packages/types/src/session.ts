@@ -4,11 +4,27 @@ import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
-export type IsAuthorized = (isAuthorizedParams: IsAuthorizedParams) => Promise<IsAuthorizedReturnValues>;
+export type experimental__CheckAuthorizationWithoutPermission = (
+  isAuthorizedParams: CheckAuthorizationParamsWithoutPermission,
+) => boolean;
 
-type IsAuthorizedParams =
+type CheckAuthorizationParamsWithoutPermission =
   | {
-      any: (
+      some: {
+        role: string;
+      }[];
+      role?: never;
+    }
+  | {
+      some?: never;
+      role: string;
+    };
+
+export type CheckAuthorization = (isAuthorizedParams: CheckAuthorizationParams) => boolean;
+
+type CheckAuthorizationParams =
+  | {
+      some: (
         | {
             role: string;
             permission?: never;
@@ -24,19 +40,17 @@ type IsAuthorizedParams =
       permission?: never;
     }
   | {
-      any?: never;
+      some?: never;
       role: string;
       permission?: never;
     }
   | {
-      any?: never;
+      some?: never;
       role?: never;
       // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
       // eslint-disable-next-line
       permission: OrganizationPermission | (string & {});
     };
-
-type IsAuthorizedReturnValues = boolean;
 
 export interface SessionResource extends ClerkResource {
   id: string;
@@ -56,7 +70,7 @@ export interface SessionResource extends ClerkResource {
   /**
    * @experimental The method is experimental and subject to change in future releases.
    */
-  isAuthorized: IsAuthorized;
+  experimental__checkAuthorization: CheckAuthorization;
   clearCache: () => void;
   createdAt: Date;
   updatedAt: Date;
