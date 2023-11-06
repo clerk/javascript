@@ -2,6 +2,7 @@ import type { PublishableKey } from '@clerk/types';
 
 import { DEV_OR_STAGING_SUFFIXES } from './constants';
 import { isomorphicAtob } from './isomorphicAtob';
+import { isomorphicBtoa } from './isomorphicBtoa';
 
 const PUBLISHABLE_KEY_LIVE_PREFIX = 'pk_live_';
 const PUBLISHABLE_KEY_TEST_PREFIX = 'pk_test_';
@@ -13,7 +14,7 @@ export function buildPublishableKey(frontendApi: string): string {
   const keyPrefix = PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi)
     ? PUBLISHABLE_KEY_TEST_PREFIX
     : PUBLISHABLE_KEY_LIVE_PREFIX;
-  return `${keyPrefix}${btoa(`${frontendApi}$`)}`;
+  return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`)}`;
 }
 
 export function parsePublishableKey(key: string | undefined): PublishableKey | null {

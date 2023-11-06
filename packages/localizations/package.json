@@ -37,10 +37,9 @@
     "dev": "tsup --watch",
     "lint": "eslint src/"
   },
-  "dependencies": {
-    "@clerk/types": "3.57.0"
-  },
   "devDependencies": {
+    "@clerk/types": "3.57.0",
+    "@types/node": "^18.18.0",
     "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
@@ -49,7 +48,7 @@
     "react": ">=16"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18.18.0"
   },
   "publishConfig": {
     "access": "public"

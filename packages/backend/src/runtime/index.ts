@@ -14,28 +14,16 @@
 
 // @ts-ignore - These are package subpaths
 import crypto from '#crypto';
-// @ts-ignore - These are package subpaths
-import * as fetchApisPolyfill from '#fetch';
-
-const {
-  RuntimeFetch,
-  RuntimeAbortController,
-  RuntimeBlob,
-  RuntimeFormData,
-  RuntimeHeaders,
-  RuntimeRequest,
-  RuntimeResponse,
-} = fetchApisPolyfill;
 
 type Runtime = {
   crypto: Crypto;
-  fetch: typeof global.fetch;
-  AbortController: typeof global.AbortController;
-  Blob: typeof global.Blob;
-  FormData: typeof global.FormData;
-  Headers: typeof global.Headers;
-  Request: typeof global.Request;
-  Response: typeof global.Response;
+  fetch: typeof globalThis.fetch;
+  AbortController: typeof globalThis.AbortController;
+  Blob: typeof globalThis.Blob;
+  FormData: typeof globalThis.FormData;
+  Headers: typeof globalThis.Headers;
+  Request: typeof globalThis.Request;
+  Response: typeof globalThis.Response;
 };
 
 // Invoking the global.fetch without binding it first to the globalObject fails in
@@ -44,18 +32,18 @@ type Runtime = {
 // The globalThis object is supported for Node >= 12.0.
 //
 // https://github.com/supabase/supabase/issues/4417
-const globalFetch = RuntimeFetch.bind(globalThis);
+const globalFetch = fetch.bind(globalThis);
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 const runtime: Runtime = {
   crypto,
   fetch: globalFetch,
-  AbortController: RuntimeAbortController,
-  Blob: RuntimeBlob,
-  FormData: RuntimeFormData,
-  Headers: RuntimeHeaders,
-  Request: RuntimeRequest,
-  Response: RuntimeResponse,
+  AbortController: globalThis.AbortController,
+  Blob: globalThis.Blob,
+  FormData: globalThis.FormData,
+  Headers: globalThis.Headers,
+  Request: globalThis.Request,
+  Response: globalThis.Response,
 };
 
 export default runtime;
