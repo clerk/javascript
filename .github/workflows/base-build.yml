@@ -5,7 +5,7 @@ jobs:
   build:
     # if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL }}
+    timeout-minutes: ${{  fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
