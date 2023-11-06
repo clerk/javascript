@@ -120,4 +120,4 @@ runs:
     - name: Install Playwright Browsers
       if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
       shell: bash
-      run: npx playwright install --with-deps
+      run: npx playwright install chromium
