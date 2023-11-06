@@ -1,5 +1,37 @@
 # Change Log
 
+## 2.0.0-alpha-v5.0
+
+### Major Changes
+
+- Internal update default apiUrl domain from clerk.dev to clerk.com ([#1878](https://github.com/clerk/javascript/pull/1878)) by [@dimkl](https://github.com/dimkl)
+
+- Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now. ([#1864](https://github.com/clerk/javascript/pull/1864)) by [@dimkl](https://github.com/dimkl)
+
+### Minor Changes
+
+- Expose `revalidate` and `setData` for paginated lists of data in organization hooks. ([#1745](https://github.com/clerk/javascript/pull/1745)) by [@panteliselef](https://github.com/panteliselef)
+
+  `const {userMemberships:{revalidate, setData}} = useOrganizationList({userMemberships:true})`
+
+- Introduce isomorphic `isomorphicBtoa` helper in `@clerk/shared`. ([#1864](https://github.com/clerk/javascript/pull/1864)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Rename the @staging tag to @canary. Drop support for @next tag. ([#2015](https://github.com/clerk/javascript/pull/2015)) by [@anagstef](https://github.com/anagstef)
+
+- Remove `"sideEffects": "false"` since the package has side-effects ([#1974](https://github.com/clerk/javascript/pull/1974)) by [@LekoArts](https://github.com/LekoArts)
+
+- Introduce `isTruthy` helper to better cast environment variables to a boolean. Previously only the string `"true"` was checked, now `true`, `"true"`, `"1"`, and `1` will work. ([#2002](https://github.com/clerk/javascript/pull/2002)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve the default value for `CLERK_API_URL` by utilizing the publishable key to differentiate between local, staging and prod environments. ([#1955](https://github.com/clerk/javascript/pull/1955)) by [@desiprisg](https://github.com/desiprisg)
+
+- Add clerkTraceId to ClerkBackendApiResponse and ClerkAPIResponseError to allow for better tracing and debugging API error responses. ([#1986](https://github.com/clerk/javascript/pull/1986)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  Uses `clerk_trace_id` when available in a response and defaults to [`cf-ray` identifier](https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/) if missing.
+
+- Improve compatibility with Expo ([#1958](https://github.com/clerk/javascript/pull/1958)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
 ## 1.0.0
 
 ### Major Changes
