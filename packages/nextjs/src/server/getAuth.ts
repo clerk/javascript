@@ -45,7 +45,9 @@ export const createGetAuth = ({
     return (
       req: RequestLike,
       opts?: GetAuthOpts,
-    ): AuthObjectWithDeprecatedResources<SignedInAuthObject | SignedOutAuthObject> => {
+    ):
+      | AuthObjectWithDeprecatedResources<SignedInAuthObject>
+      | AuthObjectWithDeprecatedResources<SignedOutAuthObject> => {
       const debug = getHeader(req, constants.Headers.EnableDebug) === 'true';
       if (debug) {
         logger.enable();

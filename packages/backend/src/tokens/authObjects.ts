@@ -166,7 +166,7 @@ export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T
  */
 export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(obj: T): T => {
   // remove any non-serializable props from the returned object
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const { debug, getToken, ...rest } = obj as unknown as AuthObject;
   return rest as unknown as T;
 };
