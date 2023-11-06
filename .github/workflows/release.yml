@@ -53,7 +53,7 @@ jobs:
         uses: changesets/action@v1
         with:
           commit: "chore(repo): Version packages"
-          publish: changeset publish && git push --follow-tags
+          publish: npx changeset publish && git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
