@@ -93,6 +93,12 @@ export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsS
 export const SignedIn = ComponentsModule.SignedIn as ServerComponentsServerModuleTypes['SignedIn'];
 export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerModuleTypes['SignedOut'];
 
+/**
+ * @experimental
+ */
+export const Experimental__Gate =
+  ComponentsModule.Experimental__Gate as ServerComponentsServerModuleTypes['Experimental__Gate'];
+
 export const auth = ServerHelperModule.auth as ServerHelpersServerModuleTypes['auth'];
 export const currentUser = ServerHelperModule.currentUser as ServerHelpersServerModuleTypes['currentUser'];
 // export const getAuth = ServerHelperModule.getAuth as ServerHelpersServerModuleTypes['getAuth'];
