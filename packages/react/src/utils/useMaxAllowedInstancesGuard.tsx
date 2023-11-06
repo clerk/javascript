@@ -8,7 +8,7 @@ export function useMaxAllowedInstancesGuard(name: string, error: string, maxCoun
   React.useEffect(() => {
     const count = counts.get(name) || 0;
     if (count == maxCount) {
-      errorThrower.throw(error);
+      return errorThrower.throw(error);
     }
     counts.set(name, count + 1);
 
