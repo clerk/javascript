@@ -31,7 +31,7 @@ export const createGetAuth = ({
     return (
       req: RequestLike,
       opts?: GetAuthOpts,
-    ): AuthObjectWithoutResources<SignedInAuthObject | SignedOutAuthObject> => {
+    ): AuthObjectWithoutResources<SignedInAuthObject> | AuthObjectWithoutResources<SignedOutAuthObject> => {
       const debug = getHeader(req, constants.Headers.EnableDebug) === 'true';
       if (debug) {
         logger.enable();
