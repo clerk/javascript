@@ -1,5 +1,36 @@
 # Change Log
 
+## 4.0.0-alpha-v5.0
+
+### Major Changes
+
+- Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now. ([#1864](https://github.com/clerk/javascript/pull/1864)) by [@dimkl](https://github.com/dimkl)
+
+- Avatar Shimmer will be enabled by default for `<UserButton/>` and `<OrganizationSwitcher/>`. ([#1972](https://github.com/clerk/javascript/pull/1972)) by [@octoper](https://github.com/octoper)
+
+### Minor Changes
+
+- Add support for custom roles in `<OrganizationProfile/>`. ([#2004](https://github.com/clerk/javascript/pull/2004)) by [@panteliselef](https://github.com/panteliselef)
+
+  The previous roles (`admin` and `basic_member`), are still kept as a fallback.
+
+- Experimental support for `<Gate/>` with role checks. ([#1942](https://github.com/clerk/javascript/pull/1942)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Shows list of domains if member has the `org:sys_domain:read` permission. ([#1988](https://github.com/clerk/javascript/pull/1988)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduces new element appearance descriptors: ([#1994](https://github.com/clerk/javascript/pull/1994)) by [@tmilewski](https://github.com/tmilewski)
+
+  - `activeDeviceListItem` allows you to customize the appearance of the active device list (accordion) item
+    - `activeDeviceListItem__current` allows you to customize the appearance of the _current_ active device list (accordion) item
+  - `activeDevice` allows you to customize the appearance of the active device item
+    - `activeDevice__current` allows you to customize the appearance of the _current_ active device item
+
+- Localize placeholder of confirmation field when deleting a user account from `<UserProfile/>`. ([#2036](https://github.com/clerk/javascript/pull/2036)) by [@panteliselef](https://github.com/panteliselef)
+
+- Simplify the WithOptions generic type ([#1995](https://github.com/clerk/javascript/pull/1995)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 3.57.0
 
 ### Minor Changes

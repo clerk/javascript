@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "1.7.9",
+  "version": "2.0.0-alpha-v5.0",
   "description": "Themes for the Clerk auth components",
   "keywords": [
     "react",
@@ -37,7 +37,8 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "@clerk/types": "3.57.0",
+    "@clerk/types": "4.0.0-alpha-v5.0",
+    "@types/node": "^18.18.0",
     "eslint-config-custom": "*",
     "typescript": "*"
   },
@@ -45,7 +46,7 @@
     "react": ">=16"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18.18.0"
   },
   "publishConfig": {
     "access": "public"

@@ -21,7 +21,7 @@
  *
  *  Solution:
  *  A given clerk.browser.js file will only load its corresponding chunks using a fixed version. Example:
- *  - clerk.browser.js loads from https://pk.accounts.dev/npm/@clerk/clerk-js@staging/dist/clerk.browser.js
+ *  - clerk.browser.js loads from https://pk.accounts.dev/npm/@clerk/clerk-js@canary/dist/clerk.browser.js
  *  - all other chunks need to be loaded from https://pk.accounts.dev/npm/@clerk/clerk-js@__PKG_VERSION__/dist/
  */
 if (!__DEV__) {

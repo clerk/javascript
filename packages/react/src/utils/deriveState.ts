@@ -10,10 +10,10 @@ export const deriveState = (clerkLoaded: boolean, state: Resources, initialState
 
 const deriveFromSsrInitialState = (initialState: InitialState) => {
   const userId = initialState.userId;
-  const user = initialState.user as any as UserResource;
+  const user = initialState.user as UserResource;
   const sessionId = initialState.sessionId;
-  const session = initialState.session as any as ActiveSessionResource;
-  const organization = initialState.organization as any as OrganizationResource;
+  const session = initialState.session as ActiveSessionResource;
+  const organization = initialState.organization as OrganizationResource;
   const orgId = initialState.orgId;
   const orgRole = initialState.orgRole as MembershipRole;
   const orgSlug = initialState.orgSlug;
@@ -46,6 +46,7 @@ const deriveFromClientSideState = (state: Resources) => {
   const membership = organization
     ? user?.organizationMemberships?.find(om => om.organization.id === orgId)
     : organization;
+  const orgPermissions = membership ? membership.permissions : membership;
   const orgRole = membership ? membership.role : membership;
 
   const lastOrganizationInvitation = state.lastOrganizationInvitation;
@@ -60,6 +61,7 @@ const deriveFromClientSideState = (state: Resources) => {
     orgId,
     orgRole,
     orgSlug,
+    orgPermissions,
     actor,
     lastOrganizationInvitation,
     lastOrganizationMember,

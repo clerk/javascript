@@ -13,6 +13,7 @@ export const subpathNames = [
   'globs',
   'handleValueOrFn',
   'isomorphicAtob',
+  'isomorphicBtoa',
   'keys',
   'loadScript',
   'localStorageBroadcastChannel',
