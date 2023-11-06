@@ -56,7 +56,11 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-          TURBO_FORCE: true
+          TURBO_ARGS: ${{ env.TURBO_ARGS}}
+          TURBO_TEAM: ${{ env.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ env.TURBO_TOKEN }}
+          TURBO_REMOTE_ONLY: ${{ env.TURBO_REMOTE_ONLY }}
+          TURBO_REMOTE_CACHE_SIGNATURE_KEY: ${{ env.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
