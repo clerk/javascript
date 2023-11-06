@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   canary-release:
-    if: ${{ github.repository == 'clerkinc/javascript' }}
+    if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE }}
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}

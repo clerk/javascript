@@ -9,24 +9,24 @@ Every time a PR is merged into `main`, an automated staging release will happen.
 
 ## Stable releases
 
-A stable release will be triggered every time the "Version Packages" PR is merged. Once versioning and publishing is done, the `clerkinc/javascript` repo will dispatch a workflow event, notifying other related Clerk repos of the new releases.
+A stable release will be triggered every time the "Version Packages" PR is merged. Once versioning and publishing is done, the `clerk/javascript` repo will dispatch a workflow event, notifying other related Clerk repos of the new releases.
 
 Actions that will be triggered:
 
-- `clerkinc/cloudflare-workers`: The latest clerk-js versions in `clerkjs-proxy/wrangler.toml` will be updated a PR will open. Follow the instructions in the PR to manually release a new `clerkjs-proxy` worker.
+- `clerk/cloudflare-workers`: The latest clerk-js versions in `clerkjs-proxy/wrangler.toml` will be updated a PR will open. Follow the instructions in the PR to manually release a new `clerkjs-proxy` worker.
 
-For more details, refer to [PUBLISH.md](https://github.com/clerkinc/javascript/blob/main/docs/PUBLISH.md).
+For more details, refer to [PUBLISH.md](https://github.com/clerk/javascript/blob/main/docs/PUBLISH.md).
 
 ## Automated staging releases
 
-A staging release will be triggered every time PR is merged into `main`. Once versioning and publishing is done, the `clerkinc/javascript` repo will dispatch a workflow event, notifying other related Clerk repos of the new releases.
+A staging release will be triggered every time PR is merged into `main`. Once versioning and publishing is done, the `clerk/javascript` repo will dispatch a workflow event, notifying other related Clerk repos of the new releases.
 
 Actions that will be triggered:
 
-- `clerkinc/cloudflare-workers`: The latest clerk-js versions in `clerkjs-proxy/wrangler.toml` will be updated and directly committed to `main`. A second workflow will perform a staging release of the `clerkjs-proxy` worker.
-- `clerkinc/accounts`: A new Accounts deployment will take place, using the most recent staging `@clerk/nextjs` version. This change will not be committed to `main`.
+- `clerk/cloudflare-workers`: The latest clerk-js versions in `clerkjs-proxy/wrangler.toml` will be updated and directly committed to `main`. A second workflow will perform a staging release of the `clerkjs-proxy` worker.
+- `clerk/accounts`: A new Accounts deployment will take place, using the most recent staging `@clerk/nextjs` version. This change will not be committed to `main`.
 
-For more details about staging releases, refer to [PUBLISH.md](https://github.com/clerkinc/javascript/blob/main/docs/PUBLISH.md).
+For more details about staging releases, refer to [PUBLISH.md](https://github.com/clerk/javascript/blob/main/docs/PUBLISH.md).
 
 ## Quality checks
 

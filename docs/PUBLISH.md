@@ -2,7 +2,7 @@
 
 _Note: Only core maintainers can publish packages._
 
-_Package versioning and publishing is currently handled by @clerkinc/frontend-team._
+_Package versioning and publishing is currently handled by @clerk/frontend-team._
 
 ## Publishing stable package versions (`@latest`)
 
@@ -28,7 +28,7 @@ Snapshot releases are a way to release your changes for testing without updating
 **Important:**
 Before requesting a snapshot release, ensure that your Clerk organization membership status is set to "Public". Otherwise, the snapshot release will fail. To set your status to "Public", follow [these steps](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-membership-in-organizations/publicizing-or-hiding-organization-membership).
 
-To perform a snapshot release, simply comment `!snapshot` in your PR. Once the packages are built and published (~2mins), [clerk-cookie](https://github.com/clerk-cookie) will post a reply with the published versions ([example](https://github.com/clerkinc/javascript/pull/1329#issuecomment-1586970784)). Simply install the snap version using `npm install` as usual.
+To perform a snapshot release, simply comment `!snapshot` in your PR. Once the packages are built and published (~2mins), [clerk-cookie](https://github.com/clerk-cookie) will post a reply with the published versions ([example](https://github.com/clerk/javascript/pull/1329#issuecomment-1586970784)). Simply install the snap version using `npm install` as usual.
 
 Notes:
 

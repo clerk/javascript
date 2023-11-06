@@ -33,7 +33,7 @@ jobs:
 
             We currently close issues after 40 days of inactivity. It's been 30 days since the last update here. If we missed this issue, please reply here. Otherwise, we'll close this issue in 10 days.
 
-            As a friendly reminder: The best way to see an issue fixed is to open a pull request. If you're not sure how to do that, please check out our [contributing guide](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
+            As a friendly reminder: The best way to see an issue fixed is to open a pull request. If you're not sure how to do that, please check out our [contributing guide](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
 
             Thanks for being a part of the Clerk community! 🙏
           stale-pr-message: |
@@ -47,7 +47,7 @@ jobs:
 
             After 40 days of no activity, we'll close this issue. Keep in mind, I'm just a robot, so if I've closed this issue in error, please reply here and my human colleagues will reopen it.
 
-            As a friendly reminder: The best way to see an issue fixed is to open a pull request. If you're not sure how to do that, please check out our [contributing guide](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
+            As a friendly reminder: The best way to see an issue fixed is to open a pull request. If you're not sure how to do that, please check out our [contributing guide](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
 
             Thanks for being a part of the Clerk community! 🙏
           close-pr-message: |

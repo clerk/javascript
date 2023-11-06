@@ -1,6 +1,6 @@
 const { getInfo, getInfoFromPullRequest } = require('@changesets/get-github-info');
 
-const repo = 'clerkinc/javascript';
+const repo = 'clerk/javascript';
 
 const getDependencyReleaseLine = async (changesets, dependenciesUpdated) => {
   if (dependenciesUpdated.length === 0) return '';

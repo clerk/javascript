@@ -1,7 +1,6 @@
 {
   "name": "gatsby-plugin-clerk",
   "version": "4.4.21",
-  "license": "MIT",
   "description": "Clerk SDK for Gatsby",
   "keywords": [
     "clerk",
@@ -13,6 +12,16 @@
     "authentication",
     "user management"
   ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/gatsby-plugin-clerk"
+  },
+  "license": "MIT",
   "author": "Clerk",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -27,12 +36,12 @@
   ],
   "scripts": {
     "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
-    "publish:local": "npx yalc push --replace  --sig",
-    "clean": "rimraf ./dist",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
     "@clerk/backend": "0.33.0",
@@ -56,14 +65,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/gatsby-plugin-clerk"
-  },
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "homepage": "https://clerk.com/"
+  }
 }

@@ -1,7 +1,6 @@
 {
   "name": "@clerk/clerk-js",
   "version": "4.64.2",
-  "license": "MIT",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -11,37 +10,45 @@
     "session",
     "jwt"
   ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/clerk-js"
+  },
+  "license": "MIT",
   "author": "Clerk",
-  "jsdelivr": "dist/clerk.browser.js",
   "main": "dist/clerk.js",
+  "jsdelivr": "dist/clerk.browser.js",
   "module": "dist/clerk.mjs",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
     "headless"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "build": "npm run build:bundle && npm run build:declarations",
-    "build:stats": "webpack --config webpack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
     "build:analyze": "webpack-bundle-analyzer stats.json dist/",
-    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
     "build:bundle": "npm run clean && webpack --config webpack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
+    "build:stats": "webpack --config webpack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
+    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
+    "clean": "rimraf ./dist",
     "dev": "webpack serve --config webpack.config.js",
     "dev:headless": "webpack serve --config webpack.config.js --env variant=\"clerk.headless.browser\"",
-    "clean": "rimraf ./dist",
     "lint": "eslint src/",
-    "lint:publint": "publint",
     "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "watch": "webpack --config webpack.config.js --env production --watch"
   },
+  "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "dependencies": {
     "@clerk/localizations": "1.26.8",
     "@clerk/shared": "1.0.2",
@@ -58,9 +65,6 @@
     "qrcode.react": "3.1.0",
     "qs": "6.11.0",
     "regenerator-runtime": "0.13.11"
-  },
-  "peerDependencies": {
-    "react": ">=18"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -91,14 +95,10 @@
     "webpack-dev-server": "^4.15.0",
     "webpack-merge": "^5.9.0"
   },
-  "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/clerk-js"
+  "peerDependencies": {
+    "react": ">=18"
   },
-  "homepage": "https://clerk.com/",
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
+  "publishConfig": {
+    "access": "public"
   }
 }

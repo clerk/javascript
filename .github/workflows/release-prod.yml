@@ -13,7 +13,7 @@ concurrency:
 jobs:
   release:
     name: Release
-    if: ${{ github.repository == 'clerkinc/javascript' }}
+    if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE }}
     permissions:
       contents: write
@@ -59,7 +59,7 @@ jobs:
           script: |
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
             github.rest.actions.createWorkflowDispatch({
-              owner: 'clerkinc',
+              owner: 'clerk',
               repo: 'cloudflare-workers',
               workflow_id: 'prepare-prod-clerkjs-proxy-pr.yml',
               ref: 'main',
