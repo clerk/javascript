@@ -45,7 +45,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
 
-      - name: Build
+      - name: Build release
         run: npx turbo build $TURBO_ARGS --force
 
       - name: Create Release PR

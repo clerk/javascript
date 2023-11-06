@@ -39,13 +39,15 @@ jobs:
         id: version-packages
         run: npm run version:canary | tail -1 >> "$GITHUB_OUTPUT"
 
+      - name: Build release
+        run: npx turbo build $TURBO_ARGS --force # TODO: Remove --force, when appropriate
+
       - name: Canary release
         if: steps.version-packages.outputs.success == '1'
-        run: npx turbo build $TURBO_ARGS && npx changeset publish --tag canary --no-git-tag
+        run: npm run release:canary
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-          TURBO_FORCE: true # TODO: Remove when comfortable
 
       - name: Trigger workflows on related repos
         uses: actions/github-script@v6
