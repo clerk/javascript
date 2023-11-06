@@ -95,7 +95,7 @@
   },
   "packageManager": "npm@8.5.0",
   "engines": {
-    "node": ">=16.8.0",
+    "node": ">=18.18.0",
     "npm": ">=8.5.0"
   }
 }

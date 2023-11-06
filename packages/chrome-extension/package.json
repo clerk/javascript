@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@types/chrome": "*",
-    "@types/node": "^18.18",
+    "@types/node": "^18.18.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "eslint-config-custom": "*",
@@ -61,7 +61,7 @@
     "react": ">=16"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18.18.0"
   },
   "publishConfig": {
     "access": "public"

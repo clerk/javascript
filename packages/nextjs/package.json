@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@clerk/types": "3.57.0",
-    "@types/node": "^18.18",
+    "@types/node": "^18.18.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "eslint-config-custom": "*",
@@ -79,7 +79,7 @@
     "react-dom": "^17.0.2 || ^18.0.0-0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18.18.0"
   },
   "publishConfig": {
     "access": "public"
