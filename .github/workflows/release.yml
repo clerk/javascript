@@ -69,14 +69,22 @@ jobs:
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
-            const clerkjsVersion = require('./packages/clerk-js/package.json').version;
-            github.rest.actions.createWorkflowDispatch({
-              owner: 'clerk',
-              repo: 'cloudflare-workers',
-              workflow_id: 'prepare-prod-clerkjs-proxy-pr.yml',
-              ref: 'main',
-              inputs: { version: clerkjsVersion }
-            })
+            const preMode = require("fs").existsSync("./.changeset/pre.json");
+            if (!preMode) {
+              const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'cloudflare-workers',
+                workflow_id: 'prepare-prod-clerkjs-proxy-pr.yml',
+                ref: 'main',
+                inputs: { version: clerkjsVersion }
+              })
+            } else{
+              core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
+            }
+
+
 
       - name: Generate notification payload
         id: notification
