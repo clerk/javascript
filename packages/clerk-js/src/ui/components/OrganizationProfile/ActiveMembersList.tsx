@@ -28,7 +28,7 @@ export const ActiveMembersList = () => {
       .catch(err => handleError(err, [], card.setError));
   };
 
-  const handleRemove = (membership: OrganizationMembershipResource) => () => {
+  const handleRemove = (membership: OrganizationMembershipResource) => async () => {
     return card
       .runAsync(async () => {
         const destroyedMembership = await membership.destroy();

@@ -1,9 +1,11 @@
 import type {
+  ClerkPaginatedResponse,
   ClerkPaginationParams,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMembershipsParams,
+  GetMembersParams,
   GetPendingInvitationsParams,
   OrganizationDomainResource,
   OrganizationInvitationResource,
@@ -11,8 +13,6 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
 } from '@clerk/types';
-import type { ClerkPaginatedResponse } from '@clerk/types';
-import type { GetMembersParams } from '@clerk/types';
 
 import { deprecated } from '../../deprecated';
 import { useSWR } from '../clerk-swr';
