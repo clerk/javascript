@@ -45,22 +45,20 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
 
+      - name: Build
+        run: npx turbo build $TURBO_ARGS
+
       - name: Create Release PR
         id: changesets
         uses: changesets/action@v1
         with:
           commit: "chore(repo): Version packages"
-          publish: npx turbo build $TURBO_ARGS && changeset publish && git push --follow-tags
+          publish: changeset publish && git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-          TURBO_ARGS: ${{ env.TURBO_ARGS}}
-          TURBO_TEAM: ${{ env.TURBO_TEAM }}
-          TURBO_TOKEN: ${{ env.TURBO_TOKEN }}
-          TURBO_REMOTE_ONLY: ${{ env.TURBO_REMOTE_ONLY }}
-          TURBO_REMOTE_CACHE_SIGNATURE_KEY: ${{ env.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
