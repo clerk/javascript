@@ -46,14 +46,14 @@ jobs:
           playwright-enabled: true # Must be present to enable caching on branched workflows
 
       - name: Build
-        run: npx turbo build $TURBO_ARGS
+        run: npx turbo build $TURBO_ARGS --force
 
       - name: Create Release PR
         id: changesets
         uses: changesets/action@v1
         with:
           commit: "chore(repo): Version packages"
-          publish: npx changeset publish && git push --follow-tags
+          publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
