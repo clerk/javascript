@@ -1,8 +1,10 @@
+import { deprecated } from '@clerk/shared';
+
 import { Clerk } from './clerkClient';
 
 export default Clerk;
 
-export type { WithAuthProp, RequireAuthProp } from './types';
+export type { RequireAuthProp, WithAuthProp } from './types';
 
 export {
   AllowlistIdentifier,
@@ -17,8 +19,10 @@ export {
   OrganizationMembership,
   OrganizationMembershipPublicUserData,
   PhoneNumber,
-  Session,
   SMSMessage,
+  Session,
   User,
   Verification,
 } from '@clerk/backend';
+
+deprecated('@clerk/clerk-sdk-node/instance', 'Use `@clerk/clerk-sdk-node` instead.');
