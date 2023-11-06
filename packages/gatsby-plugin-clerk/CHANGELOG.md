@@ -1,5 +1,29 @@
 # Change Log
 
+## 5.0.0-alpha-v5.0
+
+### Major Changes
+
+- Internal update default apiUrl domain from clerk.dev to clerk.com ([#1878](https://github.com/clerk/javascript/pull/1878)) by [@dimkl](https://github.com/dimkl)
+
+- Drop deprecations. Migration steps: ([#1992](https://github.com/clerk/javascript/pull/1992)) by [@dimkl](https://github.com/dimkl)
+
+  - use `CLERK_SECRET_KEY` instead of `CLERK_API_KEY` env variable
+  - use `secretKey` instead of `apiKey`
+  - use `GATSBY_CLERK_PUBLISHABLE_KEY` instead of `GATSBY_CLERK_FRONTEND_API` env variable
+  - use `publishableKey` instead of `frontendApi`
+
+- Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now. ([#1864](https://github.com/clerk/javascript/pull/1864)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Improve the default value for `CLERK_API_URL` by utilizing the publishable key to differentiate between local, staging and prod environments. ([#1955](https://github.com/clerk/javascript/pull/1955)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`ef2325dcc`](https://github.com/clerk/javascript/commit/ef2325dcc18729e9ce9ee5823e9a963efa51dbc1), [`8b6b094b9`](https://github.com/clerk/javascript/commit/8b6b094b9c7d09eeae90f8bdfac44d53513aa63d), [`71663c568`](https://github.com/clerk/javascript/commit/71663c568926b1d60b97aa7ccc5298d05b618af2), [`90aa2ea9c`](https://github.com/clerk/javascript/commit/90aa2ea9c4675662cee581298b49bd76ec8f8850), [`a605335e1`](https://github.com/clerk/javascript/commit/a605335e1e6f37d9b02170282974b0e1406e3f98), [`ae3a6683a`](https://github.com/clerk/javascript/commit/ae3a6683aa1a28e5201325463e4211229b641711), [`c22cd5214`](https://github.com/clerk/javascript/commit/c22cd52147492ba25f3c07bdbe6bbc4eb49a5cf0), [`c7e6d00f5`](https://github.com/clerk/javascript/commit/c7e6d00f56e73df4ed87712e74ad9d5bcaca8924), [`797e327e0`](https://github.com/clerk/javascript/commit/797e327e05ce6bd23320555a9e7d6fadbd9d624f), [`97407d8aa`](https://github.com/clerk/javascript/commit/97407d8aa481007d3262fe7a0772dea901ce0a8c), [`f5d55bb1f`](https://github.com/clerk/javascript/commit/f5d55bb1fc6a87303fb8bf461c3a917ae4da4005), [`a605335e1`](https://github.com/clerk/javascript/commit/a605335e1e6f37d9b02170282974b0e1406e3f98)]:
+  - @clerk/clerk-sdk-node@5.0.0-alpha-v5.0
+  - @clerk/backend@1.0.0-alpha-v5.0
+  - @clerk/clerk-react@5.0.0-alpha-v5.0
+
 ## 4.4.18
 
 ### Patch Changes

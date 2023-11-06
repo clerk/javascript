@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.0
+
+### Major Changes
+
+- Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now. ([#1864](https://github.com/clerk/javascript/pull/1864)) by [@dimkl](https://github.com/dimkl)
+
 ## 1.7.9
 
 ### Patch Changes
