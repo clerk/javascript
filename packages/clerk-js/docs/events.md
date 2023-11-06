@@ -1,6 +1,6 @@
 # How to add an event
 
-Using the new [events](https://github.com/clerkinc/javascript/blob/main/packages/clerk-js/src/core/events.ts) module in ClerkJS we can add a new event by defining the following:
+Using the new [events](https://github.com/clerk/javascript/blob/main/packages/clerk-js/src/core/events.ts) module in ClerkJS we can add a new event by defining the following:
 
 ```typescript
 // file: src/core/events.ts

@@ -55,11 +55,11 @@ Clerk's full documentation is available at [clerk.com/docs](https://clerk.com/do
 
 ## 🚢 Release Notes
 
-Curious what we shipped recently? You can browse the [GitHub Releases](https://github.com/clerkinc/javascript/releases) page or look at the individual `CHANGELOG.md` files inside each package (e.g. [`clerk-js CHANGELOG`](https://github.com/clerkinc/javascript/blob/main/packages/clerk-js/CHANGELOG.md)).
+Curious what we shipped recently? You can browse the [GitHub Releases](https://github.com/clerk/javascript/releases) page or look at the individual `CHANGELOG.md` files inside each package (e.g. [`clerk-js CHANGELOG`](https://github.com/clerk/javascript/blob/main/packages/clerk-js/CHANGELOG.md)).
 
 ## 🤝 How to Contribute
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md). We'd love to have you as part of the Clerk community!
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md). We'd love to have you as part of the Clerk community!
 
 It'll show you how to make changes to the SDKs, open pull requests, or submitting issues. If you want to add or edit localizations (e.g. how a button text is translated to your language), you can check out the [`localizations` README](./packages/localizations/README.md).
 
@@ -67,4 +67,4 @@ It'll show you how to make changes to the SDKs, open pull requests, or submittin
 
 This project is licensed under the **MIT license**.
 
-See [LICENSE](https://github.com/clerkinc/javascript/blob/main/LICENSE) for more information.
+See [LICENSE](https://github.com/clerk/javascript/blob/main/LICENSE) for more information.

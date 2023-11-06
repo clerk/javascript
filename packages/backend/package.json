@@ -1,11 +1,17 @@
 {
   "name": "@clerk/backend",
   "version": "0.33.0",
-  "license": "MIT",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
-  "types": "./dist/types/index.d.ts",
-  "main": "./dist/index.js",
-  "module": "./dist/esm/index.js",
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/backend"
+  },
+  "license": "MIT",
   "imports": {
     "#crypto": {
       "edge-light": "./dist/runtime/browser/crypto.mjs",
@@ -22,6 +28,9 @@
       "default": "./dist/runtime/browser/fetch.mjs"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist"
   ],
@@ -74,19 +83,10 @@
     "typescript": "*",
     "workerd": "^1.20230518.0"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "homepage": "https://clerk.com/",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/backend"
-  },
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
-  },
   "engines": {
     "node": ">=14"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

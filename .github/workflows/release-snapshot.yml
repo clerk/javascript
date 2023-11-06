@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   snapshot-release:
-    if: ${{ startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerkinc/javascript' && github.event.issue.pull_request }}
+    if: ${{ startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
     runs-on: ${{ vars.RUNNER_LARGE }}
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -29,7 +29,7 @@ jobs:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const isMember = await github.rest.orgs.checkMembershipForUser({
-              org: 'clerkinc',
+              org: 'clerk',
               username: context.actor
             });
             if (!isMember) {

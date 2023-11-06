@@ -18,7 +18,7 @@ body:
             I have reviewed https://clerk.com/docs for existing features that would solve my problem
           required: true
         - label: |
-            I have searched for existing feature requests: https://github.com/clerkinc/javascript/issues
+            I have searched for existing feature requests: https://github.com/clerk/javascript/issues
           required: true
         - label: |
             This issue is not a question, general help request, or anything other than a feature request directly related to Clerk. Please ask questions in our Discord community: https://clerk.com/discord.

@@ -18,7 +18,7 @@ body:
             I have reviewed the documentation: https://clerk.com/docs
           required: true
         - label: |
-            I have searched for existing issues: https://github.com/clerkinc/javascript/issues
+            I have searched for existing issues: https://github.com/clerk/javascript/issues
           required: true
         - label: |
             I have not already reached out to Clerk support via email or Discord (if you have, no need to open an issue here)
@@ -35,7 +35,7 @@ body:
         Link to a minimal reproduction (GitHub repository, CodeSandbox, StackBlitz, etc.) or a [Replay recording](https://www.replay.io/).
 
         **Do not link to your actual project**, but provide a minimal reproduction in a fresh project.
-        
+
         Instructions:
         - [How to create a minimal reproduction](https://clerkdev.notion.site/Creating-a-Minimal-Reproduction-0436afc4203f41aa9aa8700968aaef48?pvs=4)
         - [How to record a Replay](https://docs.replay.io/bug-reports/recording-a-replay)
