@@ -22,6 +22,7 @@ import { useFormControlFeedback } from '../utils';
 import { useCardState } from './contexts';
 import type { FormFeedbackProps } from './FormControl';
 import { FormFeedback } from './FormControl';
+import { RadioItem } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder' | 'disabled' | 'required'> &
   ReturnType<typeof useFormControlUtil<FieldId>>['props'];
@@ -218,6 +219,7 @@ export const Field = {
   Label: FieldLabel,
   LabelRow: FieldLabelRow,
   Input: InputElement,
+  RadioItem: RadioItem,
   Action: FieldAction,
   AsOptional: FieldOptionalLabel,
   LabelIcon: FieldLabelIcon,

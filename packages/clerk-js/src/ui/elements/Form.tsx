@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
+import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
@@ -76,35 +76,31 @@ const FormRoot = (props: FormProps): JSX.Element => {
 const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
   const { isLoading, isDisabled } = useFormState();
   return (
-    <>
-      <Button
-        elementDescriptor={descriptors.formButtonPrimary}
-        block
-        textVariant='buttonExtraSmallBold'
-        isLoading={isLoading}
-        isDisabled={isDisabled}
-        type='submit'
-        {...props}
-        localizationKey={props.localizationKey || localizationKeys('formButtonPrimary')}
-      />
-    </>
+    <Button
+      elementDescriptor={descriptors.formButtonPrimary}
+      block
+      textVariant='buttonExtraSmallBold'
+      isLoading={isLoading}
+      isDisabled={isDisabled}
+      type='submit'
+      {...props}
+      localizationKey={props.localizationKey || localizationKeys('formButtonPrimary')}
+    />
   );
 };
 
 const FormReset = (props: PropsOfComponent<typeof Button>) => {
   const { isLoading, isDisabled } = useFormState();
   return (
-    <>
-      <Button
-        elementDescriptor={descriptors.formButtonReset}
-        block
-        variant='ghost'
-        textVariant='buttonExtraSmallBold'
-        type='reset'
-        isDisabled={isLoading || isDisabled}
-        {...props}
-      />
-    </>
+    <Button
+      elementDescriptor={descriptors.formButtonReset}
+      block
+      variant='ghost'
+      textVariant='buttonExtraSmallBold'
+      type='reset'
+      isDisabled={isLoading || isDisabled}
+      {...props}
+    />
   );
 };
 
@@ -160,6 +156,31 @@ const PlainInput = (props: CommonInputProps) => {
   );
 };
 
+const RadioGroup = (
+  props: Omit<PropsOfComponent<typeof Field.Root>, 'infoText' | 'type' | 'validatePassword' | 'label' | 'placeholder'>,
+) => {
+  const { radioOptions, ...fieldProps } = props;
+  return (
+    <Field.Root {...fieldProps}>
+      <Col
+        elementDescriptor={descriptors.formFieldRadioGroup}
+        gap={2}
+      >
+        {radioOptions?.map(({ value, description, label }) => (
+          <Field.RadioItem
+            key={value}
+            value={value}
+            label={label}
+            description={description}
+          />
+        ))}
+      </Col>
+
+      <Field.Feedback />
+    </Field.Root>
+  );
+};
+
 export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
@@ -168,6 +189,7 @@ export const Form = {
    */
   Control: FormControl,
   PlainInput,
+  RadioGroup,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };
