@@ -9,7 +9,7 @@ const lineHeights = Object.freeze({
   none: 1,
   shortest: 1.1,
   shorter: 1.25,
-  short: 1.375,
+  short: 1.385,
   base: 1.5,
   tall: 1.625,
   taller: 2,
@@ -43,4 +43,4 @@ const fonts = Object.freeze({
   buttons: 'inherit',
 } as const);
 
-export { fontSizes, fontWeights, letterSpacings, lineHeights, fonts, fontStyles };
+export { fontSizes, fontStyles, fontWeights, fonts, letterSpacings, lineHeights };

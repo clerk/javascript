@@ -4,6 +4,7 @@ const textVariants = (t: InternalTheme) => {
   const base = {
     WebkitFontSmoothing: t.options.$fontSmoothing,
     fontFamily: 'inherit',
+    letterSpacing: t.letterSpacings.$normal,
   };
 
   const smallRegular = {
@@ -84,6 +85,7 @@ const textVariants = (t: InternalTheme) => {
   const buttonSmallRegular = {
     ...smallRegular,
     fontFamily: t.fonts.$buttons,
+    lineHeight: t.lineHeights.$short,
   };
 
   const buttonRegularRegular = {
