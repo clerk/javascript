@@ -58,7 +58,6 @@ import type {
   TOTPStrategy,
   Web3Strategy,
 } from './strategies';
-import type { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams } from './verification';
 import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams, VerificationResource } from './verification';
 import type { AuthenticateWithWeb3Params } from './web3Wallet';
 
@@ -90,12 +89,6 @@ export interface SignInResource extends ClerkResource {
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
   authenticateWithMetamask: () => Promise<SignInResource>;
-
-  /**
-   *
-   * @deprecated Use `createEmailLinkFlow` instead.
-   */
-  createMagicLinkFlow: () => CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
@@ -203,14 +196,6 @@ export type ResetPasswordParams = {
   password: string;
   signOutOfOtherSessions?: boolean;
 };
-
-/**
- *
- * @deprecated Use `SignInStartEmailLinkFlowParams` instead.
- */
-export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams {
-  emailAddressId: string;
-}
 
 export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams {
   emailAddressId: string;

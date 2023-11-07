@@ -27,7 +27,6 @@ import type {
   Web3Strategy,
 } from './strategies';
 import type { SnakeToCamel } from './utils';
-import type { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams } from './verification';
 import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams, VerificationResource } from './verification';
 import type { AttemptWeb3WalletVerificationParams, AuthenticateWithWeb3Params } from './web3Wallet';
 
@@ -81,10 +80,6 @@ export interface SignUpResource extends ClerkResource {
   prepareWeb3WalletVerification: () => Promise<SignUpResource>;
 
   attemptWeb3WalletVerification: (params: AttemptWeb3WalletVerificationParams) => Promise<SignUpResource>;
-  /**
-   * @deprecated Use `createEmailLinkFlow` instead.
-   */
-  createMagicLinkFlow: () => CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, SignUpResource>;
 

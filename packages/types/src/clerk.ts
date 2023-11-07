@@ -413,15 +413,6 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
-   * Completes a Magic Link flow  started by {@link Clerk.client.signIn.createMagicLinkFlow} or {@link Clerk.client.signUp.createMagicLinkFlow}
-   * @deprecated Use `handleEmailLinkVerification` instead.
-   */
-  handleMagicLinkVerification: (
-    params: HandleMagicLinkVerificationParams,
-    customNavigate?: (to: string) => Promise<unknown>,
-  ) => Promise<unknown>;
-
-  /**
    * Completes a Email Link flow  started by {@link Clerk.client.signIn.createEmailLinkFlow} or {@link Clerk.client.signUp.createEmailLinkFlow}
    */
   handleEmailLinkVerification: (
@@ -976,27 +967,6 @@ export type OrganizationListProps = {
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
 };
-
-/**
- * @deprecated Use `HandleEmailLinkVerificationParams` instead.
- */
-export interface HandleMagicLinkVerificationParams {
-  /**
-   * Full URL or path to navigate after successful magic link verification
-   * on completed sign up or sign in on the same device.
-   */
-  redirectUrlComplete?: string;
-  /**
-   * Full URL or path to navigate after successful magic link verification
-   * on the same device, but not completed sign in or sign up.
-   */
-  redirectUrl?: string;
-  /**
-   * Callback function to be executed after successful magic link
-   * verification on another device.
-   */
-  onVerifiedOnOtherDevice?: () => void;
-}
 
 export interface HandleEmailLinkVerificationParams {
   /**
