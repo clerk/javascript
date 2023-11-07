@@ -1,4 +1,8 @@
-import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '@clerk/types';
+import type {
+  OrganizationDomainResource,
+  OrganizationEnrollmentMode,
+  OrganizationSettingsResource,
+} from '@clerk/types';
 
 import { CalloutWithAction, useGate } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
@@ -51,49 +55,44 @@ const useCalloutLabel = (
   ];
 };
 
+const buildEnrollmentOptions = (settings: OrganizationSettingsResource) => {
+  const _options = [];
+  if (settings.domains.enrollmentModes.includes('manual_invitation')) {
+    _options.push({
+      value: 'manual_invitation',
+      label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__label'),
+      description: localizationKeys(
+        'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__description',
+      ),
+    });
+  }
+
+  if (settings.domains.enrollmentModes.includes('automatic_invitation')) {
+    _options.push({
+      value: 'automatic_invitation',
+      label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__label'),
+      description: localizationKeys(
+        'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__description',
+      ),
+    });
+  }
+
+  if (settings.domains.enrollmentModes.includes('automatic_suggestion')) {
+    _options.push({
+      value: 'automatic_suggestion',
+      label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__label'),
+      description: localizationKeys(
+        'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__description',
+      ),
+    });
+  }
+
+  return _options;
+};
+
 const useEnrollmentOptions = () => {
   const { organizationSettings } = useEnvironment();
-
-  const options = (() => {
-    const _options = [];
-    if (organizationSettings.domains.enrollmentModes.includes('manual_invitation')) {
-      _options.push({
-        value: 'manual_invitation',
-        label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__label'),
-        description: localizationKeys(
-          'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__description',
-        ),
-      });
-    }
-
-    if (organizationSettings.domains.enrollmentModes.includes('automatic_invitation')) {
-      _options.push({
-        value: 'automatic_invitation',
-        label: localizationKeys(
-          'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__label',
-        ),
-        description: localizationKeys(
-          'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__description',
-        ),
-      });
-    }
-
-    if (organizationSettings.domains.enrollmentModes.includes('automatic_suggestion')) {
-      _options.push({
-        value: 'automatic_suggestion',
-        label: localizationKeys(
-          'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__label',
-        ),
-        description: localizationKeys(
-          'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__description',
-        ),
-      });
-    }
-
-    return _options;
-  })();
-
-  return options;
+  return buildEnrollmentOptions(organizationSettings);
 };
 
 export const VerifiedDomainPage = withCardStateProvider(() => {
