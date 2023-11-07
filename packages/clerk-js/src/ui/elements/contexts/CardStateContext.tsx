@@ -16,10 +16,12 @@ type CardStateCtxValue = {
 const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
 
 const CardStateProvider = (props: React.PropsWithChildren<any>) => {
+  const { translateError } = useLocalizations();
+
   const [state, setState] = useSafeState<State>({
     status: 'idle',
     metadata: undefined,
-    error: undefined,
+    error: translateError(window?.Clerk?.__internal_last_error || undefined),
   });
 
   const value = React.useMemo(() => ({ value: { state, setState } }), [state, setState]);

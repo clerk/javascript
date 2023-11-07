@@ -1,3 +1,4 @@
+import { isUserLockedError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/types';
 import React from 'react';
 
@@ -28,6 +29,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
     label: localizationKeys('formFieldLabel__backupCode'),
     isRequired: true,
   });
+  const clerk = useCoreClerk();
 
   const isResettingPassword = (resource: SignInResource) =>
     isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
@@ -50,7 +52,14 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
       })
-      .catch(err => handleError(err, [codeControl], card.setError));
+      .catch(err => {
+        if (isUserLockedError(err)) {
+          // @ts-expect-error -- private method for the time being
+          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        }
+
+        handleError(err, [codeControl], card.setError);
+      });
   };
 
   return (
