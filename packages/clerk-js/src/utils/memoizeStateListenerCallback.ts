@@ -28,7 +28,11 @@ function clientChanged(prev: ClientResource, next: ClientResource): boolean {
 }
 
 function sessionChanged(prev: SessionResource, next: SessionResource): boolean {
-  return prev.id !== next.id || prev.updatedAt.getTime() < next.updatedAt.getTime();
+  return (
+    prev.id !== next.id ||
+    prev.updatedAt.getTime() < next.updatedAt.getTime() ||
+    sessionUserMembershipPermissionsChanged(next, prev)
+  );
 }
 
 function userChanged(prev: UserResource, next: UserResource): boolean {
@@ -42,6 +46,25 @@ function userMembershipsChanged(prev: UserResource, next: UserResource): boolean
   return (
     prev.organizationMemberships.length !== next.organizationMemberships.length ||
     prev.organizationMemberships[0]?.updatedAt !== next.organizationMemberships[0]?.updatedAt
+  );
+}
+
+function sessionUserMembershipPermissionsChanged(prev: SessionResource, next: SessionResource): boolean {
+  if (prev.lastActiveOrganizationId !== next.lastActiveOrganizationId) {
+    return true;
+  }
+
+  const prevActiveMembership = prev.user?.organizationMemberships?.find(
+    mem => mem.organization.id === prev.lastActiveOrganizationId,
+  );
+
+  const nextActiveMembership = next.user?.organizationMemberships?.find(
+    mem => mem.organization.id === prev.lastActiveOrganizationId,
+  );
+
+  return (
+    prevActiveMembership?.role !== nextActiveMembership?.role ||
+    prevActiveMembership?.permissions?.length !== nextActiveMembership?.permissions?.length
   );
 }
 
