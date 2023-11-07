@@ -60,16 +60,12 @@ describe('addClerkPrefix(str)', () => {
 describe('getClerkJsMajorVersionOrTag', () => {
   const stagingFrontendApi = 'foobar.lclstage.dev';
 
-  it('returns staging if pkgVersion is not provided and frontendApi is staging', () => {
-    expect(getClerkJsMajorVersionOrTag(stagingFrontendApi)).toBe('staging');
+  it('returns canary if pkgVersion is not provided and frontendApi is staging', () => {
+    expect(getClerkJsMajorVersionOrTag(stagingFrontendApi)).toBe('canary');
   });
 
   it('returns latest if pkgVersion is not provided and frontendApi is not staging', () => {
     expect(getClerkJsMajorVersionOrTag('foobar.dev')).toBe('latest');
-  });
-
-  it('returns next if pkgVersion contains next', () => {
-    expect(getClerkJsMajorVersionOrTag('foobar.dev', '1.2.3-next.4')).toBe('next');
   });
 
   it('returns the major version if pkgVersion is provided', () => {
@@ -100,15 +96,9 @@ describe('getScriptUrl', () => {
     );
   });
 
-  it('returns URL using the major version if only pkgVersion contains next', () => {
-    expect(getScriptUrl(frontendApi, { pkgVersion: '1.2.3-next.4' })).toBe(
-      'https://foobar.dev/npm/@clerk/clerk-js@next/dist/clerk.browser.js',
-    );
-  });
-
-  it('returns URL using the staging tag if frontendApi is staging', () => {
+  it('returns URL using the canary tag if frontendApi is staging', () => {
     expect(getScriptUrl('https://foobar.lclstage.dev', {})).toBe(
-      'https://foobar.lclstage.dev/npm/@clerk/clerk-js@staging/dist/clerk.browser.js',
+      'https://foobar.lclstage.dev/npm/@clerk/clerk-js@canary/dist/clerk.browser.js',
     );
   });
 });
