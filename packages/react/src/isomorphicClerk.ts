@@ -686,15 +686,6 @@ export default class IsomorphicClerk {
     }
   };
 
-  getOrganizationMemberships = async (): Promise<OrganizationMembershipResource[] | void> => {
-    const callback = () => this.clerkjs?.getOrganizationMemberships();
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<OrganizationMembershipResource[]>;
-    } else {
-      this.premountMethodCalls.set('getOrganizationMemberships', callback);
-    }
-  };
-
   getOrganization = async (organizationId: string): Promise<OrganizationResource | void> => {
     const callback = () => this.clerkjs?.getOrganization(organizationId);
     if (this.clerkjs && this.#loaded) {

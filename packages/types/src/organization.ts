@@ -1,4 +1,4 @@
-import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
+import type { ClerkPaginatedResponse } from './api';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
@@ -41,10 +41,6 @@ export interface OrganizationResource extends ClerkResource {
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: GetMemberships;
-  /**
-   * @deprecated Use `getInvitations` instead
-   */
-  getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
   getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
   /**
    * @experimental
@@ -99,10 +95,6 @@ export type GetMembersParams = {
   role?: MembershipRole[];
 };
 
-/**
- * @deprecated use `getInvitations` instead
- */
-export type GetPendingInvitationsParams = ClerkPaginationParams;
 export type GetDomainsParams = {
   /**
    * This is the starting point for your fetched results. The initial value persists between re-renders

@@ -37,7 +37,6 @@ export const createFakeOrganization = (params: FakeOrganizationParams): Organiza
     updatedAt: new Date(),
     update: jest.fn() as any,
     getMemberships: jest.fn() as any,
-    getPendingInvitations: jest.fn() as any,
     addMember: jest.fn() as any,
     inviteMember: jest.fn() as any,
     inviteMembers: jest.fn() as any,

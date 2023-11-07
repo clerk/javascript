@@ -142,14 +142,13 @@ const undefinedPaginatedResource = {
 
 export const useOrganization: UseOrganization = params => {
   const {
-    invitationList: invitationListParams,
     membershipList: membershipListParams,
     domains: domainListParams,
     membershipRequests: membershipRequestsListParams,
     memberships: membersListParams,
     invitations: invitationsListParams,
   } = params || {};
-  const { organization, lastOrganizationMember, lastOrganizationInvitation } = useOrganizationContext();
+  const { organization, lastOrganizationMember } = useOrganizationContext();
   const session = useSessionContext();
 
   const domainSafeValues = useWithSafeValues(domainListParams, {
@@ -292,30 +291,9 @@ export const useOrganization: UseOrganization = params => {
     },
   );
 
-  // Some gymnastics to adhere to the rules of hooks
-  // We need to make sure useSWR is called on every render
-  const pendingInvitations = !clerk.loaded
-    ? () => [] as OrganizationInvitationResource[]
-    : () => clerk.organization?.getPendingInvitations(invitationListParams);
-
   const currentOrganizationMemberships = !clerk.loaded
     ? () => [] as OrganizationMembershipResource[]
     : () => clerk.organization?.getMemberships(membershipListParams);
-
-  if (invitationListParams) {
-    deprecated('invitationList in useOrganization', 'Use the `invitations` property and return value instead.');
-  }
-
-  const {
-    data: invitationList,
-    isValidating: isInvitationsLoading,
-    mutate: mutateInvitationList,
-  } = useSWR(
-    shouldFetch && invitationListParams
-      ? cacheKey('invites', organization, lastOrganizationInvitation, invitationListParams)
-      : null,
-    pendingInvitations,
-  );
 
   if (membershipListParams) {
     deprecated('membershipList in useOrganization', 'Use the `memberships` property and return value instead.');
@@ -376,14 +354,12 @@ export const useOrganization: UseOrganization = params => {
   }
 
   return {
-    isLoaded: !isMembershipsLoading && !isInvitationsLoading,
+    isLoaded: !isMembershipsLoading,
     organization,
     membershipList,
     membership: getCurrentOrganizationMembership(session!.user.organizationMemberships, organization.id), // your membership in the current org
-    invitationList,
     unstable__mutate: () => {
       void mutateMembershipList();
-      void mutateInvitationList();
     },
     domains,
     membershipRequests,

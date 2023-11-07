@@ -15,8 +15,7 @@ import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
-import type { OrganizationInvitationResource } from './organizationInvitation';
-import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
+import type { MembershipRole } from './organizationMembership';
 import type { ActiveSessionResource } from './session';
 import type { UserResource } from './user';
 import type { DeepPartial, DeepSnakeToCamel } from './utils';
@@ -427,11 +426,6 @@ export interface Clerk {
   createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
 
   /**
-   * Retrieves all the organizations the current user is a member of.
-   */
-  getOrganizationMemberships: () => Promise<OrganizationMembershipResource[]>;
-
-  /**
    * Retrieves a single organization by id.
    */
   getOrganization: (organizationId: string) => Promise<OrganizationResource>;
@@ -546,16 +540,6 @@ export interface Resources {
   session?: ActiveSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
-  /**
-   * @deprecated This property will be dropped in the next major release.
-   * This property is only used in another deprecated part: `invitationList` from useOrganization
-   */
-  lastOrganizationInvitation?: OrganizationInvitationResource | null;
-  /**
-   * @deprecated This property will be dropped in the next major release.
-   * This property is only used in another deprecated part: `membershipList` from useOrganization
-   */
-  lastOrganizationMember?: OrganizationMembershipResource | null;
 }
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';

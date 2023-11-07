@@ -1,4 +1,3 @@
-import { deprecated } from '@clerk/shared/deprecated';
 import type {
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
@@ -37,21 +36,6 @@ export class OrganizationMembership extends BaseResource implements Organization
     const isDeprecatedParams =
       typeof retrieveMembershipsParams === 'undefined' || !retrieveMembershipsParams?.paginated;
 
-    if ((retrieveMembershipsParams as RetrieveMembershipsParams)?.limit) {
-      deprecated(
-        'limit',
-        'Use `pageSize` instead in OrganizationMembership.retrieve.',
-        'organization-membership:limit',
-      );
-    }
-    if ((retrieveMembershipsParams as RetrieveMembershipsParams)?.offset) {
-      deprecated(
-        'offset',
-        'Use `initialPage` instead in OrganizationMembership.retrieve.',
-        'organization-membership:offset',
-      );
-    }
-
     return await BaseResource._fetch({
       path: '/me/organization_memberships',
       method: 'GET',
@@ -86,20 +70,16 @@ export class OrganizationMembership extends BaseResource implements Organization
 
   destroy = async (): Promise<OrganizationMembership> => {
     // TODO: Revise the return type of _baseDelete
-    const deletedMembership = (await this._baseDelete({
+    return (await this._baseDelete({
       path: `/organizations/${this.organization.id}/memberships/${this.publicUserData.userId}`,
     })) as unknown as OrganizationMembership;
-    OrganizationMembership.clerk.__unstable__membershipUpdate(deletedMembership);
-    return deletedMembership;
   };
 
   update = async ({ role }: UpdateOrganizationMembershipParams): Promise<OrganizationMembership> => {
-    const updatedMembership = await this._basePatch({
+    return await this._basePatch({
       path: `/organizations/${this.organization.id}/memberships/${this.publicUserData.userId}`,
       body: { role },
     });
-    OrganizationMembership.clerk.__unstable__membershipUpdate(updatedMembership);
-    return updatedMembership;
   };
 
   protected fromJSON(data: OrganizationMembershipJSON | null): this {
@@ -141,21 +121,7 @@ export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;
 };
 
-/**
- * @deprecated
- */
-export type RetrieveMembershipsParams = {
-  /**
-   * @deprecated Use pageSize instead
-   */
-  limit?: number;
-  /**
-   * @deprecated Use initialPage instead
-   */
-  offset?: number;
-};
-
-type MembershipParams = (RetrieveMembershipsParams | GetUserOrganizationMembershipParams) & {
+type MembershipParams = GetUserOrganizationMembershipParams & {
   paginated?: boolean;
 };
 export type GetOrganizationMembershipsClass = <T extends MembershipParams>(

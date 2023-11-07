@@ -9,7 +9,6 @@ import type {
   GetMembershipRequestParams,
   GetMemberships,
   GetMembershipsParams,
-  GetPendingInvitationsParams,
   GetRolesParams,
   InviteMemberParams,
   InviteMembersParams,
@@ -56,31 +55,12 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.fromJSON(data);
   }
 
-  static async create(params: CreateOrganizationParams): Promise<OrganizationResource>;
-  /**
-   * @deprecated Calling `create` with a string is deprecated. Use an object of type {@link CreateOrganizationParams} instead.
-   */
-  static async create(name: string): Promise<OrganizationResource>;
-  static async create(paramsOrName: string | CreateOrganizationParams): Promise<OrganizationResource> {
-    let name;
-    let slug;
-    if (typeof paramsOrName === 'string') {
-      // DX: Deprecated v3.5.2
-      name = paramsOrName;
-      deprecated(
-        'create',
-        'Calling `create` with a string is deprecated. Use an object of type CreateOrganizationParams instead.',
-        'organization:create',
-      );
-    } else {
-      name = paramsOrName.name;
-      slug = paramsOrName.slug;
-    }
+  static async create(params: CreateOrganizationParams): Promise<OrganizationResource> {
     const json = (
       await BaseResource._fetch<OrganizationJSON>({
         path: '/organizations',
         method: 'POST',
-        body: { name, slug } as any,
+        body: params as any,
       })
     )?.response as unknown as OrganizationJSON;
 
@@ -240,22 +220,6 @@ export class Organization extends BaseResource implements OrganizationResource {
       });
   };
 
-  getPendingInvitations = async (
-    getPendingInvitationsParams?: GetPendingInvitationsParams,
-  ): Promise<OrganizationInvitation[]> => {
-    deprecated('getPendingInvitations', 'Use the `getInvitations` method instead.');
-    return await BaseResource._fetch({
-      path: `/organizations/${this.id}/invitations/pending`,
-      method: 'GET',
-      search: getPendingInvitationsParams as any,
-    })
-      .then(res => {
-        const pendingInvitations = res?.response as unknown as OrganizationInvitationJSON[];
-        return pendingInvitations.map(pendingInvitation => new OrganizationInvitation(pendingInvitation));
-      })
-      .catch(() => []);
-  };
-
   getInvitations = async (
     getInvitationsParams?: GetInvitationsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationInvitationResource>> => {
@@ -285,13 +249,11 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {
-    const newMember = await BaseResource._fetch({
+    return await BaseResource._fetch({
       method: 'POST',
       path: `/organizations/${this.id}/memberships`,
       body: { userId, role } as any,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
-    OrganizationMembership.clerk.__unstable__membershipUpdate(newMember);
-    return newMember;
   };
 
   inviteMember = async (params: InviteMemberParams) => {
@@ -303,22 +265,18 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   updateMember = async ({ userId, role }: UpdateMembershipParams): Promise<OrganizationMembership> => {
-    const updatedMember = await BaseResource._fetch({
+    return await BaseResource._fetch({
       method: 'PATCH',
       path: `/organizations/${this.id}/memberships/${userId}`,
       body: { role } as any,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
-    OrganizationMembership.clerk.__unstable__membershipUpdate(updatedMember);
-    return updatedMember;
   };
 
   removeMember = async (userId: string): Promise<OrganizationMembership> => {
-    const deletedMember = await BaseResource._fetch({
+    return await BaseResource._fetch({
       method: 'DELETE',
       path: `/organizations/${this.id}/memberships/${userId}`,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
-    OrganizationMembership.clerk.__unstable__membershipUpdate(deletedMember);
-    return deletedMember;
   };
 
   destroy = async (): Promise<void> => {

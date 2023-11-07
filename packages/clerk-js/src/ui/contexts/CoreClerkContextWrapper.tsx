@@ -39,11 +39,7 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
   const userCtx = React.useMemo(() => ({ value: user }), [user]);
   const organizationCtx = React.useMemo(
     () => ({
-      value: {
-        organization: organization,
-        lastOrganizationInvitation: undefined,
-        lastOrganizationMember: undefined,
-      },
+      value: { organization: organization },
     }),
     [organization],
   );

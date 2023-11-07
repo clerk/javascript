@@ -12,7 +12,6 @@ Organization {
   "getInvitations": [Function],
   "getMembershipRequests": [Function],
   "getMemberships": [Function],
-  "getPendingInvitations": [Function],
   "getRoles": [Function],
   "hasImage": true,
   "id": "test_id",

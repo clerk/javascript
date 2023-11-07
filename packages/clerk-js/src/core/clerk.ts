@@ -1,7 +1,6 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
-  deprecated,
   handleValueOrFn,
   inBrowser as inClientSide,
   is4xxError,
@@ -31,9 +30,7 @@ import type {
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
-  OrganizationInvitationResource,
   OrganizationListProps,
-  OrganizationMembershipResource,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
@@ -109,7 +106,6 @@ import {
   EmailLinkErrorCode,
   Environment,
   Organization,
-  OrganizationMembership,
 } from './resources/internal';
 import { SessionCookieService } from './services';
 import { warnings } from './warnings';
@@ -169,14 +165,6 @@ export default class Clerk implements ClerkInterface {
   #instanceType: InstanceType;
   #isReady = false;
 
-  /**
-   * @deprecated Although this being a private field, this is a reminder to drop it with the next major release
-   */
-  #lastOrganizationInvitation: OrganizationInvitationResource | null = null;
-  /**
-   * @deprecated Although this being a private field, this is a reminder to drop it with the next major release
-   */
-  #lastOrganizationMember: OrganizationMembershipResource | null = null;
   #listeners: Array<(emission: Resources) => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
@@ -640,8 +628,6 @@ export default class Clerk implements ClerkInterface {
         session: this.session,
         user: this.user,
         organization: this.organization,
-        lastOrganizationInvitation: this.#lastOrganizationInvitation,
-        lastOrganizationMember: this.#lastOrganizationMember,
       });
     }
 
@@ -1080,14 +1066,6 @@ export default class Clerk implements ClerkInterface {
     return Organization.create({ name, slug });
   };
 
-  /**
-   * @deprecated use User.getOrganizationMemberships
-   */
-  public getOrganizationMemberships = async (): Promise<OrganizationMembership[]> => {
-    deprecated('getOrganizationMemberships', 'Use User.getOrganizationMemberships');
-    return await OrganizationMembership.retrieve();
-  };
-
   public getOrganization = async (organizationId: string): Promise<OrganizationResource> =>
     Organization.get(organizationId);
 
@@ -1130,32 +1108,6 @@ export default class Clerk implements ClerkInterface {
 
     this.#emit();
   };
-
-  /**
-   * @deprecated This method will be dropped in the next major release.
-   * This method is only used in another deprecated part: `invitationList` from useOrganization
-   */
-  __unstable__invitationUpdate(invitation: OrganizationInvitationResource) {
-    deprecated(
-      '__unstable__invitationUpdate',
-      'We are completely dropping this method as it was introduced for internal use only',
-    );
-    this.#lastOrganizationInvitation = invitation;
-    this.#emit();
-  }
-
-  /**
-   * @deprecated This method will be dropped in the next major release.
-   * This method is only used in another deprecated part: `membershipList` from useOrganization
-   */
-  __unstable__membershipUpdate(membership: OrganizationMembershipResource) {
-    deprecated(
-      '__unstable__membershipUpdate',
-      'We are completely dropping this method as it was introduced for internal use only',
-    );
-    this.#lastOrganizationMember = membership;
-    this.#emit();
-  }
 
   get __unstable__environment(): EnvironmentResource | null | undefined {
     return this.#environment;
@@ -1456,8 +1408,6 @@ export default class Clerk implements ClerkInterface {
           session: this.session,
           user: this.user,
           organization: this.organization,
-          lastOrganizationInvitation: this.#lastOrganizationInvitation,
-          lastOrganizationMember: this.#lastOrganizationMember,
         });
       }
     }
