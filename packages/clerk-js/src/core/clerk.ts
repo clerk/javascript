@@ -236,51 +236,6 @@ export default class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  /**
-   * @deprecated This getter is no longer used internally and will be dropped in the next major version
-   */
-  get experimental_canUseCaptcha(): boolean | undefined {
-    deprecated('experimental_canUseCaptcha', 'This is will be dropped in the next major version');
-    if (this.#environment) {
-      return (
-        this.#environment.userSettings.signUp.captcha_enabled &&
-        this.#options.standardBrowser &&
-        this.#instanceType === 'production'
-      );
-    }
-
-    return false;
-  }
-
-  /**
-   * @deprecated This getter is no longer used internally and will be dropped in the next major version
-   */
-  get experimental_captchaSiteKey(): string | null {
-    deprecated('experimental_captchaSiteKey', 'This is will be dropped in the next major version');
-    if (this.#environment) {
-      return this.#environment.displayConfig.captchaPublicKey;
-    }
-
-    return null;
-  }
-
-  /**
-   * @deprecated This getter is no longer used internally and will be dropped in the next major version
-   */
-  get experimental_captchaURL(): string | null {
-    deprecated('experimental_captchaURL', 'This is will be dropped in the next major version');
-    if (this.#fapiClient) {
-      return this.#fapiClient
-        .buildUrl({
-          path: 'cloudflare/turnstile/v0/api.js',
-          pathPrefix: '',
-          search: '?render=explicit',
-        })
-        .toString();
-    }
-    return null;
-  }
-
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
