@@ -8,11 +8,16 @@ import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles
 import { handleError } from '../../utils';
 import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
+const membershipsParams = {
+  memberships: {
+    pageSize: 10,
+    keepPreviousData: true,
+  },
+};
+
 export const ActiveMembersList = () => {
   const card = useCardState();
-  const { organization, memberships } = useCoreOrganization({
-    memberships: true,
-  });
+  const { organization, memberships } = useCoreOrganization(membershipsParams);
 
   const { options, isLoading: loadingRoles } = useFetchRoles();
 
@@ -44,6 +49,7 @@ export const ActiveMembersList = () => {
       onPageChange={n => memberships?.fetchPage?.(n)}
       itemCount={memberships?.count || 0}
       pageCount={memberships?.pageCount || 0}
+      itemsPerPage={membershipsParams.memberships.pageSize}
       isLoading={memberships?.isLoading || loadingRoles}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
       headers={[

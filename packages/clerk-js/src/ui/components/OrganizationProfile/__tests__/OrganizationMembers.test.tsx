@@ -1,8 +1,9 @@
 import type { OrganizationInvitationResource, OrganizationMembershipResource } from '@clerk/types';
-import { describe, it } from '@jest/globals';
-import { render, waitFor } from '@testing-library/react';
+import { describe } from '@jest/globals';
+import { act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { OrganizationMembers } from '../OrganizationMembers';
@@ -168,6 +169,76 @@ describe('OrganizationMembers', () => {
       expect(queryByText('test_user2')).toBeInTheDocument();
       expect(queryByText('First2 Last2')).toBeInTheDocument();
       expect(queryByText('Member')).toBeInTheDocument();
+    });
+  });
+
+  it('display pagination counts for 2 pages', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
+      });
+    });
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+      Promise.resolve({
+        data: [],
+        total_count: 14,
+      }),
+    );
+
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
+    const { queryByText, getByText } = render(<OrganizationMembers />, { wrapper });
+
+    await waitFor(async () => {
+      expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
+      expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
+      expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
+
+      expect(queryByText(/displaying/i)).toBeInTheDocument();
+
+      expect(queryByText(/1 – 10/i)).toBeInTheDocument();
+      expect(queryByText(/of/i)).toBeInTheDocument();
+      expect(queryByText(/^14/i)).toBeInTheDocument();
+    });
+
+    await act(async () => await userEvent.click(getByText(/next/i)));
+
+    await waitFor(async () => {
+      expect(queryByText(/11 – 14/i)).toBeInTheDocument();
+      expect(queryByText(/of/i)).toBeInTheDocument();
+      expect(queryByText(/^14/i)).toBeInTheDocument();
+    });
+  });
+
+  it('display pagination counts for 1 page', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
+      });
+    });
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+      Promise.resolve({
+        data: [],
+        total_count: 5,
+      }),
+    );
+
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
+    const { queryByText, getByText } = render(<OrganizationMembers />, { wrapper });
+
+    await waitFor(async () => {
+      expect(queryByText(/displaying/i)).toBeInTheDocument();
+      expect(queryByText(/1 – 5/i)).toBeInTheDocument();
+      expect(queryByText(/of/i)).toBeInTheDocument();
+      expect(queryByText(/^5/i)).toBeInTheDocument();
+      expect(getByText(/next/i)).toBeDisabled();
     });
   });
 
@@ -369,7 +440,7 @@ describe('OrganizationMembers', () => {
       }),
     );
 
-    const { findByText } = render(<OrganizationMembers />, { wrapper });
+    const { findByText } = await act(() => render(<OrganizationMembers />, { wrapper }));
     await waitFor(() => expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled());
     expect(await findByText('You')).toBeInTheDocument();
   });
