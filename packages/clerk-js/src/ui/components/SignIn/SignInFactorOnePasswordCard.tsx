@@ -1,3 +1,4 @@
+import { isUserLockedError } from '@clerk/shared/error';
 import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
@@ -53,6 +54,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const { navigate } = useRouter();
   const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
   const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
+  const clerk = useCoreClerk();
 
   const goBack = () => {
     return navigate('../');
@@ -72,7 +74,14 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
       })
-      .catch(err => handleError(err, [passwordControl], card.setError));
+      .catch(err => {
+        if (isUserLockedError(err)) {
+          // @ts-expect-error -- private method for the time being
+          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        }
+
+        handleError(err, [passwordControl], card.setError);
+      });
   };
 
   if (showHavingTrouble) {

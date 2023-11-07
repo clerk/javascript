@@ -1,3 +1,4 @@
+import { isUserLockedError } from '@clerk/shared/error';
 import type { PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/types';
 import React from 'react';
 
@@ -34,6 +35,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   const { setActive } = useCoreClerk();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
+  const clerk = useCoreClerk();
 
   React.useEffect(() => {
     if (props.factorAlreadyPrepared) {
@@ -48,7 +50,14 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
         return props
           .prepare?.()
           .then(() => props.onFactorPrepare())
-          .catch(err => handleError(err, [], card.setError));
+          .catch(err => {
+            if (isUserLockedError(err)) {
+              // @ts-expect-error -- private method for the time being
+              return clerk.__internal_navigateWithError('..', err.errors[0]);
+            }
+
+            handleError(err, [], card.setError);
+          });
       }
     : undefined;
 
@@ -73,7 +82,14 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
       })
-      .catch(err => reject(err));
+      .catch(err => {
+        if (isUserLockedError(err)) {
+          // @ts-expect-error -- private method for the time being
+          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        }
+
+        reject(err);
+      });
   };
 
   return (
