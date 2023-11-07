@@ -1,8 +1,9 @@
 import type { OrganizationInvitationResource, OrganizationMembershipResource } from '@clerk/types';
-import { describe, it } from '@jest/globals';
-import { render, waitFor } from '@testing-library/react';
+import { describe } from '@jest/globals';
+import { act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { OrganizationMembers } from '../OrganizationMembers';
@@ -439,7 +440,7 @@ describe('OrganizationMembers', () => {
       }),
     );
 
-    const { findByText } = render(<OrganizationMembers />, { wrapper });
+    const { findByText } = await act(() => render(<OrganizationMembers />, { wrapper }));
     await waitFor(() => expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled());
     expect(await findByText('You')).toBeInTheDocument();
   });
