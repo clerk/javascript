@@ -274,7 +274,7 @@ export class Clerk implements ClerkInterface {
 
     this.#options = {
       ...defaultOptions,
-      ...getNonUndefinedValues(options),
+      ...getNonUndefinedValues(options || {}),
     };
 
     if (this.#options.sdkMetadata) {
