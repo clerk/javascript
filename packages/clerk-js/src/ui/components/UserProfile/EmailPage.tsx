@@ -8,7 +8,7 @@ import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStat
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
-import { magicLinksEnabledForInstance } from './utils';
+import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithLink } from './VerifyWithLink';
 
@@ -17,7 +17,7 @@ export const EmailPage = withCardStateProvider(() => {
   const card = useCardState();
   const user = useCoreUser();
   const environment = useEnvironment();
-  const preferEmailLinks = magicLinksEnabledForInstance(environment);
+  const preferEmailLinks = emailLinksEnabledForInstance(environment);
 
   const { params } = useRouter();
   const { id } = params || {};

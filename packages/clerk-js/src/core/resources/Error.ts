@@ -7,11 +7,8 @@ export {
   isClerkRuntimeError,
   isEmailLinkError,
   isKnownError,
-  isMagicLinkError,
   isMetamaskError,
   isUserLockedError,
-  MagicLinkError,
-  MagicLinkErrorCode,
   parseError,
   parseErrors,
 } from '@clerk/shared/error';

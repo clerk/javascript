@@ -29,7 +29,6 @@ import type {
   EnvironmentJSON,
   EnvironmentResource,
   HandleEmailLinkVerificationParams,
-  HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
@@ -113,8 +112,6 @@ import {
   EmailLinkError,
   EmailLinkErrorCode,
   Environment,
-  MagicLinkError,
-  MagicLinkErrorCode,
   Organization,
   OrganizationMembership,
 } from './resources/internal';
@@ -843,55 +840,6 @@ export default class Clerk implements ClerkInterface {
       return this.navigate(this.buildHomeUrl());
     }
     return;
-  };
-
-  /**
-   *
-   * @deprecated Use `handleEmailLinkVerification` instead.
-   */
-  public handleMagicLinkVerification = async (
-    params: HandleMagicLinkVerificationParams,
-    customNavigate?: (to: string) => Promise<unknown>,
-  ): Promise<unknown> => {
-    deprecated('handleMagicLinkVerification', 'Use `handleEmailLinkVerification` instead.');
-
-    if (!this.client) {
-      return;
-    }
-
-    const verificationStatus = getClerkQueryParam('__clerk_status');
-    if (verificationStatus === 'expired') {
-      throw new MagicLinkError(MagicLinkErrorCode.Expired);
-    } else if (verificationStatus !== 'verified') {
-      throw new MagicLinkError(MagicLinkErrorCode.Failed);
-    }
-
-    const newSessionId = getClerkQueryParam('__clerk_created_session');
-    const { signIn, signUp, sessions } = this.client;
-
-    const shouldCompleteOnThisDevice = sessions.some(s => s.id === newSessionId);
-    const shouldContinueOnThisDevice =
-      signIn.status === 'needs_second_factor' || signUp.status === 'missing_requirements';
-
-    const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
-
-    const redirectComplete = params.redirectUrlComplete ? () => navigate(params.redirectUrlComplete as string) : noop;
-    const redirectContinue = params.redirectUrl ? () => navigate(params.redirectUrl as string) : noop;
-
-    if (shouldCompleteOnThisDevice) {
-      return this.setActive({
-        session: newSessionId,
-        beforeEmit: redirectComplete,
-      });
-    } else if (shouldContinueOnThisDevice) {
-      return redirectContinue();
-    }
-
-    if (typeof params.onVerifiedOnOtherDevice === 'function') {
-      params.onVerifiedOnOtherDevice();
-    }
-    return null;
   };
 
   public handleEmailLinkVerification = async (

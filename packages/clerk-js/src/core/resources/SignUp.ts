@@ -7,7 +7,6 @@ import type {
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
   CreateEmailLinkFlowReturn,
-  CreateMagicLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
@@ -20,7 +19,6 @@ import type {
   SignUpStatus,
   SignUpUpdateParams,
   StartEmailLinkFlowParams,
-  StartMagicLinkFlowParams,
 } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getCaptchaToken, getMetamaskIdentifier, windowNavigate } from '../../utils';
@@ -114,44 +112,6 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   attemptEmailAddressVerification = (params: AttemptEmailAddressVerificationParams): Promise<SignUpResource> => {
     return this.attemptVerification({ ...params, strategy: 'email_code' });
-  };
-
-  /**
-   * @deprecated Use `createEmailLinkFlow` instead.
-   */
-  createMagicLinkFlow = (): CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource> => {
-    deprecated('createMagicLinkFlow', 'Use `createEmailLinkFlow` instead.');
-
-    const { run, stop } = Poller();
-
-    const startMagicLinkFlow = async ({ redirectUrl }: StartMagicLinkFlowParams): Promise<SignUpResource> => {
-      if (!this.id) {
-        clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
-      }
-      await this.prepareEmailAddressVerification({
-        strategy: 'email_link',
-        redirectUrl,
-      });
-
-      return new Promise((resolve, reject) => {
-        void run(() => {
-          return this.reload()
-            .then(res => {
-              const status = res.verifications.emailAddress.status;
-              if (status === 'verified' || status === 'expired') {
-                stop();
-                resolve(res);
-              }
-            })
-            .catch(err => {
-              stop();
-              reject(err);
-            });
-        });
-      });
-    };
-
-    return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, SignUpResource> => {
