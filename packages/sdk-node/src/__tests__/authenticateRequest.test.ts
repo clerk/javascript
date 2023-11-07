@@ -1,7 +1,7 @@
 import { constants, createIsomorphicRequest } from '@clerk/backend';
 import type { Request } from 'express';
 
-import { authenticateRequest } from './authenticateRequest';
+import { authenticateRequest } from '../authenticateRequest';
 
 const mockNext = jest.fn();
 
@@ -34,9 +34,7 @@ describe('authenticateRequest', () => {
     };
 
     const clerkClient = mockClerkClient();
-    const apiKey = 'apiKey';
-    const secretKey = '';
-    const frontendApi = 'frontendApi';
+    const secretKey = 'secretKey';
     const publishableKey = 'publishableKey';
     const searchParams = new URLSearchParams();
     searchParams.set('__query', 'true');
@@ -51,9 +49,7 @@ describe('authenticateRequest', () => {
 
     await authenticateRequest({
       clerkClient: clerkClient as any,
-      apiKey,
       secretKey,
-      frontendApi,
       publishableKey,
       req,
       options,
@@ -61,9 +57,7 @@ describe('authenticateRequest', () => {
     expect(clerkClient.authenticateRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         authorizedParties: ['party1'],
-        apiKey: apiKey,
         secretKey: secretKey,
-        frontendApi: frontendApi,
         publishableKey: publishableKey,
         jwtKey: 'jwtKey',
         isSatellite: false,

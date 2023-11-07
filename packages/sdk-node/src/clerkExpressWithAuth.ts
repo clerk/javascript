@@ -9,14 +9,12 @@ import type { CreateClerkExpressMiddlewareOptions } from './clerkExpressRequireA
 import type { ClerkMiddlewareOptions, MiddlewareWithAuthProp, WithAuthProp } from './types';
 
 export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlewareOptions) => {
-  const { clerkClient, frontendApi = '', apiKey = '', secretKey = '', publishableKey = '' } = createOpts;
+  const { clerkClient, secretKey = '', publishableKey = '' } = createOpts;
   return (options: ClerkMiddlewareOptions = {}): MiddlewareWithAuthProp => {
     return async (req, res, next) => {
       const requestState = await authenticateRequest({
         clerkClient,
-        apiKey,
         secretKey,
-        frontendApi,
         publishableKey,
         req,
         options,
