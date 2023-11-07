@@ -854,12 +854,6 @@ export type OrganizationSwitcherProps = {
    */
   hidePersonal?: boolean;
   /**
-   * Full URL or path to navigate after a successful organization switch.
-   * @default undefined
-   * @deprecated use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`
-   */
-  afterSwitchOrganizationUrl?: string;
-  /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
    */
