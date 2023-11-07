@@ -70,14 +70,10 @@ export interface Clerk {
 
   loaded: boolean;
 
-  /**
-   * Clerk Frontend API string
-   * @deprecated Use `publishableKey` instead.
-   */
   frontendApi: string;
 
   /** Clerk Publishable Key string. */
-  publishableKey?: string;
+  publishableKey: string;
 
   /** Clerk Proxy url string. */
   proxyUrl?: string;

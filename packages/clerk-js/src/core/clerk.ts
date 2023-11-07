@@ -6,7 +6,6 @@ import {
   inBrowser as inClientSide,
   is4xxError,
   isHttpOrHttps,
-  isLegacyFrontendApiKey,
   isValidBrowserOnline,
   isValidProxyUrl,
   noop,
@@ -38,7 +37,6 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
-  PublishableKey,
   RedirectOptions,
   Resources,
   SDKMetadata,
@@ -74,7 +72,6 @@ import {
   inActiveBrowserTab,
   inBrowser,
   isDevAccountPortalOrigin,
-  isDevOrStagingUrl,
   isError,
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
@@ -87,7 +84,6 @@ import {
   stripOrigin,
   stripSameOrigin,
   toURL,
-  validateFrontendApi,
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
@@ -156,8 +152,7 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public __internal_country?: string | null;
-  public readonly frontendApi: string;
-  public readonly publishableKey?: string;
+  public readonly publishableKey: string = '';
 
   protected internal_last_error: ClerkAPIError | null = null;
 
@@ -168,7 +163,9 @@ export default class Clerk implements ClerkInterface {
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   #devBrowserHandler: DevBrowserHandler | null = null;
   #environment?: EnvironmentResource | null;
+  //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
+  //@ts-expect-error with undefined even though it's not possible - related to issue with ts and error thrower
   #instanceType: InstanceType;
   #isReady = false;
 
@@ -219,6 +216,16 @@ export default class Clerk implements ClerkInterface {
       return proxyUrlToAbsoluteURL(_unfilteredProxy);
     }
     return '';
+  }
+
+  get frontendApi(): string {
+    const publishableKey = parsePublishableKey(this.publishableKey);
+
+    if (!publishableKey) {
+      return errorThrower.throwInvalidPublishableKeyError({ key: this.publishableKey });
+    }
+
+    return publishableKey.frontendApi;
   }
 
   get instanceType() {
@@ -280,28 +287,19 @@ export default class Clerk implements ClerkInterface {
     this.#domain = options?.domain;
     this.#proxyUrl = options?.proxyUrl;
 
-    if (isLegacyFrontendApiKey(key)) {
-      deprecated('frontendApi', 'Use `publishableKey` instead.');
-
-      if (!validateFrontendApi(key)) {
-        errorThrower.throwInvalidFrontendApiError({ key });
-      }
-
-      this.frontendApi = key;
-      this.#instanceType = isDevOrStagingUrl(this.frontendApi) ? 'development' : 'production';
-    } else {
-      const publishableKey = parsePublishableKey(key);
-
-      if (!publishableKey) {
-        errorThrower.throwInvalidPublishableKeyError({ key });
-      }
-
-      const { frontendApi, instanceType } = publishableKey as PublishableKey;
-
-      this.publishableKey = key;
-      this.frontendApi = frontendApi;
-      this.#instanceType = instanceType;
+    if (!key) {
+      return errorThrower.throwMissingPublishableKeyError();
     }
+
+    const publishableKey = parsePublishableKey(key);
+
+    if (!publishableKey) {
+      return errorThrower.throwInvalidPublishableKeyError({ key });
+    }
+
+    this.publishableKey = key;
+    this.#instanceType = publishableKey.instanceType;
+
     this.#fapiClient = createFapiClient(this);
     BaseResource.clerk = this;
   }
