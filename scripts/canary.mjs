@@ -1,7 +1,6 @@
 #!/usr/bin/env zx
 
-import 'zx/globals';
-
+import { $, echo } from 'zx';
 import { constants } from './common.mjs';
 
 await $`npx json -I -f ${constants.ChangesetConfigFile} -e "this.changelog = false"`;
