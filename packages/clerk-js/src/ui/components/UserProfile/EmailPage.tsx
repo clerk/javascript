@@ -37,7 +37,6 @@ export const EmailPage = withCardStateProvider(() => {
 
   const canSubmit = emailField.value.length > 1 && user.username !== emailField.value;
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   const addEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     return user
@@ -57,9 +56,8 @@ export const EmailPage = withCardStateProvider(() => {
       >
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>
-            <Form.Control
+            <Form.PlainInput
               {...emailField.props}
-              required
               autoFocus
             />
           </Form.ControlRow>

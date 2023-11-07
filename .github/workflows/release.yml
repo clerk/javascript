@@ -17,6 +17,7 @@ jobs:
     if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+
     permissions:
       contents: write
       id-token: write
@@ -25,6 +26,7 @@ jobs:
       issues: read
       statuses: write
       checks: write
+
     steps:
       - name: Echo github context
         run: echo "$GITHUB_CONTEXT"
@@ -35,7 +37,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup
-        uses: ./.github/actions/setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true # Must be present to enable caching on branched workflows
+
+      - name: Build release
+        run: npx turbo build $TURBO_ARGS --force
 
       - name: Create Release PR
         id: changesets
@@ -58,14 +69,22 @@ jobs:
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
-            const clerkjsVersion = require('./packages/clerk-js/package.json').version;
-            github.rest.actions.createWorkflowDispatch({
-              owner: 'clerk',
-              repo: 'cloudflare-workers',
-              workflow_id: 'prepare-prod-clerkjs-proxy-pr.yml',
-              ref: 'main',
-              inputs: { version: clerkjsVersion }
-            })
+            const preMode = require("fs").existsSync("./.changeset/pre.json");
+            if (!preMode) {
+              const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'cloudflare-workers',
+                workflow_id: 'prepare-prod-clerkjs-proxy-pr.yml',
+                ref: 'main',
+                inputs: { version: clerkjsVersion }
+              })
+            } else{
+              core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
+            }
+
+
 
       - name: Generate notification payload
         id: notification

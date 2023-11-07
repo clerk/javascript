@@ -10,12 +10,12 @@
     "yalc:add": "yalc add -- @clerk/shared @clerk/types @clerk/backend @clerk/clerk-react @clerk/clerk-sdk-node @clerk/nextjs"
   },
   "dependencies": {
-    "@clerk/backend": "file:.yalc/@clerk/backend",
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
-    "@clerk/clerk-sdk-node": "file:.yalc/@clerk/clerk-sdk-node",
-    "@clerk/nextjs": "file:.yalc/@clerk/nextjs",
-    "@clerk/shared": "file:.yalc/@clerk/shared",
-    "@clerk/types": "file:.yalc/@clerk/types",
+    "@clerk/backend": "latest",
+    "@clerk/clerk-react": "latest",
+    "@clerk/clerk-sdk-node": "latest",
+    "@clerk/nextjs": "latest",
+    "@clerk/shared": "latest",
+    "@clerk/types": "latest",
     "next": "^13.5.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

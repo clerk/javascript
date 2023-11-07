@@ -14,12 +14,11 @@ jobs:
     if: ${{ startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
     runs-on: ${{ vars.RUNNER_LARGE }}
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
     permissions:
       contents: read
       id-token: write
+
     steps:
       - name: Limit action to Clerk members
         uses: actions/github-script@v6
@@ -41,8 +40,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
+
       - name: Setup
-        uses: ./.github/actions/setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Extract snapshot name
         id: extract-snapshot-name
@@ -60,6 +65,9 @@ jobs:
       - name: Version packages for snapshot
         id: version-packages
         run: npm run version:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
+
+      - name: Build release
+        run: npx turbo build $TURBO_ARGS
 
       - name: Snapshot release
         if: steps.version-packages.outputs.success == '1'
@@ -95,7 +103,6 @@ jobs:
               .join("\n");
             core.setOutput("table", table);
             core.setOutput("snippets", snippets);
-
 
       - name: Update Comment
         if: steps.version-packages.outputs.success == '1'

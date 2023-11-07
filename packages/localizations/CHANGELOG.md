@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.26.8-alpha-v5.0
+
+### Patch Changes
+
+- Localize placeholder of confirmation field when deleting a user account from `<UserProfile/>`. ([#2036](https://github.com/clerk/javascript/pull/2036)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 1.26.7
 
 ### Patch Changes

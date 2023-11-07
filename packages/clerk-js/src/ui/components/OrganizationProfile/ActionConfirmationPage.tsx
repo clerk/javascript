@@ -141,10 +141,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
           <Text localizationKey={actionDescription} />
 
           <Form.ControlRow elementId={confirmationField.id}>
-            <Form.Control
-              {...confirmationField.props}
-              required
-            />
+            <Form.PlainInput {...confirmationField.props} />
           </Form.ControlRow>
 
           <FormButtonContainer>

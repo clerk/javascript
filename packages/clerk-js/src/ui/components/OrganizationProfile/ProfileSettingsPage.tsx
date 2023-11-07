@@ -37,7 +37,6 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
   const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value;
   const canSubmit = (dataChanged || avatarChanged) && slugField.feedbackType !== 'error';
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     return (dataChanged ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
@@ -90,17 +89,16 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
             onAvatarRemove={isDefaultImage(organization.imageUrl) ? null : onAvatarRemove}
           />
           <Form.ControlRow elementId={nameField.id}>
-            <Form.Control
+            <Form.PlainInput
               {...nameField.props}
               autoFocus
-              required
+              isRequired
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={slugField.id}>
-            <Form.Control
+            <Form.PlainInput
               {...slugField.props}
               onChange={onChangeSlug}
-              required
             />
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />

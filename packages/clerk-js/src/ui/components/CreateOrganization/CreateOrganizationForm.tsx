@@ -3,11 +3,12 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization, useCoreOrganizationList } from '../../contexts';
-import { ContentPage, Form, FormButtonContainer, SuccessPage, useCardState } from '../../elements';
-import { QuestionMark } from '../../icons';
+import { Icon } from '../../customizables';
+import { ContentPage, Form, FormButtonContainer, IconButton, SuccessPage, useCardState } from '../../elements';
+import { QuestionMark, Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import { createSlug, handleError, useFormControl } from '../../utils';
+import { colors, createSlug, handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
@@ -121,23 +122,51 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             organization={{ name: nameField.value }}
             onAvatarChange={async file => await setFile(file)}
             onAvatarRemove={file ? onAvatarRemove : null}
+            avatarPreviewPlaceholder={
+              <IconButton
+                variant='ghost'
+                colorScheme='neutral'
+                aria-label='Upload organization logo'
+                icon={
+                  <Icon
+                    size='md'
+                    icon={Upload}
+                    sx={theme => ({
+                      transitionDuration: theme.transitionDuration.$controls,
+                    })}
+                  />
+                }
+                sx={theme => ({
+                  width: theme.sizes.$11,
+                  height: theme.sizes.$11,
+                  borderRadius: theme.radii.$md,
+                  backgroundColor: theme.colors.$avatarBackground,
+                  ':hover': {
+                    backgroundColor: colors.makeTransparent(theme.colors.$avatarBackground, 0.2),
+                    svg: {
+                      transform: 'scale(1.2)',
+                    },
+                  },
+                })}
+              />
+            }
           />
           <Form.ControlRow elementId={nameField.id}>
-            <Form.Control
-              sx={{ flexBasis: '80%' }}
-              autoFocus
+            <Form.PlainInput
               {...nameField.props}
+              sx={{ flexBasis: '80%' }}
               onChange={onChangeName}
-              required
+              isRequired
+              autoFocus
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={slugField.id}>
-            <Form.Control
-              sx={{ flexBasis: '80%' }}
+            <Form.PlainInput
               {...slugField.props}
-              onChange={onChangeSlug}
+              sx={{ flexBasis: '80%' }}
               icon={QuestionMark}
-              required
+              onChange={onChangeSlug}
+              isRequired
             />
           </Form.ControlRow>
           <FormButtonContainer>

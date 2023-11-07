@@ -37,7 +37,7 @@ Clerk is the easiest way to add authentication and user management to your Gatsb
 ### Prerequisites
 
 - Gatsby v5+
-- Node.js v18+
+- Node.js `>=18.18.0` or later
 
 ### Installation
 

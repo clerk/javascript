@@ -12,10 +12,8 @@ const major = parsedVersion.major;
 try {
   if (!prerelease) {
     await fetch(`https://purge.jsdelivr.net/npm/@clerk/clerk-js@${major}/dist/clerk.browser.js`);
-  } else if (prerelease === 'staging') {
-    await fetch(`https://purge.jsdelivr.net/npm/@clerk/clerk-js@staging/dist/clerk.browser.js`);
   } else {
-    await fetch(`https://purge.jsdelivr.net/npm/@clerk/clerk-js@next/dist/clerk.browser.js`);
+    await fetch(`https://purge.jsdelivr.net/npm/@clerk/clerk-js@canary/dist/clerk.browser.js`);
   }
   console.log(`🎉 JSDelivr cache for @clerk/clerk-js (${version}) was successfully purged!`);
 } catch (err) {
