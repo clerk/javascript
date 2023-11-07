@@ -15,16 +15,9 @@ type MembersListTableProps = {
   onPageChange: (page: number) => void;
   itemCount: number;
   emptyStateLocalizationKey: LocalizationKey;
-} & (
-  | {
-      itemsPerPage?: never;
-      pageCount: number;
-    }
-  | {
-      itemsPerPage: number;
-      pageCount?: never;
-    }
-);
+  pageCount: number;
+  itemsPerPage: number;
+};
 
 export const DataTable = (props: MembersListTableProps) => {
   const {
@@ -35,13 +28,12 @@ export const DataTable = (props: MembersListTableProps) => {
     isLoading,
     itemCount,
     itemsPerPage,
-    pageCount: pageCountProp,
+    pageCount,
     emptyStateLocalizationKey,
   } = props;
 
-  const pageCount = rows.length !== 0 ? pageCountProp ?? Math.ceil(itemCount / itemsPerPage) : 1;
-  const startRowIndex = (page - 1) * rows.length;
-  const endRowIndex = Math.min(page * rows.length);
+  const startingRow = itemCount > 0 ? Math.max(0, (page - 1) * itemsPerPage) + 1 : 0;
+  const endingRow = Math.min(page * itemsPerPage, itemCount);
 
   return (
     <Col
@@ -90,8 +82,8 @@ export const DataTable = (props: MembersListTableProps) => {
           siblingCount={1}
           rowInfo={{
             allRowsCount: itemCount,
-            startingRow: rows.length ? startRowIndex + 1 : startRowIndex,
-            endingRow: endRowIndex,
+            startingRow,
+            endingRow,
           }}
         />
       }

@@ -7,11 +7,16 @@ import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';
 
+const invitationsParams = {
+  invitations: {
+    pageSize: 10,
+    keepPreviousData: true,
+  },
+};
+
 export const InvitedMembersList = () => {
   const card = useCardState();
-  const { organization, invitations } = useCoreOrganization({
-    invitations: true,
-  });
+  const { organization, invitations } = useCoreOrganization(invitationsParams);
 
   if (!organization) {
     return null;
@@ -32,6 +37,7 @@ export const InvitedMembersList = () => {
       onPageChange={invitations?.fetchPage || (() => null)}
       itemCount={invitations?.count || 0}
       pageCount={invitations?.pageCount || 0}
+      itemsPerPage={invitationsParams.invitations.pageSize}
       isLoading={invitations?.isLoading}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.invitationsTab.table__emptyRow')}
       headers={[
