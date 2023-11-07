@@ -1039,8 +1039,8 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
-    const userLockedFromSignUp = su.externalAccountErrorCode == 'user_locked';
-    const userLockedFromSignIn = si.firstFactorVerificationErrorCode == 'user_locked';
+    const userLockedFromSignUp = su.externalAccountErrorCode === 'user_locked';
+    const userLockedFromSignIn = si.firstFactorVerificationErrorCode === 'user_locked';
 
     if (userLockedFromSignUp) {
       return navigateToSignUp();
