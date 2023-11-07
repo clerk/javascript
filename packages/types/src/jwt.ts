@@ -11,7 +11,7 @@ export interface JWTHeader {
   alg: string | Algorithm;
   typ?: string;
   cty?: string;
-  crit?: Array<string | Exclude<keyof JWTHeader, 'crit'>>;
+  crit?: Array<string | Exclude<JWTHeader, 'crit'>>;
   kid?: string;
   jku?: string;
   x5u?: string | string[];
@@ -68,11 +68,6 @@ export interface ClerkJWTClaims {
    * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
    */
   act?: ActJWTClaim;
-
-  /**
-   * @deprecated - Add orgs to your session token using the "user.organizations" shortcode in JWT Templates instead
-   */
-  orgs?: Record<string, MembershipRole>;
 
   /**
    * Active organization id.
