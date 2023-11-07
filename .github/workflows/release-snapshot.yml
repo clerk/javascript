@@ -64,10 +64,7 @@ jobs:
 
       - name: Version packages for snapshot
         id: version-packages
-        run: |
-          # temporarily exit prerelease mode so snapshot works
-          changeset pre exit || true
-          npm run version:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
+        run: npm run version:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'

@@ -6,7 +6,7 @@ import { constants } from './common.mjs';
 const prefix = argv.name || argv._[0] || 'snapshot';
 
 await $`npx json -I -f ${constants.ChangesetConfigFile} -e "this.changelog = false"`;
-
+await $`npx changeset pre exit || true`;
 const res = await $`npx changeset version --snapshot ${prefix}`;
 const success = !res.stderr.includes('No unreleased changesets found');
 
