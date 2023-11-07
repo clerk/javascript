@@ -22,11 +22,12 @@ export const InvitedMembersList = () => {
     return null;
   }
 
-  const revoke = (invitation: OrganizationInvitationResource) => () => {
+  const revoke = (invitation: OrganizationInvitationResource) => async () => {
     return card
       .runAsync(async () => {
         await invitation.revoke();
-        await (invitations as any).unstable__mutate?.();
+        await invitations?.revalidate?.();
+        return invitation;
       })
       .catch(err => handleError(err, [], card.setError));
   };
