@@ -31,7 +31,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const publishableKey = opts.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY', context) || '';
 
-  const jwtKey = opts.jwtKey || getEnvVariable('CLERK_JWT_KEY', context);
+  const jwtKey = opts.jwtKey || getEnvVariable('CLERK_JWT_KEY', context) || '';
 
   const apiUrl = getEnvVariable('CLERK_API_URL', context) || apiUrlFromPublishableKey(publishableKey);
 
@@ -47,7 +47,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(
     opts?.proxyUrl,
     requestURL,
-    getEnvVariable('CLERK_PROXY_URL', context),
+    getEnvVariable('CLERK_PROXY_URL', context) || '',
   );
 
   let proxyUrl;
@@ -57,13 +57,13 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  const signInUrl = opts.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL', context) || '';
+  const signInUrl = opts.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL', context);
 
-  const signUpUrl = opts.signUpUrl || getEnvVariable('CLERK_SIGN_UP_URL', context) || '';
+  const signUpUrl = opts.signUpUrl || getEnvVariable('CLERK_SIGN_UP_URL', context);
 
-  const afterSignInUrl = opts.afterSignInUrl || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context) || '';
+  const afterSignInUrl = opts.afterSignInUrl || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context);
 
-  const afterSignUpUrl = opts.afterSignUpUrl || getEnvVariable('CLERK_AFTER_SIGN_UP_URL', context) || '';
+  const afterSignUpUrl = opts.afterSignUpUrl || getEnvVariable('CLERK_AFTER_SIGN_UP_URL', context);
 
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
