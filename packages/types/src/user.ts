@@ -61,10 +61,6 @@ export interface UserResource extends ClerkResource {
   fullName: string | null;
   firstName: string | null;
   lastName: string | null;
-  /**
-   * @deprecated  Use `imageUrl` instead.
-   */
-  profileImageUrl: string;
   imageUrl: string;
   hasImage: boolean;
   emailAddresses: EmailAddressResource[];

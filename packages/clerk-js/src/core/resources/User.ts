@@ -1,4 +1,4 @@
-import { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
+import { deprecated } from '@clerk/shared/deprecated';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
@@ -74,10 +74,6 @@ export class User extends BaseResource implements UserResource {
   primaryPhoneNumber: PhoneNumberResource | null = null;
   primaryWeb3WalletId: string | null = null;
   primaryWeb3Wallet: Web3WalletResource | null = null;
-  /**
-   * @deprecated  Use `imageUrl` instead.
-   */
-  profileImageUrl = '';
   imageUrl = '';
   hasImage = false;
   twoFactorEnabled = false;
@@ -316,7 +312,6 @@ export class User extends BaseResource implements UserResource {
       this.fullName = getFullName({ firstName: this.firstName, lastName: this.lastName });
     }
 
-    this.profileImageUrl = data.profile_image_url;
     this.imageUrl = data.image_url;
     this.hasImage = data.has_image;
     this.username = data.username;
@@ -365,5 +360,3 @@ export class User extends BaseResource implements UserResource {
     return this;
   }
 }
-
-deprecatedProperty(User, 'profileImageUrl', 'Use `imageUrl` instead.');

@@ -58,8 +58,8 @@ const createBaseDisplayConfig = (): DisplayConfigJSON => {
       },
     },
     preferred_sign_in_strategy: 'password',
-    logo_url: 'https://images.clerk.com/uploaded/img_logo.png',
-    favicon_url: 'https://images.clerk.com/uploaded/img_favicon.png',
+    logo_image_url: 'https://images.clerk.com/uploaded/img_logo.png',
+    favicon_image_url: 'https://images.clerk.com/uploaded/img_favicon.png',
     home_url: 'https://dashboard.clerk.com',
     sign_in_url: 'https://dashboard.clerk.com/sign-in',
     sign_up_url: 'https://dashboard.clerk.com/sign-up',
@@ -199,12 +199,11 @@ export const createBaseClientJSON = (): ClientJSON => {
   return {} as ClientJSON;
 };
 
-// TODO:
 export const createUserFixture = (): UserJSON => {
   return {
     first_name: 'Firstname',
     last_name: 'Lastname',
-    profile_image_url: 'https://lh3.googleusercontent.com/a/public-photo-kmmfZIb=s1000-c',
-    image_url: 'https://lh3.googleusercontent.com/a/public-photo-kmmfZIb=s1000-c',
+    image_url:
+      'https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLTmR2TUtFQzN5cUVpMVFjV0UzQjExbF9WUEVOWW5manlLMlVQd0tCSWw9czEwMDAtYyIsInMiOiJkRkowS3dTSkRINndiODE5cXJTUUxxaWF1ZS9QcHdndC84L0lUUlpYNHpnIn0?width=160',
   } as UserJSON;
 };

@@ -1,4 +1,3 @@
-import { deprecated } from '@clerk/shared/deprecated';
 import type { Attribute, Web3Provider } from '@clerk/types';
 
 import type { LocalizationKey } from '../localization/localizationKeys';
@@ -95,16 +94,6 @@ export const WEB3_PROVIDERS: Web3Providers = Object.freeze({
 
 export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | undefined | null {
   return WEB3_PROVIDERS[name];
-}
-
-/**
- * Returns the URL for a static SVG image
- * using the old images.clerk.com service
- * @deprecated In favor of iconImageUrl
- */
-export function svgUrl(id: string): string {
-  deprecated('svgUrl', 'Use `iconImageUrl` instead');
-  return `https://images.clerk.com/static/${id}.svg`;
 }
 
 /**

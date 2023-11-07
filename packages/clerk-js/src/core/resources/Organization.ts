@@ -1,4 +1,4 @@
-import { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
+import { deprecated } from '@clerk/shared/deprecated';
 import type {
   AddMemberParams,
   ClerkPaginatedResponse,
@@ -41,10 +41,6 @@ export class Organization extends BaseResource implements OrganizationResource {
   id!: string;
   name!: string;
   slug!: string;
-  /**
-   * @deprecated  Use `imageUrl` instead.
-   */
-  logoUrl!: string;
   imageUrl!: string;
   hasImage!: boolean;
   publicMetadata: OrganizationPublicMetadata = {};
@@ -365,7 +361,6 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.id = data.id;
     this.name = data.name;
     this.slug = data.slug;
-    this.logoUrl = data.logo_url;
     this.imageUrl = data.image_url;
     this.hasImage = data.has_image;
     this.publicMetadata = data.public_metadata;
@@ -395,5 +390,3 @@ export class Organization extends BaseResource implements OrganizationResource {
     return this.fromJSON(json);
   }
 }
-
-deprecatedProperty(Organization, 'logoUrl', 'Use `imageUrl` instead.');

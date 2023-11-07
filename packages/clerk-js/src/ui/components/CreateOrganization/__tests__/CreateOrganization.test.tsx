@@ -12,7 +12,6 @@ export type FakeOrganizationParams = {
   id: string;
   createdAt?: Date;
   imageUrl?: string;
-  logoUrl?: string;
   slug: string;
   name: string;
   membersCount: number;
@@ -23,7 +22,6 @@ export type FakeOrganizationParams = {
 
 export const createFakeOrganization = (params: FakeOrganizationParams): OrganizationResource => {
   return {
-    logoUrl: null,
     pathRoot: '',
     id: params.id,
     name: params.name,
