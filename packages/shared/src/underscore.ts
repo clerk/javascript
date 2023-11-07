@@ -109,11 +109,11 @@ export function isTruthy(value: unknown): boolean {
   return false;
 }
 
-export function getNonUndefinedValues<T>(obj: Record<string, T>): Record<string, T> {
-  return Object.keys(obj).reduce((result, key) => {
-    if (obj[key] !== undefined) {
-      result[key] = obj[key];
+export function getNonUndefinedValues<T extends object>(obj: T): Partial<T> {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    if (value !== undefined) {
+      acc[key as keyof T] = value;
     }
-    return result;
-  }, {} as Record<string, T>);
+    return acc;
+  }, {} as Partial<T>);
 }
