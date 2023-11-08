@@ -62,13 +62,6 @@ export interface OrganizationResource extends ClerkResource {
 }
 
 /**
- * @deprecated use GetMembersParams
- */
-export type GetMembershipsParams = {
-  role?: MembershipRole[];
-} & ClerkPaginationParams;
-
-/**
  * @experimental
  */
 export type GetRolesParams = {
@@ -163,7 +156,7 @@ export interface SetOrganizationLogoParams {
   file: Blob | File | string | null;
 }
 
-type MembersParams = (GetMembershipsParams | GetMembersParams) & {
+type MembersParams = GetMembersParams & {
   paginated?: boolean;
 };
 

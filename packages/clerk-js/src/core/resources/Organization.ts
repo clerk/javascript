@@ -1,4 +1,3 @@
-import { deprecated } from '@clerk/shared/deprecated';
 import type {
   AddMemberParams,
   ClerkPaginatedResponse,
@@ -8,7 +7,6 @@ import type {
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMemberships,
-  GetMembershipsParams,
   GetRolesParams,
   InviteMemberParams,
   InviteMembersParams,
@@ -172,29 +170,13 @@ export class Organization extends BaseResource implements OrganizationResource {
   getMemberships: GetMemberships = async getMembershipsParams => {
     const isDeprecatedParams = typeof getMembershipsParams === 'undefined' || !getMembershipsParams?.paginated;
 
-    if ((getMembershipsParams as GetMembershipsParams)?.limit) {
-      deprecated(
-        'limit',
-        'Use `pageSize` instead in Organization.getMemberships.',
-        'organization:getMemberships:limit',
-      );
-    }
-    if ((getMembershipsParams as GetMembershipsParams)?.offset) {
-      deprecated('offset', 'Use `initialPage` instead in Organization.limit.', 'organization:getMemberships:offset');
-    }
-
-    return await BaseResource._fetch(
-      {
-        path: `/organizations/${this.id}/memberships`,
-        method: 'GET',
-        search: isDeprecatedParams
-          ? getMembershipsParams
-          : (convertPageToOffset(getMembershipsParams as unknown as any) as any),
-      },
-      {
-        forceUpdateClient: true,
-      },
-    )
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/memberships`,
+      method: 'GET',
+      search: isDeprecatedParams
+        ? getMembershipsParams
+        : (convertPageToOffset(getMembershipsParams as unknown as any) as any),
+    })
       .then(res => {
         if (isDeprecatedParams) {
           const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
