@@ -15,7 +15,6 @@ import {
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
-  BeforeEmitCallback,
   BuildUrlWithAuthParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
@@ -605,17 +604,6 @@ export default class Clerk implements ClerkInterface {
     this.#emit();
     onAfterSetActive();
     this.#resetComponentsState();
-  };
-
-  /**
-   * @deprecated  Use `setActive` instead.
-   */
-  public setSession = async (
-    session: ActiveSessionResource | string | null,
-    beforeEmit?: BeforeEmitCallback,
-  ): Promise<void> => {
-    deprecated('setSession', 'Use `setActive` instead.', 'clerk:setSession');
-    return this.setActive({ session, beforeEmit });
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
