@@ -1,14 +1,10 @@
 export {
-  MagicLinkErrorCode,
   EmailLinkErrorCode,
   isClerkAPIResponseError,
+  isEmailLinkError,
   isKnownError,
   isMetamaskError,
-  isMagicLinkError,
-  isEmailLinkError,
 } from '@clerk/shared/error';
-
-export const noFrontendApiError = 'Clerk: You must add the frontendApi prop to your <ClerkProvider>';
 
 export const noClerkProviderError = 'Clerk: You must wrap your application in a <ClerkProvider> component.';
 
