@@ -86,7 +86,9 @@ export const interstitialJsonResponse = (
       __loader: opts.loader,
       __clerk_ssr_interstitial_html: loadInterstitialFromLocal({
         debugData: debugRequestState(requestState),
-        frontendApi: requestState.frontendApi,
+        // Use frontendApi only when legacy frontendApi is used to avoid showing deprecation warning
+        // since the requestState always contains the frontendApi constructed by publishableKey.
+        frontendApi: requestState.publishableKey ? '' : requestState.frontendApi,
         publishableKey: requestState.publishableKey,
         // TODO: This needs to be the version of clerk/remix not clerk/react
         // pkgVersion: LIB_VERSION,
@@ -155,7 +157,9 @@ export function getResponseClerkState(requestState: RequestState, context: AppLo
   const { reason, message, isSignedIn, isInterstitial, ...rest } = requestState;
   const clerkState = wrapWithClerkState({
     __clerk_ssr_state: rest.toAuth(),
-    __frontendApi: requestState.frontendApi,
+    // Use frontendApi only when legacy frontendApi is used to avoid showing deprecation warning
+    // since the requestState always contains the frontendApi constructed by publishableKey.
+    __frontendApi: requestState.publishableKey ? '' : requestState.frontendApi,
     __publishableKey: requestState.publishableKey,
     __proxyUrl: requestState.proxyUrl,
     __domain: requestState.domain,
