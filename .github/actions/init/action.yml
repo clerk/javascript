@@ -35,8 +35,8 @@ inputs:
   turbo-token:
     description: 'The token to use for Turbo remote auth'
     required: true
-  node-auth-token:
-    description: 'The token to use for publishing packages to NPM'
+  registry-url:
+    description: 'The registry the packages will be published to'
     required: false
     default: ''
 
@@ -95,6 +95,7 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
         NODE_AUTH_TOKEN: ${{ inputs.node-auth-token }}
+        registry-url: ${{ inputs.registry-url }}
 
     - name: Cache node_modules
       uses: actions/cache@v3
