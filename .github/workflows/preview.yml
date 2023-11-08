@@ -1,6 +1,9 @@
 name: Deploy Preview
 run-name: Deploy Preview by ${{ github.actor }}
 
+env:
+  COMMENT_HEADER: javascript-preview
+
 on:
   issue_comment:
     types: [created]
@@ -10,12 +13,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  snapshot-release:
-    if: ${{ startsWith(github.event.comment.body, '!preview') && github.repository == 'clerkinc/javascript' && github.event.issue.pull_request }}
+  preview:
+    if: ${{ startsWith(github.event.comment.body, '!preview') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+
     env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_CLERK_PROD_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_JS_PREVIEW_PROJECT_ID }}
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Limit action to Clerk members
         uses: actions/github-script@v6
@@ -26,7 +34,7 @@ jobs:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const isMember = await github.rest.orgs.checkMembershipForUser({
-              org: 'clerkinc',
+              org: 'clerk',
               username: context.actor
             });
             if (!isMember) {
@@ -34,81 +42,90 @@ jobs:
             }
 
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
+
       - name: Setup
-        uses: ./.github/actions/setup
-
-      - name: Extract snapshot name
-        id: extract-snapshot-name
-        uses: actions/github-script@v6
+        id: config
+        uses: ./.github/actions/init
         with:
-          script: |
-            const match = context.payload.comment.body.match(/!snapshot (.*)/)
-            const name = match && match[1] || '';
-            const isKebabCase = name.match(/^[a-z]+(-[a-z]+)*$/)
-            if(name && !isKebabCase) {
-              core.setFailed(`Invalid snapshot name: ${name}`);
-            }
-            core.setOutput('name', name);
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          registry-url: "https://registry.npmjs.org"
 
-      - name: Version packages for snapshot
-        id: version-packages
-        run: npm run version:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
+      - name: Build release
+        run: npx turbo build $TURBO_ARGS --force
 
-      - name: Snapshot release
-        if: steps.version-packages.outputs.success == '1'
-        run: npm run release:snapshot
+      - name: Get date
+        run: |
+          echo "DATE=$(date -u +"%b %d, %Y %I:%M %p")" >> $GITHUB_ENV
+
+      - name: Install site in isolation
+        run: node scripts/install-site-in-isolation.mjs playground/nextjs
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel environment information
+        working-directory: $FULL_TMP_FOLDER
+        run: |
+          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }}
+
+      - name: Copy clerk-js/dist into public/clerk-js of test site
+        run: |
+          cp -r $GITHUB_WORKSPACE/packages/clerk-js/dist $FULL_TMP_FOLDER/public/clerk-js
+
+      - name: Build with Vercel
+        working-directory: $FULL_TMP_FOLDER
+        run: |
+          vercel build --yes
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
+          NEXT_PUBLIC_CLERK_JS: /clerk-js/clerk.browser.js
 
-      - name: Package info
-        if: steps.version-packages.outputs.success == '1'
-        id: package-info
-        uses: actions/github-script@v6
+      - name: Deploy to Vercel (prebuilt)
+        id: vercel-deploy
+        working-directory: $FULL_TMP_FOLDER
+        run: |
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }} --no-wait > deployment_url.txt
+          echo "url=$(cat deployment_url.txt)" >> $GITHUB_OUTPUT
+
+      - name: Create preview comment - Deploying
+        uses: marocchino/sticky-pull-request-comment@v2.8.0
         with:
-          script: |
-            const fs = require("fs");
-            const files = await (await glob.create("./packages/*/package.json")).glob();
-            const descriptors = files
-              .map((file) => {
-                const { name, version } = JSON.parse(fs.readFileSync(file, "utf8"));
-                return { name, version };
-              })
-              .filter(({ version }) => version.includes("-${{ steps.extract-snapshot-name.outputs.name }}"));
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.pull_request.number }}
+          header: ${{ env.COMMENT_HEADER}}
+          message: |
+            Hey @${{ github.event.comment.user.login }}, your preview is currently deploying and should be available shortly.
 
-            let table = `| Package | Version |\n| --- | --- |\n`;
-            descriptors.forEach(({ name, version }) => {
-              table += `| ${name} | ${version} |\n`;
-            });
-            const snippets = descriptors
-              .map(
-                ({ name, version }) =>
-                  `\`${name}\`\n\`\`\`sh\nnpm i ${name}@${version} --save-exact\n\`\`\``
-              )
-              .join("\n");
-            core.setOutput("table", table);
-            core.setOutput("snippets", snippets);
+            | Status | Preview | Updated (UTC) |
+            | :-- | :-- | :-- |
+            | :cook: _Deploying..._ | [Inspect](${{ steps.vercel-deploy.outputs.url }}) | ${{ env.DATE }} |
 
+      - name: Get date
+        run: |
+          echo "DATE=$(date -u +"%b %d, %Y %I:%M %p")" >> $GITHUB_ENV
 
-      - name: Update Comment
-        if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@v3.0.0
+      - name: Wait for deployment
+        id: vercel-wait-for-deploy
+        run: |
+          vercel inspect --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }} --wait ${{ steps.vercel-deploy.outputs.url }} --timeout 10m --scope clerk-production
+          vercel alias set ${{ steps.vercel-deploy.outputs.url }} javascript-preview-${{ github.event.pull_request.number }}.clerkpreview.com --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }} --scope clerk-production
+          echo "stable_url=https://javascript-preview-${{ github.event.pull_request.number }}.clerkpreview.com" >> $GITHUB_OUTPUT
+
+      - name: Create preview comment - deployed
+        uses: marocchino/sticky-pull-request-comment@v2.8.0
         with:
-          token: ${{ secrets.CLERK_COOKIE_PAT }}
-          comment-id: ${{ github.event.comment.id }}
-          reactions: heart
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.pull_request.number }}
+          header: ${{ env.COMMENT_HEADER }}
+          message: |
+            Hey @${{ github.event.comment.user.login }}, your preview is available.
 
-      - name: Create snapshot release comment
-        if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@v3.0.0
-        with:
-          token: ${{ secrets.CLERK_COOKIE_PAT }}
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            Hey @${{ github.event.comment.user.login }} - the snapshot version command generated the following package versions:
-            ${{ steps.package-info.outputs.table }}
-            Tip: Use the snippet copy button below to quickly install the required packages.
-            ${{ steps.package-info.outputs.snippets }}
+            | Status | Preview | Updated (UTC) |
+            | :-- | :-- | :-- |
+            | :cookie: Deployed | [Visit preview](${{ steps.vercel-wait-for-deploy.outputs.stable_url }}) | ${{ env.DATE }} |
+
+            <!-- deployed:true -->
