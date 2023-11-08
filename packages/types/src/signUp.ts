@@ -127,11 +127,7 @@ export type PrepareVerificationParams =
 
 export type AttemptVerificationParams =
   | {
-      strategy: EmailCodeStrategy;
-      code: string;
-    }
-  | {
-      strategy: PhoneCodeStrategy;
+      strategy: EmailCodeStrategy | PhoneCodeStrategy;
       code: string;
     }
   | {

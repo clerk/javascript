@@ -1,4 +1,3 @@
-import { deprecated } from '@clerk/shared/deprecated';
 import type {
   AttemptWeb3WalletVerificationParams,
   PrepareWeb3WalletVerificationParams,
@@ -7,7 +6,6 @@ import type {
   Web3WalletResource,
 } from '@clerk/types';
 
-import { clerkMissingOptionError, clerkVerifyWeb3WalletCalledBeforeCreate } from '../../core/errors';
 import { BaseResource, Verification } from './internal';
 
 export class Web3Wallet extends BaseResource implements Web3WalletResource {
@@ -36,41 +34,11 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
   };
 
   attemptVerification = (params: AttemptWeb3WalletVerificationParams): Promise<this> => {
-    const { signature, generateSignature } = params || {};
-
-    if (generateSignature) {
-      deprecated('generateSignature', 'Use signature field instead.');
-    }
-
-    if (signature) {
-      return this._basePost<Web3WalletJSON>({
-        action: 'attempt_verification',
-        body: { signature },
-      });
-    }
-
-    if (!(typeof generateSignature === 'function')) {
-      clerkMissingOptionError('generateSignature');
-    }
-
-    const generateSignatureForNonce = async (): Promise<this> => {
-      if (!(typeof generateSignature === 'function')) {
-        clerkMissingOptionError('generateSignature');
-      }
-
-      const { nonce } = this.verification;
-      if (!nonce) {
-        clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
-      }
-
-      const generatedSignature = await generateSignature({ identifier: this.web3Wallet, nonce });
-      return this._basePost<Web3WalletJSON>({
-        action: 'attempt_verification',
-        body: { signature: generatedSignature },
-      });
-    };
-
-    return generateSignatureForNonce();
+    const { signature } = params;
+    return this._basePost<Web3WalletJSON>({
+      action: 'attempt_verification',
+      body: { signature },
+    });
   };
 
   destroy(): Promise<void> {

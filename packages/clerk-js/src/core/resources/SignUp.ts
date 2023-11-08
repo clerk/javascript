@@ -1,4 +1,4 @@
-import { deprecated, Poller } from '@clerk/shared';
+import { Poller } from '@clerk/shared';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,
@@ -27,7 +27,6 @@ import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { retrieveCaptchaInfo } from '../../utils/retrieveCaptchaInfo';
 import {
   clerkInvalidFAPIResponse,
-  clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
@@ -160,27 +159,8 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   attemptWeb3WalletVerification = async (params: AttemptWeb3WalletVerificationParams): Promise<SignUpResource> => {
-    const { signature, generateSignature } = params || {};
-
-    if (generateSignature) {
-      deprecated('generateSignature', 'Use signature field instead.');
-    }
-
-    if (signature) {
-      return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
-    }
-
-    if (!(typeof generateSignature === 'function')) {
-      clerkMissingOptionError('generateSignature');
-    }
-
-    const { nonce } = this.verifications.web3Wallet;
-    if (!nonce) {
-      clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
-    }
-
-    const generatedSignature = await generateSignature({ identifier: this.web3wallet!, nonce });
-    return this.attemptVerification({ signature: generatedSignature, strategy: 'web3_metamask_signature' });
+    const { signature } = params;
+    return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
   };
 
   public authenticateWithWeb3 = async (

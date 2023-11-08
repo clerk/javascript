@@ -7,9 +7,7 @@ export type PrepareWeb3WalletVerificationParams = {
 };
 
 export type AttemptWeb3WalletVerificationParams = {
-  signature?: string;
-  /** @deprecated Use signature field instead */
-  generateSignature?: GenerateSignature;
+  signature: string;
 };
 
 export interface Web3WalletResource extends ClerkResource {
