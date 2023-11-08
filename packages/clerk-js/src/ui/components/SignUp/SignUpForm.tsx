@@ -82,7 +82,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
       )}
       {shouldShow('password') && (
         <Form.ControlRow elementId='password'>
-          <Form.Control
+          <Form.PasswordInput
             {...{
               ...formState.password.props,
               isRequired: fields.password!.required,
