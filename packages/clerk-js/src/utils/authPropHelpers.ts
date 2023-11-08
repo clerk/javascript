@@ -120,5 +120,5 @@ export const normalizeRoutingOptions = ({
   routing?: RoutingStrategy;
   path?: string;
 }): RoutingOptions => {
-  return { routing: !!path && routing === undefined ? 'path' : routing, path } as RoutingOptions;
+  return { routing: !!path && !routing ? 'path' : routing, path } as RoutingOptions;
 };

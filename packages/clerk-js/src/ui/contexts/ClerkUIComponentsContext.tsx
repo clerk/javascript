@@ -241,8 +241,7 @@ export const useUserButtonContext = () => {
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
-  const userProfileMode =
-    !!ctx.userProfileUrl && ctx.userProfileMode === undefined ? 'navigation' : ctx.userProfileMode;
+  const userProfileMode = !!ctx.userProfileUrl && !ctx.userProfileMode ? 'navigation' : ctx.userProfileMode;
 
   return {
     ...ctx,
@@ -315,12 +314,10 @@ export const useOrganizationSwitcherContext = () => {
   const navigateAfterSelectPersonal = (user: UserResource) => navigateAfterSelectOrganizationOrPersonal({ user });
 
   const organizationProfileMode =
-    !!ctx.organizationProfileUrl && ctx.organizationProfileMode === undefined
-      ? 'navigation'
-      : ctx.organizationProfileMode;
+    !!ctx.organizationProfileUrl && !ctx.organizationProfileMode ? 'navigation' : ctx.organizationProfileMode;
 
   const createOrganizationMode =
-    !!ctx.createOrganizationUrl && ctx.createOrganizationMode === undefined ? 'navigation' : ctx.createOrganizationMode;
+    !!ctx.createOrganizationUrl && !ctx.createOrganizationMode ? 'navigation' : ctx.createOrganizationMode;
 
   return {
     ...ctx,
