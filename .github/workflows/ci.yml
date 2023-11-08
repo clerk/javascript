@@ -133,19 +133,16 @@ jobs:
 
     strategy:
       matrix:
-        # TODO: Remove `matrix.test-name != 'remix'` when ready, or from matrix when required check is disabled
-        test-name: [ 'generic', 'nextjs', 'remix' ]
+        test-name: [ 'generic', 'nextjs' ]
 
     steps:
       - name: Checkout Repo
-        if: ${{ matrix.test-name != 'remix' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           show-progress: false
 
       - name: Setup
-        if: ${{ matrix.test-name != 'remix' }}
         id: config
         uses: ./.github/actions/init
         with:
@@ -155,24 +152,20 @@ jobs:
           playwright-enabled: true
 
       - name: Verdaccio
-        if: ${{ matrix.test-name != 'remix' }}
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
             if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
-        if: ${{ matrix.test-name != 'remix' }}
         working-directory: ./integration
         run: npm init -y && npm install @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
-        if: ${{ matrix.test-name != 'remix' }}
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
-        if: ${{ matrix.test-name != 'remix' }}
         run: npm run test:integration:${{ matrix.test-name }}
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
@@ -181,7 +174,6 @@ jobs:
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
       # - name: Upload Integration Report for ${{ matrix.test-name }}
-      #   if: ${{ matrix.test-name != 'remix' }}
       #   uses: actions/upload-artifact@v3
       #   if: always()
       #   with:
