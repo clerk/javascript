@@ -1,4 +1,4 @@
-import { isLegacyFrontendApiKey, isPublishableKey } from '@clerk/shared/keys';
+import { isPublishableKey } from '@clerk/shared/keys';
 import type { InitialState } from '@clerk/types';
 import React from 'react';
 
@@ -19,15 +19,13 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const { initialState, children, ...restIsomorphicClerkOptions } = props;
-  const { frontendApi = '', publishableKey = '', Clerk: userInitialisedClerk } = restIsomorphicClerkOptions;
+  const { publishableKey = '', Clerk: userInitialisedClerk } = restIsomorphicClerkOptions;
 
   if (!userInitialisedClerk) {
-    if (!publishableKey && !frontendApi) {
+    if (!publishableKey) {
       errorThrower.throwMissingPublishableKeyError();
     } else if (publishableKey && !isPublishableKey(publishableKey)) {
       errorThrower.throwInvalidPublishableKeyError({ key: publishableKey });
-    } else if (!publishableKey && frontendApi && !isLegacyFrontendApiKey(frontendApi)) {
-      errorThrower.throwInvalidFrontendApiError({ key: frontendApi });
     }
   }
 
