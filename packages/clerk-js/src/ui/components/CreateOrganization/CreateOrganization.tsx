@@ -38,7 +38,7 @@ export const CreateOrganization = withOrganizationsEnabledGuard(
   { mode: 'redirect' },
 );
 
-export const CreateOrganizationModal = (props: Omit<CreateOrganizationProps, 'path'>): JSX.Element => {
+export const CreateOrganizationModal = (props: Omit<CreateOrganizationProps, 'path' | 'routing'>): JSX.Element => {
   const createOrganizationProps: CreateOrganizationCtx = {
     ...props,
     routing: 'virtual',

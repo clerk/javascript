@@ -42,7 +42,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 
 export const UserProfile = withRedirectToHomeUserGuard(withCardStateProvider(_UserProfile));
 
-export const UserProfileModal = (props: Omit<UserProfileProps, 'path'>): JSX.Element => {
+export const UserProfileModal = (props: Omit<UserProfileProps, 'path' | 'routing'>): JSX.Element => {
   const userProfileProps: UserProfileCtx = {
     ...props,
     routing: 'virtual',
