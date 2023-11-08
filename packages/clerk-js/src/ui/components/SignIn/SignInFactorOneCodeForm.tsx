@@ -77,7 +77,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
           return clerk.__internal_navigateWithError('..', err.errors[0]);
         }
 
-        reject(err);
+        return reject(err);
       });
   };
 

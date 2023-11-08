@@ -88,7 +88,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
           return clerk.__internal_navigateWithError('..', err.errors[0]);
         }
 
-        reject(err);
+        return reject(err);
       });
   };
 
