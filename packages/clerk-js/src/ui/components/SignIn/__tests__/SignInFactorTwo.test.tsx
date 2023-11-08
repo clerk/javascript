@@ -1,3 +1,4 @@
+import { parseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
@@ -200,6 +201,36 @@ describe('SignInFactorTwo', () => {
           await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
         });
       }, 10000);
+
+      it('redirects back to sign-in if the user is locked', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+          f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'user_locked',
+          long_message: 'Your account is locked. Please contact support for more information.',
+          message: 'Account locked',
+        };
+
+        fixtures.signIn.attemptSecondFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+          expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
+        });
+      });
     });
 
     describe('Authenticator app', () => {
@@ -349,6 +380,42 @@ describe('SignInFactorTwo', () => {
           await waitFor(() => expect(screen.getByText('Incorrect backup code')).toBeDefined());
         });
       }, 10000);
+
+      it('redirects back to sign-in if the user is locked', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInFactorTwo({
+            supportPhoneCode: false,
+            supportBackupCode: true,
+          });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'user_locked',
+          long_message: 'Your account is locked. Please try again after 30 minutes.',
+          message: 'Account locked',
+          meta: { duration_in_seconds: 1800 },
+        };
+
+        fixtures.signIn.attemptSecondFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        await runFakeTimers(async () => {
+          const { userEvent, getByLabelText, getByText } = render(<SignInFactorTwo />, { wrapper });
+          await userEvent.type(getByLabelText('Backup code'), '123456');
+          await userEvent.click(getByText('Continue'));
+          await waitFor(() => {
+            expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
+          });
+        });
+      });
     });
   });
 

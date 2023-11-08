@@ -48,6 +48,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
   });
   mockProp(clerk, 'navigate');
   mockProp(clerk, 'setActive');
+  mockProp(clerk, '__internal_navigateWithError');
   return clerk as any as DeepJestMocked<LoadedClerk>;
 };
 

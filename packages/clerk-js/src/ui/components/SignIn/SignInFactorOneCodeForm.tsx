@@ -1,3 +1,4 @@
+import { isUserLockedError } from '@clerk/shared';
 import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
@@ -34,6 +35,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const { navigateAfterSignIn } = useSignInContext();
   const { setActive } = useCoreClerk();
   const supportEmail = useSupportEmail();
+  const clerk = useCoreClerk();
 
   const goBack = () => {
     return navigate('../');
@@ -69,7 +71,14 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
       })
-      .catch(err => reject(err));
+      .catch(err => {
+        if (isUserLockedError(err)) {
+          // @ts-expect-error -- private method for the time being
+          return clerk.__internal_navigateWithError('..', err.errors[0]);
+        }
+
+        return reject(err);
+      });
   };
 
   return (
