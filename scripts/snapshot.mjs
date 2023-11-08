@@ -1,6 +1,7 @@
 #!/usr/bin/env zx
 
-import 'zx/globals';
+import { $, argv, echo } from 'zx';
+
 import { constants } from './common.mjs';
 
 console.log(constants);

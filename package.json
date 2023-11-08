@@ -43,6 +43,7 @@
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace --sig; cd '../../'; done"
   },
   "devDependencies": {
+    "@actions/core": "^1.10.1",
     "@arethetypeswrong/cli": "^0.12.1",
     "@changesets/cli": "^2.26.2",
     "@changesets/get-github-info": "^0.5.2",
@@ -62,6 +63,7 @@
     "@types/react-dom": "^18.2.13",
     "citty": "^0.1.4",
     "conventional-changelog-conventionalcommits": "^4.6.3",
+    "cpy-cli": "^5.0.0",
     "cross-spawn": "^7.0.3",
     "dotenv": "^16.3.1",
     "eslint": "^8.49.0",

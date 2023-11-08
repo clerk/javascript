@@ -1,8 +1,7 @@
 #!/usr/bin/env zx
 
-import 'zx/globals';
-
 import fs from 'fs';
+import { argv } from 'zx';
 
 const loadJSON = path => JSON.parse(fs.readFileSync(new URL(path, import.meta.url)));
 const writeJSON = (path, contents) =>
