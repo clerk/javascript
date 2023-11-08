@@ -1,4 +1,3 @@
-import { deprecated } from '@clerk/shared/deprecated';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
@@ -209,12 +208,6 @@ export class User extends BaseResource implements UserResource {
   };
 
   update = (params: UpdateUserParams): Promise<UserResource> => {
-    if (params.password) {
-      deprecated(
-        'password',
-        'This will be removed in the next major version. Please use `updatePassword(params)` instead.',
-      );
-    }
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });

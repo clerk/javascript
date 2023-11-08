@@ -138,14 +138,7 @@ type UpdateUserJSON = Pick<
   | 'unsafe_metadata'
 >;
 
-export type UpdateUserParams = Partial<
-  SnakeToCamel<UpdateUserJSON> & {
-    /**
-     * @deprecated This will be removed in the next major version. Please use `updatePassword(params)` instead
-     */
-    password: string;
-  }
->;
+export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
 
 export type UpdateUserPasswordParams = {
   newPassword: string;
