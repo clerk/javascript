@@ -817,7 +817,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * Full URL or path to navigate after a successful selection of personal workspace.
      * Accepts a function that returns URL or path
-     * @default undefined`
+     * @default undefined
      */
     afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
     /**
