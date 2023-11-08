@@ -141,17 +141,16 @@ export class TelemetryCollector {
   }
 
   #sendEvent(event: TelemetryEvent): void {
-    fetch(new URL('/v0/events', this.#config.endpoint), {
+    fetch(new URL('/v1/event', this.#config.endpoint), {
       method: 'POST',
       // TODO: We send an array here with that idea that we can eventually send multiple events.
       body: JSON.stringify({
         events: [event],
       }),
-      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
       },
-    }).catch(() => void 0);
+    }).catch(err => console.error(err));
   }
 
   /**
