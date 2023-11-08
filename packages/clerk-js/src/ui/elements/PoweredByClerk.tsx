@@ -76,7 +76,7 @@ export const PoweredByClerkTag = React.memo(
           variant='extraSmallRegular'
           sx={theme => ({ color: 'inherit', letterSpacing: theme.space.$none, fontSize: '0.625rem' })}
         >
-          Secured by
+          Provided by
         </Text>
         <LogoMarkIconLink />
       </Flex>
