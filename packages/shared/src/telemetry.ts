@@ -1,12 +1,6 @@
-import type { Clerk, InstanceType } from '@clerk/types';
+import type { InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from './keys';
-
-declare global {
-  interface Window {
-    Clerk: Clerk;
-  }
-}
 
 type TelemetryCollectorOptions = {
   /**
@@ -35,7 +29,10 @@ type TelemetryCollectorOptions = {
   sdkVersion?: string;
 };
 
-type TelemetryCollectorConfig = Pick<TelemetryCollectorOptions, 'samplingRate' | 'verbose'> & { endpoint: string };
+type TelemetryCollectorConfig = Pick<TelemetryCollectorOptions, 'samplingRate' | 'verbose'> & {
+  endpoint: string;
+  maxBufferSize: number;
+};
 
 type TelemetryMetadata = Required<
   Pick<TelemetryCollectorOptions, 'clerkVersion' | 'sdk' | 'sdkVersion' | 'publishableKey'>
@@ -74,12 +71,15 @@ type TelemetryEvent = {
 const DEFAULT_CONFIG: Partial<Required<TelemetryCollectorConfig>> = {
   samplingRate: 1,
   verbose: false,
+  maxBufferSize: 5,
 };
 
 // TODO: determine some type of throttle/dedupe heuristic to avoid sending excessive events for e.g. a component render
 export class TelemetryCollector {
   #config: Required<TelemetryCollectorConfig>;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
+  #buffer: TelemetryEvent[] = [];
+  #pendingFlush: any;
 
   constructor(options: TelemetryCollectorOptions) {
     this.#config = {
@@ -106,7 +106,6 @@ export class TelemetryCollector {
       this.#metadata.instanceType = parsedKey.instanceType;
     }
 
-    // TODO: determine FAPI endpoint from the publishable key
     // this.#config.endpoint = 'https://telemetry-service-staging.bryce-clerk.workers.dev';
     this.#config.endpoint = 'http://localhost:8787';
   }
@@ -133,24 +132,65 @@ export class TelemetryCollector {
       return;
     }
 
-    this.#sendEvent(preparedPayload);
+    this.#buffer.push(preparedPayload);
+
+    this.#scheduleFlush();
   }
 
   #shouldRecord(): boolean {
     return Math.random() <= this.#config.samplingRate;
   }
 
-  #sendEvent(event: TelemetryEvent): void {
+  #scheduleFlush(): void {
+    // On the server, we want to flush immediately as we have less guarantees about the lifecycle of the process
+    if (typeof window === 'undefined') {
+      this.#flush();
+      return;
+    }
+
+    const isBufferFull = this.#buffer.length >= this.#config.maxBufferSize;
+    if (isBufferFull) {
+      // If the buffer is full, flush immediately to make sure we minimize the chance of event loss.
+      // Cancel any pending flushes as we're going to flush immediately
+      if (this.#pendingFlush) {
+        const cancel = cancelIdleCallback || clearTimeout;
+        cancel(this.#pendingFlush);
+      }
+      this.#flush();
+      return;
+    }
+
+    // If we have a pending flush, do nothing
+    if (this.#pendingFlush) return;
+
+    if ('requestIdleCallback' in window) {
+      this.#pendingFlush = requestIdleCallback(() => {
+        this.#flush();
+      });
+    } else {
+      // This is not an ideal solution, but it at least waits until the next tick
+      this.#pendingFlush = setTimeout(() => {
+        this.#flush();
+      }, 0);
+    }
+  }
+
+  #flush(): void {
     fetch(new URL('/v1/event', this.#config.endpoint), {
       method: 'POST',
       // TODO: We send an array here with that idea that we can eventually send multiple events.
       body: JSON.stringify({
-        events: [event],
+        events: this.#buffer,
       }),
       headers: {
         'Content-Type': 'application/json',
       },
-    }).catch(err => console.error(err));
+    })
+      .catch(err => console.error(err))
+      .then(() => {
+        this.#buffer = [];
+      })
+      .catch(() => void 0);
   }
 
   /**
@@ -181,8 +221,10 @@ export class TelemetryCollector {
       version: this.#metadata.sdkVersion,
     };
 
+    // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
     if (typeof window !== 'undefined' && window.Clerk) {
-      sdkMetadata = { ...sdkMetadata, ...window.Clerk.sdkMetadata };
+      // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
+      sdkMetadata = { ...sdkMetadata, ...window.Clerk.constructor.prototype.sdkMetadata };
     }
 
     return sdkMetadata;
