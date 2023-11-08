@@ -124,10 +124,6 @@ export type CreateExternalAccountParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
-  /**
-   * @deprecated Use `redirectUrl` instead.
-   */
-  redirect_url?: string;
 };
 export type VerifyTOTPParams = { code: string };
 
