@@ -6,16 +6,12 @@ type ClerkProviderProps = Parameters<typeof ClerkProvider>[0];
 
 describe('ClerkProvider', () => {
   describe('Type tests', () => {
-    describe('publishableKey and frontendApi', () => {
+    describe('publishableKey', () => {
       it('expects children as the minimum accepted case', () => {
         expectTypeOf({ children: '' }).toMatchTypeOf<ClerkProviderProps>();
       });
 
-      it('publishable key is replaceable with frontendApi', () => {
-        expectTypeOf({ frontendApi: 'test', children: '' }).toMatchTypeOf<ClerkProviderProps>();
-      });
-
-      it('does not error if no publishableKey or frontendApi', () => {
+      it('does not error if no publishableKey', () => {
         expectTypeOf({ children: '' }).toMatchTypeOf<ClerkProviderProps>();
       });
     });

@@ -1,15 +1,17 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import { test as setup } from '@playwright/test';
 
 import { constants } from '../constants';
 import { appConfigs } from '../presets';
-import { fs, parseEnvOptions } from '../scripts';
+import { fs, parseEnvOptions, startClerkJsHttpServer } from '../scripts';
 
 setup('start long running apps', async () => {
+  await fs.remove(constants.TMP_DIR);
+  await fs.ensureDir(constants.TMP_DIR);
+
+  await startClerkJsHttpServer();
+
   const { appIds } = parseEnvOptions();
   if (appIds.length) {
-    // await cleanupOldProcesses();
-    await fs.remove(constants.TMP_DIR);
     const apps = appConfigs.longRunningApps.getByPattern(appIds);
     // state cannot be shared using playwright,
     // so we save the state in a file using a strategy similar to `storageState`
@@ -19,16 +21,3 @@ setup('start long running apps', async () => {
   }
   console.log('Apps started');
 });
-
-// Useful to make sure that older processes are killed before starting new ones
-// not meant to be run under normal circumstances
-// only used for cases where the test runner is not able to kill the process
-// eg debugging the e2e infra itself
-// const cleanupOldProcesses = async () => {
-//   const apps = (await stateFile.getLongRunningApps()) || {};
-//   const pids = Object.values(apps).map(app => app.pid);
-//   pids.forEach(pid => {
-//     console.log('Killing old process', pid);
-//     treekill(pid, 'SIGKILL');
-//   });
-// };

@@ -45,7 +45,6 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
   assertValidClerkState(clerkState);
   const {
     __clerk_ssr_state,
-    __frontendApi,
     __publishableKey,
     __proxyUrl,
     __domain,
@@ -68,7 +67,6 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
   }, []);
 
   const mergedProps = {
-    frontendApi: __frontendApi as any,
     publishableKey: __publishableKey as any,
     proxyUrl: __proxyUrl as any,
     domain: __domain as any,

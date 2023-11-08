@@ -1,5 +1,0 @@
-{
-  "main": "../dist/cjs/app-beta/index.js",
-  "module": "../dist/esm/app-beta/index.js",
-  "types": "../dist/types/app-beta/index.d.ts"
-}

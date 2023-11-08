@@ -1,4 +1,4 @@
-import { assertContextExists, UserContext, useUserContext } from '@clerk/shared';
+import { assertContextExists, UserContext, useUserContext } from '@clerk/shared/react';
 import React, { useContext } from 'react';
 
 import { clerkCoreErrorUserIsNotDefined } from '../../core/errors';

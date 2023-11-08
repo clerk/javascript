@@ -5,7 +5,7 @@ import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys, useLocalizations } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
-import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
+import { useConfirmPassword } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
@@ -18,7 +18,6 @@ export const _ResetPassword = () => {
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
-  const { failedValidationsText } = usePasswordComplexity(passwordSettings);
 
   const { t, locale } = useLocalizations();
 
@@ -38,7 +37,6 @@ export const _ResetPassword = () => {
     label: localizationKeys('formFieldLabel__newPassword'),
     isRequired: true,
     validatePassword: true,
-    informationText: failedValidationsText,
     buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
   });
 
@@ -46,7 +44,6 @@ export const _ResetPassword = () => {
     type: 'password',
     label: localizationKeys('formFieldLabel__confirmPassword'),
     isRequired: true,
-    enableErrorAfterBlur: true,
   });
 
   const sessionsField = useFormControl('signOutOfOtherSessions', '', {
@@ -55,7 +52,7 @@ export const _ResetPassword = () => {
     defaultChecked: true,
   });
 
-  const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
+  const { setConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
     passwordField,
     confirmPasswordField: confirmField,
   });
@@ -64,7 +61,7 @@ export const _ResetPassword = () => {
 
   const validateForm = () => {
     if (passwordField.value) {
-      displayConfirmPasswordFeedback(confirmField.value);
+      setConfirmPasswordFeedback(confirmField.value);
     }
   };
 
@@ -130,7 +127,9 @@ export const _ResetPassword = () => {
             <Form.Control
               {...confirmField.props}
               onChange={e => {
-                displayConfirmPasswordFeedback(e.target.value);
+                if (e.target.value) {
+                  setConfirmPasswordFeedback(e.target.value);
+                }
                 return confirmField.props.onChange(e);
               }}
             />

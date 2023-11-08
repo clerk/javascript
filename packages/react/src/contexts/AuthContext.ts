@@ -1,4 +1,4 @@
-import { createContextAndHook } from '@clerk/shared';
+import { createContextAndHook } from '@clerk/shared/react';
 import type { ActJWTClaim, MembershipRole } from '@clerk/types';
 
 export const [AuthContext, useAuthContext] = createContextAndHook<{

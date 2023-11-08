@@ -1,13 +1,12 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { name, version } = require('./package.json');
 
 module.exports = {
-  displayName: 'clerk-js',
+  displayName: name.replace('@clerk', ''),
   injectGlobals: true,
 
   roots: ['<rootDir>/src'],
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>../../setupJest.afterEnv.ts'],
+  setupFilesAfterEnv: ['<rootDir>../../jest.setup-after-env.ts'],
 
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {

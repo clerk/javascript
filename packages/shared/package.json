@@ -1,32 +1,85 @@
 {
   "name": "@clerk/shared",
-  "version": "0.24.5",
+  "version": "2.0.0-alpha-v5.0",
   "description": "Internal package utils used by the Clerk SDKs",
-  "types": "./dist/types/index.d.ts",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "sideEffects": false,
-  "files": [
-    "dist"
-  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/shared"
+  },
+  "license": "MIT",
+  "author": "Clerk",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    }
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./*": {
+      "import": {
+        "types": "./dist/*.d.mts",
+        "default": "./dist/*.mjs"
+      },
+      "require": {
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.js"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react/index.d.mts",
+        "default": "./dist/react/index.mjs"
+      },
+      "require": {
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      }
+    },
+    "./package.json": "./package.json"
   },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "browser",
+    "callWithRetry",
+    "color",
+    "cookie",
+    "date",
+    "deprecated",
+    "error",
+    "file",
+    "globs",
+    "handleValueOrFn",
+    "isomorphicAtob",
+    "isomorphicBtoa",
+    "keys",
+    "loadScript",
+    "localStorageBroadcastChannel",
+    "poller",
+    "proxy",
+    "underscore",
+    "url",
+    "react",
+    "constants",
+    "apiUrlFromPublishableKey"
+  ],
   "scripts": {
     "build": "tsup",
+    "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
+    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.json",
-    "publish:local": "npx yalc push --replace  --sig",
-    "clean": "rimraf ./dist",
     "lint": "eslint src/",
-    "lint:publint": "publint",
     "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "publish:local": "npx yalc push --replace  --sig",
     "test": "jest",
+    "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
@@ -36,9 +89,11 @@
     "swr": "2.2.0"
   },
   "devDependencies": {
-    "@clerk/types": "3.56.1",
+    "@clerk/types": "4.0.0-alpha-v5.0",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
+    "@types/node": "^18.18.0",
+    "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
   },
@@ -50,14 +105,10 @@
       "optional": true
     }
   },
-  "author": "Clerk",
-  "license": "MIT",
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/shared"
   }
 }

@@ -1,5 +1,6 @@
 // There is no need to execute the complete authenticateRequest to test authMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
+import { expectTypeOf } from 'expect-type';
 import { NextURL } from 'next/dist/server/web/next-url';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -49,15 +50,10 @@ jest.mock('./authenticateRequest', () => {
 
 // Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
-jest.mock('./clerkClient', () => {
-  const { debugRequestState } = jest.requireActual('./clerkClient');
+jest.mock('./constants', () => {
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
-    clerkClient: {
-      localInterstitial: jest.fn().mockResolvedValue('<html>interstitial</html>'),
-    },
-    debugRequestState,
   };
 });
 
@@ -201,11 +197,13 @@ describe('default ignored routes matcher', () => {
 });
 
 describe('authMiddleware(params)', () => {
+  beforeAll(() => {
+    clerkClient.localInterstitial = jest.fn().mockResolvedValue('<html>interstitial</html>');
+  });
+
   beforeEach(() => {
-    // @ts-ignore
-    authenticateRequest.mockClear();
-    // @ts-ignore
-    clerkClient.localInterstitial.mockClear();
+    (authenticateRequest as jest.Mock).mockClear();
+    (clerkClient.localInterstitial as jest.Mock).mockClear();
   });
 
   describe('without params', function () {
@@ -596,5 +594,60 @@ describe('401 Response on Api Routes', function () {
     })(mockRequest({ url: '/public' }), {} as NextFetchEvent);
 
     expect(resp?.status).toEqual(200);
+  });
+});
+
+describe('Type tests', () => {
+  type AuthMiddleware = Parameters<typeof authMiddleware>[0];
+  describe('AuthMiddleware', () => {
+    it('is the options argument for authMiddleware', () => {
+      () => {
+        authMiddleware({} as AuthMiddleware);
+      };
+    });
+
+    it('can receive the appropriate keys', () => {
+      expectTypeOf({ publishableKey: '', secretKey: '' }).toMatchTypeOf<AuthMiddleware>();
+      expectTypeOf({ secretKey: '' }).toMatchTypeOf<AuthMiddleware>();
+      expectTypeOf({ publishableKey: '', secretKey: '' }).toMatchTypeOf<AuthMiddleware>();
+      expectTypeOf({ secretKey: '' }).toMatchTypeOf<AuthMiddleware>();
+    });
+
+    describe('Multi domain', () => {
+      const defaultProps = { publishableKey: '', secretKey: '' };
+
+      it('proxyUrl (primary app)', () => {
+        expectTypeOf({ ...defaultProps, proxyUrl: 'test' }).toMatchTypeOf<AuthMiddleware>();
+      });
+
+      it('proxyUrl + isSatellite (satellite app)', () => {
+        expectTypeOf({ ...defaultProps, proxyUrl: 'test', isSatellite: true }).toMatchTypeOf<AuthMiddleware>();
+      });
+
+      it('domain + isSatellite (satellite app)', () => {
+        expectTypeOf({ ...defaultProps, domain: 'test', isSatellite: true }).toMatchTypeOf<AuthMiddleware>();
+      });
+
+      it('only domain is not allowed', () => {
+        expectTypeOf({ ...defaultProps, domain: 'test' }).not.toMatchTypeOf<AuthMiddleware>();
+      });
+
+      it('only isSatellite is not allowed', () => {
+        expectTypeOf({ ...defaultProps, isSatellite: true }).not.toMatchTypeOf<AuthMiddleware>();
+      });
+
+      it('proxyUrl + domain is not allowed', () => {
+        expectTypeOf({ ...defaultProps, proxyUrl: 'test', domain: 'test' }).not.toMatchTypeOf<AuthMiddleware>();
+      });
+
+      it('proxyUrl + domain + isSatellite is not allowed', () => {
+        expectTypeOf({
+          ...defaultProps,
+          proxyUrl: 'test',
+          domain: 'test',
+          isSatellite: true,
+        }).not.toMatchTypeOf<AuthMiddleware>();
+      });
+    });
   });
 });

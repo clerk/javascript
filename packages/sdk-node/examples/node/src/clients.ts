@@ -31,7 +31,7 @@ try {
 
 try {
   console.log('Get client list with invalid API key');
-  clerk.apiKey = 'snafu';
+  clerk.secretKey = 'snafu';
   const invalidClients = await clerk.clients.getClientList();
   console.log(invalidClients);
 } catch (error) {

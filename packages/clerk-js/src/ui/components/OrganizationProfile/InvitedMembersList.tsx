@@ -3,24 +3,31 @@ import type { OrganizationInvitationResource } from '@clerk/types';
 import { useCoreOrganization } from '../../contexts';
 import { localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
-import { handleError, roleLocalizationKey } from '../../utils';
+import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
+import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';
+
+const invitationsParams = {
+  invitations: {
+    pageSize: 10,
+    keepPreviousData: true,
+  },
+};
 
 export const InvitedMembersList = () => {
   const card = useCardState();
-  const { organization, invitations } = useCoreOrganization({
-    invitations: true,
-  });
+  const { organization, invitations } = useCoreOrganization(invitationsParams);
 
   if (!organization) {
     return null;
   }
 
-  const revoke = (invitation: OrganizationInvitationResource) => () => {
+  const revoke = (invitation: OrganizationInvitationResource) => async () => {
     return card
       .runAsync(async () => {
         await invitation.revoke();
-        await (invitations as any).unstable__mutate?.();
+        await invitations?.revalidate?.();
+        return invitation;
       })
       .catch(err => handleError(err, [], card.setError));
   };
@@ -31,6 +38,7 @@ export const InvitedMembersList = () => {
       onPageChange={invitations?.fetchPage || (() => null)}
       itemCount={invitations?.count || 0}
       pageCount={invitations?.pageCount || 0}
+      itemsPerPage={invitationsParams.invitations.pageSize}
       isLoading={invitations?.isLoading}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.invitationsTab.table__emptyRow')}
       headers={[
@@ -52,6 +60,7 @@ export const InvitedMembersList = () => {
 
 const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRevoke: () => unknown }) => {
   const { invitation, onRevoke } = props;
+  const { localizeCustomRole } = useLocalizeCustomRoles();
   return (
     <RowContainer>
       <Td>
@@ -64,7 +73,7 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRe
       <Td>
         <Text
           colorScheme={'neutral'}
-          localizationKey={roleLocalizationKey(invitation.role)}
+          localizationKey={localizeCustomRole(invitation.role)}
         />
       </Td>
       <Td>

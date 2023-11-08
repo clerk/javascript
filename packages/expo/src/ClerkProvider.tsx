@@ -1,9 +1,7 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import './polyfills';
 
 import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
 import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
-import { deprecated } from '@clerk/shared';
 import React from 'react';
 
 import type { TokenCache } from './cache';
@@ -20,13 +18,8 @@ export type ClerkProviderProps = ClerkReactProviderProps & {
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache = MemoryTokenCache, frontendApi, publishableKey, ...rest } = props;
-  const key =
-    publishableKey || process.env.CLERK_PUBLISHABLE_KEY || frontendApi || process.env.CLERK_FRONTEND_API || '';
-
-  if (process.env.CLERK_FRONTEND_API) {
-    deprecated('CLERK_FRONTEND_API', 'Use `CLERK_PUBLISHABLE_KEY` instead.');
-  }
+  const { children, tokenCache = MemoryTokenCache, publishableKey, ...rest } = props;
+  const key = publishableKey || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   return (
     //@ts-expect-error

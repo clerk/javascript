@@ -11,9 +11,10 @@ import { generateErrorTextUtil } from './usePasswordComplexity';
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {
   const { t, locale } = useLocalizations();
   const {
-    onValidationFailed = noop,
+    onValidationError = noop,
     onValidationSuccess = noop,
     onValidationWarning = noop,
+    onValidationInfo = noop,
     onValidationComplexity,
   } = callbacks || {};
 
@@ -23,14 +24,18 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
        * Failed complexity rules always have priority
        */
       if (Object.values(res?.complexity || {}).length > 0) {
-        return onValidationFailed(
-          generateErrorTextUtil({
-            config,
-            t,
-            failedValidations: res.complexity,
-            locale,
-          }),
-        );
+        const message = generateErrorTextUtil({
+          config,
+          t,
+          failedValidations: res.complexity,
+          locale,
+        });
+
+        if (res.complexity?.min_length) {
+          return onValidationInfo(message);
+        }
+
+        return onValidationError(message);
       }
 
       /**
@@ -38,7 +43,7 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
        */
       if (res?.strength?.state === 'fail') {
         const error = res.strength.keys.map(localizationKey => t(localizationKeys(localizationKey as any))).join(' ');
-        return onValidationFailed(error);
+        return onValidationError(error);
       }
 
       /**
@@ -57,7 +62,7 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
     [callbacks, t, locale],
   );
 
-  const setPassword = useMemo(() => {
+  const validatePassword = useMemo(() => {
     return createValidatePassword(config, {
       onValidation: onValidate,
       onValidationComplexity,
@@ -65,7 +70,7 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
   }, [onValidate]);
 
   return {
-    setPassword,
+    validatePassword,
   };
 };
 
@@ -87,19 +92,19 @@ export const useConfirmPassword = ({
     [checkPasswordMatch, confirmPasswordField.value],
   );
 
-  const displayConfirmPasswordFeedback = useCallback(
+  const setConfirmPasswordFeedback = useCallback(
     (password: string) => {
       if (checkPasswordMatch(password)) {
-        confirmPasswordField.setSuccessful(t(localizationKeys('formFieldError__matchingPasswords')));
+        confirmPasswordField.setSuccess(t(localizationKeys('formFieldError__matchingPasswords')));
       } else {
         confirmPasswordField.setError(t(localizationKeys('formFieldError__notMatchingPasswords')));
       }
     },
-    [confirmPasswordField.setError, confirmPasswordField.setSuccessful, t, checkPasswordMatch],
+    [confirmPasswordField.setError, confirmPasswordField.setSuccess, t, checkPasswordMatch],
   );
 
   return {
-    displayConfirmPasswordFeedback,
+    setConfirmPasswordFeedback,
     isPasswordMatch,
   };
 };

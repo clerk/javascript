@@ -3,15 +3,15 @@
  * If you do, app router will break.
  */
 export {
-  RedirectToUserProfile,
-  RedirectToSignUp,
-  RedirectToSignIn,
-  RedirectToOrganizationProfile,
-  RedirectToCreateOrganization,
-  MultisessionAppSupport,
-  ClerkLoading,
-  ClerkLoaded,
   AuthenticateWithRedirectCallback,
+  ClerkLoaded,
+  ClerkLoading,
+  MultisessionAppSupport,
+  RedirectToCreateOrganization,
+  RedirectToOrganizationProfile,
+  RedirectToSignIn,
+  RedirectToSignUp,
+  RedirectToUserProfile,
 } from './client-boundary/controlComponents';
 
 /**
@@ -19,18 +19,18 @@ export {
  * If you do, app router will break.
  */
 export {
+  CreateOrganization,
+  OrganizationList,
+  OrganizationProfile,
+  OrganizationSwitcher,
+  SignIn,
+  SignInButton,
+  SignInWithMetamaskButton,
+  SignOutButton,
+  SignUp,
+  SignUpButton,
   UserButton,
   UserProfile,
-  SignUpButton,
-  SignIn,
-  SignUp,
-  OrganizationSwitcher,
-  OrganizationProfile,
-  CreateOrganization,
-  SignInButton,
-  SignOutButton,
-  SignInWithMetamaskButton,
-  OrganizationList,
 } from './client-boundary/uiComponents';
 
 /**
@@ -38,34 +38,31 @@ export {
  * If you do, app router will break.
  */
 export {
-  useUser,
+  EmailLinkErrorCode,
+  WithClerk,
+  WithSession,
+  WithUser,
+  isClerkAPIResponseError,
+  isEmailLinkError,
+  isKnownError,
+  isMetamaskError,
   useAuth,
-  useSession,
   useClerk,
-  useSignIn,
-  useSignUp,
-  useSessionList,
+  useEmailLink,
   useOrganization,
   useOrganizationList,
   useOrganizations,
-  useEmailLink,
-  useMagicLink,
-  EmailLinkErrorCode,
-  MagicLinkErrorCode,
-  isEmailLinkError,
-  isMagicLinkError,
-  isClerkAPIResponseError,
-  isMetamaskError,
-  isKnownError,
-  withUser,
-  withSession,
+  useSession,
+  useSessionList,
+  useSignIn,
+  useSignUp,
+  useUser,
   withClerk,
-  WithUser,
-  WithSession,
-  WithClerk,
+  withSession,
+  withUser,
 } from './client-boundary/hooks';
 
-export type { WithUserProp, WithSessionProp, WithClerkProp } from './client-boundary/hooks';
+export type { WithClerkProp, WithSessionProp, WithUserProp } from './client-boundary/hooks';
 
 /**
  * Conditionally export components that exhibit different behavior
@@ -93,6 +90,12 @@ export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsS
 export const SignedIn = ComponentsModule.SignedIn as ServerComponentsServerModuleTypes['SignedIn'];
 export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerModuleTypes['SignedOut'];
 
+/**
+ * @experimental
+ */
+export const Experimental__Gate =
+  ComponentsModule.Experimental__Gate as ServerComponentsServerModuleTypes['Experimental__Gate'];
+
 export const auth = ServerHelperModule.auth as ServerHelpersServerModuleTypes['auth'];
 export const currentUser = ServerHelperModule.currentUser as ServerHelpersServerModuleTypes['currentUser'];
 // export const getAuth = ServerHelperModule.getAuth as ServerHelpersServerModuleTypes['getAuth'];
@@ -102,5 +105,3 @@ export const redirectToSignIn =
   ServerHelperModule.redirectToSignIn as ServerHelpersServerModuleTypes['redirectToSignIn'];
 export const redirectToSignUp =
   ServerHelperModule.redirectToSignUp as ServerHelpersServerModuleTypes['redirectToSignUp'];
-export const withClerkMiddleware =
-  ServerHelperModule.withClerkMiddleware as ServerHelpersServerModuleTypes['withClerkMiddleware'];

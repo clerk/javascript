@@ -10,6 +10,7 @@ import type {
   UserProfileTheme,
 } from './appearance';
 import type { ClientResource } from './client';
+import type { CustomPage } from './customPages';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
@@ -721,6 +722,10 @@ export type UserProfileProps = {
    * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
    */
   additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
+  /*
+   * Provide custom pages and links to be rendered inside the UserProfile.
+   */
+  customPages?: CustomPage[];
 };
 
 export type OrganizationProfileProps = {
@@ -743,6 +748,10 @@ export type OrganizationProfileProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: OrganizationProfileTheme;
+  /*
+   * Provide custom pages and links to be rendered inside the OrganizationProfile.
+   */
+  customPages?: CustomPage[];
 };
 
 export type CreateOrganizationProps = {
@@ -831,7 +840,7 @@ export type UserButtonProps = {
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages'>;
 };
 
 type PrimitiveKeys<T> = {
@@ -921,7 +930,7 @@ export type OrganizationSwitcherProps = {
    * Specify options for the underlying <OrganizationProfile /> component.
    * e.g. <UserButton userProfileProps={{appearance: {...}}} />
    */
-  organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
+  organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
 };
 
 export type OrganizationListProps = {

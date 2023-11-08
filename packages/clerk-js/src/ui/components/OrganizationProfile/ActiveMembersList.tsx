@@ -1,44 +1,45 @@
-import type { MembershipRole, OrganizationMembershipResource } from '@clerk/types';
+import type { OrganizationMembershipResource } from '@clerk/types';
 
 import { Gate } from '../../common/Gate';
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
-import { handleError, roleLocalizationKey } from '../../utils';
+import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
+import { handleError } from '../../utils';
 import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
+
+const membershipsParams = {
+  memberships: {
+    pageSize: 10,
+    keepPreviousData: true,
+  },
+};
 
 export const ActiveMembersList = () => {
   const card = useCardState();
-  const { organization, memberships, ...rest } = useCoreOrganization({
-    memberships: true,
-  });
+  const { organization, memberships } = useCoreOrganization(membershipsParams);
 
-  const mutateSwrState = () => {
-    const unstable__mutate = (rest as any).unstable__mutate;
-    if (unstable__mutate && typeof unstable__mutate === 'function') {
-      unstable__mutate();
-    }
-  };
+  const { options, isLoading: loadingRoles } = useFetchRoles();
 
   if (!organization) {
     return null;
   }
 
-  const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
+  const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: string) => {
     return card
       .runAsync(async () => {
-        await membership.update({ role: newRole });
+        return await membership.update({ role: newRole });
       })
       .catch(err => handleError(err, [], card.setError));
   };
 
-  const handleRemove = (membership: OrganizationMembershipResource) => () => {
+  const handleRemove = (membership: OrganizationMembershipResource) => async () => {
     return card
       .runAsync(async () => {
         const destroyedMembership = await membership.destroy();
+        await memberships?.revalidate?.();
         return destroyedMembership;
       })
-      .then(mutateSwrState)
       .catch(err => handleError(err, [], card.setError));
   };
 
@@ -48,7 +49,8 @@ export const ActiveMembersList = () => {
       onPageChange={n => memberships?.fetchPage?.(n)}
       itemCount={memberships?.count || 0}
       pageCount={memberships?.pageCount || 0}
-      isLoading={memberships?.isLoading}
+      itemsPerPage={membershipsParams.memberships.pageSize}
+      isLoading={memberships?.isLoading || loadingRoles}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
       headers={[
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
@@ -60,6 +62,7 @@ export const ActiveMembersList = () => {
         <MemberRow
           key={m.id}
           membership={m}
+          options={options}
           onRoleChange={handleRoleChange(m)}
           onRemove={handleRemove(m)}
         />
@@ -72,9 +75,11 @@ export const ActiveMembersList = () => {
 const MemberRow = (props: {
   membership: OrganizationMembershipResource;
   onRemove: () => unknown;
-  onRoleChange?: (role: MembershipRole) => unknown;
+  options: Parameters<typeof RoleSelect>[0]['roles'];
+  onRoleChange: (role: string) => unknown;
 }) => {
-  const { membership, onRemove, onRoleChange } = props;
+  const { membership, onRemove, onRoleChange, options } = props;
+  const { localizeCustomRole } = useLocalizeCustomRoles();
   const card = useCardState();
   const user = useCoreUser();
 
@@ -101,17 +106,13 @@ const MemberRow = (props: {
       <Td>
         <Gate
           permission={'org:sys_memberships:manage'}
-          fallback={
-            <Text
-              sx={t => ({ opacity: t.opacity.$inactive })}
-              localizationKey={roleLocalizationKey(membership.role)}
-            />
-          }
+          fallback={<Text sx={t => ({ opacity: t.opacity.$inactive })}>{localizeCustomRole(membership.role)}</Text>}
         >
           <RoleSelect
             isDisabled={card.isLoading || !onRoleChange}
             value={membership.role}
             onChange={onRoleChange}
+            roles={options}
           />
         </Gate>
       </Td>

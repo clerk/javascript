@@ -1,7 +1,8 @@
 import type { DeletedObjectResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
+import { waitFor } from '@testing-library/react';
 
-import { act, render } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { LeaveOrganizationPage } from '../ActionConfirmationPage';
@@ -13,7 +14,7 @@ describe('LeaveOrganizationPage', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
       });
     });
@@ -36,7 +37,7 @@ describe('LeaveOrganizationPage', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
       });
     });
@@ -50,11 +51,11 @@ describe('LeaveOrganizationPage', () => {
       { wrapper },
     );
 
-    await userEvent.type(getByLabelText(/Confirmation/i), 'Org1');
-
-    act(async () => {
+    await waitFor(async () => {
+      await userEvent.type(getByLabelText(/Confirmation/i), 'Org1');
       await userEvent.click(getByRole('button', { name: 'Leave organization' }));
-      expect(fixtures.clerk.user?.leaveOrganization).toHaveBeenCalledWith('Org1');
     });
+
+    expect(fixtures.clerk.user?.leaveOrganization).toHaveBeenCalledWith('Org1');
   });
 });

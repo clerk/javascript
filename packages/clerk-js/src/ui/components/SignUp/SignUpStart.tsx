@@ -15,11 +15,10 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useLoadingStatus, usePasswordComplexity } from '../../hooks';
+import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
-import { createPasswordError } from '../../utils';
-import { buildRequest, handleError, useFormControl } from '../../utils';
+import { buildRequest, createPasswordError, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
@@ -49,7 +48,6 @@ function _SignUpStart(): JSX.Element {
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
-  const { failedValidationsText } = usePasswordComplexity(passwordSettings);
 
   const formState = {
     firstName: useFormControl('firstName', signUp.firstName || initialValues.firstName || '', {
@@ -81,7 +79,6 @@ function _SignUpStart(): JSX.Element {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
-      informationText: failedValidationsText,
       validatePassword: true,
       buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
     }),
@@ -153,6 +150,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.NOT_ALLOWED_ACCESS:
           case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
+          case ERROR_CODES.USER_LOCKED:
             card.setError(error.longMessage);
             break;
           default:

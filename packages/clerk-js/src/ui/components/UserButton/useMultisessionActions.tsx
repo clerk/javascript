@@ -1,4 +1,4 @@
-import { deprecatedObjectProperty } from '@clerk/shared';
+import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import type { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
 import { windowNavigate } from '../../../utils/windowNavigate';
@@ -64,6 +64,8 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     return signOut(opts.navigateAfterSignOut);
   };
 
+  // TODO: Fix this eslint error
+  // eslint-disable-next-line @typescript-eslint/require-await
   const handleSessionClicked = (session: ActiveSessionResource) => async () => {
     card.setLoading();
     return setActive({ session, beforeEmit: opts.navigateAfterSwitchSession }).finally(() => {

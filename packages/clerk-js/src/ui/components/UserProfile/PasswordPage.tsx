@@ -13,7 +13,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useConfirmPassword, useNavigateToFlowStart, usePasswordComplexity } from '../../hooks';
+import { useConfirmPassword, useNavigateToFlowStart } from '../../hooks';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -59,15 +59,12 @@ export const PasswordPage = withCardStateProvider(() => {
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
-  const { failedValidationsText } = usePasswordComplexity(passwordSettings);
 
   const passwordField = useFormControl('newPassword', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__newPassword'),
     isRequired: true,
-    enableErrorAfterBlur: true,
     validatePassword: true,
-    informationText: failedValidationsText,
     buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
   });
 
@@ -75,7 +72,6 @@ export const PasswordPage = withCardStateProvider(() => {
     type: 'password',
     label: localizationKeys('formFieldLabel__confirmPassword'),
     isRequired: true,
-    enableErrorAfterBlur: true,
   });
 
   const sessionsField = useFormControl('signOutOfOtherSessions', '', {
@@ -84,7 +80,7 @@ export const PasswordPage = withCardStateProvider(() => {
     defaultChecked: true,
   });
 
-  const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
+  const { setConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
     passwordField,
     confirmPasswordField: confirmField,
   });
@@ -98,7 +94,7 @@ export const PasswordPage = withCardStateProvider(() => {
 
   const validateForm = () => {
     if (passwordField.value) {
-      displayConfirmPasswordFeedback(confirmField.value);
+      setConfirmPasswordFeedback(confirmField.value);
     }
   };
 
@@ -169,7 +165,9 @@ export const PasswordPage = withCardStateProvider(() => {
             <Form.Control
               {...confirmField.props}
               onChange={e => {
-                displayConfirmPasswordFeedback(e.target.value);
+                if (e.target.value) {
+                  setConfirmPasswordFeedback(e.target.value);
+                }
                 return confirmField.props.onChange(e);
               }}
               isDisabled={passwordEditDisabled}

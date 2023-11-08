@@ -363,21 +363,40 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   total_pending_suggestions: number;
 }
 
+/**
+ * @experimental
+ */
+export interface RoleJSON extends ClerkResourceJSON {
+  object: 'role';
+  id: string;
+  key: string;
+  name: string;
+  description: string;
+  permissions: PermissionJSON[];
+  created_at: number;
+  updated_at: number;
+}
+
+/**
+ * @experimental
+ */
+export interface PermissionJSON extends ClerkResourceJSON {
+  object: 'permission';
+  id: string;
+  key: string;
+  name: string;
+  description: string;
+  type: 'system' | 'user';
+  created_at: number;
+  updated_at: number;
+}
+
 export interface PublicOrganizationDataJSON {
   id: string;
   name: string;
   slug: string | null;
   has_image: boolean;
   image_url: string;
-}
-
-export interface OrganizationSuggestionJSON extends ClerkResourceJSON {
-  object: 'organization_suggestion';
-  id: string;
-  public_organization_data: PublicOrganizationDataJSON;
-  status: OrganizationSuggestionStatus;
-  created_at: number;
-  updated_at: number;
 }
 
 export interface OrganizationSuggestionJSON extends ClerkResourceJSON {

@@ -1,5 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*", "./setupJestAfterEnv.ts"],
+  "include": ["src/**/*", "./jest.setup-after-env.ts"],
   "exclude": ["node_modules"]
 }

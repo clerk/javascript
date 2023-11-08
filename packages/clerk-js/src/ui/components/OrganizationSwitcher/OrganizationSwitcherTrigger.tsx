@@ -85,6 +85,7 @@ const NotificationCountBadgeSwitcherTrigger = withGate(
     });
 
     const notificationCount =
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       (userInvitations.count || 0) + (userSuggestions.count || 0) + (membershipRequests?.count || 0);
 
     return (

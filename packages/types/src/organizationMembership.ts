@@ -40,7 +40,9 @@ export interface OrganizationMembershipResource extends ClerkResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-export type MembershipRole = 'admin' | 'basic_member' | 'guest_member';
+// Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+// eslint-disable-next-line
+export type MembershipRole = 'admin' | 'basic_member' | 'guest_member' | (string & {});
 
 export type OrganizationPermission =
   | 'org:sys_domains:manage'

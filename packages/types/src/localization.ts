@@ -8,13 +8,21 @@ export type LocalizationValue = string;
  * Users aiming to customise a few strings can also peak at the `data-localization-key` attribute by inspecting
  * the DOM and updating the corresponding key.
  * Users aiming to completely localize the components by providing a complete translation can use
- * the default english resource object from {@link https://github.com/clerkinc/javascript Clerk's open source repo}
+ * the default english resource object from {@link https://github.com/clerk/javascript Clerk's open source repo}
  * as a starting point.
  */
 export type LocalizationResource = DeepPartial<_LocalizationResource>;
 
 type _LocalizationResource = {
   locale: string;
+  /**
+   * @experimental
+   * Add role keys and their localized value
+   * e.g. roles:{ 'org:teacher': 'Teacher'}
+   */
+  roles: {
+    [r: string]: LocalizationValue;
+  };
   socialButtonsBlockButton: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
@@ -76,6 +84,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: LocalizationValue;
   formFieldInputPlaceholder__organizationDomain: LocalizationValue;
   formFieldInputPlaceholder__organizationDomainEmailAddress: LocalizationValue;
+  formFieldInputPlaceholder__confirmDeletionUserAccount: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;

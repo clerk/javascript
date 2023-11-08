@@ -49,6 +49,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
   });
   const { onChange } = useInput(propsWithoutVariants.onChange);
   const { isDisabled, hasError, focusRing, isRequired, ...rest } = propsWithoutVariants;
+  const _disabled = isDisabled || formControlProps.isDisabled;
+  const _required = isRequired || formControlProps.isRequired;
+  const _hasError = hasError || formControlProps.hasError;
 
   return (
     <input
@@ -56,11 +59,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       ref={ref}
       onChange={onChange}
       disabled={isDisabled}
-      required={isRequired || formControlProps.isRequired}
+      required={_required}
       id={props.id || formControlProps.id}
-      aria-invalid={hasError || formControlProps.hasError}
+      aria-invalid={_hasError}
       aria-describedby={formControlProps.errorMessageId}
-      aria-required={formControlProps.isRequired}
+      aria-required={_required}
+      aria-disabled={_disabled}
       css={applyVariants(propsWithoutVariants)}
     />
   );

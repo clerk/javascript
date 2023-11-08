@@ -34,11 +34,13 @@ export const ProfilePage = withCardStateProvider(() => {
     type: 'text',
     label: localizationKeys('formFieldLabel__firstName'),
     placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
+    isRequired: last_name.required,
   });
   const lastNameField = useFormControl('lastName', user.lastName || '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__lastName'),
     placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
+    isRequired: last_name.required,
   });
 
   const userInfoChanged =
@@ -103,19 +105,17 @@ export const ProfilePage = withCardStateProvider(() => {
           />
           {showFirstName && (
             <Form.ControlRow elementId={firstNameField.id}>
-              <Form.Control
-                autoFocus
+              <Form.PlainInput
                 {...firstNameField.props}
-                required={first_name.required}
                 isDisabled={nameEditDisabled}
+                autoFocus
               />
             </Form.ControlRow>
           )}
           {showLastName && (
             <Form.ControlRow elementId={lastNameField.id}>
-              <Form.Control
+              <Form.PlainInput
                 {...lastNameField.props}
-                required={last_name.required}
                 isDisabled={nameEditDisabled}
               />
             </Form.ControlRow>

@@ -1,4 +1,4 @@
-import { deprecatedObjectProperty } from '@clerk/shared';
+import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import type { JWT, JWTClaims } from '@clerk/types';
 
 import { urlDecodeB64 } from './encoders';

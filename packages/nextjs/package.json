@@ -1,7 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "4.25.6",
-  "license": "MIT",
+  "version": "5.0.0-alpha-v5.0",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -13,11 +12,18 @@
     "session",
     "jwt"
   ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/nextjs"
+  },
+  "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
@@ -28,69 +34,43 @@
       "types": "./dist/types/server/index.d.ts",
       "import": "./dist/esm/server/index.js",
       "require": "./dist/cjs/server/index.js"
-    },
-    "./api": {
-      "types": "./dist/types/api/index.d.ts",
-      "import": "./dist/esm/api/index.js",
-      "require": "./dist/cjs/api/index.js"
-    },
-    "./ssr": {
-      "types": "./dist/types/ssr/index.d.ts",
-      "import": "./dist/esm/ssr/index.js",
-      "require": "./dist/cjs/ssr/index.js"
-    },
-    "./edge-middlewarefiles": {
-      "types": "./dist/types/edge-middleware/index.d.ts",
-      "import": "./dist/esm/edge-middleware/index.js",
-      "require": "./dist/cjs/edge-middleware/index.js"
-    },
-    "./app-beta": {
-      "types": "./dist/types/app-beta/index.d.ts",
-      "import": "./dist/esm/app-beta/index.js",
-      "require": "./dist/cjs/app-beta/index.js"
-    },
-    "./app-beta/client": {
-      "types": "./dist/types/app-beta/client/index.d.ts",
-      "import": "./dist/esm/app-beta/client/index.js",
-      "require": "./dist/cjs/app-beta/client/index.js"
     }
   },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
-    "server",
-    "api",
-    "edge-middleware",
-    "ssr",
-    "app-beta"
+    "server"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
-    "publish:local": "npx yalc push --replace --sig",
-    "clean": "rimraf ./dist",
     "lint": "eslint src/",
-    "lint:publint": "publint",
     "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "publish:local": "npx yalc push --replace --sig",
     "test": "jest",
+    "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/backend": "0.31.2",
-    "@clerk/clerk-react": "4.26.6",
-    "@clerk/clerk-sdk-node": "4.12.15",
-    "@clerk/shared": "0.24.5",
-    "@clerk/types": "3.56.1",
-    "path-to-regexp": "6.2.1",
-    "tslib": "2.4.1"
+    "@clerk/backend": "1.0.0-alpha-v5.0",
+    "@clerk/clerk-react": "5.0.0-alpha-v5.0",
+    "@clerk/shared": "2.0.0-alpha-v5.0",
+    "path-to-regexp": "6.2.1"
   },
   "devDependencies": {
-    "@types/node": "^16.11.55",
+    "@clerk/types": "4.0.0-alpha-v5.0",
+    "@types/node": "^18.18.0",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "eslint-config-custom": "*",
     "next": "^13.4.19",
-    "node-fetch-native": "1.1.1",
+    "tslib": "2.4.1",
     "typescript": "*"
   },
   "peerDependencies": {
@@ -99,18 +79,9 @@
     "react-dom": "^17.0.2 || ^18.0.0-0"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18.18.0"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/nextjs"
-  },
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "homepage": "https://clerk.com/"
+  }
 }

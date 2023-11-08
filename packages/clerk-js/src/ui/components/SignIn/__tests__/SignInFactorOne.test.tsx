@@ -1,3 +1,4 @@
+import { parseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
@@ -25,11 +26,11 @@ describe('SignInFactorOne', () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
       f.withPassword();
-      f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true, identifier: 'test@clerk.dev' });
+      f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true, identifier: 'test@clerk.com' });
     });
 
     render(<SignInFactorOne />, { wrapper });
-    screen.getByText('test@clerk.dev');
+    screen.getByText('test@clerk.com');
   });
 
   it('prefills the phone number if the identifier is a phone number', async () => {
@@ -123,7 +124,7 @@ describe('SignInFactorOne', () => {
       });
 
       it('should render the other methods component when clicking on "Forgot password"', async () => {
-        const email = 'test@clerk.dev';
+        const email = 'test@clerk.com';
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
@@ -191,6 +192,38 @@ describe('SignInFactorOne', () => {
           await userEvent.type(screen.getByLabelText('Password'), '123456');
           await userEvent.click(screen.getByText('Continue'));
           await waitFor(() => expect(screen.getByText('Incorrect Password')).toBeDefined());
+        });
+      });
+
+      it('redirects back to sign-in if the user is locked', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithPhoneNumber({ supportPassword: true });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'user_locked',
+          long_message: 'Your account is locked. Please try again after 1 hour.',
+          message: 'Account locked',
+          meta: { duration_in_seconds: 3600 },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText('Password'), '123456');
+          await userEvent.click(screen.getByText('Continue'));
+          await waitFor(() => {
+            expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
+          });
         });
       });
     });
@@ -405,6 +438,35 @@ describe('SignInFactorOne', () => {
           await waitFor(() => expect(screen.getByText('Incorrect code')).toBeDefined());
         });
       });
+
+      it('redirects back to sign-in if the user is locked', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'user_locked',
+          long_message: 'Your account is locked. Please try again after 2 hours.',
+          message: 'Account locked',
+          meta: { duration_in_seconds: 7200 },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+          expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
+        });
+      });
     });
 
     describe('Phone Code', () => {
@@ -484,12 +546,42 @@ describe('SignInFactorOne', () => {
           await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
         });
       });
+
+      it('redirects back to sign-in if the user is locked', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withPhoneNumber();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'user_locked',
+          long_message: 'Your account is locked. Please contact support for more information.',
+          message: 'Account locked',
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+          await waitFor(() => {
+            expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
+          });
+        });
+      });
     });
   });
 
   describe('Use another method', () => {
     it('should render the other authentication methods list component when clicking on "Use another method"', async () => {
-      const email = 'test@clerk.dev';
+      const email = 'test@clerk.com';
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
         f.withPassword();
@@ -504,7 +596,7 @@ describe('SignInFactorOne', () => {
     });
 
     it('"Use another method" should not exist if only the current strategy is available', async () => {
-      const email = 'test@clerk.dev';
+      const email = 'test@clerk.com';
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress({ first_factors: [], verifications: [] });
         f.withPassword();
@@ -536,7 +628,7 @@ describe('SignInFactorOne', () => {
     });
 
     it('should list all the enabled first factor methods', async () => {
-      const email = 'test@clerk.dev';
+      const email = 'test@clerk.com';
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();
@@ -552,7 +644,7 @@ describe('SignInFactorOne', () => {
     });
 
     it('should list enabled first factor methods without the current one', async () => {
-      const email = 'test@clerk.dev';
+      const email = 'test@clerk.com';
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
         f.withEmailAddress();
@@ -586,7 +678,7 @@ describe('SignInFactorOne', () => {
     });
 
     it('clicking the email link method should show the magic link screen', async () => {
-      const email = 'test@clerk.dev';
+      const email = 'test@clerk.com';
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();
@@ -610,7 +702,7 @@ describe('SignInFactorOne', () => {
     });
 
     it('clicking the email code method should show the email code input', async () => {
-      const email = 'test@clerk.dev';
+      const email = 'test@clerk.com';
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();

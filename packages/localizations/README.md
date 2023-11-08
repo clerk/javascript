@@ -16,13 +16,13 @@
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_localizations)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-[Changelog](https://github.com/clerkinc/javascript/blob/main/packages/localizations/CHANGELOG.md)
+[Changelog](https://github.com/clerk/javascript/blob/main/packages/localizations/CHANGELOG.md)
 ·
-[Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
+[Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
 ·
-[Ask a Question](https://github.com/clerkinc/javascript/discussions)
+[Ask a Question](https://github.com/clerk/javascript/discussions)
 
 </div>
 
@@ -98,16 +98,16 @@ export default App;
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerkinc/javascript/discussions)
+- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
 - Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_localizations)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
 
 ### Adding a new localization key
 
-1. Open the [`types/src/localization.ts`](https://github.com/clerkinc/javascript/blob/main/packages/types/src/localization.ts) file to add a new key to the `_LocalizationResource` type.
+1. Open the [`types/src/localization.ts`](https://github.com/clerk/javascript/blob/main/packages/types/src/localization.ts) file to add a new key to the `_LocalizationResource` type.
 
    Naming things is hard, so try these things first: Has the component that should contain the new key already other localizations? If yes, see how they are named and if you could follow that pattern. For example, the `<SignIn />` component has keys with `signIn.start.title`, then I'd make sense to follow the `signIn.` pattern. If you're not sure, take your best guess and the maintainers will comment on the PR!
 
@@ -115,7 +115,7 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 1. Run `npm build` to compile `types` with your new key
 
-1. Open the [`localizations/src/en-US.ts`](https://github.com/clerkinc/javascript/blob/main/packages/localizations/src/en-US.ts) file and add your new key to the object. `en-US` is the default language. If you feel comfortable adding your message in another language than English, feel free to also edit other files.
+1. Open the [`localizations/src/en-US.ts`](https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts) file and add your new key to the object. `en-US` is the default language. If you feel comfortable adding your message in another language than English, feel free to also edit other files.
 
 1. Use the new localization key inside the component. There are two ways:
 
@@ -139,7 +139,7 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 ### Updating a localization key
 
-1. Open the [`localizations/src/en-US.ts`](https://github.com/clerkinc/javascript/blob/main/packages/localizations/src/en-US.ts) file and search for the text you want to update.
+1. Open the [`localizations/src/en-US.ts`](https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts) file and search for the text you want to update.
 
 1. Update the text inside `en-US`. If possible, also update other languages.
 
@@ -155,10 +155,10 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 `@clerk/localizations` is provided **"as is"** without any **warranty**. Use at your own risk.
 
-_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerkinc/javascript/blob/main/docs/SECURITY.md)._
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 
 ## License
 
 This project is licensed under the **MIT license**.
 
-See [LICENSE](https://github.com/clerkinc/javascript/blob/main/packages/localizations/LICENSE) for more information.
+See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/localizations/LICENSE) for more information.

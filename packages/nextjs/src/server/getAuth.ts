@@ -1,4 +1,4 @@
-import type { Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
+import type { AuthObject, Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
 import {
   AuthStatus,
   constants,
@@ -11,12 +11,14 @@ import {
 import type { SecretKeyOrApiKey } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
-import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerkClient';
+import { API_URL, API_VERSION, SECRET_KEY } from './constants';
 import { getAuthAuthHeaderMissing } from './errors';
 import type { RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 
 type GetAuthOpts = Partial<SecretKeyOrApiKey>;
+
+type AuthObjectWithoutResources<T extends AuthObject> = Omit<T, 'user' | 'organization' | 'session'>;
 
 export const createGetAuth = ({
   debugLoggerName,
@@ -26,7 +28,10 @@ export const createGetAuth = ({
   debugLoggerName: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (req: RequestLike, opts?: GetAuthOpts): SignedInAuthObject | SignedOutAuthObject => {
+    return (
+      req: RequestLike,
+      opts?: GetAuthOpts,
+    ): AuthObjectWithoutResources<SignedInAuthObject> | AuthObjectWithoutResources<SignedOutAuthObject> => {
       const debug = getHeader(req, constants.Headers.EnableDebug) === 'true';
       if (debug) {
         logger.enable();
@@ -45,7 +50,6 @@ export const createGetAuth = ({
       }
 
       const options = {
-        apiKey: opts?.apiKey || API_KEY,
         secretKey: opts?.secretKey || SECRET_KEY,
         apiUrl: API_URL,
         apiVersion: API_VERSION,
@@ -96,7 +100,6 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
   const authReason = getAuthKeyFromRequest(req, 'AuthReason');
 
   const options = {
-    apiKey: API_KEY,
     secretKey: SECRET_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,

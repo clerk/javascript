@@ -1,7 +1,7 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
-import { TelemetryCollector } from '@clerk/shared';
+import { TelemetryCollector } from '@clerk/shared/telemetry';
+import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -9,8 +9,12 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
+<<<<<<< HEAD
 import { SECRET_KEY } from './clerkClient';
 import { PUBLISHABLE_KEY } from './constants';
+=======
+import { SECRET_KEY } from './constants';
+>>>>>>> main
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import {
   clockSkewDetected,
@@ -25,7 +29,6 @@ import {
   apiEndpointUnauthorizedNextResponse,
   decorateRequest,
   isCrossOrigin,
-  isDevelopmentFromApiKey,
   setRequestHeadersOnNextResponse,
 } from './utils';
 
@@ -49,7 +52,9 @@ type ExcludeRootPath<T> = T extends '/' ? never : T;
 type RouteMatcherWithNextTypedRoutes =
   | WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>>
   | NextTypedRoute
-  | (string & object);
+  // This is necessary to allow all string, using something other than `{}` here WILL break types!
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  | (string & {});
 
 const INFINITE_REDIRECTION_LOOP_COOKIE = '__clerk_redirection_loop';
 

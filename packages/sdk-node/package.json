@@ -1,90 +1,78 @@
 {
-  "version": "4.12.15",
+  "name": "@clerk/clerk-sdk-node",
+  "version": "5.0.0-alpha-v5.0",
+  "description": "Clerk server SDK for usage with node",
+  "keywords": [
+    "clerk",
+    "sdk",
+    "node"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/sdk-node"
+  },
   "license": "MIT",
-  "type": "commonjs",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.mjs",
-  "types": "./dist/types/index.d.ts",
+  "author": {
+    "name": "Clerk, Inc.",
+    "email": "support@clerk.com",
+    "url": "git+https://github.com/clerk/javascript.git"
+  },
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "require": "./dist/cjs/index.js",
-      "import": "./dist/esm/index.mjs",
-      "default": "./dist/cjs/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
     },
-    "./esm/instance": {
-      "types": "./dist/types/instance.d.ts",
-      "require": "./dist/cjs/instance.js",
-      "import": "./dist/esm/instance.mjs",
-      "default": "./dist/cjs/instance.js"
-    },
-    "./cjs/instance": {
-      "types": "./dist/types/instance.d.ts",
-      "require": "./dist/cjs/instance.js",
-      "import": "./dist/esm/instance.mjs",
-      "default": "./dist/cjs/instance.js"
-    }
+    "./package.json": "./package.json"
   },
+  "main": "./dist/index.js",
   "files": [
-    "dist",
-    "esm",
-    "cjs"
+    "dist"
   ],
-  "engines": {
-    "node": ">=14"
-  },
   "scripts": {
     "build": "npm run clean && tsup",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "publish:local": "npx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
     "lint:publint": "publint",
     "lint:attw": "attw --pack .",
     "test": "jest",
+    "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%"
   },
-  "name": "@clerk/clerk-sdk-node",
-  "author": {
-    "name": "Clerk, Inc.",
-    "email": "support@clerk.com",
-    "url": "git+https://github.com/clerkinc/javascript.git"
+  "dependencies": {
+    "@clerk/backend": "1.0.0-alpha-v5.0",
+    "@clerk/shared": "2.0.0-alpha-v5.0",
+    "camelcase-keys": "6.2.2",
+    "snakecase-keys": "3.2.1"
   },
   "devDependencies": {
+    "@clerk/types": "4.0.0-alpha-v5.0",
+    "@types/express": "4.17.14",
+    "@types/node": "^18.18.0",
+    "eslint-config-custom": "*",
     "nock": "^13.0.7",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.5.0",
+    "tslib": "2.4.1",
     "tsup": "*",
     "typescript": "*"
   },
-  "dependencies": {
-    "@clerk/backend": "0.31.2",
-    "@clerk/shared": "0.24.5",
-    "@clerk/types": "3.56.1",
-    "@types/cookies": "0.7.7",
-    "@types/express": "4.17.14",
-    "@types/node-fetch": "2.6.2",
-    "camelcase-keys": "6.2.2",
-    "snakecase-keys": "3.2.1",
-    "tslib": "2.4.1"
+  "engines": {
+    "node": ">=18.18.0"
   },
-  "description": "Clerk server SDK for usage with node",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/sdk-node"
-  },
-  "keywords": [
-    "clerk",
-    "sdk",
-    "node"
-  ],
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "homepage": "https://clerk.com/",
   "publishConfig": {
     "access": "public"
   }

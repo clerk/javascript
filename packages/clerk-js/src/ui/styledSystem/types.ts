@@ -13,7 +13,7 @@ type StyleRule = Exclude<_Interpolation<InternalTheme>, string | number | boolea
 type ThemableCssProp = ((params: InternalTheme) => StyleRule) | StyleRule;
 type CssProp = { css?: ThemableCssProp };
 
-export type AsProp = { as?: React.ElementType };
+export type AsProp = { as?: React.ElementType | undefined };
 
 type ElementProps = {
   div: React.JSX.IntrinsicElements['div'];

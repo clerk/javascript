@@ -1,15 +1,13 @@
 import type { GetServerDataProps } from 'gatsby';
 
-import { API_KEY, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
+import { PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import { clerkClient, constants, createIsomorphicRequest } from './clerkClient';
 import type { WithServerAuthOptions } from './types';
 
 export function authenticateRequest(context: GetServerDataProps, options: WithServerAuthOptions) {
   return clerkClient.authenticateRequest({
     ...options,
-    apiKey: API_KEY,
     secretKey: SECRET_KEY,
-    frontendApi: FRONTEND_API,
     publishableKey: PUBLISHABLE_KEY,
     request: createIsomorphicRequest((Request, Headers) => {
       const headers = new Headers(Object.fromEntries(context.headers) as Record<string, string>);
@@ -38,7 +36,7 @@ const returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy = (headers: Map<str
   const referrerUrl = new URL(headers.get(constants.Headers.Referrer) as string);
   const hostUrl = new URL('https://' + (headers.get(constants.Headers.Host) as string));
 
-  if (isDevelopmentOrStaging(SECRET_KEY || API_KEY || '') && hostUrl.hostname === referrerUrl.hostname) {
+  if (isDevelopmentOrStaging(SECRET_KEY || '') && hostUrl.hostname === referrerUrl.hostname) {
     return referrerUrl.host;
   }
 

@@ -11,6 +11,7 @@ export type AvatarUploaderProps = {
   avatarPreview: React.ReactElement;
   onAvatarChange: (file: File) => Promise<unknown>;
   onAvatarRemove?: (() => void) | null;
+  avatarPreviewPlaceholder?: React.ReactElement | null;
 };
 
 export const fileToBase64 = (file: File): Promise<string> => {
@@ -27,7 +28,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
 
-  const { onAvatarChange, onAvatarRemove, title, avatarPreview, ...rest } = props;
+  const { onAvatarChange, onAvatarRemove, title, avatarPreview, avatarPreviewPlaceholder, ...rest } = props;
 
   const toggle = () => {
     setShowUpload(!showUpload);
@@ -54,6 +55,12 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     return onAvatarRemove?.();
   };
 
+  const previewElement = objectUrl
+    ? React.cloneElement(avatarPreview, { imageUrl: objectUrl })
+    : avatarPreviewPlaceholder
+    ? React.cloneElement(avatarPreviewPlaceholder, { onClick: toggle })
+    : avatarPreview;
+
   return (
     <Col gap={4}>
       <Flex
@@ -61,7 +68,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         align='center'
         {...rest}
       >
-        {objectUrl ? React.cloneElement(avatarPreview, { imageUrl: objectUrl }) : avatarPreview}
+        {previewElement}
         <Col gap={1}>
           <Text
             localizationKey={title}

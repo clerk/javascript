@@ -930,7 +930,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('redirects the user to the afterSignInUrl if one was provider', async () => {
+    it('redirects the user to the afterSignInUrl if one was provided', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -1121,7 +1121,7 @@ describe('Clerk singleton', () => {
                 external_verification_redirect_url: '',
                 error: {
                   code: 'not_allowed_to_sign_up',
-                  long_message: 'You cannot sign up with test@clerk.dev since this is a restricted application.',
+                  long_message: 'You cannot sign up with test@clerk.com since this is a restricted application.',
                   message: 'Not allowed to sign up',
                   meta: {
                     session_id: 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe',
@@ -1319,6 +1319,120 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-one');
+      });
+    });
+
+    it('redirects to sign-up if an oauth flow fails due to the user being locked', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: [],
+            unverified_fields: ['email_address'],
+            verifications: {
+              external_account: {
+                status: 'unverified',
+                error: {
+                  error: {
+                    code: 'user_locked',
+                    long_message: 'Your account is locked. Please contact yolo@swag.com for more information.',
+                    message: 'Account locked',
+                  },
+                },
+              },
+            },
+          } as unknown as SignUpJSON),
+        }),
+      );
+
+      const mockSignUpCreate = jest.fn().mockReturnValue(
+        Promise.resolve(
+          new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['phone_number'],
+          } as any as SignUpJSON),
+        ),
+      );
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
+      });
+    });
+
+    it('redirects to sign-in if an oauth flows fails due to the user being locked', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            first_factor_verification: {
+              status: 'unverified',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: null,
+              error: {
+                code: 'user_locked',
+                long_message: 'Your account is locked. Please contact yolo@swag.com for more information.',
+                message: 'Account locked',
+              },
+              expire_at: 1631777672389,
+            },
+            second_factor_verification: null,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSignInCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'needs_first_factor' }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signIn.create = mockSignInCreate;
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in');
       });
     });
 

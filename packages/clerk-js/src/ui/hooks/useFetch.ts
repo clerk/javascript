@@ -35,7 +35,7 @@ export const useFetch = <T>(
         requestStatus.setError();
         setData(null);
       });
-  }, []);
+  }, [JSON.stringify(params)]);
 
   return {
     status: requestStatus,

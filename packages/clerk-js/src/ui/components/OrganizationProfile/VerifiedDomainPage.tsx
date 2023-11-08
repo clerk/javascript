@@ -1,6 +1,10 @@
-import type { OrganizationDomainResource, OrganizationEnrollmentMode } from '@clerk/types';
+import type {
+  OrganizationDomainResource,
+  OrganizationEnrollmentMode,
+  OrganizationSettingsResource,
+} from '@clerk/types';
 
-import { CalloutWithAction } from '../../common';
+import { CalloutWithAction, useGate } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, Flex, localizationKeys, Spinner, Text } from '../../customizables';
@@ -51,15 +55,58 @@ const useCalloutLabel = (
   ];
 };
 
+const buildEnrollmentOptions = (settings: OrganizationSettingsResource) => {
+  const _options = [];
+  if (settings.domains.enrollmentModes.includes('manual_invitation')) {
+    _options.push({
+      value: 'manual_invitation',
+      label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__label'),
+      description: localizationKeys(
+        'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__description',
+      ),
+    });
+  }
+
+  if (settings.domains.enrollmentModes.includes('automatic_invitation')) {
+    _options.push({
+      value: 'automatic_invitation',
+      label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__label'),
+      description: localizationKeys(
+        'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__description',
+      ),
+    });
+  }
+
+  if (settings.domains.enrollmentModes.includes('automatic_suggestion')) {
+    _options.push({
+      value: 'automatic_suggestion',
+      label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__label'),
+      description: localizationKeys(
+        'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__description',
+      ),
+    });
+  }
+
+  return _options;
+};
+
+const useEnrollmentOptions = () => {
+  const { organizationSettings } = useEnvironment();
+  return buildEnrollmentOptions(organizationSettings);
+};
+
 export const VerifiedDomainPage = withCardStateProvider(() => {
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
-  const { organization } = useCoreOrganization();
-  const { domains } = useCoreOrganization({
+
+  const { membership, organization, domains } = useCoreOrganization({
     domains: {
       infinite: true,
     },
   });
+
+  const { isAuthorizedUser: canManageDomain } = useGate({ permission: 'org:sys_domains:manage' });
+  const { isAuthorizedUser: canDeleteDomain } = useGate({ permission: 'org:sys_domains:delete' });
 
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const { params, navigate, queryParams } = useRouter();
@@ -68,49 +115,11 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const allowsEdit = mode === 'edit';
 
+  const enrollmentOptions = useEnrollmentOptions();
   const enrollmentMode = useFormControl('enrollmentMode', '', {
     type: 'radio',
-    radioOptions: [
-      ...(organizationSettings.domains.enrollmentModes.includes('manual_invitation')
-        ? [
-            {
-              value: 'manual_invitation',
-              label: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__label',
-              ),
-              description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__description',
-              ),
-            },
-          ]
-        : []),
-      ...(organizationSettings.domains.enrollmentModes.includes('automatic_invitation')
-        ? [
-            {
-              value: 'automatic_invitation',
-              label: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__label',
-              ),
-              description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__description',
-              ),
-            },
-          ]
-        : []),
-      ...(organizationSettings.domains.enrollmentModes.includes('automatic_suggestion')
-        ? [
-            {
-              value: 'automatic_suggestion',
-              label: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__label',
-              ),
-              description: localizationKeys(
-                'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__description',
-              ),
-            },
-          ]
-        : []),
-    ],
+    radioOptions: enrollmentOptions,
+    isRequired: true,
   });
 
   const deletePending = useFormControl('deleteExistingInvitationsSuggestions', '', {
@@ -144,7 +153,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   });
 
   const updateEnrollmentMode = async () => {
-    if (!domain || !organization) {
+    if (!domain || !organization || !membership || !domains) {
       return;
     }
 
@@ -154,7 +163,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         deletePending: deletePending.checked,
       });
 
-      await (domains as any).unstable__mutate();
+      await domains.revalidate();
 
       await navigate('../../');
     } catch (e) {
@@ -200,69 +209,74 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
       <Col gap={6}>
         <Tabs>
           <TabsList>
-            <Tab
-              localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.start.headerTitle__enrollment')}
-            />
-            {allowsEdit && (
+            {canManageDomain && (
+              <Tab
+                localizationKey={localizationKeys(
+                  'organizationProfile.verifiedDomainPage.start.headerTitle__enrollment',
+                )}
+              />
+            )}
+            {allowsEdit && canDeleteDomain && (
               <Tab
                 localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.start.headerTitle__danger')}
               />
             )}
           </TabsList>
           <TabPanels>
-            <TabPanel
-              sx={{ width: '100%' }}
-              direction={'col'}
-              gap={4}
-            >
-              {calloutLabel.length > 0 && (
-                <CalloutWithAction icon={InformationCircle}>
-                  {calloutLabel.map((label, index) => (
-                    <Text
-                      key={index}
-                      as={'span'}
-                      sx={[
-                        t => ({
-                          lineHeight: t.lineHeights.$short,
-                          color: 'inherit',
-                          display: 'block',
-                        }),
-                      ]}
-                      localizationKey={label}
-                    />
-                  ))}
-                </CalloutWithAction>
-              )}
-              <Header.Root>
-                <Header.Subtitle
-                  localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
-                  variant='regularRegular'
-                />
-              </Header.Root>
-              <Form.Root
-                onSubmit={updateEnrollmentMode}
-                gap={6}
+            {canManageDomain && (
+              <TabPanel
+                sx={{ width: '100%' }}
+                direction={'col'}
+                gap={4}
               >
-                <Form.ControlRow elementId={enrollmentMode.id}>
-                  <Form.Control {...enrollmentMode.props} />
-                </Form.ControlRow>
-
-                {allowsEdit && (
-                  <Form.ControlRow elementId={deletePending.id}>
-                    <Form.Control {...deletePending.props} />
-                  </Form.ControlRow>
+                {calloutLabel.length > 0 && (
+                  <CalloutWithAction icon={InformationCircle}>
+                    {calloutLabel.map((label, index) => (
+                      <Text
+                        key={index}
+                        as={'span'}
+                        sx={[
+                          t => ({
+                            lineHeight: t.lineHeights.$short,
+                            color: 'inherit',
+                            display: 'block',
+                          }),
+                        ]}
+                        localizationKey={label}
+                      />
+                    ))}
+                  </CalloutWithAction>
                 )}
+                <Header.Root>
+                  <Header.Subtitle
+                    localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
+                    variant='regularRegular'
+                  />
+                </Header.Root>
+                <Form.Root
+                  onSubmit={updateEnrollmentMode}
+                  gap={6}
+                >
+                  <Form.ControlRow elementId={enrollmentMode.id}>
+                    <Form.RadioGroup {...enrollmentMode.props} />
+                  </Form.ControlRow>
 
-                <FormButtons
-                  localizationKey={localizationKeys(
-                    'organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save',
+                  {allowsEdit && (
+                    <Form.ControlRow elementId={deletePending.id}>
+                      <Form.Control {...deletePending.props} />
+                    </Form.ControlRow>
                   )}
-                  isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
-                />
-              </Form.Root>
-            </TabPanel>
 
-            {allowsEdit && (
+                  <FormButtons
+                    localizationKey={localizationKeys(
+                      'organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save',
+                    )}
+                    isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
+                  />
+                </Form.Root>
+              </TabPanel>
+            )}
+            {allowsEdit && canDeleteDomain && (
               <TabPanel
                 direction={'col'}
                 gap={4}

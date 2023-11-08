@@ -56,9 +56,8 @@ export const EmailPage = withCardStateProvider(() => {
       >
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>
-            <Form.Control
+            <Form.PlainInput
               {...emailField.props}
-              required
               autoFocus
             />
           </Form.ControlRow>

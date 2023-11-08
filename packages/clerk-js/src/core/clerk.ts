@@ -3,7 +3,7 @@ import {
   addClerkPrefix,
   deprecated,
   handleValueOrFn,
-  inClientSide,
+  inBrowser as inClientSide,
   is4xxError,
   isHttpOrHttps,
   isLegacyFrontendApiKey,
@@ -13,14 +13,15 @@ import {
   parsePublishableKey,
   proxyUrlToAbsoluteURL,
   stripScheme,
-  TelemetryCollector,
 } from '@clerk/shared';
+import { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   BeforeEmitCallback,
   BuildUrlWithAuthParams,
   Clerk as ClerkInterface,
+  ClerkAPIError,
   ClerkOptions,
   ClientResource,
   CreateOrganizationParams,
@@ -161,6 +162,8 @@ export default class Clerk implements ClerkInterface {
   public __internal_country?: string | null;
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
+
+  protected internal_last_error: ClerkAPIError | null = null;
 
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -1046,6 +1049,17 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
+    const userLockedFromSignUp = su.externalAccountErrorCode === 'user_locked';
+    const userLockedFromSignIn = si.firstFactorVerificationErrorCode === 'user_locked';
+
+    if (userLockedFromSignUp) {
+      return navigateToSignUp();
+    }
+
+    if (userLockedFromSignIn) {
+      return navigateToSignIn();
+    }
+
     const userHasUnverifiedEmail = si.status === 'needs_first_factor';
 
     if (userHasUnverifiedEmail) {
@@ -1197,6 +1211,16 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
+  get __internal_last_error(): ClerkAPIError | null {
+    const value = this.internal_last_error;
+    this.internal_last_error = null;
+    return value;
+  }
+
+  set __internal_last_error(value: ClerkAPIError | null) {
+    this.internal_last_error = value;
+  }
+
   updateClient = (newClient: ClientResource): void => {
     if (!this.client) {
       // This is the first time client is being
@@ -1269,6 +1293,11 @@ export default class Clerk implements ClerkInterface {
     // in the v4 build. This will be removed when v4 becomes the main stable version
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
+
+  __internal_navigateWithError(to: string, err: ClerkAPIError) {
+    this.__internal_last_error = err;
+    return this.navigate(to);
+  }
 
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
   #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);

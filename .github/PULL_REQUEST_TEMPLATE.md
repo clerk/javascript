@@ -1,7 +1,7 @@
 ## Description
 
 <!-- 
-  Thanks for contributing to Clerk. Make sure to read the contributing guide at https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md before opening a PR!
+  Thanks for contributing to Clerk. Make sure to read the contributing guide at https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md before opening a PR!
 
   **Please create a feature request before starting work on any significant change.**
 
@@ -18,7 +18,7 @@
 - [ ] `npm test` runs as expected.
 - [ ] `npm run build` runs as expected.
 - [ ] (If applicable) [JSDoc comments](https://jsdoc.app/about-getting-started.html) have been added or updated for any package exports
-- [ ] (If applicable) [Documentation](https://github.com/clerkinc/clerk-docs) has been updated
+- [ ] (If applicable) [Documentation](https://github.com/clerk/clerk-docs) has been updated
 
 ## Type of change
 
@@ -30,18 +30,18 @@
 
 ## Packages affected
 
-- [ ] `@clerk/clerk-js`
-- [ ] `@clerk/clerk-react`
-- [ ] `@clerk/nextjs`
-- [ ] `@clerk/remix`
-- [ ] `@clerk/types`
-- [ ] `@clerk/themes`
-- [ ] `@clerk/localizations`
-- [ ] `@clerk/clerk-expo`
 - [ ] `@clerk/backend`
+- [ ] `@clerk/chrome-extension`
+- [ ] `@clerk/clerk-js`
+- [ ] `@clerk/clerk-expo`
+- [ ] `@clerk/fastify`
+- [ ] `gatsby-plugin-clerk`
+- [ ] `@clerk/localizations`
+- [ ] `@clerk/nextjs`
+- [ ] `@clerk/clerk-react`
+- [ ] `@clerk/remix`
 - [ ] `@clerk/clerk-sdk-node`
 - [ ] `@clerk/shared`
-- [ ] `@clerk/fastify`
-- [ ] `@clerk/chrome-extension`
-- [ ] `gatsby-plugin-clerk`
+- [ ] `@clerk/themes`
+- [ ] `@clerk/types`
 - [ ] `build/tooling/chore`

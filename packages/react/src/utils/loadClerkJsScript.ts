@@ -1,4 +1,7 @@
-import { addClerkPrefix, isValidProxyUrl, loadScript, parsePublishableKey, proxyUrlToAbsoluteURL } from '@clerk/shared';
+import { parsePublishableKey } from '@clerk/shared/keys';
+import { loadScript } from '@clerk/shared/loadScript';
+import { isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
+import { addClerkPrefix } from '@clerk/shared/url';
 
 import type { IsomorphicClerkOptions } from '../types';
 import { errorThrower } from './errorThrower';
@@ -12,10 +15,10 @@ type LoadClerkJsScriptOptions = Omit<IsomorphicClerkOptions, 'proxyUrl' | 'domai
   domain: string;
 };
 
-export const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
-  const { frontendApi, publishableKey } = opts;
+export const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
+  const { publishableKey } = opts;
 
-  if (!publishableKey && !frontendApi) {
+  if (!publishableKey) {
     errorThrower.throwMissingPublishableKeyError();
   }
 
@@ -29,7 +32,7 @@ export const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
 };
 
 const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
-  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey, frontendApi } = opts;
+  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {
     return clerkJSUrl;
@@ -38,10 +41,10 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   let scriptHost = '';
   if (!!proxyUrl && isValidProxyUrl(proxyUrl)) {
     scriptHost = proxyUrlToAbsoluteURL(proxyUrl).replace(/http(s)?:\/\//, '');
-  } else if (domain && !isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || frontendApi || '')) {
+  } else if (domain && !isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || '')) {
     scriptHost = addClerkPrefix(domain);
   } else {
-    scriptHost = parsePublishableKey(publishableKey)?.frontendApi || frontendApi || '';
+    scriptHost = parsePublishableKey(publishableKey)?.frontendApi || '';
   }
 
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
@@ -50,11 +53,9 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
 };
 
 const applyClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => (script: HTMLScriptElement) => {
-  const { publishableKey, frontendApi, proxyUrl, domain } = options;
+  const { publishableKey, proxyUrl, domain } = options;
   if (publishableKey) {
     script.setAttribute('data-clerk-publishable-key', publishableKey);
-  } else if (frontendApi) {
-    script.setAttribute('data-clerk-frontend-api', frontendApi);
   }
 
   if (proxyUrl) {

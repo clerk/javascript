@@ -15,12 +15,13 @@ import {
   isValidUrl,
   mergeFragmentIntoUrl,
   requiresUserInput,
+  trimLeadingSlash,
   trimTrailingSlash,
 } from '../url';
 
 describe('isDevAccountPortalOrigin(url)', () => {
   const goodUrls: Array<[string | URL, boolean]> = [
-    ['clerk.dev.lclclerk.com', false],
+    ['clerk.com.lclclerk.com', false],
     ['clerk.prod.lclclerk.com', false],
     ['clerk.abc.efg.lclstage.dev', false],
     ['clerk.abc.efg.stgstage.dev', false],
@@ -236,6 +237,15 @@ describe('trimTrailingSlash(string)', () => {
     expect(trimTrailingSlash('/foo')).toBe('/foo');
     expect(trimTrailingSlash('/foo/')).toBe('/foo');
     expect(trimTrailingSlash('//foo//bar///')).toBe('//foo//bar');
+  });
+});
+
+describe('trimLeadingSlash(string)', () => {
+  it('trims all the leading slashes', () => {
+    expect(trimLeadingSlash('')).toBe('');
+    expect(trimLeadingSlash('/foo')).toBe('foo');
+    expect(trimLeadingSlash('/foo/')).toBe('foo/');
+    expect(trimLeadingSlash('//foo//bar///')).toBe('foo//bar///');
   });
 });
 

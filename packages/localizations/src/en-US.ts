@@ -59,6 +59,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: '',
   formFieldInputPlaceholder__organizationDomain: '',
   formFieldInputPlaceholder__organizationDomainEmailAddress: '',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',

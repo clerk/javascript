@@ -1,4 +1,4 @@
-import { OrganizationProfile, OrganizationSwitcher } from '@clerk/nextjs/app-beta';
+import { OrganizationProfile, OrganizationSwitcher } from '@clerk/nextjs';
 
 export default function Page() {
   return (

@@ -1,4 +1,4 @@
-import { buildErrorThrower } from '@clerk/shared';
+import { buildErrorThrower } from '@clerk/shared/error';
 
 const errorThrower = buildErrorThrower({ packageName: __PKG_NAME__ });
 

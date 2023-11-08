@@ -6,16 +6,16 @@ import { useCardState, UserPreview, withCardStateProvider } from '../../elements
 import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';
 
-const ITEMS_PER_PAGE = 10;
-
 const membershipRequestsParams = {
-  pageSize: ITEMS_PER_PAGE,
+  membershipRequests: {
+    pageSize: 10,
+    keepPreviousData: true,
+  },
 };
+
 export const RequestToJoinList = () => {
   const card = useCardState();
-  const { organization, membershipRequests } = useCoreOrganization({
-    membershipRequests: membershipRequestsParams,
-  });
+  const { organization, membershipRequests } = useCoreOrganization(membershipRequestsParams);
 
   if (!organization) {
     return null;
@@ -25,8 +25,9 @@ export const RequestToJoinList = () => {
     <DataTable
       page={membershipRequests?.page || 1}
       onPageChange={membershipRequests?.fetchPage ?? (() => null)}
-      itemCount={membershipRequests?.count ?? 0}
-      itemsPerPage={ITEMS_PER_PAGE}
+      itemCount={membershipRequests?.count || 0}
+      pageCount={membershipRequests?.pageCount || 0}
+      itemsPerPage={membershipRequestsParams.membershipRequests.pageSize}
       isLoading={membershipRequests?.isLoading}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.table__emptyRow')}
       headers={[
@@ -49,23 +50,27 @@ const RequestRow = withCardStateProvider(
   (props: { request: OrganizationMembershipRequestResource; onError: ReturnType<typeof useCardState>['setError'] }) => {
     const { request, onError } = props;
     const card = useCardState();
-    const { membershipRequests } = useCoreOrganization({
-      membershipRequests: membershipRequestsParams,
-    });
+    const { membership, membershipRequests } = useCoreOrganization(membershipRequestsParams);
 
     const onAccept = () => {
+      if (!membership || !membershipRequests) {
+        return;
+      }
       return card
         .runAsync(async () => {
           await request.accept();
-          await (membershipRequests as any).unstable__mutate?.();
+          await membershipRequests.revalidate();
         }, 'accept')
         .catch(err => handleError(err, [], onError));
     };
     const onReject = () => {
+      if (!membership || !membershipRequests) {
+        return;
+      }
       return card
         .runAsync(async () => {
           await request.reject();
-          await (membershipRequests as any).unstable__mutate?.();
+          await membershipRequests.revalidate();
         }, 'reject')
         .catch(err => handleError(err, [], onError));
     };

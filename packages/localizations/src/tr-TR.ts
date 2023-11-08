@@ -349,6 +349,12 @@ export const trTR: LocalizationResource = {
         destructiveActionSubtitle: 'Bu cüzdanı hesabınızdan kaldırın',
         destructiveAction: 'Cüzdanı kaldır',
       },
+      dangerSection: {
+        title: 'Tehlike',
+        deleteAccountButton: 'Hesabı sil',
+        deleteAccountTitle: 'Hesabı sil',
+        deleteAccountDescription: 'Hesabınızı ve ilişkili tüm verilerini silin',
+      },
     },
     profilePage: {
       title: 'Profili güncelle',

@@ -43,7 +43,7 @@ describe('ResetPassword', () => {
   });
 
   it('renders a hidden identifier field', async () => {
-    const identifier = 'test@clerk.dev';
+    const identifier = 'test@clerk.com';
     const { wrapper } = await createFixtures(f => {
       f.startSignInWithEmailAddress({ identifier });
     });
@@ -118,14 +118,13 @@ describe('ResetPassword', () => {
         await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
         const confirmField = screen.getByLabelText(/confirm password/i);
         await userEvent.type(confirmField, 'testrwerrwqrwe');
-        fireEvent.blur(confirmField);
         await waitFor(() => {
-          screen.getByText(`Passwords don't match.`);
+          expect(screen.getByText(`Passwords don't match.`)).toBeInTheDocument();
         });
 
         await userEvent.clear(confirmField);
         await waitFor(() => {
-          screen.getByText(`Passwords don't match.`);
+          expect(screen.getByText(`Passwords don't match.`)).toBeInTheDocument();
         });
       });
     }, 10000);

@@ -246,6 +246,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'page',
   'pageHeader',
 
+  'activeDevice',
+  'activeDeviceListItem',
   'activeDeviceIcon',
 
   'impersonationFab',

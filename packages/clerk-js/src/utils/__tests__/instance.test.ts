@@ -17,7 +17,7 @@ describe('validateFrontendApi(str)', () => {
     ['clerk.abcef.12345.stg.lclclerk.com', true],
     ['clerk.abcef.12345.prod.lclclerk.com', true],
     ['clerk.prod.lclclerk.com', true],
-    ['clerk.dev.lclclerk.com', true],
+    ['clerk.com.lclclerk.com', true],
     ['clerk.happy.hippo-1.lcl.dev', true],
     ['clerk.sad.panda-99.stg.dev', true],
     ['clerk.foo.bar-12.dev.lclclerk.com', true],

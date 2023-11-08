@@ -12,7 +12,7 @@ describe('ProfileSettingsPage', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
     const { getByDisplayValue } = render(<ProfileSettingsPage />, { wrapper });
@@ -23,7 +23,7 @@ describe('ProfileSettingsPage', () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
       });
     });
@@ -38,7 +38,7 @@ describe('ProfileSettingsPage', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
       });
     });
@@ -55,7 +55,7 @@ describe('ProfileSettingsPage', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
       });
     });
@@ -72,7 +72,7 @@ describe('ProfileSettingsPage', () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
-        email_addresses: ['test@clerk.dev'],
+        email_addresses: ['test@clerk.com'],
         organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
       });
     });

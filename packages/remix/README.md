@@ -16,13 +16,13 @@
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_remix)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-[Changelog](https://github.com/clerkinc/javascript/blob/main/packages/remix/CHANGELOG.md)
+[Changelog](https://github.com/clerk/javascript/blob/main/packages/remix/CHANGELOG.md)
 ·
-[Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
+[Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
 ·
-[Ask a Question](https://github.com/clerkinc/javascript/discussions)
+[Ask a Question](https://github.com/clerk/javascript/discussions)
 
 </div>
 
@@ -37,7 +37,7 @@ Clerk is the easiest way to add authentication and user management to your Remix
 ### Prerequisites
 
 - Remix `^2.0.0` or later
-- Node.js `^18.0.0` or later
+- Node.js `>=18.18.0` or later
 
 ### Installation
 
@@ -125,12 +125,12 @@ _For further details and examples, please refer to our [Documentation](https://c
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerkinc/javascript/discussions)
+- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
 - Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_remix)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
 
 ## Security
 
@@ -138,10 +138,10 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 `@clerk/remix` is provided **"as is"** without any **warranty**. Use at your own risk.
 
-_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerkinc/javascript/blob/main/docs/SECURITY.md)._
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 
 ## License
 
 This project is licensed under the **MIT license**.
 
-See [LICENSE](https://github.com/clerkinc/javascript/blob/main/packages/remix/LICENSE) for more information.
+See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/remix/LICENSE) for more information.

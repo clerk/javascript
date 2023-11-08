@@ -20,8 +20,13 @@ const mockProp = <T>(obj: T, k: keyof T) => {
   }
 };
 
-const mockMethodsOf = (obj: any) => {
-  Object.keys(obj).forEach(k => mockProp(obj, k));
+const mockMethodsOf = <T extends Record<string, any> | null = any>(obj: T, options?: { exclude: (keyof T)[] }) => {
+  if (!obj) {
+    return;
+  }
+  Object.keys(obj)
+    .filter(key => !options?.exclude.includes(key as keyof T))
+    .forEach(k => mockProp(obj, k));
 };
 
 export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk> => {
@@ -29,11 +34,13 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
   mockMethodsOf(clerk.client.signIn);
   mockMethodsOf(clerk.client.signUp);
   clerk.client.sessions.forEach(session => {
-    mockMethodsOf(session);
+    mockMethodsOf(session, {
+      exclude: ['experimental__checkAuthorization'],
+    });
     mockMethodsOf(session.user);
-    session.user?.emailAddresses.forEach(mockMethodsOf);
-    session.user?.phoneNumbers.forEach(mockMethodsOf);
-    session.user?.externalAccounts.forEach(mockMethodsOf);
+    session.user?.emailAddresses.forEach(m => mockMethodsOf(m));
+    session.user?.phoneNumbers.forEach(m => mockMethodsOf(m));
+    session.user?.externalAccounts.forEach(m => mockMethodsOf(m));
     session.user?.organizationMemberships.forEach(m => {
       mockMethodsOf(m);
       mockMethodsOf(m.organization);
@@ -41,6 +48,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
   });
   mockProp(clerk, 'navigate');
   mockProp(clerk, 'setActive');
+  mockProp(clerk, '__internal_navigateWithError');
   return clerk as any as DeepJestMocked<LoadedClerk>;
 };
 

@@ -1,7 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "0.19.11",
-  "license": "MIT",
+  "version": "1.0.0-alpha-v5.0",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -13,35 +12,46 @@
     "session",
     "jwt"
   ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/expo"
+  },
+  "license": "MIT",
   "author": "Clerk",
-  "source": "src/index.js",
   "main": "dist/index.js",
+  "source": "src/index.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
-    "publish:local": "npx yalc push --replace  --sig",
-    "clean": "rimraf ./dist",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/clerk-js": "4.62.1",
-    "@clerk/clerk-react": "4.26.6",
-    "@clerk/shared": "0.24.5",
+    "@clerk/clerk-js": "5.0.0-alpha-v5.0",
+    "@clerk/clerk-react": "5.0.0-alpha-v5.0",
+    "@clerk/shared": "2.0.0-alpha-v5.0",
     "base-64": "1.0.0",
     "react-native-url-polyfill": "2.0.0"
   },
   "devDependencies": {
-    "@clerk/types": "^3.56.1",
+    "@clerk/types": "^4.0.0-alpha-v5.0",
     "@types/base-64": "^1.0.0",
-    "@types/node": "^16.11.55",
+    "@types/node": "^18.18.0",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "eslint-config-custom": "*",
     "expo-auth-session": "^5.0.2",
     "expo-web-browser": "^12.3.2",
     "tslib": "^2.3.1",
@@ -53,18 +63,9 @@
     "react": ">=16"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18.18.0"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/expo"
-  },
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
-  },
-  "homepage": "https://clerk.com/"
+  }
 }

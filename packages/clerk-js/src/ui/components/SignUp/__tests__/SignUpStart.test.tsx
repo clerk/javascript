@@ -154,14 +154,14 @@ describe('SignUpStart', () => {
         f.withName({ required: true });
       });
 
-      fixtures.clerk.client.signUp.emailAddress = 'george@clerk.dev';
+      fixtures.clerk.client.signUp.emailAddress = 'george@clerk.com';
       fixtures.clerk.client.signUp.firstName = 'George';
       fixtures.clerk.client.signUp.lastName = 'Clerk';
       fixtures.clerk.client.signUp.phoneNumber = '+1123456789';
 
       const screen = render(<SignUpStart />, { wrapper });
 
-      expect(screen.getByRole('textbox', { name: 'Email address' })).toHaveValue('george@clerk.dev');
+      expect(screen.getByRole('textbox', { name: 'Email address' })).toHaveValue('george@clerk.com');
       expect(screen.getByRole('textbox', { name: 'First name' })).toHaveValue('George');
       expect(screen.getByRole('textbox', { name: 'Last name' })).toHaveValue('Clerk');
       expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveValue('(123) 456-789');

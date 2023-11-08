@@ -31,12 +31,7 @@ export const makeResponsive = <P extends React.JSX.IntrinsicElements['img']>(
   return responsiveComponent as ResponsivePrimitive<P>;
 };
 
-const CLERK_IMAGE_URL_BASES = [
-  'https://img.clerk.com/',
-  'https://img.clerk.dev/',
-  'https://img.clerkstage.dev/',
-  'https://img.lclclerk.com/',
-];
+const CLERK_IMAGE_URL_BASES = ['https://img.clerk.com/', 'https://img.clerkstage.dev/', 'https://img.lclclerk.com/'];
 
 const isClerkImage = (src?: string): boolean => {
   return !!CLERK_IMAGE_URL_BASES.some(base => src?.includes(base));

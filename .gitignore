@@ -84,3 +84,6 @@ test-results
 
 # verdaccio
 .verdaccio
+
+scripts/.env
+!scripts/.env.example

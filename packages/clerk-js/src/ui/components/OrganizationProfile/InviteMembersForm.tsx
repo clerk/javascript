@@ -1,26 +1,21 @@
-import { isClerkAPIResponseError } from '@clerk/shared';
-import type { ClerkAPIError, MembershipRole, OrganizationResource } from '@clerk/types';
-import React from 'react';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
+import type { ClerkAPIError, MembershipRole } from '@clerk/types';
+import type { FormEvent } from 'react';
+import { useState } from 'react';
 
+import { useCoreOrganization } from '../../contexts';
 import { Flex, Text } from '../../customizables';
-import {
-  Form,
-  FormButtonContainer,
-  Select,
-  SelectButton,
-  SelectOptionList,
-  TagInput,
-  useCardState,
-} from '../../elements';
+import { Form, FormButtonContainer, TagInput, useCardState } from '../../elements';
+import { useFetchRoles } from '../../hooks/useFetchRoles';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys, useLocalizations } from '../../localization';
 import { useRouter } from '../../router';
-import { createListFormat, handleError, roleLocalizationKey, useFormControl } from '../../utils';
+import { createListFormat, handleError, useFormControl } from '../../utils';
+import { RoleSelect } from './MemberListTable';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 
 type InviteMembersFormProps = {
-  organization: OrganizationResource;
   onSuccess: () => void;
   onReset?: () => void;
   primaryButtonLabel?: LocalizationKey;
@@ -29,21 +24,17 @@ type InviteMembersFormProps = {
 
 export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const { navigate } = useRouter();
-  const { onSuccess, onReset = () => navigate('..'), resetButtonLabel, organization } = props;
+  const { onSuccess, onReset = () => navigate('..'), resetButtonLabel } = props;
+  const { organization } = useCoreOrganization();
   const card = useCardState();
   const { t, locale } = useLocalizations();
-  const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = React.useState(false);
+  const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);
 
   if (!organization) {
     return null;
   }
 
   const validateUnsubmittedEmail = (value: string) => setIsValidUnsubmittedEmail(isEmail(value));
-
-  const roles: Array<{ label: string; value: MembershipRole }> = [
-    { label: t(roleLocalizationKey('admin')), value: 'admin' },
-    { label: t(roleLocalizationKey('basic_member')), value: 'basic_member' },
-  ];
 
   const emailAddressField = useFormControl('emailAddress', '', {
     type: 'text',
@@ -52,36 +43,32 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 
   const {
     props: {
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      enableErrorAfterBlur,
-      errorText,
-      hasLostFocus,
-      isFocused,
       setError,
       setWarning,
-      setSuccessful,
-      successfulText,
-      warningText,
+      setSuccess,
+      setInfo,
+      isFocused,
       validatePassword,
       setHasPassedComplexity,
       hasPassedComplexity,
-      /* eslint-enable @typescript-eslint/no-unused-vars */
+      feedback,
+      feedbackType,
+      clearFeedback,
       ...restEmailAddressProps
     },
   } = emailAddressField;
 
-  const roleField = useFormControl('role', 'basic_member', {
-    options: roles,
-    label: localizationKeys('formFieldLabel__role'),
-    placeholder: '',
-  });
-
   const canSubmit = !!emailAddressField.value.length || isValidUnsubmittedEmail;
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const submittedData = new FormData(e.currentTarget);
     return organization
-      .inviteMembers({ emailAddresses: emailAddressField.value.split(','), role: roleField.value as MembershipRole })
+      .inviteMembers({
+        emailAddresses: emailAddressField.value.split(','),
+        role: submittedData.get('role') as MembershipRole,
+      })
       .then(onSuccess)
       .catch(err => {
         if (isClerkAPIResponseError(err)) {
@@ -135,25 +122,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           />
         </Flex>
       </Form.ControlRow>
-      <Form.ControlRow elementId={roleField.id}>
-        <Flex
-          direction='col'
-          gap={2}
-        >
-          <Text localizationKey={roleField.label} />
-          {/*@ts-expect-error  Select expects options to be an array but useFormControl returns an optional field. */}
-          <Select
-            elementId='role'
-            {...roleField.props}
-            onChange={option => roleField.setValue(option.value)}
-          >
-            <SelectButton sx={t => ({ width: t.sizes.$48, justifyContent: 'space-between', display: 'flex' })}>
-              {roleField.props.options?.find(o => o.value === roleField.value)?.label}
-            </SelectButton>
-            <SelectOptionList sx={t => ({ minWidth: t.sizes.$48 })} />
-          </Select>
-        </Flex>
-      </Form.ControlRow>
+      <AsyncRoleSelect />
       <FormButtonContainer>
         <Form.SubmitButton
           block={false}
@@ -167,5 +136,31 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
         />
       </FormButtonContainer>
     </Form.Root>
+  );
+};
+
+const AsyncRoleSelect = () => {
+  const { options, isLoading } = useFetchRoles();
+  const roleField = useFormControl('role', '', {
+    label: localizationKeys('formFieldLabel__role'),
+  });
+
+  return (
+    <Form.ControlRow elementId={roleField.id}>
+      <Flex
+        direction='col'
+        gap={2}
+      >
+        <Text localizationKey={roleField.label} />
+        <RoleSelect
+          {...roleField.props}
+          roles={options}
+          isDisabled={isLoading}
+          onChange={value => roleField.setValue(value)}
+          triggerSx={t => ({ width: t.sizes.$48, justifyContent: 'space-between', display: 'flex' })}
+          optionListSx={t => ({ minWidth: t.sizes.$48 })}
+        />
+      </Flex>
+    </Form.ControlRow>
   );
 };

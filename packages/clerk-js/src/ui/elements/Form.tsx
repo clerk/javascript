@@ -1,11 +1,14 @@
-import { createContextAndHook } from '@clerk/shared';
+import { createContextAndHook } from '@clerk/shared/react';
 import type { FieldId } from '@clerk/types';
+import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 
-import { Button, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
+import { Field } from './FieldControl';
 import { FormControl } from './FormControl';
 
 const [FormState, useFormState] = createContextAndHook<{
@@ -73,35 +76,31 @@ const FormRoot = (props: FormProps): JSX.Element => {
 const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
   const { isLoading, isDisabled } = useFormState();
   return (
-    <>
-      <Button
-        elementDescriptor={descriptors.formButtonPrimary}
-        block
-        textVariant='buttonExtraSmallBold'
-        isLoading={isLoading}
-        isDisabled={isDisabled}
-        type='submit'
-        {...props}
-        localizationKey={props.localizationKey || localizationKeys('formButtonPrimary')}
-      />
-    </>
+    <Button
+      elementDescriptor={descriptors.formButtonPrimary}
+      block
+      textVariant='buttonExtraSmallBold'
+      isLoading={isLoading}
+      isDisabled={isDisabled}
+      type='submit'
+      {...props}
+      localizationKey={props.localizationKey || localizationKeys('formButtonPrimary')}
+    />
   );
 };
 
 const FormReset = (props: PropsOfComponent<typeof Button>) => {
   const { isLoading, isDisabled } = useFormState();
   return (
-    <>
-      <Button
-        elementDescriptor={descriptors.formButtonReset}
-        block
-        variant='ghost'
-        textVariant='buttonExtraSmallBold'
-        type='reset'
-        isDisabled={isLoading || isDisabled}
-        {...props}
-      />
-    </>
+    <Button
+      elementDescriptor={descriptors.formButtonReset}
+      block
+      variant='ghost'
+      textVariant='buttonExtraSmallBold'
+      type='reset'
+      isDisabled={isLoading || isDisabled}
+      {...props}
+    />
   );
 };
 
@@ -118,10 +117,79 @@ const FormControlRow = (props: Omit<PropsOfComponent<typeof Flex>, 'elementId'> 
   );
 };
 
+type CommonFieldRootProps = Omit<PropsOfComponent<typeof Field.Root>, 'children'>;
+
+type CommonInputProps = CommonFieldRootProps & {
+  isOptional?: boolean;
+  actionLabel?: string | LocalizationKey;
+  onActionClicked?: React.MouseEventHandler;
+  icon?: React.ComponentType;
+};
+
+const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
+  const { isOptional, icon, actionLabel, children, onActionClicked, ...fieldProps } = props;
+  return (
+    <Field.Root {...fieldProps}>
+      <Field.LabelRow>
+        <Field.Label />
+        <Field.LabelIcon icon={icon} />
+        {!actionLabel && isOptional && <Field.AsOptional />}
+        {actionLabel && (
+          <Field.Action
+            localizationKey={actionLabel}
+            onClick={onActionClicked}
+          />
+        )}
+        <Field.Action />
+      </Field.LabelRow>
+      {children}
+      <Field.Feedback />
+    </Field.Root>
+  );
+};
+
+const PlainInput = (props: CommonInputProps) => {
+  return (
+    <CommonInputWrapper {...props}>
+      <Field.Input />
+    </CommonInputWrapper>
+  );
+};
+
+const RadioGroup = (
+  props: Omit<PropsOfComponent<typeof Field.Root>, 'infoText' | 'type' | 'validatePassword' | 'label' | 'placeholder'>,
+) => {
+  const { radioOptions, ...fieldProps } = props;
+  return (
+    <Field.Root {...fieldProps}>
+      <Col
+        elementDescriptor={descriptors.formFieldRadioGroup}
+        gap={2}
+      >
+        {radioOptions?.map(({ value, description, label }) => (
+          <Field.RadioItem
+            key={value}
+            value={value}
+            label={label}
+            description={description}
+          />
+        ))}
+      </Col>
+
+      <Field.Feedback />
+    </Field.Root>
+  );
+};
+
 export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
+  /**
+   * @deprecated Use Form.PlainInput
+   */
   Control: FormControl,
+  PlainInput,
+  RadioGroup,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };

@@ -1,4 +1,4 @@
-import { deprecated, deprecatedProperty } from '@clerk/shared';
+import { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
 import type {
   AddMemberParams,
   ClerkPaginatedResponse,
@@ -8,7 +8,9 @@ import type {
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMemberships,
+  GetMembershipsParams,
   GetPendingInvitationsParams,
+  GetRolesParams,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,
@@ -20,17 +22,18 @@ import type {
   OrganizationMembershipRequestJSON,
   OrganizationMembershipRequestResource,
   OrganizationResource,
+  RoleJSON,
   SetOrganizationLogoParams,
   UpdateMembershipParams,
   UpdateOrganizationParams,
 } from '@clerk/types';
-import type { GetMembershipsParams } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
+import { Role } from './Role';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
@@ -105,14 +108,39 @@ export class Organization extends BaseResource implements OrganizationResource {
     });
   };
 
+  getRoles = async (getRolesParams?: GetRolesParams) => {
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/roles`,
+        method: 'GET',
+        search: convertPageToOffset(getRolesParams) as any,
+      },
+      {
+        forceUpdateClient: true,
+      },
+    ).then(res => {
+      const { data: roles, total_count } = res?.response as unknown as ClerkPaginatedResponse<RoleJSON>;
+
+      return {
+        total_count,
+        data: roles.map(role => new Role(role)),
+      };
+    });
+  };
+
   getDomains = async (
     getDomainParams?: GetDomainsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationDomainResource>> => {
-    return await BaseResource._fetch({
-      path: `/organizations/${this.id}/domains`,
-      method: 'GET',
-      search: convertPageToOffset(getDomainParams) as any,
-    })
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/domains`,
+        method: 'GET',
+        search: convertPageToOffset(getDomainParams) as any,
+      },
+      {
+        forceUpdateClient: true,
+      },
+    )
       .then(res => {
         const { data: invites, total_count } =
           res?.response as unknown as ClerkPaginatedResponse<OrganizationDomainJSON>;
@@ -179,13 +207,18 @@ export class Organization extends BaseResource implements OrganizationResource {
       deprecated('offset', 'Use `initialPage` instead in Organization.limit.', 'organization:getMemberships:offset');
     }
 
-    return await BaseResource._fetch({
-      path: `/organizations/${this.id}/memberships`,
-      method: 'GET',
-      search: isDeprecatedParams
-        ? getMembershipsParams
-        : (convertPageToOffset(getMembershipsParams as unknown as any) as any),
-    })
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/memberships`,
+        method: 'GET',
+        search: isDeprecatedParams
+          ? getMembershipsParams
+          : (convertPageToOffset(getMembershipsParams as unknown as any) as any),
+      },
+      {
+        forceUpdateClient: true,
+      },
+    )
       .then(res => {
         if (isDeprecatedParams) {
           const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
@@ -230,11 +263,16 @@ export class Organization extends BaseResource implements OrganizationResource {
   getInvitations = async (
     getInvitationsParams?: GetInvitationsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationInvitationResource>> => {
-    return await BaseResource._fetch({
-      path: `/organizations/${this.id}/invitations`,
-      method: 'GET',
-      search: convertPageToOffset(getInvitationsParams) as any,
-    })
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/invitations`,
+        method: 'GET',
+        search: convertPageToOffset(getInvitationsParams) as any,
+      },
+      {
+        forceUpdateClient: true,
+      },
+    )
       .then(res => {
         const { data: requests, total_count } =
           res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;

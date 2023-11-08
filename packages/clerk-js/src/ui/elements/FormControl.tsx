@@ -1,7 +1,6 @@
-import type { FieldId } from '@clerk/types';
-import type { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError, FieldId } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { forwardRef, useCallback, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -22,12 +21,12 @@ import {
   useLocalizations,
 } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
-import { useFieldMessageVisibility, usePrefersReducedMotion } from '../hooks';
+import { usePrefersReducedMotion } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
+import type { FeedbackType } from '../utils';
 import { useFormControlFeedback } from '../utils';
 import { useCardState } from './contexts';
-import { useFormState } from './Form';
 import { InputGroup } from './InputGroup';
 import { PasswordInput } from './PasswordInput';
 import { PhoneInput } from './PhoneInput';
@@ -37,7 +36,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   id: FieldId;
   isRequired?: boolean;
   isOptional?: boolean;
-  errorText?: string;
+  isFocused?: boolean;
   onActionClicked?: React.MouseEventHandler;
   isDisabled?: boolean;
   label?: string | LocalizationKey;
@@ -46,21 +45,20 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   icon?: React.ComponentType;
   validatePassword?: boolean;
   setError: (error: string | ClerkAPIError | undefined) => void;
-  warningText: string | undefined;
-  setWarning: (error: string) => void;
-  setSuccessful: (message: string) => void;
-  successfulText: string;
-  hasLostFocus: boolean;
+  setWarning: (warning: string) => void;
+  setInfo: (info: string) => void;
+  setSuccess: (message: string) => void;
+  feedback: string;
+  feedbackType: FeedbackType;
   setHasPassedComplexity: (b: boolean) => void;
+  clearFeedback: () => void;
   hasPassedComplexity: boolean;
-  enableErrorAfterBlur?: boolean;
-  informationText?: string | LocalizationKey;
+  infoText?: string | LocalizationKey;
   radioOptions?: {
     value: string;
     label: string | LocalizationKey;
     description?: string | LocalizationKey;
   }[];
-  isFocused: boolean;
   groupPreffix?: string;
   groupSuffix?: string;
 };
@@ -92,21 +90,24 @@ const getInputElementForType = ({
   return CustomInputs[customInput] || Input;
 };
 
-function useFormTextAnimation() {
+export function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const getFormTextAnimation = useCallback(
-    (enterAnimation: boolean): ThemableCssProp => {
+    (enterAnimation: boolean, options?: { inDelay?: boolean }): ThemableCssProp => {
       if (prefersReducedMotion) {
         return {
           animation: 'none',
         };
       }
+
+      const inAnimation = options?.inDelay ? animations.inDelayAnimation : animations.inAnimation;
+
       return t => ({
-        animation: `${enterAnimation ? animations.inAnimation : animations.outAnimation} ${
-          t.transitionDuration.$textField
-        } ${t.transitionTiming.$common}`,
-        transition: `height ${t.transitionDuration.$slow}  ${t.transitionTiming.$common}`, // This is expensive but required for a smooth layout shift
+        animation: `${enterAnimation ? inAnimation : animations.outAnimation} ${t.transitionDuration.$textField} ${
+          t.transitionTiming.$common
+        }`,
+        transition: `height ${t.transitionDuration.$slow} ${t.transitionTiming.$common}`, // This is expensive but required for a smooth layout shift
       });
     },
     [prefersReducedMotion],
@@ -117,52 +118,40 @@ function useFormTextAnimation() {
   };
 }
 
-type CalculateConfigProps = {
-  recalculate?: LocalizationKey | string | undefined;
-};
-type Px = number;
-const useCalculateErrorTextHeight = (config: CalculateConfigProps = {}) => {
-  const [height, setHeight] = useState<Px>(24);
+export const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) => {
+  const [height, setHeight] = useState(0);
 
   const calculateHeight = useCallback(
     (element: HTMLElement | null) => {
       if (element) {
         const computedStyles = getComputedStyle(element);
-        const marginTop = parseInt(computedStyles.marginTop.replace('px', ''));
-
-        const newHeight = 1.1 * marginTop + element.scrollHeight;
-        setHeight(newHeight);
+        setHeight(element.scrollHeight + parseInt(computedStyles.marginTop.replace('px', '')));
       }
     },
-    [config?.recalculate],
+    [feedback],
   );
+
   return {
     height,
     calculateHeight,
   };
 };
 
-type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
+export type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
 
-type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
+type Feedback = { feedback?: string; feedbackType?: FeedbackType; shouldEnter: boolean };
+
+export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
 };
 
-const delay = 350;
-
 export const FormFeedback = (props: FormFeedbackProps) => {
-  const { id, elementDescriptors } = props;
-  const errorMessage = useFieldMessageVisibility(props.errorText, delay);
-  const successMessage = useFieldMessageVisibility(props.successfulText, delay);
-  const informationMessage = useFieldMessageVisibility(props.informationText, delay);
-  const warningMessage = useFieldMessageVisibility(props.warningText, delay);
+  const { id, elementDescriptors, feedback, feedbackType = 'info' } = props;
+  const feedbacksRef = useRef<{
+    a?: Feedback;
+    b?: Feedback;
+  }>({ a: undefined, b: undefined });
 
-  const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
-  const isSomeMessageVisible = !!messageToDisplay;
-
-  const { calculateHeight, height } = useCalculateErrorTextHeight({
-    recalculate: warningMessage || errorMessage || informationMessage,
-  });
   const { getFormTextAnimation } = useFormTextAnimation();
   const defaultElementDescriptors = {
     error: descriptors.formFieldErrorText,
@@ -171,7 +160,53 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     success: descriptors.formFieldSuccessText,
   };
 
-  const getElementProps = (type: FormFeedbackDescriptorsKeys) => {
+  const feedbacks = useMemo(() => {
+    const oldFeedbacks = feedbacksRef.current;
+    let result: {
+      a?: Feedback;
+      b?: Feedback;
+    };
+    if (oldFeedbacks.a?.shouldEnter) {
+      result = {
+        a: { ...oldFeedbacks.a, shouldEnter: false },
+        b: {
+          feedback,
+          feedbackType,
+          shouldEnter: true,
+        },
+      };
+    } else {
+      result = {
+        a: {
+          feedback,
+          feedbackType,
+          shouldEnter: true,
+        },
+        b: { ...oldFeedbacks.b, shouldEnter: false },
+      };
+    }
+    feedbacksRef.current = result;
+    return result;
+  }, [feedback, feedbackType]);
+
+  const { calculateHeight: calculateHeightA, height: heightA } = useCalculateErrorTextHeight({
+    feedback: feedbacks.a?.feedback || '',
+  });
+  const { calculateHeight: calculateHeightB, height: heightB } = useCalculateErrorTextHeight({
+    feedback: feedbacks.b?.feedback || '',
+  });
+  const maxHeightRef = useRef(Math.max(heightA, heightB));
+
+  const maxHeight = useMemo(() => {
+    const max = Math.max(heightA, heightB, maxHeightRef.current);
+    maxHeightRef.current = max;
+    return max;
+  }, [heightA, heightB]);
+
+  const getElementProps = (type?: FormFeedbackDescriptorsKeys) => {
+    if (!type) {
+      return {};
+    }
     const descriptor = (elementDescriptors?.[type] || defaultElementDescriptors[type]) as ElementDescriptor | undefined;
     return {
       elementDescriptor: descriptor,
@@ -179,59 +214,49 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     };
   };
 
-  if (!isSomeMessageVisible) {
-    return null;
-  }
+  const FormInfoComponent: Record<
+    FeedbackType,
+    typeof FormErrorText | typeof FormInfoText | typeof FormSuccessText | typeof FormWarningText
+  > = {
+    error: FormErrorText,
+    info: FormInfoText,
+    success: FormSuccessText,
+    warning: FormWarningText,
+  };
+
+  const InfoComponentA = FormInfoComponent[feedbacks.a?.feedbackType || 'info'];
+  const InfoComponentB = FormInfoComponent[feedbacks.b?.feedbackType || 'info'];
 
   return (
     <Box
       style={{
-        height, // dynamic height
+        height: feedback ? maxHeight : 0, // dynamic height
         position: 'relative',
       }}
-      sx={[
-        getFormTextAnimation(
-          !!props.informationText || !!props.successfulText || !!props.errorText || !!props.warningText,
-        ),
-      ]}
+      sx={[getFormTextAnimation(!!feedback)]}
     >
-      {/*Display the directions after the success message is unmounted*/}
-      {!successMessage && !warningMessage && !errorMessage && informationMessage && (
-        <FormInfoText
-          ref={calculateHeight}
-          sx={getFormTextAnimation(!!props.informationText && !props?.successfulText && !props.warningText)}
-          localizationKey={informationMessage}
-        />
-      )}
-      {/* Display the error message after the directions is unmounted*/}
-      {errorMessage && (
-        <FormErrorText
-          {...getElementProps('error')}
-          ref={calculateHeight}
-          sx={getFormTextAnimation(!!props?.errorText)}
-          localizationKey={errorMessage}
-        />
-      )}
-
-      {/* Display the success message after the error message is unmounted*/}
-      {!errorMessage && successMessage && (
-        <FormSuccessText
-          {...getElementProps('success')}
-          ref={calculateHeight}
-          sx={getFormTextAnimation(!!props?.successfulText)}
-          localizationKey={successMessage}
-        />
-      )}
-
-      {warningMessage && (
-        <FormWarningText
-          {...getElementProps('warning')}
-          ref={calculateHeight}
-          sx={getFormTextAnimation(!!props.warningText)}
-        >
-          {warningMessage}
-        </FormWarningText>
-      )}
+      <InfoComponentA
+        {...getElementProps(feedbacks.a?.feedbackType)}
+        ref={calculateHeightA}
+        sx={[
+          () => ({
+            visibility: feedbacks.a?.shouldEnter ? 'visible' : 'hidden',
+          }),
+          getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
+        ]}
+        localizationKey={feedbacks.a?.feedback}
+      />
+      <InfoComponentB
+        {...getElementProps(feedbacks.b?.feedbackType)}
+        ref={calculateHeightB}
+        sx={[
+          () => ({
+            visibility: feedbacks.b?.shouldEnter ? 'visible' : 'hidden',
+          }),
+          getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
+        ]}
+        localizationKey={feedbacks.b?.feedback}
+      />
     </Box>
   );
 };
@@ -239,12 +264,13 @@ export const FormFeedback = (props: FormFeedbackProps) => {
 export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormControlProps>>((props, ref) => {
   const { t } = useLocalizations();
   const card = useCardState();
-  const { submittedWithEnter } = useFormState();
   const {
+    hasPassedComplexity,
+    infoText,
     id,
-    errorText,
     isRequired,
     isOptional,
+    isFocused,
     label,
     actionLabel,
     onActionClicked,
@@ -252,16 +278,13 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     placeholder,
     icon,
     setError,
-    successfulText,
-    setSuccessful,
-    hasLostFocus,
-    enableErrorAfterBlur,
-    informationText,
-    isFocused: _isFocused,
-    warningText,
+    setSuccess,
+    feedback,
+    feedbackType,
     setWarning,
+    setInfo,
     setHasPassedComplexity,
-    hasPassedComplexity,
+    clearFeedback,
     radioOptions,
     groupPreffix,
     groupSuffix,
@@ -270,7 +293,6 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
 
   const isDisabled = props.isDisabled || card.isLoading;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { validatePassword, ...inputProps } = restInputProps;
 
   const inputElementProps = useMemo(() => {
@@ -305,19 +327,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
 
   const isCheckbox = props.type === 'checkbox';
 
-  const { debounced: debouncedState } = useFormControlFeedback({
-    errorText,
-    informationText,
-    enableErrorAfterBlur,
-    hasPassedComplexity,
-    isFocused: _isFocused,
-    hasLostFocus,
-    successfulText,
-    warningText,
-    skipBlur: submittedWithEnter,
-  });
-
-  const errorMessage = useFieldMessageVisibility(debouncedState.errorText, delay);
+  const { debounced: debouncedState } = useFormControlFeedback({ feedback, feedbackType, isFocused });
 
   const ActionLabel = actionLabel ? (
     <Link
@@ -371,7 +381,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       localizationKey={typeof label === 'object' ? label : undefined}
       elementDescriptor={descriptors.formFieldLabel}
       elementId={descriptors.formFieldLabel.setId(id)}
-      hasError={!!errorMessage}
+      hasError={debouncedState.feedbackType === 'error'}
       isDisabled={isDisabled}
       isRequired={isRequired}
       sx={{
@@ -387,10 +397,16 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     <InputElement
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(id)}
-      hasError={!!errorMessage}
+      hasError={debouncedState.feedbackType === 'error'}
       isDisabled={isDisabled}
       isRequired={isRequired}
       {...inputElementProps}
+      onFocus={e => {
+        inputElementProps.onFocus?.(e);
+      }}
+      onBlur={e => {
+        inputElementProps.onBlur?.(e);
+      }}
       ref={ref}
       placeholder={t(placeholder)}
     />
@@ -401,13 +417,15 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       elementDescriptor={descriptors.formField}
       elementId={descriptors.formField.setId(id)}
       id={id}
-      hasError={!!errorMessage}
+      hasError={debouncedState.feedbackType === 'error'}
       isDisabled={isDisabled}
       isRequired={isRequired}
       setError={setError}
-      setSuccessful={setSuccessful}
+      setSuccess={setSuccess}
       setWarning={setWarning}
+      setInfo={setInfo}
       setHasPassedComplexity={setHasPassedComplexity}
+      clearFeedback={clearFeedback}
       sx={sx}
     >
       {isCheckbox ? (

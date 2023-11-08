@@ -7,7 +7,7 @@ OrganizationDomain {
   "delete": [Function],
   "enrollmentMode": "manual_invitation",
   "id": "test_domain_id",
-  "name": "clerk.dev",
+  "name": "clerk.com",
   "organizationId": "test_org_id",
   "pathRoot": "",
   "prepareAffiliationVerification": [Function],
@@ -20,12 +20,12 @@ OrganizationDomain {
 
 exports[`OrganizationDomain has the same initial properties 1`] = `
 OrganizationDomain {
-  "affiliationEmailAddress": "some@clerk.dev",
+  "affiliationEmailAddress": "some@clerk.com",
   "attemptAffiliationVerification": [Function],
   "delete": [Function],
   "enrollmentMode": "manual_invitation",
   "id": "test_domain_id",
-  "name": "clerk.dev",
+  "name": "clerk.com",
   "organizationId": "test_org_id",
   "pathRoot": "",
   "prepareAffiliationVerification": [Function],
