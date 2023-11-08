@@ -800,12 +800,7 @@ export type UserButtonProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
-  appearance?: UserButtonTheme & {
-    /**
-     * @deprecated Use `userProfileProps.appearance` instead.
-     */
-    userProfile?: UserProfileTheme;
-  };
+  appearance?: UserButtonTheme;
 
   /*
    * Specify options for the underlying <UserProfile /> component.
