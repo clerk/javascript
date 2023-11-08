@@ -39,7 +39,6 @@ const Root = (props: PropsWithChildren<FormControlProps>) => {
     setInfo,
     setSuccess,
     setWarning,
-    setHasPassedComplexity,
     clearFeedback,
     feedbackType,
     feedback,
@@ -65,7 +64,6 @@ const Root = (props: PropsWithChildren<FormControlProps>) => {
         setSuccess={setSuccess}
         setWarning={setWarning}
         setInfo={setInfo}
-        setHasPassedComplexity={setHasPassedComplexity}
         clearFeedback={clearFeedback}
         sx={sx}
       >
@@ -204,8 +202,17 @@ const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors'>) => 
 const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {
   const { t } = useLocalizations();
   const formField = useFormField();
-  const { placeholder, ...inputProps } = sanitizeInputProps(formField, ['validatePassword']);
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField, [
+    'validatePassword',
+    'setError',
+    'setWarning',
+    'setSuccess',
+    'setInfo',
+    'setHasPassedComplexity',
+  ]);
+
   return (
+    // @ts-expect-error
     <PasswordInput
       ref={ref}
       elementDescriptor={descriptors.formFieldInput}
