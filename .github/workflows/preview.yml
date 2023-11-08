@@ -5,6 +5,9 @@ env:
   COMMENT_HEADER: javascript-preview
 
 on:
+  push:
+    branches:
+      - lekoarts/sdk-853-add-deploy-preview-for-clerkincjavascript
   issue_comment:
     types: [created]
 
