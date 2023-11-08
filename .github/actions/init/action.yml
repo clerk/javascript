@@ -91,7 +91,7 @@ runs:
       run: echo $TURBO_ARGS
 
     - name: Setup NodeJS ${{ inputs.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
         NODE_AUTH_TOKEN: ${{ inputs.node-auth-token }}
