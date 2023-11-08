@@ -5,9 +5,6 @@ env:
   COMMENT_HEADER: javascript-preview
 
 on:
-  push:
-    branches:
-      - lekoarts/sdk-853-add-deploy-preview-for-clerkincjavascript
   issue_comment:
     types: [created]
 
@@ -17,7 +14,7 @@ concurrency:
 
 jobs:
   preview:
-    # if: ${{ startsWith(github.event.comment.body, '!preview') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
+    if: ${{ startsWith(github.event.comment.body, '!preview') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
@@ -47,7 +44,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          ref: refs/pull/2079/head
+          ref: refs/pull/${{ github.event.issue.number }}/head
 
       - name: Setup
         id: config
@@ -101,7 +98,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           header: ${{ env.COMMENT_HEADER}}
           message: |
-            Hey TODO, your preview is currently deploying and should be available shortly.
+            Hey @${{ github.event.comment.user.login }}, your preview is currently deploying and should be available shortly.
 
             | Status | Preview | Updated (UTC) |
             | :-- | :-- | :-- |
@@ -125,7 +122,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           header: ${{ env.COMMENT_HEADER }}
           message: |
-            Hey TODO, your preview is available.
+            Hey @${{ github.event.comment.user.login }}, your preview is available.
 
             | Status | Preview | Updated (UTC) |
             | :-- | :-- | :-- |
