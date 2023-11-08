@@ -8,12 +8,7 @@ module.exports = {
   testMatch: ['**/?(*.)+(spec|test).+(ts|tsx|js)'],
   transform: { '^.+\\.m?tsx?$': 'ts-jest' },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  testPathIgnorePatterns: ['/node_modules/', '/jest/'],
-  // Jest currently does not support package.json subpath imports
-  // so we manually map them to the actual files. See @clerk/backend/package.json
-  moduleNameMapper: {
-    '#crypto': '@clerk/backend/dist/runtime/node/crypto.js',
-  },
+  testPathIgnorePatterns: ['/node_modules/', '/jest/', '/.turbo', '/dist'],
   collectCoverage: true,
   coverageProvider: 'v8',
   coverageDirectory: 'coverage',
