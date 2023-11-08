@@ -72,7 +72,7 @@ jobs:
         run: npm install --global vercel@latest
 
       - name: Pull Vercel environment information
-        working-directory: $FULL_TMP_FOLDER
+        working-directory: ./$FULL_TMP_FOLDER
         run: |
           vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }}
 
@@ -81,7 +81,7 @@ jobs:
           cp -r $GITHUB_WORKSPACE/packages/clerk-js/dist $FULL_TMP_FOLDER/public/clerk-js
 
       - name: Build with Vercel
-        working-directory: $FULL_TMP_FOLDER
+        working-directory: ./$FULL_TMP_FOLDER
         run: |
           vercel build --yes
         env:
@@ -89,7 +89,7 @@ jobs:
 
       - name: Deploy to Vercel (prebuilt)
         id: vercel-deploy
-        working-directory: $FULL_TMP_FOLDER
+        working-directory: ./$FULL_TMP_FOLDER
         run: |
           vercel deploy --prebuilt --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }} --no-wait > deployment_url.txt
           echo "url=$(cat deployment_url.txt)" >> $GITHUB_OUTPUT
