@@ -1,7 +1,7 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
-import { TelemetryCollector } from '@clerk/shared/telemetry';
 import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
+import { TelemetryCollector } from '@clerk/shared/telemetry';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -9,12 +9,7 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
-<<<<<<< HEAD
-import { SECRET_KEY } from './clerkClient';
-import { PUBLISHABLE_KEY } from './constants';
-=======
-import { SECRET_KEY } from './constants';
->>>>>>> main
+import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import {
   clockSkewDetected,
