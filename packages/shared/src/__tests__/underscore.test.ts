@@ -235,7 +235,7 @@ describe('getNonUndefinedValues', () => {
       c: null,
     };
     expect(getNonUndefinedValues(obj)).toStrictEqual(obj);
-    expect(getNonUndefinedValues({})).toStrictEqual(obj);
+    expect(getNonUndefinedValues({})).toStrictEqual({});
   });
 
   it(`removes only the undefined values from the top level`, () => {
