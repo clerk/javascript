@@ -22,7 +22,9 @@ import { useFormControlFeedback } from '../utils';
 import { useCardState } from './contexts';
 import type { FormFeedbackProps } from './FormControl';
 import { FormFeedback } from './FormControl';
-import { RadioItem } from './RadioGroup';
+import { InputGroup } from './InputGroup';
+import { PasswordInput } from './PasswordInput';
+import { RadioItem, RadioLabel } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder' | 'disabled' | 'required'> &
   ReturnType<typeof useFormControlUtil<FieldId>>['props'];
@@ -199,6 +201,57 @@ const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors'>) => 
   );
 };
 
+const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {
+  const { t } = useLocalizations();
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField, ['validatePassword']);
+  return (
+    <PasswordInput
+      ref={ref}
+      elementDescriptor={descriptors.formFieldInput}
+      elementId={descriptors.formFieldInput.setId(formField.fieldId)}
+      {...inputProps}
+      placeholder={t(placeholder)}
+    />
+  );
+});
+
+const CheckboxIndicator = forwardRef<HTMLInputElement>((_, ref) => {
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField);
+
+  return (
+    <Input
+      ref={ref}
+      {...inputProps}
+      elementDescriptor={descriptors.formFieldInput}
+      elementId={descriptors.formFieldInput.setId(formField.fieldId)}
+      focusRing={false}
+      sx={t => ({
+        width: 'fit-content',
+        marginTop: t.space.$0x5,
+      })}
+      type='checkbox'
+    />
+  );
+});
+
+const CheckboxLabel = (props: { description?: string | LocalizationKey }) => {
+  const { label, id } = useFormField();
+
+  if (!label) {
+    return null;
+  }
+
+  return (
+    <RadioLabel
+      label={label}
+      id={id}
+      description={props.description}
+    />
+  );
+};
+
 const InputElement = forwardRef<HTMLInputElement>((_, ref) => {
   const { t } = useLocalizations();
   const formField = useFormField();
@@ -214,12 +267,40 @@ const InputElement = forwardRef<HTMLInputElement>((_, ref) => {
   );
 });
 
+const InputGroupElement = forwardRef<
+  HTMLInputElement,
+  {
+    groupPrefix?: string;
+    groupSuffix?: string;
+  }
+>((props, ref) => {
+  const { t } = useLocalizations();
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField);
+
+  return (
+    <InputGroup
+      ref={ref}
+      elementDescriptor={descriptors.formFieldInput}
+      elementId={descriptors.formFieldInput.setId(formField.fieldId)}
+      {...inputProps}
+      groupPrefix={props.groupPrefix}
+      groupSuffix={props.groupSuffix}
+      placeholder={t(placeholder)}
+    />
+  );
+});
+
 export const Field = {
   Root: Root,
   Label: FieldLabel,
   LabelRow: FieldLabelRow,
   Input: InputElement,
+  PasswordInput: PasswordInputElement,
+  InputGroup: InputGroupElement,
   RadioItem: RadioItem,
+  CheckboxIndicator: CheckboxIndicator,
+  CheckboxLabel: CheckboxLabel,
   Action: FieldAction,
   AsOptional: FieldOptionalLabel,
   LabelIcon: FieldLabelIcon,
