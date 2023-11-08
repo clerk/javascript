@@ -1,6 +1,6 @@
 import type { SignUpField, SignUpResource } from '@clerk/types';
 
-import { completeSignUpFlow } from '../util';
+import { completeSignUpFlow } from '../completeSignUpFlow';
 
 const mockHandleComplete = jest.fn();
 const mockNavigate = jest.fn();

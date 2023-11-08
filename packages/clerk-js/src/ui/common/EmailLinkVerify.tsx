@@ -1,12 +1,12 @@
 import { EmailLinkErrorCode, isEmailLinkError } from '@clerk/shared/error';
 import React from 'react';
 
-import type { VerificationStatus } from '../../utils/getClerkQueryParam';
+import type { VerificationStatus } from '../../utils';
+import { completeSignUpFlow } from '../../utils';
 import { useCoreClerk, useCoreSignUp } from '../contexts';
 import type { LocalizationKey } from '../localization';
 import { useRouter } from '../router';
 import { sleep } from '../utils';
-import { completeSignUpFlow } from '../utils/completeSignUpFlow';
 import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 
 export type EmailLinkVerifyProps = {
