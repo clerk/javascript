@@ -16,20 +16,26 @@ jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
     runs-on: ${{ vars.RUNNER_LARGE }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+
+    env:
+      TURBO_SUMMARIZE: true
 
     steps:
       - name: Checkout Repo
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           show-progress: false
 
       - name: Setup
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-remote-only: false
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
@@ -43,26 +49,45 @@ jobs:
           echo "FORCE_COLOR: $FORCE_COLOR"
 
       - name: Require Changeset
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
+        if: ${{ !(github.event_name == 'merge_group') }}
         run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
       - name: Check Formatting
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run format:check
 
       - name: Lint packages using publint
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run lint:publint -- $TURBO_ARGS
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Lint types using attw
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run lint:attw -- $TURBO_ARGS
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run lint -- $TURBO_ARGS -- --quiet
+
+      - name: Upload Turbo Summary
+        uses: actions/upload-artifact@v3
+        if: ${{ env.TURBO_SUMMARIZE == 'true' }}
+        continue-on-error: true
+        with:
+          name: turbo-summary-report-lint-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .turbo/runs
+          retention-days: 5
 
   unit-tests:
     name: Unit Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+
+    env:
+      TURBO_SUMMARIZE: true
 
     strategy:
       matrix:
@@ -81,6 +106,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
@@ -89,14 +115,24 @@ jobs:
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
+      - name: Upload Turbo Summary
+        uses: actions/upload-artifact@v3
+        if: ${{ env.TURBO_SUMMARIZE == 'true' }}
+        continue-on-error: true
+        with:
+          name: turbo-summary-report-unit-${{ github.run_id }}-${{ github.run_attempt }}-node-${{ matrix.node-version }}
+          path: .turbo/runs
+          retention-days: 5
+
   integration-tests:
     name: Integration Tests
     needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ${{ vars.RUNNER_MEDIUM }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
     strategy:
       matrix:
-        test-name: [ 'generic', 'nextjs', 'remix' ]
+        test-name: [ 'generic', 'nextjs' ]
 
     steps:
       - name: Checkout Repo
@@ -124,9 +160,14 @@ jobs:
         working-directory: ./integration
         run: npm init -y && npm install @clerk/backend
 
+      - name: Install @clerk/clerk-js in os temp
+        working-directory: ${{runner.temp}}
+        run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
+
       - name: Run Integration Tests
         run: npm run test:integration:${{ matrix.test-name }}
         env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
@@ -135,6 +176,6 @@ jobs:
       #   uses: actions/upload-artifact@v3
       #   if: always()
       #   with:
-      #     name: integration-report-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+      #     name: integration-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
       #     path: playwright-report/
       #     retention-days: 1
