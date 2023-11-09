@@ -1376,7 +1376,7 @@ export default class Clerk implements ClerkInterface {
 
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
       if (data.type === 'signout') {
-        void this.handleUnauthenticated({ broadcast: true });
+        void this.handleUnauthenticated();
       }
     });
   };
