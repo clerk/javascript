@@ -29,19 +29,7 @@ type _LocalizationResource = {
   formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
   formFieldLabel__username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldLabel__emailAddress_phoneNumber: LocalizationValue;
   formFieldLabel__emailAddress_username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldLabel__phoneNumber_username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldLabel__emailAddress_phoneNumber_username: LocalizationValue;
   formFieldLabel__password: LocalizationValue;
   formFieldLabel__currentPassword: LocalizationValue;
   formFieldLabel__newPassword: LocalizationValue;
