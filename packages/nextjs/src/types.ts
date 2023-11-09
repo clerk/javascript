@@ -1,5 +1,4 @@
 import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
-import type { MultiDomainAndOrProxy, PublishableKeyOrFrontendApi } from '@clerk/types';
 import type React from 'react';
 
 export type NextClerkProviderProps = {
@@ -13,7 +12,4 @@ export type NextClerkProviderProps = {
    * @default true
    */
   __unstable_invokeMiddlewareOnAuthStateChange?: boolean;
-} & Omit<IsomorphicClerkOptions, keyof PublishableKeyOrFrontendApi> &
-  Partial<PublishableKeyOrFrontendApi> &
-  Omit<IsomorphicClerkOptions, keyof MultiDomainAndOrProxy> &
-  MultiDomainAndOrProxy;
+} & IsomorphicClerkOptions;

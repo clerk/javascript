@@ -5,7 +5,6 @@ import type {
   DomainOrProxyUrl,
   LoadedClerk,
   MultiDomainAndOrProxy,
-  PublishableKeyOrFrontendApi,
   SDKMetadata,
   SessionResource,
   SignInRedirectOptions,
@@ -23,15 +22,14 @@ declare global {
   }
 }
 
-// TODO(@dimkl): Remove frontendApi when it's removed from ClerkOptions in @clerk/types
-export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite' | 'frontendApi'> & {
+export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
   clerkJSVersion?: string;
   sdkMetadata?: SDKMetadata;
-} & PublishableKeyOrFrontendApi &
-  MultiDomainAndOrProxy;
+  publishableKey?: string;
+} & MultiDomainAndOrProxy;
 
 export interface BrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
