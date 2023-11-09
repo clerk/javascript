@@ -113,7 +113,7 @@ jobs:
         run: |
           vercel inspect --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }} --wait ${{ steps.vercel-deploy.outputs.url }} --timeout 10m --scope clerk-production
           vercel alias set ${{ steps.vercel-deploy.outputs.url }} javascript-preview-${{ github.event.issue.number }}.clerkpreview.com --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }} --scope clerk-production
-          echo "stable_url=https://javascript-preview-${{ github.event.pull_request.number }}.clerkpreview.com" >> $GITHUB_OUTPUT
+          echo "stable_url=https://javascript-preview-${{ github.event.issue.number }}.clerkpreview.com" >> $GITHUB_OUTPUT
 
       - name: Create preview comment - Deployed
         uses: marocchino/sticky-pull-request-comment@v2.8.0
