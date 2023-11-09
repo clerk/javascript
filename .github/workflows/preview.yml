@@ -94,8 +94,8 @@ jobs:
       - name: Create preview comment - Deploying
         uses: marocchino/sticky-pull-request-comment@v2.8.0
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
+          number: ${{ github.event.issue.number }}
           header: ${{ env.COMMENT_HEADER}}
           message: |
             Hey @${{ github.event.comment.user.login }}, your preview is currently deploying and should be available shortly.
@@ -112,14 +112,14 @@ jobs:
         id: vercel-wait-for-deploy
         run: |
           vercel inspect --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }} --wait ${{ steps.vercel-deploy.outputs.url }} --timeout 10m --scope clerk-production
-          vercel alias set ${{ steps.vercel-deploy.outputs.url }} javascript-preview-${{ github.event.pull_request.number }}.clerkpreview.com --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }} --scope clerk-production
+          vercel alias set ${{ steps.vercel-deploy.outputs.url }} javascript-preview-${{ github.event.issue.number }}.clerkpreview.com --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }} --scope clerk-production
           echo "stable_url=https://javascript-preview-${{ github.event.pull_request.number }}.clerkpreview.com" >> $GITHUB_OUTPUT
 
-      - name: Create preview comment - deployed
+      - name: Create preview comment - Deployed
         uses: marocchino/sticky-pull-request-comment@v2.8.0
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
+          number: ${{ github.event.issue.number }}
           header: ${{ env.COMMENT_HEADER }}
           message: |
             Hey @${{ github.event.comment.user.login }}, your preview is available.
