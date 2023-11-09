@@ -540,10 +540,7 @@ export const jaJP: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: '表示するメンバーはありません',
       action__invite: '招待',
-      start: {
-        headerTitle__active: 'アクティブ',
-        headerTitle__invited: '招待済み',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'ユーザー',
         tableHeader__joined: '参加日時',

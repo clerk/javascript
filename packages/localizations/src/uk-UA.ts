@@ -558,10 +558,7 @@ export const ukUA: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Немає учасників для відображення',
       action__invite: 'Запросити',
-      start: {
-        headerTitle__active: 'Активні',
-        headerTitle__invited: 'Запрошені',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Користувач',
         tableHeader__joined: 'Приєднався',

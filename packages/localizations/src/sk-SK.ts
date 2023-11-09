@@ -545,10 +545,7 @@ export const skSK: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Žiadni členovia na zobrazenie',
       action__invite: 'Pozvať',
-      start: {
-        headerTitle__active: 'Aktívni',
-        headerTitle__invited: 'Pozvaní',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Užívateľ',
         tableHeader__joined: 'Pripojil sa',

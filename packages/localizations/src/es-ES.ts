@@ -518,10 +518,7 @@ export const esES: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'No hay miembros para mostrar',
       action__invite: 'Invitar',
-      start: {
-        headerTitle__active: 'Activo',
-        headerTitle__invited: 'Invitado',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Usuario',
         tableHeader__joined: 'Unido',

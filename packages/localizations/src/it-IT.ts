@@ -512,10 +512,7 @@ export const itIT: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Nessun membro da visualizzare',
       action__invite: 'Invita',
-      start: {
-        headerTitle__active: 'Attivo',
-        headerTitle__invited: 'Invitato',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Utente',
         tableHeader__joined: 'Iscritto',

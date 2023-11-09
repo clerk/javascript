@@ -521,10 +521,7 @@ export const daDK: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Ingen medlemmer at vise',
       action__invite: 'Invitere',
-      start: {
-        headerTitle__active: 'Aktiv',
-        headerTitle__invited: 'Inviteret',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Bruger',
         tableHeader__joined: 'Sluttede sig til',

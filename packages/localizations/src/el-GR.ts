@@ -584,10 +584,7 @@ export const elGR: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Δεν υπάρχουν μέλη για εμφάνιση',
       action__invite: 'Πρόσκληση',
-      start: {
-        headerTitle__active: 'Ενεργά',
-        headerTitle__invited: 'Προσκεκλημένα',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Χρήστης',
         tableHeader__joined: 'Εγγραφήκατε',

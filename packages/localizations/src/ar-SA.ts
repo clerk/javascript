@@ -636,9 +636,7 @@ export const arSA: LocalizationResource = {
       detailsTitle__emptyRow: 'لا يوجد أعضاء للعرض',
       action__invite: 'دعوة',
       start: {
-        headerTitle__active: 'نشط',
         headerTitle__members: 'الأعضاء',
-        headerTitle__invited: 'مدعو',
         headerTitle__invitations: 'الدعوات',
         headerTitle__requests: 'الطلبات',
       },

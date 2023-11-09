@@ -562,10 +562,7 @@ export const koKR: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: '표시할 멤버 없음',
       action__invite: '초대',
-      start: {
-        headerTitle__active: '활성',
-        headerTitle__invited: '초대됨',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: '사용자',
         tableHeader__joined: '가입됨',

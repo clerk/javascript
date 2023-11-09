@@ -507,10 +507,7 @@ export const nlNL: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Geen leden gevonden',
       action__invite: 'Uitnodigen',
-      start: {
-        headerTitle__active: 'Actief',
-        headerTitle__invited: 'Uitgenodigd',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Gebruiker',
         tableHeader__joined: 'Toegetreden',

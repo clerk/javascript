@@ -667,15 +667,7 @@ type _LocalizationResource = {
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
       start: {
-        /**
-         * @deprecated use `headerTitle__members` instead
-         */
-        headerTitle__active: LocalizationValue;
         headerTitle__members: LocalizationValue;
-        /**
-         * @deprecated use `headerTitle__invitations` instead
-         */
-        headerTitle__invited: LocalizationValue;
         headerTitle__invitations: LocalizationValue;
         headerTitle__requests: LocalizationValue;
       };

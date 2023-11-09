@@ -574,10 +574,7 @@ export const frFR: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Aucun membre',
       action__invite: 'Inviter',
-      start: {
-        headerTitle__active: 'Actif',
-        headerTitle__invited: 'Invité',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Utilisateur',
         tableHeader__joined: 'Rejoint',

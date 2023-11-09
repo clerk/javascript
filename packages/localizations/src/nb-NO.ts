@@ -562,10 +562,7 @@ export const nbNO: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Ingen medlemmer å vise',
       action__invite: 'Inviter',
-      start: {
-        headerTitle__active: 'Aktive',
-        headerTitle__invited: 'Inviterte',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Bruker',
         tableHeader__joined: 'Ble med',

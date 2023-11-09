@@ -531,10 +531,7 @@ export const zhCN: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: '没有可显示的成员',
       action__invite: '邀请',
-      start: {
-        headerTitle__active: '活跃',
-        headerTitle__invited: '已邀请',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: '用户',
         tableHeader__joined: '加入',

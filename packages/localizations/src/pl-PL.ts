@@ -535,10 +535,7 @@ export const plPL: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Brak użytkowników do wyświetlenia',
       action__invite: 'Zaproś',
-      start: {
-        headerTitle__active: 'Aktywni',
-        headerTitle__invited: 'Zaproszeni',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Użytkownik',
         tableHeader__joined: 'Dołączył',

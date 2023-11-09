@@ -566,10 +566,7 @@ export const viVN: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Không có thành viên để hiển thị',
       action__invite: 'Mời',
-      start: {
-        headerTitle__active: 'Hoạt động',
-        headerTitle__invited: 'Đã mời',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Người dùng',
         tableHeader__joined: 'Tham gia',

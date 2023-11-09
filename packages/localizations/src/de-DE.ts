@@ -535,10 +535,7 @@ export const deDE: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Keine Mitglieder zum Anzeigen',
       action__invite: 'Einladen',
-      start: {
-        headerTitle__active: 'Aktiv',
-        headerTitle__invited: 'Eingeladen',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Benutzer',
         tableHeader__joined: 'Trat bei',

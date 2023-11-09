@@ -543,10 +543,7 @@ export const csCZ: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Žádní členové k zobrazení',
       action__invite: 'Pozvat',
-      start: {
-        headerTitle__active: 'Aktivní',
-        headerTitle__invited: 'Pozváni',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Uživatel',
         tableHeader__joined: 'Připojil se',

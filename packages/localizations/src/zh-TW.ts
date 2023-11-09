@@ -545,10 +545,7 @@ export const zhTW: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: '沒有可顯示的成員',
       action__invite: '邀請',
-      start: {
-        headerTitle__active: '活躍',
-        headerTitle__invited: '已邀請',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: '用戶',
         tableHeader__joined: '加入',

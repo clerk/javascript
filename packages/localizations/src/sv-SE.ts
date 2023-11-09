@@ -521,10 +521,7 @@ export const svSE: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Inga medlemmar att visa',
       action__invite: 'Bjud in',
-      start: {
-        headerTitle__active: 'Aktiva',
-        headerTitle__invited: 'Inbjudna',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Användare',
         tableHeader__joined: 'Gick med',

@@ -540,10 +540,7 @@ export const heIL: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'אין חברים להצגה',
       action__invite: 'הזמן',
-      start: {
-        headerTitle__active: 'פעיל',
-        headerTitle__invited: 'הוזמן',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'משתמש',
         tableHeader__joined: 'הצטרף',

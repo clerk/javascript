@@ -647,9 +647,7 @@ export const ptBR: LocalizationResource = {
       detailsTitle__emptyRow: 'Nenhum membro para exibir',
       action__invite: 'Convidar',
       start: {
-        headerTitle__active: 'Ativo',
         headerTitle__members: 'Membros',
-        headerTitle__invited: 'Convidado',
         headerTitle__invitations: 'Convites',
         headerTitle__requests: 'Solicitações',
       },

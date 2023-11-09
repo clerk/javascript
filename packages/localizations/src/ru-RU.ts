@@ -545,10 +545,7 @@ export const ruRU: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Нет участников для отображения',
       action__invite: 'Пригласить',
-      start: {
-        headerTitle__active: 'Активные',
-        headerTitle__invited: 'Приглашенные',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Пользователь',
         tableHeader__joined: 'Присоединился',

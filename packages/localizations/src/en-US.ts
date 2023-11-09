@@ -646,9 +646,7 @@ export const enUS: LocalizationResource = {
       detailsTitle__emptyRow: 'No members to display',
       action__invite: 'Invite',
       start: {
-        headerTitle__active: 'Active',
         headerTitle__members: 'Members',
-        headerTitle__invited: 'Invited',
         headerTitle__invitations: 'Invitations',
         headerTitle__requests: 'Requests',
       },
