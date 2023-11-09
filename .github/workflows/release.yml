@@ -46,6 +46,7 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
+          registry-url: "https://registry.npmjs.org"
 
       - name: Build release
         run: npx turbo build $TURBO_ARGS --force
@@ -54,6 +55,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
+          title: Version Packages - V4
           commit: "chore(repo): Version packages"
           publish: npm run release
         env:
