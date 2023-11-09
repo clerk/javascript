@@ -37,7 +37,7 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "@clerk/types": "3.57.1",
+    "@clerk/types": "3.58.0",
     "typescript": "*"
   },
   "peerDependencies": {

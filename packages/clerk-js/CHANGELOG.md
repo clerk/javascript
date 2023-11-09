@@ -1,5 +1,40 @@
 # Change Log
 
+## 4.65.0
+
+### Minor Changes
+
+- Add support for custom roles in `<OrganizationProfile/>`. ([#2039](https://github.com/clerk/javascript/pull/2039)) by [@panteliselef](https://github.com/panteliselef)
+
+  The previous roles (`admin` and `basic_member`), are still kept as a fallback.
+
+- Experimental support for `<Gate/>` with role checks. ([#2051](https://github.com/clerk/javascript/pull/2051)) by [@panteliselef](https://github.com/panteliselef)
+
+- Handle user_locked error encountered in an oauth flow by redirecting to /sign-up or /sign-in ([#2071](https://github.com/clerk/javascript/pull/2071)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Add a private \_\_navigateWithError util function to clerk for use in User Lockout scenarios ([#2074](https://github.com/clerk/javascript/pull/2074)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+### Patch Changes
+
+- Fix incorrect pagination counters in data tables inside `<OrganizationProfile/>`. ([#2067](https://github.com/clerk/javascript/pull/2067)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Use strict equality operator to check for lockout errors in handleRedirectCallback ([#2075](https://github.com/clerk/javascript/pull/2075)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Rename the @staging tag to @canary. Drop support for @next tag. ([#2066](https://github.com/clerk/javascript/pull/2066)) by [@anagstef](https://github.com/anagstef)
+
+- Emit session when permissions or role of the active memberships change. ([#2081](https://github.com/clerk/javascript/pull/2081)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Enhance `CreateOrganizationForm` by replacing `AvatarPreview` with an upload button to prevent layout shifts ([#2090](https://github.com/clerk/javascript/pull/2090)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Re-initialize the Client to default values when is destroyed ([#2016](https://github.com/clerk/javascript/pull/2016)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Refresh invited members upon revocation ([#2088](https://github.com/clerk/javascript/pull/2088)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`7fa8fbcf2`](https://github.com/clerk/javascript/commit/7fa8fbcf21df0d52d49168eae511c580c5c82977), [`068a9025c`](https://github.com/clerk/javascript/commit/068a9025c7d7fb7e7207674d4d43844964053ca3), [`4c3429010`](https://github.com/clerk/javascript/commit/4c342901072ec37c4f77916ccdf964c6eaf04e81), [`d7fe11ede`](https://github.com/clerk/javascript/commit/d7fe11ede1b23bacc5d811c50587bac251d560b8), [`f9d1bc758`](https://github.com/clerk/javascript/commit/f9d1bc758972328be7ddb7d61f66baea2aaf2c96), [`f652a5618`](https://github.com/clerk/javascript/commit/f652a5618b7019c916000f78ea3c1e4abf9a6c1b)]:
+  - @clerk/shared@1.1.0
+  - @clerk/types@3.58.0
+  - @clerk/localizations@1.26.9
+
 ## 4.64.2
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # Change Log
 
+## 3.1.4
+
+### Patch Changes
+
+- Avoid always showing deprecation warnings for `frontendApi` in `@clerk/remix` ([#2086](https://github.com/clerk/javascript/pull/2086)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`7fa8fbcf2`](https://github.com/clerk/javascript/commit/7fa8fbcf21df0d52d49168eae511c580c5c82977), [`068a9025c`](https://github.com/clerk/javascript/commit/068a9025c7d7fb7e7207674d4d43844964053ca3), [`4c3429010`](https://github.com/clerk/javascript/commit/4c342901072ec37c4f77916ccdf964c6eaf04e81), [`d7fe11ede`](https://github.com/clerk/javascript/commit/d7fe11ede1b23bacc5d811c50587bac251d560b8), [`20eab8365`](https://github.com/clerk/javascript/commit/20eab836569bba99bbc058d1dd599c5fcfc005de), [`f9d1bc758`](https://github.com/clerk/javascript/commit/f9d1bc758972328be7ddb7d61f66baea2aaf2c96), [`f652a5618`](https://github.com/clerk/javascript/commit/f652a5618b7019c916000f78ea3c1e4abf9a6c1b)]:
+  - @clerk/shared@1.1.0
+  - @clerk/types@3.58.0
+  - @clerk/backend@0.34.0
+  - @clerk/clerk-react@4.28.0
+
 ## 3.1.3
 
 ### Patch Changes
