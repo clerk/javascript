@@ -13,7 +13,8 @@ concurrency:
 jobs:
   canary-release:
     if: ${{ github.repository == 'clerk/javascript' }}
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
@@ -23,14 +24,24 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup
-        uses: ./.github/actions/setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true # Must be present to enable caching on branched workflows
 
       - name: Version packages for canary
         id: version-packages
         run: npm run version:canary | tail -1 >> "$GITHUB_OUTPUT"
+
+      - name: Build release
+        if: steps.version-packages.outputs.success == '1'
+        run: npx turbo build $TURBO_ARGS
 
       - name: Canary release
         if: steps.version-packages.outputs.success == '1'
