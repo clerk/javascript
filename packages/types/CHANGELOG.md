@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.58.0
+
+### Minor Changes
+
+- Add support for custom roles in `<OrganizationProfile/>`. ([#2039](https://github.com/clerk/javascript/pull/2039)) by [@panteliselef](https://github.com/panteliselef)
+
+  The previous roles (`admin` and `basic_member`), are still kept as a fallback.
+
+- Experimental support for `<Gate/>` with role checks. ([#2051](https://github.com/clerk/javascript/pull/2051)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.57.1
 
 ### Patch Changes

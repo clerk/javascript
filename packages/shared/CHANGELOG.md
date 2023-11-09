@@ -1,5 +1,21 @@
 # Change Log
 
+## 1.1.0
+
+### Minor Changes
+
+- Expose `revalidate` and `setData` for paginated lists of data in organization hooks. ([#2013](https://github.com/clerk/javascript/pull/2013)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+  `const {userMemberships:{revalidate, setData}} = useOrganizationList({userMemberships:true})`
+
+- Add a private \_\_navigateWithError util function to clerk for use in User Lockout scenarios ([#2074](https://github.com/clerk/javascript/pull/2074)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+### Patch Changes
+
+- Fix incorrect pagination counters in data tables inside `<OrganizationProfile/>`. ([#2067](https://github.com/clerk/javascript/pull/2067)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Rename the @staging tag to @canary. Drop support for @next tag. ([#2066](https://github.com/clerk/javascript/pull/2066)) by [@anagstef](https://github.com/anagstef)
+
 ## 1.0.2
 
 ### Patch Changes

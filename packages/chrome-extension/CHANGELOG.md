@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.5.0
+
+### Minor Changes
+
+- Experimental support for `<Gate/>` with role checks. ([#2051](https://github.com/clerk/javascript/pull/2051)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`068a9025c`](https://github.com/clerk/javascript/commit/068a9025c7d7fb7e7207674d4d43844964053ca3), [`068adedaf`](https://github.com/clerk/javascript/commit/068adedaf8e063a232a94fab1e5013307883ddaf), [`4c3429010`](https://github.com/clerk/javascript/commit/4c342901072ec37c4f77916ccdf964c6eaf04e81), [`906da4ffb`](https://github.com/clerk/javascript/commit/906da4ffb3d22fd185fcb7221f9435abb5db2127), [`7ed0f810a`](https://github.com/clerk/javascript/commit/7ed0f810af412a25bd86047681a292654a0fc41b), [`d7fe11ede`](https://github.com/clerk/javascript/commit/d7fe11ede1b23bacc5d811c50587bac251d560b8), [`f9d1bc758`](https://github.com/clerk/javascript/commit/f9d1bc758972328be7ddb7d61f66baea2aaf2c96), [`9a065cd2d`](https://github.com/clerk/javascript/commit/9a065cd2dd502e9fd2d384aa8521c79e299c9559), [`8ff6beff6`](https://github.com/clerk/javascript/commit/8ff6beff610b8ee8b2de60800a1afde93f7219b9), [`f652a5618`](https://github.com/clerk/javascript/commit/f652a5618b7019c916000f78ea3c1e4abf9a6c1b), [`26cb643d0`](https://github.com/clerk/javascript/commit/26cb643d00a118509075d8c3de24b5dfe2642323)]:
+  - @clerk/clerk-js@4.65.0
+  - @clerk/clerk-react@4.28.0
+
 ## 0.4.13
 
 ### Patch Changes

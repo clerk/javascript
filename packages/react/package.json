@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "4.27.2",
+  "version": "4.28.0",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -56,8 +56,8 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "1.0.2",
-    "@clerk/types": "3.57.1",
+    "@clerk/shared": "1.1.0",
+    "@clerk/types": "3.58.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
