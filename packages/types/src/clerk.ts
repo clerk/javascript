@@ -552,6 +552,14 @@ export interface ClerkOptions {
    */
   isInterstitial?: boolean;
   isSatellite?: boolean | ((url: URL) => boolean);
+
+  /**
+   * Telemetry options
+   */
+  telemetry?: {
+    disabled?: boolean;
+    debug?: boolean;
+  };
 }
 
 export interface Resources {

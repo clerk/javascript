@@ -1,8 +1,17 @@
 import type { InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from './keys';
+import { isTruthy } from './underscore';
 
 type TelemetryCollectorOptions = {
+  /**
+   * If true, telemetry will not be collected.
+   */
+  disabled?: boolean;
+  /**
+   * If true, telemetry will not be sent, but collected events will be logged to the console.
+   */
+  debug?: boolean;
   /**
    * Sampling rate, 0-1
    */
@@ -29,7 +38,7 @@ type TelemetryCollectorOptions = {
   sdkVersion?: string;
 };
 
-type TelemetryCollectorConfig = Pick<TelemetryCollectorOptions, 'samplingRate' | 'verbose'> & {
+type TelemetryCollectorConfig = Pick<TelemetryCollectorOptions, 'samplingRate' | 'verbose' | 'disabled' | 'debug'> & {
   endpoint: string;
   maxBufferSize: number;
 };
@@ -108,6 +117,9 @@ export class TelemetryCollector {
 
     // this.#config.endpoint = 'https://telemetry-service-staging.bryce-clerk.workers.dev';
     this.#config.endpoint = 'http://localhost:8787';
+
+    this.#config.disabled = options.disabled ?? false;
+    this.#config.debug = options.debug ?? false;
   }
 
   get isEnabled(): boolean {
@@ -115,7 +127,12 @@ export class TelemetryCollector {
       return false;
     }
 
-    // TODO: check clerk environment / environment variable
+    // In browser or client environments, we most likely pass the disabled option to the collector, but in environments
+    // where environment variables are available we also check for `CLERK_TELEMETRY_DISABLED`.
+    if (this.#config.disabled || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DISABLED))) {
+      return false;
+    }
+
     return true;
   }
 
@@ -186,7 +203,7 @@ export class TelemetryCollector {
         'Content-Type': 'application/json',
       },
     })
-      .catch(err => console.error(err))
+      .catch(() => void 0)
       .then(() => {
         this.#buffer = [];
       })
