@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.34.1
+
+### Patch Changes
+
+- Strip `experimental__has` from the auth object in `makeAuthObjectSerializable()`. This fixes an issue in Next.js where an error is being thrown when this function is passed to a client component as a prop. ([#2103](https://github.com/clerk/javascript/pull/2103)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 0.34.0
 
 ### Minor Changes

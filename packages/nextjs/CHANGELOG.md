@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.27.1
+
+### Patch Changes
+
+- Updated dependencies [[`1df2ffe77`](https://github.com/clerk/javascript/commit/1df2ffe777838ecdbc1c47164398ed1f4521e3e2)]:
+  - @clerk/backend@0.34.1
+  - @clerk/clerk-sdk-node@4.12.21
+
 ## 4.27.0
 
 ### Minor Changes
