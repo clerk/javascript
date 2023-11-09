@@ -286,11 +286,9 @@ export const zhTW: LocalizationResource = {
       connectedAccountsSection: {
         title: '已連接的帳戶',
         primaryButton: '連接帳戶',
-        title__conectionFailed: '重試失敗的連接',
         title__connectionFailed: '重試失敗的連接',
         title__reauthorize: '需要重新授權',
         subtitle__reauthorize: '所需的權限已更新，您可能會遇到功能限制。請重新授權此應用程式，以避免任何問題',
-        actionLabel__conectionFailed: '再試一次',
         actionLabel__connectionFailed: '再試一次',
         actionLabel__reauthorize: '立即授權',
         destructiveActionTitle: '移除',

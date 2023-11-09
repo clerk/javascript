@@ -256,12 +256,10 @@ export const nlNL: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Aangesloten accounts',
         primaryButton: 'Verbind een account',
-        title__conectionFailed: 'Probeer mislukte connectie opnieuw',
         title__connectionFailed: 'Probeer mislukte connectie opnieuw',
         title__reauthorize: 'Herautorisering nodig',
         subtitle__reauthorize:
           'De vereiste scopes zijn bijgewerkt, en je ondervindt mogelijk beperkte functionaliteit. Autoriseer deze applicatie opnieuw om problemen te voorkomen',
-        actionLabel__conectionFailed: 'Probeer opnieuw',
         actionLabel__connectionFailed: 'Probeer opnieuw',
         actionLabel__reauthorize: 'Authoriseer nu',
         destructiveActionTitle: 'Verwijderen',

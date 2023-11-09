@@ -286,12 +286,10 @@ export const koKR: LocalizationResource = {
       connectedAccountsSection: {
         title: '연결된 계정',
         primaryButton: '계정 연결하기',
-        title__conectionFailed: '연결 실패 재시도',
         title__connectionFailed: '연결 실패 재시도',
         title__reauthorize: '재인증 필요',
         subtitle__reauthorize:
           '필수 범위가 업데이트되어 기능이 제한될 수 있습니다. 문제를 방지하려면 이 애플리케이션을 다시 승인하세요',
-        actionLabel__conectionFailed: '재시도',
         actionLabel__connectionFailed: '재시도',
         actionLabel__reauthorize: '지금 인증하기',
         destructiveActionTitle: '제거',

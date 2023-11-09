@@ -286,12 +286,10 @@ export const trTR: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Bağlı hesaplar',
         primaryButton: 'Hesap bağla',
-        title__conectionFailed: 'Yeniden bağlanmayı dene',
         title__connectionFailed: 'Yeniden bağlanmayı dene',
         title__reauthorize: 'Yeniden bir yetkilendirme gerekiyor',
         subtitle__reauthorize:
           'Gerekli kapsamlar güncellendi. Bir süreliğine işlevsellikte sınırlanmalar görülebilir. Herhangi bir sorun yaşamamak için bu uygulamayı yeniden yetkilendirin',
-        actionLabel__conectionFailed: 'Yeniden dene',
         actionLabel__connectionFailed: 'Yeniden dene',
         actionLabel__reauthorize: 'Yetkilendir',
         destructiveActionTitle: 'Kaldır',

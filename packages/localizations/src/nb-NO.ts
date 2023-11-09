@@ -288,12 +288,10 @@ export const nbNO: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Tilkoblede kontoer',
         primaryButton: 'Koble til konto',
-        title__conectionFailed: 'Prøv på nytt etter mislykket tilkobling',
         title__connectionFailed: 'Prøv på nytt etter mislykket tilkobling',
         title__reauthorize: 'Ny autorisasjon kreves',
         subtitle__reauthorize:
           'De nødvendige tillatelsene har blitt oppdatert, og du kan oppleve begrenset funksjonalitet. Vennligst autoriser denne applikasjonen på nytt for å unngå problemer.',
-        actionLabel__conectionFailed: 'Prøv på nytt',
         actionLabel__connectionFailed: 'Prøv på nytt',
         actionLabel__reauthorize: 'Autoriser nå',
         destructiveActionTitle: 'Fjern',

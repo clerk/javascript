@@ -266,12 +266,10 @@ export const daDK: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Tilknyttede konti',
         primaryButton: 'Tilknyt konto',
-        title__conectionFailed: 'Forsøg mislykkedes',
         title__connectionFailed: 'Andet forsøg mislykkedes',
         title__reauthorize: 'Godkendelse mangler',
         subtitle__reauthorize:
           'De påkrævede omfang er blevet opdateret, og du oplever muligvis begrænset funktionalitet. Godkend denne applikation igen for at undgå problemer',
-        actionLabel__conectionFailed: 'Prøv igen',
         actionLabel__connectionFailed: 'Prøv igen',
         actionLabel__reauthorize: 'Godkend nu',
         destructiveActionTitle: 'Fjern',

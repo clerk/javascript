@@ -289,12 +289,10 @@ export const skSK: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Pripojené účty',
         primaryButton: 'Pripojiť účet',
-        title__conectionFailed: 'Opakovať neúspešné pripojenie',
         title__connectionFailed: 'Opakovať neúspešné pripojenie',
         title__reauthorize: 'Vyžadované opätovné autorizovanie',
         subtitle__reauthorize:
           'Požadované oprávnenie bolo aktualizované a môžete mať obmedzenú funkcionalitu. Pre predchádzanie prípadným problémom autorizujte túto aplikáciu znovu.',
-        actionLabel__conectionFailed: 'Skúsiť znovu',
         actionLabel__connectionFailed: 'Skúsiť znovu',
         actionLabel__reauthorize: 'Autorizovať teraz',
         destructiveActionTitle: 'Odstrániť',

@@ -289,12 +289,10 @@ export const jaJP: LocalizationResource = {
       connectedAccountsSection: {
         title: '連携アカウント',
         primaryButton: 'アカウントを連携する',
-        title__conectionFailed: '接続の再試行',
         title__connectionFailed: '接続の再試行',
         title__reauthorize: '再認証が必要です',
         subtitle__reauthorize:
           '必要なスコープが更新されたため、機能が制限されている可能性があります。問題を回避するために、このアプリケーションを再認証してください',
-        actionLabel__conectionFailed: '再試行',
         actionLabel__connectionFailed: '再試行',
         actionLabel__reauthorize: '今すぐ認証',
         destructiveActionTitle: '削除',

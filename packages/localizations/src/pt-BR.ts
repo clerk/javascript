@@ -299,12 +299,10 @@ export const ptBR: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Contas conectadas',
         primaryButton: 'Conectar conta',
-        title__conectionFailed: 'Conexão falhou, tente novamente',
         title__connectionFailed: 'Conexão falhou, tente novamente',
         title__reauthorize: 'Reautorização necessária',
         subtitle__reauthorize:
           'Os escopos necessários foram atualizados e você pode estar experimentando funcionalidades limitadas. Por favor, re-autorize este aplicativo para evitar quaisquer problemas.',
-        actionLabel__conectionFailed: 'Tentar novamente',
         actionLabel__connectionFailed: 'Tentar novamente',
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',

@@ -288,12 +288,10 @@ export const viVN: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Tài khoản đã kết nối',
         primaryButton: 'Kết nối tài khoản',
-        title__conectionFailed: 'Thử lại kết nối không thành công',
         title__connectionFailed: 'Thử lại kết nối không thành công',
         title__reauthorize: 'Yêu cầu xác thực lại',
         subtitle__reauthorize:
           'Phạm vi yêu cầu đã được cập nhật và bạn có thể gặp phải hạn chế chức năng. Vui lòng xác thực lại ứng dụng này để tránh sự cố.',
-        actionLabel__conectionFailed: 'Thử lại',
         actionLabel__connectionFailed: 'Thử lại',
         actionLabel__reauthorize: 'Xác thực ngay',
         destructiveActionTitle: 'Xóa',

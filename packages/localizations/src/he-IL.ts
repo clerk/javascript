@@ -286,12 +286,10 @@ export const heIL: LocalizationResource = {
       connectedAccountsSection: {
         title: 'חשבונות מחוברים',
         primaryButton: 'חבר חשבון',
-        title__conectionFailed: 'נסה שוב להתחבר',
         title__connectionFailed: 'נסה שוב להתחבר',
         title__reauthorize: 'נדרשת הרשאה מחדש',
         subtitle__reauthorize:
           'ההרשאות הדרושות עודכנו, וייתכן שאתה מגלה פונקציונליות מוגבלת. אנא הרשה מחדש את היישום כדי למנוע בעיות',
-        actionLabel__conectionFailed: 'נסה שוב',
         actionLabel__connectionFailed: 'נסה שוב',
         actionLabel__reauthorize: 'אשר עכשיו',
         destructiveActionTitle: 'הסר',

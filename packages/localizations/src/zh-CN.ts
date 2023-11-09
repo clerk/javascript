@@ -285,11 +285,9 @@ export const zhCN: LocalizationResource = {
       connectedAccountsSection: {
         title: '已连接的账户',
         primaryButton: '连接账户',
-        title__conectionFailed: '重试失败的连接',
         title__connectionFailed: '重试失败的连接',
         title__reauthorize: '需要重新授权',
         subtitle__reauthorize: '所需的权限已更新，您可能会遇到功能限制。请重新授权此应用程序，以避免任何问题',
-        actionLabel__conectionFailed: '再试一次',
         actionLabel__connectionFailed: '再试一次',
         actionLabel__reauthorize: '立即授权',
         destructiveActionTitle: '移除',

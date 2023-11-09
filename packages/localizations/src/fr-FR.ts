@@ -293,9 +293,7 @@ export const frFR: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Comptes connectés',
         primaryButton: 'Connecter le compte',
-        title__conectionFailed: 'Retenter la connexion a échoué',
         title__connectionFailed: 'Retenter la connexion a échoué',
-        actionLabel__conectionFailed: 'Réessayer',
         actionLabel__connectionFailed: 'Réessayer',
         destructiveActionTitle: 'Retirer',
         destructiveActionSubtitle: 'Supprimer ce compte connecté de votre compte',

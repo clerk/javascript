@@ -265,12 +265,10 @@ export const plPL: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Połączone konta',
         primaryButton: 'Połącz konto',
-        title__conectionFailed: 'Ponów próbę nieudanego połączenia',
         title__connectionFailed: 'Ponów próbę nieudanego połączenia',
         title__reauthorize: 'Wymagana ponowna autoryzacja',
         subtitle__reauthorize:
           'Wymagane zakresy zostały zaktualizowane i możesz mieć ograniczoną funkcjonalność. Proszę ponownie autoryzuj tę aplikację, aby uniknąć problemów',
-        actionLabel__conectionFailed: 'Spróbuj ponownie',
         actionLabel__connectionFailed: 'Spróbuj ponownie',
         actionLabel__reauthorize: 'Autoryzuj teraz',
         destructiveActionTitle: 'Odłącz',

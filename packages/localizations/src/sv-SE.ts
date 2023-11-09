@@ -260,12 +260,10 @@ export const svSE: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Anslutna konton',
         primaryButton: 'Anslut konto',
-        title__conectionFailed: 'Försök igen efter misslyckad anslutning',
         title__connectionFailed: 'Försök igen efter misslyckad anslutning',
         title__reauthorize: 'Nyautorisering krävs',
         subtitle__reauthorize:
           'De nödvändiga åtkomstbehörigheterna har uppdaterats och du kan uppleva begränsad funktionalitet. Vänligen nyautorisera den här applikationen för att undvika eventuella problem.',
-        actionLabel__conectionFailed: 'Försök igen',
         actionLabel__connectionFailed: 'Försök igen',
         actionLabel__reauthorize: 'Autorisera nu',
         destructiveActionTitle: 'Ta bort',

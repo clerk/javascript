@@ -298,12 +298,10 @@ export const arSA: LocalizationResource = {
       connectedAccountsSection: {
         title: 'الحسابات المتصلة',
         primaryButton: 'ربط حساب',
-        title__conectionFailed: 'إعادة محاولة ربط الحساب',
         title__connectionFailed: 'إعادة محاولة ربط الحساب',
         title__reauthorize: 'مطلوب إعادة تفويض',
         subtitle__reauthorize:
           'تم تحديث النطاقات المطلوبة ، وقد تواجه وظائف محدودة. يرجى إعادة تفويض هذا التطبيق لتجنب أي مشاكل',
-        actionLabel__conectionFailed: 'حاول مرة أخرى',
         actionLabel__connectionFailed: 'حاول مرة أخرى',
         actionLabel__reauthorize: 'أعطى الصلاحية الآن',
         destructiveActionTitle: 'حذف',

@@ -294,12 +294,10 @@ export const elGR: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Συνδεδεμένοι λογαριασμοί',
         primaryButton: 'Σύνδεση λογαριασμού',
-        title__conectionFailed: 'Επανάληψη αποτυχημένης σύνδεσης',
         title__connectionFailed: 'Επανάληψη αποτυχημένης σύνδεσης',
         title__reauthorize: 'Απαιτείται νέα εξουσιοδότηση',
         subtitle__reauthorize:
           'Οι απαιτούμενες εμβέλειες έχουν ενημερωθεί και μπορεί να αντιμετωπίζετε περιορισμένη λειτουργικότητα. Παρακαλούμε εξουσιοδοτήστε ξανά αυτήν την εφαρμογή για να αποφύγετε προβλήματα.',
-        actionLabel__conectionFailed: 'Προσπάθεια ξανά',
         actionLabel__connectionFailed: 'Προσπάθεια ξανά',
         actionLabel__reauthorize: 'Εξουσιοδοτήστε τώρα',
         destructiveActionTitle: 'Αφαίρεση',

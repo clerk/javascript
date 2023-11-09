@@ -289,12 +289,10 @@ export const ukUA: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Підключені акаунти',
         primaryButton: 'Підключити акаунт',
-        title__conectionFailed: 'Повторна спроба підключення',
         title__connectionFailed: 'Повторна спроба підключення',
         title__reauthorize: 'Потрібна повторна авторизація',
         subtitle__reauthorize:
           'Потрібна повторна авторизація цієї програми через оновлення необхідних областей видимості, і ви можете зіткнутися з обмеженою функціональністю. Будь ласка, повторно авторизуйте цю програму, щоб уникнути проблем',
-        actionLabel__conectionFailed: 'Спробувати знову',
         actionLabel__connectionFailed: 'Спробувати знову',
         actionLabel__reauthorize: 'Авторизувати зараз',
         destructiveActionTitle: 'Видалити',

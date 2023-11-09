@@ -302,12 +302,10 @@ export const enUS: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Connected accounts',
         primaryButton: 'Connect account',
-        title__conectionFailed: 'Retry failed connection',
         title__connectionFailed: 'Retry failed connection',
         title__reauthorize: 'Reauthorization required',
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
-        actionLabel__conectionFailed: 'Try again',
         actionLabel__connectionFailed: 'Try again',
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Remove',
