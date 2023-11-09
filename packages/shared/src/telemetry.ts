@@ -95,6 +95,8 @@ export class TelemetryCollector {
       ...DEFAULT_CONFIG,
       samplingRate: options.samplingRate,
       verbose: options.verbose,
+      disabled: options.disabled ?? false,
+      debug: options.debug ?? false,
     } as Required<TelemetryCollectorConfig>;
 
     if (!options.clerkVersion && typeof window === 'undefined') {
@@ -117,9 +119,6 @@ export class TelemetryCollector {
 
     // this.#config.endpoint = 'https://telemetry-service-staging.bryce-clerk.workers.dev';
     this.#config.endpoint = 'http://localhost:8787';
-
-    this.#config.disabled = options.disabled ?? false;
-    this.#config.debug = options.debug ?? false;
   }
 
   get isEnabled(): boolean {
@@ -137,10 +136,6 @@ export class TelemetryCollector {
   }
 
   record(event: TelemetryEvent['event'], payload: TelemetryEvent['payload']) {
-    if (!this.isEnabled) {
-      return;
-    }
-
     const preparedPayload = this.#preparePayload(event, payload);
 
     this.#logEvent(preparedPayload.event, preparedPayload);
@@ -155,7 +150,7 @@ export class TelemetryCollector {
   }
 
   #shouldRecord(): boolean {
-    return Math.random() <= this.#config.samplingRate;
+    return this.isEnabled && Math.random() <= this.#config.samplingRate;
   }
 
   #scheduleFlush(): void {
@@ -211,10 +206,10 @@ export class TelemetryCollector {
   }
 
   /**
-   * If running in verbose mode, log the event and its payload to the console.
+   * If running in debug mode, log the event and its payload to the console.
    */
   #logEvent(event: TelemetryEvent['event'], payload: Record<string, any>) {
-    if (!this.#config.verbose) {
+    if (!this.#config.debug) {
       return;
     }
 
