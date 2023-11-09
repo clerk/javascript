@@ -11,6 +11,7 @@ import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError } from '../errors';
 import type IsomorphicClerk from '../isomorphicClerk';
+import { errorThrower } from '../utils';
 import { createGetToken, createSignOut } from './utils';
 
 type experimental__CheckAuthorizationSignedOut = (
@@ -213,5 +214,5 @@ export const useAuth: UseAuth = () => {
     };
   }
 
-  throw new Error(invalidStateError);
+  return errorThrower.throw(invalidStateError);
 };
