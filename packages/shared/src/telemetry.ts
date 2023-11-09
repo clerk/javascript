@@ -17,6 +17,10 @@ type TelemetryCollectorOptions = {
    */
   samplingRate?: number;
   /**
+   * Set a custom buffer size to control how often events are sent
+   */
+  maxBufferSize?: number;
+  /**
    * Determines whether or not events will be logged to the console.
    */
   verbose?: boolean;
@@ -38,9 +42,11 @@ type TelemetryCollectorOptions = {
   sdkVersion?: string;
 };
 
-type TelemetryCollectorConfig = Pick<TelemetryCollectorOptions, 'samplingRate' | 'verbose' | 'disabled' | 'debug'> & {
+type TelemetryCollectorConfig = Pick<
+  TelemetryCollectorOptions,
+  'samplingRate' | 'verbose' | 'disabled' | 'debug' | 'maxBufferSize'
+> & {
   endpoint: string;
-  maxBufferSize: number;
 };
 
 type TelemetryMetadata = Required<
@@ -92,9 +98,9 @@ export class TelemetryCollector {
 
   constructor(options: TelemetryCollectorOptions) {
     this.#config = {
-      ...DEFAULT_CONFIG,
-      samplingRate: options.samplingRate,
-      verbose: options.verbose,
+      maxBufferSize: options.maxBufferSize ?? DEFAULT_CONFIG.maxBufferSize,
+      samplingRate: options.samplingRate ?? DEFAULT_CONFIG.samplingRate,
+      verbose: options.verbose ?? DEFAULT_CONFIG.verbose,
       disabled: options.disabled ?? false,
       debug: options.debug ?? false,
     } as Required<TelemetryCollectorConfig>;
@@ -150,7 +156,7 @@ export class TelemetryCollector {
   }
 
   #shouldRecord(): boolean {
-    return this.isEnabled && Math.random() <= this.#config.samplingRate;
+    return this.isEnabled && !this.#config.debug && Math.random() <= this.#config.samplingRate;
   }
 
   #scheduleFlush(): void {
@@ -165,7 +171,7 @@ export class TelemetryCollector {
       // If the buffer is full, flush immediately to make sure we minimize the chance of event loss.
       // Cancel any pending flushes as we're going to flush immediately
       if (this.#pendingFlush) {
-        const cancel = cancelIdleCallback || clearTimeout;
+        const cancel = global.cancelIdleCallback || global.clearTimeout;
         cancel(this.#pendingFlush);
       }
       this.#flush();
