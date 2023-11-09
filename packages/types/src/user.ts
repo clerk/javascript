@@ -174,11 +174,6 @@ export type GetUserOrganizationSuggestionsParams = {
   status?: OrganizationSuggestionStatus | OrganizationSuggestionStatus[];
 };
 
-type GetUserOrganizationMembershipOldParams = {
-  limit?: number;
-  offset?: number;
-};
-
 export type GetUserOrganizationMembershipParams = {
   /**
    * This the starting point for your fetched results. The initial value persists between re-renders
@@ -190,12 +185,6 @@ export type GetUserOrganizationMembershipParams = {
   pageSize?: number;
 };
 
-type MembershipParams = (GetUserOrganizationMembershipOldParams | GetUserOrganizationMembershipParams) & {
-  paginated?: boolean;
-};
-
-export type GetOrganizationMemberships = <T extends MembershipParams>(
-  params?: T,
-) => T['paginated'] extends true
-  ? Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>
-  : Promise<OrganizationMembershipResource[]>;
+export type GetOrganizationMemberships = (
+  params?: GetUserOrganizationMembershipParams,
+) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;

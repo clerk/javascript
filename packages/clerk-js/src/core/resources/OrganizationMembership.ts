@@ -33,34 +33,23 @@ export class OrganizationMembership extends BaseResource implements Organization
   }
 
   static retrieve: GetOrganizationMembershipsClass = async retrieveMembershipsParams => {
-    const isDeprecatedParams =
-      typeof retrieveMembershipsParams === 'undefined' || !retrieveMembershipsParams?.paginated;
-
     return await BaseResource._fetch({
       path: '/me/organization_memberships',
       method: 'GET',
-      search: isDeprecatedParams
-        ? retrieveMembershipsParams
-        : (convertPageToOffset(retrieveMembershipsParams as unknown as any) as any),
+      // `paginated` is used in some legacy endpoints to support clerk paginated responses
+      // The parameter will be dropped in FAPI v2
+      search: convertPageToOffset({ ...retrieveMembershipsParams, paginated: true }) as any,
     })
       .then(res => {
-        if (isDeprecatedParams) {
-          const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
-          return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem)) as any;
-        }
-
         const { data: suggestions, total_count } =
           res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
 
         return {
           total_count,
           data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
-        } as any;
+        };
       })
       .catch(() => {
-        if (isDeprecatedParams) {
-          return [];
-        }
         return {
           total_count: 0,
           data: [],
@@ -121,11 +110,6 @@ export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;
 };
 
-type MembershipParams = GetUserOrganizationMembershipParams & {
-  paginated?: boolean;
-};
-export type GetOrganizationMembershipsClass = <T extends MembershipParams>(
-  params?: T,
-) => T['paginated'] extends true
-  ? Promise<ClerkPaginatedResponse<OrganizationMembership>>
-  : Promise<OrganizationMembership[]>;
+export type GetOrganizationMembershipsClass = (
+  params?: GetUserOrganizationMembershipParams,
+) => Promise<ClerkPaginatedResponse<OrganizationMembership>>;

@@ -156,12 +156,6 @@ export interface SetOrganizationLogoParams {
   file: Blob | File | string | null;
 }
 
-type MembersParams = GetMembersParams & {
-  paginated?: boolean;
-};
-
-export type GetMemberships = <T extends MembersParams>(
-  params?: T,
-) => T['paginated'] extends true
-  ? Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>
-  : Promise<OrganizationMembershipResource[]>;
+export type GetMemberships = (
+  params?: GetMembersParams,
+) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;

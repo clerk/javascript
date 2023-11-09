@@ -168,33 +168,23 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   getMemberships: GetMemberships = async getMembershipsParams => {
-    const isDeprecatedParams = typeof getMembershipsParams === 'undefined' || !getMembershipsParams?.paginated;
-
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/memberships`,
       method: 'GET',
-      search: isDeprecatedParams
-        ? getMembershipsParams
-        : (convertPageToOffset(getMembershipsParams as unknown as any) as any),
+      // `paginated` is used in some legacy endpoints to support clerk paginated responses
+      // The parameter will be dropped in FAPI v2
+      search: convertPageToOffset({ ...getMembershipsParams, paginated: true }) as any,
     })
       .then(res => {
-        if (isDeprecatedParams) {
-          const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
-          return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem)) as any;
-        }
-
         const { data: suggestions, total_count } =
           res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
 
         return {
           total_count,
           data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
-        } as any;
+        };
       })
       .catch(() => {
-        if (isDeprecatedParams) {
-          return [];
-        }
         return {
           total_count: 0,
           data: [],

@@ -219,11 +219,8 @@ export const useOrganization: UseOrganization = params => {
   );
 
   const memberships = usePagesOrInfinite<GetMembersParams, ClerkPaginatedResponse<OrganizationMembershipResource>>(
-    {
-      ...membersParams,
-      paginated: true,
-    } as any,
-    organization?.getMemberships as unknown as any,
+    membersParams || {},
+    organization?.getMemberships,
     {
       keepPreviousData: membersSafeValues.keepPreviousData,
       infinite: membersSafeValues.infinite,
