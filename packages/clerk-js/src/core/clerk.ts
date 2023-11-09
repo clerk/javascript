@@ -1294,7 +1294,7 @@ export default class Clerk implements ClerkInterface {
 
         this.updateClient(client);
         // updateEnvironment should be called after updateClient
-        // because authService#setEnviroment depends on clerk.session that is being
+        // because authService#setEnvironment depends on clerk.session that is being
         // set in updateClient
         this.updateEnvironment(environment);
 
