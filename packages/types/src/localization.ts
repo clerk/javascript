@@ -63,19 +63,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldInputPlaceholder__emailAddress_phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__emailAddress_username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldInputPlaceholder__phoneNumber_username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: LocalizationValue;
   formFieldInputPlaceholder__password: LocalizationValue;
   formFieldInputPlaceholder__firstName: LocalizationValue;
   formFieldInputPlaceholder__lastName: LocalizationValue;
