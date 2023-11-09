@@ -1,5 +1,6 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
+import { isTruthy } from '@clerk/shared/underscore';
 import type { AppLoadContext, defer } from '@remix-run/server-runtime';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
@@ -165,8 +166,8 @@ export function getResponseClerkState(requestState: RequestState, context: AppLo
     __clerk_debug: debugRequestState(requestState),
     __clerkJSUrl: getEnvVariable('CLERK_JS', context),
     __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),
-    __telemetryDisabled: getEnvVariable('CLERK_TELEMETRY_DISABLED', context),
-    __telemetryDebug: getEnvVariable('CLERK_TELEMETRY_DEBUG', context),
+    __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED', context)),
+    __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG', context)),
   });
 
   const headers = observabilityHeadersFromRequestState(requestState);
