@@ -61,10 +61,10 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
-import { completeSignUpFlow } from '../ui/components/SignUp/util';
 import {
   appendAsQueryParams,
   buildURL,
+  completeSignUpFlow,
   createBeforeUnloadTracker,
   createCookieHandler,
   createPageLifecycle,
