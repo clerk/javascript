@@ -30,9 +30,9 @@ export const withServerAuth: WithServerAuth = (cbOrOptions: any, options?: any):
       });
       return injectSSRStateIntoProps({ headers }, { __clerk_ssr_interstitial_html: interstitialHtml });
     }
-    const legacyAuthData = { ...requestState.toAuth(), claims: requestState?.toAuth()?.sessionClaims };
-    const contextWithAuth = injectAuthIntoContext(props, legacyAuthData);
+
+    const contextWithAuth = injectAuthIntoContext(props, requestState.toAuth());
     const callbackResult = (await callback?.(contextWithAuth)) || {};
-    return injectSSRStateIntoProps(callbackResult, { __clerk_ssr_state: sanitizeAuthObject(legacyAuthData) });
+    return injectSSRStateIntoProps(callbackResult, { __clerk_ssr_state: sanitizeAuthObject(contextWithAuth.auth) });
   };
 };
