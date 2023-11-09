@@ -133,6 +133,24 @@ describe('Clerk singleton', () => {
     eventBus.off(events.TokenUpdate);
   });
 
+  describe('initialize', () => {
+    it('should consider publishableKey readonly', () => {
+      const sut = new Clerk(productionPublishableKey);
+      expect(sut.publishableKey).toEqual(productionPublishableKey);
+
+      expect(() => {
+        // @ts-expect-error attempt to override getter field
+        sut.publishableKey = 'aloha';
+      }).toThrowError(/Cannot set property publishableKey of #<Clerk>/);
+    });
+
+    it('should throw when publishableKey is invalid', () => {
+      expect(() => {
+        new Clerk('invalidPK');
+      }).toThrowError(/The publishableKey passed to Clerk is invalid/);
+    });
+  });
+
   describe('.setActive', () => {
     const mockSession = {
       id: '1',

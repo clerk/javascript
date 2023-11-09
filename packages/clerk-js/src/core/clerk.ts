@@ -147,10 +147,10 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public __internal_country?: string | null;
-  public readonly publishableKey: string = '';
 
   protected internal_last_error: ClerkAPIError | null = null;
 
+  #publishableKey: string = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService: SessionCookieService | null = null;
@@ -167,6 +167,10 @@ export default class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
+
+  get publishableKey(): string {
+    return this.#publishableKey;
+  }
 
   get version(): string {
     return Clerk.version;
@@ -239,7 +243,7 @@ export default class Clerk implements ClerkInterface {
       return errorThrower.throwInvalidPublishableKeyError({ key });
     }
 
-    this.publishableKey = key;
+    this.#publishableKey = key;
     this.#instanceType = publishableKey.instanceType;
 
     this.#fapiClient = createFapiClient(this);

@@ -6,12 +6,14 @@ export interface JWT {
   claims: JWTClaims;
 }
 
+type NonEmptyArray<T> = [T, ...T[]];
+
 // standard names https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1
 export interface JWTHeader {
   alg: string | Algorithm;
   typ?: string;
   cty?: string;
-  crit?: Array<string | Exclude<JWTHeader, 'crit'>>;
+  crit?: NonEmptyArray<Exclude<keyof JWTHeader, 'crit'>>;
   kid?: string;
   jku?: string;
   x5u?: string | string[];

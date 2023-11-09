@@ -44,7 +44,7 @@ There are two ways you can include ClerkJS in your project. You can either [impo
 npm install @clerk/clerk-js
 ```
 
-Once you have installed the package, you will need to import the ClerkJS object constructor into your code and pass it your [Frontend API](https://dashboard.clerk.com/last-active?path=api-keys) as a parameter.
+Once you have installed the package, you will need to import the ClerkJS object constructor into your code and pass it your [Publishable Key](https://dashboard.clerk.com/last-active?path=api-keys) as a parameter.
 
 ```js
 import Clerk from '@clerk/clerk-js';

@@ -51,8 +51,6 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     return signOut(opts.navigateAfterSignOut);
   };
 
-  // TODO: Fix this eslint error
-
   const handleSessionClicked = (session: ActiveSessionResource) => async () => {
     card.setLoading();
     return setActive({ session, beforeEmit: opts.navigateAfterSwitchSession }).finally(() => {

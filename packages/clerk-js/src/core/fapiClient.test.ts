@@ -3,7 +3,7 @@ import type { Clerk } from '@clerk/types';
 import createFapiClient from './fapiClient';
 
 const mockedClerkInstance = {
-  frontendApi: 'clerk.example.com', // publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+  frontendApi: 'clerk.example.com',
   version: '42.0.0',
   session: {
     id: 'deadbeef',
