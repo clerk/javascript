@@ -241,7 +241,7 @@ export class TelemetryCollector {
     // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
     if (typeof window !== 'undefined' && window.Clerk) {
       // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
-      sdkMetadata = { ...sdkMetadata, ...window.Clerk.constructor.prototype.sdkMetadata };
+      sdkMetadata = { ...sdkMetadata, ...window.Clerk.constructor.sdkMetadata };
     }
 
     return sdkMetadata;

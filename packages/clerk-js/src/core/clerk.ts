@@ -173,7 +173,7 @@ export default class Clerk implements ClerkInterface {
   #devBrowserHandler: DevBrowserHandler | null = null;
   #environment?: EnvironmentResource | null;
   #fapiClient: FapiClient;
-  #telemetry: TelemetryCollector;
+  #telemetry?: TelemetryCollector;
   #instanceType: InstanceType;
   #isReady = false;
 
@@ -324,6 +324,10 @@ export default class Clerk implements ClerkInterface {
       ...defaultOptions,
       ...options,
     };
+
+    if (this.#options.sdkMetadata) {
+      Clerk.sdkMetadata = this.#options.sdkMetadata;
+    }
 
     this.#telemetry = new TelemetryCollector({
       clerkVersion: Clerk.version,

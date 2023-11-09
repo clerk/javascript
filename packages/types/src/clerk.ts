@@ -560,6 +560,8 @@ export interface ClerkOptions {
     disabled?: boolean;
     debug?: boolean;
   };
+
+  sdkMetadata?: SDKMetadata;
 }
 
 export interface Resources {

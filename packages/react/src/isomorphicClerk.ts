@@ -132,6 +132,11 @@ export default class IsomorphicClerk {
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inBrowser() ? 'browser' : 'server';
+
+    if (!this.options.sdkMetadata) {
+      this.options.sdkMetadata = SDK_METADATA;
+    }
+
     void this.loadClerkJS();
   }
 
@@ -168,7 +173,6 @@ export default class IsomorphicClerk {
             domain: this.domain,
           } as any);
 
-          c.sdkMetadata = this.options.sdkMetadata ?? SDK_METADATA;
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
@@ -195,12 +199,8 @@ export default class IsomorphicClerk {
           throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
 
-        global.Clerk.sdkMetadata = this.options.sdkMetadata ?? SDK_METADATA;
-
         await global.Clerk.load(this.options);
       }
-
-      global.Clerk.sdkMetadata = this.options.sdkMetadata ?? { name: PACKAGE_NAME, version: PACKAGE_VERSION };
 
       if (global.Clerk?.loaded || global.Clerk?.isReady()) {
         return this.hydrateClerkJS(global.Clerk);
