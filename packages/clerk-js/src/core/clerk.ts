@@ -1,4 +1,3 @@
-import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
   handleValueOrFn,
@@ -7,6 +6,7 @@ import {
   isHttpOrHttps,
   isValidBrowserOnline,
   isValidProxyUrl,
+  LocalStorageBroadcastChannel,
   noop,
   parsePublishableKey,
   proxyUrlToAbsoluteURL,
@@ -1282,6 +1282,7 @@ export default class Clerk implements ClerkInterface {
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
 
+    this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
     this.#setupListeners();
 
     let retries = 0;
@@ -1375,7 +1376,7 @@ export default class Clerk implements ClerkInterface {
 
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
       if (data.type === 'signout') {
-        void this.handleUnauthenticated({ broadcast: false });
+        void this.handleUnauthenticated({ broadcast: true });
       }
     });
   };
