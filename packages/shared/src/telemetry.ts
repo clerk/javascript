@@ -171,7 +171,7 @@ export class TelemetryCollector {
       // If the buffer is full, flush immediately to make sure we minimize the chance of event loss.
       // Cancel any pending flushes as we're going to flush immediately
       if (this.#pendingFlush) {
-        const cancel = global.cancelIdleCallback || global.clearTimeout;
+        const cancel = typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback : clearTimeout;
         cancel(this.#pendingFlush);
       }
       this.#flush();
