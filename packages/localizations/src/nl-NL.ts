@@ -527,7 +527,6 @@ export const nlNL: LocalizationResource = {
   createOrganization: {
     title: 'Organisatie aanmaken',
     formButtonSubmit: 'Maak organisatie aan',
-    subtitle: 'Stel het organisatieprofiel in',
     invitePage: {
       formButtonReset: 'Overslaan',
     },

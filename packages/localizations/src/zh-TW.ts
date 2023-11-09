@@ -565,7 +565,6 @@ export const zhTW: LocalizationResource = {
   createOrganization: {
     title: '創建組織',
     formButtonSubmit: '創建組織',
-    subtitle: '設置組織簡介',
     invitePage: {
       formButtonReset: '跳過',
     },

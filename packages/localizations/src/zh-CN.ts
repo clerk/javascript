@@ -551,7 +551,6 @@ export const zhCN: LocalizationResource = {
   createOrganization: {
     title: '创建组织',
     formButtonSubmit: '创建组织',
-    subtitle: '设置组织简介',
     invitePage: {
       formButtonReset: '跳过',
     },

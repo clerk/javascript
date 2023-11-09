@@ -567,7 +567,6 @@ export const trTR: LocalizationResource = {
   createOrganization: {
     title: 'Organizasyon oluştur',
     formButtonSubmit: 'Oluştur',
-    subtitle: 'Organizasyon profilini belirleyin',
     invitePage: {
       formButtonReset: 'Atla',
     },

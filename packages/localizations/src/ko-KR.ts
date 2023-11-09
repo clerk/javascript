@@ -582,7 +582,6 @@ export const koKR: LocalizationResource = {
   createOrganization: {
     title: '조직 만들기',
     formButtonSubmit: '조직 만들기',
-    subtitle: '조직 프로필 설정',
     invitePage: {
       formButtonReset: '넘기기',
     },

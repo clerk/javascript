@@ -541,7 +541,6 @@ export const daDK: LocalizationResource = {
   createOrganization: {
     title: 'Opret organisation',
     formButtonSubmit: 'Opret organisation',
-    subtitle: 'Indstil organisationsprofilen',
     invitePage: {
       formButtonReset: 'Spring over',
     },

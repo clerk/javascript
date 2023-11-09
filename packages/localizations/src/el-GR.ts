@@ -604,7 +604,6 @@ export const elGR: LocalizationResource = {
   createOrganization: {
     title: 'Δημιουργία Οργανισμού',
     formButtonSubmit: 'Δημιουργία οργανισμού',
-    subtitle: 'Ορίστε το προφίλ του οργανισμού',
     invitePage: {
       formButtonReset: 'Παράλειψη',
     },

@@ -582,7 +582,6 @@ export const nbNO: LocalizationResource = {
   createOrganization: {
     title: 'Opprett organisasjon',
     formButtonSubmit: 'Opprett organisasjon',
-    subtitle: 'Angi organisasjonsprofilen',
     invitePage: {
       formButtonReset: 'Hopp over',
     },

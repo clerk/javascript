@@ -542,7 +542,6 @@ export const svSE: LocalizationResource = {
   createOrganization: {
     title: 'Skapa organisation',
     formButtonSubmit: 'Skapa organisation',
-    subtitle: 'Ställ in organisationsprofilen',
     invitePage: {
       formButtonReset: 'Hoppa över',
     },

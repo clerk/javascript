@@ -555,7 +555,6 @@ export const deDE: LocalizationResource = {
   createOrganization: {
     title: 'Organisation erstellen',
     formButtonSubmit: 'Organisation erstellen',
-    subtitle: 'Legen Sie das Organisationsprofil fest',
     invitePage: {
       formButtonReset: 'Überspringen',
     },
