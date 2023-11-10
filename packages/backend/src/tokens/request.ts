@@ -28,8 +28,6 @@ export type LoadResourcesOptions = {
   loadOrganization?: boolean;
 };
 
-export type RequiredVerifyTokenOptions = Required<Pick<VerifyTokenOptions, 'secretKey' | 'apiUrl' | 'apiVersion'>>;
-
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
     VerifyTokenOptions,
