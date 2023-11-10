@@ -1,16 +1,10 @@
-import { useUser } from '@clerk/shared/react';
+import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { runIfFunctionOrReturn } from '../../../utils';
 import { NotificationCountBadge, withGate } from '../../common';
-import {
-  useCoreClerk,
-  useCoreOrganization,
-  useCoreOrganizationList,
-  useEnvironment,
-  useOrganizationSwitcherContext,
-} from '../../contexts';
+import { useCoreClerk, useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import {
   Action,
@@ -33,8 +27,8 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { close, ...rest } = props;
     const card = useCardState();
     const { openOrganizationProfile, openCreateOrganization } = useCoreClerk();
-    const { organization: currentOrg } = useCoreOrganization();
-    const { isLoaded, setActive } = useCoreOrganizationList();
+    const { organization: currentOrg } = useOrganization();
+    const { isLoaded, setActive } = useOrganizationList();
     const router = useRouter();
     const {
       hidePersonal,
@@ -185,7 +179,7 @@ const NotificationCountBadgeManageButton = withGate(
 
     const isDomainsEnabled = organizationSettings?.domains?.enabled;
 
-    const { membershipRequests } = useCoreOrganization({
+    const { membershipRequests } = useOrganization({
       membershipRequests: isDomainsEnabled || undefined,
     });
 

@@ -1,6 +1,5 @@
+import type { useOrganizationList } from '@clerk/shared/react';
 import type { ClerkPaginatedResponse } from '@clerk/types';
-
-import type { useCoreOrganizationList } from '../../contexts';
 
 export const organizationListParams = {
   userMemberships: {
@@ -13,7 +12,7 @@ export const organizationListParams = {
     infinite: true,
     status: ['pending', 'accepted'],
   },
-} satisfies Parameters<typeof useCoreOrganizationList>[0];
+} satisfies Parameters<typeof useOrganizationList>[0];
 
 export const populateCacheUpdateItem = <T extends { id: string }>(
   updatedItem: T,

@@ -1,13 +1,9 @@
-import { useUser } from '@clerk/shared/react';
+import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { InfiniteListSpinner } from '../../common';
-import {
-  useCoreOrganization,
-  useCoreOrganizationList,
-  useOrganizationSwitcherContext,
-} from '../../contexts';
+import { useOrganizationSwitcherContext } from '../../contexts';
 import { Box, descriptors, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview, PreviewButton } from '../../elements';
 import { useInView } from '../../hooks';
@@ -21,7 +17,7 @@ export type UserMembershipListProps = {
 };
 
 const useFetchMemberships = () => {
-  const { userMemberships } = useCoreOrganizationList({
+  const { userMemberships } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
   });
 
@@ -46,7 +42,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   const { onPersonalWorkspaceClick, onOrganizationClick } = props;
 
   const { hidePersonal } = useOrganizationSwitcherContext();
-  const { organization: currentOrg } = useCoreOrganization();
+  const { organization: currentOrg } = useOrganization();
   const { ref, userMemberships } = useFetchMemberships();
   const { user } = useUser();
 
