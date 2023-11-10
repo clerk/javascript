@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
