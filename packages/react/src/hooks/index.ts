@@ -4,7 +4,6 @@ export { useEmailLink } from './useEmailLink';
 export { useOrganization } from './useOrganization';
 export { useOrganizationList } from './useOrganizationList';
 export { useSession } from './useSession';
-export { useSessionList } from './useSessionList';
 export { useSignIn } from './useSignIn';
 export { useSignUp } from './useSignUp';
-export { useUser } from './useUser';
+export { useSessionList, useUser } from '@clerk/shared/react';
