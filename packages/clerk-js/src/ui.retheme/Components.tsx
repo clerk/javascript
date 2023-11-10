@@ -97,7 +97,7 @@ function assertDOMElement(element: HTMLElement): asserts element {
 
 export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentResource, options: ClerkOptions) => {
   // TODO @ui-retheme: remove
-  console.log('%c You are using the ui-retheme components ', 'background: blue; color: white;font-size:2rem;');
+  console.log('%c You are using the retheme components ', 'background: blue; color: white;font-size:2rem;');
 
   // TODO: Init of components should start
   // before /env and /client requests

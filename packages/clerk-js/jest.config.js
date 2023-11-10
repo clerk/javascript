@@ -1,6 +1,6 @@
 const { name } = require('./package.json');
 
-const uiRetheme = process.env.CLERK_UI_RETHEME === '1' || process.env.CLERK_UI_RETHEME === 'true';
+const uiRetheme = process.env.CLERK_RETHEME === '1' || process.env.CLERK_RETHEME === 'true';
 
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 const config = {
