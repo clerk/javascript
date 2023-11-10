@@ -1,6 +1,6 @@
 import {
   csCZ,
-  deDe,
+  deDE,
   enUS,
   esES,
   frFR,
@@ -137,7 +137,7 @@ describe('ClerkProvider', () => {
     it('works with all our prebuilt localizations', () => {
       expectTypeOf({
         ...defaultProps,
-        localization: deDe,
+        localization: deDE,
       }).toMatchTypeOf<ClerkProviderProps>();
 
       expectTypeOf({
@@ -214,7 +214,7 @@ describe('ClerkProvider', () => {
     it('is able to receive multiple localizations', () => {
       expectTypeOf({
         ...defaultProps,
-        localization: { ...frFR, ...deDe },
+        localization: { ...frFR, ...deDE },
       }).toMatchTypeOf<ClerkProviderProps>();
     });
   });
