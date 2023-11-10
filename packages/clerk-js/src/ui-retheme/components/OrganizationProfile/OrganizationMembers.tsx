@@ -1,5 +1,7 @@
+import { useOrganization } from '@clerk/shared/react';
+
 import { NotificationCountBadge, useGate } from '../../common';
-import { useCoreOrganization, useEnvironment, useOrganizationProfileContext } from '../../contexts';
+import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   CardAlert,
@@ -23,7 +25,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const card = useCardState();
   const { isAuthorizedUser: canManageMemberships } = useGate({ permission: 'org:sys_memberships:manage' });
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
-  const { membershipRequests } = useCoreOrganization({
+  const { membershipRequests } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
   });
 

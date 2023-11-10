@@ -1,13 +1,14 @@
+import { useOrganization } from '@clerk/shared/react';
 import React from 'react';
 
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
+import { useOrganizationProfileContext } from '../../contexts';
 import { Breadcrumbs, NavBar, NavbarContextProvider, OrganizationPreview } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
 
 export const OrganizationProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
 ) => {
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   const { pages } = useOrganizationProfileContext();
 
   if (!organization) {

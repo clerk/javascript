@@ -1,8 +1,8 @@
-import { useUser } from '@clerk/shared/react';
+import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreOrganization, useCoreOrganizationList, useOrganizationSwitcherContext } from '../../contexts';
+import { useOrganizationSwitcherContext } from '../../contexts';
 import { Box, descriptors, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview, PreviewButton } from '../../elements';
 import { SwitchArrows } from '../../icons';
@@ -16,8 +16,8 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   const { onPersonalWorkspaceClick, onOrganizationClick } = props;
 
   const { hidePersonal } = useOrganizationSwitcherContext();
-  const { organization: currentOrg } = useCoreOrganization();
-  const { organizationList } = useCoreOrganizationList();
+  const { organization: currentOrg } = useOrganization();
+  const { organizationList } = useOrganizationList();
   const { user } = useUser();
 
   const otherOrgs = (organizationList || []).map(e => e.organization).filter(o => o.id !== currentOrg?.id);

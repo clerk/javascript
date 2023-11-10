@@ -1,13 +1,8 @@
-import { useUser } from '@clerk/shared/react';
+import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
 import { NotificationCountBadge, withGate } from '../../common';
-import {
-  useCoreOrganization,
-  useCoreOrganizationList,
-  useEnvironment,
-  useOrganizationSwitcherContext,
-} from '../../contexts';
+import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview, withAvatarShimmer } from '../../elements';
 import { Selector } from '../../icons';
@@ -23,7 +18,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
     const { sx, ...rest } = props;
 
     const { user } = useUser();
-    const { organization } = useCoreOrganization();
+    const { organization } = useOrganization();
     const { hidePersonal } = useOrganizationSwitcherContext();
 
     if (!user) {
@@ -83,10 +78,10 @@ const NotificationCountBadgeSwitcherTrigger = withGate(
     /**
      * Prefetch user invitations and suggestions
      */
-    const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
+    const { userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
     const { organizationSettings } = useEnvironment();
     const isDomainsEnabled = organizationSettings?.domains?.enabled;
-    const { membershipRequests } = useCoreOrganization({
+    const { membershipRequests } = useOrganization({
       membershipRequests: isDomainsEnabled || undefined,
     });
 

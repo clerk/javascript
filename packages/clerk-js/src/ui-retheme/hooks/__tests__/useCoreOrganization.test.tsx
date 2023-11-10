@@ -1,3 +1,4 @@
+import { useOrganization } from '@clerk/shared/react';
 import { describe } from '@jest/globals';
 
 import { act, bindCreateFixtures, renderHook, waitFor } from '../../../testUtils';
@@ -6,12 +7,11 @@ import {
   createFakeOrganizationMembershipRequest,
 } from '../../components/OrganizationProfile/__tests__/utils';
 import { createFakeUserOrganizationMembership } from '../../components/OrganizationSwitcher/__tests__/utlis';
-import { useCoreOrganization } from '../../contexts';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 const defaultRenderer = () =>
-  useCoreOrganization({
+  useOrganization({
     domains: {
       pageSize: 2,
     },
@@ -45,7 +45,7 @@ describe('useOrganization', () => {
       });
     });
 
-    const { result } = renderHook(useCoreOrganization, { wrapper });
+    const { result } = renderHook(() => useOrganization(), { wrapper });
 
     expect(result.current.isLoaded).toBe(true);
     expect(result.current.organization).toBeDefined();
@@ -56,9 +56,6 @@ describe('useOrganization', () => {
         id: 'Org1',
       }),
     );
-
-    expect(result.current.invitationList).not.toBeDefined();
-    expect(result.current.membershipList).not.toBeDefined();
 
     expect(result.current.memberships).toEqual(expect.objectContaining(undefinedPaginatedResource));
     expect(result.current.domains).toEqual(expect.objectContaining(undefinedPaginatedResource));
@@ -73,13 +70,10 @@ describe('useOrganization', () => {
       });
     });
 
-    const { result } = renderHook(useCoreOrganization, { wrapper });
+    const { result } = renderHook(() => useOrganization(), { wrapper });
 
     expect(result.current.isLoaded).toBe(true);
     expect(result.current.organization).toBeNull();
-
-    expect(result.current.invitationList).toBeNull();
-    expect(result.current.membershipList).toBeNull();
 
     expect(result.current.memberships).toBeNull();
     expect(result.current.domains).toBeNull();

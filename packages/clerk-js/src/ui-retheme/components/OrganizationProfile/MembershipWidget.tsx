@@ -1,10 +1,12 @@
+import { useOrganization } from '@clerk/shared/react';
+
 import { useRouter } from '../../../ui/router';
 import { runIfFunctionOrReturn } from '../../../utils';
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
+import { useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, Link, Text } from '../../customizables';
 
 export const MembershipWidget = () => {
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   //@ts-expect-error
   const { __unstable_manageBillingUrl, __unstable_manageBillingLabel, __unstable_manageBillingMembersLimit } =
     useOrganizationProfileContext();

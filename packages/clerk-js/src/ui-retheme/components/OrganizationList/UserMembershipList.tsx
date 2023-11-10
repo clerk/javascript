@@ -1,7 +1,7 @@
-import { useUser } from '@clerk/shared/react';
+import { useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 
-import { useCoreOrganizationList, useOrganizationListContext } from '../../contexts';
+import { useOrganizationListContext } from '../../contexts';
 import { OrganizationPreview, PersonalWorkspacePreview, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared';
@@ -9,7 +9,7 @@ import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared'
 export const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
-  const { isLoaded, setActive } = useCoreOrganizationList();
+  const { isLoaded, setActive } = useOrganizationList();
 
   if (!isLoaded) {
     return null;
@@ -36,7 +36,7 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
 export const PersonalAccountPreview = withCardStateProvider(() => {
   const card = useCardState();
   const { hidePersonal, navigateAfterSelectPersonal } = useOrganizationListContext();
-  const { isLoaded, setActive } = useCoreOrganizationList();
+  const { isLoaded, setActive } = useOrganizationList();
   const { user } = useUser();
 
   if (!user) {

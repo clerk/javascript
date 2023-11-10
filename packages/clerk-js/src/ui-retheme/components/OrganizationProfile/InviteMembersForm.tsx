@@ -1,9 +1,9 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { useOrganization } from '@clerk/shared/react';
 import type { ClerkAPIError, MembershipRole } from '@clerk/types';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
-import { useCoreOrganization } from '../../contexts';
 import { Flex, Text } from '../../customizables';
 import { Form, FormButtonContainer, TagInput, useCardState } from '../../elements';
 import { useFetchRoles } from '../../hooks/useFetchRoles';
@@ -25,7 +25,7 @@ type InviteMembersFormProps = {
 export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const { navigate } = useRouter();
   const { onSuccess, onReset = () => navigate('..'), resetButtonLabel } = props;
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   const card = useCardState();
   const { t, locale } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);

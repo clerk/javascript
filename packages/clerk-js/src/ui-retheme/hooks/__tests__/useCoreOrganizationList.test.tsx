@@ -1,3 +1,4 @@
+import { useOrganizationList } from '@clerk/shared/react';
 import { describe } from '@jest/globals';
 
 import { act, bindCreateFixtures, renderHook, waitFor } from '../../../testUtils';
@@ -6,12 +7,11 @@ import {
   createFakeUserOrganizationMembership,
   createFakeUserOrganizationSuggestion,
 } from '../../components/OrganizationSwitcher/__tests__/utlis';
-import { useCoreOrganizationList } from '../../contexts';
 
 const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
 const defaultRenderer = () =>
-  useCoreOrganizationList({
+  useOrganizationList({
     userMemberships: {
       pageSize: 2,
     },
@@ -33,8 +33,7 @@ describe('useOrganizationList', () => {
       });
     });
 
-    const { result } = renderHook(useCoreOrganizationList, { wrapper });
-
+    const { result } = renderHook(() => useOrganizationList(), { wrapper });
     expect(result.current.isLoaded).toBe(true);
     expect(result.current.setActive).toBeDefined();
     expect(result.current.createOrganization).toBeDefined();
@@ -222,7 +221,7 @@ describe('useOrganizationList', () => {
       );
       const { result } = renderHook(
         () =>
-          useCoreOrganizationList({
+          useOrganizationList({
             userMemberships: {
               pageSize: 2,
               infinite: true,
@@ -444,7 +443,7 @@ describe('useOrganizationList', () => {
       );
       const { result } = renderHook(
         () =>
-          useCoreOrganizationList({
+          useOrganizationList({
             userInvitations: {
               pageSize: 2,
               infinite: true,
@@ -634,7 +633,7 @@ describe('useOrganizationList', () => {
       );
       const { result } = renderHook(
         () =>
-          useCoreOrganizationList({
+          useOrganizationList({
             userSuggestions: {
               pageSize: 2,
               infinite: true,

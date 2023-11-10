@@ -1,6 +1,6 @@
+import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationMembershipRequestResource } from '@clerk/types';
 
-import { useCoreOrganization } from '../../contexts';
 import { Button, Flex, localizationKeys, Td } from '../../customizables';
 import { useCardState, UserPreview, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
@@ -15,7 +15,7 @@ const membershipRequestsParams = {
 
 export const RequestToJoinList = () => {
   const card = useCardState();
-  const { organization, membershipRequests } = useCoreOrganization(membershipRequestsParams);
+  const { organization, membershipRequests } = useOrganization(membershipRequestsParams);
 
   if (!organization) {
     return null;
@@ -50,7 +50,7 @@ const RequestRow = withCardStateProvider(
   (props: { request: OrganizationMembershipRequestResource; onError: ReturnType<typeof useCardState>['setError'] }) => {
     const { request, onError } = props;
     const card = useCardState();
-    const { membership, membershipRequests } = useCoreOrganization(membershipRequestsParams);
+    const { membership, membershipRequests } = useOrganization(membershipRequestsParams);
 
     const onAccept = () => {
       if (!membership || !membershipRequests) {

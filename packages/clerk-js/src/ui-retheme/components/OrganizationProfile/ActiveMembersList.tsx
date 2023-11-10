@@ -1,8 +1,7 @@
-import { useUser } from '@clerk/shared/react';
+import { useOrganization, useUser } from '@clerk/shared/react';
 import type { OrganizationMembershipResource } from '@clerk/types';
 
 import { Gate } from '../../common/Gate';
-import { useCoreOrganization } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
@@ -18,7 +17,7 @@ const membershipsParams = {
 
 export const ActiveMembersList = () => {
   const card = useCardState();
-  const { organization, memberships } = useCoreOrganization(membershipsParams);
+  const { organization, memberships } = useOrganization(membershipsParams);
 
   const { options, isLoading: loadingRoles } = useFetchRoles();
 
