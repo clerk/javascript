@@ -24,14 +24,15 @@
   "license": "MIT",
   "author": "Clerk",
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
-    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput | awk '{gsub(/\\033c/,\"\") system(\"\")}1'",
+    "dev": "tsup --watch",
     "lint": "eslint src/"
   },
   "dependencies": {
@@ -40,6 +41,7 @@
   "devDependencies": {
     "@types/node": "^18.18.0",
     "eslint-config-custom": "*",
+    "tsup": "*",
     "typescript": "*"
   },
   "engines": {
