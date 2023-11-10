@@ -56,7 +56,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Build packages
-        run: npx turbo build $TURBO_ARGS --force
+        run: npx turbo build $TURBO_ARGS
 
       - name: Get date
         run: |
