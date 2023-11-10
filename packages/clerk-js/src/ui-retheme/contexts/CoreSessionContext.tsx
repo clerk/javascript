@@ -1,12 +1,10 @@
 import { assertContextExists, SessionContext } from '@clerk/shared/react';
 import React from 'react';
 
-export const CoreSessionContext = SessionContext;
-
 export function withCoreSessionSwitchGuard<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
   const Hoc = (props: P) => {
-    const ctx = React.useContext(CoreSessionContext);
-    assertContextExists(ctx, CoreSessionContext);
+    const ctx = React.useContext(SessionContext);
+    assertContextExists(ctx, SessionContext);
     if (ctx.value === undefined) {
       return null;
     }
