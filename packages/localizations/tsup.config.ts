@@ -1,15 +1,17 @@
 import { defineConfig } from 'tsup';
 
-export default defineConfig(overrideOptions => {
-  const isProd = overrideOptions.env?.NODE_ENV === 'production';
+export default defineConfig(() => {
+  const uiRetheme = process.env.CLERK_RETHEME === '1' || process.env.CLERK_RETHEME === 'true';
 
   return {
-    entry: ['src/index.ts'],
-    onSuccess: 'tsc',
-    minify: isProd,
+    entry: {
+      index: uiRetheme ? 'src/index.retheme.ts' : 'src/index.ts',
+    },
+    minify: false,
     clean: true,
     sourcemap: true,
     format: ['cjs', 'esm'],
     legacyOutput: true,
+    dts: true,
   };
 });
