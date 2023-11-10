@@ -153,10 +153,6 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   email_address: string;
   first_name: string;
   last_name: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  avatar_url: string;
   image_url: string;
   username: string;
   public_metadata: Record<string, unknown>;
@@ -182,10 +178,6 @@ export interface UserJSON extends ClerkResourceJSON {
   primary_email_address_id: string;
   primary_phone_number_id: string;
   primary_web3_wallet_id: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  profile_image_url: string;
   image_url: string;
   has_image: boolean;
   username: string;
@@ -216,10 +208,6 @@ export interface UserJSON extends ClerkResourceJSON {
 export interface PublicUserDataJSON extends ClerkResourceJSON {
   first_name: string | null;
   last_name: string | null;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  profile_image_url: string;
   image_url: string;
   has_image: boolean;
   identifier: string;
@@ -296,10 +284,6 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
 export interface OrganizationJSON extends ClerkResourceJSON {
   object: 'organization';
   id: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  logo_url: string;
   image_url: string;
   has_image: boolean;
   name: string;
@@ -433,10 +417,6 @@ export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
 export interface UserDataJSON {
   first_name?: string;
   last_name?: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  profile_image_url?: string;
   image_url: string;
   has_image: boolean;
 }

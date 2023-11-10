@@ -124,11 +124,6 @@ function stateWithMemoizedResources(cur: Resources, next: Resources): Resources 
     session: getSameOrUpdatedResource(cur.session, next.session),
     user: getSameOrUpdatedResource(cur.user, next.user),
     organization: getSameOrUpdatedResource(cur.organization, next.organization),
-    lastOrganizationInvitation: getSameOrUpdatedResource(
-      cur.lastOrganizationInvitation,
-      next.lastOrganizationInvitation,
-    ),
-    lastOrganizationMember: getSameOrUpdatedResource(cur.lastOrganizationMember, next.lastOrganizationMember),
   };
 }
 

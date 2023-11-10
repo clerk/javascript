@@ -22,7 +22,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const { loadSession, loadUser, loadOrganization } = opts;
   const { audience, authorizedParties } = opts;
 
-  // Fetch environment variables across Remix runtimes.
+  // Fetch environment variables across Remix runtime.
   // 1. First check if the user passed the key in the getAuth function or the rootAuthLoader.
   // 2. Then try from process.env if exists (Node).
   // 3. Then try from globalThis (Cloudflare Workers).

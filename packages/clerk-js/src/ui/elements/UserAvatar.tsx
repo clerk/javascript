@@ -11,7 +11,6 @@ type UserAvatarProps = Omit<PropsOfComponent<typeof Avatar>, 'imageUrl'> &
   };
 
 export const UserAvatar = (props: UserAvatarProps) => {
-  //TODO: replace profileImageUrl with imageUrl
   const { name, firstName, lastName, avatarUrl, imageUrl, ...rest } = props;
   const generatedName = getFullName({ name, firstName, lastName });
   const initials = getInitials({ name, firstName, lastName });

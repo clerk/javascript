@@ -61,10 +61,6 @@ export interface UserResource extends ClerkResource {
   fullName: string | null;
   firstName: string | null;
   lastName: string | null;
-  /**
-   * @deprecated  Use `imageUrl` instead.
-   */
-  profileImageUrl: string;
   imageUrl: string;
   hasImage: boolean;
   emailAddresses: EmailAddressResource[];
@@ -128,10 +124,6 @@ export type CreateExternalAccountParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
-  /**
-   * @deprecated Use `redirectUrl` instead.
-   */
-  redirect_url?: string;
 };
 export type VerifyTOTPParams = { code: string };
 
@@ -146,14 +138,7 @@ type UpdateUserJSON = Pick<
   | 'unsafe_metadata'
 >;
 
-export type UpdateUserParams = Partial<
-  SnakeToCamel<UpdateUserJSON> & {
-    /**
-     * @deprecated This will be removed in the next major version. Please use `updatePassword(params)` instead
-     */
-    password: string;
-  }
->;
+export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
 
 export type UpdateUserPasswordParams = {
   newPassword: string;
@@ -189,11 +174,6 @@ export type GetUserOrganizationSuggestionsParams = {
   status?: OrganizationSuggestionStatus | OrganizationSuggestionStatus[];
 };
 
-type GetUserOrganizationMembershipOldParams = {
-  limit?: number;
-  offset?: number;
-};
-
 export type GetUserOrganizationMembershipParams = {
   /**
    * This the starting point for your fetched results. The initial value persists between re-renders
@@ -205,12 +185,6 @@ export type GetUserOrganizationMembershipParams = {
   pageSize?: number;
 };
 
-type MembershipParams = (GetUserOrganizationMembershipOldParams | GetUserOrganizationMembershipParams) & {
-  paginated?: boolean;
-};
-
-export type GetOrganizationMemberships = <T extends MembershipParams>(
-  params?: T,
-) => T['paginated'] extends true
-  ? Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>
-  : Promise<OrganizationMembershipResource[]>;
+export type GetOrganizationMemberships = (
+  params?: GetUserOrganizationMembershipParams,
+) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;

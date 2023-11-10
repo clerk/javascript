@@ -44,13 +44,13 @@ There are two ways you can include ClerkJS in your project. You can either [impo
 npm install @clerk/clerk-js
 ```
 
-Once you have installed the package, you will need to import the ClerkJS object constructor into your code and pass it your [Frontend API](https://dashboard.clerk.com/last-active?path=api-keys) as a parameter.
+Once you have installed the package, you will need to import the ClerkJS object constructor into your code and pass it your [Publishable Key](https://dashboard.clerk.com/last-active?path=api-keys) as a parameter.
 
 ```js
 import Clerk from '@clerk/clerk-js';
 
-const clerkFrontendApi = 'pk_[publishable_key]';
-const clerk = new Clerk(clerkFrontendApi);
+const clerkPublishableKey = 'pk_[publishable_key]';
+const clerk = new Clerk(clerkPublishableKey);
 await clerk.load({
   // Set load options here...
 });
@@ -65,14 +65,13 @@ Add the following script to your site's `<body>` element:
 ```html
 <script>
   // Get this URL and Publishable Key from the Clerk Dashboard
-  const clerkFrontendApi = 'pk_[publishable_key]';
+  const clerkPublishableKey = 'pk_[publishable_key]';
   const frontendApi = '[your-domain].clerk.accounts.dev';
   const version = '@latest'; // Set to appropriate version
 
   // Creates asynchronous script
   const script = document.createElement('script');
-  script.setAttribute('data-clerk-frontend-api', frontendApi);
-  script.setAttribute('data-clerk-publishable-key', clerkFrontendApi);
+  script.setAttribute('data-clerk-publishable-key', clerkPublishableKey);
   script.async = true;
   script.src = `https://${frontendApi}/npm/@clerk/clerk-js${version}/dist/clerk.browser.js`;
 
