@@ -39,6 +39,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
       await m.page.evaluate(async () => {
         await window.Clerk.signOut();
       });
+
+      await m.po.expect.toBeSignedOut();
     });
 
     expect(await mainTab.page.evaluate('!window.Clerk.user')).toBe(false);
