@@ -63,7 +63,7 @@ jobs:
       - name: Pull Vercel environment information
         run: |
           cd $FULL_TMP_FOLDER
-          vercel pull --yes --environment=prod --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }}
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_CLERK_COOKIE_TOKEN }}
 
       - name: Copy clerk-js/dist into public/clerk-js of test site
         run: |
