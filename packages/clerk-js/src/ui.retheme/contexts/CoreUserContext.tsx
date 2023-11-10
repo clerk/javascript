@@ -1,15 +1,14 @@
-import { assertContextExists, UserContext } from '@clerk/shared/react';
-import React, { useContext } from 'react';
-
-export const CoreUserContext = UserContext;
+import { useUserContext } from '@clerk/shared/react';
+import React from 'react';
 
 export function withCoreUserGuard<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
   const Hoc = (props: P) => {
-    const ctx = useContext(CoreUserContext);
-    assertContextExists(ctx, CoreUserContext);
-    if (!ctx.value) {
+    const user = useUserContext();
+
+    if (!user) {
       return null;
     }
+
     return <Component {...(props as any)} />;
   };
 

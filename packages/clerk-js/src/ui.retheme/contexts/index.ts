@@ -1,4 +1,3 @@
-export * from './CoreClerkContext';
 export * from './CoreUserContext';
 export * from './ClerkUIComponentsContext';
 export * from './EnvironmentContext';
