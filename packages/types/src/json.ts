@@ -2,7 +2,6 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import type { FontFamily } from './appearance';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
@@ -31,7 +30,7 @@ export interface DisplayThemeJSON {
   general: {
     color: HexColor;
     background_color: Color;
-    font_family: FontFamily;
+    font_family: string;
     font_color: HexColor;
     label_font_weight: FontWeight;
     padding: EmUnit;
@@ -40,7 +39,7 @@ export interface DisplayThemeJSON {
   };
   buttons: {
     font_color: HexColor;
-    font_family: FontFamily;
+    font_family: string;
     font_weight: FontWeight;
   };
   accounts: {
