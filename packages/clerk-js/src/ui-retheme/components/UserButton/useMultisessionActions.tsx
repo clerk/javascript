@@ -1,8 +1,9 @@
 import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
+import { useSessionList } from '@clerk/shared/react';
 import type { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
 import { windowNavigate } from '../../../utils/windowNavigate';
-import { useCoreClerk, useCoreSessionList } from '../../contexts';
+import { useCoreClerk } from '../../contexts';
 import { useCardState } from '../../elements';
 import { useRouter } from '../../router';
 import { sleep } from '../../utils';
@@ -20,7 +21,7 @@ type UseMultisessionActionsParams = {
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { setActive, signOut, openUserProfile } = useCoreClerk();
   const card = useCardState();
-  const sessions = useCoreSessionList();
+  const sessions = useSessionList();
   const { navigate } = useRouter();
   const activeSessions = sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
   const otherSessions = activeSessions.filter(s => s.user?.id !== opts.user?.id);
