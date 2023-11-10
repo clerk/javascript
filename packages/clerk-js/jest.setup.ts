@@ -15,8 +15,6 @@ if (typeof window !== 'undefined') {
       matches: false,
       media: query,
       onchange: null,
-      addListener: jest.fn(), // deprecated
-      removeListener: jest.fn(), // deprecated
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
       dispatchEvent: jest.fn(),
@@ -28,7 +26,6 @@ if (typeof window !== 'undefined') {
 
   //@ts-expect-error
   global.IntersectionObserver = class IntersectionObserver {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     constructor() {}
 
     disconnect() {

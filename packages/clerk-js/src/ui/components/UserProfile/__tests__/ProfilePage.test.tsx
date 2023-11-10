@@ -121,7 +121,6 @@ describe('ProfilePage', () => {
       const { wrapper } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.com'],
-          profile_image_url: 'https://clerk.com',
           image_url: 'https://clerk.com',
           first_name: 'F',
           last_name: 'L',
@@ -149,7 +148,6 @@ describe('ProfilePage', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.com'],
-          profile_image_url: 'https://clerk.com',
           image_url:
             'https://img.clerkstage.dev/70726f78792f68747470733a2f2f696d616765732e6c636c636c65726b2e636f6d2f75706c6f616465642f696d675f324f4559646f346e575263766579536c6a366b7775757a336e79472e6a706567',
         });
@@ -161,7 +159,7 @@ describe('ProfilePage', () => {
       expect(fixtures.clerk.user?.setProfileImage).toHaveBeenCalledWith({ file: null });
     });
 
-    xit('"Remove image" is not shown when a default image exists', async () => {
+    it.skip('"Remove image" is not shown when a default image exists', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.com'],

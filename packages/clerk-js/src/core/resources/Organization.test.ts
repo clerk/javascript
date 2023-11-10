@@ -8,8 +8,8 @@ describe('Organization', () => {
       name: 'test_name',
       public_metadata: { public: 'metadata' },
       slug: 'test_slug',
-      logo_url: 'https://url-for-logo.png',
-      image_url: 'https://clerk.com',
+      image_url:
+        'https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160',
       created_at: 12345,
       updated_at: 5678,
       members_count: 1,

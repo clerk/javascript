@@ -153,11 +153,8 @@ export const useOrganizationList: UseOrganizationList = params => {
     GetUserOrganizationMembershipParams,
     ClerkPaginatedResponse<OrganizationMembershipResource>
   >(
-    {
-      ...userMembershipsParams,
-      paginated: true,
-    } as any,
-    user?.getOrganizationMemberships as unknown as any,
+    userMembershipsParams || {},
+    user?.getOrganizationMemberships,
     {
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,

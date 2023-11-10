@@ -1,4 +1,3 @@
-import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import type { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
 import { windowNavigate } from '../../../utils/windowNavigate';
@@ -44,19 +43,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
       });
     }
 
-    // The UserButton can also accept an appearance object for the nested UserProfile modal
-    if (opts.appearance?.userProfile) {
-      deprecatedObjectProperty(
-        opts.appearance,
-        'userProfile',
-        'Use `<UserButton userProfileProps={{appearance: {...}}} />` instead.',
-      );
-    }
-    openUserProfile({
-      appearance: opts.appearance?.userProfile,
-      // Prioritize the appearance of `userProfileProps`
-      ...opts.userProfileProps,
-    });
+    openUserProfile(opts.userProfileProps);
     return opts.actionCompleteCallback?.();
   };
 
@@ -64,8 +51,6 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     return signOut(opts.navigateAfterSignOut);
   };
 
-  // TODO: Fix this eslint error
-  // eslint-disable-next-line @typescript-eslint/require-await
   const handleSessionClicked = (session: ActiveSessionResource) => async () => {
     card.setLoading();
     return setActive({ session, beforeEmit: opts.navigateAfterSwitchSession }).finally(() => {

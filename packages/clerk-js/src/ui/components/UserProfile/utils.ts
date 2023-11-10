@@ -10,7 +10,7 @@ export const currentSessionFirst = (id: string) => (a: IDable) => a.id === id ? 
 
 export const defaultFirst = (a: PhoneNumberResource) => (a.defaultSecondFactor ? -1 : 1);
 
-export function magicLinksEnabledForInstance(env: EnvironmentResource): boolean {
+export function emailLinksEnabledForInstance(env: EnvironmentResource): boolean {
   const { userSettings } = env;
   const { email_address } = userSettings.attributes;
   return email_address.enabled && email_address.verifications.includes('email_link');

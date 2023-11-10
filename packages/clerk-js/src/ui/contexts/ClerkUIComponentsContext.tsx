@@ -1,4 +1,4 @@
-import { deprecated, snakeToCamel } from '@clerk/shared';
+import { snakeToCamel } from '@clerk/shared/underscore';
 import type { OrganizationResource, UserResource } from '@clerk/types';
 import React, { useMemo } from 'react';
 
@@ -300,12 +300,6 @@ export const useOrganizationSwitcherContext = () => {
         entity: organization,
       });
       return navigate(parsedUrl);
-    }
-
-    // Continue to support afterSwitchOrganizationUrl
-    if (ctx.afterSwitchOrganizationUrl) {
-      deprecated('afterSwitchOrganizationUrl', 'Use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`');
-      return navigate(ctx.afterSwitchOrganizationUrl);
     }
 
     return Promise.resolve();

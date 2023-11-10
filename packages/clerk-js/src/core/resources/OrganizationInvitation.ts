@@ -31,9 +31,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
         body: { email_address: emailAddress, role } as any,
       })
     )?.response as unknown as OrganizationInvitationJSON;
-    const newInvitation = new OrganizationInvitation(json);
-    this.clerk.__unstable__invitationUpdate(newInvitation);
-    return newInvitation;
+    return new OrganizationInvitation(json);
   }
 
   static async createBulk(
@@ -48,9 +46,6 @@ export class OrganizationInvitation extends BaseResource implements Organization
         body: { email_address: emailAddresses, role } as any,
       })
     )?.response as unknown as OrganizationInvitationJSON[];
-    // const newInvitation = new OrganizationInvitation(json);
-    // TODO: Figure out what this is...
-    // this.clerk.__unstable__invitationUpdate(newInvitation);
     return json.map(invitationJson => new OrganizationInvitation(invitationJson));
   }
 
@@ -60,11 +55,9 @@ export class OrganizationInvitation extends BaseResource implements Organization
   }
 
   revoke = async (): Promise<OrganizationInvitation> => {
-    const revokedInvitation = await this._basePost({
+    return await this._basePost({
       path: `/organizations/${this.organizationId}/invitations/${this.id}/revoke`,
     });
-    OrganizationInvitation.clerk.__unstable__invitationUpdate(revokedInvitation);
-    return revokedInvitation;
   };
 
   protected fromJSON(data: OrganizationInvitationJSON | null): this {
