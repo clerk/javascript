@@ -1,6 +1,6 @@
 # Publishing packages
 
-_Note: Only core maintainers can publish packages._
+_Note: Only Clerk employees can trigger the actions described below._
 
 ## Publishing stable package versions (`@latest`)
 
@@ -19,12 +19,15 @@ An automated canary release will be take place every time a PR gets merged into 
 - During a canary release, `@clerk/clerk-js` will also be released. If needed, use the `clerkJSVersion` prop to use a specific version, eg: `<ClerkProvider clerkJSVersion='4.1.1-canary.90012' />`
 - A package will not be published if it's not affected by a changeset.
 
+**Note:** If the `main` branch is in [prerelease mode](https://github.com/changesets/changesets/blob/main/docs/prereleases.md) merges into the latest `release/` branch will be released under the `@canary` tag.
+
 ## Publishing snapshot package versions (`@snapshot`)
 
 Snapshot releases are a way to release your changes for testing without updating the versions or waiting for your PR to be merged into `main`. This is especially useful when you want to test your changes in a cloud environment that does not offer a way to upload prebuilt artifacts of your app or if you want to test the end-to-end flow as a user, without relying on local linking to test. Snapshot releases can also be used as a tool for customers to verify a fix on their machines.
 
-**Important:**
-Before requesting a snapshot release, ensure that your Clerk organization membership status is set to "Public". Otherwise, the snapshot release will fail. To set your status to "Public", follow [these steps](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-membership-in-organizations/publicizing-or-hiding-organization-membership).
+**Important:** Before requesting a snapshot release, ensure that your Clerk organization membership status is set to "Public". Otherwise, the snapshot release will fail. To set your status to "Public", follow [these steps](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-membership-in-organizations/publicizing-or-hiding-organization-membership).
+
+**Important:** When using a snapshot release, it's highly recommended you install a specific version directly (eg `npm i @clerk/nextjs@4.27.0-snapshot.v609cd23`). Do not use the `@snapshot` tag to get the most recent snapshot release, as this will result in unexpected behavior when another member publishes their own snapshot.
 
 To perform a snapshot release, simply comment `!snapshot` in your PR. Once the packages are built and published (~2mins), [clerk-cookie](https://github.com/clerk-cookie) will post a reply with the published versions ([example](https://github.com/clerk/javascript/pull/1329#issuecomment-1586970784)). Simply install the snap version using `npm install` as usual.
 
@@ -36,10 +39,6 @@ Notes:
 - During a snapshot release, `@clerk/clerk-js` will also be released. If needed, use the `clerkJSVersion` prop to use a specific version, eg: `<ClerkProvider clerkJSVersion='4.1.1-snapshot.90012' />`
 - To make iterations faster, tests will not run for snapshot versions.
 - A package will not be published if it's not affected by a changeset.
-
-## Publishing canary package versions (`@canary`)
-
-We're still considering whether switching the repo into a `canary` mode for big, experimental features makes sense. There is no use case for this right now, however, we might experiment with the [changesets prerelease mode](https://github.com/changesets/changesets/blob/main/docs/prereleases.md) in the future.
 
 ## Backporting PRs
 
@@ -54,3 +53,13 @@ node backports.mjs release/v4 1234
 ```
 
 The command above will backport the PR `1234` to the branch `release/v4`.
+
+## Previewing PRs
+
+Deploy previews enable you to give yourself and others reviewing the PR a chance to see your changes deployed in a live environment. Your changes are applied to a test site and deployed to a URL one can visit. This is especially helpful for e.g. visual changes made inside the UI components.
+
+**Important:** Before requesting a deploy preview, ensure that your Clerk organization membership status is set to "Public". Otherwise, the preview will fail. To set your status to "Public", follow [these steps](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-membership-in-organizations/publicizing-or-hiding-organization-membership).
+
+You can request a deploy preview by commenting `!preview` in your PR. A GitHub workflow will take your current PR, install the current state of the packages into a test site, and deploy that test site to Vercel. Once the deployment is done, a GitHub comment will point you to the deployed URL.
+
+**Important:** In order for you (or others) to visit the preview URL, you’ll need to be part of the Clerk Vercel team and logged into Vercel.

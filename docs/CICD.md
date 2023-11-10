@@ -32,8 +32,8 @@ For more details about canary releases, refer to [PUBLISH.md](https://github.com
 
 Every time a PR opens or a PR is merged into `main`, the workflows defined in `.github/workflows` will run, ensuring:
 
-- all packages build correctly using Node@18 and Node@19
-- all tests pass using Node@18 and Node@19
+- all packages build correctly
+- all unit and integration tests are passing
 - no type issues exist using `TSC`
 - no lint issues exist
 - formatting is consistent
@@ -41,4 +41,4 @@ Every time a PR opens or a PR is merged into `main`, the workflows defined in `.
 ## Misc
 
 - The `labeler` workflow automatically adds tags to all PRs according to the packages they affect
-- The `lock-threads` workflow runs on a schedule and automatically locks stale PRs and Issues.
+- The `lock-threads` workflow runs on a schedule and automatically locks stale PRs and issues.

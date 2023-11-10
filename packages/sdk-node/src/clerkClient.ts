@@ -1,5 +1,5 @@
 import type { ClerkOptions, VerifyTokenOptions } from '@clerk/backend';
-import { Clerk as _Clerk, decodeJwt, verifyToken as _verifyToken } from '@clerk/backend';
+import { Clerk as _Clerk, verifyToken as _verifyToken } from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
@@ -9,7 +9,7 @@ type ExtendedClerk = ReturnType<typeof _Clerk> & {
   expressWithAuth: ReturnType<typeof createClerkExpressWithAuth>;
   expressRequireAuth: ReturnType<typeof createClerkExpressRequireAuth>;
   verifyToken: typeof _verifyToken;
-} & ReturnType<typeof createBasePropForRedwoodCompatibility>;
+};
 
 /**
  * This needs to be a *named* function in order to support the older
@@ -29,21 +29,8 @@ export function Clerk(options: ClerkOptions): ExtendedClerk {
     expressWithAuth,
     expressRequireAuth,
     verifyToken,
-    ...createBasePropForRedwoodCompatibility(),
   });
 }
-
-const createBasePropForRedwoodCompatibility = () => {
-  const verifySessionToken = (token: string) => {
-    const { jwtKey } = loadApiEnv();
-    const { payload } = decodeJwt(token);
-    return _verifyToken(token, {
-      issuer: payload.iss,
-      jwtKey,
-    });
-  };
-  return { base: { verifySessionToken } };
-};
 
 export const createClerkClient = Clerk;
 
@@ -85,23 +72,4 @@ export const ClerkExpressWithAuth = (...args: Parameters<ReturnType<typeof creat
   const env = { ...loadApiEnv(), ...loadClientEnv() };
   const fn = createClerkExpressWithAuth({ clerkClient, ...env });
   return fn(...args);
-};
-
-/**
- * Stand-alone setters bound to the pre-initialised clerkClient
- */
-export const setClerkApiKey = (value: string) => {
-  clerkClient.__unstable_options.apiKey = value;
-};
-
-export const setClerkServerApiUrl = (value: string) => {
-  clerkClient.__unstable_options.apiUrl = value;
-};
-
-export const setClerkApiVersion = (value: string) => {
-  clerkClient.__unstable_options.apiVersion = value;
-};
-
-export const setClerkHttpOptions = (value: RequestInit) => {
-  clerkClient.__unstable_options.httpOptions = value;
 };

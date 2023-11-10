@@ -65,6 +65,10 @@ export function isMetamaskError(err: any): err is MetamaskError {
   return 'code' in err && [4001, 32602, 32603].includes(err.code) && 'message' in err;
 }
 
+export function isUserLockedError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'user_locked';
+}
+
 export function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
   return data.length > 0 ? data.map(parseError) : [];
 }
@@ -242,11 +246,17 @@ export type ErrorThrowerOptions = {
 
 export interface ErrorThrower {
   setPackageName(options: ErrorThrowerOptions): ErrorThrower;
+
   setMessages(options: ErrorThrowerOptions): ErrorThrower;
+
   throwInvalidPublishableKeyError(params: { key?: string }): never;
+
   throwInvalidFrontendApiError(params: { key?: string }): never;
+
   throwInvalidProxyUrl(params: { url?: string }): never;
+
   throwMissingPublishableKeyError(): never;
+  throw(message: string): never;
 }
 
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
@@ -300,6 +310,10 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     throwMissingPublishableKeyError(): never {
       throw new Error(buildMessage(messages.MissingPublishableKeyErrorMessage));
+    },
+
+    throw(message: string): never {
+      throw new Error(buildMessage(message));
     },
   };
 }

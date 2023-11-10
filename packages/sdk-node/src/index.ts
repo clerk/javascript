@@ -1,14 +1,4 @@
-import {
-  Clerk,
-  clerkClient,
-  ClerkExpressRequireAuth,
-  ClerkExpressWithAuth,
-  createClerkClient,
-  setClerkApiKey,
-  setClerkApiVersion,
-  setClerkHttpOptions,
-  setClerkServerApiUrl,
-} from './clerkClient';
+import { Clerk, clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, createClerkClient } from './clerkClient';
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import type {
@@ -26,17 +16,7 @@ export * from '@clerk/backend';
  * to shadow the Clerk export from clerk/backend, because it needs to support
  * 2 additional apis: clerk.expressWithAuth, clerk.expressRequireAuth
  */
-export {
-  createClerkClient,
-  clerkClient,
-  setClerkApiKey,
-  setClerkApiVersion,
-  setClerkHttpOptions,
-  setClerkServerApiUrl,
-  Clerk,
-  ClerkExpressRequireAuth,
-  ClerkExpressWithAuth,
-};
+export { Clerk, clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, createClerkClient };
 
 const {
   users,
@@ -53,25 +33,24 @@ const {
 } = clerkClient;
 
 export {
-  users,
-  smsMessages,
-  sessions,
+  allowlistIdentifiers,
+  clients,
+  domains,
   emailAddresses,
-  phoneNumbers,
   emails,
   invitations,
   organizations,
-  clients,
-  allowlistIdentifiers,
-  domains,
+  phoneNumbers,
+  sessions,
+  smsMessages,
+  users,
 };
 
 export default clerkClient;
 
-export type { LooseAuthProp, StrictAuthProp, WithAuthProp, RequireAuthProp, ClerkMiddleware, ClerkMiddlewareOptions };
+export type { ClerkMiddleware, ClerkMiddlewareOptions, LooseAuthProp, RequireAuthProp, StrictAuthProp, WithAuthProp };
 
-export { createClerkExpressRequireAuth };
-export { createClerkExpressWithAuth };
+export { createClerkExpressRequireAuth, createClerkExpressWithAuth };
 
-export { withAuth } from './withAuth';
 export { requireAuth } from './requireAuth';
+export { withAuth } from './withAuth';

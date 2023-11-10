@@ -9,6 +9,7 @@ export {
   isKnownError,
   isMagicLinkError,
   isMetamaskError,
+  isUserLockedError,
   MagicLinkError,
   MagicLinkErrorCode,
   parseError,
