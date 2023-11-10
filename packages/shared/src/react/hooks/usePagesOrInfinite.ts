@@ -51,6 +51,11 @@ export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | 
   } as T;
 };
 
+const cachingSWROptions = {
+  dedupingInterval: 1000 * 60,
+  focusThrottleInterval: 1000 * 60 * 2,
+} satisfies Parameters<typeof useSWR>[2];
+
 type ArrayType<DataArray> = DataArray extends Array<infer ElementType> ? ElementType : never;
 type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Data> : Type;
 
@@ -122,7 +127,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
       // @ts-ignore
       return fetcher?.(requestParams);
     },
-    { keepPreviousData },
+    { keepPreviousData, ...cachingSWROptions },
   );
 
   const {
@@ -152,6 +157,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
       // @ts-ignore
       return fetcher?.(requestParams);
     },
+    cachingSWROptions,
   );
 
   const page = useMemo(() => {
