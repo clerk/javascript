@@ -1,4 +1,4 @@
-import type { OrganizationProfileProps } from '@clerk/types';
+import type { OrganizationProfileProps, WithoutRouting } from '@clerk/types';
 import React from 'react';
 
 import { withOrganizationsEnabledGuard, withRedirectToHomeOrganizationGuard } from '../../common';
@@ -48,7 +48,7 @@ export const OrganizationProfile = withRedirectToHomeOrganizationGuard(
   }),
 );
 
-export const OrganizationProfileModal = (props: Omit<OrganizationProfileProps, 'path' | 'routing'>): JSX.Element => {
+export const OrganizationProfileModal = (props: WithoutRouting<OrganizationProfileProps>): JSX.Element => {
   const organizationProfileProps: OrganizationProfileCtx = {
     ...props,
     routing: 'virtual',

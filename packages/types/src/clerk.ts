@@ -536,6 +536,8 @@ export interface Resources {
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';
 
+export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
+
 export type SignInInitialValues = {
   emailAddress?: string;
   phoneNumber?: string;

@@ -1,4 +1,4 @@
-import type { UserProfileProps } from '@clerk/types';
+import type { UserProfileProps, WithoutRouting } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToHomeUserGuard } from '../../common';
@@ -42,7 +42,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 
 export const UserProfile = withRedirectToHomeUserGuard(withCardStateProvider(_UserProfile));
 
-export const UserProfileModal = (props: Omit<UserProfileProps, 'path' | 'routing'>): JSX.Element => {
+export const UserProfileModal = (props: WithoutRouting<UserProfileProps>): JSX.Element => {
   const userProfileProps: UserProfileCtx = {
     ...props,
     routing: 'virtual',

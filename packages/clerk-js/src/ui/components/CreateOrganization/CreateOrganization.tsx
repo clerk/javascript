@@ -1,4 +1,4 @@
-import type { CreateOrganizationProps } from '@clerk/types';
+import type { CreateOrganizationProps, WithoutRouting } from '@clerk/types';
 
 import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
@@ -38,7 +38,7 @@ export const CreateOrganization = withOrganizationsEnabledGuard(
   { mode: 'redirect' },
 );
 
-export const CreateOrganizationModal = (props: Omit<CreateOrganizationProps, 'path' | 'routing'>): JSX.Element => {
+export const CreateOrganizationModal = (props: WithoutRouting<CreateOrganizationProps>): JSX.Element => {
   const createOrganizationProps: CreateOrganizationCtx = {
     ...props,
     routing: 'virtual',
