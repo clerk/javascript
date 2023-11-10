@@ -1,8 +1,8 @@
+import { useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, localizationKeys, Text } from '../../customizables';
 import {
@@ -72,7 +72,12 @@ type AddMfaProps = {
 const AddMfa = (props: AddMfaProps) => {
   const { onSuccess, title, onAddPhoneClick, onUnverifiedPhoneClick, resourceRef } = props;
   const card = useCardState();
-  const user = useCoreUser();
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
   const availableMethods = user.phoneNumbers.filter(p => !p.reservedForSecondFactor);
 
   const enableMfa = async (phone: PhoneNumberResource) => {

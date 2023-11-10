@@ -1,6 +1,8 @@
+import { useUser } from '@clerk/shared/react';
+
 import { getIdentifier } from '../../../utils/user';
 import { PrintableComponent, usePrintable } from '../../common';
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, Flex, Grid, Heading, localizationKeys, Text } from '../../customizables';
 import { useClipboard } from '../../hooks';
@@ -15,9 +17,14 @@ type MfaBackupCodeListProps = {
 export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
   const { subtitle, backupCodes } = props;
   const { applicationName } = useEnvironment().displayConfig;
-  const user = useCoreUser();
+  const { user } = useUser();
+
   const { print, printableProps } = usePrintable();
   const { onCopy, hasCopied } = useClipboard(backupCodes?.join(',') || '');
+
+  if (!user) {
+    return null;
+  }
   const userIdentifier = getIdentifier(user);
 
   const onDownloadTxtFile = () => {

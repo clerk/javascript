@@ -1,8 +1,8 @@
+import { useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
 import { QRCode } from '../../common';
-import { useCoreUser } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, localizationKeys, Text } from '../../customizables';
 import {
@@ -25,7 +25,7 @@ type DisplayFormat = 'qr' | 'uri';
 
 export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
   const { title, onContinue } = props;
-  const user = useCoreUser();
+  const { user } = useUser();
   const card = useCardState();
   const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');
@@ -34,7 +34,7 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
   // Non-idempotent useEffect
   React.useEffect(() => {
     void user
-      .createTOTP()
+      ?.createTOTP()
       .then((totp: TOTPResource) => setTOTP(totp))
       .catch(err => handleError(err, [], card.setError));
   }, []);

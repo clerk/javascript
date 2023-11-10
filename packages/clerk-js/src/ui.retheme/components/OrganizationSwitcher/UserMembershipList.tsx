@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
@@ -5,7 +6,6 @@ import { InfiniteListSpinner } from '../../common';
 import {
   useCoreOrganization,
   useCoreOrganizationList,
-  useCoreUser,
   useOrganizationSwitcherContext,
 } from '../../contexts';
 import { Box, descriptors, localizationKeys } from '../../customizables';
@@ -48,11 +48,15 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   const { hidePersonal } = useOrganizationSwitcherContext();
   const { organization: currentOrg } = useCoreOrganization();
   const { ref, userMemberships } = useFetchMemberships();
-  const user = useCoreUser();
+  const { user } = useUser();
 
   const otherOrgs = ((userMemberships.count || 0) > 0 ? userMemberships.data || [] : [])
     .map(e => e.organization)
     .filter(o => o.id !== currentOrg?.id);
+
+  if (!user) {
+    return null;
+  }
 
   const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
 

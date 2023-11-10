@@ -1,8 +1,9 @@
+import { useSession } from '@clerk/shared/react';
 import type { PointerEventHandler } from 'react';
 import React, { useEffect, useRef } from 'react';
 
 import { getFullName, getIdentifier } from '../../../utils/user';
-import { useCoreClerk, useCoreSession, withCoreUserGuard } from '../../contexts';
+import { useCoreClerk, withCoreUserGuard } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Col,
@@ -57,7 +58,7 @@ const EyeCircle = ({ width, height, ...props }: EyeCircleProps) => {
 type FabContentProps = { title: LocalizationKey; signOutText: LocalizationKey };
 
 const FabContent = ({ title, signOutText }: FabContentProps) => {
-  const session = useCoreSession();
+  const { session } = useSession();
   const { signOut } = useCoreClerk();
 
   return (
@@ -88,7 +89,8 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
         })}
         localizationKey={signOutText}
         onClick={async () => {
-          await signOut({ sessionId: session.id });
+          // clerk-js has been loaded at this point so we can safely access session
+          await signOut({ sessionId: session!.id });
         }}
       />
     </Col>
@@ -96,7 +98,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
 };
 
 const _ImpersonationFab = () => {
-  const session = useCoreSession();
+  const { session } = useSession();
   const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
   const containerRef = useRef<HTMLDivElement>(null);

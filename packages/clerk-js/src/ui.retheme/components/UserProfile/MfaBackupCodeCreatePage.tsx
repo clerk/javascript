@@ -1,7 +1,7 @@
+import { useUser } from '@clerk/shared/react';
 import type { BackupCodeResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreUser } from '../../contexts';
 import { descriptors, localizationKeys, Text } from '../../customizables';
 import {
   ContentPage,
@@ -16,7 +16,7 @@ import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
-  const user = useCoreUser();
+  const { user } = useUser();
   const card = useCardState();
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
 
@@ -26,7 +26,7 @@ export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
     }
 
     void user
-      .createBackupCode()
+      ?.createBackupCode()
       .then((backupCode: BackupCodeResource) => setBackupCode(backupCode))
       .catch(err => handleError(err, [], card.setError));
   }, []);

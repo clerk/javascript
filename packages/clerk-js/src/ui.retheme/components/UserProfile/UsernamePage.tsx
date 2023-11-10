@@ -1,12 +1,19 @@
+import { useUser } from '@clerk/shared/react';
+
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const UsernamePage = withCardStateProvider(() => {
-  const user = useCoreUser();
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
   const { userSettings } = useEnvironment();
   const card = useCardState();
   const wizard = useWizard();

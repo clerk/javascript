@@ -1,4 +1,5 @@
-import { useCoreUser } from '../../contexts';
+import { useUser } from '@clerk/shared/react';
+
 import { localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
 import { useRouter } from '../../router';
@@ -6,7 +7,13 @@ import { BlockButton } from './UserProfileBlockButtons';
 
 export const UserProfileSection = () => {
   const { navigate } = useRouter();
-  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
 
   return (
     <ProfileSection
