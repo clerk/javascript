@@ -1,7 +1,8 @@
+import { useSession } from '@clerk/shared/react';
 import type { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreSession, useCoreUser, useEnvironment, useUserButtonContext } from '../../contexts';
+import { useCoreUser, useEnvironment, useUserButtonContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import { Action, Actions, PopoverCard, PreviewButton, SecondaryActions, UserPreview } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
@@ -13,7 +14,7 @@ type UserButtonPopoverProps = { close: () => void } & PropsOfComponent<typeof Po
 
 export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopoverProps>((props, ref) => {
   const { close, ...rest } = props;
-  const session = useCoreSession() as ActiveSessionResource;
+  const { session } = useSession() as { session: ActiveSessionResource };
   const { authConfig } = useEnvironment();
   const user = useCoreUser();
   const {
