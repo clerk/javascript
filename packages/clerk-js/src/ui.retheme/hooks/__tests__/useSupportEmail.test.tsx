@@ -9,7 +9,7 @@ jest.mock('../../contexts', () => {
   return {
     useCoreClerk: () => {
       return {
-        frontendApi: 'clerk.clerk.com',
+        publishableKey: 'pk_live_Y2xlcmsuY2xlcmsuY29tJA',
       };
     },
     useEnvironment: () => mockUseEnvironment(),

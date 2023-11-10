@@ -25,13 +25,8 @@ export const ActiveMembersList = () => {
     return null;
   }
 
-  const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: string) => {
-    return card
-      .runAsync(async () => {
-        return await membership.update({ role: newRole });
-      })
-      .catch(err => handleError(err, [], card.setError));
-  };
+  const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: string) =>
+    card.runAsync(() => membership.update({ role: newRole })).catch(err => handleError(err, [], card.setError));
 
   const handleRemove = (membership: OrganizationMembershipResource) => async () => {
     return card

@@ -88,7 +88,7 @@ const outAnimation = keyframes`
     translateY(0px);
     max-height: 6rem;
     visibility: visible;
-  }
+  }  
   100% {
     opacity: 0;
     transform: translateY(5px);

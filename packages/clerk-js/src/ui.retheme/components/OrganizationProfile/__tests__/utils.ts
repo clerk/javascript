@@ -19,7 +19,6 @@ type FakeMemberParams = {
   identifier?: string;
   firstName?: string;
   lastName?: string;
-  profileImageUrl?: string;
   imageUrl?: string;
   createdAt?: Date;
 };
@@ -39,7 +38,6 @@ export const createFakeMember = (params: FakeMemberParams): OrganizationMembersh
       identifier: params?.identifier || 'test_user',
       firstName: params?.firstName || 'test_firstName',
       lastName: params?.lastName || 'test_lastName',
-      profileImageUrl: params?.profileImageUrl || '',
       imageUrl: params?.imageUrl || '',
     },
   } as any;
@@ -121,7 +119,6 @@ export const createFakeOrganizationMembershipRequest = (
     publicUserData: {
       firstName: null,
       lastName: null,
-      profileImageUrl: '',
       imageUrl: '',
       hasImage: false,
       userId: params.publicUserData.userId || '',
