@@ -21,9 +21,9 @@ type UseMultisessionActionsParams = {
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { setActive, signOut, openUserProfile } = useCoreClerk();
   const card = useCardState();
-  const sessions = useSessionList();
+  const { sessions } = useSessionList();
   const { navigate } = useRouter();
-  const activeSessions = sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
+  const activeSessions = sessions?.filter(s => s.status === 'active') as ActiveSessionResource[];
   const otherSessions = activeSessions.filter(s => s.user?.id !== opts.user?.id);
 
   const handleSignOutSessionClicked = (session: ActiveSessionResource) => () => {
