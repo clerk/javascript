@@ -1,8 +1,7 @@
-import { useSession } from '@clerk/shared/react';
+import { useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreUser } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection } from '../../elements';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
@@ -13,7 +12,7 @@ import { UserProfileAccordion } from './UserProfileAccordion';
 import { currentSessionFirst } from './utils';
 
 export const ActiveDevicesSection = () => {
-  const user = useCoreUser();
+  const { user } = useUser();
   const { session } = useSession();
   const [sessionsWithActivities, setSessionsWithActivities] = React.useState<SessionWithActivitiesResource[]>([]);
 

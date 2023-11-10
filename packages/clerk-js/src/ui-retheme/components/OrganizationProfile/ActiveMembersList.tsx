@@ -1,7 +1,8 @@
+import { useUser } from '@clerk/shared/react';
 import type { OrganizationMembershipResource } from '@clerk/types';
 
 import { Gate } from '../../common/Gate';
-import { useCoreOrganization, useCoreUser } from '../../contexts';
+import { useCoreOrganization } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
@@ -81,9 +82,9 @@ const MemberRow = (props: {
   const { membership, onRemove, onRoleChange, options } = props;
   const { localizeCustomRole } = useLocalizeCustomRoles();
   const card = useCardState();
-  const user = useCoreUser();
+  const { user } = useUser();
 
-  const isCurrentUser = user.id === membership.publicUserData.userId;
+  const isCurrentUser = user?.id === membership.publicUserData.userId;
 
   return (
     <RowContainer>

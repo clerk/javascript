@@ -1,7 +1,8 @@
+import { useUser } from '@clerk/shared/react';
 import type { VerificationStrategy } from '@clerk/types';
 import React from 'react';
 
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { Col, Grid, localizationKeys, Text } from '../../customizables';
 import {
   ContentPage,
@@ -24,7 +25,12 @@ export const MfaPage = withCardStateProvider(() => {
   const {
     userSettings: { attributes },
   } = useEnvironment();
-  const user = useCoreUser();
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
   const title = localizationKeys('userProfile.mfaPage.title');
   const [selectedMethod, setSelectedMethod] = React.useState<VerificationStrategy>();
 

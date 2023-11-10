@@ -1,8 +1,8 @@
-import { useSession } from '@clerk/shared/react';
+import { useSession, useUser } from '@clerk/shared/react';
 import type { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreUser, useEnvironment, useUserButtonContext } from '../../contexts';
+import { useEnvironment, useUserButtonContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import { Action, Actions, PopoverCard, PreviewButton, SecondaryActions, UserPreview } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
@@ -16,7 +16,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   const { close, ...rest } = props;
   const { session } = useSession() as { session: ActiveSessionResource };
   const { authConfig } = useEnvironment();
-  const user = useCoreUser();
+  const { user } = useUser();
   const {
     handleAddAccountClicked,
     handleManageAccountClicked,

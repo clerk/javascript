@@ -9,7 +9,7 @@ import { useRouter } from '../../router';
 import { sleep } from '../../utils';
 
 type UseMultisessionActionsParams = {
-  user: UserResource | undefined;
+  user: UserResource | null | undefined;
   actionCompleteCallback?: () => void;
   navigateAfterSignOut?: () => any;
   navigateAfterMultiSessionSingleSignOut?: () => any;

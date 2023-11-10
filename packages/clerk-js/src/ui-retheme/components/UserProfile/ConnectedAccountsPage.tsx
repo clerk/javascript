@@ -1,9 +1,10 @@
+import { useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
 import { appendModalState } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser, useUserProfileContext } from '../../contexts';
+import { useUserProfileContext } from '../../contexts';
 import { Col, Image, localizationKeys, Text } from '../../customizables';
 import {
   ArrowBlockButton,
@@ -21,12 +22,12 @@ import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const ConnectedAccountsPage = withCardStateProvider(() => {
   const title = localizationKeys('userProfile.connectedAccountPage.title');
-  const user = useCoreUser();
+  const { user } = useUser();
 
   const { params } = useRouter();
   const { id } = params || {};
 
-  const ref = React.useRef<ExternalAccountResource | undefined>(user.externalAccounts.find(a => a.id === id));
+  const ref = React.useRef<ExternalAccountResource | undefined>(user?.externalAccounts.find(a => a.id === id));
   const wizard = useWizard({ defaultStep: ref.current ? 1 : 0 });
 
   // TODO: Better handling of success redirect
@@ -44,14 +45,14 @@ export const ConnectedAccountsPage = withCardStateProvider(() => {
 
 const AddConnectedAccount = () => {
   const card = useCardState();
-  const user = useCoreUser();
+  const { user } = useUser();
   const { navigate } = useRouter();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
-  const connectedStrategies = user.verifiedExternalAccounts.map(a => `oauth_${a.provider}`) as OAuthStrategy[];
+  const connectedStrategies = user?.verifiedExternalAccounts.map(a => `oauth_${a.provider}`) as OAuthStrategy[];
 
   const unconnectedStrategies = enabledStrategies.filter(provider => {
     return !connectedStrategies.includes(provider);
@@ -68,7 +69,7 @@ const AddConnectedAccount = () => {
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
     user
-      .createExternalAccount({
+      ?.createExternalAccount({
         strategy: strategy,
         redirectUrl,
         additionalScopes,

@@ -1,8 +1,8 @@
-import { useSession } from '@clerk/shared/react';
+import { useSession, useUser } from '@clerk/shared/react';
 import { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
 import {
   ContentPage,
@@ -35,7 +35,12 @@ const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boole
 };
 
 export const PasswordPage = withCardStateProvider(() => {
-  const user = useCoreUser();
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
   const { session } = useSession();
   const title = user.passwordEnabled
     ? localizationKeys('userProfile.passwordPage.changePasswordTitle')

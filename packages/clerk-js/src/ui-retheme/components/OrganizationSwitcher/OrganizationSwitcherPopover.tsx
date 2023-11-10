@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
@@ -7,7 +8,6 @@ import {
   useCoreClerk,
   useCoreOrganization,
   useCoreOrganizationList,
-  useCoreUser,
   useEnvironment,
   useOrganizationSwitcherContext,
 } from '../../contexts';
@@ -55,7 +55,11 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       organizationProfileProps,
     } = useOrganizationSwitcherContext();
 
-    const user = useCoreUser();
+    const { user } = useUser();
+
+    if (!user) {
+      return null;
+    }
 
     const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
 

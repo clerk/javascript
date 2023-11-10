@@ -1,7 +1,7 @@
+import { useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreUser } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   ContentPage,
@@ -23,7 +23,7 @@ type VerifyTOTPProps = {
 export const VerifyTOTP = (props: VerifyTOTPProps) => {
   const { onVerified, resourceRef } = props;
   const card = useCardState();
-  const user = useCoreUser();
+  const { user } = useUser();
   const status = useLoadingStatus();
   const [success, setSuccess] = React.useState(false);
   const codeControlState = useFormControl('code', '');
@@ -47,7 +47,7 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
     status.setLoading();
     codeControlState.setError(undefined);
     return user
-      .verifyTOTP({ code })
+      ?.verifyTOTP({ code })
       .then((totp: TOTPResource) => resolve(totp))
       .catch(reject);
   });

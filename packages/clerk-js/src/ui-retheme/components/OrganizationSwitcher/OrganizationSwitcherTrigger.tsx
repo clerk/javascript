@@ -1,10 +1,10 @@
+import { useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
 import { NotificationCountBadge, withGate } from '../../common';
 import {
   useCoreOrganization,
   useCoreOrganizationList,
-  useCoreUser,
   useEnvironment,
   useOrganizationSwitcherContext,
 } from '../../contexts';
@@ -22,9 +22,15 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
   forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>((props, ref) => {
     const { sx, ...rest } = props;
 
-    const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
+    const { user } = useUser();
     const { organization } = useCoreOrganization();
     const { hidePersonal } = useOrganizationSwitcherContext();
+
+    if (!user) {
+      return null;
+    }
+
+    const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
 
     return (
       <Button

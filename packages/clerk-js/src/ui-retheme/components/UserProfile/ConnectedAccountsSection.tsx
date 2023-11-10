@@ -1,8 +1,9 @@
+import { useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 
 import { useRouter } from '../../../ui/router';
 import { appendModalState } from '../../../utils';
-import { useCoreUser, useUserProfileContext } from '../../contexts';
+import { useUserProfileContext } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState, UserPreview } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
@@ -12,8 +13,11 @@ import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const ConnectedAccountsSection = () => {
-  const user = useCoreUser();
+  const { user } = useUser();
   const { navigate } = useRouter();
+  if (!user) {
+    return null;
+  }
   const accounts = [
     ...user.verifiedExternalAccounts,
     ...user.unverifiedExternalAccounts.filter(a => a.verification?.error),
@@ -41,7 +45,7 @@ export const ConnectedAccountsSection = () => {
 
 const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResource }) => {
   const card = useCardState();
-  const user = useCoreUser();
+  const { user } = useUser();
   const { navigate } = useRouter();
   const router = useRouter();
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
@@ -71,6 +75,10 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
       if (reauthorizationRequired) {
         response = await account.reauthorize({ additionalScopes, redirectUrl });
       } else {
+        if (!user) {
+          throw Error('user is not defined');
+        }
+
         response = await user.createExternalAccount({
           strategy: account.verification!.strategy as OAuthStrategy,
           redirectUrl,

@@ -1,6 +1,6 @@
 import type { UserResource } from '@clerk/types';
 
-import { useUserContext } from '../contexts/UserContext';
+import { useUserContext } from '../contexts';
 
 type UseUserReturn =
   | { isLoaded: false; isSignedIn: undefined; user: undefined }

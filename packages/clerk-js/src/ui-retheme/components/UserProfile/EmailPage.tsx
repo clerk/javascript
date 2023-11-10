@@ -1,8 +1,9 @@
+import { useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
@@ -15,14 +16,14 @@ import { VerifyWithLink } from './VerifyWithLink';
 export const EmailPage = withCardStateProvider(() => {
   const title = localizationKeys('userProfile.emailAddressPage.title');
   const card = useCardState();
-  const user = useCoreUser();
+  const { user } = useUser();
   const environment = useEnvironment();
   const preferEmailLinks = magicLinksEnabledForInstance(environment);
 
   const { params } = useRouter();
   const { id } = params || {};
 
-  const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user.emailAddresses.find(a => a.id === id));
+  const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user?.emailAddresses.find(a => a.id === id));
   const wizard = useWizard({
     defaultStep: emailAddressRef.current ? 1 : 0,
     onNextStep: () => card.setError(undefined),
@@ -35,12 +36,12 @@ export const EmailPage = withCardStateProvider(() => {
     isRequired: true,
   });
 
-  const canSubmit = emailField.value.length > 1 && user.username !== emailField.value;
+  const canSubmit = emailField.value.length > 1 && user?.username !== emailField.value;
 
   const addEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     return user
-      .createEmailAddress({ email: emailField.value })
+      ?.createEmailAddress({ email: emailField.value })
       .then(res => {
         emailAddressRef.current = res;
         wizard.nextStep();

@@ -1,5 +1,7 @@
+import { useUser } from '@clerk/shared/react';
+
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization, useCoreUser, useOrganizationProfileContext } from '../../contexts';
+import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
 import {
@@ -18,9 +20,9 @@ export const LeaveOrganizationPage = () => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
   const { organization } = useCoreOrganization();
-  const user = useCoreUser();
+  const { user } = useUser();
 
-  if (!organization) {
+  if (!organization || !user) {
     return null;
   }
 
