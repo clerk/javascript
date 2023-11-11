@@ -170,8 +170,12 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete, identifier } = params || {};
+  public authenticateWithRedirect = async (
+    params: AuthenticateWithRedirectParams & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+    },
+  ): Promise<void> => {
+    const { strategy, redirectUrl, redirectUrlComplete, identifier, unsafeMetadata } = params || {};
 
     const { firstFactorVerification } =
       strategy === 'saml' && this.id
@@ -184,6 +188,7 @@ export class SignIn extends BaseResource implements SignInResource {
             strategy,
             identifier,
             redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+            unsafeMetadata,
             actionCompleteRedirectUrl: redirectUrlComplete,
           });
 

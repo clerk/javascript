@@ -629,6 +629,10 @@ export type SignInProps = {
    */
   appearance?: SignInTheme;
   /**
+   * Additional arbitrary metadata to be stored alongside the User object
+   */
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
    * Initial values that are used to prefill the sign in form.
    */
   initialValues?: SignInInitialValues;

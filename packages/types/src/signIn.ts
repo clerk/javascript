@@ -84,7 +84,9 @@ export interface SignInResource extends ClerkResource {
 
   attemptSecondFactor: (params: AttemptSecondFactorParams) => Promise<SignInResource>;
 
-  authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
+  authenticateWithRedirect: (
+    params: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata },
+  ) => Promise<void>;
 
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
@@ -158,6 +160,7 @@ export type SignInCreateParams = (
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
+      unsafeMetadata?: SignUpUnsafeMetadata;
     }
   | {
       strategy: TicketStrategy;
