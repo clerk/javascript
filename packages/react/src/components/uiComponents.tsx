@@ -153,7 +153,7 @@ export function UserProfileLink({ children }: PropsWithChildren<UserProfileLinkP
 }
 
 const _UserProfile = withClerk(
-  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Omit<UserProfileProps, 'customPages'>>>) => {
+  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Without<UserProfileProps, 'customPages'>>>) => {
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
     return (
       <Portal
@@ -206,7 +206,7 @@ export function OrganizationProfileLink({ children }: PropsWithChildren<Organiza
 }
 
 const _OrganizationProfile = withClerk(
-  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Omit<OrganizationProfileProps, 'customPages'>>>) => {
+  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Without<OrganizationProfileProps, 'customPages'>>>) => {
     const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children);
     return (
       <Portal

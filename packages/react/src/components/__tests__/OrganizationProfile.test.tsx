@@ -1,39 +1,39 @@
 import { expectTypeOf } from 'expect-type';
 import type React from 'react';
 
-import type { SignIn } from '..';
+import type { OrganizationProfile } from '..';
 
-export type SignInComponentProps = React.ComponentProps<typeof SignIn>;
+export type OrganizationProfileComponentProps = React.ComponentProps<typeof OrganizationProfile>;
 
-describe('<SignIn/>', () => {
+describe('<OrganizationProfile/>', () => {
   describe('Type tests', () => {
     test('has path filled', () => {
-      expectTypeOf({ path: '/sign-in' }).toMatchTypeOf<SignInComponentProps>();
+      expectTypeOf({ path: '/org' }).toMatchTypeOf<OrganizationProfileComponentProps>();
     });
 
     test('has path filled and routing has path as a value', () => {
       expectTypeOf({
-        path: '/sign-in',
+        path: '/org',
         routing: 'path' as const,
-      }).toMatchTypeOf<SignInComponentProps>();
+      }).toMatchTypeOf<OrganizationProfileComponentProps>();
     });
 
     test('when path is filled, routing must only have path as value', () => {
       expectTypeOf({
-        path: '/sign-in',
+        path: '/org',
         routing: 'virtual' as const,
-      }).not.toMatchTypeOf<SignInComponentProps>();
+      }).not.toMatchTypeOf<OrganizationProfileComponentProps>();
 
       expectTypeOf({
-        path: '/sign-in',
+        path: '/org',
         routing: 'hash' as const,
-      }).not.toMatchTypeOf<SignInComponentProps>();
+      }).not.toMatchTypeOf<OrganizationProfileComponentProps>();
     });
 
     test('when routing is hash or virtual path must be present', () => {
       expectTypeOf({
         routing: 'hash' as const,
-      }).toMatchTypeOf<SignInComponentProps>();
+      }).toMatchTypeOf<OrganizationProfileComponentProps>();
     });
   });
 });
