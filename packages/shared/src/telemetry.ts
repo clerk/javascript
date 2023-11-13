@@ -141,6 +141,10 @@ export class TelemetryCollector {
     return true;
   }
 
+  get isDebug(): boolean {
+    return this.#config.debug || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DEBUG));
+  }
+
   record(event: TelemetryEvent['event'], payload: TelemetryEvent['payload']) {
     const preparedPayload = this.#preparePayload(event, payload);
 
@@ -156,7 +160,7 @@ export class TelemetryCollector {
   }
 
   #shouldRecord(): boolean {
-    return this.isEnabled && !this.#config.debug && Math.random() <= this.#config.samplingRate;
+    return this.isEnabled && !this.isDebug && Math.random() <= this.#config.samplingRate;
   }
 
   #scheduleFlush(): void {
@@ -215,7 +219,7 @@ export class TelemetryCollector {
    * If running in debug mode, log the event and its payload to the console.
    */
   #logEvent(event: TelemetryEvent['event'], payload: Record<string, any>) {
-    if (!this.#config.debug) {
+    if (!this.isDebug) {
       return;
     }
 
