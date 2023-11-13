@@ -8,17 +8,15 @@ import type {
 
 import type { Organization, Session, User } from '../api';
 import { createBackendApiClient } from '../api';
-import type { RequestState } from './authStatus';
-import type { AuthenticateRequestOptions } from './request';
 
-type AuthObjectDebugData = Partial<AuthenticateRequestOptions & RequestState>;
+type AuthObjectDebugData = Record<string, any>;
 type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
-type AuthObjectDebug = () => unknown;
+type AuthObjectDebug = () => AuthObjectDebugData;
 
 export type SignedInAuthObjectOptions = {
   secretKey?: string;
-  apiUrl: string;
-  apiVersion: string;
+  apiUrl?: string;
+  apiVersion?: string;
   token: string;
   session?: Session;
   user?: User;

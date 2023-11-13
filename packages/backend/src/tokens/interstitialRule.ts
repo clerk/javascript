@@ -1,14 +1,32 @@
 import { checkCrossOrigin } from '../util/request';
 import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/shared';
-import type { RequestState } from './authStatus';
+import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
-import type { AuthenticateRequestOptions } from './request';
 import { verifyToken } from './verify';
 
+type InterstitialRuleOptions = AuthStatusOptionsType & {
+  /* Request origin header value */
+  origin?: string;
+  /* Request host header value */
+  host?: string;
+  /* Request forwarded host value */
+  forwardedHost?: string;
+  /* Request forwarded proto value */
+  forwardedProto?: string;
+  /* Request referrer */
+  referrer?: string;
+  /* Request user-agent value */
+  userAgent?: string;
+  /* Client token cookie value */
+  cookieToken?: string;
+  /* Client uat cookie value */
+  clientUat?: string;
+  /* Client token header value */
+  headerToken?: string;
+};
+
 type InterstitialRuleResult = RequestState | undefined;
-type InterstitialRule = <T extends AuthenticateRequestOptions>(
-  opts: T,
-) => Promise<InterstitialRuleResult> | InterstitialRuleResult;
+type InterstitialRule = (opts: InterstitialRuleOptions) => Promise<InterstitialRuleResult> | InterstitialRuleResult;
 
 const shouldRedirectToSatelliteUrl = (qp?: URLSearchParams) => !!qp?.get('__clerk_satellite_url');
 const hasJustSynced = (qp?: URLSearchParams) => qp?.get('__clerk_synced') === 'true';
@@ -116,18 +134,18 @@ export const hasPositiveClientUatButCookieIsMissing: InterstitialRule = options 
 };
 
 export const hasValidHeaderToken: InterstitialRule = async options => {
-  const { headerToken } = options as any;
-  const sessionClaims = await verifyRequestState(options, headerToken);
+  const { headerToken } = options;
+  const sessionClaims = await verifyRequestState(options, headerToken as string);
   return await signedIn(options, sessionClaims);
 };
 
 export const hasValidCookieToken: InterstitialRule = async options => {
-  const { cookieToken, clientUat } = options as any;
-  const sessionClaims = await verifyRequestState(options, cookieToken);
+  const { cookieToken, clientUat } = options;
+  const sessionClaims = await verifyRequestState(options, cookieToken as string);
   const state = await signedIn(options, sessionClaims);
 
   const jwt = state.toAuth().sessionClaims;
-  const cookieTokenIsOutdated = jwt.iat < Number.parseInt(clientUat);
+  const cookieTokenIsOutdated = jwt.iat < Number.parseInt(clientUat as string);
 
   if (!clientUat || cookieTokenIsOutdated) {
     return interstitial(options, AuthErrorReason.CookieOutDated);
@@ -136,7 +154,7 @@ export const hasValidCookieToken: InterstitialRule = async options => {
   return state;
 };
 
-export async function runInterstitialRules<T extends AuthenticateRequestOptions>(
+export async function runInterstitialRules<T extends InterstitialRuleOptions>(
   opts: T,
   rules: InterstitialRule[],
 ): Promise<RequestState> {
@@ -150,7 +168,7 @@ export async function runInterstitialRules<T extends AuthenticateRequestOptions>
   return signedOut(opts, AuthErrorReason.UnexpectedError);
 }
 
-async function verifyRequestState(options: AuthenticateRequestOptions, token: string) {
+async function verifyRequestState(options: InterstitialRuleOptions, token: string) {
   const { isSatellite, proxyUrl } = options;
   let issuer;
   if (isSatellite) {

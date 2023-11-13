@@ -2,7 +2,7 @@ import { API_URL, API_VERSION, constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { isDevelopmentFromApiKey } from '../util/shared';
-import type { RequestState } from './authStatus';
+import type { LoadResourcesOptions, RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
@@ -21,12 +21,6 @@ import {
   runInterstitialRules,
 } from './interstitialRule';
 import type { VerifyTokenOptions } from './verify';
-
-export type LoadResourcesOptions = {
-  loadSession?: boolean;
-  loadUser?: boolean;
-  loadOrganization?: boolean;
-};
 
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
@@ -161,13 +155,13 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
       if (reasonToReturnInterstitial) {
         if (tokenCarrier === 'header') {
-          return unknownState<AuthenticateRequestOptions>(options, err.reason, err.getFullMessage());
+          return unknownState(options, err.reason, err.getFullMessage());
         }
-        return interstitial<AuthenticateRequestOptions>(options, err.reason, err.getFullMessage());
+        return interstitial(options, err.reason, err.getFullMessage());
       }
-      return signedOut<AuthenticateRequestOptions>(options, err.reason, err.getFullMessage());
+      return signedOut(options, err.reason, err.getFullMessage());
     }
-    return signedOut<AuthenticateRequestOptions>(options, AuthErrorReason.UnexpectedError, (err as Error).message);
+    return signedOut(options, AuthErrorReason.UnexpectedError, (err as Error).message);
   }
 
   if (options.headerToken) {
