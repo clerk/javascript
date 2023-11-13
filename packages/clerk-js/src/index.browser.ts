@@ -6,7 +6,9 @@ import './utils/setWebpackChunkPublicPath';
 import 'regenerator-runtime/runtime';
 
 import Clerk from './core/clerk';
-import { mountComponentRenderer } from './ui/Components';
+
+// eslint-disable-next-line import/no-unresolved -- this is a webpack alias
+import { mountComponentRenderer } from '~ui/Components';
 
 Clerk.mountComponentRenderer = mountComponentRenderer;
 

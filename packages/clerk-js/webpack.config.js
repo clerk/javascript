@@ -34,7 +34,7 @@ const common = ({ mode }) => {
       // @see https://webpack.js.org/configuration/resolve/#resolveextensions
       extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
       alias: {
-        ...(uiRetheme && { './ui': './ui.retheme' }),
+        '~ui': uiRetheme ? './ui.retheme' : './ui',
       },
     },
     plugins: [
