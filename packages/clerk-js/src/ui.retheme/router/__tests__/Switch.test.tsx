@@ -5,7 +5,7 @@ import { HashRouter, Route, Switch } from '../../router';
 
 const mockNavigate = jest.fn();
 
-jest.mock('ui/contexts', () => ({
+jest.mock('ui.retheme/contexts', () => ({
   useCoreClerk: () => ({
     navigate: jest.fn(to => {
       mockNavigate(to);

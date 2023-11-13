@@ -1,8 +1,9 @@
 import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
 
-import { act, render, runFakeTimers, waitFor } from '../../../../testUtils';
+import { act, render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
 import {
   createFakeUserOrganizationInvitation,
