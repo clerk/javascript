@@ -1,6 +1,7 @@
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
+import { InfiniteListSpinner } from '../../common';
 import {
   useCoreOrganization,
   useCoreOrganizationList,
@@ -9,25 +10,53 @@ import {
 } from '../../contexts';
 import { Box, descriptors, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview, PreviewButton } from '../../elements';
+import { useInView } from '../../hooks';
 import { SwitchArrows } from '../../icons';
 import { common } from '../../styledSystem';
+import { organizationListParams } from './utils';
 
 export type UserMembershipListProps = {
   onPersonalWorkspaceClick: React.MouseEventHandler;
   onOrganizationClick: (org: OrganizationResource) => unknown;
+};
+
+const useFetchMemberships = () => {
+  const { userMemberships } = useCoreOrganizationList({
+    userMemberships: organizationListParams.userMemberships,
+  });
+
+  const { ref } = useInView({
+    threshold: 0,
+    onChange: inView => {
+      if (!inView) {
+        return;
+      }
+      if (userMemberships.hasNextPage) {
+        userMemberships.fetchNext?.();
+      }
+    },
+  });
+
+  return {
+    userMemberships,
+    ref,
+  };
 };
 export const UserMembershipList = (props: UserMembershipListProps) => {
   const { onPersonalWorkspaceClick, onOrganizationClick } = props;
 
   const { hidePersonal } = useOrganizationSwitcherContext();
   const { organization: currentOrg } = useCoreOrganization();
-  const { organizationList } = useCoreOrganizationList();
+  const { ref, userMemberships } = useFetchMemberships();
   const user = useCoreUser();
 
-  const otherOrgs = (organizationList || []).map(e => e.organization).filter(o => o.id !== currentOrg?.id);
+  const otherOrgs = ((userMemberships.count || 0) > 0 ? userMemberships.data || [] : [])
+    .map(e => e.organization)
+    .filter(o => o.id !== currentOrg?.id);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
+
+  const { isLoading, hasNextPage } = userMemberships;
 
   return (
     <Box
@@ -72,6 +101,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           />
         </PreviewButton>
       ))}
+      {(hasNextPage || isLoading) && <InfiniteListSpinner ref={ref} />}
     </Box>
   );
 };
