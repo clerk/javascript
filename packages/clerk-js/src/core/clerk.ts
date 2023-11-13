@@ -1563,6 +1563,3 @@ export class Clerk implements ClerkInterface {
     return true;
   };
 }
-function getNonUndefinedValues(arg0: ClerkOptions): ClerkOptions {
-  throw new Error('Function not implemented.');
-}
