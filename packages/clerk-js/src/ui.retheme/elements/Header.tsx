@@ -5,11 +5,13 @@ import type { PropsOfComponent } from '../styledSystem';
 import { BackLink as BackLinkEl } from './BackLink';
 
 const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
+  const { sx, ...rest } = props;
   return (
     <Col
       elementDescriptor={descriptors.header}
       gap={1}
-      {...props}
+      sx={[{ textAlign: 'center' }, sx]}
+      {...rest}
     />
   );
 });

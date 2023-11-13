@@ -119,6 +119,9 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
 export type ElementsConfig = {
   rootBox: WithOptions;
   card: WithOptions;
+  cardContent: WithOptions;
+  cardFooter: WithOptions;
+  cardFooterItem: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
