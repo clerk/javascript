@@ -5,6 +5,7 @@ export function jsonOk(body: unknown, status = 200) {
   const mockResponse = {
     ok: true,
     status,
+    statusText: status.toString(),
     headers: { get: mockHeadersGet },
     json() {
       return Promise.resolve(body);
@@ -19,6 +20,7 @@ export function jsonNotOk(body: unknown) {
   const mockResponse = {
     ok: false,
     status: 422,
+    statusText: 422,
     headers: { get: mockHeadersGet },
     json() {
       return Promise.resolve(body);
@@ -32,7 +34,8 @@ export function jsonError(body: unknown, status = 500) {
   // Mock response object that satisfies the window.Response interface
   const mockResponse = {
     ok: false,
-    status: status,
+    status,
+    statusText: status.toString(),
     headers: { get: mockHeadersGet },
     json() {
       return Promise.resolve(body);

@@ -5,5 +5,10 @@ import { auth } from './auth';
 
 export async function currentUser(): Promise<User | null> {
   const { userId } = auth();
-  return userId ? clerkClient.users.getUser(userId) : null;
+  if (!userId) return null;
+
+  const { data, errors } = await clerkClient.users.getUser(userId);
+  if (errors) return null;
+
+  return data;
 }
