@@ -1,8 +1,8 @@
 import type { LoadedClerk } from '@clerk/types';
 import React from 'react';
 
-import { useCoreClerk } from '../../ui/contexts';
 import { pathFromFullPath, trimTrailingSlash } from '../../utils';
+import { useCoreClerk } from '../contexts';
 import { useNavigateToFlowStart } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';

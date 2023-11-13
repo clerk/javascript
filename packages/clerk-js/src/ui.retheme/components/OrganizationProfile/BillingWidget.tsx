@@ -1,6 +1,6 @@
-import { useRouter } from '../../../ui/router';
 import { runIfFunctionOrReturn } from '../../../utils';
 import { AlertIcon, Flex, Link, Text } from '../../customizables';
+import { useRouter } from '../../router';
 
 export const BillingWidget = ({
   __unstable_manageBillingUrl,

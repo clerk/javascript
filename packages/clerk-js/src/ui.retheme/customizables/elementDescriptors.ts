@@ -47,7 +47,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsProviderIcon',
 
   'enterpriseButtonsProviderIcon',
-
   'alternativeMethods',
   'alternativeMethodsBlockButton',
   'alternativeMethodsBlockButtonText',
