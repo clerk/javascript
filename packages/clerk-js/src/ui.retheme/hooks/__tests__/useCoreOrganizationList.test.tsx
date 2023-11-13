@@ -1,12 +1,13 @@
 import { describe } from '@jest/globals';
 
-import { act, bindCreateFixtures, renderHook, waitFor } from '../../../testUtils';
+import { act, renderHook, waitFor } from '../../../testUtils';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
   createFakeUserOrganizationSuggestion,
 } from '../../components/OrganizationSwitcher/__tests__/utlis';
 import { useCoreOrganizationList } from '../../contexts';
+import { bindCreateFixtures } from '../../utils/test/createFixtures';
 
 const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
@@ -33,7 +34,7 @@ describe('useOrganizationList', () => {
       });
     });
 
-    const { result } = renderHook(useCoreOrganizationList, { wrapper });
+    const { result } = renderHook(() => useCoreOrganizationList(), { wrapper });
 
     expect(result.current.isLoaded).toBe(true);
     expect(result.current.setActive).toBeDefined();

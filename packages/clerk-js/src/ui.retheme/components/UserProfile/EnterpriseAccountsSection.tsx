@@ -1,10 +1,10 @@
 import type { SamlAccountResource } from '@clerk/types';
 
-import { useRouter } from '../../../ui/router';
 import { useCoreUser } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
 import { useSaml } from '../../hooks';
+import { useRouter } from '../../router';
 import { UserProfileAccordion } from './UserProfileAccordion';
 
 export const EnterpriseAccountsSection = () => {

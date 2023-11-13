@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { render, screen } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignUpVerifyPhone } from '../SignUpVerifyPhone';
 
 const { createFixtures } = bindCreateFixtures('SignUp');

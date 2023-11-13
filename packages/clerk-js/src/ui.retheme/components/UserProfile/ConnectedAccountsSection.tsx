@@ -1,11 +1,11 @@
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 
-import { useRouter } from '../../../ui/router';
 import { appendModalState } from '../../../utils';
 import { useCoreUser, useUserProfileContext } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState, UserPreview } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
+import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { UserProfileAccordion } from './UserProfileAccordion';

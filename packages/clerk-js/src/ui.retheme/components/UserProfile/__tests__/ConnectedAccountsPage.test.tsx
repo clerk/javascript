@@ -2,7 +2,8 @@ import type { ExternalAccountResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { render, screen } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { ConnectedAccountsPage } from '../ConnectedAccountsPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

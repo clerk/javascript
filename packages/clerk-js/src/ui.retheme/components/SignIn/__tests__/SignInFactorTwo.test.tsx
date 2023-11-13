@@ -3,7 +3,9 @@ import type { SignInResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { bindCreateFixtures, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
+import { render, screen, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
