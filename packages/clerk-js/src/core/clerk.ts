@@ -173,7 +173,7 @@ export default class Clerk implements ClerkInterface {
   #devBrowserHandler: DevBrowserHandler | null = null;
   #environment?: EnvironmentResource | null;
   #fapiClient: FapiClient;
-  #telemetry: TelemetryCollector;
+  #telemetry?: TelemetryCollector;
   #instanceType: InstanceType;
   #isReady = false;
 
@@ -308,12 +308,6 @@ export default class Clerk implements ClerkInterface {
       this.#instanceType = instanceType;
     }
     this.#fapiClient = createFapiClient(this);
-    this.#telemetry = new TelemetryCollector({
-      clerkVersion: Clerk.version,
-      verbose: true,
-      samplingRate: 1,
-      publishableKey: key,
-    });
     BaseResource.clerk = this;
   }
 
@@ -330,6 +324,19 @@ export default class Clerk implements ClerkInterface {
       ...defaultOptions,
       ...options,
     };
+
+    if (this.#options.sdkMetadata) {
+      Clerk.sdkMetadata = this.#options.sdkMetadata;
+    }
+
+    this.#telemetry = new TelemetryCollector({
+      clerkVersion: Clerk.version,
+      verbose: true,
+      samplingRate: 1,
+      // @ts-expect-error -- in v5 this will always be defined
+      publishableKey: this.publishableKey,
+      ...this.#options.telemetry,
+    });
 
     if (this.#options.standardBrowser) {
       this.#isReady = await this.#loadInStandardBrowser();

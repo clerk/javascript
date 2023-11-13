@@ -56,6 +56,8 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     __afterSignUpUrl,
     __clerkJSUrl,
     __clerkJSVersion,
+    __telemetryDisabled,
+    __telemetryDebug,
   } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
@@ -77,6 +79,10 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     afterSignUpUrl: __afterSignUpUrl,
     clerkJSUrl: __clerkJSUrl,
     clerkJSVersion: __clerkJSVersion,
+    telemetry: {
+      disabled: __telemetryDisabled,
+      debug: __telemetryDebug,
+    },
   };
 
   return (

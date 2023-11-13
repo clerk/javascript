@@ -1,12 +1,25 @@
 import type { InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from './keys';
+import { isTruthy } from './underscore';
 
 type TelemetryCollectorOptions = {
+  /**
+   * If true, telemetry will not be collected.
+   */
+  disabled?: boolean;
+  /**
+   * If true, telemetry will not be sent, but collected events will be logged to the console.
+   */
+  debug?: boolean;
   /**
    * Sampling rate, 0-1
    */
   samplingRate?: number;
+  /**
+   * Set a custom buffer size to control how often events are sent
+   */
+  maxBufferSize?: number;
   /**
    * Determines whether or not events will be logged to the console.
    */
@@ -29,9 +42,11 @@ type TelemetryCollectorOptions = {
   sdkVersion?: string;
 };
 
-type TelemetryCollectorConfig = Pick<TelemetryCollectorOptions, 'samplingRate' | 'verbose'> & {
+type TelemetryCollectorConfig = Pick<
+  TelemetryCollectorOptions,
+  'samplingRate' | 'verbose' | 'disabled' | 'debug' | 'maxBufferSize'
+> & {
   endpoint: string;
-  maxBufferSize: number;
 };
 
 type TelemetryMetadata = Required<
@@ -83,9 +98,11 @@ export class TelemetryCollector {
 
   constructor(options: TelemetryCollectorOptions) {
     this.#config = {
-      ...DEFAULT_CONFIG,
-      samplingRate: options.samplingRate,
-      verbose: options.verbose,
+      maxBufferSize: options.maxBufferSize ?? DEFAULT_CONFIG.maxBufferSize,
+      samplingRate: options.samplingRate ?? DEFAULT_CONFIG.samplingRate,
+      verbose: options.verbose ?? DEFAULT_CONFIG.verbose,
+      disabled: options.disabled ?? false,
+      debug: options.debug ?? false,
     } as Required<TelemetryCollectorConfig>;
 
     if (!options.clerkVersion && typeof window === 'undefined') {
@@ -115,15 +132,20 @@ export class TelemetryCollector {
       return false;
     }
 
-    // TODO: check clerk environment / environment variable
+    // In browser or client environments, we most likely pass the disabled option to the collector, but in environments
+    // where environment variables are available we also check for `CLERK_TELEMETRY_DISABLED`.
+    if (this.#config.disabled || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DISABLED))) {
+      return false;
+    }
+
     return true;
   }
 
-  record(event: TelemetryEvent['event'], payload: TelemetryEvent['payload']) {
-    if (!this.isEnabled) {
-      return;
-    }
+  get isDebug(): boolean {
+    return this.#config.debug || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DEBUG));
+  }
 
+  record(event: TelemetryEvent['event'], payload: TelemetryEvent['payload']) {
     const preparedPayload = this.#preparePayload(event, payload);
 
     this.#logEvent(preparedPayload.event, preparedPayload);
@@ -138,7 +160,7 @@ export class TelemetryCollector {
   }
 
   #shouldRecord(): boolean {
-    return Math.random() <= this.#config.samplingRate;
+    return this.isEnabled && !this.isDebug && Math.random() <= this.#config.samplingRate;
   }
 
   #scheduleFlush(): void {
@@ -153,7 +175,7 @@ export class TelemetryCollector {
       // If the buffer is full, flush immediately to make sure we minimize the chance of event loss.
       // Cancel any pending flushes as we're going to flush immediately
       if (this.#pendingFlush) {
-        const cancel = cancelIdleCallback || clearTimeout;
+        const cancel = typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback : clearTimeout;
         cancel(this.#pendingFlush);
       }
       this.#flush();
@@ -186,7 +208,7 @@ export class TelemetryCollector {
         'Content-Type': 'application/json',
       },
     })
-      .catch(err => console.error(err))
+      .catch(() => void 0)
       .then(() => {
         this.#buffer = [];
       })
@@ -194,10 +216,10 @@ export class TelemetryCollector {
   }
 
   /**
-   * If running in verbose mode, log the event and its payload to the console.
+   * If running in debug mode, log the event and its payload to the console.
    */
   #logEvent(event: TelemetryEvent['event'], payload: Record<string, any>) {
-    if (!this.#config.verbose) {
+    if (!this.isDebug) {
       return;
     }
 
@@ -224,7 +246,7 @@ export class TelemetryCollector {
     // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
     if (typeof window !== 'undefined' && window.Clerk) {
       // @ts-expect-error -- The global window.Clerk type is declared in clerk-js, but we can't rely on that here
-      sdkMetadata = { ...sdkMetadata, ...window.Clerk.constructor.prototype.sdkMetadata };
+      sdkMetadata = { ...sdkMetadata, ...window.Clerk.constructor.sdkMetadata };
     }
 
     return sdkMetadata;
