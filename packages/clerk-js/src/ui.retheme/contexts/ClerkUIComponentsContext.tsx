@@ -241,6 +241,8 @@ export const useUserButtonContext = () => {
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
+  const userProfileMode = !!ctx.userProfileUrl && !ctx.userProfileMode ? 'navigation' : ctx.userProfileMode;
+
   return {
     ...ctx,
     componentName,
@@ -252,6 +254,7 @@ export const useUserButtonContext = () => {
     afterMultiSessionSingleSignOutUrl,
     afterSignOutUrl,
     afterSwitchSessionUrl,
+    userProfileMode: userProfileMode || 'modal',
   };
 };
 
@@ -310,11 +313,17 @@ export const useOrganizationSwitcherContext = () => {
 
   const navigateAfterSelectPersonal = (user: UserResource) => navigateAfterSelectOrganizationOrPersonal({ user });
 
+  const organizationProfileMode =
+    !!ctx.organizationProfileUrl && !ctx.organizationProfileMode ? 'navigation' : ctx.organizationProfileMode;
+
+  const createOrganizationMode =
+    !!ctx.createOrganizationUrl && !ctx.createOrganizationMode ? 'navigation' : ctx.createOrganizationMode;
+
   return {
     ...ctx,
     hidePersonal: ctx.hidePersonal || false,
-    organizationProfileMode: ctx.organizationProfileMode || 'modal',
-    createOrganizationMode: ctx.createOrganizationMode || 'modal',
+    organizationProfileMode: organizationProfileMode || 'modal',
+    createOrganizationMode: createOrganizationMode || 'modal',
     afterCreateOrganizationUrl,
     afterLeaveOrganizationUrl,
     navigateOrganizationProfile,
