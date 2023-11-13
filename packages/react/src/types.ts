@@ -23,7 +23,8 @@ declare global {
   }
 }
 
-export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite'> & {
+// TODO(@dimkl): Remove frontendApi when it's removed from ClerkOptions in @clerk/types
+export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite' | 'frontendApi'> & {
   Clerk?: ClerkProp;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';

@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+
 import fs from 'fs-extra';
 import { globby as glob } from 'globby';
 

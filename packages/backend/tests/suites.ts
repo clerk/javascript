@@ -4,6 +4,7 @@ import apiTest from './dist/api/factory.test.js';
 import factoryTest from './dist/api/factory.test.js';
 import exportsTest from './dist/exports.test.js';
 import redirectTest from './dist/redirections.test.js';
+import authObjectsTest from './dist/tokens/authObjects.test.js';
 import interstitialRequestTest from './dist/tokens/interstitial.test.js';
 import jwtAssertionsTest from './dist/tokens/jwt/assertions.test.js';
 import cryptoKeysTest from './dist/tokens/jwt/cryptoKeys.test.js';
@@ -19,6 +20,7 @@ import utilsTest from './dist/utils.test.js';
 // Add them to the suite array
 const suites = [
   apiTest,
+  authObjectsTest,
   exportsTest,
   jwtAssertionsTest,
   requestTest,

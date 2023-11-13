@@ -1,4 +1,4 @@
-import { deprecatedProperty, titleize } from '@clerk/shared';
+import { titleize } from '@clerk/shared';
 import type {
   ExternalAccountJSON,
   ExternalAccountResource,
@@ -19,10 +19,6 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   approvedScopes = '';
   firstName = '';
   lastName = '';
-  /**
-   * @deprecated  Use `imageUrl` instead.
-   */
-  avatarUrl = '';
   imageUrl = '';
   username = '';
   publicMetadata = {};
@@ -55,7 +51,6 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     this.identificationId = data.identification_id;
     this.providerUserId = data.provider_user_id;
     this.approvedScopes = data.approved_scopes;
-    this.avatarUrl = data.avatar_url;
     this.imageUrl = data.image_url;
     this.emailAddress = data.email_address;
     this.firstName = data.first_name;
@@ -84,5 +79,3 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     return this.username || this.emailAddress || this.label;
   }
 }
-
-deprecatedProperty(ExternalAccount, 'avatarUrl', 'Use `imageUrl` instead.');

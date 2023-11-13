@@ -1,12 +1,10 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
-  deprecated,
   handleValueOrFn,
   inBrowser as inClientSide,
   is4xxError,
   isHttpOrHttps,
-  isLegacyFrontendApiKey,
   isValidBrowserOnline,
   isValidProxyUrl,
   noop,
@@ -17,7 +15,6 @@ import {
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
-  BeforeEmitCallback,
   BuildUrlWithAuthParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
@@ -29,17 +26,13 @@ import type {
   EnvironmentJSON,
   EnvironmentResource,
   HandleEmailLinkVerificationParams,
-  HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
-  OrganizationInvitationResource,
   OrganizationListProps,
-  OrganizationMembershipResource,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
-  PublishableKey,
   RedirectOptions,
   Resources,
   SDKMetadata,
@@ -61,10 +54,10 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
-import { completeSignUpFlow } from '../ui/components/SignUp/util';
 import {
   appendAsQueryParams,
   buildURL,
+  completeSignUpFlow,
   createBeforeUnloadTracker,
   createCookieHandler,
   createPageLifecycle,
@@ -75,7 +68,6 @@ import {
   inActiveBrowserTab,
   inBrowser,
   isDevAccountPortalOrigin,
-  isDevOrStagingUrl,
   isError,
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
@@ -88,7 +80,6 @@ import {
   stripOrigin,
   stripSameOrigin,
   toURL,
-  validateFrontendApi,
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
@@ -113,10 +104,7 @@ import {
   EmailLinkError,
   EmailLinkErrorCode,
   Environment,
-  MagicLinkError,
-  MagicLinkErrorCode,
   Organization,
-  OrganizationMembership,
 } from './resources/internal';
 import { SessionCookieService } from './services';
 import { warnings } from './warnings';
@@ -159,11 +147,10 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public __internal_country?: string | null;
-  public readonly frontendApi: string;
-  public readonly publishableKey?: string;
 
   protected internal_last_error: ClerkAPIError | null = null;
 
+  #publishableKey: string = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService: SessionCookieService | null = null;
@@ -171,21 +158,19 @@ export default class Clerk implements ClerkInterface {
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   #devBrowserHandler: DevBrowserHandler | null = null;
   #environment?: EnvironmentResource | null;
+  //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
+  //@ts-expect-error with undefined even though it's not possible - related to issue with ts and error thrower
   #instanceType: InstanceType;
   #isReady = false;
 
-  /**
-   * @deprecated Although this being a private field, this is a reminder to drop it with the next major release
-   */
-  #lastOrganizationInvitation: OrganizationInvitationResource | null = null;
-  /**
-   * @deprecated Although this being a private field, this is a reminder to drop it with the next major release
-   */
-  #lastOrganizationMember: OrganizationMembershipResource | null = null;
   #listeners: Array<(emission: Resources) => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
+
+  get publishableKey(): string {
+    return this.#publishableKey;
+  }
 
   get version(): string {
     return Clerk.version;
@@ -224,6 +209,16 @@ export default class Clerk implements ClerkInterface {
     return '';
   }
 
+  get frontendApi(): string {
+    const publishableKey = parsePublishableKey(this.publishableKey);
+
+    if (!publishableKey) {
+      return errorThrower.throwInvalidPublishableKeyError({ key: this.publishableKey });
+    }
+
+    return publishableKey.frontendApi;
+  }
+
   get instanceType() {
     return this.#instanceType;
   }
@@ -232,79 +227,25 @@ export default class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  /**
-   * @deprecated This getter is no longer used internally and will be dropped in the next major version
-   */
-  get experimental_canUseCaptcha(): boolean | undefined {
-    deprecated('experimental_canUseCaptcha', 'This is will be dropped in the next major version');
-    if (this.#environment) {
-      return (
-        this.#environment.userSettings.signUp.captcha_enabled &&
-        this.#options.standardBrowser &&
-        this.#instanceType === 'production'
-      );
-    }
-
-    return false;
-  }
-
-  /**
-   * @deprecated This getter is no longer used internally and will be dropped in the next major version
-   */
-  get experimental_captchaSiteKey(): string | null {
-    deprecated('experimental_captchaSiteKey', 'This is will be dropped in the next major version');
-    if (this.#environment) {
-      return this.#environment.displayConfig.captchaPublicKey;
-    }
-
-    return null;
-  }
-
-  /**
-   * @deprecated This getter is no longer used internally and will be dropped in the next major version
-   */
-  get experimental_captchaURL(): string | null {
-    deprecated('experimental_captchaURL', 'This is will be dropped in the next major version');
-    if (this.#fapiClient) {
-      return this.#fapiClient
-        .buildUrl({
-          path: 'cloudflare/turnstile/v0/api.js',
-          pathPrefix: '',
-          search: '?render=explicit',
-        })
-        .toString();
-    }
-    return null;
-  }
-
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
     this.#domain = options?.domain;
     this.#proxyUrl = options?.proxyUrl;
 
-    if (isLegacyFrontendApiKey(key)) {
-      deprecated('frontendApi', 'Use `publishableKey` instead.');
-
-      if (!validateFrontendApi(key)) {
-        errorThrower.throwInvalidFrontendApiError({ key });
-      }
-
-      this.frontendApi = key;
-      this.#instanceType = isDevOrStagingUrl(this.frontendApi) ? 'development' : 'production';
-    } else {
-      const publishableKey = parsePublishableKey(key);
-
-      if (!publishableKey) {
-        errorThrower.throwInvalidPublishableKeyError({ key });
-      }
-
-      const { frontendApi, instanceType } = publishableKey as PublishableKey;
-
-      this.publishableKey = key;
-      this.frontendApi = frontendApi;
-      this.#instanceType = instanceType;
+    if (!key) {
+      return errorThrower.throwMissingPublishableKeyError();
     }
+
+    const publishableKey = parsePublishableKey(key);
+
+    if (!publishableKey) {
+      return errorThrower.throwInvalidPublishableKeyError({ key });
+    }
+
+    this.#publishableKey = key;
+    this.#instanceType = publishableKey.instanceType;
+
     this.#fapiClient = createFapiClient(this);
     BaseResource.clerk = this;
   }
@@ -669,17 +610,6 @@ export default class Clerk implements ClerkInterface {
     this.#resetComponentsState();
   };
 
-  /**
-   * @deprecated  Use `setActive` instead.
-   */
-  public setSession = async (
-    session: ActiveSessionResource | string | null,
-    beforeEmit?: BeforeEmitCallback,
-  ): Promise<void> => {
-    deprecated('setSession', 'Use `setActive` instead.', 'clerk:setSession');
-    return this.setActive({ session, beforeEmit });
-  };
-
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
     listener = memoizeListenerCallback(listener);
     this.#listeners.push(listener);
@@ -690,8 +620,6 @@ export default class Clerk implements ClerkInterface {
         session: this.session,
         user: this.user,
         organization: this.organization,
-        lastOrganizationInvitation: this.#lastOrganizationInvitation,
-        lastOrganizationMember: this.#lastOrganizationMember,
       });
     }
 
@@ -843,55 +771,6 @@ export default class Clerk implements ClerkInterface {
       return this.navigate(this.buildHomeUrl());
     }
     return;
-  };
-
-  /**
-   *
-   * @deprecated Use `handleEmailLinkVerification` instead.
-   */
-  public handleMagicLinkVerification = async (
-    params: HandleMagicLinkVerificationParams,
-    customNavigate?: (to: string) => Promise<unknown>,
-  ): Promise<unknown> => {
-    deprecated('handleMagicLinkVerification', 'Use `handleEmailLinkVerification` instead.');
-
-    if (!this.client) {
-      return;
-    }
-
-    const verificationStatus = getClerkQueryParam('__clerk_status');
-    if (verificationStatus === 'expired') {
-      throw new MagicLinkError(MagicLinkErrorCode.Expired);
-    } else if (verificationStatus !== 'verified') {
-      throw new MagicLinkError(MagicLinkErrorCode.Failed);
-    }
-
-    const newSessionId = getClerkQueryParam('__clerk_created_session');
-    const { signIn, signUp, sessions } = this.client;
-
-    const shouldCompleteOnThisDevice = sessions.some(s => s.id === newSessionId);
-    const shouldContinueOnThisDevice =
-      signIn.status === 'needs_second_factor' || signUp.status === 'missing_requirements';
-
-    const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
-
-    const redirectComplete = params.redirectUrlComplete ? () => navigate(params.redirectUrlComplete as string) : noop;
-    const redirectContinue = params.redirectUrl ? () => navigate(params.redirectUrl as string) : noop;
-
-    if (shouldCompleteOnThisDevice) {
-      return this.setActive({
-        session: newSessionId,
-        beforeEmit: redirectComplete,
-      });
-    } else if (shouldContinueOnThisDevice) {
-      return redirectContinue();
-    }
-
-    if (typeof params.onVerifiedOnOtherDevice === 'function') {
-      params.onVerifiedOnOtherDevice();
-    }
-    return null;
   };
 
   public handleEmailLinkVerification = async (
@@ -1179,14 +1058,6 @@ export default class Clerk implements ClerkInterface {
     return Organization.create({ name, slug });
   };
 
-  /**
-   * @deprecated use User.getOrganizationMemberships
-   */
-  public getOrganizationMemberships = async (): Promise<OrganizationMembership[]> => {
-    deprecated('getOrganizationMemberships', 'Use User.getOrganizationMemberships');
-    return await OrganizationMembership.retrieve();
-  };
-
   public getOrganization = async (organizationId: string): Promise<OrganizationResource> =>
     Organization.get(organizationId);
 
@@ -1229,32 +1100,6 @@ export default class Clerk implements ClerkInterface {
 
     this.#emit();
   };
-
-  /**
-   * @deprecated This method will be dropped in the next major release.
-   * This method is only used in another deprecated part: `invitationList` from useOrganization
-   */
-  __unstable__invitationUpdate(invitation: OrganizationInvitationResource) {
-    deprecated(
-      '__unstable__invitationUpdate',
-      'We are completely dropping this method as it was introduced for internal use only',
-    );
-    this.#lastOrganizationInvitation = invitation;
-    this.#emit();
-  }
-
-  /**
-   * @deprecated This method will be dropped in the next major release.
-   * This method is only used in another deprecated part: `membershipList` from useOrganization
-   */
-  __unstable__membershipUpdate(membership: OrganizationMembershipResource) {
-    deprecated(
-      '__unstable__membershipUpdate',
-      'We are completely dropping this method as it was introduced for internal use only',
-    );
-    this.#lastOrganizationMember = membership;
-    this.#emit();
-  }
 
   get __unstable__environment(): EnvironmentResource | null | undefined {
     return this.#environment;
@@ -1453,7 +1298,7 @@ export default class Clerk implements ClerkInterface {
 
         this.updateClient(client);
         // updateEnvironment should be called after updateClient
-        // because authService#setEnviroment depends on clerk.session that is being
+        // because authService#setEnvironment depends on clerk.session that is being
         // set in updateClient
         this.updateEnvironment(environment);
 
@@ -1555,8 +1400,6 @@ export default class Clerk implements ClerkInterface {
           session: this.session,
           user: this.user,
           organization: this.organization,
-          lastOrganizationInvitation: this.#lastOrganizationInvitation,
-          lastOrganizationMember: this.#lastOrganizationMember,
         });
       }
     }

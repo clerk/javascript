@@ -184,7 +184,7 @@ If you want to add or edit localizations (e.g. how a button text is translated t
 
 ## Publishing packages
 
-_Note: Only core maintainers can publish packages._
+_Note: Only Clerk employees can publish packages._
 
 For more information visit [publish documentation](https://github.com/clerk/javascript/blob/main/docs/PUBLISH.md).
 

@@ -10,8 +10,8 @@ describe('OrganizationMembership', () => {
       role: 'admin',
       organization: {
         id: 'test_org_id',
-        logo_url: 'https://path-to-logo.png',
-        image_url: 'https://clerk.com',
+        image_url:
+          'https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160',
         name: 'test_name',
         slug: 'test_slug',
         public_metadata: { public: 'metadata' },
@@ -31,8 +31,8 @@ describe('OrganizationMembership', () => {
         object: 'public_user_data',
         first_name: 'test_first_name',
         last_name: 'test_last_name',
-        profile_image_url: 'test_url',
-        image_url: 'https://clerk.com',
+        image_url:
+          ' https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLTmR2TUtFQzN5cUVpMVFjV0UzQjExbF9WUEVOWW5manlLMlVQd0tCSWw9czEwMDAtYyIsInMiOiJkRkowS3dTSkRINndiODE5cXJTUUxxaWF1ZS9QcHdndC84L0lUUlpYNHpnIn0?width=160',
         identifier: 'test@identifier.gr',
         id: 'test_user_id',
         has_image: true,

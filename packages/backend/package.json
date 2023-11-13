@@ -35,7 +35,7 @@
     "publish:local": "npx yalc push --replace --sig",
     "build:lib": "tsup --env.NODE_ENV production",
     "build:tests": "tsc -p tsconfig.test.json",
-    "build:runtime": "rsync -r --include '*/' --include '*.js' --include '*.mjs' --exclude='*' src/runtime dist",
+    "build:runtime": "cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime",
     "clean": "rimraf ./dist",
     "clean:tests": "rimraf ./tests/dist",
     "lint": "eslint src/",

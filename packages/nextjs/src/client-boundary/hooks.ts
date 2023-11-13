@@ -9,7 +9,6 @@ export {
   useEmailLink,
   useOrganization,
   useOrganizationList,
-  useOrganizations,
   useSession,
   useSessionList,
   useSignIn,

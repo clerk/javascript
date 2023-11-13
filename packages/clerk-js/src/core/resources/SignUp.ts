@@ -1,4 +1,4 @@
-import { deprecated, Poller } from '@clerk/shared';
+import { Poller } from '@clerk/shared';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,
@@ -7,7 +7,6 @@ import type {
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
   CreateEmailLinkFlowReturn,
-  CreateMagicLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
@@ -20,7 +19,6 @@ import type {
   SignUpStatus,
   SignUpUpdateParams,
   StartEmailLinkFlowParams,
-  StartMagicLinkFlowParams,
 } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getCaptchaToken, getMetamaskIdentifier, windowNavigate } from '../../utils';
@@ -29,7 +27,6 @@ import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { retrieveCaptchaInfo } from '../../utils/retrieveCaptchaInfo';
 import {
   clerkInvalidFAPIResponse,
-  clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
@@ -116,44 +113,6 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptVerification({ ...params, strategy: 'email_code' });
   };
 
-  /**
-   * @deprecated Use `createEmailLinkFlow` instead.
-   */
-  createMagicLinkFlow = (): CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource> => {
-    deprecated('createMagicLinkFlow', 'Use `createEmailLinkFlow` instead.');
-
-    const { run, stop } = Poller();
-
-    const startMagicLinkFlow = async ({ redirectUrl }: StartMagicLinkFlowParams): Promise<SignUpResource> => {
-      if (!this.id) {
-        clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
-      }
-      await this.prepareEmailAddressVerification({
-        strategy: 'email_link',
-        redirectUrl,
-      });
-
-      return new Promise((resolve, reject) => {
-        void run(() => {
-          return this.reload()
-            .then(res => {
-              const status = res.verifications.emailAddress.status;
-              if (status === 'verified' || status === 'expired') {
-                stop();
-                resolve(res);
-              }
-            })
-            .catch(err => {
-              stop();
-              reject(err);
-            });
-        });
-      });
-    };
-
-    return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
-  };
-
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, SignUpResource> => {
     const { run, stop } = Poller();
 
@@ -200,27 +159,8 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   attemptWeb3WalletVerification = async (params: AttemptWeb3WalletVerificationParams): Promise<SignUpResource> => {
-    const { signature, generateSignature } = params || {};
-
-    if (generateSignature) {
-      deprecated('generateSignature', 'Use signature field instead.');
-    }
-
-    if (signature) {
-      return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
-    }
-
-    if (!(typeof generateSignature === 'function')) {
-      clerkMissingOptionError('generateSignature');
-    }
-
-    const { nonce } = this.verifications.web3Wallet;
-    if (!nonce) {
-      clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
-    }
-
-    const generatedSignature = await generateSignature({ identifier: this.web3wallet!, nonce });
-    return this.attemptVerification({ signature: generatedSignature, strategy: 'web3_metamask_signature' });
+    const { signature } = params;
+    return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
   };
 
   public authenticateWithWeb3 = async (

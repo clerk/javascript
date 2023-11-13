@@ -1,22 +1,21 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { deprecated } from '@clerk/shared/deprecated';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
-  BeforeEmitCallback,
   Clerk,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
   HandleEmailLinkVerificationParams,
-  HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
   OrganizationListProps,
   OrganizationMembershipResource,
+  OrganizationProfileProps,
   OrganizationResource,
+  OrganizationSwitcherProps,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -30,7 +29,6 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types';
 
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
 import type {
@@ -41,7 +39,7 @@ import type {
   HeadlessBrowserClerkConstrutor,
   IsomorphicClerkOptions,
 } from './types';
-import { isConstructor, loadClerkJsScript } from './utils';
+import { errorThrower, isConstructor, loadClerkJsScript } from './utils';
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
@@ -59,7 +57,6 @@ type MethodCallback = () => Promise<unknown> | unknown;
 
 export default class IsomorphicClerk {
   private readonly mode: 'browser' | 'server';
-  private readonly frontendApi?: string;
   private readonly publishableKey?: string;
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
@@ -108,7 +105,7 @@ export default class IsomorphicClerk {
       return handleValueOrFn(this.#domain, new URL(window.location.href), '');
     }
     if (typeof this.#domain === 'function') {
-      throw new Error(unsupportedNonBrowserDomainOrProxyUrlFunction);
+      return errorThrower.throw(unsupportedNonBrowserDomainOrProxyUrlFunction);
     }
     return this.#domain || '';
   }
@@ -120,14 +117,13 @@ export default class IsomorphicClerk {
       return handleValueOrFn(this.#proxyUrl, new URL(window.location.href), '');
     }
     if (typeof this.#proxyUrl === 'function') {
-      throw new Error(unsupportedNonBrowserDomainOrProxyUrlFunction);
+      return errorThrower.throw(unsupportedNonBrowserDomainOrProxyUrlFunction);
     }
     return this.#proxyUrl || '';
   }
 
   constructor(options: IsomorphicClerkOptions) {
-    const { Clerk = null, frontendApi, publishableKey } = options || {};
-    this.frontendApi = frontendApi;
+    const { Clerk = null, publishableKey } = options || {};
     this.publishableKey = publishableKey;
     this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
@@ -153,7 +149,6 @@ export default class IsomorphicClerk {
     // - https://github.com/remix-run/remix/issues/2947
     // - https://github.com/facebook/react/issues/24430
     if (typeof window !== 'undefined') {
-      window.__clerk_frontend_api = this.frontendApi;
       window.__clerk_publishable_key = this.publishableKey;
       window.__clerk_proxy_url = this.proxyUrl;
       window.__clerk_domain = this.domain;
@@ -166,7 +161,7 @@ export default class IsomorphicClerk {
 
         if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
-          c = new this.Clerk(this.publishableKey || this.frontendApi || '', {
+          c = new this.Clerk(this.publishableKey || '', {
             proxyUrl: this.proxyUrl,
             domain: this.domain,
           } as any);
@@ -186,7 +181,6 @@ export default class IsomorphicClerk {
         if (!global.Clerk) {
           await loadClerkJsScript({
             ...this.options,
-            frontendApi: this.frontendApi,
             publishableKey: this.publishableKey,
             proxyUrl: this.proxyUrl,
             domain: this.domain,
@@ -355,11 +349,6 @@ export default class IsomorphicClerk {
     } else {
       return Promise.reject();
     }
-  };
-
-  setSession = (session: ActiveSessionResource | string | null, beforeEmit?: BeforeEmitCallback): Promise<void> => {
-    deprecated('setSession', 'Use `Clerk.setActive` instead');
-    return this.setActive({ session, beforeEmit });
   };
 
   openSignIn = (props?: SignInProps): void => {
@@ -669,18 +658,6 @@ export default class IsomorphicClerk {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
     }
   };
-  /**
-   * @deprecated Use `handleEmailLinkVerification` instead.
-   */
-  handleMagicLinkVerification = async (params: HandleMagicLinkVerificationParams): Promise<void> => {
-    deprecated('handleMagicLinkVerification', 'Use `handleEmailLinkVerification` instead.');
-    const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<void>;
-    } else {
-      this.premountMethodCalls.set('handleMagicLinkVerification', callback);
-    }
-  };
 
   handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams): Promise<void> => {
     const callback = () => this.clerkjs?.handleEmailLinkVerification(params);
@@ -706,15 +683,6 @@ export default class IsomorphicClerk {
       return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('createOrganization', callback);
-    }
-  };
-
-  getOrganizationMemberships = async (): Promise<OrganizationMembershipResource[] | void> => {
-    const callback = () => this.clerkjs?.getOrganizationMemberships();
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<OrganizationMembershipResource[]>;
-    } else {
-      this.premountMethodCalls.set('getOrganizationMemberships', callback);
     }
   };
 

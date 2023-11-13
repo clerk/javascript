@@ -1,4 +1,3 @@
-import { deprecated } from '@clerk/shared/deprecated';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React from 'react';
 
@@ -24,17 +23,11 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   const { isomorphicClerkOptions, initialState, children } = props;
   const { isomorphicClerk: clerk, loaded: clerkLoaded } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
 
-  if (isomorphicClerkOptions.frontendApi) {
-    deprecated('frontendApi', 'Use `publishableKey` instead.');
-  }
-
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
     session: clerk.session,
     user: clerk.user,
     organization: clerk.organization,
-    lastOrganizationInvitation: null,
-    lastOrganizationMember: null,
   });
 
   React.useEffect(() => {
@@ -45,19 +38,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
-  const {
-    sessionId,
-    session,
-    userId,
-    user,
-    orgId,
-    actor,
-    lastOrganizationInvitation,
-    lastOrganizationMember,
-    organization,
-    orgRole,
-    orgSlug,
-  } = derivedState;
+  const { sessionId, session, userId, user, orgId, actor, organization, orgRole, orgSlug } = derivedState;
 
   const authCtx = React.useMemo(() => {
     const value = { sessionId, userId, actor, orgId, orgRole, orgSlug };
@@ -68,11 +49,9 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   const organizationCtx = React.useMemo(() => {
     const value = {
       organization: organization,
-      lastOrganizationInvitation: lastOrganizationInvitation,
-      lastOrganizationMember: lastOrganizationMember,
     };
     return { value };
-  }, [orgId, organization, lastOrganizationInvitation, lastOrganizationMember]);
+  }, [orgId, organization]);
 
   return (
     // @ts-expect-error

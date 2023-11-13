@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const webpack = require('webpack');
 const packageJSON = require('./package.json');
 const path = require('path');
@@ -26,12 +25,17 @@ const variantToSourceFile = {
 
 /** @returns { import('webpack').Configuration } */
 const common = ({ mode }) => {
+  const uiRetheme = process.env.CLERK_RETHEME === '1' || process.env.CLERK_RETHEME === 'true';
+
   return {
     mode,
     resolve: {
       // Attempt to resolve these extensions in order
       // @see https://webpack.js.org/configuration/resolve/#resolveextensions
       extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
+      alias: {
+        ...(uiRetheme && { './ui': './ui.retheme' }),
+      },
     },
     plugins: [
       new webpack.DefinePlugin({
@@ -238,7 +242,8 @@ const devConfig = ({ mode, env }) => {
   const variant = env.variant || variants.clerkBrowser;
   // accept an optional devOrigin environment option to change the origin of the dev server.
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
-  const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
+  // const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
+  const devUrl = new URL(env.devOrigin || 'http://localhost:4000');
 
   const commonForDev = () => {
     return {

@@ -1,5 +1,6 @@
 export * from './api';
 export * from './appearance';
+export * from './elementIds';
 export * from './attributes';
 export * from './authConfig';
 export * from './backupCode';

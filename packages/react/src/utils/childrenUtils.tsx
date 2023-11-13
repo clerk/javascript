@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { multipleChildrenInButtonComponent } from '../errors';
+import { errorThrower } from './errorThrower';
 
 export const assertSingleChild =
   (children: React.ReactNode) =>
@@ -8,7 +9,7 @@ export const assertSingleChild =
     try {
       return React.Children.only(children);
     } catch (e) {
-      throw new Error(multipleChildrenInButtonComponent(name));
+      return errorThrower.throw(multipleChildrenInButtonComponent(name));
     }
   };
 
