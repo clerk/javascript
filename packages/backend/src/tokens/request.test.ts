@@ -622,7 +622,6 @@ export default (QUnit: QUnit) => {
       origin: '',
       host: '',
       forwardedHost: '',
-      forwardedPort: '',
       forwardedProto: '',
       referrer: '',
       userAgent: '',
@@ -635,7 +634,6 @@ export default (QUnit: QUnit) => {
       assert.propEqual(loadOptionsFromHeaders(headers), {
         ...defaultOptions,
         forwardedProto: 'http',
-        forwardedPort: '80',
         forwardedHost: 'example.com',
       });
     });
@@ -652,7 +650,6 @@ export default (QUnit: QUnit) => {
       assert.propEqual(loadOptionsFromHeaders(headers), {
         ...defaultOptions,
         forwardedProto: 'https',
-        forwardedPort: '80',
         forwardedHost: 'example.com',
       });
     });

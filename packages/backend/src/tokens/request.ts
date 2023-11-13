@@ -152,7 +152,6 @@ export const loadOptionsFromHeaders = (headers: ReturnType<typeof buildRequest>[
     origin: headers(constants.Headers.Origin),
     host: headers(constants.Headers.Host),
     forwardedHost: headers(constants.Headers.ForwardedHost),
-    forwardedPort: headers(constants.Headers.ForwardedPort),
     forwardedProto: headers(constants.Headers.CloudFrontForwardedProto) || headers(constants.Headers.ForwardedProto),
     referrer: headers(constants.Headers.Referrer),
     userAgent: headers(constants.Headers.UserAgent),
