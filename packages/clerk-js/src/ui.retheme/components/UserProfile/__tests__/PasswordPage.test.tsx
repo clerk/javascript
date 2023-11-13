@@ -79,7 +79,7 @@ describe('PasswordPage', () => {
 
       expect(screen.getByLabelText(/new password/i)).toBeDisabled();
       expect(screen.getByLabelText(/confirm password/i)).toBeDisabled();
-      expect(screen.getByRole('checkbox', { name: 'Sign out of all other devices' })).toBeDisabled();
+      expect(screen.getByRole('checkbox', { name: /sign out of all other devices/i })).toBeDisabled();
 
       expect(
         screen.getByText(
@@ -113,7 +113,7 @@ describe('PasswordPage', () => {
 
       expect(screen.getByLabelText(/new password/i)).not.toBeDisabled();
       expect(screen.getByLabelText(/confirm password/i)).not.toBeDisabled();
-      expect(screen.getByRole('checkbox', { name: 'Sign out of all other devices' })).not.toBeDisabled();
+      expect(screen.getByRole('checkbox', { name: /sign out of all other devices/i })).not.toBeDisabled();
 
       expect(
         screen.queryByText(
@@ -149,7 +149,7 @@ describe('PasswordPage', () => {
       expect(screen.getByLabelText(/current password/i)).toBeDisabled();
       expect(screen.getByLabelText(/new password/i)).toBeDisabled();
       expect(screen.getByLabelText(/confirm password/i)).toBeDisabled();
-      expect(screen.getByRole('checkbox', { name: 'Sign out of all other devices' })).toBeDisabled();
+      expect(screen.getByRole('checkbox', { name: /sign out of all other devices/i })).toBeDisabled();
 
       expect(
         screen.getByText(
@@ -185,7 +185,7 @@ describe('PasswordPage', () => {
       expect(screen.getByLabelText(/current password/i)).not.toBeDisabled();
       expect(screen.getByLabelText(/new password/i)).not.toBeDisabled();
       expect(screen.getByLabelText(/confirm password/i)).not.toBeDisabled();
-      expect(screen.getByRole('checkbox', { name: 'Sign out of all other devices' })).not.toBeDisabled();
+      expect(screen.getByRole('checkbox', { name: /sign out of all other devices/i })).not.toBeDisabled();
 
       expect(
         screen.queryByText(

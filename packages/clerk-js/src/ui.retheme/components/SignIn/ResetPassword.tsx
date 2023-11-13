@@ -88,7 +88,7 @@ export const _ResetPassword = () => {
           return console.error(clerkInvalidFAPIResponse(status, supportEmail));
       }
     } catch (e) {
-      handleError(e, [passwordField, confirmField], card.setError);
+      return handleError(e, [passwordField, confirmField], card.setError);
     }
   };
 
@@ -117,14 +117,14 @@ export const _ResetPassword = () => {
             style={{ display: 'none' }}
           />
           <Form.ControlRow elementId={passwordField.id}>
-            <Form.Control
+            <Form.PasswordInput
               {...passwordField.props}
-              required
+              isRequired
               autoFocus
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={confirmField.id}>
-            <Form.Control
+            <Form.PasswordInput
               {...confirmField.props}
               onChange={e => {
                 if (e.target.value) {
@@ -136,7 +136,7 @@ export const _ResetPassword = () => {
           </Form.ControlRow>
           {!requiresNewPassword && (
             <Form.ControlRow elementId={sessionsField.id}>
-              <Form.Control {...sessionsField.props} />
+              <Form.Checkbox {...sessionsField.props} />
             </Form.ControlRow>
           )}
           <Form.SubmitButton
