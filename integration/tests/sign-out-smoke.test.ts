@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
@@ -43,6 +43,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
       await m.po.expect.toBeSignedOut();
     });
 
-    expect(await mainTab.page.evaluate('!window.Clerk.user')).toBe(false);
+    await mainTab.po.expect.toBeSignedOut();
   });
 });
