@@ -92,7 +92,6 @@ type RequestStateParams = {
   domain?: string;
   isSatellite?: boolean;
   proxyUrl?: string;
-  searchParams?: URLSearchParams;
   signInUrl?: string;
   signUpUrl?: string;
   afterSignInUrl?: string;

@@ -1,11 +1,12 @@
-import { API_URL, API_VERSION, constants } from '../constants';
+import { constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { isDevelopmentFromApiKey } from '../util/shared';
-import type { LoadResourcesOptions, RequestState } from './authStatus';
+import type { AuthStatusOptionsType, LoadResourcesOptions, RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
+import type { InterstitialRuleOptions } from './interstitialRule';
 import {
   crossOriginRequestWithoutHeader,
   hasPositiveClientUatButCookieIsMissing,
@@ -21,7 +22,6 @@ import {
   runInterstitialRules,
 } from './interstitialRule';
 import type { VerifyTokenOptions } from './verify';
-
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
     VerifyTokenOptions,
@@ -29,42 +29,7 @@ export type OptionalVerifyTokenOptions = Partial<
   >
 >;
 
-export type AuthenticateRequestOptions = OptionalVerifyTokenOptions &
-  LoadResourcesOptions & {
-    publishableKey?: string;
-    secretKey?: string;
-    apiVersion?: string;
-    apiUrl?: string;
-    /* Client token cookie value */
-    cookieToken?: string;
-    /* Client uat cookie value */
-    clientUat?: string;
-    /* Client token header value */
-    headerToken?: string;
-    /* Request origin header value */
-    origin?: string;
-    /* Request host header value */
-    host?: string;
-    /* Request forwarded host value */
-    forwardedHost?: string;
-    /* Request forwarded port value */
-    forwardedPort?: string;
-    /* Request forwarded proto value */
-    forwardedProto?: string;
-    /* Request referrer */
-    referrer?: string;
-    /* Request user-agent value */
-    userAgent?: string;
-    domain?: string;
-    isSatellite?: boolean;
-    proxyUrl?: string;
-    searchParams?: URLSearchParams;
-    signInUrl?: string;
-    signUpUrl?: string;
-    afterSignInUrl?: string;
-    afterSignUpUrl?: string;
-    request?: Request;
-  };
+export type AuthenticateRequestOptions = AuthStatusOptionsType & OptionalVerifyTokenOptions & { request: Request };
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
   if (!signInUrl && isDevelopmentFromApiKey(key)) {
@@ -94,29 +59,26 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   const { cookies, headers, searchParams } = buildRequest(options?.request);
 
-  options = {
+  const ruleOptions = {
     ...options,
-    ...loadOptionsFromHeaders(options, headers),
-    apiUrl: options.apiUrl || API_URL,
-    apiVersion: options.apiVersion || API_VERSION,
-    cookieToken: options.cookieToken || cookies?.(constants.Cookies.Session),
-    clientUat: options.clientUat || cookies?.(constants.Cookies.ClientUat),
-    searchParams: options.searchParams || searchParams || undefined,
-  };
+    ...loadOptionsFromHeaders(headers),
+    ...loadOptionsFromCookies(cookies),
+    searchParams,
+  } satisfies InterstitialRuleOptions;
 
-  assertValidSecretKey(options.secretKey);
+  assertValidSecretKey(ruleOptions.secretKey);
 
-  if (options.isSatellite) {
-    assertSignInUrlExists(options.signInUrl, options.secretKey);
-    if (options.signInUrl && options.origin /* could this actually be undefined? */) {
-      assertSignInUrlFormatAndOrigin(options.signInUrl, options.origin);
+  if (ruleOptions.isSatellite) {
+    assertSignInUrlExists(ruleOptions.signInUrl, ruleOptions.secretKey);
+    if (ruleOptions.signInUrl && ruleOptions.origin) {
+      assertSignInUrlFormatAndOrigin(ruleOptions.signInUrl, ruleOptions.origin);
     }
-    assertProxyUrlOrDomain(options.proxyUrl || options.domain);
+    assertProxyUrlOrDomain(ruleOptions.proxyUrl || ruleOptions.domain);
   }
 
   async function authenticateRequestWithTokenInHeader() {
     try {
-      const state = await runInterstitialRules(options, [hasValidHeaderToken]);
+      const state = await runInterstitialRules(ruleOptions, [hasValidHeaderToken]);
       return state;
     } catch (err) {
       return handleError(err, 'header');
@@ -125,7 +87,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
   async function authenticateRequestWithTokenInCookie() {
     try {
-      const state = await runInterstitialRules(options, [
+      const state = await runInterstitialRules(ruleOptions, [
         crossOriginRequestWithoutHeader,
         nonBrowserRequestInDevRule,
         isSatelliteAndNeedsSyncing,
@@ -155,16 +117,16 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
       if (reasonToReturnInterstitial) {
         if (tokenCarrier === 'header') {
-          return unknownState(options, err.reason, err.getFullMessage());
+          return unknownState(ruleOptions, err.reason, err.getFullMessage());
         }
-        return interstitial(options, err.reason, err.getFullMessage());
+        return interstitial(ruleOptions, err.reason, err.getFullMessage());
       }
-      return signedOut(options, err.reason, err.getFullMessage());
+      return signedOut(ruleOptions, err.reason, err.getFullMessage());
     }
-    return signedOut(options, AuthErrorReason.UnexpectedError, (err as Error).message);
+    return signedOut(ruleOptions, AuthErrorReason.UnexpectedError, (err as Error).message);
   }
 
-  if (options.headerToken) {
+  if (ruleOptions.headerToken) {
     return authenticateRequestWithTokenInHeader();
   }
   return authenticateRequestWithTokenInCookie();
@@ -178,27 +140,35 @@ export const debugRequestState = (params: RequestState) => {
 export type DebugRequestSate = ReturnType<typeof debugRequestState>;
 
 /**
- * Load authenticate request options from the options provided or fallback to headers.
+ * Load authenticate request options related to headers.
  */
-export const loadOptionsFromHeaders = (
-  options: AuthenticateRequestOptions,
-  headers: ReturnType<typeof buildRequest>['headers'],
-) => {
+export const loadOptionsFromHeaders = (headers: ReturnType<typeof buildRequest>['headers']) => {
   if (!headers) {
     return {};
   }
 
   return {
-    headerToken: stripAuthorizationHeader(options.headerToken || headers(constants.Headers.Authorization)),
-    origin: options.origin || headers(constants.Headers.Origin),
-    host: options.host || headers(constants.Headers.Host),
-    forwardedHost: options.forwardedHost || headers(constants.Headers.ForwardedHost),
-    forwardedPort: options.forwardedPort || headers(constants.Headers.ForwardedPort),
-    forwardedProto:
-      options.forwardedProto ||
-      headers(constants.Headers.CloudFrontForwardedProto) ||
-      headers(constants.Headers.ForwardedProto),
-    referrer: options.referrer || headers(constants.Headers.Referrer),
-    userAgent: options.userAgent || headers(constants.Headers.UserAgent),
+    headerToken: stripAuthorizationHeader(headers(constants.Headers.Authorization)),
+    origin: headers(constants.Headers.Origin),
+    host: headers(constants.Headers.Host),
+    forwardedHost: headers(constants.Headers.ForwardedHost),
+    forwardedPort: headers(constants.Headers.ForwardedPort),
+    forwardedProto: headers(constants.Headers.CloudFrontForwardedProto) || headers(constants.Headers.ForwardedProto),
+    referrer: headers(constants.Headers.Referrer),
+    userAgent: headers(constants.Headers.UserAgent),
+  };
+};
+
+/**
+ * Load authenticate request options related to cookies.
+ */
+export const loadOptionsFromCookies = (cookies: ReturnType<typeof buildRequest>['cookies']) => {
+  if (!cookies) {
+    return {};
+  }
+
+  return {
+    cookieToken: cookies?.(constants.Cookies.Session),
+    clientUat: cookies?.(constants.Cookies.ClientUat),
   };
 };

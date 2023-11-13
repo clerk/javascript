@@ -4,7 +4,7 @@ import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
 import { verifyToken } from './verify';
 
-type InterstitialRuleOptions = AuthStatusOptionsType & {
+export type InterstitialRuleOptions = AuthStatusOptionsType & {
   /* Request origin header value */
   origin?: string;
   /* Request host header value */
@@ -23,6 +23,8 @@ type InterstitialRuleOptions = AuthStatusOptionsType & {
   clientUat?: string;
   /* Client token header value */
   headerToken?: string;
+  /* Request search params value */
+  searchParams?: URLSearchParams;
 };
 
 type InterstitialRuleResult = RequestState | undefined;
