@@ -41,7 +41,6 @@ exports[`public exports should not include a breaking change 1`] = `
   "useEmailLink",
   "useOrganization",
   "useOrganizationList",
-  "useOrganizations",
   "useSession",
   "useSessionList",
   "useSignIn",

@@ -39,7 +39,7 @@ import type {
   HeadlessBrowserClerkConstrutor,
   IsomorphicClerkOptions,
 } from './types';
-import { isConstructor, loadClerkJsScript } from './utils';
+import { errorThrower, isConstructor, loadClerkJsScript } from './utils';
 
 const SDK_METADATA = { name: PACKAGE_NAME, version: PACKAGE_VERSION };
 
@@ -107,7 +107,7 @@ export default class IsomorphicClerk {
       return handleValueOrFn(this.#domain, new URL(window.location.href), '');
     }
     if (typeof this.#domain === 'function') {
-      throw new Error(unsupportedNonBrowserDomainOrProxyUrlFunction);
+      return errorThrower.throw(unsupportedNonBrowserDomainOrProxyUrlFunction);
     }
     return this.#domain || '';
   }
@@ -119,7 +119,7 @@ export default class IsomorphicClerk {
       return handleValueOrFn(this.#proxyUrl, new URL(window.location.href), '');
     }
     if (typeof this.#proxyUrl === 'function') {
-      throw new Error(unsupportedNonBrowserDomainOrProxyUrlFunction);
+      return errorThrower.throw(unsupportedNonBrowserDomainOrProxyUrlFunction);
     }
     return this.#proxyUrl || '';
   }
@@ -689,15 +689,6 @@ export default class IsomorphicClerk {
       return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('createOrganization', callback);
-    }
-  };
-
-  getOrganizationMemberships = async (): Promise<OrganizationMembershipResource[] | void> => {
-    const callback = () => this.clerkjs?.getOrganizationMemberships();
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<OrganizationMembershipResource[]>;
-    } else {
-      this.premountMethodCalls.set('getOrganizationMemberships', callback);
     }
   };
 

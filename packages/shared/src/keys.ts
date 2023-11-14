@@ -31,7 +31,7 @@ export function parsePublishableKey(key: string | undefined): PublishableKey | n
   if (!frontendApi.endsWith('$')) {
     return null;
   }
-
+  // TODO(@dimkl): validate packages/clerk-js/src/utils/instance.ts
   frontendApi = frontendApi.slice(0, -1);
 
   return {

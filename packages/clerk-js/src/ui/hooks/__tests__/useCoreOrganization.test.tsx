@@ -57,9 +57,6 @@ describe('useOrganization', () => {
       }),
     );
 
-    expect(result.current.invitationList).not.toBeDefined();
-    expect(result.current.membershipList).not.toBeDefined();
-
     expect(result.current.memberships).toEqual(expect.objectContaining(undefinedPaginatedResource));
     expect(result.current.domains).toEqual(expect.objectContaining(undefinedPaginatedResource));
     expect(result.current.membershipRequests).toEqual(expect.objectContaining(undefinedPaginatedResource));
@@ -77,9 +74,6 @@ describe('useOrganization', () => {
 
     expect(result.current.isLoaded).toBe(true);
     expect(result.current.organization).toBeNull();
-
-    expect(result.current.invitationList).toBeNull();
-    expect(result.current.membershipList).toBeNull();
 
     expect(result.current.memberships).toBeNull();
     expect(result.current.domains).toBeNull();

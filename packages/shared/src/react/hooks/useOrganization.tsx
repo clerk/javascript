@@ -1,12 +1,9 @@
 import type {
   ClerkPaginatedResponse,
-  ClerkPaginationParams,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
-  GetMembershipsParams,
   GetMembersParams,
-  GetPendingInvitationsParams,
   OrganizationDomainResource,
   OrganizationInvitationResource,
   OrganizationMembershipRequestResource,
@@ -14,21 +11,11 @@ import type {
   OrganizationResource,
 } from '@clerk/types';
 
-import { deprecated } from '../../deprecated';
-import { useSWR } from '../clerk-swr';
 import { useClerkInstanceContext, useOrganizationContext, useSessionContext } from '../contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationParams = {
-  /**
-   * @deprecated Use `invitations` instead
-   */
-  invitationList?: GetPendingInvitationsParams;
-  /**
-   * @deprecated Use `memberships` instead
-   */
-  membershipList?: GetMembershipsParams;
   domains?:
     | true
     | (GetDomainsParams & {
@@ -62,14 +49,6 @@ type UseOrganization = <T extends UseOrganizationParams>(
   | {
       isLoaded: false;
       organization: undefined;
-      /**
-       * @deprecated Use `invitations` instead
-       */
-      invitationList: undefined;
-      /**
-       * @deprecated Use `memberships` instead
-       */
-      membershipList: undefined;
       membership: undefined;
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
@@ -79,14 +58,6 @@ type UseOrganization = <T extends UseOrganizationParams>(
   | {
       isLoaded: true;
       organization: OrganizationResource;
-      /**
-       * @deprecated Use `invitations` instead
-       */
-      invitationList: undefined;
-      /**
-       * @deprecated Use `memberships` instead
-       */
-      membershipList: undefined;
       membership: undefined;
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
@@ -96,14 +67,6 @@ type UseOrganization = <T extends UseOrganizationParams>(
   | {
       isLoaded: boolean;
       organization: OrganizationResource | null;
-      /**
-       * @deprecated Use `invitations` instead
-       */
-      invitationList: OrganizationInvitationResource[] | null | undefined;
-      /**
-       * @deprecated Use `memberships` instead
-       */
-      membershipList: OrganizationMembershipResource[] | null | undefined;
       membership: OrganizationMembershipResource | null | undefined;
       domains: PaginatedResources<
         OrganizationDomainResource,
@@ -142,14 +105,12 @@ const undefinedPaginatedResource = {
 
 export const useOrganization: UseOrganization = params => {
   const {
-    invitationList: invitationListParams,
-    membershipList: membershipListParams,
     domains: domainListParams,
     membershipRequests: membershipRequestsListParams,
     memberships: membersListParams,
     invitations: invitationsListParams,
   } = params || {};
-  const { organization, lastOrganizationMember, lastOrganizationInvitation } = useOrganizationContext();
+  const { organization } = useOrganizationContext();
   const session = useSessionContext();
 
   const domainSafeValues = useWithSafeValues(domainListParams, {
@@ -185,8 +146,6 @@ export const useOrganization: UseOrganization = params => {
   });
 
   const clerk = useClerkInstanceContext();
-
-  const shouldFetch = !!(clerk.loaded && session && organization);
 
   const domainParams =
     typeof domainListParams === 'undefined'
@@ -260,11 +219,8 @@ export const useOrganization: UseOrganization = params => {
   );
 
   const memberships = usePagesOrInfinite<GetMembersParams, ClerkPaginatedResponse<OrganizationMembershipResource>>(
-    {
-      ...membersParams,
-      paginated: true,
-    } as any,
-    organization?.getMemberships as unknown as any,
+    membersParams || {},
+    organization?.getMemberships,
     {
       keepPreviousData: membersSafeValues.keepPreviousData,
       infinite: membersSafeValues.infinite,
@@ -292,52 +248,10 @@ export const useOrganization: UseOrganization = params => {
     },
   );
 
-  // Some gymnastics to adhere to the rules of hooks
-  // We need to make sure useSWR is called on every render
-  const pendingInvitations = !clerk.loaded
-    ? () => [] as OrganizationInvitationResource[]
-    : () => clerk.organization?.getPendingInvitations(invitationListParams);
-
-  const currentOrganizationMemberships = !clerk.loaded
-    ? () => [] as OrganizationMembershipResource[]
-    : () => clerk.organization?.getMemberships(membershipListParams);
-
-  if (invitationListParams) {
-    deprecated('invitationList in useOrganization', 'Use the `invitations` property and return value instead.');
-  }
-
-  const {
-    data: invitationList,
-    isValidating: isInvitationsLoading,
-    mutate: mutateInvitationList,
-  } = useSWR(
-    shouldFetch && invitationListParams
-      ? cacheKey('invites', organization, lastOrganizationInvitation, invitationListParams)
-      : null,
-    pendingInvitations,
-  );
-
-  if (membershipListParams) {
-    deprecated('membershipList in useOrganization', 'Use the `memberships` property and return value instead.');
-  }
-
-  const {
-    data: membershipList,
-    isValidating: isMembershipsLoading,
-    mutate: mutateMembershipList,
-  } = useSWR(
-    shouldFetch && membershipListParams
-      ? cacheKey('memberships', organization, lastOrganizationMember, membershipListParams)
-      : null,
-    currentOrganizationMemberships,
-  );
-
   if (organization === undefined) {
     return {
       isLoaded: false,
       organization: undefined,
-      invitationList: undefined,
-      membershipList: undefined,
       membership: undefined,
       domains: undefinedPaginatedResource,
       membershipRequests: undefinedPaginatedResource,
@@ -350,8 +264,6 @@ export const useOrganization: UseOrganization = params => {
     return {
       isLoaded: true,
       organization: null,
-      invitationList: null,
-      membershipList: null,
       membership: null,
       domains: null,
       membershipRequests: null,
@@ -365,8 +277,6 @@ export const useOrganization: UseOrganization = params => {
     return {
       isLoaded: true,
       organization,
-      invitationList: undefined,
-      membershipList: undefined,
       membership: undefined,
       domains: undefinedPaginatedResource,
       membershipRequests: undefinedPaginatedResource,
@@ -376,15 +286,9 @@ export const useOrganization: UseOrganization = params => {
   }
 
   return {
-    isLoaded: !isMembershipsLoading && !isInvitationsLoading,
+    isLoaded: clerk.loaded,
     organization,
-    membershipList,
     membership: getCurrentOrganizationMembership(session!.user.organizationMemberships, organization.id), // your membership in the current org
-    invitationList,
-    unstable__mutate: () => {
-      void mutateMembershipList();
-      void mutateInvitationList();
-    },
     domains,
     membershipRequests,
     memberships,
@@ -399,15 +303,4 @@ function getCurrentOrganizationMembership(
   return organizationMemberships.find(
     organizationMembership => organizationMembership.organization.id === activeOrganizationId,
   );
-}
-
-function cacheKey(
-  type: 'memberships' | 'invites',
-  organization: OrganizationResource,
-  resource: OrganizationInvitationResource | OrganizationMembershipResource | null | undefined,
-  pagination: ClerkPaginationParams,
-) {
-  return [type, organization.id, resource?.id, resource?.updatedAt, pagination.offset, pagination.limit]
-    .filter(Boolean)
-    .join('-');
 }

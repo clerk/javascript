@@ -25,29 +25,14 @@ const [SessionContext, useSessionContext] = createContextAndHook<ActiveSessionRe
 
 type OrganizationContextProps = {
   organization: OrganizationResource | null | undefined;
-
-  /**
-   * @deprecated This property will be dropped in the next major release.
-   * This property is only used in another deprecated part: `invitationList` from useOrganization
-   */
-  lastOrganizationInvitation: OrganizationInvitationResource | null | undefined;
-  /**
-   * @deprecated This property will be dropped in the next major release.
-   * This property is only used in another deprecated part: `membershipList` from useOrganization
-   */
-  lastOrganizationMember: OrganizationMembershipResource | null | undefined;
 };
 const [OrganizationContextInternal, useOrganizationContext] = createContextAndHook<{
   organization: OrganizationResource | null | undefined;
-  lastOrganizationInvitation: OrganizationInvitationResource | null | undefined;
-  lastOrganizationMember: OrganizationMembershipResource | null | undefined;
 }>('OrganizationContext');
 
 const OrganizationProvider = ({
   children,
   organization,
-  lastOrganizationMember,
-  lastOrganizationInvitation,
   swrConfig,
 }: PropsWithChildren<
   OrganizationContextProps & {
@@ -59,11 +44,7 @@ const OrganizationProvider = ({
     <SWRConfig value={swrConfig}>
       <OrganizationContextInternal.Provider
         value={{
-          value: {
-            organization,
-            lastOrganizationMember,
-            lastOrganizationInvitation,
-          },
+          value: { organization },
         }}
       >
         {children}

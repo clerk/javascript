@@ -1,4 +1,3 @@
-import { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
@@ -74,10 +73,6 @@ export class User extends BaseResource implements UserResource {
   primaryPhoneNumber: PhoneNumberResource | null = null;
   primaryWeb3WalletId: string | null = null;
   primaryWeb3Wallet: Web3WalletResource | null = null;
-  /**
-   * @deprecated  Use `imageUrl` instead.
-   */
-  profileImageUrl = '';
   imageUrl = '';
   hasImage = false;
   twoFactorEnabled = false;
@@ -150,10 +145,7 @@ export class User extends BaseResource implements UserResource {
   };
 
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
-    const { strategy, redirectUrl, additionalScopes, redirect_url } = params || {};
-    if (redirect_url) {
-      deprecated('redirect_url', 'Use `redirectUrl` instead.');
-    }
+    const { strategy, redirectUrl, additionalScopes } = params || {};
 
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
@@ -161,7 +153,7 @@ export class User extends BaseResource implements UserResource {
         method: 'POST',
         body: {
           strategy,
-          redirect_url: redirectUrl || redirect_url,
+          redirect_url: redirectUrl,
           additional_scope: additionalScopes,
         } as any,
       })
@@ -216,12 +208,6 @@ export class User extends BaseResource implements UserResource {
   };
 
   update = (params: UpdateUserParams): Promise<UserResource> => {
-    if (params.password) {
-      deprecated(
-        'password',
-        'This will be removed in the next major version. Please use `updatePassword(params)` instead.',
-      );
-    }
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });
@@ -316,7 +302,6 @@ export class User extends BaseResource implements UserResource {
       this.fullName = getFullName({ firstName: this.firstName, lastName: this.lastName });
     }
 
-    this.profileImageUrl = data.profile_image_url;
     this.imageUrl = data.image_url;
     this.hasImage = data.has_image;
     this.username = data.username;
@@ -365,5 +350,3 @@ export class User extends BaseResource implements UserResource {
     return this;
   }
 }
-
-deprecatedProperty(User, 'profileImageUrl', 'Use `imageUrl` instead.');

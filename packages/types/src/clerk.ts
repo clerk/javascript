@@ -15,11 +15,10 @@ import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
-import type { OrganizationInvitationResource } from './organizationInvitation';
-import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
+import type { MembershipRole } from './organizationMembership';
 import type { ActiveSessionResource } from './session';
 import type { UserResource } from './user';
-import type { DeepPartial, DeepSnakeToCamel } from './utils';
+import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 
 export type InstanceType = 'production' | 'development';
 
@@ -70,14 +69,10 @@ export interface Clerk {
 
   loaded: boolean;
 
-  /**
-   * Clerk Frontend API string
-   * @deprecated Use `publishableKey` instead.
-   */
   frontendApi: string;
 
   /** Clerk Publishable Key string. */
-  publishableKey?: string;
+  publishableKey: string;
 
   /** Clerk Proxy url string. */
   proxyUrl?: string;
@@ -307,14 +302,6 @@ export interface Clerk {
   setActive: SetActive;
 
   /**
-   * @deprecated This method is deprecated and will be removed in the future. Use {@link Clerk.setActive} instead
-   * Set the current session explicitly. Setting the session to `null` unsets the active session and signs out the user.
-   * @param session Passed session resource object, session id (string version) or null
-   * @param beforeEmit Callback run just before the active session is set to the passed object. Can be used to hook up for pre-navigation actions.
-   */
-  setSession: SetSession;
-
-  /**
    * Function used to commit a navigation after certain steps in the Clerk processes.
    */
   navigate: CustomNavigation;
@@ -413,15 +400,6 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
-   * Completes a Magic Link flow  started by {@link Clerk.client.signIn.createMagicLinkFlow} or {@link Clerk.client.signUp.createMagicLinkFlow}
-   * @deprecated Use `handleEmailLinkVerification` instead.
-   */
-  handleMagicLinkVerification: (
-    params: HandleMagicLinkVerificationParams,
-    customNavigate?: (to: string) => Promise<unknown>,
-  ) => Promise<unknown>;
-
-  /**
    * Completes a Email Link flow  started by {@link Clerk.client.signIn.createEmailLinkFlow} or {@link Clerk.client.signUp.createEmailLinkFlow}
    */
   handleEmailLinkVerification: (
@@ -438,11 +416,6 @@ export interface Clerk {
    * Creates an organization, adding the current user as admin.
    */
   createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
-
-  /**
-   * Retrieves all the organizations the current user is a member of.
-   */
-  getOrganizationMemberships: () => Promise<OrganizationMembershipResource[]>;
 
   /**
    * Retrieves a single organization by id.
@@ -569,16 +542,6 @@ export interface Resources {
   session?: ActiveSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
-  /**
-   * @deprecated This property will be dropped in the next major release.
-   * This property is only used in another deprecated part: `invitationList` from useOrganization
-   */
-  lastOrganizationInvitation?: OrganizationInvitationResource | null;
-  /**
-   * @deprecated This property will be dropped in the next major release.
-   * This property is only used in another deprecated part: `membershipList` from useOrganization
-   */
-  lastOrganizationMember?: OrganizationMembershipResource | null;
 }
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';
@@ -839,12 +802,7 @@ export type UserButtonProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
-  appearance?: UserButtonTheme & {
-    /**
-     * @deprecated Use `userProfileProps.appearance` instead.
-     */
-    userProfile?: UserProfileTheme;
-  };
+  appearance?: UserButtonTheme;
 
   /*
    * Specify options for the underlying <UserProfile /> component.
@@ -857,7 +815,7 @@ type PrimitiveKeys<T> = {
   [K in keyof T]: T[K] extends string | boolean | number | null ? K : never;
 }[keyof T];
 
-type LooseExtractedParams<T extends string> = `:${T}` | (string & NonNullable<unknown>);
+type LooseExtractedParams<T extends string> = Autocomplete<`:${T}`>;
 
 export type OrganizationSwitcherProps = {
   /**
@@ -872,12 +830,6 @@ export type OrganizationSwitcherProps = {
    * @default true
    */
   hidePersonal?: boolean;
-  /**
-   * Full URL or path to navigate after a successful organization switch.
-   * @default undefined
-   * @deprecated use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`
-   */
-  afterSwitchOrganizationUrl?: string;
   /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
@@ -986,27 +938,6 @@ export type OrganizationListProps = {
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
 };
-
-/**
- * @deprecated Use `HandleEmailLinkVerificationParams` instead.
- */
-export interface HandleMagicLinkVerificationParams {
-  /**
-   * Full URL or path to navigate after successful magic link verification
-   * on completed sign up or sign in on the same device.
-   */
-  redirectUrlComplete?: string;
-  /**
-   * Full URL or path to navigate after successful magic link verification
-   * on the same device, but not completed sign in or sign up.
-   */
-  redirectUrl?: string;
-  /**
-   * Callback function to be executed after successful magic link
-   * verification on another device.
-   */
-  onVerifiedOnOtherDevice?: () => void;
-}
 
 export interface HandleEmailLinkVerificationParams {
   /**

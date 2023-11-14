@@ -6,6 +6,6 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["./tests"],
+  "include": ["./tests", "types.d.ts"],
   "exclude": ["templates"]
 }

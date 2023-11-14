@@ -4,6 +4,7 @@ import React from 'react';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { LoadedGuarantee } from '../contexts/StructureContext';
 import { hocChildrenNotAFunctionError } from '../errors';
+import { errorThrower } from '../utils';
 
 export const withClerk = <P extends { clerk: LoadedClerk }>(
   Component: React.ComponentType<P>,
@@ -37,7 +38,7 @@ export const WithClerk: React.FC<{
   const clerk = useIsomorphicClerkContext();
 
   if (typeof children !== 'function') {
-    throw new Error(hocChildrenNotAFunctionError);
+    errorThrower.throw(hocChildrenNotAFunctionError);
   }
 
   if (!clerk.loaded) {

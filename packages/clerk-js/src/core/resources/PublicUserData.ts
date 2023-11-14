@@ -1,14 +1,8 @@
-import { deprecatedProperty } from '@clerk/shared/deprecated';
-import type { PublicUserData as IPublicUserData } from '@clerk/types';
-import type { PublicUserDataJSON } from '@clerk/types';
+import type { PublicUserData as IPublicUserData, PublicUserDataJSON } from '@clerk/types';
 
 export class PublicUserData implements IPublicUserData {
   firstName!: string | null;
   lastName!: string | null;
-  /**
-   * @deprecated  Use `imageUrl` instead.
-   */
-  profileImageUrl!: string;
   imageUrl!: string;
   hasImage!: boolean;
   identifier!: string;
@@ -22,7 +16,6 @@ export class PublicUserData implements IPublicUserData {
     if (data) {
       this.firstName = data.first_name;
       this.lastName = data.last_name;
-      this.profileImageUrl = data.profile_image_url;
       this.imageUrl = data.image_url;
       this.hasImage = data.has_image;
       this.identifier = data.identifier;
@@ -32,5 +25,3 @@ export class PublicUserData implements IPublicUserData {
     return this;
   }
 }
-
-deprecatedProperty(PublicUserData, 'profileImageUrl', 'Use `imageUrl` instead.');

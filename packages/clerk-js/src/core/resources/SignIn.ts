@@ -1,11 +1,10 @@
-import { deepSnakeToCamel, deprecated, Poller } from '@clerk/shared';
+import { deepSnakeToCamel, Poller } from '@clerk/shared';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
   CreateEmailLinkFlowReturn,
-  CreateMagicLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
   PhoneCodeConfig,
@@ -22,7 +21,6 @@ import type {
   SignInResource,
   SignInSecondFactor,
   SignInStartEmailLinkFlowParams,
-  SignInStartMagicLinkFlowParams,
   SignInStatus,
   VerificationResource,
   Web3SignatureConfig,
@@ -120,46 +118,6 @@ export class SignIn extends BaseResource implements SignInResource {
       body: params,
       action: 'attempt_first_factor',
     });
-  };
-  /**
-   * @deprecated Use `createEmailLinkFlow` instead.
-   */
-  createMagicLinkFlow = (): CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource> => {
-    deprecated('createMagicLinkFlow', 'Use `createEmailLinkFlow` instead.');
-
-    const { run, stop } = Poller();
-
-    const startMagicLinkFlow = async ({
-      emailAddressId,
-      redirectUrl,
-    }: SignInStartMagicLinkFlowParams): Promise<SignInResource> => {
-      if (!this.id) {
-        clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
-      }
-      await this.prepareFirstFactor({
-        strategy: 'email_link',
-        emailAddressId: emailAddressId,
-        redirectUrl: redirectUrl,
-      });
-      return new Promise((resolve, reject) => {
-        void run(() => {
-          return this.reload()
-            .then(res => {
-              const status = res.firstFactorVerification.status;
-              if (status === 'verified' || status === 'expired') {
-                stop();
-                resolve(res);
-              }
-            })
-            .catch(err => {
-              stop();
-              reject(err);
-            });
-        });
-      });
-    };
-
-    return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource> => {
