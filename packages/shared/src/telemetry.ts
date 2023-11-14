@@ -3,7 +3,7 @@ import type { InstanceType } from '@clerk/types';
 import { parsePublishableKey } from './keys';
 import { isTruthy } from './underscore';
 
-type TelemetryCollectorOptions = {
+export type TelemetryCollectorOptions = {
   /**
    * If true, telemetry will not be collected.
    */
@@ -21,13 +21,13 @@ type TelemetryCollectorOptions = {
    */
   maxBufferSize?: number;
   /**
-   * Determines whether or not events will be logged to the console.
-   */
-  verbose?: boolean;
-  /**
    * The publishableKey to associate with the collected events.
    */
-  publishableKey: string;
+  publishableKey?: string;
+  /**
+   * The secretKey to associate with the collected events.
+   */
+  secretKey?: string;
   /**
    * The current clerk-js version.
    */
@@ -44,13 +44,13 @@ type TelemetryCollectorOptions = {
 
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,
-  'samplingRate' | 'verbose' | 'disabled' | 'debug' | 'maxBufferSize'
+  'samplingRate' | 'disabled' | 'debug' | 'maxBufferSize'
 > & {
   endpoint: string;
 };
 
 type TelemetryMetadata = Required<
-  Pick<TelemetryCollectorOptions, 'clerkVersion' | 'sdk' | 'sdkVersion' | 'publishableKey'>
+  Pick<TelemetryCollectorOptions, 'clerkVersion' | 'sdk' | 'sdkVersion' | 'publishableKey' | 'secretKey'>
 > & {
   /**
    * The instance type, derived from the provided publishableKey.
@@ -64,6 +64,10 @@ type TelemetryEvent = {
    * publishableKey
    */
   pk?: string;
+  /**
+   * secretKey
+   */
+  sk?: string;
   /**
    * instanceType
    */
@@ -85,7 +89,6 @@ type TelemetryEvent = {
 
 const DEFAULT_CONFIG: Partial<Required<TelemetryCollectorConfig>> = {
   samplingRate: 1,
-  verbose: false,
   maxBufferSize: 5,
 };
 
@@ -100,7 +103,6 @@ export class TelemetryCollector {
     this.#config = {
       maxBufferSize: options.maxBufferSize ?? DEFAULT_CONFIG.maxBufferSize,
       samplingRate: options.samplingRate ?? DEFAULT_CONFIG.samplingRate,
-      verbose: options.verbose ?? DEFAULT_CONFIG.verbose,
       disabled: options.disabled ?? false,
       debug: options.debug ?? false,
     } as Required<TelemetryCollectorConfig>;
@@ -116,15 +118,20 @@ export class TelemetryCollector {
     this.#metadata.sdk = options.sdk!;
     this.#metadata.sdkVersion = options.sdkVersion!;
 
-    this.#metadata.publishableKey = options.publishableKey;
+    this.#metadata.publishableKey = options.publishableKey ?? '';
 
     const parsedKey = parsePublishableKey(options.publishableKey);
     if (parsedKey) {
       this.#metadata.instanceType = parsedKey.instanceType;
     }
 
-    // this.#config.endpoint = 'https://telemetry-service-staging.bryce-clerk.workers.dev';
-    this.#config.endpoint = 'http://localhost:8787';
+    if (options.secretKey) {
+      // Only send the first 16 characters of the secret key to to avoid sending the full key. We can still query against the partial key.
+      this.#metadata.secretKey = options.secretKey.substring(0, 16);
+    }
+
+    this.#config.endpoint = 'https://staging.clerk-telemetry.com';
+    // this.#config.endpoint = 'http://localhost:8787';
   }
 
   get isEnabled(): boolean {
@@ -265,6 +272,7 @@ export class TelemetryCollector {
       sdk: sdkMetadata.name,
       sdkv: sdkMetadata.version,
       ...(this.#metadata.publishableKey ? { pk: this.#metadata.publishableKey } : {}),
+      ...(this.#metadata.secretKey ? { sk: this.#metadata.secretKey } : {}),
       payload,
     };
   }
