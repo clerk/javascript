@@ -19,7 +19,7 @@ export const Box = React.forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
   return (
     <As
       {...applyDataStateProps(rest)}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
       ref={ref}
     />
   );

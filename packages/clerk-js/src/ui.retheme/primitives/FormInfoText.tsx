@@ -20,7 +20,7 @@ export const FormInfoText = forwardRef<HTMLElement, FormTextProps>((props, ref) 
       aria-live='polite'
       id={errorMessageId}
       {...props}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     />
   );
 });

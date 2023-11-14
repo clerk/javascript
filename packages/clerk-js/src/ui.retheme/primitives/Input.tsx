@@ -65,7 +65,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       aria-describedby={formControlProps.errorMessageId}
       aria-required={_required}
       aria-disabled={_disabled}
-      css={applyVariants(propsWithoutVariants)}
+      css={applyVariants(propsWithoutVariants) as any}
     />
   );
 });
