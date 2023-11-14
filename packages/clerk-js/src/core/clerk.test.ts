@@ -1,4 +1,3 @@
-import { parsePublishableKey } from '@clerk/shared';
 import type { ActiveSessionResource, SignInJSON, SignUpJSON, TokenResource } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 
@@ -406,10 +405,10 @@ describe('Clerk singleton', () => {
     });
 
     it('contains the default allowed origin values', async () => {
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load();
 
-      const frontendApiStr = parsePublishableKey(sut.publishableKey)?.frontendApi || sut.frontendApi;
+      const frontendApiStr = sut.frontendApi;
 
       expect(sut.allowedRedirectOrigins).toEqual([
         window.location.origin,
@@ -420,7 +419,7 @@ describe('Clerk singleton', () => {
     });
 
     it('contains only the allowedRedirectOrigins options given', async () => {
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         allowedRedirectOrigins: ['https://test.host'],
       });
