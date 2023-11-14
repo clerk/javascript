@@ -18,7 +18,7 @@ import type { OrganizationResource } from './organization';
 import type { MembershipRole } from './organizationMembership';
 import type { ActiveSessionResource } from './session';
 import type { UserResource } from './user';
-import type { DeepPartial, DeepSnakeToCamel } from './utils';
+import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 
 export type InstanceType = 'production' | 'development';
 
@@ -805,7 +805,7 @@ type PrimitiveKeys<T> = {
   [K in keyof T]: T[K] extends string | boolean | number | null ? K : never;
 }[keyof T];
 
-type LooseExtractedParams<T extends string> = `:${T}` | (string & NonNullable<unknown>);
+type LooseExtractedParams<T extends string> = Autocomplete<`:${T}`>;
 
 export type OrganizationSwitcherProps = {
   /**
