@@ -264,7 +264,7 @@ export class Clerk implements ClerkInterface {
         origins.push(window.location.origin + '/*');
       }
 
-      const frontendApi = parsePublishableKey(this.publishableKey)?.frontendApi || this.frontendApi;
+      const frontendApi = this.frontendApi;
 
       origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`);
       origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}/*`);
