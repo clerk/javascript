@@ -90,6 +90,7 @@ type TelemetryEvent = {
 const DEFAULT_CONFIG: Partial<Required<TelemetryCollectorConfig>> = {
   samplingRate: 1,
   maxBufferSize: 5,
+  endpoint: 'https://staging.clerk-telemetry.com',
 };
 
 // TODO: determine some type of throttle/dedupe heuristic to avoid sending excessive events for e.g. a component render
@@ -130,7 +131,6 @@ export class TelemetryCollector {
       this.#metadata.secretKey = options.secretKey.substring(0, 16);
     }
 
-    this.#config.endpoint = 'https://staging.clerk-telemetry.com';
     // this.#config.endpoint = 'http://localhost:8787';
   }
 
