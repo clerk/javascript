@@ -36,7 +36,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
         ref={ref}
       >
         <Flex
-          elementDescriptor={descriptors.cardFooterContent}
+          elementDescriptor={descriptors.cardContent}
           direction='col'
           gap={8}
           sx={[
