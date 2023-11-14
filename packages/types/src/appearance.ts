@@ -1,5 +1,16 @@
 import type * as CSS from 'csstype';
 
+import type {
+  AlertId,
+  FieldId,
+  FooterActionId,
+  MenuId,
+  OrganizationPreviewId,
+  ProfilePageId,
+  ProfileSectionId,
+  SelectId,
+  UserPreviewId,
+} from './elementIds';
 import type { OAuthProvider } from './oauth';
 import type { SamlIdpSlug } from './saml';
 import type { BuiltInColors, TransparentColor } from './theme';
@@ -54,53 +65,6 @@ type OpenState = 'open';
 type ActiveState = 'active';
 export type ElementState = LoadingState | ErrorState | OpenState | ActiveState;
 type ControlState = ErrorState;
-
-export type AlertId = 'danger' | 'warning';
-export type FieldId =
-  | 'firstName'
-  | 'lastName'
-  | 'name'
-  | 'slug'
-  | 'emailAddress'
-  | 'phoneNumber'
-  | 'currentPassword'
-  | 'newPassword'
-  | 'signOutOfOtherSessions'
-  | 'password'
-  | 'confirmPassword'
-  | 'identifier'
-  | 'username'
-  | 'code'
-  | 'role'
-  | 'deleteConfirmation'
-  | 'deleteOrganizationConfirmation'
-  | 'enrollmentMode'
-  | 'affiliationEmailAddress'
-  | 'deleteExistingInvitationsSuggestions';
-export type ProfileSectionId =
-  | 'profile'
-  | 'username'
-  | 'emailAddresses'
-  | 'phoneNumbers'
-  | 'connectedAccounts'
-  | 'enterpriseAccounts'
-  | 'web3Wallets'
-  | 'password'
-  | 'mfa'
-  | 'danger'
-  | 'activeDevices'
-  | 'organizationProfile'
-  | 'organizationDanger'
-  | 'organizationDomains';
-export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'organizationMembers';
-
-export type UserPreviewId = 'userButton' | 'personalWorkspace';
-export type OrganizationPreviewId = 'organizationSwitcher' | 'organizationList';
-
-export type FooterActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn';
-
-export type MenuId = 'invitation' | 'member';
-export type SelectId = 'countryCode' | 'role';
 
 /**
  * A type that describes the states and the ids that we will combine

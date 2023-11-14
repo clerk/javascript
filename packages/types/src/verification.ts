@@ -27,24 +27,9 @@ export interface SignatureVerificationAttemptParam {
 
 export type VerificationAttemptParams = CodeVerificationAttemptParam | SignatureVerificationAttemptParam;
 
-/**
- * @deprecated Use `StarEmailLinkFlowParams` instead.
- */
-export interface StartMagicLinkFlowParams {
-  redirectUrl: string;
-}
-
 export interface StartEmailLinkFlowParams {
   redirectUrl: string;
 }
-
-/**
- * @deprecated Use `CreateEmailLinkFlowReturn` instead.
- */
-export type CreateMagicLinkFlowReturn<Params, Resource> = {
-  startMagicLinkFlow: (params: Params) => Promise<Resource>;
-  cancelMagicLinkFlow: () => void;
-};
 
 export type CreateEmailLinkFlowReturn<Params, Resource> = {
   startEmailLinkFlow: (params: Params) => Promise<Resource>;

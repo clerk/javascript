@@ -2,7 +2,6 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import type { FontFamily } from './appearance';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
@@ -18,7 +17,7 @@ import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './sig
 import type { OAuthStrategy } from './strategies';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
-import type { CamelToSnake } from './utils';
+import type { Autocomplete, CamelToSnake } from './utils';
 import type { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
@@ -31,7 +30,7 @@ export interface DisplayThemeJSON {
   general: {
     color: HexColor;
     background_color: Color;
-    font_family: FontFamily;
+    font_family: string;
     font_color: HexColor;
     label_font_weight: FontWeight;
     padding: EmUnit;
@@ -40,7 +39,7 @@ export interface DisplayThemeJSON {
   };
   buttons: {
     font_color: HexColor;
-    font_family: FontFamily;
+    font_family: string;
     font_weight: FontWeight;
   };
   accounts: {
@@ -153,10 +152,6 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   email_address: string;
   first_name: string;
   last_name: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  avatar_url: string;
   image_url: string;
   username: string;
   public_metadata: Record<string, unknown>;
@@ -182,10 +177,6 @@ export interface UserJSON extends ClerkResourceJSON {
   primary_email_address_id: string;
   primary_phone_number_id: string;
   primary_web3_wallet_id: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  profile_image_url: string;
   image_url: string;
   has_image: boolean;
   username: string;
@@ -216,10 +207,6 @@ export interface UserJSON extends ClerkResourceJSON {
 export interface PublicUserDataJSON extends ClerkResourceJSON {
   first_name: string | null;
   last_name: string | null;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  profile_image_url: string;
   image_url: string;
   has_image: boolean;
   identifier: string;
@@ -296,10 +283,6 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
 export interface OrganizationJSON extends ClerkResourceJSON {
   object: 'organization';
   id: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  logo_url: string;
   image_url: string;
   has_image: boolean;
   name: string;
@@ -320,9 +303,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   /**
    * @experimental The property is experimental and subject to change in future releases.
    */
-  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-  // eslint-disable-next-line
-  permissions: (OrganizationPermission | (string & {}))[];
+  permissions: Autocomplete<OrganizationPermission>[];
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;
@@ -433,10 +414,6 @@ export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
 export interface UserDataJSON {
   first_name?: string;
   last_name?: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  profile_image_url?: string;
   image_url: string;
   has_image: boolean;
 }

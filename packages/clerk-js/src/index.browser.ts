@@ -6,18 +6,15 @@ import './utils/setWebpackChunkPublicPath';
 import 'regenerator-runtime/runtime';
 
 import Clerk from './core/clerk';
-import { mountComponentRenderer } from './ui/Components';
+
+// eslint-disable-next-line import/no-unresolved -- this is a webpack alias
+import { mountComponentRenderer } from '~ui/Components';
 
 Clerk.mountComponentRenderer = mountComponentRenderer;
 
 const publishableKey =
   document.querySelector('script[data-clerk-publishable-key]')?.getAttribute('data-clerk-publishable-key') ||
   window.__clerk_publishable_key ||
-  '';
-
-const frontendApi =
-  document.querySelector('script[data-clerk-frontend-api]')?.getAttribute('data-clerk-frontend-api') ||
-  window.__clerk_frontend_api ||
   '';
 
 const proxyUrl =
@@ -28,7 +25,7 @@ const proxyUrl =
 const domain =
   document.querySelector('script[data-clerk-domain]')?.getAttribute('data-clerk-domain') || window.__clerk_domain || '';
 
-window.Clerk = new Clerk(publishableKey || frontendApi, {
+window.Clerk = new Clerk(publishableKey, {
   proxyUrl,
   // @ts-expect-error
   domain,

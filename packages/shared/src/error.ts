@@ -227,7 +227,6 @@ export const EmailLinkErrorCode = {
 };
 
 const DefaultMessages = Object.freeze({
-  InvalidFrontendApiErrorMessage: `The frontendApi passed to Clerk is invalid. You can get your Frontend API key at https://dashboard.clerk.com/last-active?path=api-keys. (key={{key}})`,
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
   InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key={{key}})`,
   MissingPublishableKeyErrorMessage: `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
@@ -251,11 +250,10 @@ export interface ErrorThrower {
 
   throwInvalidPublishableKeyError(params: { key?: string }): never;
 
-  throwInvalidFrontendApiError(params: { key?: string }): never;
-
   throwInvalidProxyUrl(params: { url?: string }): never;
 
   throwMissingPublishableKeyError(): never;
+  throw(message: string): never;
 }
 
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
@@ -299,16 +297,16 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
       throw new Error(buildMessage(messages.InvalidPublishableKeyErrorMessage, params));
     },
 
-    throwInvalidFrontendApiError(params: { key?: string }): never {
-      throw new Error(buildMessage(messages.InvalidFrontendApiErrorMessage, params));
-    },
-
     throwInvalidProxyUrl(params: { url?: string }): never {
       throw new Error(buildMessage(messages.InvalidProxyUrlErrorMessage, params));
     },
 
     throwMissingPublishableKeyError(): never {
       throw new Error(buildMessage(messages.MissingPublishableKeyErrorMessage));
+    },
+
+    throw(message: string): never {
+      throw new Error(buildMessage(message));
     },
   };
 }

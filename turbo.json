@@ -78,27 +78,6 @@
     "test:cache:clear": {
       "cache": false
     },
-    "test:ci": {
-      "dependsOn": ["build"],
-      "inputs": [
-        "*.d.ts",
-        "**/package.json",
-        "bundlewatch.config.json",
-        "jest.*",
-        "src/**",
-        "tests/**",
-        "tsconfig.json",
-        "tsconfig.*.json",
-        "tsup.config.ts",
-
-        "!**/__snapshots__/**",
-        "!coverage/**",
-        "!examples/**",
-        "!node_modules/**"
-      ],
-      "outputMode": "new-only",
-      "outputs": []
-    },
     "lint": {
       "dependsOn": ["^build"],
       "outputs": []

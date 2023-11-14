@@ -5,15 +5,7 @@ import { mockNativeRuntime } from '../testUtils';
 import Clerk from './clerk';
 import { eventBus, events } from './events';
 import type { AuthConfig, DisplayConfig, Organization } from './resources/internal';
-import {
-  BaseResource,
-  Client,
-  EmailLinkErrorCode,
-  Environment,
-  MagicLinkErrorCode,
-  SignIn,
-  SignUp,
-} from './resources/internal';
+import { BaseResource, Client, EmailLinkErrorCode, Environment, SignIn, SignUp } from './resources/internal';
 import { SessionCookieService } from './services';
 import { mockJwt } from './test/fixtures';
 
@@ -52,8 +44,8 @@ const setWindowQueryParams = (params: Array<[string, string]>) => {
 
 describe('Clerk singleton', () => {
   // Use a FAPI value for local production instances to avoid triggering the devInit flow during testing
-  const frontendApi = 'clerk.abcef.12345.prod.lclclerk.com';
-  const devFrontendApi = 'clerk.abcef.12345.dev.lclclerk.com';
+  const developmentPublishableKey = 'pk_test_Y2xlcmsuYWJjZWYuMTIzNDUuZGV2LmxjbGNsZXJrLmNvbSQ';
+  const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
 
   let mockNavigate = jest.fn();
 
@@ -108,7 +100,7 @@ describe('Clerk singleton', () => {
     const mockAddEventListener = (type: string, callback: (e: any) => void) => {
       if (type === 'message') {
         callback({
-          origin: 'https://' + frontendApi,
+          origin: 'https://' + productionPublishableKey,
           data: {
             browserToken: 'hey',
           },
@@ -141,6 +133,24 @@ describe('Clerk singleton', () => {
     eventBus.off(events.TokenUpdate);
   });
 
+  describe('initialize', () => {
+    it('should consider publishableKey readonly', () => {
+      const sut = new Clerk(productionPublishableKey);
+      expect(sut.publishableKey).toEqual(productionPublishableKey);
+
+      expect(() => {
+        // @ts-expect-error attempt to override getter field
+        sut.publishableKey = 'aloha';
+      }).toThrowError(/Cannot set property publishableKey of #<Clerk>/);
+    });
+
+    it('should throw when publishableKey is invalid', () => {
+      expect(() => {
+        new Clerk('invalidPK');
+      }).toThrowError(/The publishableKey passed to Clerk is invalid/);
+    });
+  });
+
   describe('.setActive', () => {
     const mockSession = {
       id: '1',
@@ -170,7 +180,7 @@ describe('Clerk singleton', () => {
       mockSession.touch.mockReturnValueOnce(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load();
       await sut.setActive({ session: null });
       await waitFor(() => {
@@ -183,7 +193,7 @@ describe('Clerk singleton', () => {
       mockSession.touch.mockReturnValueOnce(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load();
       await sut.setActive({ session: mockSession as any as ActiveSessionResource });
       await waitFor(() => {
@@ -196,7 +206,7 @@ describe('Clerk singleton', () => {
       mockSession.touch.mockReturnValueOnce(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({ touchSession: false });
       await sut.setActive({ session: mockSession as any as ActiveSessionResource });
       await waitFor(() => {
@@ -213,7 +223,7 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).not.toHaveBeenCalled();
       };
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load();
       await sut.setActive({ session: mockSession as any as ActiveSessionResource });
       expect(mockSession.touch).toHaveBeenCalled();
@@ -229,7 +239,7 @@ describe('Clerk singleton', () => {
         expect(beforeEmitMock).toHaveBeenCalled();
       };
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load();
       await sut.setActive({ session: mockSession as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
     });
@@ -245,7 +255,7 @@ describe('Clerk singleton', () => {
       };
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession, mockSession2] }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load();
 
       const executionOrder: string[] = [];
@@ -278,7 +288,7 @@ describe('Clerk singleton', () => {
     it('calls with lastActiveOrganizationId session.touch -> set cookie -> before emit -> set accessors with touched session on organization switch', async () => {
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load();
 
       const executionOrder: string[] = [];
@@ -312,7 +322,7 @@ describe('Clerk singleton', () => {
       it('calls session.touch in a non-standard browser', async () => {
         mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
-        const sut = new Clerk(frontendApi);
+        const sut = new Clerk(productionPublishableKey);
         await sut.load({ standardBrowser: false });
 
         const executionOrder: string[] = [];
@@ -365,7 +375,7 @@ describe('Clerk singleton', () => {
 
       // any is intentional here. We simulate a runtime value that should not exist
       const mockSelectInitialSession = jest.fn(() => undefined) as any;
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         selectInitialSession: mockSelectInitialSession,
       });
@@ -379,7 +389,7 @@ describe('Clerk singleton', () => {
     it('updates auth cookie on token:update event', async () => {
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load();
 
       const token = {
@@ -404,7 +414,7 @@ describe('Clerk singleton', () => {
     });
 
     it('has no effect if called when no active sessions exist', async () => {
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [],
@@ -429,7 +439,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut();
@@ -448,7 +458,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut();
@@ -468,7 +478,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '2' });
@@ -490,7 +500,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '1' });
@@ -506,7 +516,7 @@ describe('Clerk singleton', () => {
     let sut: Clerk;
 
     beforeEach(() => {
-      sut = new Clerk(frontendApi);
+      sut = new Clerk(productionPublishableKey);
     });
 
     it('uses window location if a custom navigate is not defined', async () => {
@@ -582,7 +592,7 @@ describe('Clerk singleton', () => {
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -647,7 +657,7 @@ describe('Clerk singleton', () => {
         ),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -715,7 +725,7 @@ describe('Clerk singleton', () => {
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -773,7 +783,7 @@ describe('Clerk singleton', () => {
       );
 
       const mockSetActive = jest.fn();
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -825,7 +835,7 @@ describe('Clerk singleton', () => {
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -873,7 +883,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -916,7 +926,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -972,7 +982,7 @@ describe('Clerk singleton', () => {
         await setActiveOpts.beforeEmit();
       });
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1029,7 +1039,7 @@ describe('Clerk singleton', () => {
         await setActiveOpts.beforeEmit();
       });
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1083,7 +1093,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1133,7 +1143,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1177,7 +1187,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1226,7 +1236,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1260,7 +1270,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1306,7 +1316,7 @@ describe('Clerk singleton', () => {
 
       const mockSignInCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'needs_first_factor' }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1367,7 +1377,7 @@ describe('Clerk singleton', () => {
         ),
       );
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1420,7 +1430,7 @@ describe('Clerk singleton', () => {
 
       const mockSignInCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'needs_first_factor' }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1460,7 +1470,7 @@ describe('Clerk singleton', () => {
 
       const mockSignInCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'needs_new_password' }));
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1474,268 +1484,6 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/reset-password');
       });
-    });
-  });
-
-  // deprecated: Will be replaced by handleEmailLinkVerification
-  describe('.handleMagicLinkVerification()', () => {
-    beforeEach(() => {
-      mockClientFetch.mockReset();
-      mockEnvironmentFetch.mockReset();
-    });
-
-    it('completes the sign in flow if a session was created on this client', async () => {
-      const createdSessionId = 'sess_123';
-      setWindowQueryParams([
-        ['__clerk_status', 'verified'],
-        ['__clerk_created_session', createdSessionId],
-      ]);
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          activeSessions: [],
-          sessions: [{ id: createdSessionId }],
-          signIn: new SignIn({
-            status: 'completed',
-          } as any as SignInJSON),
-          signUp: new SignUp(null),
-        }),
-      );
-      const mockSetActive = jest.fn();
-
-      const sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-      sut.setActive = mockSetActive;
-
-      const redirectUrlComplete = '/redirect-to';
-      sut.handleMagicLinkVerification({ redirectUrlComplete });
-
-      await waitFor(() => {
-        expect(mockSetActive).toHaveBeenCalledWith({
-          session: createdSessionId,
-          beforeEmit: expect.any(Function),
-        });
-      });
-    });
-
-    it("continues to redirectUrl for sign in that's not completed", async () => {
-      setWindowQueryParams([['__clerk_status', 'verified']]);
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          activeSessions: [],
-          sessions: [],
-          signIn: new SignIn({
-            status: 'needs_second_factor',
-          } as any as SignInJSON),
-          signUp: new SignUp(null),
-        }),
-      );
-      const mockSetActive = jest.fn();
-
-      const sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-      sut.setActive = mockSetActive;
-
-      const redirectUrl = '/2fa';
-      sut.handleMagicLinkVerification({ redirectUrl });
-
-      await waitFor(() => {
-        expect(mockSetActive).not.toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith(redirectUrl);
-      });
-    });
-
-    it('completes the sign up flow if a session was created on this client', async () => {
-      const createdSessionId = 'sess_123';
-      setWindowQueryParams([
-        ['__clerk_status', 'verified'],
-        ['__clerk_created_session', createdSessionId],
-      ]);
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          activeSessions: [],
-          sessions: [{ id: createdSessionId }],
-          signUp: new SignUp({
-            status: 'completed',
-          } as any as SignUpJSON),
-          signIn: new SignIn(null),
-        }),
-      );
-      const mockSetActive = jest.fn();
-
-      const sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-      sut.setActive = mockSetActive;
-
-      const redirectUrlComplete = '/redirect-to';
-      sut.handleMagicLinkVerification({ redirectUrlComplete });
-
-      await waitFor(() => {
-        expect(mockSetActive).toHaveBeenCalledWith({
-          session: createdSessionId,
-          beforeEmit: expect.any(Function),
-        });
-      });
-    });
-
-    it("continues the sign up flow for a sign up that's not completed", async () => {
-      setWindowQueryParams([['__clerk_status', 'verified']]);
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          activeSessions: [],
-          sessions: [],
-          signUp: new SignUp({
-            status: 'missing_requirements',
-          } as any as SignUpJSON),
-          signIn: new SignIn(null),
-        }),
-      );
-      const mockSetActive = jest.fn();
-
-      const sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-      sut.setActive = mockSetActive;
-
-      const redirectUrl = '/next-up';
-      sut.handleMagicLinkVerification({ redirectUrl });
-
-      await waitFor(() => {
-        expect(mockSetActive).not.toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith(redirectUrl);
-      });
-    });
-
-    it('throws an error for expired verification status parameter', async () => {
-      setWindowQueryParams([['__clerk_status', 'expired']]);
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          activeSessions: [],
-          sessions: [],
-          signUp: new SignUp(null),
-          signIn: new SignIn(null),
-        }),
-      );
-      const mockSetActive = jest.fn();
-
-      const sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-      sut.setActive = mockSetActive;
-
-      await expect(async () => {
-        await sut.handleMagicLinkVerification({});
-      }).rejects.toThrow(MagicLinkErrorCode.Expired);
-      expect(mockSetActive).not.toHaveBeenCalled();
-    });
-
-    it('throws an error for failed verification status parameter', async () => {
-      setWindowQueryParams([['__clerk_status', 'failed']]);
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          activeSessions: [],
-          sessions: [],
-          signUp: new SignUp(null),
-          signIn: new SignIn(null),
-        }),
-      );
-      const mockSetActive = jest.fn();
-
-      const sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-      sut.setActive = mockSetActive;
-
-      await expect(async () => {
-        await sut.handleMagicLinkVerification({});
-      }).rejects.toThrow(MagicLinkErrorCode.Failed);
-      expect(mockSetActive).not.toHaveBeenCalled();
-    });
-
-    it('runs a callback when verified on other device', async () => {
-      setWindowQueryParams([
-        ['__clerk_status', 'verified'],
-        ['__clerk_created_session', 'sess_123'],
-      ]);
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          activeSessions: [],
-          sessions: [],
-          signUp: new SignUp(null),
-          signIn: new SignIn(null),
-        }),
-      );
-      const mockSetActive = jest.fn();
-      const sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-      sut.setActive = mockSetActive;
-      const res = { ping: 'ping' };
-      const cb = () => {
-        res.ping = 'pong';
-      };
-      await sut.handleMagicLinkVerification({ onVerifiedOnOtherDevice: cb });
-      expect(res.ping).toEqual('pong');
-      expect(mockSetActive).not.toHaveBeenCalled();
-    });
-
-    it('throws an error with no status query parameter', async () => {
-      setWindowQueryParams([['__clerk_created_session', 'sess_123']]);
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          activeSessions: [],
-          sessions: [],
-          signUp: new SignUp(null),
-          signIn: new SignIn(null),
-        }),
-      );
-      const mockSetActive = jest.fn();
-      const sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-      sut.setActive = mockSetActive;
-      await expect(async () => {
-        await sut.handleMagicLinkVerification({});
-      }).rejects.toThrow(MagicLinkErrorCode.Failed);
-      expect(mockSetActive).not.toHaveBeenCalled();
-    });
-
-    it('throws an error for invalid status query parameter', async () => {
-      setWindowQueryParams([
-        ['__clerk_status', 'whatever'],
-        ['__clerk_created_session', 'sess_123'],
-      ]);
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          activeSessions: [],
-          sessions: [{ id: 'sess_123' }],
-          signIn: new SignIn({
-            status: 'completed',
-          } as any as SignInJSON),
-          signUp: new SignUp(null),
-        }),
-      );
-      const mockSetActive = jest.fn();
-      const sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-      sut.setActive = mockSetActive;
-
-      await expect(async () => {
-        await sut.handleMagicLinkVerification({});
-      }).rejects.toThrow(MagicLinkErrorCode.Failed);
-      expect(mockSetActive).not.toHaveBeenCalled();
     });
   });
 
@@ -1763,7 +1511,7 @@ describe('Clerk singleton', () => {
       );
       const mockSetActive = jest.fn();
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1794,7 +1542,7 @@ describe('Clerk singleton', () => {
       );
       const mockSetActive = jest.fn();
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1827,7 +1575,7 @@ describe('Clerk singleton', () => {
       );
       const mockSetActive = jest.fn();
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1858,7 +1606,7 @@ describe('Clerk singleton', () => {
       );
       const mockSetActive = jest.fn();
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1885,7 +1633,7 @@ describe('Clerk singleton', () => {
       );
       const mockSetActive = jest.fn();
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1909,7 +1657,7 @@ describe('Clerk singleton', () => {
       );
       const mockSetActive = jest.fn();
 
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1935,7 +1683,7 @@ describe('Clerk singleton', () => {
         }),
       );
       const mockSetActive = jest.fn();
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1960,7 +1708,7 @@ describe('Clerk singleton', () => {
         }),
       );
       const mockSetActive = jest.fn();
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -1987,7 +1735,7 @@ describe('Clerk singleton', () => {
         }),
       );
       const mockSetActive = jest.fn();
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load({
         navigate: mockNavigate,
       });
@@ -2008,7 +1756,7 @@ describe('Clerk singleton', () => {
    */
   describe('Clerk().isSatellite and Clerk().domain getters', () => {
     it('domain is string, isSatellite is true', async () => {
-      const sut = new Clerk(frontendApi, {
+      const sut = new Clerk(productionPublishableKey, {
         domain: 'example.com',
       });
 
@@ -2021,7 +1769,7 @@ describe('Clerk singleton', () => {
     });
 
     it('domain is string, isSatellite is function returning true', async () => {
-      const sut = new Clerk(frontendApi, {
+      const sut = new Clerk(productionPublishableKey, {
         domain: 'example.com',
       });
 
@@ -2034,7 +1782,7 @@ describe('Clerk singleton', () => {
     });
 
     it('domain is string with scheme and clerk prefix, isSatellite is true', async () => {
-      const sut = new Clerk(frontendApi, {
+      const sut = new Clerk(productionPublishableKey, {
         domain: 'https://clerk.example.com',
       });
 
@@ -2047,7 +1795,7 @@ describe('Clerk singleton', () => {
     });
 
     it('domain is function that returns the url of the website, isSatellite is true', async () => {
-      const sut = new Clerk(frontendApi, {
+      const sut = new Clerk(productionPublishableKey, {
         domain: url => url.href.replace(/\/$/, ''),
       });
 
@@ -2063,7 +1811,7 @@ describe('Clerk singleton', () => {
   describe('buildUrlWithAuth', () => {
     it('builds an absolute url from a relative url in development for url based session syncing', async () => {
       mockUsesUrlBasedSessionSync.mockReturnValue(true);
-      const sut = new Clerk(devFrontendApi);
+      const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('foo');
@@ -2071,7 +1819,7 @@ describe('Clerk singleton', () => {
     });
 
     it('returns what was passed when in production', async () => {
-      const sut = new Clerk(frontendApi);
+      const sut = new Clerk(productionPublishableKey);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('foo');
@@ -2091,7 +1839,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const sut = new Clerk(devFrontendApi);
+      const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('foo');
@@ -2100,7 +1848,7 @@ describe('Clerk singleton', () => {
 
     it('uses the hash to propagate the dev_browser JWT by default on dev', async () => {
       mockUsesUrlBasedSessionSync.mockReturnValue(true);
-      const sut = new Clerk(devFrontendApi);
+      const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('https://example.com/some-path');
@@ -2109,7 +1857,7 @@ describe('Clerk singleton', () => {
 
     it('uses the query param to propagate the dev_browser JWT if specified by option on dev', async () => {
       mockUsesUrlBasedSessionSync.mockReturnValue(true);
-      const sut = new Clerk(devFrontendApi);
+      const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('https://example.com/some-path', { useQueryParam: true });
@@ -2118,7 +1866,7 @@ describe('Clerk singleton', () => {
 
     it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - non-kima', async () => {
       mockUsesUrlBasedSessionSync.mockReturnValue(true);
-      const sut = new Clerk(devFrontendApi);
+      const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('https://accounts.abcef.12345.dev.lclclerk.com');
@@ -2127,7 +1875,7 @@ describe('Clerk singleton', () => {
 
     it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - kima', async () => {
       mockUsesUrlBasedSessionSync.mockReturnValue(true);
-      const sut = new Clerk(devFrontendApi);
+      const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('https://rested-anemone-14.accounts.dev');
@@ -2139,7 +1887,7 @@ describe('Clerk singleton', () => {
     it('getOrganization', async () => {
       // @ts-ignore
       BaseResource._fetch = jest.fn().mockResolvedValue({});
-      const sut = new Clerk(devFrontendApi);
+      const sut = new Clerk(developmentPublishableKey);
 
       await sut.getOrganization('some-org-id');
 

@@ -2,24 +2,22 @@ import type { Clerk } from '@clerk/types';
 
 import createFapiClient from './fapiClient';
 
-const fapiClient = createFapiClient({
+const mockedClerkInstance = {
   frontendApi: 'clerk.example.com',
   version: '42.0.0',
   session: {
     id: 'deadbeef',
   },
-} as Clerk);
+} as Clerk;
+
+const fapiClient = createFapiClient(mockedClerkInstance);
 
 const proxyUrl = 'https://clerk.com/api/__clerk';
 
 const fapiClientWithProxy = createFapiClient({
-  frontendApi: 'clerk.example.com',
+  ...mockedClerkInstance,
   proxyUrl,
-  version: '42.0.0',
-  session: {
-    id: 'deadbeef',
-  },
-} as Clerk);
+});
 
 type RecursivePartial<T> = {
   [P in keyof T]?: RecursivePartial<T[P]>;

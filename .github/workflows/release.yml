@@ -35,6 +35,9 @@ jobs:
 
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
 
       - name: Setup
         id: config
@@ -84,8 +87,6 @@ jobs:
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
             }
 
-
-
       - name: Generate notification payload
         id: notification
         if: steps.changesets.outputs.published == 'true'
@@ -101,4 +102,29 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
+  # We're running the CI workflow (where node v20 modules are cached) in
+  # merge_group and not on main, we need to explicitly cache node_modules here so
+  # that follow-on branches can use the cached version of node_modules rather
+  # than recreating them every time.
+  cache-for-alternate-node-versions:
+    name: Cache for Alternate Node Versions
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    continue-on-error: true
 
+    strategy:
+      matrix:
+        version: [ 20 ] # NOTE: 18 is cached in the main release workflow
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Cache node_modules (Node v${{ matrix.version }})
+        uses: ./.github/actions/init
+        with:
+          node-version: ${{ matrix.version }}
+          turbo-team: ''
+          turbo-token: ''
