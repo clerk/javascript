@@ -30,16 +30,20 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const { t, locale } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);
 
-  if (!organization) {
-    return null;
-  }
-
   const validateUnsubmittedEmail = (value: string) => setIsValidUnsubmittedEmail(isEmail(value));
 
   const emailAddressField = useFormControl('emailAddress', '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__emailAddresses'),
   });
+
+  const roleField = useFormControl('role', '', {
+    label: localizationKeys('formFieldLabel__role'),
+  });
+
+  if (!organization) {
+    return null;
+  }
 
   const {
     props: {
@@ -58,7 +62,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     },
   } = emailAddressField;
 
-  const canSubmit = !!emailAddressField.value.length || isValidUnsubmittedEmail;
+  const canSubmit = (!!emailAddressField.value.length || isValidUnsubmittedEmail) && !!roleField.value;
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -122,7 +126,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           />
         </Flex>
       </Form.ControlRow>
-      <AsyncRoleSelect />
+      <AsyncRoleSelect {...roleField} />
       <FormButtonContainer>
         <Form.SubmitButton
           block={false}
@@ -139,24 +143,21 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   );
 };
 
-const AsyncRoleSelect = () => {
+const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
   const { options, isLoading } = useFetchRoles();
-  const roleField = useFormControl('role', '', {
-    label: localizationKeys('formFieldLabel__role'),
-  });
 
   return (
-    <Form.ControlRow elementId={roleField.id}>
+    <Form.ControlRow elementId={field.id}>
       <Flex
         direction='col'
         gap={2}
       >
-        <Text localizationKey={roleField.label} />
+        <Text localizationKey={field.label} />
         <RoleSelect
-          {...roleField.props}
+          {...field.props}
           roles={options}
           isDisabled={isLoading}
-          onChange={value => roleField.setValue(value)}
+          onChange={value => field.setValue(value)}
           triggerSx={t => ({ width: t.sizes.$48, justifyContent: 'space-between', display: 'flex' })}
           optionListSx={t => ({ minWidth: t.sizes.$48 })}
         />
