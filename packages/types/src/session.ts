@@ -1,3 +1,5 @@
+import type { Autocomplete } from 'utils';
+
 import type { ActJWTClaim } from './jwt';
 import type { OrganizationPermission } from './organizationMembership';
 import type { ClerkResource } from './resource';
@@ -31,9 +33,7 @@ type CheckAuthorizationParams =
           }
         | {
             role?: never;
-            // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-            // eslint-disable-next-line
-            permission: OrganizationPermission | (string & {});
+            permission: Autocomplete<OrganizationPermission>;
           }
       )[];
       role?: never;
@@ -47,9 +47,7 @@ type CheckAuthorizationParams =
   | {
       some?: never;
       role?: never;
-      // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-      // eslint-disable-next-line
-      permission: OrganizationPermission | (string & {});
+      permission: Autocomplete<OrganizationPermission>;
     };
 
 export interface SessionResource extends ClerkResource {
