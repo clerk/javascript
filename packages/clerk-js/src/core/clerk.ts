@@ -53,7 +53,8 @@ import type {
   UserResource,
 } from '@clerk/types';
 
-import type { MountComponentRenderer } from '../ui/Components';
+import type { MountComponentRenderer } from '~ui/Components';
+
 import {
   appendAsQueryParams,
   buildURL,

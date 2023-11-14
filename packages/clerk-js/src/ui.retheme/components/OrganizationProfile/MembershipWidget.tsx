@@ -1,7 +1,7 @@
-import { useRouter } from '../../../ui/router';
 import { runIfFunctionOrReturn } from '../../../utils';
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, Link, Text } from '../../customizables';
+import { useRouter } from '../../router';
 
 export const MembershipWidget = () => {
   const { organization } = useCoreOrganization();

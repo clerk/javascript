@@ -2,11 +2,11 @@ import type { ComponentType } from 'react';
 import React from 'react';
 
 import { warnings } from '../../core/warnings';
-import type { AvailableComponentProps } from '../../ui/types';
 import type { ComponentGuard } from '../../utils';
 import { noOrganizationExists, noUserExists, sessionExistsAndSingleSessionModeEnabled } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import { useRouter } from '../router';
+import type { AvailableComponentProps } from '../types';
 
 function withRedirectToHome<P extends AvailableComponentProps>(
   Component: ComponentType<P>,

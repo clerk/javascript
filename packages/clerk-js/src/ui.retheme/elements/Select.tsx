@@ -3,8 +3,8 @@ import type { SelectId } from '@clerk/types';
 import type { PropsWithChildren, ReactElement } from 'react';
 import React, { useState } from 'react';
 
-import { usePopover, useSearchInput } from '../../ui/hooks';
 import { Button, descriptors, Flex, Icon, Text } from '../customizables';
+import { usePopover, useSearchInput } from '../hooks';
 import { Caret, MagnifyingGlass } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations, common } from '../styledSystem';
