@@ -4,7 +4,11 @@ import { describe } from '@jest/globals';
 import { act, render, runFakeTimers, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
-import { createFakeUserOrganizationInvitation, createFakeUserOrganizationSuggestion } from './utlis';
+import {
+  createFakeUserOrganizationInvitation,
+  createFakeUserOrganizationMembership,
+  createFakeUserOrganizationSuggestion,
+} from './utlis';
 
 const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
@@ -130,10 +134,42 @@ describe('OrganizationSwitcher', () => {
     });
 
     it('lists all organizations the user belongs to', async () => {
-      const { wrapper, props } = await createFixtures(f => {
+      const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1', 'Org2'] });
       });
+
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationMembership({
+              id: '1',
+              organization: {
+                id: '1',
+                name: 'Org1',
+                slug: 'org1',
+                membersCount: 1,
+                adminDeleteEnabled: false,
+                maxAllowedMemberships: 1,
+                pendingInvitationsCount: 1,
+              },
+            }),
+            createFakeUserOrganizationMembership({
+              id: '2',
+              organization: {
+                id: '2',
+                name: 'Org2',
+                slug: 'org2',
+                membersCount: 1,
+                adminDeleteEnabled: false,
+                maxAllowedMemberships: 1,
+                pendingInvitationsCount: 1,
+              },
+            }),
+          ],
+          total_count: 2,
+        }),
+      );
 
       props.setProps({ hidePersonal: false });
       const { getAllByText, getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
@@ -313,6 +349,39 @@ describe('OrganizationSwitcher', () => {
           create_organization_enabled: false,
         });
       });
+
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeUserOrganizationMembership({
+              id: '1',
+              organization: {
+                id: '1',
+                name: 'Org1',
+                slug: 'org1',
+                membersCount: 1,
+                adminDeleteEnabled: false,
+                maxAllowedMemberships: 1,
+                pendingInvitationsCount: 1,
+              },
+            }),
+            createFakeUserOrganizationMembership({
+              id: '2',
+              organization: {
+                id: '2',
+                name: 'Org2',
+                slug: 'org2',
+                membersCount: 1,
+                adminDeleteEnabled: false,
+                maxAllowedMemberships: 1,
+                pendingInvitationsCount: 1,
+              },
+            }),
+          ],
+          total_count: 2,
+        }),
+      );
+
       fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
 
       props.setProps({ hidePersonal: true });

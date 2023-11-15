@@ -22,13 +22,11 @@ const createExpectPageObject = ({ page }: TestArgs) => {
   return {
     toBeSignedOut: () => {
       return page.waitForFunction(() => {
-        // @ts-ignore
         return !window.Clerk?.user;
       });
     },
     toBeSignedIn: async () => {
       return page.waitForFunction(() => {
-        // @ts-ignore
         return !!window.Clerk?.user;
       });
     },

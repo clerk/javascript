@@ -1,6 +1,7 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
 import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
+import type { Autocomplete } from '@clerk/types';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -32,15 +33,9 @@ type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string
 // For extra safety, we won't recommend using a `/(.*)` route matcher.
 type ExcludeRootPath<T> = T extends '/' ? never : T;
 
-// We want to show suggestions but also allow for free-text input
-// the (string & {}) type prevents the TS compiler from merging the typed union with the string type
-// https://github.com/Microsoft/TypeScript/issues/29729#issuecomment-505826972
-type RouteMatcherWithNextTypedRoutes =
-  | WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>>
-  | NextTypedRoute
-  // This is necessary to allow all string, using something other than `{}` here WILL break types!
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  | (string & {});
+type RouteMatcherWithNextTypedRoutes = Autocomplete<
+  WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>> | NextTypedRoute
+>;
 
 const INFINITE_REDIRECTION_LOOP_COOKIE = '__clerk_redirection_loop';
 

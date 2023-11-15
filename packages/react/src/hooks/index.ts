@@ -3,7 +3,6 @@ export { useClerk } from './useClerk';
 export { useEmailLink } from './useEmailLink';
 export { useOrganization } from './useOrganization';
 export { useOrganizationList } from './useOrganizationList';
-export { useOrganizations } from './useOrganizations';
 export { useSession } from './useSession';
 export { useSessionList } from './useSessionList';
 export { useSignIn } from './useSignIn';

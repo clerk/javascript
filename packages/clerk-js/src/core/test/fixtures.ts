@@ -41,8 +41,8 @@ export const createOrganizationMembership = (params: OrgParams): OrganizationMem
     organization: {
       created_at: new Date().getTime(),
       id: getOrganizationId(orgParams),
-      logo_url: null,
-      image_url: 'https://img.clerk.com',
+      image_url:
+        'https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160',
       max_allowed_memberships: 3,
       members_count: 1,
       name: 'Org',
@@ -114,7 +114,7 @@ export const createExternalAccount = (params?: Partial<ExternalAccountJSON>): Ex
     email_address: 'test@clerk.com',
     first_name: 'First name',
     last_name: 'Last name',
-    avatar_url: '',
+    image_url: '',
     username: '',
     verification: {
       status: 'verified',
@@ -133,7 +133,6 @@ export const createUser = (params: WithUserParams): UserJSON => {
     primary_email_address_id: '',
     primary_phone_number_id: '',
     primary_web3_wallet_id: '',
-    profile_image_url: '',
     image_url: '',
     username: 'testUsername',
     web3_wallets: [],
@@ -185,7 +184,6 @@ export const createSession = (sessionParams: WithSessionParams = {}, user: Parti
       image_url: user.image_url,
       has_image: user.has_image,
       identifier: user.email_addresses?.find(e => e.id === user.primary_email_address_id)?.email_address || '',
-      profile_image_url: user.profile_image_url,
     },
     created_at: sessionParams.created_at || jest.now() - 1000,
     updated_at: sessionParams.updated_at || jest.now(),
@@ -214,7 +212,6 @@ export const createSignIn = (signInParams: Partial<SignInJSON> = {}, user: Parti
       last_name: user.last_name,
       image_url: user.image_url,
       has_image: user.has_image,
-      profile_image_url: user.profile_image_url,
     },
   } as SignInJSON;
 };
