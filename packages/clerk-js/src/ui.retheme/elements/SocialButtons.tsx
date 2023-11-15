@@ -209,11 +209,13 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
 });
 
 const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
-  const { icon, isLoading, label, textLocalizationKey, ...rest } = props;
+  const { id, icon, isLoading, label, textLocalizationKey, ...rest } = props;
   const isIconElement = isValidElement(icon);
 
   return (
     <SimpleButton
+      elementDescriptor={descriptors.socialButtonsBlockButton}
+      elementId={descriptors.socialButtonsBlockButton.setId(id)}
       variant='outline'
       colorScheme='neutral'
       block
@@ -263,6 +265,8 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
           </Flex>
         )}
         <Text
+          elementDescriptor={descriptors.socialButtonsBlockButtonText}
+          elementId={descriptors.socialButtonsBlockButtonText.setId(id)}
           as='span'
           truncate
           colorScheme='inherit'
