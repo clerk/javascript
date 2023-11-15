@@ -33,7 +33,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         xs: { minHeight: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
         sm: {
           minHeight: theme.sizes.$8,
-          padding: `${theme.space.$2} ${theme.space.$3x5}`,
+          padding: `${theme.space.$1x5} ${theme.space.$2}`,
         },
         md: {
           minHeight: theme.sizes.$9,
@@ -58,11 +58,11 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         },
         neutral: {
           [vars.border]: theme.colors.$blackAlpha200,
-          [vars.accentLightest]: theme.colors.$blackAlpha50,
-          [vars.accentLighter]: theme.colors.$blackAlpha300,
-          [vars.accent]: theme.colors.$colorText,
-          [vars.accentDark]: theme.colors.$blackAlpha600,
-          [vars.accentDarker]: theme.colors.$blackAlpha700,
+          [vars.accentLightest]: theme.colors.$blackAlpha50, // TODO: once we have the new color palette and style for pseudo classes
+          [vars.accentLighter]: theme.colors.$blackAlpha300, // TODO: once we have the new color palette and style for pseudo classes
+          [vars.accent]: theme.colors.$primary800, // WIP reference: Updated to new color palette; previously `$colorText`
+          [vars.accentDark]: theme.colors.$blackAlpha600, // TODO: once we have the new color palette and style for pseudo classes
+          [vars.accentDarker]: theme.colors.$blackAlpha700, // TODO: once we have the new color palette and style for pseudo classes
         },
       },
       variant: {
@@ -74,9 +74,9 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           '&:active': { backgroundColor: vars.accentDarker },
         },
         outline: {
-          border: theme.borders.$normal,
-          borderColor: vars.accentLighter,
           color: vars.accent,
+          boxShadow:
+            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(25, 28, 33, 0.02), 0px 0px 0px 1px rgba(25, 28, 33, 0.08)', // TODO: Move to theme once we have the shadows defined
           '&:hover': { backgroundColor: vars.accentLightest },
           '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
@@ -89,9 +89,8 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         },
         icon: {
           color: vars.accent,
-          border: theme.borders.$normal,
-          borderRadius: theme.radii.$lg,
-          borderColor: vars.border,
+          boxShadow:
+            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(25, 28, 33, 0.02), 0px 0px 0px 1px rgba(25, 28, 33, 0.08)', // TODO: Move to theme once we have the shadows defined
           '&:hover': { backgroundColor: vars.accentLightest },
           '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
@@ -130,7 +129,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       textVariant: 'buttonRegularRegular',
       colorScheme: 'primary',
       variant: 'solid',
-      size: 'md',
+      size: 'sm',
       focusRing: true,
     },
   };
