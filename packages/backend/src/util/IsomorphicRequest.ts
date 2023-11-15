@@ -34,7 +34,7 @@ const decode = (str: string): string => {
 };
 
 const parseIsomorphicRequestCookies = (req: Request) => {
-  const cookies = req.headers && req.headers?.get('cookie') ? parse(req.headers.get('cookie') as string) : {};
+  const cookies = req.headers && req.headers?.get('cookie') ? parse(req.headers.get('cookie') || '') : {};
   return (key: string): string | undefined => {
     const value = cookies?.[key];
     if (value === undefined) {

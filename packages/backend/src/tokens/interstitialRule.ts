@@ -25,7 +25,7 @@ const isBrowser = (userAgent: string | undefined) => VALID_USER_AGENTS.test(user
 // automatically treated as signed out. This exception is needed for development, because the any // missing uat throws an interstitial in development.
 export const nonBrowserRequestInDevRule: InterstitialRule = options => {
   const { secretKey, userAgent } = options;
-  if (isDevelopmentFromApiKey(secretKey as string) && !isBrowser(userAgent)) {
+  if (isDevelopmentFromApiKey(secretKey || '') && !isBrowser(userAgent)) {
     return signedOut(options, AuthErrorReason.HeaderMissingNonBrowser);
   }
   return undefined;
@@ -49,8 +49,8 @@ export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
 };
 
 export const isPrimaryInDevAndRedirectsToSatellite: InterstitialRule = options => {
-  const { secretKey, isSatellite, searchParams } = options;
-  const isDev = isDevelopmentFromApiKey(secretKey as string);
+  const { secretKey = '', isSatellite, searchParams } = options;
+  const isDev = isDevelopmentFromApiKey(secretKey);
 
   if (isDev && !isSatellite && shouldRedirectToSatelliteUrl(searchParams)) {
     return interstitial(options, AuthErrorReason.PrimaryRespondsToSyncing);
@@ -59,8 +59,8 @@ export const isPrimaryInDevAndRedirectsToSatellite: InterstitialRule = options =
 };
 
 export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options => {
-  const { secretKey, clientUat } = options;
-  const res = isDevelopmentFromApiKey(secretKey as string);
+  const { secretKey = '', clientUat } = options;
+  const res = isDevelopmentFromApiKey(secretKey);
   if (res && !clientUat) {
     return interstitial(options, AuthErrorReason.CookieUATMissing);
   }
@@ -72,20 +72,20 @@ export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options =
  * It is expected that a primary app will trigger a redirect back to the satellite app.
  */
 export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: InterstitialRule = options => {
-  const { secretKey, referrer, host, forwardedHost, forwardedProto } = options;
+  const { secretKey = '', referrer, host, forwardedHost, forwardedProto } = options;
   const crossOriginReferrer =
     referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedProto });
 
-  if (isDevelopmentFromApiKey(secretKey as string) && crossOriginReferrer) {
+  if (isDevelopmentFromApiKey(secretKey) && crossOriginReferrer) {
     return interstitial(options, AuthErrorReason.CrossOriginReferrer);
   }
   return undefined;
 };
 
 export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = options => {
-  const { secretKey, clientUat, cookieToken } = options;
+  const { secretKey = '', clientUat, cookieToken } = options;
 
-  if (isProductionFromApiKey(secretKey as string) && !clientUat && !cookieToken) {
+  if (isProductionFromApiKey(secretKey) && !clientUat && !cookieToken) {
     return signedOut(options, AuthErrorReason.CookieAndUATMissing);
   }
   return undefined;
