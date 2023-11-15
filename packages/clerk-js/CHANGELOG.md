@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.65.1
+
+### Patch Changes
+
+- Require role to be selected before sending organization invite, affects `<OrganizationProfile/>` and <CreateOrganization/>`. ([#2135](https://github.com/clerk/javascript/pull/2135)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.65.0
 
 ### Minor Changes
