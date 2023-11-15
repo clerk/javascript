@@ -101,9 +101,6 @@ clerk.debugRequestState(requestState);
 // Load clerk interstitial from this package
 clerk.localInterstitial(options);
 
-// Load clerk interstitial from the public Backend API endpoint
-clerk.remotePublicInterstitial(options);
-
 // Load clerk interstitial from the public Private API endpoint (Deprecated)
 clerk.remotePrivateInterstitial(options);
 ```

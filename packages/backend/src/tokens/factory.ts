@@ -80,36 +80,13 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       domain: runtimeDomain || buildtimeDomain,
     });
 
-  const remotePublicInterstitial = ({
-    publishableKey: runtimePublishableKey,
-    proxyUrl: runtimeProxyUrl,
-    isSatellite: runtimeIsSatellite,
-    domain: runtimeDomain,
-    userAgent: runtimeUserAgent,
-    ...rest
-  }: LoadInterstitialOptions) => {
-    return loadInterstitialFromBAPI({
-      ...rest,
-      apiUrl,
-      publishableKey: runtimePublishableKey || buildtimePublishableKey,
-      proxyUrl: runtimeProxyUrl || buildProxyUrl,
-      isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
-      domain: (runtimeDomain || buildtimeDomain) as any,
-      userAgent: runtimeUserAgent || buildUserAgent,
-    });
-  };
-
-  const remotePublicInterstitialUrl = buildPublicInterstitialUrl;
-
   // TODO: Replace this function with remotePublicInterstitial
   const remotePrivateInterstitial = () => apiClient.interstitial.getInterstitial();
 
   return {
     authenticateRequest,
     localInterstitial,
-    remotePublicInterstitial,
     remotePrivateInterstitial,
-    remotePublicInterstitialUrl,
     debugRequestState,
   };
 }

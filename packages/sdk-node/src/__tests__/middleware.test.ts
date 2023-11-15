@@ -15,7 +15,6 @@ afterEach(() => {
 
 const mockClerkClient = () => ({
   authenticateRequest: jest.fn(),
-  remotePublicInterstitial: jest.fn(),
   remotePrivateInterstitial: jest.fn(),
   localInterstitial: jest.fn(),
 });
