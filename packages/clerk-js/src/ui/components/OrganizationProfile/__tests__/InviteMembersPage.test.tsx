@@ -24,7 +24,7 @@ describe('InviteMembersPage', () => {
   });
 
   describe('Submitting', () => {
-    it('enables the Send button when one or more email has been entered', async () => {
+    it('keeps the Send button disabled until a role is selected and one or more email has been entered', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -34,10 +34,14 @@ describe('InviteMembersPage', () => {
       });
 
       fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
-      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      const { getByText, getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
       expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
 
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.dev,');
+      expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
+
+      await userEvent.click(getByRole('button', { name: /select an option/i }));
+      await userEvent.click(getByText(/^member$/i));
       expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled();
     });
 
@@ -172,6 +176,9 @@ describe('InviteMembersPage', () => {
       );
       const { getByRole, userEvent, getByText, getByTestId } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.dev,');
+      await waitFor(() => expect(getByRole('button', { name: /select an option/i })).not.toBeDisabled());
+      await userEvent.click(getByRole('button', { name: /select an option/i }));
+      await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       await waitFor(() =>
         expect(
@@ -206,8 +213,11 @@ describe('InviteMembersPage', () => {
           status: 400,
         }),
       );
-      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(getByTestId('tag-input'), 'invalid@clerk.dev');
+      await waitFor(() => expect(getByRole('button', { name: /select an option/i })).not.toBeDisabled());
+      await userEvent.click(getByRole('button', { name: /select an option/i }));
+      await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
       expect(getByTestId('tag-input')).not.toHaveValue();
@@ -236,8 +246,11 @@ describe('InviteMembersPage', () => {
           status: 403,
         }),
       );
-      const { getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
+      const { getByRole, getByText, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(getByTestId('tag-input'), 'blocked@clerk.dev');
+      await waitFor(() => expect(getByRole('button', { name: /select an option/i })).not.toBeDisabled());
+      await userEvent.click(getByRole('button', { name: /select an option/i }));
+      await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
       expect(getByTestId('tag-input')).not.toHaveValue();
