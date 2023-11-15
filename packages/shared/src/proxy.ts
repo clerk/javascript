@@ -1,5 +1,3 @@
-import { deprecated } from './deprecated';
-
 export function isValidProxyUrl(key: string | undefined) {
   if (!key) {
     return true;
@@ -21,21 +19,4 @@ export function proxyUrlToAbsoluteURL(url: string | undefined): string {
     return '';
   }
   return isProxyUrlRelative(url) ? new URL(url, window.location.origin).toString() : url;
-}
-
-/**
- * @deprecated Use `buildRequestUrl` from @clerk/backend
- */
-export function getRequestUrl({ request, relativePath }: { request: Request; relativePath?: string }): URL {
-  deprecated('getRequestUrl', 'Use `buildRequestUrl` from @clerk/backend instead.');
-  const { headers, url: initialUrl } = request;
-  const url = new URL(initialUrl);
-  const host = headers.get('X-Forwarded-Host') ?? headers.get('host') ?? (headers as any)['host'] ?? url.host;
-
-  // X-Forwarded-Proto could be 'https, http'
-  let protocol =
-    (headers.get('X-Forwarded-Proto') ?? (headers as any)['X-Forwarded-Proto'])?.split(',')[0] ?? url.protocol;
-  protocol = protocol.replace(/[:/]/, '');
-
-  return new URL(relativePath || url.pathname, `${protocol}://${host}`);
 }
