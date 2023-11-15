@@ -29,7 +29,7 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
  * Utility function to get env variables across Node and Edge runtimes.
  *
  * @param name
- * @returns string
+ * @returns string|undefined
  */
 export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string | undefined => {
   // Node envs
