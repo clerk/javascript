@@ -115,7 +115,7 @@ export function buildRequest(options: CreateBackendApiOptions) {
       ...headerParams,
     };
 
-    let res: Response | undefined = undefined;
+    let res: Response | undefined;
     try {
       if (formData) {
         res = await runtime.fetch(finalUrl.href, {

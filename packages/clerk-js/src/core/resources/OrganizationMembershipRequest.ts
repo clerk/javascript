@@ -1,5 +1,8 @@
-import type { OrganizationInvitationStatus, OrganizationMembershipRequestResource } from '@clerk/types';
-import type { OrganizationMembershipRequestJSON } from '@clerk/types';
+import type {
+  OrganizationInvitationStatus,
+  OrganizationMembershipRequestJSON,
+  OrganizationMembershipRequestResource,
+} from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, PublicUserData } from './internal';

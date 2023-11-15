@@ -33,7 +33,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
-          <Header.Title localizationKey={props.cardTitle || 'Error'}></Header.Title>
+          <Header.Title localizationKey={props.cardTitle || 'Error'} />
           {props.cardSubtitle && <Header.Subtitle localizationKey={props.cardSubtitle} />}
         </Header.Root>
         {/*TODO: extract main in its own component */}

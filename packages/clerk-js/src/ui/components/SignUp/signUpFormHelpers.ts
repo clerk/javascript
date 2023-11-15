@@ -1,6 +1,5 @@
 import { camelToSnake } from '@clerk/shared';
-import type { Attributes, SignUpResource } from '@clerk/types';
-import type { UserSettingsResource } from '@clerk/types';
+import type { Attribute, Attributes, SignUpResource, UserSettingsResource } from '@clerk/types';
 
 import type { FieldState } from '../../common';
 
@@ -83,7 +82,6 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
     // Hide any non-required fields
     Object.entries(fields).forEach(([k, v]) => {
       if (v && !v.required) {
-        // @ts-ignore
         delete fields[k];
       }
     });
@@ -252,15 +250,13 @@ function getTicketField(hasTicket?: boolean): Field | undefined {
 }
 
 function getGenericField(fieldKey: FieldKey, attributes: Attributes): Field | undefined {
-  const attrKey = camelToSnake(fieldKey);
+  const attrKey = camelToSnake(fieldKey) as Attribute;
 
-  // @ts-ignore
   if (!attributes[attrKey].enabled) {
     return;
   }
 
   return {
-    // @ts-ignore
     required: attributes[attrKey].required,
   };
 }

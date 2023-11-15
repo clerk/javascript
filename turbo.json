@@ -34,6 +34,7 @@
         "!**/__tests__/**",
         "!**/__mocks__/**",
         "!**/__snapshots__/**",
+        "!CHANGELOG.md",
         "!coverage/**",
         "!examples/**",
         "!node_modules/**"
@@ -68,6 +69,7 @@
         "tsup.config.ts",
 
         "!**/__snapshots__/**",
+        "!CHANGELOG.md",
         "!coverage/**",
         "!examples/**",
         "!node_modules/**"

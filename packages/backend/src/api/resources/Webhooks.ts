@@ -1,12 +1,13 @@
 import type {
   DeletedObjectJSON,
+  EmailJSON,
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
   SessionJSON,
+  SMSMessageJSON,
   UserJSON,
 } from './JSON';
-import type { EmailJSON, SMSMessageJSON } from './JSON';
 
 type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data };
 
