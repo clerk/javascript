@@ -20,10 +20,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Email addresses',
   formFieldLabel__phoneNumber: 'Phone number',
   formFieldLabel__username: 'Username',
-  formFieldLabel__emailAddress_phoneNumber: 'Email address or phone number',
   formFieldLabel__emailAddress_username: 'Email address or username',
-  formFieldLabel__phoneNumber_username: 'phone number or username',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Email address, phone number or username',
   formFieldLabel__password: 'Password',
   formFieldLabel__currentPassword: 'Current password',
   formFieldLabel__newPassword: 'New password',
@@ -47,10 +44,7 @@ export const enUS: LocalizationResource = {
     'Enter or paste one or more email addresses, separated by spaces or commas',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -302,12 +296,10 @@ export const enUS: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Connected accounts',
         primaryButton: 'Connect account',
-        title__conectionFailed: 'Retry failed connection',
         title__connectionFailed: 'Retry failed connection',
         title__reauthorize: 'Reauthorization required',
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
-        actionLabel__conectionFailed: 'Try again',
         actionLabel__connectionFailed: 'Try again',
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Remove',
@@ -646,9 +638,7 @@ export const enUS: LocalizationResource = {
       detailsTitle__emptyRow: 'No members to display',
       action__invite: 'Invite',
       start: {
-        headerTitle__active: 'Active',
         headerTitle__members: 'Members',
-        headerTitle__invited: 'Invited',
         headerTitle__invitations: 'Invitations',
         headerTitle__requests: 'Requests',
       },
@@ -697,7 +687,6 @@ export const enUS: LocalizationResource = {
   createOrganization: {
     title: 'Create Organization',
     formButtonSubmit: 'Create organization',
-    subtitle: 'Set the organization profile',
     invitePage: {
       formButtonReset: 'Skip',
     },
