@@ -10,7 +10,7 @@ export const Thead = React.forwardRef<HTMLTableSectionElement, TheadProps>((prop
   return (
     <Box
       as='thead'
-      {...props}
+      {...(props as any)}
       ref={ref}
     />
   );

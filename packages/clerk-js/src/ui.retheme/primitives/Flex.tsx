@@ -73,7 +73,7 @@ export const Flex = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => 
 export const Col = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
   return (
     <Flex
-      {...props}
+      {...(props as any)}
       direction='col'
       ref={ref}
     />
