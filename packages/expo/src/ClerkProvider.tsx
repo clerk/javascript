@@ -22,9 +22,9 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
   const key = publishableKey || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   return (
-    //@ts-expect-error
     <ClerkReactProvider
-      // Force reset the state when the provided key changes, this ensures that the provider does not retain stale state. See JS-598 for additional context.
+      // Force reset the state when the provided key changes, this ensures that the provider does not retain stale state.
+      // See JS-598 for additional context.
       key={key}
       {...rest}
       Clerk={buildClerk({ key, tokenCache })}
