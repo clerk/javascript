@@ -74,13 +74,12 @@ export type ClerkProp =
   | undefined
   | null;
 
-type ButtonProps = {
+type ButtonProps = React.PropsWithChildren<{
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
   redirectUrl?: string;
   mode?: 'redirect' | 'modal';
-  children?: React.ReactNode;
-};
+}>;
 
 export type SignInButtonProps = ButtonProps;
 export interface SignUpButtonProps extends ButtonProps {

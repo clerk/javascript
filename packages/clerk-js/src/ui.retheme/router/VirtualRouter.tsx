@@ -4,11 +4,10 @@ import { useClerkModalStateParams } from '../hooks';
 import { BaseRouter } from './BaseRouter';
 export const VIRTUAL_ROUTER_BASE_PATH = 'CLERK-ROUTER/VIRTUAL';
 
-interface VirtualRouterProps {
+interface VirtualRouterProps extends React.PropsWithChildren {
   startPath: string;
   preservedParams?: string[];
   onExternalNavigate?: () => any;
-  children: React.ReactNode;
 }
 
 export const VirtualRouter = ({

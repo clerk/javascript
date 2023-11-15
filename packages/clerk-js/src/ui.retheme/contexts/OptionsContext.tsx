@@ -3,8 +3,7 @@ import React from 'react';
 
 export const OptionsContext = React.createContext<ClerkOptions>({});
 
-interface OptionsProviderProps {
-  children: React.ReactNode;
+interface OptionsProviderProps extends React.PropsWithChildren {
   value: ClerkOptions;
 }
 

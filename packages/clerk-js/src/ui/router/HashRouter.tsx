@@ -5,9 +5,8 @@ import { BaseRouter } from './BaseRouter';
 
 export const hashRouterBase = 'CLERK-ROUTER/HASH';
 
-interface HashRouterProps {
+interface HashRouterProps extends React.PropsWithChildren {
   preservedParams?: string[];
-  children: React.ReactNode;
 }
 
 export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.Element => {

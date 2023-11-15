@@ -12,10 +12,10 @@ __internal__setErrorThrowerOptions({
   packageName: '@clerk/clerk-react',
 });
 
-export type ClerkProviderProps = IsomorphicClerkOptions & {
-  children: React.ReactNode;
-  initialState?: InitialState;
-};
+export type ClerkProviderProps = IsomorphicClerkOptions &
+  React.PropsWithChildren<{
+    initialState?: InitialState;
+  }>;
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const { initialState, children, ...restIsomorphicClerkOptions } = props;

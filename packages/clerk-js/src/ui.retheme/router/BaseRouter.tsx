@@ -9,7 +9,7 @@ import { match } from './pathToRegexp';
 import { Route } from './Route';
 import { RouteContext } from './RouteContext';
 
-interface BaseRouterProps {
+interface BaseRouterProps extends React.PropsWithChildren {
   basePath: string;
   startPath: string;
   getPath: () => string;
@@ -25,7 +25,6 @@ interface BaseRouterProps {
     clearUrlStateParam: () => void;
     socialProvider: string;
   };
-  children: React.ReactNode;
 }
 
 export const BaseRouter = ({

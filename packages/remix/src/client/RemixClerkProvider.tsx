@@ -14,10 +14,10 @@ const SDK_METADATA = {
   version: PACKAGE_VERSION,
 };
 
-export type RemixClerkProviderProps = {
-  children: React.ReactNode;
+export type RemixClerkProviderProps = React.PropsWithChildren<{
   clerkState: ClerkState;
-} & IsomorphicClerkOptions;
+}> &
+  IsomorphicClerkOptions;
 
 /**
  * Remix hydration errors should not stop Clerk navigation from working, as the components mount only after

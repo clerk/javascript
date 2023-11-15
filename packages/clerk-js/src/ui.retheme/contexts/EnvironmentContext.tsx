@@ -5,8 +5,7 @@ import { assertContextExists } from './utils';
 
 const EnvironmentContext = React.createContext<EnvironmentResource | null>(null);
 
-interface EnvironmentProviderProps {
-  children: React.ReactNode;
+interface EnvironmentProviderProps extends React.PropsWithChildren {
   value: EnvironmentResource;
 }
 

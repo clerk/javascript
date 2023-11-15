@@ -16,7 +16,7 @@ const Portal = lazy(() => import('./../portal'));
 const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
 const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
 
-type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any; options: any; children: any }>;
+type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any; options: any }>;
 
 export const LazyProviders = (props: LazyProvidersProps) => {
   return (

@@ -11,11 +11,10 @@ import { OrganizationProvider } from './OrganizationContext';
 import { SessionContext } from './SessionContext';
 import { UserContext } from './UserContext';
 
-type ClerkContextProvider = {
+type ClerkContextProvider = React.PropsWithChildren<{
   isomorphicClerkOptions: IsomorphicClerkOptions;
   initialState: InitialState | undefined;
-  children: React.ReactNode;
-};
+}>;
 
 export type ClerkContextProviderState = Resources;
 

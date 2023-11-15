@@ -64,10 +64,4 @@ describe('ClerkProvider', () => {
       expectTypeOf({ ...defaultProps, clerkJSVariant: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
     });
   });
-
-  describe('children', () => {
-    it('errors if no children', () => {
-      expectTypeOf({}).not.toMatchTypeOf<ClerkProviderProps>();
-    });
-  });
 });

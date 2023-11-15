@@ -40,15 +40,14 @@ export const useOrganizationProfileCustomPages = (children: React.ReactNode | Re
   });
 };
 
-type UseCustomPagesParams = {
-  children: React.ReactNode | React.ReactNode[];
+type UseCustomPagesParams = React.PropsWithChildren<{
   LinkComponent: any;
   PageComponent: any;
   reorderItemsLabels: string[];
   componentName: string;
-};
+}>;
 
-type CustomPageWithIdType = UserProfilePageProps & { children?: React.ReactNode };
+type CustomPageWithIdType = React.PropsWithChildren<UserProfilePageProps>;
 
 const useCustomPages = ({
   children,

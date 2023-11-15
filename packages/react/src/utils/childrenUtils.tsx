@@ -18,7 +18,7 @@ export const normalizeWithDefaultValue = (children: React.ReactNode | undefined,
     children = defaultText;
   }
   if (typeof children === 'string') {
-    children = <button>{children}</button>;
+    children = <button type='button'>{children}</button>;
   }
   return children;
 };

@@ -4,10 +4,9 @@ import { hasUrlInFragment, mergeFragmentIntoUrl, stripOrigin } from '../../utils
 import { useCoreClerk } from '../contexts';
 import { BaseRouter } from './BaseRouter';
 
-interface PathRouterProps {
+interface PathRouterProps extends React.PropsWithChildren {
   basePath: string;
   preservedParams?: string[];
-  children: React.ReactNode;
 }
 
 export const PathRouter = ({ basePath, preservedParams, children }: PathRouterProps): JSX.Element | null => {

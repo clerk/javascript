@@ -5,11 +5,10 @@ import type { WithClerkProp } from '../types';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
 import { withClerk } from './withClerk';
 
-export type SignOutButtonProps = {
+export type SignOutButtonProps = React.PropsWithChildren<{
   signOutCallback?: SignOutCallback;
   signOutOptions?: SignOutOptions;
-  children?: React.ReactNode;
-};
+}>;
 
 export const SignOutButton = withClerk(
   ({ clerk, children, ...props }: React.PropsWithChildren<WithClerkProp<SignOutButtonProps>>) => {

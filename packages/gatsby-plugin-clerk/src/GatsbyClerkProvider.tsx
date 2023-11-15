@@ -14,10 +14,10 @@ const SDK_METADATA = {
 
 __internal__setErrorThrowerOptions({ packageName: 'gatsby-plugin-clerk' });
 
-export type GatsbyClerkProviderProps = {
-  children: React.ReactNode;
+export type GatsbyClerkProviderProps = React.PropsWithChildren<{
   clerkState: any;
-} & IsomorphicClerkOptions;
+}> &
+  IsomorphicClerkOptions;
 
 export function ClerkProvider({ children, ...rest }: GatsbyClerkProviderProps) {
   const { clerkState, ...restProps } = rest;

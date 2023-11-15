@@ -8,7 +8,7 @@ function assertRoute(v: any): v is React.ReactElement<RouteProps> {
   return !!v && React.isValidElement(v) && typeof v === 'object' && (v as React.ReactElement).type === Route;
 }
 
-export function Switch({ children }: { children: React.ReactNode }): JSX.Element {
+export function Switch({ children }: React.PropsWithChildren): JSX.Element {
   const router = useRouter();
 
   let node: React.ReactNode = null;

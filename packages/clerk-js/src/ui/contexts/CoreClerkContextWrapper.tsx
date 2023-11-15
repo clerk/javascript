@@ -8,11 +8,10 @@ import { CoreSessionContext } from './CoreSessionContext';
 import { CoreUserContext } from './CoreUserContext';
 import { assertClerkSingletonExists } from './utils';
 
-type CoreClerkContextWrapperProps = {
+type CoreClerkContextWrapperProps = React.PropsWithChildren<{
   clerk: Clerk;
-  children: React.ReactNode;
   swrConfig?: any;
-};
+}>;
 
 type CoreClerkContextProviderState = Resources;
 
