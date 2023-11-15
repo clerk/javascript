@@ -28,7 +28,7 @@ export const AlertIcon = (props: AlertIconProps): JSX.Element => {
   return (
     <Icon
       {...filterProps(rest)}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     />
   );
 };

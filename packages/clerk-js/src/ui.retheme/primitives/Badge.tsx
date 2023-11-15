@@ -53,7 +53,7 @@ export const Badge = (props: BadgeProps) => {
       {...filterProps(props)}
       center
       as='span'
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     />
   );
 };

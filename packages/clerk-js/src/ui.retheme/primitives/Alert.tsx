@@ -23,7 +23,7 @@ export const Alert = (props: AlertProps): JSX.Element => {
       // @ts-ignore
       justify='start'
       {...filterProps(props)}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     >
       {props.children}
     </Flex>

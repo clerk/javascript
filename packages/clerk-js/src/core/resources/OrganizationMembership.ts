@@ -1,4 +1,5 @@
 import type {
+  Autocomplete,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
   GetUserOrganizationMembershipParams,
@@ -20,9 +21,7 @@ export class OrganizationMembership extends BaseResource implements Organization
   /**
    * @experimental The property is experimental and subject to change in future releases.
    */
-  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-  // eslint-disable-next-line
-  permissions: (OrganizationPermission | (string & {}))[] = [];
+  permissions: Autocomplete<OrganizationPermission>[] = [];
   role!: MembershipRole;
   createdAt!: Date;
   updatedAt!: Date;
@@ -41,8 +40,16 @@ export class OrganizationMembership extends BaseResource implements Organization
       search: convertPageToOffset({ ...retrieveMembershipsParams, paginated: true }) as any,
     })
       .then(res => {
+        if (!res?.response) {
+          return {
+            total_count: 0,
+            data: [],
+          };
+        }
+
+        // TODO: Fix typing
         const { data: suggestions, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
+          res.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
 
         return {
           total_count,
@@ -99,9 +106,16 @@ export class OrganizationMembership extends BaseResource implements Organization
       },
       { forceUpdateClient: true },
     );
-    const currentMembership = (json?.response as unknown as OrganizationMembershipJSON[]).find(
+
+    if (!json?.response) {
+      return this.fromJSON(null);
+    }
+
+    // TODO: Fix typing
+    const currentMembership = (json.response as unknown as OrganizationMembershipJSON[]).find(
       orgMem => orgMem.id === this.id,
     );
+
     return this.fromJSON(currentMembership as OrganizationMembershipJSON);
   }
 }

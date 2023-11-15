@@ -141,6 +141,7 @@ type OwnProps = PrimitiveProps<'button'> & {
   isActive?: boolean;
   hoverAsFocus?: boolean;
 };
+
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
@@ -172,7 +173,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
       type={undefined}
       onClick={onClick}
       disabled={isDisabled}
-      css={applyVariants(parsedProps)}
+      css={applyVariants(parsedProps) as any}
       ref={ref}
     >
       {isLoading && (
@@ -216,7 +217,7 @@ const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, re
       // the default styles of our components
       type={undefined}
       onClick={onClick}
-      css={applyVariants(parsedProps)}
+      css={applyVariants(parsedProps) as any}
       disabled={isDisabled}
       ref={ref}
     >

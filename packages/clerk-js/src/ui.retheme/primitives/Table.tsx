@@ -59,7 +59,7 @@ export const Table = React.forwardRef<HTMLTableCellElement, TableProps>((props, 
     <Box
       as='table'
       {...filterProps(props)}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
       ref={ref}
     />
   );

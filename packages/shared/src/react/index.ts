@@ -3,7 +3,6 @@ export * from './hooks';
 export {
   ClerkInstanceContext,
   ClientContext,
-  OrganizationContext,
   OrganizationProvider,
   SessionContext,
   useClerkInstanceContext,

@@ -25,7 +25,7 @@ export const FormLabel = (props: FormLabelProps) => {
     <label
       {...applyDataStateProps(rest)}
       htmlFor={htmlForProp ?? id}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     >
       {props.children}
     </label>

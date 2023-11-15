@@ -64,7 +64,7 @@ export const Flex = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => 
   return (
     <Box
       {...filterProps(props)}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
       ref={ref}
     />
   );
@@ -73,7 +73,7 @@ export const Flex = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => 
 export const Col = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
   return (
     <Flex
-      {...props}
+      {...(props as any)}
       direction='col'
       ref={ref}
     />

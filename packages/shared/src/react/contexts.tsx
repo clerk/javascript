@@ -4,15 +4,12 @@ import type {
   ActiveSessionResource,
   ClientResource,
   LoadedClerk,
-  OrganizationInvitationResource,
-  OrganizationMembershipResource,
   OrganizationResource,
   UserResource,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { deprecated } from '../deprecated';
 import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './hooks/createContextAndHook';
 
@@ -51,14 +48,6 @@ const OrganizationProvider = ({
       </OrganizationContextInternal.Provider>
     </SWRConfig>
   );
-};
-
-/**
- * @deprecated use OrganizationProvider instead
- */
-export const OrganizationContext = (...args: Parameters<typeof OrganizationProvider>) => {
-  deprecated('OrganizationContext', 'Use `OrganizationProvider` instead');
-  return OrganizationProvider(...args);
 };
 
 export {

@@ -36,7 +36,7 @@ jobs:
 
       - name: Build packages
         run: |
-          CLERK_RETHEME=1 npx turbo build --filter='@clerk/clerk-js' --filter='@clerk/nextjs'
+          CLERK_RETHEME=1 npx turbo build --force
 
       - name: Install site in isolation
         run: node scripts/install-site-in-isolation.mjs playground/nextjs

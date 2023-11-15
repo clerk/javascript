@@ -10,7 +10,7 @@ export const Tbody = React.forwardRef<HTMLTableSectionElement, TbodyProps>((prop
   return (
     <Box
       as='tbody'
-      {...props}
+      {...(props as any)}
       ref={ref}
     />
   );

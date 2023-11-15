@@ -1,3 +1,5 @@
+import type { Autocomplete } from 'utils';
+
 import type { OrganizationResource } from './organization';
 import type { ClerkResource } from './resource';
 import type { PublicUserData } from './session';
@@ -28,9 +30,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
   /**
    * @experimental The property is experimental and subject to change in future releases.
    */
-  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-  // eslint-disable-next-line
-  permissions: (OrganizationPermission | (string & {}))[];
+  permissions: Autocomplete<OrganizationPermission>[];
   publicMetadata: OrganizationMembershipPublicMetadata;
   publicUserData: PublicUserData;
   role: MembershipRole;
@@ -40,9 +40,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-// Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-// eslint-disable-next-line
-export type MembershipRole = 'admin' | 'basic_member' | 'guest_member' | (string & {});
+export type MembershipRole = Autocomplete<'admin' | 'basic_member' | 'guest_member'>;
 
 export type OrganizationPermission =
   | 'org:sys_domains:manage'

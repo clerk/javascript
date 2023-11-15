@@ -39,7 +39,7 @@ export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props,
       aria-live='polite'
       id={errorMessageId}
       {...rest}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     >
       <Icon
         colorScheme={'danger'}

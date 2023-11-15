@@ -29,7 +29,7 @@ export const Heading = (props: HeadingProps) => {
   return (
     <As
       {...filterProps(rest)}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     />
   );
 };

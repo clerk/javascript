@@ -11,7 +11,6 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
-import { deprecatedObjectProperty } from '../../deprecated';
 import { useClerkInstanceContext, useUserContext } from '../contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -37,7 +36,6 @@ type UseOrganizationListParams = {
       });
 };
 
-type OrganizationList = ReturnType<typeof createOrganizationList>;
 const undefinedPaginatedResource = {
   data: undefined,
   count: undefined,
@@ -60,10 +58,6 @@ type UseOrganizationList = <T extends UseOrganizationListParams>(
 ) =>
   | {
       isLoaded: false;
-      /**
-       * @deprecated Use userMemberships instead
-       */
-      organizationList: undefined;
       createOrganization: undefined;
       setActive: undefined;
       userMemberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
@@ -72,10 +66,6 @@ type UseOrganizationList = <T extends UseOrganizationListParams>(
     }
   | {
       isLoaded: boolean;
-      /**
-       * @deprecated Use userMemberships instead
-       */
-      organizationList: OrganizationList;
       createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
       setActive: SetActive;
       userMemberships: PaginatedResources<
@@ -208,7 +198,6 @@ export const useOrganizationList: UseOrganizationList = params => {
   if (!isClerkLoaded) {
     return {
       isLoaded: false,
-      organizationList: undefined,
       createOrganization: undefined,
       setActive: undefined,
       userMemberships: undefinedPaginatedResource,
@@ -217,23 +206,12 @@ export const useOrganizationList: UseOrganizationList = params => {
     };
   }
 
-  const result = {
+  return {
     isLoaded: isClerkLoaded,
-    organizationList: createOrganizationList(user.organizationMemberships),
     setActive: clerk.setActive,
     createOrganization: clerk.createOrganization,
     userMemberships: memberships,
     userInvitations: invitations,
     userSuggestions: suggestions,
   };
-  deprecatedObjectProperty(result, 'organizationList', 'Use `userMemberships` instead.');
-
-  return result;
 };
-
-function createOrganizationList(organizationMemberships: OrganizationMembershipResource[]) {
-  return organizationMemberships.map(organizationMembership => ({
-    membership: organizationMembership,
-    organization: organizationMembership.organization,
-  }));
-}

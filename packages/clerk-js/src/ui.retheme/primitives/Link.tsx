@@ -66,7 +66,7 @@ export const Link = (props: LinkProps): JSX.Element => {
       href={href || ''}
       target={href && isExternal ? '_blank' : undefined}
       rel={href && isExternal ? 'noopener' : undefined}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     >
       {children}
     </a>

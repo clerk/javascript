@@ -17,7 +17,7 @@ import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './sig
 import type { OAuthStrategy } from './strategies';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
-import type { CamelToSnake } from './utils';
+import type { Autocomplete, CamelToSnake } from './utils';
 import type { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
@@ -303,9 +303,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   /**
    * @experimental The property is experimental and subject to change in future releases.
    */
-  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-  // eslint-disable-next-line
-  permissions: (OrganizationPermission | (string & {}))[];
+  permissions: Autocomplete<OrganizationPermission>[];
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;
