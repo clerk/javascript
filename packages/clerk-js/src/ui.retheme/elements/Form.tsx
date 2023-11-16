@@ -156,6 +156,43 @@ const PlainInput = (props: CommonInputProps) => {
   );
 };
 
+const PasswordInput = (props: CommonInputProps) => {
+  return (
+    <CommonInputWrapper {...props}>
+      <Field.PasswordInput />
+    </CommonInputWrapper>
+  );
+};
+
+const InputGroup = (
+  props: CommonInputProps & {
+    groupPrefix?: string;
+    groupSuffix?: string;
+  },
+) => {
+  const { groupSuffix, groupPrefix, ...fieldProps } = props;
+  return (
+    <CommonInputWrapper {...fieldProps}>
+      <Field.InputGroup {...{ groupSuffix, groupPrefix }} />
+    </CommonInputWrapper>
+  );
+};
+
+const Checkbox = (
+  props: CommonFieldRootProps & {
+    description?: string | LocalizationKey;
+  },
+) => {
+  return (
+    <Field.Root {...props}>
+      <Flex align='start'>
+        <Field.CheckboxIndicator />
+        <Field.CheckboxLabel description={props.description} />
+      </Flex>
+    </Field.Root>
+  );
+};
+
 const RadioGroup = (
   props: Omit<PropsOfComponent<typeof Field.Root>, 'infoText' | 'type' | 'validatePassword' | 'label' | 'placeholder'>,
 ) => {
@@ -189,7 +226,10 @@ export const Form = {
    */
   Control: FormControl,
   PlainInput,
+  PasswordInput,
+  InputGroup,
   RadioGroup,
+  Checkbox,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };

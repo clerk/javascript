@@ -143,26 +143,26 @@ export const PasswordPage = withCardStateProvider(() => {
           />
           {user.passwordEnabled && (
             <Form.ControlRow elementId={currentPasswordField.id}>
-              <Form.Control
+              <Form.PasswordInput
                 {...currentPasswordField.props}
                 minLength={6}
-                required
+                isRequired
                 autoFocus
                 isDisabled={passwordEditDisabled}
               />
             </Form.ControlRow>
           )}
           <Form.ControlRow elementId={passwordField.id}>
-            <Form.Control
+            <Form.PasswordInput
               {...passwordField.props}
               minLength={6}
-              required
+              isRequired
               autoFocus={!user.passwordEnabled}
               isDisabled={passwordEditDisabled}
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={confirmField.id}>
-            <Form.Control
+            <Form.PasswordInput
               {...confirmField.props}
               onChange={e => {
                 if (e.target.value) {
@@ -170,12 +170,15 @@ export const PasswordPage = withCardStateProvider(() => {
                 }
                 return confirmField.props.onChange(e);
               }}
+              isRequired
               isDisabled={passwordEditDisabled}
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={sessionsField.id}>
-            <Form.Control
+            <Form.Checkbox
               {...sessionsField.props}
+              //TODO: localize this
+              description={'It is advised to logout of all other devices that may user an old password'}
               isDisabled={passwordEditDisabled}
             />
           </Form.ControlRow>

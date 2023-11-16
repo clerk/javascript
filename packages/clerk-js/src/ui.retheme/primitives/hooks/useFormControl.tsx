@@ -20,7 +20,6 @@ export type FormControlProps = {
   setSuccess: (message: string) => void;
   setWarning: (warning: string) => void;
   setInfo: (info: string) => void;
-  setHasPassedComplexity: (b: boolean) => void;
   clearFeedback: () => void;
 };
 
@@ -48,7 +47,6 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
     setSuccess,
     setWarning,
     setInfo,
-    setHasPassedComplexity,
     clearFeedback,
   } = props;
   // TODO: This shouldnt be targettable
@@ -70,23 +68,10 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
         setSuccess,
         setWarning,
         setInfo,
-        setHasPassedComplexity,
         clearFeedback,
       },
     }),
-    [
-      isRequired,
-      hasError,
-      id,
-      errorMessageId,
-      isDisabled,
-      setError,
-      setSuccess,
-      setInfo,
-      setWarning,
-      setHasPassedComplexity,
-      clearFeedback,
-    ],
+    [isRequired, hasError, id, errorMessageId, isDisabled, setError, setSuccess, setInfo, setWarning, clearFeedback],
   );
   return <FormControlContext.Provider value={value}>{props.children}</FormControlContext.Provider>;
 };

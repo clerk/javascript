@@ -10,18 +10,7 @@ import { FormControlContextProvider } from './hooks';
  * Field.Root is just a Provider
  */
 export const FormControl = (props: React.PropsWithChildren<FormControlProps>) => {
-  const {
-    hasError,
-    id,
-    isRequired,
-    setError,
-    setInfo,
-    clearFeedback,
-    setSuccess,
-    setWarning,
-    setHasPassedComplexity,
-    ...rest
-  } = props;
+  const { hasError, id, isRequired, setError, setInfo, clearFeedback, setSuccess, setWarning, ...rest } = props;
   return (
     <Flex
       direction='col'
@@ -38,7 +27,6 @@ export const FormControl = (props: React.PropsWithChildren<FormControlProps>) =>
           clearFeedback,
           setSuccess,
           setWarning,
-          setHasPassedComplexity,
         }}
       >
         {props.children}

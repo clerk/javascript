@@ -1,3 +1,4 @@
+import type { ClerkAPIError } from '@clerk/types';
 import type { ChangeEvent } from 'react';
 import { forwardRef, useRef, useState } from 'react';
 
@@ -6,18 +7,32 @@ import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Input, localizationKeys, useLocalizations } from '../customizables';
 import { usePassword } from '../hooks/usePassword';
 import { Eye, EyeSlash } from '../icons';
-import { useFormControl } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { mergeRefs } from '../utils';
 import { IconButton } from './IconButton';
 
 type PasswordInputProps = PropsOfComponent<typeof Input> & {
   validatePassword?: boolean;
+  setError: (error: string | ClerkAPIError | undefined) => void;
+  setWarning: (warning: string) => void;
+  setSuccess: (message: string) => void;
+  setInfo: (info: string) => void;
+  setHasPassedComplexity: (b: boolean) => void;
 };
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
   const [hidden, setHidden] = useState(true);
-  const { id, onChange: onChangeProp, validatePassword: validatePasswordProp = false, ...rest } = props;
+  const {
+    id,
+    onChange: onChangeProp,
+    validatePassword: validatePasswordProp = false,
+    setInfo,
+    setSuccess,
+    setWarning,
+    setError,
+    setHasPassedComplexity,
+    ...rest
+  } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const [timeoutState, setTimeoutState] = useState<ReturnType<typeof setTimeout> | null>(null);
 
@@ -25,25 +40,23 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     userSettings: { passwordSettings },
   } = useEnvironment();
 
-  const formControlProps = useFormControl();
   const { t } = useLocalizations();
 
   const { validatePassword } = usePassword(
     { ...passwordSettings, validatePassword: validatePasswordProp },
     {
-      onValidationSuccess: () =>
-        formControlProps?.setSuccess?.(t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))),
-      onValidationError: message => formControlProps?.setError?.(message),
-      onValidationWarning: message => formControlProps?.setWarning?.(message),
+      onValidationSuccess: () => setSuccess(t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))),
+      onValidationError: message => setError(message),
+      onValidationWarning: message => setWarning(message),
       onValidationInfo: message => {
         if (inputRef.current === document.activeElement) {
-          formControlProps?.setInfo?.(message);
+          setInfo(message);
         } else {
           // Turn the suggestion into an error if not focused.
-          formControlProps?.setError?.(message);
+          setError(message);
         }
       },
-      onValidationComplexity: hasPassed => formControlProps?.setHasPassedComplexity?.(hasPassed),
+      onValidationComplexity: hasPassed => setHasPassedComplexity(hasPassed),
     },
   );
 
@@ -79,7 +92,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
           // Call validate password because to calculate the new feedbackType as the element is now focused
           validatePassword(e.target.value);
         }}
-        //@ts-expect-error
+        //@ts-expect-error Type mismatch between ForwardRef and RefObject due to null
         ref={mergeRefs(ref, inputRef)}
         type={hidden ? 'password' : 'text'}
         sx={theme => ({ paddingRight: theme.space.$10 })}
