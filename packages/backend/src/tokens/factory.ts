@@ -1,7 +1,7 @@
 import type { ApiClient } from '../api';
 import { API_URL, API_VERSION } from '../constants';
 import type { LoadInterstitialOptions } from './interstitial';
-import { buildPublicInterstitialUrl, loadInterstitialFromBAPI, loadInterstitialFromLocal } from './interstitial';
+import { loadInterstitialFromLocal } from './interstitial';
 import type { AuthenticateRequestOptions } from './request';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
 
@@ -36,7 +36,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     isSatellite: buildtimeIsSatellite = false,
     domain: buildtimeDomain = '',
     audience: buildtimeAudience = '',
-    userAgent: buildUserAgent,
+    userAgent: buildtimeUserAgent,
   } = params.options;
 
   const authenticateRequest = ({
@@ -47,7 +47,8 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     jwtKey: runtimeJwtKey,
     isSatellite: runtimeIsSatellite,
     domain: runtimeDomain,
-    searchParams,
+    searchParams: runtimeSearchParams,
+    userAgent: runtimeUserAgent,
     ...rest
   }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) => {
     return authenticateRequestOriginal({
@@ -61,7 +62,8 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
       domain: runtimeDomain || buildtimeDomain,
       jwtKey: runtimeJwtKey || buildtimeJwtKey,
-      searchParams,
+      searchParams: runtimeSearchParams,
+      userAgent: runtimeUserAgent?.toString() || buildtimeUserAgent,
     });
   };
 
