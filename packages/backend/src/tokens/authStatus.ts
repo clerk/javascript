@@ -1,7 +1,7 @@
 import type { JwtPayload } from '@clerk/types';
 
 import { createBackendApiClient } from '../api';
-import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
+import type { SignedInAuthObject, SignedInAuthObjectOptions, SignedOutAuthObject } from './authObjects';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';
 import type { TokenVerificationErrorReason } from './errors';
 
@@ -81,25 +81,59 @@ export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
 export type RequestState = SignedInState | SignedOutState | InterstitialState | UnknownState;
 
-export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promise<SignedInState> {
+export type LoadResourcesOptions = {
+  loadSession?: boolean;
+  loadUser?: boolean;
+  loadOrganization?: boolean;
+};
+
+type RequestStateParams = {
+  publishableKey?: string;
+  domain?: string;
+  isSatellite?: boolean;
+  proxyUrl?: string;
+  signInUrl?: string;
+  signUpUrl?: string;
+  afterSignInUrl?: string;
+  afterSignUpUrl?: string;
+};
+
+type AuthParams = {
+  /* Client token cookie value */
+  cookieToken?: string;
+  /* Client uat cookie value */
+  clientUat?: string;
+  /* Client token header value */
+  headerToken?: string;
+};
+
+export type AuthStatusOptionsType = LoadResourcesOptions &
+  Partial<SignedInAuthObjectOptions> &
+  RequestStateParams &
+  AuthParams;
+
+export async function signedIn<T extends AuthStatusOptionsType>(
+  options: T,
+  sessionClaims: JwtPayload,
+): Promise<SignedInState> {
   const {
+    publishableKey = '',
+    proxyUrl = '',
+    isSatellite = false,
+    domain = '',
+    signInUrl = '',
+    signUpUrl = '',
+    afterSignInUrl = '',
+    afterSignUpUrl = '',
     secretKey,
     apiUrl,
     apiVersion,
     cookieToken,
-    proxyUrl,
-    publishableKey,
-    domain,
-    isSatellite,
     headerToken,
     loadSession,
     loadUser,
     loadOrganization,
-    signInUrl,
-    signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
-  } = options as any;
+  } = options;
 
   const { sid: sessionId, org_id: orgId, sub: userId } = sessionClaims;
 
@@ -154,10 +188,21 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     toAuth: () => authObject,
   };
 }
-
-export function signedOut<T>(options: T, reason: AuthReason, message = ''): SignedOutState {
-  const { publishableKey, proxyUrl, isSatellite, domain, signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } =
-    options as any;
+export function signedOut<T extends AuthStatusOptionsType>(
+  options: T,
+  reason: AuthReason,
+  message = '',
+): SignedOutState {
+  const {
+    publishableKey = '',
+    proxyUrl = '',
+    isSatellite = false,
+    domain = '',
+    signInUrl = '',
+    signUpUrl = '',
+    afterSignInUrl = '',
+    afterSignUpUrl = '',
+  } = options;
 
   return {
     status: AuthStatus.SignedOut,
@@ -178,9 +223,22 @@ export function signedOut<T>(options: T, reason: AuthReason, message = ''): Sign
   };
 }
 
-export function interstitial<T>(options: T, reason: AuthReason, message = ''): InterstitialState {
-  const { publishableKey, proxyUrl, isSatellite, domain, signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } =
-    options as any;
+export function interstitial<T extends AuthStatusOptionsType>(
+  options: T,
+  reason: AuthReason,
+  message = '',
+): InterstitialState {
+  const {
+    publishableKey = '',
+    proxyUrl = '',
+    isSatellite = false,
+    domain = '',
+    signInUrl = '',
+    signUpUrl = '',
+    afterSignInUrl = '',
+    afterSignUpUrl = '',
+  } = options;
+
   return {
     status: AuthStatus.Interstitial,
     reason,
@@ -200,8 +258,18 @@ export function interstitial<T>(options: T, reason: AuthReason, message = ''): I
   };
 }
 
-export function unknownState<T>(options: T, reason: AuthReason, message = ''): UnknownState {
-  const { publishableKey, isSatellite, domain, signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = options as any;
+export function unknownState(options: AuthStatusOptionsType, reason: AuthReason, message = ''): UnknownState {
+  const {
+    publishableKey = '',
+    proxyUrl = '',
+    isSatellite = false,
+    domain = '',
+    signInUrl = '',
+    signUpUrl = '',
+    afterSignInUrl = '',
+    afterSignUpUrl = '',
+  } = options;
+
   return {
     status: AuthStatus.Unknown,
     reason,
@@ -209,6 +277,7 @@ export function unknownState<T>(options: T, reason: AuthReason, message = ''): U
     publishableKey,
     isSatellite,
     domain,
+    proxyUrl,
     signInUrl,
     signUpUrl,
     afterSignInUrl,

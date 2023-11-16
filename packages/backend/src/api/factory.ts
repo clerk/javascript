@@ -16,16 +16,7 @@ import {
 } from './endpoints';
 import { buildRequest } from './request';
 
-export type CreateBackendApiOptions = {
-  /* Secret Key */
-  secretKey?: string;
-  /* Backend API URL */
-  apiUrl?: string;
-  /* Backend API version */
-  apiVersion?: string;
-  /* Library/SDK name */
-  userAgent?: string;
-};
+export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0];
 
 export type ApiClient = ReturnType<typeof createBackendApiClient>;
 

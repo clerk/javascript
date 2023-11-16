@@ -5,4 +5,4 @@ export * from './errors';
 export * from './factory';
 export { loadInterstitialFromLocal } from './interstitial';
 export { debugRequestState } from './request';
-export type { AuthenticateRequestOptions, OptionalVerifyTokenOptions, RequiredVerifyTokenOptions } from './request';
+export type { AuthenticateRequestOptions, OptionalVerifyTokenOptions } from './request';

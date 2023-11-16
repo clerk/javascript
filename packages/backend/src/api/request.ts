@@ -8,7 +8,6 @@ import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
 import runtime from '../runtime';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { joinPaths } from '../util/path';
-import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
 export type ClerkBackendApiRequestOptions = {
@@ -64,7 +63,18 @@ const withLegacyReturn =
     }
   };
 
-export function buildRequest(options: CreateBackendApiOptions) {
+type BuildRequestOptions = {
+  /* Secret Key */
+  secretKey?: string;
+  /* Backend API URL */
+  apiUrl?: string;
+  /* Backend API version */
+  apiVersion?: string;
+  /* Library/SDK name */
+  userAgent?: string;
+};
+
+export function buildRequest(options: BuildRequestOptions) {
   const request = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
     const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;

@@ -6,19 +6,14 @@ import type {
   ServerGetTokenOptions,
 } from '@clerk/types';
 
-import type { Organization, Session, User } from '../api';
+import type { CreateBackendApiOptions, Organization, Session, User } from '../api';
 import { createBackendApiClient } from '../api';
-import type { RequestState } from './authStatus';
-import type { AuthenticateRequestOptions } from './request';
 
-type AuthObjectDebugData = Partial<AuthenticateRequestOptions & RequestState>;
+type AuthObjectDebugData = Record<string, any>;
 type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
-type AuthObjectDebug = () => unknown;
+type AuthObjectDebug = () => AuthObjectDebugData;
 
-export type SignedInAuthObjectOptions = {
-  secretKey?: string;
-  apiUrl: string;
-  apiVersion: string;
+export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
   token: string;
   session?: Session;
   user?: User;
