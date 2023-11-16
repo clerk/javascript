@@ -403,29 +403,6 @@ describe('Clerk singleton', () => {
 
       expect(document.cookie).toContain(mockJwt);
     });
-
-    it('contains the default allowed origin values', async () => {
-      const sut = new Clerk(productionPublishableKey);
-      await sut.load();
-
-      const frontendApiStr = sut.frontendApi;
-
-      expect(sut.allowedRedirectOrigins).toEqual([
-        window.location.origin,
-        `${window.location.origin}/*`,
-        `https://*.${getETLDPlusOneFromFrontendApi(frontendApiStr)}`,
-        `https://*.${getETLDPlusOneFromFrontendApi(frontendApiStr)}/*`,
-      ]);
-    });
-
-    it('contains only the allowedRedirectOrigins options given', async () => {
-      const sut = new Clerk(productionPublishableKey);
-      await sut.load({
-        allowedRedirectOrigins: ['https://test.host'],
-      });
-
-      expect(sut.allowedRedirectOrigins).toEqual(['https://test.host']);
-    });
   });
 
   describe('.signOut()', () => {

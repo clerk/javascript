@@ -60,12 +60,12 @@ import {
   appendAsQueryParams,
   buildURL,
   completeSignUpFlow,
+  createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createCookieHandler,
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
-  getETLDPlusOneFromFrontendApi,
   hasExternalAccountSignUpError,
   ignoreEventValue,
   inActiveBrowserTab,
@@ -256,25 +256,6 @@ export class Clerk implements ClerkInterface {
 
   public isReady = (): boolean => this.#isReady;
 
-  get allowedRedirectOrigins(): (string | RegExp)[] | undefined {
-    if (!this.#options.allowedRedirectOrigins) {
-      const origins = [];
-      if (inBrowser()) {
-        origins.push(window.location.origin);
-        origins.push(window.location.origin + '/*');
-      }
-
-      const frontendApi = this.frontendApi;
-
-      origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`);
-      origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}/*`);
-
-      return origins;
-    }
-
-    return this.#options.allowedRedirectOrigins;
-  }
-
   public load = async (options?: ClerkOptions): Promise<void> => {
     if (this.#isReady) {
       return;
@@ -285,7 +266,10 @@ export class Clerk implements ClerkInterface {
       ...options,
     };
 
-    this.#options.allowedRedirectOrigins = this.allowedRedirectOrigins;
+    this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
+      this.#options.allowedRedirectOrigins,
+      this.frontendApi,
+    );
 
     if (this.#options.standardBrowser) {
       this.#isReady = await this.#loadInStandardBrowser();

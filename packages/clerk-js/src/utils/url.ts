@@ -350,3 +350,22 @@ export const isAllowedRedirectOrigin = (_url: string, allowedRedirectOrigins: Ar
   }
   return isAllowed;
 };
+
+export function createAllowedRedirectOrigins(
+  allowedRedirectOrigins: Array<string | RegExp> | undefined,
+  frontendApi: string,
+): (string | RegExp)[] | undefined {
+  if (!allowedRedirectOrigins || allowedRedirectOrigins.length === 0) {
+    const origins = [];
+    if (typeof window !== 'undefined' && !!window.location) {
+      origins.push(window.location.origin);
+    }
+
+    origins.push(`https://${getETLDPlusOneFromFrontendApi(frontendApi)}`);
+    origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`);
+
+    return origins;
+  }
+
+  return allowedRedirectOrigins;
+}

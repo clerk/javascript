@@ -6,6 +6,5 @@ Introducing default values for allowed redirect origins, this change will apply 
 
 Let's assume the host of the application is `test.host`, the origins will be
 - `https://test.host/`
-- `https://test.host/*`
+- `https://yourawesomeapp.clerk.accounts.dev/`
 - `https://*.yourawesomeapp.clerk.accounts.dev/`
-- `https://*.yourawesomeapp.clerk.accounts.dev/*`
