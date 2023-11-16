@@ -267,8 +267,8 @@ export class TelemetryCollector {
 
     return {
       event,
-      cv: this.#metadata.clerkVersion,
-      it: this.#metadata.instanceType,
+      cv: this.#metadata.clerkVersion ?? '',
+      it: this.#metadata.instanceType ?? '',
       sdk: sdkMetadata.name,
       sdkv: sdkMetadata.version,
       ...(this.#metadata.publishableKey ? { pk: this.#metadata.publishableKey } : {}),
