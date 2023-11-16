@@ -55,7 +55,7 @@ type MethodName<T> = {
 
 type MethodCallback = () => Promise<unknown> | unknown;
 
-export default class IsomorphicClerk {
+export class IsomorphicClerk {
   private readonly mode: 'browser' | 'server';
   private readonly publishableKey?: string;
   private readonly options: IsomorphicClerkOptions;

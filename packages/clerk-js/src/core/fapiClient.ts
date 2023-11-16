@@ -59,7 +59,7 @@ export interface FapiClient {
   request<T>(requestInit: FapiRequestInit): Promise<FapiResponse<T>>;
 }
 
-export default function createFapiClient(clerkInstance: Clerk): FapiClient {
+export function createFapiClient(clerkInstance: Clerk): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
   const onAfterResponseCallbacks: Array<FapiRequestCallback<unknown>> = [];
 

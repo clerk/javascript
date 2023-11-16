@@ -2,7 +2,7 @@ import type { ActiveSessionResource, SignInJSON, SignUpJSON, TokenResource } fro
 import { waitFor } from '@testing-library/dom';
 
 import { mockNativeRuntime } from '../testUtils';
-import Clerk from './clerk';
+import { Clerk } from './clerk';
 import { eventBus, events } from './events';
 import type { AuthConfig, DisplayConfig, Organization } from './resources/internal';
 import { BaseResource, Client, EmailLinkErrorCode, Environment, SignIn, SignUp } from './resources/internal';
@@ -17,13 +17,15 @@ jest.mock('./resources/Client');
 jest.mock('./resources/Environment');
 
 // Because Jest, don't ask me why...
-jest.mock('./devBrowserHandler', () => () => ({
-  clear: jest.fn(),
-  setup: jest.fn(),
-  getDevBrowserJWT: jest.fn(() => 'deadbeef'),
-  setDevBrowserJWT: jest.fn(),
-  removeDevBrowserJWT: jest.fn(),
-  usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
+jest.mock('./devBrowserHandler', () => ({
+  createDevBrowserHandler: () => ({
+    clear: jest.fn(),
+    setup: jest.fn(),
+    getDevBrowserJWT: jest.fn(() => 'deadbeef'),
+    setDevBrowserJWT: jest.fn(),
+    removeDevBrowserJWT: jest.fn(),
+    usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
+  }),
 }));
 
 Client.getInstance = jest.fn().mockImplementation(() => {
