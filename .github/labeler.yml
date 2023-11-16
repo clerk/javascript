@@ -47,3 +47,8 @@ actions:
 
 integration:
   - integration/**
+
+# TODO @retheme: Remove
+retheme:
+  - packages/clerk-js/src/ui.retheme/**
+  - packages/**/*.retheme.*
