@@ -2,7 +2,7 @@
 '@clerk/clerk-js': minor
 ---
 
-Introducing default values for allowed redirect origins, this change will apply default values for the `allowedRedirectOrigins option`, if there is no value provided the defaults will be similar to the example below.
+Introducing default values for `allowedRedirectOrigins`. If no value is provided, default values similar to the example below will apply.
 
 Let's assume the host of the application is `test.host`, the origins will be
 - `https://test.host/`
