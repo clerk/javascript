@@ -211,7 +211,7 @@ function _SignUpStart(): JSX.Element {
     card.setError(undefined);
 
     const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
-    const redirectUrlComplete = ctx.afterSignUpUrl || '/' || displayConfig.afterSignUpUrl;
+    const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     return signUp
       .create(buildRequest(fieldsToSubmit))
