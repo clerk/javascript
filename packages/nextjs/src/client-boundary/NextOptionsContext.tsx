@@ -8,8 +8,8 @@ const ClerkNextOptionsCtx = React.createContext<{ value: ClerkNextContextValue }
 ClerkNextOptionsCtx.displayName = 'ClerkNextOptionsCtx';
 
 const useClerkNextOptions = () => {
-  const ctx = React.useContext(ClerkNextOptionsCtx)!;
-  return ctx.value as ClerkNextContextValue;
+  const ctx = React.useContext(ClerkNextOptionsCtx) as { value: ClerkNextContextValue };
+  return ctx.value;
 };
 
 const ClerkNextOptionsProvider = (props: React.PropsWithChildren<{ options: ClerkNextContextValue }>) => {

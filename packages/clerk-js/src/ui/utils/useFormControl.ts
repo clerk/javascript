@@ -142,7 +142,6 @@ export const useFormControl = <Id extends string>(
     setFocused(false);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { defaultChecked, validatePassword: validatePasswordProp, buildErrorMessage, ...restOpts } = opts;
 
   const props = {

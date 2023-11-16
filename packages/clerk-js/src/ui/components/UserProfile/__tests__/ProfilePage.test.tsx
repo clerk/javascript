@@ -1,5 +1,6 @@
 import type { ImageResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
+import React from 'react';
 
 import { bindCreateFixtures, render, screen } from '../../../../testUtils';
 import { ProfilePage } from '../ProfilePage';

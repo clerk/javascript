@@ -14,8 +14,7 @@ export const MembershipWidget = () => {
     return null;
   }
 
-  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-  const totalCount = organization?.membersCount + organization?.pendingInvitationsCount;
+  const totalCount = organization.membersCount + organization.pendingInvitationsCount;
 
   return (
     <Flex

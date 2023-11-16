@@ -15,7 +15,7 @@ export const useAwaitableNavigate = () => {
   const { push } = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+
   const urlKey = pathname + params.toString();
 
   useEffect(() => {

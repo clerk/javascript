@@ -37,7 +37,7 @@ export const PersonalAccountPreview = withCardStateProvider(() => {
   const { hidePersonal, navigateAfterSelectPersonal } = useOrganizationListContext();
   const { isLoaded, setActive } = useCoreOrganizationList();
   const user = useCoreUser();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
 
   const handlePersonalClicked = () => {
