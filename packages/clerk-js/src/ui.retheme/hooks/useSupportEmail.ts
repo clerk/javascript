@@ -1,10 +1,11 @@
+import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
 import { buildEmailAddress } from '../../utils';
-import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
+import { useEnvironment, useOptions } from '../contexts';
 
 export function useSupportEmail(): string {
-  const Clerk = useCoreClerk();
+  const Clerk = useClerk();
   const { supportEmail: supportEmailFromOptions } = useOptions();
   const { displayConfig } = useEnvironment();
   const { supportEmail: supportEmailFromEnvironment } = displayConfig;

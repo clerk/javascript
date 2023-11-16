@@ -1,8 +1,8 @@
+import { useClerk } from '@clerk/shared/react';
 import qs from 'qs';
 import React from 'react';
 
 import { getQueryParams, trimTrailingSlash } from '../../utils';
-import { useCoreClerk } from '../contexts';
 import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
@@ -40,7 +40,7 @@ export const BaseRouter = ({
   urlStateParam,
   children,
 }: BaseRouterProps): JSX.Element => {
-  const { navigate: externalNavigate } = useCoreClerk();
+  const { navigate: externalNavigate } = useClerk();
 
   const [routeParts, setRouteParts] = React.useState({
     path: getPath(),

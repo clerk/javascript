@@ -1,9 +1,9 @@
-import { useSession } from '@clerk/shared/react';
+import { useClerk, useSession } from '@clerk/shared/react';
 import type { PointerEventHandler } from 'react';
 import React, { useEffect, useRef } from 'react';
 
 import { getFullName, getIdentifier } from '../../../utils/user';
-import { useCoreClerk, withCoreUserGuard } from '../../contexts';
+import { withCoreUserGuard } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Col,
@@ -59,7 +59,7 @@ type FabContentProps = { title: LocalizationKey; signOutText: LocalizationKey };
 
 const FabContent = ({ title, signOutText }: FabContentProps) => {
   const { session } = useSession();
-  const { signOut } = useCoreClerk();
+  const { signOut } = useClerk();
 
   return (
     <Col

@@ -1,8 +1,8 @@
+import { useClerk } from '@clerk/shared/react';
 import type { NavigateOptions } from '@clerk/types';
 import React from 'react';
 
 import { hasUrlInFragment, mergeFragmentIntoUrl, stripOrigin } from '../../utils';
-import { useCoreClerk } from '../contexts';
 import { BaseRouter } from './BaseRouter';
 
 interface PathRouterProps {
@@ -12,7 +12,7 @@ interface PathRouterProps {
 }
 
 export const PathRouter = ({ basePath, preservedParams, children }: PathRouterProps): JSX.Element | null => {
-  const { navigate } = useCoreClerk();
+  const { navigate } = useClerk();
   const [stripped, setStripped] = React.useState(false);
 
   if (!navigate) {

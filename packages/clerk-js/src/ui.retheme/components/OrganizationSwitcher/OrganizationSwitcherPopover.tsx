@@ -1,10 +1,10 @@
-import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { runIfFunctionOrReturn } from '../../../utils';
 import { NotificationCountBadge, withGate } from '../../common';
-import { useCoreClerk, useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
+import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import {
   Action,
@@ -26,7 +26,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
   (props, ref) => {
     const { close, ...rest } = props;
     const card = useCardState();
-    const { openOrganizationProfile, openCreateOrganization } = useCoreClerk();
+    const { openOrganizationProfile, openCreateOrganization } = useClerk();
     const { organization: currentOrg } = useOrganization();
     const { isLoaded, setActive } = useOrganizationList();
     const router = useRouter();

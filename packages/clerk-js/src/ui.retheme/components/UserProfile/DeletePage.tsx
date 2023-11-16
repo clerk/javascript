@@ -1,6 +1,6 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 
-import { useCoreClerk, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
@@ -12,7 +12,7 @@ export const DeletePage = withCardStateProvider(() => {
   const environment = useEnvironment();
   const router = useRouter();
   const { user } = useUser();
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
 
   const deleteUser = async () => {
     try {

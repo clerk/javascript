@@ -5,13 +5,13 @@ import { useSupportEmail } from '../useSupportEmail';
 const mockUseOptions = jest.fn();
 const mockUseEnvironment = jest.fn();
 
+jest.mock('@clerk/shared/react', () => ({
+  useClerk: () => ({
+    publishableKey: 'pk_live_Y2xlcmsuY2xlcmsuY29tJA',
+  }),
+}));
 jest.mock('../../contexts', () => {
   return {
-    useCoreClerk: () => {
-      return {
-        publishableKey: 'pk_live_Y2xlcmsuY2xlcmsuY29tJA',
-      };
-    },
     useEnvironment: () => mockUseEnvironment(),
     useOptions: () => mockUseOptions(),
   };

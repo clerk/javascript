@@ -1,6 +1,6 @@
+import { useClerk } from '@clerk/shared/react';
 import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 
-import { useCoreClerk } from '../../contexts';
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import { Check } from '../../icons';
@@ -207,7 +207,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
 
 export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref) => {
   // @ts-expect-error
-  const { __internal_country } = useCoreClerk();
+  const { __internal_country } = useClerk();
 
   return (
     <PhoneInputBase

@@ -1,8 +1,7 @@
-import { useSessionList } from '@clerk/shared/react';
+import { useClerk, useSessionList } from '@clerk/shared/react';
 import type { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
 import { windowNavigate } from '../../../utils/windowNavigate';
-import { useCoreClerk } from '../../contexts';
 import { useCardState } from '../../elements';
 import { useRouter } from '../../router';
 import { sleep } from '../../utils';
@@ -18,7 +17,7 @@ type UseMultisessionActionsParams = {
 } & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
-  const { setActive, signOut, openUserProfile } = useCoreClerk();
+  const { setActive, signOut, openUserProfile } = useClerk();
   const card = useCardState();
   const { sessions } = useSessionList();
   const { navigate } = useRouter();
