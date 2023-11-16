@@ -31,7 +31,7 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
  * @param name
  * @returns string
  */
-export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string | undefined => {
+export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string => {
   // Node envs
   if (typeof process !== 'undefined') {
     return (process.env && process.env[name]) || '';
