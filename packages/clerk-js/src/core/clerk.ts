@@ -1,6 +1,5 @@
 import {
   addClerkPrefix,
-  getNonUndefinedValues,
   handleValueOrFn,
   inBrowser as inClientSide,
   is4xxError,
@@ -133,8 +132,8 @@ const defaultOptions: ClerkOptions = {
   isSatellite: false,
   signInUrl: undefined,
   signUpUrl: undefined,
-  afterSignInUrl: '/',
-  afterSignUpUrl: '/',
+  afterSignInUrl: undefined,
+  afterSignUpUrl: undefined,
   isInterstitial: false,
 };
 
@@ -274,7 +273,7 @@ export class Clerk implements ClerkInterface {
 
     this.#options = {
       ...defaultOptions,
-      ...getNonUndefinedValues(options || {}),
+      ...options,
     };
 
     if (this.#options.sdkMetadata) {
@@ -916,13 +915,9 @@ export class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
     );
 
-    const navigateAfterSignIn = makeNavigate(
-      params.afterSignInUrl || params.redirectUrl || displayConfig.afterSignInUrl,
-    );
+    const navigateAfterSignIn = makeNavigate(params.afterSignInUrl || params.redirectUrl || '/');
 
-    const navigateAfterSignUp = makeNavigate(
-      params.afterSignUpUrl || params.redirectUrl || displayConfig.afterSignUpUrl,
-    );
+    const navigateAfterSignUp = makeNavigate(params.afterSignUpUrl || params.redirectUrl || '/');
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||

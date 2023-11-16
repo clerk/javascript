@@ -69,8 +69,7 @@ export const useSignUpContext = (): SignUpContextType => {
       queryParams,
       ctx,
       options,
-      displayConfig,
-    }),
+    }) || '/',
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(
@@ -78,8 +77,7 @@ export const useSignUpContext = (): SignUpContextType => {
       queryParams,
       ctx,
       options,
-      displayConfig,
-    }),
+    }) || '/',
   );
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
@@ -145,8 +143,7 @@ export const useSignInContext = (): SignInContextType => {
       queryParams,
       ctx,
       options,
-      displayConfig,
-    }),
+    }) || '/',
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(
@@ -154,8 +151,7 @@ export const useSignInContext = (): SignInContextType => {
       queryParams,
       ctx,
       options,
-      displayConfig,
-    }),
+    }) || '/',
   );
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);

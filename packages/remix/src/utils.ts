@@ -29,19 +29,19 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
  * Utility function to get env variables across Node and Edge runtimes.
  *
  * @param name
- * @returns string|undefined
+ * @returns string
  */
 export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string | undefined => {
   // Node envs
   if (typeof process !== 'undefined') {
-    return (process.env && process.env[name]) || undefined;
+    return (process.env && process.env[name]) || '';
   }
 
   // Cloudflare pages
   if (typeof context !== 'undefined') {
     const contextEnv = context?.env as Record<string, string>;
 
-    return contextEnv[name] || (context[name] as string) || undefined;
+    return contextEnv[name] || (context[name] as string) || '';
   }
 
   // Cloudflare workers
@@ -51,5 +51,5 @@ export const getEnvVariable = (name: string, context: AppLoadContext | undefined
     // This will raise an error in Cloudflare Pages
   }
 
-  return undefined;
+  return '';
 };

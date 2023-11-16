@@ -236,7 +236,7 @@ export function _SignInStart(): JSX.Element {
 
   const authenticateWithSaml = async () => {
     const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
-    const redirectUrlComplete = ctx.afterSignInUrl || displayConfig.afterSignInUrl;
+    const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     return signIn.authenticateWithRedirect({
       strategy: 'saml',

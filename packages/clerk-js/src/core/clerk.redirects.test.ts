@@ -130,30 +130,18 @@ describe('Clerk singleton - Redirects', () => {
 
       it('redirects to signInUrl', async () => {
         await clerkForProductionInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(
-          1,
-          '/sign-in#/?after_sign_in_url=%2F&after_sign_up_url=%2F&redirect_url=https%3A%2F%2Fwww.example.com%2F',
-        );
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
 
         await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(
-          2,
-          '/sign-in#/?after_sign_in_url=%2F&after_sign_up_url=%2F&redirect_url=https%3A%2F%2Fwww.example.com%2F',
-        );
+        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
       });
 
       it('redirects to signUpUrl', async () => {
         await clerkForProductionInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(
-          1,
-          '/sign-up#/?after_sign_in_url=%2F&after_sign_up_url=%2F&redirect_url=https%3A%2F%2Fwww.example.com%2F',
-        );
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
 
         await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(
-          2,
-          '/sign-up#/?after_sign_in_url=%2F&after_sign_up_url=%2F&redirect_url=https%3A%2F%2Fwww.example.com%2F',
-        );
+        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
       });
 
       it('redirects to userProfileUrl', async () => {
@@ -222,13 +210,13 @@ describe('Clerk singleton - Redirects', () => {
         await clerkForProductionInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
         expect(mockHref).toHaveBeenNthCalledWith(
           1,
-          'http://another-test.host/sign-in#/?after_sign_in_url=http%3A%2F%2Ftest.host%2F&after_sign_up_url=http%3A%2F%2Ftest.host%2F&redirect_url=https%3A%2F%2Fwww.example.com%2F',
+          'http://another-test.host/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
         );
 
         await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
         expect(mockHref).toHaveBeenNthCalledWith(
           2,
-          'http://another-test.host/sign-in#/?after_sign_in_url=http%3A%2F%2Ftest.host%2F&after_sign_up_url=http%3A%2F%2Ftest.host%2F&redirect_url=https%3A%2F%2Fwww.example.com%2F__clerk_db_jwt[deadbeef]',
+          'http://another-test.host/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F__clerk_db_jwt[deadbeef]',
         );
       });
 
@@ -236,13 +224,13 @@ describe('Clerk singleton - Redirects', () => {
         await clerkForProductionInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
         expect(mockHref).toHaveBeenNthCalledWith(
           1,
-          'http://another-test.host/sign-up#/?after_sign_in_url=http%3A%2F%2Ftest.host%2F&after_sign_up_url=http%3A%2F%2Ftest.host%2F&redirect_url=https%3A%2F%2Fwww.example.com%2F',
+          'http://another-test.host/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
         );
 
         await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
         expect(mockHref).toHaveBeenNthCalledWith(
           2,
-          'http://another-test.host/sign-up#/?after_sign_in_url=http%3A%2F%2Ftest.host%2F&after_sign_up_url=http%3A%2F%2Ftest.host%2F&redirect_url=https%3A%2F%2Fwww.example.com%2F__clerk_db_jwt[deadbeef]',
+          'http://another-test.host/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F__clerk_db_jwt[deadbeef]',
         );
       });
 
