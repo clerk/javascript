@@ -532,6 +532,9 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 export interface ClerkOptions {
   appearance?: Appearance;
   localization?: LocalizationResource;
+  /**
+   * @deprecated This prop has been deprecated and will be removed in the next major release.
+   */
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
