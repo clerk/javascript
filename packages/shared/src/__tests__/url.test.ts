@@ -86,14 +86,8 @@ describe('getScriptUrl', () => {
     );
   });
 
-  it('returns URL using the latest version if clerkJSVersion & pkgVersion is not provided + frontendApi is not staging', () => {
+  it('returns URL using the latest version if clerkJSVersion is not provided + frontendApi is not staging', () => {
     expect(getScriptUrl(frontendApi, {})).toBe('https://foobar.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js');
-  });
-
-  it('returns URL using the major version if only pkgVersion is provided', () => {
-    expect(getScriptUrl(frontendApi, { pkgVersion: '1.2.3' })).toBe(
-      'https://foobar.dev/npm/@clerk/clerk-js@1/dist/clerk.browser.js',
-    );
   });
 
   it('returns URL using the canary tag if frontendApi is staging', () => {

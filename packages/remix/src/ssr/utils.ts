@@ -87,8 +87,6 @@ export const interstitialJsonResponse = (
       __loader: opts.loader,
       __clerk_ssr_interstitial_html: loadInterstitialFromLocal({
         debugData: debugRequestState(requestState),
-        // TODO(@dimkl): use empty string for frontendApi until type is fixed in @clerk/backend to drop it
-        frontendApi: '',
         publishableKey: requestState.publishableKey,
         // TODO: This needs to be the version of clerk/remix not clerk/react
         // pkgVersion: LIB_VERSION,

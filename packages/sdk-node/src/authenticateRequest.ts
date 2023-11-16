@@ -21,8 +21,6 @@ export async function loadInterstitial({
    */
   if (requestState.publishableKey) {
     return clerkClient.localInterstitial({
-      // TODO(@dimkl): use empty string for frontendApi until type is fixed in @clerk/backend to drop it
-      frontendApi: '',
       publishableKey: requestState.publishableKey,
       proxyUrl: requestState.proxyUrl,
       signInUrl: requestState.signInUrl,

@@ -38,15 +38,6 @@ describe('useOrganizationList', () => {
     expect(result.current.isLoaded).toBe(true);
     expect(result.current.setActive).toBeDefined();
     expect(result.current.createOrganization).toBeDefined();
-    expect(result.current.organizationList).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          membership: expect.objectContaining({
-            role: 'basic_member',
-          }),
-        }),
-      ]),
-    );
 
     expect(result.current.userInvitations).toEqual(
       expect.objectContaining({

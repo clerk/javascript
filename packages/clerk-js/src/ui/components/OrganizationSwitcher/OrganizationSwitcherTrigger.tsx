@@ -21,7 +21,7 @@ type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & {
 export const OrganizationSwitcherTrigger = withAvatarShimmer(
   forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>((props, ref) => {
     const { sx, ...rest } = props;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
     const { organization } = useCoreOrganization();
     const { hidePersonal } = useOrganizationSwitcherContext();
@@ -85,7 +85,6 @@ const NotificationCountBadgeSwitcherTrigger = withGate(
     });
 
     const notificationCount =
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       (userInvitations.count || 0) + (userSuggestions.count || 0) + (membershipRequests?.count || 0);
 
     return (

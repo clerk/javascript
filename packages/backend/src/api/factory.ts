@@ -17,11 +17,6 @@ import {
 import { buildRequest } from './request';
 
 export type CreateBackendApiOptions = {
-  /**
-   * Backend API key
-   * @deprecated Use `secretKey` instead.
-   */
-  apiKey?: string;
   /* Secret Key */
   secretKey?: string;
   /* Backend API URL */
@@ -30,11 +25,6 @@ export type CreateBackendApiOptions = {
   apiVersion?: string;
   /* Library/SDK name */
   userAgent?: string;
-  /**
-   * @deprecated This option has been deprecated and will be removed with the next major release.
-   * A RequestInit init object used by the `request` method.
-   */
-  httpOptions?: RequestInit;
 };
 
 export type ApiClient = ReturnType<typeof createBackendApiClient>;

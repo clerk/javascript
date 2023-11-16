@@ -68,7 +68,7 @@ export default (QUnit: QUnit) => {
       assert.ok(redirectAdapterSpy.calledWith(`http://signin.url:3001/sign-in?redirect_url=${encodedUrl}`));
     });
 
-    test('raises error without signInUrl and frontendApi/publishableKey in redirectToSignIn', assert => {
+    test('raises error without signInUrl and publishableKey in redirectToSignIn', assert => {
       const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
       const { redirectToSignIn } = redirect({ redirectAdapter: redirectAdapterSpy });
 
@@ -77,45 +77,6 @@ export default (QUnit: QUnit) => {
         new Error(
           '@clerk/backend: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
         ),
-      );
-    });
-
-    test('returns path based url with development frontendApi but without signInUrl to redirectToSignIn', assert => {
-      const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
-      const { redirectToSignIn } = redirect({
-        redirectAdapter: redirectAdapterSpy,
-        frontendApi: 'clerk.included.katydid-92.lcl.dev',
-      });
-
-      const result = redirectToSignIn({ returnBackUrl });
-      assert.equal(result, 'redirectAdapterValue');
-      assert.ok(
-        redirectAdapterSpy.calledWith(
-          `https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=${encodedUrl}`,
-        ),
-      );
-    });
-
-    test('returns path based url with production frontendApi but without signInUrl to redirectToSignIn', assert => {
-      const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
-      const { redirectToSignIn } = redirect({ redirectAdapter: redirectAdapterSpy, frontendApi: 'clerk.example.com' });
-
-      const result = redirectToSignIn({ returnBackUrl });
-      assert.equal(result, 'redirectAdapterValue');
-      assert.ok(redirectAdapterSpy.calledWith(`https://accounts.example.com/sign-in?redirect_url=${encodedUrl}`));
-    });
-
-    test('returns path based url with development (kima) frontendApi but without signInUrl to redirectToSignIn', assert => {
-      const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
-      const { redirectToSignIn } = redirect({
-        redirectAdapter: redirectAdapterSpy,
-        frontendApi: 'included.katydid-92.clerk.accounts.dev',
-      });
-
-      const result = redirectToSignIn({ returnBackUrl });
-      assert.equal(result, 'redirectAdapterValue');
-      assert.ok(
-        redirectAdapterSpy.calledWith(`https://included.katydid-92.accounts.dev/sign-in?redirect_url=${encodedUrl}`),
       );
     });
 
@@ -214,7 +175,7 @@ export default (QUnit: QUnit) => {
       assert.ok(redirectAdapterSpy.calledWith(`http://signup.url:3001/sign-up?redirect_url=${encodedUrl}`));
     });
 
-    test('raises error without signUpUrl and frontendApi/publishableKey in redirectToSignUp', assert => {
+    test('raises error without signUpUrl and publishableKey in redirectToSignUp', assert => {
       const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
       const { redirectToSignUp } = redirect({ redirectAdapter: redirectAdapterSpy });
 
@@ -223,45 +184,6 @@ export default (QUnit: QUnit) => {
         new Error(
           '@clerk/backend: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
         ),
-      );
-    });
-
-    test('returns path based url with development frontendApi but without signUpUrl to redirectToSignUp', assert => {
-      const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
-      const { redirectToSignUp } = redirect({
-        redirectAdapter: redirectAdapterSpy,
-        frontendApi: 'clerk.included.katydid-92.lcl.dev',
-      });
-
-      const result = redirectToSignUp({ returnBackUrl });
-      assert.equal(result, 'redirectAdapterValue');
-      assert.ok(
-        redirectAdapterSpy.calledWith(
-          `https://accounts.included.katydid-92.lcl.dev/sign-up?redirect_url=${encodedUrl}`,
-        ),
-      );
-    });
-
-    test('returns path based url with production frontendApi but without signUpUrl to redirectToSignUp', assert => {
-      const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
-      const { redirectToSignUp } = redirect({ redirectAdapter: redirectAdapterSpy, frontendApi: 'clerk.example.com' });
-
-      const result = redirectToSignUp({ returnBackUrl });
-      assert.equal(result, 'redirectAdapterValue');
-      assert.ok(redirectAdapterSpy.calledWith(`https://accounts.example.com/sign-up?redirect_url=${encodedUrl}`));
-    });
-
-    test('returns path based url with development (kima) frontendApi but without signUpUrl to redirectToSignUp', assert => {
-      const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
-      const { redirectToSignUp } = redirect({
-        redirectAdapter: redirectAdapterSpy,
-        frontendApi: 'included.katydid-92.clerk.accounts.dev',
-      });
-
-      const result = redirectToSignUp({ returnBackUrl });
-      assert.equal(result, 'redirectAdapterValue');
-      assert.ok(
-        redirectAdapterSpy.calledWith(`https://included.katydid-92.accounts.dev/sign-up?redirect_url=${encodedUrl}`),
       );
     });
 

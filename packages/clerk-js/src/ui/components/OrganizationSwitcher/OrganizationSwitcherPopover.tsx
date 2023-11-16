@@ -56,7 +56,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     } = useOrganizationSwitcherContext();
 
     const user = useCoreUser();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
 
     if (!isLoaded) {

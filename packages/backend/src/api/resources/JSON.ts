@@ -92,10 +92,6 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   email_address: string;
   first_name: string;
   last_name: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  avatar_url: string;
   image_url: string;
   username: string | null;
   public_metadata: Record<string, unknown> | null;
@@ -133,10 +129,6 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   object: ObjectType.Organization;
   name: string;
   slug: string | null;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  logo_url: string | null;
   image_url: string;
   has_image: boolean;
   public_metadata: OrganizationPublicMetadata | null;
@@ -175,10 +167,6 @@ export interface OrganizationMembershipPublicUserDataJSON {
   identifier: string;
   first_name: string | null;
   last_name: string | null;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  profile_image_url: string;
   image_url: string;
   has_image: boolean;
   user_id: string;
@@ -262,10 +250,6 @@ export interface UserJSON extends ClerkResourceJSON {
   last_name: string;
   gender: string;
   birthday: string;
-  /**
-   * @deprecated  Use `image_url` instead.
-   */
-  profile_image_url: string;
   image_url: string;
   has_image: boolean;
   primary_email_address_id: string;

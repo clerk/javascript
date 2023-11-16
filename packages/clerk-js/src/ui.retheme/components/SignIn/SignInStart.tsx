@@ -368,7 +368,7 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
         !field.value && !autofilled ? { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' } : undefined
       }
     >
-      <Form.Control
+      <Form.PasswordInput
         {...field.props}
         ref={ref}
         tabIndex={!field.value ? -1 : undefined}

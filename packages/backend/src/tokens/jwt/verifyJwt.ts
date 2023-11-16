@@ -1,11 +1,9 @@
-import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import type { Jwt, JwtPayload } from '@clerk/types';
 
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../../runtime';
 import { base64url } from '../../util/rfc4648';
-import { deprecated } from '../../util/shared';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import { getCryptoAlgorithm } from './algorithms';
 import type { IssuerResolver } from './assertions';
@@ -67,13 +65,6 @@ export function decodeJwt(token: string): Jwt {
   const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
   const signature = base64url.parse(rawSignature, { loose: true });
 
-  deprecatedObjectProperty(
-    payload,
-    'orgs',
-    'Add orgs to your session token using the "user.organizations" shortcode in JWT Templates instead.',
-    'decodeJwt:orgs',
-  );
-
   return {
     header,
     payload,
@@ -90,25 +81,16 @@ export function decodeJwt(token: string): Jwt {
 export type VerifyJwtOptions = {
   audience?: string | string[];
   authorizedParties?: string[];
-  /**
-   * @deprecated This option incorrectly accepts milliseconds instead of seconds and has been deprecated. Use clockSkewInMs instead.
-   */
-  clockSkewInSeconds?: number;
   clockSkewInMs?: number;
   issuer: IssuerResolver | string | null;
   key: JsonWebKey | string;
 };
 
-// TODO: Revise the return types. Maybe it's better to throw an error instead of return an object with a reason
 export async function verifyJwt(
   token: string,
-  { audience, authorizedParties, clockSkewInSeconds, clockSkewInMs, issuer, key }: VerifyJwtOptions,
+  { audience, authorizedParties, clockSkewInMs, issuer, key }: VerifyJwtOptions,
 ): Promise<JwtPayload> {
-  if (clockSkewInSeconds) {
-    deprecated('clockSkewInSeconds', 'Use `clockSkewInMs` instead.');
-  }
-
-  const clockSkew = clockSkewInMs || clockSkewInSeconds || DEFAULT_CLOCK_SKEW_IN_SECONDS;
+  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
 
   const decoded = decodeJwt(token);
 

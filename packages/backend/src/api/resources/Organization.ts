@@ -1,4 +1,3 @@
-import { deprecatedProperty } from '../../util/shared';
 import type { OrganizationJSON } from './JSON';
 
 export class Organization {
@@ -6,10 +5,6 @@ export class Organization {
     readonly id: string,
     readonly name: string,
     readonly slug: string | null,
-    /**
-     * @deprecated  Use `imageUrl` instead.
-     */
-    readonly logoUrl: string | null,
     readonly imageUrl: string,
     readonly hasImage: boolean,
     readonly createdBy: string,
@@ -27,7 +22,6 @@ export class Organization {
       data.id,
       data.name,
       data.slug,
-      data.logo_url,
       data.image_url,
       data.has_image,
       data.created_by,
@@ -41,5 +35,3 @@ export class Organization {
     );
   }
 }
-
-deprecatedProperty(Organization, 'logoUrl', 'Use `imageUrl` instead.');

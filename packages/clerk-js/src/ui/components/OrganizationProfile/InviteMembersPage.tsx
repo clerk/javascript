@@ -24,7 +24,6 @@ export const InviteMembersPage = withCardStateProvider(() => {
   const reachedOrganizationMemberLimit =
     !!__unstable_manageBillingMembersLimit &&
     runIfFunctionOrReturn(__unstable_manageBillingMembersLimit) <=
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       organization.pendingInvitationsCount + organization.membersCount;
 
   return (

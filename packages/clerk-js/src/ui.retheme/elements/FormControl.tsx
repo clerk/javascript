@@ -22,15 +22,13 @@ import {
 } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { usePrefersReducedMotion } from '../hooks';
+import { sanitizeInputProps } from '../primitives/hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 import type { FeedbackType } from '../utils';
 import { useFormControlFeedback } from '../utils';
 import { useCardState } from './contexts';
-import { InputGroup } from './InputGroup';
-import { PasswordInput } from './PasswordInput';
 import { PhoneInput } from './PhoneInput';
-import { RadioGroup } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> & {
   id: FieldId;
@@ -43,45 +41,23 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   placeholder?: string | LocalizationKey;
   actionLabel?: string | LocalizationKey;
   icon?: React.ComponentType;
-  validatePassword?: boolean;
   setError: (error: string | ClerkAPIError | undefined) => void;
   setWarning: (warning: string) => void;
   setInfo: (info: string) => void;
   setSuccess: (message: string) => void;
   feedback: string;
   feedbackType: FeedbackType;
-  setHasPassedComplexity: (b: boolean) => void;
   clearFeedback: () => void;
   hasPassedComplexity: boolean;
   infoText?: string | LocalizationKey;
-  radioOptions?: {
-    value: string;
-    label: string | LocalizationKey;
-    description?: string | LocalizationKey;
-  }[];
-  groupPreffix?: string;
-  groupSuffix?: string;
 };
 
 // TODO: Convert this into a Component?
-const getInputElementForType = ({
-  type,
-  groupPreffix,
-  groupSuffix,
-}: {
-  type: FormControlProps['type'];
-  groupPreffix: string | undefined;
-  groupSuffix: string | undefined;
-}) => {
+const getInputElementForType = ({ type }: { type: FormControlProps['type'] }) => {
   const CustomInputs = {
-    password: PasswordInput,
     tel: PhoneInput,
-    radio: RadioGroup,
   };
 
-  if (groupPreffix || groupSuffix) {
-    return InputGroup;
-  }
   if (!type) {
     return Input;
   }
@@ -283,49 +259,17 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
     feedbackType,
     setWarning,
     setInfo,
-    setHasPassedComplexity,
     clearFeedback,
-    radioOptions,
-    groupPreffix,
-    groupSuffix,
-    ...restInputProps
+    ...inputProps
   } = props;
 
+  // @ts-expect-error This is because setHasPassedValidation is now missing from the inputProps Form.Control shall no longer be used for password fields.
+  const sanitizedInputProps = sanitizeInputProps(inputProps);
   const isDisabled = props.isDisabled || card.isLoading;
-
-  const { validatePassword, ...inputProps } = restInputProps;
-
-  const inputElementProps = useMemo(() => {
-    const propMap = {
-      password: restInputProps,
-      radio: {
-        ...inputProps,
-        radioOptions,
-      },
-    };
-
-    if (groupPreffix || groupSuffix) {
-      return {
-        ...inputProps,
-        groupPreffix,
-        groupSuffix,
-      };
-    }
-
-    if (!props.type) {
-      return inputProps;
-    }
-    const type = props.type as keyof typeof propMap;
-    return propMap[type] || inputProps;
-  }, [restInputProps]);
 
   const InputElement = getInputElementForType({
     type: props.type,
-    groupPreffix,
-    groupSuffix,
   });
-
-  const isCheckbox = props.type === 'checkbox';
 
   const { debounced: debouncedState } = useFormControlFeedback({ feedback, feedbackType, isFocused });
 
@@ -400,13 +344,7 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       hasError={debouncedState.feedbackType === 'error'}
       isDisabled={isDisabled}
       isRequired={isRequired}
-      {...inputElementProps}
-      onFocus={e => {
-        inputElementProps.onFocus?.(e);
-      }}
-      onBlur={e => {
-        inputElementProps.onBlur?.(e);
-      }}
+      {...sanitizedInputProps}
       ref={ref}
       placeholder={t(placeholder)}
     />
@@ -424,49 +362,25 @@ export const FormControl = forwardRef<HTMLInputElement, PropsWithChildren<FormCo
       setSuccess={setSuccess}
       setWarning={setWarning}
       setInfo={setInfo}
-      setHasPassedComplexity={setHasPassedComplexity}
       clearFeedback={clearFeedback}
       sx={sx}
     >
-      {isCheckbox ? (
-        <Flex direction={'row'}>
-          {Input}
-          <Flex
-            justify={icon ? 'start' : 'between'}
-            align='center'
-            elementDescriptor={descriptors.formFieldLabelRow}
-            elementId={descriptors.formFieldLabelRow.setId(id)}
-            sx={theme => ({
-              marginBottom: isCheckbox ? 0 : theme.space.$1,
-              marginLeft: !isCheckbox ? 0 : theme.space.$1,
-            })}
-          >
-            {FieldLabel}
-            {Icon}
-            {HintLabel}
-            {ActionLabel}
-          </Flex>
-        </Flex>
-      ) : (
-        <>
-          <Flex
-            justify={icon ? 'start' : 'between'}
-            align='center'
-            elementDescriptor={descriptors.formFieldLabelRow}
-            elementId={descriptors.formFieldLabelRow.setId(id)}
-            sx={theme => ({
-              marginBottom: isCheckbox ? 0 : theme.space.$1,
-              marginLeft: !isCheckbox ? 0 : theme.space.$1,
-            })}
-          >
-            {FieldLabel}
-            {Icon}
-            {HintLabel}
-            {ActionLabel}
-          </Flex>
-          {Input}
-        </>
-      )}
+      <Flex
+        justify={icon ? 'start' : 'between'}
+        align='center'
+        elementDescriptor={descriptors.formFieldLabelRow}
+        elementId={descriptors.formFieldLabelRow.setId(id)}
+        sx={theme => ({
+          marginBottom: theme.space.$1,
+          marginLeft: 0,
+        })}
+      >
+        {FieldLabel}
+        {Icon}
+        {HintLabel}
+        {ActionLabel}
+      </Flex>
+      {Input}
 
       <FormFeedback
         {...debouncedState}

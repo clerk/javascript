@@ -263,7 +263,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
 
                   {allowsEdit && (
                     <Form.ControlRow elementId={deletePending.id}>
-                      <Form.Control {...deletePending.props} />
+                      <Form.Checkbox {...deletePending.props} />
                     </Form.ControlRow>
                   )}
 

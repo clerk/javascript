@@ -1,4 +1,3 @@
-import { deprecatedProperty } from '../../util/shared';
 import { EmailAddress } from './EmailAddress';
 import { ExternalAccount } from './ExternalAccount';
 import type { ExternalAccountJSON, UserJSON } from './JSON';
@@ -15,10 +14,6 @@ export class User {
     readonly banned: boolean,
     readonly createdAt: number,
     readonly updatedAt: number,
-    /**
-     * @deprecated  Use `imageUrl` instead.
-     */
-    readonly profileImageUrl: string,
     readonly imageUrl: string,
     readonly hasImage: boolean,
     readonly gender: string,
@@ -50,7 +45,6 @@ export class User {
       data.banned,
       data.created_at,
       data.updated_at,
-      data.profile_image_url,
       data.image_url,
       data.has_image,
       data.gender,
@@ -73,5 +67,3 @@ export class User {
     );
   }
 }
-
-deprecatedProperty(User, 'profileImageUrl', 'Use `imageUrl` instead.');

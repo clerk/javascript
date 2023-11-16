@@ -151,11 +151,11 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       >
         <Form.Root onSubmit={onSubmitPrepare}>
           <Form.ControlRow elementId={emailField.id}>
-            <Form.Control
+            <Form.InputGroup
               {...emailField.props}
               autoFocus
-              groupSuffix={`@${domain.name}`}
-              required
+              groupSuffix={emailDomainSuffix}
+              isRequired
             />
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />

@@ -1,4 +1,3 @@
-import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import type { TelemetryCollectorOptions } from '@clerk/shared/telemetry';
 import { TelemetryCollector } from '@clerk/shared/telemetry';
 import type { SDKMetadata } from '@clerk/types';
@@ -37,23 +36,9 @@ export function Clerk(options: ClerkOptions) {
     ...(opts.sdkMetadata ? { sdk: opts.sdkMetadata.name, sdkVersion: opts.sdkMetadata.version } : {}),
   });
 
-  const clerkInstance = {
+  return {
     ...apiClient,
     ...requestState,
     telemetry,
-    /**
-     * @deprecated This prop has been deprecated and will be removed in the next major release.
-     */
-    __unstable_options: opts,
   };
-
-  // The __unstable_options is not being used internally and
-  // it's only being set in packages/sdk-node/src/clerkClient.ts#L86
-  deprecatedObjectProperty(
-    clerkInstance,
-    '__unstable_options',
-    'Use `createClerkClient({...})` to create a new clerk instance instead.',
-  );
-
-  return clerkInstance;
 }

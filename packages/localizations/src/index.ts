@@ -18,6 +18,7 @@ export { jaJP } from './ja-JP';
 export { heIL } from './he-IL';
 export { csCZ } from './cs-CZ';
 export { zhCN } from './zh-CN';
+export { zhTW } from './zh-TW';
 export { koKR } from './ko-KR';
 export { nbNO } from './nb-NO';
 export { viVN } from './vi-VN';

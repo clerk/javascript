@@ -13,7 +13,7 @@ export default (QUnit: QUnit) => {
   module('api.client', hooks => {
     const apiClient = createBackendApiClient({
       apiUrl: 'https://api.clerk.test',
-      apiKey: 'deadbeef',
+      secretKey: 'deadbeef',
     });
 
     let fakeFetch;
@@ -29,7 +29,9 @@ export default (QUnit: QUnit) => {
       const payload = await apiClient.users.getUser('user_deadbeef');
 
       if (!payload) {
+        // eslint-disable-next-line qunit/no-conditional-assertions
         assert.false(true, 'This assertion should never fail. We need to check for payload to make TS happy.');
+        // eslint-disable-next-line qunit/no-early-return
         return;
       }
 
@@ -60,7 +62,9 @@ export default (QUnit: QUnit) => {
       const payload = await apiClient.users.getUserList({ offset: 2, limit: 5 });
 
       if (!payload) {
+        // eslint-disable-next-line qunit/no-conditional-assertions
         assert.false(true, 'This assertion should never fail. We need to check for payload to make TS happy.');
+        // eslint-disable-next-line qunit/no-early-return
         return;
       }
 
@@ -99,7 +103,9 @@ export default (QUnit: QUnit) => {
       const payload = await apiClient.emails.createEmail(body);
 
       if (!payload) {
+        // eslint-disable-next-line qunit/no-conditional-assertions
         assert.false(true, 'This assertion should never fail. We need to check for payload to make TS happy.');
+        // eslint-disable-next-line qunit/no-early-return
         return;
       }
       assert.equal(JSON.stringify(payload.data), '{}');
@@ -159,7 +165,7 @@ export default (QUnit: QUnit) => {
         await apiClient.users.getUser('user_deadbeef');
       } catch (e: any) {
         assert.equal(e.clerkTraceId, traceId);
-        assert.equal(e.clerkError, true);
+        assert.true(e.clerkError);
         assert.equal(e.status, 422);
         assert.equal(e.errors[0].code, 'whatever_error');
       }
@@ -183,7 +189,7 @@ export default (QUnit: QUnit) => {
       try {
         await apiClient.users.getUser('user_deadbeef');
       } catch (e: any) {
-        assert.equal(e.clerkError, true);
+        assert.true(e.clerkError);
         assert.equal(e.status, 500);
         assert.equal(e.clerkTraceId, 'mock_cf_ray');
       }
