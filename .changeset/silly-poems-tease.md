@@ -18,7 +18,7 @@ Drop deprecated properties. Migration steps:
     - `OrganizationMembershipPublicUserData.profileImageUrl`
     - `OrganizationMembershipPublicUserDataJSON.profile_image_url`
 - drop `pkgVersion`
-- use `Organization.getOrganizationInvitationList` with // TODO
+- use `Organization.getOrganizationInvitationList` with `status` instead of `getPendingOrganizationInvitationList` 
 - drop `orgs` claim (if required, can be manually added by using `user.organizations` in a jwt template)
 - use `localInterstitial` instead of `remotePublicInterstitial` / `remotePublicInterstitialUrl`
 
