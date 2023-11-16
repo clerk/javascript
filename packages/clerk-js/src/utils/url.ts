@@ -355,17 +355,17 @@ export function createAllowedRedirectOrigins(
   allowedRedirectOrigins: Array<string | RegExp> | undefined,
   frontendApi: string,
 ): (string | RegExp)[] | undefined {
-  if (!allowedRedirectOrigins || allowedRedirectOrigins.length === 0) {
-    const origins = [];
-    if (typeof window !== 'undefined' && !!window.location) {
-      origins.push(window.location.origin);
-    }
-
-    origins.push(`https://${getETLDPlusOneFromFrontendApi(frontendApi)}`);
-    origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`);
-
-    return origins;
+  if (Array.isArray(allowedRedirectOrigins) && !!allowedRedirectOrigins.length) {
+    return allowedRedirectOrigins;
   }
 
-  return allowedRedirectOrigins;
+  const origins = [];
+  if (typeof window !== 'undefined' && !!window.location) {
+    origins.push(window.location.origin);
+  }
+
+  origins.push(`https://${getETLDPlusOneFromFrontendApi(frontendApi)}`);
+  origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`);
+
+  return origins;
 }
