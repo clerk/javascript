@@ -37,8 +37,6 @@ export const handleUnknownState = (requestState: RequestState) => {
 export const handleInterstitialState = (requestState: RequestState, opts: WithAuthOptions) => {
   const response = new NextResponse(
     clerkClient.localInterstitial({
-      // TODO(@dimkl): use empty string for frontendApi until type is fixed in @clerk/backend to drop it
-      frontendApi: '',
       publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
       clerkJSUrl: CLERK_JS_URL,
       clerkJSVersion: CLERK_JS_VERSION,

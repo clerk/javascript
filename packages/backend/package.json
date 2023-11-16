@@ -50,7 +50,6 @@
   "dependencies": {
     "@clerk/shared": "2.0.0-alpha-v5.0",
     "cookie": "0.5.0",
-    "deepmerge": "4.2.2",
     "snakecase-keys": "5.4.4",
     "tslib": "2.4.1"
   },

@@ -41,8 +41,7 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
     }
 
     if (requestState.isInterstitial) {
-      // TODO(@dimkl): use empty string for frontendApi until type is fixed in @clerk/backend to drop it
-      const interstitialHtmlPage = clerkClient.localInterstitial({ publishableKey, frontendApi: '' });
+      const interstitialHtmlPage = clerkClient.localInterstitial({ publishableKey });
 
       return reply
         .code(401)

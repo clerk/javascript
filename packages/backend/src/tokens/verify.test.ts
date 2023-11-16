@@ -28,7 +28,7 @@ export default (QUnit: QUnit) => {
     test('verifies the provided session JWT', async assert => {
       const payload = await verifyToken(mockJwt, {
         apiUrl: 'https://api.clerk.test',
-        apiKey: 'a-valid-key',
+        secretKey: 'a-valid-key',
         authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
         issuer: 'https://clerk.inspired.puma-74.lcl.dev',
         skipJwksCache: true,
@@ -77,7 +77,7 @@ export default (QUnit: QUnit) => {
     test('throws an error when the verification fails', async assert => {
       try {
         await verifyToken(mockJwt, {
-          apiKey: 'a-valid-key',
+          secretKey: 'a-valid-key',
           issuer: 'https://clerk.whatever.lcl.dev',
           skipJwksCache: true,
         });

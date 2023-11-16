@@ -21,8 +21,7 @@ function assertSignedOut(
   },
 ) {
   assert.propEqual(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.SignedOut,
     isSignedIn: false,
@@ -66,8 +65,7 @@ function assertInterstitial(
   },
 ) {
   assert.propContains(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.Interstitial,
     isSignedIn: false,
@@ -86,8 +84,7 @@ function assertInterstitial(
 
 function assertUnknown(assert, requestState: RequestState, reason: AuthReason) {
   assert.propContains(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     status: AuthStatus.Unknown,
     isSignedIn: false,
     isInterstitial: false,
@@ -128,8 +125,7 @@ function assertSignedIn(
   },
 ) {
   assert.propContains(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.SignedIn,
     isSignedIn: true,
@@ -150,12 +146,10 @@ export default (QUnit: QUnit) => {
 
   /* An otherwise bare state on a request. */
   const defaultMockAuthenticateRequestOptions = {
-    apiKey: 'deadbeef',
-    secretKey: '',
+    secretKey: 'deadbeef',
     apiUrl: 'https://api.clerk.test',
     apiVersion: 'v1',
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     host: 'example.com',
     userAgent: 'Mozilla/TestAgent',
@@ -303,7 +297,7 @@ export default (QUnit: QUnit) => {
       const nonBrowserUserAgent = 'curl';
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'test_deadbeef',
+        secretKey: 'test_deadbeef',
         userAgent: nonBrowserUserAgent,
         clientUat: '12345',
         cookieToken: mockJwt,
@@ -316,7 +310,7 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns interstitial when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'deadbeef',
+        secretKey: 'deadbeef',
         clientUat: '0',
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
@@ -336,7 +330,7 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns signed out is satellite but a non-browser request [11y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'deadbeef',
+        secretKey: 'deadbeef',
         clientUat: '0',
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
@@ -377,7 +371,7 @@ export default (QUnit: QUnit) => {
       sp.set('__clerk_satellite_url', 'http://localhost:3000');
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'sk_test_deadbeef',
+        secretKey: 'sk_test_deadbeef',
         clientUat: '12345',
         isSatellite: false,
         cookieToken: mockJwt,
@@ -394,7 +388,7 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns signed out when no cookieToken and no clientUat in production [4y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'live_deadbeef',
+        secretKey: 'live_deadbeef',
       });
 
       assertSignedOut(assert, requestState, {
@@ -407,7 +401,7 @@ export default (QUnit: QUnit) => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
         cookieToken: mockJwt,
-        apiKey: 'test_deadbeef',
+        secretKey: 'test_deadbeef',
       });
 
       assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieUATMissing });
@@ -420,7 +414,7 @@ export default (QUnit: QUnit) => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
         cookieToken: mockJwt,
-        apiKey: 'test_deadbeef',
+        secretKey: 'test_deadbeef',
         clientUat: '12345',
       });
 
@@ -434,7 +428,7 @@ export default (QUnit: QUnit) => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
         cookieToken: mockJwt,
-        apiKey: 'test_deadbeef',
+        secretKey: 'test_deadbeef',
         clientUat: '12345',
         referrer: 'https://clerk.com',
       });
@@ -449,7 +443,7 @@ export default (QUnit: QUnit) => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
         cookieToken: mockJwt,
-        apiKey: 'pk_test_deadbeef',
+        secretKey: 'pk_test_deadbeef',
         clientUat: '12345',
         referrer: 'https://clerk.com',
         isSatellite: true,
@@ -475,7 +469,7 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken [8y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'deadbeef',
+        secretKey: 'deadbeef',
         clientUat: '1234',
       });
 
@@ -560,7 +554,7 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns signed in for Amazon Cloudfront userAgent', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'test_deadbeef',
+        secretKey: 'test_deadbeef',
         userAgent: 'Amazon CloudFront',
         clientUat: '12345',
         cookieToken: mockJwt,

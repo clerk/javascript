@@ -10,11 +10,9 @@ export type CreateAuthenticateRequestOptions = {
     Pick<
       AuthenticateRequestOptions,
       | 'audience'
-      | 'apiKey'
       | 'secretKey'
       | 'apiUrl'
       | 'apiVersion'
-      | 'frontendApi'
       | 'publishableKey'
       | 'jwtKey'
       | 'proxyUrl'
@@ -29,12 +27,10 @@ export type CreateAuthenticateRequestOptions = {
 export function createAuthenticateRequest(params: CreateAuthenticateRequestOptions) {
   const { apiClient } = params;
   const {
-    apiKey: buildtimeApiKey = '',
     secretKey: buildtimeSecretKey = '',
     jwtKey: buildtimeJwtKey = '',
     apiUrl = API_URL,
     apiVersion = API_VERSION,
-    frontendApi: buildtimeFrontendApi = '',
     proxyUrl: buildProxyUrl = '',
     publishableKey: buildtimePublishableKey = '',
     isSatellite: buildtimeIsSatellite = false,
@@ -44,10 +40,8 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   } = params.options;
 
   const authenticateRequest = ({
-    apiKey: runtimeApiKey,
     secretKey: runtimeSecretKey,
     audience: runtimeAudience,
-    frontendApi: runtimeFrontendApi,
     proxyUrl: runtimeProxyUrl,
     publishableKey: runtimePublishableKey,
     jwtKey: runtimeJwtKey,
@@ -58,12 +52,10 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) => {
     return authenticateRequestOriginal({
       ...rest,
-      apiKey: runtimeApiKey || buildtimeApiKey,
       secretKey: runtimeSecretKey || buildtimeSecretKey,
       audience: runtimeAudience || buildtimeAudience,
       apiUrl,
       apiVersion,
-      frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
       proxyUrl: runtimeProxyUrl || buildProxyUrl,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
       isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
@@ -74,7 +66,6 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   };
 
   const localInterstitial = ({
-    frontendApi: runtimeFrontendApi,
     publishableKey: runtimePublishableKey,
     proxyUrl: runtimeProxyUrl,
     isSatellite: runtimeIsSatellite,
@@ -83,35 +74,11 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   }: Omit<LoadInterstitialOptions, 'apiUrl'>) =>
     loadInterstitialFromLocal({
       ...rest,
-      frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
       proxyUrl: runtimeProxyUrl || buildProxyUrl,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
       isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
       domain: runtimeDomain || buildtimeDomain,
     });
-
-  const remotePublicInterstitial = ({
-    frontendApi: runtimeFrontendApi,
-    publishableKey: runtimePublishableKey,
-    proxyUrl: runtimeProxyUrl,
-    isSatellite: runtimeIsSatellite,
-    domain: runtimeDomain,
-    userAgent: runtimeUserAgent,
-    ...rest
-  }: LoadInterstitialOptions) => {
-    return loadInterstitialFromBAPI({
-      ...rest,
-      apiUrl,
-      frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
-      publishableKey: runtimePublishableKey || buildtimePublishableKey,
-      proxyUrl: runtimeProxyUrl || buildProxyUrl,
-      isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
-      domain: (runtimeDomain || buildtimeDomain) as any,
-      userAgent: runtimeUserAgent || buildUserAgent,
-    });
-  };
-
-  const remotePublicInterstitialUrl = buildPublicInterstitialUrl;
 
   // TODO: Replace this function with remotePublicInterstitial
   const remotePrivateInterstitial = () => apiClient.interstitial.getInterstitial();
@@ -119,9 +86,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   return {
     authenticateRequest,
     localInterstitial,
-    remotePublicInterstitial,
     remotePrivateInterstitial,
-    remotePublicInterstitialUrl,
     debugRequestState,
   };
 }

@@ -96,10 +96,6 @@ export type LoadClerkJWKFromRemoteOptions = {
   jwksCacheTtlInMs?: number;
   skipJwksCache?: boolean;
   secretKey?: string;
-  /**
-   * @deprecated Use `secretKey` instead.
-   */
-  apiKey?: string;
   apiUrl?: string;
   apiVersion?: string;
   issuer?: string;
@@ -119,7 +115,6 @@ export type LoadClerkJWKFromRemoteOptions = {
  * @returns {JsonWebKey} key
  */
 export async function loadClerkJWKFromRemote({
-  apiKey,
   secretKey,
   apiUrl = API_URL,
   apiVersion = API_VERSION,
@@ -131,10 +126,9 @@ export async function loadClerkJWKFromRemote({
   const shouldRefreshCache = !getFromCache(kid) && reachedMaxCacheUpdatedAt();
   if (skipJwksCache || shouldRefreshCache) {
     let fetcher;
-    const key = secretKey || apiKey;
 
-    if (key) {
-      fetcher = () => fetchJWKSFromBAPI(apiUrl, key, apiVersion);
+    if (secretKey) {
+      fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion);
     } else if (issuer) {
       fetcher = () => fetchJWKSFromFAPI(issuer);
     } else {
@@ -196,7 +190,7 @@ async function fetchJWKSFromFAPI(issuer: string) {
 async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string) {
   if (!key) {
     throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.SetClerkSecretKeyOrAPIKey,
+      action: TokenVerificationErrorAction.SetClerkSecretKey,
       message:
         'Missing Clerk Secret Key or API Key. Go to https://dashboard.clerk.com and get your key for your instance.',
       reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,

@@ -26,7 +26,6 @@ export default (QUnit: QUnit) => {
       const resp = await loadInterstitialFromBAPI({
         apiUrl: 'https://api.clerk.test',
         publishableKey,
-        frontendApi: 'accounts.included.katydid-92.lcl.dev',
         userAgent: 'clerk-backend-sdk-from-options',
       });
 

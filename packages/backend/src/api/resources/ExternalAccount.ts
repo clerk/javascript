@@ -1,4 +1,3 @@
-import { deprecatedProperty } from '../../util/shared';
 import type { ExternalAccountJSON } from './JSON';
 import { Verification } from './Verification';
 
@@ -12,10 +11,6 @@ export class ExternalAccount {
     readonly emailAddress: string,
     readonly firstName: string,
     readonly lastName: string,
-    /**
-     * @deprecated  Use `imageUrl` instead.
-     */
-    readonly picture: string,
     readonly imageUrl: string,
     readonly username: string | null,
     readonly publicMetadata: Record<string, unknown> | null = {},
@@ -33,7 +28,6 @@ export class ExternalAccount {
       data.email_address,
       data.first_name,
       data.last_name,
-      data.avatar_url,
       data.image_url,
       data.username,
       data.public_metadata,
@@ -42,5 +36,3 @@ export class ExternalAccount {
     );
   }
 }
-
-deprecatedProperty(ExternalAccount, 'picture', 'Use `imageUrl` instead.');
