@@ -1,5 +1,6 @@
 import { isTruthy } from '@clerk/shared/underscore';
 
+import { SDK_METADATA } from '../server/constants';
 import type { NextClerkProviderProps } from '../types';
 
 export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, 'children'>) => {
@@ -19,9 +20,6 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
       disabled: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DISABLED),
       debug: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
-    sdkMetadata: {
-      name: PACKAGE_NAME,
-      version: PACKAGE_VERSION,
-    },
+    sdkMetadata: SDK_METADATA,
   };
 };

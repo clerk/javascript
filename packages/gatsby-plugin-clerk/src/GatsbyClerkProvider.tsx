@@ -7,12 +7,7 @@ import {
 import { navigate } from 'gatsby';
 import React from 'react';
 
-import { TELEMETRY_DEBUG, TELEMETRY_DISABLED } from './constants';
-
-const SDK_METADATA = {
-  name: PACKAGE_NAME,
-  version: PACKAGE_VERSION,
-};
+import { SDK_METADATA, TELEMETRY_DEBUG, TELEMETRY_DISABLED } from './constants';
 
 __internal__setErrorThrowerOptions({ packageName: 'gatsby-plugin-clerk' });
 

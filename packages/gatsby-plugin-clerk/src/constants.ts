@@ -11,3 +11,8 @@ export const PROXY_URL = process.env.GATSBY_CLERK_PROXY_URL;
 
 export const TELEMETRY_DISABLED = isTruthy(process.env.GATSBY_CLERK_TELEMETRY_DISABLED);
 export const TELEMETRY_DEBUG = isTruthy(process.env.GATSBY_CLERK_TELEMETRY_DEBUG);
+
+export const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+};
