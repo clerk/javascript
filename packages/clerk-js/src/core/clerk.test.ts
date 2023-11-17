@@ -2,7 +2,6 @@ import type { ActiveSessionResource, SignInJSON, SignUpJSON, TokenResource } fro
 import { waitFor } from '@testing-library/dom';
 
 import { mockNativeRuntime } from '../testUtils';
-import { getETLDPlusOneFromFrontendApi } from '../utils';
 import { Clerk } from './clerk';
 import { eventBus, events } from './events';
 import type { AuthConfig, DisplayConfig, Organization } from './resources/internal';
