@@ -1,4 +1,3 @@
-import type { ActJWTClaim, ClerkJWTClaims } from './jwt';
 import type { ActClaim, JwtPayload } from './jwtv2';
 import type { OrganizationResource } from './organization';
 import type { MembershipRole } from './organizationMembership';
@@ -8,17 +7,6 @@ import type { Serializable } from './utils';
 
 export type ServerGetTokenOptions = { template?: string };
 export type ServerGetToken = (options?: ServerGetTokenOptions) => Promise<string | null>;
-
-/**
- * @deprecated
- */
-export type ServerSideAuth = {
-  sessionId: string | null;
-  userId: string | null;
-  actor: ActJWTClaim | null;
-  getToken: ServerGetToken;
-  claims: ClerkJWTClaims | null;
-};
 
 export type InitialState = Serializable<{
   sessionClaims: JwtPayload;

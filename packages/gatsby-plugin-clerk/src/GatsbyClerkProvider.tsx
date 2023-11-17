@@ -1,4 +1,4 @@
-import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
+import type { ClerkProviderProps } from '@clerk/clerk-react';
 import {
   __internal__setErrorThrowerOptions,
   ClerkLoaded,
@@ -15,9 +15,8 @@ const SDK_METADATA = {
 __internal__setErrorThrowerOptions({ packageName: 'gatsby-plugin-clerk' });
 
 export type GatsbyClerkProviderProps = {
-  children: React.ReactNode;
   clerkState: any;
-} & IsomorphicClerkOptions;
+} & ClerkProviderProps;
 
 export function ClerkProvider({ children, ...rest }: GatsbyClerkProviderProps) {
   const { clerkState, ...restProps } = rest;

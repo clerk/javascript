@@ -57,7 +57,6 @@ type MethodCallback = () => Promise<unknown> | unknown;
 
 export class IsomorphicClerk {
   private readonly mode: 'browser' | 'server';
-  private readonly publishableKey?: string;
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
@@ -80,6 +79,11 @@ export class IsomorphicClerk {
   #loaded = false;
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
+  #publishableKey: string;
+
+  get publishableKey(): string {
+    return this.#publishableKey;
+  }
 
   get loaded(): boolean {
     return this.#loaded;
@@ -124,7 +128,7 @@ export class IsomorphicClerk {
 
   constructor(options: IsomorphicClerkOptions) {
     const { Clerk = null, publishableKey } = options || {};
-    this.publishableKey = publishableKey;
+    this.#publishableKey = publishableKey;
     this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
     this.options = options;
@@ -149,7 +153,7 @@ export class IsomorphicClerk {
     // - https://github.com/remix-run/remix/issues/2947
     // - https://github.com/facebook/react/issues/24430
     if (typeof window !== 'undefined') {
-      window.__clerk_publishable_key = this.publishableKey;
+      window.__clerk_publishable_key = this.#publishableKey;
       window.__clerk_proxy_url = this.proxyUrl;
       window.__clerk_domain = this.domain;
     }
@@ -161,7 +165,7 @@ export class IsomorphicClerk {
 
         if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
-          c = new this.Clerk(this.publishableKey || '', {
+          c = new this.Clerk(this.#publishableKey, {
             proxyUrl: this.proxyUrl,
             domain: this.domain,
           } as any);
@@ -181,7 +185,7 @@ export class IsomorphicClerk {
         if (!global.Clerk) {
           await loadClerkJsScript({
             ...this.options,
-            publishableKey: this.publishableKey,
+            publishableKey: this.#publishableKey,
             proxyUrl: this.proxyUrl,
             domain: this.domain,
           });
