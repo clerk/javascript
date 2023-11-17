@@ -1,3 +1,15 @@
+/**
+ * The TelemetryCollector class handles collection of telemetry events from Clerk SDKs. Telemetry is opt-out and can be disabled by setting a CLERK_TELEMETRY_DISABLE environment variable.
+ * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:
+ *
+ * ```jsx
+ * <ClerkProvider telemetry={false}>
+ *    ...
+ * </ClerkProvider>
+ * ```
+ *
+ * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry
+ */
 import type { InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from './keys';
@@ -96,18 +108,6 @@ const DEFAULT_CONFIG: Partial<Required<TelemetryCollectorConfig>> = {
   endpoint: 'https://clerk-telemetry.com',
 };
 
-/**
- * Handles collection of telemetry events from Clerk SDKs. Telemetry is opt-out and can be disabled by setting a CLERK_TELEMETRY_DISABLE environment variable.
- * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:
- *
- * ```jsx
- * <ClerkProvider telemetry={false}>
- *    ...
- * </ClerkProvider>
- * ```
- *
- * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry
- */
 export class TelemetryCollector {
   #config: Required<TelemetryCollectorConfig>;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
