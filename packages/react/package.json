@@ -72,7 +72,8 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=18"
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "engines": {
     "node": ">=18.17.0"
