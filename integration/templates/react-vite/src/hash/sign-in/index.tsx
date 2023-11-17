@@ -4,8 +4,8 @@ export default function Page() {
   return (
     <div>
       <SignIn
-        path={'/sign-in'}
-        signUpUrl={'/sign-up'}
+        routing='hash'
+        signUpUrl={'/hash/sign-up'}
       />
     </div>
   );
