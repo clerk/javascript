@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0-alpha-v5.2
+
+### Major Changes
+
+- Change the minimal Node.js version required by Clerk to `18.17.0`. ([#2162](https://github.com/clerk/javascript/pull/2162)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.0.0-alpha-v5.1
 
 ### Major Changes
