@@ -50,12 +50,6 @@ export function isPublishableKey(key: string) {
   return hasValidPrefix && hasValidFrontendApiPostfix;
 }
 
-export function isLegacyFrontendApiKey(key: string) {
-  key = key || '';
-
-  return key.startsWith('clerk.');
-}
-
 export function createDevOrStagingUrlCache() {
   const devOrStagingUrlCache = new Map<string, boolean>();
 
