@@ -51,7 +51,7 @@ jobs:
           E2E_CLERK_VERSION: 'latest'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
-          E2E_NEXTJS_VERSION: '@canary'
+          E2E_NEXTJS_VERSION: 'canary'
 
       - name: Show package versions
         working-directory: ${{runner.temp}}
