@@ -529,10 +529,12 @@ export interface ClerkOptions {
   /**
    * Telemetry options
    */
-  telemetry?: {
-    disabled?: boolean;
-    debug?: boolean;
-  };
+  telemetry?:
+    | false
+    | {
+        disabled?: boolean;
+        debug?: boolean;
+      };
 
   sdkMetadata?: SDKMetadata;
 }

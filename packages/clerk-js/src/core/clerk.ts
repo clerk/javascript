@@ -271,12 +271,14 @@ export default class Clerk implements ClerkInterface {
       Clerk.sdkMetadata = this.#options.sdkMetadata;
     }
 
-    this.telemetry = new TelemetryCollector({
-      clerkVersion: Clerk.version,
-      samplingRate: 1,
-      publishableKey: this.publishableKey,
-      ...this.#options.telemetry,
-    });
+    if (this.#options.telemetry !== false) {
+      this.telemetry = new TelemetryCollector({
+        clerkVersion: Clerk.version,
+        samplingRate: 1,
+        publishableKey: this.publishableKey,
+        ...this.#options.telemetry,
+      });
+    }
 
     if (this.#options.standardBrowser) {
       this.#isReady = await this.#loadInStandardBrowser();

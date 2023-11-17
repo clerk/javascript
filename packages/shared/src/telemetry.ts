@@ -101,7 +101,7 @@ const DEFAULT_CONFIG: Partial<Required<TelemetryCollectorConfig>> = {
  * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:
  *
  * ```jsx
- * <ClerkProvider telemetry={{ disabled: true }}>
+ * <ClerkProvider telemetry={false}>
  *    ...
  * </ClerkProvider>
  * ```

@@ -25,10 +25,12 @@ export function ClerkProvider({ children, ...rest }: GatsbyClerkProviderProps) {
       navigate={to => navigate(to)}
       initialState={__clerk_ssr_state || {}}
       sdkMetadata={SDK_METADATA}
-      telemetry={{
-        disabled: TELEMETRY_DISABLED,
-        debug: TELEMETRY_DEBUG,
-      }}
+      telemetry={
+        restProps?.telemetry ?? {
+          disabled: TELEMETRY_DISABLED,
+          debug: TELEMETRY_DEBUG,
+        }
+      }
       {...restProps}
     >
       {__clerk_ssr_interstitial_html ? (

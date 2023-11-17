@@ -16,7 +16,7 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
     signUpUrl: props.signUpUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '',
     afterSignInUrl: props.afterSignInUrl || process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL || '',
     afterSignUpUrl: props.afterSignUpUrl || process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || '',
-    telemetry: {
+    telemetry: props.telemetry ?? {
       disabled: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DISABLED),
       debug: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
