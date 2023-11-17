@@ -12,7 +12,6 @@ import type {
   HandleOAuthCallbackParams,
   ListenerCallback,
   OrganizationListProps,
-  OrganizationMembershipResource,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
