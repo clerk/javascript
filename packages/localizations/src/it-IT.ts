@@ -20,10 +20,7 @@ export const itIT: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Indirizzi email',
   formFieldLabel__phoneNumber: 'Numero di telefono',
   formFieldLabel__username: 'Nome utente',
-  formFieldLabel__emailAddress_phoneNumber: 'Indirizzo email o numero di telefono',
   formFieldLabel__emailAddress_username: 'Indirizzo email o nome utente',
-  formFieldLabel__phoneNumber_username: 'numero di telefono o nome utente',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Indirizzo email, numero di telefono o nome utente',
   formFieldLabel__password: 'Password',
   formFieldLabel__currentPassword: 'Password corrente',
   formFieldLabel__newPassword: 'Nuova password',
@@ -39,10 +36,7 @@ export const itIT: LocalizationResource = {
     'Inserisci o incolla uno o piú indirizzi email, separati da spazi o virgole',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -260,9 +254,7 @@ export const itIT: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Account collegati',
         primaryButton: 'Collega account',
-        title__conectionFailed: 'Riprova la connessione fallita',
         title__connectionFailed: 'Riprova la connessione fallita',
-        actionLabel__conectionFailed: 'Riprova',
         actionLabel__connectionFailed: 'Riprova',
         destructiveActionTitle: 'Rimuovi',
         destructiveActionSubtitle: 'Rimuovi questo account collegato dal tuo account',
@@ -512,10 +504,7 @@ export const itIT: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Nessun membro da visualizzare',
       action__invite: 'Invita',
-      start: {
-        headerTitle__active: 'Attivo',
-        headerTitle__invited: 'Invitato',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Utente',
         tableHeader__joined: 'Iscritto',
@@ -532,7 +521,6 @@ export const itIT: LocalizationResource = {
   createOrganization: {
     title: 'Crea organizzazione',
     formButtonSubmit: 'Crea organizzazione',
-    subtitle: "Imposta il profile dell'organizzazione",
     invitePage: {
       formButtonReset: 'Salta',
     },

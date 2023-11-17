@@ -20,10 +20,7 @@ export const ruRU: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Почтовые адреса',
   formFieldLabel__phoneNumber: 'Номер телефона',
   formFieldLabel__username: 'Имя пользователя',
-  formFieldLabel__emailAddress_phoneNumber: 'Почта или номер телефона',
   formFieldLabel__emailAddress_username: 'Почта или имя пользователя',
-  formFieldLabel__phoneNumber_username: 'номер телефона или имя пользователя',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Почта, номер телефона или имя пользователя',
   formFieldLabel__password: 'Пароль',
   formFieldLabel__currentPassword: 'Текущий пароль',
   formFieldLabel__newPassword: 'Новый пароль',
@@ -39,10 +36,7 @@ export const ruRU: LocalizationResource = {
     'Введите или вставьте один или более адресов почты, разделенных пробелами или запятыми',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -287,12 +281,10 @@ export const ruRU: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Подключенные аккаунты',
         primaryButton: 'Подключить аккаунт',
-        title__conectionFailed: 'Повторная попытка подключения',
         title__connectionFailed: 'Повторная попытка подключения',
         title__reauthorize: 'Требуется повторная авторизация',
         subtitle__reauthorize:
           'Требуется повторная авторизация этого приложения из-за обновления необходимых областей видимости, и вы можете испытывать ограниченную функциональность. Пожалуйста, повторно авторизуйте это приложение, чтобы избежать проблем',
-        actionLabel__conectionFailed: 'Попробовать снова',
         actionLabel__connectionFailed: 'Попробовать снова',
         actionLabel__reauthorize: 'Авторизовать сейчас',
         destructiveActionTitle: 'Удалить',
@@ -545,10 +537,7 @@ export const ruRU: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Нет участников для отображения',
       action__invite: 'Пригласить',
-      start: {
-        headerTitle__active: 'Активные',
-        headerTitle__invited: 'Приглашенные',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Пользователь',
         tableHeader__joined: 'Присоединился',
@@ -565,7 +554,6 @@ export const ruRU: LocalizationResource = {
   createOrganization: {
     title: 'Создать организацию',
     formButtonSubmit: 'Создать организацию',
-    subtitle: 'Настройка профиля организации',
     invitePage: {
       formButtonReset: 'Пропустить',
     },

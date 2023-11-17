@@ -20,10 +20,7 @@ export const esES: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Direcciones de correo',
   formFieldLabel__phoneNumber: 'Número telefónico',
   formFieldLabel__username: 'Nombre de usuario',
-  formFieldLabel__emailAddress_phoneNumber: 'Correo electrónico o número de teléfono',
   formFieldLabel__emailAddress_username: 'Correo electrónico o nombre de usuario',
-  formFieldLabel__phoneNumber_username: 'número telefónico o nombre de usuario',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Correo electrónico, número telefónico o nombre de usuario',
   formFieldLabel__password: 'Contraseña',
   formFieldLabel__currentPassword: 'Contraseña actual',
   formFieldLabel__newPassword: 'Nueva contraseña',
@@ -39,10 +36,7 @@ export const esES: LocalizationResource = {
     'Ingrese o pegue una o más direcciones de correo electrónico, separadas por espacios o comas',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -261,9 +255,7 @@ export const esES: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Cuentas conectadas',
         primaryButton: 'Conectar cuenta',
-        title__conectionFailed: 'Reintentar conexión fallida',
         title__connectionFailed: 'Reintentar conexión fallida',
-        actionLabel__conectionFailed: 'Inténtelo nuevamente',
         actionLabel__connectionFailed: 'Inténtelo nuevamente',
         destructiveActionTitle: 'Quitar',
         destructiveActionSubtitle: 'Quitar esta cuenta conectada a su cuenta',
@@ -518,10 +510,7 @@ export const esES: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'No hay miembros para mostrar',
       action__invite: 'Invitar',
-      start: {
-        headerTitle__active: 'Activo',
-        headerTitle__invited: 'Invitado',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Usuario',
         tableHeader__joined: 'Unido',
@@ -538,7 +527,6 @@ export const esES: LocalizationResource = {
   createOrganization: {
     title: 'Crear organización',
     formButtonSubmit: 'Crear organización',
-    subtitle: 'Establecer el perfil de la organización',
     invitePage: {
       formButtonReset: 'Saltar',
     },

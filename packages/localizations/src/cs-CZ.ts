@@ -20,10 +20,7 @@ export const csCZ: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Emailové adresy',
   formFieldLabel__phoneNumber: 'Telefonní číslo',
   formFieldLabel__username: 'Uživatelské jméno',
-  formFieldLabel__emailAddress_phoneNumber: 'Emailová adresa nebo telefonní číslo',
   formFieldLabel__emailAddress_username: 'Emailová adresa nebo uživatelské jméno',
-  formFieldLabel__phoneNumber_username: 'telefonní číslo nebo uživatelské jméno',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Emailová adresa, telefonní číslo nebo uživatelské jméno',
   formFieldLabel__password: 'Heslo',
   formFieldLabel__currentPassword: 'Stávající heslo',
   formFieldLabel__newPassword: 'Nové heslo',
@@ -40,10 +37,7 @@ export const csCZ: LocalizationResource = {
     'Zadejte nebo vložte jednu nebo více emailových adres oddělených mezerou nebo čárkou',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -289,12 +283,10 @@ export const csCZ: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Připojené účty',
         primaryButton: 'Připojit účet',
-        title__conectionFailed: 'Opakovat neúspěšné připojení',
         title__connectionFailed: 'Opakovat neúspěšné připojení',
         title__reauthorize: 'Vyžadováno opětovné autorizování',
         subtitle__reauthorize:
           'Požadované oprávnění bylo aktualizováno a můžete mít omezenou funkcionalitu. Pro předejití případným problémům autorizujte tuto aplikaci znovu.',
-        actionLabel__conectionFailed: 'Zkusit znovu',
         actionLabel__connectionFailed: 'Zkusit znovu',
         actionLabel__reauthorize: 'Autorizovat nyní',
         destructiveActionTitle: 'Odstranit',
@@ -543,10 +535,7 @@ export const csCZ: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Žádní členové k zobrazení',
       action__invite: 'Pozvat',
-      start: {
-        headerTitle__active: 'Aktivní',
-        headerTitle__invited: 'Pozváni',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Uživatel',
         tableHeader__joined: 'Připojil se',
@@ -563,7 +552,6 @@ export const csCZ: LocalizationResource = {
   createOrganization: {
     title: 'Vytvořit organizaci',
     formButtonSubmit: 'Vytvořit organizaci',
-    subtitle: 'Nastavit profil organizace',
     invitePage: {
       formButtonReset: 'Přeskočit',
     },

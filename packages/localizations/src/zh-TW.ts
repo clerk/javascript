@@ -20,10 +20,7 @@ export const zhTW: LocalizationResource = {
   formFieldLabel__emailAddresses: '電子郵件地址',
   formFieldLabel__phoneNumber: '電話號碼',
   formFieldLabel__username: '使用者名稱',
-  formFieldLabel__emailAddress_phoneNumber: '電子郵件地址或電話號碼',
   formFieldLabel__emailAddress_username: '電子郵件地址或使用者名稱',
-  formFieldLabel__phoneNumber_username: '電話號碼或使用者名稱',
-  formFieldLabel__emailAddress_phoneNumber_username: '電子郵件地址、電話號碼或使用者名稱',
   formFieldLabel__password: '密碼',
   formFieldLabel__currentPassword: '當前密碼',
   formFieldLabel__newPassword: '新密碼',
@@ -40,10 +37,7 @@ export const zhTW: LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: '輸入或黏貼一個或多個電子郵件地址，用空格或逗號分隔',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -286,11 +280,9 @@ export const zhTW: LocalizationResource = {
       connectedAccountsSection: {
         title: '已連接的帳戶',
         primaryButton: '連接帳戶',
-        title__conectionFailed: '重試失敗的連接',
         title__connectionFailed: '重試失敗的連接',
         title__reauthorize: '需要重新授權',
         subtitle__reauthorize: '所需的權限已更新，您可能會遇到功能限制。請重新授權此應用程式，以避免任何問題',
-        actionLabel__conectionFailed: '再試一次',
         actionLabel__connectionFailed: '再試一次',
         actionLabel__reauthorize: '立即授權',
         destructiveActionTitle: '移除',
@@ -545,10 +537,7 @@ export const zhTW: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: '沒有可顯示的成員',
       action__invite: '邀請',
-      start: {
-        headerTitle__active: '活躍',
-        headerTitle__invited: '已邀請',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: '用戶',
         tableHeader__joined: '加入',
@@ -565,7 +554,6 @@ export const zhTW: LocalizationResource = {
   createOrganization: {
     title: '創建組織',
     formButtonSubmit: '創建組織',
-    subtitle: '設置組織簡介',
     invitePage: {
       formButtonReset: '跳過',
     },

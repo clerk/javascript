@@ -19,10 +19,7 @@ export const plPL: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Adresy e-mail',
   formFieldLabel__phoneNumber: 'Numer telefonu',
   formFieldLabel__username: 'Nazwa użytkownika',
-  formFieldLabel__emailAddress_phoneNumber: 'Adres e-mail lub numer telefonu',
   formFieldLabel__emailAddress_username: 'Adres e-mail lub nazwa użytkownika',
-  formFieldLabel__phoneNumber_username: 'Numer telefonu lub nazwa użytkownika',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Adres e-mail, numer telefonu lub nazwa użytkownika',
   formFieldLabel__password: 'Hasło',
   formFieldLabel__currentPassword: 'Obecne hasło',
   formFieldLabel__newPassword: 'Nowe hasło',
@@ -39,10 +36,7 @@ export const plPL: LocalizationResource = {
     'Wprowadź lub wklej jeden lub więcej adresów e-mail, oddzielonych spacjami lub przecinkami',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -265,12 +259,10 @@ export const plPL: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Połączone konta',
         primaryButton: 'Połącz konto',
-        title__conectionFailed: 'Ponów próbę nieudanego połączenia',
         title__connectionFailed: 'Ponów próbę nieudanego połączenia',
         title__reauthorize: 'Wymagana ponowna autoryzacja',
         subtitle__reauthorize:
           'Wymagane zakresy zostały zaktualizowane i możesz mieć ograniczoną funkcjonalność. Proszę ponownie autoryzuj tę aplikację, aby uniknąć problemów',
-        actionLabel__conectionFailed: 'Spróbuj ponownie',
         actionLabel__connectionFailed: 'Spróbuj ponownie',
         actionLabel__reauthorize: 'Autoryzuj teraz',
         destructiveActionTitle: 'Odłącz',
@@ -535,10 +527,7 @@ export const plPL: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Brak użytkowników do wyświetlenia',
       action__invite: 'Zaproś',
-      start: {
-        headerTitle__active: 'Aktywni',
-        headerTitle__invited: 'Zaproszeni',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Użytkownik',
         tableHeader__joined: 'Dołączył',
@@ -555,7 +544,6 @@ export const plPL: LocalizationResource = {
   createOrganization: {
     title: 'Utwórz organizację',
     formButtonSubmit: 'Utwórz organizację',
-    subtitle: 'Ustaw profil organizacji',
     invitePage: {
       formButtonReset: 'Pomiń',
     },
