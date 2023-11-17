@@ -87,7 +87,7 @@ describe('ClerkExpressWithAuth', () => {
       isUnknown: false,
       toAuth: () => ({ sessionId: '1' }),
     } as unknown as RequestState);
-    clerkClient.remotePrivateInterstitial.mockReturnValue('<html>interstitial</html>');
+    clerkClient.remotePrivateInterstitial.mockReturnValue({ data: '<html>interstitial</html>', errors: null });
 
     await createClerkExpressWithAuth({ clerkClient })()(req, res, mockNext as NextFunction);
 
@@ -189,7 +189,7 @@ describe('ClerkExpressRequireAuth', () => {
       isUnknown: false,
       toAuth: () => ({ sessionId: '1' }),
     } as unknown as RequestState);
-    clerkClient.remotePrivateInterstitial.mockReturnValue('<html>interstitial</html>');
+    clerkClient.remotePrivateInterstitial.mockReturnValue({ data: '<html>interstitial</html>', errors: null });
 
     await createClerkExpressRequireAuth({ clerkClient })()(req, res, mockNext as NextFunction);
 

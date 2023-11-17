@@ -149,12 +149,9 @@ export async function signedIn<T extends AuthStatusOptionsType>(
     loadOrganization && orgId ? organizations.getOrganization({ organizationId: orgId }) : Promise.resolve(undefined),
   ]);
 
-  const session = sessionResp;
-  const user = userResp;
-  const organization = organizationResp;
-  // const session = sessionResp && !sessionResp.errors ? sessionResp.data : undefined;
-  // const user = userResp && !userResp.errors ? userResp.data : undefined;
-  // const organization = organizationResp && !organizationResp.errors ? organizationResp.data : undefined;
+  const session = sessionResp && !sessionResp.errors ? sessionResp.data : undefined;
+  const user = userResp && !userResp.errors ? userResp.data : undefined;
+  const organization = organizationResp && !organizationResp.errors ? organizationResp.data : undefined;
 
   const authObject = signedInAuthObject(
     sessionClaims,

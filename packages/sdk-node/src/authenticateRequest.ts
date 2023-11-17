@@ -20,7 +20,7 @@ export async function loadInterstitial({
    * and avoid the extra network call
    */
   if (requestState.publishableKey) {
-    return clerkClient.localInterstitial({
+    const data = clerkClient.localInterstitial({
       publishableKey: requestState.publishableKey,
       proxyUrl: requestState.proxyUrl,
       signInUrl: requestState.signInUrl,
@@ -29,8 +29,14 @@ export async function loadInterstitial({
       clerkJSVersion,
       clerkJSUrl,
     });
+
+    return {
+      data,
+      errors: null,
+    };
   }
-  return await clerkClient.remotePrivateInterstitial();
+
+  return clerkClient.remotePrivateInterstitial();
 }
 
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {

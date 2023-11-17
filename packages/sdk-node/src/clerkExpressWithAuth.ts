@@ -28,7 +28,12 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
           clerkClient,
           requestState,
         });
-        return handleInterstitialCase(res, requestState, interstitial);
+        if (interstitial.errors) {
+          // TODO(@dimkl): return interstitial errors ?
+          next(new Error('Unauthenticated'));
+          return;
+        }
+        return handleInterstitialCase(res, requestState, interstitial.data);
       }
 
       (req as WithAuthProp<any>).auth = {
