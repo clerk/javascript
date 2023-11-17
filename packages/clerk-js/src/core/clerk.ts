@@ -149,6 +149,7 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public __internal_country?: string | null;
+  public telemetry?: TelemetryCollector;
 
   protected internal_last_error: ClerkAPIError | null = null;
 
@@ -162,7 +163,6 @@ export default class Clerk implements ClerkInterface {
   #environment?: EnvironmentResource | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
-  #telemetry?: TelemetryCollector;
   //@ts-expect-error with undefined even though it's not possible - related to issue with ts and error thrower
   #instanceType: InstanceType;
   #isReady = false;
@@ -271,11 +271,9 @@ export default class Clerk implements ClerkInterface {
       Clerk.sdkMetadata = this.#options.sdkMetadata;
     }
 
-    this.#telemetry = new TelemetryCollector({
+    this.telemetry = new TelemetryCollector({
       clerkVersion: Clerk.version,
-      verbose: true,
       samplingRate: 1,
-      // @ts-expect-error -- in v5 this will always be defined
       publishableKey: this.publishableKey,
       ...this.#options.telemetry,
     });
@@ -395,7 +393,7 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.#telemetry.record('COMPONENT_MOUNTED', { component: 'SignIn', appearanceProp: Boolean(props?.appearance) });
+    this.telemetry?.record('COMPONENT_MOUNTED', { component: 'SignIn', appearanceProp: Boolean(props?.appearance) });
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -417,7 +415,7 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.#telemetry.record('COMPONENT_MOUNTED', { component: 'SignUp', appearanceProp: Boolean(props?.appearance) });
+    this.telemetry?.record('COMPONENT_MOUNTED', { component: 'SignUp', appearanceProp: Boolean(props?.appearance) });
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -439,6 +437,11 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record('COMPONENT_MOUNTED', {
+      component: 'UserProfile',
+      appearanceProp: Boolean(props?.appearance),
+    });
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -460,6 +463,11 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record('COMPONENT_MOUNTED', {
+      component: 'OrganizationProfile',
+      appearanceProp: Boolean(props?.appearance),
+    });
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
@@ -481,6 +489,11 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record('COMPONENT_MOUNTED', {
+      component: 'CreateOrganization',
+      appearanceProp: Boolean(props?.appearance),
+    });
   };
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
@@ -502,6 +515,11 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record('COMPONENT_MOUNTED', {
+      component: 'OrganizationSwitcher',
+      appearanceProp: Boolean(props?.appearance),
+    });
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
@@ -519,6 +537,11 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record('COMPONENT_MOUNTED', {
+      component: 'OrganizationList',
+      appearanceProp: Boolean(props?.appearance),
+    });
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {
@@ -536,6 +559,11 @@ export default class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record('COMPONENT_MOUNTED', {
+      component: 'UserButton',
+      appearanceProp: Boolean(props?.appearance),
+    });
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {

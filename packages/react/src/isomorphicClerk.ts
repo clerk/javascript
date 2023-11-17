@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -12,7 +13,6 @@ import type {
   HandleOAuthCallbackParams,
   ListenerCallback,
   OrganizationListProps,
-  OrganizationMembershipResource,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
@@ -315,6 +315,15 @@ export default class IsomorphicClerk {
   get organization(): OrganizationResource | undefined | null {
     if (this.clerkjs) {
       return this.clerkjs.organization;
+    } else {
+      return undefined;
+    }
+  }
+
+  get telemetry(): TelemetryCollector | undefined {
+    if (this.clerkjs) {
+      // @ts-expect-error -- We can't add the type here due to the TelemetryCollector type existing in shared, but the Clerk type existing in types
+      return this.clerkjs.telemetry;
     } else {
       return undefined;
     }
