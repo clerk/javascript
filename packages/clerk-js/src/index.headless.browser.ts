@@ -1,6 +1,6 @@
 import 'regenerator-runtime/runtime';
 
-import Clerk from './core/clerk';
+import { Clerk } from './core/clerk';
 
 const publishableKey =
   document.querySelector('script[data-clerk-publishable-key]')?.getAttribute('data-clerk-publishable-key') ||

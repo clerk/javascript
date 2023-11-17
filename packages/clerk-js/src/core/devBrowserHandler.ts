@@ -29,7 +29,7 @@ export type CreateDevBrowserHandlerOptions = {
 };
 
 // export type DevBrowserHandler = ReturnType<typeof createDevBrowserHandler>;
-export default function createDevBrowserHandler({
+export function createDevBrowserHandler({
   frontendApi,
   fapiClient,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {

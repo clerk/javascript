@@ -1,4 +1,4 @@
-import Clerk from '@clerk/clerk-js';
+import { Clerk } from '@clerk/clerk-js';
 import type { ClerkProp } from '@clerk/clerk-react';
 
 import type { TokenCache } from './cache';

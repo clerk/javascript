@@ -1,4 +1,4 @@
-import Clerk from './clerk';
+import { Clerk } from './clerk';
 import type { AuthConfig, DisplayConfig } from './resources/internal';
 import { Client, Environment } from './resources/internal';
 
@@ -10,13 +10,15 @@ jest.mock('./resources/Client');
 jest.mock('./resources/Environment');
 
 // Because Jest, don't ask me why...
-jest.mock('./devBrowserHandler', () => () => ({
-  clear: jest.fn(),
-  setup: jest.fn(),
-  getDevBrowserJWT: jest.fn(() => 'deadbeef'),
-  setDevBrowserJWT: jest.fn(),
-  removeDevBrowserJWT: jest.fn(),
-  usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
+jest.mock('./devBrowserHandler', () => ({
+  createDevBrowserHandler: () => ({
+    clear: jest.fn(),
+    setup: jest.fn(),
+    getDevBrowserJWT: jest.fn(() => 'deadbeef'),
+    setDevBrowserJWT: jest.fn(),
+    removeDevBrowserJWT: jest.fn(),
+    usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
+  }),
 }));
 
 Client.getInstance = jest.fn().mockImplementation(() => {
