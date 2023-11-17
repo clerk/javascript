@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.0.0-alpha-v5.1
+
+### Major Changes
+
+- Drop deprecations. Migration steps: ([#2109](https://github.com/clerk/javascript/pull/2109)) by [@dimkl](https://github.com/dimkl)
+
+  - drop `orgs` jwt claim from session token
+  - change type of `auth` param of `withServerAuth()` callback to `AuthObject` from `ServerSideAuth` in `gatsby-clerk-plugin`
+    - use `auth.sessionClaims` instead of `auth.claims`
+    - use `AuthObject` properties from `auth`
+  - use `publishableKey` instead of `frontendApi`
+  - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
+
+### Patch Changes
+
+- Updated dependencies [[`deac67c1c`](https://github.com/clerk/javascript/commit/deac67c1c40d6d3ccc3559746c0c31cc29a93b84), [`83e9d0846`](https://github.com/clerk/javascript/commit/83e9d08469e7c2840f06aa7d86831055e23f67a5), [`7f833da9e`](https://github.com/clerk/javascript/commit/7f833da9ebc1b2ec9c65513628c377d0584e5d72), [`2a22aade8`](https://github.com/clerk/javascript/commit/2a22aade8c9bd1f83a9be085983f96fa87903804), [`dd5703013`](https://github.com/clerk/javascript/commit/dd57030133fb8ce98681ff0bcad7e53ee826bb0e), [`ee432df4e`](https://github.com/clerk/javascript/commit/ee432df4e26e00549dbe0613e52867fc8882e96f), [`9615e6cda`](https://github.com/clerk/javascript/commit/9615e6cda8fb1cbc3c2e464e6e891d56e245fac4), [`cace85374`](https://github.com/clerk/javascript/commit/cace85374cb0bb13578cf63fe1f3e6ee59f7f3c2), [`477170962`](https://github.com/clerk/javascript/commit/477170962f486fd4e6b0653a64826573f0d8621b), [`e0e79b4fe`](https://github.com/clerk/javascript/commit/e0e79b4fe47f64006718d547c898b9f67fe4d424), [`3c4209068`](https://github.com/clerk/javascript/commit/3c42090688166b74badfdefc7ed8c428601a0ba7), [`a6451aece`](https://github.com/clerk/javascript/commit/a6451aecef0bac578b295b524f1246dede3a7598)]:
+  - @clerk/clerk-sdk-node@5.0.0-alpha-v5.1
+  - @clerk/backend@1.0.0-alpha-v5.1
+  - @clerk/clerk-react@5.0.0-alpha-v5.1
+
 ## 5.0.0-alpha-v5.0
 
 ### Major Changes
