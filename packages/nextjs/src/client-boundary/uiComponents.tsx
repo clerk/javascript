@@ -21,16 +21,14 @@ export {
 
 export const SignIn = (props: SignInProps) => {
   const { signInUrl: repoLevelSignInUrl } = useClerkNextOptions();
-  const { routing: _routing, path, ...restProps } = props;
+  const path = props.path || repoLevelSignInUrl;
 
-  if (repoLevelSignInUrl || path) {
-    return (
-      <BaseSignIn
-        routing='path'
-        path={path || repoLevelSignInUrl}
-        {...restProps}
-      />
-    );
+  if (path) {
+    <BaseSignIn
+      {...props}
+      routing='path'
+      path={path}
+    />;
   }
 
   return <BaseSignIn {...props} />;
@@ -38,16 +36,17 @@ export const SignIn = (props: SignInProps) => {
 
 export const SignUp = (props: SignUpProps) => {
   const { signUpUrl: repoLevelSignUpUrl } = useClerkNextOptions();
-  const { routing: _routing, path, ...restProps } = props;
+  const path = props.path || repoLevelSignUpUrl;
 
-  if (repoLevelSignUpUrl || path) {
+  if (path) {
     return (
       <BaseSignUp
+        {...props}
         routing='path'
-        path={path || repoLevelSignUpUrl}
-        {...restProps}
+        path={path}
       />
     );
   }
-  return <BaseSignUp {...restProps} />;
+
+  return <BaseSignUp {...props} />;
 };
