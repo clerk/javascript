@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 
-import { NotificationCountBadge, withGate } from '../../common';
+import { NotificationCountBadge, useGate } from '../../common';
 import {
   useCoreOrganization,
   useCoreOrganizationList,
@@ -72,33 +72,31 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
     );
   }),
 );
-const NotificationCountBadgeSwitcherTrigger = withGate(
-  () => {
-    /**
-     * Prefetch user invitations and suggestions
-     */
-    const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
-    const { organizationSettings } = useEnvironment();
-    const isDomainsEnabled = organizationSettings?.domains?.enabled;
-    const { membershipRequests } = useCoreOrganization({
-      membershipRequests: isDomainsEnabled || undefined,
-    });
 
-    const notificationCount =
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      (userInvitations.count || 0) + (userSuggestions.count || 0) + (membershipRequests?.count || 0);
-
-    return (
-      <NotificationCountBadge
-        containerSx={t => ({
-          marginLeft: `${t.space.$2}`,
-        })}
-        notificationCount={notificationCount}
-      />
-    );
-  },
-  {
-    // if the user is not able to accept a request we should not notify them
+const NotificationCountBadgeSwitcherTrigger = () => {
+  /**
+   * Prefetch user invitations and suggestions
+   */
+  const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
+  const { organizationSettings } = useEnvironment();
+  const { isAuthorizedUser: canAcceptRequests } = useGate({
     permission: 'org:sys_memberships:manage',
-  },
-);
+  });
+  const isDomainsEnabled = organizationSettings?.domains?.enabled;
+  const { membershipRequests } = useCoreOrganization({
+    membershipRequests: (isDomainsEnabled && canAcceptRequests) || undefined,
+  });
+
+  const notificationCount =
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    (userInvitations.count || 0) + (userSuggestions.count || 0) + (membershipRequests?.count || 0);
+
+  return (
+    <NotificationCountBadge
+      containerSx={t => ({
+        marginLeft: `${t.space.$2}`,
+      })}
+      notificationCount={notificationCount}
+    />
+  );
+};
