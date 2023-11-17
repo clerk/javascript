@@ -62,7 +62,6 @@ exports[`module exports should not change unless explicitly set 1`] = `
   "signJwt",
   "signedInAuthObject",
   "signedOutAuthObject",
-  "smsMessages",
   "users",
   "verifyJwt",
   "verifyToken",
