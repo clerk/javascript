@@ -27,6 +27,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
       // See JS-598 for additional context.
       key={key}
       {...rest}
+      publishableKey={key}
       Clerk={buildClerk({ key, tokenCache })}
       standardBrowser={!isReactNative()}
     >

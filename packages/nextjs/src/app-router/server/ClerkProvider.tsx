@@ -1,4 +1,4 @@
-import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
+import type { ClerkProviderOptionsWrapper } from '@clerk/clerk-react';
 import type { InitialState } from '@clerk/types';
 import React from 'react';
 
@@ -6,7 +6,7 @@ import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithE
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { initialState } from './auth';
 
-type NextAppClerkProviderProps = React.PropsWithChildren<IsomorphicClerkOptions>;
+type NextAppClerkProviderProps = ClerkProviderOptionsWrapper;
 
 export function ClerkProvider(props: NextAppClerkProviderProps) {
   const { children, ...rest } = props;

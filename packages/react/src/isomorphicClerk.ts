@@ -128,7 +128,7 @@ export class IsomorphicClerk {
 
   constructor(options: IsomorphicClerkOptions) {
     const { Clerk = null, publishableKey } = options || {};
-    this.#publishableKey = publishableKey || '';
+    this.#publishableKey = publishableKey;
     this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
     this.options = options;
