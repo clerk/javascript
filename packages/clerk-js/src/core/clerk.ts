@@ -60,6 +60,7 @@ import {
   appendAsQueryParams,
   buildURL,
   completeSignUpFlow,
+  createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createCookieHandler,
   createPageLifecycle,
@@ -264,6 +265,11 @@ export class Clerk implements ClerkInterface {
       ...defaultOptions,
       ...options,
     };
+
+    this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
+      this.#options.allowedRedirectOrigins,
+      this.frontendApi,
+    );
 
     if (this.#options.standardBrowser) {
       this.#isReady = await this.#loadInStandardBrowser();
