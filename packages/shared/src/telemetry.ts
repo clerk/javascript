@@ -1,5 +1,5 @@
 /**
- * The TelemetryCollector class handles collection of telemetry events from Clerk SDKs. Telemetry is opt-out and can be disabled by setting a CLERK_TELEMETRY_DISABLE environment variable.
+ * The `TelemetryCollector` class handles collection of telemetry events from Clerk SDKs. Telemetry is opt-out and can be disabled by setting a CLERK_TELEMETRY_DISABLE environment variable.
  * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:
  *
  * ```jsx
