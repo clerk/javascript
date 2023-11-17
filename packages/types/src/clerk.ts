@@ -632,6 +632,8 @@ export type SignInProps = RoutingOptions & {
   initialValues?: SignInInitialValues;
 } & RedirectOptions;
 
+export type SignInModalProps = WithoutRouting<SignInProps>;
+
 export type SignUpProps = RoutingOptions & {
   /**
    * Full URL or path to for the sign in process.
@@ -655,6 +657,8 @@ export type SignUpProps = RoutingOptions & {
   initialValues?: SignUpInitialValues;
 } & RedirectOptions;
 
+export type SignUpModalProps = WithoutRouting<SignUpProps>;
+
 export type UserProfileProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
@@ -673,6 +677,8 @@ export type UserProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
 };
 
+export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
+
 export type OrganizationProfileProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after the user leaves the currently active organization.
@@ -690,6 +696,8 @@ export type OrganizationProfileProps = RoutingOptions & {
    */
   customPages?: CustomPage[];
 };
+
+export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**
@@ -712,6 +720,8 @@ export type CreateOrganizationProps = RoutingOptions & {
    */
   appearance?: CreateOrganizationTheme;
 };
+
+export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
 
 type UserProfileMode = 'modal' | 'navigation';
 type UserButtonProfileMode =

@@ -536,6 +536,8 @@ export interface Resources {
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';
 
+export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
+
 export type SignInInitialValues = {
   emailAddress?: string;
   phoneNumber?: string;
@@ -608,15 +610,11 @@ export type SetActiveParams = {
 
 export type SetActive = (params: SetActiveParams) => Promise<void>;
 
-export type SignInProps = {
-  /*
-   * Page routing strategy
-   */
-  routing?: RoutingStrategy;
-  /*
-   * Root URL where the component is mounted on, eg: '/sign in'
-   */
-  path?: string;
+export type RoutingOptions =
+  | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
+  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
+
+export type SignInProps = RoutingOptions & {
   /**
    * Full URL or path to for the sign up process.
    * Used to fill the "Sign up" link in the SignUp component.
@@ -634,15 +632,9 @@ export type SignInProps = {
   initialValues?: SignInInitialValues;
 } & RedirectOptions;
 
-export type SignUpProps = {
-  /*
-   * Page routing strategy
-   */
-  routing?: RoutingStrategy;
-  /*
-   * Root URL where the component is mounted on, eg: '/sign up'
-   */
-  path?: string;
+export type SignInModalProps = WithoutRouting<SignInProps>;
+
+export type SignUpProps = RoutingOptions & {
   /**
    * Full URL or path to for the sign in process.
    * Used to fill the "Sign in" link in the SignUp component.
@@ -665,15 +657,9 @@ export type SignUpProps = {
   initialValues?: SignUpInitialValues;
 } & RedirectOptions;
 
-export type UserProfileProps = {
-  /*
-   * Page routing strategy
-   */
-  routing?: RoutingStrategy;
-  /*
-   * Root URL where the component is mounted on, eg: '/user'
-   */
-  path?: string;
+export type SignUpModalProps = WithoutRouting<SignUpProps>;
+
+export type UserProfileProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
@@ -691,15 +677,9 @@ export type UserProfileProps = {
   customPages?: CustomPage[];
 };
 
-export type OrganizationProfileProps = {
-  /*
-   * Page routing strategy
-   */
-  routing?: RoutingStrategy;
-  /*
-   * Root URL where the component is mounted on, eg: '/user'
-   */
-  path?: string;
+export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
+
+export type OrganizationProfileProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after the user leaves the currently active organization.
    * @default undefined
@@ -717,15 +697,9 @@ export type OrganizationProfileProps = {
   customPages?: CustomPage[];
 };
 
-export type CreateOrganizationProps = {
-  /*
-   * Page routing strategy
-   */
-  routing?: RoutingStrategy;
-  /*
-   * Root URL where the component is mounted on, eg: '/user'
-   */
-  path?: string;
+export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
+
+export type CreateOrganizationProps = RoutingOptions & {
   /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
@@ -747,7 +721,20 @@ export type CreateOrganizationProps = {
   appearance?: CreateOrganizationTheme;
 };
 
-export type UserButtonProps = {
+export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
+
+type UserProfileMode = 'modal' | 'navigation';
+type UserButtonProfileMode =
+  | {
+      userProfileUrl?: never;
+      userProfileMode?: Extract<UserProfileMode, 'modal'>;
+    }
+  | {
+      userProfileUrl: string;
+      userProfileMode?: Extract<UserProfileMode, 'navigation'>;
+    };
+
+export type UserButtonProps = UserButtonProfileMode & {
   /**
    * Controls if the username is displayed next to the trigger button
    */
@@ -766,11 +753,6 @@ export type UserButtonProps = {
    */
   afterMultiSessionSingleSignOutUrl?: string;
   /**
-   *  Full URL or path leading to the
-   * account management interface.
-   */
-  userProfileUrl?: string;
-  /**
    * Full URL or path to navigate on "Add another account" action.
    * Multi-session mode only.
    */
@@ -780,13 +762,6 @@ export type UserButtonProps = {
    * Multi-session mode only.
    */
   afterSwitchSessionUrl?: string;
-  /**
-   * Controls whether clicking the "Manage your account" button will cause
-   * the UserProfile component to open as a modal, or if the browser will navigate
-   * to the `userProfileUrl` where UserProfile is mounted as a page.
-   * @default 'modal'
-   */
-  userProfileMode?: 'modal' | 'navigation';
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
@@ -807,83 +782,74 @@ type PrimitiveKeys<T> = {
 
 type LooseExtractedParams<T extends string> = Autocomplete<`:${T}`>;
 
-export type OrganizationSwitcherProps = {
-  /**
+type OrganizationProfileMode =
+  | { organizationProfileUrl: string; organizationProfileMode?: 'navigation' }
+  | { organizationProfileUrl?: never; organizationProfileMode?: 'modal' };
+
+type CreateOrganizationMode =
+  | { createOrganizationUrl: string; createOrganizationMode?: 'navigation' }
+  | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
+
+export type OrganizationSwitcherProps = CreateOrganizationMode &
+  OrganizationProfileMode & {
+    /**
      Controls the default state of the OrganizationSwitcher
      */
-  defaultOpen?: boolean;
-  /**
-   * By default, users can switch between organization and their personal account.
-   * This option controls whether OrganizationSwitcher will include the user's personal account
-   * in the organization list. Setting this to `false` will hide the personal account entry,
-   * and users will only be able to switch between organizations.
-   * @default true
-   */
-  hidePersonal?: boolean;
-  /**
-   * Full URL or path to navigate after creating a new organization.
-   * @default undefined
-   */
-  afterCreateOrganizationUrl?:
-    | ((organization: OrganizationResource) => string)
-    | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
-  /**
-   * Full URL or path to navigate after a successful organization selection.
-   * Accepts a function that returns URL or path
-   * @default undefined`
-   */
-  afterSelectOrganizationUrl?:
-    | ((organization: OrganizationResource) => string)
-    | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
+    defaultOpen?: boolean;
+    /**
+     * By default, users can switch between organization and their personal account.
+     * This option controls whether OrganizationSwitcher will include the user's personal account
+     * in the organization list. Setting this to `false` will hide the personal account entry,
+     * and users will only be able to switch between organizations.
+     * @default true
+     */
+    hidePersonal?: boolean;
+    /**
+     * Full URL or path to navigate after a successful organization switch.
+     * @default undefined
+     * @deprecated use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`
+     */
+    afterSwitchOrganizationUrl?: string;
+    /**
+     * Full URL or path to navigate after creating a new organization.
+     * @default undefined
+     */
+    afterCreateOrganizationUrl?:
+      | ((organization: OrganizationResource) => string)
+      | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
+    /**
+     * Full URL or path to navigate after a successful organization selection.
+     * Accepts a function that returns URL or path
+     * @default undefined`
+     */
+    afterSelectOrganizationUrl?:
+      | ((organization: OrganizationResource) => string)
+      | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
 
-  /**
-   * Full URL or path to navigate after a successful selection of personal workspace.
-   * Accepts a function that returns URL or path
-   * @default undefined`
-   */
-  afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
-  /**
-   * Full URL or path to navigate to after the user leaves the currently active organization.
-   * @default undefined
-   */
-  afterLeaveOrganizationUrl?: string;
-  /**
-   * Controls whether clicking the "Manage organization" button will cause
-   * the OrganizationProfile component to open as a modal, or if the browser will navigate
-   * to the `organizationProfileUrl` where OrganizationProfile is mounted as a page.
-   * @default modal
-   */
-  organizationProfileMode?: 'modal' | 'navigation';
-  /**
-   * Controls whether clicking the "Create organization" button will cause
-   * the CreateOrganization component to open as a modal, or if the browser will navigate
-   * to the `createOrganizationUrl` where CreateOrganization is mounted as a page.
-   * @default modal
-   */
-  createOrganizationMode?: 'modal' | 'navigation';
-  /**
-   * Full URL or path where the <OrganizationProfile /> component is mounted.
-   * @default undefined
-   */
-  organizationProfileUrl?: string;
-  /**
-   * Full URL or path where the <CreateOrganization /> component is mounted.
-   * @default undefined
-   */
-  createOrganizationUrl?: string;
-  /**
-   * Customisation options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
-   */
-  appearance?: OrganizationSwitcherTheme;
+    /**
+     * Full URL or path to navigate after a successful selection of personal workspace.
+     * Accepts a function that returns URL or path
+     * @default undefined
+     */
+    afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
+    /**
+     * Full URL or path to navigate to after the user leaves the currently active organization.
+     * @default undefined
+     */
+    afterLeaveOrganizationUrl?: string;
+    /**
+     * Customisation options to fully match the Clerk components to your own brand.
+     * These options serve as overrides and will be merged with the global `appearance`
+     * prop of ClerkProvided (if one is provided)
+     */
+    appearance?: OrganizationSwitcherTheme;
 
-  /*
-   * Specify options for the underlying <OrganizationProfile /> component.
-   * e.g. <UserButton userProfileProps={{appearance: {...}}} />
-   */
-  organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
-};
+    /*
+     * Specify options for the underlying <OrganizationProfile /> component.
+     * e.g. <UserButton userProfileProps={{appearance: {...}}} />
+     */
+    organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
+  };
 
 export type OrganizationListProps = {
   /**
