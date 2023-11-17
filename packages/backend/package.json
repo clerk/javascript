@@ -58,7 +58,7 @@
     "@cloudflare/workers-types": "^3.18.0",
     "@types/chai": "^4.3.3",
     "@types/cookie": "^0.5.1",
-    "@types/node": "^18.18.0",
+    "@types/node": "^18.17.0",
     "@types/qunit": "^2.19.7",
     "@types/sinon": "^10.0.13",
     "chai": "^4.3.6",
@@ -75,7 +75,7 @@
     "workerd": "^1.20230518.0"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public"

@@ -46,7 +46,7 @@
     "cookies": "0.8.0"
   },
   "devDependencies": {
-    "@types/node": "^18.18.0",
+    "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
@@ -56,7 +56,7 @@
     "fastify-plugin": "^4.5.0"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public"

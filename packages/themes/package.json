@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@clerk/types": "4.0.0-alpha-v5.1",
-    "@types/node": "^18.18.0",
+    "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "typescript": "*"
   },
@@ -46,7 +46,7 @@
     "react": ">=16"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public"

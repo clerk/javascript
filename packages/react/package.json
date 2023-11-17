@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@clerk/themes": "2.0.0-alpha-v5.0",
-    "@types/node": "^18.18.0",
+    "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "@types/semver": "^7.5.4",
@@ -75,7 +75,7 @@
     "react": ">=16"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public"
