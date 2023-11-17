@@ -1,5 +1,121 @@
 # Change Log
 
+## 1.0.0-alpha-v5.1
+
+### Major Changes
+
+- Drop default exports from all packages. Migration guide: ([#2150](https://github.com/clerk/javascript/pull/2150)) by [@dimkl](https://github.com/dimkl)
+
+  - use `import { Clerk } from '@clerk/backend';`
+  - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-js';`
+  - use `import { Clerk } from '@clerk/clerk-js/headless';`
+  - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
+
+- Change the response payload of Backend API requests to return `{ data, errors }` instead of return the data and throwing on error response. ([#2126](https://github.com/clerk/javascript/pull/2126)) by [@dimkl](https://github.com/dimkl)
+
+  Code example to keep the same behavior:
+
+  ```typescript
+  import { users } from '@clerk/backend';
+  import { ClerkAPIResponseError } from '@clerk/shared/error';
+
+  const { data, errors, clerkTraceId, status, statusText } = await users.getUser('user_deadbeef');
+  if (errors) {
+    throw new ClerkAPIResponseError(statusText, { data: errors, status, clerkTraceId });
+  }
+  ```
+
+- Enforce passing `request` param to `authenticateRequest` method of `@clerk/backend` ([#2122](https://github.com/clerk/javascript/pull/2122)) by [@dimkl](https://github.com/dimkl)
+
+  instead of passing each header or cookie related option that is used internally to
+  determine the request state.
+
+  Migration guide:
+
+  - use `request` param in `clerkClient.authenticateRequest()` instead of:
+    - `origin`
+    - `host`
+    - `forwardedHost`
+    - `forwardedProto`
+    - `referrer`
+    - `userAgent`
+    - `cookieToken`
+    - `clientUat`
+    - `headerToken`
+    - `searchParams`
+
+  Example
+
+  ```typescript
+  //
+  // current
+  //
+  import { clerkClient } from '@clerk/backend'
+
+  const requestState = await clerkClient.authenticateRequest({
+      secretKey: 'sk_....'
+      publishableKey: 'pk_....'
+      origin: req.headers.get('origin'),
+      host: req.headers.get('host'),
+      forwardedHost: req.headers.get('x-forwarded-host'),
+      forwardedProto: req.headers.get('x-forwarded-proto'),
+      referrer: req.headers.get('referer'),
+      userAgent: req.headers.get('user-agent'),
+      clientUat: req.cookies.get('__client_uat'),
+      cookieToken: req.cookies.get('__session'),
+      headerToken: req.headers.get('authorization'),
+      searchParams: req.searchParams
+  });
+
+  //
+  // new
+  //
+  import { clerkClient,  } from '@clerk/backend'
+
+  // use req (if it's a fetch#Request instance) or use `createIsomorphicRequest` from `@clerk/backend`
+  // to re-construct fetch#Request instance
+  const requestState = await clerkClient.authenticateRequest({
+      secretKey: 'sk_....'
+      publishableKey: 'pk_....'
+      request: req
+  });
+
+  ```
+
+- Drop deprecated properties. Migration steps: ([#1899](https://github.com/clerk/javascript/pull/1899)) by [@dimkl](https://github.com/dimkl)
+
+  - use `createClerkClient` instead of `__unstable_options`
+  - use `publishableKey` instead of `frontendApi`
+  - use `clockSkewInMs` instead of `clockSkewInSeconds`
+  - use `apiKey` instead of `secretKey`
+  - drop `httpOptions`
+  - use `*.image` instead of
+    - `ExternalAccount.picture`
+    - `ExternalAccountJSON.avatar_url`
+    - `Organization.logoUrl`
+    - `OrganizationJSON.logo_url`
+    - `User.profileImageUrl`
+    - `UserJSON.profile_image_url`
+    - `OrganizationMembershipPublicUserData.profileImageUrl`
+    - `OrganizationMembershipPublicUserDataJSON.profile_image_url`
+  - drop `pkgVersion`
+  - use `Organization.getOrganizationInvitationList` with `status` instead of `getPendingOrganizationInvitationList`
+  - drop `orgs` claim (if required, can be manually added by using `user.organizations` in a jwt template)
+  - use `localInterstitial` instead of `remotePublicInterstitial` / `remotePublicInterstitialUrl`
+
+  Internal changes:
+
+  - replaced error enum (and it's) `SetClerkSecretKeyOrAPIKey` with `SetClerkSecretKey`
+
+### Patch Changes
+
+- Strip `experimental__has` from the auth object in `makeAuthObjectSerializable()`. This fixes an issue in Next.js where an error is being thrown when this function is passed to a client component as a prop. ([#2101](https://github.com/clerk/javascript/pull/2101)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`64d3763ec`](https://github.com/clerk/javascript/commit/64d3763ec73747ad04c4b47017195cf4114e150c), [`83e9d0846`](https://github.com/clerk/javascript/commit/83e9d08469e7c2840f06aa7d86831055e23f67a5), [`7f833da9e`](https://github.com/clerk/javascript/commit/7f833da9ebc1b2ec9c65513628c377d0584e5d72), [`492b8a7b1`](https://github.com/clerk/javascript/commit/492b8a7b12f14658a384566012e5807f0a171710), [`0d1052ac2`](https://github.com/clerk/javascript/commit/0d1052ac284b909786fd0e4744b02fcf4d1a8be6), [`5471c7e8d`](https://github.com/clerk/javascript/commit/5471c7e8dd0155348748fa90e5ae97093f59efe9), [`e0e79b4fe`](https://github.com/clerk/javascript/commit/e0e79b4fe47f64006718d547c898b9f67fe4d424)]:
+  - @clerk/shared@2.0.0-alpha-v5.1
+
 ## 1.0.0-alpha-v5.0
 
 ### Major Changes

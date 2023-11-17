@@ -1,5 +1,100 @@
 # Change Log
 
+## 5.0.0-alpha-v5.1
+
+### Major Changes
+
+- Drop default exports from all packages. Migration guide: ([#2150](https://github.com/clerk/javascript/pull/2150)) by [@dimkl](https://github.com/dimkl)
+
+  - use `import { Clerk } from '@clerk/backend';`
+  - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-js';`
+  - use `import { Clerk } from '@clerk/clerk-js/headless';`
+  - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
+
+- Drop deprecations. Migration steps: ([#2102](https://github.com/clerk/javascript/pull/2102)) by [@dimkl](https://github.com/dimkl)
+
+  - use `EmailLinkError` instead of `MagicLinkError`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - use `buildRequestUrl` from `@clerk/backend` instead of `getRequestUrl` from `@clerk/shared`
+  - use `OrganizationProvider` instead of `OrganizationContext`
+  - use `userMemberships` instead of `organizationList` from `useOrganizationList`
+
+- Drop deprecations. Migration steps: ([#2082](https://github.com/clerk/javascript/pull/2082)) by [@dimkl](https://github.com/dimkl)
+
+  - use `publishableKey` instead of `frontendApi`
+  - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - drop `orgs` jwt claim from session token
+  - use `ExternalAccount.imageUrl` instead of `ExternalAccount.avatarUrl`
+  - use `Organization.imageUrl` instead of `Organization.logoUrl`
+  - use `User.imageUrl` instead of `User.profileImageUrl`
+  - use `OrganizationMembershipPublicUserData.imageUrl` instead of `OrganizationMembershipPublicUserData.profileImageUrl`
+  - use `useOrganizationList` instead of `useOrganizations`
+  - use `userProfileProps` instead of `userProfile` in `Appearance`
+  - use `Clerk.setActive()` instead of `Clerk.setSession()`
+  - drop `password` param in `User.update()`
+  - use `afterSelectOrganizationUrl` instead of `afterSwitchOrganizationUrl` in `OrganizationSwitcher`
+  - drop `Clerk.experimental_canUseCaptcha` / `Clerk.Clerk.experimental_captchaSiteKey` / `Clerk.experimental_captchaURL` (were meant for internal use)
+  - use `User.getOrganizationMemberships()` instead of `Clerk.getOrganizationMemberships()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from Clerk emitted events
+  - drop `Clerk.__unstable__invitationUpdate` / `Clerk.__unstable__membershipUpdate`
+  - drop support for string param in `Organization.create()`
+  - use `Organization.getInvitations()` instead of `Organization.getPendingInvitations()`
+  - use `pageSize` instead of `limit` in `OrganizationMembership.retrieve()`
+  - use `initialPage` instead of `offset` in `OrganizationMembership.retrieve()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from ClerkProvider
+  - use `invitations` instead of `invitationList` in `useOrganization`
+  - use `memberships` instead of `membershipList` in `useOrganization`
+  - use `redirectUrl` instead of `redirect_url` in `User.createExternalAccount()`
+  - use `signature` instead of `generatedSignature` in `Signup.attemptWeb3WalletVerification()`
+
+- Drop deprecations. Migration steps: ([#2109](https://github.com/clerk/javascript/pull/2109)) by [@dimkl](https://github.com/dimkl)
+
+  - drop `orgs` jwt claim from session token
+  - change type of `auth` param of `withServerAuth()` callback to `AuthObject` from `ServerSideAuth` in `gatsby-clerk-plugin`
+    - use `auth.sessionClaims` instead of `auth.claims`
+    - use `AuthObject` properties from `auth`
+  - use `publishableKey` instead of `frontendApi`
+  - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
+
+- Drop deprecations. Migration steps: ([#2151](https://github.com/clerk/javascript/pull/2151)) by [@dimkl](https://github.com/dimkl)
+
+  - drop `formFieldLabel__emailAddress_phoneNumber` from localization keys
+  - drop `formFieldLabel__phoneNumber_username` from localization keys
+  - drop `formFieldLabel__emailAddress_phoneNumber_username` from localization keys
+  - drop `formFieldInputPlaceholder__emailAddress_phoneNumber` from localization keys
+  - drop `formFieldInputPlaceholder__phoneNumber_username` from localization keys
+  - drop `formFieldInputPlaceholder__emailAddress_phoneNumber_username` from localization keys
+  - use `title__connectionFailed` instead of `title__conectionFailed` from localization keys
+  - use `actionLabel__connectionFailed` instead of `actionLabel__conectionFailed` from localization keys
+  - use `headerTitle__members` instead of `headerTitle__active` from localization keys
+  - use `headerTitle__invitations` instead of `headerTitle__invited` from localization keys
+  - drop `createOrganization.subtitle` from localization keys
+  - use `deDE` instead of `deDe` localization from `@clerk/localizations`
+
+- Drop deprecations. Migration steps: ([#1993](https://github.com/clerk/javascript/pull/1993)) by [@dimkl](https://github.com/dimkl)
+
+  - use `setActive` instead of `setSession` from `useSessionList | useSignUp | useSignIn` hooks
+  - use `publishableKey` instead of `frontendApi`
+  - use `handleEmailLinkVerification` instead of `handleMagicLinkVerification` from `IsomorphicClerk`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+
+### Patch Changes
+
+- Use the errorThrower shared utility when throwing errors ([#1999](https://github.com/clerk/javascript/pull/1999)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`64d3763ec`](https://github.com/clerk/javascript/commit/64d3763ec73747ad04c4b47017195cf4114e150c), [`83e9d0846`](https://github.com/clerk/javascript/commit/83e9d08469e7c2840f06aa7d86831055e23f67a5), [`7f833da9e`](https://github.com/clerk/javascript/commit/7f833da9ebc1b2ec9c65513628c377d0584e5d72), [`492b8a7b1`](https://github.com/clerk/javascript/commit/492b8a7b12f14658a384566012e5807f0a171710), [`2a22aade8`](https://github.com/clerk/javascript/commit/2a22aade8c9bd1f83a9be085983f96fa87903804), [`f77e8cdbd`](https://github.com/clerk/javascript/commit/f77e8cdbd24411f7f9dbfdafcab0596c598f66c1), [`0d1052ac2`](https://github.com/clerk/javascript/commit/0d1052ac284b909786fd0e4744b02fcf4d1a8be6), [`5471c7e8d`](https://github.com/clerk/javascript/commit/5471c7e8dd0155348748fa90e5ae97093f59efe9), [`477170962`](https://github.com/clerk/javascript/commit/477170962f486fd4e6b0653a64826573f0d8621b), [`e0e79b4fe`](https://github.com/clerk/javascript/commit/e0e79b4fe47f64006718d547c898b9f67fe4d424)]:
+  - @clerk/shared@2.0.0-alpha-v5.1
+  - @clerk/types@4.0.0-alpha-v5.1
+
 ## 5.0.0-alpha-v5.0
 
 ### Major Changes

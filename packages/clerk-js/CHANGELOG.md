@@ -1,5 +1,105 @@
 # Change Log
 
+## 5.0.0-alpha-v5.1
+
+### Major Changes
+
+- Drop default exports from all packages. Migration guide: ([#2150](https://github.com/clerk/javascript/pull/2150)) by [@dimkl](https://github.com/dimkl)
+
+  - use `import { Clerk } from '@clerk/backend';`
+  - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-js';`
+  - use `import { Clerk } from '@clerk/clerk-js/headless';`
+  - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
+
+- Drop deprecations. Migration steps: ([#2082](https://github.com/clerk/javascript/pull/2082)) by [@dimkl](https://github.com/dimkl)
+
+  - use `publishableKey` instead of `frontendApi`
+  - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - drop `orgs` jwt claim from session token
+  - use `ExternalAccount.imageUrl` instead of `ExternalAccount.avatarUrl`
+  - use `Organization.imageUrl` instead of `Organization.logoUrl`
+  - use `User.imageUrl` instead of `User.profileImageUrl`
+  - use `OrganizationMembershipPublicUserData.imageUrl` instead of `OrganizationMembershipPublicUserData.profileImageUrl`
+  - use `useOrganizationList` instead of `useOrganizations`
+  - use `userProfileProps` instead of `userProfile` in `Appearance`
+  - use `Clerk.setActive()` instead of `Clerk.setSession()`
+  - drop `password` param in `User.update()`
+  - use `afterSelectOrganizationUrl` instead of `afterSwitchOrganizationUrl` in `OrganizationSwitcher`
+  - drop `Clerk.experimental_canUseCaptcha` / `Clerk.Clerk.experimental_captchaSiteKey` / `Clerk.experimental_captchaURL` (were meant for internal use)
+  - use `User.getOrganizationMemberships()` instead of `Clerk.getOrganizationMemberships()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from Clerk emitted events
+  - drop `Clerk.__unstable__invitationUpdate` / `Clerk.__unstable__membershipUpdate`
+  - drop support for string param in `Organization.create()`
+  - use `Organization.getInvitations()` instead of `Organization.getPendingInvitations()`
+  - use `pageSize` instead of `limit` in `OrganizationMembership.retrieve()`
+  - use `initialPage` instead of `offset` in `OrganizationMembership.retrieve()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from ClerkProvider
+  - use `invitations` instead of `invitationList` in `useOrganization`
+  - use `memberships` instead of `membershipList` in `useOrganization`
+  - use `redirectUrl` instead of `redirect_url` in `User.createExternalAccount()`
+  - use `signature` instead of `generatedSignature` in `Signup.attemptWeb3WalletVerification()`
+
+### Minor Changes
+
+- Introducing sign out from all open tabs at once. ([#2094](https://github.com/clerk/javascript/pull/2094)) by [@octoper](https://github.com/octoper)
+
+- Introducing default values for `allowedRedirectOrigins`. If no value is provided, default values similar to the example below will apply. ([#2128](https://github.com/clerk/javascript/pull/2128)) by [@octoper](https://github.com/octoper)
+
+  Let's assume the host of the application is `test.host`, the origins will be
+
+  - `https://test.host/`
+  - `https://yourawesomeapp.clerk.accounts.dev/`
+  - `https://*.yourawesomeapp.clerk.accounts.dev/`
+
+- Increase the duration until data become stale for organization hooks. ([#2093](https://github.com/clerk/javascript/pull/2093)) by [@panteliselef](https://github.com/panteliselef)
+
+- Handle user_locked error encountered in an oauth flow by redirecting to /sign-up or /sign-in ([#2019](https://github.com/clerk/javascript/pull/2019)) by [@yourtallness](https://github.com/yourtallness)
+
+- Add a private \_\_navigateWithError util function to clerk for use in User Lockout scenarios ([#2043](https://github.com/clerk/javascript/pull/2043)) by [@yourtallness](https://github.com/yourtallness)
+
+- Move and export the following from @clerk/clerk-js and @clerk/nextjs to @clerk/shared: ([#2149](https://github.com/clerk/javascript/pull/2149)) by [@dimkl](https://github.com/dimkl)
+
+      - `DEV_BROWSER_SSO_JWT_PARAMETER`
+      - `DEV_BROWSER_JWT_MARKER`
+      - `DEV_BROWSER_SSO_JWT_KEY`
+      - `setDevBrowserJWTInURL`
+      - `getDevBrowserJWTFromURL`
+      - `getDevBrowserJWTFromResponse`
+
+### Patch Changes
+
+- A bug fix for prefetching data for OrganizationSwitcher and correctly displaying a notification count in the switcher as well. ([#2147](https://github.com/clerk/javascript/pull/2147)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix incorrect pagination counters in data tables inside `<OrganizationProfile/>`. ([#2056](https://github.com/clerk/javascript/pull/2056)) by [@panteliselef](https://github.com/panteliselef)
+
+- Use strict equality operator to check for lockout errors in handleRedirectCallback ([#2072](https://github.com/clerk/javascript/pull/2072)) by [@yourtallness](https://github.com/yourtallness)
+
+- Emit session when permissions or role of the active memberships change. ([#2073](https://github.com/clerk/javascript/pull/2073)) by [@panteliselef](https://github.com/panteliselef)
+
+- Return reject(err) in factor one & two code forms ([#2080](https://github.com/clerk/javascript/pull/2080)) by [@yourtallness](https://github.com/yourtallness)
+
+- Use `userMemberships` instead of `organizationList` inside `<OrganizationSwitcher/>`. ([#2118](https://github.com/clerk/javascript/pull/2118)) by [@panteliselef](https://github.com/panteliselef)
+
+- Require role to be selected before sending organization invite, affects `<OrganizationProfile/>` and <CreateOrganization/>`. ([#2129](https://github.com/clerk/javascript/pull/2129)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add Autocomplete TS generic for union literals ([#2132](https://github.com/clerk/javascript/pull/2132)) by [@tmilewski](https://github.com/tmilewski)
+
+- Refactor of internal input group, password field, and checkbox inputs in forms. ([#2087](https://github.com/clerk/javascript/pull/2087)) by [@panteliselef](https://github.com/panteliselef)
+
+- Refactor of internal radio input in forms. ([#2034](https://github.com/clerk/javascript/pull/2034)) by [@panteliselef](https://github.com/panteliselef)
+
+- Refresh invited members upon revocation ([#2058](https://github.com/clerk/javascript/pull/2058)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`64d3763ec`](https://github.com/clerk/javascript/commit/64d3763ec73747ad04c4b47017195cf4114e150c), [`83e9d0846`](https://github.com/clerk/javascript/commit/83e9d08469e7c2840f06aa7d86831055e23f67a5), [`7f833da9e`](https://github.com/clerk/javascript/commit/7f833da9ebc1b2ec9c65513628c377d0584e5d72), [`492b8a7b1`](https://github.com/clerk/javascript/commit/492b8a7b12f14658a384566012e5807f0a171710), [`b473ad862`](https://github.com/clerk/javascript/commit/b473ad8622b370f140e023759136cc30a84276a2), [`2a22aade8`](https://github.com/clerk/javascript/commit/2a22aade8c9bd1f83a9be085983f96fa87903804), [`f77e8cdbd`](https://github.com/clerk/javascript/commit/f77e8cdbd24411f7f9dbfdafcab0596c598f66c1), [`0d1052ac2`](https://github.com/clerk/javascript/commit/0d1052ac284b909786fd0e4744b02fcf4d1a8be6), [`5471c7e8d`](https://github.com/clerk/javascript/commit/5471c7e8dd0155348748fa90e5ae97093f59efe9), [`477170962`](https://github.com/clerk/javascript/commit/477170962f486fd4e6b0653a64826573f0d8621b), [`e0e79b4fe`](https://github.com/clerk/javascript/commit/e0e79b4fe47f64006718d547c898b9f67fe4d424)]:
+  - @clerk/shared@2.0.0-alpha-v5.1
+  - @clerk/types@4.0.0-alpha-v5.1
+  - @clerk/localizations@2.0.0-alpha-v5.1
+
 ## 5.0.0-alpha-v5.0
 
 ### Major Changes
