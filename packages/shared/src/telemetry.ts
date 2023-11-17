@@ -106,6 +106,7 @@ export class TelemetryCollector {
       samplingRate: options.samplingRate ?? DEFAULT_CONFIG.samplingRate,
       disabled: options.disabled ?? false,
       debug: options.debug ?? false,
+      endpoint: DEFAULT_CONFIG.endpoint,
     } as Required<TelemetryCollectorConfig>;
 
     if (!options.clerkVersion && typeof window === 'undefined') {

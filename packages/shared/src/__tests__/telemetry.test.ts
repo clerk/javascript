@@ -1,3 +1,5 @@
+import 'cross-fetch/polyfill';
+
 import { TelemetryCollector } from '../telemetry';
 
 jest.useFakeTimers();
@@ -44,7 +46,8 @@ describe('TelemetryCollector', () => {
 
   test('does not send events when debug is enabled, logs them instead', async () => {
     const fetchSpy = jest.spyOn(global, 'fetch');
-    const consoleSpy = jest.spyOn(global.console, 'log');
+    const consoleGroupSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     const collector = new TelemetryCollector({
       debug: true,
@@ -73,6 +76,7 @@ describe('TelemetryCollector', () => {
       ]
     `);
 
+    consoleGroupSpy.mockRestore();
     consoleSpy.mockRestore();
     fetchSpy.mockRestore();
   });
@@ -81,7 +85,8 @@ describe('TelemetryCollector', () => {
     process.env.CLERK_TELEMETRY_DEBUG = '1';
 
     const fetchSpy = jest.spyOn(global, 'fetch');
-    const consoleSpy = jest.spyOn(global.console, 'log');
+    const consoleGroupSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     const collector = new TelemetryCollector({
       publishableKey: TEST_PK,
@@ -109,6 +114,7 @@ describe('TelemetryCollector', () => {
       ]
     `);
 
+    consoleGroupSpy.mockRestore();
     consoleSpy.mockRestore();
     fetchSpy.mockRestore();
 

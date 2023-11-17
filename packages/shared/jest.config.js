@@ -4,9 +4,6 @@ const { name } = require('./package.json');
 const config = {
   displayName: name.replace('@clerk', ''),
   injectGlobals: true,
-  globals: {
-    fetch: global.fetch,
-  },
 
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
