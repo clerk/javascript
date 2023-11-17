@@ -1,7 +1,5 @@
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 
-import { deprecated } from './deprecated';
-
 export function isUnauthorizedError(e: any): boolean {
   const status = e?.status;
   const code = e?.errors?.[0]?.code;
@@ -22,6 +20,7 @@ export function isNetworkError(e: any): boolean {
 interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
   status: number;
+  clerkTraceId?: string;
 }
 
 // For a comprehensive Metamask error list, please see
@@ -64,6 +63,10 @@ export function isMetamaskError(err: any): err is MetamaskError {
   return 'code' in err && [4001, 32602, 32603].includes(err.code) && 'message' in err;
 }
 
+export function isUserLockedError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'user_locked';
+}
+
 export function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
   return data.length > 0 ? data.map(parseError) : [];
 }
@@ -88,24 +91,32 @@ export class ClerkAPIResponseError extends Error {
 
   status: number;
   message: string;
+  clerkTraceId?: string;
 
   errors: ClerkAPIError[];
 
-  constructor(message: string, { data, status }: ClerkAPIResponseOptions) {
+  constructor(message: string, { data, status, clerkTraceId }: ClerkAPIResponseOptions) {
     super(message);
 
     Object.setPrototypeOf(this, ClerkAPIResponseError.prototype);
 
     this.status = status;
     this.message = message;
+    this.clerkTraceId = clerkTraceId;
     this.clerkError = true;
     this.errors = parseErrors(data);
   }
 
   public toString = () => {
-    return `[${this.name}]\nMessage:${this.message}\nStatus:${this.status}\nSerialized errors: ${this.errors.map(e =>
-      JSON.stringify(e),
+    let message = `[${this.name}]\nMessage:${this.message}\nStatus:${this.status}\nSerialized errors: ${this.errors.map(
+      e => JSON.stringify(e),
     )}`;
+
+    if (this.clerkTraceId) {
+      message += `\nClerk Trace ID: ${this.clerkTraceId}`;
+    }
+
+    return message;
   };
 }
 
@@ -156,20 +167,6 @@ export class ClerkRuntimeError extends Error {
   };
 }
 
-/**
- * @deprecated Use `EmailLinkError` instead.
- */
-export class MagicLinkError extends Error {
-  code: string;
-
-  constructor(code: string) {
-    super(code);
-    this.code = code;
-    Object.setPrototypeOf(this, MagicLinkError.prototype);
-    deprecated('MagicLinkError', 'Use `EmailLinkError` instead.');
-  }
-}
-
 export class EmailLinkError extends Error {
   code: string;
 
@@ -180,33 +177,9 @@ export class EmailLinkError extends Error {
   }
 }
 
-/**
- * Check if the error is a MagicLinkError.
- * @deprecated Use `isEmailLinkError` instead.
- */
-export function isMagicLinkError(err: Error): err is MagicLinkError {
-  deprecated('isMagicLinkError', 'Use `isEmailLinkError` instead.');
-  return err instanceof MagicLinkError;
-}
-
 export function isEmailLinkError(err: Error): err is EmailLinkError {
   return err instanceof EmailLinkError;
 }
-
-const _MagicLinkErrorCode = {
-  Expired: 'expired',
-  Failed: 'failed',
-};
-
-/**
- * @deprecated Use `EmailLinkErrorCode` instead.
- */
-export const MagicLinkErrorCode = new Proxy(_MagicLinkErrorCode, {
-  get(target, prop, receiver) {
-    deprecated('MagicLinkErrorCode', 'Use `EmailLinkErrorCode` instead.');
-    return Reflect.get(target, prop, receiver);
-  },
-});
 
 export const EmailLinkErrorCode = {
   Expired: 'expired',
@@ -214,7 +187,6 @@ export const EmailLinkErrorCode = {
 };
 
 const DefaultMessages = Object.freeze({
-  InvalidFrontendApiErrorMessage: `The frontendApi passed to Clerk is invalid. You can get your Frontend API key at https://dashboard.clerk.com/last-active?path=api-keys. (key={{key}})`,
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
   InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key={{key}})`,
   MissingPublishableKeyErrorMessage: `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
@@ -233,11 +205,15 @@ export type ErrorThrowerOptions = {
 
 export interface ErrorThrower {
   setPackageName(options: ErrorThrowerOptions): ErrorThrower;
+
   setMessages(options: ErrorThrowerOptions): ErrorThrower;
+
   throwInvalidPublishableKeyError(params: { key?: string }): never;
-  throwInvalidFrontendApiError(params: { key?: string }): never;
+
   throwInvalidProxyUrl(params: { url?: string }): never;
+
   throwMissingPublishableKeyError(): never;
+  throw(message: string): never;
 }
 
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
@@ -281,16 +257,16 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
       throw new Error(buildMessage(messages.InvalidPublishableKeyErrorMessage, params));
     },
 
-    throwInvalidFrontendApiError(params: { key?: string }): never {
-      throw new Error(buildMessage(messages.InvalidFrontendApiErrorMessage, params));
-    },
-
     throwInvalidProxyUrl(params: { url?: string }): never {
       throw new Error(buildMessage(messages.InvalidProxyUrlErrorMessage, params));
     },
 
     throwMissingPublishableKeyError(): never {
       throw new Error(buildMessage(messages.MissingPublishableKeyErrorMessage));
+    },
+
+    throw(message: string): never {
+      throw new Error(buildMessage(message));
     },
   };
 }

@@ -57,8 +57,7 @@ describe('withClerkMiddleware(options)', () => {
     expect(response.body).toEqual(JSON.stringify({ auth: 'mockedAuth' }));
     expect(authenticateRequestMock).toBeCalledWith(
       expect.objectContaining({
-        secretKey: 'TEST_API_KEY',
-        apiKey: 'TEST_API_KEY',
+        secretKey: 'TEST_SECRET_KEY',
         request: expect.any(Request),
       }),
     );
@@ -97,8 +96,7 @@ describe('withClerkMiddleware(options)', () => {
     expect(response.body).toEqual(JSON.stringify({ auth: 'mockedAuth' }));
     expect(authenticateRequestMock).toBeCalledWith(
       expect.objectContaining({
-        secretKey: 'TEST_API_KEY',
-        apiKey: 'TEST_API_KEY',
+        secretKey: 'TEST_SECRET_KEY',
         request: expect.any(Request),
       }),
     );
@@ -193,8 +191,7 @@ describe('withClerkMiddleware(options)', () => {
     expect(response.body).toEqual(JSON.stringify({ auth: 'mockedAuth' }));
     expect(authenticateRequestMock).toBeCalledWith(
       expect.objectContaining({
-        secretKey: 'TEST_API_KEY',
-        apiKey: 'TEST_API_KEY',
+        secretKey: 'TEST_SECRET_KEY',
         request: expect.any(Request),
       }),
     );

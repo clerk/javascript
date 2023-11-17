@@ -1,6 +1,6 @@
 import { Clerk } from './clerkClient';
 
-export default Clerk;
+export { Clerk };
 
 export type { WithAuthProp, RequireAuthProp } from './types';
 

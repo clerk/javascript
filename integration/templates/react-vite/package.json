@@ -1,11 +1,11 @@
 {
   "name": "react-vite",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port $PORT --no-open",
     "build": "tsc && vite build",
+    "dev": "vite --port $PORT --no-open",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview --port $PORT --no-open"
   },
@@ -15,6 +15,7 @@
     "react-router-dom": "^6.14.1"
   },
   "devDependencies": {
+    "@types/node": "^18.17.0",
     "@types/react": "^18.0.37",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
@@ -25,5 +26,8 @@
     "eslint-plugin-react-refresh": "^0.3.4",
     "typescript": "^5.0.2",
     "vite": "^4.3.9"
+  },
+  "engines": {
+    "node": ">=18.17.0"
   }
 }

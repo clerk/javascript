@@ -11,30 +11,20 @@ import type { ClerkMiddlewareOptions, MiddlewareRequireAuthProp, RequireAuthProp
 
 export type CreateClerkExpressMiddlewareOptions = {
   clerkClient: ReturnType<typeof Clerk>;
-  /**
-   * @deprecated Use `secretKey` instead.
-   */
-  apiKey?: string;
   /* Secret Key */
   secretKey?: string;
-  /**
-   * @deprecated Use `publishableKey` instead.
-   */
-  frontendApi?: string;
   publishableKey?: string;
   apiUrl?: string;
 };
 
 export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMiddlewareOptions) => {
-  const { clerkClient, frontendApi = '', apiKey = '', secretKey = '', publishableKey = '' } = createOpts;
+  const { clerkClient, secretKey = '', publishableKey = '' } = createOpts;
 
   return (options: ClerkMiddlewareOptions = {}): MiddlewareRequireAuthProp => {
     return async (req, res, next) => {
       const requestState = await authenticateRequest({
         clerkClient,
-        apiKey,
         secretKey,
-        frontendApi,
         publishableKey,
         req,
         options,
@@ -48,7 +38,12 @@ export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMidd
           clerkClient,
           requestState,
         });
-        return handleInterstitialCase(res, requestState, interstitial);
+        if (interstitial.errors) {
+          // TODO(@dimkl): return interstitial errors ?
+          next(new Error('Unauthenticated'));
+          return;
+        }
+        return handleInterstitialCase(res, requestState, interstitial.data);
       }
 
       if (requestState.isSignedIn) {

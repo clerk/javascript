@@ -10,16 +10,18 @@
 
 export * from './utils';
 
-export { createWorkerTimers } from './workerTimers';
+export { apiUrlFromPublishableKey } from './apiUrlFromPublishableKey';
 export * from './browser';
 export { callWithRetry } from './callWithRetry';
 export * from './color';
+export * from './constants';
 export * from './date';
 export * from './deprecated';
 export * from './error';
 export * from './file';
 export { handleValueOrFn } from './handleValueOrFn';
 export { isomorphicAtob } from './isomorphicAtob';
+export { isomorphicBtoa } from './isomorphicBtoa';
 export * from './keys';
 export { loadScript } from './loadScript';
 export { LocalStorageBroadcastChannel } from './localStorageBroadcastChannel';
@@ -27,3 +29,11 @@ export * from './poller';
 export * from './proxy';
 export * from './underscore';
 export * from './url';
+export { createWorkerTimers } from './workerTimers';
+export {
+  DEV_BROWSER_SSO_JWT_PARAMETER,
+  DEV_BROWSER_JWT_MARKER,
+  getDevBrowserJWTFromURL,
+  setDevBrowserJWTInURL,
+  getDevBrowserJWTFromResponse,
+} from './devBrowser';

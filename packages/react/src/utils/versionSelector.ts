@@ -1,3 +1,6 @@
+import major from 'semver/functions/major';
+import prerelease from 'semver/functions/prerelease';
+
 /**
  * This version selector is a bit complicated, so here is the flow:
  * 1. Use the clerkJSVersion prop on the provider
@@ -24,6 +27,5 @@ export const versionSelector = (clerkJSVersion: string | undefined) => {
   return getMajorVersion(PACKAGE_VERSION);
 };
 
-// TODO: Replace these with "semver" package
-const getPrereleaseTag = (packageVersion: string) => packageVersion.match(/-(.*)\./)?.[1];
-const getMajorVersion = (packageVersion: string) => packageVersion.split('.')[0];
+const getPrereleaseTag = (packageVersion: string) => prerelease(packageVersion)?.[0].toString();
+const getMajorVersion = (packageVersion: string) => major(packageVersion).toString();

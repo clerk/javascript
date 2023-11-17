@@ -3,9 +3,9 @@ import type {
   ClerkOptions,
   ClientResource,
   DomainOrProxyUrl,
+  InitialState,
   LoadedClerk,
   MultiDomainAndOrProxy,
-  PublishableKeyOrFrontendApi,
   SDKMetadata,
   SessionResource,
   SignInRedirectOptions,
@@ -29,8 +29,27 @@ export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite'> & {
   clerkJSVariant?: 'headless' | '';
   clerkJSVersion?: string;
   sdkMetadata?: SDKMetadata;
-} & PublishableKeyOrFrontendApi &
-  MultiDomainAndOrProxy;
+  publishableKey: string;
+} & MultiDomainAndOrProxy;
+
+export type ClerkProviderProps = IsomorphicClerkOptions & {
+  children: React.ReactNode;
+  initialState?: InitialState;
+};
+
+// TODO(@dimkl): replacing it with the following make nextjs type tests fail
+//   `Exclude<IsomorphicClerkOptions, 'publishableKey'> & { publishableKey?: string }`
+// find another way to reduce the duplication.
+export type ClerkProviderOptionsWrapper = Omit<ClerkOptions, 'isSatellite'> & {
+  Clerk?: ClerkProp;
+  clerkJSUrl?: string;
+  clerkJSVariant?: 'headless' | '';
+  clerkJSVersion?: string;
+  sdkMetadata?: SDKMetadata;
+  publishableKey?: string;
+} & MultiDomainAndOrProxy & {
+    children: React.ReactNode;
+  };
 
 export interface BrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;

@@ -1,6 +1,8 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import type { AuthObject, RequestState } from '@clerk/backend';
-import { buildRequestUrl, constants } from '@clerk/backend';
+import { buildRequestUrl, constants, TokenVerificationErrorReason } from '@clerk/backend';
+import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
+import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
+import type { Autocomplete } from '@clerk/types';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -8,8 +10,7 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
-import { SECRET_KEY } from './clerkClient';
-import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
+import { SECRET_KEY } from './constants';
 import {
   clockSkewDetected,
   infiniteRedirectLoopDetected,
@@ -23,7 +24,6 @@ import {
   apiEndpointUnauthorizedNextResponse,
   decorateRequest,
   isCrossOrigin,
-  isDevelopmentFromApiKey,
   setRequestHeadersOnNextResponse,
 } from './utils';
 
@@ -33,15 +33,9 @@ type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string
 // For extra safety, we won't recommend using a `/(.*)` route matcher.
 type ExcludeRootPath<T> = T extends '/' ? never : T;
 
-// We want to show suggestions but also allow for free-text input
-// the (string & {}) type prevents the TS compiler from merging the typed union with the string type
-// https://github.com/Microsoft/TypeScript/issues/29729#issuecomment-505826972
-type RouteMatcherWithNextTypedRoutes =
-  | WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>>
-  | NextTypedRoute
-  // This is necessary to allow all string, using something other than `{}` here WILL break types!
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  | (string & {});
+type RouteMatcherWithNextTypedRoutes = Autocomplete<
+  WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>> | NextTypedRoute
+>;
 
 const INFINITE_REDIRECTION_LOOP_COOKIE = '__clerk_redirection_loop';
 
@@ -355,7 +349,7 @@ const assertClockSkew = (requestState: RequestState, opts: AuthMiddlewareParams)
     return;
   }
 
-  if (requestState.reason === 'token-not-active-yet') {
+  if (requestState.reason === TokenVerificationErrorReason.TokenNotActiveYet) {
     throw new Error(clockSkewDetected(requestState.message));
   }
 };
@@ -377,7 +371,7 @@ const assertInfiniteRedirectionLoop = (
   if (infiniteRedirectsCounter === 6) {
     // Infinite redirect detected, is it clock skew?
     // We check for token-expired here because it can be a valid, recoverable scenario, but in a redirect loop a token-expired error likely indicates clock skew.
-    if (requestState.reason === 'token-expired') {
+    if (requestState.reason === TokenVerificationErrorReason.TokenExpired) {
       throw new Error(clockSkewDetected(requestState.message));
     }
 

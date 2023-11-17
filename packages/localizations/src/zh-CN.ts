@@ -20,10 +20,7 @@ export const zhCN: LocalizationResource = {
   formFieldLabel__emailAddresses: '电子邮件地址',
   formFieldLabel__phoneNumber: '电话号码',
   formFieldLabel__username: '用户名',
-  formFieldLabel__emailAddress_phoneNumber: '电子邮件地址或电话号码',
   formFieldLabel__emailAddress_username: '电子邮件地址或用户名',
-  formFieldLabel__phoneNumber_username: '电话号码或用户名',
-  formFieldLabel__emailAddress_phoneNumber_username: '电子邮件地址、电话号码或用户名',
   formFieldLabel__password: '密码',
   formFieldLabel__currentPassword: '当前密码',
   formFieldLabel__newPassword: '新密码',
@@ -39,10 +36,7 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: '输入或粘贴一个或多个电子邮件地址，用空格或逗号分隔',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -285,11 +279,9 @@ export const zhCN: LocalizationResource = {
       connectedAccountsSection: {
         title: '已连接的账户',
         primaryButton: '连接账户',
-        title__conectionFailed: '重试失败的连接',
         title__connectionFailed: '重试失败的连接',
         title__reauthorize: '需要重新授权',
         subtitle__reauthorize: '所需的权限已更新，您可能会遇到功能限制。请重新授权此应用程序，以避免任何问题',
-        actionLabel__conectionFailed: '再试一次',
         actionLabel__connectionFailed: '再试一次',
         actionLabel__reauthorize: '立即授权',
         destructiveActionTitle: '移除',
@@ -531,10 +523,7 @@ export const zhCN: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: '没有可显示的成员',
       action__invite: '邀请',
-      start: {
-        headerTitle__active: '活跃',
-        headerTitle__invited: '已邀请',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: '用户',
         tableHeader__joined: '加入',
@@ -551,7 +540,6 @@ export const zhCN: LocalizationResource = {
   createOrganization: {
     title: '创建组织',
     formButtonSubmit: '创建组织',
-    subtitle: '设置组织简介',
     invitePage: {
       formButtonReset: '跳过',
     },

@@ -5,23 +5,62 @@ on:
     - cron: '0 7 * * *'
 
 jobs:
-  build:
-    name: Build packages and upload artifacts
-    uses: ./.github/workflows/base-build.yml
+  integration-tests:
+    name: Integration Tests
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
-  integration-nextjs:
-    name: Integration (NextJS canary)
-    needs: build
-    uses: ./.github/workflows/base-e2e.yml
-    with:
-      SCRIPT: 'E2E_NEXTJS_VERSION=canary npm run test:integration:nextjs'
-    secrets: inherit
+    strategy:
+      matrix:
+        test-name: [ 'nextjs' ]
 
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
+
+      - name: Verdaccio
+        uses: ./.github/actions/verdaccio
+        with:
+          publish-cmd: |
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS && npx changeset publish --no-git-tag; fi
+
+      - name: Install @clerk/backend in /integration
+        working-directory: ./integration
+        run: npm init -y && npm install @clerk/backend
+
+      - name: Install @clerk/clerk-js in os temp
+        working-directory: ${{runner.temp}}
+        run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
+
+      - name: Run Integration Tests
+        run: npm run test:integration:${{ matrix.test-name }}
+        env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_CLERK_VERSION: 'latest'
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+          E2E_NEXTJS_VERSION: 'canary'
+
+      - name: Show package versions
+        working-directory: ${{runner.temp}}
+        run: cd .temp_integration && for i in */; do (echo "---$i----" && cd "$i" && npm list) done;
   notify-slack:
     name: Notify Slack
-    needs: integration-nextjs
+    needs: integration-tests
     if: ${{ contains(needs.*.result, 'failure') }}
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ${{ vars.RUNNER_NORMAL }}
     steps:
       - name: Report Status
         uses: ravsamhq/notify-slack-action@v1

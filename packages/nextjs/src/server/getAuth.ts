@@ -8,15 +8,12 @@ import {
   signedInAuthObject,
   signedOutAuthObject,
 } from '@clerk/backend';
-import type { SecretKeyOrApiKey } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
-import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerkClient';
+import { API_URL, API_VERSION, SECRET_KEY } from './constants';
 import { getAuthAuthHeaderMissing } from './errors';
 import type { RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
-
-type GetAuthOpts = Partial<SecretKeyOrApiKey>;
 
 type AuthObjectWithoutResources<T extends AuthObject> = Omit<T, 'user' | 'organization' | 'session'>;
 
@@ -30,8 +27,8 @@ export const createGetAuth = ({
   withLogger(debugLoggerName, logger => {
     return (
       req: RequestLike,
-      opts?: GetAuthOpts,
-    ): AuthObjectWithoutResources<SignedInAuthObject | SignedOutAuthObject> => {
+      opts?: { secretKey?: string },
+    ): AuthObjectWithoutResources<SignedInAuthObject> | AuthObjectWithoutResources<SignedOutAuthObject> => {
       const debug = getHeader(req, constants.Headers.EnableDebug) === 'true';
       if (debug) {
         logger.enable();
@@ -40,7 +37,7 @@ export const createGetAuth = ({
       // When the auth status is set, we trust that the middleware has already run
       // Then, we don't have to re-verify the JWT here,
       // we can just strip out the claims manually.
-      const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+      const authStatus = getAuthKeyFromRequest(req, 'AuthStatus') as AuthStatus;
       const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
       const authReason = getAuthKeyFromRequest(req, 'AuthReason');
       logger.debug('Headers debug', { authStatus, authMessage, authReason });
@@ -50,7 +47,6 @@ export const createGetAuth = ({
       }
 
       const options = {
-        apiKey: opts?.apiKey || API_KEY,
         secretKey: opts?.secretKey || SECRET_KEY,
         apiUrl: API_URL,
         apiVersion: API_VERSION,
@@ -101,7 +97,6 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
   const authReason = getAuthKeyFromRequest(req, 'AuthReason');
 
   const options = {
-    apiKey: API_KEY,
     secretKey: SECRET_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,

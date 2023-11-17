@@ -11,7 +11,6 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
-import { deprecatedObjectProperty } from '../../deprecated';
 import { useClerkInstanceContext, useUserContext } from '../contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -37,34 +36,6 @@ type UseOrganizationListParams = {
       });
 };
 
-type OrganizationList = ReturnType<typeof createOrganizationList>;
-
-type UseOrganizationListReturn =
-  | {
-      isLoaded: false;
-      /**
-       * @deprecated Use userMemberships instead
-       */
-      organizationList: undefined;
-      createOrganization: undefined;
-      setActive: undefined;
-      userMemberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
-      userInvitations: PaginatedResourcesWithDefault<UserOrganizationInvitationResource>;
-      userSuggestions: PaginatedResourcesWithDefault<OrganizationSuggestionResource>;
-    }
-  | {
-      isLoaded: boolean;
-      /**
-       * @deprecated Use userMemberships instead
-       */
-      organizationList: OrganizationList;
-      createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
-      setActive: SetActive;
-      userMemberships: PaginatedResources<OrganizationMembershipResource>;
-      userInvitations: PaginatedResources<UserOrganizationInvitationResource>;
-      userSuggestions: PaginatedResources<OrganizationSuggestionResource>;
-    };
-
 const undefinedPaginatedResource = {
   data: undefined,
   count: undefined,
@@ -78,10 +49,38 @@ const undefinedPaginatedResource = {
   fetchPrevious: undefined,
   hasNextPage: false,
   hasPreviousPage: false,
-  unstable__mutate: undefined,
+  revalidate: undefined,
+  setData: undefined,
 } as const;
 
-type UseOrganizationList = (params?: UseOrganizationListParams) => UseOrganizationListReturn;
+type UseOrganizationList = <T extends UseOrganizationListParams>(
+  params?: T,
+) =>
+  | {
+      isLoaded: false;
+      createOrganization: undefined;
+      setActive: undefined;
+      userMemberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
+      userInvitations: PaginatedResourcesWithDefault<UserOrganizationInvitationResource>;
+      userSuggestions: PaginatedResourcesWithDefault<OrganizationSuggestionResource>;
+    }
+  | {
+      isLoaded: boolean;
+      createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
+      setActive: SetActive;
+      userMemberships: PaginatedResources<
+        OrganizationMembershipResource,
+        T['userMemberships'] extends { infinite: true } ? true : false
+      >;
+      userInvitations: PaginatedResources<
+        UserOrganizationInvitationResource,
+        T['userInvitations'] extends { infinite: true } ? true : false
+      >;
+      userSuggestions: PaginatedResources<
+        OrganizationSuggestionResource,
+        T['userSuggestions'] extends { infinite: true } ? true : false
+      >;
+    };
 
 export const useOrganizationList: UseOrganizationList = params => {
   const { userMemberships, userInvitations, userSuggestions } = params || {};
@@ -144,11 +143,8 @@ export const useOrganizationList: UseOrganizationList = params => {
     GetUserOrganizationMembershipParams,
     ClerkPaginatedResponse<OrganizationMembershipResource>
   >(
-    {
-      ...userMembershipsParams,
-      paginated: true,
-    } as any,
-    user?.getOrganizationMemberships as unknown as any,
+    userMembershipsParams || {},
+    user?.getOrganizationMemberships,
     {
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,
@@ -202,7 +198,6 @@ export const useOrganizationList: UseOrganizationList = params => {
   if (!isClerkLoaded) {
     return {
       isLoaded: false,
-      organizationList: undefined,
       createOrganization: undefined,
       setActive: undefined,
       userMemberships: undefinedPaginatedResource,
@@ -211,23 +206,12 @@ export const useOrganizationList: UseOrganizationList = params => {
     };
   }
 
-  const result = {
+  return {
     isLoaded: isClerkLoaded,
-    organizationList: createOrganizationList(user.organizationMemberships),
     setActive: clerk.setActive,
     createOrganization: clerk.createOrganization,
     userMemberships: memberships,
     userInvitations: invitations,
     userSuggestions: suggestions,
   };
-  deprecatedObjectProperty(result, 'organizationList', 'Use `userMemberships` instead.');
-
-  return result;
 };
-
-function createOrganizationList(organizationMemberships: OrganizationMembershipResource[]) {
-  return organizationMemberships.map(organizationMembership => ({
-    membership: organizationMembership,
-    organization: organizationMembership.organization,
-  }));
-}

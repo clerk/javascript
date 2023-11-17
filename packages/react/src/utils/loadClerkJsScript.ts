@@ -16,9 +16,9 @@ type LoadClerkJsScriptOptions = Omit<IsomorphicClerkOptions, 'proxyUrl' | 'domai
 };
 
 export const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
-  const { frontendApi, publishableKey } = opts;
+  const { publishableKey } = opts;
 
-  if (!publishableKey && !frontendApi) {
+  if (!publishableKey) {
     errorThrower.throwMissingPublishableKeyError();
   }
 
@@ -32,7 +32,7 @@ export const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
 };
 
 const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
-  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey, frontendApi } = opts;
+  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {
     return clerkJSUrl;
@@ -41,10 +41,10 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   let scriptHost = '';
   if (!!proxyUrl && isValidProxyUrl(proxyUrl)) {
     scriptHost = proxyUrlToAbsoluteURL(proxyUrl).replace(/http(s)?:\/\//, '');
-  } else if (domain && !isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || frontendApi || '')) {
+  } else if (domain && !isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || '')) {
     scriptHost = addClerkPrefix(domain);
   } else {
-    scriptHost = parsePublishableKey(publishableKey)?.frontendApi || frontendApi || '';
+    scriptHost = parsePublishableKey(publishableKey)?.frontendApi || '';
   }
 
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
@@ -53,11 +53,9 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
 };
 
 const applyClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => (script: HTMLScriptElement) => {
-  const { publishableKey, frontendApi, proxyUrl, domain } = options;
+  const { publishableKey, proxyUrl, domain } = options;
   if (publishableKey) {
     script.setAttribute('data-clerk-publishable-key', publishableKey);
-  } else if (frontendApi) {
-    script.setAttribute('data-clerk-frontend-api', frontendApi);
   }
 
   if (proxyUrl) {

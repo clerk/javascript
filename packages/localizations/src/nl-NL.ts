@@ -20,10 +20,7 @@ export const nlNL: LocalizationResource = {
   formFieldLabel__emailAddresses: 'E-mailadressen',
   formFieldLabel__phoneNumber: 'Telefoonnummer',
   formFieldLabel__username: 'Gebruikersnaam',
-  formFieldLabel__emailAddress_phoneNumber: 'E-mailadres of telefoonnummer',
   formFieldLabel__emailAddress_username: 'E-mailadres of gebruikersnaam',
-  formFieldLabel__phoneNumber_username: 'telefoonnummer of gebruikersnaam',
-  formFieldLabel__emailAddress_phoneNumber_username: 'E-mailadres, telefoonnummer of gebruikersnaam',
   formFieldLabel__password: 'Wachtwoord',
   formFieldLabel__newPassword: 'Nieuw wachtwoord',
   formFieldLabel__confirmPassword: 'Wachtwoord bevestigen',
@@ -37,10 +34,7 @@ export const nlNL: LocalizationResource = {
     "Typ of plak één of meerdere emailadressen, gescheiden door spaties of komma's.",
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -256,12 +250,10 @@ export const nlNL: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Aangesloten accounts',
         primaryButton: 'Verbind een account',
-        title__conectionFailed: 'Probeer mislukte connectie opnieuw',
         title__connectionFailed: 'Probeer mislukte connectie opnieuw',
         title__reauthorize: 'Herautorisering nodig',
         subtitle__reauthorize:
           'De vereiste scopes zijn bijgewerkt, en je ondervindt mogelijk beperkte functionaliteit. Autoriseer deze applicatie opnieuw om problemen te voorkomen',
-        actionLabel__conectionFailed: 'Probeer opnieuw',
         actionLabel__connectionFailed: 'Probeer opnieuw',
         actionLabel__reauthorize: 'Authoriseer nu',
         destructiveActionTitle: 'Verwijderen',
@@ -507,10 +499,7 @@ export const nlNL: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Geen leden gevonden',
       action__invite: 'Uitnodigen',
-      start: {
-        headerTitle__active: 'Actief',
-        headerTitle__invited: 'Uitgenodigd',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Gebruiker',
         tableHeader__joined: 'Toegetreden',
@@ -527,7 +516,6 @@ export const nlNL: LocalizationResource = {
   createOrganization: {
     title: 'Organisatie aanmaken',
     formButtonSubmit: 'Maak organisatie aan',
-    subtitle: 'Stel het organisatieprofiel in',
     invitePage: {
       formButtonReset: 'Overslaan',
     },

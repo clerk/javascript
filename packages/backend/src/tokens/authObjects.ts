@@ -1,23 +1,19 @@
-import { deprecated } from '@clerk/shared/deprecated';
-import type { ActClaim, JwtPayload, ServerGetToken, ServerGetTokenOptions } from '@clerk/types';
+import type {
+  ActClaim,
+  experimental__CheckAuthorizationWithoutPermission,
+  JwtPayload,
+  ServerGetToken,
+  ServerGetTokenOptions,
+} from '@clerk/types';
 
-import type { Organization, Session, User } from '../api';
+import type { CreateBackendApiOptions, Organization, Session, User } from '../api';
 import { createBackendApiClient } from '../api';
-import type { RequestState } from './authStatus';
-import type { AuthenticateRequestOptions } from './request';
 
-type AuthObjectDebugData = Partial<AuthenticateRequestOptions & RequestState>;
+type AuthObjectDebugData = Record<string, any>;
 type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
-type AuthObjectDebug = () => unknown;
+type AuthObjectDebug = () => AuthObjectDebugData;
 
-export type SignedInAuthObjectOptions = {
-  /**
-   * @deprecated Use `secretKey` instead.
-   */
-  apiKey?: string;
-  secretKey?: string;
-  apiUrl: string;
-  apiVersion: string;
+export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
   token: string;
   session?: Session;
   user?: User;
@@ -36,6 +32,10 @@ export type SignedInAuthObject = {
   orgSlug: string | undefined;
   organization: Organization | undefined;
   getToken: ServerGetToken;
+  /**
+   * @experimental The method is experimental and subject to change in future releases.
+   */
+  experimental__has: experimental__CheckAuthorizationWithoutPermission;
   debug: AuthObjectDebug;
 };
 
@@ -51,6 +51,10 @@ export type SignedOutAuthObject = {
   orgSlug: null;
   organization: null;
   getToken: ServerGetToken;
+  /**
+   * @experimental The method is experimental and subject to change in future releases.
+   */
+  experimental__has: experimental__CheckAuthorizationWithoutPermission;
   debug: AuthObjectDebug;
 };
 
@@ -59,7 +63,6 @@ export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
 const createDebug: CreateAuthObjectDebug = data => {
   return () => {
     const res = { ...data } || {};
-    res.apiKey = (res.apiKey || '').substring(0, 7);
     res.secretKey = (res.secretKey || '').substring(0, 7);
     res.jwtKey = (res.jwtKey || '').substring(0, 7);
     return { ...res };
@@ -79,14 +82,8 @@ export function signedInAuthObject(
     org_slug: orgSlug,
     sub: userId,
   } = sessionClaims;
-  const { apiKey, secretKey, apiUrl, apiVersion, token, session, user, organization } = options;
-
-  if (apiKey) {
-    deprecated('apiKey', 'Use `secretKey` instead.');
-  }
-
+  const { secretKey, apiUrl, apiVersion, token, session, user, organization } = options;
   const { sessions } = createBackendApiClient({
-    apiKey,
     secretKey,
     apiUrl,
     apiVersion,
@@ -110,15 +107,12 @@ export function signedInAuthObject(
     orgSlug,
     organization,
     getToken,
+    experimental__has: createHasAuthorization({ orgId, orgRole, userId }),
     debug: createDebug({ ...options, ...debugData }),
   };
 }
 
 export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutAuthObject {
-  if (debugData?.apiKey) {
-    deprecated('apiKey', 'Use `secretKey` instead.');
-  }
-
   return {
     sessionClaims: null,
     sessionId: null,
@@ -131,11 +125,21 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgSlug: null,
     organization: null,
     getToken: () => Promise.resolve(null),
+    experimental__has: () => false,
     debug: createDebug(debugData),
   };
 }
 
-export function prunePrivateMetadata(resource?: { private_metadata: any } | { privateMetadata: any } | null) {
+export function prunePrivateMetadata(
+  resource?:
+    | {
+        private_metadata: any;
+      }
+    | {
+        privateMetadata: any;
+      }
+    | null,
+) {
   // Delete sensitive private metadata from resource before rendering in SSR
   if (resource) {
     // @ts-ignore
@@ -166,8 +170,8 @@ export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T
  */
 export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(obj: T): T => {
   // remove any non-serializable props from the returned object
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { debug, getToken, ...rest } = obj as unknown as AuthObject;
+
+  const { debug, getToken, experimental__has, ...rest } = obj as unknown as AuthObject;
   return rest as unknown as T;
 };
 
@@ -190,3 +194,34 @@ const createGetToken: CreateGetToken = params => {
     return sessionToken;
   };
 };
+
+const createHasAuthorization =
+  ({
+    orgId,
+    orgRole,
+    userId,
+  }: {
+    userId: string;
+    orgId: string | undefined;
+    orgRole: string | undefined;
+  }): experimental__CheckAuthorizationWithoutPermission =>
+  params => {
+    if (!orgId || !userId) {
+      return false;
+    }
+
+    if (params.role) {
+      return orgRole === params.role;
+    }
+
+    if (params.some) {
+      return !!params.some.find(permObj => {
+        if (permObj.role) {
+          return orgRole === permObj.role;
+        }
+        return false;
+      });
+    }
+
+    return false;
+  };

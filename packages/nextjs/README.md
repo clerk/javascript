@@ -16,13 +16,13 @@
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_nextjs)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-[Changelog](https://github.com/clerkinc/javascript/blob/main/packages/nextjs/CHANGELOG.md)
+[Changelog](https://github.com/clerk/javascript/blob/main/packages/nextjs/CHANGELOG.md)
 ·
-[Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
+[Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
 ·
-[Ask a Question](https://github.com/clerkinc/javascript/discussions)
+[Ask a Question](https://github.com/clerk/javascript/discussions)
 
 </div>
 
@@ -38,7 +38,7 @@ and profile management to your application in minutes.
 ### Prerequisites
 
 - Next.js v10+
-- Node.js v14+
+- Node.js `>=18.18.0` or later
 
 ### Installation
 
@@ -66,9 +66,6 @@ Clerk requires your application to be wrapped in the `<ClerkProvider/>` context.
 
 Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` to your Publishable Key in your `.env.local` file to make the environment
 variable accessible to the Provider.
-
-If you are using the previous version of Clerk keys, set `NEXT_PUBLIC_CLERK_FRONTEND_API` to your Frontend API in
-your `.env.local` file.
 
 ```sh
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
@@ -111,13 +108,13 @@ our [Documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_ne
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerkinc/javascript/discussions)
+- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
 - Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_nextjs)
 
 ## Contributing
 
 We're open to all community contributions! If you'd like to contribute in any way, please
-read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md))
+read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md))
 .
 
 ## Security
@@ -127,10 +124,10 @@ read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/m
 `@clerk/nextjs` is provided **"as is"** without any **warranty**. Use at your own risk.
 
 _For more information and to report security issues, please refer to
-our [security documentation](https://github.com/clerkinc/javascript/blob/main/docs/SECURITY.md)._
+our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 
 ## License
 
 This project is licensed under the **MIT license**.
 
-See [LICENSE](https://github.com/clerkinc/javascript/blob/main/packages/nextjs/LICENSE) for more information.
+See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/nextjs/LICENSE) for more information.

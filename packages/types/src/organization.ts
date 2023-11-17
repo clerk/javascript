@@ -1,9 +1,10 @@
-import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
+import type { ClerkPaginatedResponse } from './api';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationMembershipRequestResource } from './organizationMembershipRequest';
 import type { ClerkResource } from './resource';
+import type { RoleResource } from './role';
 
 declare global {
   /**
@@ -29,10 +30,6 @@ export interface OrganizationResource extends ClerkResource {
   id: string;
   name: string;
   slug: string | null;
-  /**
-   * @deprecated Use `imageUrl` instead.
-   */
-  logoUrl: string | null;
   imageUrl: string;
   hasImage: boolean;
   membersCount: number;
@@ -44,11 +41,11 @@ export interface OrganizationResource extends ClerkResource {
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: GetMemberships;
-  /**
-   * @deprecated Use `getInvitations` instead
-   */
-  getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
   getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
+  /**
+   * @experimental
+   */
+  getRoles: (params?: GetRolesParams) => Promise<ClerkPaginatedResponse<RoleResource>>;
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   getMembershipRequests: (
     params?: GetMembershipRequestParams,
@@ -65,11 +62,18 @@ export interface OrganizationResource extends ClerkResource {
 }
 
 /**
- * @deprecated use GetMembersParams
+ * @experimental
  */
-export type GetMembershipsParams = {
-  role?: MembershipRole[];
-} & ClerkPaginationParams;
+export type GetRolesParams = {
+  /**
+   * This is the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+};
 
 export type GetMembersParams = {
   /**
@@ -84,10 +88,6 @@ export type GetMembersParams = {
   role?: MembershipRole[];
 };
 
-/**
- * @deprecated use `getInvitations` instead
- */
-export type GetPendingInvitationsParams = ClerkPaginationParams;
 export type GetDomainsParams = {
   /**
    * This is the starting point for your fetched results. The initial value persists between re-renders
@@ -156,12 +156,6 @@ export interface SetOrganizationLogoParams {
   file: Blob | File | string | null;
 }
 
-type MembersParams = (GetMembershipsParams | GetMembersParams) & {
-  paginated?: boolean;
-};
-
-export type GetMemberships = <T extends MembersParams>(
-  params?: T,
-) => T['paginated'] extends true
-  ? Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>
-  : Promise<OrganizationMembershipResource[]>;
+export type GetMemberships = (
+  params?: GetMembersParams,
+) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;

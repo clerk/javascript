@@ -1,4 +1,4 @@
-import Clerk from './clerk';
+import { Clerk } from './clerk';
 import type { AuthConfig, DisplayConfig } from './resources/internal';
 import { Client, Environment } from './resources/internal';
 
@@ -10,13 +10,15 @@ jest.mock('./resources/Client');
 jest.mock('./resources/Environment');
 
 // Because Jest, don't ask me why...
-jest.mock('./devBrowserHandler', () => () => ({
-  clear: jest.fn(),
-  setup: jest.fn(),
-  getDevBrowserJWT: jest.fn(() => 'deadbeef'),
-  setDevBrowserJWT: jest.fn(),
-  removeDevBrowserJWT: jest.fn(),
-  usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
+jest.mock('./devBrowserHandler', () => ({
+  createDevBrowserHandler: () => ({
+    clear: jest.fn(),
+    setup: jest.fn(),
+    getDevBrowserJWT: jest.fn(() => 'deadbeef'),
+    setDevBrowserJWT: jest.fn(),
+    removeDevBrowserJWT: jest.fn(),
+    usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
+  }),
 }));
 
 Client.getInstance = jest.fn().mockImplementation(() => {
@@ -52,8 +54,8 @@ const mockUserSettings = {
   },
 };
 
-const developmentFrontendApi = 'clerk.abcef.12345.dev.lclclerk.com';
-const productionFrontendApi = 'clerk.abcef.12345.prod.lclclerk.com';
+const developmentPublishableKey = 'pk_test_Y2xlcmsuYWJjZWYuMTIzNDUuZGV2LmxjbGNsZXJrLmNvbSQ';
+const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
 
 describe('Clerk singleton - Redirects', () => {
   let mockNavigate = jest.fn();
@@ -111,12 +113,12 @@ describe('Clerk singleton - Redirects', () => {
 
         mockUsesUrlBasedSessionSync.mockReturnValue(true);
 
-        clerkForProductionInstance = new Clerk(productionFrontendApi);
+        clerkForProductionInstance = new Clerk(productionPublishableKey);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
         });
 
-        clerkForDevelopmentInstance = new Clerk(developmentFrontendApi);
+        clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
         });
@@ -189,12 +191,12 @@ describe('Clerk singleton - Redirects', () => {
 
         mockUsesUrlBasedSessionSync.mockReturnValue(true);
 
-        clerkForProductionInstance = new Clerk(productionFrontendApi);
+        clerkForProductionInstance = new Clerk(productionPublishableKey);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
         });
 
-        clerkForDevelopmentInstance = new Clerk(developmentFrontendApi);
+        clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
         });
@@ -280,12 +282,12 @@ describe('Clerk singleton - Redirects', () => {
       beforeEach(async () => {
         mockUsesUrlBasedSessionSync.mockReturnValue(false);
 
-        clerkForProductionInstance = new Clerk(productionFrontendApi);
+        clerkForProductionInstance = new Clerk(productionPublishableKey);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
         });
 
-        clerkForDevelopmentInstance = new Clerk(developmentFrontendApi);
+        clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
         });
@@ -313,12 +315,12 @@ describe('Clerk singleton - Redirects', () => {
           }),
         );
 
-        clerkForProductionInstance = new Clerk(productionFrontendApi);
+        clerkForProductionInstance = new Clerk(productionPublishableKey);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
         });
 
-        clerkForDevelopmentInstance = new Clerk(developmentFrontendApi);
+        clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
         });

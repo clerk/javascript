@@ -7,13 +7,16 @@ import type {
   OrganizationMembershipJSON,
   OrganizationPermission,
   PhoneNumberJSON,
+  SessionJSON,
+  SignInJSON,
+  SignUpJSON,
   UserJSON,
 } from '@clerk/types';
 
 export const mockJwt =
   'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yR0lvUWhiVXB5MGhYN0IyY1ZrdVRNaW5Yb0QiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FjY291bnRzLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsImV4cCI6MTY2NjY0ODMxMCwiaWF0IjoxNjY2NjQ4MjUwLCJpc3MiOiJodHRwczovL2NsZXJrLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsIm5iZiI6MTY2NjY0ODI0MCwic2lkIjoic2Vzc18yR2JEQjRlbk5kQ2E1dlMxenBDM1h6Zzl0SzkiLCJzdWIiOiJ1c2VyXzJHSXBYT0VwVnlKdzUxcmtabjlLbW5jNlN4ciJ9.n1Usc-DLDftqA0Xb-_2w8IGs4yjCmwc5RngwbSRvwevuZOIuRoeHmE2sgCdEvjfJEa7ewL6EVGVcM557TWPW--g_J1XQPwBy8tXfz7-S73CEuyRFiR97L2AHRdvRtvGtwR-o6l8aHaFxtlmfWbQXfg4kFJz2UGe9afmh3U9-f_4JOZ5fa3mI98UMy1-bo20vjXeWQ9aGrqaxHQxjnzzC-1Kpi5LdPvhQ16H0dPB8MHRTSM5TAuLKTpPV7wqixmbtcc2-0k6b9FKYZNqRVTaIyV-lifZloBvdzlfOF8nW1VVH_fx-iW5Q3hovHFcJIULHEC1kcAYTubbxzpgeVQepGg';
 
-type OrgParams = Partial<OrganizationJSON> & { role?: MembershipRole; permissions?: OrganizationPermission[] };
+export type OrgParams = Partial<OrganizationJSON> & { role?: MembershipRole; permissions?: OrganizationPermission[] };
 
 type WithUserParams = Omit<
   Partial<UserJSON>,
@@ -24,6 +27,8 @@ type WithUserParams = Omit<
   external_accounts?: Array<OAuthProvider | Partial<ExternalAccountJSON>>;
   organization_memberships?: Array<string | OrgParams>;
 };
+
+type WithSessionParams = Partial<SessionJSON>;
 
 export const getOrganizationId = (orgParams: OrgParams) => orgParams?.id || orgParams?.name || 'test_id';
 
@@ -36,8 +41,8 @@ export const createOrganizationMembership = (params: OrgParams): OrganizationMem
     organization: {
       created_at: new Date().getTime(),
       id: getOrganizationId(orgParams),
-      logo_url: null,
-      image_url: 'https://img.clerk.com',
+      image_url:
+        'https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160',
       max_allowed_memberships: 3,
       members_count: 1,
       name: 'Org',
@@ -109,7 +114,7 @@ export const createExternalAccount = (params?: Partial<ExternalAccountJSON>): Ex
     email_address: 'test@clerk.com',
     first_name: 'First name',
     last_name: 'Last name',
-    avatar_url: '',
+    image_url: '',
     username: '',
     verification: {
       status: 'verified',
@@ -128,7 +133,6 @@ export const createUser = (params: WithUserParams): UserJSON => {
     primary_email_address_id: '',
     primary_phone_number_id: '',
     primary_web3_wallet_id: '',
-    profile_image_url: '',
     image_url: '',
     username: 'testUsername',
     web3_wallets: [],
@@ -158,9 +162,85 @@ export const createUser = (params: WithUserParams): UserJSON => {
     organization_memberships: (params.organization_memberships || []).map(o =>
       typeof o === 'string' ? createOrganizationMembership({ name: o }) : createOrganizationMembership(o),
     ),
-  } as any as UserJSON;
+  } as UserJSON;
   res.primary_email_address_id = res.email_addresses[0]?.id;
   return res;
+};
+
+export const createSession = (sessionParams: WithSessionParams = {}, user: Partial<UserJSON> = {}) => {
+  return {
+    object: 'session',
+    id: sessionParams.id,
+    status: sessionParams.status,
+    expire_at: sessionParams.expire_at || jest.now() + 5000,
+    abandon_at: sessionParams.abandon_at,
+    last_active_at: sessionParams.last_active_at || jest.now(),
+    last_active_organization_id: sessionParams.last_active_organization_id,
+    actor: sessionParams.actor,
+    user: createUser({}),
+    public_user_data: {
+      first_name: user.first_name,
+      last_name: user.last_name,
+      image_url: user.image_url,
+      has_image: user.has_image,
+      identifier: user.email_addresses?.find(e => e.id === user.primary_email_address_id)?.email_address || '',
+    },
+    created_at: sessionParams.created_at || jest.now() - 1000,
+    updated_at: sessionParams.updated_at || jest.now(),
+    last_active_token: {
+      object: 'token',
+      jwt: mockJwt,
+    },
+  } as SessionJSON;
+};
+
+export const createSignIn = (signInParams: Partial<SignInJSON> = {}, user: Partial<UserJSON> = {}) => {
+  return {
+    id: signInParams.id,
+    created_session_id: signInParams.created_session_id,
+    status: signInParams.status,
+    first_factor_verification: signInParams.first_factor_verification,
+    identifier: signInParams.identifier,
+    object: 'sign_in',
+    second_factor_verification: signInParams.second_factor_verification,
+    supported_external_accounts: signInParams.supported_external_accounts,
+    supported_first_factors: signInParams.supported_first_factors,
+    supported_identifiers: signInParams.supported_identifiers,
+    supported_second_factors: signInParams.supported_second_factors,
+    user_data: {
+      first_name: user.first_name,
+      last_name: user.last_name,
+      image_url: user.image_url,
+      has_image: user.has_image,
+    },
+  } as SignInJSON;
+};
+
+export const createSignUp = (signUpParams: Partial<SignUpJSON> = {}) => {
+  return {
+    id: signUpParams.id,
+    created_session_id: signUpParams.created_session_id,
+    status: signUpParams.status,
+    abandon_at: signUpParams.abandon_at,
+    created_user_id: signUpParams.created_user_id,
+    email_address: signUpParams.email_address,
+    external_account: signUpParams.external_account,
+    external_account_strategy: signUpParams.external_account_strategy,
+    first_name: signUpParams.first_name,
+    has_password: signUpParams.has_password,
+    last_name: signUpParams.last_name,
+    missing_fields: signUpParams.missing_fields,
+    object: 'sign_up',
+    optional_fields: signUpParams.optional_fields,
+    phone_number: signUpParams.phone_number,
+    required_fields: signUpParams.required_fields,
+    supported_external_accounts: signUpParams.supported_external_accounts,
+    unsafe_metadata: signUpParams.unsafe_metadata,
+    unverified_fields: signUpParams.unverified_fields,
+    username: signUpParams.username,
+    verifications: signUpParams.verifications,
+    web3_wallet: signUpParams.web3_wallet,
+  } as SignUpJSON;
 };
 
 export const clerkMock = () => {

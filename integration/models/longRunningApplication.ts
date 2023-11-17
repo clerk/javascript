@@ -1,6 +1,4 @@
-import treekill from 'tree-kill';
-
-import { fs } from '../scripts';
+import { awaitableTreekill, fs } from '../scripts';
 import type { Application } from './application';
 import type { ApplicationConfig } from './applicationConfig';
 import type { EnvironmentConfig } from './environment';
@@ -68,7 +66,8 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       destroy: async () => {
         readFromStateFile();
         console.log(`Destroying ${serverUrl}`);
-        treekill(pid, 'SIGKILL');
+        await awaitableTreekill(pid, 'SIGKILL');
+        // TODO: Test whether this is necessary now that we have awaitableTreekill
         await new Promise(res => setTimeout(res, 2000));
         await fs.rm(appDir, { recursive: true, force: true });
       },
@@ -110,6 +109,5 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
     },
   );
 
-  // eslint-disable-next-line
   return self as any as Application & ApplicationConfig & typeof self;
 };

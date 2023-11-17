@@ -82,5 +82,14 @@ playground/*/yarn.lock
 playwright-report
 test-results
 
-# verdaccio
+# Verdaccio
 .verdaccio
+
+# Workflow Outputs
+/packages/*/*.tgz
+
+# Scripts
+scripts/.env
+!scripts/.env.example
+
+

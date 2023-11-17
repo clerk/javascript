@@ -1,7 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "4.27.0",
-  "license": "MIT",
+  "version": "5.0.0-alpha-v5.2",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -12,10 +11,23 @@
     "session",
     "jwt"
   ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/react"
+  },
+  "license": "MIT",
   "author": "Clerk",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
+  "sideEffects": [
+    "./dist/cjs/index.js",
+    "./dist/cjs/polyfills.js",
+    "./dist/esm/index.js",
+    "./dist/esm/polyfills.js"
+  ],
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
@@ -23,56 +35,49 @@
       "require": "./dist/cjs/index.js"
     }
   },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist"
   ],
-  "sideEffects": [
-    "./dist/cjs/index.js",
-    "./dist/cjs/polyfills.js",
-    "./dist/esm/index.js",
-    "./dist/esm/polyfills.js"
-  ],
   "scripts": {
     "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
-    "publish:local": "npx yalc push --replace  --sig",
-    "clean": "rimraf ./dist",
     "lint": "eslint src/",
-    "lint:publint": "publint",
     "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "publish:local": "npx yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "1.0.0",
-    "@clerk/types": "3.57.0",
+    "@clerk/shared": "2.0.0-alpha-v5.2",
+    "@clerk/types": "4.0.0-alpha-v5.2",
+    "eslint-config-custom": "*",
+    "semver": "^7.5.4",
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@types/node": "^16.11.55",
+    "@clerk/themes": "2.0.0-alpha-v5.1",
+    "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "@types/semver": "^7.5.4",
+    "eslint-config-custom": "*",
     "typescript": "*"
   },
   "peerDependencies": {
     "react": ">=16"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/react"
-  },
-  "homepage": "https://clerk.com/",
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
   }
 }

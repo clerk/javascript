@@ -25,10 +25,7 @@ export const ptBR: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Endereços de e-mail',
   formFieldLabel__phoneNumber: 'Telefone',
   formFieldLabel__username: 'Nome de usuário',
-  formFieldLabel__emailAddress_phoneNumber: 'E-mail ou Telefone',
   formFieldLabel__emailAddress_username: 'E-mail ou nome de usuário',
-  formFieldLabel__phoneNumber_username: 'telefone ou nome de usuário',
-  formFieldLabel__emailAddress_phoneNumber_username: 'E-mail, telefone ou nome de usuário',
   formFieldLabel__password: 'Senha',
   formFieldLabel__currentPassword: 'Senha atual',
   formFieldLabel__newPassword: 'Nova senha',
@@ -51,10 +48,7 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: 'Insira um ou mais endereços de e-mail separados por espaços ou vírgulas',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -299,12 +293,10 @@ export const ptBR: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Contas conectadas',
         primaryButton: 'Conectar conta',
-        title__conectionFailed: 'Conexão falhou, tente novamente',
         title__connectionFailed: 'Conexão falhou, tente novamente',
         title__reauthorize: 'Reautorização necessária',
         subtitle__reauthorize:
           'Os escopos necessários foram atualizados e você pode estar experimentando funcionalidades limitadas. Por favor, re-autorize este aplicativo para evitar quaisquer problemas.',
-        actionLabel__conectionFailed: 'Tentar novamente',
         actionLabel__connectionFailed: 'Tentar novamente',
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
@@ -647,9 +639,7 @@ export const ptBR: LocalizationResource = {
       detailsTitle__emptyRow: 'Nenhum membro para exibir',
       action__invite: 'Convidar',
       start: {
-        headerTitle__active: 'Ativo',
         headerTitle__members: 'Membros',
-        headerTitle__invited: 'Convidado',
         headerTitle__invitations: 'Convites',
         headerTitle__requests: 'Solicitações',
       },
@@ -698,7 +688,6 @@ export const ptBR: LocalizationResource = {
   createOrganization: {
     title: 'Criar organização',
     formButtonSubmit: 'Criar organização',
-    subtitle: 'Configure o perfil da organização',
     invitePage: {
       formButtonReset: 'Pular',
     },

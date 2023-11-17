@@ -1,10 +1,10 @@
 import 'regenerator-runtime/runtime';
 
-import Clerk from './core/clerk';
+import { Clerk } from './core/clerk';
 
 export * from './core/resources/Error';
 
-export default Clerk;
+export { Clerk };
 
 if (module.hot) {
   module.hot.accept();

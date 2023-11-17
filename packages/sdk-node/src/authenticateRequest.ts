@@ -16,14 +16,11 @@ export async function loadInterstitial({
 }) {
   const { clerkJSVersion, clerkJSUrl } = loadClientEnv();
   /**
-   * When publishable key or frontendApi is present utilize the localInterstitial method
+   * When publishable key is present utilize the localInterstitial method
    * and avoid the extra network call
    */
-  if (requestState.publishableKey || requestState.frontendApi) {
-    return clerkClient.localInterstitial({
-      // Use frontendApi only when legacy frontendApi is used to avoid showing deprecation warning
-      // since the requestState always contains the frontendApi constructed by publishableKey.
-      frontendApi: requestState.publishableKey ? '' : requestState.frontendApi,
+  if (requestState.publishableKey) {
+    const data = clerkClient.localInterstitial({
       publishableKey: requestState.publishableKey,
       proxyUrl: requestState.proxyUrl,
       signInUrl: requestState.signInUrl,
@@ -32,12 +29,18 @@ export async function loadInterstitial({
       clerkJSVersion,
       clerkJSUrl,
     });
+
+    return {
+      data,
+      errors: null,
+    };
   }
-  return await clerkClient.remotePrivateInterstitial();
+
+  return clerkClient.remotePrivateInterstitial();
 }
 
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
-  const { clerkClient, apiKey, secretKey, frontendApi, publishableKey, req, options } = opts;
+  const { clerkClient, secretKey, publishableKey, req, options } = opts;
   const { jwtKey, authorizedParties, audience } = options || {};
 
   const env = { ...loadApiEnv(), ...loadClientEnv() };
@@ -69,15 +72,13 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || apiKey || '')) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || '')) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
   return clerkClient.authenticateRequest({
     audience,
-    apiKey,
     secretKey,
-    frontendApi,
     publishableKey,
     jwtKey,
     authorizedParties,
@@ -108,8 +109,7 @@ export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, re
   requestState.status && res.setHeader(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
 
-const isDevelopmentFromApiKey = (apiKey: string): boolean =>
-  apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
+const isDevelopmentFromApiKey = (secretKey: string): boolean => secretKey.startsWith('sk_test_');
 
 const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): string => {
   if (!relativeOrAbsoluteUrl || !isValidProxyUrl(relativeOrAbsoluteUrl) || !isProxyUrlRelative(relativeOrAbsoluteUrl)) {

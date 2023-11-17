@@ -1,4 +1,3 @@
-import { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
 import type {
   AddMemberParams,
   ClerkPaginatedResponse,
@@ -8,7 +7,7 @@ import type {
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMemberships,
-  GetPendingInvitationsParams,
+  GetRolesParams,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,
@@ -20,17 +19,18 @@ import type {
   OrganizationMembershipRequestJSON,
   OrganizationMembershipRequestResource,
   OrganizationResource,
+  RoleJSON,
   SetOrganizationLogoParams,
   UpdateMembershipParams,
   UpdateOrganizationParams,
 } from '@clerk/types';
-import type { GetMembershipsParams } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
+import { Role } from './Role';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
@@ -38,10 +38,6 @@ export class Organization extends BaseResource implements OrganizationResource {
   id!: string;
   name!: string;
   slug!: string;
-  /**
-   * @deprecated  Use `imageUrl` instead.
-   */
-  logoUrl!: string;
   imageUrl!: string;
   hasImage!: boolean;
   publicMetadata: OrganizationPublicMetadata = {};
@@ -57,31 +53,12 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.fromJSON(data);
   }
 
-  static async create(params: CreateOrganizationParams): Promise<OrganizationResource>;
-  /**
-   * @deprecated Calling `create` with a string is deprecated. Use an object of type {@link CreateOrganizationParams} instead.
-   */
-  static async create(name: string): Promise<OrganizationResource>;
-  static async create(paramsOrName: string | CreateOrganizationParams): Promise<OrganizationResource> {
-    let name;
-    let slug;
-    if (typeof paramsOrName === 'string') {
-      // DX: Deprecated v3.5.2
-      name = paramsOrName;
-      deprecated(
-        'create',
-        'Calling `create` with a string is deprecated. Use an object of type CreateOrganizationParams instead.',
-        'organization:create',
-      );
-    } else {
-      name = paramsOrName.name;
-      slug = paramsOrName.slug;
-    }
+  static async create(params: CreateOrganizationParams): Promise<OrganizationResource> {
     const json = (
       await BaseResource._fetch<OrganizationJSON>({
         path: '/organizations',
         method: 'POST',
-        body: { name, slug } as any,
+        body: params as any,
       })
     )?.response as unknown as OrganizationJSON;
 
@@ -105,14 +82,39 @@ export class Organization extends BaseResource implements OrganizationResource {
     });
   };
 
+  getRoles = async (getRolesParams?: GetRolesParams) => {
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/roles`,
+        method: 'GET',
+        search: convertPageToOffset(getRolesParams) as any,
+      },
+      {
+        forceUpdateClient: true,
+      },
+    ).then(res => {
+      const { data: roles, total_count } = res?.response as unknown as ClerkPaginatedResponse<RoleJSON>;
+
+      return {
+        total_count,
+        data: roles.map(role => new Role(role)),
+      };
+    });
+  };
+
   getDomains = async (
     getDomainParams?: GetDomainsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationDomainResource>> => {
-    return await BaseResource._fetch({
-      path: `/organizations/${this.id}/domains`,
-      method: 'GET',
-      search: convertPageToOffset(getDomainParams) as any,
-    })
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/domains`,
+        method: 'GET',
+        search: convertPageToOffset(getDomainParams) as any,
+      },
+      {
+        forceUpdateClient: true,
+      },
+    )
       .then(res => {
         const { data: invites, total_count } =
           res?.response as unknown as ClerkPaginatedResponse<OrganizationDomainJSON>;
@@ -166,44 +168,23 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   getMemberships: GetMemberships = async getMembershipsParams => {
-    const isDeprecatedParams = typeof getMembershipsParams === 'undefined' || !getMembershipsParams?.paginated;
-
-    if ((getMembershipsParams as GetMembershipsParams)?.limit) {
-      deprecated(
-        'limit',
-        'Use `pageSize` instead in Organization.getMemberships.',
-        'organization:getMemberships:limit',
-      );
-    }
-    if ((getMembershipsParams as GetMembershipsParams)?.offset) {
-      deprecated('offset', 'Use `initialPage` instead in Organization.limit.', 'organization:getMemberships:offset');
-    }
-
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/memberships`,
       method: 'GET',
-      search: isDeprecatedParams
-        ? getMembershipsParams
-        : (convertPageToOffset(getMembershipsParams as unknown as any) as any),
+      // `paginated` is used in some legacy endpoints to support clerk paginated responses
+      // The parameter will be dropped in FAPI v2
+      search: convertPageToOffset({ ...getMembershipsParams, paginated: true }) as any,
     })
       .then(res => {
-        if (isDeprecatedParams) {
-          const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
-          return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem)) as any;
-        }
-
         const { data: suggestions, total_count } =
           res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
 
         return {
           total_count,
           data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
-        } as any;
+        };
       })
       .catch(() => {
-        if (isDeprecatedParams) {
-          return [];
-        }
         return {
           total_count: 0,
           data: [],
@@ -211,30 +192,19 @@ export class Organization extends BaseResource implements OrganizationResource {
       });
   };
 
-  getPendingInvitations = async (
-    getPendingInvitationsParams?: GetPendingInvitationsParams,
-  ): Promise<OrganizationInvitation[]> => {
-    deprecated('getPendingInvitations', 'Use the `getInvitations` method instead.');
-    return await BaseResource._fetch({
-      path: `/organizations/${this.id}/invitations/pending`,
-      method: 'GET',
-      search: getPendingInvitationsParams as any,
-    })
-      .then(res => {
-        const pendingInvitations = res?.response as unknown as OrganizationInvitationJSON[];
-        return pendingInvitations.map(pendingInvitation => new OrganizationInvitation(pendingInvitation));
-      })
-      .catch(() => []);
-  };
-
   getInvitations = async (
     getInvitationsParams?: GetInvitationsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationInvitationResource>> => {
-    return await BaseResource._fetch({
-      path: `/organizations/${this.id}/invitations`,
-      method: 'GET',
-      search: convertPageToOffset(getInvitationsParams) as any,
-    })
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/invitations`,
+        method: 'GET',
+        search: convertPageToOffset(getInvitationsParams) as any,
+      },
+      {
+        forceUpdateClient: true,
+      },
+    )
       .then(res => {
         const { data: requests, total_count } =
           res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;
@@ -251,13 +221,11 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {
-    const newMember = await BaseResource._fetch({
+    return await BaseResource._fetch({
       method: 'POST',
       path: `/organizations/${this.id}/memberships`,
       body: { userId, role } as any,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
-    OrganizationMembership.clerk.__unstable__membershipUpdate(newMember);
-    return newMember;
   };
 
   inviteMember = async (params: InviteMemberParams) => {
@@ -269,22 +237,18 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   updateMember = async ({ userId, role }: UpdateMembershipParams): Promise<OrganizationMembership> => {
-    const updatedMember = await BaseResource._fetch({
+    return await BaseResource._fetch({
       method: 'PATCH',
       path: `/organizations/${this.id}/memberships/${userId}`,
       body: { role } as any,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
-    OrganizationMembership.clerk.__unstable__membershipUpdate(updatedMember);
-    return updatedMember;
   };
 
   removeMember = async (userId: string): Promise<OrganizationMembership> => {
-    const deletedMember = await BaseResource._fetch({
+    return await BaseResource._fetch({
       method: 'DELETE',
       path: `/organizations/${this.id}/memberships/${userId}`,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
-    OrganizationMembership.clerk.__unstable__membershipUpdate(deletedMember);
-    return deletedMember;
   };
 
   destroy = async (): Promise<void> => {
@@ -327,7 +291,6 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.id = data.id;
     this.name = data.name;
     this.slug = data.slug;
-    this.logoUrl = data.logo_url;
     this.imageUrl = data.image_url;
     this.hasImage = data.has_image;
     this.publicMetadata = data.public_metadata;
@@ -357,5 +320,3 @@ export class Organization extends BaseResource implements OrganizationResource {
     return this.fromJSON(json);
   }
 }
-
-deprecatedProperty(Organization, 'logoUrl', 'Use `imageUrl` instead.');

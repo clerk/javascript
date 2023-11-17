@@ -11,14 +11,14 @@ export default defineConfig(overrideOptions => {
 
   const common: Options = {
     entry: ['src/index.ts'],
-    onSuccess: `rsync -r --include '*/' --include '*.js' --include '*.mjs' --include '*.cjs' --exclude='*' ./src/runtime ./dist/`,
+    onSuccess: `cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime`,
     sourcemap: true,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
       __DEV__: `${isWatch}`,
     },
-    external: ['#crypto', '#fetch'],
+    external: ['#crypto'],
     legacyOutput: true,
     bundle: true,
     clean: true,

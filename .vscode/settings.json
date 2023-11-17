@@ -4,6 +4,25 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true,
-    "source.organizeImports": true
-  }
+  },
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "cSpell.words": [
+    "accountsstage",
+    "adduser",
+    "arethetypeswrong",
+    "attw",
+    "BAPI",
+    "citty",
+    "execa",
+    "FAPI",
+    "jwks",
+    "lclclerk",
+    "lclstage",
+    "nextjs",
+    "publint"
+  ],
 }

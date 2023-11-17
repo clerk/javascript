@@ -1,11 +1,22 @@
-import type { ActJWTClaim, GetToken, MembershipRole, SignOut } from '@clerk/types';
+import type {
+  ActJWTClaim,
+  experimental__CheckAuthorizationWithoutPermission,
+  GetToken,
+  MembershipRole,
+  SignOut,
+} from '@clerk/types';
 import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError } from '../errors';
-import type IsomorphicClerk from '../isomorphicClerk';
+import type { IsomorphicClerk } from '../isomorphicClerk';
+import { errorThrower } from '../utils';
 import { createGetToken, createSignOut } from './utils';
+
+type experimental__CheckAuthorizationSignedOut = (
+  params?: Parameters<experimental__CheckAuthorizationWithoutPermission>[0],
+) => false;
 
 type UseAuthReturn =
   | {
@@ -17,6 +28,10 @@ type UseAuthReturn =
       orgId: undefined;
       orgRole: undefined;
       orgSlug: undefined;
+      /**
+       * @experimental The method is experimental and subject to change in future releases.
+       */
+      experimental__has: experimental__CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -29,6 +44,10 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
+      /**
+       * @experimental The method is experimental and subject to change in future releases.
+       */
+      experimental__has: experimental__CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -41,6 +60,10 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
+      /**
+       * @experimental The method is experimental and subject to change in future releases.
+       */
+      experimental__has: experimental__CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -53,6 +76,10 @@ type UseAuthReturn =
       orgId: string;
       orgRole: MembershipRole;
       orgSlug: string | null;
+      /**
+       * @experimental The method is experimental and subject to change in future releases.
+       */
+      experimental__has: experimental__CheckAuthorizationWithoutPermission;
       signOut: SignOut;
       getToken: GetToken;
     };
@@ -105,6 +132,24 @@ export const useAuth: UseAuth = () => {
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
+  const has = useCallback(
+    (params?: Parameters<experimental__CheckAuthorizationWithoutPermission>[0]) => {
+      if (!orgId || !userId || !orgRole) {
+        return false;
+      }
+
+      if (!params) {
+        return false;
+      }
+
+      if (params.role) {
+        return orgRole === params.role;
+      }
+      return false;
+    },
+    [orgId, orgRole, userId],
+  );
+
   if (sessionId === undefined && userId === undefined) {
     return {
       isLoaded: false,
@@ -115,6 +160,7 @@ export const useAuth: UseAuth = () => {
       orgId: undefined,
       orgRole: undefined,
       orgSlug: undefined,
+      experimental__has: () => false,
       signOut,
       getToken,
     };
@@ -130,6 +176,7 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
+      experimental__has: () => false,
       signOut,
       getToken,
     };
@@ -145,6 +192,7 @@ export const useAuth: UseAuth = () => {
       orgId,
       orgRole,
       orgSlug: orgSlug || null,
+      experimental__has: has,
       signOut,
       getToken,
     };
@@ -160,10 +208,11 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
+      experimental__has: () => false,
       signOut,
       getToken,
     };
   }
 
-  throw new Error(invalidStateError);
+  return errorThrower.throw(invalidStateError);
 };

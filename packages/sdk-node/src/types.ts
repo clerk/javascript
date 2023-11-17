@@ -42,14 +42,6 @@ export type AuthenticateRequestParams = {
   clerkClient: ClerkClient;
   publishableKey?: string;
   secretKey?: string;
-  /**
-   * @deprecated Use `publishableKey` instead.
-   */
-  frontendApi?: string;
-  /**
-   * @deprecated Use `secretKey` instead.
-   */
-  apiKey?: string;
   req: IncomingMessage;
   options?: ClerkMiddlewareOptions;
 };

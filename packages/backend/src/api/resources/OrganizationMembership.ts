@@ -1,4 +1,3 @@
-import { deprecatedProperty } from '../../util/shared';
 import { Organization } from '../resources';
 import type { OrganizationMembershipRole } from './Enums';
 import type { OrganizationMembershipJSON, OrganizationMembershipPublicUserDataJSON } from './JSON';
@@ -34,10 +33,6 @@ export class OrganizationMembershipPublicUserData {
     readonly identifier: string,
     readonly firstName: string | null,
     readonly lastName: string | null,
-    /**
-     * @deprecated  Use `imageUrl` instead.
-     */
-    readonly profileImageUrl: string,
     readonly imageUrl: string,
     readonly hasImage: boolean,
     readonly userId: string,
@@ -48,12 +43,9 @@ export class OrganizationMembershipPublicUserData {
       data.identifier,
       data.first_name,
       data.last_name,
-      data.profile_image_url,
       data.image_url,
       data.has_image,
       data.user_id,
     );
   }
 }
-
-deprecatedProperty(OrganizationMembershipPublicUserData, 'profileImageUrl', 'Use `imageUrl` instead.');

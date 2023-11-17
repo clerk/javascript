@@ -2,6 +2,7 @@ import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig.js';
 import { templates } from '../templates/index.js';
 
+const clerkNextjsLocal = `file:${process.cwd()}/packages/nextjs`;
 const appRouter = applicationConfig()
   .setName('next-app-router')
   .useTemplate(templates['next-app-router'])
@@ -11,7 +12,7 @@ const appRouter = applicationConfig()
   .addScript('build', 'npm run build')
   .addScript('serve', 'npm run start')
   .addDependency('next', constants.E2E_NEXTJS_VERSION)
-  .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION);
+  .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || clerkNextjsLocal);
 
 const appRouterTurbo = appRouter
   .clone()

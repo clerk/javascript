@@ -1,19 +1,54 @@
+import type { Autocomplete } from 'utils';
+
 import type { ActJWTClaim } from './jwt';
 import type { OrganizationPermission } from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
-export type IsAuthorized = (isAuthorizedParams: IsAuthorizedParams) => Promise<IsAuthorizedReturnValues>;
+export type experimental__CheckAuthorizationWithoutPermission = (
+  isAuthorizedParams: CheckAuthorizationParamsWithoutPermission,
+) => boolean;
 
-interface IsAuthorizedParams {
-  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-  // eslint-disable-next-line
-  permission?: OrganizationPermission | (string & {});
-  role?: string;
-}
+type CheckAuthorizationParamsWithoutPermission =
+  | {
+      some: {
+        role: string;
+      }[];
+      role?: never;
+    }
+  | {
+      some?: never;
+      role: string;
+    };
 
-type IsAuthorizedReturnValues = boolean;
+export type CheckAuthorization = (isAuthorizedParams: CheckAuthorizationParams) => boolean;
+
+type CheckAuthorizationParams =
+  | {
+      some: (
+        | {
+            role: string;
+            permission?: never;
+          }
+        | {
+            role?: never;
+            permission: Autocomplete<OrganizationPermission>;
+          }
+      )[];
+      role?: never;
+      permission?: never;
+    }
+  | {
+      some?: never;
+      role: string;
+      permission?: never;
+    }
+  | {
+      some?: never;
+      role?: never;
+      permission: Autocomplete<OrganizationPermission>;
+    };
 
 export interface SessionResource extends ClerkResource {
   id: string;
@@ -33,7 +68,7 @@ export interface SessionResource extends ClerkResource {
   /**
    * @experimental The method is experimental and subject to change in future releases.
    */
-  isAuthorized: IsAuthorized;
+  experimental__checkAuthorization: CheckAuthorization;
   clearCache: () => void;
   createdAt: Date;
   updatedAt: Date;
@@ -72,10 +107,6 @@ export type SessionStatus = 'abandoned' | 'active' | 'ended' | 'expired' | 'remo
 export interface PublicUserData {
   firstName: string | null;
   lastName: string | null;
-  /**
-   * @deprecated  Use `imageUrl` instead.
-   */
-  profileImageUrl: string;
   imageUrl: string;
   hasImage: boolean;
   identifier: string;

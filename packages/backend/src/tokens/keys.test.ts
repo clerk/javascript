@@ -46,25 +46,6 @@ export default (QUnit: QUnit) => {
       sinon.restore();
     });
 
-    test('loads JWKS from Backend API when apiKey is provided', async assert => {
-      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
-      const jwk = await loadClerkJWKFromRemote({
-        apiKey: 'deadbeef',
-        kid: mockRsaJwkKid,
-        skipJwksCache: true,
-      });
-
-      fakeFetch.calledOnceWith('https://api.clerk.com/v1/jwks', {
-        method: 'GET',
-        headers: {
-          Authorization: 'Bearer deadbeef',
-          'Content-Type': 'application/json',
-          'Clerk-Backend-SDK': '@clerk/backend',
-        },
-      });
-      assert.propEqual(jwk, mockRsaJwk);
-    });
-
     test('loads JWKS from Backend API when secretKey is provided', async assert => {
       fakeFetch.onCall(0).returns(jsonOk(mockJwks));
       const jwk = await loadClerkJWKFromRemote({
@@ -125,13 +106,13 @@ export default (QUnit: QUnit) => {
     test('caches JWK by kid', async assert => {
       fakeFetch.onCall(0).returns(jsonOk(mockJwks));
       let jwk = await loadClerkJWKFromRemote({
-        apiKey: 'deadbeef',
+        secretKey: 'deadbeef',
         kid: mockRsaJwkKid,
         skipJwksCache: true,
       });
       assert.propEqual(jwk, mockRsaJwk);
       jwk = await loadClerkJWKFromRemote({
-        apiKey: 'deadbeef',
+        secretKey: 'deadbeef',
         kid: mockRsaJwkKid,
       });
       assert.propEqual(jwk, mockRsaJwk);
@@ -149,7 +130,7 @@ export default (QUnit: QUnit) => {
 
       try {
         await loadClerkJWKFromRemote({
-          apiKey: 'deadbeef',
+          secretKey: 'deadbeef',
           kid: 'ins_whatever',
           skipJwksCache: true,
         });
@@ -192,7 +173,7 @@ export default (QUnit: QUnit) => {
       const kid = 'ins_whatever';
       try {
         await loadClerkJWKFromRemote({
-          apiKey: 'deadbeef',
+          secretKey: 'deadbeef',
           kid,
         });
         assert.false(true);
@@ -218,7 +199,7 @@ export default (QUnit: QUnit) => {
 
       try {
         await loadClerkJWKFromRemote({
-          apiKey: 'deadbeef',
+          secretKey: 'deadbeef',
           kid,
         });
         assert.false(true);

@@ -1,10 +1,8 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import { Clerk } from '@clerk/backend';
 
-import { API_KEY, API_URL, API_VERSION, DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY } from './constants';
+import { API_URL, API_VERSION, DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY } from './constants';
 
 const clerkClient = Clerk({
-  apiKey: API_KEY,
   secretKey: SECRET_KEY,
   apiUrl: API_URL,
   apiVersion: API_VERSION,
@@ -17,11 +15,6 @@ const clerkClient = Clerk({
 
 const createClerkClient = Clerk;
 
-export { clerkClient, createClerkClient, Clerk };
+export { Clerk, clerkClient, createClerkClient };
 
 export * from '@clerk/backend';
-
-/**
- * @deprecated Don't export the constants. Should be marked as internal
- */
-export * from './constants';

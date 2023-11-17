@@ -10,6 +10,10 @@ inputs:
     description: 'Enable Playwright?'
     required: false
     default: 'false'
+  turbo-summarize:
+    description: 'The token to use for Turbo task summaries'
+    required: false
+    default: 'false'
   turbo-enabled:
     description: 'Enable Turbo?'
     required: false
@@ -31,6 +35,10 @@ inputs:
   turbo-token:
     description: 'The token to use for Turbo remote auth'
     required: true
+  registry-url:
+    description: 'The registry the packages will be published to'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -44,6 +52,7 @@ runs:
         CACHE_DIR: ${{ inputs.turbo-cache-dir }}
         REMOTE_ONLY: ${{ inputs.turbo-remote-only }}
         SIGNATURE: ${{ inputs.turbo-signature }}
+        SUMMARIZE: ${{ inputs.turbo-summarize }}
         TEAM: ${{ inputs.turbo-team }}
         TOKEN: ${{ inputs.turbo-token }}
       with:
@@ -54,13 +63,14 @@ runs:
               ? os.availableParallelism()
               : os.cpus().length;
 
-          const { ENABLED, CACHE_DIR, SIGNATURE, REMOTE_ONLY, TEAM, TOKEN } = process.env
+          const { ENABLED, CACHE_DIR, SIGNATURE, REMOTE_ONLY, SUMMARIZE, TEAM, TOKEN } = process.env
 
           core.exportVariable('TURBO_ARGS',
             [
               '--output-logs=new-only',
               `--cache-dir=${CACHE_DIR}`,
-              `--concurrency=${cpus}`
+              `--concurrency=${cpus}`,
+              `--summarize=${SUMMARIZE}`,
             ].join(' ')
           )
 
@@ -81,16 +91,17 @@ runs:
       run: echo $TURBO_ARGS
 
     - name: Setup NodeJS ${{ inputs.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
+        registry-url: ${{ inputs.registry-url }}
 
     - name: Cache node_modules
       uses: actions/cache@v3
       id: npm-cache
       with:
         path: ./node_modules
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('package-lock.json') }}
 
     - name: Install NPM Dependencies
       if: steps.npm-cache.outputs.cache-hit != 'true'
@@ -114,4 +125,4 @@ runs:
     - name: Install Playwright Browsers
       if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
       shell: bash
-      run: npx playwright install --with-deps
+      run: npx playwright install chromium

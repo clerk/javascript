@@ -82,11 +82,6 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   act?: ActClaim;
 
   /**
-   * @deprecated - Add orgs to your session token using the "user.organizations" shortcode in JWT Templates instead
-   */
-  orgs?: Record<string, MembershipRole>;
-
-  /**
    * Active organization id.
    */
   org_id?: string;
@@ -112,5 +107,6 @@ export interface JwtPayload extends CustomJwtSessionClaims {
  */
 export interface ActClaim {
   sub: string;
+
   [x: string]: unknown;
 }

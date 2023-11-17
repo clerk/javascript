@@ -13,6 +13,7 @@ export const subpathNames = [
   'globs',
   'handleValueOrFn',
   'isomorphicAtob',
+  'isomorphicBtoa',
   'keys',
   'loadScript',
   'localStorageBroadcastChannel',
@@ -20,6 +21,8 @@ export const subpathNames = [
   'proxy',
   'underscore',
   'url',
+  'constants',
+  'apiUrlFromPublishableKey',
 ];
 
 export const subpathFoldersBarrel = ['react'];

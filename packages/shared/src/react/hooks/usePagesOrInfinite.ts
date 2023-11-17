@@ -3,8 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useSWR, useSWRInfinite } from '../clerk-swr';
-import type { ValueOrSetter } from '../types';
-import type { PaginatedResources } from '../types';
+import type { CacheSetter, PaginatedResources, ValueOrSetter } from '../types';
 
 function getDifferentKeys(obj1: Record<string, unknown>, obj2: Record<string, unknown>): Record<string, unknown> {
   const keysSet = new Set(Object.keys(obj2));
@@ -52,13 +51,34 @@ export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | 
   } as T;
 };
 
+const cachingSWROptions = {
+  dedupingInterval: 1000 * 60,
+  focusThrottleInterval: 1000 * 60 * 2,
+} satisfies Parameters<typeof useSWR>[2];
+
 type ArrayType<DataArray> = DataArray extends Array<infer ElementType> ? ElementType : never;
 type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Data> : Type;
+
+type DefaultOptions = {
+  /**
+   * Persists the previous pages with new ones in the same array
+   */
+  infinite?: boolean;
+  /**
+   * Return the previous key's data until the new data has been loaded
+   */
+  keepPreviousData?: boolean;
+  /**
+   * Should a request be triggered
+   */
+  enabled?: boolean;
+};
 
 type UsePagesOrInfinite = <
   Params extends PagesOrInfiniteOptions,
   FetcherReturnData extends Record<string, any>,
   CacheKeys = Record<string, unknown>,
+  TOptions extends DefaultOptions = DefaultOptions,
 >(
   /**
    * The parameters will be passed to the fetcher
@@ -71,24 +91,9 @@ type UsePagesOrInfinite = <
   /**
    * Internal configuration of the hook
    */
-  options: {
-    /**
-     * Persists the previous pages with new ones in the same array
-     */
-    infinite?: boolean;
-    /**
-     * Return the previous key's data until the new data has been loaded
-     */
-    keepPreviousData?: boolean;
-    /**
-     * Should a request be triggered
-     */
-    enabled?: boolean;
-  },
+  options: TOptions,
   cacheKeys: CacheKeys,
-) => PaginatedResources<ExtractData<FetcherReturnData>> & {
-  unstable__mutate: () => Promise<unknown>;
-};
+) => PaginatedResources<ExtractData<FetcherReturnData>, TOptions['infinite']>;
 
 export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
@@ -122,7 +127,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
       // @ts-ignore
       return fetcher?.(requestParams);
     },
-    { keepPreviousData },
+    { keepPreviousData, ...cachingSWROptions },
   );
 
   const {
@@ -152,6 +157,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
       // @ts-ignore
       return fetcher?.(requestParams);
     },
+    cachingSWROptions,
   );
 
   const page = useMemo(() => {
@@ -206,7 +212,17 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
   const hasNextPage = count - offsetCount * pageSizeRef.current > page * pageSizeRef.current;
   const hasPreviousPage = (page - 1) * pageSizeRef.current > offsetCount * pageSizeRef.current;
 
-  const unstable__mutate = triggerInfinite ? swrInfiniteMutate : swrMutate;
+  const setData: CacheSetter = triggerInfinite
+    ? value =>
+        swrInfiniteMutate(value, {
+          revalidate: false,
+        })
+    : value =>
+        swrMutate(value, {
+          revalidate: false,
+        });
+
+  const revalidate = triggerInfinite ? () => swrInfiniteMutate() : () => swrMutate();
 
   return {
     data,
@@ -221,6 +237,9 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
     fetchPrevious,
     hasNextPage,
     hasPreviousPage,
-    unstable__mutate,
+    // Let the hook return type define this type
+    revalidate: revalidate as any,
+    // Let the hook return type define this type
+    setData: setData as any,
   };
 };

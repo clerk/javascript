@@ -2,10 +2,6 @@ export { arSA } from './ar-SA';
 export { enUS } from './en-US';
 export { frFR } from './fr-FR';
 export { daDK } from './da-DK';
-/**
- * @deprecated Use `deDE` instead
- */
-export { deDE as deDe } from './de-DE';
 export { deDE } from './de-DE';
 export { itIT } from './it-IT';
 export { ptBR } from './pt-BR';
@@ -18,6 +14,7 @@ export { jaJP } from './ja-JP';
 export { heIL } from './he-IL';
 export { csCZ } from './cs-CZ';
 export { zhCN } from './zh-CN';
+export { zhTW } from './zh-TW';
 export { koKR } from './ko-KR';
 export { nbNO } from './nb-NO';
 export { viVN } from './vi-VN';

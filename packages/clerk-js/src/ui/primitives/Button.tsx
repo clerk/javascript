@@ -149,7 +149,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
   const {
     isLoading,
     isDisabled,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     hoverAsFocus,
     loadingText,
     children,
@@ -199,7 +198,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
 
 const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const { loadingText, isDisabled, hoverAsFocus, children, onClick: onClickProp, ...rest } = filterProps(parsedProps);
 
   const onClick: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -215,6 +214,7 @@ const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, re
       // Explicitly remove type=submit or type=button
       // to prevent global css resets (eg tailwind) from affecting
       // the default styles of our components
+      // eslint-disable-next-line react/button-has-type
       type={undefined}
       onClick={onClick}
       css={applyVariants(parsedProps)}

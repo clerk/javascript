@@ -1,12 +1,14 @@
 {
   "name": "@clerk/shared",
-  "version": "1.0.0",
+  "version": "2.0.0-alpha-v5.2",
   "description": "Internal package utils used by the Clerk SDKs",
-  "sideEffects": false,
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/shared"
+  },
+  "license": "MIT",
+  "author": "Clerk",
   "exports": {
     ".": {
       "import": {
@@ -37,18 +39,45 @@
         "types": "./dist/react/index.d.ts",
         "default": "./dist/react/index.js"
       }
-    }
+    },
+    "./package.json": "./package.json"
   },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "browser",
+    "callWithRetry",
+    "color",
+    "cookie",
+    "date",
+    "deprecated",
+    "error",
+    "file",
+    "globs",
+    "handleValueOrFn",
+    "isomorphicAtob",
+    "isomorphicBtoa",
+    "keys",
+    "loadScript",
+    "localStorageBroadcastChannel",
+    "poller",
+    "proxy",
+    "underscore",
+    "url",
+    "react",
+    "constants",
+    "apiUrlFromPublishableKey"
+  ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
-    "publish:local": "npx yalc push --replace  --sig",
     "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
     "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "dev:publish": "npm run dev -- --env.publish",
     "lint": "eslint src/",
-    "lint:publint": "publint",
     "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "publish:local": "npx yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
@@ -60,9 +89,11 @@
     "swr": "2.2.0"
   },
   "devDependencies": {
-    "@clerk/types": "3.57.0",
+    "@clerk/types": "4.0.0-alpha-v5.2",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
+    "@types/node": "^18.17.0",
+    "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
   },
@@ -74,14 +105,10 @@
       "optional": true
     }
   },
-  "author": "Clerk",
-  "license": "MIT",
+  "engines": {
+    "node": ">=18.17.0"
+  },
   "publishConfig": {
     "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerkinc/javascript.git",
-    "directory": "packages/shared"
   }
 }

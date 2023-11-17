@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const webpack = require('webpack');
 const packageJSON = require('./package.json');
 const path = require('path');
@@ -26,12 +25,17 @@ const variantToSourceFile = {
 
 /** @returns { import('webpack').Configuration } */
 const common = ({ mode }) => {
+  const uiRetheme = process.env.CLERK_RETHEME === '1' || process.env.CLERK_RETHEME === 'true';
+
   return {
     mode,
     resolve: {
       // Attempt to resolve these extensions in order
       // @see https://webpack.js.org/configuration/resolve/#resolveextensions
       extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
+      alias: {
+        '~ui': uiRetheme ? './ui.retheme' : './ui',
+      },
     },
     plugins: [
       new webpack.DefinePlugin({

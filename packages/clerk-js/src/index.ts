@@ -1,12 +1,13 @@
 import 'regenerator-runtime/runtime';
 
-import Clerk from './core/clerk';
-import { mountComponentRenderer } from './ui/Components';
+import { mountComponentRenderer } from '~ui/Components';
+
+import { Clerk } from './core/clerk';
 
 export * from './core/resources/Error';
 
 Clerk.mountComponentRenderer = mountComponentRenderer;
-export default Clerk;
+export { Clerk };
 
 if (module.hot) {
   module.hot.accept();

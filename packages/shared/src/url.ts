@@ -1,3 +1,4 @@
+import { CURRENT_DEV_INSTANCE_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
 import { isStaging } from './utils/instance';
 
 export function parseSearchParams(queryString = ''): URLSearchParams {
@@ -31,24 +32,19 @@ export function addClerkPrefix(str: string | undefined) {
 /**
  *
  * Retrieve the clerk-js major tag using the major version from the pkgVersion
- * param or use the frontendApi to determine if the staging tag should be used.
- * The default tag is `latest` and a `next` pkgVersion also exists to retrieve
- * the next canary release.
+ * param or use the frontendApi to determine if the canary tag should be used.
+ * The default tag is `latest`.
  */
-export const getClerkJsMajorVersionOrTag = (frontendApi: string, pkgVersion?: string) => {
-  if (!pkgVersion && isStaging(frontendApi)) {
-    return 'staging';
+export const getClerkJsMajorVersionOrTag = (frontendApi: string, version?: string) => {
+  if (!version && isStaging(frontendApi)) {
+    return 'canary';
   }
 
-  if (!pkgVersion) {
+  if (!version) {
     return 'latest';
   }
 
-  if (pkgVersion.includes('next')) {
-    return 'next';
-  }
-
-  return pkgVersion.split('.')[0] || 'latest';
+  return version.split('.')[0] || 'latest';
 };
 
 /**
@@ -56,11 +52,30 @@ export const getClerkJsMajorVersionOrTag = (frontendApi: string, pkgVersion?: st
  * Retrieve the clerk-js script url from the frontendApi and the major tag
  * using the {@link getClerkJsMajorVersionOrTag} or a provided clerkJSVersion tag.
  */
-export const getScriptUrl = (
-  frontendApi: string,
-  { pkgVersion, clerkJSVersion }: { pkgVersion?: string; clerkJSVersion?: string },
-) => {
+export const getScriptUrl = (frontendApi: string, { clerkJSVersion }: { clerkJSVersion?: string }) => {
   const noSchemeFrontendApi = frontendApi.replace(/http(s)?:\/\//, '');
-  const major = getClerkJsMajorVersionOrTag(frontendApi, pkgVersion);
+  const major = getClerkJsMajorVersionOrTag(frontendApi, clerkJSVersion);
   return `https://${noSchemeFrontendApi}/npm/@clerk/clerk-js@${clerkJSVersion || major}/dist/clerk.browser.js`;
 };
+
+// Returns true for hosts such as:
+// * accounts.foo.bar-13.lcl.dev
+// * accounts.foo.bar-13.lclstage.dev
+// * accounts.foo.bar-13.dev.lclclerk.com
+export function isLegacyDevAccountPortalOrigin(host: string): boolean {
+  return LEGACY_DEV_INSTANCE_SUFFIXES.some(legacyDevSuffix => {
+    return host.startsWith('accounts.') && host.endsWith(legacyDevSuffix);
+  });
+}
+
+// Returns true for hosts such as:
+// * foo-bar-13.accounts.dev
+// * foo-bar-13.accountsstage.dev
+// * foo-bar-13.accounts.lclclerk.com
+// But false for:
+// * foo-bar-13.clerk.accounts.lclclerk.com
+export function isCurrentDevAccountPortalOrigin(host: string): boolean {
+  return CURRENT_DEV_INSTANCE_SUFFIXES.some(currentDevSuffix => {
+    return host.endsWith(currentDevSuffix) && !host.endsWith('.clerk' + currentDevSuffix);
+  });
+}

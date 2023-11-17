@@ -1,8 +1,6 @@
 import * as path from 'node:path';
 
-import treekill from 'tree-kill';
-
-import { createLogger, fs, getPort, run, waitForIdleProcess, waitForServer } from '../scripts';
+import { awaitableTreekill, createLogger, fs, getPort, run, waitForIdleProcess, waitForServer } from '../scripts';
 import type { ApplicationConfig } from './applicationConfig.js';
 import type { EnvironmentConfig } from './environment.js';
 
@@ -63,9 +61,10 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
         log: opts.detached ? undefined : log,
       });
-      await waitForServer(serverUrl, { log, maxAttempts: Infinity });
+      const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
+      await waitForServer(serverUrl, { log, maxAttempts: Infinity, shouldExit });
       log(`Server started at ${serverUrl}, pid: ${proc.pid}`);
-      cleanupFns.push(() => treekill(proc.pid, 'SIGKILL'));
+      cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       state.serverUrl = serverUrl;
       return { port, serverUrl, pid: proc.pid };
     },
@@ -85,11 +84,10 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
     serve: async (opts: { port?: number; manualStart?: boolean } = {}) => {
       const port = opts.port || (await getPort());
       const serverUrl = `http://localhost:${port}`;
-      const log = logger.child({ prefix: 'serve' }).info;
       // If this is ever used as a background process, we need to make sure
       // it's not using the log function. See the dev() method above
       const proc = run(scripts.serve, { cwd: appDirPath, env: { PORT: port.toString() } });
-      cleanupFns.push(() => treekill(proc.pid, 'SIGKILL'));
+      cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       await waitForIdleProcess(proc);
       state.serverUrl = serverUrl;
       return { port, serverUrl, pid: proc };

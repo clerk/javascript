@@ -12,7 +12,7 @@ import {
 } from '@clerk/nextjs';
 import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 
 const themes = { default: undefined, dark, neobrutalism, shadesOfPurple };
 
@@ -29,6 +29,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   };
 
+  const C = Component as FunctionComponent;
+
   return (
     <ClerkProvider
       appearance={{
@@ -44,7 +46,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         onChangeTheme={e => setSelectedTheme(e.target.value as any)}
         onToggleDark={onToggleDark}
       />
-      <Component {...pageProps} />
+      <C {...pageProps} />
     </ClerkProvider>
   );
 }
@@ -86,7 +88,7 @@ const AppBar = (props: AppBarProps) => {
         <option value='shadesOfPurple'>shadesOfPurple</option>
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
-      <UserButton  afterSignOutUrl='/'/>
+      <UserButton afterSignOutUrl='/' />
 
       <SignedIn>
         <SignOutButton />

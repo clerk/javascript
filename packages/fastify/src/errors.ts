@@ -1,4 +1,4 @@
-// https://github.com/clerkinc/javascript/blob/main/packages/remix/src/errors.ts#L1-L0
+// https://github.com/clerk/javascript/blob/main/packages/remix/src/errors.ts#L1-L0
 const createErrorMessage = (msg: string) => {
   return `🔒 Clerk: ${msg.trim()}
 

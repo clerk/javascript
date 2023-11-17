@@ -3,6 +3,7 @@ import type { SignUpResource } from '@clerk/types';
 import {
   appendAsQueryParams,
   buildURL,
+  createAllowedRedirectOrigins,
   getAllETLDs,
   getETLDPlusOneFromFrontendApi,
   getSearchParameterFromHash,
@@ -15,6 +16,7 @@ import {
   isValidUrl,
   mergeFragmentIntoUrl,
   requiresUserInput,
+  trimLeadingSlash,
   trimTrailingSlash,
 } from '../url';
 
@@ -239,6 +241,15 @@ describe('trimTrailingSlash(string)', () => {
   });
 });
 
+describe('trimLeadingSlash(string)', () => {
+  it('trims all the leading slashes', () => {
+    expect(trimLeadingSlash('')).toBe('');
+    expect(trimLeadingSlash('/foo')).toBe('foo');
+    expect(trimLeadingSlash('/foo/')).toBe('foo/');
+    expect(trimLeadingSlash('//foo//bar///')).toBe('foo//bar///');
+  });
+});
+
 describe('appendQueryParams(base,url)', () => {
   it('returns the same url if no params provided', () => {
     const base = new URL('https://dashboard.clerk.com');
@@ -448,5 +459,35 @@ describe('isAllowedRedirectOrigin', () => {
   test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
     expect(isAllowedRedirectOrigin(url, allowedOrigins)).toEqual(expected);
     expect(warnMock).toHaveBeenCalledTimes(Number(!expected)); // Number(boolean) evaluates to 0 or 1
+  });
+});
+
+describe('createAllowedRedirectOrigins', () => {
+  it('contains the default allowed origin values if no value is provided', async () => {
+    const frontendApi = 'https://somename.clerk.accounts.dev';
+    const allowedRedirectOriginsValuesUndefined = createAllowedRedirectOrigins(undefined, frontendApi);
+    const allowedRedirectOriginsValuesEmptyArray = createAllowedRedirectOrigins([], frontendApi);
+
+    expect(allowedRedirectOriginsValuesUndefined).toEqual([
+      'http://localhost',
+      `https://${getETLDPlusOneFromFrontendApi(frontendApi)}`,
+      `https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`,
+    ]);
+
+    expect(allowedRedirectOriginsValuesEmptyArray).toEqual([
+      'http://localhost',
+      `https://${getETLDPlusOneFromFrontendApi(frontendApi)}`,
+      `https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`,
+    ]);
+  });
+
+  it('contains only the allowedRedirectOrigins options given', async () => {
+    const frontendApi = 'https://somename.clerk.accounts.dev';
+    const allowedRedirectOriginsValues = createAllowedRedirectOrigins(
+      ['https://test.host', 'https://*.test.host'],
+      frontendApi,
+    );
+
+    expect(allowedRedirectOriginsValues).toEqual(['https://test.host', 'https://*.test.host']);
   });
 });

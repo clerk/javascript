@@ -16,13 +16,13 @@
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_js)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-[Changelog](https://github.com/clerkinc/javascript/blob/main/packages/clerk-js/CHANGELOG.md)
+[Changelog](https://github.com/clerk/javascript/blob/main/packages/clerk-js/CHANGELOG.md)
 ·
-[Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
+[Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
 ·
-[Ask a Question](https://github.com/clerkinc/javascript/discussions)
+[Ask a Question](https://github.com/clerk/javascript/discussions)
 
 </div>
 
@@ -44,13 +44,13 @@ There are two ways you can include ClerkJS in your project. You can either [impo
 npm install @clerk/clerk-js
 ```
 
-Once you have installed the package, you will need to import the ClerkJS object constructor into your code and pass it your [Frontend API](https://dashboard.clerk.com/last-active?path=api-keys) as a parameter.
+Once you have installed the package, you will need to import the ClerkJS object constructor into your code and pass it your [Publishable Key](https://dashboard.clerk.com/last-active?path=api-keys) as a parameter.
 
 ```js
 import Clerk from '@clerk/clerk-js';
 
-const clerkFrontendApi = 'pk_[publishable_key]';
-const clerk = new Clerk(clerkFrontendApi);
+const clerkPublishableKey = 'pk_[publishable_key]';
+const clerk = new Clerk(clerkPublishableKey);
 await clerk.load({
   // Set load options here...
 });
@@ -65,14 +65,13 @@ Add the following script to your site's `<body>` element:
 ```html
 <script>
   // Get this URL and Publishable Key from the Clerk Dashboard
-  const clerkFrontendApi = 'pk_[publishable_key]';
+  const clerkPublishableKey = 'pk_[publishable_key]';
   const frontendApi = '[your-domain].clerk.accounts.dev';
   const version = '@latest'; // Set to appropriate version
 
   // Creates asynchronous script
   const script = document.createElement('script');
-  script.setAttribute('data-clerk-frontend-api', frontendApi);
-  script.setAttribute('data-clerk-publishable-key', clerkFrontendApi);
+  script.setAttribute('data-clerk-publishable-key', clerkPublishableKey);
   script.async = true;
   script.src = `https://${frontendApi}/npm/@clerk/clerk-js${version}/dist/clerk.browser.js`;
 
@@ -130,12 +129,12 @@ _For further details and examples, please refer to our [Documentation](https://c
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerkinc/javascript/discussions)
+- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
 - Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_js)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
 
 ## Security
 
@@ -143,10 +142,10 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 `@clerk/clerk-js` is provided **"as is"** without any **warranty**. Use at your own risk.
 
-_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerkinc/javascript/blob/main/docs/SECURITY.md)._
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 
 ## License
 
 This project is licensed under the **MIT license**.
 
-See [LICENSE](https://github.com/clerkinc/javascript/blob/main/packages/clerk-js/LICENSE) for more information.
+See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/clerk-js/LICENSE) for more information.

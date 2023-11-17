@@ -9,14 +9,12 @@ import type { CreateClerkExpressMiddlewareOptions } from './clerkExpressRequireA
 import type { ClerkMiddlewareOptions, MiddlewareWithAuthProp, WithAuthProp } from './types';
 
 export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlewareOptions) => {
-  const { clerkClient, frontendApi = '', apiKey = '', secretKey = '', publishableKey = '' } = createOpts;
+  const { clerkClient, secretKey = '', publishableKey = '' } = createOpts;
   return (options: ClerkMiddlewareOptions = {}): MiddlewareWithAuthProp => {
     return async (req, res, next) => {
       const requestState = await authenticateRequest({
         clerkClient,
-        apiKey,
         secretKey,
-        frontendApi,
         publishableKey,
         req,
         options,
@@ -30,7 +28,12 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
           clerkClient,
           requestState,
         });
-        return handleInterstitialCase(res, requestState, interstitial);
+        if (interstitial.errors) {
+          // TODO(@dimkl): return interstitial errors ?
+          next(new Error('Unauthenticated'));
+          return;
+        }
+        return handleInterstitialCase(res, requestState, interstitial.data);
       }
 
       (req as WithAuthProp<any>).auth = {

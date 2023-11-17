@@ -8,10 +8,7 @@ export const deDE: LocalizationResource = {
   formFieldLabel__emailAddresses: 'E-Mail-Adressen',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__username: 'Nutzername',
-  formFieldLabel__emailAddress_phoneNumber: 'E-Mail-Adresse oder Telefonnummer',
   formFieldLabel__emailAddress_username: 'E-Mail-Adresse oder Benutzername',
-  formFieldLabel__phoneNumber_username: 'Telefonnummer oder Benutzername',
-  formFieldLabel__emailAddress_phoneNumber_username: 'E-Mail-Adresse, Telefonnummer oder Benutzername',
   formFieldLabel__password: 'Passwort',
   formFieldLabel__currentPassword: 'Aktuelles Passwort',
   formFieldLabel__newPassword: 'Neues Passwort',
@@ -27,10 +24,7 @@ export const deDE: LocalizationResource = {
     'Geben oder fügen Sie eine oder mehrere E-Mail-Adressen ein, getrennt durch Leerzeichen oder Kommas',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -267,9 +261,7 @@ export const deDE: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Verbundene Konten',
         primaryButton: 'Konto verbinden',
-        title__conectionFailed: 'Fehlgeschlagene Verbindung erneut versuchen',
         title__connectionFailed: 'Fehlgeschlagene Verbindung erneut versuchen',
-        actionLabel__conectionFailed: 'Versuchen Sie es nochmal',
         actionLabel__connectionFailed: 'Versuchen Sie es nochmal',
         destructiveActionTitle: 'Entfernen',
         destructiveActionSubtitle: 'Entfernen Sie dieses Konto aus Ihrem Konto',
@@ -535,10 +527,7 @@ export const deDE: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Keine Mitglieder zum Anzeigen',
       action__invite: 'Einladen',
-      start: {
-        headerTitle__active: 'Aktiv',
-        headerTitle__invited: 'Eingeladen',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Benutzer',
         tableHeader__joined: 'Trat bei',
@@ -555,7 +544,6 @@ export const deDE: LocalizationResource = {
   createOrganization: {
     title: 'Organisation erstellen',
     formButtonSubmit: 'Organisation erstellen',
-    subtitle: 'Legen Sie das Organisationsprofil fest',
     invitePage: {
       formButtonReset: 'Überspringen',
     },

@@ -1,6 +1,8 @@
 import type { PublishableKey } from '@clerk/types';
 
+import { DEV_OR_STAGING_SUFFIXES } from './constants';
 import { isomorphicAtob } from './isomorphicAtob';
+import { isomorphicBtoa } from './isomorphicBtoa';
 
 const PUBLISHABLE_KEY_LIVE_PREFIX = 'pk_live_';
 const PUBLISHABLE_KEY_TEST_PREFIX = 'pk_test_';
@@ -12,7 +14,7 @@ export function buildPublishableKey(frontendApi: string): string {
   const keyPrefix = PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi)
     ? PUBLISHABLE_KEY_TEST_PREFIX
     : PUBLISHABLE_KEY_LIVE_PREFIX;
-  return `${keyPrefix}${btoa(`${frontendApi}$`)}`;
+  return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`)}`;
 }
 
 export function parsePublishableKey(key: string | undefined): PublishableKey | null {
@@ -29,7 +31,7 @@ export function parsePublishableKey(key: string | undefined): PublishableKey | n
   if (!frontendApi.endsWith('$')) {
     return null;
   }
-
+  // TODO(@dimkl): validate packages/clerk-js/src/utils/instance.ts
   frontendApi = frontendApi.slice(0, -1);
 
   return {
@@ -55,19 +57,6 @@ export function isLegacyFrontendApiKey(key: string) {
 }
 
 export function createDevOrStagingUrlCache() {
-  // TODO: Check if we can merge it with `./instance.ts#isStaging()`
-  const DEV_OR_STAGING_SUFFIXES = [
-    '.lcl.dev',
-    '.stg.dev',
-    '.lclstage.dev',
-    '.stgstage.dev',
-    '.dev.lclclerk.com',
-    '.stg.lclclerk.com',
-    '.accounts.lclclerk.com',
-    'accountsstage.dev',
-    'accounts.dev',
-  ];
-
   const devOrStagingUrlCache = new Map<string, boolean>();
 
   return {

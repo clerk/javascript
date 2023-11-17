@@ -1,4 +1,4 @@
-import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
+import { API_URL, API_VERSION, JWKS_CACHE_TTL_MS, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
@@ -27,10 +27,7 @@ function getCacheValues() {
   return Object.values(cache);
 }
 
-function setInCache(
-  jwk: JsonWebKeyWithKid,
-  jwksCacheTtlInMs: number = 1000 * 60 * 60, // 1 hour
-) {
+function setInCache(jwk: JsonWebKeyWithKid, jwksCacheTtlInMs: number) {
   cache[jwk.kid] = jwk;
   lastUpdatedAt = Date.now();
 
@@ -99,10 +96,6 @@ export type LoadClerkJWKFromRemoteOptions = {
   jwksCacheTtlInMs?: number;
   skipJwksCache?: boolean;
   secretKey?: string;
-  /**
-   * @deprecated Use `secretKey` instead.
-   */
-  apiKey?: string;
   apiUrl?: string;
   apiVersion?: string;
   issuer?: string;
@@ -122,22 +115,20 @@ export type LoadClerkJWKFromRemoteOptions = {
  * @returns {JsonWebKey} key
  */
 export async function loadClerkJWKFromRemote({
-  apiKey,
   secretKey,
   apiUrl = API_URL,
   apiVersion = API_VERSION,
   issuer,
   kid,
-  jwksCacheTtlInMs = 1000 * 60 * 60, // 1 hour,
+  jwksCacheTtlInMs = JWKS_CACHE_TTL_MS,
   skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
   const shouldRefreshCache = !getFromCache(kid) && reachedMaxCacheUpdatedAt();
   if (skipJwksCache || shouldRefreshCache) {
     let fetcher;
-    const key = secretKey || apiKey;
 
-    if (key) {
-      fetcher = () => fetchJWKSFromBAPI(apiUrl, key, apiVersion);
+    if (secretKey) {
+      fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion);
     } else if (issuer) {
       fetcher = () => fetchJWKSFromFAPI(issuer);
     } else {
@@ -199,7 +190,7 @@ async function fetchJWKSFromFAPI(issuer: string) {
 async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string) {
   if (!key) {
     throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.SetClerkSecretKeyOrAPIKey,
+      action: TokenVerificationErrorAction.SetClerkSecretKey,
       message:
         'Missing Clerk Secret Key or API Key. Go to https://dashboard.clerk.com and get your key for your instance.',
       reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,

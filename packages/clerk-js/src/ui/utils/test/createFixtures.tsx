@@ -2,7 +2,7 @@ import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@cl
 import { jest } from '@jest/globals';
 import React from 'react';
 
-import { default as ClerkCtor } from '../../../core/clerk';
+import { Clerk as ClerkCtor } from '../../../core/clerk';
 import { Client, Environment } from '../../../core/resources';
 import { ComponentContext, CoreClerkContextWrapper, EnvironmentProvider, OptionsProvider } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
@@ -58,8 +58,8 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
     Client.getInstance().fetch = jest.fn(() => Promise.resolve(clientMock));
 
     // Use a FAPI value for local production instances to avoid triggering the devInit flow during testing
-    const frontendApi = 'clerk.abcef.12345.prod.lclclerk.com';
-    const tempClerk = new ClerkCtor(frontendApi);
+    const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
+    const tempClerk = new ClerkCtor(productionPublishableKey);
     await tempClerk.load();
     const clerkMock = mockClerkMethods(tempClerk as LoadedClerk);
     const optionsMock = {} as ClerkOptions;

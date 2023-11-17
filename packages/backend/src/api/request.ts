@@ -1,5 +1,4 @@
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
-import deepmerge from 'deepmerge';
 import snakecaseKeys from 'snakecase-keys';
 
 import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
@@ -8,8 +7,6 @@ import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
 import runtime from '../runtime';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { joinPaths } from '../util/path';
-import { deprecated } from '../util/shared';
-import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
 export type ClerkBackendApiRequestOptions = {
@@ -37,56 +34,29 @@ export type ClerkBackendApiResponse<T> =
   | {
       data: null;
       errors: ClerkAPIError[];
+      clerkTraceId?: string;
+      status?: number;
+      statusText?: string;
     };
 
 export type RequestFunction = ReturnType<typeof buildRequest>;
-type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) => Promise<T>;
 
-/**
- * Switching to the { data, errors } format is a breaking change, so we will skip it for now
- * until we release v5 of the related SDKs.
- * This HOF wraps the request helper and transforms the new return to the legacy return.
- * TODO: Simply remove this wrapper and the ClerkAPIResponseError before the v5 release.
- */
-const withLegacyReturn =
-  (cb: any): LegacyRequestFunction =>
-  async (...args) => {
-    // @ts-ignore
-    const { data, errors, status, statusText } = await cb<T>(...args);
-    if (errors === null) {
-      return data;
-    } else {
-      throw new ClerkAPIResponseError(statusText || '', {
-        data: errors,
-        status: status || '',
-      });
-    }
-  };
-
-export function buildRequest(options: CreateBackendApiOptions) {
-  const request = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
-    const {
-      apiKey,
-      secretKey,
-      httpOptions,
-      apiUrl = API_URL,
-      apiVersion = API_VERSION,
-      userAgent = USER_AGENT,
-    } = options;
-    if (apiKey) {
-      deprecated('apiKey', 'Use `secretKey` instead.');
-    }
-    if (httpOptions) {
-      deprecated(
-        'httpOptions',
-        'This option has been deprecated and will be removed with the next major release.\nA RequestInit init object used by the `request` method.',
-      );
-    }
-
+type BuildRequestOptions = {
+  /* Secret Key */
+  secretKey?: string;
+  /* Backend API URL */
+  apiUrl?: string;
+  /* Backend API version */
+  apiVersion?: string;
+  /* Library/SDK name */
+  userAgent?: string;
+};
+export function buildRequest(options: BuildRequestOptions) {
+  return async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
+    const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
-    const key = secretKey || apiKey;
 
-    assertValidSecretKey(key);
+    assertValidSecretKey(secretKey);
 
     const url = joinPaths(apiUrl, apiVersion, path);
 
@@ -107,16 +77,15 @@ export function buildRequest(options: CreateBackendApiOptions) {
 
     // Build headers
     const headers: Record<string, any> = {
-      Authorization: `Bearer ${key}`,
+      Authorization: `Bearer ${secretKey}`,
       'Clerk-Backend-SDK': userAgent,
       ...headerParams,
     };
 
-    let res: Response | undefined = undefined;
+    let res: Response | undefined;
     try {
       if (formData) {
         res = await runtime.fetch(finalUrl.href, {
-          ...httpOptions,
           method,
           headers,
           body: formData,
@@ -128,14 +97,11 @@ export function buildRequest(options: CreateBackendApiOptions) {
         const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
         const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
 
-        res = await runtime.fetch(
-          finalUrl.href,
-          deepmerge(httpOptions || {}, {
-            method,
-            headers,
-            ...body,
-          }),
-        );
+        res = await runtime.fetch(finalUrl.href, {
+          method,
+          headers,
+          ...body,
+        });
       }
 
       // TODO: Parse JSON or Text response based on a response header
@@ -144,7 +110,13 @@ export function buildRequest(options: CreateBackendApiOptions) {
       const data = await (isJSONResponse ? res.json() : res.text());
 
       if (!res.ok) {
-        throw data;
+        return {
+          data: null,
+          errors: data?.errors || data,
+          status: res?.status,
+          statusText: res?.statusText,
+          clerkTraceId: getTraceId(data, res?.headers),
+        };
       }
 
       return {
@@ -161,21 +133,30 @@ export function buildRequest(options: CreateBackendApiOptions) {
               message: err.message || 'Unexpected error',
             },
           ],
+          clerkTraceId: getTraceId(err, res?.headers),
         };
       }
 
       return {
         data: null,
         errors: parseErrors(err),
-        // TODO: To be removed with withLegacyReturn
-        // @ts-expect-error
         status: res?.status,
         statusText: res?.statusText,
+        clerkTraceId: getTraceId(err, res?.headers),
       };
     }
   };
+}
 
-  return withLegacyReturn(request);
+// Returns either clerk_trace_id if present in response json, otherwise defaults to CF-Ray header
+// If the request failed before receiving a response, returns undefined
+function getTraceId(data: unknown, headers?: Headers): string {
+  if (data && typeof data === 'object' && 'clerk_trace_id' in data && typeof data.clerk_trace_id === 'string') {
+    return data.clerk_trace_id;
+  }
+
+  const cfRay = headers?.get('cf-ray');
+  return cfRay || '';
 }
 
 function parseErrors(data: unknown): ClerkAPIError[] {
@@ -196,24 +177,4 @@ function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
       sessionId: error?.meta?.session_id,
     },
   };
-}
-
-class ClerkAPIResponseError extends Error {
-  clerkError: true;
-
-  status: number;
-  message: string;
-
-  errors: ClerkAPIError[];
-
-  constructor(message: string, { data, status }: { data: ClerkAPIError[]; status: number }) {
-    super(message);
-
-    Object.setPrototypeOf(this, ClerkAPIResponseError.prototype);
-
-    this.clerkError = true;
-    this.message = message;
-    this.status = status;
-    this.errors = data;
-  }
 }

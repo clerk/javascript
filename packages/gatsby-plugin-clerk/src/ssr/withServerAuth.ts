@@ -1,6 +1,6 @@
 import type { GetServerDataProps, GetServerDataReturn } from 'gatsby';
 
-import { FRONTEND_API, PUBLISHABLE_KEY } from '../constants';
+import { PUBLISHABLE_KEY } from '../constants';
 import { authenticateRequest } from './authenticateRequest';
 import { clerkClient, constants } from './clerkClient';
 import type { WithServerAuthCallback, WithServerAuthOptions, WithServerAuthResult } from './types';
@@ -26,14 +26,13 @@ export const withServerAuth: WithServerAuth = (cbOrOptions: any, options?: any):
         [constants.Headers.AuthStatus]: requestState.status,
       };
       const interstitialHtml = clerkClient.localInterstitial({
-        frontendApi: FRONTEND_API,
         publishableKey: PUBLISHABLE_KEY,
       });
       return injectSSRStateIntoProps({ headers }, { __clerk_ssr_interstitial_html: interstitialHtml });
     }
-    const legacyAuthData = { ...requestState.toAuth(), claims: requestState?.toAuth()?.sessionClaims };
-    const contextWithAuth = injectAuthIntoContext(props, legacyAuthData);
+
+    const contextWithAuth = injectAuthIntoContext(props, requestState.toAuth());
     const callbackResult = (await callback?.(contextWithAuth)) || {};
-    return injectSSRStateIntoProps(callbackResult, { __clerk_ssr_state: sanitizeAuthObject(legacyAuthData) });
+    return injectSSRStateIntoProps(callbackResult, { __clerk_ssr_state: sanitizeAuthObject(contextWithAuth.auth) });
   };
 };
