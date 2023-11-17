@@ -152,7 +152,6 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     const req = withNormalizedClerkUrl(_req);
 
     logger.debug('URL debug', {
-      url: req.nextUrl.href,
       method: req.method,
       headers: stringifyHeaders(req.headers),
       nextUrl: req.nextUrl.href,

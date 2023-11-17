@@ -46,7 +46,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     isTruthy(getEnvVariable('CLERK_IS_SATELLITE', context)) ||
     false;
 
-  const requestURL = buildRequestUrl(request);
+  const requestURL = buildRequestUrl(request, { hostPreference: 'forwarded' });
 
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(
     opts?.proxyUrl,

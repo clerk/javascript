@@ -53,7 +53,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     });
   });
 
-  const requestUrl = buildRequestUrl(isomorphicRequest);
+  const requestUrl = buildRequestUrl(isomorphicRequest, { hostPreference: 'forwarded' });
   const isSatellite = handleValueOrFn(options?.isSatellite, requestUrl, env.isSatellite);
   const domain = handleValueOrFn(options?.domain, requestUrl) || env.domain;
   const signInUrl = options?.signInUrl || env.signInUrl;

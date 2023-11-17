@@ -17,7 +17,10 @@ export function checkCrossOrigin({
   forwardedHost?: string | null;
   forwardedProto?: string | null;
 }) {
-  const finalURL = buildOrigin({ forwardedProto, forwardedHost, protocol: originURL.protocol, host });
+  const finalURL = buildOrigin(
+    { forwardedProto, forwardedHost, protocol: originURL.protocol, host },
+    { hostPreference: 'forwarded' },
+  );
   return finalURL && new URL(finalURL).origin !== originURL.origin;
 }
 
