@@ -1,6 +1,7 @@
 import type { LongRunningApplication } from '../models/longRunningApplication';
 import { longRunningApplication } from '../models/longRunningApplication';
 import { envs } from './envs';
+import { express } from './express';
 import { next } from './next';
 import { react } from './react';
 import { remix } from './remix';
@@ -12,6 +13,7 @@ import { remix } from './remix';
  */
 export const createLongRunningApps = () => {
   const configs = [
+    { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
     { id: 'react.vite.withEmailCodes', config: react.vite, env: envs.withEmailCodes },
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
     { id: 'remix.node.withEmailCodes', config: remix.remixNode, env: envs.withEmailCodes },
