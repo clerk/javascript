@@ -25,4 +25,17 @@
     "nextjs",
     "publint"
   ],
+
+  // https://code.visualstudio.com/api/references/theme-color
+  "workbench.colorCustomizations": {
+    "list.activeSelectionBackground":"#3b63f133",
+    "list.inactiveSelectionBackground":"#3b63f112",
+    "sideBarSectionHeader.background":"#3b63f112",
+    "sideBarSectionHeader.foreground": "#103FEF",
+    "titleBar.activeBackground": "#103fef",
+    "titleBar.activeForeground": "#ffffff",
+    "titleBar.border": "#ffffff",
+    "titleBar.inactiveBackground": "#103fef",
+    "titleBar.inactiveForeground": "#ffffff",
+  },
 }
