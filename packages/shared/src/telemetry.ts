@@ -90,7 +90,10 @@ type TelemetryEvent = {
 const DEFAULT_CONFIG: Partial<Required<TelemetryCollectorConfig>> = {
   samplingRate: 1,
   maxBufferSize: 5,
-  endpoint: 'https://staging.clerk-telemetry.com',
+  // Production endpoint: https://clerk-telemetry.com
+  // Staging endpoint: https://staging.clerk-telemetry.com
+  // Local: http://localhost:8787
+  endpoint: 'https://clerk-telemetry.com',
 };
 
 // TODO: determine some type of throttle/dedupe heuristic to avoid sending excessive events for e.g. a component render
@@ -131,8 +134,6 @@ export class TelemetryCollector {
       // Only send the first 16 characters of the secret key to to avoid sending the full key. We can still query against the partial key.
       this.#metadata.secretKey = options.secretKey.substring(0, 16);
     }
-
-    // this.#config.endpoint = 'http://localhost:8787';
   }
 
   get isEnabled(): boolean {
