@@ -55,7 +55,7 @@ jobs:
 
       - name: Show package versions
         working-directory: ${{runner.temp}}
-        run: npm list
+        run: cd .temp_integration && for i in */; do (echo "---$i----" && cd "$i" && npm list) done;
   notify-slack:
     name: Notify Slack
     needs: integration-tests
