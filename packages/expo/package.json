@@ -60,7 +60,7 @@
   "peerDependencies": {
     "expo-auth-session": ">=4",
     "expo-web-browser": ">=12",
-    "react": ">=16"
+    "react": ">=18"
   },
   "engines": {
     "node": ">=18.17.0"

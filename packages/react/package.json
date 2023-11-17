@@ -72,7 +72,7 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=16"
+    "react": ">=18"
   },
   "engines": {
     "node": ">=18.17.0"

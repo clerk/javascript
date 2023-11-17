@@ -98,7 +98,7 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=16"
+    "react": ">=18"
   },
   "peerDependenciesMeta": {
     "react": {
