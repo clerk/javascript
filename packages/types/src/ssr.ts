@@ -1,7 +1,7 @@
 import type { ActJWTClaim, ClerkJWTClaims } from './jwt';
 import type { ActClaim, JwtPayload } from './jwtv2';
 import type { OrganizationResource } from './organization';
-import type { MembershipRole } from './organizationMembership';
+import type { MembershipRole, OrganizationPermission } from './organizationMembership';
 import type { SessionResource } from './session';
 import type { UserResource } from './user';
 import type { Serializable } from './utils';
@@ -30,5 +30,9 @@ export type InitialState = Serializable<{
   orgId: string | undefined;
   orgRole: MembershipRole | undefined;
   orgSlug: string | undefined;
+  // TODO(@panteliselef): Typesafe
+  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+  // eslint-disable-next-line
+  orgPermissions: (OrganizationPermission | (string & {}))[] | undefined;
   organization: OrganizationResource | undefined;
 }>;

@@ -1,8 +1,9 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
   ActClaim,
-  experimental__CheckAuthorizationWithoutPermission,
+  experimental__CheckAuthorizationWithCustomPermissions,
   JwtPayload,
+  OrganizationPermission,
   ServerGetToken,
   ServerGetTokenOptions,
 } from '@clerk/types';
@@ -40,12 +41,14 @@ export type SignedInAuthObject = {
   orgId: string | undefined;
   orgRole: string | undefined;
   orgSlug: string | undefined;
+  // TODO(@panteliselef): Typesafe
+  orgPermissions: OrganizationPermission[] | undefined;
   organization: Organization | undefined;
   getToken: ServerGetToken;
   /**
    * @experimental The method is experimental and subject to change in future releases.
    */
-  experimental__has: experimental__CheckAuthorizationWithoutPermission;
+  experimental__has: experimental__CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
 };
 
@@ -59,12 +62,13 @@ export type SignedOutAuthObject = {
   orgId: null;
   orgRole: null;
   orgSlug: null;
+  orgPermissions: null;
   organization: null;
   getToken: ServerGetToken;
   /**
    * @experimental The method is experimental and subject to change in future releases.
    */
-  experimental__has: experimental__CheckAuthorizationWithoutPermission;
+  experimental__has: experimental__CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
 };
 
@@ -91,6 +95,7 @@ export function signedInAuthObject(
     org_id: orgId,
     org_role: orgRole,
     org_slug: orgSlug,
+    org_permissions: orgPermissions,
     sub: userId,
   } = sessionClaims;
   const { apiKey, secretKey, apiUrl, apiVersion, token, session, user, organization } = options;
@@ -122,9 +127,10 @@ export function signedInAuthObject(
     orgId,
     orgRole,
     orgSlug,
+    orgPermissions,
     organization,
     getToken,
-    experimental__has: createHasAuthorization({ orgId, orgRole, userId }),
+    experimental__has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
     debug: createDebug({ ...options, ...debugData }),
   };
 }
@@ -144,6 +150,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgId: null,
     orgRole: null,
     orgSlug: null,
+    orgPermissions: null,
     organization: null,
     getToken: () => Promise.resolve(null),
     experimental__has: () => false,
@@ -221,14 +228,20 @@ const createHasAuthorization =
     orgId,
     orgRole,
     userId,
+    orgPermissions,
   }: {
     userId: string;
     orgId: string | undefined;
     orgRole: string | undefined;
-  }): experimental__CheckAuthorizationWithoutPermission =>
+    orgPermissions: string[] | undefined;
+  }): experimental__CheckAuthorizationWithCustomPermissions =>
   params => {
-    if (!orgId || !userId) {
+    if (!orgId || !userId || !orgPermissions) {
       return false;
+    }
+
+    if (params.permission) {
+      return orgPermissions.includes(params.permission);
     }
 
     if (params.role) {
@@ -237,6 +250,9 @@ const createHasAuthorization =
 
     if (params.some) {
       return !!params.some.find(permObj => {
+        if (permObj.permission) {
+          return orgPermissions.includes(permObj.permission);
+        }
         if (permObj.role) {
           return orgRole === permObj.role;
         }

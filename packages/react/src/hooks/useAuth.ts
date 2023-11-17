@@ -1,6 +1,6 @@
 import type {
   ActJWTClaim,
-  experimental__CheckAuthorizationWithoutPermission,
+  experimental__CheckAuthorizationWithCustomPermissions,
   GetToken,
   MembershipRole,
   SignOut,
@@ -14,7 +14,7 @@ import type IsomorphicClerk from '../isomorphicClerk';
 import { createGetToken, createSignOut } from './utils';
 
 type experimental__CheckAuthorizationSignedOut = (
-  params?: Parameters<experimental__CheckAuthorizationWithoutPermission>[0],
+  params?: Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0],
 ) => false;
 
 type UseAuthReturn =
@@ -78,7 +78,7 @@ type UseAuthReturn =
       /**
        * @experimental The method is experimental and subject to change in future releases.
        */
-      experimental__has: experimental__CheckAuthorizationWithoutPermission;
+      experimental__has: experimental__CheckAuthorizationWithCustomPermissions;
       signOut: SignOut;
       getToken: GetToken;
     };
@@ -125,15 +125,15 @@ type UseAuth = () => UseAuthReturn;
  * }
  */
 export const useAuth: UseAuth = () => {
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug } = useAuthContext();
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
   const has = useCallback(
-    (params?: Parameters<experimental__CheckAuthorizationWithoutPermission>[0]) => {
-      if (!orgId || !userId || !orgRole) {
+    (params?: Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0]) => {
+      if (!orgId || !userId || !orgRole || !orgPermissions) {
         return false;
       }
 
@@ -141,12 +141,15 @@ export const useAuth: UseAuth = () => {
         return false;
       }
 
+      if (params.permission) {
+        return orgPermissions.includes(params.permission);
+      }
       if (params.role) {
         return orgRole === params.role;
       }
       return false;
     },
-    [orgId, orgRole, userId],
+    [orgId, orgRole, userId, orgPermissions],
   );
 
   if (sessionId === undefined && userId === undefined) {

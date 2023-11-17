@@ -1,4 +1,4 @@
-import type { experimental__CheckAuthorizationWithoutPermission } from '@clerk/types';
+import type { experimental__CheckAuthorizationWithCustomPermissions } from '@clerk/types';
 import { redirect } from 'next/navigation';
 import React from 'react';
 
@@ -17,7 +17,7 @@ export function SignedOut(props: React.PropsWithChildren) {
 }
 
 type GateServerComponentProps = React.PropsWithChildren<
-  Parameters<experimental__CheckAuthorizationWithoutPermission>[0] & {
+  Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0] & {
     fallback?: React.ReactNode;
     redirectTo?: string;
   }

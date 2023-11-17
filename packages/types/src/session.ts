@@ -4,20 +4,38 @@ import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
-export type experimental__CheckAuthorizationWithoutPermission = (
-  isAuthorizedParams: CheckAuthorizationParamsWithoutPermission,
+export type experimental__CheckAuthorizationWithCustomPermissions = (
+  isAuthorizedParams: CheckAuthorizationParamsWithCustomPermissions,
 ) => boolean;
 
-type CheckAuthorizationParamsWithoutPermission =
+type CheckAuthorizationParamsWithCustomPermissions =
   | {
-      some: {
-        role: string;
-      }[];
+      some: (
+        | {
+            role: string;
+            permission?: never;
+          }
+        | {
+            role?: never;
+            // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+            // eslint-disable-next-line
+            permission: OrganizationPermission | (string & {});
+          }
+      )[];
       role?: never;
+      permission?: never;
     }
   | {
       some?: never;
       role: string;
+      permission?: never;
+    }
+  | {
+      some?: never;
+      role?: never;
+      // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
+      // eslint-disable-next-line
+      permission: OrganizationPermission | (string & {});
     };
 
 export type CheckAuthorization = (isAuthorizedParams: CheckAuthorizationParams) => boolean;
