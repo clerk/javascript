@@ -11,5 +11,4 @@ export * from './PhoneNumberApi';
 export * from './RedirectUrlApi';
 export * from './SessionApi';
 export * from './SignInTokenApi';
-export * from './SMSMessageApi';
 export * from './UserApi';
