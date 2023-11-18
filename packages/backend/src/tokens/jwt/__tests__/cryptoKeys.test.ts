@@ -1,7 +1,7 @@
 import type QUnit from 'qunit';
 
-import { pemEncodedPublicKey, pemEncodedSignKey, publicJwks, signingJwks } from '../fixtures';
-import { importKey } from './cryptoKeys';
+import { pemEncodedPublicKey, pemEncodedSignKey, publicJwks, signingJwks } from '../../fixtures';
+import { importKey } from '../cryptoKeys';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

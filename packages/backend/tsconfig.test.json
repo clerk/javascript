@@ -12,6 +12,6 @@
       "@clerk/shared/*": ["../shared/dist/*.js"]
     }
   },
-  "include": ["src/**/*.test.ts"],
-  "exclude": ["node_modules", "dist", "src/__tests__"]
+  "include": ["src/**/__tests__"],
+  "exclude": ["node_modules", "dist"]
 }

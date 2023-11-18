@@ -10,7 +10,7 @@ import {
   assertHeaderType,
   assertIssuedAtClaim,
   assertSubClaim,
-} from './assertions';
+} from '../assertions';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

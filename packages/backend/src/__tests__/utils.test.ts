@@ -1,6 +1,6 @@
 import type QUnit from 'qunit';
 
-import { buildOrigin, buildRequestUrl } from './utils';
+import { buildOrigin, buildRequestUrl } from '../utils';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

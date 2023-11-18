@@ -8,9 +8,9 @@ import {
   pemEncodedSignKey,
   publicJwks,
   signingJwks,
-} from '../fixtures';
-import { signJwt } from './signJwt';
-import { verifyJwt } from './verifyJwt';
+} from '../../fixtures';
+import { signJwt } from '../signJwt';
+import { verifyJwt } from '../verifyJwt';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;
