@@ -11,12 +11,18 @@
  *
  * TODO: Support TS runtime modules
  */
-
-// @ts-ignore - These are package subpaths
-import crypto from '#crypto';
+let webcrypto;
+try {
+  webcrypto = require('node:crypto');
+  if (!webcrypto) {
+    webcrypto = globalThis.crypto;
+  }
+} catch (e) {
+  webcrypto = globalThis.crypto;
+}
 
 type Runtime = {
-  crypto: Crypto;
+  crypto: typeof webcrypto;
   fetch: typeof globalThis.fetch;
   AbortController: typeof globalThis.AbortController;
   Blob: typeof globalThis.Blob;
@@ -36,7 +42,7 @@ const globalFetch = fetch.bind(globalThis);
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 const runtime: Runtime = {
-  crypto,
+  crypto: webcrypto,
   fetch: globalFetch,
   AbortController: globalThis.AbortController,
   Blob: globalThis.Blob,

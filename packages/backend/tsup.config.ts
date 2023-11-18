@@ -18,7 +18,6 @@ export default defineConfig(overrideOptions => {
       PACKAGE_VERSION: `"${version}"`,
       __DEV__: `${isWatch}`,
     },
-    external: ['#crypto'],
     legacyOutput: true,
     bundle: true,
     clean: true,

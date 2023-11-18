@@ -12,15 +12,6 @@
     "directory": "packages/backend"
   },
   "license": "MIT",
-  "imports": {
-    "#crypto": {
-      "edge-light": "./dist/runtime/browser/crypto.mjs",
-      "worker": "./dist/runtime/browser/crypto.mjs",
-      "browser": "./dist/runtime/browser/crypto.mjs",
-      "node": "./dist/runtime/node/crypto.js",
-      "default": "./dist/runtime/browser/crypto.mjs"
-    }
-  },
   "main": "./dist/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
