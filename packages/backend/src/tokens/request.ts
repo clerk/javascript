@@ -2,13 +2,13 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import type { JwtPayload } from '@clerk/types';
 
 import { constants } from '../constants';
+import type { TokenCarrier } from '../errors';
+import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
-import type { TokenCarrier } from './errors';
-import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
 import { verifyHandshakeToken } from './handshake';
 import { decodeJwt } from './jwt';
 import { verifyToken, type VerifyTokenOptions } from './verify';

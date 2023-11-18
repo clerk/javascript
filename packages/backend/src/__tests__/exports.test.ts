@@ -1,5 +1,6 @@
 import type QUnit from 'qunit';
 
+import * as errorExports from '../errors';
 import * as publicExports from '../index';
 
 export default (QUnit: QUnit) => {
@@ -29,8 +30,6 @@ export default (QUnit: QUnit) => {
         'Session',
         'SignInToken',
         'Token',
-        'TokenVerificationError',
-        'TokenVerificationErrorReason',
         'User',
         'Verification',
         'buildRequestUrl',
@@ -53,6 +52,18 @@ export default (QUnit: QUnit) => {
         'verifyToken',
       ];
       assert.deepEqual(Object.keys(publicExports).sort(), exportedApiKeys);
+    });
+  });
+
+  module('subpath /errors exports', () => {
+    test('should not include a breaking change', assert => {
+      const exportedApiKeys = [
+        'TokenVerificationError',
+        'TokenVerificationErrorAction',
+        'TokenVerificationErrorCode',
+        'TokenVerificationErrorReason',
+      ];
+      assert.deepEqual(Object.keys(errorExports).sort(), exportedApiKeys);
     });
   });
 };

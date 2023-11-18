@@ -10,7 +10,7 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['src/index.ts'],
+    entry: ['src/index.ts', 'src/errors.ts'],
     onSuccess: `cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime`,
     sourcemap: true,
     define: {
@@ -19,7 +19,6 @@ export default defineConfig(overrideOptions => {
       __DEV__: `${isWatch}`,
     },
     external: ['#crypto'],
-    legacyOutput: true,
     bundle: true,
     clean: true,
     minify: false,
