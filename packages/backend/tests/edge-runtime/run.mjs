@@ -1,8 +1,9 @@
-import { EdgeRuntime } from 'edge-runtime';
-import { exit } from 'node:process';
 import fs from 'node:fs';
-import * as url from 'url';
+import { exit } from 'node:process';
+
+import { EdgeRuntime } from 'edge-runtime';
 import * as path from 'path';
+import * as url from 'url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
