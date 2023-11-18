@@ -23,8 +23,6 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "Session",
   "SignInToken",
   "Token",
-  "TokenVerificationError",
-  "TokenVerificationErrorReason",
   "User",
   "Verification",
   "auth",
