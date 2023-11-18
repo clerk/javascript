@@ -6,8 +6,14 @@ import emailJson from '../../fixtures/email.json';
 // @ts-ignore
 import userJson from '../../fixtures/user.json';
 import runtime from '../../runtime';
-import { assertErrorResponse, assertResponse } from '../../util/assertResponse';
-import { jsonError, jsonNotOk, jsonOk, jsonPaginatedOk } from '../../util/mockFetch';
+import {
+  assertErrorResponse,
+  assertResponse,
+  jsonError,
+  jsonNotOk,
+  jsonOk,
+  jsonPaginatedOk,
+} from '../../util/testUtils';
 import { createBackendApiClient } from '../factory';
 
 export default (QUnit: QUnit) => {

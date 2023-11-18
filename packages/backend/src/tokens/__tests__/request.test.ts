@@ -2,7 +2,7 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import runtime from '../../runtime';
-import { jsonOk } from '../../util/mockFetch';
+import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
 import { TokenVerificationErrorReason } from '../errors';
 import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from '../fixtures';

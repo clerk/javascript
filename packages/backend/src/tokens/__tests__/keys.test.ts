@@ -2,7 +2,7 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import runtime from '../../runtime';
-import { jsonError, jsonOk } from '../../util/mockFetch';
+import { jsonError, jsonOk } from '../../util/testUtils';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import {
   mockJwks,
