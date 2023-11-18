@@ -1,6 +1,6 @@
 import type QUnit from 'qunit';
 
-import * as publicExports from './index';
+import * as publicExports from '../index';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

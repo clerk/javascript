@@ -147,7 +147,7 @@ export async function loadClerkJWKFromRemote({
 
   if (!jwk) {
     const cacheValues = getCacheValues();
-    const jwkKeys = cacheValues.map(jwk => jwk.kid).join(', ');
+    const jwkKeys = cacheValues.map(jwk => jwk.kid).sort().join(', ');
 
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.ContactSupport,

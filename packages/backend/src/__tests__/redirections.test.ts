@@ -1,7 +1,7 @@
 import type QUnit from 'qunit';
 import sinon from 'sinon';
 
-import { redirect } from './redirections';
+import { redirect } from '../redirections';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

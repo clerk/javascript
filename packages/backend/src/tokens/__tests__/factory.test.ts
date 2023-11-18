@@ -1,7 +1,7 @@
 import type QUnit from 'qunit';
 
-import type { ApiClient } from '../api';
-import { createAuthenticateRequest } from './factory';
+import type { ApiClient } from '../../api';
+import { createAuthenticateRequest } from '../factory';
 
 const TEST_PK = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
 

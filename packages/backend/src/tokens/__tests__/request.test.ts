@@ -1,13 +1,13 @@
 import type QUnit from 'qunit';
 import sinon from 'sinon';
 
-import runtime from '../runtime';
-import { jsonOk } from '../util/mockFetch';
-import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from './authStatus';
-import { TokenVerificationErrorReason } from './errors';
-import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from './fixtures';
-import type { AuthenticateRequestOptions } from './request';
-import { authenticateRequest, loadOptionsFromHeaders } from './request';
+import runtime from '../../runtime';
+import { jsonOk } from '../../util/mockFetch';
+import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
+import { TokenVerificationErrorReason } from '../errors';
+import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from '../fixtures';
+import type { AuthenticateRequestOptions } from '../request';
+import { authenticateRequest, loadOptionsFromHeaders } from '../request';
 
 function assertSignedOut(
   assert,
@@ -181,12 +181,8 @@ export default (QUnit: QUnit) => {
 
     test('returns signed out state if jwk fails to load from remote', async assert => {
       fakeFetch.onCall(0).returns(jsonOk({}));
-      const requestState = await authenticateRequest(
-        mockRequestWithHeaderAuth(),
-        mockOptions({
-          skipJwksCache: false,
-        }),
-      );
+
+      const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
 
       const errMessage =
         'The JWKS endpoint did not contain any signing keys. Contact support@clerk.com. Contact support@clerk.com (reason=jwk-remote-failed-to-load, token-carrier=header)';

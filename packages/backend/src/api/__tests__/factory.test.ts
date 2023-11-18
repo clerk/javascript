@@ -1,12 +1,14 @@
 import type QUnit from 'qunit';
 import sinon from 'sinon';
 
-import emailJson from '../fixtures/responses/email.json';
-import userJson from '../fixtures/responses/user.json';
-import runtime from '../runtime';
-import { assertErrorResponse, assertResponse } from '../util/assertResponse';
-import { jsonError, jsonNotOk, jsonOk, jsonPaginatedOk } from '../util/mockFetch';
-import { createBackendApiClient } from './factory';
+// @ts-ignore
+import emailJson from '../../fixtures/email.json';
+// @ts-ignore
+import userJson from '../../fixtures/user.json';
+import runtime from '../../runtime';
+import { assertErrorResponse, assertResponse } from '../../util/assertResponse';
+import { jsonError, jsonNotOk, jsonOk, jsonPaginatedOk } from '../../util/mockFetch';
+import { createBackendApiClient } from '../factory';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;
