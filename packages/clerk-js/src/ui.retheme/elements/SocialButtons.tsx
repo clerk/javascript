@@ -16,7 +16,7 @@ import {
   Text,
   useAppearance,
 } from '../customizables';
-import { useEnabledThirdPartyProviders } from '../hooks';
+import { useEnabledThirdPartyProviders, useResizeObserver } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { useCardState } from './contexts';
@@ -63,25 +63,13 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { oauthCallback, web3Callback, enableOAuthProviders = true, enableWeb3Providers = true } = props;
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
-  const firstStrategyRef = useRef<HTMLButtonElement>(null);
   const { socialButtonsVariant } = useAppearance().parsedLayout;
-  const [strategyWidth, setStrategyWidth] = useState(0);
+  const [firstStrategyRef, firstElementRect] = useResizeObserver();
 
   const strategies = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
     ...(enableWeb3Providers ? web3Strategies : []),
   ];
-
-  useLayoutEffect(() => {
-    if (!firstStrategyRef.current) return;
-
-    const resizeObserver = new ResizeObserver(() => {
-      setStrategyWidth(firstStrategyRef.current?.clientWidth ?? 0);
-    });
-
-    resizeObserver.observe(firstStrategyRef.current);
-    return () => resizeObserver.disconnect();
-  }, []);
 
   if (!strategies.length) {
     return null;
@@ -126,7 +114,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           gap={2}
           sx={{
             // Allow the first row items to use the entire row's width, but the rest should have a fixed width based on the first row's items
-            gridTemplateColumns: `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${strategyWidth}px`})`,
+            gridTemplateColumns: `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
             justifyContent: 'center',
           }}
         >
@@ -151,28 +139,27 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 : null;
 
             return (
-              <div key={strategy}>
-                <ButtonElement
-                  id={strategyToDisplayData[strategy].id}
-                  ref={ref}
-                  onClick={startOauth(strategy)}
-                  isLoading={card.loadingMetadata === strategy}
-                  isDisabled={card.isLoading}
-                  label={label}
-                  textLocalizationKey={localizedText}
-                  icon={
-                    <Image
-                      elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
-                      elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
-                      isLoading={card.loadingMetadata === strategy}
-                      isDisabled={card.isLoading}
-                      src={strategyToDisplayData[strategy].iconUrl}
-                      alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-                      sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
-                    />
-                  }
-                />
-              </div>
+              <ButtonElement
+                key={strategy}
+                id={strategyToDisplayData[strategy].id}
+                ref={ref}
+                onClick={startOauth(strategy)}
+                isLoading={card.loadingMetadata === strategy}
+                isDisabled={card.isLoading}
+                label={label}
+                textLocalizationKey={localizedText}
+                icon={
+                  <Image
+                    elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
+                    elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
+                    isLoading={card.loadingMetadata === strategy}
+                    isDisabled={card.isLoading}
+                    src={strategyToDisplayData[strategy].iconUrl}
+                    alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                    sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
+                  />
+                }
+              />
             );
           })}
         </Grid>
