@@ -22,6 +22,7 @@ export * from './Invitation';
 export * from './JSON';
 export * from './OauthAccessToken';
 export * from './Organization';
+export * from './OrganizationRole';
 export * from './Permission';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
