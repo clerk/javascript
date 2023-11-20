@@ -1,5 +1,5 @@
 import { checkCrossOrigin } from '../util/request';
-import { isDevelopmentFromSecretKey, isProductionFromApiKey } from '../util/shared';
+import { isDevelopmentFromSecretKey, isProductionFromSecretKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
 import { verifyToken } from './verify';
@@ -105,7 +105,7 @@ export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: Interstitia
 export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = options => {
   const { secretKey = '', clientUat, cookieToken } = options;
 
-  if (isProductionFromApiKey(secretKey) && !clientUat && !cookieToken) {
+  if (isProductionFromSecretKey(secretKey) && !clientUat && !cookieToken) {
     return signedOut(options, AuthErrorReason.CookieAndUATMissing);
   }
   return undefined;

@@ -2,7 +2,7 @@ import {
   buildPublishableKey,
   createDevOrStagingUrlCache,
   isDevelopmentFromSecretKey,
-  isProductionFromApiKey,
+  isProductionFromSecretKey,
   isPublishableKey,
   parsePublishableKey,
 } from '../keys';
@@ -97,7 +97,7 @@ describe('isDevelopmentFromSecretKey(key)', () => {
   });
 });
 
-describe('isProductionFromApiKey(key)', () => {
+describe('isProductionFromSecretKey(key)', () => {
   const cases: Array<[string, boolean]> = [
     ['sk_live_Y2xlcmsuY2xlcmsuZGV2JA==', true],
     ['sk_test_Y2xlcmsuY2xlcmsuZGV2JA==', false],
@@ -106,7 +106,7 @@ describe('isProductionFromApiKey(key)', () => {
   ];
 
   test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expected) => {
-    const result = isProductionFromApiKey(publishableKeyStr);
+    const result = isProductionFromSecretKey(publishableKeyStr);
     expect(result).toEqual(expected);
   });
 });

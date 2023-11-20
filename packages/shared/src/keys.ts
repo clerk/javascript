@@ -74,6 +74,6 @@ export function isDevelopmentFromSecretKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
 }
 
-export function isProductionFromApiKey(apiKey: string): boolean {
+export function isProductionFromSecretKey(apiKey: string): boolean {
   return apiKey.startsWith('live_') || apiKey.startsWith('sk_live_');
 }
