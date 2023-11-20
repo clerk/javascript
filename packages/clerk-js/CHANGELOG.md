@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.65.2
+
+### Patch Changes
+
+- A bug fix for prefetching data for OrganizationSwitcher and correctly displaying a notification count in the switcher as well. ([#2157](https://github.com/clerk/javascript/pull/2157)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`d5e8735c5`](https://github.com/clerk/javascript/commit/d5e8735c57d4b849a77e0b51fe0df5da4bccc5cb)]:
+  - @clerk/localizations@1.26.10
+
 ## 4.65.1
 
 ### Patch Changes

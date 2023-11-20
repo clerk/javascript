@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.26.10
+
+### Patch Changes
+
+- Add missing ru-RU localization keys ([#2171](https://github.com/clerk/javascript/pull/2171)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.26.9
 
 ### Patch Changes
