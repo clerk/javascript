@@ -7,7 +7,6 @@ import {
   Button,
   descriptors,
   Flex,
-  Grid,
   Icon,
   Image,
   localizationKeys,
@@ -79,13 +78,11 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const ButtonElement = preferBlockButtons ? SocialButtonBlock : SocialButtonIcon;
 
   return (
-    <Grid
+    <Flex
       elementDescriptor={descriptors.socialButtons}
       gap={2}
-      sx={t => ({
-        gridTemplateColumns: `repeat(auto-fit, minmax(${t.sizes.$12}, 1fr))`,
-        gridAutoRows: t.sizes.$8,
-      })}
+      wrap='wrap'
+      justify='center'
     >
       {strategies.map(strategy => {
         const label =
@@ -101,29 +98,36 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
             : undefined;
 
         return (
-          <ButtonElement
+          // This div is just a temp solution to add styles to the buttons without modifiying <ButtonElement />
+          <div
             key={strategy}
-            id={strategyToDisplayData[strategy].id}
-            onClick={startOauth(strategy)}
-            isLoading={card.loadingMetadata === strategy}
-            isDisabled={card.isLoading}
-            label={label}
-            textLocalizationKey={localizedText}
-            icon={
-              <Image
-                elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
-                elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
-                src={strategyToDisplayData[strategy].iconUrl}
-                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-                sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
-              />
-            }
-          />
+            style={{
+              minWidth: '100px',
+            }}
+          >
+            <ButtonElement
+              id={strategyToDisplayData[strategy].id}
+              onClick={startOauth(strategy)}
+              isLoading={card.loadingMetadata === strategy}
+              isDisabled={card.isLoading}
+              label={label}
+              textLocalizationKey={localizedText}
+              icon={
+                <Image
+                  elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
+                  elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
+                  isLoading={card.loadingMetadata === strategy}
+                  isDisabled={card.isLoading}
+                  src={strategyToDisplayData[strategy].iconUrl}
+                  alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                  sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
+                />
+              }
+            />
+          </div>
         );
       })}
-    </Grid>
+    </Flex>
   );
 });
 
