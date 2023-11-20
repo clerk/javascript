@@ -1,6 +1,6 @@
 import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import type { Ref } from 'react';
-import React, { forwardRef, isValidElement, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, isValidElement } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -16,34 +16,13 @@ import {
   Text,
   useAppearance,
 } from '../customizables';
-import { useEnabledThirdPartyProviders, useResizeObserver } from '../hooks';
+import { useEnabledThirdPartyProviders } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { useCardState } from './contexts';
 
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
-const MAX_STRATEGIES_PER_ROW = 6;
-
-function distributeStrategiesIntoRows<T>(items: T[]): T[][] {
-  if (items.length <= MAX_STRATEGIES_PER_ROW) return [items];
-
-  const numArrays = Math.ceil(items.length / MAX_STRATEGIES_PER_ROW);
-  const itemsPerArray = Math.ceil(items.length / numArrays);
-  const arrays: T[][] = Array.from({ length: numArrays }, () => []);
-
-  let currentArrayIndex = 0;
-
-  for (const item of items) {
-    arrays[currentArrayIndex].push(item);
-
-    if (arrays[currentArrayIndex].length === itemsPerArray) {
-      currentArrayIndex++;
-    }
-  }
-
-  return arrays;
-}
 
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
@@ -64,7 +43,6 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
-  const [firstStrategyRef, firstElementRect] = useResizeObserver();
 
   const strategies = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
@@ -74,8 +52,6 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   if (!strategies.length) {
     return null;
   }
-
-  const strategyRows = distributeStrategiesIntoRows([...strategies]);
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
@@ -103,68 +79,51 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const ButtonElement = preferBlockButtons ? SocialButtonBlock : SocialButtonIcon;
 
   return (
-    <Flex
-      direction='col'
+    <Grid
+      elementDescriptor={descriptors.socialButtons}
       gap={2}
+      sx={t => ({
+        gridTemplateColumns: `repeat(auto-fit, minmax(${t.sizes.$12}, 1fr))`,
+        gridAutoRows: t.sizes.$8,
+      })}
     >
-      {strategyRows.map((row, rowIndex) => (
-        <Grid
-          key={row.join('-')}
-          elementDescriptor={descriptors.socialButtons}
-          gap={2}
-          sx={{
-            // Allow the first row items to use the entire row's width, but the rest should have a fixed width based on the first row's items
-            gridTemplateColumns: `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
-            justifyContent: 'center',
-          }}
-        >
-          {row.map((strategy, strategyIndex) => {
-            const label =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
-                ? `Continue with ${strategyToDisplayData[strategy].name}`
-                : strategyToDisplayData[strategy].name;
+      {strategies.map(strategy => {
+        const label =
+          strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+            ? `Continue with ${strategyToDisplayData[strategy].name}`
+            : strategyToDisplayData[strategy].name;
 
-            const localizedText =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
-                ? localizationKeys('socialButtonsBlockButton', {
-                    provider: strategyToDisplayData[strategy].name,
-                  })
-                : undefined;
+        const localizedText =
+          strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+            ? localizationKeys('socialButtonsBlockButton', {
+                provider: strategyToDisplayData[strategy].name,
+              })
+            : undefined;
 
-            // When strategies break into 2 rows or more, use the first item of the first
-            // row as reference for the width of the buttons in the second row and beyond
-            const ref =
-              strategies.length > MAX_STRATEGIES_PER_ROW && rowIndex === 0 && strategyIndex === 0
-                ? firstStrategyRef
-                : null;
-
-            return (
-              <ButtonElement
-                key={strategy}
-                id={strategyToDisplayData[strategy].id}
-                ref={ref}
-                onClick={startOauth(strategy)}
+        return (
+          <ButtonElement
+            key={strategy}
+            id={strategyToDisplayData[strategy].id}
+            onClick={startOauth(strategy)}
+            isLoading={card.loadingMetadata === strategy}
+            isDisabled={card.isLoading}
+            label={label}
+            textLocalizationKey={localizedText}
+            icon={
+              <Image
+                elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
+                elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
-                label={label}
-                textLocalizationKey={localizedText}
-                icon={
-                  <Image
-                    elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
-                    elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
-                    isLoading={card.loadingMetadata === strategy}
-                    isDisabled={card.isLoading}
-                    src={strategyToDisplayData[strategy].iconUrl}
-                    alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-                    sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
-                  />
-                }
+                src={strategyToDisplayData[strategy].iconUrl}
+                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
               />
-            );
-          })}
-        </Grid>
-      ))}
-    </Flex>
+            }
+          />
+        );
+      })}
+    </Grid>
   );
 });
 
