@@ -20,10 +20,7 @@ export const jaJP: LocalizationResource = {
   formFieldLabel__emailAddresses: 'メールアドレス',
   formFieldLabel__phoneNumber: '電話番号',
   formFieldLabel__username: 'ユーザー名',
-  formFieldLabel__emailAddress_phoneNumber: 'メールアドレスまたは電話番号',
   formFieldLabel__emailAddress_username: 'メールアドレスまたはユーザー名',
-  formFieldLabel__phoneNumber_username: '電話番号またはユーザー名',
-  formFieldLabel__emailAddress_phoneNumber_username: 'メールアドレス、電話番号またはユーザー名',
   formFieldLabel__password: 'パスワード',
   formFieldLabel__currentPassword: '現在のパスワード',
   formFieldLabel__newPassword: '新しいパスワード',
@@ -40,10 +37,7 @@ export const jaJP: LocalizationResource = {
     'スペースまたはカンマで区切って、1つ以上のメールアドレスを入力または貼り付けてください',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -289,12 +283,10 @@ export const jaJP: LocalizationResource = {
       connectedAccountsSection: {
         title: '連携アカウント',
         primaryButton: 'アカウントを連携する',
-        title__conectionFailed: '接続の再試行',
         title__connectionFailed: '接続の再試行',
         title__reauthorize: '再認証が必要です',
         subtitle__reauthorize:
           '必要なスコープが更新されたため、機能が制限されている可能性があります。問題を回避するために、このアプリケーションを再認証してください',
-        actionLabel__conectionFailed: '再試行',
         actionLabel__connectionFailed: '再試行',
         actionLabel__reauthorize: '今すぐ認証',
         destructiveActionTitle: '削除',
@@ -540,10 +532,7 @@ export const jaJP: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: '表示するメンバーはありません',
       action__invite: '招待',
-      start: {
-        headerTitle__active: 'アクティブ',
-        headerTitle__invited: '招待済み',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'ユーザー',
         tableHeader__joined: '参加日時',
@@ -560,7 +549,6 @@ export const jaJP: LocalizationResource = {
   createOrganization: {
     title: '組織の作成',
     formButtonSubmit: '組織を作成する',
-    subtitle: '組織のプロフィールを設定する',
     invitePage: {
       formButtonReset: 'スキップ',
     },

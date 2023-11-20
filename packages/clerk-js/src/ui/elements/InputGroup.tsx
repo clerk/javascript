@@ -8,13 +8,13 @@ type InputGroupProps = PropsOfComponent<typeof Input>;
 export const InputGroup = forwardRef<
   HTMLInputElement,
   InputGroupProps & {
-    groupPreffix?: string;
+    groupPrefix?: string;
     groupSuffix?: string;
   }
 >((props, ref) => {
-  const { sx, groupPreffix, groupSuffix, ...rest } = props;
+  const { sx, groupPrefix, groupSuffix, ...rest } = props;
 
-  const inputBorder = groupPreffix
+  const inputBorder = groupPrefix
     ? {
         borderTopLeftRadius: '0',
         borderBottomLeftRadius: '0',
@@ -47,7 +47,7 @@ export const InputGroup = forwardRef<
         borderColor: theme.colors.$blackAlpha300, // we use this value in the Input primitive
       })}
     >
-      {groupPreffix && <Text sx={textProps}>{groupPreffix}</Text>}
+      {groupPrefix && <Text sx={textProps}>{groupPrefix}</Text>}
       <Input
         maxLength={25}
         sx={[

@@ -20,10 +20,7 @@ export const nbNO: LocalizationResource = {
   formFieldLabel__emailAddresses: 'E-postadresser',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__username: 'Brukernavn',
-  formFieldLabel__emailAddress_phoneNumber: 'E-postadresse eller telefonnummer',
   formFieldLabel__emailAddress_username: 'E-postadresse eller brukernavn',
-  formFieldLabel__phoneNumber_username: 'Telefonnummer eller brukernavn',
-  formFieldLabel__emailAddress_phoneNumber_username: 'E-postadresse, telefonnummer eller brukernavn',
   formFieldLabel__password: 'Passord',
   formFieldLabel__currentPassword: 'Nåværende passord',
   formFieldLabel__newPassword: 'Nytt passord',
@@ -40,10 +37,7 @@ export const nbNO: LocalizationResource = {
     'Skriv inn eller lim inn én eller flere e-postadresser, separert med mellomrom eller komma',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -288,12 +282,10 @@ export const nbNO: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Tilkoblede kontoer',
         primaryButton: 'Koble til konto',
-        title__conectionFailed: 'Prøv på nytt etter mislykket tilkobling',
         title__connectionFailed: 'Prøv på nytt etter mislykket tilkobling',
         title__reauthorize: 'Ny autorisasjon kreves',
         subtitle__reauthorize:
           'De nødvendige tillatelsene har blitt oppdatert, og du kan oppleve begrenset funksjonalitet. Vennligst autoriser denne applikasjonen på nytt for å unngå problemer.',
-        actionLabel__conectionFailed: 'Prøv på nytt',
         actionLabel__connectionFailed: 'Prøv på nytt',
         actionLabel__reauthorize: 'Autoriser nå',
         destructiveActionTitle: 'Fjern',
@@ -562,10 +554,7 @@ export const nbNO: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Ingen medlemmer å vise',
       action__invite: 'Inviter',
-      start: {
-        headerTitle__active: 'Aktive',
-        headerTitle__invited: 'Inviterte',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Bruker',
         tableHeader__joined: 'Ble med',
@@ -582,7 +571,6 @@ export const nbNO: LocalizationResource = {
   createOrganization: {
     title: 'Opprett organisasjon',
     formButtonSubmit: 'Opprett organisasjon',
-    subtitle: 'Angi organisasjonsprofilen',
     invitePage: {
       formButtonReset: 'Hopp over',
     },

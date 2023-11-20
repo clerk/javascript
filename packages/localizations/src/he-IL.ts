@@ -20,10 +20,7 @@ export const heIL: LocalizationResource = {
   formFieldLabel__emailAddresses: 'כתובות דוא"ל',
   formFieldLabel__phoneNumber: 'מספר טלפון',
   formFieldLabel__username: 'שם משתמש',
-  formFieldLabel__emailAddress_phoneNumber: 'כתובת דוא"ל או מספר טלפון',
   formFieldLabel__emailAddress_username: 'כתובת דוא"ל או שם משתמש',
-  formFieldLabel__phoneNumber_username: 'מספר טלפון או שם משתמש',
-  formFieldLabel__emailAddress_phoneNumber_username: 'כתובת דוא"ל, מספר טלפון או שם משתמש',
   formFieldLabel__password: 'סיסמה',
   formFieldLabel__currentPassword: 'סיסמה נוכחית',
   formFieldLabel__newPassword: 'סיסמה חדשה',
@@ -39,10 +36,7 @@ export const heIL: LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: 'הכנס או הדבק כתובת או כתובות דוא"ל, מופרדות ברווחים או פסיקים',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -286,12 +280,10 @@ export const heIL: LocalizationResource = {
       connectedAccountsSection: {
         title: 'חשבונות מחוברים',
         primaryButton: 'חבר חשבון',
-        title__conectionFailed: 'נסה שוב להתחבר',
         title__connectionFailed: 'נסה שוב להתחבר',
         title__reauthorize: 'נדרשת הרשאה מחדש',
         subtitle__reauthorize:
           'ההרשאות הדרושות עודכנו, וייתכן שאתה מגלה פונקציונליות מוגבלת. אנא הרשה מחדש את היישום כדי למנוע בעיות',
-        actionLabel__conectionFailed: 'נסה שוב',
         actionLabel__connectionFailed: 'נסה שוב',
         actionLabel__reauthorize: 'אשר עכשיו',
         destructiveActionTitle: 'הסר',
@@ -540,10 +532,7 @@ export const heIL: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'אין חברים להצגה',
       action__invite: 'הזמן',
-      start: {
-        headerTitle__active: 'פעיל',
-        headerTitle__invited: 'הוזמן',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'משתמש',
         tableHeader__joined: 'הצטרף',
@@ -560,7 +549,6 @@ export const heIL: LocalizationResource = {
   createOrganization: {
     title: 'צור ארגון',
     formButtonSubmit: 'צור ארגון',
-    subtitle: 'הגדר את פרופיל הארגון',
     invitePage: {
       formButtonReset: 'דלג',
     },

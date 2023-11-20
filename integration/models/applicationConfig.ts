@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 
+import { constants } from '../constants';
 import { createLogger, fs } from '../scripts';
 import { application } from './application.js';
 import type { EnvironmentConfig } from './environment';
@@ -62,10 +63,9 @@ export const applicationConfig = () => {
     commit: async (opts?: { stableHash?: string }) => {
       const { stableHash } = opts || {};
       logger.info(`Creating project "${name}"`);
-      const TMP_DIR = path.join(process.cwd(), '.temp_integration');
 
       const appDirName = stableHash || `${name}__${Date.now()}__${hash()}`;
-      const appDirPath = path.resolve(TMP_DIR, appDirName);
+      const appDirPath = path.resolve(constants.TMP_DIR, appDirName);
 
       // Copy template files
       for (const template of templates) {

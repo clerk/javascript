@@ -123,6 +123,6 @@ const Container = (props: React.PropsWithChildren) => {
         border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
       })}
       {...props}
-    ></Flex>
+    />
   );
 };

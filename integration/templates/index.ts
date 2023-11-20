@@ -7,6 +7,7 @@ export const templates = {
   'next-app-router': resolve(__dirname, './next-app-router'),
   'react-cra': resolve(__dirname, './react-cra'),
   'react-vite': resolve(__dirname, './react-vite'),
+  'express-vite': resolve(__dirname, './express-vite'),
   'remix-node': resolve(__dirname, './remix-node'),
 } as const;
 

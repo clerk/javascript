@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError } from '../errors';
-import type IsomorphicClerk from '../isomorphicClerk';
+import type { IsomorphicClerk } from '../isomorphicClerk';
 import { errorThrower } from '../utils';
 import { createGetToken, createSignOut } from './utils';
 

@@ -18,7 +18,7 @@ export function setCustomAttributeOnRequest(req: RequestLike, key: string, value
 }
 
 export function getCustomAttributeFromRequest(req: RequestLike, key: string): string | null | undefined {
-  // @ts-expect-error
+  // @ts-expect-error - TS doesn't like indexing into RequestLike
   return key in req ? req[key] : undefined;
 }
 

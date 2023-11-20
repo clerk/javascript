@@ -34,7 +34,6 @@ describe('applyTokensToString', function () {
 
   describe('Date related tokens and modifiers', () => {
     beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       jest.spyOn(console, 'warn').mockImplementation(() => {});
     });
 

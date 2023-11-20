@@ -20,10 +20,7 @@ export const arSA: LocalizationResource = {
   formFieldLabel__emailAddresses: 'العناوين الإلكترونية',
   formFieldLabel__phoneNumber: 'رقم الجوال',
   formFieldLabel__username: 'اسم المستخدم',
-  formFieldLabel__emailAddress_phoneNumber: 'العنوان الإلكتروني أو رقم الجوال',
   formFieldLabel__emailAddress_username: 'العنوان الإلكتروني أو اسم المستخدم',
-  formFieldLabel__phoneNumber_username: 'رقم الجوال أو اسم المستخدم',
-  formFieldLabel__emailAddress_phoneNumber_username: 'العنوان الإلكتروني, رقم الجوال أو اسم المستخدم',
   formFieldLabel__password: 'كلمة المرور',
   formFieldLabel__currentPassword: 'كلمة المرور الحالية',
   formFieldLabel__newPassword: 'كلمة المرور الجديدة',
@@ -46,10 +43,7 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: 'أدخل أو لصق عنوان بريد إلكتروني واحد أو أكثر ، مفصولة بمسافات أو فواصل',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -298,12 +292,10 @@ export const arSA: LocalizationResource = {
       connectedAccountsSection: {
         title: 'الحسابات المتصلة',
         primaryButton: 'ربط حساب',
-        title__conectionFailed: 'إعادة محاولة ربط الحساب',
         title__connectionFailed: 'إعادة محاولة ربط الحساب',
         title__reauthorize: 'مطلوب إعادة تفويض',
         subtitle__reauthorize:
           'تم تحديث النطاقات المطلوبة ، وقد تواجه وظائف محدودة. يرجى إعادة تفويض هذا التطبيق لتجنب أي مشاكل',
-        actionLabel__conectionFailed: 'حاول مرة أخرى',
         actionLabel__connectionFailed: 'حاول مرة أخرى',
         actionLabel__reauthorize: 'أعطى الصلاحية الآن',
         destructiveActionTitle: 'حذف',
@@ -636,9 +628,7 @@ export const arSA: LocalizationResource = {
       detailsTitle__emptyRow: 'لا يوجد أعضاء للعرض',
       action__invite: 'دعوة',
       start: {
-        headerTitle__active: 'نشط',
         headerTitle__members: 'الأعضاء',
-        headerTitle__invited: 'مدعو',
         headerTitle__invitations: 'الدعوات',
         headerTitle__requests: 'الطلبات',
       },
@@ -687,7 +677,6 @@ export const arSA: LocalizationResource = {
   createOrganization: {
     title: 'أنشاء منظمة',
     formButtonSubmit: 'أنشاء منظمة',
-    subtitle: 'تعيين الملف الشخصي للمنظمة',
     invitePage: {
       formButtonReset: 'تخطي',
     },

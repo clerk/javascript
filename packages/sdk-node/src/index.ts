@@ -46,8 +46,6 @@ export {
   users,
 };
 
-export default clerkClient;
-
 export type { ClerkMiddleware, ClerkMiddlewareOptions, LooseAuthProp, RequireAuthProp, StrictAuthProp, WithAuthProp };
 
 export { createClerkExpressRequireAuth, createClerkExpressWithAuth };

@@ -30,7 +30,7 @@ export enum TokenVerificationErrorAction {
   ContactSupport = 'Contact support@clerk.com',
   EnsureClerkJWT = 'Make sure that this is a valid Clerk generate JWT.',
   SetClerkJWTKey = 'Set the CLERK_JWT_KEY environment variable.',
-  SetClerkSecretKeyOrAPIKey = 'Set the CLERK_SECRET_KEY or CLERK_API_KEY environment variable.',
+  SetClerkSecretKey = 'Set the CLERK_SECRET_KEY environment variable.',
   EnsureClockSync = 'Make sure your system clock is in sync (e.g. turn off and on automatic time synchronization).',
 }
 

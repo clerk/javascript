@@ -132,7 +132,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: [ 'generic', 'nextjs' ]
+        test-name: [ 'generic', 'nextjs', 'express' ]
 
     steps:
       - name: Checkout Repo

@@ -20,10 +20,7 @@ export const svSE: LocalizationResource = {
   formFieldLabel__emailAddresses: 'E-postadresser',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__username: 'Användarnamn',
-  formFieldLabel__emailAddress_phoneNumber: 'E-postadress eller telefonnummer',
   formFieldLabel__emailAddress_username: 'E-postadress eller användarnamn',
-  formFieldLabel__phoneNumber_username: 'Telefonnummer eller användarnamn',
-  formFieldLabel__emailAddress_phoneNumber_username: 'E-postadress, telefonnummer eller användarnamn',
   formFieldLabel__password: 'Lösenord',
   formFieldLabel__currentPassword: 'Nuvarande lösenord',
   formFieldLabel__newPassword: 'Nytt lösenord',
@@ -39,10 +36,7 @@ export const svSE: LocalizationResource = {
     'Ange eller klistra in en eller flera e-postadresser, separerade med mellanslag eller kommatecken',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -260,12 +254,10 @@ export const svSE: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Anslutna konton',
         primaryButton: 'Anslut konto',
-        title__conectionFailed: 'Försök igen efter misslyckad anslutning',
         title__connectionFailed: 'Försök igen efter misslyckad anslutning',
         title__reauthorize: 'Nyautorisering krävs',
         subtitle__reauthorize:
           'De nödvändiga åtkomstbehörigheterna har uppdaterats och du kan uppleva begränsad funktionalitet. Vänligen nyautorisera den här applikationen för att undvika eventuella problem.',
-        actionLabel__conectionFailed: 'Försök igen',
         actionLabel__connectionFailed: 'Försök igen',
         actionLabel__reauthorize: 'Autorisera nu',
         destructiveActionTitle: 'Ta bort',
@@ -521,10 +513,7 @@ export const svSE: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Inga medlemmar att visa',
       action__invite: 'Bjud in',
-      start: {
-        headerTitle__active: 'Aktiva',
-        headerTitle__invited: 'Inbjudna',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Användare',
         tableHeader__joined: 'Gick med',
@@ -542,7 +531,6 @@ export const svSE: LocalizationResource = {
   createOrganization: {
     title: 'Skapa organisation',
     formButtonSubmit: 'Skapa organisation',
-    subtitle: 'Ställ in organisationsprofilen',
     invitePage: {
       formButtonReset: 'Hoppa över',
     },

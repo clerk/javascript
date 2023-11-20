@@ -21,8 +21,7 @@ function assertSignedOut(
   },
 ) {
   assert.propEqual(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.SignedOut,
     isSignedIn: false,
@@ -66,8 +65,7 @@ function assertInterstitial(
   },
 ) {
   assert.propContains(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.Interstitial,
     isSignedIn: false,
@@ -86,8 +84,7 @@ function assertInterstitial(
 
 function assertUnknown(assert, requestState: RequestState, reason: AuthReason) {
   assert.propContains(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     status: AuthStatus.Unknown,
     isSignedIn: false,
     isInterstitial: false,
@@ -128,8 +125,7 @@ function assertSignedIn(
   },
 ) {
   assert.propContains(requestState, {
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
+    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.SignedIn,
     isSignedIn: true,
@@ -148,26 +144,55 @@ function assertSignedIn(
 export default (QUnit: QUnit) => {
   const { module, test, skip } = QUnit;
 
-  /* An otherwise bare state on a request. */
-  const defaultMockAuthenticateRequestOptions = {
-    apiKey: 'deadbeef',
-    secretKey: '',
-    apiUrl: 'https://api.clerk.test',
-    apiVersion: 'v1',
-    frontendApi: 'cafe.babe.clerk.ts',
-    publishableKey: '',
-    proxyUrl: '',
+  const defaultHeaders: Record<string, string> = {
     host: 'example.com',
-    userAgent: 'Mozilla/TestAgent',
-    skipJwksCache: true,
-    isSatellite: false,
-    signInUrl: '',
-    signUpUrl: '',
-    afterSignInUrl: '',
-    afterSignUpUrl: '',
-    domain: '',
-    searchParams: new URLSearchParams(),
-  } satisfies AuthenticateRequestOptions;
+    'user-agent': 'Mozilla/TestAgent',
+  };
+
+  /* An otherwise bare state on a request. */
+  const defaultMockAuthenticateRequestOptions = (headers = defaultHeaders, requestUrl = 'http://clerk.com/path') =>
+    ({
+      secretKey: 'deadbeef',
+      apiUrl: 'https://api.clerk.test',
+      apiVersion: 'v1',
+      publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
+      proxyUrl: '',
+      skipJwksCache: true,
+      isSatellite: false,
+      signInUrl: '',
+      signUpUrl: '',
+      afterSignInUrl: '',
+      afterSignUpUrl: '',
+      domain: '',
+      request: new Request(requestUrl, { headers }),
+    } satisfies AuthenticateRequestOptions);
+
+  const defaultMockHeaderAuthOptions = (headers = defaultHeaders, requestUrl?) => {
+    return {
+      ...defaultMockAuthenticateRequestOptions(
+        {
+          authorization: mockJwt,
+          ...headers,
+        },
+        requestUrl,
+      ),
+    };
+  };
+
+  const defaultMockCookieAuthOptions = (headers = defaultHeaders, cookies = {}, requestUrl?) => {
+    const cookieStr = Object.entries(cookies)
+      .map(([k, v]) => `${k}=${v}`)
+      .join(';');
+    return {
+      ...defaultMockAuthenticateRequestOptions(
+        {
+          cookie: cookieStr,
+          ...headers,
+        },
+        requestUrl,
+      ),
+    };
+  };
 
   module('tokens.authenticateRequest(options)', hooks => {
     let fakeClock;
@@ -192,8 +217,7 @@ export default (QUnit: QUnit) => {
     test('returns signed out state if jwk fails to load from remote', async assert => {
       fakeFetch.onCall(0).returns(jsonOk({}));
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        headerToken: mockJwt,
+        ...defaultMockHeaderAuthOptions(),
         skipJwksCache: false,
       });
 
@@ -207,10 +231,7 @@ export default (QUnit: QUnit) => {
     });
 
     test('headerToken: returns signed in state when a valid token [1y.2y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        headerToken: mockJwt,
-      });
+      const requestState = await authenticateRequest(defaultMockHeaderAuthOptions());
 
       assertSignedIn(assert, requestState);
       assertSignedInToAuth(assert, requestState);
@@ -225,8 +246,7 @@ export default (QUnit: QUnit) => {
 
     test('headerToken: returns signed out state when a token with invalid authorizedParties [1y.2n]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        headerToken: mockJwt,
+        ...defaultMockHeaderAuthOptions(),
         authorizedParties: ['whatever'],
       });
 
@@ -243,20 +263,19 @@ export default (QUnit: QUnit) => {
       // advance clock for 1 hour
       fakeClock.tick(3600 * 1000);
 
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        headerToken: mockJwt,
-      });
+      const requestState = await authenticateRequest(defaultMockHeaderAuthOptions());
 
       assertUnknown(assert, requestState, TokenVerificationErrorReason.TokenExpired);
       assert.strictEqual(requestState.toAuth(), null);
     });
 
     test('headerToken: returns signed out state when invalid signature [1y.2n]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        headerToken: mockInvalidSignatureJwt,
-      });
+      const requestState = await authenticateRequest(
+        defaultMockHeaderAuthOptions({
+          ...defaultHeaders,
+          authorization: mockInvalidSignatureJwt,
+        }),
+      );
 
       const errMessage = 'JWT signature is invalid. (reason=token-invalid-signature, token-carrier=header)';
       assertSignedOut(assert, requestState, {
@@ -267,10 +286,12 @@ export default (QUnit: QUnit) => {
     });
 
     test('headerToken: returns signed out state when an malformed token [1y.1n]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        headerToken: 'test_header_token',
-      });
+      const requestState = await authenticateRequest(
+        defaultMockHeaderAuthOptions({
+          ...defaultHeaders,
+          authorization: 'test_header_token',
+        }),
+      );
 
       const errMessage =
         'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, token-carrier=header)';
@@ -286,12 +307,16 @@ export default (QUnit: QUnit) => {
     //
 
     test('cookieToken: returns signed out state when cross-origin request [2y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        origin: 'https://clerk.com',
-        forwardedProto: 'http',
-        cookieToken: mockJwt,
-      });
+      const requestState = await authenticateRequest(
+        defaultMockCookieAuthOptions(
+          {
+            ...defaultHeaders,
+            origin: 'https://clerk.com',
+            'x-forwarded-proto': 'http',
+          },
+          { __session: mockJwt },
+        ),
+      );
 
       assertSignedOut(assert, requestState, {
         reason: AuthErrorReason.HeaderMissingCORS,
@@ -302,11 +327,14 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns signed out when non browser requests in development [3y]', async assert => {
       const nonBrowserUserAgent = 'curl';
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'test_deadbeef',
-        userAgent: nonBrowserUserAgent,
-        clientUat: '12345',
-        cookieToken: mockJwt,
+        ...defaultMockCookieAuthOptions(
+          {
+            ...defaultHeaders,
+            'user-agent': nonBrowserUserAgent,
+          },
+          { __client_uat: '12345', __session: mockJwt },
+        ),
+        secretKey: 'test_deadbeef',
       });
 
       assertSignedOut(assert, requestState, { reason: AuthErrorReason.HeaderMissingNonBrowser });
@@ -315,8 +343,13 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns interstitial when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'deadbeef',
+        ...defaultMockCookieAuthOptions(
+          {
+            ...defaultHeaders,
+          },
+          { __client_uat: '0' },
+        ),
+        secretKey: 'deadbeef',
         clientUat: '0',
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
@@ -335,13 +368,17 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns signed out is satellite but a non-browser request [11y]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'deadbeef',
-        clientUat: '0',
+        ...defaultMockCookieAuthOptions(
+          {
+            ...defaultHeaders,
+            'user-agent': '[some-agent]',
+          },
+          { __client_uat: '0' },
+        ),
+        secretKey: 'deadbeef',
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
-        userAgent: '[some-agent]',
       });
 
       assertSignedOut(assert, requestState, {
@@ -353,9 +390,9 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    test('returns interstitial when app is satellite, returns from primary and is dev instance [13y]', async assert => {
+    test('cookieToken: returns interstitial when app is satellite, returns from primary and is dev instance [13y]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
+        ...defaultMockCookieAuthOptions(),
         secretKey: 'sk_test_deadbeef',
         signInUrl: 'http://primary.example/sign-in',
         isSatellite: true,
@@ -375,13 +412,11 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns interstitial when app is not satellite and responds to syncing on dev instances[12y]', async assert => {
       const sp = new URLSearchParams();
       sp.set('__clerk_satellite_url', 'http://localhost:3000');
+      const requestUrl = `http://clerk.com/path?${sp.toString()}`;
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'sk_test_deadbeef',
-        clientUat: '12345',
+        ...defaultMockCookieAuthOptions(defaultHeaders, { __client_uat: '12345', __session: mockJwt }, requestUrl),
+        secretKey: 'sk_test_deadbeef',
         isSatellite: false,
-        cookieToken: mockJwt,
-        searchParams: sp,
       });
 
       assertInterstitial(assert, requestState, {
@@ -393,8 +428,8 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns signed out when no cookieToken and no clientUat in production [4y]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'live_deadbeef',
+        ...defaultMockCookieAuthOptions(),
+        secretKey: 'live_deadbeef',
       });
 
       assertSignedOut(assert, requestState, {
@@ -405,9 +440,8 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns interstitial when no clientUat in development [5y]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        cookieToken: mockJwt,
-        apiKey: 'test_deadbeef',
+        ...defaultMockCookieAuthOptions(defaultHeaders, { __session: mockJwt }),
+        secretKey: 'test_deadbeef',
       });
 
       assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieUATMissing });
@@ -418,10 +452,8 @@ export default (QUnit: QUnit) => {
     // Omit because it caused view-source to always returns the interstitial in development mode (there's no referrer for view-source)
     skip('cookieToken: returns interstitial when no referrer in development [6y]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        cookieToken: mockJwt,
-        apiKey: 'test_deadbeef',
-        clientUat: '12345',
+        ...defaultMockCookieAuthOptions(defaultHeaders, { __client_uat: '12345', __session: mockJwt }),
+        secretKey: 'test_deadbeef',
       });
 
       assertInterstitial(assert, requestState, { reason: AuthErrorReason.CrossOriginReferrer });
@@ -432,11 +464,15 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns interstitial when crossOriginReferrer in development [6y]', async assert => {
       // Scenario: after auth action on Clerk-hosted UIs
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        cookieToken: mockJwt,
-        apiKey: 'test_deadbeef',
-        clientUat: '12345',
-        referrer: 'https://clerk.com',
+        ...defaultMockCookieAuthOptions(
+          {
+            ...defaultHeaders,
+            // this is not a typo, it's intentional to be `referer` to match HTTP header key
+            referer: 'https://clerk.com',
+          },
+          { __client_uat: '12345', __session: mockJwt },
+        ),
+        secretKey: 'test_deadbeef',
       });
 
       assertInterstitial(assert, requestState, { reason: AuthErrorReason.CrossOriginReferrer });
@@ -447,11 +483,15 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns undefined when crossOriginReferrer in development and is satellite [6n]', async assert => {
       // Scenario: after auth action on Clerk-hosted UIs
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        cookieToken: mockJwt,
-        apiKey: 'pk_test_deadbeef',
-        clientUat: '12345',
-        referrer: 'https://clerk.com',
+        ...defaultMockCookieAuthOptions(
+          {
+            ...defaultHeaders,
+            // this is not a typo, it's intentional to be `referer` to match HTTP header key
+            referer: 'https://clerk.com',
+          },
+          { __client_uat: '12345', __session: mockJwt },
+        ),
+        secretKey: 'pk_test_deadbeef',
         isSatellite: true,
         signInUrl: 'https://localhost:3000/sign-in/',
         domain: 'localhost:3001',
@@ -474,9 +514,8 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken [8y]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'deadbeef',
-        clientUat: '1234',
+        ...defaultMockCookieAuthOptions(defaultHeaders, { __client_uat: '12345' }),
+        secretKey: 'deadbeef',
       });
 
       assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieMissing });
@@ -486,8 +525,7 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns signed out when clientUat = 0 and no cookieToken [9y]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        clientUat: '0',
+        ...defaultMockCookieAuthOptions(defaultHeaders, { __client_uat: '0' }),
       });
 
       assertSignedOut(assert, requestState, {
@@ -497,11 +535,12 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns interstitial when clientUat > cookieToken.iat [10n]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        cookieToken: mockJwt,
-        clientUat: `${mockJwtPayload.iat + 10}`,
-      });
+      const requestState = await authenticateRequest(
+        defaultMockCookieAuthOptions(defaultHeaders, {
+          __client_uat: `${mockJwtPayload.iat + 10}`,
+          __session: mockJwt,
+        }),
+      );
 
       assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieOutDated });
       assert.equal(requestState.message, '');
@@ -509,11 +548,12 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns signed out when cookieToken.iat >= clientUat and malformed token [10y.1n]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        cookieToken: mockMalformedJwt,
-        clientUat: `${mockJwtPayload.iat - 10}`,
-      });
+      const requestState = await authenticateRequest(
+        defaultMockCookieAuthOptions(defaultHeaders, {
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: mockMalformedJwt,
+        }),
+      );
 
       const errMessage =
         'Subject claim (sub) is required and must be a string. Received undefined. Make sure that this is a valid Clerk generate JWT. (reason=token-verification-failed, token-carrier=cookie)';
@@ -525,11 +565,12 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns signed in when cookieToken.iat >= clientUat and valid token [10y.2y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        cookieToken: mockJwt,
-        clientUat: `${mockJwtPayload.iat - 10}`,
-      });
+      const requestState = await authenticateRequest(
+        defaultMockCookieAuthOptions(defaultHeaders, {
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: mockJwt,
+        }),
+      );
 
       assertSignedIn(assert, requestState);
       assertSignedInToAuth(assert, requestState);
@@ -546,11 +587,12 @@ export default (QUnit: QUnit) => {
       // advance clock for 1 hour
       fakeClock.tick(3600 * 1000);
 
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        cookieToken: mockJwt,
-        clientUat: `${mockJwtPayload.iat - 10}`,
-      });
+      const requestState = await authenticateRequest(
+        defaultMockCookieAuthOptions(defaultHeaders, {
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: mockJwt,
+        }),
+      );
 
       assertInterstitial(assert, requestState, { reason: TokenVerificationErrorReason.TokenExpired });
       assert.true(/^JWT is expired/.test(requestState.message || ''));
@@ -559,11 +601,14 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns signed in for Amazon Cloudfront userAgent', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'test_deadbeef',
-        userAgent: 'Amazon CloudFront',
-        clientUat: '12345',
-        cookieToken: mockJwt,
+        ...defaultMockCookieAuthOptions(
+          {
+            ...defaultHeaders,
+            'user-agent': 'Amazon CloudFront',
+          },
+          { __client_uat: `12345`, __session: mockJwt },
+        ),
+        secretKey: 'test_deadbeef',
       });
 
       assertSignedIn(assert, requestState);
@@ -577,34 +622,23 @@ export default (QUnit: QUnit) => {
       origin: '',
       host: '',
       forwardedHost: '',
-      forwardedPort: '',
       forwardedProto: '',
       referrer: '',
       userAgent: '',
     };
 
-    test('returns options even if headers exist', async assert => {
-      const headers = key => (key === 'x-forwarded-proto' ? 'https' : '');
-      const options = { forwardedProto: 'http' };
-      assert.propEqual(loadOptionsFromHeaders(options, headers), {
-        ...defaultOptions,
-        forwardedProto: 'http',
-      });
-    });
-
-    test('returns forwarded headers from headers', async assert => {
+    test('returns forwarded headers from headers', assert => {
       const headersData = { 'x-forwarded-proto': 'http', 'x-forwarded-port': '80', 'x-forwarded-host': 'example.com' };
       const headers = key => headersData[key] || '';
 
-      assert.propEqual(loadOptionsFromHeaders({}, headers), {
+      assert.propEqual(loadOptionsFromHeaders(headers), {
         ...defaultOptions,
         forwardedProto: 'http',
-        forwardedPort: '80',
         forwardedHost: 'example.com',
       });
     });
 
-    test('returns Cloudfront forwarded proto from headers even if forwarded proto header exists', async assert => {
+    test('returns Cloudfront forwarded proto from headers even if forwarded proto header exists', assert => {
       const headersData = {
         'cloudfront-forwarded-proto': 'https',
         'x-forwarded-proto': 'http',
@@ -613,10 +647,9 @@ export default (QUnit: QUnit) => {
       };
       const headers = key => headersData[key] || '';
 
-      assert.propEqual(loadOptionsFromHeaders({}, headers), {
+      assert.propEqual(loadOptionsFromHeaders(headers), {
         ...defaultOptions,
         forwardedProto: 'https',
-        forwardedPort: '80',
         forwardedHost: 'example.com',
       });
     });

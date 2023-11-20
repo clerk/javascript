@@ -23,6 +23,6 @@ export const ExternalElementMounter = ({ mount, unmount, ...rest }: ExternalElem
     <div
       ref={nodeRef}
       {...rest}
-    ></div>
+    />
   );
 };

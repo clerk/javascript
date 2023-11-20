@@ -1,4 +1,4 @@
-import { deprecated, errorThrower, parsePublishableKey } from './util/shared';
+import { errorThrower, parsePublishableKey } from './util/shared';
 
 type RedirectAdapter = (url: string) => any;
 
@@ -30,19 +30,10 @@ type RedirectParams = {
   signInUrl?: string;
   signUpUrl?: string;
   publishableKey?: string;
-  /**
-   * @deprecated Use `publishableKey` instead.
-   */
-  frontendApi?: string;
 };
 
-export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, publishableKey }: RedirectParams) {
-  if (!frontendApi) {
-    frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
-  } else {
-    deprecated('frontendApi', 'Use `publishableKey` instead.');
-  }
-
+export function redirect({ redirectAdapter, signUpUrl, signInUrl, publishableKey }: RedirectParams) {
+  const frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
   const accountsBaseUrl = buildAccountsBaseUrl(frontendApi);
 
   const redirectToSignUp = ({ returnBackUrl }: SignUpParams = {}) => {

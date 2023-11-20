@@ -8,7 +8,7 @@ const ClerkRemixOptionsCtx = React.createContext<{ value: ClerkRemixContextValue
 ClerkRemixOptionsCtx.displayName = 'ClerkRemixOptionsCtx';
 
 const useClerkRemixOptions = () => {
-  const ctx = React.useContext(ClerkRemixOptionsCtx)!;
+  const ctx = React.useContext(ClerkRemixOptionsCtx) as { value: ClerkRemixContextValue };
   return ctx.value;
 };
 

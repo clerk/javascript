@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "1.0.0-alpha-v5.0",
+  "version": "1.0.0-alpha-v5.2",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -45,12 +45,12 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/clerk-js": "5.0.0-alpha-v5.0",
-    "@clerk/clerk-react": "5.0.0-alpha-v5.0"
+    "@clerk/clerk-js": "5.0.0-alpha-v5.2",
+    "@clerk/clerk-react": "5.0.0-alpha-v5.2"
   },
   "devDependencies": {
     "@types/chrome": "*",
-    "@types/node": "^18.18.0",
+    "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "eslint-config-custom": "*",
@@ -58,10 +58,11 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=16"
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public"

@@ -10,6 +10,7 @@ import {
   noop,
   parsePublishableKey,
   proxyUrlToAbsoluteURL,
+  setDevBrowserJWTInURL,
   stripScheme,
 } from '@clerk/shared';
 import type {
@@ -59,6 +60,7 @@ import {
   appendAsQueryParams,
   buildURL,
   completeSignUpFlow,
+  createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createCookieHandler,
   createPageLifecycle,
@@ -77,7 +79,6 @@ import {
   removeClerkQueryParam,
   requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
-  setDevBrowserJWTInURL,
   stripOrigin,
   stripSameOrigin,
   toURL,
@@ -86,7 +87,7 @@ import {
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
 import type { DevBrowserHandler } from './devBrowserHandler';
-import createDevBrowserHandler from './devBrowserHandler';
+import { createDevBrowserHandler } from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
   clerkInvalidSignInUrlFormat,
@@ -98,7 +99,7 @@ import {
   clerkRedirectUrlIsMissingScheme,
 } from './errors';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
-import createFapiClient from './fapiClient';
+import { createFapiClient } from './fapiClient';
 import {
   BaseResource,
   Client,
@@ -134,7 +135,7 @@ const defaultOptions: ClerkOptions = {
   isInterstitial: false,
 };
 
-export default class Clerk implements ClerkInterface {
+export class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
 
   public static version: string = __PKG_VERSION__;
@@ -264,6 +265,11 @@ export default class Clerk implements ClerkInterface {
       ...defaultOptions,
       ...options,
     };
+
+    this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
+      this.#options.allowedRedirectOrigins,
+      this.frontendApi,
+    );
 
     if (this.#options.standardBrowser) {
       this.#isReady = await this.#loadInStandardBrowser();

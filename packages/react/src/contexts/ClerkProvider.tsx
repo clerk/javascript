@@ -1,9 +1,8 @@
 import { isPublishableKey } from '@clerk/shared/keys';
-import type { InitialState } from '@clerk/types';
 import React from 'react';
 
 import { multipleClerkProvidersError } from '../errors';
-import type { IsomorphicClerkOptions } from '../types';
+import type { ClerkProviderProps } from '../types';
 import { __internal__setErrorThrowerOptions, errorThrower, withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';
 import { StructureContext, StructureContextStates } from './StructureContext';
@@ -11,11 +10,6 @@ import { StructureContext, StructureContextStates } from './StructureContext';
 __internal__setErrorThrowerOptions({
   packageName: '@clerk/clerk-react',
 });
-
-export type ClerkProviderProps = IsomorphicClerkOptions & {
-  children: React.ReactNode;
-  initialState?: InitialState;
-};
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const { initialState, children, ...restIsomorphicClerkOptions } = props;

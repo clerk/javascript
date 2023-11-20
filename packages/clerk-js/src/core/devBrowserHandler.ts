@@ -1,5 +1,11 @@
-import { buildURL, createCookieHandler, getDevBrowserJWTFromURL, isDevOrStagingUrl, runIframe } from '../utils';
-import { DEV_BROWSER_SSO_JWT_HTTP_HEADER, DEV_BROWSER_SSO_JWT_KEY, DEV_BROWSER_SSO_JWT_PARAMETER } from './constants';
+import {
+  DEV_BROWSER_SSO_JWT_KEY,
+  getDevBrowserJWTFromResponse,
+  getDevBrowserJWTFromURL,
+  setDevBrowserJWTInURL,
+} from '@clerk/shared/devBrowser';
+
+import { buildURL, createCookieHandler, isDevOrStagingUrl, runIframe } from '../utils';
 import { clerkErrorDevInitFailed } from './errors';
 import type { FapiClient } from './fapiClient';
 
@@ -23,7 +29,7 @@ export type CreateDevBrowserHandlerOptions = {
 };
 
 // export type DevBrowserHandler = ReturnType<typeof createDevBrowserHandler>;
-export default function createDevBrowserHandler({
+export function createDevBrowserHandler({
   frontendApi,
   fapiClient,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
@@ -157,13 +163,13 @@ export default function createDevBrowserHandler({
     if (devOrStgApi) {
       fapiClient.onBeforeRequest(request => {
         const devBrowserJWT = getDevBrowserJWT();
-        if (devBrowserJWT) {
-          request.url?.searchParams.set(DEV_BROWSER_SSO_JWT_PARAMETER, devBrowserJWT);
+        if (devBrowserJWT && request?.url) {
+          request.url = setDevBrowserJWTInURL(request.url, devBrowserJWT, true);
         }
       });
 
       fapiClient.onAfterResponse((_, response) => {
-        const newDevBrowserJWT = response?.headers?.get(DEV_BROWSER_SSO_JWT_HTTP_HEADER);
+        const newDevBrowserJWT = getDevBrowserJWTFromResponse(response);
         if (newDevBrowserJWT) {
           setDevBrowserJWT(newDevBrowserJWT);
         }

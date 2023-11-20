@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "1.26.8-alpha-v5.0",
+  "version": "2.0.0-alpha-v5.2",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -38,17 +38,18 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-alpha-v5.0",
-    "@types/node": "^18.18.0",
+    "@clerk/types": "4.0.0-alpha-v5.2",
+    "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=16"
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public"

@@ -1,5 +1,6 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
-import { buildRequestUrl, constants } from '@clerk/backend';
+import { buildRequestUrl, constants, TokenVerificationErrorReason } from '@clerk/backend';
+import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
 import type { Autocomplete } from '@clerk/types';
 import type Link from 'next/link';
@@ -10,7 +11,6 @@ import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
 import { SECRET_KEY } from './constants';
-import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import {
   clockSkewDetected,
   infiniteRedirectLoopDetected,
@@ -349,7 +349,7 @@ const assertClockSkew = (requestState: RequestState, opts: AuthMiddlewareParams)
     return;
   }
 
-  if (requestState.reason === 'token-not-active-yet') {
+  if (requestState.reason === TokenVerificationErrorReason.TokenNotActiveYet) {
     throw new Error(clockSkewDetected(requestState.message));
   }
 };
@@ -371,7 +371,7 @@ const assertInfiniteRedirectionLoop = (
   if (infiniteRedirectsCounter === 6) {
     // Infinite redirect detected, is it clock skew?
     // We check for token-expired here because it can be a valid, recoverable scenario, but in a redirect loop a token-expired error likely indicates clock skew.
-    if (requestState.reason === 'token-expired') {
+    if (requestState.reason === TokenVerificationErrorReason.TokenExpired) {
       throw new Error(clockSkewDetected(requestState.message));
     }
 

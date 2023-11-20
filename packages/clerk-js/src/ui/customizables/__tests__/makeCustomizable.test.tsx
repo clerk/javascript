@@ -1,11 +1,10 @@
-// eslint-disable-next-line simple-import-sort/imports
-import { render, screen } from '../../../testUtils';
 import React from 'react';
 
+import { render, screen } from '../../../testUtils';
+import { InternalThemeProvider } from '../../styledSystem';
 import { Box, descriptors } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
 import { knownColors } from './testUtils';
-import { InternalThemeProvider } from '../../styledSystem';
 
 describe('Theme used in sx callback', () => {
   it('styles match the theme/globalAppearance', () => {
@@ -120,7 +119,7 @@ describe('Styles for specific elements', () => {
       <Box
         data-testid='test'
         elementDescriptor={descriptors.formButtonPrimary}
-        isLoading={true}
+        isLoading
       />,
     );
     expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');
@@ -158,7 +157,7 @@ describe('Styles for specific elements', () => {
       <Box
         data-testid='test'
         elementDescriptor={descriptors.navbarButton}
-        isActive={true}
+        isActive
       />,
     );
     expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');
@@ -198,7 +197,7 @@ describe('Styles for specific elements', () => {
       <Box
         data-testid='test'
         elementDescriptor={descriptors.navbarButton}
-        hasError={true}
+        hasError
       />,
     );
     expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');
@@ -241,7 +240,7 @@ describe('Styles for specific elements', () => {
       <Box
         data-testid='test'
         elementDescriptor={descriptors.navbarButton}
-        isOpen={true}
+        isOpen
       />,
     );
     expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');
@@ -283,7 +282,7 @@ describe('Styles for specific elements', () => {
       <Box
         data-testid='test'
         elementDescriptor={descriptors.navbarButton}
-        isLoading={true}
+        isLoading
       />,
     );
     expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('red');

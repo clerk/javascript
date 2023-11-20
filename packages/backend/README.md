@@ -57,7 +57,7 @@ npm install @clerk/backend
 ```
 import { Clerk } from '@clerk/backend';
 
-const clerk = Clerk({ apiKey: '...' });
+const clerk = Clerk({ secretKey: '...' });
 
 await clerk.users.getUser("user_...");
 ```
@@ -71,7 +71,7 @@ Create Clerk SDK that includes an HTTP Rest client for the Backend API and sessi
 ```js
 import { Clerk } from '@clerk/backend';
 
-const clerk = Clerk({ apiKey: '...' });
+const clerk = Clerk({ secretKey: '...' });
 
 await clerk.users.getUser('user_...');
 
@@ -100,9 +100,6 @@ clerk.debugRequestState(requestState);
 
 // Load clerk interstitial from this package
 clerk.localInterstitial(options);
-
-// Load clerk interstitial from the public Backend API endpoint
-clerk.remotePublicInterstitial(options);
 
 // Load clerk interstitial from the public Private API endpoint (Deprecated)
 clerk.remotePrivateInterstitial(options);
@@ -174,7 +171,7 @@ import { loadInterstitialFromLocal } from '@clerk/backend';
 
 loadInterstitialFromLocal({
   frontendApi: '...',
-  pkgVersion: '...',
+  clerkJSVersion: '...',
   debugData: {},
 });
 ```

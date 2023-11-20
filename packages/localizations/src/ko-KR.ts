@@ -20,10 +20,7 @@ export const koKR: LocalizationResource = {
   formFieldLabel__emailAddresses: '이메일 주소',
   formFieldLabel__phoneNumber: '휴대폰 번호',
   formFieldLabel__username: '사용자 이름',
-  formFieldLabel__emailAddress_phoneNumber: '이메일 주소 혹은 휴대폰 번호',
   formFieldLabel__emailAddress_username: '이메일 주소 혹은 사용자 이름',
-  formFieldLabel__phoneNumber_username: '휴대폰 번호 혹은 사용자 이름',
-  formFieldLabel__emailAddress_phoneNumber_username: '이메일 주소, 휴대폰 번호 혹은 사용자 이름',
   formFieldLabel__password: '비밀번호',
   formFieldLabel__currentPassword: '현재 비밀번호',
   formFieldLabel__newPassword: '새 비밀번호',
@@ -40,10 +37,7 @@ export const koKR: LocalizationResource = {
     '하나 이상의 이메일 주소를 공백 또는 쉼표로 구분하여 입력하거나 붙여넣습니다',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -286,12 +280,10 @@ export const koKR: LocalizationResource = {
       connectedAccountsSection: {
         title: '연결된 계정',
         primaryButton: '계정 연결하기',
-        title__conectionFailed: '연결 실패 재시도',
         title__connectionFailed: '연결 실패 재시도',
         title__reauthorize: '재인증 필요',
         subtitle__reauthorize:
           '필수 범위가 업데이트되어 기능이 제한될 수 있습니다. 문제를 방지하려면 이 애플리케이션을 다시 승인하세요',
-        actionLabel__conectionFailed: '재시도',
         actionLabel__connectionFailed: '재시도',
         actionLabel__reauthorize: '지금 인증하기',
         destructiveActionTitle: '제거',
@@ -562,10 +554,7 @@ export const koKR: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: '표시할 멤버 없음',
       action__invite: '초대',
-      start: {
-        headerTitle__active: '활성',
-        headerTitle__invited: '초대됨',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: '사용자',
         tableHeader__joined: '가입됨',
@@ -582,7 +571,6 @@ export const koKR: LocalizationResource = {
   createOrganization: {
     title: '조직 만들기',
     formButtonSubmit: '조직 만들기',
-    subtitle: '조직 프로필 설정',
     invitePage: {
       formButtonReset: '넘기기',
     },

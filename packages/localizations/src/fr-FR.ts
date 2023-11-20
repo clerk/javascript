@@ -20,10 +20,7 @@ export const frFR: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Adresses e-mail',
   formFieldLabel__phoneNumber: 'Numéro de téléphone',
   formFieldLabel__username: "Nom d'utilisateur",
-  formFieldLabel__emailAddress_phoneNumber: 'Adresse e-mail ou numéro de téléphone',
   formFieldLabel__emailAddress_username: "Adresse email ou nom d'utilisateur",
-  formFieldLabel__phoneNumber_username: "numéro de téléphone ou nom d'utilisateur",
-  formFieldLabel__emailAddress_phoneNumber_username: "Adresse e-mail, numéro de téléphone ou nom d'utilisateur",
   formFieldLabel__password: 'Mot de passe',
   formFieldLabel__currentPassword: 'Mot de passe actuel',
   formFieldLabel__newPassword: 'Nouveau mot de passe',
@@ -41,10 +38,7 @@ export const frFR: LocalizationResource = {
     'Saisissez ou collez une ou plusieurs adresses e-mail, séparées par des espaces ou des virgules',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -293,9 +287,7 @@ export const frFR: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Comptes connectés',
         primaryButton: 'Connecter le compte',
-        title__conectionFailed: 'Retenter la connexion a échoué',
         title__connectionFailed: 'Retenter la connexion a échoué',
-        actionLabel__conectionFailed: 'Réessayer',
         actionLabel__connectionFailed: 'Réessayer',
         destructiveActionTitle: 'Retirer',
         destructiveActionSubtitle: 'Supprimer ce compte connecté de votre compte',
@@ -574,10 +566,7 @@ export const frFR: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Aucun membre',
       action__invite: 'Inviter',
-      start: {
-        headerTitle__active: 'Actif',
-        headerTitle__invited: 'Invité',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Utilisateur',
         tableHeader__joined: 'Rejoint',
@@ -594,7 +583,6 @@ export const frFR: LocalizationResource = {
   createOrganization: {
     title: 'Créer une organisation',
     formButtonSubmit: 'Créer l’organisation',
-    subtitle: 'Créer une organisation pour votre équipe',
     invitePage: {
       formButtonReset: 'Passer',
     },
