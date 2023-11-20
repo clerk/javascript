@@ -1,11 +1,10 @@
-import type { AuthenticateRequestOptions, Organization, Session, User } from '@clerk/backend';
-import type { ServerSideAuth } from '@clerk/types';
+import type { AuthenticateRequestOptions, AuthObject, Organization, Session, User } from '@clerk/backend';
 import type { GetServerDataProps } from 'gatsby';
 
 export type WithServerAuthResult<CallbackReturn> = (props: GetServerDataProps) => Promise<Awaited<CallbackReturn>>;
 
 export type GetServerDataPropsWithAuth<Options extends WithServerAuthOptions = any> = GetServerDataProps & {
-  auth: ServerSideAuth;
+  auth: AuthObject;
 } & (Options extends { loadSession: true } ? { session: Session | null } : object) &
   (Options extends { loadUser: true } ? { user: User | null } : object) &
   (Options extends { loadOrg: true } ? { organization: Organization | null } : object);

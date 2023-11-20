@@ -1,5 +1,77 @@
 # Change Log
 
+## 2.0.0-alpha-v5.2
+
+### Major Changes
+
+- Change the minimal Node.js version required by Clerk to `18.17.0`. ([#2162](https://github.com/clerk/javascript/pull/2162)) by [@dimkl](https://github.com/dimkl)
+
+## 2.0.0-alpha-v5.1
+
+### Major Changes
+
+- Drop deprecations. Migration steps: ([#2102](https://github.com/clerk/javascript/pull/2102)) by [@dimkl](https://github.com/dimkl)
+
+  - use `EmailLinkError` instead of `MagicLinkError`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - use `buildRequestUrl` from `@clerk/backend` instead of `getRequestUrl` from `@clerk/shared`
+  - use `OrganizationProvider` instead of `OrganizationContext`
+  - use `userMemberships` instead of `organizationList` from `useOrganizationList`
+
+- Drop deprecations. Migration steps: ([#2082](https://github.com/clerk/javascript/pull/2082)) by [@dimkl](https://github.com/dimkl)
+
+  - use `publishableKey` instead of `frontendApi`
+  - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - drop `orgs` jwt claim from session token
+  - use `ExternalAccount.imageUrl` instead of `ExternalAccount.avatarUrl`
+  - use `Organization.imageUrl` instead of `Organization.logoUrl`
+  - use `User.imageUrl` instead of `User.profileImageUrl`
+  - use `OrganizationMembershipPublicUserData.imageUrl` instead of `OrganizationMembershipPublicUserData.profileImageUrl`
+  - use `useOrganizationList` instead of `useOrganizations`
+  - use `userProfileProps` instead of `userProfile` in `Appearance`
+  - use `Clerk.setActive()` instead of `Clerk.setSession()`
+  - drop `password` param in `User.update()`
+  - use `afterSelectOrganizationUrl` instead of `afterSwitchOrganizationUrl` in `OrganizationSwitcher`
+  - drop `Clerk.experimental_canUseCaptcha` / `Clerk.Clerk.experimental_captchaSiteKey` / `Clerk.experimental_captchaURL` (were meant for internal use)
+  - use `User.getOrganizationMemberships()` instead of `Clerk.getOrganizationMemberships()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from Clerk emitted events
+  - drop `Clerk.__unstable__invitationUpdate` / `Clerk.__unstable__membershipUpdate`
+  - drop support for string param in `Organization.create()`
+  - use `Organization.getInvitations()` instead of `Organization.getPendingInvitations()`
+  - use `pageSize` instead of `limit` in `OrganizationMembership.retrieve()`
+  - use `initialPage` instead of `offset` in `OrganizationMembership.retrieve()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from ClerkProvider
+  - use `invitations` instead of `invitationList` in `useOrganization`
+  - use `memberships` instead of `membershipList` in `useOrganization`
+  - use `redirectUrl` instead of `redirect_url` in `User.createExternalAccount()`
+  - use `signature` instead of `generatedSignature` in `Signup.attemptWeb3WalletVerification()`
+
+### Minor Changes
+
+- Increase the duration until data become stale for organization hooks. ([#2093](https://github.com/clerk/javascript/pull/2093)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add a private \_\_navigateWithError util function to clerk for use in User Lockout scenarios ([#2043](https://github.com/clerk/javascript/pull/2043)) by [@yourtallness](https://github.com/yourtallness)
+
+- Move and export the following from @clerk/clerk-js and @clerk/nextjs to @clerk/shared: ([#2149](https://github.com/clerk/javascript/pull/2149)) by [@dimkl](https://github.com/dimkl)
+
+      - `DEV_BROWSER_SSO_JWT_PARAMETER`
+      - `DEV_BROWSER_JWT_MARKER`
+      - `DEV_BROWSER_SSO_JWT_KEY`
+      - `setDevBrowserJWTInURL`
+      - `getDevBrowserJWTFromURL`
+      - `getDevBrowserJWTFromResponse`
+
+### Patch Changes
+
+- Fix incorrect pagination counters in data tables inside `<OrganizationProfile/>`. ([#2056](https://github.com/clerk/javascript/pull/2056)) by [@panteliselef](https://github.com/panteliselef)
+
+- Use the errorThrower shared utility when throwing errors ([#1999](https://github.com/clerk/javascript/pull/1999)) by [@anagstef](https://github.com/anagstef)
+
 ## 2.0.0-alpha-v5.0
 
 ### Major Changes

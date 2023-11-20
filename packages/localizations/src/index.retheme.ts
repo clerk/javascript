@@ -2,10 +2,6 @@ export { arSA } from './ar-SA';
 export { enUS } from './en-US.retheme';
 export { frFR } from './fr-FR';
 export { daDK } from './da-DK';
-/**
- * @deprecated Use `deDE` instead
- */
-export { deDE as deDe } from './de-DE';
 export { deDE } from './de-DE';
 export { itIT } from './it-IT';
 export { ptBR } from './pt-BR';

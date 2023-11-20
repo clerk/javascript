@@ -1,6 +1,5 @@
-import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
-import type { InitialState, MultiDomainAndOrProxy, PublishableKeyOrFrontendApi } from '@clerk/types';
-import type { PropsWithChildren } from 'react';
+import type { ClerkProviderOptionsWrapper } from '@clerk/clerk-react';
+import type { InitialState } from '@clerk/types';
 
 export type ClerkState = {
   __type: 'clerkState';
@@ -28,9 +27,4 @@ export type WithClerkState<U = any> = {
   clerkState: { __type: 'clerkState' };
 };
 
-export type RemixClerkProviderProps = PropsWithChildren<
-  Omit<IsomorphicClerkOptions, keyof PublishableKeyOrFrontendApi> &
-    Partial<PublishableKeyOrFrontendApi> &
-    Omit<IsomorphicClerkOptions, keyof MultiDomainAndOrProxy> &
-    MultiDomainAndOrProxy
->;
+export type RemixClerkProviderProps = ClerkProviderOptionsWrapper;

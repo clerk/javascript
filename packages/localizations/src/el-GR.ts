@@ -20,10 +20,7 @@ export const elGR: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Διευθύνσεις email',
   formFieldLabel__phoneNumber: 'Αριθμός τηλεφώνου',
   formFieldLabel__username: 'Όνομα χρήστη',
-  formFieldLabel__emailAddress_phoneNumber: 'Διεύθυνση email ή αριθμός τηλεφώνου',
   formFieldLabel__emailAddress_username: 'Διεύθυνση email ή όνομα χρήστη',
-  formFieldLabel__phoneNumber_username: 'Αριθμός τηλεφώνου ή όνομα χρήστη',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Διεύθυνση email, αριθμός τηλεφώνου ή όνομα χρήστη',
   formFieldLabel__password: 'Κωδικός πρόσβασης',
   formFieldLabel__currentPassword: 'Τρέχων κωδικός πρόσβασης',
   formFieldLabel__newPassword: 'Νέος κωδικός πρόσβασης',
@@ -41,10 +38,7 @@ export const elGR: LocalizationResource = {
     'Εισαγάγετε ή επικολλήστε μία ή περισσότερες διευθύνσεις email, χωρισμένες με κενά ή κόμματα',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -294,12 +288,10 @@ export const elGR: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Συνδεδεμένοι λογαριασμοί',
         primaryButton: 'Σύνδεση λογαριασμού',
-        title__conectionFailed: 'Επανάληψη αποτυχημένης σύνδεσης',
         title__connectionFailed: 'Επανάληψη αποτυχημένης σύνδεσης',
         title__reauthorize: 'Απαιτείται νέα εξουσιοδότηση',
         subtitle__reauthorize:
           'Οι απαιτούμενες εμβέλειες έχουν ενημερωθεί και μπορεί να αντιμετωπίζετε περιορισμένη λειτουργικότητα. Παρακαλούμε εξουσιοδοτήστε ξανά αυτήν την εφαρμογή για να αποφύγετε προβλήματα.',
-        actionLabel__conectionFailed: 'Προσπάθεια ξανά',
         actionLabel__connectionFailed: 'Προσπάθεια ξανά',
         actionLabel__reauthorize: 'Εξουσιοδοτήστε τώρα',
         destructiveActionTitle: 'Αφαίρεση',
@@ -584,10 +576,7 @@ export const elGR: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Δεν υπάρχουν μέλη για εμφάνιση',
       action__invite: 'Πρόσκληση',
-      start: {
-        headerTitle__active: 'Ενεργά',
-        headerTitle__invited: 'Προσκεκλημένα',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Χρήστης',
         tableHeader__joined: 'Εγγραφήκατε',
@@ -604,7 +593,6 @@ export const elGR: LocalizationResource = {
   createOrganization: {
     title: 'Δημιουργία Οργανισμού',
     formButtonSubmit: 'Δημιουργία οργανισμού',
-    subtitle: 'Ορίστε το προφίλ του οργανισμού',
     invitePage: {
       formButtonReset: 'Παράλειψη',
     },

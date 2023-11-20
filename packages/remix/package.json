@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.0.0-alpha-v5.0",
+  "version": "4.0.0-alpha-v5.2",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -69,18 +69,18 @@
     "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/backend": "1.0.0-alpha-v5.0",
-    "@clerk/clerk-react": "5.0.0-alpha-v5.0",
-    "@clerk/shared": "2.0.0-alpha-v5.0",
+    "@clerk/backend": "1.0.0-alpha-v5.2",
+    "@clerk/clerk-react": "5.0.0-alpha-v5.2",
+    "@clerk/shared": "2.0.0-alpha-v5.2",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-alpha-v5.0",
+    "@clerk/types": "4.0.0-alpha-v5.2",
     "@remix-run/react": "^2.0.0",
     "@remix-run/server-runtime": "^2.0.0",
     "@types/cookie": "^0.5.0",
-    "@types/node": "^18.18.0",
+    "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "eslint-config-custom": "*",
@@ -89,11 +89,11 @@
   "peerDependencies": {
     "@remix-run/react": "^2.0.0",
     "@remix-run/server-runtime": "^2.0.0",
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public"

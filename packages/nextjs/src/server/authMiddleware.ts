@@ -1,5 +1,6 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants, TokenVerificationErrorReason } from '@clerk/backend';
+import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
 import type { Autocomplete } from '@clerk/types';
 import type Link from 'next/link';
@@ -11,7 +12,6 @@ import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
 import { clerkClient } from './clerkClient';
 import { SECRET_KEY } from './constants';
-import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import {
   clockSkewDetected,
   infiniteRedirectLoopDetected,

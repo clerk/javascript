@@ -1,4 +1,4 @@
-export type { default as Clerk } from '../clerk';
+export type { Clerk } from '../clerk';
 export * from './Base';
 export * from './UserSettings';
 export * from './AuthConfig';

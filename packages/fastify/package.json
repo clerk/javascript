@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "1.0.0-alpha-v5.0",
+  "version": "1.0.0-alpha-v5.2",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -40,13 +40,13 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/backend": "1.0.0-alpha-v5.0",
-    "@clerk/shared": "2.0.0-alpha-v5.0",
-    "@clerk/types": "4.0.0-alpha-v5.0",
+    "@clerk/backend": "1.0.0-alpha-v5.2",
+    "@clerk/shared": "2.0.0-alpha-v5.2",
+    "@clerk/types": "4.0.0-alpha-v5.2",
     "cookies": "0.8.0"
   },
   "devDependencies": {
-    "@types/node": "^18.18.0",
+    "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
@@ -56,7 +56,7 @@
     "fastify-plugin": "^4.5.0"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public"

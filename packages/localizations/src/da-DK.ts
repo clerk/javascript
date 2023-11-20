@@ -20,10 +20,7 @@ export const daDK: LocalizationResource = {
   formFieldLabel__emailAddresses: 'E-mailadresser',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__username: 'Brugernavn',
-  formFieldLabel__emailAddress_phoneNumber: 'E-mailadresse eller telefonnummer',
   formFieldLabel__emailAddress_username: 'E-mailadresse eller brugernavn',
-  formFieldLabel__phoneNumber_username: 'telefonnummer eller brugernavn',
-  formFieldLabel__emailAddress_phoneNumber_username: 'E-mailadresse, telefonnummer eller brugernavn',
   formFieldLabel__password: 'Adgangskode',
   formFieldLabel__currentPassword: 'Nuværende adgangskode',
   formFieldLabel__newPassword: 'Ny adgangskode',
@@ -40,10 +37,7 @@ export const daDK: LocalizationResource = {
     'Indtast eller indsæt en eller flere e-mailadresser, adskilt af mellemrum eller kommaer',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -266,12 +260,10 @@ export const daDK: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Tilknyttede konti',
         primaryButton: 'Tilknyt konto',
-        title__conectionFailed: 'Forsøg mislykkedes',
         title__connectionFailed: 'Andet forsøg mislykkedes',
         title__reauthorize: 'Godkendelse mangler',
         subtitle__reauthorize:
           'De påkrævede omfang er blevet opdateret, og du oplever muligvis begrænset funktionalitet. Godkend denne applikation igen for at undgå problemer',
-        actionLabel__conectionFailed: 'Prøv igen',
         actionLabel__connectionFailed: 'Prøv igen',
         actionLabel__reauthorize: 'Godkend nu',
         destructiveActionTitle: 'Fjern',
@@ -521,10 +513,7 @@ export const daDK: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Ingen medlemmer at vise',
       action__invite: 'Invitere',
-      start: {
-        headerTitle__active: 'Aktiv',
-        headerTitle__invited: 'Inviteret',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Bruger',
         tableHeader__joined: 'Sluttede sig til',
@@ -541,7 +530,6 @@ export const daDK: LocalizationResource = {
   createOrganization: {
     title: 'Opret organisation',
     formButtonSubmit: 'Opret organisation',
-    subtitle: 'Indstil organisationsprofilen',
     invitePage: {
       formButtonReset: 'Spring over',
     },

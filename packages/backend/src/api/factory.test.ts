@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import emailJson from '../fixtures/responses/email.json';
 import userJson from '../fixtures/responses/user.json';
 import runtime from '../runtime';
+import { assertErrorResponse, assertResponse } from '../util/assertResponse';
 import { jsonError, jsonNotOk, jsonOk } from '../util/mockFetch';
 import { createBackendApiClient } from './factory';
 
@@ -26,14 +27,10 @@ export default (QUnit: QUnit) => {
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonOk(userJson));
 
-      const payload = await apiClient.users.getUser('user_deadbeef');
+      const response = await apiClient.users.getUser('user_deadbeef');
 
-      if (!payload) {
-        // eslint-disable-next-line qunit/no-conditional-assertions
-        assert.false(true, 'This assertion should never fail. We need to check for payload to make TS happy.');
-        // eslint-disable-next-line qunit/no-early-return
-        return;
-      }
+      assertResponse(assert, response);
+      const { data: payload } = response;
 
       assert.equal(payload.firstName, 'John');
       assert.equal(payload.lastName, 'Doe');
@@ -41,7 +38,6 @@ export default (QUnit: QUnit) => {
       assert.equal(payload.phoneNumbers[0].phoneNumber, '+311-555-2368');
       assert.equal(payload.externalAccounts[0].emailAddress, 'john.doe@clerk.test');
       assert.equal(payload.publicMetadata.zodiac_sign, 'leo');
-      // assert.equal(payload.errors, null);
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {
@@ -59,14 +55,9 @@ export default (QUnit: QUnit) => {
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonOk([userJson]));
 
-      const payload = await apiClient.users.getUserList({ offset: 2, limit: 5 });
-
-      if (!payload) {
-        // eslint-disable-next-line qunit/no-conditional-assertions
-        assert.false(true, 'This assertion should never fail. We need to check for payload to make TS happy.');
-        // eslint-disable-next-line qunit/no-early-return
-        return;
-      }
+      const response = await apiClient.users.getUserList({ offset: 2, limit: 5 });
+      assertResponse(assert, response);
+      const { data: payload } = response;
 
       assert.equal(payload[0].firstName, 'John');
       assert.equal(payload[0].lastName, 'Doe');
@@ -74,7 +65,6 @@ export default (QUnit: QUnit) => {
       assert.equal(payload[0].phoneNumbers[0].phoneNumber, '+311-555-2368');
       assert.equal(payload[0].externalAccounts[0].emailAddress, 'john.doe@clerk.test');
       assert.equal(payload[0].publicMetadata.zodiac_sign, 'leo');
-      // assert.equal(payload.errors, null);
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users?offset=2&limit=5', {
@@ -100,14 +90,10 @@ export default (QUnit: QUnit) => {
       };
       const requestBody =
         '{"from_email_name":"foobar123","email_address_id":"test@test.dev","body":"this is a test","subject":"this is a test"}';
-      const payload = await apiClient.emails.createEmail(body);
+      const response = await apiClient.emails.createEmail(body);
+      assertResponse(assert, response);
+      const { data: payload } = response;
 
-      if (!payload) {
-        // eslint-disable-next-line qunit/no-conditional-assertions
-        assert.false(true, 'This assertion should never fail. We need to check for payload to make TS happy.');
-        // eslint-disable-next-line qunit/no-early-return
-        return;
-      }
       assert.equal(JSON.stringify(payload.data), '{}');
       assert.equal(payload.id, 'ema_2PHa2N3bS7D6NPPQ5mpHEg0waZQ');
 
@@ -126,15 +112,19 @@ export default (QUnit: QUnit) => {
 
     test('executes a successful backend API request to create a new resource', async assert => {
       fakeFetch = sinon.stub(runtime, 'fetch');
-      fakeFetch.onCall(0).returns(jsonOk([userJson]));
+      fakeFetch.onCall(0).returns(jsonOk(userJson));
 
-      await apiClient.users.createUser({
+      const response = await apiClient.users.createUser({
         firstName: 'John',
         lastName: 'Doe',
         publicMetadata: {
           star_sign: 'Leon',
         },
       });
+      assertResponse(assert, response);
+      const { data: payload } = response;
+
+      assert.equal(payload.firstName, 'John');
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users', {
@@ -161,14 +151,13 @@ export default (QUnit: QUnit) => {
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonNotOk({ errors: [mockErrorPayload], clerk_trace_id: traceId }));
 
-      try {
-        await apiClient.users.getUser('user_deadbeef');
-      } catch (e: any) {
-        assert.equal(e.clerkTraceId, traceId);
-        assert.true(e.clerkError);
-        assert.equal(e.status, 422);
-        assert.equal(e.errors[0].code, 'whatever_error');
-      }
+      const response = await apiClient.users.getUser('user_deadbeef');
+      assertErrorResponse(assert, response);
+
+      assert.equal(response.clerkTraceId, traceId);
+      assert.equal(response.status, 422);
+      assert.equal(response.statusText, '422');
+      assert.equal(response.errors[0].code, 'whatever_error');
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {
@@ -186,13 +175,12 @@ export default (QUnit: QUnit) => {
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonError({ errors: [] }));
 
-      try {
-        await apiClient.users.getUser('user_deadbeef');
-      } catch (e: any) {
-        assert.true(e.clerkError);
-        assert.equal(e.status, 500);
-        assert.equal(e.clerkTraceId, 'mock_cf_ray');
-      }
+      const response = await apiClient.users.getUser('user_deadbeef');
+      assertErrorResponse(assert, response);
+
+      assert.equal(response.status, 500);
+      assert.equal(response.statusText, '500');
+      assert.equal(response.clerkTraceId, 'mock_cf_ray');
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {

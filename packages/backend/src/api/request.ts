@@ -1,4 +1,3 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import snakecaseKeys from 'snakecase-keys';
 
@@ -8,7 +7,6 @@ import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
 import runtime from '../runtime';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { joinPaths } from '../util/path';
-import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
 export type ClerkBackendApiRequestOptions = {
@@ -37,35 +35,24 @@ export type ClerkBackendApiResponse<T> =
       data: null;
       errors: ClerkAPIError[];
       clerkTraceId?: string;
+      status?: number;
+      statusText?: string;
     };
 
 export type RequestFunction = ReturnType<typeof buildRequest>;
-type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) => Promise<T>;
 
-/**
- * Switching to the { data, errors } format is a breaking change, so we will skip it for now
- * until we release v5 of the related SDKs.
- * This HOF wraps the request helper and transforms the new return to the legacy return.
- * TODO: Simply remove this wrapper and the ClerkAPIResponseError before the v5 release.
- */
-const withLegacyReturn =
-  (cb: any): LegacyRequestFunction =>
-  async (...args) => {
-    // @ts-ignore
-    const { data, errors, status, statusText, clerkTraceId } = await cb<T>(...args);
-    if (errors === null) {
-      return data;
-    } else {
-      throw new ClerkAPIResponseError(statusText || '', {
-        data: errors,
-        status: status || '',
-        clerkTraceId,
-      });
-    }
-  };
-
-export function buildRequest(options: CreateBackendApiOptions) {
-  const request = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
+type BuildRequestOptions = {
+  /* Secret Key */
+  secretKey?: string;
+  /* Backend API URL */
+  apiUrl?: string;
+  /* Backend API version */
+  apiVersion?: string;
+  /* Library/SDK name */
+  userAgent?: string;
+};
+export function buildRequest(options: BuildRequestOptions) {
+  return async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
     const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
@@ -123,7 +110,13 @@ export function buildRequest(options: CreateBackendApiOptions) {
       const data = await (isJSONResponse ? res.json() : res.text());
 
       if (!res.ok) {
-        throw data;
+        return {
+          data: null,
+          errors: data?.errors || data,
+          status: res?.status,
+          statusText: res?.statusText,
+          clerkTraceId: getTraceId(data, res?.headers),
+        };
       }
 
       return {
@@ -147,16 +140,12 @@ export function buildRequest(options: CreateBackendApiOptions) {
       return {
         data: null,
         errors: parseErrors(err),
-        // TODO: To be removed with withLegacyReturn
-        // @ts-expect-error
         status: res?.status,
         statusText: res?.statusText,
         clerkTraceId: getTraceId(err, res?.headers),
       };
     }
   };
-
-  return withLegacyReturn(request);
 }
 
 // Returns either clerk_trace_id if present in response json, otherwise defaults to CF-Ray header

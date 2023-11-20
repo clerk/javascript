@@ -29,19 +29,7 @@ type _LocalizationResource = {
   formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
   formFieldLabel__username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldLabel__emailAddress_phoneNumber: LocalizationValue;
   formFieldLabel__emailAddress_username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldLabel__phoneNumber_username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldLabel__emailAddress_phoneNumber_username: LocalizationValue;
   formFieldLabel__password: LocalizationValue;
   formFieldLabel__currentPassword: LocalizationValue;
   formFieldLabel__newPassword: LocalizationValue;
@@ -63,19 +51,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldInputPlaceholder__emailAddress_phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__emailAddress_username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldInputPlaceholder__phoneNumber_username: LocalizationValue;
-  /**
-   * @deprecated
-   */
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: LocalizationValue;
   formFieldInputPlaceholder__password: LocalizationValue;
   formFieldInputPlaceholder__firstName: LocalizationValue;
   formFieldInputPlaceholder__lastName: LocalizationValue;
@@ -336,17 +312,9 @@ type _LocalizationResource = {
       connectedAccountsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        /**
-         * @deprecated Use `title__connectionFailed` instead.
-         */
-        title__conectionFailed: LocalizationValue;
         title__connectionFailed: LocalizationValue;
         title__reauthorize: LocalizationValue;
         subtitle__reauthorize: LocalizationValue;
-        /**
-         * @deprecated Use `actionLabel__connectionFailed` instead.
-         */
-        actionLabel__conectionFailed: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
         actionLabel__reauthorize: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
@@ -667,15 +635,7 @@ type _LocalizationResource = {
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
       start: {
-        /**
-         * @deprecated use `headerTitle__members` instead
-         */
-        headerTitle__active: LocalizationValue;
         headerTitle__members: LocalizationValue;
-        /**
-         * @deprecated use `headerTitle__invitations` instead
-         */
-        headerTitle__invited: LocalizationValue;
         headerTitle__invitations: LocalizationValue;
         headerTitle__requests: LocalizationValue;
       };
@@ -722,10 +682,6 @@ type _LocalizationResource = {
   createOrganization: {
     title: LocalizationValue;
     formButtonSubmit: LocalizationValue;
-    /**
-     * @deprecated This key is no longer used and will be removed in the next major version
-     */
-    subtitle: LocalizationValue;
     invitePage: {
       formButtonReset: LocalizationValue;
     };

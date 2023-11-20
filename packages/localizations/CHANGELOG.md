@@ -1,5 +1,34 @@
 # Change Log
 
+## 2.0.0-alpha-v5.2
+
+### Major Changes
+
+- Change the minimal Node.js version required by Clerk to `18.17.0`. ([#2162](https://github.com/clerk/javascript/pull/2162)) by [@dimkl](https://github.com/dimkl)
+
+## 2.0.0-alpha-v5.1
+
+### Major Changes
+
+- Drop deprecations. Migration steps: ([#2151](https://github.com/clerk/javascript/pull/2151)) by [@dimkl](https://github.com/dimkl)
+
+  - drop `formFieldLabel__emailAddress_phoneNumber` from localization keys
+  - drop `formFieldLabel__phoneNumber_username` from localization keys
+  - drop `formFieldLabel__emailAddress_phoneNumber_username` from localization keys
+  - drop `formFieldInputPlaceholder__emailAddress_phoneNumber` from localization keys
+  - drop `formFieldInputPlaceholder__phoneNumber_username` from localization keys
+  - drop `formFieldInputPlaceholder__emailAddress_phoneNumber_username` from localization keys
+  - use `title__connectionFailed` instead of `title__conectionFailed` from localization keys
+  - use `actionLabel__connectionFailed` instead of `actionLabel__conectionFailed` from localization keys
+  - use `headerTitle__members` instead of `headerTitle__active` from localization keys
+  - use `headerTitle__invitations` instead of `headerTitle__invited` from localization keys
+  - drop `createOrganization.subtitle` from localization keys
+  - use `deDE` instead of `deDe` localization from `@clerk/localizations`
+
+### Patch Changes
+
+- Fix zh-TW localization and export zh-TW from index.ts ([#2098](https://github.com/clerk/javascript/pull/2098)) by [@tszhong0411](https://github.com/tszhong0411)
+
 ## 1.26.8-alpha-v5.0
 
 ### Patch Changes

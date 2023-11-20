@@ -1,4 +1,4 @@
-import type { IsomorphicClerkOptions } from '@clerk/clerk-react';
+import type { ClerkProviderOptionsWrapper } from '@clerk/clerk-react';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 
@@ -15,9 +15,8 @@ const SDK_METADATA = {
 };
 
 export type RemixClerkProviderProps = {
-  children: React.ReactNode;
   clerkState: ClerkState;
-} & IsomorphicClerkOptions;
+} & ClerkProviderOptionsWrapper;
 
 /**
  * Remix hydration errors should not stop Clerk navigation from working, as the components mount only after

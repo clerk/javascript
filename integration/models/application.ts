@@ -61,9 +61,8 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
         log: opts.detached ? undefined : log,
       });
-      // TODO @dimitris: Fail early if server exits
-      // const shouldRetry = () => proc.exitCode !== 0 && proc.exitCode !== null;
-      await waitForServer(serverUrl, { log, maxAttempts: Infinity });
+      const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
+      await waitForServer(serverUrl, { log, maxAttempts: Infinity, shouldExit });
       log(`Server started at ${serverUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       state.serverUrl = serverUrl;
@@ -85,7 +84,6 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
     serve: async (opts: { port?: number; manualStart?: boolean } = {}) => {
       const port = opts.port || (await getPort());
       const serverUrl = `http://localhost:${port}`;
-      const log = logger.child({ prefix: 'serve' }).info;
       // If this is ever used as a background process, we need to make sure
       // it's not using the log function. See the dev() method above
       const proc = run(scripts.serve, { cwd: appDirPath, env: { PORT: port.toString() } });

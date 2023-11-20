@@ -20,10 +20,7 @@ export const viVN: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Các địa chỉ email',
   formFieldLabel__phoneNumber: 'Số điện thoại',
   formFieldLabel__username: 'Tên người dùng',
-  formFieldLabel__emailAddress_phoneNumber: 'Địa chỉ email hoặc số điện thoại',
   formFieldLabel__emailAddress_username: 'Địa chỉ email hoặc tên người dùng',
-  formFieldLabel__phoneNumber_username: 'Số điện thoại hoặc tên người dùng',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Địa chỉ email, số điện thoại hoặc tên người dùng',
   formFieldLabel__password: 'Mật khẩu',
   formFieldLabel__currentPassword: 'Mật khẩu hiện tại',
   formFieldLabel__newPassword: 'Mật khẩu mới',
@@ -40,10 +37,7 @@ export const viVN: LocalizationResource = {
     'Nhập hoặc dán một hoặc nhiều địa chỉ email, cách nhau bằng khoảng trắng hoặc dấu phẩy',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -288,12 +282,10 @@ export const viVN: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Tài khoản đã kết nối',
         primaryButton: 'Kết nối tài khoản',
-        title__conectionFailed: 'Thử lại kết nối không thành công',
         title__connectionFailed: 'Thử lại kết nối không thành công',
         title__reauthorize: 'Yêu cầu xác thực lại',
         subtitle__reauthorize:
           'Phạm vi yêu cầu đã được cập nhật và bạn có thể gặp phải hạn chế chức năng. Vui lòng xác thực lại ứng dụng này để tránh sự cố.',
-        actionLabel__conectionFailed: 'Thử lại',
         actionLabel__connectionFailed: 'Thử lại',
         actionLabel__reauthorize: 'Xác thực ngay',
         destructiveActionTitle: 'Xóa',
@@ -566,10 +558,7 @@ export const viVN: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Không có thành viên để hiển thị',
       action__invite: 'Mời',
-      start: {
-        headerTitle__active: 'Hoạt động',
-        headerTitle__invited: 'Đã mời',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Người dùng',
         tableHeader__joined: 'Tham gia',
@@ -586,7 +575,6 @@ export const viVN: LocalizationResource = {
   createOrganization: {
     title: 'Tạo Tổ chức',
     formButtonSubmit: 'Tạo tổ chức',
-    subtitle: 'Đặt hồ sơ tổ chức',
     invitePage: {
       formButtonReset: 'Bỏ qua',
     },

@@ -20,10 +20,7 @@ export const trTR: LocalizationResource = {
   formFieldLabel__emailAddresses: 'E-posta adresleri',
   formFieldLabel__phoneNumber: 'Telefon numarası',
   formFieldLabel__username: 'Kullanıcı adı',
-  formFieldLabel__emailAddress_phoneNumber: 'E-posta adresi veya telefon numarası',
   formFieldLabel__emailAddress_username: 'E-posta adresi veya kullanıcı adı',
-  formFieldLabel__phoneNumber_username: 'telefon numarası veya kullanıcı adı',
-  formFieldLabel__emailAddress_phoneNumber_username: 'E-posta adresi, telefon numarası veya kullanıcı adı',
   formFieldLabel__password: 'Şifre',
   formFieldLabel__currentPassword: 'Mevcut şifre',
   formFieldLabel__newPassword: 'Yeni şifre',
@@ -40,10 +37,7 @@ export const trTR: LocalizationResource = {
     'Boşluklar veya virgüllerle ayırarak bir veya daha fazla e-posta adresi girin veya yapıştırın',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -286,12 +280,10 @@ export const trTR: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Bağlı hesaplar',
         primaryButton: 'Hesap bağla',
-        title__conectionFailed: 'Yeniden bağlanmayı dene',
         title__connectionFailed: 'Yeniden bağlanmayı dene',
         title__reauthorize: 'Yeniden bir yetkilendirme gerekiyor',
         subtitle__reauthorize:
           'Gerekli kapsamlar güncellendi. Bir süreliğine işlevsellikte sınırlanmalar görülebilir. Herhangi bir sorun yaşamamak için bu uygulamayı yeniden yetkilendirin',
-        actionLabel__conectionFailed: 'Yeniden dene',
         actionLabel__connectionFailed: 'Yeniden dene',
         actionLabel__reauthorize: 'Yetkilendir',
         destructiveActionTitle: 'Kaldır',
@@ -547,10 +539,7 @@ export const trTR: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Gösterilecek üye yok',
       action__invite: 'Davet et',
-      start: {
-        headerTitle__active: 'Aktif',
-        headerTitle__invited: 'Davetli',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Kullanıcı',
         tableHeader__joined: 'Katılma tarihi',
@@ -567,7 +556,6 @@ export const trTR: LocalizationResource = {
   createOrganization: {
     title: 'Organizasyon oluştur',
     formButtonSubmit: 'Oluştur',
-    subtitle: 'Organizasyon profilini belirleyin',
     invitePage: {
       formButtonReset: 'Atla',
     },

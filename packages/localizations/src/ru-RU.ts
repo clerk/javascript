@@ -20,10 +20,7 @@ export const ruRU: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Почтовые адреса',
   formFieldLabel__phoneNumber: 'Номер телефона',
   formFieldLabel__username: 'Имя пользователя',
-  formFieldLabel__emailAddress_phoneNumber: 'Почта или номер телефона',
   formFieldLabel__emailAddress_username: 'Почта или имя пользователя',
-  formFieldLabel__phoneNumber_username: 'номер телефона или имя пользователя',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Почта, номер телефона или имя пользователя',
   formFieldLabel__password: 'Пароль',
   formFieldLabel__currentPassword: 'Текущий пароль',
   formFieldLabel__newPassword: 'Новый пароль',
@@ -39,10 +36,7 @@ export const ruRU: LocalizationResource = {
     'Введите или вставьте один или более адресов почты, разделенных пробелами или запятыми',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -72,7 +66,7 @@ export const ruRU: LocalizationResource = {
   paginationRowText__displaying: 'Отображение',
   paginationRowText__of: 'из',
   membershipRole__admin: 'Администратор',
-  membershipRole__basicMember: 'Член',
+  membershipRole__basicMember: 'Участник',
   membershipRole__guestMember: 'Гость',
   signUp: {
     start: {
@@ -287,12 +281,10 @@ export const ruRU: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Подключенные аккаунты',
         primaryButton: 'Подключить аккаунт',
-        title__conectionFailed: 'Повторная попытка подключения',
         title__connectionFailed: 'Повторная попытка подключения',
         title__reauthorize: 'Требуется повторная авторизация',
         subtitle__reauthorize:
           'Требуется повторная авторизация этого приложения из-за обновления необходимых областей видимости, и вы можете испытывать ограниченную функциональность. Пожалуйста, повторно авторизуйте это приложение, чтобы избежать проблем',
-        actionLabel__conectionFailed: 'Попробовать снова',
         actionLabel__connectionFailed: 'Попробовать снова',
         actionLabel__reauthorize: 'Авторизовать сейчас',
         destructiveActionTitle: 'Удалить',
@@ -530,9 +522,69 @@ export const ruRU: LocalizationResource = {
           title: 'Покинуть организацию',
           messageLine1:
             'Вы уверены, что хотите покинуть эту организацию? Вы потеряете доступ к этой организации и ее приложениям.',
-          messageLine2: 'Это действие является постоянным и необратимым.',
+          messageLine2: 'Это действие нельзя отменить.',
           successMessage: 'Вы покинули организацию.',
         },
+        deleteOrganization: {
+          title: 'Удалить организацию',
+          messageLine1: 'Вы уверены, что хотите удалить эту организацию?',
+          messageLine2: 'Это действие нельзя отменить.',
+          actionDescription: 'Напишите {{organizationName}} в поле ниже, чтобы продолжить.',
+          successMessage: 'Вы удалили организацию.',
+        },
+      },
+      domainSection: {
+        title: 'Верифицированные домены',
+        subtitle:
+          'Разрешите пользователям присоединяться к организации автоматически или по запросу, если домен их электронной почты верифицирован.',
+        primaryButton: 'Добавить домен',
+        unverifiedDomain_menuAction__verify: 'Верифицировать домен',
+        unverifiedDomain_menuAction__remove: 'Удалить домен',
+      },
+    },
+    createDomainPage: {
+      title: 'Добавить домен',
+      subtitle:
+        'Добавьте верифицированный домен. Пользователи, чья электронная почта зарегистрирована на верифицированном домене, могут присоединяться к организации автоматически или по запросу.',
+    },
+    verifyDomainPage: {
+      title: 'Верификация домена',
+      subtitle: 'Домен {{domainName}} должен быть верифицирован через электронную почту.',
+      subtitleVerificationCodeScreen:
+        'Код подтверждения верификации отправлен на почту {{emailAddress}}. Введите его сюда, чтобы продолжить.',
+      formTitle: 'Код подтверждения',
+      formSubtitle: 'Введите код подтверждения, отправленный на указанную почту',
+      resendButton: 'Не получили код? Отправить ещё раз',
+    },
+    verifiedDomainPage: {
+      subtitle:
+        'Домен {{domain}} верифицирован. Теперь выберите, как пользователи с этим доменом будут присоединяться к организации.',
+      start: {
+        headerTitle__enrollment: 'Способы присоединения',
+        headerTitle__danger: 'Опасность',
+      },
+      enrollmentTab: {
+        subtitle:
+          'Выберите, каким способом пользователи с этим доменом электронной почты будут присоединяться к организации.',
+        manualInvitationOption__label: 'Только ручное добавление',
+        manualInvitationOption__description:
+          'Пользователи не смогут присоединяться самостоятельно, можно добавлять их только вручную.',
+        automaticInvitationOption__label: 'Автоматические приглашения',
+        automaticInvitationOption__description:
+          'Пользователи автоматически получают приглашение присоединиться к организации после регистрации и могут принять его в любое время без одобрения администратора',
+        automaticSuggestionOption__label: 'Автоматические рекомендации',
+        automaticSuggestionOption__description:
+          'Пользователи автоматически получают приглашение подать заявку на присоединение к организации. Чтобы пользователь смог присоединиться к организации, администратор должен одобрить заявку.',
+        formButton__save: 'Сохранить',
+        calloutInfoLabel: 'Изменение способа присоединения повлияет только на новых пользователей.',
+        calloutInvitationCountLabel: 'Приглашений отправлено: {{count}}',
+        calloutSuggestionCountLabel: 'Рекомендаций отправлено: {{count}}',
+      },
+      dangerTab: {
+        removeDomainTitle: 'Удалить домен',
+        removeDomainSubtitle: 'Удалить этот домен из числа верифицированных',
+        removeDomainActionLabel__remove: 'Удалить домен',
+        calloutInfoLabel: 'Удаление домена повлияет на приглашенных пользователей.',
       },
     },
     invitePage: {
@@ -546,14 +598,15 @@ export const ruRU: LocalizationResource = {
       detailsTitle__emptyRow: 'Нет участников для отображения',
       action__invite: 'Пригласить',
       start: {
-        headerTitle__active: 'Активные',
-        headerTitle__invited: 'Приглашенные',
+        headerTitle__members: 'Участники',
+        headerTitle__invitations: 'Приглашения',
+        headerTitle__requests: 'Заявки',
       },
       activeMembersTab: {
         tableHeader__user: 'Пользователь',
         tableHeader__joined: 'Присоединился',
         tableHeader__role: 'Роль',
-        tableHeader__actions: '',
+        tableHeader__actions: 'Действия',
         menuAction__remove: 'Удалить участника',
       },
       invitedMembersTab: {
@@ -565,7 +618,6 @@ export const ruRU: LocalizationResource = {
   createOrganization: {
     title: 'Создать организацию',
     formButtonSubmit: 'Создать организацию',
-    subtitle: 'Настройка профиля организации',
     invitePage: {
       formButtonReset: 'Пропустить',
     },

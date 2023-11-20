@@ -20,10 +20,7 @@ export const ukUA: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Поштові адреси',
   formFieldLabel__phoneNumber: 'Номер телефону',
   formFieldLabel__username: `Ім'я користувача`,
-  formFieldLabel__emailAddress_phoneNumber: 'Пошта або номер телефону',
   formFieldLabel__emailAddress_username: `Пошта або ім'я користувача`,
-  formFieldLabel__phoneNumber_username: `номер телефону або ім'я користувача`,
-  formFieldLabel__emailAddress_phoneNumber_username: `Пошта, номер телефону або ім'я користувача`,
   formFieldLabel__password: 'Пароль',
   formFieldLabel__currentPassword: 'Поточний пароль',
   formFieldLabel__newPassword: 'Новий пароль',
@@ -41,10 +38,7 @@ export const ukUA: LocalizationResource = {
     'Введіть або вставте одну або більше адрес електронної пошти, розділених пробілами або комами',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -289,12 +283,10 @@ export const ukUA: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Підключені акаунти',
         primaryButton: 'Підключити акаунт',
-        title__conectionFailed: 'Повторна спроба підключення',
         title__connectionFailed: 'Повторна спроба підключення',
         title__reauthorize: 'Потрібна повторна авторизація',
         subtitle__reauthorize:
           'Потрібна повторна авторизація цієї програми через оновлення необхідних областей видимості, і ви можете зіткнутися з обмеженою функціональністю. Будь ласка, повторно авторизуйте цю програму, щоб уникнути проблем',
-        actionLabel__conectionFailed: 'Спробувати знову',
         actionLabel__connectionFailed: 'Спробувати знову',
         actionLabel__reauthorize: 'Авторизувати зараз',
         destructiveActionTitle: 'Видалити',
@@ -558,10 +550,7 @@ export const ukUA: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'Немає учасників для відображення',
       action__invite: 'Запросити',
-      start: {
-        headerTitle__active: 'Активні',
-        headerTitle__invited: 'Запрошені',
-      },
+      start: {},
       activeMembersTab: {
         tableHeader__user: 'Користувач',
         tableHeader__joined: 'Приєднався',
@@ -578,7 +567,6 @@ export const ukUA: LocalizationResource = {
   createOrganization: {
     title: 'Створити організацію',
     formButtonSubmit: 'Створити організацію',
-    subtitle: 'Налаштування профілю організації',
     invitePage: {
       formButtonReset: 'Пропустити',
     },
