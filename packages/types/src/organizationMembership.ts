@@ -1,5 +1,3 @@
-import type { Autocomplete } from 'utils';
-
 import type { OrganizationResource } from './organization';
 import type { ClerkResource } from './resource';
 import type { PublicUserData } from './session';
@@ -26,6 +24,10 @@ declare global {
   interface OrganizationCustomPermissions {
     [k: string]: string;
   }
+
+  interface OrganizationCustomRoles {
+    [k: string]: string;
+  }
 }
 
 export interface OrganizationMembershipResource extends ClerkResource {
@@ -45,8 +47,23 @@ export interface OrganizationMembershipResource extends ClerkResource {
 }
 
 export type OrganizationCustomPermission = OrganizationCustomPermissions[keyof OrganizationCustomPermissions];
+export type OrganizationCustomRole = OrganizationCustomRoles[keyof OrganizationCustomRoles];
 
-export type MembershipRole = Autocomplete<'admin' | 'basic_member' | 'guest_member'>;
+/**
+ * @deprecated This type is deprecated and will be removed in the next major release.
+ * Instead, override the type like this
+ * ```
+ * declare global {
+ *  interface OrganizationCustomRoles {
+ *     "org:custom_role1": "org:custom_role1";
+ *     "org:custom_role2": "org:custom_role2";
+ *   }
+ * }
+ * ```
+ * MembershipRole includes `admin`, `basic_member`, `guest_member`. With the introduction of "Custom roles"
+ * these types will no longer match a developer's custom logic.
+ */
+export type MembershipRole = 'admin' | 'basic_member' | 'guest_member' | OrganizationCustomRole;
 
 export type OrganizationSystemPermission =
   | 'org:sys_domains:manage'

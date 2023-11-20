@@ -1,5 +1,10 @@
 import type { ActJWTClaim } from './jwt';
-import type { OrganizationCustomPermission, OrganizationPermission } from './organizationMembership';
+import type {
+  MembershipRole,
+  OrganizationCustomPermission,
+  OrganizationCustomRole,
+  OrganizationPermission,
+} from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
@@ -12,7 +17,7 @@ type CheckAuthorizationParamsWithCustomPermissions =
   | {
       some: (
         | {
-            role: string;
+            role: OrganizationCustomRole;
             permission?: never;
           }
         | {
@@ -25,7 +30,7 @@ type CheckAuthorizationParamsWithCustomPermissions =
     }
   | {
       some?: never;
-      role: string;
+      role: OrganizationCustomRole;
       permission?: never;
     }
   | {
@@ -40,7 +45,7 @@ type CheckAuthorizationParams =
   | {
       some: (
         | {
-            role: string;
+            role: MembershipRole;
             permission?: never;
           }
         | {
@@ -53,7 +58,7 @@ type CheckAuthorizationParams =
     }
   | {
       some?: never;
-      role: string;
+      role: MembershipRole;
       permission?: never;
     }
   | {
