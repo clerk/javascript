@@ -1,5 +1,4 @@
 import type {
-  Autocomplete,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
   GetUserOrganizationMembershipParams,
@@ -21,7 +20,7 @@ export class OrganizationMembership extends BaseResource implements Organization
   /**
    * @experimental The property is experimental and subject to change in future releases.
    */
-  permissions: Autocomplete<OrganizationPermission>[] = [];
+  permissions: OrganizationPermission[] = [];
   role!: MembershipRole;
   createdAt!: Date;
   updatedAt!: Date;

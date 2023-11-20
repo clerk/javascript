@@ -96,7 +96,6 @@ export interface JwtPayload extends CustomJwtSessionClaims {
    */
   org_role?: MembershipRole;
 
-  // TODO(@panteliselef): Typesafe
   /**
    * Active organization role
    */

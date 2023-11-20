@@ -1,7 +1,5 @@
-import type { Autocomplete } from 'utils';
-
 import type { ActJWTClaim } from './jwt';
-import type { OrganizationPermission } from './organizationMembership';
+import type { OrganizationCustomPermission, OrganizationPermission } from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
@@ -19,7 +17,7 @@ type CheckAuthorizationParamsWithCustomPermissions =
           }
         | {
             role?: never;
-            permission: Autocomplete<OrganizationPermission>;
+            permission: OrganizationCustomPermission;
           }
       )[];
       role?: never;
@@ -33,7 +31,7 @@ type CheckAuthorizationParamsWithCustomPermissions =
   | {
       some?: never;
       role?: never;
-      permission: Autocomplete<OrganizationPermission>;
+      permission: OrganizationCustomPermission;
     };
 
 export type CheckAuthorization = (isAuthorizedParams: CheckAuthorizationParams) => boolean;
@@ -47,7 +45,7 @@ type CheckAuthorizationParams =
           }
         | {
             role?: never;
-            permission: Autocomplete<OrganizationPermission>;
+            permission: OrganizationPermission;
           }
       )[];
       role?: never;
@@ -61,7 +59,7 @@ type CheckAuthorizationParams =
   | {
       some?: never;
       role?: never;
-      permission: Autocomplete<OrganizationPermission>;
+      permission: OrganizationPermission;
     };
 
 export interface SessionResource extends ClerkResource {

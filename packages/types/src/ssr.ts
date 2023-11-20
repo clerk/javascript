@@ -3,7 +3,7 @@ import type { OrganizationResource } from './organization';
 import type { MembershipRole, OrganizationPermission } from './organizationMembership';
 import type { SessionResource } from './session';
 import type { UserResource } from './user';
-import type { Autocomplete, Serializable } from './utils';
+import type { Serializable } from './utils';
 
 export type ServerGetTokenOptions = { template?: string };
 export type ServerGetToken = (options?: ServerGetTokenOptions) => Promise<string | null>;
@@ -18,7 +18,6 @@ export type InitialState = Serializable<{
   orgId: string | undefined;
   orgRole: MembershipRole | undefined;
   orgSlug: string | undefined;
-  // TODO(@panteliselef): Typesafe
-  orgPermissions: Autocomplete<OrganizationPermission>[] | undefined;
+  orgPermissions: OrganizationPermission[] | undefined;
   organization: OrganizationResource | undefined;
 }>;

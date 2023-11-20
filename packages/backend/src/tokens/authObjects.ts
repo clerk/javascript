@@ -31,7 +31,6 @@ export type SignedInAuthObject = {
   orgId: string | undefined;
   orgRole: string | undefined;
   orgSlug: string | undefined;
-  // TODO(@panteliselef): Typesafe
   orgPermissions: OrganizationPermission[] | undefined;
   organization: Organization | undefined;
   getToken: ServerGetToken;
@@ -215,12 +214,6 @@ const createHasAuthorization =
     orgPermissions: string[] | undefined;
   }): experimental__CheckAuthorizationWithCustomPermissions =>
   params => {
-    // console.log({
-    //   orgId,
-    //   userId,
-    //   orgRole,
-    //   orgPermissions,
-    // });
     if (!orgId || !userId || !orgPermissions) {
       return false;
     }
