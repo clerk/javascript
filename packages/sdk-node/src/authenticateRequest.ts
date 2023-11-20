@@ -1,6 +1,7 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants, createIsomorphicRequest } from '@clerk/backend';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import type { ServerResponse } from 'http';
 
@@ -108,8 +109,6 @@ export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, re
   requestState.reason && res.setHeader(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
   requestState.status && res.setHeader(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
-
-const isDevelopmentFromApiKey = (secretKey: string): boolean => secretKey.startsWith('sk_test_');
 
 const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): string => {
   if (!relativeOrAbsoluteUrl || !isValidProxyUrl(relativeOrAbsoluteUrl) || !isProxyUrlRelative(relativeOrAbsoluteUrl)) {
