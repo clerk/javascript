@@ -2,7 +2,7 @@ import { constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { isDevelopmentFromApiKey } from '../util/shared';
-import type { AuthStatusOptionsType, LoadResourcesOptions, RequestState } from './authStatus';
+import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
