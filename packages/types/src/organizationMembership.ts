@@ -21,10 +21,35 @@ declare global {
     [k: string]: unknown;
   }
 
+  /**
+   * If you want to provide custom types for the organizationMembership.permissions
+   * array, simply redeclare this rule in the global namespace.
+   * Every utility function or component will use the provided type.
+   * ```
+   *     interface OrganizationCustomPermissions {
+   *       "org:appointment:accept":"org:appointment:accept";
+   *       "org:appointment:decline":"org:appointment:decline";
+   *       "org:patients:create":"org:patients:create";
+   *     }
+   * ```
+   */
   interface OrganizationCustomPermissions {
     [k: string]: string;
   }
 
+  /**
+   * If you want to provide custom types for the organizationMembership.role
+   * property, simply redeclare this rule in the global namespace.
+   * Every utility function or component will use the provided type.
+   * ```
+   *    interface OrganizationCustomPermissions {
+   *       "org:role1":"org:role1";
+   *       "org:role2":"org:role2";
+   *     }
+   * ```
+   * `organizationMembership.role` will be equal to  "org:role1" | "org:role2"
+   *
+   */
   interface OrganizationCustomRoles {
     [k: string]: string;
   }
