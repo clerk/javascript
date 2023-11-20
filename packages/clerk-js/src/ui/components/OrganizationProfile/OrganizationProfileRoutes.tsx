@@ -131,7 +131,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
               <Route index>
                 <Gate
                   some={[{ permission: 'org:sys_memberships:read' }, { permission: 'org:sys_memberships:manage' }]}
-                  redirectTo='./organization-settings'
+                  redirectTo={isSettingsPageRoot ? '../' : './organization-settings'}
                 >
                   <OrganizationMembers />
                 </Gate>
