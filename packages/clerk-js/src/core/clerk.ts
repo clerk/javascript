@@ -13,7 +13,7 @@ import {
   setDevBrowserJWTInURL,
   stripScheme,
 } from '@clerk/shared';
-import { TelemetryCollector } from '@clerk/shared/telemetry';
+import { eventComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -401,7 +401,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record('COMPONENT_MOUNTED', { component: 'SignIn', appearanceProp: Boolean(props?.appearance) });
+    this.telemetry?.record(eventComponentMounted('SignIn', props));
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -423,7 +423,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record('COMPONENT_MOUNTED', { component: 'SignUp', appearanceProp: Boolean(props?.appearance) });
+    this.telemetry?.record(eventComponentMounted('SignUp', props));
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -446,10 +446,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record('COMPONENT_MOUNTED', {
-      component: 'UserProfile',
-      appearanceProp: Boolean(props?.appearance),
-    });
+    this.telemetry?.record(eventComponentMounted('UserProfile', props));
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -472,10 +469,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record('COMPONENT_MOUNTED', {
-      component: 'OrganizationProfile',
-      appearanceProp: Boolean(props?.appearance),
-    });
+    this.telemetry?.record(eventComponentMounted('OrganizationProfile', props));
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
@@ -498,10 +492,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record('COMPONENT_MOUNTED', {
-      component: 'CreateOrganization',
-      appearanceProp: Boolean(props?.appearance),
-    });
+    this.telemetry?.record(eventComponentMounted('CreateOrganization', props));
   };
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
@@ -524,10 +515,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record('COMPONENT_MOUNTED', {
-      component: 'OrganizationSwitcher',
-      appearanceProp: Boolean(props?.appearance),
-    });
+    this.telemetry?.record(eventComponentMounted('OrganizationSwitcher', props));
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
@@ -546,10 +534,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record('COMPONENT_MOUNTED', {
-      component: 'OrganizationList',
-      appearanceProp: Boolean(props?.appearance),
-    });
+    this.telemetry?.record(eventComponentMounted('OrganizationList', props));
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {
@@ -568,10 +553,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record('COMPONENT_MOUNTED', {
-      component: 'UserButton',
-      appearanceProp: Boolean(props?.appearance),
-    });
+    this.telemetry?.record(eventComponentMounted('UserButton', props));
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
