@@ -22,6 +22,10 @@ declare global {
   interface OrganizationMembershipPrivateMetadata {
     [k: string]: unknown;
   }
+
+  interface OrganizationCustomPermissions {
+    [k: string]: string;
+  }
 }
 
 export interface OrganizationMembershipResource extends ClerkResource {
@@ -30,7 +34,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
   /**
    * @experimental The property is experimental and subject to change in future releases.
    */
-  permissions: Autocomplete<OrganizationPermission>[];
+  permissions: OrganizationPermission[];
   publicMetadata: OrganizationMembershipPublicMetadata;
   publicUserData: PublicUserData;
   role: MembershipRole;
@@ -40,9 +44,11 @@ export interface OrganizationMembershipResource extends ClerkResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
+export type OrganizationCustomPermission = OrganizationCustomPermissions[keyof OrganizationCustomPermissions];
+
 export type MembershipRole = Autocomplete<'admin' | 'basic_member' | 'guest_member'>;
 
-export type OrganizationPermission =
+export type OrganizationSystemPermission =
   | 'org:sys_domains:manage'
   | 'org:sys_domains:delete'
   | 'org:sys_profile:manage'
@@ -51,6 +57,8 @@ export type OrganizationPermission =
   | 'org:sys_memberships:manage'
   | 'org:sys_memberships:delete'
   | 'org:sys_domains:read';
+
+export type OrganizationPermission = OrganizationSystemPermission | OrganizationCustomPermission;
 
 export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;

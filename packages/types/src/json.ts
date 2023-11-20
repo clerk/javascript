@@ -17,7 +17,7 @@ import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './sig
 import type { OAuthStrategy } from './strategies';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
-import type { Autocomplete, CamelToSnake } from './utils';
+import type { CamelToSnake } from './utils';
 import type { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
@@ -303,7 +303,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   /**
    * @experimental The property is experimental and subject to change in future releases.
    */
-  permissions: Autocomplete<OrganizationPermission>[];
+  permissions: OrganizationPermission[];
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;
