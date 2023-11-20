@@ -2,7 +2,7 @@ import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, Clerk } from '@clerk/backend';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
-import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
+import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { isTruthy } from '@clerk/shared/underscore';
 
@@ -69,7 +69,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 

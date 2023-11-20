@@ -1,5 +1,5 @@
 import { checkCrossOrigin } from '../util/request';
-import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/shared';
+import { isDevelopmentFromSecretKey, isProductionFromApiKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
 import { verifyToken } from './verify';
@@ -45,7 +45,7 @@ const isBrowser = (userAgent: string | undefined) => VALID_USER_AGENTS.test(user
 // automatically treated as signed out. This exception is needed for development, because the any // missing uat throws an interstitial in development.
 export const nonBrowserRequestInDevRule: InterstitialRule = options => {
   const { secretKey, userAgent } = options;
-  if (isDevelopmentFromApiKey(secretKey || '') && !isBrowser(userAgent)) {
+  if (isDevelopmentFromSecretKey(secretKey || '') && !isBrowser(userAgent)) {
     return signedOut(options, AuthErrorReason.HeaderMissingNonBrowser);
   }
   return undefined;
@@ -70,7 +70,7 @@ export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
 
 export const isPrimaryInDevAndRedirectsToSatellite: InterstitialRule = options => {
   const { secretKey = '', isSatellite, searchParams } = options;
-  const isDev = isDevelopmentFromApiKey(secretKey);
+  const isDev = isDevelopmentFromSecretKey(secretKey);
 
   if (isDev && !isSatellite && shouldRedirectToSatelliteUrl(searchParams)) {
     return interstitial(options, AuthErrorReason.PrimaryRespondsToSyncing);
@@ -80,7 +80,7 @@ export const isPrimaryInDevAndRedirectsToSatellite: InterstitialRule = options =
 
 export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options => {
   const { secretKey = '', clientUat } = options;
-  const res = isDevelopmentFromApiKey(secretKey);
+  const res = isDevelopmentFromSecretKey(secretKey);
   if (res && !clientUat) {
     return interstitial(options, AuthErrorReason.CookieUATMissing);
   }
@@ -96,7 +96,7 @@ export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: Interstitia
   const crossOriginReferrer =
     referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedProto });
 
-  if (isDevelopmentFromApiKey(secretKey) && crossOriginReferrer) {
+  if (isDevelopmentFromSecretKey(secretKey) && crossOriginReferrer) {
     return interstitial(options, AuthErrorReason.CrossOriginReferrer);
   }
   return undefined;

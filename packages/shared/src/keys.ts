@@ -70,7 +70,7 @@ export function createDevOrStagingUrlCache() {
   };
 }
 
-export function isDevelopmentFromApiKey(apiKey: string): boolean {
+export function isDevelopmentFromSecretKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
 }
 

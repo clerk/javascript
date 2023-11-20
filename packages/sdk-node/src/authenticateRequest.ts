@@ -1,7 +1,7 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants, createIsomorphicRequest } from '@clerk/backend';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
-import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
+import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import type { ServerResponse } from 'http';
 
@@ -73,7 +73,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || '')) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey || '')) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 

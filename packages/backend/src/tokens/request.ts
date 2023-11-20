@@ -1,7 +1,7 @@
 import { constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
-import { isDevelopmentFromApiKey } from '../util/shared';
+import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
@@ -32,7 +32,7 @@ export type OptionalVerifyTokenOptions = Partial<
 export type AuthenticateRequestOptions = AuthStatusOptionsType & OptionalVerifyTokenOptions & { request: Request };
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
-  if (!signInUrl && isDevelopmentFromApiKey(key)) {
+  if (!signInUrl && isDevelopmentFromSecretKey(key)) {
     throw new Error(`Missing signInUrl. Pass a signInUrl for dev instances if an app is satellite`);
   }
 }
