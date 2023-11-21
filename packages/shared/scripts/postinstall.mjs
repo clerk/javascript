@@ -63,7 +63,11 @@ async function notifyAboutTelemetry() {
 }
 
 async function main() {
-  await notifyAboutTelemetry();
+  try {
+    await notifyAboutTelemetry();
+  } catch {
+    // Do nothing, we _really_ don't want to log errors during install.
+  }
 }
 
 main();
