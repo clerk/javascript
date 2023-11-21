@@ -1,6 +1,6 @@
-import { unstable_createTheme } from '../createTheme';
+import { experimental_createTheme } from '../createTheme';
 
-export const dark = unstable_createTheme({
+export const dark = experimental_createTheme({
   variables: {
     colorBackground: '#19191A',
     colorInputBackground: '#19191A',

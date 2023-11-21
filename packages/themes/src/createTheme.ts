@@ -11,7 +11,7 @@ interface CreateClerkThemeParams extends DeepPartial<Theme> {
   elements?: Elements | ((params: { theme: InternalTheme }) => Elements);
 }
 
-export const unstable_createTheme = (appearance: Appearance<CreateClerkThemeParams>): BaseTheme => {
+export const experimental_createTheme = (appearance: Appearance<CreateClerkThemeParams>): BaseTheme => {
   // Placeholder method that might hande more transformations in the future
   return { ...appearance, __type: 'prebuilt_appearance' };
 };
