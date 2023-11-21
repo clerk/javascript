@@ -24,8 +24,15 @@ async function run() {
     `Found ${subpathHelperFile.subpathNames.length} subpaths and ${subpathHelperFile.subpathFoldersBarrel.length} subpath barrels`,
   );
 
-  const allFilesNames = [...subpathHelperFile.subpathNames, ...subpathHelperFile.subpathFoldersBarrel, 'dist'];
+  const allFilesNames = [
+    ...subpathHelperFile.subpathNames,
+    ...subpathHelperFile.subpathFoldersBarrel,
+    'dist',
+    'scripts',
+  ];
   const hasAllSubpathsInFiles = pkgFile.files.every(name => allFilesNames.includes(name));
+
+  console.log(allFilesNames, pkgFile.files);
 
   if (!hasAllSubpathsInFiles) {
     throw new Error('Not all subpaths from the package.json "files" array are in the subpaths.mjs');
