@@ -12,10 +12,13 @@ import { IconButton } from './IconButton';
 import { useUnsafeModalContext } from './Modal';
 import { PoweredByClerkTag } from './PoweredByClerk';
 
-type CardProps = PropsOfComponent<typeof BaseCard> & React.PropsWithChildren<Record<never, never>>;
+type CardProps = PropsOfComponent<typeof BaseCard> &
+  React.PropsWithChildren<{
+    footerItems?: React.ReactNode[];
+  }>;
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
-  const { sx, children, ...rest } = props;
+  const { sx, children, footerItems, ...rest } = props;
   const appearance = useAppearance();
   const flowMetadata = useFlowMetadata();
   const { branded } = useEnvironment().displayConfig;
@@ -45,9 +48,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
               position: 'relative',
               backgroundColor: t.colors.$colorBackground,
               padding: t.space.$8,
-              boxShadow: t.shadows.$sm,
+              boxShadow: t.shadows.$cardInnerDropShadow,
               width: t.sizes.$100,
-              borderRadius: `${t.radii.$xl} ${t.radii.$xl} ${t.radii.$lg} ${t.radii.$lg}`,
+              borderRadius: `${t.radii.$card} ${t.radii.$card} ${t.radii.$lg} ${t.radii.$lg}`,
             }),
             sx,
           ]}
@@ -57,6 +60,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
           {children}
         </Flex>
         <CardFooter>
+          {footerItems?.map((item, index) => (
+            <CardFooterItem key={index}>{item}</CardFooterItem>
+          ))}
           {branded && (
             <CardFooterItem>
               <PoweredByClerkTag />
@@ -114,8 +120,9 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
           willChange: 'transform, opacity, height',
           transitionProperty: t.transitionProperty.$common,
           transitionDuration: '200ms',
-          borderRadius: t.radii.$xl,
-          boxShadow: t.shadows.$cardDropShadow,
+          borderRadius: t.radii.$card,
+          boxShadow: t.shadows.$cardOuterDropShadow,
+          overflow: 'hidden',
         }),
         sx,
       ]}
@@ -135,15 +142,12 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
             />
           }
           sx={t => ({
+            color: t.colors.$colorTextTertiary,
             zIndex: t.zIndices.$modal,
-            opacity: t.opacity.$inactive,
-            ':hover': {
-              opacity: 0.8,
-            },
             position: 'absolute',
-            top: t.space.$3,
+            top: t.space.$none,
+            right: t.space.$none,
             padding: t.space.$3,
-            right: t.space.$3,
           })}
         />
       )}
@@ -162,13 +166,13 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       elementDescriptor={descriptors.cardFooter}
       sx={t => ({
         '>:first-of-type': {
-          padding: `${t.space.$4} ${t.space.$2} ${t.space.$2} ${t.space.$2}`,
+          padding: `${t.space.$6} ${t.space.$2} ${t.space.$4} ${t.space.$2}`,
           marginTop: `-${t.space.$2}`,
         },
         '>:not(:first-of-type)': {
-          padding: `${t.space.$2}`,
+          padding: `${t.space.$4} ${t.space.$2}`,
           borderTop: t.borders.$normal,
-          borderColor: t.colors.$blackAlpha300,
+          borderColor: t.colors.$blackAlpha100,
         },
       })}
       {...props}
@@ -191,7 +195,6 @@ export const CardFooterItem = React.forwardRef<HTMLDivElement, CardFooterItemPro
         t => ({
           position: 'relative',
           width: '100%',
-          borderRadius: `0 0 ${t.radii.$xl} ${t.radii.$xl}`,
           backgroundColor: t.colors.$blackAlpha200,
         }),
       ]}

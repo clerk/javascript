@@ -279,7 +279,20 @@ export function _SignInStart(): JSX.Element {
 
   return (
     <Flow.Part part='start'>
-      <Card>
+      <Card
+        footerItems={[
+          <Footer.Root key='signIn.start.actionLink'>
+            <Footer.Action elementId='signIn'>
+              <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
+              <Footer.ActionLink
+                localizationKey={localizationKeys('signIn.start.actionLink')}
+                to={clerk.buildUrlWithAuth(signUpUrl)}
+              />
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root>,
+        ]}
+      >
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
@@ -314,16 +327,6 @@ export function _SignInStart(): JSX.Element {
             ) : null}
           </SocialButtonsReversibleContainerWithDivider>
         </Col>
-        <Footer.Root>
-          <Footer.Action elementId='signIn'>
-            <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
-            <Footer.ActionLink
-              localizationKey={localizationKeys('signIn.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signUpUrl)}
-            />
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
       </Card>
     </Flow.Part>
   );

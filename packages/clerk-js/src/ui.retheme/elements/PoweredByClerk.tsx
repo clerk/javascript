@@ -40,14 +40,13 @@ export const PoweredByClerkTag = React.memo(
         justify='center'
         sx={t => ({
           width: '100%',
-          color: t.colors.$colorTextSecondary,
-          padding: t.space.$2,
+          color: t.colors.$primary500,
         })}
         {...props}
         ref={ref}
       >
         <Text
-          variant='regularRegular'
+          variant='extraSmallMedium'
           sx={theme => ({ color: 'inherit', letterSpacing: theme.space.$none })}
         >
           Secured by

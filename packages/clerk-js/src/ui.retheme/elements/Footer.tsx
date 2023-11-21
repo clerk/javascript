@@ -39,7 +39,11 @@ const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
       {...props}
       as='span'
       variant='smallRegular'
-      colorScheme='neutral'
+      // colorScheme='neutral'
+      sx={t => ({
+        // TODO: Make the color theme-aware once we have dark mode colors
+        color: t.colors.$primary500,
+      })}
     />
   );
 };
@@ -49,7 +53,12 @@ const FooterActionLink = (props: PropsOfComponent<typeof RouterLink>): JSX.Eleme
     <RouterLink
       elementDescriptor={descriptors.footerActionLink}
       {...props}
-      colorScheme='primary'
+      // colorScheme='primary'
+      sx={t => ({
+        // TODO: Make the color theme-aware once we have dark mode colors
+        color: t.colors.$primary700,
+        fontWeight: t.fontWeights.$medium,
+      })}
     />
   );
 };
