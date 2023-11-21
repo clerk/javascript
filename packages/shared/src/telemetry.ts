@@ -1,3 +1,4 @@
-export { TelemetryCollector, type TelemetryCollectorOptions } from './telemetry/collector';
+export { TelemetryCollector } from './telemetry/collector';
+export type { TelemetryCollectorOptions } from './telemetry/types';
 
 export * from './telemetry/events';

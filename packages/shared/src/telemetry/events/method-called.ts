@@ -1,3 +1,5 @@
+import type { TelemetryEventRaw } from '../types';
+
 const EVENT_METHOD_CALLED = 'METHOD_CALLED' as const;
 
 type EventMethodCalled = {
@@ -10,7 +12,7 @@ type EventMethodCalled = {
 export function eventMethodCalled(
   method: string,
   payload?: Record<string, unknown>,
-): { event: typeof EVENT_METHOD_CALLED; payload: EventMethodCalled } {
+): TelemetryEventRaw<EventMethodCalled> {
   return {
     event: EVENT_METHOD_CALLED,
     payload: {

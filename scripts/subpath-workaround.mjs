@@ -32,8 +32,6 @@ async function run() {
   ];
   const hasAllSubpathsInFiles = pkgFile.files.every(name => allFilesNames.includes(name));
 
-  console.log(allFilesNames, pkgFile.files);
-
   if (!hasAllSubpathsInFiles) {
     throw new Error('Not all subpaths from the package.json "files" array are in the subpaths.mjs');
   }

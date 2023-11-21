@@ -1,5 +1,5 @@
 /**
- * The `TelemetryCollector` class handles collection of telemetry events from Clerk SDKs. Telemetry is opt-out and can be disabled by setting a CLERK_TELEMETRY_DISABLE environment variable.
+ * The `TelemetryCollector` class handles collection of telemetry events from Clerk SDKs. Telemetry is opt-out and can be disabled by setting a CLERK_TELEMETRY_DISABLED environment variable.
  * The `ClerkProvider` also accepts a `telemetry` prop that will be passed to the collector during initialization:
  *
  * ```jsx
@@ -14,45 +14,7 @@ import type { InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';
-
-export type TelemetryCollectorOptions = {
-  /**
-   * If true, telemetry will not be collected.
-   */
-  disabled?: boolean;
-  /**
-   * If true, telemetry will not be sent, but collected events will be logged to the console.
-   */
-  debug?: boolean;
-  /**
-   * Sampling rate, 0-1
-   */
-  samplingRate?: number;
-  /**
-   * Set a custom buffer size to control how often events are sent
-   */
-  maxBufferSize?: number;
-  /**
-   * The publishableKey to associate with the collected events.
-   */
-  publishableKey?: string;
-  /**
-   * The secretKey to associate with the collected events.
-   */
-  secretKey?: string;
-  /**
-   * The current clerk-js version.
-   */
-  clerkVersion?: string;
-  /**
-   * The SDK being used, e.g. `@clerk/nextjs` or `@clerk/remix`.
-   */
-  sdk?: string;
-  /**
-   * The version of the SDK being used.
-   */
-  sdkVersion?: string;
-};
+import type { TelemetryCollectorOptions, TelemetryEvent } from './types';
 
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,
@@ -70,36 +32,7 @@ type TelemetryMetadata = Required<
   instanceType: InstanceType;
 };
 
-type TelemetryEvent = {
-  event: string;
-  /**
-   * publishableKey
-   */
-  pk?: string;
-  /**
-   * secretKey
-   */
-  sk?: string;
-  /**
-   * instanceType
-   */
-  it: InstanceType;
-  /**
-   * clerkVersion
-   */
-  cv: string;
-  /**
-   * SDK
-   */
-  sdk?: string;
-  /**
-   * SDK Version
-   */
-  sdkv?: string;
-  payload: Record<string, string | number | boolean>;
-};
-
-const DEFAULT_CONFIG: Partial<Required<TelemetryCollectorConfig>> = {
+const DEFAULT_CONFIG: Partial<TelemetryCollectorConfig> = {
   samplingRate: 1,
   maxBufferSize: 5,
   // Production endpoint: https://clerk-telemetry.com
