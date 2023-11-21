@@ -20,10 +20,7 @@ export const roRO: LocalizationResource = {
   formFieldLabel__emailAddresses: 'Adrese de e-mail',
   formFieldLabel__phoneNumber: 'Număr de telefon',
   formFieldLabel__username: 'Nume utilizator',
-  formFieldLabel__emailAddress_phoneNumber: 'Adresa de e-mail sau numărul de telefon',
   formFieldLabel__emailAddress_username: 'Adresa de e-mail sau numele de utilizator',
-  formFieldLabel__phoneNumber_username: 'număr de telefon sau nume de utilizator',
-  formFieldLabel__emailAddress_phoneNumber_username: 'Adresa de e-mail, numărul de telefon sau numele de utilizator',
   formFieldLabel__password: 'Parola',
   formFieldLabel__currentPassword: 'Parola curentă',
   formFieldLabel__newPassword: 'Parolă nouă',
@@ -47,10 +44,7 @@ export const roRO: LocalizationResource = {
     'Introduceți sau lipiți una sau mai multe adrese de e-mail, separate prin spații sau virgule',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__phoneNumber_username: '',
-  formFieldInputPlaceholder__emailAddress_phoneNumber_username: '',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
@@ -303,12 +297,10 @@ export const roRO: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Conturi conectate',
         primaryButton: 'Conectați-vă contul',
-        title__conectionFailed: 'Reîncercarea conexiunii eșuate',
         title__connectionFailed: 'Reîncercarea conexiunii eșuate',
         title__reauthorize: 'Reautorizare necesară',
         subtitle__reauthorize:
           'Scopurile contului dvs. au fost actualizate și este posibil să vă confruntați cu o funcționalitate limitată. Vă rugăm să autorizați din nou această aplicație pentru a evita orice problemă',
-        actionLabel__conectionFailed: 'Încearcă din nou',
         actionLabel__connectionFailed: 'Încearcă din nou',
         actionLabel__reauthorize: 'Autorizați acum',
         destructiveActionTitle: 'Eliminați',
@@ -656,9 +648,7 @@ export const roRO: LocalizationResource = {
       detailsTitle__emptyRow: 'Nu există membri de afișat',
       action__invite: 'Invitați',
       start: {
-        headerTitle__active: 'Activ',
         headerTitle__members: 'Membri',
-        headerTitle__invited: 'Invitat',
         headerTitle__invitations: 'Invitații',
         headerTitle__requests: 'Cereri',
       },
@@ -707,7 +697,6 @@ export const roRO: LocalizationResource = {
   createOrganization: {
     title: 'Creați o organizație',
     formButtonSubmit: 'Creați o organizație',
-    subtitle: 'Setați profilul organizației',
     invitePage: {
       formButtonReset: 'Skip',
     },
