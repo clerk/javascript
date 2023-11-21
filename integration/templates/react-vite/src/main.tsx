@@ -8,9 +8,6 @@ import Protected from './protected';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
 import UserProfile from './user';
-import SignInHash from './hash/sign-in';
-import SignUpHash from './hash/sign-up';
-import UserProfileHash from './hash/user';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -50,18 +47,6 @@ const router = createBrowserRouter([
       {
         path: '/protected',
         element: <Protected />,
-      },
-      {
-        path: '/hash/sign-up/*',
-        element: <SignUpHash />,
-      },
-      {
-        path: '/hash/sign-in/*',
-        element: <SignInHash />,
-      },
-      {
-        path: '/hash/user/*',
-        element: <UserProfileHash />,
       },
     ],
   },
