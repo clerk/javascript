@@ -1,6 +1,5 @@
 import { joinPaths } from '../../util/path';
-import type { DeletedObject } from '../resources';
-import type { OrganizationRole } from '../resources/OrganizationRole';
+import type { DeletedObject, OrganizationRole } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/organizations_roles';
@@ -8,21 +7,62 @@ const basePath = '/organizations_roles';
 type GetOrganizationRoleListParams = {
   limit?: number;
   offset?: number;
+  query?: string;
+  order_by?: string;
 };
 
 type CreateParams = {
+  /**
+   * A name of a role in a readable friendly format.
+   * F.e. `Teacher` or `Administrator`
+   */
   name: string;
+
+  /**
+   * A unique identifier that represents the role.
+   * F.e. `org:administrator`
+   */
   key: string;
+
+  /**
+   * A brief description of what the role represents or its intended use.
+   */
   description: string;
+
+  /**
+   * An array of permission ids that will be assigned to this role.
+   */
   permissions: string[];
 };
 
 type GetOrganizationRoleParams = { roleId: string };
 
 type UpdateParams = {
+  /**
+   * A name of a role in a readable friendly format.
+   * F.e. `Teacher` or `Administrator`
+   * Passing undefined has no effect to the existing value.
+   */
   name?: string;
+
+  /**
+   * A unique identifier that represents the role.
+   * F.e. `org:administrator`
+   * Passing undefined has no effect to the existing value.
+   */
+  key?: string;
+
+  /**
+   * A brief description of what the role represents or its intended use.
+   * Passing undefined has no effect to the existing value.
+   */
   description?: string;
-  //TODO(@pantelis): Will this override or union ?
+
+  /**
+   * An array of permission ids that will be assigned to this role.
+   * Passing undefined has no effect to the permission that already exist.
+   * Passing an empty array will override the existing permissions.
+   */
   permissions?: string[];
 };
 
