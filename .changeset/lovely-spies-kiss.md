@@ -2,4 +2,4 @@
 '@clerk/themes': patch
 ---
 
-Changed unstable_createTheme to experimental_createTheme
+Rename `unstable_createTheme` to `experimental_createTheme`
