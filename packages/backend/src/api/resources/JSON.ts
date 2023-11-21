@@ -2,6 +2,7 @@ import type {
   InvitationStatus,
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
+  PermissionType,
   SignInStatus,
   SignUpAttributeRequirements,
   SignUpStatus,
@@ -20,6 +21,7 @@ export enum ObjectType {
   Organization = 'organization',
   OrganizationInvitation = 'organization_invitation',
   OrganizationMembership = 'organization_membership',
+  Permission = 'permission',
   PhoneNumber = 'phone_number',
   RedirectUrl = 'redirect_url',
   Session = 'session',
@@ -170,6 +172,17 @@ export interface OrganizationMembershipPublicUserDataJSON {
   image_url: string;
   has_image: boolean;
   user_id: string;
+}
+
+export interface PermissionJSON extends ClerkResourceJSON {
+  object: ObjectType.Permission;
+  id: string;
+  name: string;
+  key: string;
+  description: string;
+  type: PermissionType;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface PhoneNumberJSON extends ClerkResourceJSON {
