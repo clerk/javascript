@@ -6,7 +6,7 @@ import path from 'node:path';
 const TELEMETRY_NOTICE_VERSION = '1';
 
 function telemetryNotice() {
-  console.log(`Attention: Clerk now collects telemetry data from its SDKs connected to development instances.`);
+  console.log(`Attention: Clerk now collects telemetry data from its SDKs when connected to development instances.`);
   console.log(`The data collected is used to inform Clerk's product roadmap.`);
   console.log(
     `To learn more, including how to opt-out from the telemetry program, visit: https://clerk.com/docs/telemetry.`,
