@@ -120,7 +120,7 @@ const InvitationPreview = withCardStateProvider(
         })}
       >
         <OrganizationPreview
-          elementId='organizationSwitcherTrigger'
+          elementId='organizationSwitcherListedOrganization'
           avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
           organization={publicOrganizationData}
           size='sm'
