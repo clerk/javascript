@@ -175,12 +175,12 @@ export interface OrganizationMembershipPublicUserDataJSON {
   user_id: string;
 }
 
-export interface OrganizationRoleJSON extends ClerkResourceJSON {
+export interface RoleJSON extends ClerkResourceJSON {
   object: ObjectType.Role;
   name: string;
   key: string;
   description: string;
-  permissions: string[];
+  permissions: PermissionJSON[];
   created_at: number;
   updated_at: number;
 }
