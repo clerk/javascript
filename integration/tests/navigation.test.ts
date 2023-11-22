@@ -91,7 +91,19 @@ export default function Page() {
 
     await u.page.getByRole('button', { name: /Set username/i }).click();
 
-    await u.page.waitForURL('**/user/username');
+    await u.page.waitForURL(`${app.serverUrl}/user/username`);
+
+    await u.page.getByRole('button', { name: /Cancel/i }).click();
+
+    await u.page.waitForURL(`${app.serverUrl}/user`);
+
+    await u.page.getByRole('button', { name: /Add an email address/i }).click();
+
+    await u.page.waitForURL(`${app.serverUrl}/user/email-address`);
+
+    await u.page.getByRole('button', { name: /Cancel/i }).click();
+
+    await u.page.waitForURL(`${app.serverUrl}/user`);
   });
 
   test('user profile with hash router', async ({ page, context }) => {
@@ -106,6 +118,18 @@ export default function Page() {
 
     await u.page.getByRole('button', { name: /Set username/i }).click();
 
-    expect(u.page.url()).toContain('user#/username');
+    expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#/username`);
+
+    await u.page.getByRole('button', { name: /Cancel/i }).click();
+
+    expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#`);
+
+    await u.page.getByRole('button', { name: /Add an email address/i }).click();
+
+    expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#/email-address`);
+
+    await u.page.getByRole('button', { name: /Cancel/i }).click();
+
+    expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#`);
   });
 });
