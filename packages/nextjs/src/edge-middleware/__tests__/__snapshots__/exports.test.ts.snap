@@ -21,6 +21,7 @@ exports[`/edge-middleware public exports should not include a breaking change 1`
   "Permission",
   "PhoneNumber",
   "RedirectUrl",
+  "Role",
   "SMSMessage",
   "Session",
   "SignInToken",
