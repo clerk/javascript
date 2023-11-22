@@ -3,6 +3,7 @@ import { transform } from 'esbuild';
 import { readFile } from 'fs/promises';
 import { defineConfig } from 'tsup';
 
+import { version as clerkJsVersion } from '../clerk-js/package.json';
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
@@ -17,8 +18,9 @@ export default defineConfig(overrideOptions => {
     sourcemap: true,
     dts: true,
     external: ['react', 'react-dom'],
-    esbuildPlugins: [WebWorkerMinifyPlugin as any],
+    esbuildPlugins: [WebWorkerMinifyPlugin],
     define: {
+      CLERK_JS_PACKAGE_VERSION: `"${clerkJsVersion}"`,
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
       __DEV__: `${isWatch}`,
