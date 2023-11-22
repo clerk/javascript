@@ -98,16 +98,8 @@ export class TelemetryCollector {
     return this.#config.debug || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DEBUG));
   }
 
-  record(event: Pick<TelemetryEvent, 'event' | 'payload'>): void;
-  record(event: TelemetryEvent['event'], payload: TelemetryEvent['payload']): void;
-  record(
-    event: TelemetryEvent['event'] | Pick<TelemetryEvent, 'event' | 'payload'>,
-    payload?: TelemetryEvent['payload'],
-  ): void {
-    const preparedPayload =
-      typeof event === 'string'
-        ? this.#preparePayload(event, payload ?? {})
-        : this.#preparePayload(event.event, event.payload);
+  record(event: Pick<TelemetryEvent, 'event' | 'payload'>): void {
+    const preparedPayload = this.#preparePayload(event.event, event.payload);
 
     this.#logEvent(preparedPayload.event, preparedPayload);
 

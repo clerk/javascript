@@ -15,7 +15,7 @@ describe('TelemetryCollector', () => {
       publishableKey: TEST_PK,
     });
 
-    collector.record('TEST_EVENT', {});
+    collector.record({ event: 'TEST_EVENT', payload: {} });
 
     jest.runAllTimers();
 
@@ -33,7 +33,7 @@ describe('TelemetryCollector', () => {
       publishableKey: TEST_PK,
     });
 
-    collector.record('TEST_EVENT', {});
+    collector.record({ event: 'TEST_EVENT', payload: {} });
 
     jest.runAllTimers();
 
@@ -54,7 +54,7 @@ describe('TelemetryCollector', () => {
       publishableKey: TEST_PK,
     });
 
-    collector.record('TEST_EVENT', {});
+    collector.record({ event: 'TEST_EVENT', payload: {} });
 
     jest.runAllTimers();
 
@@ -92,7 +92,7 @@ describe('TelemetryCollector', () => {
       publishableKey: TEST_PK,
     });
 
-    collector.record('TEST_EVENT', {});
+    collector.record({ event: 'TEST_EVENT', payload: {} });
 
     jest.runAllTimers();
 
@@ -128,7 +128,7 @@ describe('TelemetryCollector', () => {
       publishableKey: TEST_PK,
     });
 
-    collector.record('TEST_EVENT', {});
+    collector.record({ event: 'TEST_EVENT', payload: {} });
 
     jest.runAllTimers();
 
@@ -145,8 +145,8 @@ describe('TelemetryCollector', () => {
       publishableKey: TEST_PK,
     });
 
-    collector.record('TEST_EVENT', {});
-    collector.record('TEST_EVENT', {});
+    collector.record({ event: 'TEST_EVENT', payload: {} });
+    collector.record({ event: 'TEST_EVENT', payload: {} });
 
     expect(fetchSpy).toHaveBeenCalled();
 
