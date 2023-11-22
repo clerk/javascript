@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useGate } from '../../../ui/common';
+import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../../ui/constants';
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Breadcrumbs, NavBar, NavbarContextProvider, OrganizationPreview } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
@@ -9,6 +11,17 @@ export const OrganizationProfileNavbar = (
 ) => {
   const { organization } = useCoreOrganization();
   const { pages } = useOrganizationProfileContext();
+
+  const { isAuthorizedUser: allowMembersRoute } = useGate({
+    some: [
+      {
+        permission: 'org:sys_memberships:read',
+      },
+      {
+        permission: 'org:sys_memberships:manage',
+      },
+    ],
+  });
 
   if (!organization) {
     return null;
@@ -24,7 +37,11 @@ export const OrganizationProfileNavbar = (
             sx={t => ({ margin: `0 0 ${t.space.$4} ${t.space.$2}` })}
           />
         }
-        routes={pages.routes}
+        routes={pages.routes.filter(
+          r =>
+            r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS ||
+            (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS && allowMembersRoute),
+        )}
         contentRef={props.contentRef}
       />
       {props.children}
