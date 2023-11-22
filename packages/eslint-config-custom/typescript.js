@@ -56,12 +56,12 @@ module.exports = {
     {
       files: TYPESCRIPT_FILES,
       extends: [
-        'eslint:recommended',
+        require.resolve('./_base'),
         'plugin:@typescript-eslint/recommended',
         'plugin:@typescript-eslint/recommended-requiring-type-checking',
-        'prettier',
       ],
       rules: {
+        // ...base.rules,
         '@typescript-eslint/ban-ts-comment': [
           `warn`,
           {
