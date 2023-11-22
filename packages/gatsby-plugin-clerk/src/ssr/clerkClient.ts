@@ -12,6 +12,8 @@ const clerkClient = Clerk({
 
 const createClerkClient = Clerk;
 
+// eslint-disable-next-line import/export
 export { Clerk, clerkClient, createClerkClient };
 
+// eslint-disable-next-line import/export
 export * from '@clerk/backend';
