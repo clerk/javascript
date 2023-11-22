@@ -1,4 +1,4 @@
-name: Nightly upstream tests
+name: Cleanup e2e instances
 on:
   workflow_dispatch:
   schedule:
