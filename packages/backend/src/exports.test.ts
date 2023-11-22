@@ -24,6 +24,7 @@ export default (QUnit: QUnit) => {
         'OrganizationInvitation',
         'OrganizationMembership',
         'OrganizationMembershipPublicUserData',
+        'Permission',
         'PhoneNumber',
         'RedirectUrl',
         'SMSMessage',

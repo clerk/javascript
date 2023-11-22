@@ -7,6 +7,7 @@ import {
   InterstitialAPI,
   InvitationAPI,
   OrganizationAPI,
+  OrganizationPermissionAPI,
   PhoneNumberAPI,
   RedirectUrlAPI,
   SessionAPI,
@@ -41,7 +42,6 @@ export type ApiClient = ReturnType<typeof createBackendApiClient>;
 
 export function createBackendApiClient(options: CreateBackendApiOptions) {
   const request = buildRequest(options);
-
   return {
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     clients: new ClientAPI(request),
@@ -50,6 +50,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     interstitial: new InterstitialAPI(request),
     invitations: new InvitationAPI(request),
     organizations: new OrganizationAPI(request),
+    organizationPermissions: new OrganizationPermissionAPI(request),
     phoneNumbers: new PhoneNumberAPI(request),
     redirectUrls: new RedirectUrlAPI(request),
     sessions: new SessionAPI(request),
