@@ -37,6 +37,16 @@ declare global {
     [k: string]: string;
   }
 
+  type OrganizationCustomPermissions = 'org';
+
+  interface OrganizationCustomProperties {
+    permission: string;
+  }
+
+  interface ClerkCustomPermissions {
+    permissions: 'nikos' | 'pantelis';
+  }
+
   /**
    * If you want to provide custom types for the organizationMembership.role
    * property, simply redeclare this rule in the global namespace.
@@ -71,7 +81,17 @@ export interface OrganizationMembershipResource extends ClerkResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-export type OrganizationCustomPermission = OrganizationCustomPermissions[keyof OrganizationCustomPermissions];
+interface ClerkCustomPermissions {
+  permissions: 'dimitris';
+}
+
+type Test = ClerkCustomPermissions['permissions'];
+
+const test: Test = 'dimitris';
+
+console.log(test);
+
+export type OrganizationCustomPermission = OrganizationCustomProperties['permission'];
 export type OrganizationCustomRole = OrganizationCustomRoles[keyof OrganizationCustomRoles];
 
 /**
