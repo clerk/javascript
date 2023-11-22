@@ -47,20 +47,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </html>
     </Provider>
   );
-}
-      `,
+}`,
       )
       .addFile(
         'src/app/hash/user/[[...catchall]]/page.tsx',
         () => `
-import { UserProfile } from '@clerk/nextjs';
+import { UserProfile, UserButton } from '@clerk/nextjs';
 
 export default function Page() {
   return (
-    <UserProfile routing="hash" />
+    <div>
+      <UserButton />
+      <UserProfile routing="hash" />
+    </div>
   );
-}
-      `,
+}`,
+      )
+      .addFile(
+        'src/app/hash/sign-in/[[...catchall]]/page.tsx',
+        () => `
+import { SignIn } from '@clerk/nextjs';
+
+export default function Page() {
+  return (
+    <SignIn routing="hash" />
+  );
+}`,
       )
       .commit();
     await app.setup();
@@ -79,7 +91,7 @@ export default function Page() {
     await app.teardown();
   });
 
-  test('user profile with path router', async ({ page, context }) => {
+  test('user profile with path routing', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -89,24 +101,24 @@ export default function Page() {
     await u.po.userProfile.goTo();
     await u.po.userProfile.waitForMounted();
 
-    await u.page.getByRole('button', { name: /Set username/i }).click();
+    await u.page.getByText(/Set username/i).click();
 
     await u.page.waitForURL(`${app.serverUrl}/user/username`);
 
-    await u.page.getByRole('button', { name: /Cancel/i }).click();
+    await u.page.getByText(/Cancel/i).click();
 
     await u.page.waitForURL(`${app.serverUrl}/user`);
 
-    await u.page.getByRole('button', { name: /Add an email address/i }).click();
+    await u.page.getByText(/Add an email address/i).click();
 
     await u.page.waitForURL(`${app.serverUrl}/user/email-address`);
 
-    await u.page.getByRole('button', { name: /Cancel/i }).click();
+    await u.page.getByText(/Cancel/i).click();
 
     await u.page.waitForURL(`${app.serverUrl}/user`);
   });
 
-  test('user profile with hash router', async ({ page, context }) => {
+  test('user profile with hash routing', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -116,20 +128,73 @@ export default function Page() {
     await u.page.goToRelative('/hash/user');
     await u.po.userProfile.waitForMounted();
 
-    await u.page.getByRole('button', { name: /Set username/i }).click();
+    await u.page.getByText(/Set username/i).click();
 
     expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#/username`);
 
-    await u.page.getByRole('button', { name: /Cancel/i }).click();
+    await u.page.getByText(/Cancel/i).click();
 
     expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#`);
 
-    await u.page.getByRole('button', { name: /Add an email address/i }).click();
+    await u.page.getByText(/Add an email address/i).click();
 
     expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#/email-address`);
 
-    await u.page.getByRole('button', { name: /Cancel/i }).click();
+    await u.page.getByText(/Cancel/i).click();
 
     expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#`);
+  });
+
+  test('sign in with path routing', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.page.waitForURL(`${app.serverUrl}/sign-in/factor-one`);
+
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+
+    await u.po.expect.toBeSignedIn();
+  });
+
+  test('sign in with hash routing', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/hash/sign-in');
+    await u.po.signIn.waitForMounted();
+
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.page.waitForURL(`${app.serverUrl}/hash/sign-in#/factor-one`);
+
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+
+    await u.po.expect.toBeSignedIn();
+  });
+
+  test('user profile from user button navigates correctly', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/');
+    await u.page.waitForClerkComponentMounted();
+
+    await u.page.getByRole('button', { name: 'Open user button' }).click();
+
+    await u.page.getByText(/Manage account/).click();
+
+    await u.page.waitForSelector('.cl-modalContent > .cl-userProfile-root', { state: 'attached' });
+
+    await u.page.getByText(/Set username/i).click();
+    await u.page.getByText(/Cancel/i).click();
+
+    await u.page.getByText(/Add an email address/i).click();
+    await u.page.getByText(/Cancel/i).click();
   });
 });

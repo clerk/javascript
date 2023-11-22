@@ -1,7 +1,6 @@
 import type { Browser, BrowserContext } from '@playwright/test';
 
 import type { createAppPageObject } from './appPageObject';
-import { common } from './commonPageObject';
 
 export type EnchancedPage = ReturnType<typeof createAppPageObject>;
 export type TestArgs = { page: EnchancedPage; context: BrowserContext; browser: Browser };
