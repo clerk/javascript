@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from '@remix-run/react';
 import React from 'react';
+import type { NavigateOptions } from 'react-router';
 
 type Resolve = (value?: unknown) => void;
 
@@ -18,10 +19,10 @@ export const useAwaitableNavigate = () => {
     resolveAll();
   }, [location]);
 
-  return (to: string) => {
+  return (to: string, opts?: NavigateOptions) => {
     return new Promise(res => {
       resolveFunctionsRef.current.push(res);
-      navigate(to);
+      navigate(to, opts);
     });
   };
 };

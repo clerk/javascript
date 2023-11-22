@@ -4,7 +4,9 @@ import React from 'react';
 import type { RemixClerkProviderProps } from './RemixClerkProvider';
 import { ClerkProvider } from './RemixClerkProvider';
 
-type ClerkAppOptions = Partial<Omit<RemixClerkProviderProps, 'navigate' | 'children' | 'clerkState'>>;
+type ClerkAppOptions = Partial<
+  Omit<RemixClerkProviderProps, 'routerPush' | 'routerReplace' | 'children' | 'clerkState'>
+>;
 
 export function ClerkApp(App: () => JSX.Element, opts: ClerkAppOptions = {}) {
   return () => {

@@ -3,9 +3,11 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 
+type NavigateFunction = ReturnType<typeof useRouter>['push'];
+
 declare global {
   interface Window {
-    __clerk_nav_ref: (to: string) => any;
+    __clerk_nav_ref: NavigateFunction;
     __clerk_nav_resolves_ref: Array<(val?: any) => any> | undefined;
   }
 }
@@ -19,9 +21,10 @@ export const useAwaitableNavigate = () => {
   const urlKey = pathname + params.toString();
 
   useEffect(() => {
-    window.__clerk_nav_ref = (to: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    window.__clerk_nav_ref = (to, opts) => {
       if (to === window.location.href.replace(window.location.origin, '')) {
-        push(to);
+        push(to, opts);
         return Promise.resolve();
       }
 
@@ -43,7 +46,7 @@ export const useAwaitableNavigate = () => {
     window.__clerk_nav_resolves_ref = [];
   });
 
-  return useCallback((to: string) => {
-    return window.__clerk_nav_ref(to);
+  return useCallback<NavigateFunction>((to, opts) => {
+    return window.__clerk_nav_ref(to, opts);
   }, []);
 };

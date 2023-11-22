@@ -529,14 +529,14 @@ describe('Clerk singleton', () => {
     });
 
     it('uses window location if a custom navigate is defined but destination has different origin', async () => {
-      await sut.load({ navigate: mockNavigate });
+      await sut.load({ routerPush: mockNavigate });
       const toUrl = 'https://www.origindifferent.com/';
       await sut.navigate(toUrl);
       expect(mockHref).toHaveBeenCalledWith(toUrl);
     });
 
     it('wraps custom navigate method in a promise if provided and it sync', async () => {
-      await sut.load({ navigate: mockNavigate });
+      await sut.load({ routerPush: mockNavigate });
       const toUrl = 'http://test.host/path#hash';
       const res = sut.navigate(toUrl);
       expect(res.then).toBeDefined();
@@ -596,7 +596,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       if (!sut.client) {
         fail('we should always have a client');
@@ -661,7 +661,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       if (!sut.client) {
         fail('we should always have a client');
@@ -729,7 +729,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       if (!sut.client) {
         fail('we should always have a client');
@@ -787,7 +787,7 @@ describe('Clerk singleton', () => {
       const mockSetActive = jest.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
 
@@ -839,7 +839,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       if (!sut.client) {
         fail('we should always have a client');
@@ -887,7 +887,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
 
       await sut.handleRedirectCallback();
@@ -930,7 +930,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
 
       sut.handleRedirectCallback({
@@ -986,7 +986,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive as any;
 
@@ -1043,7 +1043,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive as any;
 
@@ -1097,7 +1097,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
 
       await sut.handleRedirectCallback();
@@ -1147,7 +1147,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
 
       await sut.handleRedirectCallback();
@@ -1191,7 +1191,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
 
       await sut.handleRedirectCallback();
@@ -1240,7 +1240,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
 
       await sut.handleRedirectCallback();
@@ -1274,7 +1274,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
 
       await sut.handleRedirectCallback();
@@ -1320,7 +1320,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       if (!sut.client) {
         fail('we should always have a client');
@@ -1381,7 +1381,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       if (!sut.client) {
         fail('we should always have a client');
@@ -1434,7 +1434,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       if (!sut.client) {
         fail('we should always have a client');
@@ -1474,7 +1474,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       if (!sut.client) {
         fail('we should always have a client');
@@ -1515,7 +1515,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
 
@@ -1546,7 +1546,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
 
@@ -1579,7 +1579,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
 
@@ -1610,7 +1610,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
 
@@ -1637,7 +1637,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
 
@@ -1661,7 +1661,7 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
 
@@ -1687,7 +1687,7 @@ describe('Clerk singleton', () => {
       const mockSetActive = jest.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
       const res = { ping: 'ping' };
@@ -1712,7 +1712,7 @@ describe('Clerk singleton', () => {
       const mockSetActive = jest.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
       await expect(async () => {
@@ -1739,7 +1739,7 @@ describe('Clerk singleton', () => {
       const mockSetActive = jest.fn();
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
-        navigate: mockNavigate,
+        routerPush: mockNavigate,
       });
       sut.setActive = mockSetActive;
 
