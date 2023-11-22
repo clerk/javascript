@@ -53,7 +53,7 @@ export const getClerkJsMajorVersionOrTag = (frontendApi: string, pkgVersion?: st
  */
 export const getScriptUrl = (
   frontendApi: string,
-  { pkgVersion, clerkJSVersion }: { pkgVersion?: string; clerkJSVersion?: string },
+  { pkgVersion = CLERK_JS_PACKAGE_VERSION, clerkJSVersion }: { pkgVersion?: string; clerkJSVersion?: string },
 ) => {
   const noSchemeFrontendApi = frontendApi.replace(/http(s)?:\/\//, '');
   const major = getClerkJsMajorVersionOrTag(frontendApi, pkgVersion);
