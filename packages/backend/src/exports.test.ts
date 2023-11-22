@@ -33,8 +33,6 @@ export default (QUnit: QUnit) => {
         'SignInToken',
         'Token',
         'TokenVerificationError',
-        'TokenVerificationErrorAction',
-        'TokenVerificationErrorCode',
         'TokenVerificationErrorReason',
         'User',
         'Verification',
