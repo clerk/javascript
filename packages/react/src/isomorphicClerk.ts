@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -39,6 +40,8 @@ import type {
   IsomorphicClerkOptions,
 } from './types';
 import { errorThrower, isConstructor, loadClerkJsScript } from './utils';
+
+const SDK_METADATA = { name: PACKAGE_NAME, version: PACKAGE_VERSION };
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
@@ -133,6 +136,11 @@ export class IsomorphicClerk {
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inBrowser() ? 'browser' : 'server';
+
+    if (!this.options.sdkMetadata) {
+      this.options.sdkMetadata = SDK_METADATA;
+    }
+
     void this.loadClerkJS();
   }
 
@@ -168,6 +176,7 @@ export class IsomorphicClerk {
             proxyUrl: this.proxyUrl,
             domain: this.domain,
           } as any);
+
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
@@ -196,8 +205,6 @@ export class IsomorphicClerk {
 
         await global.Clerk.load(this.options);
       }
-
-      global.Clerk.sdkMetadata = this.options.sdkMetadata ?? { name: PACKAGE_NAME, version: PACKAGE_VERSION };
 
       if (global.Clerk?.loaded || global.Clerk?.isReady()) {
         return this.hydrateClerkJS(global.Clerk);
@@ -312,6 +319,15 @@ export class IsomorphicClerk {
   get organization(): OrganizationResource | undefined | null {
     if (this.clerkjs) {
       return this.clerkjs.organization;
+    } else {
+      return undefined;
+    }
+  }
+
+  get telemetry(): TelemetryCollector | undefined {
+    if (this.clerkjs) {
+      // @ts-expect-error -- We can't add the type here due to the TelemetryCollector type existing in shared, but the Clerk type existing in types
+      return this.clerkjs.telemetry;
     } else {
       return undefined;
     }

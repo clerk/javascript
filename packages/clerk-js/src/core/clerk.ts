@@ -13,6 +13,7 @@ import {
   setDevBrowserJWTInURL,
   stripScheme,
 } from '@clerk/shared';
+import { eventComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -149,6 +150,7 @@ export class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public __internal_country?: string | null;
+  public telemetry?: TelemetryCollector;
 
   protected internal_last_error: ClerkAPIError | null = null;
 
@@ -265,6 +267,19 @@ export class Clerk implements ClerkInterface {
       ...defaultOptions,
       ...options,
     };
+
+    if (this.#options.sdkMetadata) {
+      Clerk.sdkMetadata = this.#options.sdkMetadata;
+    }
+
+    if (this.#options.telemetry !== false) {
+      this.telemetry = new TelemetryCollector({
+        clerkVersion: Clerk.version,
+        samplingRate: 1,
+        publishableKey: this.publishableKey,
+        ...this.#options.telemetry,
+      });
+    }
 
     this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
       this.#options.allowedRedirectOrigins,
@@ -386,6 +401,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+    this.telemetry?.record(eventComponentMounted('SignIn', props));
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -407,6 +423,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+    this.telemetry?.record(eventComponentMounted('SignUp', props));
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -428,6 +445,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record(eventComponentMounted('UserProfile', props));
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -449,6 +468,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record(eventComponentMounted('OrganizationProfile', props));
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
@@ -470,6 +491,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record(eventComponentMounted('CreateOrganization', props));
   };
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
@@ -491,6 +514,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record(eventComponentMounted('OrganizationSwitcher', props));
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
@@ -508,6 +533,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record(eventComponentMounted('OrganizationList', props));
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {
@@ -525,6 +552,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
+
+    this.telemetry?.record(eventComponentMounted('UserButton', props));
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {

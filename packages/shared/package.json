@@ -66,7 +66,8 @@
     "url",
     "react",
     "constants",
-    "apiUrlFromPublishableKey"
+    "apiUrlFromPublishableKey",
+    "scripts"
   ],
   "scripts": {
     "build": "tsup",
@@ -74,6 +75,7 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
+    "postinstall": "node ./scripts/postinstall.mjs",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
@@ -93,6 +95,7 @@
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
     "@types/node": "^18.17.0",
+    "cross-fetch": "^4.0.0",
     "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"

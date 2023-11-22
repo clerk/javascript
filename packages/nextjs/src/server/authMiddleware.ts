@@ -2,6 +2,7 @@ import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants, TokenVerificationErrorReason } from '@clerk/backend';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
@@ -10,6 +11,7 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
+import { clerkClient } from './clerkClient';
 import { SECRET_KEY } from './constants';
 import {
   clockSkewDetected,
@@ -144,6 +146,15 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(publicRoutes));
   const isApiRoute = createApiRoutes(apiRoutes);
   const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, params);
+
+  clerkClient.telemetry.record(
+    eventMethodCalled('authMiddleware', {
+      publicRoutes: Boolean(publicRoutes),
+      ignoredRoutes: Boolean(ignoredRoutes),
+      beforeAuth: Boolean(beforeAuth),
+      afterAuth: Boolean(afterAuth),
+    }),
+  );
 
   return withLogger('authMiddleware', logger => async (_req: NextRequest, evt: NextFetchEvent) => {
     if (options.debug) {
