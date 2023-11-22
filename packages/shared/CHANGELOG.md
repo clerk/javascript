@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.1.1
+
+### Patch Changes
+
+- Ensure that the interstitial page loads clerk-js@v4. ([#2180](https://github.com/clerk/javascript/pull/2180)) by [@BRKalow](https://github.com/BRKalow)
+
+- Ensure the interstitial loads a clerk-js version that matches the current major version. ([#2180](https://github.com/clerk/javascript/pull/2180)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 1.1.0
 
 ### Minor Changes

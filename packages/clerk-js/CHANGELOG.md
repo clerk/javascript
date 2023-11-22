@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.65.3
+
+### Patch Changes
+
+- Hide members page of <OrganizationProfile/> if user doesn't have any membership related permissions. ([#2182](https://github.com/clerk/javascript/pull/2182)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e41374abf`](https://github.com/clerk/javascript/commit/e41374abf96ae62410ac63c03c5055d4f9af363e), [`e41374abf`](https://github.com/clerk/javascript/commit/e41374abf96ae62410ac63c03c5055d4f9af363e)]:
+  - @clerk/shared@1.1.1
+
 ## 4.65.2
 
 ### Patch Changes

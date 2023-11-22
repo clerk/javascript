@@ -1,5 +1,25 @@
 # Change Log
 
+## 0.34.2
+
+### Patch Changes
+
+- Add OrganizationRoleAPI for CRUD operations regarding instance level organization roles. ([#2187](https://github.com/clerk/javascript/pull/2187)) by [@panteliselef](https://github.com/panteliselef)
+
+- Deprecate `createSMSMessage` and `SMSMessageApi` from `clerkClient`. ([#2184](https://github.com/clerk/javascript/pull/2184)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  The `/sms_messages` Backend API endpoint will also be dropped in the future since this feature will no longer be available for new Clerk instances.
+
+  For a brief period it will still be accessible for instances that have used it in the past 7
+  days (13-11-2023 to 20-11-2023).
+
+  New instances will get a 403 forbidden response if they try to access it.
+
+- Add OrganizationPermissionAPI for CRUD operations regarding instance level organization permissions. ([#2185](https://github.com/clerk/javascript/pull/2185)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e41374abf`](https://github.com/clerk/javascript/commit/e41374abf96ae62410ac63c03c5055d4f9af363e), [`e41374abf`](https://github.com/clerk/javascript/commit/e41374abf96ae62410ac63c03c5055d4f9af363e)]:
+  - @clerk/shared@1.1.1
+
 ## 0.34.1
 
 ### Patch Changes
