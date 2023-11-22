@@ -20,6 +20,11 @@ export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
 export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
 
+export type PermissionType = 'system' | 'user';
+
+/**
+ * @deprecated In the next major release this type will change to string
+ */
 export type OrganizationMembershipRole = 'basic_member' | 'guest_member' | 'admin';
 
 export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_factor_two' | 'complete';

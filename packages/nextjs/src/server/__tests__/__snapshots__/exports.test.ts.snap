@@ -29,6 +29,7 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "OrganizationMembershipPublicUserData",
   "PROXY_URL",
   "PUBLISHABLE_KEY",
+  "Permission",
   "PhoneNumber",
   "RedirectUrl",
   "SECRET_KEY",
