@@ -3,6 +3,10 @@ const config = {
   displayName: 'shared',
   injectGlobals: true,
 
+  globals: {
+    CLERK_JS_PACKAGE_VERSION: '4.0.0-test',
+  },
+
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
   setupFiles: ['./jest.setup.ts'],
