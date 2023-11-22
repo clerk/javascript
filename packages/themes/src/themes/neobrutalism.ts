@@ -1,4 +1,4 @@
-import { unstable_createTheme } from '../createTheme';
+import { experimental_createTheme } from '../createTheme';
 
 const buttonStyle = {
   boxShadow: '3px 3px 0px #000',
@@ -14,7 +14,7 @@ const buttonStyle = {
   },
 };
 
-export const neobrutalism = unstable_createTheme({
+export const neobrutalism = experimental_createTheme({
   variables: {
     colorPrimary: '#DF1B1B',
     colorTextSecondary: '#000',

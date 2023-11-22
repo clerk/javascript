@@ -46,3 +46,5 @@ export { default as Trash } from './trash.svg';
 export { default as Upload } from './upload.svg';
 export { default as User } from './user.svg';
 export { default as UserAdd } from './userAdd.svg';
+export { default as Check } from './check.svg';
+export { default as ArrowUpDown } from './arrow-up-down.svg';
