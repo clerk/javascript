@@ -2,7 +2,7 @@ import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@cl
 import { jest } from '@jest/globals';
 import React from 'react';
 
-import { default as ClerkCtor } from '../../../core/clerk';
+import { Clerk as ClerkCtor } from '../../../core/clerk';
 import { Client, Environment } from '../../../core/resources';
 import { ComponentContext, CoreClerkContextWrapper, EnvironmentProvider, OptionsProvider } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
