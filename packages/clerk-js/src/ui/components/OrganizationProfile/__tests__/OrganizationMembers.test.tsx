@@ -70,7 +70,7 @@ describe('OrganizationMembers', () => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.dev'],
-        organization_memberships: [{ name: 'Org1', permissions: [] }],
+        organization_memberships: [{ name: 'Org1', permissions: ['org:sys_memberships:read'] }],
       });
     });
 
@@ -80,6 +80,26 @@ describe('OrganizationMembers', () => {
 
     await waitFor(() => {
       expect(queryByRole('tab', { name: 'Members' })).toBeInTheDocument();
+      expect(queryByRole('tab', { name: 'Invitations' })).not.toBeInTheDocument();
+      expect(queryByRole('tab', { name: 'Requests' })).not.toBeInTheDocument();
+    });
+  });
+
+  it('does not show members tab or navbar route if user is lacking permissions', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', permissions: [] }],
+      });
+    });
+
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
+    const { queryByRole } = render(<OrganizationMembers />, { wrapper });
+
+    await waitFor(() => {
+      expect(queryByRole('tab', { name: 'Members' })).not.toBeInTheDocument();
       expect(queryByRole('tab', { name: 'Invitations' })).not.toBeInTheDocument();
       expect(queryByRole('tab', { name: 'Requests' })).not.toBeInTheDocument();
     });

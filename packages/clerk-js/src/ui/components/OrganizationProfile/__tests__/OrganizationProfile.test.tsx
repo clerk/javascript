@@ -53,4 +53,24 @@ describe('OrganizationProfile', () => {
     expect(getByText('Custom1')).toBeDefined();
     expect(getByText('ExternalLink')).toBeDefined();
   });
+
+  it('removes member nav item if user is lacking permissions', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [
+          {
+            name: 'Org1',
+            permissions: [],
+          },
+        ],
+      });
+    });
+
+    const { queryByText } = render(<OrganizationProfile />, { wrapper });
+    expect(queryByText('Org1')).toBeInTheDocument();
+    expect(queryByText('Members')).not.toBeInTheDocument();
+    expect(queryByText('Settings')).toBeInTheDocument();
+  });
 });
