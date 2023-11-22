@@ -11,7 +11,6 @@ import {
   RedirectUrlAPI,
   SessionAPI,
   SignInTokenAPI,
-  SMSMessageAPI,
   UserAPI,
 } from './endpoints';
 import { buildRequest } from './request';
@@ -35,7 +34,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     redirectUrls: new RedirectUrlAPI(request),
     sessions: new SessionAPI(request),
     signInTokens: new SignInTokenAPI(request),
-    smsMessages: new SMSMessageAPI(request),
     users: new UserAPI(request),
     domains: new DomainAPI(request),
   };

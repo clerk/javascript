@@ -20,7 +20,6 @@ export { Clerk, clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, crea
 
 const {
   users,
-  smsMessages,
   sessions,
   emailAddresses,
   phoneNumbers,
@@ -42,7 +41,6 @@ export {
   organizations,
   phoneNumbers,
   sessions,
-  smsMessages,
   users,
 };
 
