@@ -1,5 +1,47 @@
 # Change Log
 
+## 5.0.0-alpha-v5.3
+
+### Major Changes
+
+- Upgrade React version to >=18 and add react-dom as peer dependency ([#2164](https://github.com/clerk/javascript/pull/2164)) by [@dimkl](https://github.com/dimkl)
+
+  to fix issues with vite & rollup building.
+
+- Breaking Changes: ([#2169](https://github.com/clerk/javascript/pull/2169)) by [@dimkl](https://github.com/dimkl)
+
+  - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
+  - Drop default exports from `@clerk/clerk-js`
+    - on headless Clerk type
+    - on ui and ui.retheme `Portal`
+  - Use `isProductionFromSecretKey` instead of `isProductionFromApiKey`
+  - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
+
+  Changes:
+
+  - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
+  - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
+  - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
+  - Drop `node-fetch` dependency from `@clerk/backend`
+  - Drop duplicate test in `@clerk/backend`
+
+- Introducing some changes and some addition for the appearence descriptors for the organization preview in `<OrganizationSwitcher/>`: ([#2158](https://github.com/clerk/javascript/pull/2158)) by [@octoper](https://github.com/octoper)
+
+  - `.cl-organizationPreview__organizationSwitcher` has been renamed to `.cl-organizationPreview__organizationSwitcherTrigger`.
+  - `.cl-organizationPreview__organizationSwitcherListedOrganization` was added to allow you to customize the appearance of all the listed organization previews.
+  - `.cl-organizationPreview__organizationSwitcherActiveOrganizationn` was added to allow you to customize the appearance of the active organization.
+
+### Patch Changes
+
+- Hide members page of <OrganizationProfile/> if user doesn't have any membership related permissions. ([#2138](https://github.com/clerk/javascript/pull/2138)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry. ([#2154](https://github.com/clerk/javascript/pull/2154)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`9f5491357`](https://github.com/clerk/javascript/commit/9f5491357defddaa64bf6ab45688d262fcc6fb54), [`27fb9b728`](https://github.com/clerk/javascript/commit/27fb9b7281bc5e6f16e81ed1cd07aa17c44de970), [`52ff8fe6b`](https://github.com/clerk/javascript/commit/52ff8fe6b6ff88ceb5e1246378b54b0565bede9d), [`4bb57057e`](https://github.com/clerk/javascript/commit/4bb57057e9af20fc433626ed178d97d3ca811362), [`40ac4b645`](https://github.com/clerk/javascript/commit/40ac4b645f449b546dae5b4c0d013c9d9ea6d09c), [`429d030f7`](https://github.com/clerk/javascript/commit/429d030f7b6efe838a1e7fec7f736ba59fcc6b61)]:
+  - @clerk/localizations@2.0.0-alpha-v5.3
+  - @clerk/shared@2.0.0-alpha-v5.3
+  - @clerk/types@4.0.0-alpha-v5.3
+
 ## 5.0.0-alpha-v5.2
 
 ### Major Changes
