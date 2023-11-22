@@ -21,6 +21,7 @@ export enum ObjectType {
   Organization = 'organization',
   OrganizationInvitation = 'organization_invitation',
   OrganizationMembership = 'organization_membership',
+  Role = 'role',
   Permission = 'permission',
   PhoneNumber = 'phone_number',
   RedirectUrl = 'redirect_url',
@@ -184,6 +185,16 @@ export interface OrganizationMembershipPublicUserDataJSON {
   image_url: string;
   has_image: boolean;
   user_id: string;
+}
+
+export interface RoleJSON extends ClerkResourceJSON {
+  object: ObjectType.Role;
+  name: string;
+  key: string;
+  description: string;
+  permissions: PermissionJSON[];
+  created_at: number;
+  updated_at: number;
 }
 
 export interface PermissionJSON extends ClerkResourceJSON {

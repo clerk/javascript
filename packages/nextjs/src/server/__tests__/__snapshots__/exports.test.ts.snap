@@ -32,6 +32,7 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "Permission",
   "PhoneNumber",
   "RedirectUrl",
+  "Role",
   "SECRET_KEY",
   "SIGN_IN_URL",
   "SIGN_UP_URL",
