@@ -1,7 +1,7 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants, TokenVerificationErrorReason } from '@clerk/backend';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
-import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
+import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import type { Autocomplete } from '@clerk/types';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
@@ -162,7 +162,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     if (isIgnoredRoute(req)) {
       logger.debug({ isIgnoredRoute: true });
-      if (isDevelopmentFromApiKey(options.secretKey || SECRET_KEY) && !params.ignoredRoutes) {
+      if (isDevelopmentFromSecretKey(options.secretKey || SECRET_KEY) && !params.ignoredRoutes) {
         console.warn(
           receivedRequestForIgnoredRoute(req.experimental_clerkUrl.href, JSON.stringify(DEFAULT_CONFIG_MATCHER)),
         );
@@ -296,7 +296,7 @@ const appendDevBrowserOnCrossOrigin = (req: WithClerkUrl<NextRequest>, res: Resp
   if (
     shouldAppendDevBrowser &&
     !!location &&
-    isDevelopmentFromApiKey(opts.secretKey || SECRET_KEY) &&
+    isDevelopmentFromSecretKey(opts.secretKey || SECRET_KEY) &&
     isCrossOrigin(req.experimental_clerkUrl, location)
   ) {
     const dbJwt = req.cookies.get(DEV_BROWSER_JWT_MARKER)?.value || '';
@@ -345,7 +345,7 @@ const isRequestMethodIndicatingApiRoute = (req: NextRequest): boolean => {
  * In development, attempt to detect clock skew based on the requestState. This check should run when requestState.isInterstitial is true. If detected, we throw an error.
  */
 const assertClockSkew = (requestState: RequestState, opts: AuthMiddlewareParams): void => {
-  if (!isDevelopmentFromApiKey(opts.secretKey || SECRET_KEY)) {
+  if (!isDevelopmentFromSecretKey(opts.secretKey || SECRET_KEY)) {
     return;
   }
 
@@ -363,7 +363,7 @@ const assertInfiniteRedirectionLoop = (
   opts: AuthMiddlewareParams,
   requestState: RequestState,
 ): NextResponse => {
-  if (!isDevelopmentFromApiKey(opts.secretKey || SECRET_KEY)) {
+  if (!isDevelopmentFromSecretKey(opts.secretKey || SECRET_KEY)) {
     return res;
   }
 
@@ -403,7 +403,7 @@ const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => 
 };
 
 const informAboutProtectedRoute = (path: string, params: AuthMiddlewareParams, isApiRoute: boolean) => {
-  if (params.debug || isDevelopmentFromApiKey(params.secretKey || SECRET_KEY)) {
+  if (params.debug || isDevelopmentFromSecretKey(params.secretKey || SECRET_KEY)) {
     console.warn(
       informAboutProtectedRouteInfo(
         path,

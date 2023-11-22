@@ -29,7 +29,9 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
           requestState,
         });
         if (interstitial.errors) {
-          // TODO(@dimkl): return interstitial errors ?
+          // Temporarily return Unauthenticated instead of the interstitial errors since we don't
+          // want to expose any internal error (possible errors are http 401, 500 response from BAPI)
+          // It will be dropped with the removal of fetching remotePrivateInterstitial
           next(new Error('Unauthenticated'));
           return;
         }

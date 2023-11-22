@@ -12,7 +12,6 @@ import type {
   HandleOAuthCallbackParams,
   ListenerCallback,
   OrganizationListProps,
-  OrganizationMembershipResource,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
@@ -36,7 +35,7 @@ import type {
   BrowserClerkConstructor,
   ClerkProp,
   HeadlessBrowserClerk,
-  HeadlessBrowserClerkConstrutor,
+  HeadlessBrowserClerkConstructor,
   IsomorphicClerkOptions,
 } from './types';
 import { errorThrower, isConstructor, loadClerkJsScript } from './utils';
@@ -163,7 +162,7 @@ export class IsomorphicClerk {
         // Set a fixed Clerk version
         let c: ClerkProp;
 
-        if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
+        if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
           c = new this.Clerk(this.#publishableKey, {
             proxyUrl: this.proxyUrl,

@@ -14,7 +14,7 @@ type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType
   props?: PropsType & { path?: string; routing?: string };
 } & Pick<CtxType, 'componentName'>;
 
-export default class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
+export class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
   render(): React.ReactPortal {
     const { props, component, componentName, node } = this.props;
 

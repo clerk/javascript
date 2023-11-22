@@ -1,9 +1,8 @@
 import {
   buildPublishableKey,
   createDevOrStagingUrlCache,
-  isDevelopmentFromApiKey,
-  isLegacyFrontendApiKey,
-  isProductionFromApiKey,
+  isDevelopmentFromSecretKey,
+  isProductionFromSecretKey,
   isPublishableKey,
   parsePublishableKey,
 } from '../keys';
@@ -57,15 +56,6 @@ describe('isPublishableKey(key)', () => {
   });
 });
 
-describe('isLegacyFrontendApiKey(key)', () => {
-  it('returns true if the key is a valid legacy frontend Api key', () => {
-    expect(isLegacyFrontendApiKey('clerk.clerk.com')).toBe(true);
-  });
-  it('returns true if the key is not a valid legacy frontend Api key', () => {
-    expect(isLegacyFrontendApiKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==')).toBe(false);
-  });
-});
-
 describe('isDevOrStagingUrl(url)', () => {
   const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 
@@ -93,7 +83,7 @@ describe('isDevOrStagingUrl(url)', () => {
   });
 });
 
-describe('isDevelopmentFromApiKey(key)', () => {
+describe('isDevelopmentFromSecretKey(key)', () => {
   const cases: Array<[string, boolean]> = [
     ['sk_live_Y2xlcmsuY2xlcmsuZGV2JA==', false],
     ['sk_test_Y2xlcmsuY2xlcmsuZGV2JA==', true],
@@ -102,12 +92,12 @@ describe('isDevelopmentFromApiKey(key)', () => {
   ];
 
   test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expected) => {
-    const result = isDevelopmentFromApiKey(publishableKeyStr);
+    const result = isDevelopmentFromSecretKey(publishableKeyStr);
     expect(result).toEqual(expected);
   });
 });
 
-describe('isProductionFromApiKey(key)', () => {
+describe('isProductionFromSecretKey(key)', () => {
   const cases: Array<[string, boolean]> = [
     ['sk_live_Y2xlcmsuY2xlcmsuZGV2JA==', true],
     ['sk_test_Y2xlcmsuY2xlcmsuZGV2JA==', false],
@@ -116,7 +106,7 @@ describe('isProductionFromApiKey(key)', () => {
   ];
 
   test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expected) => {
-    const result = isProductionFromApiKey(publishableKeyStr);
+    const result = isProductionFromSecretKey(publishableKeyStr);
     expect(result).toEqual(expected);
   });
 });
