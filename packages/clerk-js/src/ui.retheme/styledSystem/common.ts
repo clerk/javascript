@@ -136,7 +136,7 @@ const fontSizeVariants = (t: InternalTheme) => {
 const borderVariants = (t: InternalTheme, props?: any) => {
   return {
     normal: {
-      borderRadius: t.radii.$md,
+      borderRadius: t.radii.$lg,
       border: t.borders.$normal,
       ...borderColor(t, props),
     },
