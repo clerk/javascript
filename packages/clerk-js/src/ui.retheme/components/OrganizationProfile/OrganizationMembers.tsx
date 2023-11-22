@@ -22,12 +22,13 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
   const { isAuthorizedUser: canManageMemberships } = useGate({ permission: 'org:sys_memberships:manage' });
+  const { isAuthorizedUser: canReadMemberships } = useGate({ permission: 'org:sys_memberships:read' });
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
   const { membershipRequests } = useCoreOrganization({
     membershipRequests: isDomainsEnabled || undefined,
   });
 
-  // @ts-expect-error
+  // @ts-expect-error This property is not typed. It is used by our dashboard in order to render a billing widget.
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
 
   if (canManageMemberships === null) {
@@ -55,7 +56,9 @@ export const OrganizationMembers = withCardStateProvider(() => {
         </Header.Root>
         <Tabs>
           <TabsList>
-            <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
+            {canReadMemberships && (
+              <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
+            )}
             {canManageMemberships && (
               <Tab
                 localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
@@ -68,18 +71,20 @@ export const OrganizationMembers = withCardStateProvider(() => {
             )}
           </TabsList>
           <TabPanels>
-            <TabPanel sx={{ width: '100%' }}>
-              <Flex
-                gap={4}
-                direction='col'
-                sx={{
-                  width: '100%',
-                }}
-              >
-                {canManageMemberships && __unstable_manageBillingUrl && <MembershipWidget />}
-                <ActiveMembersList />
-              </Flex>
-            </TabPanel>
+            {canReadMemberships && (
+              <TabPanel sx={{ width: '100%' }}>
+                <Flex
+                  gap={4}
+                  direction='col'
+                  sx={{
+                    width: '100%',
+                  }}
+                >
+                  {canManageMemberships && __unstable_manageBillingUrl && <MembershipWidget />}
+                  <ActiveMembersList />
+                </Flex>
+              </TabPanel>
+            )}
             {canManageMemberships && (
               <TabPanel sx={{ width: '100%' }}>
                 <OrganizationMembersTabInvitations />
