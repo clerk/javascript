@@ -14,10 +14,6 @@ type UseUserReturn =
  * Once Clerk loads, `isLoaded` will be set to `true`, and you can
  * safely access `isSignedIn` state and `user`.
  *
- * For projects using NextJs or Remix, you can make this state available during SSR
- * simply by using the `withServerSideAuth` helper and setting the `loadUser` flag to `true`.
- *
- *
  * @example
  * A simple example:
  *
@@ -30,23 +26,6 @@ type UseUserReturn =
  *   }
  *   return <div>Hello, {user.firstName}</div>
  * }
- *
- * @example
- * Basic example in a NextJs app. This page will be fully rendered during SSR:
- *
- * import { useUser } from '@clerk/nextjs'
- * import { withServerSideAuth } from '@clerk/nextjs/api'
- *
- * export getServerSideProps = withServerSideAuth({ loadUser: true});
- *
- * export HelloPage = () => {
- *   const { isSignedIn, user } = useUser();
- *   if(!isSignedIn) {
- *     return null;
- *   }
- *   return <div>Hello, {user.firstName}</div>
- * }
- *
  */
 export function useUser(): UseUserReturn {
   const user = useUserContext();

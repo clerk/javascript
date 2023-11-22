@@ -94,7 +94,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           role='menuitem'
         >
           <OrganizationPreview
-            elementId='organizationSwitcher'
+            elementId='organizationSwitcherListedOrganization'
             avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
             organization={organization}
             size='sm'

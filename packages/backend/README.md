@@ -87,7 +87,6 @@ clerk.phoneNumbers;
 clerk.redirectUrls;
 clerk.sessions;
 clerk.signInTokens;
-clerk.smsMessages;
 clerk.users;
 
 // These functions should be used by framework-specific libraries, such as @clerk/nextjs or @clerk/remix.

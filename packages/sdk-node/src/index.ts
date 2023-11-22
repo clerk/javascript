@@ -20,13 +20,14 @@ export { Clerk, clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, crea
 
 const {
   users,
-  smsMessages,
   sessions,
   emailAddresses,
   phoneNumbers,
   emails,
   invitations,
   organizations,
+  organizationRoles,
+  organizationPermissions,
   clients,
   allowlistIdentifiers,
   domains,
@@ -40,9 +41,10 @@ export {
   emails,
   invitations,
   organizations,
+  organizationRoles,
+  organizationPermissions,
   phoneNumbers,
   sessions,
-  smsMessages,
   users,
 };
 

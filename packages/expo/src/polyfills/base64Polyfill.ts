@@ -1,9 +1,10 @@
-import { decode, encode } from 'base-64';
+import { isomorphicAtob } from '@clerk/shared/isomorphicAtob';
+import { isomorphicBtoa } from '@clerk/shared/isomorphicBtoa';
 
 if (!global.btoa) {
-  global.btoa = encode;
+  global.btoa = isomorphicBtoa;
 }
 
 if (!global.atob) {
-  global.atob = decode;
+  global.atob = isomorphicAtob;
 }

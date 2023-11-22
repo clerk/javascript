@@ -1,10 +1,10 @@
 // Import all suites
 // TODO: Automate this step using dynamic imports
-import apiTest from './dist/api/factory.test.js';
 import factoryTest from './dist/api/factory.test.js';
 import exportsTest from './dist/exports.test.js';
 import redirectTest from './dist/redirections.test.js';
 import authObjectsTest from './dist/tokens/authObjects.test.js';
+import tokenFactoryTest from './dist/tokens/factory.test.js';
 import jwtAssertionsTest from './dist/tokens/jwt/assertions.test.js';
 import cryptoKeysTest from './dist/tokens/jwt/cryptoKeys.test.js';
 import signJwtTest from './dist/tokens/jwt/signJwt.test.js';
@@ -18,7 +18,6 @@ import utilsTest from './dist/utils.test.js';
 
 // Add them to the suite array
 const suites = [
-  apiTest,
   authObjectsTest,
   exportsTest,
   jwtAssertionsTest,
@@ -33,6 +32,7 @@ const suites = [
   factoryTest,
   redirectTest,
   utilsTest,
+  tokenFactoryTest,
 ];
 
 export default suites;
