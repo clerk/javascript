@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import { descriptors, Flex, Input, Spinner } from '../customizables';
+import { useCardState } from '../elements/contexts';
+import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { common } from '../styledSystem';
 import type { FormControlState } from '../utils';
+import { handleError, sleep, useFormControl } from '../utils';
 import { FormFeedback } from './FormControl';
 
 type UseCodeInputOptions = {
@@ -13,9 +16,75 @@ type UseCodeInputOptions = {
 type onCodeEntryFinishedCallback = (code: string) => unknown;
 type onCodeEntryFinished = (cb: onCodeEntryFinishedCallback) => void;
 
+type onCodeEntryFinishedActionCallback<R = unknown> = (
+  code: string,
+  resolve: (params?: R) => Promise<void>,
+  reject: (err: unknown) => Promise<void>,
+) => void;
+
 type UseCodeControlReturn = ReturnType<typeof useCodeControl>;
 
-export const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOptions) => {
+type UseFieldOTP = <R = unknown>(params: {
+  id?: 'code';
+  onCodeEntryFinished: onCodeEntryFinishedActionCallback<R>;
+  onResendCodeClicked?: React.MouseEventHandler;
+  onResolve?: (a?: R) => Promise<void> | void;
+}) => {
+  isLoading: boolean;
+  isSuccess: boolean;
+  otpControl: ReturnType<typeof useCodeControl>;
+  onResendCode: React.MouseEventHandler<HTMLButtonElement> | undefined;
+};
+
+export const useFieldOTP: UseFieldOTP = params => {
+  const card = useCardState();
+  const {
+    id = 'code',
+    onCodeEntryFinished: paramsOnCodeEntryFinished,
+    onResendCodeClicked: paramsOnResendCodeClicked,
+    onResolve: paramsOnResolve,
+  } = params;
+  const codeControlState = useFormControl(id, '');
+  const codeControl = useCodeControl(codeControlState);
+  const [success, setSuccess] = React.useState(false);
+  const status = useLoadingStatus();
+
+  const resolve = async (param: any) => {
+    setSuccess(true);
+    await sleep(750);
+    await paramsOnResolve?.(param);
+  };
+
+  const reject = async (err: any) => {
+    handleError(err, [codeControlState], card.setError);
+    status.setIdle();
+    await sleep(750);
+    codeControl.reset();
+  };
+
+  codeControl.onCodeEntryFinished(code => {
+    status.setLoading();
+    codeControlState.setError(undefined);
+    paramsOnCodeEntryFinished(code, resolve, reject);
+  });
+
+  const onResendCode = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
+    e => {
+      codeControl.reset();
+      paramsOnResendCodeClicked?.(e);
+    },
+    [codeControl, paramsOnResendCodeClicked],
+  );
+
+  return {
+    isLoading: status.isLoading,
+    isSuccess: success,
+    otpControl: codeControl,
+    onResendCode: paramsOnResendCodeClicked ? onResendCode : undefined,
+  };
+};
+
+const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOptions) => {
   const otpControlRef = React.useRef<any>();
   const userOnCodeEnteredCallback = React.useRef<onCodeEntryFinishedCallback>();
   const defaultValue = formControl.value;

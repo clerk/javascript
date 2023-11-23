@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Text } from '../customizables';
-import type { useCodeControl } from './CodeControl';
+import type { useFieldOTP } from './CodeControl';
 import { CodeControl } from './CodeControl';
 import { TimerButton } from './TimerButton';
 
@@ -11,13 +11,13 @@ type CodeFormProps = {
   subtitle: LocalizationKey;
   resendButton?: LocalizationKey;
   isLoading: boolean;
-  success: boolean;
-  onResendCodeClicked?: React.MouseEventHandler<HTMLButtonElement>;
-  codeControl: ReturnType<typeof useCodeControl>;
+  isSuccess: boolean;
+  onResendCode?: React.MouseEventHandler<HTMLButtonElement>;
+  otpControl: ReturnType<typeof useFieldOTP>['otpControl'];
 };
 
 export const CodeForm = (props: CodeFormProps) => {
-  const { subtitle, title, isLoading, success, codeControl, onResendCodeClicked, resendButton } = props;
+  const { subtitle, title, isLoading, isSuccess, otpControl, onResendCode, resendButton } = props;
 
   return (
     <Col
@@ -36,17 +36,17 @@ export const CodeForm = (props: CodeFormProps) => {
         colorScheme='neutral'
       />
       <CodeControl
-        {...codeControl.otpInputProps}
+        {...otpControl.otpInputProps}
         isLoading={isLoading}
-        isSuccessfullyFilled={success}
+        isSuccessfullyFilled={isSuccess}
       />
-      {onResendCodeClicked && (
+      {onResendCode && (
         <TimerButton
           elementDescriptor={descriptors.formResendCodeLink}
-          onClick={onResendCodeClicked}
+          onClick={onResendCode}
           startDisabled
-          isDisabled={success || isLoading}
-          showCounter={!success}
+          isDisabled={isSuccess || isLoading}
+          showCounter={!isSuccess}
           sx={theme => ({ marginTop: theme.space.$6 })}
           localizationKey={resendButton}
         />

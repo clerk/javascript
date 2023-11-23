@@ -1,12 +1,13 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { FieldId } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
+import { CodeForm } from './CodeForm';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
 import { FormControl } from './FormControl';
@@ -157,10 +158,18 @@ const PlainInput = (props: CommonInputProps) => {
   );
 };
 
-const PasswordInput = (props: CommonInputProps) => {
+const PasswordInput = forwardRef<HTMLInputElement, CommonInputProps>((props, ref) => {
   return (
     <CommonInputWrapper {...props}>
-      <Field.PasswordInput />
+      <Field.PasswordInput ref={ref} />
+    </CommonInputWrapper>
+  );
+});
+
+const PhoneInput = (props: CommonInputProps) => {
+  return (
+    <CommonInputWrapper {...props}>
+      <Field.PhoneInput />
     </CommonInputWrapper>
   );
 };
@@ -228,6 +237,8 @@ export const Form = {
   Control: FormControl,
   PlainInput,
   PasswordInput,
+  PhoneInput,
+  OTP: CodeForm,
   InputGroup,
   RadioGroup,
   Checkbox,
