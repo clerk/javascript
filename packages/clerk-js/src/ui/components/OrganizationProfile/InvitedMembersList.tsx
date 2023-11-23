@@ -3,7 +3,7 @@ import type { OrganizationInvitationResource } from '@clerk/types';
 import { useCoreOrganization } from '../../contexts';
 import { localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
-import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
+import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';
 
@@ -17,6 +17,8 @@ const invitationsParams = {
 export const InvitedMembersList = () => {
   const card = useCardState();
   const { organization, invitations } = useCoreOrganization(invitationsParams);
+
+  const { options, isLoading: loadingRoles } = useFetchRoles();
 
   if (!organization) {
     return null;
@@ -39,7 +41,7 @@ export const InvitedMembersList = () => {
       itemCount={invitations?.count || 0}
       pageCount={invitations?.pageCount || 0}
       itemsPerPage={invitationsParams.invitations.pageSize}
-      isLoading={invitations?.isLoading}
+      isLoading={invitations?.isLoading || loadingRoles}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.invitationsTab.table__emptyRow')}
       headers={[
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
@@ -50,6 +52,7 @@ export const InvitedMembersList = () => {
       rows={(invitations?.data || []).map(i => (
         <InvitationRow
           key={i.id}
+          options={options}
           invitation={i}
           onRevoke={revoke(i)}
         />
@@ -58,9 +61,16 @@ export const InvitedMembersList = () => {
   );
 };
 
-const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRevoke: () => unknown }) => {
-  const { invitation, onRevoke } = props;
+const InvitationRow = (props: {
+  invitation: OrganizationInvitationResource;
+  options: ReturnType<typeof useFetchRoles>['options'];
+  onRevoke: () => unknown;
+}) => {
+  const { invitation, onRevoke, options } = props;
   const { localizeCustomRole } = useLocalizeCustomRoles();
+
+  const unlocalizedRoleLabel = options?.find(a => a.value === invitation.role)?.label;
+
   return (
     <RowContainer>
       <Td>
@@ -73,7 +83,7 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRe
       <Td>
         <Text
           colorScheme={'neutral'}
-          localizationKey={localizeCustomRole(invitation.role)}
+          localizationKey={localizeCustomRole(invitation.role) || unlocalizedRoleLabel}
         />
       </Td>
       <Td>
