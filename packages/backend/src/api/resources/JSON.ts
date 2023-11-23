@@ -320,3 +320,8 @@ export interface DeletedObjectJSON {
   slug?: string;
   deleted: boolean;
 }
+
+export interface PaginatedResponseJSON {
+  data: object[];
+  total_count?: number;
+}
