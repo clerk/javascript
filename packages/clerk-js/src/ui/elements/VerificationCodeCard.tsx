@@ -2,15 +2,13 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { Col, descriptors, localizationKeys } from '../customizables';
-import { useLoadingStatus } from '../hooks';
 import type { LocalizationKey } from '../localization';
-import { handleError, sleep, useFormControl } from '../utils';
 import { CardAlert } from './Alert';
 import { Card } from './Card';
-import { useCodeControl } from './CodeControl';
-import { CodeForm } from './CodeForm';
+import { useFieldOTP } from './CodeControl';
 import { useCardState } from './contexts';
 import { Footer } from './Footer';
+import { Form } from './Form';
 import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';
 
@@ -36,36 +34,14 @@ export type VerificationCodeCardProps = {
 
 export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCardProps>) => {
   const { showAlternativeMethods = true, children } = props;
-  const [success, setSuccess] = React.useState(false);
-  const status = useLoadingStatus();
-  const codeControlState = useFormControl('code', '');
-  const codeControl = useCodeControl(codeControlState);
   const card = useCardState();
 
-  const resolve = async () => {
-    setSuccess(true);
-    await sleep(750);
-  };
-
-  const reject = async (err: any) => {
-    handleError(err, [codeControlState], card.setError);
-    status.setIdle();
-    await sleep(750);
-    codeControl.reset();
-  };
-
-  codeControl.onCodeEntryFinished(code => {
-    status.setLoading();
-    codeControlState.setError(undefined);
-    props.onCodeEntryFinishedAction(code, resolve, reject);
+  const otp = useFieldOTP({
+    onCodeEntryFinished: (code, resolve, reject) => {
+      props.onCodeEntryFinishedAction(code, resolve, reject);
+    },
+    onResendCodeClicked: props.onResendCodeClicked,
   });
-
-  const handleResend = props.onResendCodeClicked
-    ? (e: React.MouseEvent) => {
-        codeControl.reset();
-        props.onResendCodeClicked?.(e);
-      }
-    : undefined;
 
   return (
     <Card>
@@ -85,14 +61,11 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
         elementDescriptor={descriptors.main}
         gap={8}
       >
-        <CodeForm
+        <Form.OTP
+          {...otp}
           title={props.formTitle}
           subtitle={props.formSubtitle}
           resendButton={props.resendButton}
-          isLoading={status.isLoading}
-          success={success}
-          codeControl={codeControl}
-          onResendCodeClicked={handleResend}
         />
       </Col>
 

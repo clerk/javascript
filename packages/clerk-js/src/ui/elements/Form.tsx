@@ -7,6 +7,7 @@ import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
+import { CodeForm } from './CodeForm';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
 import { FormControl } from './FormControl';
@@ -164,6 +165,14 @@ const PasswordInput = (props: CommonInputProps) => {
   );
 };
 
+const PhoneInput = (props: CommonInputProps) => {
+  return (
+    <CommonInputWrapper {...props}>
+      <Field.PhoneInput />
+    </CommonInputWrapper>
+  );
+};
+
 const InputGroup = (
   props: CommonInputProps & {
     groupPrefix?: string;
@@ -227,6 +236,8 @@ export const Form = {
   Control: FormControl,
   PlainInput,
   PasswordInput,
+  PhoneInput,
+  OTP: CodeForm,
   InputGroup,
   RadioGroup,
   Checkbox,

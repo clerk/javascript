@@ -80,9 +80,8 @@ export const AddPhone = (props: AddPhoneProps) => {
     >
       <Form.Root onSubmit={addPhone}>
         <Form.ControlRow elementId={phoneField.id}>
-          <Form.Control
+          <Form.PhoneInput
             {...phoneField.props}
-            required
             autoFocus
           />
         </Form.ControlRow>
