@@ -3,6 +3,7 @@ import type { ClerkOptions, DisplayConfigResource, RoutingOptions, RoutingStrate
 import type { ParsedQs } from 'qs';
 import qs from 'qs';
 
+import { clerkInvalidRoutingStrategy } from '../core/errors';
 import { hasBannedProtocol, isAllowedRedirectOrigin, isValidUrl } from './url';
 
 type PickRedirectionUrlKey = 'afterSignUpUrl' | 'afterSignInUrl' | 'signInUrl' | 'signUpUrl';
@@ -122,6 +123,10 @@ export const normalizeRoutingOptions = ({
 }): RoutingOptions => {
   if (!!path && !routing) {
     return { routing: 'path', path };
+  }
+
+  if (routing !== 'path' && !!path) {
+    clerkInvalidRoutingStrategy(routing);
   }
 
   return { routing, path } as RoutingOptions;
