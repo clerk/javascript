@@ -7,9 +7,9 @@ import { PathRouter, Route, useRouter } from '..';
 
 const mockNavigate = jest.fn();
 
-jest.mock('ui/contexts', () => {
+jest.mock('@clerk/shared/react', () => {
   return {
-    useCoreClerk: () => {
+    useClerk: () => {
       return {
         navigate: (to: string) => {
           mockNavigate(to);

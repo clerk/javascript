@@ -1,13 +1,13 @@
+import { useClerk, useSessionList } from '@clerk/shared/react';
 import type { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
 import { windowNavigate } from '../../../utils/windowNavigate';
-import { useCoreClerk, useCoreSessionList } from '../../contexts';
 import { useCardState } from '../../elements';
 import { useRouter } from '../../router';
 import { sleep } from '../../utils';
 
 type UseMultisessionActionsParams = {
-  user: UserResource | undefined;
+  user: UserResource | null | undefined;
   actionCompleteCallback?: () => void;
   navigateAfterSignOut?: () => any;
   navigateAfterMultiSessionSingleSignOut?: () => any;
@@ -17,11 +17,11 @@ type UseMultisessionActionsParams = {
 } & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
-  const { setActive, signOut, openUserProfile } = useCoreClerk();
+  const { setActive, signOut, openUserProfile } = useClerk();
   const card = useCardState();
-  const sessions = useCoreSessionList();
+  const { sessions } = useSessionList();
   const { navigate } = useRouter();
-  const activeSessions = sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
+  const activeSessions = sessions?.filter(s => s.status === 'active') as ActiveSessionResource[];
   const otherSessions = activeSessions.filter(s => s.user?.id !== opts.user?.id);
 
   const handleSignOutSessionClicked = (session: ActiveSessionResource) => () => {

@@ -1,6 +1,8 @@
+import { useOrganization } from '@clerk/shared/react';
+
 import { runIfFunctionOrReturn } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
+import { useOrganizationProfileContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { ContentPage, IconCircle, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { Email } from '../../icons';
@@ -13,7 +15,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
   const subtitle = localizationKeys('organizationProfile.invitePage.subtitle');
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   //@ts-expect-error
   const { __unstable_manageBillingUrl, __unstable_manageBillingMembersLimit } = useOrganizationProfileContext();
 

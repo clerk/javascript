@@ -1,7 +1,8 @@
+import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
 import { buildSSOCallbackURL } from '../../common/redirects';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
@@ -10,7 +11,7 @@ import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
 export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
   const { displayConfig } = useEnvironment();

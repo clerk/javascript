@@ -1,9 +1,9 @@
+import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
-import { Plus } from '../../../ui/icons';
-import { useCoreUser } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import { Action, SecondaryActions } from '../../elements';
+import { Plus } from '../../icons';
 import { UserInvitationSuggestionList } from './UserInvitationSuggestionList';
 import type { UserMembershipListProps } from './UserMembershipList';
 import { UserMembershipList } from './UserMembershipList';
@@ -15,9 +15,9 @@ export interface OrganizationActionListProps extends UserMembershipListProps {
 const CreateOrganizationButton = ({
   onCreateOrganizationClick,
 }: Pick<OrganizationActionListProps, 'onCreateOrganizationClick'>) => {
-  const user = useCoreUser();
+  const { user } = useUser();
 
-  if (!user.createOrganizationEnabled) {
+  if (!user?.createOrganizationEnabled) {
     return null;
   }
 

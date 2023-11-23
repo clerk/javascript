@@ -1,7 +1,8 @@
+import { useUser } from '@clerk/shared/react';
 import { useId } from 'react';
 
 import { getFullName, getIdentifier } from '../../../utils/user';
-import { useCoreUser, useUserButtonContext, withCoreUserGuard } from '../../contexts';
+import { useUserButtonContext, withCoreUserGuard } from '../../contexts';
 import { descriptors, Flex, Flow, Text } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
@@ -51,8 +52,12 @@ const _UserButton = withFloatingTree(() => {
 });
 
 const UserButtonTopLevelIdentifier = () => {
-  const user = useCoreUser();
+  const { user } = useUser();
+
   const { showName } = useUserButtonContext();
+  if (!user) {
+    return null;
+  }
   return showName ? (
     <Text
       variant='regularMedium'

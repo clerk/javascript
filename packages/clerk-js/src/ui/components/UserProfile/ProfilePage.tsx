@@ -1,8 +1,9 @@
+import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import { isDefaultImage } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import {
   ContentPage,
@@ -20,7 +21,12 @@ import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 export const ProfilePage = withCardStateProvider(() => {
   const title = localizationKeys('userProfile.profilePage.title');
   const card = useCardState();
-  const user = useCoreUser();
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
   const [avatarChanged, setAvatarChanged] = React.useState(false);
   const { first_name, last_name } = useEnvironment().userSettings.attributes;
   const showFirstName = first_name.enabled;

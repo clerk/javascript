@@ -1,11 +1,13 @@
+import {
+  ClerkInstanceContext,
+  ClientContext,
+  OrganizationProvider,
+  SessionContext,
+  UserContext,
+} from '@clerk/shared/react';
 import type { Clerk, LoadedClerk, Resources } from '@clerk/types';
 import React from 'react';
 
-import { CoreClerkContext } from './CoreClerkContext';
-import { CoreClientContext } from './CoreClientContext';
-import { CoreOrganizationProvider } from './CoreOrganizationContext';
-import { CoreSessionContext } from './CoreSessionContext';
-import { CoreUserContext } from './CoreUserContext';
 import { assertClerkSingletonExists } from './utils';
 
 type CoreClerkContextWrapperProps = {
@@ -45,17 +47,17 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
   );
 
   return (
-    <CoreClerkContext.Provider value={clerkCtx}>
-      <CoreClientContext.Provider value={clientCtx}>
-        <CoreSessionContext.Provider value={sessionCtx}>
-          <CoreOrganizationProvider
+    <ClerkInstanceContext.Provider value={clerkCtx}>
+      <ClientContext.Provider value={clientCtx}>
+        <SessionContext.Provider value={sessionCtx}>
+          <OrganizationProvider
             {...organizationCtx.value}
             swrConfig={props.swrConfig}
           >
-            <CoreUserContext.Provider value={userCtx}>{props.children}</CoreUserContext.Provider>
-          </CoreOrganizationProvider>
-        </CoreSessionContext.Provider>
-      </CoreClientContext.Provider>
-    </CoreClerkContext.Provider>
+            <UserContext.Provider value={userCtx}>{props.children}</UserContext.Provider>
+          </OrganizationProvider>
+        </SessionContext.Provider>
+      </ClientContext.Provider>
+    </ClerkInstanceContext.Provider>
   );
 }

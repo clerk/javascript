@@ -1,4 +1,6 @@
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useUser } from '@clerk/shared/react';
+
+import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { useRouter } from '../../router';
@@ -13,7 +15,11 @@ export const MfaSection = () => {
   const {
     userSettings: { attributes },
   } = useEnvironment();
-  const user = useCoreUser();
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
 
   const secondFactors = getSecondFactors(attributes);
   const secondFactorsAvailableToAdd = getSecondFactorsAvailableToAdd(attributes, user);

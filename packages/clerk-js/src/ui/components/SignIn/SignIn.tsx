@@ -1,8 +1,9 @@
+import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
 import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { ComponentContext, useCoreClerk, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
+import { ComponentContext, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { ResetPassword } from './ResetPassword';
@@ -14,7 +15,7 @@ import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
 
 function RedirectToSignIn() {
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
   React.useEffect(() => {
     void clerk.redirectToSignIn();
   }, []);

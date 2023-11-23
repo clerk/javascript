@@ -1,26 +1,14 @@
-import { assertContextExists, SessionContext, useSessionContext } from '@clerk/shared/react';
-import type { SessionResource } from '@clerk/types';
+import { useSessionContext } from '@clerk/shared/react';
 import React from 'react';
-
-import { clerkCoreErrorSessionIsNotDefined } from '../../core/errors';
-
-export const CoreSessionContext = SessionContext;
-
-export function useCoreSession(): SessionResource {
-  const session = useSessionContext();
-  if (!session) {
-    clerkCoreErrorSessionIsNotDefined();
-  }
-  return session;
-}
 
 export function withCoreSessionSwitchGuard<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
   const Hoc = (props: P) => {
-    const ctx = React.useContext(CoreSessionContext);
-    assertContextExists(ctx, CoreSessionContext);
-    if (ctx.value === undefined) {
+    const session = useSessionContext();
+
+    if (!session) {
       return null;
     }
+
     return <Component {...(props as any)} />;
   };
 

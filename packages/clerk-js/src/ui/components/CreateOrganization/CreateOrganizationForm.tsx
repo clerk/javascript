@@ -1,8 +1,8 @@
+import { useOrganization, useOrganizationList } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization, useCoreOrganizationList } from '../../contexts';
 import { Icon } from '../../customizables';
 import { ContentPage, Form, FormButtonContainer, IconButton, SuccessPage, useCardState } from '../../elements';
 import { QuestionMark, Upload } from '../../icons';
@@ -30,8 +30,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
-  const { createOrganization, isLoaded, setActive } = useCoreOrganizationList();
-  const { organization } = useCoreOrganization();
+  const { createOrganization, isLoaded, setActive } = useOrganizationList();
+  const { organization } = useOrganization();
   const [file, setFile] = React.useState<File | null>();
 
   const nameField = useFormControl('name', '', {

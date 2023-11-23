@@ -1,15 +1,16 @@
+import { useOrganization } from '@clerk/shared/react';
 import React from 'react';
 
-import { useGate } from '../../../ui/common';
-import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../../ui/constants';
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
+import { useGate } from '../../common';
+import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
+import { useOrganizationProfileContext } from '../../contexts';
 import { Breadcrumbs, NavBar, NavbarContextProvider, OrganizationPreview } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
 
 export const OrganizationProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
 ) => {
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   const { pages } = useOrganizationProfileContext();
 
   const { isAuthorizedUser: allowMembersRoute } = useGate({

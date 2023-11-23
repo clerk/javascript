@@ -1,6 +1,6 @@
+import { useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
-import { useCoreUser } from '../../contexts';
 import { Button, descriptors } from '../../customizables';
 import { UserAvatar, withAvatarShimmer } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
@@ -12,7 +12,7 @@ type UserButtonTriggerProps = PropsOfComponent<typeof Button> & {
 export const UserButtonTrigger = withAvatarShimmer(
   forwardRef<HTMLButtonElement, UserButtonTriggerProps>((props, ref) => {
     const { sx, ...rest } = props;
-    const user = useCoreUser();
+    const { user } = useUser();
 
     return (
       <Button

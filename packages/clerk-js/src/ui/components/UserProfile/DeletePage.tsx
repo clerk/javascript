@@ -1,4 +1,6 @@
-import { useCoreClerk, useCoreUser, useEnvironment } from '../../contexts';
+import { useClerk, useUser } from '@clerk/shared/react';
+
+import { useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
@@ -9,11 +11,15 @@ export const DeletePage = withCardStateProvider(() => {
   const card = useCardState();
   const environment = useEnvironment();
   const router = useRouter();
-  const user = useCoreUser();
-  const clerk = useCoreClerk();
+  const { user } = useUser();
+  const clerk = useClerk();
 
   const deleteUser = async () => {
     try {
+      if (!user) {
+        throw Error('user is not defined');
+      }
+
       await user.delete();
       if (clerk.client.activeSessions.length > 0) {
         await router.navigate(environment.displayConfig.afterSignOutOneUrl);

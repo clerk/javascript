@@ -1,7 +1,7 @@
+import { useClerk } from '@clerk/shared/react';
 import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk/types';
 import React from 'react';
 
-import { useCoreClerk } from '../contexts';
 import { Flow } from '../customizables';
 import { Card, CardAlert, LoadingCardContainer, useCardState, withCardStateProvider } from '../elements';
 import { useRouter } from '../router';
@@ -16,7 +16,7 @@ export const SSOCallback = withCardStateProvider<HandleOAuthCallbackParams | Han
 });
 
 export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCallbackParams) => {
-  const { handleRedirectCallback } = useCoreClerk();
+  const { handleRedirectCallback } = useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
 

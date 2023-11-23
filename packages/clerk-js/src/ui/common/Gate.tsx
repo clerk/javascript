@@ -1,8 +1,8 @@
+import { useSession } from '@clerk/shared/react';
 import type { CheckAuthorization } from '@clerk/types';
 import type { ComponentType, PropsWithChildren, ReactNode } from 'react';
 import React, { useEffect } from 'react';
 
-import { useCoreSession } from '../contexts';
 import { useRouter } from '../router';
 
 type GateParams = Parameters<CheckAuthorization>[0];
@@ -14,10 +14,10 @@ type GateProps = PropsWithChildren<
 >;
 
 export const useGate = (params: GateParams) => {
-  const { experimental__checkAuthorization } = useCoreSession();
+  const { session } = useSession();
 
   return {
-    isAuthorizedUser: experimental__checkAuthorization(params),
+    isAuthorizedUser: session?.experimental__checkAuthorization(params),
   };
 };
 
