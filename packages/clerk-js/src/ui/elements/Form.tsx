@@ -1,7 +1,7 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { FieldId } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
@@ -157,13 +157,13 @@ const PlainInput = (props: CommonInputProps) => {
   );
 };
 
-const PasswordInput = (props: CommonInputProps) => {
+const PasswordInput = forwardRef<HTMLInputElement, CommonInputProps>((props, ref) => {
   return (
     <CommonInputWrapper {...props}>
-      <Field.PasswordInput />
+      <Field.PasswordInput ref={ref} />
     </CommonInputWrapper>
   );
-};
+});
 
 const PhoneInput = (props: CommonInputProps) => {
   return (
