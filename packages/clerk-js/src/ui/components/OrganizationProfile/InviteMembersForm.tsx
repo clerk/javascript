@@ -25,7 +25,12 @@ type InviteMembersFormProps = {
 export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const { navigate } = useRouter();
   const { onSuccess, onReset = () => navigate('..'), resetButtonLabel } = props;
-  const { organization } = useCoreOrganization();
+  const { organization, invitations } = useCoreOrganization({
+    invitations: {
+      pageSize: 10,
+      keepPreviousData: true,
+    },
+  });
   const card = useCardState();
   const { t, locale } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);
@@ -73,7 +78,10 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
         emailAddresses: emailAddressField.value.split(','),
         role: submittedData.get('role') as MembershipRole,
       })
-      .then(onSuccess)
+      .then(async () => {
+        await invitations?.revalidate?.();
+        return onSuccess();
+      })
       .catch(err => {
         if (isClerkAPIResponseError(err)) {
           removeInvalidEmails(err.errors[0]);
