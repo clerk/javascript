@@ -7,6 +7,7 @@ import { createEmailService } from './emailService';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
 import { createSignUpComponentPageObject } from './signUpPageObject';
+import { createUserProfileComponentPageObject } from './userProfilePageObject';
 import type { FakeUser } from './usersService';
 import { createUserService } from './usersService';
 
@@ -64,6 +65,7 @@ export const createTestUtils = <
   const pageObjects = {
     signUp: createSignUpComponentPageObject(testArgs),
     signIn: createSignInComponentPageObject(testArgs),
+    userProfile: createUserProfileComponentPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
   };
 
