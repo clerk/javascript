@@ -766,8 +766,9 @@ export const ptBR: LocalizationResource = {
       form_username_invalid_length: "",
       form_username_invalid_character: "",
       form_param_format_invalid: "",
+      form_param_format_invalid__phone_number: 'O número de telemóvel deve ser válido.',
       form_param_format_invalid__email_address:
-        "O endereço de e-mail deve ser um endereço de e-mail válido.",
+        "O endereço de e-mail deve ser válido.",
       form_password_length_too_short: "",
       form_param_nil: "",
       form_code_incorrect: "",
