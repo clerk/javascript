@@ -141,8 +141,21 @@ export const useAuth: UseAuth = () => {
       if (params.permission) {
         return orgPermissions.includes(params.permission);
       }
+
       if (params.role) {
         return orgRole === params.role;
+      }
+
+      if (params.some) {
+        return !!params.some.find(permObj => {
+          if (permObj.permission) {
+            return orgPermissions.includes(permObj.permission);
+          }
+          if (permObj.role) {
+            return orgRole === permObj.role;
+          }
+          return false;
+        });
       }
       return false;
     },
