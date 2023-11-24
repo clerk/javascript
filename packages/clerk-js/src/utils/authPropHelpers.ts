@@ -126,7 +126,7 @@ export const normalizeRoutingOptions = ({
   }
 
   if (routing !== 'path' && !!path) {
-    clerkInvalidRoutingStrategy(routing);
+    return clerkInvalidRoutingStrategy(routing);
   }
 
   return { routing, path } as RoutingOptions;
