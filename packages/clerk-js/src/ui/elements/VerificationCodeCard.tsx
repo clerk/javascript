@@ -61,10 +61,10 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
         elementDescriptor={descriptors.main}
         gap={8}
       >
-        <Form.OTP
+        <Form.OTPInput
           {...otp}
-          title={props.formTitle}
-          subtitle={props.formSubtitle}
+          label={props.formTitle}
+          description={props.formSubtitle}
           resendButton={props.resendButton}
         />
       </Col>

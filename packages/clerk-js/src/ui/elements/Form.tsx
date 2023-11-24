@@ -7,7 +7,7 @@ import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
-import { CodeForm } from './CodeForm';
+import type { OTPInputProps } from './CodeControl';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
 import { FormControl } from './FormControl';
@@ -227,6 +227,39 @@ const RadioGroup = (
   );
 };
 
+const OTPInput = (props: OTPInputProps) => {
+  const { ref, ...restInputProps } = props.otpControl.otpInputProps;
+  return (
+    // Use Field.Root in order to pass feedback down to Field.Feedback
+    // @ts-ignore
+    <Field.Root {...restInputProps}>
+      <Field.OTPRoot {...props}>
+        <Col
+          elementDescriptor={descriptors.form}
+          gap={2}
+        >
+          <Field.OTPInputLabel />
+          <Field.OTPInputDescription />
+          <Flex
+            elementDescriptor={descriptors.otpCodeField}
+            isLoading={props.isLoading}
+            hasError={props.otpControl.otpInputProps.feedbackType === 'error'}
+            direction='col'
+          >
+            <Field.OTPCodeControl ref={ref} />
+            <Field.Feedback
+              elementDescriptors={{
+                error: descriptors.otpCodeFieldErrorText,
+              }}
+            />
+          </Flex>
+          <Field.OTPResendButton />
+        </Col>
+      </Field.OTPRoot>
+    </Field.Root>
+  );
+};
+
 export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
@@ -237,7 +270,7 @@ export const Form = {
   PlainInput,
   PasswordInput,
   PhoneInput,
-  OTP: CodeForm,
+  OTPInput,
   InputGroup,
   RadioGroup,
   Checkbox,
