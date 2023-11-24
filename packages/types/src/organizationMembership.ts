@@ -1,6 +1,7 @@
 import type { OrganizationResource } from './organization';
 import type { ClerkResource } from './resource';
 import type { PublicUserData } from './session';
+import type { Autocomplete } from './utils';
 
 declare global {
   /**
@@ -20,39 +21,6 @@ declare global {
   interface OrganizationMembershipPrivateMetadata {
     [k: string]: unknown;
   }
-
-  /**
-   * If you want to provide custom types for the organizationMembership.permissions
-   * array, simply redeclare this rule in the global namespace.
-   * Every utility function or component will use the provided type.
-   * ```
-   *     interface OrganizationCustomPermissions {
-   *       "org:appointment:accept":"org:appointment:accept";
-   *       "org:appointment:decline":"org:appointment:decline";
-   *       "org:patients:create":"org:patients:create";
-   *     }
-   * ```
-   */
-  interface OrganizationCustomPermissions {
-    [k: string]: string;
-  }
-
-  /**
-   * If you want to provide custom types for the organizationMembership.role
-   * property, simply redeclare this rule in the global namespace.
-   * Every utility function or component will use the provided type.
-   * ```
-   *    interface OrganizationCustomPermissions {
-   *       "org:role1":"org:role1";
-   *       "org:role2":"org:role2";
-   *     }
-   * ```
-   * `organizationMembership.role` will be equal to  "org:role1" | "org:role2"
-   *
-   */
-  interface OrganizationCustomRoles {
-    [k: string]: string;
-  }
 }
 
 export interface OrganizationMembershipResource extends ClerkResource {
@@ -71,24 +39,16 @@ export interface OrganizationMembershipResource extends ClerkResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-export type OrganizationCustomPermission = OrganizationCustomPermissions[keyof OrganizationCustomPermissions];
-export type OrganizationCustomRole = OrganizationCustomRoles[keyof OrganizationCustomRoles];
+export type OrganizationCustomPermission = string;
+export type OrganizationCustomRole = string;
 
 /**
  * @deprecated This type is deprecated and will be removed in the next major release.
- * Instead, override the type like this
- * ```
- * declare global {
- *  interface OrganizationCustomRoles {
- *     "org:custom_role1": "org:custom_role1";
- *     "org:custom_role2": "org:custom_role2";
- *   }
- * }
- * ```
+ * Use `OrganizationCustomRole` instead.
  * MembershipRole includes `admin`, `basic_member`, `guest_member`. With the introduction of "Custom roles"
  * these types will no longer match a developer's custom logic.
  */
-export type MembershipRole = 'admin' | 'basic_member' | 'guest_member' | OrganizationCustomRole;
+export type MembershipRole = Autocomplete<'admin' | 'basic_member' | 'guest_member'>;
 
 export type OrganizationSystemPermission =
   | 'org:sys_domains:manage'
@@ -100,7 +60,7 @@ export type OrganizationSystemPermission =
   | 'org:sys_memberships:delete'
   | 'org:sys_domains:read';
 
-export type OrganizationPermission = OrganizationSystemPermission | OrganizationCustomPermission;
+export type OrganizationPermission = Autocomplete<OrganizationSystemPermission>;
 
 export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;
