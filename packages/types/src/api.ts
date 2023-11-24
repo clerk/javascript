@@ -27,7 +27,7 @@ export interface ClerkRuntimeError {
 /**
  * Pagination params
  */
-export interface ClerkPaginationParams {
+export interface ClerkPaginationRequest {
   limit?: number;
   offset?: number;
 }
