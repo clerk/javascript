@@ -17,10 +17,17 @@ export function SignedOut(props: React.PropsWithChildren) {
 }
 
 type GateServerComponentProps = React.PropsWithChildren<
-  Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0] & {
-    fallback?: React.ReactNode;
-    redirectTo?: string;
-  }
+  Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0] &
+    (
+      | {
+          fallback: React.ReactNode;
+          redirectTo?: never;
+        }
+      | {
+          fallback?: never;
+          redirectTo: string;
+        }
+    )
 >;
 
 /**
@@ -32,11 +39,11 @@ export function experimental__Gate(gateProps: GateServerComponentProps) {
 
   const isAuthorizedUser = experimental__has(restAuthorizedParams);
 
-  const handleFallback = () => {
-    if (!redirectTo && !fallback) {
-      throw new Error('Provide `<Gate />` with a `fallback` or `redirectTo`');
-    }
+  if (!redirectTo && !fallback) {
+    throw new Error('Provide `<Gate />` with a `fallback` or `redirectTo`');
+  }
 
+  const handleFallback = () => {
     if (redirectTo) {
       return redirect(redirectTo);
     }
