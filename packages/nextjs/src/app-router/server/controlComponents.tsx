@@ -1,5 +1,4 @@
 import type { experimental__CheckAuthorizationWithCustomPermissions } from '@clerk/types';
-import { redirect } from 'next/navigation';
 import React from 'react';
 
 import { auth } from './auth';
@@ -17,43 +16,21 @@ export function SignedOut(props: React.PropsWithChildren) {
 }
 
 type GateServerComponentProps = React.PropsWithChildren<
-  Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0] &
-    (
-      | {
-          fallback: React.ReactNode;
-          redirectTo?: never;
-        }
-      | {
-          fallback?: never;
-          redirectTo: string;
-        }
-    )
+  Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0] & {
+    fallback?: React.ReactNode;
+  }
 >;
 
 /**
  * @experimental The component is experimental and subject to change in future releases.
  */
 export function experimental__Gate(gateProps: GateServerComponentProps) {
-  const { children, fallback, redirectTo, ...restAuthorizedParams } = gateProps;
+  const { children, fallback, ...restAuthorizedParams } = gateProps;
   const { experimental__has } = auth();
 
-  const isAuthorizedUser = experimental__has(restAuthorizedParams);
-
-  if (!redirectTo && !fallback) {
-    throw new Error('Provide `<Gate />` with a `fallback` or `redirectTo`');
+  if (experimental__has(restAuthorizedParams)) {
+    return <>{children}</>;
   }
 
-  const handleFallback = () => {
-    if (redirectTo) {
-      return redirect(redirectTo);
-    }
-
-    return <>{fallback}</>;
-  };
-
-  if (!isAuthorizedUser) {
-    return handleFallback();
-  }
-
-  return <>{children}</>;
+  return <>{fallback ?? null}</>;
 }
