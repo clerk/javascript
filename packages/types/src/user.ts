@@ -1,4 +1,3 @@
-import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
 import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
@@ -9,6 +8,7 @@ import type { OAuthScope } from './oauth';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationSuggestionResource, OrganizationSuggestionStatus } from './organizationSuggestion';
+import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
 import type { SamlAccountResource } from './samlAccount';

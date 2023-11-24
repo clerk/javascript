@@ -1,8 +1,8 @@
-import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationMembershipRequestResource } from './organizationMembershipRequest';
+import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
 import type { RoleResource } from './role';
 
