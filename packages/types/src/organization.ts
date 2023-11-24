@@ -1,4 +1,4 @@
-import type { ClerkPaginatedResponse } from './api';
+import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
@@ -64,68 +64,23 @@ export interface OrganizationResource extends ClerkResource {
 /**
  * @experimental
  */
-export type GetRolesParams = {
-  /**
-   * This is the starting point for your fetched results. The initial value persists between re-renders
-   */
-  initialPage?: number;
-  /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
-   */
-  pageSize?: number;
-};
+export type GetRolesParams = ClerkPaginationParams;
 
-export type GetMembersParams = {
-  /**
-   * This is the starting point for your fetched results. The initial value persists between re-renders
-   */
-  initialPage?: number;
-  /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
-   */
-  pageSize?: number;
-
+export type GetMembersParams = ClerkPaginationParams<{
   role?: MembershipRole[];
-};
+}>;
 
-export type GetDomainsParams = {
-  /**
-   * This is the starting point for your fetched results. The initial value persists between re-renders
-   */
-  initialPage?: number;
-  /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
-   */
-  pageSize?: number;
-
+export type GetDomainsParams = ClerkPaginationParams<{
   enrollmentMode?: OrganizationEnrollmentMode;
-};
+}>;
 
-export type GetInvitationsParams = {
-  /**
-   * This is the starting point for your fetched results. The initial value persists between re-renders
-   */
-  initialPage?: number;
-  /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
-   */
-  pageSize?: number;
-
+export type GetInvitationsParams = ClerkPaginationParams<{
   status?: OrganizationInvitationStatus[];
-};
+}>;
 
-export type GetMembershipRequestParams = {
-  /**
-   * This is the starting point for your fetched results. The initial value persists between re-renders
-   */
-  initialPage?: number;
-  /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
-   */
-  pageSize?: number;
-
+export type GetMembershipRequestParams = ClerkPaginationParams<{
   status?: OrganizationInvitationStatus;
-};
+}>;
 
 export interface AddMemberParams {
   userId: string;

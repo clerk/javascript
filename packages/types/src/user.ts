@@ -1,4 +1,4 @@
-import type { ClerkPaginatedResponse } from './api';
+import type { ClerkPaginatedResponse, ClerkPaginationParams } from './api';
 import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
@@ -148,42 +148,15 @@ export type UpdateUserPasswordParams = {
 
 export type RemoveUserPasswordParams = Pick<UpdateUserPasswordParams, 'currentPassword'>;
 
-export type GetUserOrganizationInvitationsParams = {
-  /**
-   * This the starting point for your fetched results. The initial value persists between re-renders
-   */
-  initialPage?: number;
-  /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
-   */
-  pageSize?: number;
-
+export type GetUserOrganizationInvitationsParams = ClerkPaginationParams<{
   status?: OrganizationInvitationStatus;
-};
+}>;
 
-export type GetUserOrganizationSuggestionsParams = {
-  /**
-   * This the starting point for your fetched results. The initial value persists between re-renders
-   */
-  initialPage?: number;
-  /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
-   */
-  pageSize?: number;
-
+export type GetUserOrganizationSuggestionsParams = ClerkPaginationParams<{
   status?: OrganizationSuggestionStatus | OrganizationSuggestionStatus[];
-};
+}>;
 
-export type GetUserOrganizationMembershipParams = {
-  /**
-   * This the starting point for your fetched results. The initial value persists between re-renders
-   */
-  initialPage?: number;
-  /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
-   */
-  pageSize?: number;
-};
+export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 
 export type GetOrganizationMemberships = (
   params?: GetUserOrganizationMembershipParams,
