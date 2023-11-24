@@ -1,5 +1,3 @@
-import type { MembershipRole, OrganizationCustomPermission } from './organizationMembership';
-
 export interface Jwt {
   header: JwtHeader;
   payload: JwtPayload;
@@ -36,7 +34,8 @@ declare global {
   }
 }
 
-export interface JwtPayload extends CustomJwtSessionClaims {
+export interface JwtPayload<Role extends string = string, Permission extends string = string>
+  extends CustomJwtSessionClaims {
   /**
    * Encoded token supporting the `getRawString` method.
    */
@@ -94,12 +93,12 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   /**
    * Active organization role
    */
-  org_role?: MembershipRole;
+  org_role?: Role;
 
   /**
    * Active organization role
    */
-  org_permissions?: OrganizationCustomPermission[];
+  org_permissions?: Permission[];
 
   /**
    * Any other JWT Claim Set member.

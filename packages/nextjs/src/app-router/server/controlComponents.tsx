@@ -15,8 +15,11 @@ export function SignedOut(props: React.PropsWithChildren) {
   return userId ? null : <>{children}</>;
 }
 
-type GateServerComponentProps = React.PropsWithChildren<
-  Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0] & {
+type GateServerComponentProps<
+  Role extends string = string,
+  Permission extends string = string,
+> = React.PropsWithChildren<
+  Parameters<experimental__CheckAuthorizationWithCustomPermissions<Role, Permission>>[0] & {
     fallback?: React.ReactNode;
   }
 >;
@@ -24,9 +27,11 @@ type GateServerComponentProps = React.PropsWithChildren<
 /**
  * @experimental The component is experimental and subject to change in future releases.
  */
-export function experimental__Gate(gateProps: GateServerComponentProps) {
+export function experimental__Gate<Role extends string = string, Permission extends string = string>(
+  gateProps: GateServerComponentProps<Role, Permission>,
+) {
   const { children, fallback, ...restAuthorizedParams } = gateProps;
-  const { experimental__has } = auth();
+  const { experimental__has } = auth<Role, Permission>();
 
   if (experimental__has(restAuthorizedParams)) {
     return <>{children}</>;

@@ -41,8 +41,8 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JS
   return <>{children}</>;
 };
 
-type GateProps = React.PropsWithChildren<
-  Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0] & {
+type GateProps<Role extends string = string, Permission extends string = string> = React.PropsWithChildren<
+  Parameters<experimental__CheckAuthorizationWithCustomPermissions<Role, Permission>>[0] & {
     fallback?: React.ReactNode;
   }
 >;
@@ -50,15 +50,19 @@ type GateProps = React.PropsWithChildren<
 /**
  * @experimental The component is experimental and subject to change in future releases.
  */
-export const experimental__Gate = ({ children, fallback, ...restAuthorizedParams }: GateProps) => {
-  const { experimental__has } = useAuth();
+export function experimental__Gate<Role extends string = string, Permission extends string = string>({
+  children,
+  fallback,
+  ...restAuthorizedParams
+}: GateProps<Role, Permission>) {
+  const { experimental__has } = useAuth<Role, Permission>();
 
   if (experimental__has(restAuthorizedParams)) {
     return <>{children}</>;
   }
 
   return <>{fallback ?? null}</>;
-};
+}
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;

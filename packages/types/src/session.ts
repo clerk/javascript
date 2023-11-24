@@ -1,28 +1,24 @@
 import type { ActJWTClaim } from './jwt';
-import type {
-  MembershipRole,
-  OrganizationCustomPermission,
-  OrganizationCustomRole,
-  OrganizationPermission,
-} from './organizationMembership';
+import type { MembershipRole, OrganizationPermission } from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
-export type experimental__CheckAuthorizationWithCustomPermissions = (
-  isAuthorizedParams: CheckAuthorizationParamsWithCustomPermissions,
-) => boolean;
+export type experimental__CheckAuthorizationWithCustomPermissions<
+  Role extends string = string,
+  Permission extends string = string,
+> = (isAuthorizedParams: CheckAuthorizationParamsWithCustomPermissions<Role, Permission>) => boolean;
 
-type CheckAuthorizationParamsWithCustomPermissions =
+type CheckAuthorizationParamsWithCustomPermissions<Role = string, Permission = string> =
   | {
       some: (
         | {
-            role: OrganizationCustomRole;
+            role: Role;
             permission?: never;
           }
         | {
             role?: never;
-            permission: OrganizationCustomPermission;
+            permission: Permission;
           }
       )[];
       role?: never;
@@ -30,13 +26,13 @@ type CheckAuthorizationParamsWithCustomPermissions =
     }
   | {
       some?: never;
-      role: OrganizationCustomRole;
+      role: Role;
       permission?: never;
     }
   | {
       some?: never;
       role?: never;
-      permission: OrganizationCustomPermission;
+      permission: Permission;
     };
 
 export type CheckAuthorization = (isAuthorizedParams: CheckAuthorizationParams) => boolean;

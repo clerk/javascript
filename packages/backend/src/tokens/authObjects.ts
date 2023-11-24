@@ -22,7 +22,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
   organization?: Organization;
 };
 
-export type SignedInAuthObject = {
+export type SignedInAuthObject<Role extends string = string, Permission extends string = string> = {
   sessionClaims: JwtPayload;
   sessionId: string;
   session: Session | undefined;
@@ -30,15 +30,15 @@ export type SignedInAuthObject = {
   userId: string;
   user: User | undefined;
   orgId: string | undefined;
-  orgRole: OrganizationCustomRole | undefined;
+  orgRole: Role | undefined;
   orgSlug: string | undefined;
-  orgPermissions: OrganizationCustomPermission[] | undefined;
+  orgPermissions: Permission[] | undefined;
   organization: Organization | undefined;
   getToken: ServerGetToken;
   /**
    * @experimental The method is experimental and subject to change in future releases.
    */
-  experimental__has: experimental__CheckAuthorizationWithCustomPermissions;
+  experimental__has: experimental__CheckAuthorizationWithCustomPermissions<Role, Permission>;
   debug: AuthObjectDebug;
 };
 
@@ -62,7 +62,9 @@ export type SignedOutAuthObject = {
   debug: AuthObjectDebug;
 };
 
-export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
+export type AuthObject<Role extends string = string, Permission extends string = string> =
+  | SignedInAuthObject<Role, Permission>
+  | SignedOutAuthObject;
 
 const createDebug: CreateAuthObjectDebug = data => {
   return () => {
@@ -73,11 +75,11 @@ const createDebug: CreateAuthObjectDebug = data => {
   };
 };
 
-export function signedInAuthObject(
-  sessionClaims: JwtPayload,
+export function signedInAuthObject<Role extends string = string, Permission extends string = string>(
+  sessionClaims: JwtPayload<Role, Permission>,
   options: SignedInAuthObjectOptions,
   debugData?: AuthObjectDebugData,
-): SignedInAuthObject {
+): SignedInAuthObject<Role, Permission> {
   const {
     act: actor,
     sid: sessionId,
@@ -113,7 +115,7 @@ export function signedInAuthObject(
     orgPermissions,
     organization,
     getToken,
-    experimental__has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
+    experimental__has: createHasAuthorization<Role, Permission>({ orgId, orgRole, orgPermissions, userId }),
     debug: createDebug({ ...options, ...debugData }),
   };
 }
@@ -203,7 +205,7 @@ const createGetToken: CreateGetToken = params => {
 };
 
 const createHasAuthorization =
-  ({
+  <Role extends string = string, Permission extends string = string>({
     orgId,
     orgRole,
     userId,
@@ -211,9 +213,9 @@ const createHasAuthorization =
   }: {
     userId: string;
     orgId: string | undefined;
-    orgRole: string | undefined;
-    orgPermissions: string[] | undefined;
-  }): experimental__CheckAuthorizationWithCustomPermissions =>
+    orgRole: Role | undefined;
+    orgPermissions: Permission[] | undefined;
+  }): experimental__CheckAuthorizationWithCustomPermissions<Role, Permission> =>
   params => {
     if (!orgId || !userId || !orgPermissions) {
       return false;

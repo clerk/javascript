@@ -95,6 +95,8 @@ export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerMod
 export const Experimental__Gate =
   ComponentsModule.Experimental__Gate as ServerComponentsServerModuleTypes['Experimental__Gate'];
 
+export const createClerk = ComponentsModule.createClerk as ServerComponentsServerModuleTypes['createClerk'];
+
 export const auth = ServerHelperModule.auth as ServerHelpersServerModuleTypes['auth'];
 export const currentUser = ServerHelperModule.currentUser as ServerHelpersServerModuleTypes['currentUser'];
 // export const getAuth = ServerHelperModule.getAuth as ServerHelpersServerModuleTypes['getAuth'];

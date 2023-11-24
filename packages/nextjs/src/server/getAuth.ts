@@ -8,6 +8,7 @@ import {
   signedInAuthObject,
   signedOutAuthObject,
 } from '@clerk/backend';
+import type { JwtPayload } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
 import { API_URL, API_VERSION, SECRET_KEY } from './constants';
@@ -15,9 +16,13 @@ import { getAuthAuthHeaderMissing } from './errors';
 import type { RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 
-type AuthObjectWithoutResources<T extends AuthObject> = Omit<T, 'user' | 'organization' | 'session'>;
+type AuthObjectWithoutResources<
+  T extends AuthObject<Role, Permission>,
+  Role extends string = string,
+  Permission extends string = string,
+> = Omit<T, 'user' | 'organization' | 'session'>;
 
-export const createGetAuth = ({
+export const createGetAuth = <Role extends string = string, Permission extends string = string>({
   debugLoggerName,
   noAuthStatusMessage,
 }: {
@@ -28,7 +33,9 @@ export const createGetAuth = ({
     return (
       req: RequestLike,
       opts?: { secretKey?: string },
-    ): AuthObjectWithoutResources<SignedInAuthObject> | AuthObjectWithoutResources<SignedOutAuthObject> => {
+    ):
+      | AuthObjectWithoutResources<SignedInAuthObject<Role, Permission>, Role, Permission>
+      | AuthObjectWithoutResources<SignedOutAuthObject> => {
       const debug = getHeader(req, constants.Headers.EnableDebug) === 'true';
       if (debug) {
         logger.enable();
@@ -62,7 +69,10 @@ export const createGetAuth = ({
 
       const jwt = parseJwt(req);
       logger.debug('JWT debug', jwt.raw.text);
-      return signedInAuthObject(jwt.payload, { ...options, token: jwt.raw.text });
+      return signedInAuthObject<Role, Permission>(jwt.payload as JwtPayload<Role, Permission>, {
+        ...options,
+        token: jwt.raw.text,
+      });
     };
   });
 

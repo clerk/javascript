@@ -18,7 +18,7 @@ type experimental__CheckAuthorizationSignedOut = (
   params?: Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0],
 ) => false;
 
-type UseAuthReturn =
+type UseAuthReturn<Role extends string = string, Permission extends string = string> =
   | {
       isLoaded: false;
       isSignedIn: undefined;
@@ -74,17 +74,17 @@ type UseAuthReturn =
       sessionId: string;
       actor: ActJWTClaim | null;
       orgId: string;
-      orgRole: MembershipRole;
+      orgRole: Role;
       orgSlug: string | null;
       /**
        * @experimental The method is experimental and subject to change in future releases.
        */
-      experimental__has: experimental__CheckAuthorizationWithCustomPermissions;
+      experimental__has: experimental__CheckAuthorizationWithCustomPermissions<Role, Permission>;
       signOut: SignOut;
       getToken: GetToken;
     };
 
-type UseAuth = () => UseAuthReturn;
+type UseAuth = <Role extends string = string, Permission extends string = string>() => UseAuthReturn<Role, Permission>;
 
 /**
  * Returns the current auth state, the user and session ids and the `getToken`
@@ -125,7 +125,7 @@ type UseAuth = () => UseAuthReturn;
  *   return <div>...</div>
  * }
  */
-export const useAuth: UseAuth = () => {
+export const useAuth: UseAuth = <Role extends string = string, Permission extends string = string>() => {
   const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
 
@@ -133,7 +133,7 @@ export const useAuth: UseAuth = () => {
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
   const has = useCallback(
-    (params?: Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0]) => {
+    (params?: Parameters<experimental__CheckAuthorizationWithCustomPermissions<Role, Permission>>[0]) => {
       if (!orgId || !userId || !orgRole || !orgPermissions) {
         return false;
       }
@@ -206,7 +206,7 @@ export const useAuth: UseAuth = () => {
       userId,
       actor: actor || null,
       orgId,
-      orgRole,
+      orgRole: orgRole as Role,
       orgSlug: orgSlug || null,
       experimental__has: has,
       signOut,
