@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.0.0-alpha-v5.4
+
+### Minor Changes
+
+- - By default, all the components with routing will have the `routing` prop assigned as `'path'` by default when the `path` prop is filled. ([#1957](https://github.com/clerk/javascript/pull/1957)) by [@octoper](https://github.com/octoper)
+
+  - The `<UserButton />` component will set the default value of the `userProfileMode` prop to `'navigation'` if the `userProfileUrl` prop is provided.
+  - The `<OrganizationSwitcher />` component will have the `organizationProfileMode` and `createOrganizationMode` props assigned with `'navigation'` by default if the `organizationProfileUrl` and `createOrganizationUrl` props are filled accordingly.
+
+### Patch Changes
+
+- Updated dependencies [[`7f6a64f43`](https://github.com/clerk/javascript/commit/7f6a64f4335832c66ff355f6d2f311f33a313d59)]:
+  - @clerk/types@4.0.0-alpha-v5.4
+
 ## 5.0.0-alpha-v5.3
 
 ### Major Changes
