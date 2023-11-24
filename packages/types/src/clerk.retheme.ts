@@ -525,6 +525,18 @@ export interface ClerkOptions {
    */
   isInterstitial?: boolean;
   isSatellite?: boolean | ((url: URL) => boolean);
+
+  /**
+   * Telemetry options
+   */
+  telemetry?:
+    | false
+    | {
+        disabled?: boolean;
+        debug?: boolean;
+      };
+
+  sdkMetadata?: SDKMetadata;
 }
 
 export interface Resources {
