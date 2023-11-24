@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.65.4
+
+### Patch Changes
+
+- Fallback to custom role name if localization is not provided. ([#2196](https://github.com/clerk/javascript/pull/2196)) by [@panteliselef](https://github.com/panteliselef)
+
+- Revalidate invitations table after invitation screen submit. ([#2197](https://github.com/clerk/javascript/pull/2197)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.65.3
 
 ### Patch Changes
