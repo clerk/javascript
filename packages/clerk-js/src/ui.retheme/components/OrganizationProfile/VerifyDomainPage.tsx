@@ -161,7 +161,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
             type='reset'
             isDisabled={otp.isLoading || otp.otpControl.otpInputProps.feedbackType === 'success'}
             onClick={() => {
-              // codeControlState.clearFeedback();
+              otp.otpControl.otpInputProps.clearFeedback();
               otp.otpControl.reset();
               wizard.prevStep();
             }}

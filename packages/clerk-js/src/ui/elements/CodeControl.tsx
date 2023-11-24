@@ -87,7 +87,7 @@ const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOpt
   const otpControlRef = React.useRef<any>();
   const userOnCodeEnteredCallback = React.useRef<onCodeEntryFinishedCallback>();
   const defaultValue = formControl.value;
-  const { feedback, feedbackType, onChange } = formControl;
+  const { feedback, feedbackType, onChange, clearFeedback } = formControl;
   const { length = 6 } = options || {};
   const [values, setValues] = React.useState(() =>
     defaultValue ? defaultValue.split('').slice(0, length) : Array.from({ length }, () => ''),
@@ -108,7 +108,7 @@ const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOpt
     }
   }, [values.toString()]);
 
-  const otpInputProps = { length, values, setValues, feedback, feedbackType, ref: otpControlRef };
+  const otpInputProps = { length, values, setValues, feedback, feedbackType, clearFeedback, ref: otpControlRef };
   return { otpInputProps, onCodeEntryFinished, reset: () => otpControlRef.current?.reset() };
 };
 
