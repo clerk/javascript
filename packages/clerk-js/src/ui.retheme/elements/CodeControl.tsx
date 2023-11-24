@@ -1,13 +1,16 @@
+import { createContextAndHook } from '@clerk/shared/react';
+import type { PropsWithChildren } from 'react';
 import React, { useCallback } from 'react';
 
-import { descriptors, Flex, Input, Spinner } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { descriptors, Flex, Input, Spinner, Text } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { common } from '../styledSystem';
 import type { FormControlState } from '../utils';
 import { handleError, sleep, useFormControl } from '../utils';
-import { FormFeedback } from './FormControl';
+import { TimerButton } from './TimerButton';
 
 type UseCodeInputOptions = {
   length?: number;
@@ -22,8 +25,6 @@ type onCodeEntryFinishedActionCallback<R = unknown> = (
   reject: (err: unknown) => Promise<void>,
 ) => void;
 
-type UseCodeControlReturn = ReturnType<typeof useCodeControl>;
-
 type UseFieldOTP = <R = unknown>(params: {
   id?: 'code';
   onCodeEntryFinished: onCodeEntryFinishedActionCallback<R>;
@@ -31,7 +32,6 @@ type UseFieldOTP = <R = unknown>(params: {
   onResolve?: (a?: R) => Promise<void> | void;
 }) => {
   isLoading: boolean;
-  isSuccess: boolean;
   otpControl: ReturnType<typeof useCodeControl>;
   onResendCode: React.MouseEventHandler<HTMLButtonElement> | undefined;
 };
@@ -46,11 +46,11 @@ export const useFieldOTP: UseFieldOTP = params => {
   } = params;
   const codeControlState = useFormControl(id, '');
   const codeControl = useCodeControl(codeControlState);
-  const [success, setSuccess] = React.useState(false);
   const status = useLoadingStatus();
 
   const resolve = async (param: any) => {
-    setSuccess(true);
+    // TODO: Localize this
+    codeControlState.setSuccess('success');
     await sleep(750);
     await paramsOnResolve?.(param);
   };
@@ -78,7 +78,6 @@ export const useFieldOTP: UseFieldOTP = params => {
 
   return {
     isLoading: status.isLoading,
-    isSuccess: success,
     otpControl: codeControl,
     onResendCode: paramsOnResendCodeClicked ? onResendCode : undefined,
   };
@@ -113,18 +112,72 @@ const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOpt
   return { otpInputProps, onCodeEntryFinished, reset: () => otpControlRef.current?.reset() };
 };
 
-type CodeControlProps = UseCodeControlReturn['otpInputProps'] & {
+export type OTPInputProps = {
+  label: string | LocalizationKey;
+  description: string | LocalizationKey;
+  resendButton?: LocalizationKey;
+  isLoading: boolean;
   isDisabled?: boolean;
-  errorText?: string;
-  isSuccessfullyFilled?: boolean;
-  isLoading?: boolean;
+  onResendCode?: React.MouseEventHandler<HTMLButtonElement>;
+  otpControl: ReturnType<typeof useFieldOTP>['otpControl'];
 };
 
-export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((props, ref) => {
+const [OTPInputContext, useOTPInputContext] = createContextAndHook<OTPInputProps>('OTPInputContext');
+
+export const OTPRoot = ({ children, ...props }: PropsWithChildren<OTPInputProps>) => {
+  return <OTPInputContext.Provider value={{ value: props }}>{children}</OTPInputContext.Provider>;
+};
+
+export const OTPInputLabel = () => {
+  const { label } = useOTPInputContext();
+  return (
+    <Text
+      localizationKey={label}
+      elementDescriptor={descriptors.formHeaderTitle}
+      variant='smallMedium'
+    />
+  );
+};
+
+export const OTPInputDescription = () => {
+  const { description } = useOTPInputContext();
+  return (
+    <Text
+      localizationKey={description}
+      elementDescriptor={descriptors.formHeaderSubtitle}
+      variant='smallRegular'
+      colorScheme='neutral'
+    />
+  );
+};
+
+export const OTPResendButton = () => {
+  const { resendButton, onResendCode, isLoading, otpControl } = useOTPInputContext();
+
+  if (!onResendCode) {
+    return null;
+  }
+
+  return (
+    <TimerButton
+      elementDescriptor={descriptors.formResendCodeLink}
+      onClick={onResendCode}
+      startDisabled
+      isDisabled={otpControl.otpInputProps.feedbackType === 'success' || isLoading}
+      showCounter={otpControl.otpInputProps.feedbackType !== 'success'}
+      sx={theme => ({ marginTop: theme.space.$6 })}
+      localizationKey={resendButton}
+    />
+  );
+};
+
+export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
   const [disabled, setDisabled] = React.useState(false);
   const refs = React.useRef<Array<HTMLInputElement | null>>([]);
   const firstClickRef = React.useRef(false);
-  const { values, setValues, isDisabled, feedback, feedbackType, isSuccessfullyFilled, isLoading, length } = props;
+
+  const { otpControl, isLoading, isDisabled } = useOTPInputContext();
+  const { feedback, values, setValues, feedbackType, length } = otpControl.otpInputProps;
 
   React.useImperativeHandle(ref, () => ({
     reset: () => {
@@ -235,55 +288,41 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
 
   return (
     <Flex
-      elementDescriptor={descriptors.otpCodeField}
       isLoading={isLoading}
       hasError={feedbackType === 'error'}
-      direction='col'
+      elementDescriptor={descriptors.otpCodeFieldInputs}
+      gap={2}
+      align='center'
+      sx={{ direction: 'ltr', width: 'max-content' }}
     >
-      <Flex
-        isLoading={isLoading}
-        hasError={feedbackType === 'error'}
-        elementDescriptor={descriptors.otpCodeFieldInputs}
-        gap={2}
-        align='center'
-        sx={{ direction: 'ltr', width: 'max-content' }}
-      >
-        {values.map((value, index: number) => (
-          <SingleCharInput
-            elementDescriptor={descriptors.otpCodeFieldInput}
-            key={index}
-            value={value}
-            onClick={handleOnClick(index)}
-            onChange={handleOnChange(index)}
-            onKeyDown={handleOnKeyDown(index)}
-            onInput={handleOnInput(index)}
-            onPaste={handleOnPaste(index)}
-            ref={node => (refs.current[index] = node)}
-            autoFocus={index === 0 || undefined}
-            autoComplete='one-time-code'
-            aria-label={`${index === 0 ? 'Enter verification code. ' : ''} Digit ${index + 1}`}
-            isDisabled={isDisabled || isLoading || disabled || isSuccessfullyFilled}
-            hasError={feedbackType === 'error'}
-            isSuccessfullyFilled={isSuccessfullyFilled}
-            type='text'
-            inputMode='numeric'
-            name={`codeInput-${index}`}
-          />
-        ))}
-        {isLoading && (
-          <Spinner
-            colorScheme='neutral'
-            sx={theme => ({ marginLeft: theme.space.$2 })}
-          />
-        )}
-      </Flex>
-      <FormFeedback
-        feedback={feedback}
-        feedbackType={feedbackType}
-        elementDescriptors={{
-          error: descriptors.otpCodeFieldErrorText,
-        }}
-      />
+      {values.map((value, index: number) => (
+        <SingleCharInput
+          elementDescriptor={descriptors.otpCodeFieldInput}
+          key={index}
+          value={value}
+          onClick={handleOnClick(index)}
+          onChange={handleOnChange(index)}
+          onKeyDown={handleOnKeyDown(index)}
+          onInput={handleOnInput(index)}
+          onPaste={handleOnPaste(index)}
+          ref={node => (refs.current[index] = node)}
+          autoFocus={index === 0 || undefined}
+          autoComplete='one-time-code'
+          aria-label={`${index === 0 ? 'Enter verification code. ' : ''} Digit ${index + 1}`}
+          isDisabled={isDisabled || isLoading || disabled || feedbackType === 'success'}
+          hasError={feedbackType === 'error'}
+          isSuccessfullyFilled={feedbackType === 'success'}
+          type='text'
+          inputMode='numeric'
+          name={`codeInput-${index}`}
+        />
+      ))}
+      {isLoading && (
+        <Spinner
+          colorScheme='neutral'
+          sx={theme => ({ marginLeft: theme.space.$2 })}
+        />
+      )}
     </Flex>
   );
 });

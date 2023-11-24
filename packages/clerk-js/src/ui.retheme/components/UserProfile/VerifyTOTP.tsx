@@ -34,10 +34,10 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
       Breadcrumbs={UserProfileBreadcrumbs}
     >
       <Col>
-        <Form.OTP
+        <Form.OTPInput
           {...otp}
-          title={localizationKeys('userProfile.mfaTOTPPage.verifyTitle')}
-          subtitle={localizationKeys('userProfile.mfaTOTPPage.verifySubtitle')}
+          label={localizationKeys('userProfile.mfaTOTPPage.verifyTitle')}
+          description={localizationKeys('userProfile.mfaTOTPPage.verifySubtitle')}
         />
       </Col>
 

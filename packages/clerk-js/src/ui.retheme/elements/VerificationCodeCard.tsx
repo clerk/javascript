@@ -2,13 +2,13 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { Col, descriptors, localizationKeys } from '../customizables';
-import { Form } from '../elements';
 import type { LocalizationKey } from '../localization';
 import { CardAlert } from './Alert';
 import { Card } from './Card';
 import { useFieldOTP } from './CodeControl';
 import { useCardState } from './contexts';
 import { Footer } from './Footer';
+import { Form } from './Form';
 import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';
 
@@ -61,10 +61,10 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
         elementDescriptor={descriptors.main}
         gap={8}
       >
-        <Form.OTP
+        <Form.OTPInput
           {...otp}
-          title={props.formTitle}
-          subtitle={props.formSubtitle}
+          label={props.formTitle}
+          description={props.formSubtitle}
           resendButton={props.resendButton}
         />
       </Col>

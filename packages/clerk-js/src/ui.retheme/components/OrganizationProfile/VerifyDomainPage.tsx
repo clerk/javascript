@@ -145,10 +145,10 @@ export const VerifyDomainPage = withCardStateProvider(() => {
         headerSubtitle={subtitleVerificationCodeScreen}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
-        <Form.OTP
+        <Form.OTPInput
           {...otp}
-          title={localizationKeys('organizationProfile.verifyDomainPage.formTitle')}
-          subtitle={localizationKeys('organizationProfile.verifyDomainPage.formSubtitle')}
+          label={localizationKeys('organizationProfile.verifyDomainPage.formTitle')}
+          description={localizationKeys('organizationProfile.verifyDomainPage.formSubtitle')}
           resendButton={localizationKeys('organizationProfile.verifyDomainPage.resendButton')}
         />
 
@@ -159,10 +159,10 @@ export const VerifyDomainPage = withCardStateProvider(() => {
             variant='ghost'
             textVariant='buttonExtraSmallBold'
             type='reset'
-            isDisabled={otp.isLoading || otp.isSuccess}
+            isDisabled={otp.isLoading || otp.otpControl.otpInputProps.feedbackType === 'success'}
             onClick={() => {
               // codeControlState.clearFeedback();
-              // codeControl.reset();
+              otp.otpControl.reset();
               wizard.prevStep();
             }}
             localizationKey={localizationKeys('userProfile.formButtonReset')}

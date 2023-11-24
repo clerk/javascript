@@ -37,10 +37,10 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
 
   return (
     <>
-      <Form.OTP
+      <Form.OTPInput
         {...otp}
-        title={localizationKeys('userProfile.emailAddressPage.emailCode.formTitle')}
-        subtitle={localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', { identifier })}
+        label={localizationKeys('userProfile.emailAddressPage.emailCode.formTitle')}
+        description={localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', { identifier })}
         resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
       />
       <FormButtonContainer>
