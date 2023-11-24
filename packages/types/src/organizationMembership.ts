@@ -58,6 +58,10 @@ export type OrganizationSystemPermission =
   | 'org:sys_memberships:manage'
   | 'org:sys_domains:read';
 
+/**
+ * OrganizationPermission is a combination of system and custom permissions.
+ * System permissions are only accessible from FAPI and client-side operations/utils
+ */
 export type OrganizationPermission = Autocomplete<OrganizationSystemPermission>;
 
 export type UpdateOrganizationMembershipParams = {
