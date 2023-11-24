@@ -228,7 +228,7 @@ export type ElementsConfig = {
   userButtonPopoverCard: WithOptions;
   userButtonPopoverMain: WithOptions;
   userButtonPopoverUserPreview: WithOptions;
-  userButtonPopoverActions: WithOptions;
+  userButtonPopoverActions: WithOptions<'singleSession' | 'multiSession'>;
   userButtonPopoverActionButton: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
