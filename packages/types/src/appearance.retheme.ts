@@ -229,10 +229,10 @@ export type ElementsConfig = {
   userButtonPopoverMain: WithOptions;
   userButtonPopoverUserPreview: WithOptions;
   userButtonPopoverActions: WithOptions;
-  userButtonPopoverActionButton: WithOptions<'manageAccount' | 'signOut'>;
-  userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'signOut'>;
-  userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'signOut'>;
-  userButtonPopoverActionButtonText: WithOptions<'manageAccount' | 'signOut'>;
+  userButtonPopoverActionButton: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
+  userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
+  userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
+  userButtonPopoverActionButtonText: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverFooter: WithOptions;
   userButtonPopoverFooterPages: WithOptions;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;

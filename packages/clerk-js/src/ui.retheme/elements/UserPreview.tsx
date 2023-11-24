@@ -68,13 +68,13 @@ export const UserPreview = (props: UserPreviewProps) => {
 
   const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
 
-  const getAvatarSizes = (t: InternalTheme) => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size]);
+  const getAvatarSizes = (t: InternalTheme) => ({ sm: t.sizes.$9, md: t.sizes.$11, lg: t.sizes.$12x5 }[size]);
 
   return (
     <Flex
       elementDescriptor={descriptors.userPreview}
       elementId={descriptors.userPreview.setId(elementId)}
-      gap={4}
+      gap={3}
       align='center'
       sx={[{ minWidth: '0px', width: '100%' }, sx]}
       {...rest}

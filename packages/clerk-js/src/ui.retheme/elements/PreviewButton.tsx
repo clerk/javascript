@@ -27,7 +27,7 @@ export const PreviewButton = (props: PreviewButtonProps) => {
           minHeight: 'unset',
           height: t.space.$12,
           justifyContent: 'space-between',
-          padding: `${t.space.$3} ${t.space.$6}`,
+          padding: `${t.space.$4} ${t.space.$5}`,
           ...(showIconOnHover
             ? {
                 ':hover > svg': {

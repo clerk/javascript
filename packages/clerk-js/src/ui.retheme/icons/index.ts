@@ -40,6 +40,7 @@ export { default as Selector } from './selector.svg';
 export { default as SignOutDouble } from './signout-double.svg';
 export { default as SignOut } from './signout.svg';
 export { default as SwitchArrows } from './switch-arrows.svg';
+export { default as SwitchArrowRight } from './switch-arrow-right.svg';
 export { default as ThreeDots } from './threeDots.svg';
 export { default as TickShield } from './tick-shield.svg';
 export { default as Times } from './times.svg';
