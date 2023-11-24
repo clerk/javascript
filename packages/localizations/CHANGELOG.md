@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.4
+
+### Patch Changes
+
+- Add missing localization key for invalid phone_number (unstable error) in the en-US localization ([#2191](https://github.com/clerk/javascript/pull/2191)) by [@royanger](https://github.com/royanger)
+
 ## 2.0.0-alpha-v5.3
 
 ### Major Changes

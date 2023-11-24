@@ -1,5 +1,30 @@
 # Change Log
 
+## 5.0.0-alpha-v5.4
+
+### Major Changes
+
+- - By default, all the components with routing will have the `routing` prop assigned as `'path'` by default when the `path` prop is filled. ([#1957](https://github.com/clerk/javascript/pull/1957)) by [@octoper](https://github.com/octoper)
+
+  - The `<UserButton />` component will set the default value of the `userProfileMode` prop to `'navigation'` if the `userProfileUrl` prop is provided.
+  - The `<OrganizationSwitcher />` component will have the `organizationProfileMode` and `createOrganizationMode` props assigned with `'navigation'` by default if the `organizationProfileUrl` and `createOrganizationUrl` props are filled accordingly.
+
+### Minor Changes
+
+- Drop firebase legacy integration code and start using sessions/:sid/tokens/:template endpoint for the firebase tokens. ([#2190](https://github.com/clerk/javascript/pull/2190)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Reset OTP field when pressing "Cancel" in VerifyDomainPage inside `<OrganziatoinProfile/>`. ([#2200](https://github.com/clerk/javascript/pull/2200)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fallback to custom role name if localization is not provided. ([#2194](https://github.com/clerk/javascript/pull/2194)) by [@panteliselef](https://github.com/panteliselef)
+
+- Revalidate invitations table after invitation screen submit. ([#2195](https://github.com/clerk/javascript/pull/2195)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`164ca116c`](https://github.com/clerk/javascript/commit/164ca116ca717859e5593c333ab65f9d1eb794d0), [`7f6a64f43`](https://github.com/clerk/javascript/commit/7f6a64f4335832c66ff355f6d2f311f33a313d59)]:
+  - @clerk/localizations@2.0.0-alpha-v5.4
+  - @clerk/types@4.0.0-alpha-v5.4
+
 ## 5.0.0-alpha-v5.3
 
 ### Major Changes
