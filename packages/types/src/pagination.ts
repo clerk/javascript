@@ -1,10 +1,16 @@
 /**
  * Pagination params in request
  */
-export interface ClerkPaginationRequest {
+export type ClerkPaginationRequest<T = any> = {
+  /**
+   * Maximum number of items returned per request.
+   */
   limit?: number;
+  /**
+   * This is the starting point for your fetched results.
+   */
   offset?: number;
-}
+} & T;
 
 /**
  * Pagination params in response
@@ -19,11 +25,11 @@ export interface ClerkPaginatedResponse<T> {
  */
 export type ClerkPaginationParams<T = any> = {
   /**
-   * This is the starting point for your fetched results. The initial value persists between re-renders
+   * This is the starting point for your fetched results.
    */
   initialPage?: number;
   /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
+   * Maximum number of items returned per request.
    */
   pageSize?: number;
 } & T;

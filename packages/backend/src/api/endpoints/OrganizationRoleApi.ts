@@ -1,15 +1,15 @@
+import type { ClerkPaginationRequest } from '@clerk/types';
+
 import { joinPaths } from '../../util/path';
 import type { DeletedObject, Role } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/organizations_roles';
 
-type GetRoleListParams = {
-  limit?: number;
-  offset?: number;
+type GetRoleListParams = ClerkPaginationRequest<{
   query?: string;
   order_by?: string;
-};
+}>;
 
 type CreateParams = {
   /**
