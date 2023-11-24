@@ -6,10 +6,13 @@ describe('auth prop helpers', () => {
       expect(normalizeRoutingOptions({ path: 'test' })).toEqual({ routing: 'path', path: 'test' });
     });
 
-    it('returns the same options if routing was provided (any routing) and path was provided (avoid breaking integrations)', () => {
-      expect(normalizeRoutingOptions({ routing: 'path', path: 'test' })).toEqual({ routing: 'path', path: 'test' });
-      expect(normalizeRoutingOptions({ routing: 'hash', path: 'test' })).toEqual({ routing: 'hash', path: 'test' });
-      expect(normalizeRoutingOptions({ routing: 'virtual' })).toEqual({ routing: 'virtual' });
+    it('it throws an error when path is provided and routing strategy is not path', () => {
+      expect(() => {
+        normalizeRoutingOptions({ path: 'test', routing: 'hash' });
+      }).toThrow('ClerkJS: Invalid routing strategy, path cannot be used in tandem with hash.');
+      expect(() => {
+        normalizeRoutingOptions({ path: 'test', routing: 'virtual' });
+      }).toThrow('ClerkJS: Invalid routing strategy, path cannot be used in tandem with virtual.');
     });
   });
 });

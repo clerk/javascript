@@ -186,7 +186,11 @@ export const VerifyDomainPage = withCardStateProvider(() => {
             textVariant='buttonExtraSmallBold'
             type='reset'
             isDisabled={status.isLoading || success}
-            onClick={wizard.prevStep}
+            onClick={() => {
+              codeControlState.clearFeedback();
+              codeControl.reset();
+              wizard.prevStep();
+            }}
             localizationKey={localizationKeys('userProfile.formButtonReset')}
           />
         </FormButtonContainer>

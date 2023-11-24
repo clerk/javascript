@@ -15,6 +15,24 @@ export function jsonOk(body: unknown, status = 200) {
   return Promise.resolve(mockResponse);
 }
 
+export function jsonPaginatedOk(body: unknown[], total_count: number, status = 200) {
+  // Mock response object that satisfies the window.Response interface
+  const mockResponse = {
+    ok: true,
+    status,
+    statusText: status.toString(),
+    headers: { get: mockHeadersGet },
+    json() {
+      return Promise.resolve({
+        data: body,
+        total_count,
+      });
+    },
+  };
+
+  return Promise.resolve(mockResponse);
+}
+
 export function jsonNotOk(body: unknown) {
   // Mock response object that satisfies the window.Response interface
   const mockResponse = {

@@ -115,3 +115,7 @@ export function clerkRedirectUrlIsMissingScheme(): never {
 export function clerkFailedToLoadThirdPartyScript(name?: string): never {
   throw new Error(`${errorPrefix} Unable to retrieve a third party script${name ? ` ${name}` : ''}.`);
 }
+
+export function clerkInvalidRoutingStrategy(strategy?: string): never {
+  throw new Error(`${errorPrefix} Invalid routing strategy, path cannot be used in tandem with ${strategy}.`);
+}
