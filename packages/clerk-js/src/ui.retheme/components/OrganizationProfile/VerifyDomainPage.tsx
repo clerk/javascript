@@ -10,13 +10,12 @@ import {
   FormButtonContainer,
   FormButtons,
   useCardState,
-  useCodeControl,
+  useFieldOTP,
   withCardStateProvider,
 } from '../../elements';
-import { CodeForm } from '../../elements/CodeForm';
-import { useFetch, useLoadingStatus } from '../../hooks';
+import { useFetch } from '../../hooks';
 import { useRouter } from '../../router';
-import { handleError, sleep, useFormControl } from '../../utils';
+import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const VerifyDomainPage = withCardStateProvider(() => {
@@ -24,8 +23,6 @@ export const VerifyDomainPage = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const { organization } = useCoreOrganization();
   const { params, navigate } = useRouter();
-
-  const [success, setSuccess] = React.useState(false);
 
   const { data: domain, status: domainStatus } = useFetch(organization?.getDomain, {
     domainId: params.id,
@@ -36,12 +33,6 @@ export const VerifyDomainPage = withCardStateProvider(() => {
   });
 
   const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
-
-  const status = useLoadingStatus();
-
-  const codeControlState = useFormControl('code', '');
-  const codeControl = useCodeControl(codeControlState);
-
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const emailField = useFormControl('affiliationEmailAddress', '', {
@@ -49,6 +40,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__organizationDomainEmailAddress'),
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationDomainEmailAddress'),
     infoText: localizationKeys('formFieldLabel__organizationDomainEmailAddressDescription'),
+    isRequired: true,
   });
 
   const affiliationEmailAddressRef = useRef<string>();
@@ -59,11 +51,6 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       emailAddress: affiliationEmailAddressRef.current,
     },
   );
-
-  const resolve = async () => {
-    setSuccess(true);
-    await sleep(750);
-  };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     domain
@@ -78,29 +65,20 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       .catch(err => reject(err));
   };
 
-  const reject = async (err: any) => {
-    handleError(err, [codeControlState], card.setError);
-    status.setIdle();
-    await sleep(750);
-    codeControl.reset();
-  };
-
-  codeControl.onCodeEntryFinished(code => {
-    status.setLoading();
-    codeControlState.setError(undefined);
-    action(code, resolve, reject);
+  const otp = useFieldOTP({
+    onCodeEntryFinished: (code, resolve, reject) => {
+      action(code, resolve, reject);
+    },
+    onResendCodeClicked: () => {
+      domain?.prepareAffiliationVerification({ affiliationEmailAddress: emailField.value }).catch(err => {
+        handleError(err, [emailField], card.setError);
+      });
+    },
   });
 
   if (!organization || !organizationSettings) {
     return null;
   }
-
-  const handleResend = () => {
-    codeControl.reset();
-    domain?.prepareAffiliationVerification({ affiliationEmailAddress: emailField.value }).catch(err => {
-      handleError(err, [emailField], card.setError);
-    });
-  };
 
   const dataChanged = organization.name !== emailField.value;
   const canSubmit = dataChanged;
@@ -155,7 +133,6 @@ export const VerifyDomainPage = withCardStateProvider(() => {
               {...emailField.props}
               autoFocus
               groupSuffix={emailDomainSuffix}
-              isRequired
             />
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />
@@ -168,14 +145,11 @@ export const VerifyDomainPage = withCardStateProvider(() => {
         headerSubtitle={subtitleVerificationCodeScreen}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
-        <CodeForm
-          title={localizationKeys('organizationProfile.verifyDomainPage.formTitle')}
-          subtitle={localizationKeys('organizationProfile.verifyDomainPage.formSubtitle')}
+        <Form.OTPInput
+          {...otp}
+          label={localizationKeys('organizationProfile.verifyDomainPage.formTitle')}
+          description={localizationKeys('organizationProfile.verifyDomainPage.formSubtitle')}
           resendButton={localizationKeys('organizationProfile.verifyDomainPage.resendButton')}
-          isLoading={status.isLoading}
-          success={success}
-          codeControl={codeControl}
-          onResendCodeClicked={handleResend}
         />
 
         <FormButtonContainer>
@@ -185,10 +159,10 @@ export const VerifyDomainPage = withCardStateProvider(() => {
             variant='ghost'
             textVariant='buttonExtraSmallBold'
             type='reset'
-            isDisabled={status.isLoading || success}
+            isDisabled={otp.isLoading || otp.otpControl.otpInputProps.feedbackType === 'success'}
             onClick={() => {
-              codeControlState.clearFeedback();
-              codeControl.reset();
+              otp.otpControl.otpInputProps.clearFeedback();
+              otp.otpControl.reset();
               wizard.prevStep();
             }}
             localizationKey={localizationKeys('userProfile.formButtonReset')}

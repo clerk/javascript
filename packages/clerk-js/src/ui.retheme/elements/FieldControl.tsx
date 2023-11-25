@@ -19,11 +19,13 @@ import { FormFieldContextProvider, sanitizeInputProps, useFormField } from '../p
 import type { PropsOfComponent } from '../styledSystem';
 import type { useFormControl as useFormControlUtil } from '../utils';
 import { useFormControlFeedback } from '../utils';
+import { OTPCodeControl, OTPInputDescription, OTPInputLabel, OTPResendButton, OTPRoot } from './CodeControl';
 import { useCardState } from './contexts';
 import type { FormFeedbackProps } from './FormControl';
 import { FormFeedback } from './FormControl';
 import { InputGroup } from './InputGroup';
 import { PasswordInput } from './PasswordInput';
+import { PhoneInput } from './PhoneInput';
 import { RadioItem, RadioLabel } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder' | 'disabled' | 'required'> &
@@ -199,6 +201,22 @@ const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors'>) => 
   );
 };
 
+const PhoneInputElement = forwardRef<HTMLInputElement>((_, ref) => {
+  const { t } = useLocalizations();
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField);
+
+  return (
+    <PhoneInput
+      ref={ref}
+      elementDescriptor={descriptors.formFieldInput}
+      elementId={descriptors.formFieldInput.setId(formField.fieldId)}
+      {...inputProps}
+      placeholder={t(placeholder)}
+    />
+  );
+});
+
 const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {
   const { t } = useLocalizations();
   const formField = useFormField();
@@ -304,6 +322,7 @@ export const Field = {
   LabelRow: FieldLabelRow,
   Input: InputElement,
   PasswordInput: PasswordInputElement,
+  PhoneInput: PhoneInputElement,
   InputGroup: InputGroupElement,
   RadioItem: RadioItem,
   CheckboxIndicator: CheckboxIndicator,
@@ -312,4 +331,9 @@ export const Field = {
   AsOptional: FieldOptionalLabel,
   LabelIcon: FieldLabelIcon,
   Feedback: FieldFeedback,
+  OTPRoot,
+  OTPInputLabel,
+  OTPInputDescription,
+  OTPCodeControl,
+  OTPResendButton,
 };
