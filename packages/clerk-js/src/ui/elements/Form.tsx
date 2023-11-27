@@ -10,7 +10,6 @@ import type { PropsOfComponent } from '../styledSystem';
 import type { OTPInputProps } from './CodeControl';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
-import { FormControl } from './FormControl';
 
 const [FormState, useFormState] = createContextAndHook<{
   isLoading: boolean;
@@ -118,7 +117,7 @@ const FormControlRow = (props: Omit<PropsOfComponent<typeof Flex>, 'elementId'> 
   );
 };
 
-type CommonFieldRootProps = Omit<PropsOfComponent<typeof Field.Root>, 'children'>;
+type CommonFieldRootProps = Omit<PropsOfComponent<typeof Field.Root>, 'children' | 'elementDescriptor' | 'elementId'>;
 
 type CommonInputProps = CommonFieldRootProps & {
   isOptional?: boolean;
@@ -131,20 +130,27 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
   const { isOptional, icon, actionLabel, children, onActionClicked, ...fieldProps } = props;
   return (
     <Field.Root {...fieldProps}>
-      <Field.LabelRow>
-        <Field.Label />
-        <Field.LabelIcon icon={icon} />
-        {!actionLabel && isOptional && <Field.AsOptional />}
-        {actionLabel && (
-          <Field.Action
-            localizationKey={actionLabel}
-            onClick={onActionClicked}
-          />
-        )}
-        <Field.Action />
-      </Field.LabelRow>
-      {children}
-      <Field.Feedback />
+      <Flex
+        direction='col'
+        elementDescriptor={descriptors.formField}
+        elementId={descriptors.formField.setId(fieldProps.id)}
+        sx={{ position: 'relative', flex: '1 1 auto' }}
+      >
+        <Field.LabelRow>
+          <Field.Label />
+          <Field.LabelIcon icon={icon} />
+          {!actionLabel && isOptional && <Field.AsOptional />}
+          {actionLabel && (
+            <Field.Action
+              localizationKey={actionLabel}
+              onClick={onActionClicked}
+            />
+          )}
+          <Field.Action />
+        </Field.LabelRow>
+        {children}
+        <Field.Feedback />
+      </Flex>
     </Field.Root>
   );
 };
@@ -194,6 +200,7 @@ const Checkbox = (
 ) => {
   return (
     <Field.Root {...props}>
+      {/*TODO: Create a descriptor for Checkbox wrapper*/}
       <Flex align='start'>
         <Field.CheckboxIndicator />
         <Field.CheckboxLabel description={props.description} />
@@ -234,6 +241,7 @@ const OTPInput = (props: OTPInputProps) => {
     // @ts-ignore
     <Field.Root {...restInputProps}>
       <Field.OTPRoot {...props}>
+        {/*TODO: Create a descriptor for OTP wrapper*/}
         <Col
           elementDescriptor={descriptors.form}
           gap={2}
@@ -263,10 +271,6 @@ const OTPInput = (props: OTPInputProps) => {
 export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
-  /**
-   * @deprecated Use Form.PlainInput
-   */
-  Control: FormControl,
   PlainInput,
   PasswordInput,
   PhoneInput,

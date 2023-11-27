@@ -1,99 +1,26 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { ClerkAPIError, FieldId } from '@clerk/types';
+import type { FieldId } from '@clerk/types';
 import React from 'react';
 
 import type { useFormControl as useFormControlUtil } from '../../utils/useFormControl';
 
-/**
- * @deprecated
- */
-export type FormControlProps = {
-  /**
-   * The custom `id` to use for the form control. This is passed directly to the form element (e.g, Input).
-   * - The form element (e.g. Input) gets the `id`
-   */
-  id: string;
-  isRequired?: boolean;
-  hasError?: boolean;
-  isDisabled?: boolean;
-  setError: (error: string | ClerkAPIError | undefined) => void;
-  setSuccess: (message: string) => void;
-  setWarning: (warning: string) => void;
-  setInfo: (info: string) => void;
-  clearFeedback: () => void;
-};
-
-/**
- * @deprecated
- */
-type FormControlContextValue = Required<FormControlProps> & { errorMessageId: string };
-
-/**
- * @deprecated Use FormFieldContextProvider
- */
-export const [FormControlContext, , useFormControl] =
-  createContextAndHook<FormControlContextValue>('FormControlContext');
-
-/**
- * @deprecated Use FormFieldContextProvider
- */
-export const FormControlContextProvider = (props: React.PropsWithChildren<FormControlProps>) => {
-  const {
-    id: propsId,
-    isRequired = false,
-    hasError = false,
-    isDisabled = false,
-    setError,
-    setSuccess,
-    setWarning,
-    setInfo,
-    clearFeedback,
-  } = props;
-  // TODO: This shouldnt be targettable
-  const id = `${propsId}-field`;
-  /**
-   * Track whether the `FormErrorText` has been rendered.
-   * We use this to append its id the `aria-describedby` of the `input`.
-   */
-  const errorMessageId = hasError ? `error-${propsId}` : '';
-  const value = React.useMemo(
-    () => ({
-      value: {
-        isRequired,
-        hasError,
-        id,
-        errorMessageId,
-        isDisabled,
-        setError,
-        setSuccess,
-        setWarning,
-        setInfo,
-        clearFeedback,
-      },
-    }),
-    [isRequired, hasError, id, errorMessageId, isDisabled, setError, setSuccess, setInfo, setWarning, clearFeedback],
-  );
-  return <FormControlContext.Provider value={value}>{props.children}</FormControlContext.Provider>;
-};
-
 type FormFieldProviderProps = ReturnType<typeof useFormControlUtil<FieldId>>['props'] & {
-  hasError?: boolean;
-  isDisabled?: boolean;
+  isDisabled: boolean;
 };
 
 type FormFieldContextValue = Omit<FormFieldProviderProps, 'id'> & {
   errorMessageId?: string;
   id?: string;
   fieldId?: FieldId;
+  hasError: boolean;
 };
-export const [FormFieldContext, useFormField] = createContextAndHook<FormFieldContextValue>('FormFieldContext');
+export const [FormFieldContext, , useFormField] = createContextAndHook<FormFieldContextValue>('FormFieldContext');
 
 export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFieldProviderProps>) => {
   const {
     id: propsId,
     isRequired = false,
     isDisabled = false,
-    hasError = false,
     setError,
     setSuccess,
     setWarning,
@@ -101,11 +28,14 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
     setInfo,
     clearFeedback,
     children,
+    feedbackType,
     ...rest
   } = props;
+  // The following TODO existed beforehand, it is simply copied during the refactor
   // TODO: This shouldnt be targettable
   const id = `${propsId}-field`;
 
+  const hasError = feedbackType === 'error';
   /**
    * Track whether the `FormErrorText` has been rendered.
    * We use this to append its id the `aria-describedby` of the `input`.
@@ -125,6 +55,7 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       setInfo,
       clearFeedback,
       setHasPassedComplexity,
+      feedbackType,
     }),
     [
       isRequired,
@@ -139,6 +70,7 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       setInfo,
       clearFeedback,
       setHasPassedComplexity,
+      feedbackType,
     ],
   );
   return (
@@ -155,6 +87,11 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
   );
 };
 
+/**
+ * Each of our Form primitives depend on different custom props
+ * This utility filters out any props that will litter the DOM, but allows for exceptions when the `keep` param is used.
+ * This allows for maintainers to opt-in and only allow for specific props to be passed for each primitive.
+ */
 export const sanitizeInputProps = (
   obj: ReturnType<typeof useFormField>,
   keep?: (keyof ReturnType<typeof useFormField>)[],

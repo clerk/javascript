@@ -2,11 +2,11 @@ import { forwardRef } from 'react';
 
 import type { FormTextProps } from './FormSuccessText';
 import { applyVariants } from './FormSuccessText';
-import { useFormControl } from './hooks';
+import { useFormField } from './hooks';
 import { Text } from './Text';
 
 export const FormInfoText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
-  const { hasError, errorMessageId } = useFormControl() || {};
+  const { hasError, errorMessageId } = useFormField() || {};
 
   if (!hasError && !props.children) {
     return null;
