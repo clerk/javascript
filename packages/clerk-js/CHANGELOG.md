@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.65.5
+
+### Patch Changes
+
+- Reset OTP field when pressing "Cancel" in VerifyDomainPage inside `<OrganziatoinProfile/>`. ([#2204](https://github.com/clerk/javascript/pull/2204)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.65.4
 
 ### Patch Changes
