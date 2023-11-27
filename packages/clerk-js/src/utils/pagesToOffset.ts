@@ -1,7 +1,6 @@
 import { getNonUndefinedValues } from '@clerk/shared';
 import type { ClerkPaginationParams, ClerkPaginationRequest } from '@clerk/types';
 
-
 export function convertPageToOffset<T extends ClerkPaginationParams | undefined>(
   pageParams: T,
 ): ClerkPaginationRequest {
