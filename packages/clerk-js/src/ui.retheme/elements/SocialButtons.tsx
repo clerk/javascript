@@ -20,30 +20,11 @@ import { useEnabledThirdPartyProviders, useResizeObserver } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { useCardState } from './contexts';
+import { distributeStrategiesIntoRows } from './utils';
 
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
 const MAX_STRATEGIES_PER_ROW = 6;
-
-function distributeStrategiesIntoRows<T>(items: T[]): T[][] {
-  if (items.length <= MAX_STRATEGIES_PER_ROW) return [items];
-
-  const numArrays = Math.ceil(items.length / MAX_STRATEGIES_PER_ROW);
-  const itemsPerArray = Math.ceil(items.length / numArrays);
-  const arrays: T[][] = Array.from({ length: numArrays }, () => []);
-
-  let currentArrayIndex = 0;
-
-  for (const item of items) {
-    arrays[currentArrayIndex].push(item);
-
-    if (arrays[currentArrayIndex].length === itemsPerArray) {
-      currentArrayIndex++;
-    }
-  }
-
-  return arrays;
-}
 
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
@@ -75,7 +56,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     return null;
   }
 
-  const strategyRows = distributeStrategiesIntoRows([...strategies]);
+  const strategyRows = distributeStrategiesIntoRows([...strategies], MAX_STRATEGIES_PER_ROW);
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
