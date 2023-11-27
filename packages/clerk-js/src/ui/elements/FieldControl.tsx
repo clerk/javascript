@@ -41,18 +41,14 @@ const Root = (props: PropsWithChildren<FormControlProps>) => {
 
   const isDisabled = isDisabledProp || card.isLoading;
 
-  return (
-    <FormFieldContextProvider
-      {...{
-        ...restProps,
-        isDisabled,
-        isFocused,
-        ...debouncedState,
-      }}
-    >
-      {children}
-    </FormFieldContextProvider>
-  );
+  const ctxProps = {
+    ...restProps,
+    isDisabled,
+    isFocused,
+    ...debouncedState,
+  };
+
+  return <FormFieldContextProvider {...ctxProps}>{children}</FormFieldContextProvider>;
 };
 
 const FieldAction = (
@@ -210,7 +206,7 @@ const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {
   ]);
 
   return (
-    // @ts-expect-error Typescript is complaining that `setError`, `setWarning` and the rest of feedback setters are not passed. We are clearly passing thing them from above.
+    // @ts-expect-error Typescript is complaining that `setError`, `setWarning` and the rest of feedback setters are not passed. We are clearly passing them from above.
     <PasswordInput
       ref={ref}
       elementDescriptor={descriptors.formFieldInput}

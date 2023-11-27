@@ -14,7 +14,11 @@ type FormFieldContextValue = Omit<FormFieldProviderProps, 'id'> & {
   fieldId?: FieldId;
   hasError: boolean;
 };
-export const [FormFieldContext, , useFormField] = createContextAndHook<FormFieldContextValue>('FormFieldContext');
+/**
+ * Extract the context hook without the guarantee in order to avoid throwing errors if our field/form primitives are not wrapped inside a Field.Root component.
+ * In case our primitives need to always be wrapped with Field.Root, consider updating the following line to [FormFieldContext, useFormField]
+ */
+export const [FormFieldContext, _, useFormField] = createContextAndHook<FormFieldContextValue>('FormFieldContext');
 
 export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFieldProviderProps>) => {
   const {
@@ -31,7 +35,6 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
     feedbackType,
     ...rest
   } = props;
-  // The following TODO existed beforehand, it is simply copied during the refactor
   // TODO: This shouldnt be targettable
   const id = `${propsId}-field`;
 
