@@ -1,5 +1,37 @@
 # Change Log
 
+## 1.0.0-alpha-v5.4
+
+### Minor Changes
+
+- Expose `totalCount` from `@clerk/backend` client responses for responses ([#2199](https://github.com/clerk/javascript/pull/2199)) by [@dimkl](https://github.com/dimkl)
+
+  containing pagination information or for responses with type `{ data: object[] }`.
+
+  Example:
+
+  ```typescript
+  import { Clerk } from '@clerk/backend';
+
+  const clerkClient = Clerk({ secretKey: '...' });
+
+  // current
+  const { data } = await clerkClient.organizations.getOrganizationList();
+  console.log('totalCount: ', data.length);
+
+  // new
+  const { data, totalCount } = await clerkClient.organizations.getOrganizationList();
+  console.log('totalCount: ', totalCount);
+  ```
+
+- Re-use common pagination types for consistency across types. ([#2210](https://github.com/clerk/javascript/pull/2210)) by [@dimkl](https://github.com/dimkl)
+
+  Types introduced in `@clerk/types`:
+
+  - `ClerkPaginationRequest` : describes pagination related props in request payload
+  - `ClerkPaginatedResponse` : describes pagination related props in response body
+  - `ClerkPaginationParams` : describes pagination related props in api client method params
+
 ## 1.0.0-alpha-v5.3
 
 ### Minor Changes

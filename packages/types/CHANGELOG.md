@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.0.0-alpha-v5.5
+
+### Minor Changes
+
+- Re-use common pagination types for consistency across types. ([#2210](https://github.com/clerk/javascript/pull/2210)) by [@dimkl](https://github.com/dimkl)
+
+  Types introduced in `@clerk/types`:
+
+  - `ClerkPaginationRequest` : describes pagination related props in request payload
+  - `ClerkPaginatedResponse` : describes pagination related props in response body
+  - `ClerkPaginationParams` : describes pagination related props in api client method params
+
 ## 4.0.0-alpha-v5.4
 
 ### Patch Changes

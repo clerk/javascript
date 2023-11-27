@@ -1,5 +1,36 @@
 # Change Log
 
+## 5.0.0-alpha-v5.5
+
+### Major Changes
+
+- All the components that using routing will throw a runtime error if the a path property is provided with a routing strategy other than path. ([#2208](https://github.com/clerk/javascript/pull/2208)) by [@octoper](https://github.com/octoper)
+
+  Example that will throw an error:
+
+  ```tsx
+  <SignIn
+    routing='hash'
+    path='/sign-in'
+  />
+  ```
+
+### Minor Changes
+
+- Re-use common pagination types for consistency across types. ([#2210](https://github.com/clerk/javascript/pull/2210)) by [@dimkl](https://github.com/dimkl)
+
+  Types introduced in `@clerk/types`:
+
+  - `ClerkPaginationRequest` : describes pagination related props in request payload
+  - `ClerkPaginatedResponse` : describes pagination related props in response body
+  - `ClerkPaginationParams` : describes pagination related props in api client method params
+
+### Patch Changes
+
+- Updated dependencies [[`b8599d700`](https://github.com/clerk/javascript/commit/b8599d700c38c995183a783c505d0805fda8f5fa), [`12962bc58`](https://github.com/clerk/javascript/commit/12962bc58e2c9caad416ba4e6d52061d00bc2feb)]:
+  - @clerk/localizations@2.0.0-alpha-v5.5
+  - @clerk/types@4.0.0-alpha-v5.5
+
 ## 5.0.0-alpha-v5.4
 
 ### Major Changes
