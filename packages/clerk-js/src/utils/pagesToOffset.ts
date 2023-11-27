@@ -1,9 +1,5 @@
-import type { ClerkPaginationParams } from '@clerk/types';
+import type { ClerkPaginationParams, ClerkPaginationRequest } from '@clerk/types';
 
-type Pages = {
-  initialPage?: number;
-  pageSize?: number;
-};
 function getNonUndefinedValues<T>(obj: Record<string, T>): Record<string, T> {
   return Object.keys(obj).reduce((result, key) => {
     if (obj[key] !== undefined) {
@@ -12,8 +8,10 @@ function getNonUndefinedValues<T>(obj: Record<string, T>): Record<string, T> {
     return result;
   }, {} as Record<string, T>);
 }
-export function convertPageToOffset<T extends Pages | undefined>(pageParams: T): ClerkPaginationParams {
-  const { pageSize, initialPage, ...restParams } = pageParams || {};
+export function convertPageToOffset<T extends ClerkPaginationParams | undefined>(
+  pageParams: T,
+): ClerkPaginationRequest {
+  const { pageSize, initialPage, ...restParams } = pageParams || ({} as ClerkPaginationParams);
   const _pageSize = pageSize ?? 10;
   const _initialPage = initialPage ?? 1;
 

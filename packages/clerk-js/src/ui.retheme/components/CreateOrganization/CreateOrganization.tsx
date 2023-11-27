@@ -1,4 +1,4 @@
-import type { CreateOrganizationModalProps, CreateOrganizationProps } from '@clerk/types';
+import type { CreateOrganizationModalProps } from '@clerk/types';
 
 import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
