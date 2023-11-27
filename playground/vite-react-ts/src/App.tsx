@@ -15,7 +15,7 @@ import {
 } from '@clerk/clerk-react';
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 
-const clerkPubKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY;
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 function NavBar() {
   return (
