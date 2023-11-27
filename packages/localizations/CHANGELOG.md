@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.5
+
+### Minor Changes
+
+- Add support for Portuguese (Portugal) language ([#2202](https://github.com/clerk/javascript/pull/2202)) by [@SirRamboia](https://github.com/SirRamboia)
+
 ## 2.0.0-alpha-v5.4
 
 ### Patch Changes

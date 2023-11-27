@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.0.0-alpha-v5.5
+
+### Patch Changes
+
+- Updated dependencies [[`12962bc58`](https://github.com/clerk/javascript/commit/12962bc58e2c9caad416ba4e6d52061d00bc2feb)]:
+  - @clerk/types@4.0.0-alpha-v5.5
+
 ## 5.0.0-alpha-v5.4
 
 ### Minor Changes
