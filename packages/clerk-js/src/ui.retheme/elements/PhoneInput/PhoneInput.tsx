@@ -100,12 +100,13 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         comparator={(term, option) => option.searchTerm.toLowerCase().includes(term.toLowerCase())}
       >
         <SelectButton
-          sx={{
+          sx={t => ({
             border: 'none',
+            borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
             borderBottomRightRadius: '0',
             borderTopRightRadius: '0',
             zIndex: 2,
-          }}
+          })}
           isDisabled={rest.isDisabled}
         >
           <Text
@@ -122,7 +123,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         />
       </Select>
 
-      <Flex sx={{ position: 'relative', width: '100%', marginLeft: 1 }}>
+      <Flex sx={{ position: 'relative', width: '100%', marginLeft: 3 /* same as focus ring width */ }}>
         <Text
           variant='smallRegular'
           sx={{ position: 'absolute', left: '1ch', top: '50%', transform: 'translateY(-50%)' }}
