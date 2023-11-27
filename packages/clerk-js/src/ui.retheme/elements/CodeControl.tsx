@@ -321,6 +321,7 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
         <Spinner
           colorScheme='neutral'
           sx={theme => ({ marginLeft: theme.space.$2 })}
+          elementDescriptor={descriptors.spinner}
         />
       )}
     </Flex>

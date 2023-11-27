@@ -1,13 +1,12 @@
 import React from 'react';
 
-import { Icon } from '../customizables';
+import { descriptors, Icon, Spinner } from '../customizables';
 import { ArrowRightButtonIcon } from '../icons';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { common, createCssVariables, createVariants } from '../styledSystem';
 import { colors } from '../utils';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
-import { Spinner } from './Spinner';
 
 const vars = createCssVariables('accent', 'accentDark', 'accentDarker', 'accentLighter', 'accentLightest', 'border');
 
@@ -200,8 +199,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           }}
         >
           <Spinner
-            css={{ position: loadingText ? undefined : 'absolute' }}
             aria-label={loadingText || 'Loading'}
+            elementDescriptor={descriptors.spinner}
+            sx={{
+              position: loadingText ? undefined : 'absolute',
+            }}
           />
           {loadingText || <span style={{ opacity: 0 }}>{children}</span>}
         </Flex>

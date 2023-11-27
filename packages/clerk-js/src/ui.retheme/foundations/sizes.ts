@@ -16,6 +16,7 @@ const dynamicSpaceUnits = Object.freeze({
   '5': '1.25rem',
   '6': '1.5rem',
   '7': '1.75rem',
+  '7x5': '1.875rem',
   '8': '2rem',
   '9': '2.25rem',
   '9x5': '2.375rem',

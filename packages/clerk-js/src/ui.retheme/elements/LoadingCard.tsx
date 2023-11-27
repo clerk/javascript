@@ -21,6 +21,7 @@ export const LoadingCardContainer = ({ children }: PropsWithChildren) => {
       <Spinner
         size='xl'
         colorScheme='primary'
+        elementDescriptor={descriptors.spinner}
       />
       {children}
     </Flex>

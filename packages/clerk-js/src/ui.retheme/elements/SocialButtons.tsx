@@ -1,6 +1,6 @@
 import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import type { Ref } from 'react';
-import React, { forwardRef, isValidElement, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, isValidElement } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -185,9 +185,10 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       elementId={descriptors.socialButtonsIconButton.setId(id)}
       variant='icon'
       colorScheme='neutral'
-      sx={{
+      sx={t => ({
+        minHeight: t.sizes.$7x5,
         width: '100%',
-      }}
+      })}
       {...rest}
     >
       {icon}
@@ -234,7 +235,10 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
             sx={theme => ({ flex: `0 0 ${theme.space.$4}` })}
           >
             {isLoading ? (
-              <Spinner size='sm' />
+              <Spinner
+                size='sm'
+                elementDescriptor={descriptors.spinner}
+              />
             ) : !isIconElement && icon ? (
               <Icon
                 icon={icon as unknown as React.ComponentType}

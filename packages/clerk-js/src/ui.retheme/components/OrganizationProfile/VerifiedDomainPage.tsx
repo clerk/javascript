@@ -7,7 +7,7 @@ import type {
 import { CalloutWithAction, useGate } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Col, Flex, localizationKeys, Spinner, Text } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -189,6 +189,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         <Spinner
           size={'lg'}
           colorScheme={'primary'}
+          elementDescriptor={descriptors.spinner}
         />
       </Flex>
     );
