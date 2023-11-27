@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, Flex, Icon, Spinner, Text } from '../customizables';
+import { Button, Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
@@ -96,7 +96,10 @@ export const Action = (props: ActionProps) => {
         sx={theme => ({ flex: `0 0 ${theme.sizes.$11}` })}
       >
         {status.isLoading ? (
-          <Spinner size='xs' />
+          <Spinner
+            size='xs'
+            elementDescriptor={descriptors.spinner}
+          />
         ) : (
           <Icon
             elementDescriptor={iconElementDescriptor}

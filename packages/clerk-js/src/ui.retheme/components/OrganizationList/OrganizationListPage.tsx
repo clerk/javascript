@@ -67,6 +67,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
           <Spinner
             size={'lg'}
             colorScheme={'primary'}
+            elementDescriptor={descriptors.spinner}
           />
         </Flex>
       )}

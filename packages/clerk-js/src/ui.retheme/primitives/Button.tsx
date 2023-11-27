@@ -1,13 +1,12 @@
 import React from 'react';
 
-import { Icon } from '../customizables';
+import { descriptors, Icon, Spinner } from '../customizables';
 import { ArrowRightButtonIcon } from '../icons';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { common, createCssVariables, createVariants } from '../styledSystem';
 import { colors } from '../utils';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
-import { Spinner } from './Spinner';
 
 const vars = createCssVariables('accent', 'accentDark', 'accentDarker', 'accentLighter', 'accentLightest', 'border');
 
@@ -62,11 +61,11 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         },
         neutral: {
           [vars.border]: theme.colors.$blackAlpha200,
-          [vars.accentLightest]: theme.colors.$blackAlpha50,
-          [vars.accentLighter]: theme.colors.$blackAlpha300,
-          [vars.accent]: theme.colors.$colorText,
-          [vars.accentDark]: theme.colors.$blackAlpha600,
-          [vars.accentDarker]: theme.colors.$blackAlpha700,
+          [vars.accentLightest]: theme.colors.$blackAlpha50, // TODO: once we have the new color palette and style for pseudo classes
+          [vars.accentLighter]: theme.colors.$blackAlpha300, // TODO: once we have the new color palette and style for pseudo classes
+          [vars.accent]: theme.colors.$primary800, // WIP reference: Updated to new color palette; previously `$colorText`
+          [vars.accentDark]: theme.colors.$blackAlpha600, // TODO: once we have the new color palette and style for pseudo classes
+          [vars.accentDarker]: theme.colors.$blackAlpha700, // TODO: once we have the new color palette and style for pseudo classes
         },
       },
       variant: {
@@ -87,9 +86,9 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           },
         },
         outline: {
-          border: theme.borders.$normal,
-          borderColor: vars.accentLighter,
           color: vars.accent,
+          boxShadow:
+            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(25, 28, 33, 0.02), 0px 0px 0px 1px rgba(25, 28, 33, 0.08)', // TODO: Move to theme once we have the shadows defined
           '&:hover': { backgroundColor: vars.accentLightest },
           '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
@@ -102,9 +101,8 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         },
         icon: {
           color: vars.accent,
-          border: theme.borders.$normal,
-          borderRadius: theme.radii.$lg,
-          borderColor: vars.border,
+          boxShadow:
+            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(25, 28, 33, 0.02), 0px 0px 0px 1px rgba(25, 28, 33, 0.08)', // TODO: Move to theme once we have the shadows defined
           '&:hover': { backgroundColor: vars.accentLightest },
           '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
@@ -201,8 +199,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           }}
         >
           <Spinner
-            css={{ position: loadingText ? undefined : 'absolute' }}
             aria-label={loadingText || 'Loading'}
+            elementDescriptor={descriptors.spinner}
+            sx={{
+              position: loadingText ? undefined : 'absolute',
+            }}
           />
           {loadingText || <span style={{ opacity: 0 }}>{children}</span>}
         </Flex>
