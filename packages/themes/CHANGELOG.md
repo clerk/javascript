@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.0.0-alpha-v5.2
+
+### Major Changes
+
+- Upgrade React version to >=18 and add react-dom as peer dependency ([#2164](https://github.com/clerk/javascript/pull/2164)) by [@dimkl](https://github.com/dimkl)
+
+  to fix issues with vite & rollup building.
+
+### Patch Changes
+
+- Rename `unstable_createTheme` to `experimental_createTheme` ([#2174](https://github.com/clerk/javascript/pull/2174)) by [@royanger](https://github.com/royanger)
+
 ## 2.0.0-alpha-v5.1
 
 ### Major Changes

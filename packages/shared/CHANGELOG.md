@@ -1,5 +1,34 @@
 # Change Log
 
+## 2.0.0-alpha-v5.3
+
+### Major Changes
+
+- Upgrade React version to >=18 and add react-dom as peer dependency ([#2164](https://github.com/clerk/javascript/pull/2164)) by [@dimkl](https://github.com/dimkl)
+
+  to fix issues with vite & rollup building.
+
+- Breaking Changes: ([#2169](https://github.com/clerk/javascript/pull/2169)) by [@dimkl](https://github.com/dimkl)
+
+  - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
+  - Drop default exports from `@clerk/clerk-js`
+    - on headless Clerk type
+    - on ui and ui.retheme `Portal`
+  - Use `isProductionFromSecretKey` instead of `isProductionFromApiKey`
+  - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
+
+  Changes:
+
+  - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
+  - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
+  - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
+  - Drop `node-fetch` dependency from `@clerk/backend`
+  - Drop duplicate test in `@clerk/backend`
+
+### Patch Changes
+
+- Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry. ([#2154](https://github.com/clerk/javascript/pull/2154)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 2.0.0-alpha-v5.2
 
 ### Major Changes

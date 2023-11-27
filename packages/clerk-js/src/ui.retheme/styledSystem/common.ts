@@ -4,6 +4,7 @@ const textVariants = (t: InternalTheme) => {
   const base = {
     WebkitFontSmoothing: t.options.$fontSmoothing,
     fontFamily: 'inherit',
+    letterSpacing: t.letterSpacings.$normal,
   };
 
   const smallRegular = {
@@ -84,6 +85,7 @@ const textVariants = (t: InternalTheme) => {
   const buttonSmallRegular = {
     ...smallRegular,
     fontFamily: t.fonts.$buttons,
+    lineHeight: t.lineHeights.$short,
   };
 
   const buttonRegularRegular = {
@@ -175,6 +177,10 @@ const focusRingInput = (t: InternalTheme, props?: any) => {
   } as const;
 };
 
+const buttonShadow = (t: InternalTheme) => {
+  return { boxShadow: t.shadows.$buttonShadow.replace('{{color}}', t.colors.$primary800) };
+};
+
 const disabled = (t: InternalTheme) => {
   return {
     '&:disabled,&[data-disabled]': {
@@ -218,6 +224,7 @@ export const common = {
   borderVariants,
   focusRing,
   focusRingInput,
+  buttonShadow,
   disabled,
   borderColor,
   centeredFlex,

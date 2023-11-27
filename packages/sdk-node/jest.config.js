@@ -2,6 +2,10 @@ const { name } = require('./package.json');
 
 module.exports = {
   displayName: name.replace('@clerk', ''),
+  globals: {
+    PACKAGE_NAME: '@clerk/clerk-sdk-node',
+    PACKAGE_VERSION: '0.0.0-test',
+  },
   roots: ['<rootDir>/src'],
   testMatch: ['**/?(*.)+(spec|test).+(ts|tsx|js)'],
   transform: {

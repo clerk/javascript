@@ -1,5 +1,54 @@
 # Change Log
 
+## 5.0.0-alpha-v5.4
+
+### Minor Changes
+
+- - By default, all the components with routing will have the `routing` prop assigned as `'path'` by default when the `path` prop is filled. ([#1957](https://github.com/clerk/javascript/pull/1957)) by [@octoper](https://github.com/octoper)
+
+  - The `<UserButton />` component will set the default value of the `userProfileMode` prop to `'navigation'` if the `userProfileUrl` prop is provided.
+  - The `<OrganizationSwitcher />` component will have the `organizationProfileMode` and `createOrganizationMode` props assigned with `'navigation'` by default if the `organizationProfileUrl` and `createOrganizationUrl` props are filled accordingly.
+
+### Patch Changes
+
+- Updated dependencies [[`7f6a64f43`](https://github.com/clerk/javascript/commit/7f6a64f4335832c66ff355f6d2f311f33a313d59)]:
+  - @clerk/types@4.0.0-alpha-v5.4
+
+## 5.0.0-alpha-v5.3
+
+### Major Changes
+
+- Upgrade React version to >=18 and add react-dom as peer dependency ([#2164](https://github.com/clerk/javascript/pull/2164)) by [@dimkl](https://github.com/dimkl)
+
+  to fix issues with vite & rollup building.
+
+### Minor Changes
+
+- Breaking Changes: ([#2169](https://github.com/clerk/javascript/pull/2169)) by [@dimkl](https://github.com/dimkl)
+
+  - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
+  - Drop default exports from `@clerk/clerk-js`
+    - on headless Clerk type
+    - on ui and ui.retheme `Portal`
+  - Use `isProductionFromSecretKey` instead of `isProductionFromApiKey`
+  - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
+
+  Changes:
+
+  - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
+  - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
+  - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
+  - Drop `node-fetch` dependency from `@clerk/backend`
+  - Drop duplicate test in `@clerk/backend`
+
+### Patch Changes
+
+- Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry. ([#2154](https://github.com/clerk/javascript/pull/2154)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`52ff8fe6b`](https://github.com/clerk/javascript/commit/52ff8fe6b6ff88ceb5e1246378b54b0565bede9d), [`4bb57057e`](https://github.com/clerk/javascript/commit/4bb57057e9af20fc433626ed178d97d3ca811362), [`40ac4b645`](https://github.com/clerk/javascript/commit/40ac4b645f449b546dae5b4c0d013c9d9ea6d09c), [`429d030f7`](https://github.com/clerk/javascript/commit/429d030f7b6efe838a1e7fec7f736ba59fcc6b61)]:
+  - @clerk/shared@2.0.0-alpha-v5.3
+  - @clerk/types@4.0.0-alpha-v5.3
+
 ## 5.0.0-alpha-v5.2
 
 ### Major Changes

@@ -1,4 +1,3 @@
-import React from 'react';
 import { SignIn } from '@clerk/nextjs';
 import type { NextPage } from 'next';
 

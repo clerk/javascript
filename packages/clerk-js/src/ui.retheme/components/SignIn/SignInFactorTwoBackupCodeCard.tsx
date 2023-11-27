@@ -83,7 +83,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
       >
         <Form.Root onSubmit={handleBackupCodeSubmit}>
           <Form.ControlRow elementId={codeControl.id}>
-            <Form.Control
+            <Form.PlainInput
               {...codeControl.props}
               autoFocus
               onActionClicked={onShowAlternativeMethodsClicked}

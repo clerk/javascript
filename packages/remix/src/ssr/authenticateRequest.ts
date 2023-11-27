@@ -2,15 +2,11 @@ import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, Clerk } from '@clerk/backend';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
-import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
+import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { isTruthy } from '@clerk/shared/underscore';
 
-import {
-  noSecretKeyOrApiKeyError,
-  satelliteAndMissingProxyUrlAndDomain,
-  satelliteAndMissingSignInUrl,
-} from '../errors';
+import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../errors';
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 
@@ -30,7 +26,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const secretKey = opts.secretKey || getEnvVariable('CLERK_SECRET_KEY', context) || '';
 
   if (!secretKey) {
-    throw new Error(noSecretKeyOrApiKeyError);
+    throw new Error(noSecretKeyError);
   }
 
   const publishableKey = opts.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY', context) || '';
@@ -73,7 +69,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 

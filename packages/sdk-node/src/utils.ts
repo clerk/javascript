@@ -32,5 +32,9 @@ export const loadApiEnv = () => {
     signInUrl: process.env.CLERK_SIGN_IN_URL || '',
     isSatellite: isTruthy(process.env.CLERK_IS_SATELLITE),
     jwtKey: process.env.CLERK_JWT_KEY || '',
+    sdkMetadata: {
+      name: PACKAGE_NAME,
+      version: PACKAGE_VERSION,
+    },
   };
 };

@@ -1,4 +1,4 @@
-import type { OAuthProvider } from '@clerk/types';
+import type { ClerkPaginationRequest, OAuthProvider } from '@clerk/types';
 
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
@@ -17,11 +17,11 @@ type UserCountParams = {
   externalId?: string[];
 };
 
-type UserListParams = UserCountParams & {
-  limit?: number;
-  offset?: number;
-  orderBy?: 'created_at' | 'updated_at' | '+created_at' | '+updated_at' | '-created_at' | '-updated_at';
-};
+type UserListParams = ClerkPaginationRequest<
+  UserCountParams & {
+    orderBy?: 'created_at' | 'updated_at' | '+created_at' | '+updated_at' | '-created_at' | '-updated_at';
+  }
+>;
 
 type UserMetadataParams = {
   publicMetadata?: UserPublicMetadata;
@@ -77,11 +77,9 @@ interface UpdateUserParams extends UserMetadataParams {
   createdAt?: Date;
 }
 
-type GetOrganizationMembershipListParams = {
+type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   userId: string;
-  limit?: number;
-  offset?: number;
-};
+}>;
 
 type VerifyPasswordParams = {
   userId: string;

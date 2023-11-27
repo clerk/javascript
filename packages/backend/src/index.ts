@@ -1,3 +1,7 @@
+import type { TelemetryCollectorOptions } from '@clerk/shared/telemetry';
+import { TelemetryCollector } from '@clerk/shared/telemetry';
+import type { SDKMetadata } from '@clerk/types';
+
 import type { CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
 import type { CreateAuthenticateRequestOptions } from './tokens';
@@ -19,15 +23,22 @@ export type ClerkOptions = CreateBackendApiOptions &
       CreateAuthenticateRequestOptions['options'],
       'audience' | 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'domain' | 'isSatellite'
     >
-  >;
+  > & { sdkMetadata?: SDKMetadata; telemetry?: Pick<TelemetryCollectorOptions, 'disabled' | 'debug'> };
 
 export function Clerk(options: ClerkOptions) {
   const opts = { ...options };
   const apiClient = createBackendApiClient(opts);
   const requestState = createAuthenticateRequest({ options: opts, apiClient });
+  const telemetry = new TelemetryCollector({
+    ...options.telemetry,
+    publishableKey: opts.publishableKey,
+    secretKey: opts.secretKey,
+    ...(opts.sdkMetadata ? { sdk: opts.sdkMetadata.name, sdkVersion: opts.sdkMetadata.version } : {}),
+  });
 
   return {
     ...apiClient,
     ...requestState,
+    telemetry,
   };
 }

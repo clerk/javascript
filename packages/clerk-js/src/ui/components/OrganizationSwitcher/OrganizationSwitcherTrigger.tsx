@@ -40,7 +40,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
       >
         {organization && (
           <OrganizationPreview
-            elementId={'organizationSwitcher'}
+            elementId={'organizationSwitcherTrigger'}
             gap={3}
             size={'sm'}
             organization={organization}

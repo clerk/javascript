@@ -7,6 +7,7 @@ import App from './App.tsx';
 import Protected from './protected';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
+import UserProfile from './user';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: '/sign-up/*',
         element: <SignUp />,
+      },
+      {
+        path: '/user/*',
+        element: <UserProfile />,
       },
       {
         path: '/protected',

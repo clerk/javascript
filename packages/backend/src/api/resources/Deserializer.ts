@@ -17,28 +17,45 @@ import {
   Token,
   User,
 } from '.';
+import type { PaginatedResponseJSON } from './JSON';
 import { ObjectType } from './JSON';
 
-// FIXME don't return any
-export function deserialize(payload: any): any {
+type ResourceResponse<T> = {
+  data: T;
+};
+
+type PaginatedResponse<T> = {
+  data: T;
+  totalCount?: number;
+};
+
+export function deserialize<U = any>(payload: unknown): PaginatedResponse<U> | ResourceResponse<U> {
+  let data, totalCount: number | undefined;
+
   if (Array.isArray(payload)) {
-    return payload.map(item => jsonToObject(item));
+    data = payload.map(item => jsonToObject(item)) as U;
+    totalCount = payload.length;
+
+    return { data, totalCount };
   } else if (isPaginated(payload)) {
-    return payload.data.map(item => jsonToObject(item));
+    data = payload.data.map(item => jsonToObject(item)) as U;
+    totalCount = payload.total_count;
+
+    return { data, totalCount };
   } else {
-    return jsonToObject(payload);
+    return { data: jsonToObject(payload) };
   }
 }
 
-type PaginatedResponse = {
-  data: object[];
-};
+function isPaginated(payload: unknown): payload is PaginatedResponseJSON {
+  if (!payload || typeof payload !== 'object' || !('data' in payload)) {
+    return false;
+  }
 
-function isPaginated(payload: any): payload is PaginatedResponse {
-  return Array.isArray(payload.data) && <PaginatedResponse>payload.data !== undefined;
+  return Array.isArray(payload.data) && payload.data !== undefined;
 }
 
-function getCount(item: { total_count: number }) {
+function getCount(item: PaginatedResponseJSON) {
   return item.total_count;
 }
 

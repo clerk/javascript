@@ -69,12 +69,10 @@ export const SignUpForm = (props: SignUpFormProps) => {
       )}
       {shouldShow('phoneNumber') && (
         <Form.ControlRow elementId='phoneNumber'>
-          <Form.Control
-            {...{
-              ...formState.phoneNumber.props,
-              isRequired: fields.phoneNumber!.required,
-              isOptional: !fields.phoneNumber!.required,
-            }}
+          <Form.PhoneInput
+            {...formState.phoneNumber.props}
+            isRequired={fields.phoneNumber!.required}
+            isOptional={!fields.phoneNumber!.required}
             actionLabel={canToggleEmailPhone ? 'Use email instead' : undefined}
             onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
           />
@@ -83,11 +81,9 @@ export const SignUpForm = (props: SignUpFormProps) => {
       {shouldShow('password') && (
         <Form.ControlRow elementId='password'>
           <Form.PasswordInput
-            {...{
-              ...formState.password.props,
-              isRequired: fields.password!.required,
-              isOptional: !fields.password!.required,
-            }}
+            {...formState.password.props}
+            isRequired={fields.password!.required}
+            isOptional={!fields.password!.required}
           />
         </Form.ControlRow>
       )}

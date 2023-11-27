@@ -6,6 +6,7 @@
  */
 export { default as ArrowLeftIcon } from './arrow-left.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
+export { default as ArrowRightButtonIcon } from './arrow-right-button.svg';
 export { default as AuthApp } from './auth-app.svg';
 export { default as Billing } from './billing.svg';
 export { default as Caret } from './caret.svg';
@@ -46,3 +47,5 @@ export { default as Trash } from './trash.svg';
 export { default as Upload } from './upload.svg';
 export { default as User } from './user.svg';
 export { default as UserAdd } from './userAdd.svg';
+export { default as Check } from './check.svg';
+export { default as ArrowUpDown } from './arrow-up-down.svg';

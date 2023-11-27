@@ -1,12 +1,13 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { FieldId } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
+import type { OTPInputProps } from './CodeControl';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
 import { FormControl } from './FormControl';
@@ -79,7 +80,8 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
     <Button
       elementDescriptor={descriptors.formButtonPrimary}
       block
-      textVariant='buttonExtraSmallBold'
+      hasArrow
+      textVariant='buttonSmallRegular'
       isLoading={isLoading}
       isDisabled={isDisabled}
       type='submit'
@@ -156,10 +158,18 @@ const PlainInput = (props: CommonInputProps) => {
   );
 };
 
-const PasswordInput = (props: CommonInputProps) => {
+const PasswordInput = forwardRef<HTMLInputElement, CommonInputProps>((props, ref) => {
   return (
     <CommonInputWrapper {...props}>
-      <Field.PasswordInput />
+      <Field.PasswordInput ref={ref} />
+    </CommonInputWrapper>
+  );
+});
+
+const PhoneInput = (props: CommonInputProps) => {
+  return (
+    <CommonInputWrapper {...props}>
+      <Field.PhoneInput />
     </CommonInputWrapper>
   );
 };
@@ -218,6 +228,39 @@ const RadioGroup = (
   );
 };
 
+const OTPInput = (props: OTPInputProps) => {
+  const { ref, ...restInputProps } = props.otpControl.otpInputProps;
+  return (
+    // Use Field.Root in order to pass feedback down to Field.Feedback
+    // @ts-ignore
+    <Field.Root {...restInputProps}>
+      <Field.OTPRoot {...props}>
+        <Col
+          elementDescriptor={descriptors.form}
+          gap={2}
+        >
+          <Field.OTPInputLabel />
+          <Field.OTPInputDescription />
+          <Flex
+            elementDescriptor={descriptors.otpCodeField}
+            isLoading={props.isLoading}
+            hasError={props.otpControl.otpInputProps.feedbackType === 'error'}
+            direction='col'
+          >
+            <Field.OTPCodeControl ref={ref} />
+            <Field.Feedback
+              elementDescriptors={{
+                error: descriptors.otpCodeFieldErrorText,
+              }}
+            />
+          </Flex>
+          <Field.OTPResendButton />
+        </Col>
+      </Field.OTPRoot>
+    </Field.Root>
+  );
+};
+
 export const Form = {
   Root: FormRoot,
   ControlRow: FormControlRow,
@@ -227,6 +270,8 @@ export const Form = {
   Control: FormControl,
   PlainInput,
   PasswordInput,
+  PhoneInput,
+  OTPInput,
   InputGroup,
   RadioGroup,
   Checkbox,

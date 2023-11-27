@@ -715,6 +715,7 @@ export const enUS: LocalizationResource = {
     form_username_invalid_length: '',
     form_username_invalid_character: '',
     form_param_format_invalid: '',
+    form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_password_length_too_short: '',
     form_param_nil: '',

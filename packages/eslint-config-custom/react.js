@@ -17,14 +17,16 @@ const disabledRules = {
   'react-hooks/rules-of-hooks': 'warn',
 };
 
+const extensions = [
+  'plugin:react/recommended',
+  'plugin:react-hooks/recommended',
+  'plugin:jsx-a11y/recommended',
+  'plugin:import/react',
+  'prettier',
+];
+
 module.exports = {
-  extends: [
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:jsx-a11y/recommended',
-    'plugin:import/react',
-    'prettier',
-  ],
+  extends: extensions,
   rules: {
     'no-restricted-imports': [
       'error',
@@ -64,7 +66,7 @@ module.exports = {
   // overrides: [
   //   {
   //     files: TEST_FILES,
-  //     extends: ['plugin:testing-library/react'],
+  //     extends: [...extensions, 'plugin:jest/recommended', 'plugin:testing-library/react'],
   //     plugins: ['testing-library'],
   //   },
   // ],

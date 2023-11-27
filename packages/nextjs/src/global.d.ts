@@ -8,7 +8,6 @@ declare global {
 declare global {
   const PACKAGE_NAME: string;
   const PACKAGE_VERSION: string;
-
   namespace NodeJS {
     interface ProcessEnv {
       CLERK_SECRET_KEY: string | undefined;

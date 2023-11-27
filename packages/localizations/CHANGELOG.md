@@ -1,5 +1,25 @@
 # Change Log
 
+## 2.0.0-alpha-v5.4
+
+### Patch Changes
+
+- Add missing localization key for invalid phone_number (unstable error) in the en-US localization ([#2191](https://github.com/clerk/javascript/pull/2191)) by [@royanger](https://github.com/royanger)
+
+## 2.0.0-alpha-v5.3
+
+### Major Changes
+
+- Upgrade React version to >=18 and add react-dom as peer dependency ([#2164](https://github.com/clerk/javascript/pull/2164)) by [@dimkl](https://github.com/dimkl)
+
+  to fix issues with vite & rollup building.
+
+### Patch Changes
+
+- Add missing ru-RU localization keys ([#2167](https://github.com/clerk/javascript/pull/2167)) by [@artemxknpv](https://github.com/artemxknpv)
+
+- Introduce ro-RO localization ([#2175](https://github.com/clerk/javascript/pull/2175)) by [@predam](https://github.com/predam)
+
 ## 2.0.0-alpha-v5.2
 
 ### Major Changes

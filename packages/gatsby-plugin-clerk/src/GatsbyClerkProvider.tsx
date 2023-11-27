@@ -7,10 +7,7 @@ import {
 import { navigate } from 'gatsby';
 import React from 'react';
 
-const SDK_METADATA = {
-  name: PACKAGE_NAME,
-  version: PACKAGE_VERSION,
-};
+import { SDK_METADATA, TELEMETRY_DEBUG, TELEMETRY_DISABLED } from './constants';
 
 __internal__setErrorThrowerOptions({ packageName: 'gatsby-plugin-clerk' });
 
@@ -27,6 +24,12 @@ export function ClerkProvider({ children, ...rest }: GatsbyClerkProviderProps) {
       navigate={to => navigate(to)}
       initialState={__clerk_ssr_state || {}}
       sdkMetadata={SDK_METADATA}
+      telemetry={
+        restProps?.telemetry ?? {
+          disabled: TELEMETRY_DISABLED,
+          debug: TELEMETRY_DEBUG,
+        }
+      }
       {...restProps}
     >
       {__clerk_ssr_interstitial_html ? (

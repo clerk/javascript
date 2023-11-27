@@ -23,6 +23,7 @@ export const subpathNames = [
   'url',
   'constants',
   'apiUrlFromPublishableKey',
+  'telemetry',
 ];
 
 export const subpathFoldersBarrel = ['react'];

@@ -8,6 +8,7 @@ import type {
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
+  Without,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import React, { createElement } from 'react';
@@ -39,7 +40,7 @@ type UserButtonExportType = typeof _UserButton & {
   UserProfileLink: typeof UserProfileLink;
 };
 
-type UserButtonPropsWithoutCustomPages = Omit<UserButtonProps, 'userProfileProps'> & {
+type UserButtonPropsWithoutCustomPages = Without<UserButtonProps, 'userProfileProps'> & {
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
 };
 
@@ -53,7 +54,7 @@ type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
   OrganizationProfileLink: typeof OrganizationProfileLink;
 };
 
-type OrganizationSwitcherPropsWithoutCustomPages = Omit<OrganizationSwitcherProps, 'organizationProfileProps'> & {
+type OrganizationSwitcherPropsWithoutCustomPages = Without<OrganizationSwitcherProps, 'organizationProfileProps'> & {
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
 };
 
@@ -152,7 +153,7 @@ export function UserProfileLink({ children }: PropsWithChildren<UserProfileLinkP
 }
 
 const _UserProfile = withClerk(
-  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Omit<UserProfileProps, 'customPages'>>>) => {
+  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Without<UserProfileProps, 'customPages'>>>) => {
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
     return (
       <Portal
@@ -205,7 +206,7 @@ export function OrganizationProfileLink({ children }: PropsWithChildren<Organiza
 }
 
 const _OrganizationProfile = withClerk(
-  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Omit<OrganizationProfileProps, 'customPages'>>>) => {
+  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Without<OrganizationProfileProps, 'customPages'>>>) => {
     const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children);
     return (
       <Portal
