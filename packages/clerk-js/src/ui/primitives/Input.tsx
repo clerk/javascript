@@ -42,7 +42,6 @@ type OwnProps = {
 export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-  // const formControlProps = useFormControl() || {};
   const fieldControlProps = useFormField() || {};
   const propsWithoutVariants = filterProps({
     ...props,

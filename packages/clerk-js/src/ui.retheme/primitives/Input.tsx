@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
 import { common, createVariants, mqu } from '../styledSystem';
-import { useFormControl } from './hooks';
+import { useFormField } from './hooks';
 import { useInput } from './hooks/useInput';
 
 const { applyVariants, filterProps } = createVariants((theme, props) => ({
@@ -42,16 +42,16 @@ type OwnProps = {
 export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-  const formControlProps = useFormControl() || {};
+  const fieldControlProps = useFormField() || {};
   const propsWithoutVariants = filterProps({
     ...props,
-    hasError: props.hasError || formControlProps.hasError,
+    hasError: props.hasError || fieldControlProps.hasError,
   });
   const { onChange } = useInput(propsWithoutVariants.onChange);
   const { isDisabled, hasError, focusRing, isRequired, ...rest } = propsWithoutVariants;
-  const _disabled = isDisabled || formControlProps.isDisabled;
-  const _required = isRequired || formControlProps.isRequired;
-  const _hasError = hasError || formControlProps.hasError;
+  const _disabled = isDisabled || fieldControlProps.isDisabled;
+  const _required = isRequired || fieldControlProps.isRequired;
+  const _hasError = hasError || fieldControlProps.hasError;
 
   return (
     <input
@@ -60,12 +60,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       onChange={onChange}
       disabled={isDisabled}
       required={_required}
-      id={props.id || formControlProps.id}
+      id={props.id || fieldControlProps.id}
       aria-invalid={_hasError}
-      aria-describedby={formControlProps.errorMessageId}
+      aria-describedby={fieldControlProps.errorMessageId}
       aria-required={_required}
       aria-disabled={_disabled}
-      css={applyVariants(propsWithoutVariants) as any}
+      css={applyVariants(propsWithoutVariants)}
     />
   );
 });
