@@ -498,14 +498,15 @@ export type BuildUrlWithAuthParams = {
 
 // TODO: Make sure Isomorphic Clerk navigate can work with the correct type:
 // (to: string) => Promise<unknown>
-export type CustomNavigation = (to: string) => Promise<unknown> | void;
+export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | void;
 
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
 export interface ClerkOptions {
   appearance?: Appearance;
   localization?: LocalizationResource;
-  navigate?: (to: string) => Promise<unknown> | unknown;
+  routerPush?: (to: string) => Promise<unknown> | unknown;
+  routerReplace?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
@@ -537,6 +538,10 @@ export interface ClerkOptions {
       };
 
   sdkMetadata?: SDKMetadata;
+}
+
+export interface NavigateOptions {
+  replace?: boolean;
 }
 
 export interface Resources {
