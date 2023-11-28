@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.0.0-alpha-v5.6
+
+### Major Changes
+
+- Use the new `routerPush` and `routerReplace` props for `<ClerkProvider />` instead of `navigate`. ([#1304](https://github.com/clerk/javascript/pull/1304)) by [@desiprisg](https://github.com/desiprisg)
+
+- Introduces two new props for `<ClerkProvider />`, `push` and `replace`. These props replace the `navigate` prop. Passing both `push` and `replace` will allow Clerk to correctly handle navigations without causing issues with the host application's router. ([#1304](https://github.com/clerk/javascript/pull/1304)) by [@desiprisg](https://github.com/desiprisg)
+
+### Minor Changes
+
+- Add `routerDebug` option in `Clerk.load()` to log the destination URLs when navigating ([#2223](https://github.com/clerk/javascript/pull/2223)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.0.0-alpha-v5.5
 
 ### Minor Changes

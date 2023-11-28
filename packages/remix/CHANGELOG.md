@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.0.0-alpha-v5.6
+
+### Major Changes
+
+- Use the new `routerPush` and `routerReplace` props for `<ClerkProvider />` instead of `navigate`. ([#1304](https://github.com/clerk/javascript/pull/1304)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-alpha-v5.6
+
 ## 4.0.0-alpha-v5.5
 
 ### Patch Changes

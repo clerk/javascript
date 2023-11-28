@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.0.0-alpha-v5.6
+
+### Major Changes
+
+- Fix a bug where navigating from the sign in page to the sign up page required two back button presses to go back. ([#1304](https://github.com/clerk/javascript/pull/1304)) by [@desiprisg](https://github.com/desiprisg)
+
+- Use the new `routerPush` and `routerReplace` props for `<ClerkProvider />` instead of `navigate`. ([#1304](https://github.com/clerk/javascript/pull/1304)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-alpha-v5.6
+
 ## 5.0.0-alpha-v5.5
 
 ### Patch Changes
