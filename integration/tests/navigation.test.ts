@@ -197,4 +197,18 @@ export default function Page() {
     await u.page.getByText(/Add an email address/i).click();
     await u.page.getByText(/Cancel/i).click();
   });
+
+  test('sign in with path routing navigates to previous page', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+
+    await u.po.signIn.getGoToSignUp().click();
+    await u.po.signUp.waitForMounted();
+    await u.page.waitForURL(`${app.serverUrl}/sign-up?redirect_url=${encodeURIComponent(app.serverUrl + '/')}`);
+
+    await page.goBack();
+    await u.po.signIn.waitForMounted();
+    await u.page.waitForURL(`${app.serverUrl}/sign-in`);
+  });
 });

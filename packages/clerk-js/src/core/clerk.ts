@@ -31,6 +31,7 @@ import type {
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
+  NavigateOptions,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -665,13 +666,14 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public navigate = async (to: string | undefined): Promise<unknown> => {
+  public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
     if (!to || !inBrowser()) {
       return;
     }
 
     const toURL = new URL(to, window.location.href);
-    const customNavigate = this.#options.navigate;
+    const customNavigate =
+      options?.replace && this.#options.routerReplace ? this.#options.routerReplace : this.#options.routerPush;
 
     if (toURL.origin !== window.location.origin || !customNavigate) {
       windowNavigate(toURL);

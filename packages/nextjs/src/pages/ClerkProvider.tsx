@@ -12,7 +12,7 @@ __internal__setErrorThrowerOptions({ packageName: '@clerk/nextjs' });
 
 export function ClerkProvider({ children, ...props }: NextClerkProviderProps): JSX.Element {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
-  const { push } = useRouter();
+  const { push, replace } = useRouter();
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   useSafeLayoutEffect(() => {
@@ -31,7 +31,8 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
   }, []);
 
   const navigate = (to: string) => push(to);
-  const mergedProps = mergeNextClerkPropsWithEnv({ ...props, navigate });
+  const replaceNavigate = (to: string) => replace(to);
+  const mergedProps = mergeNextClerkPropsWithEnv({ ...props, routerPush: navigate, routerReplace: replaceNavigate });
   // ClerkProvider automatically injects __clerk_ssr_state
   // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
   // @ts-expect-error initialState is hidden from the types as it's a private prop
