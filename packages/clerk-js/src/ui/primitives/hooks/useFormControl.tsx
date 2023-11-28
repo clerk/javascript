@@ -3,6 +3,7 @@ import type { FieldId } from '@clerk/types';
 import React from 'react';
 
 import type { useFormControl as useFormControlUtil } from '../../utils/useFormControl';
+import { useFormControlFeedback } from '../../utils/useFormControl';
 
 type FormFieldProviderProps = ReturnType<typeof useFormControlUtil<FieldId>>['props'] & {
   isDisabled: boolean;
@@ -13,12 +14,14 @@ type FormFieldContextValue = Omit<FormFieldProviderProps, 'id'> & {
   id?: string;
   fieldId?: FieldId;
   hasError: boolean;
+  debouncedFeedback: ReturnType<typeof useFormControlFeedback>['debounced'];
 };
+
 /**
  * Extract the context hook without the guarantee in order to avoid throwing errors if our field/form primitives are not wrapped inside a Field.Root component.
  * In case our primitives need to always be wrapped with Field.Root, consider updating the following line to [FormFieldContext, useFormField]
  */
-export const [FormFieldContext, _, useFormField] = createContextAndHook<FormFieldContextValue>('FormFieldContext');
+export const [FormFieldContext, , useFormField] = createContextAndHook<FormFieldContextValue>('FormFieldContext');
 
 export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFieldProviderProps>) => {
   const {
@@ -33,12 +36,23 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
     clearFeedback,
     children,
     feedbackType,
+    feedback,
+    isFocused,
     ...rest
   } = props;
   // TODO: This shouldnt be targettable
   const id = `${propsId}-field`;
 
-  const hasError = feedbackType === 'error';
+  /**
+   * Create a debounced version of the feedback.
+   */
+  const { debounced } = useFormControlFeedback({ feedback, feedbackType, isFocused });
+
+  /**
+   * Both html attributes (e.g. data-invalid) and css styles depend on hasError being debounced
+   */
+  const hasError = debounced.feedbackType === 'error';
+
   /**
    * Track whether the `FormErrorText` has been rendered.
    * We use this to append its id the `aria-describedby` of the `input`.
@@ -59,6 +73,8 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       clearFeedback,
       setHasPassedComplexity,
       feedbackType,
+      feedback,
+      isFocused,
     }),
     [
       isRequired,
@@ -74,14 +90,21 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       clearFeedback,
       setHasPassedComplexity,
       feedbackType,
+      feedback,
+      isFocused,
     ],
   );
+
   return (
     <FormFieldContext.Provider
       value={{
         value: {
           ...value,
           ...rest,
+          /**
+           * Keep both debounced and regular feedback state inside the context
+           */
+          debouncedFeedback: debounced,
         },
       }}
     >
