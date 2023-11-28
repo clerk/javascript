@@ -165,8 +165,7 @@ export class Clerk implements ClerkInterface {
   #environment?: EnvironmentResource | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
-  //@ts-expect-error with undefined even though it's not possible - related to issue with ts and error thrower
-  #instanceType: InstanceType;
+  #instanceType?: InstanceType;
   #isReady = false;
 
   #listeners: Array<(emission: Resources) => void> = [];
@@ -674,6 +673,10 @@ export class Clerk implements ClerkInterface {
     const toURL = new URL(to, window.location.href);
     const customNavigate =
       options?.replace && this.#options.routerReplace ? this.#options.routerReplace : this.#options.routerPush;
+
+    if (this.#options.routerDebug) {
+      console.log(`Clerk is navigating to: ${toURL}`);
+    }
 
     if (toURL.origin !== window.location.origin || !customNavigate) {
       windowNavigate(toURL);
