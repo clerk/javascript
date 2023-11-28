@@ -11,6 +11,7 @@ import type {
   SignInRedirectOptions,
   SignUpRedirectOptions,
   UserResource,
+  Without,
 } from '@clerk/types';
 import type React from 'react';
 
@@ -23,7 +24,7 @@ declare global {
   }
 }
 
-export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite'> & {
+export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
@@ -37,19 +38,10 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
   initialState?: InitialState;
 };
 
-// TODO(@dimkl): replacing it with the following make nextjs type tests fail
-//   `Exclude<IsomorphicClerkOptions, 'publishableKey'> & { publishableKey?: string }`
-// find another way to reduce the duplication.
-export type ClerkProviderOptionsWrapper = Omit<ClerkOptions, 'isSatellite'> & {
-  Clerk?: ClerkProp;
-  clerkJSUrl?: string;
-  clerkJSVariant?: 'headless' | '';
-  clerkJSVersion?: string;
-  sdkMetadata?: SDKMetadata;
+export type ClerkProviderOptionsWrapper = Without<IsomorphicClerkOptions, 'publishableKey'> & {
   publishableKey?: string;
-} & MultiDomainAndOrProxy & {
-    children: React.ReactNode;
-  };
+  children: React.ReactNode;
+};
 
 export interface BrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
@@ -75,7 +67,7 @@ export interface MountProps {
 }
 
 export interface HeadlessBrowserClerk extends Clerk {
-  load: (opts?: Omit<ClerkOptions, 'isSatellite'>) => Promise<void>;
+  load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 
