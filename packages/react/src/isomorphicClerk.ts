@@ -4,6 +4,7 @@ import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
+  BuildUrlWithAuthParams,
   Clerk,
   ClientResource,
   CreateOrganizationParams,
@@ -11,11 +12,15 @@ import type {
   DomainOrProxyUrl,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
+  InstanceType,
   ListenerCallback,
+  LoadedClerk,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  RedirectOptions,
+  SDKMetadata,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -57,7 +62,52 @@ type MethodName<T> = {
 
 type MethodCallback = () => Promise<unknown> | unknown;
 
-export class IsomorphicClerk {
+type IsomorphicLoadedClerk = Omit<
+  LoadedClerk,
+  | 'redirectWithAuth'
+  | 'redirectToSignIn'
+  | 'redirectToSignUp'
+  | 'handleRedirectCallback'
+  | 'authenticateWithMetamask'
+  | 'createOrganization'
+  | 'getOrganization'
+  | 'mountUserButton'
+  | 'mountOrganizationList'
+  | 'mountOrganizationSwitcher'
+  | 'mountOrganizationProfile'
+  | 'mountCreateOrganization'
+  | 'mountSignUp'
+  | 'mountSignIn'
+  | 'mountUserProfile'
+  | 'client'
+> & {
+  // TODO: Align return type
+  redirectWithAuth: (...args: Parameters<Clerk['redirectWithAuth']>) => void;
+  // TODO: Align return type
+  redirectToSignIn: (options: SignInRedirectOptions) => void;
+  // TODO: Align return type
+  redirectToSignUp: (options: SignUpRedirectOptions) => void;
+  // TODO: Align return type and parms
+  handleRedirectCallback: (params: HandleOAuthCallbackParams) => void;
+  // TODO: Align Promise unknown
+  authenticateWithMetamask: (params: AuthenticateWithMetamaskParams) => Promise<void>;
+  // TODO: Align return type (maybe not possible or correct)
+  createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource | void>;
+  // TODO: Align return type (maybe not possible or correct)
+  getOrganization: (organizationId: string) => Promise<OrganizationResource | void>;
+
+  mountUserButton: (targetNode: HTMLDivElement, userButtonProps: UserButtonProps) => void;
+  mountOrganizationList: (targetNode: HTMLDivElement, props: OrganizationListProps) => void;
+  mountOrganizationSwitcher: (targetNode: HTMLDivElement, props: OrganizationSwitcherProps) => void;
+  mountOrganizationProfile: (targetNode: HTMLDivElement, props: OrganizationProfileProps) => void;
+  mountCreateOrganization: (targetNode: HTMLDivElement, props: CreateOrganizationProps) => void;
+  mountSignUp: (targetNode: HTMLDivElement, signUpProps: SignUpProps) => void;
+  mountSignIn: (targetNode: HTMLDivElement, signInProps: SignInProps) => void;
+  mountUserProfile: (targetNode: HTMLDivElement, userProfileProps: UserProfileProps) => void;
+  client: ClientResource | undefined;
+};
+
+export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly mode: 'browser' | 'server';
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
@@ -143,6 +193,44 @@ export class IsomorphicClerk {
 
     void this.loadClerkJS();
   }
+
+  /**
+   * These are missing from IsomorphicClerk.
+   * These need to be aligned because `useClerk` exported by `@clerk/clerk-react` returns LoadedClerk
+   * Calling `const {buildUrlWithAuth} = useClerk()` will result in a runtime error as the function does not exist
+   */
+  sdkMetadata?: SDKMetadata | undefined;
+  frontendApi: string;
+  isSatellite: boolean;
+  instanceType?: InstanceType | undefined;
+  isStandardBrowser?: boolean | undefined;
+  buildUrlWithAuth(to: string, opts?: BuildUrlWithAuthParams | undefined): string {
+    throw new Error('Method not implemented.');
+  }
+  buildSignInUrl(opts?: RedirectOptions | undefined): string {
+    throw new Error('Method not implemented.');
+  }
+  buildSignUpUrl(opts?: RedirectOptions | undefined): string {
+    throw new Error('Method not implemented.');
+  }
+  buildUserProfileUrl(): string {
+    throw new Error('Method not implemented.');
+  }
+  buildCreateOrganizationUrl(): string {
+    throw new Error('Method not implemented.');
+  }
+  buildOrganizationProfileUrl(): string {
+    throw new Error('Method not implemented.');
+  }
+  buildHomeUrl(): string {
+    throw new Error('Method not implemented.');
+  }
+  handleUnauthenticated: () => Promise<unknown>;
+  isReady: () => boolean;
+
+  /**
+   * END OF METHODS THAT NEED TO BE ALIGNED
+   */
 
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
     if (this.mode !== 'browser' || this.#loaded) {

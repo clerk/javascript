@@ -373,21 +373,25 @@ export interface Clerk {
   /**
    * Redirects to the configured URL where <UserProfile/> is mounted.
    */
+  // TODO: why is this return void and the `redirectToSignUp` returns a Promise
   redirectToUserProfile: () => void;
 
   /**
    * Redirects to the configured URL where <OrganizationProfile /> is mounted.
    */
+  // TODO: why is this return void and the `redirectToSignUp` returns a Promise
   redirectToOrganizationProfile: () => void;
 
   /**
    * Redirects to the configured URL where <CreateOrganization /> is mounted.
    */
+  // TODO: why is this return void and the `redirectToSignUp` returns a Promise
   redirectToCreateOrganization: () => void;
 
   /**
    * Redirects to the configured home URL of the instance.
    */
+  // TODO: why is this return void and the `redirectToSignUp` returns a Promise
   redirectToHome: () => void;
 
   /**
@@ -760,8 +764,8 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   showName?: boolean;
   /**
-     Controls the default state of the UserButton
-     */
+   Controls the default state of the UserButton
+   */
   defaultOpen?: boolean;
   /**
    * Full URL or path to navigate after sign out is complete
@@ -813,8 +817,8 @@ type CreateOrganizationMode =
 export type OrganizationSwitcherProps = CreateOrganizationMode &
   OrganizationProfileMode & {
     /**
-     Controls the default state of the OrganizationSwitcher
-     */
+   Controls the default state of the OrganizationSwitcher
+   */
     defaultOpen?: boolean;
     /**
      * By default, users can switch between organization and their personal account.
