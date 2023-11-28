@@ -50,3 +50,4 @@ export { default as User } from './user.svg';
 export { default as UserAdd } from './userAdd.svg';
 export { default as Check } from './check.svg';
 export { default as ArrowUpDown } from './arrow-up-down.svg';
+export { default as CheckmarkFilled } from './checkmark-filled.svg';

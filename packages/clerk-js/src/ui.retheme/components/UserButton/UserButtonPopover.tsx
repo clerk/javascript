@@ -3,9 +3,9 @@ import type { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
 import { useEnvironment, useUserButtonContext } from '../../contexts';
-import { descriptors, localizationKeys } from '../../customizables';
+import { descriptors, Icon, localizationKeys } from '../../customizables';
 import { Action, Actions, PopoverCard, PreviewButton, RootBox, SecondaryActions, UserPreview } from '../../elements';
-import { Plus, SignOut, SwitchArrowRight } from '../../icons';
+import { CheckmarkFilled, Plus, SignOut, SwitchArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { MultiSessionActions, SingleSessionActions } from './SessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
@@ -134,6 +134,13 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
               padding: `${t.space.$4} ${t.space.$5}`,
             })}
             size='sm'
+            icon={
+              <Icon
+                icon={CheckmarkFilled}
+                sx={t => ({ width: t.sizes.$3x5, height: t.sizes.$3x5 })}
+              />
+            }
+            iconSx={t => ({ left: 'unset', right: 0, color: t.colors.$primary500 })}
           />
           {authConfig.singleSessionMode ? (
             <SingleSessionActions

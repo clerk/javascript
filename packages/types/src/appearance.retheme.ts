@@ -274,6 +274,7 @@ export type ElementsConfig = {
   userPreviewAvatarContainer: WithOptions<UserPreviewId>;
   userPreviewAvatarBox: WithOptions<UserPreviewId>;
   userPreviewAvatarImage: WithOptions<UserPreviewId>;
+  userPreviewAvatarIcon: WithOptions<UserPreviewId>;
   userPreviewTextContainer: WithOptions<UserPreviewId>;
   userPreviewMainIdentifier: WithOptions<UserPreviewId>;
   userPreviewSecondaryIdentifier: WithOptions<UserPreviewId>;

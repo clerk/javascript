@@ -15,6 +15,7 @@ import { UserAvatar } from './UserAvatar';
 export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'elementId'> & {
   size?: 'lg' | 'md' | 'sm';
   icon?: React.ReactNode;
+  iconSx?: ThemableCssProp;
   badge?: React.ReactNode;
   imageUrl?: string | null;
   rounded?: boolean;
@@ -50,6 +51,7 @@ export const UserPreview = (props: UserPreviewProps) => {
     size = 'md',
     showAvatar = true,
     icon,
+    iconSx,
     rounded = true,
     imageUrl: imageUrlProp,
     badge,
@@ -101,7 +103,14 @@ export const UserPreview = (props: UserPreviewProps) => {
               rounded={rounded}
             />
 
-            {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
+            {icon && (
+              <Flex
+                elementDescriptor={descriptors.userPreviewAvatarIcon}
+                sx={[{ position: 'absolute', left: 0, bottom: 0 }, iconSx]}
+              >
+                {icon}
+              </Flex>
+            )}
           </Flex>
         ) : (
           // Reserve layout space when avatar is not visible
