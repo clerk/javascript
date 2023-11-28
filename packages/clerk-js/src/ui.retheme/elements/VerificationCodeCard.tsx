@@ -50,13 +50,13 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
         {props.onBackLinkClicked && <Header.BackLink onClick={props.onBackLinkClicked} />}
         <Header.Title localizationKey={props.cardTitle} />
         <Header.Subtitle localizationKey={props.cardSubtitle} />
+        <IdentityPreview
+          identifier={props.safeIdentifier}
+          avatarUrl={props.profileImageUrl}
+          onClick={!props.onBackLinkClicked ? props.onIdentityPreviewEditClicked : undefined}
+        />
       </Header.Root>
       {children}
-      <IdentityPreview
-        identifier={props.safeIdentifier}
-        avatarUrl={props.profileImageUrl}
-        onClick={!props.onBackLinkClicked ? props.onIdentityPreviewEditClicked : undefined}
-      />
       <Col
         elementDescriptor={descriptors.main}
         gap={8}

@@ -56,7 +56,7 @@ const textVariants = (t: InternalTheme) => {
   const largeBold = {
     ...base,
     fontWeight: t.fontWeights.$bold,
-    fontSize: t.fontSizes.$md,
+    fontSize: t.fontSizes.$lg,
     lineHeight: t.lineHeights.$taller,
   } as const;
 

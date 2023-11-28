@@ -79,7 +79,7 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
     <Button
       elementDescriptor={descriptors.formButtonPrimary}
       block
-      textVariant='buttonExtraSmallBold'
+      hasArrow
       isLoading={isLoading}
       isDisabled={isDisabled}
       type='submit'
@@ -244,10 +244,9 @@ const OTPInput = (props: OTPInputProps) => {
         {/*TODO: Create a descriptor for OTP wrapper*/}
         <Col
           elementDescriptor={descriptors.form}
-          gap={2}
+          gap={3}
+          align='center'
         >
-          <Field.OTPInputLabel />
-          <Field.OTPInputDescription />
           <Flex
             elementDescriptor={descriptors.otpCodeField}
             isLoading={props.isLoading}

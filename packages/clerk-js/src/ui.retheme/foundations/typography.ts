@@ -29,7 +29,7 @@ const fontSizes = Object.freeze({
   xs: '0.8125rem',
   sm: '0.875rem',
   md: '1rem',
-  lg: '1.125rem',
+  lg: '1.0625rem',
   xl: '1.25rem',
   '2xl': '2rem',
 } as const);

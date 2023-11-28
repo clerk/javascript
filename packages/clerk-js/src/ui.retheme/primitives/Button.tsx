@@ -138,7 +138,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       },
     },
     defaultVariants: {
-      textVariant: 'buttonRegularRegular',
+      textVariant: 'buttonSmallRegular',
       colorScheme: 'primary',
       variant: 'solid',
       size: 'sm',

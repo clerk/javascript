@@ -28,6 +28,9 @@ const FooterAction = (props: FooterActionProps): JSX.Element => {
       elementId={descriptors.footerAction.setId(elementId)}
       {...rest}
       gap={1}
+      sx={t => ({
+        margin: `${t.space.$none} auto`,
+      })}
     />
   );
 };

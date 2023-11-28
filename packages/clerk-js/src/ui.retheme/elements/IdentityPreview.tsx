@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Button, descriptors, Flex, Icon, Text } from '../customizables';
-import { UserAvatar } from '../elements';
 import { AuthApp, PencilEdit } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
 import { formatSafeIdentifier, getFlagEmojiFromCountryIso, isMaskedIdentifier, parsePhoneString } from '../utils';
@@ -65,7 +64,7 @@ const IdentifierContainer = (props: React.PropsWithChildren) => {
   return (
     <Text
       elementDescriptor={descriptors.identityPreviewText}
-      variant='smallRegular'
+      variant='smallMedium'
       colorScheme='neutral'
       truncate
       {...props}
@@ -74,17 +73,7 @@ const IdentifierContainer = (props: React.PropsWithChildren) => {
 };
 
 const UsernameOrEmailIdentifier = (props: any) => {
-  return (
-    <>
-      <UserAvatar
-        boxElementDescriptor={descriptors.identityPreviewAvatarBox}
-        imageElementDescriptor={descriptors.identityPreviewAvatarImage}
-        avatarUrl={props.avatarUrl}
-        size={t => t.sizes.$5}
-      />
-      <IdentifierContainer>{props.identifier}</IdentifierContainer>
-    </>
-  );
+  return <IdentifierContainer>{props.identifier}</IdentifierContainer>;
 };
 
 const PhoneIdentifier = (props: { identifier: string; flag?: string }) => {
@@ -113,14 +102,8 @@ const Container = (props: React.PropsWithChildren) => {
     <Flex
       elementDescriptor={descriptors.identityPreview}
       align='center'
-      gap={2}
       sx={t => ({
-        minHeight: t.space.$9x5,
-        maxWidth: 'fit-content',
-        backgroundColor: t.colors.$blackAlpha20,
-        padding: `${t.space.$1x5} ${t.space.$4}`,
-        borderRadius: t.radii.$2xl,
-        border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+        margin: `${t.space.$none} auto`,
       })}
       {...props}
     />

@@ -17,7 +17,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   defaultVariants: {
     as: 'h1',
-    textVariant: 'xlargeMedium',
+    textVariant: 'largeBold',
   },
 }));
 
