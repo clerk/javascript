@@ -5,7 +5,10 @@ export function withCoreSessionSwitchGuard<P>(Component: React.ComponentType<P>)
   const Hoc = (props: P) => {
     const session = useSessionContext();
 
-    if (!session) {
+    /**
+     * Avoid simply checking if session is falsy, checking against undefined is preferable as it means that clerk has not loaded yet
+     */
+    if (typeof session === 'undefined') {
       return null;
     }
 
