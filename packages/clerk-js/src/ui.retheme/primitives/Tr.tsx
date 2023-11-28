@@ -10,7 +10,7 @@ export const Tr = React.forwardRef<HTMLTableCellElement, TrProps>((props, ref) =
   return (
     <Box
       as='tr'
-      {...(props as any)}
+      {...props}
       ref={ref}
     />
   );

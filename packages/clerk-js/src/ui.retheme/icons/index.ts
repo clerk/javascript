@@ -6,6 +6,7 @@
  */
 export { default as ArrowLeftIcon } from './arrow-left.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
+export { default as ArrowRightButtonIcon } from './arrow-right-button.svg';
 export { default as AuthApp } from './auth-app.svg';
 export { default as Billing } from './billing.svg';
 export { default as Caret } from './caret.svg';

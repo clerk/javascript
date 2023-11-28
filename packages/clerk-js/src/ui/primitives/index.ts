@@ -11,7 +11,6 @@ export * from './Image';
 export * from './Alert';
 export * from './AlertIcon';
 export * from './Input';
-export * from './FormControl';
 export * from './FormErrorText';
 export * from './FormInfoText';
 export * from './FormSuccessText';

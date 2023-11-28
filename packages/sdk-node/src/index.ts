@@ -10,23 +10,26 @@ import type {
   WithAuthProp,
 } from './types';
 
+// eslint-disable-next-line import/export
 export * from '@clerk/backend';
 /**
  * The order of these exports is important, as we want Clerk from clerk/sdk-node
  * to shadow the Clerk export from clerk/backend, because it needs to support
  * 2 additional apis: clerk.expressWithAuth, clerk.expressRequireAuth
  */
+// eslint-disable-next-line import/export
 export { Clerk, clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, createClerkClient };
 
 const {
   users,
-  smsMessages,
   sessions,
   emailAddresses,
   phoneNumbers,
   emails,
   invitations,
   organizations,
+  organizationRoles,
+  organizationPermissions,
   clients,
   allowlistIdentifiers,
   domains,
@@ -40,9 +43,10 @@ export {
   emails,
   invitations,
   organizations,
+  organizationRoles,
+  organizationPermissions,
   phoneNumbers,
   sessions,
-  smsMessages,
   users,
 };
 

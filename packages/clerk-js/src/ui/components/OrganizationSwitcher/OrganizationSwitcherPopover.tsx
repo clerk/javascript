@@ -141,7 +141,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             {currentOrg ? (
               <>
                 <OrganizationPreview
-                  elementId={'organizationSwitcher'}
+                  elementId={'organizationSwitcherActiveOrganization'}
                   gap={4}
                   organization={currentOrg}
                   user={user}

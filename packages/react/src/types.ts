@@ -55,7 +55,7 @@ export interface BrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
 }
 
-export interface HeadlessBrowserClerkConstrutor {
+export interface HeadlessBrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): HeadlessBrowserClerk;
 }
 
@@ -88,7 +88,7 @@ export type ClerkProp =
   | BrowserClerkConstructor
   | BrowserClerk
   | HeadlessBrowserClerk
-  | HeadlessBrowserClerkConstrutor
+  | HeadlessBrowserClerkConstructor
   | undefined
   | null;
 

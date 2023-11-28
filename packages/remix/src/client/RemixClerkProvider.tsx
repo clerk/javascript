@@ -7,6 +7,7 @@ import { ClerkRemixOptionsProvider } from './RemixOptionsContext';
 import type { ClerkState } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
+// eslint-disable-next-line import/export
 export * from '@clerk/clerk-react';
 
 const SDK_METADATA = {
@@ -31,6 +32,7 @@ export type RemixClerkProviderProps = {
  */
 const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 
+// eslint-disable-next-line import/export
 export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
 
@@ -55,6 +57,8 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     __afterSignUpUrl,
     __clerkJSUrl,
     __clerkJSVersion,
+    __telemetryDisabled,
+    __telemetryDebug,
   } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
@@ -76,6 +80,10 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     afterSignUpUrl: __afterSignUpUrl,
     clerkJSUrl: __clerkJSUrl,
     clerkJSVersion: __clerkJSVersion,
+    telemetry: {
+      disabled: __telemetryDisabled,
+      debug: __telemetryDebug,
+    },
   };
 
   return (

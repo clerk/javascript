@@ -10,7 +10,7 @@ import { stripOrigin, toURL, trimLeadingSlash } from '../../../utils';
 import { useGate, withGate } from '../../common';
 import { useCoreOrganization } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Box, Col, localizationKeys, Spinner } from '../../customizables';
+import { Box, Col, descriptors, localizationKeys, Spinner } from '../../customizables';
 import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
 import { useInView } from '../../hooks';
 import { useRouter } from '../../router';
@@ -193,6 +193,7 @@ export const DomainList = withGate(
               <Spinner
                 size='sm'
                 colorScheme='primary'
+                elementDescriptor={descriptors.spinner}
               />
             </Box>
           </Box>

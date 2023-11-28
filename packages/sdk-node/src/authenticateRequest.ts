@@ -1,6 +1,7 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants, createIsomorphicRequest } from '@clerk/backend';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import type { ServerResponse } from 'http';
 
@@ -72,7 +73,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || '')) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey || '')) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
@@ -108,8 +109,6 @@ export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, re
   requestState.reason && res.setHeader(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
   requestState.status && res.setHeader(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
-
-const isDevelopmentFromApiKey = (secretKey: string): boolean => secretKey.startsWith('sk_test_');
 
 const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): string => {
   if (!relativeOrAbsoluteUrl || !isValidProxyUrl(relativeOrAbsoluteUrl) || !isProxyUrlRelative(relativeOrAbsoluteUrl)) {

@@ -1,5 +1,103 @@
 # Change Log
 
+## 5.0.0-alpha-v5.5
+
+### Major Changes
+
+- All the components that using routing will throw a runtime error if the a path property is provided with a routing strategy other than path. ([#2208](https://github.com/clerk/javascript/pull/2208)) by [@octoper](https://github.com/octoper)
+
+  Example that will throw an error:
+
+  ```tsx
+  <SignIn
+    routing='hash'
+    path='/sign-in'
+  />
+  ```
+
+### Minor Changes
+
+- Re-use common pagination types for consistency across types. ([#2210](https://github.com/clerk/javascript/pull/2210)) by [@dimkl](https://github.com/dimkl)
+
+  Types introduced in `@clerk/types`:
+
+  - `ClerkPaginationRequest` : describes pagination related props in request payload
+  - `ClerkPaginatedResponse` : describes pagination related props in response body
+  - `ClerkPaginationParams` : describes pagination related props in api client method params
+
+### Patch Changes
+
+- Updated dependencies [[`b8599d700`](https://github.com/clerk/javascript/commit/b8599d700c38c995183a783c505d0805fda8f5fa), [`12962bc58`](https://github.com/clerk/javascript/commit/12962bc58e2c9caad416ba4e6d52061d00bc2feb)]:
+  - @clerk/localizations@2.0.0-alpha-v5.5
+  - @clerk/types@4.0.0-alpha-v5.5
+
+## 5.0.0-alpha-v5.4
+
+### Major Changes
+
+- - By default, all the components with routing will have the `routing` prop assigned as `'path'` by default when the `path` prop is filled. ([#1957](https://github.com/clerk/javascript/pull/1957)) by [@octoper](https://github.com/octoper)
+
+  - The `<UserButton />` component will set the default value of the `userProfileMode` prop to `'navigation'` if the `userProfileUrl` prop is provided.
+  - The `<OrganizationSwitcher />` component will have the `organizationProfileMode` and `createOrganizationMode` props assigned with `'navigation'` by default if the `organizationProfileUrl` and `createOrganizationUrl` props are filled accordingly.
+
+### Minor Changes
+
+- Drop firebase legacy integration code and start using sessions/:sid/tokens/:template endpoint for the firebase tokens. ([#2190](https://github.com/clerk/javascript/pull/2190)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Reset OTP field when pressing "Cancel" in VerifyDomainPage inside `<OrganziatoinProfile/>`. ([#2200](https://github.com/clerk/javascript/pull/2200)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fallback to custom role name if localization is not provided. ([#2194](https://github.com/clerk/javascript/pull/2194)) by [@panteliselef](https://github.com/panteliselef)
+
+- Revalidate invitations table after invitation screen submit. ([#2195](https://github.com/clerk/javascript/pull/2195)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`164ca116c`](https://github.com/clerk/javascript/commit/164ca116ca717859e5593c333ab65f9d1eb794d0), [`7f6a64f43`](https://github.com/clerk/javascript/commit/7f6a64f4335832c66ff355f6d2f311f33a313d59)]:
+  - @clerk/localizations@2.0.0-alpha-v5.4
+  - @clerk/types@4.0.0-alpha-v5.4
+
+## 5.0.0-alpha-v5.3
+
+### Major Changes
+
+- Upgrade React version to >=18 and add react-dom as peer dependency ([#2164](https://github.com/clerk/javascript/pull/2164)) by [@dimkl](https://github.com/dimkl)
+
+  to fix issues with vite & rollup building.
+
+- Breaking Changes: ([#2169](https://github.com/clerk/javascript/pull/2169)) by [@dimkl](https://github.com/dimkl)
+
+  - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
+  - Drop default exports from `@clerk/clerk-js`
+    - on headless Clerk type
+    - on ui and ui.retheme `Portal`
+  - Use `isProductionFromSecretKey` instead of `isProductionFromApiKey`
+  - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
+
+  Changes:
+
+  - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
+  - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
+  - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
+  - Drop `node-fetch` dependency from `@clerk/backend`
+  - Drop duplicate test in `@clerk/backend`
+
+- Introducing some changes and some addition for the appearence descriptors for the organization preview in `<OrganizationSwitcher/>`: ([#2158](https://github.com/clerk/javascript/pull/2158)) by [@octoper](https://github.com/octoper)
+
+  - `.cl-organizationPreview__organizationSwitcher` has been renamed to `.cl-organizationPreview__organizationSwitcherTrigger`.
+  - `.cl-organizationPreview__organizationSwitcherListedOrganization` was added to allow you to customize the appearance of all the listed organization previews.
+  - `.cl-organizationPreview__organizationSwitcherActiveOrganizationn` was added to allow you to customize the appearance of the active organization.
+
+### Patch Changes
+
+- Hide members page of <OrganizationProfile/> if user doesn't have any membership related permissions. ([#2138](https://github.com/clerk/javascript/pull/2138)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry. ([#2154](https://github.com/clerk/javascript/pull/2154)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`9f5491357`](https://github.com/clerk/javascript/commit/9f5491357defddaa64bf6ab45688d262fcc6fb54), [`27fb9b728`](https://github.com/clerk/javascript/commit/27fb9b7281bc5e6f16e81ed1cd07aa17c44de970), [`52ff8fe6b`](https://github.com/clerk/javascript/commit/52ff8fe6b6ff88ceb5e1246378b54b0565bede9d), [`4bb57057e`](https://github.com/clerk/javascript/commit/4bb57057e9af20fc433626ed178d97d3ca811362), [`40ac4b645`](https://github.com/clerk/javascript/commit/40ac4b645f449b546dae5b4c0d013c9d9ea6d09c), [`429d030f7`](https://github.com/clerk/javascript/commit/429d030f7b6efe838a1e7fec7f736ba59fcc6b61)]:
+  - @clerk/localizations@2.0.0-alpha-v5.3
+  - @clerk/shared@2.0.0-alpha-v5.3
+  - @clerk/types@4.0.0-alpha-v5.3
+
 ## 5.0.0-alpha-v5.2
 
 ### Major Changes

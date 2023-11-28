@@ -1,0 +1,42 @@
+name: Cleanup e2e instances
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5,17 * * *'
+
+jobs:
+  integration-tests:
+    name: Cleanup e2e instances
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
+
+      - name: Verdaccio
+        uses: ./.github/actions/verdaccio
+        with:
+          publish-cmd: |
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS && npx changeset publish --no-git-tag; fi
+
+      - name: Install @clerk/backend in /integration
+        working-directory: ./integration
+        run: npm init -y && npm install @clerk/backend
+
+      - name: Run cleanup
+        run: npm run test:integration:cleanup
+        env:
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}

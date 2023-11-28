@@ -136,35 +136,6 @@ export class Session extends BaseResource implements SessionResource {
     return `${template ? `${this.id}-${template}` : this.id}-${this.updatedAt.getTime()}`;
   }
 
-  #isLegacyIntegrationRequest = (template: string | undefined): boolean => {
-    return !!template && template.startsWith('integration_');
-  };
-
-  #removeLegacyIntegrationPrefix = (template: string | undefined): string => {
-    return (template || '').replace('integration_', '');
-  };
-
-  // Can be removed once `integration_firebase` are no longer supported
-  #handleLegacyIntegrationToken = async (options: GetTokenOptions): Promise<string> => {
-    const { template, leewayInSeconds } = options;
-    const cachedEntry = SessionTokenCache.get({ tokenId: this.user!.id, audience: template }, leewayInSeconds);
-    if (cachedEntry) {
-      return cachedEntry.tokenResolver.then(res => res.getRawString());
-    }
-    const tokenResolver = Token.create(this.user!.pathRoot + '/tokens', {
-      service: this.#removeLegacyIntegrationPrefix(template),
-    });
-    SessionTokenCache.set({
-      tokenId: this.user!.id,
-      audience: template,
-      tokenResolver,
-    });
-    return tokenResolver.then(token => {
-      eventBus.dispatch(events.TokenUpdate, { token });
-      return token.getRawString();
-    });
-  };
-
   protected fromJSON(data: SessionJSON | null): this {
     if (!data) {
       return this;
@@ -198,10 +169,6 @@ export class Session extends BaseResource implements SessionResource {
     const { leewayInSeconds, template, skipCache = false } = options || {};
     if (!template && Number(leewayInSeconds) >= 60) {
       throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
-    }
-
-    if (this.#isLegacyIntegrationRequest(template)) {
-      return this.#handleLegacyIntegrationToken({ template, leewayInSeconds, skipCache });
     }
 
     const tokenId = this.#getCacheId(template);

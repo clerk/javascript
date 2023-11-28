@@ -27,6 +27,10 @@ exports[`constants from environment variables 1`] = `
   },
   "JWT_KEY": "CLERK_JWT_KEY",
   "PUBLISHABLE_KEY": "CLERK_PUBLISHABLE_KEY",
+  "SDK_METADATA": {
+    "name": "@clerk/fastify",
+    "version": "0.0.0-test",
+  },
   "SECRET_KEY": "CLERK_SECRET_KEY",
 }
 `;

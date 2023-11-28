@@ -4,7 +4,7 @@ import { Icon } from '../customizables';
 import { ExclamationCircle } from '../icons';
 import type { StyleVariants } from '../styledSystem';
 import { animations, createVariants } from '../styledSystem';
-import { useFormControl } from './hooks';
+import { useFormField } from './hooks';
 import { Text } from './Text';
 
 const { applyVariants } = createVariants(theme => ({
@@ -23,7 +23,7 @@ const { applyVariants } = createVariants(theme => ({
 type FormErrorTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
 export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props, ref) => {
-  const { hasError, errorMessageId } = useFormControl() || {};
+  const { hasError, errorMessageId } = useFormField() || {};
 
   if (!hasError && !props.children) {
     return null;
@@ -39,7 +39,7 @@ export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props,
       aria-live='polite'
       id={errorMessageId}
       {...rest}
-      css={applyVariants(props) as any}
+      css={applyVariants(props)}
     >
       <Icon
         colorScheme={'danger'}

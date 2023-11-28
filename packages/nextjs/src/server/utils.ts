@@ -1,7 +1,7 @@
 import type { RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
-import { isDevelopmentFromApiKey } from '@clerk/shared/keys';
+import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -239,7 +239,7 @@ export const handleMultiDomainAndProxy = (req: NextRequest, opts: WithAuthOption
     throw new Error(missingDomainAndProxy);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(SECRET_KEY)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(SECRET_KEY)) {
     throw new Error(missingSignInUrlInDev);
   }
 

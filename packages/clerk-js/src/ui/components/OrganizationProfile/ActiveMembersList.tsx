@@ -79,6 +79,7 @@ const MemberRow = (props: {
   const user = useCoreUser();
 
   const isCurrentUser = user.id === membership.publicUserData.userId;
+  const unlocalizedRoleLabel = options?.find(a => a.value === membership.role)?.label;
 
   return (
     <RowContainer>
@@ -101,7 +102,11 @@ const MemberRow = (props: {
       <Td>
         <Gate
           permission={'org:sys_memberships:manage'}
-          fallback={<Text sx={t => ({ opacity: t.opacity.$inactive })}>{localizeCustomRole(membership.role)}</Text>}
+          fallback={
+            <Text sx={t => ({ opacity: t.opacity.$inactive })}>
+              {localizeCustomRole(membership.role) || unlocalizedRoleLabel}
+            </Text>
+          }
         >
           <RoleSelect
             isDisabled={card.isLoading || !onRoleChange}

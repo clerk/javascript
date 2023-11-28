@@ -1,5 +1,35 @@
 # Change Log
 
+## 1.0.0-alpha-v5.5
+
+### Patch Changes
+
+- Updated dependencies [[`043801f2a`](https://github.com/clerk/javascript/commit/043801f2ae9447fb1bb8c9bb08869d3c59cd8419), [`12962bc58`](https://github.com/clerk/javascript/commit/12962bc58e2c9caad416ba4e6d52061d00bc2feb)]:
+  - @clerk/clerk-js@5.0.0-alpha-v5.5
+  - @clerk/clerk-react@5.0.0-alpha-v5.5
+
+## 1.0.0-alpha-v5.4
+
+### Patch Changes
+
+- Updated dependencies [[`e214450e9`](https://github.com/clerk/javascript/commit/e214450e9a35c2006fa6b1cbe4c8df24f4a44959), [`7f6a64f43`](https://github.com/clerk/javascript/commit/7f6a64f4335832c66ff355f6d2f311f33a313d59), [`dd49f93da`](https://github.com/clerk/javascript/commit/dd49f93dadd65924c48b48de57c4b40e84203aea), [`676d23a59`](https://github.com/clerk/javascript/commit/676d23a5924f020812574c3c1df57645f659ce0e), [`d941b902f`](https://github.com/clerk/javascript/commit/d941b902f8c8230d1795eb44c7564498ee840a66)]:
+  - @clerk/clerk-js@5.0.0-alpha-v5.4
+  - @clerk/clerk-react@5.0.0-alpha-v5.4
+
+## 1.0.0-alpha-v5.3
+
+### Major Changes
+
+- Upgrade React version to >=18 and add react-dom as peer dependency ([#2164](https://github.com/clerk/javascript/pull/2164)) by [@dimkl](https://github.com/dimkl)
+
+  to fix issues with vite & rollup building.
+
+### Patch Changes
+
+- Updated dependencies [[`52ff8fe6b`](https://github.com/clerk/javascript/commit/52ff8fe6b6ff88ceb5e1246378b54b0565bede9d), [`4bb57057e`](https://github.com/clerk/javascript/commit/4bb57057e9af20fc433626ed178d97d3ca811362), [`9955938d6`](https://github.com/clerk/javascript/commit/9955938d63e6c9a6fd0488060d587a059768388a), [`40ac4b645`](https://github.com/clerk/javascript/commit/40ac4b645f449b546dae5b4c0d013c9d9ea6d09c), [`429d030f7`](https://github.com/clerk/javascript/commit/429d030f7b6efe838a1e7fec7f736ba59fcc6b61)]:
+  - @clerk/clerk-js@5.0.0-alpha-v5.3
+  - @clerk/clerk-react@5.0.0-alpha-v5.3
+
 ## 1.0.0-alpha-v5.2
 
 ### Major Changes

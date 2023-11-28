@@ -38,7 +38,11 @@ export type ProfileSectionId =
 export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'organizationMembers';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
-export type OrganizationPreviewId = 'organizationSwitcher' | 'organizationList';
+export type OrganizationPreviewId =
+  | 'organizationSwitcherTrigger'
+  | 'organizationList'
+  | 'organizationSwitcherListedOrganization'
+  | 'organizationSwitcherActiveOrganization';
 
 export type FooterActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn';
 

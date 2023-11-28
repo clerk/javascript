@@ -81,7 +81,7 @@ export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
 export type RequestState = SignedInState | SignedOutState | InterstitialState | UnknownState;
 
-export type LoadResourcesOptions = {
+type LoadResourcesOptions = {
   loadSession?: boolean;
   loadUser?: boolean;
   loadOrganization?: boolean;

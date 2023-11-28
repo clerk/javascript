@@ -1,8 +1,9 @@
 import { camelToSnake } from '@clerk/shared';
-import type { ClerkOptions, DisplayConfigResource } from '@clerk/types';
+import type { ClerkOptions, DisplayConfigResource, RoutingOptions, RoutingStrategy } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import qs from 'qs';
 
+import { clerkInvalidRoutingStrategy } from '../core/errors';
 import { hasBannedProtocol, isAllowedRedirectOrigin, isValidUrl } from './url';
 
 type PickRedirectionUrlKey = 'afterSignUpUrl' | 'afterSignInUrl' | 'signInUrl' | 'signUpUrl';
@@ -111,4 +112,22 @@ export const buildAuthQueryString = (data: BuildAuthQueryStringArgs): string | n
     }
   }
   return Object.keys(query).length === 0 ? null : qs.stringify(query);
+};
+
+export const normalizeRoutingOptions = ({
+  routing,
+  path,
+}: {
+  routing?: RoutingStrategy;
+  path?: string;
+}): RoutingOptions => {
+  if (!!path && !routing) {
+    return { routing: 'path', path };
+  }
+
+  if (routing !== 'path' && !!path) {
+    return clerkInvalidRoutingStrategy(routing);
+  }
+
+  return { routing, path } as RoutingOptions;
 };

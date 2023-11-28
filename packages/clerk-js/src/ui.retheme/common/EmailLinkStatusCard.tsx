@@ -61,6 +61,7 @@ const StatusRow = (props: { status: VerificationStatus }) => {
           size='xl'
           colorScheme='primary'
           sx={theme => ({ margin: `${theme.space.$12} 0` })}
+          elementDescriptor={descriptors.spinner}
         />
       ) : (
         <>

@@ -30,10 +30,12 @@ export type ClerkBackendApiResponse<T> =
   | {
       data: T;
       errors: null;
+      totalCount?: number;
     }
   | {
       data: null;
       errors: ClerkAPIError[];
+      totalCount?: never;
       clerkTraceId?: string;
       status?: number;
       statusText?: string;
@@ -107,20 +109,20 @@ export function buildRequest(options: BuildRequestOptions) {
       // TODO: Parse JSON or Text response based on a response header
       const isJSONResponse =
         res?.headers && res.headers?.get(constants.Headers.ContentType) === constants.ContentTypes.Json;
-      const data = await (isJSONResponse ? res.json() : res.text());
+      const responseBody = await (isJSONResponse ? res.json() : res.text());
 
       if (!res.ok) {
         return {
           data: null,
-          errors: data?.errors || data,
+          errors: responseBody?.errors || responseBody,
           status: res?.status,
           statusText: res?.statusText,
-          clerkTraceId: getTraceId(data, res?.headers),
+          clerkTraceId: getTraceId(responseBody, res?.headers),
         };
       }
 
       return {
-        data: deserialize(data),
+        ...deserialize<T>(responseBody),
         errors: null,
       };
     } catch (err) {

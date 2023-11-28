@@ -12,6 +12,7 @@ export * from './usePasswordComplexity';
 export * from './usePopover';
 export * from './usePrefersReducedMotion';
 export * from './useLocalStorage';
+export * from './useResizeObserver';
 export * from './useSafeState';
 export * from './useSearchInput';
 export * from './useDebounce';

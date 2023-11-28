@@ -96,8 +96,6 @@ export function _SignInStart(): JSX.Element {
 
   const identifierField = identifierAttribute === 'phone_number' ? phoneIdentifierField : textIdentifierField;
 
-  const identifierFieldRef = useRef<HTMLInputElement>(null);
-
   const switchToNextIdentifier = () => {
     setIdentifierAttribute(
       i => identifierAttributes[(identifierAttributes.indexOf(i) + 1) % identifierAttributes.length],
@@ -273,6 +271,17 @@ export function _SignInStart(): JSX.Element {
     return signInWithFields(identifierField, instantPasswordField);
   };
 
+  const DynamicField = useMemo(() => {
+    const components = {
+      tel: Form.PhoneInput,
+      password: Form.PasswordInput,
+      text: Form.PlainInput,
+      email: Form.PlainInput,
+    };
+
+    return components[identifierField.type as keyof typeof components];
+  }, [identifierField.type]);
+
   if (status.isLoading) {
     return <LoadingCard />;
   }
@@ -313,8 +322,7 @@ export function _SignInStart(): JSX.Element {
             {standardFormAttributes.length ? (
               <Form.Root onSubmit={handleFirstPartySubmit}>
                 <Form.ControlRow elementId={identifierField.id}>
-                  <Form.Control
-                    ref={identifierFieldRef}
+                  <DynamicField
                     actionLabel={nextIdentifier?.action}
                     onActionClicked={switchToNextIdentifier}
                     {...identifierField.props}

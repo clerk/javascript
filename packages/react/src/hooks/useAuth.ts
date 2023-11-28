@@ -94,8 +94,8 @@ type UseAuth = () => UseAuthReturn;
  * Once Clerk loads, `isLoaded` will be set to `true`, and you can
  * safely access the `userId` and `sessionId` variables.
  *
- * For projects using NextJs or Remix, you can have immediate access to this data  during SSR
- * simply by using the `withServerSideAuth` helper.
+ * For projects using NextJs or Remix, you can have immediate access to this data during SSR
+ * simply by using the `ClerkProvider`.
  *
  * @example
  * A simple example:
@@ -115,9 +115,6 @@ type UseAuth = () => UseAuthReturn;
  * Basic example in a NextJs app. This page will be fully rendered during SSR:
  *
  * import { useAuth } from '@clerk/nextjs'
- * import { withServerSideAuth } from '@clerk/nextjs/api'
- *
- * export getServerSideProps = withServerSideAuth();
  *
  * export HelloPage = () => {
  *   const { isSignedIn, sessionId, userId } = useAuth();

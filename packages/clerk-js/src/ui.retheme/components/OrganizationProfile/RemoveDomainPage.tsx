@@ -3,7 +3,7 @@ import React from 'react';
 
 import { RemoveResourcePage } from '../../common';
 import { useCoreOrganization, useEnvironment } from '../../contexts';
-import { Flex, Spinner } from '../../customizables';
+import { descriptors, Flex, Spinner } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
@@ -51,6 +51,7 @@ export const RemoveDomainPage = () => {
         <Spinner
           size={'lg'}
           colorScheme={'primary'}
+          elementDescriptor={descriptors.spinner}
         />
       </Flex>
     );

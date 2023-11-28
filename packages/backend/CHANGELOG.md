@@ -1,5 +1,87 @@
 # Change Log
 
+## 1.0.0-alpha-v5.4
+
+### Minor Changes
+
+- Expose `totalCount` from `@clerk/backend` client responses for responses ([#2199](https://github.com/clerk/javascript/pull/2199)) by [@dimkl](https://github.com/dimkl)
+
+  containing pagination information or for responses with type `{ data: object[] }`.
+
+  Example:
+
+  ```typescript
+  import { Clerk } from '@clerk/backend';
+
+  const clerkClient = Clerk({ secretKey: '...' });
+
+  // current
+  const { data } = await clerkClient.organizations.getOrganizationList();
+  console.log('totalCount: ', data.length);
+
+  // new
+  const { data, totalCount } = await clerkClient.organizations.getOrganizationList();
+  console.log('totalCount: ', totalCount);
+  ```
+
+- Re-use common pagination types for consistency across types. ([#2210](https://github.com/clerk/javascript/pull/2210)) by [@dimkl](https://github.com/dimkl)
+
+  Types introduced in `@clerk/types`:
+
+  - `ClerkPaginationRequest` : describes pagination related props in request payload
+  - `ClerkPaginatedResponse` : describes pagination related props in response body
+  - `ClerkPaginationParams` : describes pagination related props in api client method params
+
+## 1.0.0-alpha-v5.3
+
+### Minor Changes
+
+- Breaking Changes: ([#2169](https://github.com/clerk/javascript/pull/2169)) by [@dimkl](https://github.com/dimkl)
+
+  - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
+  - Drop default exports from `@clerk/clerk-js`
+    - on headless Clerk type
+    - on ui and ui.retheme `Portal`
+  - Use `isProductionFromSecretKey` instead of `isProductionFromApiKey`
+  - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
+
+  Changes:
+
+  - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
+  - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
+  - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
+  - Drop `node-fetch` dependency from `@clerk/backend`
+  - Drop duplicate test in `@clerk/backend`
+
+- Deprecate `createSMSMessage` and `SMSMessageApi` from `clerkClient`. ([#2165](https://github.com/clerk/javascript/pull/2165)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  The equivalent `/sms_messages` Backend API endpoint will also be dropped in the future, since this feature will no longer be available for new instances.
+
+  For a brief period it will still be accessible for instances that have used it in the past 7
+  days (13-11-2023 to 20-11-2023).
+
+  New instances will get a 403 forbidden response if they try to access it.
+
+### Patch Changes
+
+- Add OrganizationRoleAPI for CRUD operations regarding instance level organization roles. ([#2177](https://github.com/clerk/javascript/pull/2177)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove createSms functions from @clerk/backend and @clerk/sdk-node. ([#2165](https://github.com/clerk/javascript/pull/2165)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  The equivalent /sms_messages Backend API endpoint will also dropped in the future, since this feature will no longer be available for new instances.
+
+  For a brief period it will still be accessible for instances that have used it in the past 7
+  days (13-11-2023 to 20-11-2023).
+
+  New instances will get a 403 forbidden response if they try to access it.
+
+- Add OrganizationPermissionAPI for CRUD operations regarding instance level organization permissions. ([#2178](https://github.com/clerk/javascript/pull/2178)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry. ([#2154](https://github.com/clerk/javascript/pull/2154)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`52ff8fe6b`](https://github.com/clerk/javascript/commit/52ff8fe6b6ff88ceb5e1246378b54b0565bede9d), [`4bb57057e`](https://github.com/clerk/javascript/commit/4bb57057e9af20fc433626ed178d97d3ca811362), [`40ac4b645`](https://github.com/clerk/javascript/commit/40ac4b645f449b546dae5b4c0d013c9d9ea6d09c)]:
+  - @clerk/shared@2.0.0-alpha-v5.3
+
 ## 1.0.0-alpha-v5.2
 
 ### Major Changes

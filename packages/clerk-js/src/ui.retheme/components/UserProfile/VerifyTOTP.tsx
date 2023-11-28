@@ -3,16 +3,7 @@ import React from 'react';
 
 import { useCoreUser } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import {
-  ContentPage,
-  FormButtonContainer,
-  NavigateToFlowStartButton,
-  useCardState,
-  useCodeControl,
-} from '../../elements';
-import { CodeForm } from '../../elements/CodeForm';
-import { useLoadingStatus } from '../../hooks';
-import { handleError, sleep, useFormControl } from '../../utils';
+import { ContentPage, Form, FormButtonContainer, NavigateToFlowStartButton, useFieldOTP } from '../../elements';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type VerifyTOTPProps = {
@@ -22,34 +13,19 @@ type VerifyTOTPProps = {
 
 export const VerifyTOTP = (props: VerifyTOTPProps) => {
   const { onVerified, resourceRef } = props;
-  const card = useCardState();
   const user = useCoreUser();
-  const status = useLoadingStatus();
-  const [success, setSuccess] = React.useState(false);
-  const codeControlState = useFormControl('code', '');
-  const codeControl = useCodeControl(codeControlState);
 
-  const resolve = async (totp: TOTPResource) => {
-    setSuccess(true);
-    resourceRef.current = totp;
-    await sleep(750);
-    onVerified();
-  };
-
-  const reject = async (err: any) => {
-    handleError(err, [codeControlState], card.setError);
-    status.setIdle();
-    await sleep(750);
-    codeControl.reset();
-  };
-
-  codeControl.onCodeEntryFinished(code => {
-    status.setLoading();
-    codeControlState.setError(undefined);
-    return user
-      .verifyTOTP({ code })
-      .then((totp: TOTPResource) => resolve(totp))
-      .catch(reject);
+  const otp = useFieldOTP<TOTPResource>({
+    onCodeEntryFinished: (code, resolve, reject) => {
+      user
+        .verifyTOTP({ code })
+        .then((totp: TOTPResource) => resolve(totp))
+        .catch(reject);
+    },
+    onResolve: a => {
+      resourceRef.current = a;
+      onVerified();
+    },
   });
 
   return (
@@ -58,12 +34,10 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
       Breadcrumbs={UserProfileBreadcrumbs}
     >
       <Col>
-        <CodeForm
-          title={localizationKeys('userProfile.mfaTOTPPage.verifyTitle')}
-          subtitle={localizationKeys('userProfile.mfaTOTPPage.verifySubtitle')}
-          isLoading={status.isLoading}
-          success={success}
-          codeControl={codeControl}
+        <Form.OTPInput
+          {...otp}
+          label={localizationKeys('userProfile.mfaTOTPPage.verifyTitle')}
+          description={localizationKeys('userProfile.mfaTOTPPage.verifySubtitle')}
         />
       </Col>
 

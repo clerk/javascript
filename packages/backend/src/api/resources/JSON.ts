@@ -2,6 +2,7 @@ import type {
   InvitationStatus,
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
+  PermissionType,
   SignInStatus,
   SignUpAttributeRequirements,
   SignUpStatus,
@@ -20,6 +21,8 @@ export enum ObjectType {
   Organization = 'organization',
   OrganizationInvitation = 'organization_invitation',
   OrganizationMembership = 'organization_membership',
+  Role = 'role',
+  Permission = 'permission',
   PhoneNumber = 'phone_number',
   RedirectUrl = 'redirect_url',
   Session = 'session',
@@ -172,6 +175,27 @@ export interface OrganizationMembershipPublicUserDataJSON {
   user_id: string;
 }
 
+export interface RoleJSON extends ClerkResourceJSON {
+  object: ObjectType.Role;
+  name: string;
+  key: string;
+  description: string;
+  permissions: PermissionJSON[];
+  created_at: number;
+  updated_at: number;
+}
+
+export interface PermissionJSON extends ClerkResourceJSON {
+  object: ObjectType.Permission;
+  id: string;
+  name: string;
+  key: string;
+  description: string;
+  type: PermissionType;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface PhoneNumberJSON extends ClerkResourceJSON {
   object: ObjectType.PhoneNumber;
   phone_number: string;
@@ -295,4 +319,9 @@ export interface DeletedObjectJSON {
   id?: string;
   slug?: string;
   deleted: boolean;
+}
+
+export interface PaginatedResponseJSON {
+  data: object[];
+  total_count?: number;
 }

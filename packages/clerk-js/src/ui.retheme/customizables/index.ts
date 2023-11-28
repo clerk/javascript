@@ -25,13 +25,11 @@ export const SimpleButton = makeCustomizable(makeLocalizable(sanitizeDomProps(Pr
 export const Heading = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Heading)));
 export const Link = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Link)));
 export const Text = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Text)));
-
 export const Image = makeCustomizable(sanitizeDomProps(makeResponsive(Primitives.Image)));
 
 export const Alert = makeCustomizable(sanitizeDomProps(Primitives.Alert));
 export const AlertIcon = makeCustomizable(sanitizeDomProps(Primitives.AlertIcon));
 export const Input = makeCustomizable(sanitizeDomProps(Primitives.Input));
-export const FormControl = makeCustomizable(sanitizeDomProps(Primitives.FormControl));
 export const FormLabel = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormLabel)));
 export const FormErrorText = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormErrorText)));
 export const FormSuccessText = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormSuccessText)));

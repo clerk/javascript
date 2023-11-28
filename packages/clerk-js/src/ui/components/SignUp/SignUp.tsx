@@ -1,4 +1,4 @@
-import type { SignUpProps } from '@clerk/types';
+import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
@@ -87,8 +87,8 @@ SignUpRoutes.displayName = 'SignUp';
 
 export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGuard(SignUpRoutes);
 
-export const SignUpModal = (props: SignUpProps): JSX.Element => {
-  const signUpProps: SignUpProps = {
+export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
+  const signUpProps = {
     signInUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/sign-in`,
     ...props,
   };
@@ -97,8 +97,8 @@ export const SignUpModal = (props: SignUpProps): JSX.Element => {
     <Route path='sign-up'>
       <ComponentContext.Provider
         value={{
-          componentName: 'SignUp',
           ...signUpProps,
+          componentName: 'SignUp',
           routing: 'virtual',
         }}
       >

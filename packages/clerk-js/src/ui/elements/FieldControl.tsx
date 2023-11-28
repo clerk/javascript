@@ -6,7 +6,6 @@ import type { LocalizationKey } from '../customizables';
 import {
   descriptors,
   Flex,
-  FormControl as FormControlPrim,
   FormLabel,
   Icon as IconCustomizable,
   Input,
@@ -19,11 +18,13 @@ import { FormFieldContextProvider, sanitizeInputProps, useFormField } from '../p
 import type { PropsOfComponent } from '../styledSystem';
 import type { useFormControl as useFormControlUtil } from '../utils';
 import { useFormControlFeedback } from '../utils';
+import { OTPCodeControl, OTPInputDescription, OTPInputLabel, OTPResendButton, OTPRoot } from './CodeControl';
 import { useCardState } from './contexts';
 import type { FormFeedbackProps } from './FormControl';
 import { FormFeedback } from './FormControl';
 import { InputGroup } from './InputGroup';
 import { PasswordInput } from './PasswordInput';
+import { PhoneInput } from './PhoneInput';
 import { RadioItem, RadioLabel } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder' | 'disabled' | 'required'> &
@@ -31,46 +32,23 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
 
 const Root = (props: PropsWithChildren<FormControlProps>) => {
   const card = useCardState();
-  const {
-    id,
-    isRequired,
-    sx,
-    setError,
-    setInfo,
-    setSuccess,
-    setWarning,
-    clearFeedback,
-    feedbackType,
-    feedback,
-    isFocused,
-  } = props;
+  const { children, feedbackType, feedback, isFocused, isDisabled: isDisabledProp, ...restProps } = props;
 
+  /**
+   * Debounce the feedback before passing it inside the provider.
+   */
   const { debounced: debouncedState } = useFormControlFeedback({ feedback, feedbackType, isFocused });
 
-  const isDisabled = props.isDisabled || card.isLoading;
+  const isDisabled = isDisabledProp || card.isLoading;
 
-  return (
-    <FormFieldContextProvider {...{ ...props, isDisabled }}>
-      {/*Most of our primitives still depend on this provider.*/}
-      {/*TODO: In follow-up PRs these will be removed*/}
-      <FormControlPrim
-        elementDescriptor={descriptors.formField}
-        elementId={descriptors.formField.setId(id)}
-        id={id}
-        hasError={debouncedState.feedbackType === 'error'}
-        isDisabled={isDisabled}
-        isRequired={isRequired}
-        setError={setError}
-        setSuccess={setSuccess}
-        setWarning={setWarning}
-        setInfo={setInfo}
-        clearFeedback={clearFeedback}
-        sx={sx}
-      >
-        {props.children}
-      </FormControlPrim>
-    </FormFieldContextProvider>
-  );
+  const ctxProps = {
+    ...restProps,
+    isDisabled,
+    isFocused,
+    ...debouncedState,
+  };
+
+  return <FormFieldContextProvider {...ctxProps}>{children}</FormFieldContextProvider>;
 };
 
 const FieldAction = (
@@ -199,6 +177,22 @@ const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors'>) => 
   );
 };
 
+const PhoneInputElement = forwardRef<HTMLInputElement>((_, ref) => {
+  const { t } = useLocalizations();
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField);
+
+  return (
+    <PhoneInput
+      ref={ref}
+      elementDescriptor={descriptors.formFieldInput}
+      elementId={descriptors.formFieldInput.setId(formField.fieldId)}
+      {...inputProps}
+      placeholder={t(placeholder)}
+    />
+  );
+});
+
 const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {
   const { t } = useLocalizations();
   const formField = useFormField();
@@ -212,7 +206,7 @@ const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {
   ]);
 
   return (
-    // @ts-expect-error
+    // @ts-expect-error Typescript is complaining that `setError`, `setWarning` and the rest of feedback setters are not passed. We are clearly passing them from above.
     <PasswordInput
       ref={ref}
       elementDescriptor={descriptors.formFieldInput}
@@ -304,6 +298,7 @@ export const Field = {
   LabelRow: FieldLabelRow,
   Input: InputElement,
   PasswordInput: PasswordInputElement,
+  PhoneInput: PhoneInputElement,
   InputGroup: InputGroupElement,
   RadioItem: RadioItem,
   CheckboxIndicator: CheckboxIndicator,
@@ -312,4 +307,9 @@ export const Field = {
   AsOptional: FieldOptionalLabel,
   LabelIcon: FieldLabelIcon,
   Feedback: FieldFeedback,
+  OTPRoot,
+  OTPInputLabel,
+  OTPInputDescription,
+  OTPCodeControl,
+  OTPResendButton,
 };

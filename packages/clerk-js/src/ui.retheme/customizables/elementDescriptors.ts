@@ -279,6 +279,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'notificationBadge',
   'button',
   'providerIcon',
+  'spinner',
   // Decide if we want to keep the keys as camel cased in HTML as well,
   // if yes, refactor and remove the .map(camelize) method
 ] as const).map(camelize) as (keyof ElementsConfig)[];

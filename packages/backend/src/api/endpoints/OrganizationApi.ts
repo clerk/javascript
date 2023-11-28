@@ -1,3 +1,5 @@
+import type { ClerkPaginationRequest } from '@clerk/types';
+
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type {
@@ -16,12 +18,10 @@ type MetadataParams<TPublic = OrganizationPublicMetadata, TPrivate = Organizatio
   privateMetadata?: TPrivate;
 };
 
-type GetOrganizationListParams = {
-  limit?: number;
-  offset?: number;
+type GetOrganizationListParams = ClerkPaginationRequest<{
   includeMembersCount?: boolean;
   query?: string;
-};
+}>;
 
 type CreateParams = {
   name: string;
@@ -46,11 +46,9 @@ type UpdateLogoParams = {
 
 type UpdateMetadataParams = MetadataParams;
 
-type GetOrganizationMembershipListParams = {
+type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   organizationId: string;
-  limit?: number;
-  offset?: number;
-};
+}>;
 
 type CreateOrganizationMembershipParams = {
   organizationId: string;
@@ -79,12 +77,10 @@ type CreateOrganizationInvitationParams = {
   publicMetadata?: OrganizationInvitationPublicMetadata;
 };
 
-type GetOrganizationInvitationListParams = {
+type GetOrganizationInvitationListParams = ClerkPaginationRequest<{
   organizationId: string;
   status?: OrganizationInvitationStatus[];
-  limit?: number;
-  offset?: number;
-};
+}>;
 
 type GetOrganizationInvitationParams = {
   organizationId: string;

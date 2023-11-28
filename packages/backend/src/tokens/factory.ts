@@ -1,80 +1,65 @@
 import type { ApiClient } from '../api';
-import { API_URL, API_VERSION } from '../constants';
+import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
 import type { LoadInterstitialOptions } from './interstitial';
 import { loadInterstitialFromLocal } from './interstitial';
 import type { AuthenticateRequestOptions } from './request';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
 
+type RunTimeOptions = Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>;
+
+type BuildTimeOptions = Partial<
+  Pick<
+    AuthenticateRequestOptions,
+    | 'apiUrl'
+    | 'apiVersion'
+    | 'audience'
+    | 'domain'
+    | 'isSatellite'
+    | 'jwtKey'
+    | 'proxyUrl'
+    | 'publishableKey'
+    | 'secretKey'
+  >
+>;
+
+const defaultOptions = {
+  secretKey: '',
+  jwtKey: '',
+  apiUrl: undefined,
+  apiVersion: undefined,
+  proxyUrl: '',
+  publishableKey: '',
+  isSatellite: false,
+  domain: '',
+  audience: '',
+} satisfies BuildTimeOptions;
+
 export type CreateAuthenticateRequestOptions = {
-  options: Partial<
-    Pick<
-      AuthenticateRequestOptions,
-      | 'audience'
-      | 'secretKey'
-      | 'apiUrl'
-      | 'apiVersion'
-      | 'publishableKey'
-      | 'jwtKey'
-      | 'proxyUrl'
-      | 'domain'
-      | 'isSatellite'
-    >
-  >;
+  options: BuildTimeOptions;
   apiClient: ApiClient;
 };
 
 export function createAuthenticateRequest(params: CreateAuthenticateRequestOptions) {
   const { apiClient } = params;
-  const {
-    secretKey: buildtimeSecretKey = '',
-    jwtKey: buildtimeJwtKey = '',
-    apiUrl = API_URL,
-    apiVersion = API_VERSION,
-    proxyUrl: buildProxyUrl = '',
-    publishableKey: buildtimePublishableKey = '',
-    isSatellite: buildtimeIsSatellite = false,
-    domain: buildtimeDomain = '',
-    audience: buildtimeAudience = '',
-  } = params.options;
+  const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
 
-  const authenticateRequest = ({
-    secretKey: runtimeSecretKey,
-    audience: runtimeAudience,
-    proxyUrl: runtimeProxyUrl,
-    publishableKey: runtimePublishableKey,
-    jwtKey: runtimeJwtKey,
-    isSatellite: runtimeIsSatellite,
-    domain: runtimeDomain,
-    ...rest
-  }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) => {
+  const authenticateRequest = (options: RunTimeOptions) => {
+    const { apiUrl, apiVersion } = buildTimeOptions;
+    const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
     return authenticateRequestOriginal({
-      ...rest,
-      secretKey: runtimeSecretKey || buildtimeSecretKey,
-      audience: runtimeAudience || buildtimeAudience,
+      ...options,
+      ...runTimeOptions,
+      // We should add all the omitted props from options here (eg apiUrl / apiVersion)
+      // to avoid runtime options override them.
       apiUrl,
       apiVersion,
-      proxyUrl: runtimeProxyUrl || buildProxyUrl,
-      publishableKey: runtimePublishableKey || buildtimePublishableKey,
-      isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
-      domain: runtimeDomain || buildtimeDomain,
-      jwtKey: runtimeJwtKey || buildtimeJwtKey,
     });
   };
 
-  const localInterstitial = ({
-    publishableKey: runtimePublishableKey,
-    proxyUrl: runtimeProxyUrl,
-    isSatellite: runtimeIsSatellite,
-    domain: runtimeDomain,
-    ...rest
-  }: Omit<LoadInterstitialOptions, 'apiUrl'>) =>
-    loadInterstitialFromLocal({
-      ...rest,
-      proxyUrl: runtimeProxyUrl || buildProxyUrl,
-      publishableKey: runtimePublishableKey || buildtimePublishableKey,
-      isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
-      domain: runtimeDomain || buildtimeDomain,
-    });
+  const localInterstitial = (options: Omit<LoadInterstitialOptions, 'apiUrl'>) => {
+    const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
+    return loadInterstitialFromLocal({ ...options, ...runTimeOptions });
+  };
 
   // TODO: Replace this function with remotePublicInterstitial
   const remotePrivateInterstitial = () => apiClient.interstitial.getInterstitial();
