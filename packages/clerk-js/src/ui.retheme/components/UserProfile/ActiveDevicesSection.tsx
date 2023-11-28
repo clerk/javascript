@@ -1,7 +1,7 @@
+import { useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreSession, useCoreUser } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection } from '../../elements';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
@@ -12,8 +12,8 @@ import { UserProfileAccordion } from './UserProfileAccordion';
 import { currentSessionFirst } from './utils';
 
 export const ActiveDevicesSection = () => {
-  const user = useCoreUser();
-  const session = useCoreSession();
+  const { user } = useUser();
+  const { session } = useSession();
   const [sessionsWithActivities, setSessionsWithActivities] = React.useState<SessionWithActivitiesResource[]>([]);
 
   React.useEffect(() => {
@@ -27,7 +27,7 @@ export const ActiveDevicesSection = () => {
     >
       {!sessionsWithActivities.length && <FullHeightLoader />}
       {!!sessionsWithActivities.length &&
-        sessionsWithActivities.sort(currentSessionFirst(session?.id)).map(sa => (
+        sessionsWithActivities.sort(currentSessionFirst(session!.id)).map(sa => (
           <DeviceAccordion
             key={sa.id}
             session={sa}
@@ -38,7 +38,7 @@ export const ActiveDevicesSection = () => {
 };
 
 const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
-  const isCurrent = useCoreSession()?.id === props.session.id;
+  const isCurrent = useSession().session?.id === props.session.id;
   const revoke = async () => {
     if (isCurrent || !props.session) {
       return;
@@ -74,9 +74,9 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
 };
 
 const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
-  const coreSession = useCoreSession();
-  const isCurrent = coreSession?.id === props.session.id;
-  const isCurrentlyImpersonating = !!coreSession.actor;
+  const { session } = useSession();
+  const isCurrent = session?.id === props.session.id;
+  const isCurrentlyImpersonating = !!session?.actor;
   const isImpersonationSession = !!props.session.actor;
   const { city, country, browserName, browserVersion, deviceType, ipAddress, isMobile } = props.session.latestActivity;
   const title = deviceType ? deviceType : isMobile ? 'Mobile device' : 'Desktop device';

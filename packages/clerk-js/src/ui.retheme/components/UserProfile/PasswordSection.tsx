@@ -1,4 +1,5 @@
-import { useCoreUser } from '../../contexts';
+import { useUser } from '@clerk/shared/react';
+
 import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Pencil } from '../../icons';
@@ -7,7 +8,13 @@ import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const PasswordSection = () => {
   const { navigate } = useRouter();
-  const { passwordEnabled } = useCoreUser();
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const { passwordEnabled } = user;
 
   const navigateToPage = () => {
     return navigate('password');

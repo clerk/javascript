@@ -1,7 +1,7 @@
+import { useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreUser } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtonContainer, NavigateToFlowStartButton, useFieldOTP } from '../../elements';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
@@ -13,12 +13,12 @@ type VerifyTOTPProps = {
 
 export const VerifyTOTP = (props: VerifyTOTPProps) => {
   const { onVerified, resourceRef } = props;
-  const user = useCoreUser();
+  const { user } = useUser();
 
   const otp = useFieldOTP<TOTPResource>({
     onCodeEntryFinished: (code, resolve, reject) => {
       user
-        .verifyTOTP({ code })
+        ?.verifyTOTP({ code })
         .then((totp: TOTPResource) => resolve(totp))
         .catch(reject);
     },

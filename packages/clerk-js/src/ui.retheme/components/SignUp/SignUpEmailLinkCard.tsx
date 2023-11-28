@@ -1,9 +1,10 @@
+import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
 import { buildEmailLinkRedirectUrl } from '../../common/redirects';
-import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { VerificationLinkCard } from '../../elements';
 import { useCardState } from '../../elements/contexts';
@@ -20,7 +21,7 @@ export const SignUpEmailLinkCard = () => {
   const card = useCardState();
   const { displayConfig } = useEnvironment();
   const { navigate } = useRouter();
-  const { setActive } = useCoreClerk();
+  const { setActive } = useClerk();
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
 
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signUp);

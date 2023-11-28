@@ -1,18 +1,18 @@
+import { useOrganization } from '@clerk/shared/react';
 import { describe } from '@jest/globals';
 
-import { act, renderHook, waitFor } from '../../../testUtils';
+import { act, bindCreateFixtures, renderHook, waitFor } from '../../../testUtils';
 import {
   createFakeDomain,
   createFakeOrganizationMembershipRequest,
 } from '../../components/OrganizationProfile/__tests__/utils';
 import { createFakeUserOrganizationMembership } from '../../components/OrganizationSwitcher/__tests__/utlis';
-import { useCoreOrganization } from '../../contexts';
 import { bindCreateFixtures } from '../../utils/test/createFixtures';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 const defaultRenderer = () =>
-  useCoreOrganization({
+  useOrganization({
     domains: {
       pageSize: 2,
     },
@@ -46,7 +46,7 @@ describe('useOrganization', () => {
       });
     });
 
-    const { result } = renderHook(useCoreOrganization, { wrapper });
+    const { result } = renderHook(() => useOrganization(), { wrapper });
 
     expect(result.current.isLoaded).toBe(true);
     expect(result.current.organization).toBeDefined();
@@ -71,7 +71,7 @@ describe('useOrganization', () => {
       });
     });
 
-    const { result } = renderHook(useCoreOrganization, { wrapper });
+    const { result } = renderHook(() => useOrganization(), { wrapper });
 
     expect(result.current.isLoaded).toBe(true);
     expect(result.current.organization).toBeNull();

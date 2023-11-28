@@ -1,6 +1,7 @@
+import { useOrganizationList } from '@clerk/shared/react';
 import { useState } from 'react';
 
-import { useCoreOrganizationList, useEnvironment, useOrganizationListContext } from '../../contexts';
+import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { Card, CardAlert, Divider, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
@@ -11,8 +12,8 @@ import { MembershipPreview, PersonalAccountPreview } from './UserMembershipList'
 import { SuggestionPreview } from './UserSuggestionList';
 import { organizationListParams } from './utils';
 
-const useCoreOrganizationListInView = () => {
-  const { userMemberships, userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
+const useOrganizationListInView = () => {
+  const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
 
   const { ref } = useInView({
     threshold: 0,
@@ -40,7 +41,7 @@ const useCoreOrganizationListInView = () => {
 
 export const OrganizationListPage = withCardStateProvider(() => {
   const card = useCardState();
-  const { userMemberships, userSuggestions, userInvitations } = useCoreOrganizationListInView();
+  const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasAnyData = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
 
@@ -118,7 +119,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
 const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void }) => {
   const environment = useEnvironment();
 
-  const { ref, userMemberships, userSuggestions, userInvitations } = useCoreOrganizationListInView();
+  const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const { hidePersonal } = useOrganizationListContext();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;

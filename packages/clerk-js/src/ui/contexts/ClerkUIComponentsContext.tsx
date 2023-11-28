@@ -1,10 +1,11 @@
+import { useClerk } from '@clerk/shared/react';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import type { OrganizationResource, UserResource } from '@clerk/types';
 import React, { useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
 import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
-import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
+import { useEnvironment, useOptions } from '../contexts';
 import type { NavbarRoute } from '../elements';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
@@ -52,7 +53,7 @@ export const useSignUpContext = (): SignUpContextType => {
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),
@@ -128,7 +129,7 @@ export const useSignInContext = (): SignInContextType => {
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
@@ -220,7 +221,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
 
 export const useUserButtonContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
-  const Clerk = useCoreClerk();
+  const clerk = useClerk();
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const options = useOptions();
@@ -233,7 +234,7 @@ export const useUserButtonContext = () => {
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
   const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;
-  const navigateAfterMultiSessionSingleSignOut = () => Clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
+  const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
 
   const afterSignOutUrl = ctx.afterSignOutUrl || displayConfig.afterSignOutAllUrl;
   const navigateAfterSignOut = () => navigate(afterSignOutUrl);

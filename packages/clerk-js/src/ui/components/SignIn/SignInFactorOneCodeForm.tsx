@@ -1,9 +1,10 @@
 import { isUserLockedError } from '@clerk/shared';
+import { useClerk } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useSignInContext } from '../../contexts';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -33,9 +34,9 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const card = useCardState();
   const { navigate } = useRouter();
   const { navigateAfterSignIn } = useSignInContext();
-  const { setActive } = useCoreClerk();
+  const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
 
   const goBack = () => {
     return navigate('../');

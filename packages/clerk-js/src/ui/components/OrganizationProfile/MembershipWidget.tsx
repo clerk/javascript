@@ -1,10 +1,12 @@
-import { useRouter } from '../../../ui/router';
+import { useOrganization } from '@clerk/shared/react';
+
 import { runIfFunctionOrReturn } from '../../../utils';
-import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
+import { useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, Link, Text } from '../../customizables';
+import { useRouter } from '../../router';
 
 export const MembershipWidget = () => {
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   //@ts-expect-error
   const { __unstable_manageBillingUrl, __unstable_manageBillingLabel, __unstable_manageBillingMembersLimit } =
     useOrganizationProfileContext();
@@ -14,7 +16,7 @@ export const MembershipWidget = () => {
     return null;
   }
 
-  const totalCount = organization.membersCount + organization.pendingInvitationsCount;
+  const totalCount = organization?.membersCount + organization?.pendingInvitationsCount;
 
   return (
     <Flex

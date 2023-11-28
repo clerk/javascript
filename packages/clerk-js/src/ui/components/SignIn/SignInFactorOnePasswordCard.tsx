@@ -1,9 +1,10 @@
 import { isUserLockedError } from '@clerk/shared/error';
+import { useClerk } from '@clerk/shared/react';
 import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Footer, Form, Header, IdentityPreview, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -46,7 +47,7 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
   const { onShowAlternativeMethodsClick } = props;
   const card = useCardState();
-  const { setActive } = useCoreClerk();
+  const { setActive } = useClerk();
   const signIn = useCoreSignIn();
   const { navigateAfterSignIn } = useSignInContext();
   const supportEmail = useSupportEmail();
@@ -54,7 +55,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const { navigate } = useRouter();
   const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
   const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
 
   const goBack = () => {
     return navigate('../');

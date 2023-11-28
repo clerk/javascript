@@ -1,7 +1,7 @@
+import { useClerk } from '@clerk/shared/react';
 import type { LoadedClerk } from '@clerk/types';
 import React from 'react';
 
-import { useCoreClerk } from '../../ui/contexts';
 import { pathFromFullPath, trimTrailingSlash } from '../../utils';
 import { useNavigateToFlowStart } from '../hooks';
 import { newPaths } from './newPaths';
@@ -18,6 +18,7 @@ interface UnguardedRouteProps {
   flowStart?: boolean;
   canActivate?: never;
 }
+
 type GuardedRouteProps = {
   path?: string;
   index?: boolean;
@@ -28,7 +29,7 @@ export type RouteProps = React.PropsWithChildren<UnguardedRouteProps | GuardedRo
 
 const RouteGuard = ({ canActivate, children }: React.PropsWithChildren<RouteGuardProps>): JSX.Element | null => {
   const { navigateToFlowStart } = useNavigateToFlowStart();
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
 
   React.useEffect(() => {
     if (!canActivate(clerk)) {

@@ -1,8 +1,9 @@
+import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { ComponentContext, useCoreClerk, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
+import { ComponentContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
@@ -12,7 +13,7 @@ import { SignUpVerifyEmail } from './SignUpVerifyEmail';
 import { SignUpVerifyPhone } from './SignUpVerifyPhone';
 
 function RedirectToSignUp() {
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
   React.useEffect(() => {
     void clerk.redirectToSignUp();
   }, []);

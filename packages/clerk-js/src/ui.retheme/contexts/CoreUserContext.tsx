@@ -1,25 +1,14 @@
-import { assertContextExists, UserContext, useUserContext } from '@clerk/shared/react';
-import React, { useContext } from 'react';
-
-import { clerkCoreErrorUserIsNotDefined } from '../../core/errors';
-
-export const CoreUserContext = UserContext;
-
-export const useCoreUser = () => {
-  const user = useUserContext();
-  if (!user) {
-    clerkCoreErrorUserIsNotDefined();
-  }
-  return user;
-};
+import { useUserContext } from '@clerk/shared/react';
+import React from 'react';
 
 export function withCoreUserGuard<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
   const Hoc = (props: P) => {
-    const ctx = useContext(CoreUserContext);
-    assertContextExists(ctx, CoreUserContext);
-    if (!ctx.value) {
+    const user = useUserContext();
+
+    if (!user) {
       return null;
     }
+
     return <Component {...(props as any)} />;
   };
 

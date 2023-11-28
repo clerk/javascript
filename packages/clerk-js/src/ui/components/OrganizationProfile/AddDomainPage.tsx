@@ -1,6 +1,7 @@
+import { useOrganization } from '@clerk/shared/react';
 import React from 'react';
 
-import { useCoreOrganization, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
@@ -13,7 +14,7 @@ export const AddDomainPage = withCardStateProvider(() => {
   const subtitle = localizationKeys('organizationProfile.createDomainPage.subtitle');
   const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const card = useCardState();
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   const { navigate } = useRouter();
 
   const nameField = useFormControl('name', '', {

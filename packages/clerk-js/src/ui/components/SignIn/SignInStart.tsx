@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 import type { ClerkAPIError, SignInCreateParams } from '@clerk/types';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
@@ -11,7 +12,7 @@ import {
   withRedirectToHomeSingleSessionGuard,
 } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
-import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -33,7 +34,7 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 
 export function _SignInStart(): JSX.Element {
   const card = useCardState();
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
   const status = useLoadingStatus();
   const { displayConfig, userSettings } = useEnvironment();
   const signIn = useCoreSignIn();

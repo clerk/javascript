@@ -1,6 +1,6 @@
+import { useClerk } from '@clerk/shared/react';
 import { forwardRef, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { useCoreClerk } from '../../contexts';
 import { descriptors, Flex, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
@@ -207,7 +207,7 @@ const Flag = (props: { iso: CountryIso }) => {
 
 export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref) => {
   // @ts-expect-error
-  const { __internal_country } = useCoreClerk();
+  const { __internal_country } = useClerk();
 
   return (
     <PhoneInputBase

@@ -1,5 +1,7 @@
+import { useOrganization, useUser } from '@clerk/shared/react';
+
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization, useCoreUser, useOrganizationProfileContext } from '../../contexts';
+import { useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
 import {
@@ -17,10 +19,10 @@ import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 export const LeaveOrganizationPage = () => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
-  const { organization } = useCoreOrganization();
-  const user = useCoreUser();
+  const { organization } = useOrganization();
+  const { user } = useUser();
 
-  if (!organization) {
+  if (!organization || !user) {
     return null;
   }
 
@@ -50,7 +52,7 @@ export const LeaveOrganizationPage = () => {
 export const DeleteOrganizationPage = () => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
 
   if (!organization) {
     return null;

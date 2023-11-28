@@ -1,6 +1,6 @@
+import { useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/types';
 
-import { useCoreUser } from '../../contexts';
 import { Badge, Col, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, useCardState } from '../../elements';
 import { useRouter } from '../../router';
@@ -11,7 +11,7 @@ import { AddBlockButton } from './UserProfileBlockButtons';
 import { primaryIdentificationFirst } from './utils';
 
 export const PhoneSection = () => {
-  const user = useCoreUser();
+  const { user } = useUser();
   const { navigate } = useRouter();
 
   return (
@@ -19,7 +19,7 @@ export const PhoneSection = () => {
       title={localizationKeys('userProfile.start.phoneNumbersSection.title')}
       id='phoneNumbers'
     >
-      {user.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
+      {user?.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
         <PhoneAccordion
           key={phone.id}
           phone={phone}
@@ -37,8 +37,13 @@ export const PhoneSection = () => {
 
 const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
   const card = useCardState();
-  const user = useCoreUser();
+  const { user } = useUser();
   const { navigate } = useRouter();
+
+  if (!user) {
+    return null;
+  }
+
   const isPrimary = user.primaryPhoneNumberId === phone.id;
   const isVerified = phone.verification.status === 'verified';
   const setPrimary = () => {

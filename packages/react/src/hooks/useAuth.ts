@@ -10,7 +10,6 @@ import { useCallback } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError } from '../errors';
-import type { IsomorphicClerk } from '../isomorphicClerk';
 import { errorThrower } from '../utils';
 import { createGetToken, createSignOut } from './utils';
 
@@ -124,7 +123,7 @@ type UseAuth = () => UseAuthReturn;
  */
 export const useAuth: UseAuth = () => {
   const { sessionId, userId, actor, orgId, orgRole, orgSlug } = useAuthContext();
-  const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
+  const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);

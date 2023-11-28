@@ -1,4 +1,4 @@
-import type { useCoreOrganizationList } from '../../contexts';
+import type { useOrganizationList } from '@clerk/shared/react';
 
 export const organizationListParams = {
   userMemberships: {
@@ -11,4 +11,4 @@ export const organizationListParams = {
     infinite: true,
     status: ['pending', 'accepted'],
   },
-} satisfies Parameters<typeof useCoreOrganizationList>[0];
+} satisfies Parameters<typeof useOrganizationList>[0];

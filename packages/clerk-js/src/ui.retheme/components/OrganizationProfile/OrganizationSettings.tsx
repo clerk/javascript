@@ -1,5 +1,7 @@
+import { useOrganization } from '@clerk/shared/react';
+
 import { AddBlockButton, BlockButton, Gate, useGate } from '../../common';
-import { useCoreOrganization, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
 import { Times } from '../../icons';
@@ -36,7 +38,7 @@ export const OrganizationSettings = () => {
 };
 
 const OrganizationProfileSection = () => {
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   const { navigate } = useRouter();
 
   if (!organization) {
@@ -67,7 +69,7 @@ const OrganizationProfileSection = () => {
 
 const OrganizationDomainsSection = () => {
   const { organizationSettings } = useEnvironment();
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
 
   const { navigate } = useRouter();
 
@@ -97,7 +99,7 @@ const OrganizationDomainsSection = () => {
 };
 
 const OrganizationDangerSection = () => {
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   const { navigate } = useRouter();
   const { isAuthorizedUser: canDeleteOrganization } = useGate({ permission: 'org:sys_profile:delete' });
 

@@ -1,8 +1,8 @@
+import { useOrganization } from '@clerk/shared/react';
 import React from 'react';
 
 import { isDefaultImage } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -14,7 +14,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
   const subtitle = localizationKeys('organizationProfile.profilePage.subtitle');
   const card = useCardState();
   const [avatarChanged, setAvatarChanged] = React.useState(false);
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 

@@ -1,6 +1,6 @@
+import { useClientContext } from '@clerk/shared/react';
 import type { SetActive, SignInResource } from '@clerk/types';
 
-import { useClientContext } from '../contexts/ClientContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 
 type UseSignInReturn =

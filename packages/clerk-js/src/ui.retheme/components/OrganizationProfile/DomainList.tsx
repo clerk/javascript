@@ -1,3 +1,4 @@
+import { useOrganization } from '@clerk/shared/react';
 import type {
   GetDomainsParams,
   OrganizationDomainResource,
@@ -8,7 +9,6 @@ import React, { useMemo } from 'react';
 
 import { stripOrigin, toURL, trimLeadingSlash } from '../../../utils';
 import { useGate, withGate } from '../../common';
-import { useCoreOrganization } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Box, Col, descriptors, localizationKeys, Spinner } from '../../customizables';
 import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
@@ -81,7 +81,7 @@ const DomainListDotMenu = ({
 export const DomainList = withGate(
   (props: DomainListProps) => {
     const { verificationStatus, enrollmentMode, redirectSubPath, fallback, ...rest } = props;
-    const { organization, domains } = useCoreOrganization({
+    const { organization, domains } = useOrganization({
       domains: {
         infinite: true,
         ...rest,

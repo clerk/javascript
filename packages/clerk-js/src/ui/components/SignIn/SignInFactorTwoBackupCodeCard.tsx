@@ -1,9 +1,10 @@
 import { isUserLockedError } from '@clerk/shared/error';
+import { useClerk } from '@clerk/shared/react';
 import type { SignInResource } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Footer, Form, Header, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -20,7 +21,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
   const signIn = useCoreSignIn();
   const { displayConfig } = useEnvironment();
   const { navigateAfterSignIn } = useSignInContext();
-  const { setActive } = useCoreClerk();
+  const { setActive } = useClerk();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const card = useCardState();
@@ -29,7 +30,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
     label: localizationKeys('formFieldLabel__backupCode'),
     isRequired: true,
   });
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
 
   const isResettingPassword = (resource: SignInResource) =>
     isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&

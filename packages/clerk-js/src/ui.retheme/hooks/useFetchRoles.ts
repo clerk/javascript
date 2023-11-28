@@ -1,4 +1,5 @@
-import { useCoreOrganization } from '../contexts';
+import { useOrganization } from '@clerk/shared/react';
+
 import { useLocalizations } from '../localization';
 import { customRoleLocalizationKey, roleLocalizationKey } from '../utils';
 import { useFetch } from './useFetch';
@@ -11,7 +12,7 @@ const getRolesParams = {
   pageSize: 20,
 };
 export const useFetchRoles = () => {
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   const { data, status } = useFetch(organization?.getRoles, getRolesParams);
 
   return {

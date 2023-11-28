@@ -1,7 +1,7 @@
+import { useClerk, useOrganizationList } from '@clerk/shared/react';
 import type { OrganizationResource, UserOrganizationInvitationResource } from '@clerk/types';
 import { useState } from 'react';
 
-import { useCoreClerk, useCoreOrganizationList } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
@@ -24,9 +24,9 @@ export const AcceptRejectInvitationButtons = (props: { onAccept: () => void }) =
 
 export const InvitationPreview = withCardStateProvider((props: UserOrganizationInvitationResource) => {
   const card = useCardState();
-  const { getOrganization } = useCoreClerk();
+  const { getOrganization } = useClerk();
   const [acceptedOrganization, setAcceptedOrganization] = useState<OrganizationResource | null>(null);
-  const { userInvitations } = useCoreOrganizationList({
+  const { userInvitations } = useOrganizationList({
     userInvitations: organizationListParams.userInvitations,
   });
 
