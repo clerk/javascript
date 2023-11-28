@@ -134,11 +134,41 @@ const fontSizeVariants = (t: InternalTheme) => {
 };
 
 const borderVariants = (t: InternalTheme, props?: any) => {
+  const defaultBoxShadow = t.shadows.$input
+    .replace('{{color1}}', t.colors.$blackAlpha200)
+    .replace('{{color2}}', t.colors.$blackAlpha300);
+  const hoverBoxShadow = t.shadows.$inputHover
+    .replace('{{color1}}', t.colors.$blackAlpha300)
+    .replace('{{color2}}', t.colors.$blackAlpha400);
+  const hoverStyles = {
+    '&:hover': {
+      WebkitTapHighlightColor: 'transparent',
+      boxShadow: [defaultBoxShadow, hoverBoxShadow].toString(),
+    },
+  };
+  const focusStyles =
+    props?.focusRing === false
+      ? {}
+      : {
+          '&:focus': {
+            WebkitTapHighlightColor: 'transparent',
+            boxShadow: [
+              defaultBoxShadow,
+              hoverBoxShadow,
+              t.shadows.$focusRing.replace('{{color}}', props?.hasError ? t.colors.$danger300 : t.colors.$primary300),
+            ].toString(),
+          },
+        };
   return {
     normal: {
       borderRadius: t.radii.$lg,
-      border: t.borders.$normal,
-      ...borderColor(t, props),
+      border: 'none',
+      boxShadow: defaultBoxShadow,
+      transitionProperty: t.transitionProperty.$common,
+      transitionTimingFunction: t.transitionTiming.$common,
+      transitionDuration: t.transitionDuration.$focusRing,
+      ...hoverStyles,
+      ...focusStyles,
     },
   } as const;
 };
