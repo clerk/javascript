@@ -141,7 +141,6 @@ export const UserPreview = (props: UserPreviewProps) => {
         >
           <Text
             as='span'
-            colorScheme='inherit'
             truncate
             sx={{ fontSize: 'inherit', fontWeight: 'inherit' }}
           >
