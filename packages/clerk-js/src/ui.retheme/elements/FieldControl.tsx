@@ -17,7 +17,6 @@ import {
 import { FormFieldContextProvider, sanitizeInputProps, useFormField } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import type { useFormControl as useFormControlUtil } from '../utils';
-import { useFormControlFeedback } from '../utils';
 import { OTPCodeControl, OTPInputDescription, OTPInputLabel, OTPResendButton, OTPRoot } from './CodeControl';
 import { useCardState } from './contexts';
 import type { FormFeedbackProps } from './FormControl';
@@ -32,20 +31,13 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
 
 const Root = (props: PropsWithChildren<FormControlProps>) => {
   const card = useCardState();
-  const { children, feedbackType, feedback, isFocused, isDisabled: isDisabledProp, ...restProps } = props;
-
-  /**
-   * Debounce the feedback before passing it inside the provider.
-   */
-  const { debounced: debouncedState } = useFormControlFeedback({ feedback, feedbackType, isFocused });
+  const { children, isDisabled: isDisabledProp, ...restProps } = props;
 
   const isDisabled = isDisabledProp || card.isLoading;
 
   const ctxProps = {
     ...restProps,
     isDisabled,
-    isFocused,
-    ...debouncedState,
   };
 
   return <FormFieldContextProvider {...ctxProps}>{children}</FormFieldContextProvider>;
@@ -163,13 +155,12 @@ const FieldLabelRow = (props: PropsWithChildren) => {
 };
 
 const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors'>) => {
-  const { feedback, feedbackType, isFocused, fieldId } = useFormField();
-  const { debounced } = useFormControlFeedback({ feedback, feedbackType, isFocused });
+  const { fieldId, debouncedFeedback } = useFormField();
 
   return (
     <FormFeedback
       {...{
-        ...debounced,
+        ...debouncedFeedback,
         elementDescriptors: props.elementDescriptors,
         id: fieldId,
       }}
