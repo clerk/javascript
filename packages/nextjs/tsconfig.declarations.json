@@ -8,5 +8,6 @@
     "declarationMap": true,
     "sourceMap": false,
     "declarationDir": "./dist/types"
-  }
+  },
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }
