@@ -157,6 +157,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userPreviewAvatarContainer',
   'userPreviewAvatarBox',
   'userPreviewAvatarImage',
+  'userPreviewAvatarIcon',
   'userPreviewTextContainer',
   'userPreviewMainIdentifier',
   'userPreviewSecondaryIdentifier',

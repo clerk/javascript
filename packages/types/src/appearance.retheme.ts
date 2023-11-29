@@ -228,11 +228,11 @@ export type ElementsConfig = {
   userButtonPopoverCard: WithOptions;
   userButtonPopoverMain: WithOptions;
   userButtonPopoverUserPreview: WithOptions;
-  userButtonPopoverActions: WithOptions;
-  userButtonPopoverActionButton: WithOptions<'manageAccount' | 'signOut'>;
-  userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'signOut'>;
-  userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'signOut'>;
-  userButtonPopoverActionButtonText: WithOptions<'manageAccount' | 'signOut'>;
+  userButtonPopoverActions: WithOptions<'singleSession' | 'multiSession'>;
+  userButtonPopoverActionButton: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
+  userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
+  userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
+  userButtonPopoverActionButtonText: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverFooter: WithOptions;
   userButtonPopoverFooterPages: WithOptions;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
@@ -274,6 +274,7 @@ export type ElementsConfig = {
   userPreviewAvatarContainer: WithOptions<UserPreviewId>;
   userPreviewAvatarBox: WithOptions<UserPreviewId>;
   userPreviewAvatarImage: WithOptions<UserPreviewId>;
+  userPreviewAvatarIcon: WithOptions<UserPreviewId>;
   userPreviewTextContainer: WithOptions<UserPreviewId>;
   userPreviewMainIdentifier: WithOptions<UserPreviewId>;
   userPreviewSecondaryIdentifier: WithOptions<UserPreviewId>;

@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { descriptors, Icon, Spinner } from '../customizables';
@@ -63,7 +64,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           [vars.border]: theme.colors.$blackAlpha200,
           [vars.accentLightest]: theme.colors.$blackAlpha50, // TODO: once we have the new color palette and style for pseudo classes
           [vars.accentLighter]: theme.colors.$blackAlpha300, // TODO: once we have the new color palette and style for pseudo classes
-          [vars.accent]: theme.colors.$primary800, // WIP reference: Updated to new color palette; previously `$colorText`
+          [vars.accent]: theme.colors.$blackAlpha800, // WIP reference: Updated to new color palette; previously `$colorText`
           [vars.accentDark]: theme.colors.$blackAlpha600, // TODO: once we have the new color palette and style for pseudo classes
           [vars.accentDarker]: theme.colors.$blackAlpha700, // TODO: once we have the new color palette and style for pseudo classes
         },
@@ -157,6 +158,25 @@ type OwnProps = PrimitiveProps<'button'> & {
 
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
+const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
+  return (
+    <Flex
+      align='center'
+      gap={2}
+    >
+      {children}
+      <Icon
+        icon={ArrowRightButtonIcon}
+        sx={t => ({
+          width: t.sizes.$2x5,
+          height: t.sizes.$2x5,
+          opacity: t.opacity.$inactive,
+        })}
+      />
+    </Flex>
+  );
+};
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
   const {
@@ -208,25 +228,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           {loadingText || <span style={{ opacity: 0 }}>{children}</span>}
         </Flex>
       )}
-
-      {!isLoading && (
-        <Flex
-          align='center'
-          gap={2}
-        >
-          {children}
-          {hasArrow && (
-            <Icon
-              icon={ArrowRightButtonIcon}
-              sx={t => ({
-                width: t.sizes.$2x5,
-                height: t.sizes.$2x5,
-                opacity: t.opacity.$inactive,
-              })}
-            />
-          )}
-        </Flex>
-      )}
+      {!isLoading && (hasArrow ? <ButtonChildrenWithArrow>{children}</ButtonChildrenWithArrow> : children)}
     </button>
   );
 });
