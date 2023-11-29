@@ -6,7 +6,13 @@ on:
       - main
     paths:
       - 'packages/clerk-js/src/ui/**'
-
+      # files with matching `*.retheme.ts` retheme variant
+      - 'packages/localizations/src/en-US.ts'
+      - 'packages/localizations/src/index.ts'
+      - 'packages/types/src/appearance.ts'
+      - 'packages/types/src/clerk.ts'
+      - 'packages/types/src/index.ts'
+      - 'packages/types/src/localization.ts'
 jobs:
   check-changes:
     runs-on: ubuntu-latest
