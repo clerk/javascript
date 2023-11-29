@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0-alpha-v5.7
+
+### Minor Changes
+
+- Update the TypeScript types of `<ClerkProvider />`. If you use the `routerPush` prop you're now required to also provide the `routerReplace` prop (or other way around). You can also not provide them at all since both props are optional. ([#2227](https://github.com/clerk/javascript/pull/2227)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.0.0-alpha-v5.6
 
 ### Major Changes

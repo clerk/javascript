@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.0.0-alpha-v5.7
+
+### Minor Changes
+
+- Fix `@clerk/clerk-react` bundle output to resolve issues with vite / rollup ESM module imports. ([#2216](https://github.com/clerk/javascript/pull/2216)) by [@dimkl](https://github.com/dimkl)
+
+  We have also used the `bundle` output to export a single index.ts and dropped the unnecessary
+  published files / folders (eg `__tests__`).
+
+- Update the TypeScript types of `<ClerkProvider />`. If you use the `routerPush` prop you're now required to also provide the `routerReplace` prop (or other way around). You can also not provide them at all since both props are optional. ([#2227](https://github.com/clerk/javascript/pull/2227)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Sync IsomorphicClerk with the clerk singleton and the LoadedClerk interface. IsomorphicClerk now extends from LoadedClerk. ([#2226](https://github.com/clerk/javascript/pull/2226)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`4b8bedc66`](https://github.com/clerk/javascript/commit/4b8bedc66d47dca5c6192148f4b31ae6d49ff733), [`c776f86fb`](https://github.com/clerk/javascript/commit/c776f86fb2a999dcae46fda9abb5005718c354b2), [`d6a7ea61a`](https://github.com/clerk/javascript/commit/d6a7ea61a8ae64c93877ec117e54fc48b1c86f16)]:
+  - @clerk/shared@2.0.0-alpha-v5.4
+  - @clerk/types@4.0.0-alpha-v5.7
+
 ## 5.0.0-alpha-v5.6
 
 ### Patch Changes
