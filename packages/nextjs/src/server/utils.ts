@@ -221,7 +221,7 @@ export const isCrossOrigin = (from: string | URL, to: string | URL) => {
   return fromUrl.origin !== toUrl.origin;
 };
 
-export const handleMultiDomainAndProxy = (req: NextRequest, opts: WithAuthOptions) => {
+export const handleMultiDomainAndProxy = (req: Request, opts: WithAuthOptions) => {
   const requestURL = buildRequestUrl(req);
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, requestURL, PROXY_URL);
   let proxyUrl;

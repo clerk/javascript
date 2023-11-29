@@ -1,24 +1,20 @@
-import type { AuthObject, RequestState } from '@clerk/backend';
-import { buildRequestUrl, constants, TokenVerificationErrorReason } from '@clerk/backend';
+import type { AuthObject } from '@clerk/backend';
+import { buildRequestUrl, constants } from '@clerk/backend';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import type Link from 'next/link';
-import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import type { NextFetchEvent, NextMiddleware } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
-import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
+import { authenticateRequest, initHandshake } from './authenticateRequest';
 import { clerkClient } from './clerkClient';
 import { SECRET_KEY } from './constants';
-import {
-  clockSkewDetected,
-  infiniteRedirectLoopDetected,
-  informAboutProtectedRouteInfo,
-  receivedRequestForIgnoredRoute,
-} from './errors';
+import { informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
+import { authenticateRequestHandshake } from './handshake';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
 import { isDevAccountPortalOrigin } from './url';
@@ -38,8 +34,6 @@ type ExcludeRootPath<T> = T extends '/' ? never : T;
 type RouteMatcherWithNextTypedRoutes = Autocomplete<
   WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>> | NextTypedRoute
 >;
-
-const INFINITE_REDIRECTION_LOOP_COOKIE = '__clerk_redirection_loop';
 
 /**
  * The default ideal matcher that excludes the _next directory (internals) and all static files,
@@ -191,43 +185,64 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return setHeader(beforeAuthRes, constants.Headers.AuthReason, 'redirect');
     }
 
-    const requestState = await authenticateRequest(req, options);
-    if (requestState.isUnknown) {
-      logger.debug('authenticateRequest state is unknown', requestState);
-      return handleUnknownState(requestState);
-    } else if (requestState.isInterstitial && isApiRoute(req)) {
-      logger.debug('authenticateRequest state is interstitial in an API route', requestState);
-      return handleUnknownState(requestState);
-    } else if (requestState.isInterstitial) {
-      logger.debug('authenticateRequest state is interstitial', requestState);
-
-      assertClockSkew(requestState, options);
-
-      const res = handleInterstitialState(requestState, options);
-      return assertInfiniteRedirectionLoop(req, res, options, requestState);
+    // handle handshake
+    const handshakeRes = await authenticateRequestHandshake(req, options);
+    if (handshakeRes.status === 'handshake') {
+      return initHandshake(req, options);
     }
 
+    let reqWithCookie = req;
+    if (handshakeRes.handshakeToken) {
+      const newCookies = { ...req.cookies, __session: handshakeRes.handshakeToken };
+      const cookieHeaderString = Object.entries(newCookies).join('; ');
+      console.log({ cookieHeaderString });
+      reqWithCookie = withNormalizedClerkUrl(
+        new NextRequest(req.url, {
+          ...req,
+          headers: {
+            ...req.headers,
+            cookie: cookieHeaderString,
+          },
+        }),
+      );
+    }
+
+    // todo: handle normal signed in or signed out
+    const requestState = await authenticateRequest(reqWithCookie, options);
+    if (requestState.status === 'handshake') {
+      throw new Error('invalid state, should be signed in or signed out at this point');
+    }
+
+    console.log('skt signed in or signed out');
+    // signed in or signed out
     const auth = Object.assign(requestState.toAuth(), {
-      isPublicRoute: isPublicRoute(req),
-      isApiRoute: isApiRoute(req),
+      isPublicRoute: isPublicRoute(reqWithCookie),
+      isApiRoute: isApiRoute(reqWithCookie),
     });
     logger.debug(() => ({ auth: JSON.stringify(auth), debug: auth.debug() }));
-    const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, req, evt);
+    const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, reqWithCookie, evt);
     const finalRes = mergeResponses(beforeAuthRes, afterAuthRes) || NextResponse.next();
+
+    if (handshakeRes.headers) {
+      for (const [key, value] of Object.entries(handshakeRes.headers)) {
+        finalRes.headers.append(key, value);
+      }
+    }
+
     logger.debug(() => ({ mergedHeaders: stringifyHeaders(finalRes.headers) }));
 
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
       const res = setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
-      return appendDevBrowserOnCrossOrigin(req, res, options);
+      return appendDevBrowserOnCrossOrigin(reqWithCookie, res, options);
     }
 
     if (options.debug) {
-      setRequestHeadersOnNextResponse(finalRes, req, { [constants.Headers.EnableDebug]: 'true' });
+      setRequestHeadersOnNextResponse(finalRes, reqWithCookie, { [constants.Headers.EnableDebug]: 'true' });
       logger.debug(`Added ${constants.Headers.EnableDebug} on request`);
     }
 
-    return decorateRequest(req, finalRes, requestState);
+    return decorateRequest(reqWithCookie, finalRes, requestState);
   });
 };
 
@@ -350,55 +365,6 @@ const isRequestContentTypeJson = (req: NextRequest): boolean => {
 const isRequestMethodIndicatingApiRoute = (req: NextRequest): boolean => {
   const requestMethod = req.method.toLowerCase();
   return !['get', 'head', 'options'].includes(requestMethod);
-};
-
-/**
- * In development, attempt to detect clock skew based on the requestState. This check should run when requestState.isInterstitial is true. If detected, we throw an error.
- */
-const assertClockSkew = (requestState: RequestState, opts: AuthMiddlewareParams): void => {
-  if (!isDevelopmentFromSecretKey(opts.secretKey || SECRET_KEY)) {
-    return;
-  }
-
-  if (requestState.reason === TokenVerificationErrorReason.TokenNotActiveYet) {
-    throw new Error(clockSkewDetected(requestState.message));
-  }
-};
-
-// When in development, we want to prevent infinite interstitial redirection loops.
-// We incrementally set a `__clerk_redirection_loop` cookie, and when it loops 6 times, we throw an error.
-// We also utilize the `referer` header to skip the prefetch requests.
-const assertInfiniteRedirectionLoop = (
-  req: NextRequest,
-  res: NextResponse,
-  opts: AuthMiddlewareParams,
-  requestState: RequestState,
-): NextResponse => {
-  if (!isDevelopmentFromSecretKey(opts.secretKey || SECRET_KEY)) {
-    return res;
-  }
-
-  const infiniteRedirectsCounter = Number(req.cookies.get(INFINITE_REDIRECTION_LOOP_COOKIE)?.value) || 0;
-  if (infiniteRedirectsCounter === 6) {
-    // Infinite redirect detected, is it clock skew?
-    // We check for token-expired here because it can be a valid, recoverable scenario, but in a redirect loop a token-expired error likely indicates clock skew.
-    if (requestState.reason === TokenVerificationErrorReason.TokenExpired) {
-      throw new Error(clockSkewDetected(requestState.message));
-    }
-
-    // Not clock skew, return general error
-    throw new Error(infiniteRedirectLoopDetected());
-  }
-
-  // Skip the prefetch requests (when hovering a Next Link element)
-  if (req.headers.get('referer') === req.url) {
-    res.cookies.set({
-      name: INFINITE_REDIRECTION_LOOP_COOKIE,
-      value: `${infiniteRedirectsCounter + 1}`,
-      maxAge: 3,
-    });
-  }
-  return res;
 };
 
 const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => {

@@ -118,7 +118,9 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
 };
 
 const parseJwt = (req: RequestLike) => {
+  // const handshakeToken = getHeader(req, 'Clerk-Handshake-Token');
   const cookieToken = getCookie(req, constants.Cookies.Session);
   const headerToken = getHeader(req, 'authorization')?.replace('Bearer ', '');
+  // return decodeJwt(handshakeToken || cookieToken || headerToken || '');
   return decodeJwt(cookieToken || headerToken || '');
 };
