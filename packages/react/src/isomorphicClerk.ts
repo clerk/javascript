@@ -33,6 +33,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
+  Without,
 } from '@clerk/types';
 
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
@@ -62,7 +63,7 @@ type MethodName<T> = {
 
 type MethodCallback = () => Promise<unknown> | unknown;
 
-type IsomorphicLoadedClerk = Omit<
+type IsomorphicLoadedClerk = Without<
   LoadedClerk,
   /**
    * Override ClerkJS methods in order to support premountMethodCalls

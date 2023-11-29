@@ -146,10 +146,10 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
   };
 
-  public client?: ClientResource;
-  public session?: ActiveSessionResource | null;
-  public organization?: OrganizationResource | null;
-  public user?: UserResource | null;
+  public client: ClientResource | undefined;
+  public session: ActiveSessionResource | null | undefined;
+  public organization: OrganizationResource | null | undefined;
+  public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry?: TelemetryCollector;
 
