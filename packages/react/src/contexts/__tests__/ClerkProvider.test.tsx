@@ -224,4 +224,23 @@ describe('ClerkProvider', () => {
       expectTypeOf({ publishableKey: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
     });
   });
+
+  describe('navigation options', () => {
+    it('expects both routerPush & routerReplace to pass', () => {
+      expectTypeOf({
+        publishableKey: 'test',
+        children: '',
+        routerPush: () => {},
+        routerReplace: () => {},
+      }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('errors if one of routerPush / routerReplace is passed', () => {
+      expectTypeOf({
+        publishableKey: 'test',
+        children: '',
+        routerPush: () => {},
+      }).not.toMatchTypeOf<ClerkProviderProps>();
+    });
+  });
 });

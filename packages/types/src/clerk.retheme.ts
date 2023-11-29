@@ -495,7 +495,25 @@ export type CustomNavigation = (to: string, options?: NavigateOptions) => Promis
 
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
-export interface ClerkOptions {
+/**
+ * Navigation options used to replace or push history changes.
+ * Both `routerPush` & `routerReplace` OR none options should be passed.
+ */
+type ClerkOptionsNavigationFn =
+  | {
+      routerPush?: never;
+      routerReplace?: never;
+    }
+  | {
+      routerPush: (to: string) => Promise<unknown> | unknown;
+      routerReplace: (to: string) => Promise<unknown> | unknown;
+    };
+
+type ClerkOptionsNavigation = ClerkOptionsNavigationFn & {
+  routerDebug?: boolean;
+};
+
+export type ClerkOptions = ClerkOptionsNavigation & {
   appearance?: Appearance;
   localization?: LocalizationResource;
   /**
@@ -535,7 +553,7 @@ export interface ClerkOptions {
       };
 
   sdkMetadata?: SDKMetadata;
-}
+};
 
 export interface NavigateOptions {
   replace?: boolean;
