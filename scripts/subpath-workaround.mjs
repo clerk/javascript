@@ -27,8 +27,8 @@ async function run() {
   const allFilesNames = [
     ...subpathHelperFile.subpathNames,
     ...subpathHelperFile.subpathFoldersBarrel,
+    ...subpathHelperFile.ignoredFolders,
     'dist',
-    'scripts',
   ];
   const hasAllSubpathsInFiles = pkgFile.files.every(name => allFilesNames.includes(name));
 
