@@ -23,7 +23,7 @@ export const invalidStateError =
   'Invalid state. Feel free to submit a bug or reach out to support here: https://clerk.com/support';
 
 export const unsupportedNonBrowserDomainOrProxyUrlFunction =
-  'Unsupported usage of domain or proxyUrl. The usage of domain or proxyUrl as function is not supported in non-browser environments.';
+  'Unsupported usage of isSatellite, domain or proxyUrl. The usage of isSatellite, domain or proxyUrl as function is not supported in non-browser environments.';
 
 export const userProfilePageRenderedError =
   '<UserProfile.Page /> component needs to be a direct child of `<UserProfile />` or `<UserButton />`.';
