@@ -34,3 +34,11 @@ jobs:
             # ⚠️ Changes detected under the ClerkJS `ui` directory!
             **Don't forget to apply the same changes under the `/ui.retheme` directory:**
             `packages/clerk-js/src/ui/**` ➡️ `packages/clerk-js/src/ui.retheme/**`
+
+            Also, you may need to update the following files:
+            - `packages/localizations/src/en-US.retheme.ts`
+            - `packages/localizations/src/index.retheme.ts`
+            - `packages/types/src/appearance.retheme.ts`
+            - `packages/types/src/clerk.retheme.ts`
+            - `packages/types/src/index.retheme.ts`
+            - `packages/types/src/localization.retheme.ts`
