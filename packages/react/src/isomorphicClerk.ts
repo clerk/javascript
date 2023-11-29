@@ -64,6 +64,13 @@ type MethodCallback = () => Promise<unknown> | unknown;
 
 type IsomorphicLoadedClerk = Omit<
   LoadedClerk,
+  | 'buildSignInUrl'
+  | 'buildSignUpUrl'
+  | 'buildUserProfileUrl'
+  | 'buildCreateOrganizationUrl'
+  | 'buildOrganizationProfileUrl'
+  | 'buildHomeUrl'
+  | 'buildUrlWithAuth'
   | 'redirectWithAuth'
   | 'redirectToSignIn'
   | 'redirectToSignUp'
@@ -96,14 +103,29 @@ type IsomorphicLoadedClerk = Omit<
   // TODO: Align return type (maybe not possible or correct)
   getOrganization: (organizationId: string) => Promise<OrganizationResource | void>;
 
-  mountUserButton: (targetNode: HTMLDivElement, userButtonProps: UserButtonProps) => void;
-  mountOrganizationList: (targetNode: HTMLDivElement, props: OrganizationListProps) => void;
-  mountOrganizationSwitcher: (targetNode: HTMLDivElement, props: OrganizationSwitcherProps) => void;
-  mountOrganizationProfile: (targetNode: HTMLDivElement, props: OrganizationProfileProps) => void;
-  mountCreateOrganization: (targetNode: HTMLDivElement, props: CreateOrganizationProps) => void;
-  mountSignUp: (targetNode: HTMLDivElement, signUpProps: SignUpProps) => void;
-  mountSignIn: (targetNode: HTMLDivElement, signInProps: SignInProps) => void;
-  mountUserProfile: (targetNode: HTMLDivElement, userProfileProps: UserProfileProps) => void;
+  // TODO: Align return type
+  buildSignInUrl: (opts?: RedirectOptions) => string | void;
+  // TODO: Align return type
+  buildSignUpUrl: (opts?: RedirectOptions) => string | void;
+  // TODO: Align return type
+  buildUserProfileUrl: () => string | void;
+  // TODO: Align return type
+  buildCreateOrganizationUrl: () => string | void;
+  // TODO: Align return type
+  buildOrganizationProfileUrl: () => string | void;
+  // TODO: Align return type
+  buildHomeUrl: () => string | void;
+  // TODO: Align return type
+  buildUrlWithAuth: (to: string, opts?: BuildUrlWithAuthParams | undefined) => string | void;
+
+  mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
+  mountOrganizationList: (node: HTMLDivElement, props: OrganizationListProps) => void;
+  mountOrganizationSwitcher: (node: HTMLDivElement, props: OrganizationSwitcherProps) => void;
+  mountOrganizationProfile: (node: HTMLDivElement, props: OrganizationProfileProps) => void;
+  mountCreateOrganization: (node: HTMLDivElement, props: CreateOrganizationProps) => void;
+  mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
+  mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
+  mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
   client: ClientResource | undefined;
 };
 
@@ -194,43 +216,99 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     void this.loadClerkJS();
   }
 
-  /**
-   * These are missing from IsomorphicClerk.
-   * These need to be aligned because `useClerk` exported by `@clerk/clerk-react` returns LoadedClerk
-   * Calling `const {buildUrlWithAuth} = useClerk()` will result in a runtime error as the function does not exist
-   */
-  sdkMetadata?: SDKMetadata | undefined;
-  frontendApi: string;
-  isSatellite: boolean;
-  instanceType?: InstanceType | undefined;
-  isStandardBrowser?: boolean | undefined;
-  buildUrlWithAuth(to: string, opts?: BuildUrlWithAuthParams | undefined): string {
-    throw new Error('Method not implemented.');
+  get sdkMetadata(): SDKMetadata | undefined {
+    return this.clerkjs?.sdkMetadata || this.options.sdkMetadata || undefined;
   }
-  buildSignInUrl(opts?: RedirectOptions | undefined): string {
-    throw new Error('Method not implemented.');
-  }
-  buildSignUpUrl(opts?: RedirectOptions | undefined): string {
-    throw new Error('Method not implemented.');
-  }
-  buildUserProfileUrl(): string {
-    throw new Error('Method not implemented.');
-  }
-  buildCreateOrganizationUrl(): string {
-    throw new Error('Method not implemented.');
-  }
-  buildOrganizationProfileUrl(): string {
-    throw new Error('Method not implemented.');
-  }
-  buildHomeUrl(): string {
-    throw new Error('Method not implemented.');
-  }
-  handleUnauthenticated: () => Promise<unknown>;
-  isReady: () => boolean;
 
-  /**
-   * END OF METHODS THAT NEED TO BE ALIGNED
-   */
+  get instanceType(): InstanceType | undefined {
+    return this.clerkjs?.instanceType;
+  }
+
+  get frontendApi(): string {
+    return this.clerkjs?.frontendApi || '';
+  }
+
+  get isStandardBrowser(): boolean {
+    return this.clerkjs?.isStandardBrowser || false;
+  }
+
+  get isSatellite(): boolean {
+    return this.clerkjs?.isSatellite || false;
+  }
+
+  isReady = (): boolean => Boolean(this.clerkjs?.isReady());
+
+  buildSignInUrl = (opts?: RedirectOptions): string | void => {
+    const callback = () => this.clerkjs?.buildSignInUrl(opts) || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildSignInUrl', callback);
+    }
+  };
+
+  buildSignUpUrl = (opts?: RedirectOptions): string | void => {
+    const callback = () => this.clerkjs?.buildSignUpUrl(opts) || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildSignUpUrl', callback);
+    }
+  };
+
+  buildUserProfileUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildUserProfileUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildUserProfileUrl', callback);
+    }
+  };
+
+  buildCreateOrganizationUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildCreateOrganizationUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildCreateOrganizationUrl', callback);
+    }
+  };
+
+  buildOrganizationProfileUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildOrganizationProfileUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildOrganizationProfileUrl', callback);
+    }
+  };
+
+  buildHomeUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildHomeUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildHomeUrl', callback);
+    }
+  };
+
+  buildUrlWithAuth = (to: string, opts?: BuildUrlWithAuthParams | undefined): string | void => {
+    const callback = () => this.clerkjs?.buildUrlWithAuth(to, opts) || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildUrlWithAuth', callback);
+    }
+  };
+
+  handleUnauthenticated = async (): Promise<void> => {
+    const callback = () => this.clerkjs?.handleUnauthenticated();
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('handleUnauthenticated', callback);
+    }
+  };
 
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
     if (this.mode !== 'browser' || this.#loaded) {
