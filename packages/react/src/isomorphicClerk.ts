@@ -230,7 +230,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.instanceType;
   }
 
-  // TODO: Ask Dimtris why is this still here
   get frontendApi(): string {
     return this.clerkjs?.frontendApi || '';
   }
