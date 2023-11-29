@@ -39,6 +39,7 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   }
 
   let scriptHost = '';
+  // TODO @nikos: this should be refactored into a single utility
   if (!!proxyUrl && isValidProxyUrl(proxyUrl)) {
     scriptHost = proxyUrlToAbsoluteURL(proxyUrl).replace(/http(s)?:\/\//, '');
   } else if (domain && !isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || '')) {

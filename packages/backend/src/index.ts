@@ -28,7 +28,7 @@ export type ClerkOptions = CreateBackendApiOptions &
 export function Clerk(options: ClerkOptions) {
   const opts = { ...options };
   const apiClient = createBackendApiClient(opts);
-  const requestState = createAuthenticateRequest({ options: opts, apiClient });
+  const requestState = createAuthenticateRequest({ options: opts });
   const telemetry = new TelemetryCollector({
     ...options.telemetry,
     publishableKey: opts.publishableKey,

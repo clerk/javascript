@@ -3,25 +3,13 @@ import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
-import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
+import { AuthErrorReason, handshake, signedOut } from './authStatus';
 import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
-import type { InterstitialRuleOptions } from './interstitialRule';
-import {
-  crossOriginRequestWithoutHeader,
-  hasPositiveClientUatButCookieIsMissing,
-  hasValidCookieToken,
-  hasValidHeaderToken,
-  isNormalSignedOutState,
-  isPrimaryInDevAndRedirectsToSatellite,
-  isSatelliteAndNeedsSyncing,
-  nonBrowserRequestInDevRule,
-  potentialFirstLoadInDevWhenUATMissing,
-  potentialFirstRequestOnProductionEnvironment,
-  potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
-  runInterstitialRules,
-} from './interstitialRule';
+import type { HandshakeRulesOptions } from './handshakeRule';
+import { rules, runHandshakeRules } from './handshakeRule';
 import type { VerifyTokenOptions } from './verify';
+
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
     VerifyTokenOptions,
@@ -29,7 +17,11 @@ export type OptionalVerifyTokenOptions = Partial<
   >
 >;
 
-export type AuthenticateRequestOptions = AuthStatusOptionsType & OptionalVerifyTokenOptions & { request: Request };
+export type AuthenticateRequestOptions = AuthStatusOptionsType &
+  OptionalVerifyTokenOptions & {
+    request: Request;
+    handshakeToken?: string;
+  };
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
   if (!signInUrl && isDevelopmentFromSecretKey(key)) {
@@ -63,8 +55,9 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     ...options,
     ...loadOptionsFromHeaders(headers),
     ...loadOptionsFromCookies(cookies),
+    request: options.request,
     searchParams,
-  } satisfies InterstitialRuleOptions;
+  } satisfies HandshakeRulesOptions;
 
   assertValidSecretKey(ruleOptions.secretKey);
 
@@ -76,10 +69,27 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     assertProxyUrlOrDomain(ruleOptions.proxyUrl || ruleOptions.domain);
   }
 
+  function handleError(err: unknown, tokenCarrier: TokenCarrier) {
+    if (!(err instanceof TokenVerificationError)) {
+      return signedOut(ruleOptions, AuthErrorReason.UnexpectedError, (err as Error).message);
+    }
+
+    err.tokenCarrier = tokenCarrier;
+    const recoverableErrors = [
+      TokenVerificationErrorReason.TokenExpired,
+      TokenVerificationErrorReason.TokenNotActiveYet,
+    ].includes(err.reason);
+
+    if (!recoverableErrors || tokenCarrier === 'header') {
+      return signedOut(ruleOptions, err.reason, err.getFullMessage());
+    }
+
+    return handshake(ruleOptions, err.reason, err.getFullMessage());
+  }
+
   async function authenticateRequestWithTokenInHeader() {
     try {
-      const state = await runInterstitialRules(ruleOptions, [hasValidHeaderToken]);
-      return state;
+      return await runHandshakeRules(ruleOptions, [rules.hasValidHeaderToken]);
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -87,57 +97,19 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
   async function authenticateRequestWithTokenInCookie() {
     try {
-      const state = await runInterstitialRules(ruleOptions, [
-        crossOriginRequestWithoutHeader,
-        nonBrowserRequestInDevRule,
-        isSatelliteAndNeedsSyncing,
-        isPrimaryInDevAndRedirectsToSatellite,
-        potentialFirstRequestOnProductionEnvironment,
-        potentialFirstLoadInDevWhenUATMissing,
-        potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
-        hasPositiveClientUatButCookieIsMissing,
-        isNormalSignedOutState,
-        hasValidCookieToken,
-      ]);
-
-      return state;
+      return await runHandshakeRules(ruleOptions, [rules.hasValidCookieToken]);
     } catch (err) {
       return handleError(err, 'cookie');
     }
   }
 
-  function handleError(err: unknown, tokenCarrier: TokenCarrier) {
-    if (err instanceof TokenVerificationError) {
-      err.tokenCarrier = tokenCarrier;
-
-      const reasonToReturnInterstitial = [
-        TokenVerificationErrorReason.TokenExpired,
-        TokenVerificationErrorReason.TokenNotActiveYet,
-      ].includes(err.reason);
-
-      if (reasonToReturnInterstitial) {
-        if (tokenCarrier === 'header') {
-          return unknownState(ruleOptions, err.reason, err.getFullMessage());
-        }
-        return interstitial(ruleOptions, err.reason, err.getFullMessage());
-      }
-      return signedOut(ruleOptions, err.reason, err.getFullMessage());
-    }
-    return signedOut(ruleOptions, AuthErrorReason.UnexpectedError, (err as Error).message);
-  }
-
-  if (ruleOptions.headerToken) {
-    return authenticateRequestWithTokenInHeader();
-  }
-  return authenticateRequestWithTokenInCookie();
+  return ruleOptions.headerToken ? authenticateRequestWithTokenInHeader() : authenticateRequestWithTokenInCookie();
 }
 
 export const debugRequestState = (params: RequestState) => {
-  const { isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain } = params;
-  return { isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain };
+  const { proxyUrl, reason, message, publishableKey, isSatellite, domain, status } = params;
+  return { proxyUrl, reason, message, publishableKey, isSatellite, domain, status };
 };
-
-export type DebugRequestSate = ReturnType<typeof debugRequestState>;
 
 /**
  * Load authenticate request options related to headers.
