@@ -54,11 +54,6 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
             borderBottomRightRadius: t.radii.$lg,
             ':hover': {
               backgroundColor: t.colors.$danger50,
-            },
-            ':hover .cl-userButtonPopoverActionButtonText__signOut': {
-              color: t.colors.$danger400,
-            },
-            ':hover .cl-userButtonPopoverActionButtonIcon__signOut': {
               color: t.colors.$danger400,
             },
           }),
@@ -113,11 +108,6 @@ export const MultiSessionActions = (props: SessionActionsProps) => {
             t => ({
               ':hover': {
                 backgroundColor: t.colors.$danger50,
-              },
-              ':hover .cl-userButtonPopoverActionButtonText__signOut': {
-                color: t.colors.$danger400,
-              },
-              ':hover .cl-userButtonPopoverActionButtonIcon__signOut': {
                 color: t.colors.$danger400,
               },
             }),

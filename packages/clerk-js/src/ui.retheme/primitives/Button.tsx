@@ -64,7 +64,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           [vars.border]: theme.colors.$blackAlpha200,
           [vars.accentLightest]: theme.colors.$blackAlpha50, // TODO: once we have the new color palette and style for pseudo classes
           [vars.accentLighter]: theme.colors.$blackAlpha300, // TODO: once we have the new color palette and style for pseudo classes
-          [vars.accent]: theme.colors.$primary800, // WIP reference: Updated to new color palette; previously `$colorText`
+          [vars.accent]: theme.colors.$blackAlpha800, // WIP reference: Updated to new color palette; previously `$colorText`
           [vars.accentDark]: theme.colors.$blackAlpha600, // TODO: once we have the new color palette and style for pseudo classes
           [vars.accentDarker]: theme.colors.$blackAlpha700, // TODO: once we have the new color palette and style for pseudo classes
         },

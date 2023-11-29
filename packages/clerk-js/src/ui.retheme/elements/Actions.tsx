@@ -100,7 +100,6 @@ export const Action = (props: ActionProps) => {
             icon={icon}
             sx={[
               theme => ({
-                color: theme.colors.$blackAlpha700,
                 width: theme.sizes.$4,
                 height: theme.sizes.$6,
               }),
@@ -114,7 +113,7 @@ export const Action = (props: ActionProps) => {
         elementId={textElementId}
         as='span'
         variant='smallMedium'
-        colorScheme='neutral'
+        colorScheme='inherit'
       />
       {trailing}
     </Button>
@@ -192,7 +191,6 @@ export const SmallAction = (props: ActionProps) => {
             elementId={iconElementId}
             icon={icon}
             sx={theme => ({
-              color: theme.colors.$blackAlpha800,
               width: theme.sizes.$4,
               height: theme.sizes.$4,
               marginRight: theme.space.$2,
@@ -206,7 +204,7 @@ export const SmallAction = (props: ActionProps) => {
         elementId={textElementId}
         as='span'
         variant='extraSmallMedium'
-        colorScheme='neutral'
+        colorScheme='inherit'
       />
       {trailing}
     </Button>
