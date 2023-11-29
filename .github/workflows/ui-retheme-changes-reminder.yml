@@ -2,6 +2,8 @@ name: UI Retheme Changes Reminder
 
 on:
   pull_request:
+    branches:
+      - main
     paths:
       - 'packages/clerk-js/src/ui/**'
 
