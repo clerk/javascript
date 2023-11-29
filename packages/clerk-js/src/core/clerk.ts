@@ -154,13 +154,13 @@ export default class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
   };
 
-  public client?: ClientResource;
-  public session?: ActiveSessionResource | null;
-  public organization?: OrganizationResource | null;
-  public user?: UserResource | null;
+  public client: ClientResource | undefined;
+  public session: ActiveSessionResource | null | undefined;
+  public organization: OrganizationResource | null | undefined;
+  public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public readonly frontendApi: string;
-  public readonly publishableKey?: string;
+  public readonly publishableKey: string | undefined;
 
   protected internal_last_error: ClerkAPIError | null = null;
 
@@ -189,6 +189,10 @@ export default class Clerk implements ClerkInterface {
 
   get version(): string {
     return Clerk.version;
+  }
+
+  get sdkMetadata(): SDKMetadata {
+    return Clerk.sdkMetadata;
   }
 
   get loaded(): boolean {
