@@ -47,11 +47,6 @@ export interface SignOut {
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
-export type SetSession = (
-  session: ActiveSessionResource | string | null,
-  beforeEmit?: BeforeEmitCallback,
-) => Promise<void>;
-
 /**
  * Main Clerk SDK object.
  */
