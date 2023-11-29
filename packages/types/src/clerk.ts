@@ -67,8 +67,12 @@ export interface Clerk {
    */
   sdkMetadata?: SDKMetadata;
 
+  /**
+   * If true the bootstrapping of Clerk.load() has completed successfully.
+   */
   loaded: boolean;
 
+  // TODO: Maybe remove ?
   frontendApi: string;
 
   /** Clerk Publishable Key string. */
@@ -434,6 +438,7 @@ export interface Clerk {
   /**
    * Returns true if bootstrapping with Clerk.load has completed successfully. Otherwise, returns false.
    */
+  // TODO: Should we deprecate this ?
   isReady: () => boolean;
 }
 

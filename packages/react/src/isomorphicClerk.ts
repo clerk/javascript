@@ -64,6 +64,9 @@ type MethodCallback = () => Promise<unknown> | unknown;
 
 type IsomorphicLoadedClerk = Omit<
   LoadedClerk,
+  /**
+   * Override ClerkJS methods in order to support premountMethodCalls
+   */
   | 'buildSignInUrl'
   | 'buildSignUpUrl'
   | 'buildUserProfileUrl'
@@ -75,6 +78,7 @@ type IsomorphicLoadedClerk = Omit<
   | 'redirectToSignIn'
   | 'redirectToSignUp'
   | 'handleRedirectCallback'
+  | 'handleUnauthenticated'
   | 'authenticateWithMetamask'
   | 'createOrganization'
   | 'getOrganization'
@@ -96,6 +100,7 @@ type IsomorphicLoadedClerk = Omit<
   redirectToSignUp: (options: SignUpRedirectOptions) => void;
   // TODO: Align return type and parms
   handleRedirectCallback: (params: HandleOAuthCallbackParams) => void;
+  handleUnauthenticated: () => void;
   // TODO: Align Promise unknown
   authenticateWithMetamask: (params: AuthenticateWithMetamaskParams) => Promise<void>;
   // TODO: Align return type (maybe not possible or correct)
@@ -118,6 +123,7 @@ type IsomorphicLoadedClerk = Omit<
   // TODO: Align return type
   buildUrlWithAuth: (to: string, opts?: BuildUrlWithAuthParams | undefined) => string | void;
 
+  // TODO: Align optional props
   mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
   mountOrganizationList: (node: HTMLDivElement, props: OrganizationListProps) => void;
   mountOrganizationSwitcher: (node: HTMLDivElement, props: OrganizationSwitcherProps) => void;
@@ -224,16 +230,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.instanceType;
   }
 
+  // TODO: Ask Dimtris why is this still here
   get frontendApi(): string {
     return this.clerkjs?.frontendApi || '';
   }
 
   get isStandardBrowser(): boolean {
-    return this.clerkjs?.isStandardBrowser || false;
+    return this.clerkjs?.isStandardBrowser || this.options.standardBrowser || false;
   }
 
   get isSatellite(): boolean {
-    return this.clerkjs?.isSatellite || false;
+    // This getter can run in environments where window is not available.
+    // In those cases we should expect and use domain as a string
+    if (typeof window !== 'undefined' && window.location) {
+      return handleValueOrFn(this.options.isSatellite, new URL(window.location.href), false);
+    }
+    if (typeof this.options.isSatellite === 'function') {
+      return errorThrower.throw(unsupportedNonBrowserDomainOrProxyUrlFunction);
+    }
+    return false;
   }
 
   isReady = (): boolean => Boolean(this.clerkjs?.isReady());
@@ -301,10 +316,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  handleUnauthenticated = async (): Promise<void> => {
+  handleUnauthenticated = (): void => {
     const callback = () => this.clerkjs?.handleUnauthenticated();
     if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<void>;
+      void callback();
     } else {
       this.premountMethodCalls.set('handleUnauthenticated', callback);
     }
