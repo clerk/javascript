@@ -5,6 +5,7 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   BeforeEmitCallback,
+  BuildUrlWithAuthParams,
   Clerk,
   ClientResource,
   CreateOrganizationParams,
@@ -13,10 +14,16 @@ import type {
   HandleEmailLinkVerificationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  InstanceType,
   ListenerCallback,
+  LoadedClerk,
   OrganizationListProps,
   OrganizationMembershipResource,
+  OrganizationProfileProps,
   OrganizationResource,
+  OrganizationSwitcherProps,
+  RedirectOptions,
+  SDKMetadata,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -30,7 +37,6 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types';
 
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
 import type {
@@ -57,10 +63,84 @@ type MethodName<T> = {
 
 type MethodCallback = () => Promise<unknown> | unknown;
 
-export default class IsomorphicClerk {
+type IsomorphicLoadedClerk = Omit<
+  LoadedClerk,
+  /**
+   * Override ClerkJS methods in order to support premountMethodCalls
+   */
+  | 'buildSignInUrl'
+  | 'buildSignUpUrl'
+  | 'buildUserProfileUrl'
+  | 'buildCreateOrganizationUrl'
+  | 'buildOrganizationProfileUrl'
+  | 'buildHomeUrl'
+  | 'buildUrlWithAuth'
+  | 'redirectWithAuth'
+  | 'redirectToSignIn'
+  | 'redirectToSignUp'
+  | 'handleRedirectCallback'
+  | 'handleUnauthenticated'
+  | 'authenticateWithMetamask'
+  | 'createOrganization'
+  | 'getOrganization'
+  | 'mountUserButton'
+  | 'mountOrganizationList'
+  | 'mountOrganizationSwitcher'
+  | 'mountOrganizationProfile'
+  | 'mountCreateOrganization'
+  | 'mountSignUp'
+  | 'mountSignIn'
+  | 'mountUserProfile'
+  | 'client'
+  | 'getOrganizationMemberships'
+> & {
+  // TODO: Align return type
+  redirectWithAuth: (...args: Parameters<Clerk['redirectWithAuth']>) => void;
+  // TODO: Align return type
+  redirectToSignIn: (options: SignInRedirectOptions) => void;
+  // TODO: Align return type
+  redirectToSignUp: (options: SignUpRedirectOptions) => void;
+  // TODO: Align return type and parms
+  handleRedirectCallback: (params: HandleOAuthCallbackParams) => void;
+  handleUnauthenticated: () => void;
+  // TODO: Align Promise unknown
+  authenticateWithMetamask: (params: AuthenticateWithMetamaskParams) => Promise<void>;
+  // TODO: Align return type (maybe not possible or correct)
+  createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource | void>;
+  // TODO: Align return type (maybe not possible or correct)
+  getOrganization: (organizationId: string) => Promise<OrganizationResource | void>;
+
+  // TODO: Align return type
+  buildSignInUrl: (opts?: RedirectOptions) => string | void;
+  // TODO: Align return type
+  buildSignUpUrl: (opts?: RedirectOptions) => string | void;
+  // TODO: Align return type
+  buildUserProfileUrl: () => string | void;
+  // TODO: Align return type
+  buildCreateOrganizationUrl: () => string | void;
+  // TODO: Align return type
+  buildOrganizationProfileUrl: () => string | void;
+  // TODO: Align return type
+  buildHomeUrl: () => string | void;
+  // TODO: Align return type
+  buildUrlWithAuth: (to: string, opts?: BuildUrlWithAuthParams | undefined) => string | void;
+
+  // TODO: Align optional props
+  mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
+  mountOrganizationList: (node: HTMLDivElement, props: OrganizationListProps) => void;
+  mountOrganizationSwitcher: (node: HTMLDivElement, props: OrganizationSwitcherProps) => void;
+  mountOrganizationProfile: (node: HTMLDivElement, props: OrganizationProfileProps) => void;
+  mountCreateOrganization: (node: HTMLDivElement, props: CreateOrganizationProps) => void;
+  mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
+  mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
+  mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
+  client: ClientResource | undefined;
+
+  getOrganizationMemberships: () => Promise<OrganizationMembershipResource[] | void>;
+};
+
+export default class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly mode: 'browser' | 'server';
-  private readonly frontendApi?: string;
-  private readonly publishableKey?: string;
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
@@ -83,6 +163,12 @@ export default class IsomorphicClerk {
   #loaded = false;
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
+  #frontendApi: string | undefined;
+  #publishableKey: string | undefined;
+
+  get publishableKey(): string | undefined {
+    return this.#publishableKey;
+  }
 
   get loaded(): boolean {
     return this.#loaded;
@@ -127,8 +213,8 @@ export default class IsomorphicClerk {
 
   constructor(options: IsomorphicClerkOptions) {
     const { Clerk = null, frontendApi, publishableKey } = options || {};
-    this.frontendApi = frontendApi;
-    this.publishableKey = publishableKey;
+    this.#frontendApi = frontendApi;
+    this.#publishableKey = publishableKey;
     this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
     this.options = options;
@@ -136,6 +222,108 @@ export default class IsomorphicClerk {
     this.mode = inBrowser() ? 'browser' : 'server';
     void this.loadClerkJS();
   }
+
+  get sdkMetadata(): SDKMetadata | undefined {
+    return this.clerkjs?.sdkMetadata || this.options.sdkMetadata || undefined;
+  }
+
+  get instanceType(): InstanceType | undefined {
+    return this.clerkjs?.instanceType;
+  }
+
+  get frontendApi(): string {
+    return this.clerkjs?.frontendApi || this.#frontendApi || '';
+  }
+
+  get isStandardBrowser(): boolean {
+    return this.clerkjs?.isStandardBrowser || this.options.standardBrowser || false;
+  }
+
+  get isSatellite(): boolean {
+    // This getter can run in environments where window is not available.
+    // In those cases we should expect and use domain as a string
+    if (typeof window !== 'undefined' && window.location) {
+      return handleValueOrFn(this.options.isSatellite, new URL(window.location.href), false);
+    }
+    if (typeof this.options.isSatellite === 'function') {
+      throw new Error(unsupportedNonBrowserDomainOrProxyUrlFunction);
+    }
+    return false;
+  }
+
+  isReady = (): boolean => Boolean(this.clerkjs?.isReady());
+
+  buildSignInUrl = (opts?: RedirectOptions): string | void => {
+    const callback = () => this.clerkjs?.buildSignInUrl(opts) || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildSignInUrl', callback);
+    }
+  };
+
+  buildSignUpUrl = (opts?: RedirectOptions): string | void => {
+    const callback = () => this.clerkjs?.buildSignUpUrl(opts) || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildSignUpUrl', callback);
+    }
+  };
+
+  buildUserProfileUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildUserProfileUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildUserProfileUrl', callback);
+    }
+  };
+
+  buildCreateOrganizationUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildCreateOrganizationUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildCreateOrganizationUrl', callback);
+    }
+  };
+
+  buildOrganizationProfileUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildOrganizationProfileUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildOrganizationProfileUrl', callback);
+    }
+  };
+
+  buildHomeUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildHomeUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildHomeUrl', callback);
+    }
+  };
+
+  buildUrlWithAuth = (to: string, opts?: BuildUrlWithAuthParams | undefined): string | void => {
+    const callback = () => this.clerkjs?.buildUrlWithAuth(to, opts) || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildUrlWithAuth', callback);
+    }
+  };
+
+  handleUnauthenticated = (): void => {
+    const callback = () => this.clerkjs?.handleUnauthenticated();
+    if (this.clerkjs && this.#loaded) {
+      void callback();
+    } else {
+      this.premountMethodCalls.set('handleUnauthenticated', callback);
+    }
+  };
 
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
     if (this.mode !== 'browser' || this.#loaded) {

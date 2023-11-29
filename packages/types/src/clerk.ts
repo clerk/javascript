@@ -60,14 +60,17 @@ export interface Clerk {
   /**
    * Clerk SDK version number.
    */
-  version?: string;
+  version: string | undefined;
 
   /**
    * If present, contains information about the SDK that the host application is using.
    * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
    */
-  sdkMetadata?: SDKMetadata;
+  sdkMetadata: SDKMetadata | undefined;
 
+  /**
+   * If true the bootstrapping of Clerk.load() has completed successfully.
+   */
   loaded: boolean;
 
   /**
@@ -77,10 +80,10 @@ export interface Clerk {
   frontendApi: string;
 
   /** Clerk Publishable Key string. */
-  publishableKey?: string;
+  publishableKey: string | undefined;
 
   /** Clerk Proxy url string. */
-  proxyUrl?: string;
+  proxyUrl: string | undefined;
 
   /** Clerk Satellite Frontend API string. */
   domain: string;
@@ -89,22 +92,22 @@ export interface Clerk {
   isSatellite: boolean;
 
   /** Clerk Instance type is defined from the Publishable key */
-  instanceType?: InstanceType;
+  instanceType: InstanceType | undefined;
 
   /** Clerk flag for loading Clerk in a standard browser setup */
-  isStandardBrowser?: boolean;
+  isStandardBrowser: boolean | undefined;
 
   /** Client handling most Clerk operations. */
-  client?: ClientResource;
+  client: ClientResource | undefined;
 
   /** Active Session. */
-  session?: ActiveSessionResource | null;
+  session: ActiveSessionResource | null | undefined;
 
   /** Active Organization */
-  organization?: OrganizationResource | null;
+  organization: OrganizationResource | null | undefined;
 
   /** Current User. */
-  user?: UserResource | null;
+  user: UserResource | null | undefined;
 
   /**
    * Signs out the current user on single-session instances, or all users on multi-session instances
@@ -790,8 +793,8 @@ export type UserButtonProps = {
    */
   showName?: boolean;
   /**
-     Controls the default state of the UserButton
-     */
+   * Controls the default state of the UserButton
+   */
   defaultOpen?: boolean;
   /**
    * Full URL or path to navigate after sign out is complete
@@ -851,8 +854,8 @@ type LooseExtractedParams<T extends string> = `:${T}` | (string & NonNullable<un
 
 export type OrganizationSwitcherProps = {
   /**
-     Controls the default state of the OrganizationSwitcher
-     */
+   * Controls the default state of the OrganizationSwitcher
+   */
   defaultOpen?: boolean;
   /**
    * By default, users can switch between organization and their personal account.
