@@ -3,6 +3,4 @@
 '@clerk/types': minor
 ---
 
-Update `<ClerkProvider/>` `routerPush` and `routerReplace` options to be both required or both missing.
-Also used internally the `Without` generic instead of `Omit` to resolve issues with complex types and
-partially making a type property optional.
+Update the TypeScript types of `<ClerkProvider />`. If you use the `routerPush` prop you're now required to also provide the `routerReplace` prop (or other way around). You can also not provide them at all since both props are optional.
