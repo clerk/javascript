@@ -77,14 +77,24 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   }
 
   async function authenticateRequestWithTokenInCookie() {
-    function buildRedirectToHandshake(publishableKey: string, devBrowserToken?: string): URL {
+    function buildRedirectToHandshake({
+      publishableKey,
+      devBrowserToken,
+      redirectUrl,
+    }: {
+      publishableKey: string;
+      devBrowserToken: string;
+      redirectUrl: string;
+    }): string {
       const pk = parsePublishableKey(publishableKey);
 
       const url = new URL(`https://${pk?.frontendApi}/v1/client/handshake`);
+      url.searchParams.append('redirect_url', redirectUrl);
+
       if (pk?.instanceType === 'development' && devBrowserToken) {
         url.searchParams.append('__clerk_db_jwt', devBrowserToken);
       }
-      return url;
+      return url.href;
     }
 
     async function verifyRequestState(options: InterstitialRuleOptions, token: string) {
@@ -149,7 +159,11 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const headers = new Headers();
       headers.set(
         'Location',
-        buildRedirectToHandshake(ruleOptions.publishableKey!, ruleOptions.devBrowserToken).toString(),
+        buildRedirectToHandshake({
+          publishableKey: ruleOptions.publishableKey!,
+          devBrowserToken: ruleOptions.devBrowserToken!,
+          redirectUrl: ruleOptions.request.url.toString(),
+        }),
       );
 
       // TODO: Add status code for redirection
@@ -160,7 +174,11 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const headers = new Headers();
       headers.set(
         'Location',
-        buildRedirectToHandshake(ruleOptions.publishableKey!, ruleOptions.devBrowserToken).toString(),
+        buildRedirectToHandshake({
+          publishableKey: ruleOptions.publishableKey!,
+          devBrowserToken: ruleOptions.devBrowserToken!,
+          redirectUrl: ruleOptions.request.url.toString(),
+        }),
       );
 
       // TODO: Add status code for redirection
@@ -173,7 +191,11 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const headers = new Headers();
       headers.set(
         'Location',
-        buildRedirectToHandshake(ruleOptions.publishableKey!, ruleOptions.devBrowserToken).toString(),
+        buildRedirectToHandshake({
+          publishableKey: ruleOptions.publishableKey!,
+          devBrowserToken: ruleOptions.devBrowserToken!,
+          redirectUrl: ruleOptions.request.url.toString(),
+        }),
       );
 
       // TODO: Add status code for redirection
@@ -198,7 +220,11 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
           const headers = new Headers();
           headers.set(
             'Location',
-            buildRedirectToHandshake(ruleOptions.publishableKey!, ruleOptions.devBrowserToken).toString(),
+            buildRedirectToHandshake({
+              publishableKey: ruleOptions.publishableKey!,
+              devBrowserToken: ruleOptions.devBrowserToken!,
+              redirectUrl: ruleOptions.request.url.toString(),
+            }),
           );
 
           // TODO: Add status code for redirection
