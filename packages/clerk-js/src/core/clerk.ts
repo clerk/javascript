@@ -180,6 +180,10 @@ export class Clerk implements ClerkInterface {
     return Clerk.version;
   }
 
+  set sdkMetadata(metadata: SDKMetadata) {
+    Clerk.sdkMetadata = metadata;
+  }
+
   get sdkMetadata(): SDKMetadata {
     return Clerk.sdkMetadata;
   }
