@@ -29,7 +29,7 @@ export type SignedInState = {
   isInterstitial: false;
   isUnknown: false;
   toAuth: () => SignedInAuthObject;
-  headers: Headers | null;
+  headers: Headers;
 };
 
 export type SignedOutState = {
@@ -48,7 +48,7 @@ export type SignedOutState = {
   isInterstitial: false;
   isUnknown: false;
   toAuth: () => SignedOutAuthObject;
-  headers: Headers | null;
+  headers: Headers;
 };
 
 export type InterstitialState = Omit<SignedOutState, 'isInterstitial' | 'status' | 'toAuth'> & {
@@ -136,7 +136,7 @@ export type AuthStatusOptionsType = LoadResourcesOptions &
 export async function signedIn<T extends AuthStatusOptionsType>(
   options: T,
   sessionClaims: JwtPayload,
-  headers: Headers | null = null,
+  headers: Headers = new Headers(),
 ): Promise<SignedInState> {
   const {
     publishableKey = '',
@@ -212,7 +212,7 @@ export function signedOut<T extends AuthStatusOptionsType>(
   options: T,
   reason: AuthReason,
   message = '',
-  headers: Headers | null = null,
+  headers: Headers = new Headers(),
 ): SignedOutState {
   const {
     publishableKey = '',
