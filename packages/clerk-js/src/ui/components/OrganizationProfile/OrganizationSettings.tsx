@@ -89,11 +89,13 @@ const OrganizationDomainsSection = () => {
     >
       <DomainList redirectSubPath={'domain'} />
 
-      <AddBlockButton
-        textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
-        id='addOrganizationDomain'
-        onClick={() => navigate('domain')}
-      />
+      <Gate permission='org:sys_domains:manage'>
+        <AddBlockButton
+          textLocalizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
+          id='addOrganizationDomain'
+          onClick={() => navigate('domain')}
+        />
+      </Gate>
     </ProfileSection>
   );
 };

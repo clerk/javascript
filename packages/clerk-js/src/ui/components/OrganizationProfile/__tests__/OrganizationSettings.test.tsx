@@ -1,4 +1,4 @@
-import type { OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
+import type { ClerkPaginatedResponse, OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -66,7 +66,10 @@ describe('OrganizationSettings', () => {
   });
 
   it.skip('disables organization profile button and enables leave when user is not admin', async () => {
-    const adminsList: OrganizationMembershipResource[] = [createFakeMember({ id: '1', orgId: '1', role: 'admin' })];
+    const adminsList: ClerkPaginatedResponse<OrganizationMembershipResource> = {
+      data: [createFakeMember({ id: '1', orgId: '1', role: 'admin' })],
+      total_count: 1,
+    };
 
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
@@ -101,7 +104,7 @@ describe('OrganizationSettings', () => {
     expect(fixtures.clerk.organization?.getDomains).not.toBeCalled();
   });
 
-  it('shows domains when `read` permission exists', async () => {
+  it('shows domains when `read` permission exists but hides the Add domain button', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withOrganizationDomains();
@@ -120,6 +123,30 @@ describe('OrganizationSettings', () => {
 
     await new Promise(r => setTimeout(r, 100));
     expect(queryByText('Verified domains')).toBeInTheDocument();
+    expect(queryByText('Add domain')).not.toBeInTheDocument();
+    expect(fixtures.clerk.organization?.getDomains).toBeCalled();
+  });
+
+  it('shows domains and shows the Add domain button when `org:sys_domains:manage` exists', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withOrganizationDomains();
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', permissions: ['org:sys_domains:read', 'org:sys_domains:manage'] }],
+      });
+    });
+    fixtures.clerk.organization?.getDomains.mockReturnValue(
+      Promise.resolve({
+        data: [],
+        total_count: 0,
+      }),
+    );
+    const { queryByText } = await act(() => render(<OrganizationSettings />, { wrapper }));
+
+    await new Promise(r => setTimeout(r, 100));
+    expect(queryByText('Verified domains')).toBeInTheDocument();
+    expect(queryByText('Add domain')).toBeInTheDocument();
     expect(fixtures.clerk.organization?.getDomains).toBeCalled();
   });
 
@@ -159,18 +186,21 @@ describe('OrganizationSettings', () => {
     });
 
     it.skip('disabled leave organization button with delete organization button', async () => {
-      const adminsList: OrganizationMembershipResource[] = [
-        createFakeMember({
-          id: '1',
-          orgId: '1',
-          role: 'admin',
-        }),
-        createFakeMember({
-          id: '2',
-          orgId: '1',
-          role: 'admin',
-        }),
-      ];
+      const adminsList: ClerkPaginatedResponse<OrganizationMembershipResource> = {
+        data: [
+          createFakeMember({
+            id: '1',
+            orgId: '1',
+            role: 'admin',
+          }),
+          createFakeMember({
+            id: '2',
+            orgId: '1',
+            role: 'admin',
+          }),
+        ],
+        total_count: 2,
+      };
 
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
@@ -215,21 +245,18 @@ describe('OrganizationSettings', () => {
       expect(fixtures.router.navigate).toHaveBeenCalledWith('profile');
     });
 
-    it('navigates to Leave Organization page when clicking on the respective button and user is not admin', async () => {
-      const adminsList: OrganizationMembershipResource[] = [createFakeMember({ id: '1', orgId: '1', role: 'admin' })];
-
+    // TODO(@panteliselef): Update this test to allow user to leave an org, only if there will be at least one person left with the minimum set of permissions
+    it('navigates to Leave Organization page when clicking on the respective button', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.com'],
-          organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+          organization_memberships: [{ name: 'Org1', permissions: [] }],
         });
       });
 
-      fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
       const { findByText } = render(<OrganizationSettings />, { wrapper });
       await waitFor(async () => {
-        // expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
         await userEvent.click(await findByText(/leave organization/i, { exact: false }));
       });
       expect(fixtures.router.navigate).toHaveBeenCalledWith('leave');
