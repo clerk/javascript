@@ -9,6 +9,7 @@ export enum AuthStatus {
   SignedIn = 'signed-in',
   SignedOut = 'signed-out',
   Interstitial = 'interstitial',
+  Handshake = 'handshake',
   Unknown = 'unknown',
 }
 
@@ -28,6 +29,7 @@ export type SignedInState = {
   isInterstitial: false;
   isUnknown: false;
   toAuth: () => SignedInAuthObject;
+  headers: Headers | null;
 };
 
 export type SignedOutState = {
@@ -46,11 +48,19 @@ export type SignedOutState = {
   isInterstitial: false;
   isUnknown: false;
   toAuth: () => SignedOutAuthObject;
+  headers: Headers | null;
 };
 
 export type InterstitialState = Omit<SignedOutState, 'isInterstitial' | 'status' | 'toAuth'> & {
   status: AuthStatus.Interstitial;
   isInterstitial: true;
+  toAuth: () => null;
+};
+
+export type HandshakeState = Omit<SignedOutState, 'headers' | 'status' | 'toAuth'> & {
+  status: AuthStatus.Handshake;
+  headers: Headers;
+  isInterstitial: false;
   toAuth: () => null;
 };
 
@@ -61,6 +71,15 @@ export type UnknownState = Omit<InterstitialState, 'status' | 'isInterstitial' |
 };
 
 export enum AuthErrorReason {
+  SessionTokenMissing = 'session-token-missing',
+  SessionTokenWithoutClientUAT = 'session-token-but-no-client-uat',
+  ClientUATWithoutSessionToken = 'client-uat-but-no-session-token',
+  SessionTokenOutdated = 'session-token-outdated',
+  ClockSkew = 'clock-skew',
+  UnexpectedError = 'unexpected-error',
+  Unknown = 'unknown',
+
+  // Delete these old crap
   CookieAndUATMissing = 'cookie-and-uat-missing',
   CookieMissing = 'cookie-missing',
   CookieOutDated = 'cookie-outdated',
@@ -73,13 +92,11 @@ export enum AuthErrorReason {
   PrimaryRespondsToSyncing = 'primary-responds-to-syncing',
   StandardSignedIn = 'standard-signed-in',
   StandardSignedOut = 'standard-signed-out',
-  UnexpectedError = 'unexpected-error',
-  Unknown = 'unknown',
 }
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState = SignedInState | SignedOutState | InterstitialState | UnknownState;
+export type RequestState = SignedInState | SignedOutState | InterstitialState | HandshakeState | UnknownState;
 
 type LoadResourcesOptions = {
   loadSession?: boolean;
@@ -99,12 +116,16 @@ type RequestStateParams = {
 };
 
 type AuthParams = {
-  /* Client token cookie value */
-  cookieToken?: string;
+  /* Session token cookie value */
+  sessionTokenInCookie?: string;
+  /* Client token header value */
+  sessionTokenInHeader?: string;
   /* Client uat cookie value */
   clientUat?: string;
-  /* Client token header value */
-  headerToken?: string;
+  /* DevBrowser token value */
+  devBrowserToken?: string;
+  /* Handshake token value */
+  handshakeToken?: string;
 };
 
 export type AuthStatusOptionsType = LoadResourcesOptions &
@@ -115,6 +136,7 @@ export type AuthStatusOptionsType = LoadResourcesOptions &
 export async function signedIn<T extends AuthStatusOptionsType>(
   options: T,
   sessionClaims: JwtPayload,
+  headers: Headers | null = null,
 ): Promise<SignedInState> {
   const {
     publishableKey = '',
@@ -128,8 +150,8 @@ export async function signedIn<T extends AuthStatusOptionsType>(
     secretKey,
     apiUrl,
     apiVersion,
-    cookieToken,
-    headerToken,
+    sessionTokenInCookie,
+    sessionTokenInHeader,
     loadSession,
     loadUser,
     loadOrganization,
@@ -159,7 +181,7 @@ export async function signedIn<T extends AuthStatusOptionsType>(
       secretKey,
       apiUrl,
       apiVersion,
-      token: cookieToken || headerToken || '',
+      token: sessionTokenInCookie || sessionTokenInHeader || '',
       session,
       user,
       organization,
@@ -183,12 +205,14 @@ export async function signedIn<T extends AuthStatusOptionsType>(
     isInterstitial: false,
     isUnknown: false,
     toAuth: () => authObject,
+    headers,
   };
 }
 export function signedOut<T extends AuthStatusOptionsType>(
   options: T,
   reason: AuthReason,
   message = '',
+  headers: Headers | null = null,
 ): SignedOutState {
   const {
     publishableKey = '',
@@ -216,6 +240,7 @@ export function signedOut<T extends AuthStatusOptionsType>(
     isSignedIn: false,
     isInterstitial: false,
     isUnknown: false,
+    headers,
     toAuth: () => signedOutAuthObject({ ...options, status: AuthStatus.SignedOut, reason, message }),
   };
 }
@@ -252,6 +277,44 @@ export function interstitial<T extends AuthStatusOptionsType>(
     isInterstitial: true,
     isUnknown: false,
     toAuth: () => null,
+    headers: new Headers(),
+  };
+}
+
+export function handshake<T extends AuthStatusOptionsType>(
+  options: T,
+  reason: AuthReason,
+  message = '',
+  headers: Headers,
+): HandshakeState {
+  const {
+    publishableKey = '',
+    proxyUrl = '',
+    isSatellite = false,
+    domain = '',
+    signInUrl = '',
+    signUpUrl = '',
+    afterSignInUrl = '',
+    afterSignUpUrl = '',
+  } = options;
+
+  return {
+    status: AuthStatus.Handshake,
+    reason,
+    message,
+    publishableKey,
+    isSatellite,
+    domain,
+    proxyUrl,
+    signInUrl,
+    signUpUrl,
+    afterSignInUrl,
+    afterSignUpUrl,
+    isSignedIn: false,
+    isUnknown: false,
+    headers,
+    isInterstitial: false,
+    toAuth: () => null,
   };
 }
 
@@ -283,5 +346,6 @@ export function unknownState(options: AuthStatusOptionsType, reason: AuthReason,
     isInterstitial: false,
     isUnknown: true,
     toAuth: () => null,
+    headers: new Headers(),
   };
 }
