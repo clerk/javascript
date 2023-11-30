@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import { buildRequestUrl, constants } from '@clerk/backend';
+import { buildRequestUrl, constants, verifyToken } from '@clerk/backend';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
@@ -207,7 +207,9 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     console.log('skt 2.1 reqWithCookie', reqWithCookie.headers.get('cookie'));
     // todo: handle normal signed in or signed out
     const requestState = await authenticateRequest(reqWithCookie, options);
+
     if (requestState.status === 'handshake') {
+      console.log(requestState);
       throw new Error('invalid state, should be signed in or signed out at this point');
     }
 

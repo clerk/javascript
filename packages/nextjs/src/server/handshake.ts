@@ -65,7 +65,7 @@ export const startHandshake = async (request: Request, _opts: WithAuthOptions) =
 
   const dbJwt = req.clerkUrl.searchParams.get('__clerk_db_jwt') || req.cookies.get('__clerk_db_jwt');
   if (dbJwt) {
-    url.searchParams.set('__dev_session', dbJwt);
+    url.searchParams.set('__clerk_db_jwt', dbJwt);
   }
 
   return Response.redirect(url, 307);
@@ -82,12 +82,20 @@ const parseHandshakeResult = async (handshakeResult: string, opts: WithAuthOptio
     'Access-Control-Allow-Credentials': 'true',
   });
   let token = '';
+
+  console.log('cookies', cookiesToSet);
+  console.log('headers before', headersToSet);
+
   cookiesToSet.forEach((x: string) => {
     headersToSet.append('Set-Cookie', x);
     if (x.startsWith('__session=')) {
       token = x.split(';')[0].substring(10);
     }
   });
+
+  console.log('headers', headersToSet);
+
+  console.log('token', token);
 
   if (token === '') {
     return { status: AuthenticateRequestStatus.SignedOut, headers: headersToSet };
@@ -120,7 +128,7 @@ const authenticateRequestWithCookies = async (req: ClerkRequest, opts: WithAuthO
       status: AuthenticateRequestStatus.Handshake,
       reason: 'new-dev-browser',
       headers: new Headers({
-        'Set-Cookie': serializeCookie('__dev_session', newDevBrowser, { path: '/' }),
+        'Set-Cookie': serializeCookie('__clerk_db_jwt', newDevBrowser, { path: '/' }),
       }),
     };
   }

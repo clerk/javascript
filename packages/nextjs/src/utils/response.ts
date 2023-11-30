@@ -18,12 +18,16 @@ export const mergeResponses = (...responses: (NextResponse | Response | null | u
 
   for (const response of normalisedResponses) {
     response.headers.forEach((value: string, name: string) => {
-      finalResponse.headers.set(name, value);
+      if (name.toLocaleLowerCase() === 'set-cookie') {
+        finalResponse.headers.append(name, value);
+      } else {
+        finalResponse.headers.set(name, value);
+      }
     });
 
-    response.cookies.getAll().forEach(cookie => {
-      finalResponse.cookies.set(cookie.name, cookie.value);
-    });
+    // response.cookies.getAll().forEach(cookie => {
+    //   finalResponse.cookies.set(cookie.name, cookie.value);
+    // });
   }
 
   return finalResponse;
