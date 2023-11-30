@@ -60,7 +60,7 @@ export const Action = (props: ActionProps) => {
     <Button
       size='md'
       variant='ghost'
-      colorScheme='neutral'
+      colorScheme='secondary'
       textVariant='buttonSmallRegular'
       focusRing={false}
       hoverAsFocus
@@ -73,7 +73,6 @@ export const Action = (props: ActionProps) => {
           gap: theme.space.$3,
           padding: `${theme.space.$4} ${theme.space.$5}`,
           justifyContent: 'flex-start',
-          backgroundColor: theme.colors.$white,
         }),
         sx,
       ]}
@@ -153,7 +152,7 @@ export const SmallAction = (props: ActionProps) => {
     <Button
       size='xs'
       variant='ghost'
-      colorScheme='neutral'
+      colorScheme='secondary'
       textVariant='buttonSmallRegular'
       focusRing={false}
       hoverAsFocus

@@ -61,7 +61,6 @@ export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
 
           <FormButtonContainer>
             <NavigateToFlowStartButton
-              variant='solid'
               autoFocus
               localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
               elementDescriptor={descriptors.formButtonPrimary}

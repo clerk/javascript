@@ -23,7 +23,7 @@ const PageButton = (props: PropsOfComponent<typeof Button> & { isActive?: boolea
     <Button
       size='xs'
       variant='ghost'
-      colorScheme='neutral'
+      colorScheme='secondary'
       sx={t => [
         {
           color: t.colors.$colorText,
