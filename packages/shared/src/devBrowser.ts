@@ -1,4 +1,4 @@
-export const DEV_BROWSER_SSO_JWT_PARAMETER = '__dev_session';
+export const DEV_BROWSER_SSO_JWT_PARAMETER = '__clerk_db_jwt';
 export const DEV_BROWSER_JWT_MARKER = '__clerk_db_jwt';
 export const DEV_BROWSER_SSO_JWT_KEY = 'clerk-db-jwt';
 

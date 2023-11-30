@@ -1,3 +1,4 @@
+import type { AuthenticateRequestOptions } from '@clerk/backend';
 import { constants, debugRequestState } from '@clerk/backend';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -5,10 +6,9 @@ import { NextResponse } from 'next/server';
 import type { RequestState } from './clerkClient';
 import { clerkClient } from './clerkClient';
 import { CLERK_JS_URL, CLERK_JS_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from './constants';
-import type { WithAuthOptions } from './types';
 import { apiEndpointUnauthorizedNextResponse, handleMultiDomainAndProxy } from './utils';
 
-export const authenticateRequest = async (req: NextRequest, opts: WithAuthOptions) => {
+export const authenticateRequest = async (req: NextRequest, opts: AuthenticateRequestOptions) => {
   const { isSatellite, domain, signInUrl, proxyUrl } = handleMultiDomainAndProxy(req, opts);
   return await clerkClient.authenticateRequest({
     ...opts,
@@ -34,7 +34,7 @@ export const handleUnknownState = (requestState: RequestState) => {
   return response;
 };
 
-export const handleInterstitialState = (requestState: RequestState, opts: WithAuthOptions) => {
+export const handleInterstitialState = (requestState: RequestState, opts: AuthenticateRequestOptions) => {
   const response = new NextResponse(
     clerkClient.localInterstitial({
       publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
