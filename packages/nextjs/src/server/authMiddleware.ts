@@ -10,11 +10,11 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
-import { authenticateRequest, initHandshake } from './authenticateRequest';
+import { authenticateRequest } from './authenticateRequest';
 import { clerkClient } from './clerkClient';
 import { SECRET_KEY } from './constants';
 import { informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
-import { authenticateRequestHandshake } from './handshake';
+import { authenticateRequestHandshake, startHandshake } from './handshake';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
 import { isDevAccountPortalOrigin } from './url';
@@ -187,47 +187,66 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     // handle handshake
     const handshakeRes = await authenticateRequestHandshake(req, options);
+    console.log('skt 1 authenticateRequestHandshake', handshakeRes, options);
     if (handshakeRes.status === 'handshake') {
-      return initHandshake(req, options);
+      return startHandshake(req, options);
     }
 
     let reqWithCookie = req;
+    // If we have a handshake token here it means we just got back from
+    // the handshake redirect. Set it on the req temporarily so that we can
+    // reuse the existing mechanisms. Pending refactor.
     if (handshakeRes.handshakeToken) {
-      const newCookies = { ...req.cookies, __session: handshakeRes.handshakeToken };
-      const cookieHeaderString = Object.entries(newCookies).join('; ');
-      console.log({ cookieHeaderString });
+      req.cookies.delete('__session');
+      const oldCookiesString = req.cookies.toString();
+      const newCookiesString = `${oldCookiesString}; __session=${handshakeRes.handshakeToken}`;
       reqWithCookie = withNormalizedClerkUrl(
-        new NextRequest(req.url, {
-          ...req,
-          headers: {
-            ...req.headers,
-            cookie: cookieHeaderString,
-          },
-        }),
+        new NextRequest(req.url, { ...req, headers: { ...req.headers, cookie: newCookiesString } }),
       );
     }
-
+    console.log('skt 2.1 reqWithCookie', reqWithCookie.headers.get('cookie'));
     // todo: handle normal signed in or signed out
     const requestState = await authenticateRequest(reqWithCookie, options);
     if (requestState.status === 'handshake') {
       throw new Error('invalid state, should be signed in or signed out at this point');
     }
 
-    console.log('skt signed in or signed out');
     // signed in or signed out
     const auth = Object.assign(requestState.toAuth(), {
       isPublicRoute: isPublicRoute(reqWithCookie),
       isApiRoute: isApiRoute(reqWithCookie),
     });
+
+    console.log('skt 3 signed in or signed out', auth.sessionId);
     logger.debug(() => ({ auth: JSON.stringify(auth), debug: auth.debug() }));
     const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, reqWithCookie, evt);
-    const finalRes = mergeResponses(beforeAuthRes, afterAuthRes) || NextResponse.next();
+    const resWithHeadersFromHandshake = new NextResponse(null, { headers: handshakeRes.headers });
 
-    if (handshakeRes.headers) {
-      for (const [key, value] of Object.entries(handshakeRes.headers)) {
-        finalRes.headers.append(key, value);
-      }
-    }
+    // Remove the handshake token from the search params if it exists.
+    // Otherwise, refresh the page after 1 minute will result in a stale token and error
+    // as we check whether a handshake token exists in order to complete the handshake flow
+    const shouldRemoveHandshakeFromSearchParams = !!reqWithCookie.nextUrl.searchParams.get('__clerk_handshake');
+    const urlWithoutHandshake = new URL(reqWithCookie.nextUrl);
+    urlWithoutHandshake.searchParams.delete('__clerk_handshake');
+    urlWithoutHandshake.searchParams.delete('__clerk_help');
+
+    const finalRes =
+      mergeResponses(
+        beforeAuthRes,
+        afterAuthRes,
+        resWithHeadersFromHandshake,
+        shouldRemoveHandshakeFromSearchParams
+          ? new NextResponse(null, {
+              status: 307,
+              headers: new Headers({ Location: urlWithoutHandshake.toString() }),
+            })
+          : null,
+      ) || NextResponse.next();
+
+    console.log('skt 3.1 ', {
+      headerstoset: handshakeRes.headers && [...handshakeRes.headers.entries()],
+      finalHeaders: [...finalRes.headers.entries()],
+    });
 
     logger.debug(() => ({ mergedHeaders: stringifyHeaders(finalRes.headers) }));
 

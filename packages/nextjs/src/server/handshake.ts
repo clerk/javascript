@@ -1,8 +1,11 @@
 import { verifyToken } from '@clerk/backend';
+import { parsePublishableKey } from '@clerk/shared/keys';
+import { joinPaths } from '@clerk/shared/url';
 import { serialize as serializeCookie } from 'cookie';
 
 import type { ClerkRequest } from './clerk-request';
 import { createClerkRequest } from './clerk-request';
+import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 import type { WithAuthOptions } from './types';
 
 export const AuthenticateRequestStatus = {
@@ -13,11 +16,66 @@ export const AuthenticateRequestStatus = {
 
 export type AuthenticateRequestStatus = (typeof AuthenticateRequestStatus)[keyof typeof AuthenticateRequestStatus];
 
+export const authenticateRequestHandshake = async (
+  req: Request,
+  opts: WithAuthOptions,
+): Promise<AuthenticateRequestResult> => {
+  const clerkReq = createClerkRequest(req);
+  const options = {
+    ...opts,
+    secretKey: opts.secretKey || SECRET_KEY,
+    publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
+    apiUrl: API_URL,
+  };
+  console.log('authenticateRequestHandshake', { options });
+
+  if (clerkReq.headers.get('Authorization')) {
+    return authenticateRequestWithAuthorizationHeader(clerkReq, options);
+  }
+
+  const handshakeResult = getHandshakeResult(clerkReq);
+  if (handshakeResult) {
+    return parseHandshakeResult(handshakeResult, options);
+  }
+
+  return authenticateRequestWithCookies(clerkReq, options);
+};
+
+/**
+ * Init a handshake with Clerk FAPI by returning a 307 redirect to the /handshake endpoint.
+ */
+export const startHandshake = async (request: Request, _opts: WithAuthOptions) => {
+  // TODO:
+  const options = {
+    ..._opts,
+    secretKey: _opts.secretKey || SECRET_KEY,
+    publishableKey: _opts.publishableKey || PUBLISHABLE_KEY,
+    apiUrl: API_URL,
+  };
+  console.log('startHandshake', { options });
+  const req = createClerkRequest(request);
+  const parsedKey = parsePublishableKey(options.publishableKey);
+  if (!parsedKey) {
+    throw new Error('Invalid publishable key');
+  }
+
+  const url = new URL(`https://${parsedKey.frontendApi}`);
+  url.pathname = joinPaths(url.pathname, API_VERSION, '/client/handshake');
+  url.searchParams.set('redirect_url', req.clerkUrl.toString());
+
+  const dbJwt = req.clerkUrl.searchParams.get('__clerk_db_jwt') || req.cookies.get('__clerk_db_jwt');
+  if (dbJwt) {
+    url.searchParams.set('__dev_session', dbJwt);
+  }
+
+  return Response.redirect(url, 307);
+};
+
 const getHandshakeResult = (req: ClerkRequest) => {
   return req.cookies.get('__clerk_handshake') || req.clerkUrl.searchParams.get('__clerk_handshake');
 };
 
-const parseHandshakeResult = async (handshakeResult: string) => {
+const parseHandshakeResult = async (handshakeResult: string, opts: WithAuthOptions) => {
   const cookiesToSet = JSON.parse(atob(handshakeResult)) as string[];
   const headersToSet = new Headers({
     'Access-Control-Allow-Origin': 'null',
@@ -36,10 +94,10 @@ const parseHandshakeResult = async (handshakeResult: string) => {
   }
 
   try {
-    await verifyToken(token, {} as any);
+    await verifyRequestState(token, opts);
     return { status: AuthenticateRequestStatus.SignedIn, headers: headersToSet, handshakeToken: token };
-  } catch (e) {
-    return { status: AuthenticateRequestStatus.SignedOut, reason: 'handshake-token-invalid' };
+  } catch (e: any) {
+    return { status: AuthenticateRequestStatus.SignedOut, reason: e.reason };
   }
 };
 
@@ -49,8 +107,8 @@ const authenticateRequestWithAuthorizationHeader = async (req: ClerkRequest, opt
   try {
     await verifyRequestState(token, opts);
     return { status: AuthenticateRequestStatus.SignedIn };
-  } catch (e) {
-    return { status: AuthenticateRequestStatus.SignedOut, reason: 'header-token-invalid' };
+  } catch (e: any) {
+    return { status: AuthenticateRequestStatus.SignedOut, reason: e.reason };
   }
 };
 
@@ -62,7 +120,7 @@ const authenticateRequestWithCookies = async (req: ClerkRequest, opts: WithAuthO
       status: AuthenticateRequestStatus.Handshake,
       reason: 'new-dev-browser',
       headers: new Headers({
-        'Set-Cookie': serializeCookie('__clerk_db_jwt', newDevBrowser, { path: '/' }),
+        'Set-Cookie': serializeCookie('__dev_session', newDevBrowser, { path: '/' }),
       }),
     };
   }
@@ -120,22 +178,4 @@ type AuthenticateRequestResult = {
   reason?: string;
   headers?: Headers;
   handshakeToken?: string;
-};
-
-export const authenticateRequestHandshake = async (
-  req: Request,
-  opts: WithAuthOptions,
-): Promise<AuthenticateRequestResult> => {
-  const clerkReq = createClerkRequest(req);
-
-  if (clerkReq.headers.get('Authorization')) {
-    return authenticateRequestWithAuthorizationHeader(clerkReq, opts);
-  }
-
-  const handshakeResult = getHandshakeResult(clerkReq);
-  if (handshakeResult) {
-    return parseHandshakeResult(handshakeResult);
-  }
-
-  return authenticateRequestWithCookies(clerkReq, opts);
 };
