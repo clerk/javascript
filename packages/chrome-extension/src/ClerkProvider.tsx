@@ -3,9 +3,8 @@ import type { ClerkProp, ClerkProviderProps as ClerkReactProviderProps } from '@
 import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
-import type { TokenCache } from './cache';
-import { ChromeStorageCache } from './cache';
 import { buildClerk } from './singleton';
+import type { StorageCache } from './utils/storage';
 
 Clerk.sdkMetadata = {
   name: PACKAGE_NAME,
@@ -18,30 +17,29 @@ __internal__setErrorThrowerOptions({
 
 type WebSSOClerkProviderCustomProps =
   | {
+      syncSessionHost?: never;
       syncSessionWithTab?: false;
-      tokenCache?: never;
+      storageCache?: never;
     }
   | {
+      syncSessionHost?: string;
       syncSessionWithTab: true;
-      tokenCache?: TokenCache;
+      storageCache?: StorageCache;
     };
 
 type WebSSOClerkProviderProps = ClerkReactProviderProps & WebSSOClerkProviderCustomProps;
 
 const WebSSOClerkProvider = (props: WebSSOClerkProviderProps): JSX.Element | null => {
-  const { children, tokenCache: runtimeTokenCache, ...rest } = props;
+  const { children, storageCache: runtimeStorageCache, syncSessionWithTab, ...rest } = props;
   const { publishableKey = '' } = props;
 
   const [clerkInstance, setClerkInstance] = React.useState<ClerkProp>(null);
 
-  // When syncSessionWithTab is set tokenCache is an optional parameter that defaults to ChromeStorageCache
-  const tokenCache = runtimeTokenCache || ChromeStorageCache;
-
   React.useEffect(() => {
     void (async () => {
-      setClerkInstance(await buildClerk({ publishableKey, tokenCache }));
+      setClerkInstance(await buildClerk({ publishableKey, storageCache: runtimeStorageCache }));
     })();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!clerkInstance) {
     return null;
@@ -74,13 +72,6 @@ const StandaloneClerkProvider = (props: ClerkReactProviderProps): JSX.Element =>
 type ChromeExtensionClerkProviderProps = WebSSOClerkProviderProps;
 
 export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
-  const { tokenCache, syncSessionWithTab, ...rest } = props;
-  return syncSessionWithTab ? (
-    <WebSSOClerkProvider
-      {...props}
-      tokenCache={tokenCache}
-    />
-  ) : (
-    <StandaloneClerkProvider {...rest} />
-  );
+  const { syncSessionHost, storageCache, syncSessionWithTab, ...rest } = props;
+  return syncSessionWithTab ? <WebSSOClerkProvider {...props} /> : <StandaloneClerkProvider {...rest} />;
 }

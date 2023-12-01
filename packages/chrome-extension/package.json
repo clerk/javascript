@@ -46,13 +46,15 @@
   },
   "dependencies": {
     "@clerk/clerk-js": "5.0.0-alpha-v5.9",
-    "@clerk/clerk-react": "5.0.0-alpha-v5.9"
+    "@clerk/clerk-react": "5.0.0-alpha-v5.9",
+    "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
     "@types/chrome": "*",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "@types/webextension-polyfill": "^0.10.7",
     "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
