@@ -2,7 +2,20 @@
 import { default as chalk } from 'chalk';
 
 const getRandomChalkColor = () => {
-  const colors = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan'];
+  const colors = [
+    'red',
+    'green',
+    'yellow',
+    'blue',
+    'magenta',
+    'cyan',
+    'redBright',
+    'greenBright',
+    'yellowBright',
+    'blueBright',
+    'magentaBright',
+    'cyanBright',
+  ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
