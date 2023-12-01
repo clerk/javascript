@@ -48,7 +48,6 @@ export const SuccessPage = (props: SuccessPageProps) => {
 
       <FormButtonContainer>
         <NavigateToFlowStartButton
-          variant='solid'
           autoFocus
           //Do we need a separate key here?
           localizationKey={finishLabel || localizationKeys('userProfile.formButtonPrimary__finish')}

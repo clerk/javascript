@@ -42,6 +42,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       sx={t => ({
         borderBottomLeftRadius: t.radii.$lg,
         borderBottomRightRadius: t.radii.$lg,
+        backgroundColor: t.colors.$colorBackground,
       })}
     />
   );
@@ -67,20 +68,11 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         icon={SignOut}
         label={localizationKeys('userButton.action__signOutAll')}
         onClick={handleSignOutAllClicked}
+        colorScheme='danger'
         sx={t => ({
           padding: `${t.space.$2} ${t.space.$3}`,
-          backgroundColor: t.colors.$transparent,
           borderBottom: 'none',
           borderRadius: t.radii.$lg,
-          ':hover': {
-            backgroundColor: t.colors.$danger50,
-          },
-          ':hover .cl-userButtonPopoverActionButtonText__signOutAll': {
-            color: t.colors.$danger400,
-          },
-          ':hover .cl-userButtonPopoverActionButtonIcon__signOutAll': {
-            color: t.colors.$danger400,
-          },
         })}
       />
     </Actions>

@@ -128,7 +128,7 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
         <IconButton
           elementDescriptor={descriptors.modalCloseButton}
           variant='ghost'
-          colorScheme='neutral'
+          colorScheme='secondary'
           aria-label='Close modal'
           onClick={toggle}
           icon={

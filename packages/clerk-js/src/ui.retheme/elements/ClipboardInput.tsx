@@ -22,7 +22,7 @@ export const ClipboardInput = (props: PropsOfComponent<typeof Input>) => {
 
       <Button
         elementDescriptor={descriptors.formFieldInputCopyToClipboardButton}
-        variant='ghostIcon'
+        variant='secondary'
         tabIndex={-1}
         colorScheme={'primary'}
         onClick={onCopy}
