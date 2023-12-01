@@ -30,7 +30,9 @@ export const mergeResponses = (...responses: (NextResponse | Response | null | u
     });
 
     response.cookies.getAll().forEach(cookie => {
-      finalResponse.cookies.set(cookie.name, cookie.value);
+      const { name, value, ...options } = cookie;
+
+      finalResponse.cookies.set(name, value, options);
     });
   }
 

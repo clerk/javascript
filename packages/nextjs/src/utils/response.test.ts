@@ -29,10 +29,33 @@ describe('mergeResponses', function () {
     const response1 = new NextResponse();
     const response2 = new NextResponse();
     response1.cookies.set('foo', '1');
+    response1.cookies.set('second', '2');
     response1.cookies.set('bar', '1');
     response2.cookies.set('bar', '2');
     const finalResponse = mergeResponses(response1, response2);
     expect(finalResponse!.cookies.get('foo')).toEqual(response1.cookies.get('foo'));
+    expect(finalResponse!.cookies.get('second')).toEqual(response1.cookies.get('second'));
+    expect(finalResponse!.cookies.get('bar')).toEqual(response2.cookies.get('bar'));
+  });
+
+  it('should merge the cookies with non-response values', function () {
+    const response2 = NextResponse.next();
+    console.log(response2);
+    response2.cookies.set('foo', '1');
+    response2.cookies.set({
+      name: 'second',
+      value: '2',
+      path: '/',
+      sameSite: 'none',
+      secure: true,
+    });
+    response2.cookies.set('bar', '1', {
+      sameSite: 'none',
+      secure: true,
+    });
+    const finalResponse = mergeResponses(null, response2);
+    expect(finalResponse!.cookies.get('foo')).toEqual(response2.cookies.get('foo'));
+    expect(finalResponse!.cookies.get('second')).toEqual(response2.cookies.get('second'));
     expect(finalResponse!.cookies.get('bar')).toEqual(response2.cookies.get('bar'));
   });
 
