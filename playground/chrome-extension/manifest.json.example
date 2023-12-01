@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Clerk Chrome Extension Playground",
+  "description": "Playground App for the Clerk Chrome Extension",
+  "action": {
+    "default_popup": "src/pages/popup/index.html",
+    "default_icon": {
+      "32": "icon-32.png"
+    }
+  },
+  "icons": {
+    "128": "icon-128.png"
+  },
+  "permissions": [
+    "cookies",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://<YOUR_CLERK_FRONTEND_API_GOES_HERE>/"
+  ]
+}
