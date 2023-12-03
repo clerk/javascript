@@ -8,38 +8,22 @@ import type {
 import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
+export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
-export type experimental__CheckAuthorizationWithCustomPermissions = (
-  isAuthorizedParams: CheckAuthorizationParamsWithCustomPermissions,
-) => boolean;
+export type CheckAuthorizationWithCustomPermissions =
+  CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
 type CheckAuthorizationParamsWithCustomPermissions =
   | {
-      some: (
-        | {
-            role: OrganizationCustomRole;
-            permission?: never;
-          }
-        | {
-            role?: never;
-            permission: OrganizationCustomPermission;
-          }
-      )[];
-      role?: never;
-      permission?: never;
-    }
-  | {
-      some?: never;
       role: OrganizationCustomRole;
       permission?: never;
     }
   | {
-      some?: never;
       role?: never;
       permission: OrganizationCustomPermission;
     };
 
-export type CheckAuthorization = (isAuthorizedParams: CheckAuthorizationParams) => boolean;
+export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
 type CheckAuthorizationParams =
   | {
