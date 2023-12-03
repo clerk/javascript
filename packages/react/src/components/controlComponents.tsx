@@ -1,4 +1,9 @@
-import type { experimental__CheckAuthorizationWithCustomPermissions, HandleOAuthCallbackParams } from '@clerk/types';
+import type {
+  CheckAuthorizationWithCustomPermissions,
+  HandleOAuthCallbackParams,
+  OrganizationCustomPermission,
+  OrganizationCustomRole,
+} from '@clerk/types';
 import React from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -41,22 +46,63 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JS
   return <>{children}</>;
 };
 
-type GateProps = React.PropsWithChildren<
-  Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0] & {
+type ProtectProps = React.PropsWithChildren<
+  (
+    | {
+        condition?: never;
+        role: OrganizationCustomRole;
+        permission?: never;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission: OrganizationCustomPermission;
+      }
+    | {
+        condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
+        role?: never;
+        permission?: never;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission?: never;
+      }
+  ) & {
     fallback?: React.ReactNode;
   }
 >;
 
-/**
- * @experimental The component is experimental and subject to change in future releases.
- */
-export const experimental__Gate = ({ children, fallback, ...restAuthorizedParams }: GateProps) => {
-  const { experimental__has } = useAuth();
+export const Protect = ({ children, fallback, ...restAuthorizedParams }: ProtectProps) => {
+  const { has, userId, sessionId } = useAuth();
 
-  if (experimental__has(restAuthorizedParams)) {
+  /**
+   * If neither of the authorization params are passed behave as the `<SignedIn/>`
+   */
+  if (!restAuthorizedParams.condition && !restAuthorizedParams.role && !restAuthorizedParams.permission) {
+    if (userId && sessionId) {
+      return <>{children}</>;
+    }
+    return <>{fallback ?? null}</>;
+  }
+
+  /**
+   * Check against the results of `has` called inside the callback
+   */
+  if (typeof restAuthorizedParams.condition === 'function') {
+    if (restAuthorizedParams.condition(has)) {
+      return <>{children}</>;
+    }
+    return <>{fallback ?? null}</>;
+  }
+
+  if (has(restAuthorizedParams)) {
     return <>{children}</>;
   }
 
+  /**
+   * Fallback to custom ui or null if authorization checks failed
+   */
   return <>{fallback ?? null}</>;
 };
 

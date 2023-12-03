@@ -92,8 +92,7 @@ export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerMod
 /**
  * @experimental
  */
-export const Experimental__Gate =
-  ComponentsModule.Experimental__Gate as ServerComponentsServerModuleTypes['Experimental__Gate'];
+export const Protect = ComponentsModule.Protect as ServerComponentsServerModuleTypes['Protect'];
 
 export const auth = ServerHelperModule.auth as ServerHelpersServerModuleTypes['auth'];
 export const currentUser = ServerHelperModule.currentUser as ServerHelpersServerModuleTypes['currentUser'];

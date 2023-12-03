@@ -1,6 +1,6 @@
 import type {
   ActClaim,
-  experimental__CheckAuthorizationWithCustomPermissions,
+  CheckAuthorizationWithCustomPermissions,
   JwtPayload,
   OrganizationCustomPermission,
   OrganizationCustomRole,
@@ -35,10 +35,7 @@ export type SignedInAuthObject = {
   orgPermissions: OrganizationCustomPermission[] | undefined;
   organization: Organization | undefined;
   getToken: ServerGetToken;
-  /**
-   * @experimental The method is experimental and subject to change in future releases.
-   */
-  experimental__has: experimental__CheckAuthorizationWithCustomPermissions;
+  has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
 };
 
@@ -55,10 +52,7 @@ export type SignedOutAuthObject = {
   orgPermissions: null;
   organization: null;
   getToken: ServerGetToken;
-  /**
-   * @experimental The method is experimental and subject to change in future releases.
-   */
-  experimental__has: experimental__CheckAuthorizationWithCustomPermissions;
+  has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
 };
 
@@ -113,7 +107,7 @@ export function signedInAuthObject(
     orgPermissions,
     organization,
     getToken,
-    experimental__has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
+    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
     debug: createDebug({ ...options, ...debugData }),
   };
 }
@@ -132,7 +126,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgPermissions: null,
     organization: null,
     getToken: () => Promise.resolve(null),
-    experimental__has: () => false,
+    has: () => false,
     debug: createDebug(debugData),
   };
 }
@@ -178,7 +172,7 @@ export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T
 export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(obj: T): T => {
   // remove any non-serializable props from the returned object
 
-  const { debug, getToken, experimental__has, ...rest } = obj as unknown as AuthObject;
+  const { debug, getToken, has, ...rest } = obj as unknown as AuthObject;
   return rest as unknown as T;
 };
 
@@ -202,6 +196,7 @@ const createGetToken: CreateGetToken = params => {
   };
 };
 
+//MAYBE move this to @shared
 const createHasAuthorization =
   ({
     orgId,
@@ -213,9 +208,14 @@ const createHasAuthorization =
     orgId: string | undefined;
     orgRole: string | undefined;
     orgPermissions: string[] | undefined;
-  }): experimental__CheckAuthorizationWithCustomPermissions =>
+  }): CheckAuthorizationWithCustomPermissions =>
   params => {
-    if (!orgId || !userId || !orgPermissions) {
+    // TODO: assert
+    if (!params?.permission && !params?.role) {
+      throw 'Permission or role is required';
+    }
+
+    if (!orgId || !userId || !orgRole || !orgPermissions) {
       return false;
     }
 
@@ -225,18 +225,6 @@ const createHasAuthorization =
 
     if (params.role) {
       return orgRole === params.role;
-    }
-
-    if (params.some) {
-      return !!params.some.find(permObj => {
-        if (permObj.permission) {
-          return orgPermissions.includes(permObj.permission);
-        }
-        if (permObj.role) {
-          return orgRole === permObj.role;
-        }
-        return false;
-      });
     }
 
     return false;

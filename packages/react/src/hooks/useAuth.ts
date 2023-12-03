@@ -1,6 +1,6 @@
 import type {
   ActJWTClaim,
-  experimental__CheckAuthorizationWithCustomPermissions,
+  CheckAuthorizationWithCustomPermissions,
   GetToken,
   MembershipRole,
   SignOut,
@@ -13,9 +13,7 @@ import { invalidStateError } from '../errors';
 import { errorThrower } from '../utils';
 import { createGetToken, createSignOut } from './utils';
 
-type experimental__CheckAuthorizationSignedOut = (
-  params?: Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0],
-) => false;
+type CheckAuthorizationSignedOut = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 type UseAuthReturn =
   | {
@@ -27,10 +25,7 @@ type UseAuthReturn =
       orgId: undefined;
       orgRole: undefined;
       orgSlug: undefined;
-      /**
-       * @experimental The method is experimental and subject to change in future releases.
-       */
-      experimental__has: experimental__CheckAuthorizationSignedOut;
+      has: CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -43,10 +38,7 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      /**
-       * @experimental The method is experimental and subject to change in future releases.
-       */
-      experimental__has: experimental__CheckAuthorizationSignedOut;
+      has: CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -59,10 +51,7 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      /**
-       * @experimental The method is experimental and subject to change in future releases.
-       */
-      experimental__has: experimental__CheckAuthorizationSignedOut;
+      has: CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -75,10 +64,7 @@ type UseAuthReturn =
       orgId: string;
       orgRole: MembershipRole;
       orgSlug: string | null;
-      /**
-       * @experimental The method is experimental and subject to change in future releases.
-       */
-      experimental__has: experimental__CheckAuthorizationWithCustomPermissions;
+      has: CheckAuthorizationWithCustomPermissions;
       signOut: SignOut;
       getToken: GetToken;
     };
@@ -129,12 +115,13 @@ export const useAuth: UseAuth = () => {
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
   const has = useCallback(
-    (params?: Parameters<experimental__CheckAuthorizationWithCustomPermissions>[0]) => {
-      if (!orgId || !userId || !orgRole || !orgPermissions) {
-        return false;
+    (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
+      // TODO: assert
+      if (!params?.permission && !params?.role) {
+        throw 'Permission or role is required';
       }
 
-      if (!params) {
+      if (!orgId || !userId || !orgRole || !orgPermissions) {
         return false;
       }
 
@@ -146,17 +133,6 @@ export const useAuth: UseAuth = () => {
         return orgRole === params.role;
       }
 
-      if (params.some) {
-        return !!params.some.find(permObj => {
-          if (permObj.permission) {
-            return orgPermissions.includes(permObj.permission);
-          }
-          if (permObj.role) {
-            return orgRole === permObj.role;
-          }
-          return false;
-        });
-      }
       return false;
     },
     [orgId, orgRole, userId, orgPermissions],
@@ -172,7 +148,7 @@ export const useAuth: UseAuth = () => {
       orgId: undefined,
       orgRole: undefined,
       orgSlug: undefined,
-      experimental__has: () => false,
+      has: () => false,
       signOut,
       getToken,
     };
@@ -188,7 +164,7 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      experimental__has: () => false,
+      has: () => false,
       signOut,
       getToken,
     };
@@ -204,7 +180,7 @@ export const useAuth: UseAuth = () => {
       orgId,
       orgRole,
       orgSlug: orgSlug || null,
-      experimental__has: has,
+      has,
       signOut,
       getToken,
     };
@@ -220,7 +196,7 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      experimental__has: () => false,
+      has: () => false,
       signOut,
       getToken,
     };
