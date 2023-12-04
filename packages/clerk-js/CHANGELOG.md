@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.65.6
+
+### Patch Changes
+
+- Sync IsomorphicClerk with the clerk singleton and the LoadedClerk interface. IsomorphicClerk now extends from LoadedClerk. ([#2233](https://github.com/clerk/javascript/pull/2233)) by [@panteliselef](https://github.com/panteliselef)
+
+- Hide "Add domain" button inside `<OrganizationProfile/>` when user is missing the `org:sys_domains:manage` permission. ([#2250](https://github.com/clerk/javascript/pull/2250)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add setter for sdkMetadata on Clerk to address issues arising from older versions of the SDK. ([#2239](https://github.com/clerk/javascript/pull/2239)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
 ## 4.65.5
 
 ### Patch Changes
