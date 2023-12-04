@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useUserProfileContext } from '../../contexts';
 import { Breadcrumbs, NavBar, NavbarContextProvider } from '../../elements';
+import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
 
 export const UserProfileNavbar = (
@@ -11,6 +12,8 @@ export const UserProfileNavbar = (
   return (
     <NavbarContextProvider>
       <NavBar
+        title={localizationKeys('userProfile.navbar.title')}
+        description={localizationKeys('userProfile.navbar.description')}
         routes={pages.routes}
         contentRef={props.contentRef}
       />
