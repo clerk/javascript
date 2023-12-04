@@ -1,5 +1,7 @@
-const jwt = require('jsonwebtoken');
-const uuid = require('uuid');
+// @ts-ignore ignore types
+import * as jwt from 'jsonwebtoken';
+// @ts-ignore ignore types
+import * as uuid from 'uuid';
 
 const rsaPairs = {
   a: {
@@ -134,11 +136,8 @@ function generateConfig({
   return config;
 }
 
-function getJwksFromSecretKey(sk) {
-  return allConfigs.find(x => x.sk === sk);
+function getJwksFromSecretKey(sk: any) {
+  return allConfigs.find((x: any) => x.sk === sk);
 }
 
-module.exports = {
-  generateConfig,
-  getJwksFromSecretKey,
-};
+export { generateConfig, getJwksFromSecretKey };

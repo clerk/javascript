@@ -1,5 +1,8 @@
-import http from 'http';
-import cfg from './handshakeTestConfigs';
+// @ts-ignore ignore types
+import * as http from 'http';
+import * as cfg from './handshakeTestConfigs';
+
+console.log({ http, cfg });
 
 const pkHost = 'clerk.pktest.com';
 const domain = 'domaintest.com';
