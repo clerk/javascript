@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
+import { createTestUtils } from '../testUtils';
 
 test.describe('next middleware @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
@@ -11,7 +12,7 @@ test.describe('next middleware @nextjs', () => {
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
-        'src/app/middleware.ts',
+        'src/middleware.ts',
         () => `import { authMiddleware } from '@clerk/nextjs/server';
 import { NextResponse } from "next/server";
 
@@ -82,14 +83,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       .commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);
-    await app.build();
+    await app.dev();
   });
 
   test.afterAll(async () => {
     await app.teardown();
   });
 
-  test('authMiddleware passes through all cookies', () => {
-    // TODO
+  test('authMiddleware passes through all cookies', async ({ browser }) => {
+    // See https://playwright.dev/docs/api/class-browsercontext
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const u = createTestUtils({ app, page });
+
+    await page.goto(app.serverUrl);
+    await u.po.signIn.waitForMounted();
+
+    const cookies = await context.cookies();
+
+    expect(cookies.find(c => c.name == 'first').value).toBe('123456789');
+    expect(cookies.find(c => c.name == 'second').value).toBe('987654321');
+    expect(cookies.find(c => c.name == 'third').value).toBe('foobar');
+
+    await context.close();
   });
 });
