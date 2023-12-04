@@ -9,6 +9,10 @@ import { buildRequestLike } from './utils';
 
 type AuthSignedIn = AuthObjectWithoutResources<
   SignedInAuthObject & {
+    /**
+     * @experimental
+     * This function is experimental as it throws a Nextjs notFound error if user is not authenticated or authorized
+     */
     protect: (
       params?:
         | Parameters<CheckAuthorizationWithCustomPermissions>[0]
@@ -19,6 +23,10 @@ type AuthSignedIn = AuthObjectWithoutResources<
 
 type AuthSignedOut = AuthObjectWithoutResources<
   SignedOutAuthObject & {
+    /**
+     * @experimental
+     * This function is experimental as it throws a Nextjs notFound error if user is not authenticated or authorized
+     */
     protect: never;
   }
 >;
