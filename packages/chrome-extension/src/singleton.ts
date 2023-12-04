@@ -1,53 +1,58 @@
 import { Clerk } from '@clerk/clerk-js';
 import type { ClerkProp } from '@clerk/clerk-react';
+import { parsePublishableKey } from '@clerk/shared';
 
-import type { TokenCache } from './cache';
-import { convertPublishableKeyToFrontendAPIOrigin, getClientCookie } from './utils';
-
-const KEY = '__clerk_client_jwt';
+import { STORAGE_KEY_CLIENT_JWT } from './constants';
+import { logErrorHandler } from './errors';
+import { getClientCookie } from './utils/cookies';
+import { ChromeStorageCache } from './utils/storage';
 
 export let clerk: ClerkProp;
 
 type BuildClerkOptions = {
   publishableKey: string;
-  tokenCache: TokenCache;
 };
 
-// error handler that logs the error (used in cookie retrieval and token saving)
-const logErrorHandler = (err: Error) => console.error(err);
-
-export async function buildClerk({ publishableKey, tokenCache }: BuildClerkOptions): Promise<ClerkProp> {
-  if (!clerk) {
-    const clerkFrontendAPIOrigin = convertPublishableKeyToFrontendAPIOrigin(publishableKey);
-
-    const clientCookie = await getClientCookie(clerkFrontendAPIOrigin).catch(logErrorHandler);
-
-    // TODO: Listen to client cookie changes and sync updates
-    // https://developer.chrome.com/docs/extensions/reference/cookies/#event-onChanged
-
-    if (clientCookie) {
-      await tokenCache.saveToken(KEY, clientCookie.value).catch(logErrorHandler);
-    }
-
-    clerk = new Clerk(publishableKey);
-
-    // @ts-expect-error
-    clerk.__unstable__onBeforeRequest(async requestInit => {
-      requestInit.credentials = 'omit';
-      requestInit.url?.searchParams.append('_is_native', '1');
-
-      const jwt = await tokenCache.getToken(KEY);
-      (requestInit.headers as Headers).set('authorization', jwt || '');
-    });
-
-    // @ts-expect-error
-    clerk.__unstable__onAfterResponse(async (_, response) => {
-      const authHeader = response.headers.get('authorization');
-      if (authHeader) {
-        await tokenCache.saveToken(KEY, authHeader);
-      }
-    });
+export async function buildClerk({ publishableKey }: BuildClerkOptions): Promise<ClerkProp> {
+  if (clerk) {
+    return clerk;
   }
+
+  const { frontendApi, instanceType } = parsePublishableKey(publishableKey) || {};
+
+  if (!frontendApi || !instanceType) {
+    throw new Error('Invalid publishable key.');
+  }
+
+  const clientCookie = await getClientCookie(frontendApi).catch(logErrorHandler);
+
+  // TODO: Listen to client cookie changes and sync updates
+  // https://developer.chrome.com/docs/extensions/reference/cookies/#event-onChanged
+
+  const KEY = ChromeStorageCache.createKey(frontendApi, STORAGE_KEY_CLIENT_JWT);
+
+  if (clientCookie) {
+    await ChromeStorageCache.set(KEY, clientCookie.value).catch(logErrorHandler);
+  }
+
+  clerk = new Clerk(publishableKey);
+
+  // @ts-expect-error - Clerk doesn't expose this unstable method
+  clerk.__unstable__onBeforeRequest(async requestInit => {
+    requestInit.credentials = 'omit';
+    requestInit.url?.searchParams.append('_is_native', '1');
+
+    const jwt = await ChromeStorageCache.get(KEY);
+    (requestInit.headers as Headers).set('authorization', jwt || '');
+  });
+
+  // @ts-expect-error - Clerk doesn't expose this unstable method
+  clerk.__unstable__onAfterResponse(async (_, response) => {
+    const authHeader = response.headers.get('authorization');
+    if (authHeader) {
+      await ChromeStorageCache.set(KEY, authHeader);
+    }
+  });
 
   return clerk;
 }

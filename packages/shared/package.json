@@ -45,13 +45,16 @@
   "main": "./dist/index.js",
   "files": [
     "dist",
+    "apiUrlFromPublishableKey",
     "browser",
     "callWithRetry",
     "color",
+    "constants",
     "cookie",
     "date",
     "deprecated",
     "error",
+    "extensionSyncManager",
     "file",
     "globs",
     "handleValueOrFn",
@@ -62,13 +65,11 @@
     "localStorageBroadcastChannel",
     "poller",
     "proxy",
-    "underscore",
-    "url",
     "react",
-    "constants",
-    "apiUrlFromPublishableKey",
+    "telemetry",
     "scripts",
-    "telemetry"
+    "underscore",
+    "url"
   ],
   "scripts": {
     "build": "tsup",

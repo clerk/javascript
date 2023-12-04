@@ -3,8 +3,6 @@ import type { ClerkProp, ClerkProviderProps as ClerkReactProviderProps } from '@
 import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
-import type { TokenCache } from './cache';
-import { ChromeStorageCache } from './cache';
 import { buildClerk } from './singleton';
 
 Clerk.sdkMetadata = {
@@ -16,30 +14,21 @@ __internal__setErrorThrowerOptions({
   packageName: '@clerk/chrome-extension',
 });
 
-type WebSSOClerkProviderCustomProps =
-  | {
-      syncSessionWithTab?: false;
-      tokenCache?: never;
-    }
-  | {
-      syncSessionWithTab: true;
-      tokenCache?: TokenCache;
-    };
+type WebSSOClerkProviderCustomProps = {
+  syncSessionWithTab?: boolean;
+};
 
 type WebSSOClerkProviderProps = ClerkReactProviderProps & WebSSOClerkProviderCustomProps;
 
 const WebSSOClerkProvider = (props: WebSSOClerkProviderProps): JSX.Element | null => {
-  const { children, tokenCache: runtimeTokenCache, ...rest } = props;
+  const { children, ...rest } = props;
   const { publishableKey = '' } = props;
 
   const [clerkInstance, setClerkInstance] = React.useState<ClerkProp>(null);
 
-  // When syncSessionWithTab is set tokenCache is an optional parameter that defaults to ChromeStorageCache
-  const tokenCache = runtimeTokenCache || ChromeStorageCache;
-
   React.useEffect(() => {
     void (async () => {
-      setClerkInstance(await buildClerk({ publishableKey, tokenCache }));
+      setClerkInstance(await buildClerk({ publishableKey }));
     })();
   }, []);
 
@@ -73,14 +62,6 @@ const StandaloneClerkProvider = (props: ClerkReactProviderProps): JSX.Element =>
 
 type ChromeExtensionClerkProviderProps = WebSSOClerkProviderProps;
 
-export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
-  const { tokenCache, syncSessionWithTab, ...rest } = props;
-  return syncSessionWithTab ? (
-    <WebSSOClerkProvider
-      {...props}
-      tokenCache={tokenCache}
-    />
-  ) : (
-    <StandaloneClerkProvider {...rest} />
-  );
+export function ClerkProvider({ syncSessionWithTab, ...rest }: ChromeExtensionClerkProviderProps): JSX.Element | null {
+  return syncSessionWithTab ? <WebSSOClerkProvider {...rest} /> : <StandaloneClerkProvider {...rest} />;
 }
