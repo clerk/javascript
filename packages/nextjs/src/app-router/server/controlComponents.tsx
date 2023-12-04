@@ -1,7 +1,7 @@
 import type {
   CheckAuthorizationWithCustomPermissions,
-  OrganizationCustomPermission,
-  OrganizationCustomRole,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
 } from '@clerk/types';
 import React from 'react';
 
@@ -19,17 +19,17 @@ export function SignedOut(props: React.PropsWithChildren) {
   return userId ? null : <>{children}</>;
 }
 
-type GateServerComponentProps = React.PropsWithChildren<
+type ProtectServerComponentProps = React.PropsWithChildren<
   (
     | {
         condition?: never;
-        role: OrganizationCustomRole;
+        role: OrganizationCustomRoleKey;
         permission?: never;
       }
     | {
         condition?: never;
         role?: never;
-        permission: OrganizationCustomPermission;
+        permission: OrganizationCustomPermissionKey;
       }
     | {
         condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
@@ -46,11 +46,8 @@ type GateServerComponentProps = React.PropsWithChildren<
   }
 >;
 
-/**
- * @experimental The component is experimental and subject to change in future releases.
- */
-export function Protect(gateProps: GateServerComponentProps) {
-  const { children, fallback, ...restAuthorizedParams } = gateProps;
+export function Protect(props: ProtectServerComponentProps) {
+  const { children, fallback, ...restAuthorizedParams } = props;
   const { has, userId, sessionId } = auth();
 
   /**

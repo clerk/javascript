@@ -26,10 +26,7 @@ declare global {
 export interface OrganizationMembershipResource extends ClerkResource {
   id: string;
   organization: OrganizationResource;
-  /**
-   * @experimental The property is experimental and subject to change in future releases.
-   */
-  permissions: OrganizationPermission[];
+  permissions: OrganizationPermissionKey[];
   publicMetadata: OrganizationMembershipPublicMetadata;
   publicUserData: PublicUserData;
   role: MembershipRole;
@@ -39,8 +36,8 @@ export interface OrganizationMembershipResource extends ClerkResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-export type OrganizationCustomPermission = string;
-export type OrganizationCustomRole = string;
+export type OrganizationCustomPermissionKey = string;
+export type OrganizationCustomRoleKey = string;
 
 /**
  * @deprecated This type is deprecated and will be removed in the next major release.
@@ -50,7 +47,7 @@ export type OrganizationCustomRole = string;
  */
 export type MembershipRole = Autocomplete<'admin' | 'basic_member' | 'guest_member'>;
 
-export type OrganizationSystemPermission =
+export type OrganizationSystemPermissionKey =
   | 'org:sys_domains:manage'
   | 'org:sys_profile:manage'
   | 'org:sys_profile:delete'
@@ -62,7 +59,7 @@ export type OrganizationSystemPermission =
  * OrganizationPermission is a combination of system and custom permissions.
  * System permissions are only accessible from FAPI and client-side operations/utils
  */
-export type OrganizationPermission = Autocomplete<OrganizationSystemPermission>;
+export type OrganizationPermissionKey = Autocomplete<OrganizationSystemPermissionKey>;
 
 export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;

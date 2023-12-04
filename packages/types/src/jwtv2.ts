@@ -1,4 +1,4 @@
-import type { MembershipRole, OrganizationCustomPermission } from './organizationMembership';
+import type { MembershipRole, OrganizationCustomPermissionKey } from './organizationMembership';
 
 export interface Jwt {
   header: JwtHeader;
@@ -99,7 +99,7 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   /**
    * Active organization role
    */
-  org_permissions?: OrganizationCustomPermission[];
+  org_permissions?: OrganizationCustomPermissionKey[];
 
   /**
    * Any other JWT Claim Set member.
