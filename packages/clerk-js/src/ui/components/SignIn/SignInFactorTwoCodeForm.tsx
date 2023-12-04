@@ -1,9 +1,10 @@
 import { isUserLockedError } from '@clerk/shared/error';
+import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
@@ -32,10 +33,10 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigateAfterSignIn } = useSignInContext();
-  const { setActive } = useCoreClerk();
+  const { setActive } = useClerk();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
 
   React.useEffect(() => {
     if (props.factorAlreadyPrepared) {

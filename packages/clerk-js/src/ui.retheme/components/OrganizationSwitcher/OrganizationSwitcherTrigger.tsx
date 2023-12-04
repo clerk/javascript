@@ -1,13 +1,8 @@
+import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
 import { NotificationCountBadge, useGate } from '../../common';
-import {
-  useCoreOrganization,
-  useCoreOrganizationList,
-  useCoreUser,
-  useEnvironment,
-  useOrganizationSwitcherContext,
-} from '../../contexts';
+import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview, withAvatarShimmer } from '../../elements';
 import { Selector } from '../../icons';
@@ -22,15 +17,21 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
   forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>((props, ref) => {
     const { sx, ...rest } = props;
 
-    const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
-    const { organization } = useCoreOrganization();
+    const { user } = useUser();
+    const { organization } = useOrganization();
     const { hidePersonal } = useOrganizationSwitcherContext();
+
+    if (!user) {
+      return null;
+    }
+
+    const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
 
     return (
       <Button
         elementDescriptor={descriptors.organizationSwitcherTrigger}
         variant='ghost'
-        colorScheme='neutral'
+        colorScheme='secondary'
         sx={[t => ({ minHeight: 0, padding: `0 ${t.space.$2} 0 0`, position: 'relative' }), sx]}
         ref={ref}
         aria-label={`${props.isOpen ? 'Close' : 'Open'} organization switcher`}
@@ -77,13 +78,13 @@ const NotificationCountBadgeSwitcherTrigger = () => {
   /**
    * Prefetch user invitations and suggestions
    */
-  const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
+  const { userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
   const { organizationSettings } = useEnvironment();
   const { isAuthorizedUser: canAcceptRequests } = useGate({
     permission: 'org:sys_memberships:manage',
   });
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
-  const { membershipRequests } = useCoreOrganization({
+  const { membershipRequests } = useOrganization({
     membershipRequests: (isDomainsEnabled && canAcceptRequests) || undefined,
   });
 

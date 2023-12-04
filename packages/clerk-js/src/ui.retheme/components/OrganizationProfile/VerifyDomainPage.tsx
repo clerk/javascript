@@ -1,7 +1,8 @@
+import { useOrganization } from '@clerk/shared/react';
 import React, { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import {
@@ -21,7 +22,7 @@ import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 export const VerifyDomainPage = withCardStateProvider(() => {
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   const { params, navigate } = useRouter();
 
   const { data: domain, status: domainStatus } = useFetch(organization?.getDomain, {

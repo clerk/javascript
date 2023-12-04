@@ -1,4 +1,6 @@
-import { useCoreClerk, useEnvironment } from '../contexts';
+import { useClerk } from '@clerk/shared/react';
+
+import { useEnvironment } from '../contexts';
 import { MODIFIERS } from './localizationModifiers';
 
 export type GlobalTokens = {
@@ -29,7 +31,7 @@ export const applyTokensToString = (s: string | undefined, tokens: Tokens): stri
 
 export const useGlobalTokens = (): GlobalTokens => {
   const { applicationName } = useEnvironment().displayConfig;
-  const { client, user } = useCoreClerk();
+  const { client, user } = useClerk();
   const { signIn } = client;
 
   return {

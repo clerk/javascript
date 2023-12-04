@@ -1,6 +1,6 @@
+import { useOrganizationList } from '@clerk/shared/react';
 import type { OrganizationSuggestionResource } from '@clerk/types';
 
-import { useCoreOrganizationList } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { useCardState, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
@@ -10,7 +10,7 @@ import { organizationListParams } from './utils';
 
 export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResource) => {
   const card = useCardState();
-  const { userSuggestions } = useCoreOrganizationList({
+  const { userSuggestions } = useOrganizationList({
     userSuggestions: organizationListParams.userSuggestions,
   });
 

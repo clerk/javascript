@@ -1,6 +1,6 @@
+import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationInvitationResource } from '@clerk/types';
 
-import { useCoreOrganization } from '../../contexts';
 import { localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
@@ -16,7 +16,7 @@ const invitationsParams = {
 
 export const InvitedMembersList = () => {
   const card = useCardState();
-  const { organization, invitations } = useCoreOrganization(invitationsParams);
+  const { organization, invitations } = useOrganization(invitationsParams);
 
   const { options, isLoading: loadingRoles } = useFetchRoles();
 

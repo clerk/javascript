@@ -1,6 +1,6 @@
+import { useClerk } from '@clerk/shared/react';
 import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 
-import { useCoreClerk } from '../../contexts';
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import { Check } from '../../icons';
@@ -72,8 +72,6 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
-        border: theme.borders.$normal,
-        borderColor: theme.colors.$blackAlpha300, // we use this value in the Input primitive
       })}
     >
       <Select
@@ -105,7 +103,12 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
             borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
             borderBottomRightRadius: '0',
             borderTopRightRadius: '0',
-            zIndex: 2,
+            ':hover': {
+              zIndex: 2,
+            },
+            ':focus': {
+              zIndex: 2,
+            },
           })}
           isDisabled={rest.isDisabled}
         >
@@ -123,10 +126,15 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         />
       </Select>
 
-      <Flex sx={{ position: 'relative', width: '100%', marginLeft: 3 /* same as focus ring width */ }}>
+      <Flex
+        sx={{
+          position: 'relative',
+          width: '100%',
+        }}
+      >
         <Text
           variant='smallRegular'
-          sx={{ position: 'absolute', left: '1ch', top: '50%', transform: 'translateY(-50%)' }}
+          sx={{ position: 'absolute', left: '1ch', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
         >
           +{selectedCountryOption.country.code}
         </Text>
@@ -199,7 +207,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
 
 export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref) => {
   // @ts-expect-error
-  const { __internal_country } = useCoreClerk();
+  const { __internal_country } = useClerk();
 
   return (
     <PhoneInputBase

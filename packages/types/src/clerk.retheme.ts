@@ -47,11 +47,6 @@ export interface SignOut {
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
-export type SetSession = (
-  session: ActiveSessionResource | string | null,
-  beforeEmit?: BeforeEmitCallback,
-) => Promise<void>;
-
 /**
  * Main Clerk SDK object.
  */
@@ -59,14 +54,17 @@ export interface Clerk {
   /**
    * Clerk SDK version number.
    */
-  version?: string;
+  version: string | undefined;
 
   /**
    * If present, contains information about the SDK that the host application is using.
    * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
    */
-  sdkMetadata?: SDKMetadata;
+  sdkMetadata: SDKMetadata | undefined;
 
+  /**
+   * If true the bootstrapping of Clerk.load() has completed successfully.
+   */
   loaded: boolean;
 
   frontendApi: string;
@@ -75,7 +73,7 @@ export interface Clerk {
   publishableKey: string;
 
   /** Clerk Proxy url string. */
-  proxyUrl?: string;
+  proxyUrl: string | undefined;
 
   /** Clerk Satellite Frontend API string. */
   domain: string;
@@ -84,22 +82,22 @@ export interface Clerk {
   isSatellite: boolean;
 
   /** Clerk Instance type is defined from the Publishable key */
-  instanceType?: InstanceType;
+  instanceType: InstanceType | undefined;
 
   /** Clerk flag for loading Clerk in a standard browser setup */
-  isStandardBrowser?: boolean;
+  isStandardBrowser: boolean | undefined;
 
   /** Client handling most Clerk operations. */
-  client?: ClientResource;
+  client: ClientResource | undefined;
 
   /** Active Session. */
-  session?: ActiveSessionResource | null;
+  session: ActiveSessionResource | null | undefined;
 
   /** Active Organization */
-  organization?: OrganizationResource | null;
+  organization: OrganizationResource | null | undefined;
 
   /** Current User. */
-  user?: UserResource | null;
+  user: UserResource | null | undefined;
 
   /**
    * Signs out the current user on single-session instances, or all users on multi-session instances
@@ -496,16 +494,37 @@ export type BuildUrlWithAuthParams = {
   useQueryParam?: boolean | null;
 };
 
-// TODO: Make sure Isomorphic Clerk navigate can work with the correct type:
-// (to: string) => Promise<unknown>
-export type CustomNavigation = (to: string) => Promise<unknown> | void;
+export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | void;
 
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
-export interface ClerkOptions {
+/**
+ * Navigation options used to replace or push history changes.
+ * Both `routerPush` & `routerReplace` OR none options should be passed.
+ */
+type ClerkOptionsNavigationFn =
+  | {
+      routerPush?: never;
+      routerReplace?: never;
+    }
+  | {
+      routerPush: (to: string) => Promise<unknown> | unknown;
+      routerReplace: (to: string) => Promise<unknown> | unknown;
+    };
+
+type ClerkOptionsNavigation = ClerkOptionsNavigationFn & {
+  routerDebug?: boolean;
+};
+
+export type ClerkOptions = ClerkOptionsNavigation & {
   appearance?: Appearance;
   localization?: LocalizationResource;
-  navigate?: (to: string) => Promise<unknown> | unknown;
+  /**
+   * Navigation
+   */
+  routerPush?: (to: string) => Promise<unknown> | unknown;
+  routerReplace?: (to: string) => Promise<unknown> | unknown;
+  routerDebug?: boolean;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
@@ -537,6 +556,10 @@ export interface ClerkOptions {
       };
 
   sdkMetadata?: SDKMetadata;
+};
+
+export interface NavigateOptions {
+  replace?: boolean;
 }
 
 export interface Resources {
@@ -752,8 +775,8 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   showName?: boolean;
   /**
-     Controls the default state of the UserButton
-     */
+   * Controls the default state of the UserButton
+   */
   defaultOpen?: boolean;
   /**
    * Full URL or path to navigate after sign out is complete
@@ -805,7 +828,7 @@ type CreateOrganizationMode =
 export type OrganizationSwitcherProps = CreateOrganizationMode &
   OrganizationProfileMode & {
     /**
-     Controls the default state of the OrganizationSwitcher
+     * Controls the default state of the OrganizationSwitcher
      */
     defaultOpen?: boolean;
     /**

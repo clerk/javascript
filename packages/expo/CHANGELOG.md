@@ -1,5 +1,26 @@
 # Change Log
 
+## 1.0.0-alpha-v5.7
+
+### Minor Changes
+
+- Use `base-64` package for Expo instead of the isomorphic from `@clerk/shared` due to errors about `Maximum call stack size exceeded` on `global.Buffer` ([#2230](https://github.com/clerk/javascript/pull/2230)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`4b8bedc66`](https://github.com/clerk/javascript/commit/4b8bedc66d47dca5c6192148f4b31ae6d49ff733), [`c776f86fb`](https://github.com/clerk/javascript/commit/c776f86fb2a999dcae46fda9abb5005718c354b2), [`6e54b1b59`](https://github.com/clerk/javascript/commit/6e54b1b590ccdbc7002bde151093d78c217de391), [`c9e0f68af`](https://github.com/clerk/javascript/commit/c9e0f68af1a5cf07dc373ff45999c72d3d86f8f9), [`d6a7ea61a`](https://github.com/clerk/javascript/commit/d6a7ea61a8ae64c93877ec117e54fc48b1c86f16)]:
+  - @clerk/clerk-js@5.0.0-alpha-v5.7
+  - @clerk/shared@2.0.0-alpha-v5.4
+  - @clerk/clerk-react@5.0.0-alpha-v5.7
+
+## 1.0.0-alpha-v5.6
+
+### Patch Changes
+
+- Updated dependencies [[`5aab9f04a`](https://github.com/clerk/javascript/commit/5aab9f04a1eac39e42a03f555075e08a5a8ee02c), [`9a1fe3728`](https://github.com/clerk/javascript/commit/9a1fe37289c7606dc111913cb9f70f2a2efff6b7)]:
+  - @clerk/clerk-js@5.0.0-alpha-v5.6
+  - @clerk/clerk-react@5.0.0-alpha-v5.6
+
 ## 1.0.0-alpha-v5.5
 
 ### Patch Changes

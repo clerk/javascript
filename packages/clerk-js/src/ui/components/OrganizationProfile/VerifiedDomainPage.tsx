@@ -1,3 +1,4 @@
+import { useOrganization } from '@clerk/shared/react';
 import type {
   OrganizationDomainResource,
   OrganizationEnrollmentMode,
@@ -5,7 +6,7 @@ import type {
 } from '@clerk/types';
 
 import { CalloutWithAction, useGate } from '../../common';
-import { useCoreOrganization, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import {
@@ -99,7 +100,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
 
-  const { membership, organization, domains } = useCoreOrganization({
+  const { membership, organization, domains } = useOrganization({
     domains: {
       infinite: true,
     },

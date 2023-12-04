@@ -23,8 +23,8 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
     },
     setInstantPassword: async (val: string) => {
       const passField = self.getPasswordInput();
-      await passField.fill(val, { force: true });
       await expect(passField).toBeVisible();
+      await passField.fill(val, { force: true });
     },
     getGoToSignUp: () => {
       return page.getByRole('link', { name: /sign up/i });
@@ -42,7 +42,10 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
       return page.getByRole('button', { name: new RegExp(`continue with ${provider}`, 'gi') });
     },
     signInWithEmailAndInstantPassword: async (opts: { email: string; password: string }) => {
-      await self.getIdentifierInput().fill(opts.email);
+      const identifierField = self.getIdentifierInput();
+      await expect(identifierField).toBeVisible();
+
+      await identifierField.fill(opts.email);
       await self.setInstantPassword(opts.password);
       await self.continue();
     },

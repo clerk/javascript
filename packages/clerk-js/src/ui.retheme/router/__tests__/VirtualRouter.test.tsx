@@ -6,8 +6,8 @@ import { Route, useRouter, VirtualRouter } from '..';
 
 const mockNavigate = jest.fn();
 
-jest.mock('ui.retheme/contexts', () => ({
-  useCoreClerk: () => ({
+jest.mock('@clerk/shared/react', () => ({
+  useClerk: () => ({
     navigate: jest.fn(to => {
       mockNavigate(to);
       if (to) {

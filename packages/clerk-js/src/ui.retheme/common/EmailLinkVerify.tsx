@@ -1,9 +1,10 @@
 import { EmailLinkErrorCode, isEmailLinkError } from '@clerk/shared/error';
+import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
 import type { VerificationStatus } from '../../utils';
 import { completeSignUpFlow } from '../../utils';
-import { useCoreClerk, useCoreSignUp } from '../contexts';
+import { useCoreSignUp } from '../contexts';
 import type { LocalizationKey } from '../localization';
 import { useRouter } from '../router';
 import { sleep } from '../utils';
@@ -19,7 +20,7 @@ export type EmailLinkVerifyProps = {
 
 export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
   const { redirectUrl, redirectUrlComplete, verifyEmailPath, verifyPhonePath } = props;
-  const { handleEmailLinkVerification } = useCoreClerk();
+  const { handleEmailLinkVerification } = useClerk();
   const { navigate } = useRouter();
   const signUp = useCoreSignUp();
   const [verificationStatus, setVerificationStatus] = React.useState<VerificationStatus>('loading');

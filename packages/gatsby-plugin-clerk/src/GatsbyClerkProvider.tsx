@@ -21,7 +21,8 @@ export function ClerkProvider({ children, ...rest }: GatsbyClerkProviderProps) {
 
   return (
     <ReactClerkProvider
-      navigate={to => navigate(to)}
+      routerPush={to => navigate(to)}
+      routerReplace={to => navigate(to, { replace: true })}
       initialState={__clerk_ssr_state || {}}
       sdkMetadata={SDK_METADATA}
       telemetry={

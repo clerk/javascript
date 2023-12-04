@@ -16,3 +16,5 @@ examples
 node_modules
 package-lock.json
 playground
+packages/backend/tests/**/*.js
+/**/CHANGELOG.md

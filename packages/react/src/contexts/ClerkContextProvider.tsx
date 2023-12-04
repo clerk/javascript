@@ -1,3 +1,4 @@
+import { ClientContext, OrganizationProvider, SessionContext, UserContext } from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React from 'react';
 
@@ -5,11 +6,7 @@ import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
 import { deriveState } from '../utils/deriveState';
 import { AuthContext } from './AuthContext';
-import { ClientContext } from './ClientContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
-import { OrganizationProvider } from './OrganizationContext';
-import { SessionContext } from './SessionContext';
-import { UserContext } from './UserContext';
 
 type ClerkContextProvider = {
   isomorphicClerkOptions: IsomorphicClerkOptions;
@@ -54,7 +51,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   }, [orgId, organization]);
 
   return (
-    // @ts-expect-error
+    // @ts-expect-error value passed is of type IsomorphicClerk where the context expects LoadedClerk
     <IsomorphicClerkContext.Provider value={clerkCtx}>
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>

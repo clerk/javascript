@@ -1,8 +1,8 @@
+import { useOrganizationList } from '@clerk/shared/react';
 import type { OrganizationSuggestionResource, UserOrganizationInvitationResource } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 
 import { InfiniteListSpinner } from '../../common';
-import { useCoreOrganizationList } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Actions, OrganizationPreview, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
@@ -12,7 +12,7 @@ import { handleError } from '../../utils';
 import { organizationListParams, populateCacheRemoveItem, populateCacheUpdateItem } from './utils';
 
 const useFetchInvitations = () => {
-  const { userInvitations, userSuggestions } = useCoreOrganizationList(organizationListParams);
+  const { userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
 
   const { ref } = useInView({
     threshold: 0,
@@ -37,7 +37,7 @@ const useFetchInvitations = () => {
 
 const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) => {
   const card = useCardState();
-  const { userSuggestions } = useCoreOrganizationList({
+  const { userSuggestions } = useOrganizationList({
     userSuggestions: organizationListParams.userSuggestions,
   });
 
@@ -62,8 +62,8 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
       textVariant='buttonExtraSmallBold'
-      variant='outline'
-      colorScheme='neutral'
+      variant='secondary'
+      colorScheme='secondary'
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
@@ -74,7 +74,7 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
 
 const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource) => {
   const card = useCardState();
-  const { userInvitations } = useCoreOrganizationList({
+  const { userInvitations } = useOrganizationList({
     userInvitations: organizationListParams.userInvitations,
   });
 

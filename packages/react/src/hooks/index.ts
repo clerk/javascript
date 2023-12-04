@@ -1,10 +1,12 @@
 export { useAuth } from './useAuth';
-export { useClerk } from './useClerk';
 export { useEmailLink } from './useEmailLink';
-export { useOrganization } from './useOrganization';
-export { useOrganizationList } from './useOrganizationList';
-export { useSession } from './useSession';
-export { useSessionList } from './useSessionList';
 export { useSignIn } from './useSignIn';
 export { useSignUp } from './useSignUp';
-export { useUser } from './useUser';
+export {
+  useClerk,
+  useOrganization,
+  useOrganizationList,
+  useSessionList,
+  useUser,
+  useSession,
+} from '@clerk/shared/react';

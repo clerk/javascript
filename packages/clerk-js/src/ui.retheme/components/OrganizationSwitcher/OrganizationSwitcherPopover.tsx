@@ -1,16 +1,10 @@
+import { useClerk, useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { runIfFunctionOrReturn } from '../../../utils';
 import { NotificationCountBadge, withGate } from '../../common';
-import {
-  useCoreClerk,
-  useCoreOrganization,
-  useCoreOrganizationList,
-  useCoreUser,
-  useEnvironment,
-  useOrganizationSwitcherContext,
-} from '../../contexts';
+import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import {
   Action,
@@ -32,9 +26,9 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
   (props, ref) => {
     const { close, ...rest } = props;
     const card = useCardState();
-    const { openOrganizationProfile, openCreateOrganization } = useCoreClerk();
-    const { organization: currentOrg } = useCoreOrganization();
-    const { isLoaded, setActive } = useCoreOrganizationList();
+    const { openOrganizationProfile, openCreateOrganization } = useClerk();
+    const { organization: currentOrg } = useOrganization();
+    const { isLoaded, setActive } = useOrganizationList();
     const router = useRouter();
     const {
       hidePersonal,
@@ -55,7 +49,11 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       organizationProfileProps,
     } = useOrganizationSwitcherContext();
 
-    const user = useCoreUser();
+    const { user } = useUser();
+
+    if (!user) {
+      return null;
+    }
 
     const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
 
@@ -181,7 +179,7 @@ const NotificationCountBadgeManageButton = withGate(
 
     const isDomainsEnabled = organizationSettings?.domains?.enabled;
 
-    const { membershipRequests } = useCoreOrganization({
+    const { membershipRequests } = useOrganization({
       membershipRequests: isDomainsEnabled || undefined,
     });
 

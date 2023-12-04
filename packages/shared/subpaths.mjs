@@ -27,3 +27,5 @@ export const subpathNames = [
 ];
 
 export const subpathFoldersBarrel = ['react'];
+
+export const ignoredFolders = ['scripts'];

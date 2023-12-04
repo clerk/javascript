@@ -1,14 +1,14 @@
+import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { descriptors, Icon, Spinner } from '../customizables';
 import { ArrowRightButtonIcon } from '../icons';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { common, createCssVariables, createVariants } from '../styledSystem';
-import { colors } from '../utils';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
 
-const vars = createCssVariables('accent', 'accentDark', 'accentDarker', 'accentLighter', 'accentLightest', 'border');
+const vars = createCssVariables('idle', 'hover', 'text', 'textHover', 'borderShadow');
 
 const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) => {
   return {
@@ -46,75 +46,90 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       },
       colorScheme: {
         primary: {
-          [vars.accentLightest]: colors.setAlpha(theme.colors.$primary400, 0.3), // TODO: once we have the new color palette
-          [vars.accentLighter]: colors.setAlpha(theme.colors.$primary800, 0.3), // WIP reference: Updated to new color palette; previously `$primary500`
-          [vars.accent]: theme.colors.$primary800, // WIP reference: Updated to new color palette; previously `$primary500`
-          [vars.accentDark]: theme.colors.$primary600, // TODO: once we have the new color palette
-          [vars.accentDarker]: theme.colors.$primary700, // TODO: once we have the new color palette
+          [vars.idle]: theme.colors.$primary800, //we should ideally make this primary500
+          [vars.hover]: theme.colors.$primary800, //same on purpose
+          [vars.text]: theme.colors.$colorTextOnPrimaryBackground,
+          [vars.textHover]: theme.colors.$colorTextOnPrimaryBackground,
+          [vars.borderShadow]:
+            '0px 0px 0px 1px #2F3037, 0px 1px 1px 0px rgba(255, 255, 255, 0.07) inset, 0px 2px 3px 0px rgba(34, 42, 53, 0.20), 0px 1px 1px 0px rgba(0, 0, 0, 0.24)',
+        },
+        secondary: {
+          [vars.idle]: theme.colors.$transparent,
+          [vars.hover]: theme.colors.$blackAlpha50,
+          [vars.text]: theme.colors.$colorText,
+          [vars.textHover]: theme.colors.$colorText,
+          [vars.borderShadow]:
+            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(0, 0, 0, 0.02), 0px 0px 0px 1px rgba(0, 0, 0, 0.08)',
         },
         danger: {
-          [vars.accentLightest]: colors.setAlpha(theme.colors.$danger400, 0.3),
-          [vars.accentLighter]: colors.setAlpha(theme.colors.$danger500, 0.3),
-          [vars.accent]: theme.colors.$danger500,
-          [vars.accentDark]: theme.colors.$danger600,
-          [vars.accentDarker]: theme.colors.$danger700,
-        },
-        neutral: {
-          [vars.border]: theme.colors.$blackAlpha200,
-          [vars.accentLightest]: theme.colors.$blackAlpha50, // TODO: once we have the new color palette and style for pseudo classes
-          [vars.accentLighter]: theme.colors.$blackAlpha300, // TODO: once we have the new color palette and style for pseudo classes
-          [vars.accent]: theme.colors.$primary800, // WIP reference: Updated to new color palette; previously `$colorText`
-          [vars.accentDark]: theme.colors.$blackAlpha600, // TODO: once we have the new color palette and style for pseudo classes
-          [vars.accentDarker]: theme.colors.$blackAlpha700, // TODO: once we have the new color palette and style for pseudo classes
+          [vars.idle]: theme.colors.$transparent,
+          [vars.hover]: theme.colors.$danger50,
+          [vars.text]: theme.colors.$colorText,
+          [vars.textHover]: theme.colors.$danger400,
+          [vars.borderShadow]:
+            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(0, 0, 0, 0.02), 0px 0px 0px 1px rgba(0, 0, 0, 0.08)',
         },
       },
       variant: {
-        solid: {
-          backgroundColor: vars.accent,
-          color: theme.colors.$colorTextOnPrimaryBackground,
-          ...common.buttonShadow(theme),
-          // '&:hover': { backgroundColor: vars.accentDark }, // TODO: once we have the new color palette
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentDark } : undefined,
-          // '&:active': { backgroundColor: vars.accentDarker }, // TODO: once we have the new color palette
+        primary: {
+          backgroundColor: vars.idle,
+          color: vars.text,
+          boxShadow: vars.borderShadow,
+          '&:hover': {
+            backgroundColor: vars.hover,
+            color: vars.textHover,
+          },
+          ':before': {
+            position: 'absolute',
+            content: '""',
+            borderRadius: 'inherit',
+            zIndex: -1,
+            inset: 0,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%)`,
+          },
           ':after': {
             position: 'absolute',
             content: '""',
             borderRadius: 'inherit',
             zIndex: -1,
             inset: 0,
-            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.00) 100%)',
+            opacity: 0,
+            transitionProperty: theme.transitionProperty.$common,
+            transitionDuration: theme.transitionDuration.$controls,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha200} 0%, ${theme.colors.$transparent} 100%)`,
+          },
+          ':hover::after': {
+            opacity: 1,
+          },
+          ':active::after': {
+            opacity: 0,
           },
         },
-        outline: {
-          color: vars.accent,
-          boxShadow:
-            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(25, 28, 33, 0.02), 0px 0px 0px 1px rgba(25, 28, 33, 0.08)', // TODO: Move to theme once we have the shadows defined
-          '&:hover': { backgroundColor: vars.accentLightest },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
-          '&:active': { backgroundColor: vars.accentLighter },
+        secondary: {
+          backgroundColor: vars.idle,
+          color: vars.text,
+          boxShadow: vars.borderShadow,
+          '&:hover': {
+            backgroundColor: vars.hover,
+            color: vars.textHover,
+          },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.hover, color: vars.textHover } : undefined,
+          '&:active': { backgroundColor: vars.idle },
         },
         ghost: {
-          color: vars.accent,
-          '&:hover': { backgroundColor: vars.accentLightest },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
-          '&:active': { backgroundColor: vars.accentLighter },
-        },
-        icon: {
-          color: vars.accent,
-          boxShadow:
-            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(25, 28, 33, 0.02), 0px 0px 0px 1px rgba(25, 28, 33, 0.08)', // TODO: Move to theme once we have the shadows defined
-          '&:hover': { backgroundColor: vars.accentLightest },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
-          '&:active': { backgroundColor: vars.accentLighter },
+          color: vars.text,
+          '&:hover': { backgroundColor: vars.hover, color: vars.textHover },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.hover, color: vars.textHover } : undefined,
+          '&:active': { backgroundColor: vars.idle },
         },
         ghostIcon: {
-          color: vars.accent,
+          color: vars.idle,
           minHeight: theme.sizes.$6,
           width: theme.sizes.$6,
           padding: `${theme.space.$1} ${theme.space.$1}`,
-          '&:hover': { color: vars.accentDark },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentDark } : undefined,
-          '&:active': { color: vars.accentDarker },
+          '&:hover': { color: vars.hover },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.hover } : undefined,
+          '&:active': { color: vars.idle },
         },
         link: {
           ...common.textVariants(theme).smallRegular,
@@ -123,10 +138,10 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           width: 'fit-content',
           textTransform: 'none',
           padding: 0,
-          color: vars.accent,
+          color: vars.idle,
           '&:hover': { textDecoration: 'underline' },
           '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
-          '&:active': { color: vars.accentDark },
+          '&:active': { color: vars.idle },
         },
         roundWrapper: { padding: 0, margin: 0, height: 'unset', width: 'unset', minHeight: 'unset' },
       },
@@ -140,7 +155,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
     defaultVariants: {
       textVariant: 'buttonSmallRegular',
       colorScheme: 'primary',
-      variant: 'solid',
+      variant: 'primary',
       size: 'sm',
       focusRing: true,
     },
@@ -156,6 +171,25 @@ type OwnProps = PrimitiveProps<'button'> & {
 };
 
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
+
+const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
+  return (
+    <Flex
+      align='center'
+      gap={2}
+    >
+      {children}
+      <Icon
+        icon={ArrowRightButtonIcon}
+        sx={t => ({
+          width: t.sizes.$2x5,
+          height: t.sizes.$2x5,
+          opacity: t.opacity.$inactive,
+        })}
+      />
+    </Flex>
+  );
+};
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
@@ -208,25 +242,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           {loadingText || <span style={{ opacity: 0 }}>{children}</span>}
         </Flex>
       )}
-
-      {!isLoading && (
-        <Flex
-          align='center'
-          gap={2}
-        >
-          {children}
-          {hasArrow && (
-            <Icon
-              icon={ArrowRightButtonIcon}
-              sx={t => ({
-                width: t.sizes.$2x5,
-                height: t.sizes.$2x5,
-                opacity: t.opacity.$inactive,
-              })}
-            />
-          )}
-        </Flex>
-      )}
+      {!isLoading && (hasArrow ? <ButtonChildrenWithArrow>{children}</ButtonChildrenWithArrow> : children)}
     </button>
   );
 });

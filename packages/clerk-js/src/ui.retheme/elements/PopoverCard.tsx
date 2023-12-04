@@ -14,11 +14,11 @@ const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof
         {...props}
         ref={ref}
         sx={t => ({
-          padding: `${t.space.$6} 0`,
           width: t.sizes.$94,
           maxWidth: `calc(100vw - ${t.sizes.$8})`,
           zIndex: t.zIndices.$modal,
           animation: `${animations.dropdownSlideInScaleAndFade} 140ms `,
+          border: `1px solid ${t.colors.$blackAlpha200}`,
         })}
       >
         {props.children}
@@ -54,9 +54,11 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
     <Flex
       justify='between'
       sx={[
-        theme => ({
-          padding: `${theme.space.$6}`,
-          paddingBottom: 0,
+        t => ({
+          padding: `${t.space.$4} 0`,
+          borderBottomLeftRadius: 'inherit',
+          borderBottomRightRadius: 'inherit',
+          backgroundColor: t.colors.$blackAlpha100,
           '&:empty': {
             padding: '0',
           },

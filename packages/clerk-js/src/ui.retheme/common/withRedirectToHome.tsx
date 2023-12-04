@@ -1,10 +1,11 @@
+import { useClerk } from '@clerk/shared/react';
 import type { ComponentType } from 'react';
 import React from 'react';
 
 import { warnings } from '../../core/warnings';
 import type { ComponentGuard } from '../../utils';
 import { noOrganizationExists, noUserExists, sessionExistsAndSingleSessionModeEnabled } from '../../utils';
-import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
+import { useEnvironment, useOptions } from '../contexts';
 import { useRouter } from '../router';
 import type { AvailableComponentProps } from '../types';
 
@@ -18,7 +19,7 @@ function withRedirectToHome<P extends AvailableComponentProps>(
 
   const HOC = (props: P) => {
     const { navigate } = useRouter();
-    const clerk = useCoreClerk();
+    const clerk = useClerk();
     const environment = useEnvironment();
     const options = useOptions();
 

@@ -48,7 +48,8 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
               position: 'relative',
               backgroundColor: t.colors.$colorBackground,
               padding: t.space.$8,
-              boxShadow: t.shadows.$cardInnerDropShadow,
+              boxShadow:
+                '0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.06), 0px 0px 0px 1px rgba(25, 28, 33, 0.04)',
               width: t.sizes.$100,
               borderRadius: `${t.radii.$card} ${t.radii.$card} ${t.radii.$lg} ${t.radii.$lg}`,
             }),
@@ -120,9 +121,10 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
           willChange: 'transform, opacity, height',
           transitionProperty: t.transitionProperty.$common,
           transitionDuration: '200ms',
-          borderRadius: t.radii.$card,
-          boxShadow: t.shadows.$cardOuterDropShadow,
-          overflow: 'hidden',
+          borderRadius: t.radii.$xl,
+          boxShadow:
+            '0px 5px 15px 0px rgba(0, 0, 0, 0.08), 0px 15px 35px -5px rgba(25, 28, 33, 0.20), 0px 0px 0px 1px rgba(25, 28, 33, 0.06)',
+          backdropFilter: 'blur(10px)',
         }),
         sx,
       ]}
@@ -132,7 +134,7 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
         <IconButton
           elementDescriptor={descriptors.modalCloseButton}
           variant='ghost'
-          colorScheme='neutral'
+          colorScheme='secondary'
           aria-label='Close modal'
           onClick={toggle}
           icon={

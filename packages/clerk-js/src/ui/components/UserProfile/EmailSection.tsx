@@ -1,6 +1,6 @@
+import { useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
 
-import { useCoreUser } from '../../contexts';
 import { Badge, Col, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState } from '../../elements';
 import { useRouter } from '../../router';
@@ -12,14 +12,14 @@ import { primaryIdentificationFirst } from './utils';
 
 export const EmailsSection = () => {
   const { navigate } = useRouter();
-  const user = useCoreUser();
+  const { user } = useUser();
 
   return (
     <ProfileSection
       title={localizationKeys('userProfile.start.emailAddressesSection.title')}
       id='emailAddresses'
     >
-      {user.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
+      {user?.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
         <EmailAccordion
           key={email.id}
           email={email}
@@ -37,12 +37,12 @@ export const EmailsSection = () => {
 
 const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
   const card = useCardState();
-  const user = useCoreUser();
+  const { user } = useUser();
   const { navigate } = useRouter();
-  const isPrimary = user.primaryEmailAddressId === email.id;
+  const isPrimary = user?.primaryEmailAddressId === email.id;
   const isVerified = email.verification.status === 'verified';
   const setPrimary = () => {
-    return user.update({ primaryEmailAddressId: email.id }).catch(e => handleError(e, [], card.setError));
+    return user!.update({ primaryEmailAddressId: email.id }).catch(e => handleError(e, [], card.setError));
   };
 
   return (

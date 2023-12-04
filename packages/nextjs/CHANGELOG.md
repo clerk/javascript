@@ -1,5 +1,27 @@
 # Change Log
 
+## 5.0.0-alpha-v5.7
+
+### Patch Changes
+
+- Updated dependencies [[`4b8bedc66`](https://github.com/clerk/javascript/commit/4b8bedc66d47dca5c6192148f4b31ae6d49ff733), [`c776f86fb`](https://github.com/clerk/javascript/commit/c776f86fb2a999dcae46fda9abb5005718c354b2), [`6e54b1b59`](https://github.com/clerk/javascript/commit/6e54b1b590ccdbc7002bde151093d78c217de391), [`c9e0f68af`](https://github.com/clerk/javascript/commit/c9e0f68af1a5cf07dc373ff45999c72d3d86f8f9), [`d6a7ea61a`](https://github.com/clerk/javascript/commit/d6a7ea61a8ae64c93877ec117e54fc48b1c86f16)]:
+  - @clerk/shared@2.0.0-alpha-v5.4
+  - @clerk/clerk-react@5.0.0-alpha-v5.7
+  - @clerk/backend@1.0.0-alpha-v5.5
+
+## 5.0.0-alpha-v5.6
+
+### Major Changes
+
+- Fix a bug where navigating from the sign in page to the sign up page required two back button presses to go back. ([#1304](https://github.com/clerk/javascript/pull/1304)) by [@desiprisg](https://github.com/desiprisg)
+
+- Use the new `routerPush` and `routerReplace` props for `<ClerkProvider />` instead of `navigate`. ([#1304](https://github.com/clerk/javascript/pull/1304)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-alpha-v5.6
+
 ## 5.0.0-alpha-v5.5
 
 ### Patch Changes

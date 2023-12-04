@@ -1,6 +1,6 @@
+import { useUser } from '@clerk/shared/react';
 import type { Web3WalletResource } from '@clerk/types';
 
-import { useCoreUser } from '../../contexts';
 import { Col, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
@@ -10,7 +10,7 @@ import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const Web3Section = () => {
-  const user = useCoreUser();
+  const { user } = useUser();
   const { navigate } = useRouter();
 
   return (
@@ -18,7 +18,7 @@ export const Web3Section = () => {
       title={localizationKeys('userProfile.start.web3WalletsSection.title')}
       id='web3Wallets'
     >
-      {user.web3Wallets.map(wallet => (
+      {user?.web3Wallets.map(wallet => (
         <Web3WalletAccordion
           key={wallet.id}
           wallet={wallet}

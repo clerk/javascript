@@ -1,8 +1,9 @@
+import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationDomainResource } from '@clerk/types';
 import React from 'react';
 
 import { RemoveResourcePage } from '../../common';
-import { useCoreOrganization, useEnvironment } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Spinner } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { localizationKeys } from '../../localization';
@@ -11,7 +12,7 @@ import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const RemoveDomainPage = () => {
   const { organizationSettings } = useEnvironment();
-  const { organization } = useCoreOrganization();
+  const { organization } = useOrganization();
   const { params } = useRouter();
 
   const ref = React.useRef<OrganizationDomainResource>();
@@ -27,7 +28,7 @@ export const RemoveDomainPage = () => {
     },
   );
 
-  const { domains } = useCoreOrganization({
+  const { domains } = useOrganization({
     domains: {
       infinite: true,
     },

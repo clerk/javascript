@@ -16,7 +16,7 @@ export const applicationConfig = () => {
   const files = new Map<string, string>();
   const scripts: Scripts = { dev: 'npm run dev', serve: 'npm run serve', build: 'npm run build', setup: 'npm i' };
   const envFormatters = { public: (key: string) => key, private: (key: string) => key };
-  const logger = createLogger({ prefix: 'appConfig', color: 'bgYellow' });
+  const logger = createLogger({ prefix: 'appConfig', color: 'yellow' });
   const dependencies = new Map<string, string>();
 
   const self = {

@@ -16,7 +16,8 @@ const Root = () => {
       // @ts-ignore
       publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string}
       clerkJSUrl={import.meta.env.VITE_CLERK_JS as string}
-      navigate={(to: string) => navigate(to)}
+      routerPush={(to: string) => navigate(to)}
+      routerReplace={(to: string) => navigate(to, { replace: true })}
     >
       <Outlet />
     </ClerkProvider>

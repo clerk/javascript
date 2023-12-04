@@ -1,6 +1,6 @@
+import { useUser } from '@clerk/shared/react';
 import type { SamlAccountResource } from '@clerk/types';
 
-import { useCoreUser } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
 import { useSaml } from '../../hooks';
@@ -8,14 +8,14 @@ import { useRouter } from '../../router';
 import { UserProfileAccordion } from './UserProfileAccordion';
 
 export const EnterpriseAccountsSection = () => {
-  const user = useCoreUser();
+  const { user } = useUser();
 
   return (
     <ProfileSection
       title={localizationKeys('userProfile.start.enterpriseAccountsSection.title')}
       id='enterpriseAccounts'
     >
-      {user.samlAccounts.map(account => (
+      {user?.samlAccounts.map(account => (
         <EnterpriseAccountAccordion
           key={account.id}
           account={account}

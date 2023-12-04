@@ -1,6 +1,6 @@
 import type { ActiveSessionResource } from '@clerk/types';
 
-import { useSessionContext } from '../contexts/SessionContext';
+import { useSessionContext } from '../contexts';
 
 type UseSessionReturn =
   | { isLoaded: false; isSignedIn: undefined; session: undefined }

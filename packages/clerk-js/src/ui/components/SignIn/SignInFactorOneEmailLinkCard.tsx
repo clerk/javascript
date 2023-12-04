@@ -1,10 +1,11 @@
 import { isUserLockedError } from '@clerk/shared/error';
+import { useClerk } from '@clerk/shared/react';
 import type { EmailLinkFactor, SignInResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
 import { buildEmailLinkRedirectUrl } from '../../common/redirects';
-import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { VerificationLinkCard } from '../../elements';
@@ -27,10 +28,10 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const { signInUrl } = useEnvironment().displayConfig;
   const { navigate } = useRouter();
   const { navigateAfterSignIn } = useSignInContext();
-  const { setActive } = useCoreClerk();
+  const { setActive } = useClerk();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
 
   React.useEffect(() => {
     void startEmailLinkVerification();

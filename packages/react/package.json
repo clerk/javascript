@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.0.0-alpha-v5.5",
+  "version": "5.0.0-alpha-v5.7",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -22,28 +22,26 @@
   },
   "license": "MIT",
   "author": "Clerk",
-  "sideEffects": [
-    "./dist/cjs/index.js",
-    "./dist/cjs/polyfills.js",
-    "./dist/esm/index.js",
-    "./dist/esm/polyfills.js"
-  ],
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    }
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json"
   },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
@@ -56,8 +54,8 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "2.0.0-alpha-v5.3",
-    "@clerk/types": "4.0.0-alpha-v5.5",
+    "@clerk/shared": "2.0.0-alpha-v5.4",
+    "@clerk/types": "4.0.0-alpha-v5.7",
     "eslint-config-custom": "*",
     "semver": "^7.5.4",
     "tslib": "2.4.1"

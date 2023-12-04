@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.0.0-alpha-v5.4
+
+### Minor Changes
+
+- Move usage of internal useCoreX hooks to useX hooks ([#2111](https://github.com/clerk/javascript/pull/2111)) by [@LekoArts](https://github.com/LekoArts)
+
+### Patch Changes
+
+- Add missing `telemetry` entry to `files` array in `package.json` ([#2229](https://github.com/clerk/javascript/pull/2229)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 2.0.0-alpha-v5.3
 
 ### Major Changes

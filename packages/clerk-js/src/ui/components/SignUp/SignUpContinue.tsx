@@ -1,6 +1,7 @@
+import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
-import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -28,7 +29,7 @@ import { completeSignUpFlow } from './util';
 
 function _SignUpContinue() {
   const card = useCardState();
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
   const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;

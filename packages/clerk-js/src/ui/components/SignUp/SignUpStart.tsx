@@ -1,9 +1,10 @@
+import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToHomeSingleSessionGuard } from '../../common';
-import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
@@ -27,14 +28,14 @@ import { completeSignUpFlow } from './util';
 
 function _SignUpStart(): JSX.Element {
   const card = useCardState();
-  const clerk = useCoreClerk();
+  const clerk = useClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
   const { showOptionalFields } = useAppearance().parsedLayout;
   const { userSettings, displayConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
-  const { setActive } = useCoreClerk();
+  const { setActive } = useClerk();
   const ctx = useSignUpContext();
   const { navigateAfterSignUp, signInUrl, unsafeMetadata } = ctx;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(

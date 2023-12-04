@@ -1,7 +1,6 @@
 import type { SessionResource, SetActive } from '@clerk/types';
 
-import { useClientContext } from '../contexts/ClientContext';
-import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
+import { useClerkInstanceContext, useClientContext } from '../contexts';
 
 type UseSessionListReturn =
   | {
@@ -18,7 +17,7 @@ type UseSessionListReturn =
 type UseSessionList = () => UseSessionListReturn;
 
 export const useSessionList: UseSessionList = () => {
-  const isomorphicClerk = useIsomorphicClerkContext();
+  const isomorphicClerk = useClerkInstanceContext();
   const client = useClientContext();
 
   if (!client) {

@@ -11,13 +11,14 @@ export const PoweredByClerkText = React.memo(() => {
   return (
     <Flex
       gap={1}
+      align='center'
       justify='center'
-      sx={theme => ({ color: theme.colors.$blackAlpha300 })}
+      sx={t => ({ width: '100%', color: t.colors.$colorTextSecondary })}
     >
       {branded ? (
         <>
           <Text
-            variant='smallMedium'
+            variant='extraSmallRegular'
             sx={{ color: 'inherit' }}
           >
             Secured by

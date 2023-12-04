@@ -372,7 +372,7 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
       ref={reference}
-      colorScheme='neutral'
+      colorScheme='secondary'
       variant='ghost'
       textVariant='smallMedium'
       onClick={onTriggerClick}

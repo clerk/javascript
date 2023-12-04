@@ -1,6 +1,7 @@
+import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/types';
 
-import { useCoreClerk, useSignUpContext } from '../../contexts';
+import { useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { VerificationCodeCard } from '../../elements';
@@ -20,7 +21,7 @@ type SignInFactorOneCodeFormProps = {
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
   const { navigateAfterSignUp } = useSignUpContext();
-  const { setActive } = useCoreClerk();
+  const { setActive } = useClerk();
   const { navigate } = useRouter();
 
   const goBack = () => {

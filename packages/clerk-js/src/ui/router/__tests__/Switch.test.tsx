@@ -5,8 +5,8 @@ import { HashRouter, Route, Switch } from '../../router';
 
 const mockNavigate = jest.fn();
 
-jest.mock('ui/contexts', () => ({
-  useCoreClerk: () => ({
+jest.mock('@clerk/shared/react', () => ({
+  useClerk: () => ({
     navigate: jest.fn(to => {
       mockNavigate(to);
       if (to) {

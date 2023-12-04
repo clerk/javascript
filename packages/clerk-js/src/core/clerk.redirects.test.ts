@@ -115,12 +115,12 @@ describe('Clerk singleton - Redirects', () => {
 
         clerkForProductionInstance = new Clerk(productionPublishableKey);
         await clerkForProductionInstance.load({
-          navigate: mockNavigate,
+          routerPush: mockNavigate,
         });
 
         clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
         await clerkForDevelopmentInstance.load({
-          navigate: mockNavigate,
+          routerPush: mockNavigate,
         });
       });
 
@@ -193,12 +193,12 @@ describe('Clerk singleton - Redirects', () => {
 
         clerkForProductionInstance = new Clerk(productionPublishableKey);
         await clerkForProductionInstance.load({
-          navigate: mockNavigate,
+          routerPush: mockNavigate,
         });
 
         clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
         await clerkForDevelopmentInstance.load({
-          navigate: mockNavigate,
+          routerPush: mockNavigate,
         });
       });
 
@@ -284,12 +284,12 @@ describe('Clerk singleton - Redirects', () => {
 
         clerkForProductionInstance = new Clerk(productionPublishableKey);
         await clerkForProductionInstance.load({
-          navigate: mockNavigate,
+          routerPush: mockNavigate,
         });
 
         clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
         await clerkForDevelopmentInstance.load({
-          navigate: mockNavigate,
+          routerPush: mockNavigate,
         });
       });
 
@@ -317,12 +317,12 @@ describe('Clerk singleton - Redirects', () => {
 
         clerkForProductionInstance = new Clerk(productionPublishableKey);
         await clerkForProductionInstance.load({
-          navigate: mockNavigate,
+          routerPush: mockNavigate,
         });
 
         clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
         await clerkForDevelopmentInstance.load({
-          navigate: mockNavigate,
+          routerPush: mockNavigate,
         });
       });
 
