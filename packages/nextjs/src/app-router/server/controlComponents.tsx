@@ -1,8 +1,4 @@
-import type {
-  CheckAuthorizationWithCustomPermissions,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-} from '@clerk/types';
+import type { Protect as ProtectClientComponent } from '@clerk/clerk-react';
 import React from 'react';
 
 import { auth } from './auth';
@@ -19,32 +15,7 @@ export function SignedOut(props: React.PropsWithChildren) {
   return userId ? null : <>{children}</>;
 }
 
-type ProtectServerComponentProps = React.PropsWithChildren<
-  (
-    | {
-        condition?: never;
-        role: OrganizationCustomRoleKey;
-        permission?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission: OrganizationCustomPermissionKey;
-      }
-    | {
-        condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-        role?: never;
-        permission?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-      }
-  ) & {
-    fallback?: React.ReactNode;
-  }
->;
+type ProtectServerComponentProps = React.ComponentProps<typeof ProtectClientComponent>;
 
 export function Protect(props: ProtectServerComponentProps) {
   const { children, fallback, ...restAuthorizedParams } = props;
