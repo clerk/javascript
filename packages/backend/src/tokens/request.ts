@@ -106,17 +106,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     }
 
     async function verifyRequestState(options: InterstitialRuleOptions, token: string) {
-      const { isSatellite, proxyUrl } = options;
-      let issuer;
-      if (isSatellite) {
-        issuer = null;
-      } else if (proxyUrl) {
-        issuer = proxyUrl;
-      } else {
-        issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
-      }
-
-      return verifyToken(token, { ...options, issuer });
+      return verifyToken(token, options);
     }
 
     const clientUat = parseInt(ruleOptions.clientUat || '', 10) || 0;
