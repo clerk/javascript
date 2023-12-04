@@ -174,7 +174,7 @@ export const MenuItem = (props: MenuItemProps) => {
       focusRing={false}
       hoverAsFocus
       variant='ghost'
-      colorScheme={destructive ? 'danger' : 'neutral'}
+      colorScheme={destructive ? 'danger' : 'secondary'}
       role='menuitem'
       onKeyDown={onKeyDown}
       onClick={e => {
