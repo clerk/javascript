@@ -41,7 +41,7 @@ export type OrganizationCustomRoleKey = string;
 
 /**
  * @deprecated This type is deprecated and will be removed in the next major release.
- * Use `OrganizationCustomRole` instead.
+ * Use `OrganizationCustomRoleKey` instead.
  * MembershipRole includes `admin`, `basic_member`, `guest_member`. With the introduction of "Custom roles"
  * these types will no longer match a developer's custom logic.
  */
@@ -56,7 +56,7 @@ export type OrganizationSystemPermissionKey =
   | 'org:sys_domains:read';
 
 /**
- * OrganizationPermission is a combination of system and custom permissions.
+ * OrganizationPermissionKey is a combination of system and custom permissions.
  * System permissions are only accessible from FAPI and client-side operations/utils
  */
 export type OrganizationPermissionKey = Autocomplete<OrganizationSystemPermissionKey>;

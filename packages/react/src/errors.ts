@@ -45,4 +45,4 @@ export const customLinkWrongProps = (componentName: string) =>
   `Missing props. <${componentName}.Link /> component requires the following props: url, label and labelIcon.`;
 
 export const useAuthHasRequiresRoleOrPermission =
-  'Missing params. `has` from `useAuth` requires a permission or role key to be passed.';
+  'Missing parameters. `has` from `useAuth` requires a permission or role key to be passed.';
