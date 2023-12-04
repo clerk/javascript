@@ -18,7 +18,6 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "OrganizationInvitation",
   "OrganizationMembership",
   "OrganizationMembershipPublicUserData",
-  "Permission",
   "PhoneNumber",
   "RedirectUrl",
   "SMSMessage",

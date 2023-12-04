@@ -7,7 +7,6 @@ export * from './EmailApi';
 export * from './InterstitialApi';
 export * from './InvitationApi';
 export * from './OrganizationApi';
-export * from './OrganizationPermissionApi';
 export * from './PhoneNumberApi';
 export * from './RedirectUrlApi';
 export * from './SessionApi';
