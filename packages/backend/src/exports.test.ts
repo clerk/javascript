@@ -27,7 +27,6 @@ export default (QUnit: QUnit) => {
         'Permission',
         'PhoneNumber',
         'RedirectUrl',
-        'Role',
         'SMSMessage',
         'Session',
         'SignInToken',
