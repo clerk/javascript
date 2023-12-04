@@ -736,6 +736,22 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#environment.displayConfig.homeUrl);
   }
 
+  public buildRedirectToAfterSignInUrl(): string {
+    if (this.#options.afterSignInUrl === undefined) {
+      return '';
+    }
+
+    return this.buildUrlWithAuth(this.#options.afterSignInUrl);
+  }
+
+  public buildRedirectToAfterSignUpUrl(): string {
+    if (this.#options.afterSignUpUrl === undefined) {
+      return '';
+    }
+
+    return this.buildUrlWithAuth(this.#options.afterSignUpUrl);
+  }
+
   public buildCreateOrganizationUrl(): string {
     if (!this.#environment || !this.#environment.displayConfig) {
       return '';
@@ -812,9 +828,16 @@ export class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToHome = async (): Promise<unknown> => {
+  public redirectToAfterSignIn = async (): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildHomeUrl());
+      return this.navigate(this.buildRedirectToAfterSignInUrl());
+    }
+    return;
+  };
+
+  public redirectToAfterSignUp = async (): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildRedirectToAfterSignUpUrl());
     }
     return;
   };

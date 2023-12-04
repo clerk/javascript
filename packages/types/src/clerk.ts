@@ -384,9 +384,14 @@ export interface Clerk {
   redirectToCreateOrganization: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured home URL of the instance.
+   * Redirects to the configured afterSignInUrl URL.
    */
-  redirectToHome: () => Promise<unknown>;
+  redirectToAfterSignIn: () => void;
+
+  /**
+   * Redirects to the configured afterSignUpUrl URL.
+   */
+  redirectToAfterSignUp: () => void;
 
   /**
    * Completes an OAuth or SAML redirection flow started by

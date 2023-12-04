@@ -808,13 +808,21 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  redirectToHome = async (): Promise<unknown> => {
-    const callback = () => this.clerkjs?.redirectToHome();
+  redirectToAfterSignUp = (): void => {
+    const callback = () => this.clerkjs?.redirectToAfterSignUp();
     if (this.clerkjs && this.#loaded) {
       return callback();
     } else {
-      this.premountMethodCalls.set('redirectToHome', callback);
-      return;
+      this.premountMethodCalls.set('redirectToAfterSignUp', callback);
+    }
+  };
+
+  redirectToAfterSignIn = (): void => {
+    const callback = () => this.clerkjs?.redirectToAfterSignIn();
+    if (this.clerkjs && this.#loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('redirectToAfterSignIn', callback);
     }
   };
 
