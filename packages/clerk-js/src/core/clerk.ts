@@ -738,7 +738,7 @@ export class Clerk implements ClerkInterface {
 
   public buildRedirectToAfterSignInUrl(): string {
     if (this.#options.afterSignInUrl === undefined) {
-      return '';
+      return '/';
     }
 
     return this.buildUrlWithAuth(this.#options.afterSignInUrl);
@@ -746,7 +746,7 @@ export class Clerk implements ClerkInterface {
 
   public buildRedirectToAfterSignUpUrl(): string {
     if (this.#options.afterSignUpUrl === undefined) {
-      return '';
+      return '/';
     }
 
     return this.buildUrlWithAuth(this.#options.afterSignUpUrl);
