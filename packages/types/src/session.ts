@@ -1,13 +1,14 @@
 import type { ActJWTClaim } from './jwt';
 import type {
   MembershipRole,
-  OrganizationCustomPermission,
-  OrganizationCustomRole,
-  OrganizationPermission,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
+  OrganizationPermissionKey,
 } from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
+
 export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
 export type CheckAuthorizationWithCustomPermissions =
@@ -15,12 +16,12 @@ export type CheckAuthorizationWithCustomPermissions =
 
 type CheckAuthorizationParamsWithCustomPermissions =
   | {
-      role: OrganizationCustomRole;
+      role: OrganizationCustomRoleKey;
       permission?: never;
     }
   | {
       role?: never;
-      permission: OrganizationCustomPermission;
+      permission: OrganizationCustomPermissionKey;
     };
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
@@ -34,7 +35,7 @@ type CheckAuthorizationParams =
           }
         | {
             role?: never;
-            permission: OrganizationPermission;
+            permission: OrganizationPermissionKey;
           }
       )[];
       role?: never;
@@ -48,7 +49,7 @@ type CheckAuthorizationParams =
   | {
       some?: never;
       role?: never;
-      permission: OrganizationPermission;
+      permission: OrganizationPermissionKey;
     };
 
 export interface SessionResource extends ClerkResource {

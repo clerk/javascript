@@ -1,8 +1,8 @@
 import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend';
 import type {
   CheckAuthorizationWithCustomPermissions,
-  OrganizationCustomPermission,
-  OrganizationCustomRole,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
 } from '@clerk/types';
 import { notFound } from 'next/navigation';
 
@@ -21,12 +21,12 @@ export const auth = () => {
           protect: (
             params?:
               | {
-                  role: OrganizationCustomRole;
+                  role: OrganizationCustomRoleKey;
                   permission?: never;
                 }
               | {
                   role?: never;
-                  permission: OrganizationCustomPermission;
+                  permission: OrganizationCustomPermissionKey;
                 }
               | ((has: CheckAuthorizationWithCustomPermissions) => boolean),
           ) => AuthObjectWithoutResources<SignedInAuthObject>;

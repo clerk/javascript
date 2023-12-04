@@ -2,8 +2,8 @@ import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
   JwtPayload,
-  OrganizationCustomPermission,
-  OrganizationCustomRole,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
   ServerGetToken,
   ServerGetTokenOptions,
 } from '@clerk/types';
@@ -30,9 +30,9 @@ export type SignedInAuthObject = {
   userId: string;
   user: User | undefined;
   orgId: string | undefined;
-  orgRole: OrganizationCustomRole | undefined;
+  orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
-  orgPermissions: OrganizationCustomPermission[] | undefined;
+  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   organization: Organization | undefined;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;

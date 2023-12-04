@@ -1,8 +1,8 @@
 import type {
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
-  OrganizationCustomPermission,
-  OrganizationCustomRole,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
 } from '@clerk/types';
 import React from 'react';
 
@@ -50,13 +50,13 @@ type ProtectProps = React.PropsWithChildren<
   (
     | {
         condition?: never;
-        role: OrganizationCustomRole;
+        role: OrganizationCustomRoleKey;
         permission?: never;
       }
     | {
         condition?: never;
         role?: never;
-        permission: OrganizationCustomPermission;
+        permission: OrganizationCustomPermissionKey;
       }
     | {
         condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
