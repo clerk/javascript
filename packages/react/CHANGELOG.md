@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.28.2
+
+### Patch Changes
+
+- Sync IsomorphicClerk with the clerk singleton and the LoadedClerk interface. IsomorphicClerk now extends from LoadedClerk. ([#2233](https://github.com/clerk/javascript/pull/2233)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.28.1
 
 ### Patch Changes
