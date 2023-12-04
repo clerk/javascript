@@ -4,11 +4,12 @@ import { authMiddleware } from '@clerk/nextjs/server';
 const publicPaths = ['/', /^(?!\/(sign-in|sign-up|app-dir|custom)\/*).*$/];
 
 export const middleware = (req, evt) => {
-  console.log(req.url, req.headers.get("x-publishable-key"));
+  console.log("pk", req.headers.get("x-publishable-key"));
   return authMiddleware({
     publicRoutes: publicPaths,
     publishableKey: req.headers.get("x-publishable-key"),
     secretKey: req.headers.get("x-secret-key"),
+    debug: true
   })(req, evt)
 };
 

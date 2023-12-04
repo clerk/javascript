@@ -85,20 +85,17 @@ type TestConfig = Readonly<{
   proxyUrl?: string;
 }>;
 
-function generateConfig({
+export function generateConfig({
   mode,
-  pkHost,
   matchedKeys = true,
-  domain,
-  proxyUrl,
 }: {
   mode: 'test' | 'live';
-  pkHost: string;
   matchedKeys?: boolean;
   domain?: string;
   proxyUrl?: string;
 }): TestConfig {
   const ins_id = uuid.v4();
+  const pkHost = `clerk.${uuid.v4()}.com`;
   const pk = `pk_${mode}_${btoa(`${pkHost}$`)}`;
   const sk = `sk_${mode}_${uuid.v4()}`;
   const rsa = matchedKeys
@@ -119,7 +116,7 @@ function generateConfig({
   };
 
   const generateToken = (claims: any) => {
-    return jwt.sign(claims, rsaPairs.a, {
+    return jwt.sign(claims, rsa.private, {
       algorithm: 'RS256',
       header: { kid: ins_id },
     });
@@ -129,15 +126,11 @@ function generateConfig({
     sk,
     generateToken,
     jwks,
-    domain,
-    proxyUrl,
   });
   allConfigs.push(config);
   return config;
 }
 
-function getJwksFromSecretKey(sk: any) {
-  return allConfigs.find((x: any) => x.sk === sk);
+export function getJwksFromSecretKey(sk: any) {
+  return allConfigs.find((x: any) => x.sk === sk)?.jwks;
 }
-
-export { generateConfig, getJwksFromSecretKey };
