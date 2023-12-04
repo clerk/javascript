@@ -196,7 +196,6 @@ const createGetToken: CreateGetToken = params => {
   };
 };
 
-//MAYBE move this to @shared
 const createHasAuthorization =
   ({
     orgId,
@@ -210,9 +209,8 @@ const createHasAuthorization =
     orgPermissions: string[] | undefined;
   }): CheckAuthorizationWithCustomPermissions =>
   params => {
-    // TODO: assert
     if (!params?.permission && !params?.role) {
-      throw 'Permission or role is required';
+      throw new Error('Missing params. `has` from `useAuth` requires a permission or role key to be passed.');
     }
 
     if (!orgId || !userId || !orgRole || !orgPermissions) {

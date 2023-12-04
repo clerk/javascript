@@ -1,9 +1,5 @@
 import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend';
-import type {
-  CheckAuthorizationWithCustomPermissions,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-} from '@clerk/types';
+import type { CheckAuthorizationWithCustomPermissions } from '@clerk/types';
 import { notFound } from 'next/navigation';
 
 import { authAuthHeaderMissing } from '../../server/errors';
@@ -11,37 +7,29 @@ import { buildClerkProps, createGetAuth } from '../../server/getAuth';
 import type { AuthObjectWithoutResources } from '../../server/types';
 import { buildRequestLike } from './utils';
 
+type AuthSignedIn = AuthObjectWithoutResources<
+  SignedInAuthObject & {
+    protect: (
+      params?:
+        | Parameters<CheckAuthorizationWithCustomPermissions>[0]
+        | ((has: CheckAuthorizationWithCustomPermissions) => boolean),
+    ) => AuthObjectWithoutResources<SignedInAuthObject>;
+  }
+>;
+
+type AuthSignedOut = AuthObjectWithoutResources<
+  SignedOutAuthObject & {
+    protect: never;
+  }
+>;
+
 export const auth = () => {
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing(),
-  })(buildRequestLike()) as
-    | AuthObjectWithoutResources<
-        SignedInAuthObject & {
-          protect: (
-            params?:
-              | {
-                  role: OrganizationCustomRoleKey;
-                  permission?: never;
-                }
-              | {
-                  role?: never;
-                  permission: OrganizationCustomPermissionKey;
-                }
-              | ((has: CheckAuthorizationWithCustomPermissions) => boolean),
-          ) => AuthObjectWithoutResources<SignedInAuthObject>;
-        }
-      >
-    /**
-     * Add a comment
-     */
-    | AuthObjectWithoutResources<
-        SignedOutAuthObject & {
-          protect: never;
-        }
-      >;
+  })(buildRequestLike());
 
-  authObject.protect = params => {
+  (authObject as AuthSignedIn).protect = params => {
     /**
      * User is not authenticated
      */
@@ -63,7 +51,7 @@ export const auth = () => {
       if (params(authObject.has)) {
         return { ...authObject };
       }
-      return notFound();
+      notFound();
     }
 
     /**
@@ -76,7 +64,7 @@ export const auth = () => {
     notFound();
   };
 
-  return authObject;
+  return authObject as AuthSignedIn | AuthSignedOut;
 };
 
 export const initialState = () => {

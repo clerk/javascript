@@ -9,7 +9,7 @@ import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
-import { invalidStateError } from '../errors';
+import { invalidStateError, useAuthHasRequiresRoleOrPermission } from '../errors';
 import { errorThrower } from '../utils';
 import { createGetToken, createSignOut } from './utils';
 
@@ -116,9 +116,8 @@ export const useAuth: UseAuth = () => {
 
   const has = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
-      // TODO: assert
       if (!params?.permission && !params?.role) {
-        throw 'Permission or role is required';
+        errorThrower.throw(useAuthHasRequiresRoleOrPermission);
       }
 
       if (!orgId || !userId || !orgRole || !orgPermissions) {
