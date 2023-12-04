@@ -11,6 +11,7 @@ import pkg from './package.json';
 const root = resolve(__dirname, 'src');
 const pagesDir = resolve(root, 'pages');
 const assetsDir = resolve(root, 'assets');
+const componentsDir = resolve(root, 'components');
 const outDir = resolve(__dirname, 'dist');
 const publicDir = resolve(__dirname, 'public');
 
@@ -19,7 +20,7 @@ const isDev = process.env.__DEV__ === 'true';
 const extensionManifest = {
   ...manifest,
   ...(isDev ? devManifest : {} as ManifestV3Export),
-  name: isDev ? `DEV: ${ manifest.name }` : manifest.name,
+  name: isDev ? `DEV: ${manifest.name}` : manifest.name,
   version: pkg.version,
 };
 
@@ -50,9 +51,10 @@ const crxPlugin = crx({
 export default defineConfig({
   resolve: {
     alias: {
-      '@src': root,
       '@assets': assetsDir,
+      '@components': componentsDir,
       '@pages': pagesDir,
+      '@src': root,
     },
   },
   plugins: [
@@ -65,6 +67,11 @@ export default defineConfig({
     emptyOutDir: true, // !isDev,
     outDir,
     minify: !isDev,
-    sourcemap: isDev
+    sourcemap: isDev,
+    rollupOptions: {
+      input: {
+        panel: 'src/pages/panel/index.html',
+      },
+    },
   },
 });

@@ -1,0 +1,12 @@
+body {
+  width: 500px;
+  min-height: 350px;
+  margin: 0;
+  position: relative;
+}
+
+.container {
+  text-align: center;
+  padding: 24px;
+}
+

@@ -28,7 +28,40 @@ Would you like to work on Open Source software and help maintain this repository
 
 ## Introduction
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). It demonstrates a basic password or OTP flow using ClerkJS Components in a Chrome Extension Popup.
+This project was bootstrapped with [Vite](https://vitejs.dev/) with [CRXJ](https://crxjs.dev/vite-plugin/).
+
+It's a kitchen-sink starter of how to use ClerkJS in a Chrome Extension either as a Standalone App or alongside a Web Application via WebSSO.
+
+It demonstrates a basic password or OTP flow using ClerkJS Components in the following extension contexts:
+
+- [x] Popup
+- [x] Chrome Pages
+  - [x] New Tab
+  - [x] History
+  - [x] Bookmark Manager
+- [x] Dev Tools
+- [x] Extension Options
+
+## Getting Started
+
+- Clone this repo
+- Run `npm install`
+- Copy manifest examples: `cp manifest.json.example manifest.json; cp manifest.dev.json.example manifest.dev.json`
+
+
+
+
+
+
+
+
+
+
+
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). 
+
+It demonstrates a basic password or OTP flow using ClerkJS Components in a Chrome Extension Popup.
 
 <img src="./demo.png" height="400">
 

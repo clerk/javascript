@@ -1,5 +1,10 @@
 {
   "host_permissions": [
-    "*://localhost:*/*"
-  ]
+    "*://localhost/*",
+    "*://<ANY_CUSTOM_LOCAL_DOMAIN>/*"
+  ],
+  "icons": {
+    "32": "dev-icon-32.png",
+    "128": "dev-icon-128.png"
+  }
 }

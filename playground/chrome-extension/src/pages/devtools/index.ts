@@ -1,7 +1,6 @@
-import Browser from 'webextension-polyfill';
+import browser from 'webextension-polyfill';
 
-Browser
+browser
   .devtools
   .panels
-  .create('Dev Tools', 'icon-32.png', 'src/pages/panel/index.html')
-  .catch(console.error);
+  .create('Clerk Starter', 'icon-32.png', 'src/pages/panel/index.html');

@@ -1,6 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import Options from '@pages/options/Options';
+import Options from './options';
+
+import '@assets/styles/index.css';
+import './style.css';
 
 function init() {
   const rootContainer = document.querySelector("#__root");
