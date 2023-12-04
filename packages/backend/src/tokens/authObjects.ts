@@ -210,7 +210,9 @@ const createHasAuthorization =
   }): CheckAuthorizationWithCustomPermissions =>
   params => {
     if (!params?.permission && !params?.role) {
-      throw new Error('Missing params. `has` from `useAuth` requires a permission or role key to be passed.');
+      throw new Error(
+        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed.',
+      );
     }
 
     if (!orgId || !userId || !orgRole || !orgPermissions) {

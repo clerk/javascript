@@ -17,15 +17,27 @@ export function SignedOut(props: React.PropsWithChildren) {
 
 type ProtectServerComponentProps = React.ComponentProps<typeof ProtectClientComponent>;
 
+/**
+ * Use `<Protect/>` in order to prevent unauthenticated or unauthorized user from accessing the children passed to the component.
+ *
+ * Examples:
+ * ```
+ * <Protect permission="a_permission_key" />
+ * <Protect role="a_role_key" />
+ * <Protect condition={(has) => has({permission:"a_permission_key"})} />
+ * <Protect condition={(has) => has({role:"a_role_key"})} />
+ * <Protect fallback={<p>Unauthorized</p>}/>
+ * ```
+ */
 export function Protect(props: ProtectServerComponentProps) {
   const { children, fallback, ...restAuthorizedParams } = props;
-  const { has, userId, sessionId } = auth();
+  const { has, userId } = auth();
 
   /**
    * If neither of the authorization params are passed behave as the `<SignedIn/>`
    */
   if (!restAuthorizedParams.condition && !restAuthorizedParams.role && !restAuthorizedParams.permission) {
-    if (userId && sessionId) {
+    if (userId) {
       return <>{children}</>;
     }
     return <>{fallback ?? null}</>;
