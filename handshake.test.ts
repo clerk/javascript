@@ -422,6 +422,7 @@ test('Handshake result - dev - nominal', async () => {
   const handshake = btoa(JSON.stringify(cookiesToSet));
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
+      Cookie: `${devBrowserCookie}`,
       'X-Publishable-Key': config.pk,
       'X-Secret-Key': config.sk,
     }),
@@ -444,6 +445,7 @@ test('Handshake result - dev - skew - clock behind', async () => {
   const handshake = btoa(JSON.stringify(cookiesToSet));
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
+      Cookie: `${devBrowserCookie}`,
       'X-Publishable-Key': config.pk,
       'X-Secret-Key': config.sk,
     }),
@@ -461,6 +463,7 @@ test('Handshake result - dev - skew - clock ahead', async () => {
   const handshake = btoa(JSON.stringify(cookiesToSet));
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
+      Cookie: `${devBrowserCookie}`,
       'X-Publishable-Key': config.pk,
       'X-Secret-Key': config.sk,
     }),
@@ -479,12 +482,59 @@ test('Handshake result - dev - mismatched keys', async () => {
   const handshake = btoa(JSON.stringify(cookiesToSet));
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
+      Cookie: `${devBrowserCookie}`,
       'X-Publishable-Key': config.pk,
       'X-Secret-Key': config.sk,
     }),
     redirect: 'manual',
   });
   expect(res.status).toBe(500);
+});
+
+// I don't know if we need this one? We might pass new devbrowser back in handshake
+test('Handshake result - dev - new devbrowser', async () => {
+  const config = generateConfig({
+    mode: 'test',
+  });
+  const { token } = config.generateToken({ state: 'active' });
+  const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
+  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const res = await fetch(url + '/?__clerk_handshake=' + handshake + '&__clerk_db_jwt=asdf', {
+    headers: new Headers({
+      Cookie: `${devBrowserCookie}`,
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(307);
+  expect(res.headers.get('location')).toBe('/');
+  const headers = [...res.headers.entries()];
+  cookiesToSet.forEach(cookie => {
+    expect(headers).toContainEqual(['set-cookie', cookie]);
+  });
+  console.log(entries);
+  expect(headers).toContainEqual(['set-cookie', '__clerk_db_jwt=asdf']);
+});
+
+test('External visit - new devbrowser', async () => {
+  const config = generateConfig({
+    mode: 'test',
+  });
+  const res = await fetch(url + '/?__clerk_db_jwt=asdf', {
+    headers: new Headers({
+      Cookie: `${devBrowserCookie}`,
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(307);
+  // expect(res.headers.get('location')).toBe('/');
+  const headers = [...res.headers.entries()];
+  console.log(headers);
+  // Set cookie should look bigger than this
+  expect(headers).toContainEqual(['set-cookie', '__clerk_db_jwt=asdf']);
 });
 
 test('Handshake result - prod - nominal', async () => {
