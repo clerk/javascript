@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.27.4
+
+### Patch Changes
+
+- Drop the introduction of `OrganizationRole` and `OrganizationPermission` resources fro BAPI. ([#2257](https://github.com/clerk/javascript/pull/2257)) by [@panteliselef](https://github.com/panteliselef)
+
+- Ensure that cookies set inside Next.js Middleware are correctly passed through while using [`authMiddleware`](https://clerk.com/docs/references/nextjs/auth-middleware). ([#2260](https://github.com/clerk/javascript/pull/2260)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`11fdbcb39`](https://github.com/clerk/javascript/commit/11fdbcb39ba155fcada663897c24911d84ff3654)]:
+  - @clerk/clerk-sdk-node@4.12.23
+  - @clerk/backend@0.34.3
+
 ## 4.27.3
 
 ### Patch Changes

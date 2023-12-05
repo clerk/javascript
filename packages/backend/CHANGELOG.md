@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.34.3
+
+### Patch Changes
+
+- Drop the introduction of `OrganizationRole` and `OrganizationPermission` resources fro BAPI. ([#2257](https://github.com/clerk/javascript/pull/2257)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 0.34.2
 
 ### Patch Changes
