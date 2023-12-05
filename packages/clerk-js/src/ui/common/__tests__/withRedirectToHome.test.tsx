@@ -6,7 +6,7 @@ import {
   withRedirectToHomeOrganizationGuard,
   withRedirectToHomeSingleSessionGuard,
   withRedirectToHomeUserGuard,
-} from '../withRedirectToHome';
+} from '../withRedirect';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 

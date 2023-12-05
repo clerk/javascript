@@ -1,3 +1,3 @@
-import { SSOCallback, withRedirectToHomeSingleSessionGuard } from '../../common';
+import { SSOCallback, withRedirectToAfterSignIn } from '../../common';
 
-export const SignInSSOCallback = withRedirectToHomeSingleSessionGuard(SSOCallback);
+export const SignInSSOCallback = withRedirectToAfterSignIn(SSOCallback);

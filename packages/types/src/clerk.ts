@@ -344,7 +344,12 @@ export interface Clerk {
   /**
    * Returns the configured home URL of the instance.
    */
-  buildHomeUrl(): string;
+  buildAfterSignInUrl(): string;
+
+  /**
+   * Returns the configured home URL of the instance.
+   */
+  buildAfterSignUpUrl(): string;
 
   /**
    *

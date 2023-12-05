@@ -6,11 +6,7 @@ import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
-import {
-  getIdentifierControlDisplayValues,
-  groupIdentifiers,
-  withRedirectToHomeSingleSessionGuard,
-} from '../../common';
+import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
@@ -390,4 +386,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_SignInStart));
+export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(_SignInStart));

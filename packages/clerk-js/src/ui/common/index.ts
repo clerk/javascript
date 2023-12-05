@@ -6,7 +6,7 @@ export * from './Gate';
 export * from './InfiniteListSpinner';
 export * from './redirects';
 export * from './verification';
-export * from './withRedirectToHome';
+export * from './withRedirect';
 export * from './SSOCallback';
 export * from './EmailLinkVerify';
 export * from './EmailLinkStatusCard';

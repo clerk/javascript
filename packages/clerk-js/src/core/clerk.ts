@@ -736,7 +736,7 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#environment.displayConfig.homeUrl);
   }
 
-  public buildRedirectToAfterSignInUrl(): string {
+  public buildAfterSignInUrl(): string {
     if (this.#options.afterSignInUrl === undefined) {
       return '/';
     }
@@ -744,7 +744,7 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#options.afterSignInUrl);
   }
 
-  public buildRedirectToAfterSignUpUrl(): string {
+  public buildAfterSignUpUrl(): string {
     if (this.#options.afterSignUpUrl === undefined) {
       return '/';
     }
@@ -830,14 +830,14 @@ export class Clerk implements ClerkInterface {
 
   public redirectToAfterSignIn = async (): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildRedirectToAfterSignInUrl());
+      return this.navigate(this.buildAfterSignInUrl());
     }
     return;
   };
 
   public redirectToAfterSignUp = async (): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildRedirectToAfterSignUpUrl());
+      return this.navigate(this.buildAfterSignUpUrl());
     }
     return;
   };
