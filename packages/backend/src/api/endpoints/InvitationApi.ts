@@ -8,6 +8,8 @@ type CreateParams = {
   emailAddress: string;
   redirectUrl?: string;
   publicMetadata?: UserPublicMetadata;
+  delay?: boolean;
+  ignoreExisting?: boolean;
 };
 
 type GetInvitationListParams = {
