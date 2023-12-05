@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getAuth, clerkClient } from '@clerk/nextjs/server';
+import { clerkClient, getAuth } from '@clerk/nextjs/server';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { userId } = await getAuth(req);
   if (!userId) return res.status(401);
 
   const user = await clerkClient.users.getUser(userId);
-  const email = user.primaryEmailAddressId;
+  const email = user.data?.primaryEmailAddressId;
 
   if (!email) return res.status(422).json({ error: 'primaryEmailAddress is required!' });
 
