@@ -40,7 +40,6 @@ describe('mergeResponses', function () {
 
   it('should merge the cookies with non-response values', function () {
     const response2 = NextResponse.next();
-    console.log(response2);
     response2.cookies.set('foo', '1');
     response2.cookies.set({
       name: 'second',
