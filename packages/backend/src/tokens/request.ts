@@ -95,8 +95,9 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const pkFapi = pk?.frontendApi || '';
       // determine proper FAPI url, taking into account multi-domain setups
       const frontendApi = proxyUrl || (!isDevOrStagingUrl(pkFapi) ? addClerkPrefix(domain) : '') || pkFapi;
+      const frontendApiNoProtocol = frontendApi.replace(/http(s)?:\/\//, '');
 
-      const url = new URL(`https://${frontendApi}/v1/client/handshake`);
+      const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
       url.searchParams.append('redirect_url', redirectUrl);
 
       if (pk?.instanceType === 'development' && devBrowserToken) {
@@ -106,17 +107,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     }
 
     async function verifyRequestState(options: InterstitialRuleOptions, token: string) {
-      const { isSatellite, proxyUrl } = options;
-      let issuer;
-      if (isSatellite) {
-        issuer = null;
-      } else if (proxyUrl) {
-        issuer = proxyUrl;
-      } else {
-        issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
-      }
-
-      return verifyToken(token, { ...options, issuer });
+      return verifyToken(token, options);
     }
 
     const clientUat = parseInt(ruleOptions.clientUat || '', 10) || 0;
@@ -196,6 +187,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         buildRedirectToHandshake({
           publishableKey: ruleOptions.publishableKey!,
           devBrowserToken: ruleOptions.devBrowserToken!,
+          proxyUrl: ruleOptions.proxyUrl,
+          domain: ruleOptions.domain,
           redirectUrl: ruleOptions.request.url.toString(),
         }),
       );
@@ -211,6 +204,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         buildRedirectToHandshake({
           publishableKey: ruleOptions.publishableKey!,
           devBrowserToken: ruleOptions.devBrowserToken!,
+          proxyUrl: ruleOptions.proxyUrl,
+          domain: ruleOptions.domain,
           redirectUrl: ruleOptions.request.url.toString(),
         }),
       );
@@ -228,6 +223,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         buildRedirectToHandshake({
           publishableKey: ruleOptions.publishableKey!,
           devBrowserToken: ruleOptions.devBrowserToken!,
+          proxyUrl: ruleOptions.proxyUrl,
+          domain: ruleOptions.domain,
           redirectUrl: ruleOptions.request.url.toString(),
         }),
       );
@@ -257,6 +254,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
             buildRedirectToHandshake({
               publishableKey: ruleOptions.publishableKey!,
               devBrowserToken: ruleOptions.devBrowserToken!,
+              proxyUrl: ruleOptions.proxyUrl,
+              domain: ruleOptions.domain,
               redirectUrl: ruleOptions.request.url.toString(),
             }),
           );
