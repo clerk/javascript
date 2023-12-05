@@ -413,6 +413,50 @@ test('Test redirect url - proxy - prod', async () => {
   );
 });
 
+test('Test redirect url - proxy with port - dev', async () => {
+  const config = generateConfig({
+    mode: 'test',
+  });
+  const { token, claims } = config.generateToken({ state: 'expired' });
+  const clientUat = claims.iat;
+  const res = await fetch(url + '/hello?foo=bar', {
+    headers: new Headers({
+      Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      'X-Forwarded-Host': 'example.com:3213',
+      'X-Forwarded-Proto': 'https',
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(307);
+  expect(res.headers.get('location')).toBe(
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar${devBrowserQuery}`,
+  );
+});
+
+test('Test redirect url - proxy with port - prod', async () => {
+  const config = generateConfig({
+    mode: 'live',
+  });
+  const { token, claims } = config.generateToken({ state: 'expired' });
+  const clientUat = claims.iat;
+  const res = await fetch(url + '/hello?foo=bar', {
+    headers: new Headers({
+      Cookie: `__client_uat=${clientUat}; __session=${token}`,
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      'X-Forwarded-Host': 'example.com:3213',
+      'X-Forwarded-Proto': 'https',
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(307);
+  expect(res.headers.get('location')).toBe(
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar`,
+  );
+});
+
 test('Handshake result - dev - nominal', async () => {
   const config = generateConfig({
     mode: 'test',
