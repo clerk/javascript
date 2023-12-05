@@ -1,10 +1,10 @@
 import { parsePublishableKey } from '@clerk/shared/keys';
+import { Token } from 'src';
 
 import { constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { addClerkPrefix, isDevelopmentFromSecretKey, isDevOrStagingUrl } from '../util/shared';
-import { buildRequestUrl } from '../utils';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, handshake, interstitial, signedIn, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
@@ -49,14 +49,23 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
 }
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
-  const { cookies, headers, searchParams } = buildRequest(options?.request);
+  const { cookies, headers, searchParams, derivedRequestUrl } = buildRequest(options.request);
 
   const ruleOptions = {
     ...options,
     ...loadOptionsFromHeaders(headers),
     ...loadOptionsFromCookies(cookies),
     searchParams,
+    derivedRequestUrl,
   } satisfies InterstitialRuleOptions;
+
+  // TODO: Get types in a better place, there's definitely a pk here
+  const pk = parsePublishableKey(options.publishableKey);
+  if (!pk) {
+    throw new Error('no pk');
+  }
+
+  const instanceType = pk.instanceType;
 
   assertValidSecretKey(ruleOptions.secretKey);
 
@@ -81,42 +90,25 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     function buildRedirectToHandshake({
       publishableKey,
       devBrowserToken,
-      redirectUrl,
-      domain,
+      derivedRequestUrl,
       proxyUrl,
-    }: {
-      publishableKey: string;
-      devBrowserToken: string;
-      redirectUrl: string;
-      domain?: string;
-      proxyUrl?: string;
-    }): string {
+      domain,
+    }: InterstitialRuleOptions): string {
+      const redirectUrl = new URL(derivedRequestUrl as URL);
+      redirectUrl.searchParams.delete('__clerk_db_jwt');
       const pk = parsePublishableKey(publishableKey);
       const pkFapi = pk?.frontendApi || '';
       // determine proper FAPI url, taking into account multi-domain setups
-      const frontendApi = proxyUrl || (!isDevOrStagingUrl(pkFapi) ? addClerkPrefix(domain) : '') || pkFapi;
+      const frontendApi = proxyUrl || (pk?.instanceType !== 'development' ? addClerkPrefix(domain) : '') || pkFapi;
+      const frontendApiNoProtocol = frontendApi.replace(/http(s)?:\/\//, '');
 
-      const url = new URL(`https://${frontendApi}/v1/client/handshake`);
-      url.searchParams.append('redirect_url', redirectUrl);
+      const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
+      url.searchParams.append('redirect_url', redirectUrl?.href || '');
 
       if (pk?.instanceType === 'development' && devBrowserToken) {
         url.searchParams.append('__clerk_db_jwt', devBrowserToken);
       }
       return url.href;
-    }
-
-    async function verifyRequestState(options: InterstitialRuleOptions, token: string) {
-      const { isSatellite, proxyUrl } = options;
-      let issuer;
-      if (isSatellite) {
-        issuer = null;
-      } else if (proxyUrl) {
-        issuer = proxyUrl;
-      } else {
-        issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
-      }
-
-      return verifyToken(token, { ...options, issuer });
     }
 
     const clientUat = parseInt(ruleOptions.clientUat || '', 10) || 0;
@@ -143,11 +135,12 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         }
       });
 
+      // Right after a handshake is a good time to detect the skew
+      // const detectedSkew
       if (parsePublishableKey(options.publishableKey)?.instanceType === 'development') {
-        const newUrl = new URL(options.request.url);
+        const newUrl = new URL(ruleOptions.derivedRequestUrl);
         newUrl.searchParams.delete('__clerk_handshake');
         newUrl.searchParams.delete('__clerk_help');
-
         headers.append('Location', newUrl.toString());
       }
 
@@ -155,30 +148,26 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         return signedOut(ruleOptions, AuthErrorReason.SessionTokenMissing, '', headers);
       }
 
-      try {
-        const verifyResult = await verifyRequestState(ruleOptions, sessionToken);
-        if (verifyResult) {
-          return signedIn(ruleOptions, verifyResult, headers);
-        }
-      } catch (err) {
-        return signedOut(ruleOptions, AuthErrorReason.ClockSkew, '', headers);
+      // Uncaught
+      const verifyResult = await verifyToken(sessionToken, ruleOptions);
+
+      if (verifyResult) {
+        return signedIn(ruleOptions, verifyResult, headers);
       }
     }
 
     // ================ This is to start the handshake if necessary ===================
-    if (ruleOptions.isSatellite && !new URL(options.request.url).searchParams.has('__clerk_synced')) {
-      const redirectUrl = buildRequestUrl(options.request);
+    if (instanceType === 'development' && ruleOptions.derivedRequestUrl.searchParams.has('__clerk_db_jwt')) {
       const headers = new Headers();
-      headers.set(
-        'Location',
-        buildRedirectToHandshake({
-          publishableKey: ruleOptions.publishableKey!,
-          devBrowserToken: ruleOptions.devBrowserToken!,
-          redirectUrl: redirectUrl.toString(),
-          proxyUrl: ruleOptions.proxyUrl,
-          domain: ruleOptions.domain,
-        }),
-      );
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
+
+      // TODO: Add status code for redirection
+      return handshake(ruleOptions, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+    }
+
+    if (ruleOptions.isSatellite && !ruleOptions.derivedRequestUrl.searchParams.has('__clerk_synced')) {
+      const headers = new Headers();
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
       // TODO: Add status code for redirection
       return handshake(ruleOptions, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
@@ -191,14 +180,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
     if (!hasActiveClient && hasSessionToken) {
       const headers = new Headers();
-      headers.set(
-        'Location',
-        buildRedirectToHandshake({
-          publishableKey: ruleOptions.publishableKey!,
-          devBrowserToken: ruleOptions.devBrowserToken!,
-          redirectUrl: ruleOptions.request.url.toString(),
-        }),
-      );
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
       // TODO: Add status code for redirection
       return handshake(ruleOptions, AuthErrorReason.SessionTokenWithoutClientUAT, '', headers);
@@ -206,14 +188,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
     if (hasActiveClient && !hasSessionToken) {
       const headers = new Headers();
-      headers.set(
-        'Location',
-        buildRedirectToHandshake({
-          publishableKey: ruleOptions.publishableKey!,
-          devBrowserToken: ruleOptions.devBrowserToken!,
-          redirectUrl: ruleOptions.request.url.toString(),
-        }),
-      );
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
       // TODO: Add status code for redirection
       return handshake(ruleOptions, AuthErrorReason.ClientUATWithoutSessionToken, '', headers);
@@ -223,21 +198,14 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
     if (decodeResult.payload.iat < clientUat) {
       const headers = new Headers();
-      headers.set(
-        'Location',
-        buildRedirectToHandshake({
-          publishableKey: ruleOptions.publishableKey!,
-          devBrowserToken: ruleOptions.devBrowserToken!,
-          redirectUrl: ruleOptions.request.url.toString(),
-        }),
-      );
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
       // TODO: Add status code for redirection
       return handshake(ruleOptions, AuthErrorReason.SessionTokenOutdated, '', headers);
     }
 
     try {
-      const verifyResult = await verifyRequestState(ruleOptions, sessionToken!);
+      const verifyResult = await verifyToken(sessionToken!, ruleOptions);
       if (verifyResult) {
         return signedIn(ruleOptions, verifyResult);
       }
@@ -252,14 +220,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
         if (reasonToHandshake) {
           const headers = new Headers();
-          headers.set(
-            'Location',
-            buildRedirectToHandshake({
-              publishableKey: ruleOptions.publishableKey!,
-              devBrowserToken: ruleOptions.devBrowserToken!,
-              redirectUrl: ruleOptions.request.url.toString(),
-            }),
-          );
+          headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
           // TODO: Add status code for redirection
           return handshake(ruleOptions, AuthErrorReason.SessionTokenOutdated, '', headers);

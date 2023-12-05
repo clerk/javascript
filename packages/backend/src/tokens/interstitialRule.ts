@@ -25,6 +25,8 @@ export type InterstitialRuleOptions = AuthStatusOptionsType & {
   headerToken?: string;
   /* Request search params value */
   searchParams?: URLSearchParams;
+  /* Derived Request URL */
+  derivedRequestUrl?: URL;
 };
 
 type InterstitialRuleResult = RequestState | undefined;
@@ -171,17 +173,7 @@ export async function runInterstitialRules<T extends InterstitialRuleOptions>(
 }
 
 async function verifyRequestState(options: InterstitialRuleOptions, token: string) {
-  const { isSatellite, proxyUrl } = options;
-  let issuer;
-  if (isSatellite) {
-    issuer = null;
-  } else if (proxyUrl) {
-    issuer = proxyUrl;
-  } else {
-    issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
-  }
-
-  return verifyToken(token, { ...options, issuer });
+  return verifyToken(token, { ...options });
 }
 
 /**
