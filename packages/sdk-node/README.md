@@ -37,7 +37,7 @@ the <a href="https://clerk.com/docs/reference/node/getting-started?utm_source=gi
 
 ### Prerequisites
 
-- Node.js `>=18.18.0` or later
+- Node.js `>=18.17.0` or later
 
 ## Installation
 
