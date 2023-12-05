@@ -76,24 +76,7 @@ t5o8u/dlwJ1fGGday48gs/hA4V/F9zDjecNkYWUB/wUwVStqZljn
 
 const allConfigs: any = [];
 
-type TestConfig = Readonly<{
-  pk: string;
-  sk: string;
-  generateToken: (claims: any) => string;
-  jwks: any;
-  domain?: string;
-  proxyUrl?: string;
-}>;
-
-export function generateConfig({
-  mode,
-  matchedKeys = true,
-}: {
-  mode: 'test' | 'live';
-  matchedKeys?: boolean;
-  domain?: string;
-  proxyUrl?: string;
-}): TestConfig {
+export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'live'; matchedKeys?: boolean }) {
   const ins_id = uuid.v4();
   const pkHost = `clerk.${uuid.v4()}.com`;
   const pk = `pk_${mode}_${btoa(`${pkHost}$`)}`;
@@ -115,17 +98,43 @@ export function generateConfig({
     ],
   };
 
-  const generateToken = (claims: any) => {
-    return jwt.sign(claims, rsa.private, {
-      algorithm: 'RS256',
-      header: { kid: ins_id },
-    });
+  type Claims = {
+    sub: string;
+    iat: number;
+    exp: number;
+    nbf: number;
+  };
+  const generateToken = ({ state }: { state: 'active' | 'expired' | 'early' }) => {
+    let claims = { sub: 'user_12345' } as Claims;
+
+    const now = Math.floor(Date.now() / 1000);
+    if (state === 'active') {
+      claims.iat = now;
+      claims.nbf = now - 10;
+      claims.exp = now + 60;
+    } else if (state === 'expired') {
+      claims.iat = now - 600;
+      claims.nbf = now - 10 - 600;
+      claims.exp = now + 60 - 600;
+    } else if (state === 'early') {
+      claims.iat = now + 600;
+      claims.nbf = now - 10 + 600;
+      claims.exp = now + 60 + 600;
+    }
+    return {
+      token: jwt.sign(claims, rsa.private, {
+        algorithm: 'RS256',
+        header: { kid: ins_id },
+      }),
+      claims,
+    };
   };
   const config = Object.freeze({
     pk,
     sk,
     generateToken,
     jwks,
+    pkHost,
   });
   allConfigs.push(config);
   return config;

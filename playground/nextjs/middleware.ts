@@ -9,6 +9,8 @@ export const middleware = (req, evt) => {
     publicRoutes: publicPaths,
     publishableKey: req.headers.get("x-publishable-key"),
     secretKey: req.headers.get("x-secret-key"),
+    proxyUrl: req.headers.get("x-proxy-url"),
+    domain: req.headers.get("x-domain"),
     debug: true
   })(req, evt)
 };
