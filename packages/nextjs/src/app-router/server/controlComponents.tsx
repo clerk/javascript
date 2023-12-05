@@ -47,13 +47,13 @@ export function Protect(props: ProtectServerComponentProps) {
    * Check against the results of `has` called inside the callback
    */
   if (typeof restAuthorizedParams.condition === 'function') {
-    if (restAuthorizedParams.condition(has)) {
+    if (userId && restAuthorizedParams.condition(has)) {
       return <>{children}</>;
     }
     return <>{fallback ?? null}</>;
   }
 
-  if (has(restAuthorizedParams)) {
+  if (userId && has(restAuthorizedParams)) {
     return <>{children}</>;
   }
 

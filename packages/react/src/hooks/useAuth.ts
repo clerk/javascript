@@ -13,7 +13,8 @@ import { invalidStateError, useAuthHasRequiresRoleOrPermission } from '../errors
 import { errorThrower } from '../utils';
 import { createGetToken, createSignOut } from './utils';
 
-type CheckAuthorizationSignedOut = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
+type CheckAuthorizationSignedOut = undefined;
+type CheckAuthorizationWithoutOrg = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 type UseAuthReturn =
   | {
@@ -51,7 +52,7 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      has: CheckAuthorizationSignedOut;
+      has: CheckAuthorizationWithoutOrg;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -147,7 +148,7 @@ export const useAuth: UseAuth = () => {
       orgId: undefined,
       orgRole: undefined,
       orgSlug: undefined,
-      has: () => false,
+      has: undefined,
       signOut,
       getToken,
     };
@@ -163,7 +164,7 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: () => false,
+      has: undefined,
       signOut,
       getToken,
     };
