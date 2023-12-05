@@ -387,7 +387,7 @@ test('Test redirect url - proxy - dev', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A4011%2Fhello%3Ffoo%3Dbar${devBrowserQuery}`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar${devBrowserQuery}`,
   );
 });
 
@@ -409,7 +409,7 @@ test('Test redirect url - proxy - prod', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A4011%2Fhello%3Ffoo%3Dbar`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar`,
   );
 });
 
@@ -513,7 +513,6 @@ test('Handshake result - dev - new devbrowser', async () => {
   cookiesToSet.forEach(cookie => {
     expect(headers).toContainEqual(['set-cookie', cookie]);
   });
-  console.log(entries);
   expect(headers).toContainEqual(['set-cookie', '__clerk_db_jwt=asdf']);
 });
 

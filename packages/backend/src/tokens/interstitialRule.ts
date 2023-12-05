@@ -25,6 +25,8 @@ export type InterstitialRuleOptions = AuthStatusOptionsType & {
   headerToken?: string;
   /* Request search params value */
   searchParams?: URLSearchParams;
+  /* Derived Request URL */
+  derivedRequestUrl?: URL;
 };
 
 type InterstitialRuleResult = RequestState | undefined;

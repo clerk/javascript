@@ -11,18 +11,17 @@ export const createIsomorphicRequest = (cb: IsomorphicRequestOptions): Request =
   return new runtime.Request(headersGeneratedURL, req);
 };
 
-export const buildRequest = (req?: Request) => {
-  if (!req) {
-    return {};
-  }
+export const buildRequest = (req: Request) => {
   const cookies = parseIsomorphicRequestCookies(req);
   const headers = getHeaderFromIsomorphicRequest(req);
   const searchParams = getSearchParamsFromIsomorphicRequest(req);
+  const derivedRequestUrl = buildRequestUrl(req);
 
   return {
     cookies,
     headers,
     searchParams,
+    derivedRequestUrl,
   };
 };
 

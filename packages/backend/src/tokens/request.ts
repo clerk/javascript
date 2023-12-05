@@ -49,13 +49,14 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
 }
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
-  const { cookies, headers, searchParams } = buildRequest(options?.request);
+  const { cookies, headers, searchParams, derivedRequestUrl } = buildRequest(options.request);
 
   const ruleOptions = {
     ...options,
     ...loadOptionsFromHeaders(headers),
     ...loadOptionsFromCookies(cookies),
     searchParams,
+    derivedRequestUrl,
   } satisfies InterstitialRuleOptions;
 
   assertValidSecretKey(ruleOptions.secretKey);
@@ -81,16 +82,11 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     function buildRedirectToHandshake({
       publishableKey,
       devBrowserToken,
-      redirectUrl,
-      domain,
+      derivedRequestUrl,
       proxyUrl,
-    }: {
-      publishableKey: string;
-      devBrowserToken: string;
-      redirectUrl: string;
-      domain?: string;
-      proxyUrl?: string;
-    }): string {
+      domain,
+    }: InterstitialRuleOptions): string {
+      const redirectUrl = derivedRequestUrl;
       const pk = parsePublishableKey(publishableKey);
       const pkFapi = pk?.frontendApi || '';
       // determine proper FAPI url, taking into account multi-domain setups
@@ -98,7 +94,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const frontendApiNoProtocol = frontendApi.replace(/http(s)?:\/\//, '');
 
       const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
-      url.searchParams.append('redirect_url', redirectUrl);
+      url.searchParams.append('redirect_url', redirectUrl?.href || '');
 
       if (pk?.instanceType === 'development' && devBrowserToken) {
         url.searchParams.append('__clerk_db_jwt', devBrowserToken);
@@ -158,18 +154,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
     // ================ This is to start the handshake if necessary ===================
     if (ruleOptions.isSatellite && !new URL(options.request.url).searchParams.has('__clerk_synced')) {
-      const redirectUrl = buildRequestUrl(options.request);
       const headers = new Headers();
-      headers.set(
-        'Location',
-        buildRedirectToHandshake({
-          publishableKey: ruleOptions.publishableKey!,
-          devBrowserToken: ruleOptions.devBrowserToken!,
-          redirectUrl: redirectUrl.toString(),
-          proxyUrl: ruleOptions.proxyUrl,
-          domain: ruleOptions.domain,
-        }),
-      );
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
       // TODO: Add status code for redirection
       return handshake(ruleOptions, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
@@ -182,16 +168,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
     if (!hasActiveClient && hasSessionToken) {
       const headers = new Headers();
-      headers.set(
-        'Location',
-        buildRedirectToHandshake({
-          publishableKey: ruleOptions.publishableKey!,
-          devBrowserToken: ruleOptions.devBrowserToken!,
-          proxyUrl: ruleOptions.proxyUrl,
-          domain: ruleOptions.domain,
-          redirectUrl: ruleOptions.request.url.toString(),
-        }),
-      );
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
       // TODO: Add status code for redirection
       return handshake(ruleOptions, AuthErrorReason.SessionTokenWithoutClientUAT, '', headers);
@@ -199,16 +176,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
     if (hasActiveClient && !hasSessionToken) {
       const headers = new Headers();
-      headers.set(
-        'Location',
-        buildRedirectToHandshake({
-          publishableKey: ruleOptions.publishableKey!,
-          devBrowserToken: ruleOptions.devBrowserToken!,
-          proxyUrl: ruleOptions.proxyUrl,
-          domain: ruleOptions.domain,
-          redirectUrl: ruleOptions.request.url.toString(),
-        }),
-      );
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
       // TODO: Add status code for redirection
       return handshake(ruleOptions, AuthErrorReason.ClientUATWithoutSessionToken, '', headers);
@@ -218,16 +186,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
     if (decodeResult.payload.iat < clientUat) {
       const headers = new Headers();
-      headers.set(
-        'Location',
-        buildRedirectToHandshake({
-          publishableKey: ruleOptions.publishableKey!,
-          devBrowserToken: ruleOptions.devBrowserToken!,
-          proxyUrl: ruleOptions.proxyUrl,
-          domain: ruleOptions.domain,
-          redirectUrl: ruleOptions.request.url.toString(),
-        }),
-      );
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
       // TODO: Add status code for redirection
       return handshake(ruleOptions, AuthErrorReason.SessionTokenOutdated, '', headers);
@@ -249,16 +208,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
         if (reasonToHandshake) {
           const headers = new Headers();
-          headers.set(
-            'Location',
-            buildRedirectToHandshake({
-              publishableKey: ruleOptions.publishableKey!,
-              devBrowserToken: ruleOptions.devBrowserToken!,
-              proxyUrl: ruleOptions.proxyUrl,
-              domain: ruleOptions.domain,
-              redirectUrl: ruleOptions.request.url.toString(),
-            }),
-          );
+          headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
           // TODO: Add status code for redirection
           return handshake(ruleOptions, AuthErrorReason.SessionTokenOutdated, '', headers);

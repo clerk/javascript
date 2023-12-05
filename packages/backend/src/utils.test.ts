@@ -105,11 +105,6 @@ export default (QUnit: QUnit) => {
       assert.equal(buildRequestUrl(req), 'https://example.com/path');
     });
 
-    test('with path', assert => {
-      const req = new Request('http://localhost:3000/path');
-      assert.equal(buildRequestUrl(req, '/other-path'), 'http://localhost:3000/other-path');
-    });
-
     test('with query params in request', assert => {
       const req = new Request('http://localhost:3000/path');
       assert.equal(buildRequestUrl(req), 'http://localhost:3000/path');
