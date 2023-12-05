@@ -15,11 +15,22 @@ type UserCountParams = {
   query?: string;
   userId?: string[];
   externalId?: string[];
+  last_active_at_since?: number;
 };
 
 type UserListParams = ClerkPaginationRequest<
   UserCountParams & {
-    orderBy?: 'created_at' | 'updated_at' | '+created_at' | '+updated_at' | '-created_at' | '-updated_at';
+    orderBy?:
+      | 'created_at'
+      | 'updated_at'
+      | '+created_at'
+      | '+updated_at'
+      | '-created_at'
+      | '-updated_at'
+      | '+last_sign_in_at'
+      | '+last_active_at'
+      | '-last_sign_in_at'
+      | '-last_active_at';
   }
 >;
 
