@@ -94,20 +94,6 @@ export const assertAuthorizedPartiesClaim = (azp?: string, authorizedParties?: s
   }
 };
 
-export const assertIssuerClaim = (iss: string, issuer: IssuerResolver | null) => {
-  if (typeof issuer === 'function' && !issuer(iss)) {
-    throw new TokenVerificationError({
-      reason: TokenVerificationErrorReason.TokenInvalidIssuer,
-      message: 'Failed JWT issuer resolver. Make sure that the resolver returns a truthy value.',
-    });
-  } else if (typeof issuer === 'string' && iss && iss !== issuer) {
-    throw new TokenVerificationError({
-      reason: TokenVerificationErrorReason.TokenInvalidIssuer,
-      message: `Invalid JWT issuer claim (iss) ${JSON.stringify(iss)}. Expected "${issuer}".`,
-    });
-  }
-};
-
 export const assertExpirationClaim = (exp: number, clockSkewInMs: number) => {
   if (typeof exp !== 'number') {
     throw new TokenVerificationError({

@@ -9,7 +9,6 @@ export enum TokenVerificationErrorReason {
   TokenInvalid = 'token-invalid',
   TokenInvalidAlgorithm = 'token-invalid-algorithm',
   TokenInvalidAuthorizedParties = 'token-invalid-authorized-parties',
-  TokenInvalidIssuer = 'token-invalid-issuer',
   TokenInvalidSignature = 'token-invalid-signature',
   TokenNotActiveYet = 'token-not-active-yet',
   TokenVerificationFailed = 'token-verification-failed',

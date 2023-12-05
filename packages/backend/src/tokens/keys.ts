@@ -98,7 +98,6 @@ export type LoadClerkJWKFromRemoteOptions = {
   secretKey?: string;
   apiUrl?: string;
   apiVersion?: string;
-  issuer?: string;
 };
 
 /**
@@ -108,7 +107,6 @@ export type LoadClerkJWKFromRemoteOptions = {
  * The cache lasts 1 hour by default.
  *
  * @param {Object} options
- * @param {string} options.issuer - The issuer origin of the JWT
  * @param {string} options.kid - The id of the key that the JWT was signed with
  * @param {string} options.alg - The algorithm of the JWT
  * @param {number} options.jwksCacheTtlInMs - The TTL of the jwks cache (defaults to 1 hour)
@@ -118,27 +116,20 @@ export async function loadClerkJWKFromRemote({
   secretKey,
   apiUrl = API_URL,
   apiVersion = API_VERSION,
-  issuer,
   kid,
   jwksCacheTtlInMs = JWKS_CACHE_TTL_MS,
   skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  const shouldRefreshCache = !getFromCache(kid) && reachedMaxCacheUpdatedAt();
-  if (skipJwksCache || shouldRefreshCache) {
-    let fetcher;
-
-    if (secretKey) {
-      fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion);
-    } else if (issuer) {
-      fetcher = () => fetchJWKSFromFAPI(issuer);
-    } else {
+  const needsFetch = !getFromCache(kid) || cacheHasExpired();
+  if (skipJwksCache || needsFetch) {
+    if (!secretKey) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.ContactSupport,
         message: 'Failed to load JWKS from Clerk Backend or Frontend API.',
         reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
       });
     }
-
+    const fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion);
     const { keys } = await callWithRetry<{ keys: JsonWebKeyWithKid[] }>(fetcher);
 
     if (!keys || !keys.length) {
@@ -231,6 +222,6 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   return response.json();
 }
 
-function reachedMaxCacheUpdatedAt() {
+function cacheHasExpired() {
   return Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
 }
