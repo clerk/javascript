@@ -95,8 +95,9 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const pkFapi = pk?.frontendApi || '';
       // determine proper FAPI url, taking into account multi-domain setups
       const frontendApi = proxyUrl || (!isDevOrStagingUrl(pkFapi) ? addClerkPrefix(domain) : '') || pkFapi;
+      const frontendApiNoProtocol = frontendApi.replace(/http(s)?:\/\//, '');
 
-      const url = new URL(`https://${frontendApi}/v1/client/handshake`);
+      const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
       url.searchParams.append('redirect_url', redirectUrl);
 
       if (pk?.instanceType === 'development' && devBrowserToken) {
@@ -186,6 +187,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         buildRedirectToHandshake({
           publishableKey: ruleOptions.publishableKey!,
           devBrowserToken: ruleOptions.devBrowserToken!,
+          proxyUrl: ruleOptions.proxyUrl,
+          domain: ruleOptions.domain,
           redirectUrl: ruleOptions.request.url.toString(),
         }),
       );
@@ -201,6 +204,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         buildRedirectToHandshake({
           publishableKey: ruleOptions.publishableKey!,
           devBrowserToken: ruleOptions.devBrowserToken!,
+          proxyUrl: ruleOptions.proxyUrl,
+          domain: ruleOptions.domain,
           redirectUrl: ruleOptions.request.url.toString(),
         }),
       );
@@ -218,6 +223,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         buildRedirectToHandshake({
           publishableKey: ruleOptions.publishableKey!,
           devBrowserToken: ruleOptions.devBrowserToken!,
+          proxyUrl: ruleOptions.proxyUrl,
+          domain: ruleOptions.domain,
           redirectUrl: ruleOptions.request.url.toString(),
         }),
       );
@@ -247,6 +254,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
             buildRedirectToHandshake({
               publishableKey: ruleOptions.publishableKey!,
               devBrowserToken: ruleOptions.devBrowserToken!,
+              proxyUrl: ruleOptions.proxyUrl,
+              domain: ruleOptions.domain,
               redirectUrl: ruleOptions.request.url.toString(),
             }),
           );

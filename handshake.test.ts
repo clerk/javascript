@@ -180,7 +180,7 @@ test('Test proxyUrl - prod', async () => {
 
 test('Test domain - dev', async () => {
   const config = generateConfig({
-    mode: 'live',
+    mode: 'test',
   });
   const { token, claims } = config.generateToken({ state: 'expired' });
   const clientUat = claims.iat;
@@ -195,7 +195,7 @@ test('Test domain - dev', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F${devBrowserQuery}`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F${devBrowserQuery}`,
   );
 });
 
