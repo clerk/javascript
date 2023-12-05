@@ -3,6 +3,20 @@ import type { ClerkResource } from './resource';
 import type { PublicUserData } from './session';
 import type { Autocomplete } from './utils';
 
+interface Base {
+  permission: string;
+  role: string;
+}
+
+interface Placeholder {
+  permission: unknown;
+  role: unknown;
+}
+
+declare global {
+  interface ClerkAuthorization {}
+}
+
 declare global {
   /**
    * If you want to provide custom types for the organizationMembership.publicMetadata
@@ -36,8 +50,16 @@ export interface OrganizationMembershipResource extends ClerkResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-export type OrganizationCustomPermissionKey = string;
-export type OrganizationCustomRoleKey = string;
+// @ts-expect-error
+export type OrganizationCustomPermissionKey = ClerkAuthorization['permission'] extends Placeholder['permission']
+  ? // @ts-expect-error
+    ClerkAuthorization['permission']
+  : Base['permission'];
+// @ts-expect-error
+export type OrganizationCustomRoleKey = ClerkAuthorization['role'] extends Placeholder['role']
+  ? // @ts-expect-error
+    ClerkAuthorization['role']
+  : Base['role'];
 
 /**
  * @deprecated This type is deprecated and will be removed in the next major release.
