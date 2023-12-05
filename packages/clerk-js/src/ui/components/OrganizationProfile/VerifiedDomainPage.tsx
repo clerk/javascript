@@ -62,7 +62,6 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   });
 
   const { isAuthorizedUser: canManageDomain } = useGate({ permission: 'org:sys_domains:manage' });
-  const { isAuthorizedUser: canDeleteDomain } = useGate({ permission: 'org:sys_domains:delete' });
 
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const { params, navigate, queryParams } = useRouter();
@@ -210,7 +209,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                 )}
               />
             )}
-            {allowsEdit && canDeleteDomain && (
+            {allowsEdit && canManageDomain && (
               <Tab
                 localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.start.headerTitle__danger')}
               />
@@ -270,7 +269,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                 </Form.Root>
               </TabPanel>
             )}
-            {allowsEdit && canDeleteDomain && (
+            {allowsEdit && canManageDomain && (
               <TabPanel
                 direction={'col'}
                 gap={4}

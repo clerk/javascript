@@ -23,17 +23,6 @@ type DomainListProps = GetDomainsParams & {
   fallback?: React.ReactNode;
 };
 
-const useDomainList = () => {
-  const { isAuthorizedUser: canDeleteDomain } = useGate({ permission: 'org:sys_domains:delete' });
-  const { isAuthorizedUser: canVerifyDomain } = useGate({ permission: 'org:sys_domains:manage' });
-
-  return {
-    showDotMenu: canDeleteDomain || canVerifyDomain,
-    canVerifyDomain,
-    canDeleteDomain,
-  };
-};
-
 const buildDomainListRelativeURL = (parentPath: string, domainId: string, mode?: 'verify' | 'remove') =>
   trimLeadingSlash(stripOrigin(toURL(`${parentPath}/${domainId}/${mode || ''}`)));
 
@@ -41,19 +30,17 @@ const useMenuActions = (
   parentPath: string,
   domainId: string,
 ): { label: LocalizationKey; onClick: () => Promise<unknown>; isDestructive?: boolean }[] => {
-  const { canDeleteDomain, canVerifyDomain } = useDomainList();
+  const { isAuthorizedUser: canManageDomain } = useGate({ permission: 'org:sys_domains:manage' });
+
   const { navigate } = useRouter();
 
   const menuActions = [];
 
-  if (canVerifyDomain) {
+  if (canManageDomain) {
     menuActions.push({
       label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify'),
       onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'verify')),
     });
-  }
-
-  if (canDeleteDomain) {
     menuActions.push({
       label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove'),
       isDestructive: true,
@@ -84,7 +71,7 @@ export const DomainList = withGate(
       },
     });
 
-    const { showDotMenu } = useDomainList();
+    const { isAuthorizedUser: canManageDomain } = useGate({ permission: 'org:sys_domains:manage' });
     const { ref } = useInView({
       threshold: 0,
       onChange: inView => {
@@ -123,7 +110,7 @@ export const DomainList = withGate(
       <Col>
         {domainList.length === 0 && !domains?.isLoading && fallback}
         {domainList.map(d => {
-          if (!(d.verification && d.verification.status === 'verified') || !showDotMenu) {
+          if (!(d.verification && d.verification.status === 'verified') || !canManageDomain) {
             return (
               <BlockWithTrailingComponent
                 key={d.id}
@@ -136,7 +123,7 @@ export const DomainList = withGate(
                 })}
                 badge={<EnrollmentBadge organizationDomain={d} />}
                 trailingComponent={
-                  showDotMenu ? (
+                  canManageDomain ? (
                     <DomainListDotMenu
                       redirectSubPath={redirectSubPath}
                       domainId={d.id}
