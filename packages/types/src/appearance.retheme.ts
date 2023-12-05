@@ -399,6 +399,7 @@ export type ElementsConfig = {
   notificationBadge: WithOptions;
   button: WithOptions<never, LoadingState>;
   providerIcon: WithOptions<OAuthProvider | Web3Provider>;
+  spinner: WithOptions;
 };
 
 export type Elements = {

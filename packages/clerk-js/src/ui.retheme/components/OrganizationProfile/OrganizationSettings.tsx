@@ -127,7 +127,7 @@ const OrganizationDangerSection = () => {
               sx={t => ({ marginRight: t.space.$2 })}
             />
           }
-          variant='outline'
+          variant='secondary'
           colorScheme='danger'
           textVariant='buttonExtraSmallBold'
           onClick={() => navigate('leave')}
@@ -143,7 +143,7 @@ const OrganizationDangerSection = () => {
                 sx={t => ({ marginRight: t.space.$2 })}
               />
             }
-            variant='outline'
+            variant='secondary'
             colorScheme='danger'
             textVariant='buttonExtraSmallBold'
             onClick={() => navigate('delete')}

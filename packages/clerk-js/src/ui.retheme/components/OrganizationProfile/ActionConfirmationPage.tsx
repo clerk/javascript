@@ -90,7 +90,7 @@ type ActionConfirmationPageProps = {
   successMessage: LocalizationKey;
   submitLabel: LocalizationKey;
   onConfirmation: () => Promise<any>;
-  colorScheme?: 'danger' | 'neutral' | 'primary';
+  colorScheme?: 'danger' | 'secondary' | 'primary';
 };
 
 const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationPageProps) => {

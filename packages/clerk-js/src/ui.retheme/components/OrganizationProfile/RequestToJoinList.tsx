@@ -109,7 +109,7 @@ const AcceptRejectRequestButtons = (props: { onAccept: () => unknown; onReject: 
 
       <Button
         textVariant='buttonExtraSmallBold'
-        variant='solid'
+        variant='primary'
         isLoading={card.isLoading && card.loadingMetadata === 'accept'}
         isDisabled={card.isLoading && card.loadingMetadata !== 'accept'}
         onClick={props.onAccept}

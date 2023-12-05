@@ -305,7 +305,7 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
         onClick={open}
         size='xs'
         variant='ghost'
-        colorScheme='neutral'
+        colorScheme='secondary'
         sx={t => ({
           color: t.colors.$colorText,
           gap: t.space.$1x5,
