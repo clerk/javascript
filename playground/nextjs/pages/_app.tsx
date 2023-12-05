@@ -73,7 +73,10 @@ const AppBar = (props: AppBarProps) => {
         hidePersonal
         afterLeaveOrganizationUrl={'https://www.google.com'}
       />
-      <OrganizationSwitcher organizationProfileMode={'navigation'} />
+      <OrganizationSwitcher
+        organizationProfileMode={'navigation'}
+        organizationProfileUrl={'/organization'}
+      />
       <Link href={'/'}>
         <h2>Nextjs Playground</h2>
       </Link>
