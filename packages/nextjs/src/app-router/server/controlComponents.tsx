@@ -18,7 +18,7 @@ export function SignedOut(props: React.PropsWithChildren) {
 type ProtectServerComponentProps = React.ComponentProps<typeof ProtectClientComponent>;
 
 /**
- * Use `<Protect/>` in order to prevent unauthenticated or unauthorized user from accessing the children passed to the component.
+ * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
  *
  * Examples:
  * ```
@@ -26,7 +26,7 @@ type ProtectServerComponentProps = React.ComponentProps<typeof ProtectClientComp
  * <Protect role="a_role_key" />
  * <Protect condition={(has) => has({permission:"a_permission_key"})} />
  * <Protect condition={(has) => has({role:"a_role_key"})} />
- * <Protect fallback={<p>Unauthorized</p>}/>
+ * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
 export function Protect(props: ProtectServerComponentProps) {
@@ -34,7 +34,8 @@ export function Protect(props: ProtectServerComponentProps) {
   const { has, userId } = auth();
 
   /**
-   * If neither of the authorization params are passed behave as the `<SignedIn/>`
+   * If neither of the authorization params are passed behave as the `<SignedIn/>`.
+   * If fallback is present render that instead of rendering nothing.
    */
   if (!restAuthorizedParams.condition && !restAuthorizedParams.role && !restAuthorizedParams.permission) {
     if (userId) {
@@ -58,7 +59,7 @@ export function Protect(props: ProtectServerComponentProps) {
   }
 
   /**
-   * Fallback to custom ui or null if authorization checks failed
+   * Fallback to UI provided by user or `null` if authorization checks failed
    */
   return <>{fallback ?? null}</>;
 }

@@ -74,7 +74,7 @@ type ProtectProps = React.PropsWithChildren<
 >;
 
 /**
- * Use `<Protect/>` in order to prevent unauthenticated or unauthorized user from accessing the children passed to the component.
+ * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
  *
  * Examples:
  * ```
@@ -82,14 +82,15 @@ type ProtectProps = React.PropsWithChildren<
  * <Protect role="a_role_key" />
  * <Protect condition={(has) => has({permission:"a_permission_key"})} />
  * <Protect condition={(has) => has({role:"a_role_key"})} />
- * <Protect fallback={<p>Unauthorized</p>}/>
+ * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
 export const Protect = ({ children, fallback, ...restAuthorizedParams }: ProtectProps) => {
   const { has, userId } = useAuth();
 
   /**
-   * If neither of the authorization params are passed behave as the `<SignedIn/>`
+   * If neither of the authorization params are passed behave as the `<SignedIn/>`.
+   * If fallback is present render that instead of rendering nothing.
    */
   if (!restAuthorizedParams.condition && !restAuthorizedParams.role && !restAuthorizedParams.permission) {
     if (userId) {
@@ -113,7 +114,7 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
   }
 
   /**
-   * Fallback to custom ui or null if authorization checks failed
+   * Fallback to UI provided by user or `null` if authorization checks failed
    */
   return <>{fallback ?? null}</>;
 };
