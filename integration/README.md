@@ -1,193 +1,460 @@
-# Integration testing
+# Integration Testing
 
-## Local setup
+Clerk offers SDKs with bindings for different frameworks, platforms, and runtimes. This is a broad surface area and we often don't have control over those upstream dependencies. In an effort to ensure that all Clerk integrations work as expected, the goals of this integration test suite are:
 
-### Installation
+- Catch accidental breaking changes
+- Test existing flows using our prebuilt components
+- CJS and ESM interop works
+- SDKs behave the same locally and deployed
+- The flows work using Clerk's development instances
 
-If you haven’t run the integration tests before, make sure to run `npm i` from the root of the `javascript` repo so all Playwright dependencies are installed - Playwright will download the browser binaries needed for the integration tests.
+We're using [Playwright](https://playwright.dev/) for our tests, so make yourself familiar with it by reading its documentation.
 
-### Env variables
+## Prerequisites
 
-The integration suite uses env variables to switch between Clerk instances or use 3rd party services to access emails sent to complete auth flows like signing in with email code or email links. Even though not all env variables are needed to run specific tests, we recommend setting them all at the beginning to avoid confusion later.
+Before you begin writing tests, you should already have:
 
-Note that these environment variables will be available to the tests via `process.env.INTEGRATION_INSTANCE_KEYS` on our CICD.
+- Followed the setup instructions in the [contributing guide](../docs/CONTRIBUTING.md)
+- Access to Clerk's 1Password
+- Access to the **Integration testing** organization on Clerk (it owns the Clerk instances used in the tests)
+- Chromium installed. Run `npx playwright install chromium`.
 
-To create the necessary files, run:
+## Initial setup
 
-```json
-cd javascript/integration
-cp .env.local.sample .env.local
-cp .keys.json.sample .keys.json
+You'll only need to follow these instructions once when you setup the integration test suite.
+
+1. Navigate to the `integration` folder:
+   ```shell
+   cd integration
+   ```
+1. Make local duplicates of the sample files. They'll be automatically ignored by git:
+   ```shell
+   cp .env.local.sample .env.local
+   cp .keys.json.sample .keys.json
+   ```
+1. Open Clerk's 1Password and search for **JS SDKs integration tests**. Inside the secure note you'll find the secret keys that should go into `.env.local` and `.keys.json`. Copy them over.
+
+> [!CAUTION]
+> Make sure to not accidentally commit any keys. Double check that the two new files are ignored by git.
+
+## Running tests
+
+For most use cases you can rely on the [npm scripts](https://docs.npmjs.com/cli/v10/using-npm/scripts) defined in the root `package.json` file. Thus you'll need to execute the scripts from the repository root.
+
+The **most important** scripts:
+
+- All integration tests in parallel:
+  ```shell
+  npm run test:integration:base
+  ```
+- All tests for a specific preset (e.g. Next.js):
+  ```shell
+  npm run test:integration:nextjs
+  ```
+  Check the `package.json` for more preset scripts.
+
+You can filter tests by filename, e.g. if you only want to run the tests for `email-link.test.ts` you should use:
+
+```shell
+npm run test:integration:base -- email.link.test.ts
 ```
 
-To get the values, open the 1Password app and search for the “**JS SDKs integration tests**” secure note. These files are **not** committed to the git because they contain the secret keys - make sure not to accidentally commit them, either.
+Additionally, you can use two flags to configure how Playwright runs:
 
-> Note: We use `.keys.json` instead of adding the values in the `.env.local` file simply because it’s more convenient to work with json values while developing locally.
+- `--ui`: Run tests in [UI mode](https://playwright.dev/docs/running-tests#run-tests-in-ui-mode)
+- `--debug`: Debug tests with the [Playwright Inspector](https://playwright.dev/docs/running-tests#debug-tests-with-the-playwright-inspector)
 
-A detailed explanation for all env variables follows.
+For example:
 
-**Clerk applications:**
-
-The tests need to run against a Clerk instance. Currently, we cannot programmatically create Clerk applications. To workaround this limitation, we created the “Integration testing” organization that owns two Clerk applications. If you want to be invited, please reach out to @Nikos Douvlis or @Sokratis Vidros
-
-Each application is described by its name, a `pk` and an `sk` key:
-
-```json
-{
-  "application-name": {
-    "pk": "pk_...",
-    "sk": "sk_..."
-  }
-}
+```shell
+npm run test:integration:base -- --ui email.link.test.ts
 ```
 
-Currently, we have two Clerk applications configured:
+> [!TIP]
+> If you want to learn more, read the [Running and debugging tests documentation](https://playwright.dev/docs/running-tests).
 
-- **with-email-codes**: a single session application with most toggles enabled
-- **email-links**: a single session app with email links enabled and email codes disabled. Useful to test email links flows as the SignUp component currently does not support switching between email links and email codes.
+## Writing your first test
 
-**Email service:**
+In this step-by-step instruction you'll learn how to create a new integration test. If your test case already fits into an existing file, please add a new `test()` block instead of creating a whole new file.
 
-- `MAILSAC_API_KEY`: The secret key for the https://mailsac.com/ service. This is a temp email service we use to retrieve email codes and magic links.
+1. Create a new file inside `integration/tests` with the name `smoke.test.ts`. You **need** to give your filename a postfix of `.test.ts`.
+1. Give it the following initial contents:
 
-**Vercel deployments:**
+   ```ts
+   import { test } from '@playwright/test';
 
-- `VERCEL_PROJECT_ID`: Only required if you plan to run deployment tests locally. This is the Vercel project ID, and it points to an application created via the Vercel dashboard. The easiest way to get access to it is by linking a local app to the Vercel project using the Vercel cli, and then copying the values from the `.vercel` directory.
-- `VERCEL_ORG_ID`: The org that owns the Vercel project. See above for more details.
-- `VERCEL_TOKEN`: A personal access token. This corresponds to a real user running the deployment command. Attention: be extra careful with this token as it cannot be scoped to a single Vercel project, meaning that the token has access to every project in the account it belongs to.
+   test.describe('Smoke test', () => {});
+   ```
 
-## Running the tests
+   `test` is not a global identifier so it needs to be imported. The outer-level `describe` block should have a concise, fitting name what this file is about.
 
-You can run the whole integration suite using `npm run test:integration`. This is going to start all long running apps (global setup), then run all suites in parallel and finally, tear down any apps started during the first step (global teardown).
+   You can also add annotations like `@generic` or `@nextjs` to the name. Some npm scripts mentioned in [running tests](#running-tests) will use Playwright's [`--grep`](https://playwright.dev/docs/test-cli#reference) flag to search for these annotations. For example, if you're creating a test that is specific to Next.js, add the `@nextjs` annotation in the name (at the end).
 
-You can filter tests by filename or test name, eg: `npm run test:integration -- filename`. If you want to debug a suite by stepping through the test steps, use the `debug` flag: `npm run test:integration -- --debug filename`. By default, Playwright will execute the tests in headless browsers, if you want to open browser window then use the `--ui` flag. For more details, take a look at: https://playwright.dev/docs/running-tests
+1. Configure parallelism for your test suite. By default, tests in a single file are run in order. If you have many independent tests in a single file, you might want to run them in parallel with [`test.describe.configure()`](https://playwright.dev/docs/api/class-test#test-describe-configure). As a rule of thumb, start with `parallel` and switch to `serial` if necessary.
 
-Running the tests with the `DEBUG` env variable set to a truthy value will enable logging and also forward the logs of the apps running in the background, eg: `DEBUG=1 npm run test:integration`
+   ```ts
+   import { test } from '@playwright/test';
 
-To run the deployments suite, use npm run test:deployments.
+   test.describe('Smoke test', () => {
+     test.describe.configure({ mode: 'parallel' });
+   });
+   ```
 
-## Annotations
+   All parallel work in Playwright is executed within isolated workers. Running tests in parallel means that tests cannot share state using `beforeAll`/`afterAll` as these will run for _every worker_. If your tests depend on state that gets set in these lifecycle hooks, you can force Playwright to run them sequentially.
 
-- `@generic`: Generic tests that use our components, so they can be run against any app that has a SignIn component mounted in /sign-in and a SignUp component mounted in /sign-up.
--
+1. Import the `Application` type, set an `app` variable and create `beforeAll` and `afterAll` hooks:
 
-## How to write tests
+   ```ts
+   import { test } from '@playwright/test';
 
-Even though the best way to start writing tests would be to treat existing tests as examples or templates, this section will describe the basic structure of a test.
+   import type { Application } from '../models/application';
 
-```jsx
-// `test` is not a global identifier; it needs to be imported
-import { test } from '@playwright/test';
+   test.describe('Smoke test', () => {
+     test.describe.configure({ mode: 'parallel' });
+     let app: Application;
 
-// The outer-level describe block usually describes a set of tests
-// running in different apps in parallel
-test.describe('sign in smoke test', () => {
+     test.beforeAll(async () => {
+       // TODO
+     });
 
-  // An array of apps the tests of this file are going to run in
-  // A single or even multiple apps are supported
-  const configs = [...];
+     test.afterAll(async () => {
+       // TODO
+     });
+   });
+   ```
 
-  configs.forEach(config => {
-    test.describe(`${config.name}`, () => {
+1. Inside the `beforeAll` hook you'll want to create a new `Application` and assign it to the `app` variable. So before all tests are run, a new test site is created from a template in an isolated directory. All tests will be run on that site. Inside the `afterAll` hook all processes are shutdown and the temporary site is cleaned up.
 
-      // All parallel work in Playwright is executed within isolated workers
-      // Running tests in parallel means that tests cannot share state using
-      // beforeAll/ afterAll as these will run for *every worker*.
-      // If your tests depend on state that gets set in these lifecycle hooks,
-      // you can force Playwright to run them sequentially.
-      //
-      // Note: keep in mind that because of the outer-level `describe` block, tests will
-      // still run in parallel for apps in the `configs` array. This only forces
-      // tests in a single app to run sequentially so the performance impact is minimal
-      test.describe.configure({ mode: 'serial' });
+   Import the `appConfigs`. A minimal example will look like this (for more details, read [Application](#application)):
 
-      let app: Application;
-      let fakeUser: FakeUser;
+   ```ts
+   import { test } from '@playwright/test';
 
-      test.beforeAll(async () => {
-        // Commit and start the app
-        app = await config.commit()
-        await app.dev();
-        // You can also create a fake user to be used across the tests.
-        // The tests must be idempotent, so always create the resources you need
-        const u = createTestUtils({ app });
-        fakeUser = u.services.users.createFakeUser();
-        await u.services.users.createBapiUser(fakeUser);
-      });
+   import type { Application } from '../models/application';
+   import { appConfigs } from '../presets';
 
-      test.afterAll(async () => {
-        // Make sure to clean up all resources created
-        await fakeUser.deleteIfExists();
-        // And finally, remove the temp apps from the disk
-        await app.teardown();
-      });
+   test.describe('Smoke test', () => {
+     test.describe.configure({ mode: 'parallel' });
+     let app: Application;
 
-      test('sign in with email and password', async ({ page, context }) => {
-        // Call createTestUtils to get a access to all utils and Page Objects.
-        // For more info, read the "Basic Concepts -> createTestUtils: section
-        const u = createTestUtils({ app, page, context });
-        // ... Rest of the test
-      });
-    });
+     test.beforeAll(async () => {
+       app = await appConfigs.react.vite.clone().commit();
+       await app.setup();
+       await app.withEnv(appConfigs.envs.withEmailCodes);
+       await app.dev();
+     });
+
+     test.afterAll(async () => {
+       await app.teardown();
+     });
+   });
+   ```
+
+1. Write your individual tests! You're now all set up to write tests against a site that doesn't require an authenticated user (if you need that, read the next section [Creating a fake user](#creating-a-fake-user)).
+
+   Import the `createTestUtils` and write your tests:
+
+   ```ts
+   import { test } from '@playwright/test';
+
+   import type { Application } from '../models/application';
+   import { appConfigs } from '../presets';
+   import { createTestUtils } from '../testUtils';
+
+   test.describe('Smoke test', () => {
+     test.describe.configure({ mode: 'parallel' });
+     let app: Application;
+
+     test.beforeAll(async () => {
+       // ...
+     });
+
+     test.afterAll(async () => {
+       await app.teardown();
+     });
+
+     test('your test', async ({ page, context }) => {
+       const u = createTestUtils({ app, page, context });
+
+       // Your tests
+     });
+   });
+   ```
+
+### Creating a fake user
+
+If you need a fake user to login to the test site, use `createTestUtils`.
+
+1. Set up the necessary boilerplate code inside `beforeAll` and `afterAll`. Import the `FakeUser` type and create a new variable called `fakeUser` at the top of the `describe` block:
+
+   ```ts
+   // Rest of imports from previous section
+   import type { FakeUser } from '../testUtils';
+
+   test.describe('Smoke test', () => {
+     test.describe.configure({ mode: 'parallel' });
+     let app: Application;
+     let fakeUser: FakeUser;
+
+     test.beforeAll(async () => {
+       // ...
+
+       const m = createTestUtils({ app });
+       fakeUser = m.services.users.createFakeUser();
+       await m.services.users.createBapiUser(fakeUser);
+     });
+
+     test.afterAll(async () => {
+       await fakeUser.deleteIfExists();
+       await app.teardown();
+     });
+   });
+   ```
+
+1. Inside the test you now can use the `fakeUser` to login:
+
+   ```ts
+   // Imports
+
+   test.describe('Smoke test', () => {
+     test.describe.configure({ mode: 'parallel' });
+     let app: Application;
+     let fakeUser: FakeUser;
+
+     test.beforeAll(async () => {
+       // ...
+     });
+
+     test.afterAll(async () => {
+       // ...
+     });
+
+     test('can sign in', async ({ page, context }) => {
+       const u = createTestUtils({ app, page, context });
+       await u.po.signIn.goTo();
+       await u.po.signIn.waitForMounted();
+       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+       await u.po.expect.toBeSignedIn();
+     });
+   });
+   ```
+
+## Reference
+
+> [!TIP]
+> Have a look at the [existing tests](./tests/) or ask a maintainer/colleague if you need more examples.
+
+### Application configs
+
+An application config lets you programmatically create an application starting from a template (`integration/templates`), allowing to override or create new files, npm scripts etc. The [`ApplicationConfig`](./models/applicationConfig.ts) interface exposes a `commit` method that writes the app described by the config in a temporary `.temp_integration` directory and returns an `Application`.
+
+Assuming you have a `react-parcel` template defined in `integration/templates`, you could define a new Parcel preset like so:
+
+1. Open `react.ts` inside `integration/presets`
+1. Define a new application:
+
+   ```ts
+   const parcel = applicationConfig()
+     .setName('react-parcel')
+     .useTemplate(templates['react-parcel'])
+     .setEnvFormatter('public', key => `${key}`)
+     .addDependency('@clerk/clerk-react', constants.E2E_CLERK_VERSION || clerkReactLocal);
+   ```
+
+   Here's what each thing is doing:
+
+   - `setName`: Set internal name
+   - `useTemplate`: Define which template inside `integration/templates` to use
+   - `setEnvFormatter`: Define how environment variables should be formatted. The first argument accepts `'public'` and `'private'`. Inside [`envs.ts`](./presets/envs.ts) the environment variables you can use through [`withEnv`](#environment-configs) are defined. Since different frameworks require environment variables to be in different formats (e.g. Next.js wants public env vars to be prefixed with `NEXT_PUBLIC_`) you can use this formatter to change that.
+   - `addDependency`: As the name suggests, you can append additional dependencies to the template
+
+Inside other presets you'll see additional `.addScript()` methods which you can use to override the default npm scripts for `setup`, `dev`, `build`, and `serve`. Ideally your template already defines these npm scripts.
+
+```ts
+.addScript('dev', 'npm run dev')
+```
+
+You can use `.addFile()` to append another file to the template:
+
+```ts
+.addFile(
+  'src/metadata.ts',
+  ({ ts }) => ts`export const metadata = {
+    name: 'Hello World',
+  }`
+)
+
+// This also works without the `ts` helper, but you'll then want to make sure the indentation is right
+.addFile(
+  'src/metadata.ts',
+  () => `export const metadata = {
+  name: 'Hello World',
+}`
+)
+```
+
+Lastly, inside a test you'll use it like so:
+
+```ts
+import { expect, test } from '@playwright/test';
+
+import type { Application } from '../models/application';
+import { appConfigs } from '../presets';
+
+test.describe('Your test', () => {
+  test.describe.configure({ mode: 'parallel' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    app = await appConfigs.react.vite
+      .clone()
+      .addFile(
+        'src/metadata.ts',
+        () => `export const metadata = {
+  name: 'Hello World',
+}`,
+      )
+      .commit();
   });
 });
 ```
 
-We will consider introducing a high-level abstraction around this structure if needed in the future.
+Through `appConfigs.react.vite` you're creating a new `applicationConfig` and with the `.commit()` you're creating a new application (see next paragraph). Generally speaking it's these steps:
 
-## Basic concepts
+1. Use your desired `appConfig`
+1. Use `.clone()`
+1. Modify the template however you like
+1. Use `.commit()`
 
-### Application configs
+### Application
 
-An application config lets you programmatically create an application starting from a template (`integration/templates`), allowing to override or create new files, npm scripts etc. The `ApplicationConfig` interface exposes a `commit` method that writes the app described by the config in a temp `.temp_integration` directory and returns an `Application`.
+An `Application` controls the application that lives in the `.temp_integration` directory and exposes helpers to start and teardown the test itself. Starting an application returns the getters and methods of [`application`](./models/application.ts).
 
-### Applications
+Inside a test you'll use it like so:
 
-An `Application` controls an application that lives in the `.temp_integration` directory and exposes helpers to start and teardown the test itself. Starting an application returns a `serverUrl` .
+```ts
+import { expect, test } from '@playwright/test';
+
+import type { Application } from '../models/application';
+import { appConfigs } from '../presets';
+
+test.describe('Your test', () => {
+  test.describe.configure({ mode: 'parallel' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    app = await appConfigs.react.vite
+      .clone()
+      .addFile(
+        'src/metadata.ts',
+        () => `export const metadata = {
+  name: 'Hello World',
+}`,
+      )
+      .commit();
+
+    // Run the 'setup' npm script and do other setup stuff
+    await app.setup();
+    // Set the environment variables
+    await app.withEnv(appConfigs.envs.withEmailCodes);
+    // Start the development server through the 'dev' npm script
+    await app.dev();
+  });
+
+  test.afterAll(async () => {
+    // Remove the temporary test folder and any temporary artifacts
+    await app.teardown();
+  });
+
+  test('your tests', async ({ page }) => {
+    // TODO
+  });
+});
+```
+
+If you want to test the build artifacts of a preset, you can run the `build` script instead:
+
+```ts
+await app.build();
+```
 
 ### Long running Applications
 
-A long running application is a thin wrapper around an `Application` that exposes the same API but defaults to `noop` for any mutating methods such as `stop` and `teardown` . They can be used interchangeably with `Application` instances.
+A long running application is a thin wrapper around an `Application` that exposes the same API but defaults to `noop` for any mutating methods such as `stop` and `teardown`. They can be used interchangeably with `Application` instances.
 
-Since installing dependencies and booting an app is a slow operation, long running applications are designed to start **once** in `global.setup` , stay open while the tests run and then stop in `global.teardown` so they can be reused by different suites.
+Since installing dependencies and booting up an app is a slow operation, long running applications are designed to start **once** in `global.setup` stay open while the tests run, and then stop in `global.teardown` so they can be reused by different suites.
+
+You'd define it like so:
+
+```ts
+import { expect, test } from '@playwright/test';
+
+import { appConfigs } from '../presets';
+import type { FakeUser } from '../testUtils';
+import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('your test', ({ app }) => {
+  // Your test
+}
+```
 
 ### Environment configs
 
-An environment config can be passed into an application using the `withEnv` method. Env configs usually define the PK and SK keys for a Clerk instance and can be reused among different applications.
+An environment config can be passed into an application using the `withEnv` method. Environment configs usually define the PK and SK keys for a Clerk instance and can be reused among different applications.
+
+Example (also see [Application](#application)):
+
+```ts
+await app.withEnv(appConfigs.envs.withEmailCodes);
+```
 
 ### Deployments
 
-A `deployment` wraps an `Application` , deploys it to a cloud provider and returns an `Application` interface. A `deployment` can be used in the place of an `Application` as once deployed, they expose the same API.
+A `deployment` wraps an `Application`, deploys it to a cloud provider, and returns an `Application` interface. A `deployment` can be used in the place of an `Application` as once deployed, they expose the same API.
 
-### Tests
+### `createTestUtils`
 
-A “test flow” is a set of steps that describe a Clerk business flow we want to test.
+The `createTestUtils` helper is the main abstraction you'll be using while writing tests. It is a function that accepts the `app` in use, the current `page`, `context`, and `browser` (optional) objects. It returns a `u` namespace containing common utilities, for example:
 
-### createTestUtils
-
-The `createTestUtils` is the main abstraction we’ll be using while writing test. It is a function that accepts the `app` in use, and the current `page`, `context` and `browser` (optional) objects and returns a `u` namespace containing common utilities, eg:
-
-```json
+```ts
 test('...', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context, browser });
-    await u.po.signUp.goTo();
+  const u = createTestUtils({ app, page, context, browser });
+  await u.po.signUp.goTo();
 });
 ```
 
 Currently, `u` has:
 
-- `u.page`: a reference to the current `page` object
-- `u.services`: pre-instantiated services like `email`, `users` and `clerk` (BAPI)
-- `u.po`: includes [Page Object models](https://playwright.dev/docs/pom) for the Clerk components or any other commonly used page (eg: Account Portal). These APIs are abstractions over commonly used actions, eg: “go to the sign up component” (`u.po.signUp.goto()`) or “create a user with email and password” (`u.po.signUp.signUpWithEmailAndPassword()` ). These actions also include validations internally, so if an action fails, the parent test fails as well.
-- `u.tabs`: an API to programmatically run code in the context of different tabs or browsers, eg
+- `u.page`: A reference to the current `page` object
+- `u.services`: Pre-instantiated services like `email`, `users`, and `clerk` (BAPI)
+- `u.po`: Includes [Page Object models](https://playwright.dev/docs/pom) for the Clerk components or any other commonly used page (e.g. Account Portal). These APIs are abstractions over commonly used actions. These actions also include validations internally, so if an action fails, the parent test fails as well. Examples:
+  - “Go to the sign up component” will be `u.po.signUp.goto()`
+  - “Create a user with email and password” will be `u.po.signUp.signUpWithEmailAndPassword()`
+- `u.tabs`: An API to programmatically run code in the context of different tabs or browsers, for example:
+  ```ts
+  await u.tabs.runInNewBrowser(async u => {
+    // TODO
+  });
+  ```
+  This handler runs in the context of a new browser, as the second browser is completely isolated. The nested `u` variable shadows the `u` variable of the parent scope to make this distinction apparent.
 
-```json
-await u.tabs.runInNewBrowser(async u => {
-  // this handler runs in the context or a new browser
-  // the 2nd browser is completely isolated
-  // the nested `u` variable shadows the `u` variable of the parent scope
-  // to make this distinction apparent
-});
-```
+> [!TIP]
+> You can find more details in the [source code](./testUtils/index.ts) of `createTestUtils`. For example inside [`appPageObject`](./testUtils/appPageObject.ts) you can find out that `u.page` allows you to programatically go to the index page through `u.page.goToStart()`.
 
-For more examples, refer to the existing tests.
+## Concepts
+
+### Secret keys
+
+The integration suite uses these keys to set environment variables. It allows the suite to switch between Clerk instances and use third-party services to e.g. access emails.
+
+Currently, we have two Clerk instances configured:
+
+- **with-email-codes**: a single session application with all toggles enabled.
+- **with-email-links**: a single session app with email links enabled and email codes disabled. Useful to test email links flows as the `<SignUp />` component currently does not support switching between email links and email codes.
+
+> [!NOTE]
+>
+> - `MAILSAC_API_KEY`: Used for [Mailsac](https://mailsac.com/) to retrieve email codes and magic links from temporary email addresses.
+> - `VERCEL_PROJECT_ID`: Only required if you plan on running deployment tests locally. This is the Vercel project ID, and it points to an application created via the Vercel dashboard. The easiest way to get access to it is by linking a local app to the Vercel project using the Vercel CLI, and then copying the values from the `.vercel` directory.
+> - `VERCEL_ORG_ID`: The organization that owns the Vercel project. See above for more details.
+> - `VERCEL_TOKEN`: A personal access token. This corresponds to a real user running the deployment command. Attention: Be extra careful with this token as it can't be scoped to a single Vercel project, meaning that the token has access to every project in the account it belongs to.
