@@ -14,7 +14,7 @@ import { errorThrower } from '../utils';
 import { createGetToken, createSignOut } from './utils';
 
 type CheckAuthorizationSignedOut = undefined;
-type CheckAuthorizationWithoutOrg = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
+type CheckAuthorizationWithoutOrgOrUser = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 type UseAuthReturn =
   | {
@@ -39,7 +39,7 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      has: CheckAuthorizationSignedOut;
+      has: CheckAuthorizationWithoutOrgOrUser;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -52,7 +52,7 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      has: CheckAuthorizationWithoutOrg;
+      has: CheckAuthorizationWithoutOrgOrUser;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -164,7 +164,7 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: undefined,
+      has: () => false,
       signOut,
       getToken,
     };
