@@ -232,42 +232,6 @@ export default (QUnit: QUnit) => {
     });
   });
 
-  module('assertIssuerClaim(iss, issuer)', () => {
-    test('does not throw if issuer is null', assert => {
-      assert.equal(undefined, assertIssuerClaim('', null));
-    });
-
-    test('throws error if iss does not match with issuer string', assert => {
-      assert.raises(
-        () => assertIssuerClaim('issuer', ''),
-        new Error(`Invalid JWT issuer claim (iss) "issuer". Expected "".`),
-      );
-      assert.raises(
-        () => assertIssuerClaim('issuer', 'issuer-2'),
-        new Error(`Invalid JWT issuer claim (iss) "issuer". Expected "issuer-2".`),
-      );
-    });
-
-    test('throws error if iss does not match with issuer function result', assert => {
-      assert.raises(
-        () => assertIssuerClaim('issuer', () => false),
-        new Error(`Failed JWT issuer resolver. Make sure that the resolver returns a truthy value.`),
-      );
-    });
-
-    test('does not throw if iss matches issuer ', assert => {
-      assert.equal(undefined, assertIssuerClaim('issuer', 'issuer'));
-      assert.equal(
-        undefined,
-        assertIssuerClaim('issuer', s => s === 'issuer'),
-      );
-      assert.equal(
-        undefined,
-        assertIssuerClaim('issuer', () => true),
-      );
-    });
-  });
-
   module('assertExpirationClaim(exp, clockSkewInMs)', hooks => {
     let fakeClock;
     hooks.beforeEach(() => {

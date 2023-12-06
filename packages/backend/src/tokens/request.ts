@@ -1,10 +1,10 @@
 import { parsePublishableKey } from '@clerk/shared/keys';
+import { Token } from 'src';
 
 import { constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { addClerkPrefix, isDevelopmentFromSecretKey, isDevOrStagingUrl } from '../util/shared';
-import { buildRequestUrl } from '../utils';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, handshake, interstitial, signedIn, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
@@ -102,10 +102,6 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       return url.href;
     }
 
-    async function verifyRequestState(options: InterstitialRuleOptions, token: string) {
-      return verifyToken(token, options);
-    }
-
     const clientUat = parseInt(ruleOptions.clientUat || '', 10) || 0;
     const hasActiveClient = clientUat > 0;
     // TODO rename this to sessionToken
@@ -130,11 +126,12 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         }
       });
 
+      // Right after a handshake is a good time to detect the skew
+      // const detectedSkew
       if (parsePublishableKey(options.publishableKey)?.instanceType === 'development') {
-        const newUrl = new URL(options.request.url);
+        const newUrl = new URL(ruleOptions.derivedRequestUrl);
         newUrl.searchParams.delete('__clerk_handshake');
         newUrl.searchParams.delete('__clerk_help');
-
         headers.append('Location', newUrl.toString());
       }
 
@@ -142,18 +139,16 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         return signedOut(ruleOptions, AuthErrorReason.SessionTokenMissing, '', headers);
       }
 
-      try {
-        const verifyResult = await verifyRequestState(ruleOptions, sessionToken);
-        if (verifyResult) {
-          return signedIn(ruleOptions, verifyResult, headers);
-        }
-      } catch (err) {
-        return signedOut(ruleOptions, AuthErrorReason.ClockSkew, '', headers);
+      // Uncaught
+      const verifyResult = await verifyToken(sessionToken, ruleOptions);
+
+      if (verifyResult) {
+        return signedIn(ruleOptions, verifyResult, headers);
       }
     }
 
     // ================ This is to start the handshake if necessary ===================
-    if (ruleOptions.isSatellite && !new URL(options.request.url).searchParams.has('__clerk_synced')) {
+    if (ruleOptions.isSatellite && !ruleOptions.derivedRequestUrl.searchParams.has('__clerk_synced')) {
       const headers = new Headers();
       headers.set('Location', buildRedirectToHandshake(ruleOptions));
 
@@ -193,7 +188,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     }
 
     try {
-      const verifyResult = await verifyRequestState(ruleOptions, sessionToken!);
+      const verifyResult = await verifyToken(sessionToken!, ruleOptions);
       if (verifyResult) {
         return signedIn(ruleOptions, verifyResult);
       }
