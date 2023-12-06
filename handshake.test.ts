@@ -19,8 +19,6 @@ const server = http.createServer(function (req, res) {
     console.log('No SK to', req.url, req.headers);
   }
 
-  const jwks = getJwksFromSecretKey(sk);
-
   res.setHeader('Content-Type', 'application/json');
   res.write(JSON.stringify(getJwksFromSecretKey(sk))); //write a response to the client
   res.end(); //end the response
@@ -541,9 +539,9 @@ test('Handshake result - dev - new devbrowser', async () => {
     mode: 'test',
   });
   const { token } = config.generateToken({ state: 'active' });
-  const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
+  const cookiesToSet = [`__session=${token};path=/`, '__clerk_db_jwt=asdf;path=/'];
   const handshake = btoa(JSON.stringify(cookiesToSet));
-  const res = await fetch(url + '/?__clerk_handshake=' + handshake + '&__clerk_db_jwt=asdf', {
+  const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
       Cookie: `${devBrowserCookie}`,
       'X-Publishable-Key': config.pk,
@@ -557,7 +555,6 @@ test('Handshake result - dev - new devbrowser', async () => {
   cookiesToSet.forEach(cookie => {
     expect(headers).toContainEqual(['set-cookie', cookie]);
   });
-  expect(headers).toContainEqual(['set-cookie', '__clerk_db_jwt=asdf']);
 });
 
 test('External visit - new devbrowser', async () => {
@@ -573,11 +570,9 @@ test('External visit - new devbrowser', async () => {
     redirect: 'manual',
   });
   expect(res.status).toBe(307);
-  // expect(res.headers.get('location')).toBe('/');
-  const headers = [...res.headers.entries()];
-  console.log(headers);
-  // Set cookie should look bigger than this
-  expect(headers).toContainEqual(['set-cookie', '__clerk_db_jwt=asdf']);
+  expect(res.headers.get('location')).toBe(
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F&__clerk_db_jwt=asdf`,
+  );
 });
 
 test('Handshake result - prod - nominal', async () => {

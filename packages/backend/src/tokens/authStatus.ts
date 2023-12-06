@@ -105,7 +105,7 @@ type LoadResourcesOptions = {
 };
 
 type RequestStateParams = {
-  publishableKey?: string;
+  publishableKey: string;
   domain?: string;
   isSatellite?: boolean;
   proxyUrl?: string;

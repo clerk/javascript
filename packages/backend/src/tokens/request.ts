@@ -59,6 +59,14 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     derivedRequestUrl,
   } satisfies InterstitialRuleOptions;
 
+  // TODO: Get types in a better place, there's definitely a pk here
+  const pk = parsePublishableKey(options.publishableKey);
+  if (!pk) {
+    throw new Error('no pk');
+  }
+
+  const instanceType = pk.instanceType;
+
   assertValidSecretKey(ruleOptions.secretKey);
 
   if (ruleOptions.isSatellite) {
@@ -86,11 +94,12 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       proxyUrl,
       domain,
     }: InterstitialRuleOptions): string {
-      const redirectUrl = derivedRequestUrl;
+      const redirectUrl = new URL(derivedRequestUrl as URL);
+      redirectUrl.searchParams.delete('__clerk_db_jwt');
       const pk = parsePublishableKey(publishableKey);
       const pkFapi = pk?.frontendApi || '';
       // determine proper FAPI url, taking into account multi-domain setups
-      const frontendApi = proxyUrl || (!isDevOrStagingUrl(pkFapi) ? addClerkPrefix(domain) : '') || pkFapi;
+      const frontendApi = proxyUrl || (pk?.instanceType !== 'development' ? addClerkPrefix(domain) : '') || pkFapi;
       const frontendApiNoProtocol = frontendApi.replace(/http(s)?:\/\//, '');
 
       const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
@@ -148,6 +157,14 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     }
 
     // ================ This is to start the handshake if necessary ===================
+    if (instanceType === 'development' && ruleOptions.derivedRequestUrl.searchParams.has('__clerk_db_jwt')) {
+      const headers = new Headers();
+      headers.set('Location', buildRedirectToHandshake(ruleOptions));
+
+      // TODO: Add status code for redirection
+      return handshake(ruleOptions, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+    }
+
     if (ruleOptions.isSatellite && !ruleOptions.derivedRequestUrl.searchParams.has('__clerk_synced')) {
       const headers = new Headers();
       headers.set('Location', buildRedirectToHandshake(ruleOptions));
