@@ -56,10 +56,8 @@ export const createOrganizationMembership = (params: OrgParams): OrganizationMem
     public_metadata: {},
     role: role || 'admin',
     permissions: permissions || [
-      'org:sys_domains:delete',
       'org:sys_domains:manage',
       'org:sys_domains:read',
-      'org:sys_memberships:delete',
       'org:sys_memberships:manage',
       'org:sys_memberships:read',
       'org:sys_profile:delete',
