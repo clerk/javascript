@@ -8,7 +8,7 @@ type CreateParams = {
   emailAddress: string;
   redirectUrl?: string;
   publicMetadata?: UserPublicMetadata;
-  delay?: boolean;
+  notify?: boolean;
   ignoreExisting?: boolean;
 };
 
