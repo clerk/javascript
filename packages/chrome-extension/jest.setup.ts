@@ -1,6 +1,5 @@
 import { chrome } from 'jest-chrome';
 
-// @ts-expect-error - Mock implementation
+// @ts-expect-error - required for the browser polyfill
 chrome.runtime.id = 'chrome-extension-test';
-
-Object.assign(globalThis, { chrome, browser: chrome });
+Object.assign(global, { chrome, browser: chrome });

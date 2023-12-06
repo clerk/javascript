@@ -56,7 +56,6 @@
     "@types/react-dom": "*",
     "@types/webextension-polyfill": "^0.10.7",
     "eslint-config-custom": "*",
-    "jest-chrome": "^0.8.0",
     "tsup": "*",
     "typescript": "*"
   },
