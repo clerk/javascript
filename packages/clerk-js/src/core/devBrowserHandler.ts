@@ -4,7 +4,6 @@ import {
   getDevBrowserJWTFromURL,
   setDevBrowserJWTInURL,
 } from '@clerk/shared/devBrowser';
-import { createExtensionSyncManager, events as extensionSyncEvents } from '@clerk/shared/extensionSyncManager';
 
 import { buildURL, createCookieHandler, isDevOrStagingUrl, runIframe } from '../utils';
 import { clerkErrorDevInitFailed } from './errors';
@@ -35,7 +34,6 @@ export function createDevBrowserHandler({
   fapiClient,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
   const cookieHandler = createCookieHandler();
-  const extensionSyncManager = createExtensionSyncManager();
   const key = DEV_BROWSER_SSO_JWT_KEY;
 
   let usesUrlBasedSessionSyncing = true;
@@ -48,18 +46,12 @@ export function createDevBrowserHandler({
     localStorage.setItem(key, jwt);
     // Append dev browser JWT to cookies, because server-side redirects (e.g. middleware) has no access to local storage
     cookieHandler.setDevBrowserCookie(jwt);
-
-    if (jwt) {
-      extensionSyncManager.dispatch(extensionSyncEvents.DevJWTUpdate, { action: 'set', token: jwt, frontendApi });
-    }
   }
 
   function removeDevBrowserJWT() {
     // TODO: Maybe clear keys for both dev session sync modes to be on the safe side?
     localStorage.removeItem(key);
     cookieHandler.removeDevBrowserCookie();
-
-    extensionSyncManager.dispatch(extensionSyncEvents.DevJWTUpdate, { action: 'remove', frontendApi });
   }
 
   // location.host == *.[lcl.dev](http://lcl.dev)

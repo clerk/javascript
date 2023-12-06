@@ -6,7 +6,6 @@ Array [
   "ClerkLoaded",
   "ClerkLoading",
   "ClerkProvider",
-  "ContentScript",
   "CreateOrganization",
   "EmailLinkErrorCode",
   "Experimental__Gate",

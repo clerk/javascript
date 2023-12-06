@@ -2,17 +2,13 @@
 // We have to polyfill our "exports" subpaths :cry:
 
 export const subpathNames = [
-  'apiUrlFromPublishableKey',
   'browser',
   'callWithRetry',
   'color',
-  'constants',
   'cookie',
   'date',
   'deprecated',
-  'devBrowser',
   'error',
-  'extensionSyncManager',
   'file',
   'globs',
   'handleValueOrFn',
@@ -23,9 +19,11 @@ export const subpathNames = [
   'localStorageBroadcastChannel',
   'poller',
   'proxy',
-  'telemetry',
   'underscore',
   'url',
+  'constants',
+  'apiUrlFromPublishableKey',
+  'telemetry',
 ];
 
 export const subpathFoldersBarrel = ['react'];
