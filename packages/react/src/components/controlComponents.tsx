@@ -86,7 +86,14 @@ type ProtectProps = React.PropsWithChildren<
  * ```
  */
 export const Protect = ({ children, fallback, ...restAuthorizedParams }: ProtectProps) => {
-  const { has, userId } = useAuth();
+  const { isLoaded, has, userId } = useAuth();
+
+  /**
+   * Avoid flickering children or fallback while clerk is loading sessionId or userId
+   */
+  if (!isLoaded) {
+    return null;
+  }
 
   /**
    * If neither of the authorization params are passed behave as the `<SignedIn/>`.
