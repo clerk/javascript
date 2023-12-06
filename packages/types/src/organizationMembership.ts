@@ -22,8 +22,8 @@ declare global {
     [k: string]: unknown;
   }
 
-  type ClerkPermissionKey = string;
-  type ClerkRoleKey = string;
+  type ClerkPermissionKey = unknown;
+  type ClerkRoleKey = unknown;
 }
 
 export interface OrganizationMembershipResource extends ClerkResource {
@@ -39,12 +39,12 @@ export interface OrganizationMembershipResource extends ClerkResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-export type OrganizationCustomPermissionKey = ClerkPermissionKey;
-export type OrganizationCustomRoleKey = ClerkRoleKey;
+export type OrganizationCustomPermissionKey = ClerkPermissionKey extends string ? ClerkPermissionKey : string;
+export type OrganizationCustomRoleKey = ClerkRoleKey extends string ? ClerkRoleKey : string;
 
 /**
  * @deprecated This type is deprecated and will be removed in the next major release.
- * Use `OrganizationCustomRoleKey` instead.
+ * Use `OrganizationCustomRoleKey` instead.a
  * MembershipRole includes `admin`, `basic_member`, `guest_member`. With the introduction of "Custom roles"
  * these types will no longer match a developer's custom logic.
  */
@@ -64,7 +64,9 @@ export type OrganizationSystemPermissionKey =
  * OrganizationPermissionKey is a combination of system and custom permissions.
  * System permissions are only accessible from FAPI and client-side operations/utils
  */
-export type OrganizationPermissionKey = Autocomplete<OrganizationSystemPermissionKey>;
+export type OrganizationPermissionKey = OrganizationCustomPermissionKey extends string
+  ? OrganizationSystemPermissionKey | OrganizationCustomPermissionKey
+  : Autocomplete<OrganizationSystemPermissionKey>;
 
 export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;
