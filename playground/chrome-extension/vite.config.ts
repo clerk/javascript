@@ -1,45 +1,22 @@
-import react from '@vitejs/plugin-react-swc';
+import { fileURLToPath, URL } from 'url';
 import { resolve } from 'path';
-import fs from 'fs';
-import { defineConfig } from 'vite';
+
+import react from '@vitejs/plugin-react-swc';
 import { crx, ManifestV3Export } from '@crxjs/vite-plugin';
+import { defineConfig } from 'vite';
 
 import manifest from './manifest.json';
 import devManifest from './manifest.dev.json';
 import pkg from './package.json';
-
-const root = resolve(__dirname, 'src');
-const pagesDir = resolve(root, 'pages');
-const assetsDir = resolve(root, 'assets');
-const componentsDir = resolve(root, 'components');
-const outDir = resolve(__dirname, 'dist');
-const publicDir = resolve(__dirname, 'public');
 
 const isDev = process.env.__DEV__ === 'true';
 
 const extensionManifest = {
   ...manifest,
   ...(isDev ? devManifest : {} as ManifestV3Export),
-  name: isDev ? `DEV: ${manifest.name}` : manifest.name,
+  name: isDev ? `[DEV] ${manifest.name}` : manifest.name,
   version: pkg.version,
 };
-
-// plugin to remove dev icons from prod build
-function stripDevIcons (apply: boolean) {
-  if (apply) return null
-
-  return {
-    name: 'strip-dev-icons',
-    resolveId (source: string) {
-      return source === 'virtual-module' ? source : null
-    },
-    renderStart (outputOptions: any, inputOptions: any) {
-      const outDir = outputOptions.dir
-      fs.rm(resolve(outDir, 'dev-icon-32.png'), () => console.log(`Deleted dev-icon-32.png frm prod build`))
-      fs.rm(resolve(outDir, 'dev-icon-128.png'), () => console.log(`Deleted dev-icon-128.png frm prod build`))
-    }
-  }
-}
 
 const crxPlugin = crx({
   manifest: extensionManifest as ManifestV3Export,
@@ -50,22 +27,18 @@ const crxPlugin = crx({
 
 export default defineConfig({
   resolve: {
-    alias: {
-      '@assets': assetsDir,
-      '@components': componentsDir,
-      '@pages': pagesDir,
-      '@src': root,
-    },
+    alias: [
+      { find: '@/', replacement: fileURLToPath(new URL('./src/', import.meta.url)) },
+    ],
   },
   plugins: [
     react(),
     crxPlugin,
-    stripDevIcons(isDev)
   ],
-  publicDir,
+  publicDir: resolve(__dirname, 'public'),
   build: {
-    emptyOutDir: true, // !isDev,
-    outDir,
+    emptyOutDir: !isDev,
+    outDir: resolve(__dirname, 'dist'),
     minify: !isDev,
     sourcemap: isDev,
     rollupOptions: {

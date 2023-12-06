@@ -117,12 +117,13 @@ WebSSO usage snippet:
 // ...
 <ClerkProvider
   publishableKey={publishableKey}
-  navigate={to => navigate(to)}
+  routerPush={to => navigate(to)}
+  routerReplace={to => navigate(to, { replace: true })}
   syncSessionWithTab
 >
   {/* ... */}
 </ClerkProvider>
-//...
+// ...
 ```
 
 Examples of a chrome extension using the `@clerk/chrome-extension` package for authentication

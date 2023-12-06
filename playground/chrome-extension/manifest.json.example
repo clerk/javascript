@@ -10,7 +10,7 @@
   },
   "devtools_page": "src/pages/devtools/index.html",
   "host_permissions": [
-    "https://<YOUR_CLERK_FRONTEND_API_GOES_HERE>/*"
+    "https://<YOUR_CLERK_PRODUCTION_FRONTEND_API_GOES_HERE>/*"
   ],
   "icons": {
     "32": "icon-32.png",

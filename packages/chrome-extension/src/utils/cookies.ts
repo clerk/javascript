@@ -1,3 +1,5 @@
-export async function getClientCookie(url: string) {
-  return chrome.cookies.get({ url, name: '__client' });
+import browser from 'webextension-polyfill';
+
+export async function getClientCookie(url: string, name: string) {
+  return browser.cookies.get({ url, name });
 }

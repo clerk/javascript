@@ -1,53 +1,34 @@
+import browser from 'webextension-polyfill';
+
 import { getClientCookie } from './cookies';
 
-const domain = 'clerk.domain.com';
-const createCookie = (
-  name: string,
-  value: string,
-  opts: Partial<Omit<chrome.cookies.Cookie, 'name' | 'value'>>,
-): chrome.cookies.Cookie => ({
-  domain: 'clerk.domain.com',
-  secure: true,
+type RequiredCookieOpts = 'domain' | 'name' | 'value';
+type CreateCookieOpts<T extends keyof browser.Cookies.Cookie> = Pick<browser.Cookies.Cookie, T> &
+  Partial<Omit<browser.Cookies.Cookie, T>>;
+
+const createCookie = (opts: CreateCookieOpts<RequiredCookieOpts>): browser.Cookies.Cookie => ({
+  firstPartyDomain: opts.domain,
+  hostOnly: false,
   httpOnly: true,
   path: '/',
-  storeId: '0',
+  sameSite: 'lax',
+  secure: true,
   session: false,
-  hostOnly: false,
-  sameSite: 'no_restriction',
+  storeId: '0',
   ...opts,
-  name,
-  value,
 });
 
-describe('utils', () => {
-  const _chrome = globalThis.chrome;
-
-  // export function get(details: Details): Promise<Cookie | null>;
-
-  globalThis.chrome = {
-    // @ts-expect-error - Mock
-    cookies: {
-      get: jest.fn(),
-      // get: jest.fn(({ url, name }) => `cookies.get:${url}:${name}`),
-    },
-  };
-
-  afterEach(() => jest.resetAllMocks());
-  afterAll(() => {
-    jest.clearAllMocks();
-    globalThis.chrome = _chrome;
-  });
-
-  // export function get(details: Details): Promise<Cookie | null>;
+describe('browser.cookies', () => {
   describe('getClientCookie', () => {
+    const domain = 'clerk.domain.com';
     const url = `https://${domain}`;
     const name = '__client';
-    const cookie = createCookie(name, 'foo', { domain });
+    const cookie = createCookie({ name, value: 'foo', domain });
 
-    test('returns cookie value from chrome.cookies if is set for url', async () => {
-      const getMock = jest.mocked(globalThis.chrome.cookies.get).mockResolvedValue(cookie);
+    test('returns cookie value from browser.cookies if is set for url', async () => {
+      const getMock = jest.mocked(browser.cookies.get).mockResolvedValue(cookie);
 
-      expect(await getClientCookie(url)).toBe(cookie);
+      expect(await getClientCookie(url, name)).toBe(cookie);
 
       expect(getMock).toHaveBeenCalledTimes(1);
       expect(getMock).toHaveBeenCalledWith({ url, name });

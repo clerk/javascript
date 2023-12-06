@@ -32,81 +32,35 @@ This project was bootstrapped with [Vite](https://vitejs.dev/) with [CRXJ](https
 
 It's a kitchen-sink starter of how to use ClerkJS in a Chrome Extension either as a Standalone App or alongside a Web Application via WebSSO.
 
+<img src="./demo.png" height="400">
+
 It demonstrates a basic password or OTP flow using ClerkJS Components in the following extension contexts:
 
-- [x] Popup
+- [x] Popup `action.*`
 - [x] Chrome Pages
-  - [x] New Tab
-  - [x] History
-  - [x] Bookmark Manager
-- [x] Dev Tools
-- [x] Extension Options
+  - [x] New Tab `chrome_url_overrides.newtab`
+  - [x] History `chrome_url_overrides.history`
+  - [x] Bookmark Manager `chrome_url_overrides.bookmarks`
+- [x] Dev Tools `devtools_page`
+- [x] Extension Options `options_ui`
+
+You may safely remove any of the above contexts from the `manifest.json` if you do not need them.
+
+This repo will be enhanced with examples of authentication redirection flows such as OAuth or Magic Links and advanced extension patterns.
 
 ## Getting Started
 
-- Clone this repo
-- Run `npm install`
-- Copy manifest examples: `cp manifest.json.example manifest.json; cp manifest.dev.json.example manifest.dev.json`
+1. Sign up for a Clerk account at [https://clerk.com](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=template_repos&utm_campaign=chrome_extension_template).
+2. Go to the [Clerk dashboard](https://dashboard.clerk.com?utm_source=github&utm_medium=template_repos&utm_campaign=chrome_extension_template) and create an application.
+3. Clone the repository `git clone https://github.com/clerkinc/clerk-chrome-extension-starter.git clerk-chrome-extension-starter`
+4. Go to the project directory: cd clerk-chrome-extension-starter
+5. Install dependencies: `npm install`
+6. Copy example files and sent the required variables in each file:
+   - `cp .env.example .env`
+   - `cp manifest.json.example manifest.json`
+   - `cp manifest.dev.json.example manifest.dev.json` (The attributes in this file overwrite the attributes in `manifest.json` when running in development mode.)
+7. Launch the development server: `npm run dev`
 
+The files generated in the `dist` directory can be loaded as an unpacked extension in Chrome.
 
-
-
-
-
-
-
-
-
-
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). 
-
-It demonstrates a basic password or OTP flow using ClerkJS Components in a Chrome Extension Popup.
-
-<img src="./demo.png" height="400">
-
-This repo will be enhanced with examples of authentication redirection flows such as OAuth or Magic Links and advance extension patterns
-using [Manifest V3 service workers](https://developer.chrome.com/docs/extensions/mv3/service_workers/) and the new [chrome.storage API](https://developer.chrome.com/docs/extensions/reference/storage/).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+PLEASE NOTE: Any changes to the manifest require a reload of the extension in [chrome://extensions/](chrome://extensions/).

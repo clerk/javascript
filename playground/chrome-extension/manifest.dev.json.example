@@ -1,7 +1,7 @@
 {
   "host_permissions": [
     "*://localhost/*",
-    "*://<ANY_CUSTOM_LOCAL_DOMAIN>/*"
+    "https://<YOUR_CLERK_DEVELOPMENT_FRONTEND_API_GOES_HERE>/*"
   ],
   "icons": {
     "32": "dev-icon-32.png",

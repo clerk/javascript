@@ -3,7 +3,7 @@ import { createExtensionSyncManager, events } from '@clerk/shared/extensionSyncM
 
 import { STORAGE_KEY_CLIENT_JWT } from './constants';
 import { ClerkChromeExtensionError, logErrorHandler } from './errors';
-import { ChromeStorageCache } from './utils/storage';
+import { BrowserStorageCache } from './utils/storage';
 
 export const ContentScript = {
   init(publishableKey: string) {
@@ -40,12 +40,12 @@ export const ContentScript = {
           return;
         }
 
-        const KEY = ChromeStorageCache.createKey(data.frontendApi, STORAGE_KEY_CLIENT_JWT);
+        const KEY = BrowserStorageCache.createKey(data.frontendApi, STORAGE_KEY_CLIENT_JWT);
 
         if (data.action === 'set') {
-          void ChromeStorageCache.set(KEY, data.token);
+          void BrowserStorageCache.set(KEY, data.token);
         } else if (data.action === 'remove') {
-          void ChromeStorageCache.remove(KEY);
+          void BrowserStorageCache.remove(KEY);
         }
       });
     } catch (e) {

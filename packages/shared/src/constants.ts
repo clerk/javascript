@@ -16,3 +16,4 @@ export const STAGING_ENV_SUFFIXES = ['.accountsstage.dev'];
 export const LOCAL_API_URL = 'https://api.lclclerk.com';
 export const STAGING_API_URL = 'https://api.clerkstage.dev';
 export const PROD_API_URL = 'https://api.clerk.com';
+export const CLIENT_JWT_KEY = '__client';

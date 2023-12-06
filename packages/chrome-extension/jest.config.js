@@ -6,13 +6,13 @@ module.exports = {
 
   roots: ['<rootDir>/src'],
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>../../jest.setup-after-env.ts'],
+  setupFilesAfterEnv: ['<rootDir>../../jest.setup-after-env.ts', '<rootDir>/jest.setup.ts'],
 
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {
     '^.+\\.m?tsx?$': ['ts-jest', { diagnostics: false }],
   },
-
+  clearMocks: true,
   testRegex: ['/src/.*.test.[jt]sx?$'],
   testPathIgnorePatterns: ['/node_modules/'],
 

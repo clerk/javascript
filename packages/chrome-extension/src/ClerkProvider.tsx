@@ -4,6 +4,7 @@ import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider
 import React from 'react';
 
 import { buildClerk } from './singleton';
+import { type StorageCache } from './utils/storage';
 
 Clerk.sdkMetadata = {
   name: PACKAGE_NAME,
@@ -14,23 +15,31 @@ __internal__setErrorThrowerOptions({
   packageName: '@clerk/chrome-extension',
 });
 
-type WebSSOClerkProviderCustomProps = {
-  syncSessionWithTab?: boolean;
-};
+type WebSSOClerkProviderCustomProps =
+  | {
+      syncSessionHost?: never;
+      syncSessionWithTab?: false;
+      storageCache?: never;
+    }
+  | {
+      syncSessionHost?: string;
+      syncSessionWithTab: true;
+      storageCache?: StorageCache;
+    };
 
 type WebSSOClerkProviderProps = ClerkReactProviderProps & WebSSOClerkProviderCustomProps;
 
 const WebSSOClerkProvider = (props: WebSSOClerkProviderProps): JSX.Element | null => {
-  const { children, ...rest } = props;
+  const { children, storageCache: runtimeStorageCache, syncSessionWithTab, ...rest } = props;
   const { publishableKey = '' } = props;
 
   const [clerkInstance, setClerkInstance] = React.useState<ClerkProp>(null);
 
   React.useEffect(() => {
     void (async () => {
-      setClerkInstance(await buildClerk({ publishableKey }));
+      setClerkInstance(await buildClerk({ publishableKey, storageCache: runtimeStorageCache }));
     })();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!clerkInstance) {
     return null;
@@ -60,8 +69,9 @@ const StandaloneClerkProvider = (props: ClerkReactProviderProps): JSX.Element =>
   );
 };
 
-type ChromeExtensionClerkProviderProps = WebSSOClerkProviderProps;
+export type ChromeExtensionClerkProviderProps = WebSSOClerkProviderProps;
 
-export function ClerkProvider({ syncSessionWithTab, ...rest }: ChromeExtensionClerkProviderProps): JSX.Element | null {
-  return syncSessionWithTab ? <WebSSOClerkProvider {...rest} /> : <StandaloneClerkProvider {...rest} />;
+export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
+  const { syncSessionHost, storageCache, syncSessionWithTab, ...rest } = props;
+  return syncSessionWithTab ? <WebSSOClerkProvider {...props} /> : <StandaloneClerkProvider {...rest} />;
 }
