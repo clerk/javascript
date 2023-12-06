@@ -521,7 +521,7 @@ test('Handshake result - dev - mismatched keys', async () => {
     mode: 'test',
     matchedKeys: false,
   });
-  const { token } = config.generateToken({ state: 'early' });
+  const { token } = config.generateToken({ state: 'active' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
   const handshake = btoa(JSON.stringify(cookiesToSet));
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
@@ -643,7 +643,7 @@ test('Handshake result - prod - mismatched keys', async () => {
     mode: 'live',
     matchedKeys: false,
   });
-  const { token } = config.generateToken({ state: 'early' });
+  const { token } = config.generateToken({ state: 'active' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
   const handshake = btoa(JSON.stringify(cookiesToSet));
   const res = await fetch(url + '/', {
