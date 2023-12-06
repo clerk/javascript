@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.0.0-alpha-v5.8
+
+### Major Changes
+
+- Change the default behavior of `afterSignOutUrl`, `afterSignIn` and `afterSignUp` props to be redirected to `/` instead of the Account Portal defined URL. ([#2020](https://github.com/clerk/javascript/pull/2020)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Drop `org:sys_domains:delete` and `org:sys_memberships:delete` as those have now been merged with the respective `manage` ones. ([#2256](https://github.com/clerk/javascript/pull/2256)) by [@panteliselef](https://github.com/panteliselef)
+
+- Hide "Add domain" button inside `<OrganizationProfile/>` when user is missing the `org:sys_domains:manage` permission. ([#2240](https://github.com/clerk/javascript/pull/2240)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add setter for sdkMetadata on Clerk to address issues arising from older versions of the SDK. ([#2237](https://github.com/clerk/javascript/pull/2237)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`6a33709cc`](https://github.com/clerk/javascript/commit/6a33709ccf48586f1a8b62216688ea300b7b5dfb), [`2d383e413`](https://github.com/clerk/javascript/commit/2d383e413920fae1d1b303a669ca165035658639), [`d30ea1faa`](https://github.com/clerk/javascript/commit/d30ea1faa45074e09c037530e8ba3ca2dbd50654)]:
+  - @clerk/types@4.0.0-alpha-v5.8
+  - @clerk/localizations@2.0.0-alpha-v5.6
+  - @clerk/shared@2.0.0-alpha-v5.5
+
 ## 5.0.0-alpha-v5.7
 
 ### Minor Changes
