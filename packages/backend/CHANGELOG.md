@@ -1,5 +1,23 @@
 # Change Log
 
+## 1.0.0-alpha-v5.6
+
+### Minor Changes
+
+- - Added the `User.last_active_at` timestamp field which stores the latest date of session activity, with day precision. For further details, please consult the [Backend API documentation](https://clerk.com/docs/reference/backend-api/tag/Users#operation/GetUser). ([#2261](https://github.com/clerk/javascript/pull/2261)) by [@georgepsarakis](https://github.com/georgepsarakis)
+
+  - Added the `last_active_at_since` filtering parameter for the Users listing request. The new parameter can be used to retrieve users that have displayed session activity since the given date. For further details, please consult the [Backend API documentation](https://clerk.com/docs/reference/backend-api/tag/Users#operation/GetUserList).
+  - Added the `last_active_at` available options for the `orderBy` parameter of the Users listing request. For further details, please consult the [Backend API documentation](https://clerk.com/docs/reference/backend-api/tag/Users#operation/GetUserList).
+
+### Patch Changes
+
+- Drop the introduction of `OrganizationRole` and `OrganizationPermission` resources fro BAPI. ([#2252](https://github.com/clerk/javascript/pull/2252)) by [@panteliselef](https://github.com/panteliselef)
+
+- Set correct information on required Node.js and React versions in README ([#2264](https://github.com/clerk/javascript/pull/2264)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`d30ea1faa`](https://github.com/clerk/javascript/commit/d30ea1faa45074e09c037530e8ba3ca2dbd50654)]:
+  - @clerk/shared@2.0.0-alpha-v5.5
+
 ## 1.0.0-alpha-v5.5
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.5
+
+### Patch Changes
+
+- Change the default behavior of `afterSignOutUrl`, `afterSignIn` and `afterSignUp` props to be redirected to `/` instead of the Account Portal defined URL. ([#2020](https://github.com/clerk/javascript/pull/2020)) by [@octoper](https://github.com/octoper)
+
 ## 2.0.0-alpha-v5.4
 
 ### Minor Changes
