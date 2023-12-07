@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.65.7
+
+### Patch Changes
+
+- Drop `org:sys_domains:delete` and `org:sys_memberships:delete` as those have now been merged with the respective `manage` ones. ([#2270](https://github.com/clerk/javascript/pull/2270)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fallback to the API error message when the password is pwned and there is no translation available. ([#2274](https://github.com/clerk/javascript/pull/2274)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`31ee1438a`](https://github.com/clerk/javascript/commit/31ee1438aa848aff50889c31a2f2bb8098eb1424), [`12b362923`](https://github.com/clerk/javascript/commit/12b362923366a913a455b516a262455e0a40d723)]:
+  - @clerk/types@3.58.1
+  - @clerk/localizations@1.26.11
+
 ## 4.65.6
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # Change Log
 
+## 0.35.0
+
+### Minor Changes
+
+- Add missing `createdAt` param in `User#createUser()` of `@clerk/backend`. ([#2288](https://github.com/clerk/javascript/pull/2288)) by [@dimkl](https://github.com/dimkl)
+
+  Fix `clerkClient.verifyToken()` signature to support a single `token: string` parameter.
+
+### Patch Changes
+
+- Added missing types for `clerkClient.invitations.createInvitation` ([#2287](https://github.com/clerk/javascript/pull/2287)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`31ee1438a`](https://github.com/clerk/javascript/commit/31ee1438aa848aff50889c31a2f2bb8098eb1424), [`12b362923`](https://github.com/clerk/javascript/commit/12b362923366a913a455b516a262455e0a40d723)]:
+  - @clerk/types@3.58.1
+
 ## 0.34.3
 
 ### Patch Changes
