@@ -8,7 +8,7 @@ import { loadApiEnv, loadClientEnv } from './utils';
 type ExtendedClerk = ReturnType<typeof _Clerk> & {
   expressWithAuth: ReturnType<typeof createClerkExpressWithAuth>;
   expressRequireAuth: ReturnType<typeof createClerkExpressRequireAuth>;
-  verifyToken: typeof _verifyToken;
+  verifyToken: (token: string, verifyOpts?: Parameters<typeof _verifyToken>[1]) => ReturnType<typeof _verifyToken>;
 } & ReturnType<typeof createBasePropForRedwoodCompatibility>;
 
 /**
