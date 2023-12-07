@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.58.1
+
+### Patch Changes
+
+- Add `permissions` to `meta` field of fapi error. ([#2285](https://github.com/clerk/javascript/pull/2285)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Drop `org:sys_domains:delete` and `org:sys_memberships:delete` as those have now been merged with the respective `manage` ones. ([#2270](https://github.com/clerk/javascript/pull/2270)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.58.0
 
 ### Minor Changes
