@@ -1,4 +1,4 @@
-import { parsePublishableKey } from '@clerk/shared/keys';
+import { isPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
 import { Token } from 'src';
 
 import { constants } from '../constants';
@@ -48,38 +48,126 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
   }
 }
 
+/**
+ * Parse the provided publishable key, but adjust the returned frontendApi based on the provided domain and proxyUrl.
+ */
+export function parsePublishableKeyWithOptions({
+  publishableKey,
+  domain,
+  proxyUrl,
+}: {
+  publishableKey: string;
+  domain?: string;
+  proxyUrl?: string;
+}) {
+  if (!isPublishableKey(publishableKey)) {
+    throw new Error('Publishable key not valid.');
+  }
+
+  const { frontendApi: frontendApiFromPK, instanceType } = parsePublishableKey(publishableKey)!;
+
+  let frontendApi = frontendApiFromPK;
+  if (proxyUrl) {
+    frontendApi = proxyUrl;
+  } else if (instanceType !== 'development' && domain) {
+    frontendApi = `https://clerk.${domain}`;
+  } else {
+    frontendApi = `https://${frontendApi}`;
+  }
+
+  return {
+    frontendApi,
+    instanceType,
+  };
+}
+
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   const { cookies, headers, searchParams, derivedRequestUrl } = buildRequest(options.request);
 
-  const ruleOptions = {
+  const authenticateContext = {
     ...options,
     ...loadOptionsFromHeaders(headers),
     ...loadOptionsFromCookies(cookies),
     searchParams,
     derivedRequestUrl,
-  } satisfies InterstitialRuleOptions;
+  };
 
-  // TODO: Get types in a better place, there's definitely a pk here
-  const pk = parsePublishableKey(options.publishableKey);
-  if (!pk) {
-    throw new Error('no pk');
+  const devBrowserToken = searchParams?.get('__clerk_db_jwt') || cookies('__clerk_db_jwt') || '';
+  const handshakeToken = searchParams?.get('__clerk_handshake') || cookies('__clerk_handshake') || '';
+
+  assertValidSecretKey(authenticateContext.secretKey);
+
+  if (authenticateContext.isSatellite) {
+    assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
+    if (authenticateContext.signInUrl && authenticateContext.origin) {
+      assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
+    }
+    assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
   }
+
+  function buildRedirectToHandshake() {
+    const redirectUrl = new URL(derivedRequestUrl);
+    redirectUrl.searchParams.delete('__clerk_db_jwt');
+    const frontendApiNoProtocol = pk.frontendApi.replace(/http(s)?:\/\//, '');
+
+    const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
+    url.searchParams.append('redirect_url', redirectUrl?.href || '');
+
+    if (pk?.instanceType === 'development' && devBrowserToken) {
+      url.searchParams.append('__clerk_db_jwt', devBrowserToken);
+    }
+
+    return new Headers({ location: url.href });
+  }
+
+  async function resolveHandshake() {
+    const headers = new Headers({
+      'Access-Control-Allow-Origin': 'null',
+      'Access-Control-Allow-Credentials': 'true',
+    });
+
+    const cookiesToSet = JSON.parse(atob(handshakeToken)) as string[];
+
+    let sessionToken = '';
+    cookiesToSet.forEach((x: string) => {
+      headers.append('Set-Cookie', x);
+      if (x.startsWith('__session=')) {
+        sessionToken = x.split(';')[0].substring(10);
+      }
+    });
+
+    // Right after a handshake is a good time to detect the skew
+    // const detectedSkew
+    if (instanceType === 'development') {
+      const newUrl = new URL(authenticateContext.derivedRequestUrl);
+      newUrl.searchParams.delete('__clerk_handshake');
+      newUrl.searchParams.delete('__clerk_help');
+      headers.append('Location', newUrl.toString());
+    }
+
+    if (sessionToken === '') {
+      return signedOut(authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
+    }
+
+    // Uncaught
+    const verifyResult = await verifyToken(sessionToken, authenticateContext);
+
+    if (verifyResult) {
+      return signedIn(authenticateContext, verifyResult, headers);
+    }
+  }
+
+  const pk = parsePublishableKeyWithOptions({
+    publishableKey: options.publishableKey,
+    proxyUrl: options.proxyUrl,
+    domain: options.domain,
+  });
 
   const instanceType = pk.instanceType;
 
-  assertValidSecretKey(ruleOptions.secretKey);
-
-  if (ruleOptions.isSatellite) {
-    assertSignInUrlExists(ruleOptions.signInUrl, ruleOptions.secretKey);
-    if (ruleOptions.signInUrl && ruleOptions.origin) {
-      assertSignInUrlFormatAndOrigin(ruleOptions.signInUrl, ruleOptions.origin);
-    }
-    assertProxyUrlOrDomain(ruleOptions.proxyUrl || ruleOptions.domain);
-  }
-
   async function authenticateRequestWithTokenInHeader() {
     try {
-      const state = await runInterstitialRules(ruleOptions, [hasValidHeaderToken]);
+      const state = await runInterstitialRules(authenticateContext, [hasValidHeaderToken]);
       return state;
     } catch (err) {
       return handleError(err, 'header');
@@ -87,127 +175,63 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   }
 
   async function authenticateRequestWithTokenInCookie() {
-    function buildRedirectToHandshake({
-      publishableKey,
-      devBrowserToken,
-      derivedRequestUrl,
-      proxyUrl,
-      domain,
-    }: InterstitialRuleOptions): string {
-      const redirectUrl = new URL(derivedRequestUrl as URL);
-      redirectUrl.searchParams.delete('__clerk_db_jwt');
-      const pk = parsePublishableKey(publishableKey);
-      const pkFapi = pk?.frontendApi || '';
-      // determine proper FAPI url, taking into account multi-domain setups
-      const frontendApi = proxyUrl || (pk?.instanceType !== 'development' ? addClerkPrefix(domain) : '') || pkFapi;
-      const frontendApiNoProtocol = frontendApi.replace(/http(s)?:\/\//, '');
-
-      const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
-      url.searchParams.append('redirect_url', redirectUrl?.href || '');
-
-      if (pk?.instanceType === 'development' && devBrowserToken) {
-        url.searchParams.append('__clerk_db_jwt', devBrowserToken);
-      }
-      return url.href;
-    }
-
-    const clientUat = parseInt(ruleOptions.clientUat || '', 10) || 0;
+    const clientUat = parseInt(authenticateContext.clientUat || '', 10) || 0;
     const hasActiveClient = clientUat > 0;
     // TODO rename this to sessionToken
-    const sessionToken = ruleOptions.sessionTokenInCookie;
+    const sessionToken = authenticateContext.sessionTokenInCookie;
     const hasSessionToken = !!sessionToken;
-    const handshakeToken = ruleOptions.handshakeToken;
 
-    // ================ This is to end the handshake if necessary ===================
+    /**
+     * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
+     */
     if (handshakeToken) {
-      const headers = new Headers({
-        'Access-Control-Allow-Origin': 'null',
-        'Access-Control-Allow-Credentials': 'true',
-      });
+      const handshakeResult = await resolveHandshake();
 
-      const cookiesToSet = JSON.parse(atob(handshakeToken)) as string[];
-
-      let sessionToken = '';
-      cookiesToSet.forEach((x: string) => {
-        headers.append('Set-Cookie', x);
-        if (x.startsWith('__session=')) {
-          sessionToken = x.split(';')[0].substring(10);
-        }
-      });
-
-      // Right after a handshake is a good time to detect the skew
-      // const detectedSkew
-      if (parsePublishableKey(options.publishableKey)?.instanceType === 'development') {
-        const newUrl = new URL(ruleOptions.derivedRequestUrl);
-        newUrl.searchParams.delete('__clerk_handshake');
-        newUrl.searchParams.delete('__clerk_help');
-        headers.append('Location', newUrl.toString());
-      }
-
-      if (sessionToken === '') {
-        return signedOut(ruleOptions, AuthErrorReason.SessionTokenMissing, '', headers);
-      }
-
-      // Uncaught
-      const verifyResult = await verifyToken(sessionToken, ruleOptions);
-
-      if (verifyResult) {
-        return signedIn(ruleOptions, verifyResult, headers);
+      // This shouldn't ever be undefined, but to appease the types we check truthiness before returning
+      if (handshakeResult) {
+        return handshakeResult;
       }
     }
 
-    // ================ This is to start the handshake if necessary ===================
-    if (instanceType === 'development' && ruleOptions.derivedRequestUrl.searchParams.has('__clerk_db_jwt')) {
-      const headers = new Headers();
-      headers.set('Location', buildRedirectToHandshake(ruleOptions));
-
-      // TODO: Add status code for redirection
-      return handshake(ruleOptions, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+    /**
+     * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
+     */
+    if (instanceType === 'development' && authenticateContext.derivedRequestUrl.searchParams.has('__clerk_db_jwt')) {
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.DevBrowserSync, '', headers);
     }
 
-    if (ruleOptions.isSatellite && !ruleOptions.derivedRequestUrl.searchParams.has('__clerk_synced')) {
-      const headers = new Headers();
-      headers.set('Location', buildRedirectToHandshake(ruleOptions));
-
-      // TODO: Add status code for redirection
-      return handshake(ruleOptions, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+    if (authenticateContext.isSatellite && !authenticateContext.derivedRequestUrl.searchParams.has('__clerk_synced')) {
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
     if (!hasActiveClient && !hasSessionToken) {
-      return signedOut(ruleOptions, AuthErrorReason.CookieAndUATMissing);
+      return signedOut(authenticateContext, AuthErrorReason.CookieAndUATMissing);
     }
 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
     if (!hasActiveClient && hasSessionToken) {
-      const headers = new Headers();
-      headers.set('Location', buildRedirectToHandshake(ruleOptions));
-
-      // TODO: Add status code for redirection
-      return handshake(ruleOptions, AuthErrorReason.SessionTokenWithoutClientUAT, '', headers);
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.SessionTokenWithoutClientUAT, '', headers);
     }
 
     if (hasActiveClient && !hasSessionToken) {
-      const headers = new Headers();
-      headers.set('Location', buildRedirectToHandshake(ruleOptions));
-
-      // TODO: Add status code for redirection
-      return handshake(ruleOptions, AuthErrorReason.ClientUATWithoutSessionToken, '', headers);
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '', headers);
     }
 
     const decodeResult = decodeJwt(sessionToken!);
 
     if (decodeResult.payload.iat < clientUat) {
-      const headers = new Headers();
-      headers.set('Location', buildRedirectToHandshake(ruleOptions));
-
-      // TODO: Add status code for redirection
-      return handshake(ruleOptions, AuthErrorReason.SessionTokenOutdated, '', headers);
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, '', headers);
     }
 
     try {
-      const verifyResult = await verifyToken(sessionToken!, ruleOptions);
+      const verifyResult = await verifyToken(sessionToken!, authenticateContext);
       if (verifyResult) {
-        return signedIn(ruleOptions, verifyResult);
+        return signedIn(authenticateContext, verifyResult);
       }
     } catch (err) {
       if (err instanceof TokenVerificationError) {
@@ -219,19 +243,16 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         ].includes(err.reason);
 
         if (reasonToHandshake) {
-          const headers = new Headers();
-          headers.set('Location', buildRedirectToHandshake(ruleOptions));
-
-          // TODO: Add status code for redirection
-          return handshake(ruleOptions, AuthErrorReason.SessionTokenOutdated, '', headers);
+          const headers = buildRedirectToHandshake();
+          return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, '', headers);
         }
-        return signedOut(ruleOptions, err.reason, err.getFullMessage());
+        return signedOut(authenticateContext, err.reason, err.getFullMessage());
       }
 
-      return signedOut(ruleOptions, AuthErrorReason.UnexpectedError);
+      return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
     }
 
-    return signedOut(ruleOptions, AuthErrorReason.UnexpectedError);
+    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
   function handleError(err: unknown, tokenCarrier: TokenCarrier) {
@@ -245,16 +266,16 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
       if (reasonToReturnInterstitial) {
         if (tokenCarrier === 'header') {
-          return unknownState(ruleOptions, err.reason, err.getFullMessage());
+          return unknownState(authenticateContext, err.reason, err.getFullMessage());
         }
-        return interstitial(ruleOptions, err.reason, err.getFullMessage());
+        return interstitial(authenticateContext, err.reason, err.getFullMessage());
       }
-      return signedOut(ruleOptions, err.reason, err.getFullMessage());
+      return signedOut(authenticateContext, err.reason, err.getFullMessage());
     }
-    return signedOut(ruleOptions, AuthErrorReason.UnexpectedError, (err as Error).message);
+    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError, (err as Error).message);
   }
 
-  if (ruleOptions.sessionTokenInHeader) {
+  if (authenticateContext.sessionTokenInHeader) {
     return authenticateRequestWithTokenInHeader();
   }
   return authenticateRequestWithTokenInCookie();

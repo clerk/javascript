@@ -57,7 +57,7 @@ export type InterstitialState = Omit<SignedOutState, 'isInterstitial' | 'status'
   toAuth: () => null;
 };
 
-export type HandshakeState = Omit<SignedOutState, 'headers' | 'status' | 'toAuth'> & {
+export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
   status: AuthStatus.Handshake;
   headers: Headers;
   isInterstitial: false;
@@ -71,6 +71,7 @@ export type UnknownState = Omit<InterstitialState, 'status' | 'isInterstitial' |
 };
 
 export enum AuthErrorReason {
+  DevBrowserSync = 'dev-browser-sync',
   SessionTokenMissing = 'session-token-missing',
   SessionTokenWithoutClientUAT = 'session-token-but-no-client-uat',
   ClientUATWithoutSessionToken = 'client-uat-but-no-session-token',
@@ -122,10 +123,6 @@ type AuthParams = {
   sessionTokenInHeader?: string;
   /* Client uat cookie value */
   clientUat?: string;
-  /* DevBrowser token value */
-  devBrowserToken?: string;
-  /* Handshake token value */
-  handshakeToken?: string;
 };
 
 export type AuthStatusOptionsType = LoadResourcesOptions &

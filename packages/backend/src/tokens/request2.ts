@@ -124,11 +124,11 @@ export type AuthenticateRequestOptions = {
 export async function baseAuthenticateRequest(
   request: Request,
   requestOptions: AuthenticateRequestOptions,
-  clerkOptions: ClerkOptions,
+  // clerkOptions: ClerkOptions,
 ): Promise<RequestState> {
   // const { cookies, headers, searchParams, derivedRequestUrl } = buildRequest(request);
 
-  const opts = { ...requestOptions, ...clerkOptions };
+  const opts = { ...requestOptions };
 
   if (!opts.publishableKey) {
     throw new Error('Publishable key is missing');
