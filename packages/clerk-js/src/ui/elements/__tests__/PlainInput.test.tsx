@@ -1,5 +1,5 @@
 import { describe, it } from '@jest/globals';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { useFormControl } from '../../utils';

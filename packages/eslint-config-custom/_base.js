@@ -14,7 +14,7 @@ module.exports = {
     'turbo',
     require.resolve('./rules/variables'),
   ],
-  plugins: ['simple-import-sort'],
+  plugins: ['simple-import-sort', 'unused-imports'],
   env: {
     [`es${ECMA_VERSION}`]: true,
   },

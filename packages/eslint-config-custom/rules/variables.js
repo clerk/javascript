@@ -12,5 +12,6 @@ module.exports = {
         varsIgnorePattern: '^_',
       },
     ],
+    'unused-imports/no-unused-imports': 'error',
   },
 };
