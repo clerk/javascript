@@ -6,8 +6,7 @@ import type { CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
 import type { CreateAuthenticateRequestOptions } from './tokens';
 import { createAuthenticateRequest } from './tokens';
-import type { AuthenticateRequestOptions } from './tokens/request2';
-import { baseAuthenticateRequest } from './tokens/request2';
+import type { AuthenticateRequestOptions } from './tokens/request';
 
 export { createIsomorphicRequest } from './util/IsomorphicRequest';
 
@@ -42,7 +41,7 @@ export function createClerkClient(options: ClerkOptions) {
     ...apiClient,
     ...requestState,
     authenticateRequest: (request: Request, requestOptions: AuthenticateRequestOptions) => {
-      return baseAuthenticateRequest(request, requestOptions, options);
+      return requestState.authenticateRequest({ ...requestOptions, request });
     },
     telemetry,
   };
