@@ -1,7 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import { describe } from '@jest/globals';
 
-import { act, bindCreateFixtures, renderHook, waitFor } from '../../../testUtils';
+import { act, renderHook, waitFor } from '../../../testUtils';
 import {
   createFakeDomain,
   createFakeOrganizationMembershipRequest,
@@ -129,23 +129,22 @@ describe('useOrganization', () => {
       expect(result.current.memberships?.isFetching).toBe(true);
       expect(result.current.memberships?.count).toBe(0);
 
-      await waitFor(() => {
-        expect(result.current.memberships?.isLoading).toBe(false);
-        expect(result.current.memberships?.count).toBe(4);
-        expect(result.current.memberships?.page).toBe(1);
-        expect(result.current.memberships?.pageCount).toBe(2);
-        expect(result.current.memberships?.hasNextPage).toBe(true);
-        expect(result.current.memberships?.data).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              id: '1',
-            }),
-            expect.objectContaining({
-              id: '2',
-            }),
-          ]),
-        );
-      });
+      await waitFor(() => expect(result.current.memberships?.isLoading).toBe(false));
+
+      expect(result.current.memberships?.count).toBe(4);
+      expect(result.current.memberships?.page).toBe(1);
+      expect(result.current.memberships?.pageCount).toBe(2);
+      expect(result.current.memberships?.hasNextPage).toBe(true);
+      expect(result.current.memberships?.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: '1',
+          }),
+          expect.objectContaining({
+            id: '2',
+          }),
+        ]),
+      );
 
       fixtures.clerk.organization?.getMemberships.mockReturnValue(
         Promise.resolve({
@@ -179,35 +178,29 @@ describe('useOrganization', () => {
         }),
       );
 
-      act(() => {
-        result.current.memberships?.fetchNext?.();
-      });
+      act(() => result.current.memberships?.fetchNext?.());
 
-      await waitFor(() => {
-        expect(result.current.memberships?.isLoading).toBe(true);
-      });
+      await waitFor(() => expect(result.current.memberships?.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.memberships?.isLoading).toBe(false));
 
-      await waitFor(() => {
-        expect(result.current.memberships?.isLoading).toBe(false);
-        expect(result.current.memberships?.page).toBe(2);
-        expect(result.current.memberships?.hasNextPage).toBe(false);
-        expect(result.current.memberships?.data).toEqual(
-          expect.arrayContaining([
-            expect.not.objectContaining({
-              id: '1',
-            }),
-            expect.not.objectContaining({
-              id: '2',
-            }),
-            expect.objectContaining({
-              id: '3',
-            }),
-            expect.objectContaining({
-              id: '4',
-            }),
-          ]),
-        );
-      });
+      expect(result.current.memberships?.page).toBe(2);
+      expect(result.current.memberships?.hasNextPage).toBe(false);
+      expect(result.current.memberships?.data).toEqual(
+        expect.arrayContaining([
+          expect.not.objectContaining({
+            id: '1',
+          }),
+          expect.not.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            id: '3',
+          }),
+          expect.objectContaining({
+            id: '4',
+          }),
+        ]),
+      );
     });
   });
 
@@ -243,25 +236,25 @@ describe('useOrganization', () => {
       expect(result.current.domains?.isFetching).toBe(true);
       expect(result.current.domains?.count).toBe(0);
 
-      await waitFor(() => {
-        expect(result.current.domains?.isLoading).toBe(false);
-        expect(result.current.domains?.count).toBe(4);
-        expect(result.current.domains?.page).toBe(1);
-        expect(result.current.domains?.pageCount).toBe(2);
-        expect(result.current.domains?.hasNextPage).toBe(true);
-        expect(result.current.domains?.data).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              id: '1',
-              name: 'one.dev',
-            }),
-            expect.objectContaining({
-              id: '2',
-              name: 'two.dev',
-            }),
-          ]),
-        );
-      });
+      await waitFor(() => expect(result.current.domains?.isLoading).toBe(false));
+
+      expect(result.current.domains?.isLoading).toBe(false);
+      expect(result.current.domains?.count).toBe(4);
+      expect(result.current.domains?.page).toBe(1);
+      expect(result.current.domains?.pageCount).toBe(2);
+      expect(result.current.domains?.hasNextPage).toBe(true);
+      expect(result.current.domains?.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: '1',
+            name: 'one.dev',
+          }),
+          expect.objectContaining({
+            id: '2',
+            name: 'two.dev',
+          }),
+        ]),
+      );
 
       fixtures.clerk.organization?.getDomains.mockReturnValue(
         Promise.resolve({
@@ -281,35 +274,29 @@ describe('useOrganization', () => {
         }),
       );
 
-      act(() => {
-        result.current.domains?.fetchNext?.();
-      });
+      act(() => result.current.domains?.fetchNext?.());
 
-      await waitFor(() => {
-        expect(result.current.domains?.isLoading).toBe(true);
-      });
+      await waitFor(() => expect(result.current.domains?.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.domains?.isLoading).toBe(false));
 
-      await waitFor(() => {
-        expect(result.current.domains?.isLoading).toBe(false);
-        expect(result.current.domains?.page).toBe(2);
-        expect(result.current.domains?.hasNextPage).toBe(false);
-        expect(result.current.domains?.data).toEqual(
-          expect.arrayContaining([
-            expect.not.objectContaining({
-              id: '1',
-            }),
-            expect.not.objectContaining({
-              id: '2',
-            }),
-            expect.objectContaining({
-              id: '3',
-            }),
-            expect.objectContaining({
-              id: '4',
-            }),
-          ]),
-        );
-      });
+      expect(result.current.domains?.page).toBe(2);
+      expect(result.current.domains?.hasNextPage).toBe(false);
+      expect(result.current.domains?.data).toEqual(
+        expect.arrayContaining([
+          expect.not.objectContaining({
+            id: '1',
+          }),
+          expect.not.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            id: '3',
+          }),
+          expect.objectContaining({
+            id: '4',
+          }),
+        ]),
+      );
     });
   });
 
@@ -351,13 +338,13 @@ describe('useOrganization', () => {
       expect(result.current.membershipRequests?.isFetching).toBe(true);
       expect(result.current.membershipRequests?.count).toBe(0);
 
-      await waitFor(() => {
-        expect(result.current.membershipRequests?.isLoading).toBe(false);
-        expect(result.current.membershipRequests?.count).toBe(4);
-        expect(result.current.membershipRequests?.page).toBe(1);
-        expect(result.current.membershipRequests?.pageCount).toBe(2);
-        expect(result.current.membershipRequests?.hasNextPage).toBe(true);
-      });
+      await waitFor(() => expect(result.current.membershipRequests?.isLoading).toBe(false));
+
+      expect(result.current.membershipRequests?.isFetching).toBe(false);
+      expect(result.current.membershipRequests?.count).toBe(4);
+      expect(result.current.membershipRequests?.page).toBe(1);
+      expect(result.current.membershipRequests?.pageCount).toBe(2);
+      expect(result.current.membershipRequests?.hasNextPage).toBe(true);
 
       fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(
         Promise.resolve({
@@ -383,43 +370,37 @@ describe('useOrganization', () => {
         }),
       );
 
-      act(() => {
-        result.current.membershipRequests?.fetchNext?.();
-      });
+      act(() => result.current.membershipRequests?.fetchNext?.());
 
-      await waitFor(() => {
-        expect(result.current.membershipRequests?.isLoading).toBe(true);
-      });
+      await waitFor(() => expect(result.current.membershipRequests?.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.membershipRequests?.isLoading).toBe(false));
 
-      await waitFor(() => {
-        expect(result.current.membershipRequests?.isLoading).toBe(false);
-        expect(result.current.membershipRequests?.page).toBe(2);
-        expect(result.current.membershipRequests?.hasNextPage).toBe(false);
-        expect(result.current.membershipRequests?.data).toEqual(
-          expect.arrayContaining([
-            expect.not.objectContaining({
-              id: '1',
+      expect(result.current.membershipRequests?.page).toBe(2);
+      expect(result.current.membershipRequests?.hasNextPage).toBe(false);
+      expect(result.current.membershipRequests?.data).toEqual(
+        expect.arrayContaining([
+          expect.not.objectContaining({
+            id: '1',
+          }),
+          expect.not.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            organizationId: '1',
+            id: '3',
+            publicUserData: expect.objectContaining({
+              userId: 'test_user3',
             }),
-            expect.not.objectContaining({
-              id: '2',
+          }),
+          expect.objectContaining({
+            organizationId: '1',
+            id: '4',
+            publicUserData: expect.objectContaining({
+              userId: 'test_user4',
             }),
-            expect.objectContaining({
-              organizationId: '1',
-              id: '3',
-              publicUserData: expect.objectContaining({
-                userId: 'test_user3',
-              }),
-            }),
-            expect.objectContaining({
-              organizationId: '1',
-              id: '4',
-              publicUserData: expect.objectContaining({
-                userId: 'test_user4',
-              }),
-            }),
-          ]),
-        );
-      });
+          }),
+        ]),
+      );
     });
   });
 });

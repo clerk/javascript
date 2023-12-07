@@ -15,12 +15,18 @@ const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
 describe('OrganizationSwitcher', () => {
   it('renders component', async () => {
+    jest.useFakeTimers();
+
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
     const { queryByRole } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
+
+    jest.advanceTimersByTime(15000);
     expect(queryByRole('button')).toBeDefined();
+
+    jest.useRealTimers();
   });
 
   describe('Personal Workspace', () => {

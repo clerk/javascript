@@ -1,5 +1,5 @@
 import { describe, it } from '@jest/globals';
-import { act, fireEvent, render, waitFor } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { useFormControl } from '../../utils';
@@ -141,7 +141,7 @@ describe('RadioGroup', () => {
     const { wrapper } = await createFixtures();
     const { Field } = createField('some-radio', 'two');
 
-    const { getAllByRole, getByRole, getByText } = render(
+    const { getAllByRole, getByRole, findByText } = render(
       <Field
         radioOptions={[
           { value: 'one', label: 'One' },
@@ -151,15 +151,13 @@ describe('RadioGroup', () => {
       { wrapper },
     );
 
-    await act(() => userEvent.click(getByRole('button', { name: /set error/i })));
+    await userEvent.click(getByRole('button', { name: /set error/i }));
+    expect(await findByText('some error')).toBeInTheDocument();
 
-    await waitFor(() => {
-      const radios = getAllByRole('radio');
-      radios.forEach(radio => {
-        expect(radio).toHaveAttribute('aria-invalid', 'true');
-        expect(radio).toHaveAttribute('aria-describedby', 'error-some-radio');
-      });
-      expect(getByText('some error')).toBeInTheDocument();
+    const radios = getAllByRole('radio');
+    radios.forEach(radio => {
+      expect(radio).toHaveAttribute('aria-invalid', 'true');
+      expect(radio).toHaveAttribute('aria-describedby', 'error-some-radio');
     });
   });
 
@@ -174,11 +172,9 @@ describe('RadioGroup', () => {
       infoText: 'some info',
     });
 
-    const { getByLabelText, getByText } = render(<Field />, { wrapper });
+    const { findByLabelText, findByText } = render(<Field />, { wrapper });
 
-    await act(() => fireEvent.focus(getByLabelText('One')));
-    await waitFor(() => {
-      expect(getByText('some info')).toBeInTheDocument();
-    });
+    fireEvent.focus(await findByLabelText('One'));
+    expect(await findByText('some info')).toBeInTheDocument();
   });
 });
