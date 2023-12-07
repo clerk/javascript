@@ -10,7 +10,7 @@ import { apiEndpointUnauthorizedNextResponse, handleMultiDomainAndProxy } from '
 
 export const authenticateRequest = async (req: NextRequest, opts: AuthenticateRequestOptions) => {
   const { isSatellite, domain, signInUrl, proxyUrl } = handleMultiDomainAndProxy(req, opts);
-  return await clerkClient.authenticateRequest({
+  return await clerkClient.authenticateRequest(req, {
     ...opts,
     secretKey: opts.secretKey || SECRET_KEY,
     publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
@@ -18,7 +18,6 @@ export const authenticateRequest = async (req: NextRequest, opts: AuthenticateRe
     domain,
     signInUrl,
     proxyUrl,
-    request: req,
   });
 };
 
