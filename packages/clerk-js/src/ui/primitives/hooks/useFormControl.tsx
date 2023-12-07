@@ -139,6 +139,7 @@ export const sanitizeInputProps = (
     label,
     clearFeedback,
     infoText,
+    debouncedFeedback,
     ...inputProps
   } = obj;
   /* eslint-enable */
