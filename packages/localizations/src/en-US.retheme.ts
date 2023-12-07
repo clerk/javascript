@@ -246,6 +246,10 @@ export const enUS: LocalizationResource = {
     formButtonPrimary__continue: 'Continue',
     formButtonPrimary__finish: 'Finish',
     formButtonReset: 'Cancel',
+    navbar: {
+      title: 'Account',
+      description: 'Manage your account info.',
+    },
     start: {
       headerTitle__account: 'Account',
       headerTitle__security: 'Security',
@@ -542,6 +546,10 @@ export const enUS: LocalizationResource = {
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
+    navbar: {
+      title: 'Organization',
+      description: 'Manage your organization.',
+    },
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
@@ -715,6 +723,7 @@ export const enUS: LocalizationResource = {
     form_username_invalid_length: '',
     form_username_invalid_character: '',
     form_param_format_invalid: '',
+    form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_password_length_too_short: '',
     form_param_nil: '',
