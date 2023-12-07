@@ -56,6 +56,7 @@ type CreateUserParams = {
   skipPasswordRequirement?: boolean;
   totpSecret?: string;
   backupCodes?: string[];
+  createdAt?: Date;
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);
 
