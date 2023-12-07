@@ -18,7 +18,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
   const edit = onClick && (
     <Button
       elementDescriptor={descriptors.identityPreviewEditButton}
-      variant='secondary'
+      variant='ghostIcon'
       onClick={onClick}
       aria-label={'Edit'}
     >
