@@ -184,17 +184,8 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return setHeader(beforeAuthRes, constants.Headers.AuthReason, 'redirect');
     }
 
-    const devBrowserToken =
-      req.nextUrl.searchParams.get('__clerk_db_jwt') || req.cookies.get('__clerk_db_jwt')?.value || '';
-    const handshakeToken =
-      req.nextUrl.searchParams.get('__clerk_handshake') || req.cookies.get('__clerk_handshake')?.value || '';
-
     // TODO: fix type discrepancy between WithAuthOptions and AuthenticateRequestOptions
-    const requestState = await authenticateRequest(req, {
-      ...options,
-      devBrowserToken,
-      handshakeToken,
-    } as AuthenticateRequestOptions);
+    const requestState = await authenticateRequest(req, options as AuthenticateRequestOptions);
     const requestStateHeaders = requestState.headers;
 
     const locationHeader = requestStateHeaders?.get('location');
