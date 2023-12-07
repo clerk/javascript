@@ -26,13 +26,12 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
         iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('manageAccount')}
         iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
         iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('manageAccount')}
-        textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
-        textElementId={descriptors.userButtonPopoverActionButtonText.setId('manageAccount')}
         icon={CogFilled}
         label={localizationKeys('userButton.action__manageAccount')}
         onClick={handleManageAccountClicked}
         sx={t => ({
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          backgroundColor: t.colors.$white,
         })}
       />
       <Action
@@ -42,8 +41,6 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
         iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('signOut')}
         iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
         iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('signOut')}
-        textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
-        textElementId={descriptors.userButtonPopoverActionButtonText.setId('signOut')}
         icon={SignOut}
         label={localizationKeys('userButton.action__signOut')}
         onClick={handleSignOutSessionClicked(session)}
@@ -85,8 +82,6 @@ export const MultiSessionActions = (props: SessionActionsProps) => {
           iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('manageAccount')}
           iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
           iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('manageAccount')}
-          textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
-          textElementId={descriptors.userButtonPopoverActionButtonText.setId('manageAccount')}
           icon={CogFilled}
           label={localizationKeys('userButton.action__manageAccount')}
           onClick={handleManageAccountClicked}
@@ -98,19 +93,15 @@ export const MultiSessionActions = (props: SessionActionsProps) => {
           iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('signOut')}
           iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
           iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('signOut')}
-          textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
-          textElementId={descriptors.userButtonPopoverActionButtonText.setId('signOut')}
           icon={SignOut}
           label={localizationKeys('userButton.action__signOut')}
           onClick={handleSignOutSessionClicked(session)}
-          sx={[
-            t => ({
-              ':hover': {
-                backgroundColor: t.colors.$danger50,
-                color: t.colors.$danger400,
-              },
-            }),
-          ]}
+          sx={t => ({
+            ':hover': {
+              backgroundColor: t.colors.$danger50,
+              color: t.colors.$danger400,
+            },
+          })}
         />
       </Flex>
     </Actions>
