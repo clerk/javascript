@@ -67,7 +67,7 @@ describe('InviteMembersPage', () => {
       await userEvent.click(getByText('Member'));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
           emailAddresses: ['test+1@clerk.com'],
           role: 'basic_member' as MembershipRole,
@@ -107,7 +107,7 @@ describe('InviteMembersPage', () => {
       await userEvent.click(getByText('Teacher'));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
           emailAddresses: ['test+1@clerk.com'],
           role: 'org:teacher' as MembershipRole,
@@ -135,7 +135,7 @@ describe('InviteMembersPage', () => {
       await userEvent.click(getByText('Member'));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
           emailAddresses: ['test+1@clerk.com', 'test+2@clerk.com', 'test+3@clerk.com', 'test+4@clerk.com'],
           role: 'basic_member' as MembershipRole,
@@ -160,7 +160,7 @@ describe('InviteMembersPage', () => {
       await userEvent.click(getByText('Admin'));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
           emailAddresses: ['test+1@clerk.com'],
           role: 'admin' as MembershipRole,
