@@ -1,5 +1,5 @@
 import { describe, it } from '@jest/globals';
-import { act, fireEvent, render, waitFor } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { useFormControl } from '../../utils';
@@ -132,15 +132,15 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole, getByLabelText, getByText } = render(<Field />, { wrapper });
+    const { getByRole, getByLabelText, findByText } = render(<Field />, { wrapper });
 
-    await act(() => userEvent.click(getByRole('button', { name: /set error/i })));
+    await userEvent.click(getByRole('button', { name: /set error/i }));
 
-    await waitFor(() => {
-      expect(getByLabelText('some label')).toHaveAttribute('aria-invalid', 'true');
-      expect(getByLabelText('some label')).toHaveAttribute('aria-describedby', 'error-firstname');
-      expect(getByText('some error')).toBeInTheDocument();
-    });
+    expect(await findByText('some error')).toBeInTheDocument();
+
+    const label = getByLabelText('some label');
+    expect(label).toHaveAttribute('aria-invalid', 'true');
+    expect(label).toHaveAttribute('aria-describedby', 'error-firstname');
   });
 
   it('with info', async () => {
@@ -152,10 +152,9 @@ describe('PlainInput', () => {
       infoText: 'some info',
     });
 
-    const { getByLabelText, getByText } = render(<Field actionLabel={'take action'} />, { wrapper });
-    await act(() => fireEvent.focus(getByLabelText('some label')));
-    await waitFor(() => {
-      expect(getByText('some info')).toBeInTheDocument();
-    });
+    const { findByLabelText, findByText } = render(<Field actionLabel={'take action'} />, { wrapper });
+
+    fireEvent.focus(await findByLabelText('some label'));
+    expect(await findByText('some info')).toBeInTheDocument();
   });
 });

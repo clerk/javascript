@@ -100,13 +100,12 @@ describe('useOrganizationList', () => {
       expect(result.current.userMemberships.isFetching).toBe(true);
       expect(result.current.userMemberships.count).toBe(0);
 
-      await waitFor(() => {
-        expect(result.current.userMemberships.isLoading).toBe(false);
-        expect(result.current.userMemberships.count).toBe(4);
-        expect(result.current.userMemberships.page).toBe(1);
-        expect(result.current.userMemberships.pageCount).toBe(2);
-        expect(result.current.userMemberships.hasNextPage).toBe(true);
-      });
+      await waitFor(() => expect(result.current.userMemberships.isLoading).toBe(false));
+
+      expect(result.current.userMemberships.count).toBe(4);
+      expect(result.current.userMemberships.page).toBe(1);
+      expect(result.current.userMemberships.pageCount).toBe(2);
+      expect(result.current.userMemberships.hasNextPage).toBe(true);
 
       fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
         Promise.resolve({
@@ -140,35 +139,29 @@ describe('useOrganizationList', () => {
         }),
       );
 
-      act(() => {
-        result.current.userMemberships.fetchNext?.();
-      });
+      act(() => result.current.userMemberships?.fetchNext?.());
 
-      await waitFor(() => {
-        expect(result.current.userMemberships.isLoading).toBe(true);
-      });
+      await waitFor(() => expect(result.current.userMemberships?.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.userMemberships?.isLoading).toBe(false));
 
-      await waitFor(() => {
-        expect(result.current.userMemberships.isLoading).toBe(false);
-        expect(result.current.userMemberships.page).toBe(2);
-        expect(result.current.userMemberships.hasNextPage).toBe(false);
-        expect(result.current.userMemberships.data).toEqual(
-          expect.arrayContaining([
-            expect.not.objectContaining({
-              id: '1',
-            }),
-            expect.not.objectContaining({
-              id: '2',
-            }),
-            expect.objectContaining({
-              id: '3',
-            }),
-            expect.objectContaining({
-              id: '4',
-            }),
-          ]),
-        );
-      });
+      expect(result.current.userMemberships.page).toBe(2);
+      expect(result.current.userMemberships.hasNextPage).toBe(false);
+      expect(result.current.userMemberships.data).toEqual(
+        expect.arrayContaining([
+          expect.not.objectContaining({
+            id: '1',
+          }),
+          expect.not.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            id: '3',
+          }),
+          expect.objectContaining({
+            id: '4',
+          }),
+        ]),
+      );
     });
 
     it('infinite fetch', async () => {
@@ -224,10 +217,8 @@ describe('useOrganizationList', () => {
       expect(result.current.userMemberships.isLoading).toBe(true);
       expect(result.current.userMemberships.isFetching).toBe(true);
 
-      await waitFor(() => {
-        expect(result.current.userMemberships.isLoading).toBe(false);
-        expect(result.current.userMemberships.isFetching).toBe(false);
-      });
+      await waitFor(() => expect(result.current.userMemberships.isLoading).toBe(false));
+      expect(result.current.userMemberships.isFetching).toBe(false);
 
       fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
         Promise.resolve({
@@ -293,34 +284,28 @@ describe('useOrganizationList', () => {
         }),
       );
 
-      act(() => {
-        result.current.userMemberships.fetchNext?.();
-      });
+      act(() => result.current.userMemberships?.fetchNext?.());
 
-      await waitFor(() => {
-        expect(result.current.userMemberships.isLoading).toBe(false);
-        expect(result.current.userMemberships.isFetching).toBe(true);
-      });
+      await waitFor(() => expect(result.current.userMemberships?.isFetching).toBe(true));
+      expect(result.current.userMemberships?.isLoading).toBe(false);
 
-      await waitFor(() => {
-        expect(result.current.userMemberships.isFetching).toBe(false);
-        expect(result.current.userMemberships.data).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              id: '1',
-            }),
-            expect.objectContaining({
-              id: '2',
-            }),
-            expect.objectContaining({
-              id: '3',
-            }),
-            expect.objectContaining({
-              id: '4',
-            }),
-          ]),
-        );
-      });
+      await waitFor(() => expect(result.current.userMemberships?.isFetching).toBe(false));
+      expect(result.current.userMemberships.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: '1',
+          }),
+          expect.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            id: '3',
+          }),
+          expect.objectContaining({
+            id: '4',
+          }),
+        ]),
+      );
     });
   });
 
@@ -349,18 +334,19 @@ describe('useOrganizationList', () => {
           total_count: 4,
         }),
       );
+
       const { result } = renderHook(defaultRenderer, { wrapper });
+
       expect(result.current.userInvitations.isLoading).toBe(true);
       expect(result.current.userInvitations.isFetching).toBe(true);
       expect(result.current.userInvitations.count).toBe(0);
 
-      await waitFor(() => {
-        expect(result.current.userInvitations.isLoading).toBe(false);
-        expect(result.current.userInvitations.count).toBe(4);
-        expect(result.current.userInvitations.page).toBe(1);
-        expect(result.current.userInvitations.pageCount).toBe(2);
-        expect(result.current.userInvitations.hasNextPage).toBe(true);
-      });
+      await waitFor(() => expect(result.current.userInvitations.isLoading).toBe(false));
+
+      expect(result.current.userInvitations.count).toBe(4);
+      expect(result.current.userInvitations.page).toBe(1);
+      expect(result.current.userInvitations.pageCount).toBe(2);
+      expect(result.current.userInvitations.hasNextPage).toBe(true);
 
       fixtures.clerk.user?.getOrganizationInvitations.mockReturnValue(
         Promise.resolve({
@@ -378,35 +364,29 @@ describe('useOrganizationList', () => {
         }),
       );
 
-      act(() => {
-        result.current.userInvitations.fetchNext?.();
-      });
+      act(() => result.current.userInvitations?.fetchNext?.());
 
-      await waitFor(() => {
-        expect(result.current.userInvitations.isLoading).toBe(true);
-      });
+      await waitFor(() => expect(result.current.userInvitations?.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.userInvitations?.isLoading).toBe(false));
 
-      await waitFor(() => {
-        expect(result.current.userInvitations.isLoading).toBe(false);
-        expect(result.current.userInvitations.page).toBe(2);
-        expect(result.current.userInvitations.hasNextPage).toBe(false);
-        expect(result.current.userInvitations.data).toEqual(
-          expect.arrayContaining([
-            expect.not.objectContaining({
-              id: '1',
-            }),
-            expect.not.objectContaining({
-              id: '2',
-            }),
-            expect.objectContaining({
-              id: '3',
-            }),
-            expect.objectContaining({
-              id: '4',
-            }),
-          ]),
-        );
-      });
+      expect(result.current.userInvitations.page).toBe(2);
+      expect(result.current.userInvitations.hasNextPage).toBe(false);
+      expect(result.current.userInvitations.data).toEqual(
+        expect.arrayContaining([
+          expect.not.objectContaining({
+            id: '1',
+          }),
+          expect.not.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            id: '3',
+          }),
+          expect.objectContaining({
+            id: '4',
+          }),
+        ]),
+      );
     });
 
     it('infinite fetch', async () => {
@@ -443,13 +423,12 @@ describe('useOrganizationList', () => {
           }),
         { wrapper },
       );
+
       expect(result.current.userInvitations.isLoading).toBe(true);
       expect(result.current.userInvitations.isFetching).toBe(true);
 
-      await waitFor(() => {
-        expect(result.current.userInvitations.isLoading).toBe(false);
-        expect(result.current.userInvitations.isFetching).toBe(false);
-      });
+      await waitFor(() => expect(result.current.userInvitations.isLoading).toBe(false));
+      expect(result.current.userInvitations.isFetching).toBe(false);
 
       fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
         Promise.resolve({
@@ -483,34 +462,28 @@ describe('useOrganizationList', () => {
         }),
       );
 
-      act(() => {
-        result.current.userInvitations.fetchNext?.();
-      });
+      act(() => result.current.userInvitations.fetchNext?.());
 
-      await waitFor(() => {
-        expect(result.current.userInvitations.isLoading).toBe(false);
-        expect(result.current.userInvitations.isFetching).toBe(true);
-      });
+      await waitFor(() => expect(result.current.userInvitations.isFetching).toBe(true));
+      expect(result.current.userInvitations.isLoading).toBe(false);
 
-      await waitFor(() => {
-        expect(result.current.userInvitations.isFetching).toBe(false);
-        expect(result.current.userInvitations.data).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              id: '1',
-            }),
-            expect.objectContaining({
-              id: '2',
-            }),
-            expect.objectContaining({
-              id: '3',
-            }),
-            expect.objectContaining({
-              id: '4',
-            }),
-          ]),
-        );
-      });
+      await waitFor(() => expect(result.current.userInvitations.isFetching).toBe(false));
+      expect(result.current.userInvitations.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: '1',
+          }),
+          expect.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            id: '3',
+          }),
+          expect.objectContaining({
+            id: '4',
+          }),
+        ]),
+      );
     });
   });
 
@@ -544,13 +517,12 @@ describe('useOrganizationList', () => {
       expect(result.current.userSuggestions.isFetching).toBe(true);
       expect(result.current.userSuggestions.count).toBe(0);
 
-      await waitFor(() => {
-        expect(result.current.userSuggestions.isLoading).toBe(false);
-        expect(result.current.userSuggestions.count).toBe(4);
-        expect(result.current.userSuggestions.page).toBe(1);
-        expect(result.current.userSuggestions.pageCount).toBe(2);
-        expect(result.current.userSuggestions.hasNextPage).toBe(true);
-      });
+      await waitFor(() => expect(result.current.userSuggestions.isLoading).toBe(false));
+
+      expect(result.current.userSuggestions.count).toBe(4);
+      expect(result.current.userSuggestions.page).toBe(1);
+      expect(result.current.userSuggestions.pageCount).toBe(2);
+      expect(result.current.userSuggestions.hasNextPage).toBe(true);
 
       fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValue(
         Promise.resolve({
@@ -568,35 +540,29 @@ describe('useOrganizationList', () => {
         }),
       );
 
-      act(() => {
-        result.current.userSuggestions.fetchNext?.();
-      });
+      act(() => result.current.userSuggestions.fetchNext?.());
 
-      await waitFor(() => {
-        expect(result.current.userSuggestions.isLoading).toBe(true);
-      });
+      await waitFor(() => expect(result.current.userSuggestions.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.userSuggestions.isLoading).toBe(false));
 
-      await waitFor(() => {
-        expect(result.current.userSuggestions.isLoading).toBe(false);
-        expect(result.current.userSuggestions.page).toBe(2);
-        expect(result.current.userSuggestions.hasNextPage).toBe(false);
-        expect(result.current.userSuggestions.data).toEqual(
-          expect.arrayContaining([
-            expect.not.objectContaining({
-              id: '1',
-            }),
-            expect.not.objectContaining({
-              id: '2',
-            }),
-            expect.objectContaining({
-              id: '3',
-            }),
-            expect.objectContaining({
-              id: '4',
-            }),
-          ]),
-        );
-      });
+      expect(result.current.userSuggestions.page).toBe(2);
+      expect(result.current.userSuggestions.hasNextPage).toBe(false);
+      expect(result.current.userSuggestions.data).toEqual(
+        expect.arrayContaining([
+          expect.not.objectContaining({
+            id: '1',
+          }),
+          expect.not.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            id: '3',
+          }),
+          expect.objectContaining({
+            id: '4',
+          }),
+        ]),
+      );
     });
 
     it('infinite fetch', async () => {
@@ -636,10 +602,8 @@ describe('useOrganizationList', () => {
       expect(result.current.userSuggestions.isLoading).toBe(true);
       expect(result.current.userSuggestions.isFetching).toBe(true);
 
-      await waitFor(() => {
-        expect(result.current.userSuggestions.isLoading).toBe(false);
-        expect(result.current.userSuggestions.isFetching).toBe(false);
-      });
+      await waitFor(() => expect(result.current.userSuggestions.isLoading).toBe(false));
+      expect(result.current.userSuggestions.isFetching).toBe(false);
 
       fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
         Promise.resolve({
@@ -673,34 +637,28 @@ describe('useOrganizationList', () => {
         }),
       );
 
-      act(() => {
-        result.current.userSuggestions.fetchNext?.();
-      });
+      act(() => result.current.userSuggestions.fetchNext?.());
 
-      await waitFor(() => {
-        expect(result.current.userSuggestions.isLoading).toBe(false);
-        expect(result.current.userSuggestions.isFetching).toBe(true);
-      });
+      await waitFor(() => expect(result.current.userSuggestions.isFetching).toBe(true));
+      expect(result.current.userSuggestions.isLoading).toBe(false);
 
-      await waitFor(() => {
-        expect(result.current.userSuggestions.isFetching).toBe(false);
-        expect(result.current.userSuggestions.data).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              id: '1',
-            }),
-            expect.objectContaining({
-              id: '2',
-            }),
-            expect.objectContaining({
-              id: '3',
-            }),
-            expect.objectContaining({
-              id: '4',
-            }),
-          ]),
-        );
-      });
+      await waitFor(() => expect(result.current.userSuggestions.isFetching).toBe(false));
+      expect(result.current.userSuggestions.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: '1',
+          }),
+          expect.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            id: '3',
+          }),
+          expect.objectContaining({
+            id: '4',
+          }),
+        ]),
+      );
     });
   });
 });

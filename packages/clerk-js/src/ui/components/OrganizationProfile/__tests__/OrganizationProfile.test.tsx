@@ -16,9 +16,9 @@ describe('OrganizationProfile', () => {
     });
 
     const { getByText } = render(<OrganizationProfile />, { wrapper });
-    expect(getByText('Org1')).toBeDefined();
-    expect(getByText('Members')).toBeDefined();
-    expect(getByText('Settings')).toBeDefined();
+    expect(getByText('Org1')).toBeInTheDocument();
+    expect(getByText('Members')).toBeInTheDocument();
+    expect(getByText('Settings')).toBeInTheDocument();
   });
 
   it('includes custom nav items', async () => {
@@ -47,11 +47,11 @@ describe('OrganizationProfile', () => {
     props.setProps({ customPages });
 
     const { getByText } = render(<OrganizationProfile />, { wrapper });
-    expect(getByText('Org1')).toBeDefined();
-    expect(getByText('Members')).toBeDefined();
-    expect(getByText('Settings')).toBeDefined();
-    expect(getByText('Custom1')).toBeDefined();
-    expect(getByText('ExternalLink')).toBeDefined();
+    expect(getByText('Org1')).toBeInTheDocument();
+    expect(getByText('Members')).toBeInTheDocument();
+    expect(getByText('Settings')).toBeInTheDocument();
+    expect(getByText('Custom1')).toBeInTheDocument();
+    expect(getByText('ExternalLink')).toBeInTheDocument();
   });
 
   it('removes member nav item if user is lacking permissions', async () => {

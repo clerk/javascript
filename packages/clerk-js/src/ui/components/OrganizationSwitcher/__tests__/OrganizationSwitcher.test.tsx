@@ -1,7 +1,7 @@
 import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
 
-import { act, render, runFakeTimers, waitFor } from '../../../../testUtils';
+import { act, render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
 import {
@@ -18,8 +18,8 @@ describe('OrganizationSwitcher', () => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
-    const { queryByRole } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
-    expect(queryByRole('button')).toBeDefined();
+    const { getByRole } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
+    expect(getByRole('button')).toBeInTheDocument();
   });
 
   describe('Personal Workspace', () => {
@@ -30,7 +30,7 @@ describe('OrganizationSwitcher', () => {
       });
       props.setProps({ hidePersonal: false });
       const { getByText } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
-      expect(getByText('Personal account')).toBeDefined();
+      expect(getByText('Personal account')).toBeInTheDocument();
     });
 
     it('does not show the personal workspace when disabled', async () => {
@@ -42,7 +42,7 @@ describe('OrganizationSwitcher', () => {
       const { queryByText, getByRole, userEvent, getByText } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
       expect(queryByText('Personal Workspace')).toBeNull();
-      expect(getByText('No organization selected')).toBeDefined();
+      expect(getByText('No organization selected')).toBeInTheDocument();
     });
   });
 
@@ -70,13 +70,8 @@ describe('OrganizationSwitcher', () => {
         }),
       );
 
-      await runFakeTimers(async () => {
-        const { getByText } = render(<OrganizationSwitcher />, { wrapper });
-
-        await waitFor(() => {
-          expect(getByText('5')).toBeInTheDocument();
-        });
-      });
+      const { findByText } = render(<OrganizationSwitcher />, { wrapper });
+      expect(await findByText('5')).toBeInTheDocument();
     });
 
     it('shows the counter for pending suggestions and invitations and membership requests', async () => {
@@ -109,14 +104,8 @@ describe('OrganizationSwitcher', () => {
           total_count: 3,
         }),
       );
-
-      await runFakeTimers(async () => {
-        const { getByText } = render(<OrganizationSwitcher />, { wrapper });
-
-        await waitFor(() => {
-          expect(getByText('7')).toBeInTheDocument();
-        });
-      });
+      const { findByText } = render(<OrganizationSwitcher />, { wrapper });
+      expect(await findByText('7')).toBeInTheDocument();
     });
   });
 
@@ -130,7 +119,7 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      expect(getByText('Create Organization')).toBeDefined();
+      expect(getByText('Create Organization')).toBeInTheDocument();
     });
 
     it('lists all organizations the user belongs to', async () => {
@@ -175,8 +164,8 @@ describe('OrganizationSwitcher', () => {
       const { getAllByText, getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
       expect(getAllByText('Org1')).not.toBeNull();
-      expect(getByText('Personal account')).toBeDefined();
-      expect(getByText('Org2')).toBeDefined();
+      expect(getByText('Personal account')).toBeInTheDocument();
+      expect(getByText('Org2')).toBeInTheDocument();
     });
 
     it.each([
@@ -195,8 +184,8 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getAllByText, getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      expect(getAllByText('Org1')).not.toBeNull();
-      expect(getByText(text)).toBeDefined();
+      expect(getAllByText('Org1').length).toBeGreaterThan(0);
+      expect(getByText(text)).toBeInTheDocument();
     });
 
     it('opens organization profile when "Manage Organization" is clicked', async () => {
