@@ -61,7 +61,12 @@ export type OrganizationCustomRoleKey = 'role' extends keyof ClerkAuthorization
  * MembershipRole includes `admin`, `basic_member`, `guest_member`. With the introduction of "Custom roles"
  * these types will no longer match a developer's custom logic.
  */
-export type MembershipRole = Autocomplete<'admin' | 'basic_member' | 'guest_member'>;
+export type MembershipRole = 'role' extends keyof ClerkAuthorization
+  ? // @ts-expect-error Typescript cannot infer the existence of the `role` key even if we checking it above
+    // Disabling eslint rule because the error causes the type to become any when accessing a property that does not exist
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    ClerkAuthorization['role'] | 'admin' | 'basic_member' | 'guest_member'
+  : Autocomplete<'admin' | 'basic_member' | 'guest_member'>;
 
 export type OrganizationSystemPermissionKey =
   | 'org:sys_domains:manage'
