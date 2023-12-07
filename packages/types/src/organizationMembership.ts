@@ -44,12 +44,10 @@ export type MembershipRole = Autocomplete<'admin' | 'basic_member' | 'guest_memb
 
 export type OrganizationPermission =
   | 'org:sys_domains:manage'
-  | 'org:sys_domains:delete'
   | 'org:sys_profile:manage'
   | 'org:sys_profile:delete'
   | 'org:sys_memberships:read'
   | 'org:sys_memberships:manage'
-  | 'org:sys_memberships:delete'
   | 'org:sys_domains:read';
 
 export type UpdateOrganizationMembershipParams = {

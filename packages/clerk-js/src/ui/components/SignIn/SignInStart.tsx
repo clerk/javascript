@@ -236,7 +236,7 @@ export function _SignInStart(): JSX.Element {
 
   const authenticateWithSaml = async () => {
     const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
-    const redirectUrlComplete = ctx.afterSignInUrl || displayConfig.afterSignInUrl;
+    const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     return signIn.authenticateWithRedirect({
       strategy: 'saml',
@@ -287,6 +287,8 @@ export function _SignInStart(): JSX.Element {
     return <LoadingCard />;
   }
 
+  // @ts-expect-error `action` is not typed
+  const { action, ...identifierFieldProps } = identifierField.props;
   return (
     <Flow.Part part='start'>
       <Card>
@@ -313,7 +315,7 @@ export function _SignInStart(): JSX.Element {
                   <DynamicField
                     actionLabel={nextIdentifier?.action}
                     onActionClicked={switchToNextIdentifier}
-                    {...identifierField.props}
+                    {...identifierFieldProps}
                     autoFocus={shouldAutofocus}
                   />
                 </Form.ControlRow>
@@ -341,6 +343,7 @@ export function _SignInStart(): JSX.Element {
 const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
   const [autofilled, setAutofilled] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
+  const show = !!(autofilled || field?.value);
 
   // show password if it's autofilled by the browser
   useLayoutEffect(() => {
@@ -373,14 +376,12 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   return (
     <Form.ControlRow
       elementId={field.id}
-      sx={
-        !field.value && !autofilled ? { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' } : undefined
-      }
+      sx={show ? undefined : { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
     >
       <Form.PasswordInput
         {...field.props}
         ref={ref}
-        tabIndex={!field.value ? -1 : undefined}
+        tabIndex={show ? undefined : -1}
       />
     </Form.ControlRow>
   );

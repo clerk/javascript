@@ -264,6 +264,10 @@ type _LocalizationResource = {
     formButtonPrimary__continue: LocalizationValue;
     formButtonPrimary__finish: LocalizationValue;
     formButtonReset: LocalizationValue;
+    navbar: {
+      title: LocalizationValue;
+      description: LocalizationValue;
+    };
     start: {
       headerTitle__account: LocalizationValue;
       headerTitle__security: LocalizationValue;
@@ -545,6 +549,10 @@ type _LocalizationResource = {
     badge__automaticInvitation: LocalizationValue;
     badge__automaticSuggestion: LocalizationValue;
     badge__manualInvitation: LocalizationValue;
+    navbar: {
+      title: LocalizationValue;
+      description: LocalizationValue;
+    };
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;

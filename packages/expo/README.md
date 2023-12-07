@@ -36,8 +36,8 @@ Clerk is the easiest way to add authentication and user management to your Expo 
 
 ### Prerequisites
 
-- React v16+
-- Node.js `>=18.18.0` or later
+- React v18+
+- Node.js `>=18.17.0` or later
 - An application built using Expo
 
 If an expo app already exists, you can skip this section and go straight to Installation.

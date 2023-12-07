@@ -1,4 +1,4 @@
-import { WithSession, withSession, WithSessionProp, useSession } from '@clerk/nextjs';
+import { useSession, withSession, WithSession, WithSessionProp } from '@clerk/nextjs';
 import { PublicUserData } from '@clerk/types';
 import type { NextPage } from 'next';
 import React from 'react';
@@ -49,7 +49,7 @@ const SessionExamplesPage: NextPage = () => {
       <PublicMetadataWithHook />
       <PublicMetadataClassHOC />
       <PublicMetadataFnHOC />
-      <PublicMetadataFaaC />
+      {/*<PublicMetadataFaaC />*/}
     </div>
   );
 };

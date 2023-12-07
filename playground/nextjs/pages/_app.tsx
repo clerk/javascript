@@ -1,5 +1,5 @@
-import '../styles/globals.css';
 import type { AppProps } from 'next/app';
+import '../styles/globals.css';
 
 import {
   ClerkProvider,
@@ -73,7 +73,10 @@ const AppBar = (props: AppBarProps) => {
         hidePersonal
         afterLeaveOrganizationUrl={'https://www.google.com'}
       />
-      <OrganizationSwitcher organizationProfileMode={'navigation'} />
+      <OrganizationSwitcher
+        organizationProfileMode={'navigation'}
+        organizationProfileUrl={'/organization'}
+      />
       <Link href={'/'}>
         <h2>Nextjs Playground</h2>
       </Link>
@@ -88,7 +91,7 @@ const AppBar = (props: AppBarProps) => {
         <option value='shadesOfPurple'>shadesOfPurple</option>
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
-      <UserButton afterSignOutUrl='/' />
+      <UserButton />
 
       <SignedIn>
         <SignOutButton />

@@ -4,7 +4,7 @@ When contributing to this repository, please first discuss the change you wish t
 Please note we have a [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md), please follow it in all your interactions with the project.
 
 <details open="open">
-<summary><strong>TABLE OF CONTENTS</strong></summary>
+<summary><strong>Table of contents</strong></summary>
 
 - [Contributing guide](#contributing-guide)
   - [Developing locally](#developing-locally)
@@ -12,6 +12,7 @@ Please note we have a [code of conduct](https://github.com/clerk/javascript/blob
     - [Prerequisites](#prerequisites)
     - [Setting up your local environment](#setting-up-your-local-environment)
     - [Documenting your changes](#documenting-your-changes)
+    - [Writing tests](#writing-tests)
   - [Opening a Pull Request](#opening-a-pull-request)
     - [Changesets](#changesets)
     - [Commit messages](#commit-messages)
@@ -35,6 +36,9 @@ The current monorepo setup is based on:
 - [Changesets](https://github.com/changesets/changesets), used for package versioning, publishing and changelog generation.
 - [GitHub Actions](https://docs.github.com/en/actions), used for quality checks and automated release orchestration.
 - [Yalc](https://github.com/wclr/yalc), used for to publish packages locally and test them in other local projects.
+- [Jest](https://jestjs.io/), used for running unit tests.
+- [QUnit](https://qunitjs.com/), used for tests inside `@clerk/backend`.
+- [Playwright](https://playwright.dev/), used for running the [integration](../integration/) test suite.
 
 All packages of the monorepo are inside [packages](../packages). For package specific details on installation, architecture and usage, you can refer to the package's README file.
 
@@ -48,7 +52,7 @@ Additionally there are packages which act as shared utilities or building blocks
 
 ### Prerequisites
 
-Have a node version installed that is equal or higher than the one defined in `.nvmrc`
+Ensure that you have Node.js installed ([How to install Node.js](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs)). Its version should be equal or higher than the one defined in `.nvmrc` in the root of the repository.
 
 ### Setting up your local environment
 
@@ -60,20 +64,22 @@ To set up your development environment, please follow these steps:
    git clone https://github.com/clerk/javascript
    ```
 
-2. Install the dependencies. We're using npm workspaces, so you **should always run `npm install` from the root of the monorepo**, as it will install dependencies for all the packages:
+1. Install the dependencies. We're using npm workspaces, so you **should always run `npm install` from the root of the monorepo**, as it will install dependencies for all the packages:
 
    ```sh
    cd javascript
    npm install
    ```
 
-3. Build all the packages in the monorepo by running:
+1. Build all the packages in the monorepo by running:
 
    ```sh
    npm run build
    ```
 
-For package specific setup, refer to the `Build` section of the specific package (eg packages/<package_name>/README.md#build).
+   This ensures that all internal TypeScript types are generated and any dependencies between packages are resolving.
+
+For package specific setup, refer to the `Build` section of the specific package (e.g. `packages/<package_name>/README.md#build`).
 
 ### Documenting your changes
 
@@ -81,18 +87,30 @@ Updating documentation is an important part of the contribution process. If you 
 
 To improve the in-editor experience when using Clerk's SDKs, we do our best to add [JSDoc comments](https://jsdoc.app/about-getting-started.html) to our package's public exports. The JSDoc comments should not attempt to duplicate any existing type information, but should provide meaningful additional context or references. If you are adding a new export, make sure it has a JSDoc comment. If you are updating an existing export, make sure any existing comments are updated appropriately.
 
+### Writing tests
+
+When changing functionality or adding completely new code it's highly recommended to add/edit tests to verify the new behavior.
+
+Inside the repository you'll find two types of tests:
+
+1. Unit tests
+1. Integration tests
+
+While changing a file inside a package, check if e.g. a `<name>.test.ts` file or a test inside a `__tests__` folder exists. If you add a completely new file, please add a unit test for it.
+
+If your change can't only be tested by unit tests, you should add/edit an integration test. You can find all necessary information about this in the [integration tests README](../integration/README.md).
+
 ## Opening a Pull Request
 
-1. Search our repository for open or closed
-   [Pull Requests](https://github.com/clerk/javascript/pulls)
-   that relate to your submission. You don't want to duplicate effort.
-2. Fork the project
-3. Create your feature branch (`git checkout -b feat/amazing_feature`)
-4. If required, create a `changeset` that describes your changes (`npm run changeset`). In cases where a changeset is not required, an empty changeset can be created instead (`npm run changeset:empty`) - an empty changeset will not generate a changelog entry for the change, so please use it as an escape hatch or for internal refactors only.
-5. Commit your changes (`git commit -m 'feat: Add amazing_feature'`)
-6. Push to the branch (`git push origin feat/amazing_feature`)
-7. [Open a Pull Request](https://github.com/clerk/javascript/compare?expand=1). Make sure the description includes enough information for the reviewer to understand what the PR is about.
-8. Follow the instructions of the pull request template
+1. Search our repository for open or closed [Pull Requests](https://github.com/clerk/javascript/pulls) that relate to your submission. You don't want to duplicate effort.
+1. Fork the project
+1. Create your feature branch (`git checkout -b feat/amazing_feature`)
+1. It's highly recommended to [write tests](#writing-tests) to ensure your change works and will continue to work in the future
+1. If required, create a `changeset` that describes your changes (`npm run changeset`). In cases where a changeset is not required, an empty changeset can be created instead (`npm run changeset:empty`) - an empty changeset will not generate a changelog entry for the change, so please use it as an escape hatch or for internal refactors only.
+1. Commit your changes (`git commit -m 'feat: Add amazing_feature'`)
+1. Push to the branch (`git push origin feat/amazing_feature`)
+1. [Open a Pull Request](https://github.com/clerk/javascript/compare?expand=1). Make sure the description includes enough information for the reviewer to understand what the PR is about.
+1. Follow the instructions of the pull request template
 
 ### Changesets
 

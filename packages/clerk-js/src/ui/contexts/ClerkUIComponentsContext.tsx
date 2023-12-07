@@ -69,8 +69,7 @@ export const useSignUpContext = (): SignUpContextType => {
       queryParams,
       ctx,
       options,
-      displayConfig,
-    }),
+    }) || '/',
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(
@@ -78,8 +77,7 @@ export const useSignUpContext = (): SignUpContextType => {
       queryParams,
       ctx,
       options,
-      displayConfig,
-    }),
+    }) || '/',
   );
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
@@ -145,8 +143,7 @@ export const useSignInContext = (): SignInContextType => {
       queryParams,
       ctx,
       options,
-      displayConfig,
-    }),
+    }) || '/',
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(
@@ -154,8 +151,7 @@ export const useSignInContext = (): SignInContextType => {
       queryParams,
       ctx,
       options,
-      displayConfig,
-    }),
+    }) || '/',
   );
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
@@ -236,7 +232,7 @@ export const useUserButtonContext = () => {
   const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;
   const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
 
-  const afterSignOutUrl = ctx.afterSignOutUrl || displayConfig.afterSignOutAllUrl;
+  const afterSignOutUrl = ctx.afterSignOutUrl || '/';
   const navigateAfterSignOut = () => navigate(afterSignOutUrl);
 
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;

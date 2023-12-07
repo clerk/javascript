@@ -38,7 +38,7 @@ export const createPasswordError = (errors: ClerkAPIError[], localizationConfig:
   const { t, locale, passwordSettings } = localizationConfig;
 
   if (errors?.[0]?.code === 'form_password_size_in_bytes_exceeded' || errors?.[0]?.code === 'form_password_pwned') {
-    return `${t(localizationKeys(`unstable__errors.${errors?.[0]?.code}` as any))}`;
+    return `${t(localizationKeys(`unstable__errors.${errors?.[0]?.code}` as any)) || errors?.[0]?.message}`;
   }
 
   if (errors?.[0]?.code === 'form_password_not_strong_enough') {

@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0-alpha-v5.8
+
+### Patch Changes
+
+- Drop `org:sys_domains:delete` and `org:sys_memberships:delete` as those have now been merged with the respective `manage` ones. ([#2256](https://github.com/clerk/javascript/pull/2256)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.0.0-alpha-v5.7
 
 ### Minor Changes

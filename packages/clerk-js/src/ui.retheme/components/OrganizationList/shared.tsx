@@ -97,7 +97,7 @@ export const PreviewListItemButton = (props: Parameters<typeof Button>[0]) => {
     <Button
       elementDescriptor={descriptors.organizationListPreviewItemActionButton}
       textVariant='buttonExtraSmallBold'
-      variant='outline'
+      variant='secondary'
       colorScheme='secondary'
       size='sm'
       {...props}

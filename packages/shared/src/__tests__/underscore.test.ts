@@ -1,4 +1,12 @@
-import { deepCamelToSnake, deepSnakeToCamel, isIPV4Address, isTruthy, titleize, toSentence } from '../underscore';
+import {
+  deepCamelToSnake,
+  deepSnakeToCamel,
+  getNonUndefinedValues,
+  isIPV4Address,
+  isTruthy,
+  titleize,
+  toSentence,
+} from '../underscore';
 
 describe('toSentence', () => {
   it('returns a single item as-is', () => {
@@ -202,5 +210,49 @@ describe(`isTruthy`, () => {
   });
   it(`defaults to false`, () => {
     expect(isTruthy(`foobar`)).toBe(false);
+  });
+});
+
+describe('getNonUndefinedValues', () => {
+  it(`removes all the undefined values from the object`, () => {
+    const obj = {
+      a: 1,
+      b: undefined,
+      c: null,
+    };
+    expect(getNonUndefinedValues(obj)).toStrictEqual({
+      a: 1,
+      c: null,
+    });
+  });
+
+  it(`returns the same object if no undefined value exists`, () => {
+    const obj = {
+      a: 1,
+      b: 'foo',
+      c: null,
+    };
+    expect(getNonUndefinedValues(obj)).toStrictEqual(obj);
+    expect(getNonUndefinedValues({})).toStrictEqual({});
+  });
+
+  it(`removes only the undefined values from the top level`, () => {
+    const obj = {
+      a: 1,
+      b: undefined,
+      c: null,
+      e: {
+        f: undefined,
+        g: 1,
+      },
+    };
+    expect(getNonUndefinedValues(obj)).toStrictEqual({
+      a: 1,
+      c: null,
+      e: {
+        f: undefined,
+        g: 1,
+      },
+    });
   });
 });

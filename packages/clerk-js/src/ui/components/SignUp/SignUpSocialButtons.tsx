@@ -21,7 +21,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const ctx = useSignUpContext();
   const signUp = useCoreSignUp();
   const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
-  const redirectUrlComplete = ctx.afterSignUpUrl || displayConfig.afterSignUpUrl;
+  const redirectUrlComplete = ctx.afterSignUpUrl || '/';
   const { continueSignUp = false, ...rest } = props;
 
   return (

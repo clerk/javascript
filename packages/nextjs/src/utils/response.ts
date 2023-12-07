@@ -8,7 +8,15 @@ import { constants as nextConstants } from '../constants';
  * but the cookies and headers of all responses are merged.
  */
 export const mergeResponses = (...responses: (NextResponse | Response | null | undefined | void)[]) => {
-  const normalisedResponses = responses.filter(Boolean).map(res => new NextResponse(res!.body, res!));
+  const normalisedResponses = responses.filter(Boolean).map(res => {
+    // If the response is a NextResponse, we can just return it
+    if (res instanceof NextResponse) {
+      return res;
+    }
+
+    return new NextResponse(res!.body, res!);
+  });
+
   if (normalisedResponses.length === 0) {
     return;
   }
@@ -22,7 +30,9 @@ export const mergeResponses = (...responses: (NextResponse | Response | null | u
     });
 
     response.cookies.getAll().forEach(cookie => {
-      finalResponse.cookies.set(cookie.name, cookie.value);
+      const { name, value, ...options } = cookie;
+
+      finalResponse.cookies.set(name, value, options);
     });
   }
 

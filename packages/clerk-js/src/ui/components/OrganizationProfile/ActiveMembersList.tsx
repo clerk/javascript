@@ -117,7 +117,7 @@ const MemberRow = (props: {
         </Gate>
       </Td>
       <Td>
-        <Gate permission={'org:sys_memberships:delete'}>
+        <Gate permission={'org:sys_memberships:manage'}>
           <ThreeDotsMenu
             actions={[
               {

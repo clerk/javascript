@@ -53,7 +53,7 @@ const UserExamplesPage: NextPage = () => {
       <GreetingWithHook />
       <GreetingClassHOC />
       <GreetingFnHOC greeting={'Ciao'} />
-      <GreetingFaaC />
+      {/*<GreetingFaaC />*/}
     </div>
   );
 };

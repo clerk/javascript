@@ -89,8 +89,8 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
       textVariant='buttonExtraSmallBold'
-      variant='outline'
-      colorScheme='neutral'
+      variant='secondary'
+      colorScheme='secondary'
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}

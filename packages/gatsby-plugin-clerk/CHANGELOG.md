@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.0.0-alpha-v5.8
+
+### Patch Changes
+
+- Set correct information on required Node.js and React versions in README ([#2264](https://github.com/clerk/javascript/pull/2264)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`93d05c868`](https://github.com/clerk/javascript/commit/93d05c8680ed213e594a16d4630a65f8eb244b32), [`a6b893d28`](https://github.com/clerk/javascript/commit/a6b893d281b23dc7b4bd7f3733b33e4cf655bc1b), [`2e77cd737`](https://github.com/clerk/javascript/commit/2e77cd737a333de022533d29cb12e73a907694c8)]:
+  - @clerk/clerk-sdk-node@5.0.0-alpha-v5.6
+  - @clerk/backend@1.0.0-alpha-v5.6
+  - @clerk/clerk-react@5.0.0-alpha-v5.8
+
 ## 5.0.0-alpha-v5.7
 
 ### Patch Changes
