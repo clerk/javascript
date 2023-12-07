@@ -287,6 +287,8 @@ export function _SignInStart(): JSX.Element {
     return <LoadingCard />;
   }
 
+  // @ts-expect-error `action` is not typed
+  const { action, ...identifierFieldProps } = identifierField.props;
   return (
     <Flow.Part part='start'>
       <Card>
@@ -313,7 +315,7 @@ export function _SignInStart(): JSX.Element {
                   <DynamicField
                     actionLabel={nextIdentifier?.action}
                     onActionClicked={switchToNextIdentifier}
-                    {...identifierField.props}
+                    {...identifierFieldProps}
                     autoFocus={shouldAutofocus}
                   />
                 </Form.ControlRow>

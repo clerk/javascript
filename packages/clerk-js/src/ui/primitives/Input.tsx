@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
 import { common, createVariants, mqu } from '../styledSystem';
-import { useFormField } from './hooks';
+import { sanitizeInputProps, useFormField } from './hooks';
 import { useInput } from './hooks/useInput';
 
 const { applyVariants, filterProps } = createVariants((theme, props) => ({
@@ -42,7 +42,9 @@ type OwnProps = {
 export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-  const fieldControlProps = useFormField() || {};
+  const fieldControl = useFormField() || {};
+  // @ts-expect-error Typescript is complaining that `errorMessageId` does not exist. We are clearly passing them from above.
+  const { errorMessageId, ...fieldControlProps } = sanitizeInputProps(fieldControl, ['errorMessageId']);
   const propsWithoutVariants = filterProps({
     ...props,
     hasError: props.hasError || fieldControlProps.hasError,
@@ -62,7 +64,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       required={_required}
       id={props.id || fieldControlProps.id}
       aria-invalid={_hasError}
-      aria-describedby={fieldControlProps.errorMessageId}
+      aria-describedby={errorMessageId}
       aria-required={_required}
       aria-disabled={_disabled}
       css={applyVariants(propsWithoutVariants)}
