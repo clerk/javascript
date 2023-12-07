@@ -1,15 +1,13 @@
 import { isPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
-import { Token } from 'src';
 
 import { constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
-import { addClerkPrefix, isDevelopmentFromSecretKey, isDevOrStagingUrl } from '../util/shared';
+import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, handshake, interstitial, signedIn, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
-import type { InterstitialRuleOptions } from './interstitialRule';
 // TODO: Rename this crap, it's not interstitial anymore.
 import { hasValidHeaderToken, runInterstitialRules } from './interstitialRule';
 import { decodeJwt } from './jwt';
@@ -152,9 +150,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     // Uncaught
     const verifyResult = await verifyToken(sessionToken, authenticateContext);
 
-    if (verifyResult) {
-      return signedIn(authenticateContext, verifyResult, headers);
-    }
+    return signedIn(authenticateContext, verifyResult, headers);
   }
 
   const pk = parsePublishableKeyWithOptions({
@@ -185,12 +181,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
      */
     if (handshakeToken) {
-      const handshakeResult = await resolveHandshake();
-
-      // This shouldn't ever be undefined, but to appease the types we check truthiness before returning
-      if (handshakeResult) {
-        return handshakeResult;
-      }
+      return resolveHandshake();
     }
 
     /**
