@@ -16,6 +16,7 @@ export interface ClerkAPIError {
         message: string;
       }[];
     };
+    permissions?: string[];
   };
 }
 
