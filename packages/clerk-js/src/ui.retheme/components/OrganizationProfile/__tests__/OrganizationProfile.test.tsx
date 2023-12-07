@@ -9,6 +9,8 @@ import { OrganizationProfile } from '../OrganizationProfile';
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('OrganizationProfile', () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
   it('includes buttons for the bigger sections', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();

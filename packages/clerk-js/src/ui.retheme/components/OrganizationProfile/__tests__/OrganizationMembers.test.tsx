@@ -5,7 +5,6 @@ import userEvent from '@testing-library/user-event';
 
 import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { OrganizationMembers } from '../OrganizationMembers';
 import { createFakeMember, createFakeOrganizationInvitation, createFakeOrganizationMembershipRequest } from './utils';
 
@@ -59,11 +58,11 @@ describe('OrganizationMembers', () => {
 
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
-    const { getByRole, getByText } = render(<OrganizationMembers />, { wrapper });
+    const { getByRole, findByText } = render(<OrganizationMembers />, { wrapper });
 
     await userEvent.click(getByRole('tab', { name: 'Invitations' }));
-    expect(getByText('Invited')).toBeDefined();
-    expect(getByRole('button', { name: 'Invite' })).toBeDefined();
+    expect(await findByText('Invited')).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Invite' })).toBeInTheDocument();
   });
 
   it('does not show invitations and requests if user is not an admin', async () => {
@@ -322,12 +321,8 @@ describe('OrganizationMembers', () => {
       }),
     );
 
-    await runFakeTimers(async () => {
-      const { getByText } = render(<OrganizationMembers />, { wrapper });
-      await waitFor(() => {
-        expect(getByText('2')).toBeInTheDocument();
-      });
-    });
+    const { findByText } = render(<OrganizationMembers />, { wrapper });
+    expect(await findByText('2')).toBeInTheDocument();
   });
 
   it.todo('removes member from organization when clicking the respective button on a user row');
@@ -366,17 +361,16 @@ describe('OrganizationMembers', () => {
       }),
     );
 
-    const { container, getByRole, getByText } = render(<OrganizationMembers />, { wrapper });
+    const { container, getByRole, getByText, findByText } = render(<OrganizationMembers />, { wrapper });
 
     await waitForLoadingCompleted(container);
     await userEvent.click(getByRole('tab', { name: 'Invitations' }));
 
-    expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
-
-    expect(getByText('admin1@clerk.com')).toBeInTheDocument();
+    expect(await findByText('admin1@clerk.com')).toBeInTheDocument();
     expect(getByText('Admin')).toBeInTheDocument();
     expect(getByText('member2@clerk.com')).toBeInTheDocument();
     expect(getByText('Member')).toBeInTheDocument();
+    expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
   });
 
   it('changes tab and renders pending requests', async () => {
