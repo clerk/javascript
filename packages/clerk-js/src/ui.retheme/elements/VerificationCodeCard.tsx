@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { Col, descriptors, localizationKeys } from '../customizables';
+import { Button, Col, descriptors, localizationKeys } from '../customizables';
 import type { LocalizationKey } from '../localization';
 import { CardAlert } from './Alert';
 import { Card } from './Card';
@@ -66,6 +66,13 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
           label={props.formTitle}
           description={props.formSubtitle}
           resendButton={props.resendButton}
+        />
+        <Button
+          elementDescriptor={descriptors.formButtonPrimary}
+          block
+          hasArrow
+          localizationKey={localizationKeys('formButtonPrimary')}
+          onClick={otp.onFakeContinue}
         />
       </Col>
 

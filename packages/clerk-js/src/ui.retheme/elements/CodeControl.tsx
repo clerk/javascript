@@ -34,6 +34,7 @@ type UseFieldOTP = <R = unknown>(params: {
   isLoading: boolean;
   otpControl: ReturnType<typeof useCodeControl>;
   onResendCode: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  onFakeContinue: () => void;
 };
 
 export const useFieldOTP: UseFieldOTP = params => {
@@ -68,6 +69,11 @@ export const useFieldOTP: UseFieldOTP = params => {
     paramsOnCodeEntryFinished(code, resolve, reject);
   });
 
+  const onFakeContinue = () => {
+    codeControlState.setError(undefined);
+    paramsOnCodeEntryFinished('', resolve, reject);
+  };
+
   const onResendCode = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     e => {
       codeControl.reset();
@@ -80,6 +86,7 @@ export const useFieldOTP: UseFieldOTP = params => {
     isLoading: status.isLoading,
     otpControl: codeControl,
     onResendCode: paramsOnResendCodeClicked ? onResendCode : undefined,
+    onFakeContinue,
   };
 };
 
