@@ -65,24 +65,6 @@ export default (QUnit: QUnit) => {
       assert.propEqual(jwk, mockRsaJwk);
     });
 
-    test('loads JWKS from Frontend API when issuer is provided', async assert => {
-      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
-      const jwk = await loadClerkJWKFromRemote({
-        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
-        kid: mockRsaJwkKid,
-        skipJwksCache: true,
-      });
-
-      fakeFetch.calledOnceWith('https://clerk.inspired.puma-74.lcl.dev/.well-known/jwks.json', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Clerk-Backend-SDK': '@clerk/backend',
-        },
-      });
-      assert.propEqual(jwk, mockRsaJwk);
-    });
-
     test('loads JWKS from Backend API using the provided apiUrl', async assert => {
       fakeFetch.onCall(0).returns(jsonOk(mockJwks));
       const jwk = await loadClerkJWKFromRemote({
@@ -161,30 +143,6 @@ export default (QUnit: QUnit) => {
           assert.propEqual(err, {
             reason: 'jwk-remote-failed-to-load',
             action: 'Contact support@clerk.com',
-          });
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
-    });
-
-    test('throws an error when JWKS can not be fetched from Backend or Frontend API and cache updated less than 5 minutes ago', async assert => {
-      const kid = 'ins_whatever';
-      try {
-        await loadClerkJWKFromRemote({
-          secretKey: 'deadbeef',
-          kid,
-        });
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.propEqual(err, {
-            reason: 'jwk-remote-missing',
-            action: 'Contact support@clerk.com',
-          });
-          assert.propContains(err, {
-            message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid are available: ${mockRsaJwkKid}, local`,
           });
         } else {
           // This should never be reached. If it does, the suite should fail

@@ -11,6 +11,7 @@ export enum AuthStatus {
   Interstitial = 'interstitial',
   Handshake = 'handshake',
   Unknown = 'unknown',
+  SessionTokenOutdated = 'SessionTokenOutdated',
 }
 
 export type SignedInState = {
@@ -106,7 +107,7 @@ type LoadResourcesOptions = {
 };
 
 type RequestStateParams = {
-  publishableKey: string;
+  publishableKey?: string;
   domain?: string;
   isSatellite?: boolean;
   proxyUrl?: string;
