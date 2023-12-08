@@ -531,12 +531,6 @@ export type ClerkOptions = ClerkOptionsNavigation & {
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
   allowedRedirectOrigins?: Array<string | RegExp>;
-
-  /**
-   * Indicates that clerk.js is will be loaded from interstitial
-   * Defaults to false
-   */
-  isInterstitial?: boolean;
   isSatellite?: boolean | ((url: URL) => boolean);
 
   /**

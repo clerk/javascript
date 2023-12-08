@@ -1,7 +1,5 @@
 import type { ApiClient } from '../api';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
-import type { LoadInterstitialOptions } from './interstitial';
-import { loadInterstitialFromLocal } from './interstitial';
 import type { AuthenticateRequestOptions } from './request';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
 
@@ -55,16 +53,8 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     });
   };
 
-  const localInterstitial = (options: Omit<LoadInterstitialOptions, 'apiUrl'>) => {
-    const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
-    return loadInterstitialFromLocal({ ...options, ...runTimeOptions });
-  };
-
-  // TODO: Replace this function with remotePublicInterstitial
-
   return {
     authenticateRequest,
-    localInterstitial,
     debugRequestState,
   };
 }
