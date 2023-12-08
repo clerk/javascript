@@ -349,6 +349,23 @@ test('Test signed out satellite with sec-fetch-dest=document - prod', async () =
   );
 });
 
+test.only('Test signed out satellite - dev', async () => {
+  const config = generateConfig({
+    mode: 'test',
+  });
+  const res = await fetch(url + '/', {
+    headers: new Headers({
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      'X-Satellite': 'true',
+      'X-Domain': 'example.com',
+      'X-Sign-In-Url': 'https://example.com/sign-in',
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(200);
+});
+
 test('Test missing session token, missing uat (indicating signed out), missing devbrowser - dev', async () => {
   const config = generateConfig({
     mode: 'test',

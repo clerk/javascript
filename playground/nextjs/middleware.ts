@@ -10,6 +10,8 @@ export const middleware = (req, evt) => {
     secretKey: req.headers.get("x-secret-key"),
     proxyUrl: req.headers.get("x-proxy-url"),
     domain: req.headers.get("x-domain"),
+    isSatellite: req.headers.get('x-satellite') === 'true',
+    signInUrl: req.headers.get("x-sign-in-url"),
   })(req, evt)
 };
 
