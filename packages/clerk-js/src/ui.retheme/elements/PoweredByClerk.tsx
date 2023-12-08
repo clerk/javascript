@@ -5,57 +5,33 @@ import { Flex, Icon, Link, Text } from '../customizables';
 import { LogoMark } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
 
-export const PoweredByClerkText = React.memo(() => {
-  const { branded } = useEnvironment().displayConfig;
-
-  return (
-    <Flex
-      gap={1}
-      align='center'
-      justify='center'
-      sx={t => ({ width: '100%', color: t.colors.$colorTextSecondary })}
-    >
-      {branded ? (
-        <>
-          <Text
-            variant='extraSmallRegular'
-            sx={{ color: 'inherit' }}
-          >
-            Secured by
-          </Text>
-          <LogoMarkIconLink />
-        </>
-      ) : null}
-    </Flex>
-  );
-});
-
 export const PoweredByClerkTag = React.memo(
   React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Flex>>((props, ref) => {
+    const { sx, ...rest } = props;
     const { branded } = useEnvironment().displayConfig;
 
-    return branded ? (
+    return (
       <Flex
-        gap={2}
+        gap={1}
         align='center'
         justify='center'
-        sx={t => ({
-          width: '100%',
-          color: t.colors.$colorTextSecondary,
-          padding: t.space.$2,
-        })}
-        {...props}
+        sx={[t => ({ width: '100%', color: t.colors.$colorTextSecondary }), sx]}
+        {...rest}
         ref={ref}
       >
-        <Text
-          variant='regularRegular'
-          sx={theme => ({ color: 'inherit', letterSpacing: theme.space.$none })}
-        >
-          Secured by
-        </Text>
-        <LogoMarkIconLink />
+        {branded ? (
+          <>
+            <Text
+              variant='regularRegular'
+              sx={{ color: 'inherit' }}
+            >
+              Secured by
+            </Text>
+            <LogoMarkIconLink />
+          </>
+        ) : null}
       </Flex>
-    ) : null;
+    );
   }),
 );
 

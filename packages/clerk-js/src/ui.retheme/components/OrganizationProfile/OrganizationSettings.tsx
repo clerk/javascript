@@ -25,7 +25,6 @@ export const OrganizationSettings = () => {
             localizationKey={localizationKeys('organizationProfile.start.headerTitle__settings')}
             textVariant='xxlargeMedium'
           />
-          <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__settings')} />
         </Header.Root>
         <OrganizationProfileSection />
         <Gate permission='org:sys_domains:read'>
