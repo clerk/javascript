@@ -40,7 +40,6 @@ export type CreateAuthenticateRequestOptions = {
 };
 
 export function createAuthenticateRequest(params: CreateAuthenticateRequestOptions) {
-  const { apiClient } = params;
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
 
   const authenticateRequest = (request: Request, options: RunTimeOptions = {}) => {
@@ -62,12 +61,10 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   };
 
   // TODO: Replace this function with remotePublicInterstitial
-  const remotePrivateInterstitial = () => apiClient.interstitial.getInterstitial();
 
   return {
     authenticateRequest,
     localInterstitial,
-    remotePrivateInterstitial,
     debugRequestState,
   };
 }
