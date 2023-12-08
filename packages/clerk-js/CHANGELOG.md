@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.0.0-alpha-v5.9
+
+### Major Changes
+
+- Drop `Clerk.isReady(). Use `Clerk.loaded` instead.` ([#2294](https://github.com/clerk/javascript/pull/2294)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Fixes errant `act` output from unit tests ([#2289](https://github.com/clerk/javascript/pull/2289)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fallback to the API error message when the password is pwned and there is no translation available. ([#2273](https://github.com/clerk/javascript/pull/2273)) by [@desiprisg](https://github.com/desiprisg)
+
+- Make the instant password field focusable if it is autofilled. ([#2283](https://github.com/clerk/javascript/pull/2283)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`1db1f4068`](https://github.com/clerk/javascript/commit/1db1f4068466d967df0de39f032a476ca8163651), [`7bffc47cb`](https://github.com/clerk/javascript/commit/7bffc47cb71a2c3e026df5977c25487bfd5c55d7)]:
+  - @clerk/types@4.0.0-alpha-v5.9
+
 ## 5.0.0-alpha-v5.8
 
 ### Major Changes

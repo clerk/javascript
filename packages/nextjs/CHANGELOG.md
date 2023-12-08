@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.0.0-alpha-v5.9
+
+### Major Changes
+
+- Limit TokenVerificationError exports to TokenVerificationError and TokenVerificationErrorReason ([#2189](https://github.com/clerk/javascript/pull/2189)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`de6519daa`](https://github.com/clerk/javascript/commit/de6519daa84732023bcfd74ad816a2654f457952), [`7bffc47cb`](https://github.com/clerk/javascript/commit/7bffc47cb71a2c3e026df5977c25487bfd5c55d7), [`7af0949ae`](https://github.com/clerk/javascript/commit/7af0949ae7b4072f550dee220f4d41854fe504c6), [`e1f7eae87`](https://github.com/clerk/javascript/commit/e1f7eae87531b483564256f5456a31150caa469e)]:
+  - @clerk/backend@1.0.0-alpha-v5.7
+  - @clerk/clerk-react@5.0.0-alpha-v5.9
+
 ## 5.0.0-alpha-v5.8
 
 ### Patch Changes
