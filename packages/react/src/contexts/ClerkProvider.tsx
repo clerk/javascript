@@ -1,4 +1,5 @@
 import { isPublishableKey } from '@clerk/shared/keys';
+import { ClerkProviderAssertionContext } from '@clerk/shared/react';
 import React from 'react';
 
 import { multipleClerkProvidersError } from '../errors';
@@ -24,14 +25,16 @@ function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   }
 
   return (
-    <StructureContext.Provider value={StructureContextStates.noGuarantees}>
-      <ClerkContextProvider
-        initialState={initialState}
-        isomorphicClerkOptions={restIsomorphicClerkOptions}
-      >
-        {children}
-      </ClerkContextProvider>
-    </StructureContext.Provider>
+    <ClerkProviderAssertionContext.Provider value={{ inTree: true }}>
+      <StructureContext.Provider value={StructureContextStates.noGuarantees}>
+        <ClerkContextProvider
+          initialState={initialState}
+          isomorphicClerkOptions={restIsomorphicClerkOptions}
+        >
+          {children}
+        </ClerkContextProvider>
+      </StructureContext.Provider>
+    </ClerkProviderAssertionContext.Provider>
   );
 }
 

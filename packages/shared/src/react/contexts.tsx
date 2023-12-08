@@ -50,6 +50,25 @@ const OrganizationProvider = ({
   );
 };
 
+const ClerkProviderAssertionContext = React.createContext<{ inTree: true } | undefined>(undefined);
+ClerkProviderAssertionContext.displayName = 'ClerkProviderAssertionContext';
+
+function useAssertWrappedByClerkProvider(displayNameOrCustomHandler?: string | (() => void)): void {
+  const assertionCtx = React.useContext(ClerkProviderAssertionContext);
+
+  if (!assertionCtx) {
+    if (typeof displayNameOrCustomHandler === 'function') {
+      displayNameOrCustomHandler();
+      return;
+    }
+
+    throw new Error(
+      `${displayNameOrCustomHandler || 'Clerk components'} must be wrapped within the <ClerkProvider> component.
+      Please see: https://clerk.com/docs/components/clerk-provider`,
+    );
+  }
+}
+
 export {
   ClientContext,
   useClientContext,
@@ -61,4 +80,6 @@ export {
   useSessionContext,
   ClerkInstanceContext,
   useClerkInstanceContext,
+  ClerkProviderAssertionContext,
+  useAssertWrappedByClerkProvider,
 };
