@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.0.0-alpha-v5.9
+
+### Major Changes
+
+- Drop `Clerk.isReady(). Use `Clerk.loaded` instead.` ([#2294](https://github.com/clerk/javascript/pull/2294)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Updated dependencies [[`1db1f4068`](https://github.com/clerk/javascript/commit/1db1f4068466d967df0de39f032a476ca8163651), [`7bffc47cb`](https://github.com/clerk/javascript/commit/7bffc47cb71a2c3e026df5977c25487bfd5c55d7)]:
+  - @clerk/types@4.0.0-alpha-v5.9
+
 ## 5.0.0-alpha-v5.8
 
 ### Patch Changes
