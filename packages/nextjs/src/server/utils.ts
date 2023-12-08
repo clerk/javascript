@@ -239,7 +239,7 @@ export const handleMultiDomainAndProxy = (req: NextRequest, opts: AuthenticateRe
     throw new Error(missingDomainAndProxy);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(SECRET_KEY)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(opts.secretKey || SECRET_KEY)) {
     throw new Error(missingSignInUrlInDev);
   }
 

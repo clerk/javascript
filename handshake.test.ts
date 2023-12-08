@@ -90,7 +90,7 @@ test('Test expired session token - dev', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F${devBrowserQuery}`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}${devBrowserQuery}`,
   );
 });
 
@@ -110,7 +110,7 @@ test('Test expired session token - prod', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}`,
   );
 });
 
@@ -130,7 +130,7 @@ test('Test early session token - dev', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F${devBrowserQuery}`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}${devBrowserQuery}`,
   );
 });
 
@@ -151,7 +151,7 @@ test('Test proxyUrl - dev', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://example.com/clerk/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F${devBrowserQuery}`,
+    `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}${devBrowserQuery}`,
   );
 });
 
@@ -172,7 +172,7 @@ test('Test proxyUrl - prod', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://example.com/clerk/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F`,
+    `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}`,
   );
 });
 
@@ -193,7 +193,7 @@ test('Test domain - dev', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F${devBrowserQuery}`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}${devBrowserQuery}`,
   );
 });
 
@@ -214,7 +214,7 @@ test('Test domain - prod', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://clerk.example.com/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F`,
+    `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}`,
   );
 });
 
@@ -232,7 +232,7 @@ test('Test missing session token, positive uat - dev', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F${devBrowserQuery}`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}${devBrowserQuery}`,
   );
 });
 
@@ -250,7 +250,7 @@ test('Test missing session token, positive uat - prod', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}`,
   );
 });
 
@@ -313,6 +313,42 @@ test('Test missing session token, missing uat (indicating signed out) - prod', a
   expect(res.status).toBe(200);
 });
 
+test('Test signed out satellite no sec-fetch-dest=document - prod', async () => {
+  const config = generateConfig({
+    mode: 'live',
+  });
+  const res = await fetch(url + '/', {
+    headers: new Headers({
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      'X-Satellite': 'true',
+      'X-Domain': 'example.com',
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(200);
+});
+
+test('Test signed out satellite with sec-fetch-dest=document - prod', async () => {
+  const config = generateConfig({
+    mode: 'live',
+  });
+  const res = await fetch(url + '/', {
+    headers: new Headers({
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      'X-Satellite': 'true',
+      'X-Domain': 'example.com',
+      'Sec-Fetch-Dest': 'document',
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(307);
+  expect(res.headers.get('location')).toBe(
+    `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(url + '/')}`,
+  );
+});
+
 test('Test missing session token, missing uat (indicating signed out), missing devbrowser - dev', async () => {
   const config = generateConfig({
     mode: 'test',
@@ -343,7 +379,9 @@ test('Test redirect url - path and qs - dev', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2Fhello%3Ffoo%3Dbar${devBrowserQuery}`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
+      `${url}/`,
+    )}hello%3Ffoo%3Dbar${devBrowserQuery}`,
   );
 });
 
@@ -363,7 +401,7 @@ test('Test redirect url - path and qs - prod', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2Fhello%3Ffoo%3Dbar`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}hello%3Ffoo%3Dbar`,
   );
 });
 
@@ -571,7 +609,7 @@ test('External visit - new devbrowser', async () => {
   });
   expect(res.status).toBe(307);
   expect(res.headers.get('location')).toBe(
-    `https://${config.pkHost}/v1/client/handshake?redirect_url=http%3A%2F%2Flocalhost%3A4011%2F&__clerk_db_jwt=asdf`,
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}&__clerk_db_jwt=asdf`,
   );
 });
 
