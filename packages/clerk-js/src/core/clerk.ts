@@ -166,7 +166,7 @@ export class Clerk implements ClerkInterface {
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
-  #isReady = false;
+  #loaded = false;
 
   #listeners: Array<(emission: Resources) => void> = [];
   #options: ClerkOptions = {};
@@ -189,7 +189,7 @@ export class Clerk implements ClerkInterface {
   }
 
   get loaded(): boolean {
-    return this.#isReady;
+    return this.#loaded;
   }
 
   get isSatellite(): boolean {
@@ -264,10 +264,8 @@ export class Clerk implements ClerkInterface {
 
   public getFapiClient = (): FapiClient => this.#fapiClient;
 
-  public isReady = (): boolean => this.#isReady;
-
   public load = async (options?: ClerkOptions): Promise<void> => {
-    if (this.#isReady) {
+    if (this.loaded) {
       return;
     }
 
@@ -295,9 +293,9 @@ export class Clerk implements ClerkInterface {
     );
 
     if (this.#options.standardBrowser) {
-      this.#isReady = await this.#loadInStandardBrowser();
+      this.#loaded = await this.#loadInStandardBrowser();
     } else {
-      this.#isReady = await this.#loadInNonStandardBrowser();
+      this.#loaded = await this.#loadInNonStandardBrowser();
     }
   };
 
@@ -869,7 +867,7 @@ export class Clerk implements ClerkInterface {
     params: HandleOAuthCallbackParams = {},
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
-    if (!this.#isReady || !this.#environment || !this.client) {
+    if (!this.loaded || !this.#environment || !this.client) {
       return;
     }
     const { signIn, signUp } = this.client;
@@ -1500,7 +1498,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #buildUrl = (key: 'signInUrl' | 'signUpUrl', options?: SignInRedirectOptions | SignUpRedirectOptions): string => {
-    if (!this.#isReady || !this.#environment || !this.#environment.displayConfig) {
+    if (!this.loaded || !this.#environment || !this.#environment.displayConfig) {
       return '';
     }
 
