@@ -117,7 +117,7 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
           title={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionTitle')}
           subtitle={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionSubtitle')}
           actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction')}
-          colorScheme='danger'
+          variant='linkDanger'
           onClick={() => navigate(`phone-number/${phone.id}/remove`)}
         />
       </Col>

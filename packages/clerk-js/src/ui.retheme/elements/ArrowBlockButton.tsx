@@ -49,7 +49,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
   return (
     <SimpleButton
       variant='secondary'
-      colorScheme='secondary'
       block
       isLoading={isLoading}
       {...rest}

@@ -148,7 +148,7 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
           actionLabel={localizationKeys(
             'userProfile.start.connectedAccountsSection.destructiveActionAccordionSubtitle',
           )}
-          colorScheme='danger'
+          variant='linkDanger'
           onClick={() => navigate(`connected-account/${account.id}/remove`)}
         />
       </Col>

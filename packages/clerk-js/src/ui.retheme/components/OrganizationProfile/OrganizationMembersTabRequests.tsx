@@ -49,7 +49,6 @@ export const OrganizationMembersTabRequests = () => {
             <DomainList
               fallback={
                 <BlockButton
-                  colorScheme='primary'
                   textLocalizationKey={localizationKeys(
                     'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
                   )}

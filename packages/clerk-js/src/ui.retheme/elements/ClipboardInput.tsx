@@ -24,7 +24,6 @@ export const ClipboardInput = (props: PropsOfComponent<typeof Input>) => {
         elementDescriptor={descriptors.formFieldInputCopyToClipboardButton}
         variant='secondary'
         tabIndex={-1}
-        colorScheme={'primary'}
         onClick={onCopy}
         sx={theme => ({
           position: 'absolute',

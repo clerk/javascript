@@ -68,8 +68,9 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         icon={SignOut}
         label={localizationKeys('userButton.action__signOutAll')}
         onClick={handleSignOutAllClicked}
-        colorScheme='danger'
+        variant='ghostDanger'
         sx={t => ({
+          color: t.colors.$colorText,
           padding: `${t.space.$2} ${t.space.$3}`,
           borderBottom: 'none',
           borderRadius: t.radii.$lg,

@@ -4,11 +4,9 @@ import React from 'react';
 import { descriptors, Icon, Spinner } from '../customizables';
 import { ArrowRightButtonIcon } from '../icons';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
-import { common, createCssVariables, createVariants } from '../styledSystem';
+import { common, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
-
-const vars = createCssVariables('idle', 'hover', 'text', 'textHover', 'borderShadow');
 
 const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) => {
   return {
@@ -44,41 +42,41 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           letterSpacing: theme.sizes.$xxs,
         },
       },
-      colorScheme: {
-        primary: {
-          [vars.idle]: theme.colors.$primary800, //we should ideally make this primary500
-          [vars.hover]: theme.colors.$primary800, //same on purpose
-          [vars.text]: theme.colors.$colorTextOnPrimaryBackground,
-          [vars.textHover]: theme.colors.$colorTextOnPrimaryBackground,
-          [vars.borderShadow]:
-            '0px 0px 0px 1px #2F3037, 0px 1px 1px 0px rgba(255, 255, 255, 0.07) inset, 0px 2px 3px 0px rgba(34, 42, 53, 0.20), 0px 1px 1px 0px rgba(0, 0, 0, 0.24)',
-        },
-        secondary: {
-          [vars.idle]: theme.colors.$transparent,
-          [vars.hover]: theme.colors.$blackAlpha50,
-          [vars.text]: theme.colors.$colorText,
-          [vars.textHover]: theme.colors.$colorText,
-          [vars.borderShadow]:
-            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(0, 0, 0, 0.02), 0px 0px 0px 1px rgba(0, 0, 0, 0.08)',
-        },
-        danger: {
-          [vars.idle]: theme.colors.$transparent,
-          [vars.hover]: theme.colors.$danger50,
-          [vars.text]: theme.colors.$colorText,
-          [vars.textHover]: theme.colors.$danger400,
-          [vars.borderShadow]:
-            '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(0, 0, 0, 0.02), 0px 0px 0px 1px rgba(0, 0, 0, 0.08)',
-        },
-      },
       variant: {
         primary: {
-          backgroundColor: vars.idle,
-          color: vars.text,
-          boxShadow: vars.borderShadow,
-          '&:hover': {
-            backgroundColor: vars.hover,
-            color: vars.textHover,
+          backgroundColor: theme.colors.$primary500,
+          color: theme.colors.$colorTextOnPrimaryBackground,
+          ...common.buttonShadow,
+          ':before': {
+            position: 'absolute',
+            content: '""',
+            borderRadius: 'inherit',
+            zIndex: -1,
+            inset: 0,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%)`,
           },
+          ':after': {
+            position: 'absolute',
+            content: '""',
+            borderRadius: 'inherit',
+            zIndex: -1,
+            inset: 0,
+            opacity: 0,
+            transitionProperty: theme.transitionProperty.$common,
+            transitionDuration: theme.transitionDuration.$controls,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha200} 0%, ${theme.colors.$transparent} 100%)`,
+          },
+          ':hover::after': {
+            opacity: 1,
+          },
+          ':active::after': {
+            opacity: 0,
+          },
+        },
+        primaryDanger: {
+          backgroundColor: theme.colors.$danger500,
+          color: theme.colors.$colorTextOnPrimaryBackground,
+          ...common.buttonShadow,
           ':before': {
             position: 'absolute',
             content: '""',
@@ -106,30 +104,47 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           },
         },
         secondary: {
-          backgroundColor: vars.idle,
-          color: vars.text,
-          boxShadow: vars.borderShadow,
+          backgroundColor: theme.colors.$colorBackground,
+          color: theme.colors.$colorText,
           '&:hover': {
-            backgroundColor: vars.hover,
-            color: vars.textHover,
+            backgroundColor: theme.colors.$blackAlpha50,
           },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.hover, color: vars.textHover } : undefined,
-          '&:active': { backgroundColor: vars.idle },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$blackAlpha50 } : undefined,
+          '&:active': { backgroundColor: theme.colors.$colorBackground },
+          boxShadow: theme.shadows.$secondaryButtonShadow,
+        },
+        secondaryDanger: {
+          backgroundColor: theme.colors.$colorBackground,
+          color: theme.colors.$danger500,
+          '&:hover': {
+            backgroundColor: theme.colors.$danger50,
+            color: theme.colors.$danger500,
+          },
+          '&:focus': props.hoverAsFocus
+            ? { backgroundColor: theme.colors.$danger50, color: theme.colors.$danger500 }
+            : undefined,
+          '&:active': { backgroundColor: theme.colors.$colorBackground },
+          boxShadow: theme.shadows.$secondaryButtonShadow,
         },
         ghost: {
-          color: vars.text,
-          '&:hover': { backgroundColor: vars.hover, color: vars.textHover },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.hover, color: vars.textHover } : undefined,
-          '&:active': { backgroundColor: vars.idle },
+          color: theme.colors.$colorText,
+          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$colorText },
+          '&:focus': props.hoverAsFocus
+            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$colorText }
+            : undefined,
+          '&:active': { backgroundColor: theme.colors.$transparent },
         },
-        ghostIcon: {
-          color: vars.idle,
-          minHeight: theme.sizes.$6,
-          width: theme.sizes.$6,
-          padding: `${theme.space.$1} ${theme.space.$1}`,
-          '&:hover': { color: vars.hover },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.hover } : undefined,
-          '&:active': { color: vars.idle },
+        ghostPrimary: {
+          color: theme.colors.$primary500,
+          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$primary500 },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$blackAlpha50 } : undefined,
+          '&:active': { backgroundColor: theme.colors.$transparent },
+        },
+        ghostDanger: {
+          color: theme.colors.$danger500,
+          '&:hover': { backgroundColor: theme.colors.$danger50, color: theme.colors.$danger500 },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$danger50 } : undefined,
+          '&:active': { backgroundColor: theme.colors.$transparent },
         },
         link: {
           ...common.textVariants(theme).smallRegular,
@@ -138,10 +153,20 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           width: 'fit-content',
           textTransform: 'none',
           padding: 0,
-          color: vars.idle,
+          color: theme.colors.$primary500,
           '&:hover': { textDecoration: 'underline' },
           '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
-          '&:active': { color: vars.idle },
+        },
+        linkDanger: {
+          ...common.textVariants(theme).smallRegular,
+          minHeight: 'fit-content',
+          height: 'fit-content',
+          width: 'fit-content',
+          textTransform: 'none',
+          padding: 0,
+          color: theme.colors.$danger500,
+          '&:hover': { textDecoration: 'underline' },
+          '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
         },
         roundWrapper: { padding: 0, margin: 0, height: 'unset', width: 'unset', minHeight: 'unset' },
       },
@@ -154,7 +179,6 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
     },
     defaultVariants: {
       textVariant: 'buttonRegularRegular',
-      colorScheme: 'primary',
       variant: 'primary',
       size: 'sm',
       focusRing: true,

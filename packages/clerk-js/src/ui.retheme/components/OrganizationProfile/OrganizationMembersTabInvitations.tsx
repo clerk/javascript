@@ -50,7 +50,6 @@ export const OrganizationMembersTabInvitations = () => {
             <DomainList
               fallback={
                 <BlockButton
-                  colorScheme='primary'
                   textLocalizationKey={localizationKeys(
                     'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
                   )}

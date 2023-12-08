@@ -312,7 +312,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                     actionLabel={localizationKeys(
                       'organizationProfile.verifiedDomainPage.dangerTab.removeDomainActionLabel__remove',
                     )}
-                    colorScheme='danger'
+                    variant='linkDanger'
                     onClick={() => navigate(`../../domain/${domain.id}/remove`)}
                   />
                 </Col>

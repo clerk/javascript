@@ -102,7 +102,6 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         iconElementDescriptor={descriptors.formFieldInputShowPasswordIcon}
         aria-label={`${hidden ? 'Show' : 'Hide'} password`}
         variant='secondary'
-        colorScheme={'secondary'}
         tabIndex={-1}
         onClick={() => setHidden(s => !s)}
         sx={theme => ({
