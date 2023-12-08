@@ -459,6 +459,7 @@ export interface Clerk {
 
   /**
    * Returns true if bootstrapping with Clerk.load has completed successfully. Otherwise, returns false.
+   * @deprecated Use `loaded` instead.
    */
   isReady: () => boolean;
 }

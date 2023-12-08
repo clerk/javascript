@@ -32,7 +32,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
     waitForClerkJsLoaded: async () => {
       return page.waitForFunction(() => {
         // @ts-ignore
-        return window.Clerk?.isReady();
+        return window.Clerk?.loaded;
       });
     },
     waitForClerkComponentMounted: async () => {
