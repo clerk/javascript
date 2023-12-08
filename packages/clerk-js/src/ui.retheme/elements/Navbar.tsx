@@ -22,6 +22,7 @@ import { animations, mqu } from '../styledSystem';
 import { colors, sleep } from '../utils';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
+import { PoweredByClerkTag } from './PoweredByClerk';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
 export const [NavbarContext, useNavbarContext, useUnsafeNavbarContext] =
@@ -187,34 +188,37 @@ const NavbarContainer = (
     <Col
       elementDescriptor={descriptors.navbar}
       sx={t => ({
-        flex: `0 0 ${t.space.$60}`,
         maxWidth: t.space.$60,
         borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha300}`,
         backgroundColor: t.colors.$blackAlpha100,
-        padding: `${t.space.$9x5} ${t.space.$6}`,
         [mqu.md]: {
           display: 'none',
         },
-        gap: t.space.$6,
+        padding: `${t.space.$9x5} ${t.space.$6} ${t.space.$3} ${t.space.$6}`,
         color: t.colors.$colorText,
+        justifyContent: 'space-between',
       })}
     >
-      <Col
-        sx={t => ({
-          gap: t.space.$0x5,
-        })}
-      >
-        <Heading
-          as='h1'
-          localizationKey={title}
-        />
+      <Col sx={t => ({ gap: t.space.$6, flex: `0 0 ${t.space.$60}` })}>
+        <Col
+          sx={t => ({
+            gap: t.space.$0x5,
+          })}
+        >
+          <Heading
+            as='h1'
+            localizationKey={title}
+          />
 
-        <Text
-          colorScheme='neutral'
-          localizationKey={description}
-        />
+          <Text
+            colorScheme='neutral'
+            variant='smallRegular'
+            localizationKey={description}
+          />
+        </Col>
+        {props.children}
       </Col>
-      {props.children}
+      <PoweredByClerkTag sx={{ justifyContent: 'start' }} />
     </Col>
   );
 };

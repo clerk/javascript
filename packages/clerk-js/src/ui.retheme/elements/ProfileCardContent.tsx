@@ -29,7 +29,10 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
   }, [router.currentPath]);
 
   return (
-    <ScrollerContainer>
+    <Col
+      elementDescriptor={descriptors.scrollBox}
+      sx={t => ({ position: 'relative', borderRadius: t.radii.$xl, width: '100%', overflowY: 'auto' })}
+    >
       <Col
         elementDescriptor={descriptors.pageScrollBox}
         sx={theme => ({
@@ -44,16 +47,6 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
       >
         {children}
       </Col>
-    </ScrollerContainer>
-  );
-};
-
-const ScrollerContainer = (props: React.PropsWithChildren<Record<never, never>>) => {
-  return (
-    <Col
-      elementDescriptor={descriptors.scrollBox}
-      sx={t => ({ position: 'relative', borderRadius: t.radii.$xl, width: '100%', overflow: 'hidden' })}
-      {...props}
-    />
+    </Col>
   );
 };

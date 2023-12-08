@@ -34,7 +34,9 @@ const _OrganizationProfile = (_: OrganizationProfileProps) => {
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
   return (
-    <ProfileCard sx={{ height: '100%' }}>
+    <ProfileCard
+      sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
+    >
       <OrganizationProfileNavbar contentRef={contentRef}>
         <OrganizationProfileRoutes contentRef={contentRef} />
       </OrganizationProfileNavbar>

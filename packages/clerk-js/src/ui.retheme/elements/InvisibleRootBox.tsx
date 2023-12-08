@@ -37,7 +37,6 @@ export const InvisibleRootBox = makeCustomizable(_InvisibleRootBox, {
   defaultStyles: t => ({
     boxSizing: 'border-box',
     width: 'fit-content',
-
     fontFamily: t.fonts.$main,
     fontStyle: t.fontStyles.$normal,
   }),

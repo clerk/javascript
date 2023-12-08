@@ -48,7 +48,6 @@ export const RootPage = withCardStateProvider(() => {
             localizationKey={localizationKeys('userProfile.start.headerTitle__account')}
             textVariant='xxlargeMedium'
           />
-          <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__account')} />
         </Header.Root>
 
         <UserProfileSection />
@@ -69,7 +68,6 @@ export const RootPage = withCardStateProvider(() => {
             localizationKey={localizationKeys('userProfile.start.headerTitle__security')}
             textVariant='xxlargeMedium'
           />
-          <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__security')} />
         </Header.Root>
         {showPassword && <PasswordSection />}
         {showMfa && <MfaSection />}

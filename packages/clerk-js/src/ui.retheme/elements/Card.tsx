@@ -71,27 +71,18 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
 
 export const ProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const { sx, children, ...rest } = props;
-  const { branded } = useEnvironment().displayConfig;
   return (
-    <BaseCard ref={ref}>
-      <Flex
-        sx={[
-          t => ({
-            width: t.sizes.$220,
-          }),
-          sx,
-        ]}
-        {...rest}
-      >
-        {children}
-      </Flex>
-      <CardFooter>
-        {branded && (
-          <CardFooterItem>
-            <PoweredByClerkTag />
-          </CardFooterItem>
-        )}
-      </CardFooter>
+    <BaseCard
+      ref={ref}
+      sx={[
+        t => ({
+          width: t.sizes.$220,
+        }),
+        sx,
+      ]}
+      {...rest}
+    >
+      {children}
     </BaseCard>
   );
 });
@@ -112,6 +103,7 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
       sx={[
         t => ({
           backgroundColor: t.colors.$colorBackground,
+          overflow: 'hidden',
           willChange: 'transform, opacity, height',
           transitionProperty: t.transitionProperty.$common,
           transitionDuration: '200ms',

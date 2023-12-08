@@ -5,7 +5,7 @@ import { descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '
 import type { PropsOfComponent } from '../styledSystem';
 import { animations } from '../styledSystem';
 import { BaseCard } from './Card';
-import { PoweredByClerkText } from './PoweredByClerk';
+import { PoweredByClerkTag } from './PoweredByClerk';
 
 const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof BaseCard>>((props, ref) => {
   return (
@@ -67,7 +67,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
       ]}
       {...rest}
     >
-      <PoweredByClerkText />
+      <PoweredByClerkTag />
       <PopoverCardLinks />
     </Flex>
   );
