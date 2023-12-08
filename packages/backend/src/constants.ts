@@ -33,6 +33,7 @@ const Headers = {
   Origin: 'origin',
   Host: 'host',
   ContentType: 'content-type',
+  SecFetchDest: 'sec-fetch-dest',
 } as const;
 
 const SearchParams = {

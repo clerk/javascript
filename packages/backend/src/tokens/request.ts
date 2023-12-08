@@ -192,7 +192,11 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       return handshake(authenticateContext, AuthErrorReason.DevBrowserSync, '', headers);
     }
 
-    if (authenticateContext.isSatellite && !authenticateContext.derivedRequestUrl.searchParams.has('__clerk_synced')) {
+    if (
+      authenticateContext.isSatellite &&
+      authenticateContext.secFetchDest === 'document' &&
+      !authenticateContext.derivedRequestUrl.searchParams.has('__clerk_synced')
+    ) {
       const headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
@@ -295,6 +299,7 @@ export const loadOptionsFromHeaders = (headers: ReturnType<typeof buildRequest>[
     forwardedProto: headers(constants.Headers.CloudFrontForwardedProto) || headers(constants.Headers.ForwardedProto),
     referrer: headers(constants.Headers.Referrer),
     userAgent: headers(constants.Headers.UserAgent),
+    secFetchDest: headers(constants.Headers.SecFetchDest),
   };
 };
 
