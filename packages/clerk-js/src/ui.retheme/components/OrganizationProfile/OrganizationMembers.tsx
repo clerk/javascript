@@ -52,7 +52,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
         <Header.Root>
           <Header.Title
             localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
-            textVariant='xxlargeMedium'
+            textVariant='h1'
           />
         </Header.Root>
         <Tabs>

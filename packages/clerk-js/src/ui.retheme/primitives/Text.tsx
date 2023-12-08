@@ -17,7 +17,6 @@ const { applyVariants, filterProps } = createVariants(theme => {
     },
     variants: {
       variant: common.textVariants(theme),
-      size: common.fontSizeVariants(theme),
       colorScheme: {
         primary: { color: theme.colors.$colorText },
         onPrimaryBg: { color: theme.colors.$colorTextOnPrimaryBackground },
@@ -35,7 +34,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       },
     },
     defaultVariants: {
-      variant: 'regularRegular',
+      variant: 'body',
     },
   };
 });

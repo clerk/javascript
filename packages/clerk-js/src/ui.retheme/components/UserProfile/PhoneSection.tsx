@@ -66,17 +66,11 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
       title={formattedPhone}
       badge={
         <>
-          {isPrimary && (
-            <Badge
-              localizationKey={localizationKeys('badge__primary')}
-              textVariant={'extraSmallMedium'}
-            />
-          )}
+          {isPrimary && <Badge localizationKey={localizationKeys('badge__primary')} />}
           {!isVerified && (
             <Badge
               localizationKey={localizationKeys('badge__unverified')}
               colorScheme='danger'
-              textVariant={'extraSmallMedium'}
             />
           )}
         </>

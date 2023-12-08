@@ -50,17 +50,11 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
       title={email.emailAddress}
       badge={
         <>
-          {isPrimary && (
-            <Badge
-              localizationKey={localizationKeys('badge__primary')}
-              textVariant={'extraSmallMedium'}
-            />
-          )}
+          {isPrimary && <Badge localizationKey={localizationKeys('badge__primary')} />}
           {!isVerified && (
             <Badge
               localizationKey={localizationKeys('badge__unverified')}
               colorScheme='danger'
-              textVariant={'extraSmallMedium'}
             />
           )}
         </>

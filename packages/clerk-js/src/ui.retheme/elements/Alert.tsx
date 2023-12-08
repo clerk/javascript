@@ -42,7 +42,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           elementDescriptor={descriptors.alertText}
           elementId={descriptors.alert.setId(variant)}
           colorScheme='neutral'
-          variant='smallRegular'
+          variant='body'
           localizationKey={title}
         >
           {children}
@@ -52,7 +52,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
             elementDescriptor={descriptors.alertText}
             elementId={descriptors.alert.setId(variant)}
             colorScheme='neutral'
-            variant='smallRegular'
+            variant='body'
             localizationKey={subtitle}
           />
         )}

@@ -62,7 +62,7 @@ export const SectionHeader = (props: SectionHeaderProps) => {
     >
       <Text
         localizationKey={localizationKey}
-        variant='largeMedium'
+        variant='h2'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
       />
@@ -78,7 +78,6 @@ export const SectionSubHeader = (props: SectionHeaderProps) => {
     >
       <Text
         localizationKey={localizationKey}
-        variant='regularRegular'
         colorScheme='neutral'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}

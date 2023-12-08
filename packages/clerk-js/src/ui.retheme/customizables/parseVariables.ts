@@ -71,13 +71,11 @@ export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes
   }
   const { numericValue, unit = 'rem' } = splitCssUnit(fontSize);
   return {
-    '2xs': (numericValue * 0.625).toString() + unit,
-    xs: (numericValue * 0.75).toString() + unit,
-    sm: (numericValue * 0.875).toString() + unit,
-    md: fontSize,
-    lg: (numericValue * 1.125).toString() + unit,
-    xl: (numericValue * 1.25).toString() + unit,
-    '2xl': (numericValue * 2).toString() + unit,
+    xs: (numericValue * 0.6875).toString() + unit,
+    sm: (numericValue * 0.75).toString() + unit,
+    md: (numericValue * 0.8125).toString() + unit,
+    lg: (numericValue * 1.0625).toString() + unit,
+    xl: (numericValue * 1.5).toString() + unit,
   };
 };
 

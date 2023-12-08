@@ -212,7 +212,6 @@ const NavbarContainer = (
 
           <Text
             colorScheme='neutral'
-            variant='smallRegular'
             localizationKey={description}
           />
         </Col>
@@ -299,7 +298,7 @@ const NavButton = (props: NavButtonProps) => {
   return (
     <Button
       variant='ghost'
-      textVariant='buttonRegularMedium'
+      textVariant='buttonLarge'
       size='md'
       isActive={isActive}
       {...rest}

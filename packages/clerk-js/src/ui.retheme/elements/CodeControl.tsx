@@ -134,7 +134,7 @@ export const OTPInputLabel = () => {
     <Text
       localizationKey={label}
       elementDescriptor={descriptors.formHeaderTitle}
-      variant='smallMedium'
+      variant='subtitle'
     />
   );
 };
@@ -145,7 +145,6 @@ export const OTPInputDescription = () => {
     <Text
       localizationKey={description}
       elementDescriptor={descriptors.formHeaderSubtitle}
-      variant='smallRegular'
       colorScheme='neutral'
     />
   );
@@ -339,7 +338,7 @@ const SingleCharInput = React.forwardRef<
       type='text'
       sx={theme => ({
         textAlign: 'center',
-        ...common.textVariants(theme).xlargeMedium,
+        ...common.textVariants(theme).h2,
         padding: `${theme.space.$0x5} 0`,
         boxSizing: 'content-box',
         minWidth: '1ch',

@@ -51,7 +51,6 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
   if (props.status === 'accepted') {
     return (
       <Text
-        variant='smallRegular'
         colorScheme='neutral'
         localizationKey={localizationKeys('organizationSwitcher.suggestionsAcceptedLabel')}
       />
@@ -61,7 +60,7 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
   return (
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
-      textVariant='buttonExtraSmallBold'
+      textVariant='buttonSmall'
       variant='secondary'
       size='sm'
       isLoading={card.isLoading}
@@ -87,7 +86,7 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
   return (
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
-      textVariant='buttonExtraSmallBold'
+      textVariant='buttonSmall'
       variant='secondary'
       size='sm'
       isLoading={card.isLoading}

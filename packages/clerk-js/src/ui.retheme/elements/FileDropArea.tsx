@@ -110,7 +110,6 @@ export const FileDropArea = (props: FileDropAreaProps) => {
       <Text
         localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaHint')}
         elementDescriptor={descriptors.fileDropAreaFooterHint}
-        variant='smallRegular'
         colorScheme='neutral'
       />
     </Col>

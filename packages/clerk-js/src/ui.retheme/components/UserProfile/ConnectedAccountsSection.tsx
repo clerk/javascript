@@ -114,7 +114,6 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
           {(error || reauthorizationRequired) && (
             <Badge
               colorScheme='danger'
-              textVariant={'extraSmallMedium'}
               localizationKey={localizationKeys('badge__requiresAction')}
             />
           )}

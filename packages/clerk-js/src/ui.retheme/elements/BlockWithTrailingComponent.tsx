@@ -57,7 +57,7 @@ export const BlockWithTrailingComponent = (props: BlockWithTrailingComponentProp
           as='span'
           truncate
           colorScheme='inherit'
-          variant='buttonSmallRegular'
+          variant='buttonSmall'
           localizationKey={textLocalizationKey}
         >
           {children}

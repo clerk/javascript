@@ -29,22 +29,14 @@ export const MembershipWidget = () => {
       })}
     >
       <Col>
-        <Text
-          sx={t => ({
-            lineHeight: t.lineHeights.$tall,
-          })}
-        >
-          Members can be given access to applications.
-        </Text>
+        <Text>Members can be given access to applications.</Text>
 
         {runIfFunctionOrReturn(__unstable_manageBillingMembersLimit) > 0 && (
           <Link
-            variant='regularRegular'
             sx={t => ({
               alignSelf: 'flex-start',
               color: t.colors.$primary500,
               marginTop: t.space.$1,
-              fontWeight: t.fontWeights.$normal,
             })}
             onClick={() => router.navigate(runIfFunctionOrReturn(__unstable_manageBillingUrl))}
           >
@@ -54,10 +46,7 @@ export const MembershipWidget = () => {
       </Col>
       <Col>
         <Text
-          variant='regularRegular'
           sx={t => ({
-            fontWeight: t.fontWeights.$normal,
-            lineHeight: t.lineHeights.$tall,
             color: t.colors.$blackAlpha600,
           })}
         >

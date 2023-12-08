@@ -65,7 +65,6 @@ const IdentifierContainer = (props: React.PropsWithChildren) => {
   return (
     <Text
       elementDescriptor={descriptors.identityPreviewText}
-      variant='smallRegular'
       colorScheme='neutral'
       truncate
       {...props}

@@ -114,7 +114,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           as='span'
           truncate
           colorScheme='inherit'
-          variant='buttonSmallRegular'
+          variant='buttonSmall'
           localizationKey={textLocalizationKey}
         >
           {children}
