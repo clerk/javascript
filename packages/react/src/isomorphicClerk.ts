@@ -251,8 +251,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return false;
   }
 
-  isReady = (): boolean => Boolean(this.clerkjs?.isReady());
-
   buildSignInUrl = (opts?: RedirectOptions): string | void => {
     const callback = () => this.clerkjs?.buildSignInUrl(opts) || '';
     if (this.clerkjs && this.#loaded) {
@@ -363,7 +361,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
           // Otherwise use the instantiated Clerk object
           c = this.Clerk;
 
-          if (!c.isReady()) {
+          if (!c.loaded) {
             await c.load(this.options);
           }
         }
@@ -387,7 +385,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         await global.Clerk.load(this.options);
       }
 
-      if (global.Clerk?.loaded || global.Clerk?.isReady()) {
+      if (global.Clerk?.loaded) {
         return this.hydrateClerkJS(global.Clerk);
       }
       return;

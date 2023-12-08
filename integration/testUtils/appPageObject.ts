@@ -31,7 +31,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
     },
     waitForClerkJsLoaded: async () => {
       return page.waitForFunction(() => {
-        return window.Clerk?.isReady();
+        return window.Clerk?.loaded;
       });
     },
     waitForClerkComponentMounted: async () => {

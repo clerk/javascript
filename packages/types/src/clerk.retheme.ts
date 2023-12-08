@@ -424,11 +424,6 @@ export interface Clerk {
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
    */
   handleUnauthenticated: () => Promise<unknown>;
-
-  /**
-   * Returns true if bootstrapping with Clerk.load has completed successfully. Otherwise, returns false.
-   */
-  isReady: () => boolean;
 }
 
 export type HandleOAuthCallbackParams = {
