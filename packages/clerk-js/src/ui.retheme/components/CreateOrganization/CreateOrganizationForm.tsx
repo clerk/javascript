@@ -125,7 +125,6 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             avatarPreviewPlaceholder={
               <IconButton
                 variant='ghost'
-                colorScheme='secondary'
                 aria-label='Upload organization logo'
                 icon={
                   <Icon

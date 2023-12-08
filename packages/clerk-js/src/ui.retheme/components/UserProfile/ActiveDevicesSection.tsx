@@ -62,7 +62,7 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
         {!isCurrent && (
           <LinkButtonWithDescription
             actionLabel={localizationKeys('userProfile.start.activeDevicesSection.destructiveAction')}
-            colorScheme='danger'
+            variant='linkDanger'
             onClick={revoke}
             subtitle={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionSubtitle')}
             title={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionTitle')}

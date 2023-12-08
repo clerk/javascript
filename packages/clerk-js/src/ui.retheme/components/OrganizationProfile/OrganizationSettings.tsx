@@ -126,8 +126,7 @@ const OrganizationDangerSection = () => {
               sx={t => ({ marginRight: t.space.$2 })}
             />
           }
-          variant='secondary'
-          colorScheme='danger'
+          variant='secondaryDanger'
           textVariant='buttonExtraSmallBold'
           onClick={() => navigate('leave')}
           localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
@@ -142,8 +141,7 @@ const OrganizationDangerSection = () => {
                 sx={t => ({ marginRight: t.space.$2 })}
               />
             }
-            variant='secondary'
-            colorScheme='danger'
+            variant='secondaryDanger'
             textVariant='buttonExtraSmallBold'
             onClick={() => navigate('delete')}
             localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}

@@ -144,7 +144,6 @@ export const DomainList = withGate(
             <ArrowBlockButton
               key={d.id}
               variant='ghost'
-              colorScheme='secondary'
               badge={!verificationStatus ? <EnrollmentBadge organizationDomain={d} /> : undefined}
               sx={t => ({
                 padding: `${t.space.$3} ${t.space.$4}`,

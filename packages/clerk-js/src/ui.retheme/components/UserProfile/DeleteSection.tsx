@@ -27,7 +27,7 @@ export const DeleteSection = () => {
         </Col>
         <Button
           aria-label='Delete account'
-          colorScheme='danger'
+          variant='primaryDanger'
           textVariant='buttonExtraSmallBold'
           onClick={() => navigate(`delete`)}
           localizationKey={localizationKeys('userProfile.start.dangerSection.deleteAccountButton')}

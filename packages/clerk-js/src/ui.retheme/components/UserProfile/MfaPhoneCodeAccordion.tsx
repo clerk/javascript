@@ -63,7 +63,7 @@ export const MfaPhoneCodeAccordion = ({ phone, showTOTP }: MfaPhoneCodeAccordion
           title={localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionTitle')}
           subtitle={localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionSubtitle')}
           actionLabel={localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionLabel')}
-          colorScheme='danger'
+          variant='linkDanger'
           onClick={() => navigate(`multi-factor/${phone.id}/remove`)}
         />
       </Col>

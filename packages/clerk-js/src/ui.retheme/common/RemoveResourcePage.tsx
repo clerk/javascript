@@ -45,7 +45,7 @@ export const RemoveResourcePage = withCardStateProvider((props: RemovePageProps)
             localizationKey={messageLine2}
             variant='regularRegular'
           />
-          <FormButtons colorScheme={'danger'} />
+          <FormButtons variant='primaryDanger' />
         </Form.Root>
       </ContentPage>
       <SuccessPage

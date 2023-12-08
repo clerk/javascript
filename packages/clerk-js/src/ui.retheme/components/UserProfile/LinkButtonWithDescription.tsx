@@ -46,7 +46,6 @@ export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionPr
         <Button
           localizationKey={actionLabel}
           loadingText={t(actionLabel)}
-          colorScheme='primary'
           variant='link'
           {...rest}
           isLoading={status.isLoading}
