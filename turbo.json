@@ -3,7 +3,14 @@
   "remoteCache": {
     "signature": true
   },
-  "globalDependencies": ["jest.*.ts", "package.json", "package-lock.json", "tsconfig.json", "tsconfig.*.json"],
+  "globalDependencies": [
+    "jest.*.ts",
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "tsconfig.*.json",
+    "scripts/subpath-workaround.mjs"
+  ],
   "globalEnv": [
     "CLERK_*",
     "GATSBY_CLERK_*",
@@ -28,6 +35,7 @@
         "tsconfig.build.json",
         "tsconfig.declarations.json",
         "tsup.config.ts",
+        "subpaths.mjs",
         "!**/**/*.test.*",
         "!**/test/**",
         "!**/tests/**",
