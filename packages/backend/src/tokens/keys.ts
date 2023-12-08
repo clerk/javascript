@@ -161,23 +161,6 @@ export async function loadClerkJWKFromRemote({
   return jwk;
 }
 
-async function fetchJWKSFromFAPI(issuer: string) {
-  const url = new URL(issuer);
-  url.pathname = joinPaths(url.pathname, '.well-known/jwks.json');
-
-  const response = await runtime.fetch(url.href);
-
-  if (!response.ok) {
-    throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.ContactSupport,
-      message: `Error loading Clerk JWKS from ${url.href} with code=${response.status}`,
-      reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
-    });
-  }
-
-  return response.json();
-}
-
 async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string) {
   if (!key) {
     throw new TokenVerificationError({

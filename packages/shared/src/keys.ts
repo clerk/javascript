@@ -17,41 +17,6 @@ export function buildPublishableKey(frontendApi: string): string {
   return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`)}`;
 }
 
-export function parsePublishableOptions({
-  publishableKey,
-  domain,
-  proxyUrl,
-}: {
-  publishableKey: string;
-  domain?: string;
-  proxyUrl?: string;
-}) {
-  if (!isPublishableKey(publishableKey)) {
-    throw new Error('Publishable key not valid.');
-  }
-  const environmentType = publishableKey.startsWith(PUBLISHABLE_KEY_LIVE_PREFIX) ? 'production' : 'development';
-
-  let frontendApi;
-  if (proxyUrl) {
-    frontendApi = proxyUrl;
-  } else if (environmentType !== 'development' && domain) {
-    frontendApi = `https://clerk.${domain}`;
-  } else {
-    frontendApi = isomorphicAtob(publishableKey.split('_')[2]);
-
-    if (!frontendApi.endsWith('$')) {
-      throw new Error('Publishable key not valid.');
-    }
-
-    frontendApi = `https://${frontendApi.slice(0, -1)}`;
-  }
-
-  return {
-    frontendApi,
-    environmentType,
-  };
-}
-
 export function parsePublishableKey(key: string | undefined): PublishableKey | null {
   key = key || '';
 

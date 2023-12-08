@@ -20,7 +20,7 @@ function assertSignedOut(
     message?: string;
   },
 ) {
-  assert.propEqual(requestState, {
+  assert.propContains(requestState, {
     publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.SignedOut,
@@ -54,7 +54,7 @@ function assertSignedOutToAuth(assert, requestState: RequestState) {
   });
 }
 
-function assertInterstitial(
+function assertHandshake(
   assert,
   requestState: RequestState,
   expectedState: {
@@ -67,9 +67,8 @@ function assertInterstitial(
   assert.propContains(requestState, {
     publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
-    status: AuthStatus.Interstitial,
+    status: AuthStatus.Handshake,
     isSignedIn: false,
-    isInterstitial: true,
     isUnknown: false,
     isSatellite: false,
     signInUrl: '',
@@ -259,13 +258,13 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    test('headerToken: returns interstitial state when token expired [1y.2n]', async assert => {
+    test('headerToken: returns handshake state when token expired [1y.2n]', async assert => {
       // advance clock for 1 hour
       fakeClock.tick(3600 * 1000);
 
       const requestState = await authenticateRequest(defaultMockHeaderAuthOptions());
 
-      assertUnknown(assert, requestState, TokenVerificationErrorReason.TokenExpired);
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
       assert.strictEqual(requestState.toAuth(), null);
     });
 
@@ -302,50 +301,12 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    //
-    // HTTP Authorization does NOT exist and __session cookie exists
-    //
-
-    test('cookieToken: returns signed out state when cross-origin request [2y]', async assert => {
-      const requestState = await authenticateRequest(
-        defaultMockCookieAuthOptions(
-          {
-            ...defaultHeaders,
-            origin: 'https://clerk.com',
-            'x-forwarded-proto': 'http',
-          },
-          { __session: mockJwt },
-        ),
-      );
-
-      assertSignedOut(assert, requestState, {
-        reason: AuthErrorReason.HeaderMissingCORS,
-      });
-      assertSignedOutToAuth(assert, requestState);
-    });
-
-    test('cookieToken: returns signed out when non browser requests in development [3y]', async assert => {
-      const nonBrowserUserAgent = 'curl';
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(
-          {
-            ...defaultHeaders,
-            'user-agent': nonBrowserUserAgent,
-          },
-          { __client_uat: '12345', __session: mockJwt },
-        ),
-        secretKey: 'test_deadbeef',
-      });
-
-      assertSignedOut(assert, requestState, { reason: AuthErrorReason.HeaderMissingNonBrowser });
-      assertSignedOutToAuth(assert, requestState);
-    });
-
     test('cookieToken: returns interstitial when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockCookieAuthOptions(
           {
             ...defaultHeaders,
+            'Sec-Fetch-Dest': 'document',
           },
           { __client_uat: '0' },
         ),
@@ -356,7 +317,7 @@ export default (QUnit: QUnit) => {
         domain: 'satellite.dev',
       });
 
-      assertInterstitial(assert, requestState, {
+      assertHandshake(assert, requestState, {
         reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
@@ -382,7 +343,7 @@ export default (QUnit: QUnit) => {
       });
 
       assertSignedOut(assert, requestState, {
-        reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+        reason: AuthErrorReason.CookieAndUATMissing,
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
@@ -392,15 +353,19 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns interstitial when app is satellite, returns from primary and is dev instance [13y]', async assert => {
       const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(),
+        ...defaultMockCookieAuthOptions(
+          undefined,
+          undefined,
+          `http://satellite.example/path?__clerk_synced=true&__clerk_db_jwt=${mockJwt}`,
+        ),
         secretKey: 'sk_test_deadbeef',
         signInUrl: 'http://primary.example/sign-in',
         isSatellite: true,
         domain: 'satellite.example',
       });
 
-      assertInterstitial(assert, requestState, {
-        reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      assertHandshake(assert, requestState, {
+        reason: AuthErrorReason.DevBrowserSync,
         isSatellite: true,
         domain: 'satellite.example',
         signInUrl: 'http://primary.example/sign-in',
@@ -411,15 +376,19 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns interstitial when app is not satellite and responds to syncing on dev instances[12y]', async assert => {
       const sp = new URLSearchParams();
-      sp.set('__clerk_satellite_url', 'http://localhost:3000');
+      sp.set('__clerk_redirect_url', 'http://localhost:3000');
       const requestUrl = `http://clerk.com/path?${sp.toString()}`;
       const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(defaultHeaders, { __client_uat: '12345', __session: mockJwt }, requestUrl),
+        ...defaultMockCookieAuthOptions(
+          { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+          { __client_uat: '12345', __session: mockJwt },
+          requestUrl,
+        ),
         secretKey: 'sk_test_deadbeef',
         isSatellite: false,
       });
 
-      assertInterstitial(assert, requestState, {
+      assertHandshake(assert, requestState, {
         reason: AuthErrorReason.PrimaryRespondsToSyncing,
       });
       assert.equal(requestState.message, '');
@@ -444,38 +413,7 @@ export default (QUnit: QUnit) => {
         secretKey: 'test_deadbeef',
       });
 
-      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieUATMissing });
-      assert.equal(requestState.message, '');
-      assert.strictEqual(requestState.toAuth(), null);
-    });
-
-    // Omit because it caused view-source to always returns the interstitial in development mode (there's no referrer for view-source)
-    skip('cookieToken: returns interstitial when no referrer in development [6y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(defaultHeaders, { __client_uat: '12345', __session: mockJwt }),
-        secretKey: 'test_deadbeef',
-      });
-
-      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CrossOriginReferrer });
-      assert.equal(requestState.message, '');
-      assert.strictEqual(requestState.toAuth(), null);
-    });
-
-    test('cookieToken: returns interstitial when crossOriginReferrer in development [6y]', async assert => {
-      // Scenario: after auth action on Clerk-hosted UIs
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(
-          {
-            ...defaultHeaders,
-            // this is not a typo, it's intentional to be `referer` to match HTTP header key
-            referer: 'https://clerk.com',
-          },
-          { __client_uat: '12345', __session: mockJwt },
-        ),
-        secretKey: 'test_deadbeef',
-      });
-
-      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CrossOriginReferrer });
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenWithoutClientUAT });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -505,20 +443,13 @@ export default (QUnit: QUnit) => {
       assertSignedInToAuth(assert, requestState);
     });
 
-    // // Note: The user is definitely signed out here so this interstitial can be
-    // // eliminated. We can keep it if we're worried about something inspecting
-    // // the __session cookie manually
-    skip('cookieToken: returns interstitial when clientUat = 0 [7y]', assert => {
-      assert.true(true);
-    });
-
     test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken [8y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockCookieAuthOptions(defaultHeaders, { __client_uat: '12345' }),
         secretKey: 'deadbeef',
       });
 
-      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieMissing });
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.ClientUATWithoutSessionToken });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -529,7 +460,7 @@ export default (QUnit: QUnit) => {
       });
 
       assertSignedOut(assert, requestState, {
-        reason: AuthErrorReason.StandardSignedOut,
+        reason: AuthErrorReason.CookieAndUATMissing,
       });
       assertSignedOutToAuth(assert, requestState);
     });
@@ -542,7 +473,7 @@ export default (QUnit: QUnit) => {
         }),
       );
 
-      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieOutDated });
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -583,7 +514,7 @@ export default (QUnit: QUnit) => {
     //   },
     // );
 
-    test('cookieToken: returns interstitial when cookieToken.iat >= clientUat and expired token [10y.2n.1n]', async assert => {
+    test('cookieToken: returns handshake when cookieToken.iat >= clientUat and expired token [10y.2n.1n]', async assert => {
       // advance clock for 1 hour
       fakeClock.tick(3600 * 1000);
 
@@ -594,7 +525,7 @@ export default (QUnit: QUnit) => {
         }),
       );
 
-      assertInterstitial(assert, requestState, { reason: TokenVerificationErrorReason.TokenExpired });
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
       assert.true(/^JWT is expired/.test(requestState.message || ''));
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -617,22 +548,11 @@ export default (QUnit: QUnit) => {
   });
 
   module('tokens.loadOptionsFromHeaders', () => {
-    const defaultOptions = {
-      headerToken: '',
-      origin: '',
-      host: '',
-      forwardedHost: '',
-      forwardedProto: '',
-      referrer: '',
-      userAgent: '',
-    };
-
     test('returns forwarded headers from headers', assert => {
       const headersData = { 'x-forwarded-proto': 'http', 'x-forwarded-port': '80', 'x-forwarded-host': 'example.com' };
       const headers = key => headersData[key] || '';
 
-      assert.propEqual(loadOptionsFromHeaders(headers), {
-        ...defaultOptions,
+      assert.propContains(loadOptionsFromHeaders(headers), {
         forwardedProto: 'http',
         forwardedHost: 'example.com',
       });
@@ -647,8 +567,7 @@ export default (QUnit: QUnit) => {
       };
       const headers = key => headersData[key] || '';
 
-      assert.propEqual(loadOptionsFromHeaders(headers), {
-        ...defaultOptions,
+      assert.propContains(loadOptionsFromHeaders(headers), {
         forwardedProto: 'https',
         forwardedHost: 'example.com',
       });

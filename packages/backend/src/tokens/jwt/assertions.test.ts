@@ -9,7 +9,6 @@ import {
   assertHeaderAlgorithm,
   assertHeaderType,
   assertIssuedAtClaim,
-  assertIssuerClaim,
   assertSubClaim,
 } from './assertions';
 
