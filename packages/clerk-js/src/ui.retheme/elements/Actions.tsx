@@ -60,7 +60,6 @@ export const Action = (props: ActionProps) => {
     <Button
       size='md'
       variant='ghost'
-      colorScheme='secondary'
       textVariant='buttonLarge'
       focusRing={false}
       hoverAsFocus

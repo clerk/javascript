@@ -158,7 +158,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
         },
         linkDanger: {
-          ...common.textVariants(theme).smallRegular,
+          ...common.textVariants(theme).buttonSmall,
           minHeight: 'fit-content',
           height: 'fit-content',
           width: 'fit-content',
