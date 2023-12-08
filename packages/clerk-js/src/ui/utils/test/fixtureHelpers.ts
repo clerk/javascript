@@ -4,7 +4,6 @@ import type {
   EmailAddressJSON,
   EnvironmentJSON,
   ExternalAccountJSON,
-  MembershipRole,
   OAuthProvider,
   OrganizationEnrollmentMode,
   PhoneNumberJSON,

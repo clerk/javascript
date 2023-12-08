@@ -10,7 +10,8 @@
     "eslint-config-turbo": "^1.10.14",
     "eslint-plugin-playwright": "^0.17.0",
     "eslint-plugin-qunit": "^8.0.1",
-    "eslint-plugin-simple-import-sort": "^10.0.0"
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unused-imports": "^3.0.0"
   },
   "peerDependencies": {
     "typescript": "*"
