@@ -6,11 +6,8 @@ import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
-import { AuthErrorReason, handshake, interstitial, signedIn, signedOut, unknownState } from './authStatus';
-import type { TokenCarrier } from './errors';
+import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
-// TODO: Rename this crap, it's not interstitial anymore.
-import { hasValidHeaderToken, runInterstitialRules } from './interstitialRule';
 import { decodeJwt } from './jwt';
 import { verifyToken, type VerifyTokenOptions } from './verify';
 export type OptionalVerifyTokenOptions = Partial<
@@ -189,10 +186,10 @@ ${err.getFullMessage()}`,
 
   async function authenticateRequestWithTokenInHeader() {
     try {
-      const state = await runInterstitialRules(authenticateContext, [hasValidHeaderToken]);
-      return state;
+      const verifyResult = await verifyToken(authenticateContext.sessionTokenInHeader!, authenticateContext);
+      return await signedIn(options, verifyResult);
     } catch (err) {
-      return handleError(err, 'header');
+      return handleError(err);
     }
   }
 
@@ -256,45 +253,29 @@ ${err.getFullMessage()}`,
         return signedIn(authenticateContext, verifyResult);
       }
     } catch (err) {
-      if (err instanceof TokenVerificationError) {
-        err.tokenCarrier === 'cookie';
-
-        const reasonToHandshake = [
-          TokenVerificationErrorReason.TokenExpired,
-          TokenVerificationErrorReason.TokenNotActiveYet,
-        ].includes(err.reason);
-
-        if (reasonToHandshake) {
-          const headers = buildRedirectToHandshake();
-          return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, '', headers);
-        }
-        return signedOut(authenticateContext, err.reason, err.getFullMessage());
-      }
-
-      return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
+      return handleError(err);
     }
 
     return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
-  function handleError(err: unknown, tokenCarrier: TokenCarrier) {
+  function handleError(err: unknown) {
     if (err instanceof TokenVerificationError) {
-      err.tokenCarrier = tokenCarrier;
+      err.tokenCarrier === 'cookie';
 
-      const reasonToReturnInterstitial = [
+      const reasonToHandshake = [
         TokenVerificationErrorReason.TokenExpired,
         TokenVerificationErrorReason.TokenNotActiveYet,
       ].includes(err.reason);
 
-      if (reasonToReturnInterstitial) {
-        if (tokenCarrier === 'header') {
-          return unknownState(authenticateContext, err.reason, err.getFullMessage());
-        }
-        return interstitial(authenticateContext, err.reason, err.getFullMessage());
+      if (reasonToHandshake) {
+        const headers = buildRedirectToHandshake();
+        return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, '', headers);
       }
       return signedOut(authenticateContext, err.reason, err.getFullMessage());
     }
-    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError, (err as Error).message);
+
+    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
   if (authenticateContext.sessionTokenInHeader) {
@@ -304,8 +285,8 @@ ${err.getFullMessage()}`,
 }
 
 export const debugRequestState = (params: RequestState) => {
-  const { isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain } = params;
-  return { isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain };
+  const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
+  return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
 export type DebugRequestSate = ReturnType<typeof debugRequestState>;

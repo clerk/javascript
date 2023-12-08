@@ -57,6 +57,24 @@ test('Test standard signed-in - dev', async () => {
   expect(res.status).toBe(200);
 });
 
+test('Test standard signed-in - authorization header - dev', async () => {
+  const config = generateConfig({
+    mode: 'test',
+  });
+  const { token, claims } = config.generateToken({ state: 'active' });
+  const clientUat = claims.iat;
+  const res = await fetch(url + '/', {
+    headers: new Headers({
+      Cookie: `${devBrowserCookie} __client_uat=${clientUat};`,
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      Authorization: `Bearer ${token}`,
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(200);
+});
+
 test('Test standard signed-in - prod', async () => {
   const config = generateConfig({
     mode: 'live',
@@ -68,6 +86,24 @@ test('Test standard signed-in - prod', async () => {
       Cookie: `__client_uat=${clientUat}; __session=${token}`,
       'X-Publishable-Key': config.pk,
       'X-Secret-Key': config.sk,
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(200);
+});
+
+test('Test standard signed-in - authorization header - prod', async () => {
+  const config = generateConfig({
+    mode: 'live',
+  });
+  const { token, claims } = config.generateToken({ state: 'active' });
+  const clientUat = claims.iat;
+  const res = await fetch(url + '/', {
+    headers: new Headers({
+      Cookie: `__client_uat=${clientUat};`,
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      Authorization: `Bearer ${token}`,
     }),
     redirect: 'manual',
   });
@@ -114,6 +150,27 @@ test('Test expired session token - prod', async () => {
   );
 });
 
+test('Test expired session token - authorization header - prod', async () => {
+  const config = generateConfig({
+    mode: 'live',
+  });
+  const { token, claims } = config.generateToken({ state: 'expired' });
+  const clientUat = claims.iat;
+  const res = await fetch(url + '/', {
+    headers: new Headers({
+      Cookie: `__client_uat=${clientUat};`,
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      Authorization: `Bearer ${token}`,
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(307);
+  expect(res.headers.get('location')).toBe(
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}`,
+  );
+});
+
 test('Test early session token - dev', async () => {
   const config = generateConfig({
     mode: 'test',
@@ -125,6 +182,27 @@ test('Test early session token - dev', async () => {
       Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
       'X-Publishable-Key': config.pk,
       'X-Secret-Key': config.sk,
+    }),
+    redirect: 'manual',
+  });
+  expect(res.status).toBe(307);
+  expect(res.headers.get('location')).toBe(
+    `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${url}/`)}${devBrowserQuery}`,
+  );
+});
+
+test('Test early session token - authorization header - dev', async () => {
+  const config = generateConfig({
+    mode: 'test',
+  });
+  const { token, claims } = config.generateToken({ state: 'early' });
+  const clientUat = claims.iat;
+  const res = await fetch(url + '/', {
+    headers: new Headers({
+      Cookie: `${devBrowserCookie} __client_uat=${clientUat};`,
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      Authorization: `Bearer ${token}`,
     }),
     redirect: 'manual',
   });
@@ -349,7 +427,7 @@ test('Test signed out satellite with sec-fetch-dest=document - prod', async () =
   );
 });
 
-test.only('Test signed out satellite - dev', async () => {
+test('Test signed out satellite - dev', async () => {
   const config = generateConfig({
     mode: 'test',
   });
