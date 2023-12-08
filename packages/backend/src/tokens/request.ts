@@ -1,4 +1,5 @@
 import { isPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
+import type { JwtPayload } from '@clerk/types';
 
 import { constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
@@ -134,8 +135,6 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       }
     });
 
-    // Right after a handshake is a good time to detect the skew
-    // const detectedSkew
     if (instanceType === 'development') {
       const newUrl = new URL(authenticateContext.derivedRequestUrl);
       newUrl.searchParams.delete('__clerk_handshake');
@@ -147,10 +146,37 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       return signedOut(authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
     }
 
-    // Uncaught
-    const verifyResult = await verifyToken(sessionToken, authenticateContext);
+    let verifyResult: JwtPayload;
 
-    return signedIn(authenticateContext, verifyResult, headers);
+    try {
+      verifyResult = await verifyToken(sessionToken, authenticateContext);
+    } catch (err) {
+      if (err instanceof TokenVerificationError) {
+        if (
+          instanceType === 'development' &&
+          (err.reason === TokenVerificationErrorReason.TokenExpired ||
+            err.reason === TokenVerificationErrorReason.TokenNotActiveYet)
+        ) {
+          // This probably means we're dealing with clock skew
+          console.error(
+            `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will attempt to account for the clock skew in development.
+
+To resolve this issue, make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
+
+---
+
+${err.getFullMessage()}`,
+          );
+
+          // Retry with a generous clock skew allowance (1 day)
+          verifyResult = await verifyToken(sessionToken, { ...authenticateContext, clockSkewInMs: 86_400_000 });
+        }
+      } else {
+        throw err;
+      }
+    }
+
+    return signedIn(authenticateContext, verifyResult!, headers);
   }
 
   const pk = parsePublishableKeyWithOptions({
@@ -193,6 +219,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     }
 
     if (
+      instanceType === 'production' &&
       authenticateContext.isSatellite &&
       authenticateContext.secFetchDest === 'document' &&
       !authenticateContext.derivedRequestUrl.searchParams.has('__clerk_synced')

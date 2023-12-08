@@ -531,7 +531,8 @@ test('Handshake result - dev - skew - clock behind', async () => {
     }),
     redirect: 'manual',
   });
-  expect(res.status).toBe(500);
+  expect(res.status).toBe(307);
+  expect(res.headers.get('location')).toBe('/');
 });
 
 test('Handshake result - dev - skew - clock ahead', async () => {
@@ -549,7 +550,7 @@ test('Handshake result - dev - skew - clock ahead', async () => {
     }),
     redirect: 'manual',
   });
-  expect(res.status).toBe(500);
+  expect(res.status).toBe(307);
 });
 
 test('Handshake result - dev - mismatched keys', async () => {
