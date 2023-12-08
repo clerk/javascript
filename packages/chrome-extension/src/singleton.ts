@@ -46,8 +46,8 @@ export async function buildClerk({
   // Create StorageCache key
   const CACHE_KEY = storageCache.createKey(isProd ? key.frontendApi : syncSessionHost, STORAGE_KEY_CLIENT_JWT);
 
+  // Set client cookie in StorageCache
   if (clientCookie) {
-    // Set client cookie in StorageCache
     await storageCache.set(CACHE_KEY, clientCookie.value).catch(errorLogger);
   }
 
