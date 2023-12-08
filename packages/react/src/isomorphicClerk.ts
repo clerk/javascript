@@ -363,7 +363,7 @@ export default class IsomorphicClerk implements IsomorphicLoadedClerk {
           // Otherwise use the instantiated Clerk object
           c = this.Clerk;
 
-          if (!c.isReady()) {
+          if (!c.loaded) {
             await c.load(this.options);
           }
         }
@@ -390,7 +390,7 @@ export default class IsomorphicClerk implements IsomorphicLoadedClerk {
 
       global.Clerk.sdkMetadata = this.options.sdkMetadata ?? { name: PACKAGE_NAME, version: PACKAGE_VERSION };
 
-      if (global.Clerk?.loaded || global.Clerk?.isReady()) {
+      if (global.Clerk?.loaded) {
         return this.hydrateClerkJS(global.Clerk);
       }
       return;
