@@ -21,12 +21,7 @@ export const PoweredByClerkTag = React.memo(
       >
         {branded ? (
           <>
-            <Text
-              variant='regularRegular'
-              sx={{ color: 'inherit' }}
-            >
-              Secured by
-            </Text>
+            <Text sx={{ color: 'inherit' }}>Secured by</Text>
             <LogoMarkIconLink />
           </>
         ) : null}

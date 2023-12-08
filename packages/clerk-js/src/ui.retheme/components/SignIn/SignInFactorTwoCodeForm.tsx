@@ -111,7 +111,6 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       {isResettingPassword(signIn) && (
         <Text
           localizationKey={localizationKeys('signIn.resetPasswordMfa.detailsLabel')}
-          variant='smallRegular'
           colorScheme='neutral'
         />
       )}

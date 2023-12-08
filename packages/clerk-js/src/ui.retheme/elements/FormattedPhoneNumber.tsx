@@ -21,12 +21,7 @@ export const FormattedPhoneNumber = (props: FormattedPhoneProps) => {
       >
         {flag}
       </Text>
-      <Text
-        elementDescriptor={descriptors.formattedPhoneNumberText}
-        variant='smallRegular'
-      >
-        {formattedPhone}
-      </Text>
+      <Text elementDescriptor={descriptors.formattedPhoneNumberText}>{formattedPhone}</Text>
     </Flex>
   );
 };
@@ -38,7 +33,6 @@ export const FormattedPhoneNumberText = (props: FormattedPhoneProps & PropsOfCom
     <Text
       as='span'
       elementDescriptor={descriptors.formattedPhoneNumberText}
-      variant='smallRegular'
     >
       {formattedPhone}
     </Text>

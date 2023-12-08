@@ -104,8 +104,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
     slugField.setValue(val);
   };
 
-  const headerTitleTextVariant = props.flow === 'organizationList' ? 'xlargeMedium' : undefined;
-  const headerSubtitleTextVariant = props.flow === 'organizationList' ? 'headingRegularRegular' : undefined;
+  const headerTitleTextVariant = props.flow === 'organizationList' ? 'h2' : undefined;
+  const headerSubtitleTextVariant = props.flow === 'organizationList' ? 'subtitle' : undefined;
 
   return (
     <Wizard {...wizard.props}>

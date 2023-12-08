@@ -7,129 +7,71 @@ const textVariants = (t: InternalTheme) => {
     letterSpacing: t.letterSpacings.$normal,
   };
 
-  const smallRegular = {
-    ...base,
-    fontWeight: t.fontWeights.$normal,
-    fontSize: t.fontSizes.$xs,
-    lineHeight: t.lineHeights.$shorter,
-  } as const;
-
-  const smallMedium = {
-    ...smallRegular,
-    fontWeight: t.fontWeights.$medium,
-    lineHeight: t.lineHeights.$short,
-  } as const;
-
-  const smallBold = {
-    ...smallMedium,
-    fontWeight: t.fontWeights.$bold,
-  } as const;
-
-  const extraSmallRegular = {
-    ...base,
-    fontWeight: t.fontWeights.$normal,
-    fontSize: t.fontSizes.$2xs,
-    letterSpacing: t.letterSpacings.$normal,
-    lineHeight: t.lineHeights.$none,
-  } as const;
-
-  const extraSmallMedium = {
+  const h1 = {
     ...base,
     fontWeight: t.fontWeights.$medium,
-    fontSize: t.fontSizes.$2xs,
-    letterSpacing: t.letterSpacings.$normal,
-    lineHeight: t.lineHeights.$shortest,
-  } as const;
-
-  const regularRegular = {
-    ...base,
-    fontWeight: t.fontWeights.$normal,
-    fontSize: t.fontSizes.$sm,
-    lineHeight: t.lineHeights.$shorter,
-  } as const;
-
-  const regularMedium = {
-    ...regularRegular,
-    fontWeight: t.fontWeights.$medium,
-  } as const;
-
-  const largeBold = {
-    ...base,
-    fontWeight: t.fontWeights.$bold,
-    fontSize: t.fontSizes.$md,
-    lineHeight: t.lineHeights.$taller,
-  } as const;
-
-  const largeMedium = {
-    ...largeBold,
-    fontWeight: t.fontWeights.$medium,
-  };
-
-  const xlargeMedium = {
-    ...largeBold,
     fontSize: t.fontSizes.$xl,
+    lineHeight: t.lineHeights.$large,
   } as const;
 
-  const xxlargeMedium = {
-    ...xlargeMedium,
-    fontSize: t.fontSizes.$2xl,
-  } as const;
-
-  const buttonExtraSmallBold = {
-    ...extraSmallRegular,
+  const h2 = {
+    ...base,
     fontWeight: t.fontWeights.$bold,
-    textTransform: 'uppercase',
-    fontFamily: t.fonts.$buttons,
+    fontSize: t.fontSizes.$lg,
+    lineHeight: t.lineHeights.$medium,
   } as const;
 
-  const buttonSmallRegular = {
-    ...smallRegular,
-    fontFamily: t.fonts.$buttons,
-    lineHeight: t.lineHeights.$short,
-  };
-
-  const buttonRegularRegular = {
-    ...regularRegular,
-    fontFamily: t.fonts.$buttons,
-    lineHeight: t.lineHeights.$none,
-  };
-
-  const buttonRegularMedium = {
-    ...regularMedium,
-    fontFamily: t.fonts.$buttons,
-    lineHeight: t.lineHeights.$none,
-  };
-
-  const headingRegularRegular = {
-    ...regularRegular,
+  const h3 = {
+    ...base,
+    fontWeight: t.fontWeights.$bold,
     fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+  } as const;
+
+  const subtitle = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+  } as const;
+
+  const body = {
+    ...base,
+    fontWeight: t.fontWeights.$normal,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+  } as const;
+
+  const caption = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$xs,
+    lineHeight: t.lineHeights.$none,
+  } as const;
+
+  const buttonLarge = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+  } as const;
+
+  const buttonSmall = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$sm,
+    lineHeight: t.lineHeights.$none,
   } as const;
 
   return {
-    headingRegularRegular,
-    buttonExtraSmallBold,
-    buttonSmallRegular,
-    buttonRegularRegular,
-    buttonRegularMedium,
-    extraSmallRegular,
-    extraSmallMedium,
-    smallRegular,
-    smallMedium,
-    smallBold,
-    regularRegular,
-    regularMedium,
-    largeMedium,
-    largeBold,
-    xlargeMedium,
-    xxlargeMedium,
-  } as const;
-};
-
-const fontSizeVariants = (t: InternalTheme) => {
-  return {
-    xss: { fontSize: t.fontSizes.$2xs },
-    xs: { fontSize: t.fontSizes.$xs },
-    sm: { fontSize: t.fontSizes.$sm },
+    h1,
+    h2,
+    h3,
+    subtitle,
+    body,
+    caption,
+    buttonLarge,
+    buttonSmall,
   } as const;
 };
 
@@ -250,7 +192,6 @@ const maxHeightScroller = (t: InternalTheme) =>
 
 export const common = {
   textVariants,
-  fontSizeVariants,
   borderVariants,
   focusRing,
   focusRingInput,

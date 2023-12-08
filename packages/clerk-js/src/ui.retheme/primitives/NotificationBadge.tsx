@@ -25,7 +25,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   defaultVariants: {
     colorScheme: 'primary',
-    textVariant: 'extraSmallRegular',
+    textVariant: 'caption',
   },
 }));
 

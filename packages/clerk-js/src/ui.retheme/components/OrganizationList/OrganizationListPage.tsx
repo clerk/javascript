@@ -206,7 +206,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
             elementDescriptor={descriptors.button}
             block
             variant='secondary'
-            textVariant='buttonExtraSmallBold'
+            textVariant='buttonSmall'
             onClick={handleCreateOrganizationClicked}
             localizationKey={localizationKeys('organizationList.action__createOrganization')}
           />

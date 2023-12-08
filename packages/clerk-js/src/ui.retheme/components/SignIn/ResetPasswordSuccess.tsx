@@ -19,7 +19,6 @@ export const _ResetPasswordSuccess = () => {
       >
         <Text
           localizationKey={localizationKeys('signIn.resetPassword.successMessage')}
-          variant='smallRegular'
           colorScheme='inherit'
         />
         <Flex

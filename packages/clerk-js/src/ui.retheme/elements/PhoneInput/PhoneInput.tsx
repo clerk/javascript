@@ -133,7 +133,6 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         }}
       >
         <Text
-          variant='smallRegular'
           sx={{ position: 'absolute', left: '1ch', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
         >
           +{selectedCountryOption.country.code}
@@ -190,17 +189,11 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       />
       <Text
         as='div'
-        variant='regularRegular'
         sx={{ width: '100%' }}
       >
         {country.name}
       </Text>
-      <Text
-        variant='smallRegular'
-        colorScheme='neutral'
-      >
-        +{country.code}
-      </Text>
+      <Text colorScheme='neutral'>+{country.code}</Text>
     </Flex>
   );
 });

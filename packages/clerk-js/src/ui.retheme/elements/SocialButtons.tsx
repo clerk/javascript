@@ -240,7 +240,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
           as='span'
           truncate
           colorScheme='inherit'
-          variant='buttonSmallRegular'
+          variant='buttonSmall'
           localizationKey={textLocalizationKey}
         >
           {label}

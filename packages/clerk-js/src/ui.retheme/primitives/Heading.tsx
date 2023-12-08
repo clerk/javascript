@@ -9,15 +9,10 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   variants: {
     textVariant: { ...common.textVariants(theme) },
-    as: {
-      h1: {
-        lineHeight: theme.lineHeights.$base,
-      },
-    },
   },
   defaultVariants: {
     as: 'h1',
-    textVariant: 'xlargeMedium',
+    textVariant: 'h1',
   },
 }));
 

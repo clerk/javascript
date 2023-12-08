@@ -69,7 +69,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         <Text
           elementDescriptor={descriptors.organizationPreviewMainIdentifier}
           elementId={descriptors.organizationPreviewMainIdentifier.setId(elementId)}
-          variant={({ sm: 'smallMedium', md: 'regularMedium', lg: 'regularMedium' } as const)[size]}
+          variant={({ sm: 'caption', md: 'subtitle', lg: 'h1' } as const)[size]}
           colorScheme='inherit'
           truncate
           sx={mainIdentifierSx}
@@ -81,7 +81,6 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
             elementDescriptor={descriptors.organizationPreviewSecondaryIdentifier}
             elementId={descriptors.organizationPreviewSecondaryIdentifier.setId(elementId)}
             localizationKey={role && roleLocalizationKey(role)}
-            variant='smallRegular'
             colorScheme='neutral'
             truncate
           />

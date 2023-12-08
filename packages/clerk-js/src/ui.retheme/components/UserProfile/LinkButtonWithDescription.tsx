@@ -32,13 +32,13 @@ export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionPr
         >
           <Text
             localizationKey={title}
-            variant='regularMedium'
+            variant='subtitle'
           />
           {titleLabel}
         </Flex>
         <Text
           localizationKey={subtitle}
-          variant='smallRegular'
+          variant='caption'
           colorScheme='neutral'
         />
       </Col>

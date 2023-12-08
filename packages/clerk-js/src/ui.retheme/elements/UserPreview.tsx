@@ -135,7 +135,7 @@ export const UserPreview = (props: UserPreviewProps) => {
         <Text
           elementDescriptor={descriptors.userPreviewMainIdentifier}
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
-          variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
+          variant={size === 'md' ? 'subtitle' : 'buttonSmall'}
           colorScheme='inherit'
           sx={[theme => ({ display: 'flex', gap: theme.sizes.$1, alignItems: 'center' }), mainIdentifierSx]}
         >
@@ -154,7 +154,6 @@ export const UserPreview = (props: UserPreviewProps) => {
           <Text
             elementDescriptor={descriptors.userPreviewSecondaryIdentifier}
             elementId={descriptors.userPreviewSecondaryIdentifier.setId(elementId)}
-            variant='smallRegular'
             colorScheme='neutral'
             truncate
             localizationKey={subtitle || identifier}

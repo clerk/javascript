@@ -23,7 +23,7 @@ export const OrganizationSettings = () => {
         <Header.Root>
           <Header.Title
             localizationKey={localizationKeys('organizationProfile.start.headerTitle__settings')}
-            textVariant='xxlargeMedium'
+            textVariant='h1'
           />
         </Header.Root>
         <OrganizationProfileSection />
@@ -127,7 +127,7 @@ const OrganizationDangerSection = () => {
             />
           }
           variant='secondaryDanger'
-          textVariant='buttonExtraSmallBold'
+          textVariant='buttonSmall'
           onClick={() => navigate('leave')}
           localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
         />
@@ -142,7 +142,7 @@ const OrganizationDangerSection = () => {
               />
             }
             variant='secondaryDanger'
-            textVariant='buttonExtraSmallBold'
+            textVariant='buttonSmall'
             onClick={() => navigate('delete')}
             localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
           />

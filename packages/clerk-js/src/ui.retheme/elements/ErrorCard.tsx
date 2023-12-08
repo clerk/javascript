@@ -44,14 +44,12 @@ export const ErrorCard = (props: ErrorCardProps) => {
         >
           {props.message && (
             <Text
-              variant='smallRegular'
               colorScheme='neutral'
               localizationKey={props.message}
             />
           )}
           {/*TODO: extract  */}
           <Text
-            variant='smallRegular'
             colorScheme='neutral'
             localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.content')}
           />

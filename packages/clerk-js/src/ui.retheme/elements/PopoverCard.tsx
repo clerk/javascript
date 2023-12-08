@@ -78,7 +78,6 @@ const PopoverCardLink = (props: PropsOfComponent<typeof Link>) => {
     <Link
       colorScheme='neutral'
       isExternal
-      size='xss'
       {...props}
     />
   );

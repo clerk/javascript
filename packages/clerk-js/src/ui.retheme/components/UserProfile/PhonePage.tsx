@@ -85,12 +85,8 @@ export const AddPhone = (props: AddPhoneProps) => {
             autoFocus
           />
         </Form.ControlRow>
+        <Text localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')} />
         <Text
-          variant='regularRegular'
-          localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')}
-        />
-        <Text
-          variant='smallRegular'
           colorScheme='neutral'
           localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText__secondary')}
         />

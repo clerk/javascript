@@ -8,7 +8,7 @@ export const NavigateToFlowStartButton = (props: NavigateToFlowStartButtonProps)
   const { navigateToFlowStart } = useNavigateToFlowStart();
   return (
     <Button
-      textVariant='buttonExtraSmallBold'
+      textVariant='buttonSmall'
       variant='ghost'
       onClick={navigateToFlowStart}
       {...props}
