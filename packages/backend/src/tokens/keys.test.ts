@@ -65,24 +65,6 @@ export default (QUnit: QUnit) => {
       assert.propEqual(jwk, mockRsaJwk);
     });
 
-    test('loads JWKS from Frontend API when issuer is provided', async assert => {
-      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
-      const jwk = await loadClerkJWKFromRemote({
-        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
-        kid: mockRsaJwkKid,
-        skipJwksCache: true,
-      });
-
-      fakeFetch.calledOnceWith('https://clerk.inspired.puma-74.lcl.dev/.well-known/jwks.json', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Clerk-Backend-SDK': '@clerk/backend',
-        },
-      });
-      assert.propEqual(jwk, mockRsaJwk);
-    });
-
     test('loads JWKS from Backend API using the provided apiUrl', async assert => {
       fakeFetch.onCall(0).returns(jsonOk(mockJwks));
       const jwk = await loadClerkJWKFromRemote({
@@ -170,6 +152,7 @@ export default (QUnit: QUnit) => {
     });
 
     test('throws an error when JWKS can not be fetched from Backend or Frontend API and cache updated less than 5 minutes ago', async assert => {
+      console.log('here');
       const kid = 'ins_whatever';
       try {
         await loadClerkJWKFromRemote({

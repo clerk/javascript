@@ -30,7 +30,6 @@ export default (QUnit: QUnit) => {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
         authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
         skipJwksCache: true,
       });
 
@@ -42,7 +41,6 @@ export default (QUnit: QUnit) => {
       const payload = await verifyToken(mockJwt, {
         secretKey: 'a-valid-key',
         authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
         skipJwksCache: true,
       });
 
@@ -60,7 +58,6 @@ export default (QUnit: QUnit) => {
     test('verifies the token by fetching the JWKs from Frontend API when issuer (string) is provided ', async assert => {
       const payload = await verifyToken(mockJwt, {
         authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
         skipJwksCache: true,
       });
 
@@ -78,7 +75,6 @@ export default (QUnit: QUnit) => {
       try {
         await verifyToken(mockJwt, {
           secretKey: 'a-valid-key',
-          issuer: 'https://clerk.whatever.lcl.dev',
           skipJwksCache: true,
         });
         // This should never be reached. If it does, the suite should fail

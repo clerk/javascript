@@ -31,7 +31,7 @@ export default (QUnit: QUnit) => {
         header: mockJwtHeader,
       });
 
-      const verifiedPayload = await verifyJwt(jwt, { key: publicJwks, issuer: mockJwtPayload.iss });
+      const verifiedPayload = await verifyJwt(jwt, { key: publicJwks });
       assert.deepEqual(verifiedPayload, payload);
     });
 
@@ -41,7 +41,7 @@ export default (QUnit: QUnit) => {
         header: mockJwtHeader,
       });
 
-      const verifiedPayload = await verifyJwt(jwt, { key: pemEncodedPublicKey, issuer: mockJwtPayload.iss });
+      const verifiedPayload = await verifyJwt(jwt, { key: pemEncodedPublicKey });
       assert.deepEqual(verifiedPayload, payload);
     });
   });

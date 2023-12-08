@@ -7,6 +7,7 @@ import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicReques
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
+import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
 import { decodeJwt } from './jwt';
 import { verifyToken, type VerifyTokenOptions } from './verify';
@@ -52,11 +53,11 @@ export function parsePublishableKeyWithOptions({
   domain,
   proxyUrl,
 }: {
-  publishableKey: string;
+  publishableKey?: string;
   domain?: string;
   proxyUrl?: string;
 }) {
-  if (!isPublishableKey(publishableKey)) {
+  if (!publishableKey || !isPublishableKey(publishableKey)) {
     throw new Error('Publishable key not valid.');
   }
 
@@ -149,6 +150,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       verifyResult = await verifyToken(sessionToken, authenticateContext);
     } catch (err) {
       if (err instanceof TokenVerificationError) {
+        err.tokenCarrier = 'cookie';
         if (
           instanceType === 'development' &&
           (err.reason === TokenVerificationErrorReason.TokenExpired ||
@@ -189,7 +191,7 @@ ${err.getFullMessage()}`,
       const verifyResult = await verifyToken(authenticateContext.sessionTokenInHeader!, authenticateContext);
       return await signedIn(options, verifyResult);
     } catch (err) {
-      return handleError(err);
+      return handleError(err, 'header');
     }
   }
 
@@ -225,8 +227,45 @@ ${err.getFullMessage()}`,
       return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
-    if (!hasActiveClient && !hasSessionToken) {
+    if (
+      authenticateContext.isSatellite &&
+      authenticateContext.secFetchDest === 'document' &&
+      !authenticateContext.derivedRequestUrl.searchParams.has('__clerk_synced')
+    ) {
+      // Dev initiate MD sync
+
+      // TODO: validate signInURL exists (find the old assert function)
+      const redirectURL = new URL(authenticateContext.signInUrl!);
+      redirectURL.searchParams.append('__clerk_redirect_url', authenticateContext.derivedRequestUrl.toString());
+
+      const headers = new Headers({ location: redirectURL.toString() });
+      return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+      // if dev, and satellite, and sec-fetch-dest document,
+      // redirect to sign in url (primary), set redirect_url param to current url, redirect back with __clerk_db_jwt and __clerk_synced params
+    }
+
+    const redirectUrl = new URL(authenticateContext.derivedRequestUrl).searchParams.get('__clerk_redirect_url');
+    if (instanceType === 'development' && !authenticateContext.isSatellite && redirectUrl) {
+      // Dev MD sync from primary, redirect back to satellite w/ __clerk_db_jwt
+      const redirectBackToSatelliteUrl = new URL(redirectUrl);
+
+      if (devBrowserToken) {
+        redirectBackToSatelliteUrl.searchParams.append('__clerk_db_jwt', devBrowserToken);
+      }
+      redirectBackToSatelliteUrl.searchParams.append('__clerk_synced', 'true');
+
+      const headers = new Headers({ location: redirectBackToSatelliteUrl.toString() });
+      return handshake(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
+    }
+
+    if (instanceType === 'development' && !hasActiveClient && !hasSessionToken) {
       return signedOut(authenticateContext, AuthErrorReason.CookieAndUATMissing);
+    }
+
+    {
+      if (!hasActiveClient && !hasSessionToken) {
+        return signedOut(authenticateContext, AuthErrorReason.CookieAndUATMissing);
+      }
     }
 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
@@ -253,15 +292,15 @@ ${err.getFullMessage()}`,
         return signedIn(authenticateContext, verifyResult);
       }
     } catch (err) {
-      return handleError(err);
+      return handleError(err, 'cookie');
     }
 
     return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
-  function handleError(err: unknown) {
+  function handleError(err: unknown, tokenCarrier: TokenCarrier) {
     if (err instanceof TokenVerificationError) {
-      err.tokenCarrier === 'cookie';
+      err.tokenCarrier = tokenCarrier;
 
       const reasonToHandshake = [
         TokenVerificationErrorReason.TokenExpired,
@@ -270,7 +309,7 @@ ${err.getFullMessage()}`,
 
       if (reasonToHandshake) {
         const headers = buildRedirectToHandshake();
-        return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, '', headers);
+        return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, err.getFullMessage(), headers);
       }
       return signedOut(authenticateContext, err.reason, err.getFullMessage());
     }
