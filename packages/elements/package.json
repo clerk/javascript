@@ -1,0 +1,68 @@
+{
+  "name": "@clerk/elements",
+  "version": "0.0.1",
+  "description": "Clerk Elements ",
+  "keywords": [
+    "clerk",
+    "typescript",
+    "nextjs",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/elements"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "dev:publish": "npm run dev -- --env.publish",
+    "lint": "eslint src/",
+    "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "test": "jest",
+    "test:cache:clear": "jest --clearCache --useStderr"
+  },
+  "dependencies": {
+    "@clerk/clerk-react": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^18.17.0",
+    "@types/react": "*",
+    "@types/react-dom": "*",
+    "eslint-config-custom": "*",
+    "next": "^13.4.19",
+    "tslib": "2.4.1",
+    "typescript": "*"
+  },
+  "peerDependencies": {
+    "next": ">=10",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
