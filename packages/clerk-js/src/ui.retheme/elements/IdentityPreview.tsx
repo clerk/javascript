@@ -114,7 +114,7 @@ const Container = (props: React.PropsWithChildren) => {
       align='center'
       gap={2}
       sx={t => ({
-        minHeight: t.space.$9x5,
+        minHeight: t.space.$10,
         maxWidth: 'fit-content',
         backgroundColor: t.colors.$blackAlpha20,
         padding: `${t.space.$1x5} ${t.space.$4}`,

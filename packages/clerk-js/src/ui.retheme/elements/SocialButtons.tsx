@@ -166,7 +166,7 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       elementId={descriptors.socialButtonsIconButton.setId(id)}
       variant='secondary'
       sx={t => ({
-        minHeight: t.sizes.$7x5,
+        minHeight: t.sizes.$8,
         width: '100%',
       })}
       {...rest}

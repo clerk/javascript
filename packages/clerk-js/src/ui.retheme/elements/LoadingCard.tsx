@@ -14,7 +14,7 @@ export const LoadingCardContainer = ({ children }: PropsWithChildren) => {
       gap={8}
       sx={theme => ({
         marginTop: theme.space.$16,
-        marginBottom: theme.space.$14,
+        marginBottom: theme.space.$13,
       })}
     >
       <Spinner

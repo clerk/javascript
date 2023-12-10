@@ -90,7 +90,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
             key={session.id}
             icon={SwitchArrowRight}
             sx={t => ({
-              height: t.sizes.$17,
+              height: t.sizes.$20,
               borderRadius: 0,
               borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
               backgroundColor: t.colors.$white,

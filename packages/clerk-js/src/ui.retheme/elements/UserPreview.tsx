@@ -70,7 +70,7 @@ export const UserPreview = (props: UserPreviewProps) => {
 
   const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
 
-  const getAvatarSizes = (t: InternalTheme) => ({ sm: t.sizes.$9, md: t.sizes.$11, lg: t.sizes.$12x5 }[size]);
+  const getAvatarSizes = (t: InternalTheme) => ({ sm: t.sizes.$9, md: t.sizes.$12, lg: t.sizes.$13 }[size]);
 
   return (
     <Flex
