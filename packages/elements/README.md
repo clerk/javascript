@@ -32,17 +32,36 @@
 
 Clerk is the easiest way to add authentication and user management to your React application. Add sign up, sign in, and profile management to your application in minutes.
 
-## Getting Started
+## Development
 
-### Development w/ Playground
+### Playground
 
 ```sh
-# Terminal 1 - Run dev for @clerk/elements
-turbo run dev --filter=@clerk/elements
+# Togther:
+turbo run dev --filter=...elements # Includes dependents of @clerk/elements
 
-# Terminal 2 - Run dev for the elements NextJS playground
+# Separate:
+
+# -- NextJS playground
+turbo run dev --filter=elements
+
+# -- @clerk/elements (Only necessary if you're actively working on @clerk/elements)
 turbo run dev --filter=elements-next
+```
 
-# If you run into a "no workspaces found" issue with the playground, run the following:
-npx next telemetry disable
+**Note:** If you run into a "no workspaces found" issue with the playground, run the following: `(cd playground/elements/next && npx next telemetry disable)`
+
+### E2E Testing
+
+```sh
+turbo run e2e --filter=elements-next
+
+# With UI: https://playwright.dev/docs/running-tests#run-tests-in-ui-mode
+turbo run e2e --filter=elements-next -- --ui
+
+# Headed Mode: https://playwright.dev/docs/running-tests#run-tests-in-headed-mode
+turbo run e2e --filter=elements-next -- --headed
+
+# Specific Tests: https://playwright.dev/docs/running-tests#run-specific-tests
+turbo run e2e --filter=elements-next -- e2e/elements.spec.ts
 ```
