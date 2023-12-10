@@ -136,8 +136,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
                   />
                 }
                 sx={theme => ({
-                  width: theme.sizes.$11,
-                  height: theme.sizes.$11,
+                  width: theme.sizes.$12,
+                  height: theme.sizes.$12,
                   borderRadius: theme.radii.$md,
                   backgroundColor: theme.colors.$avatarBackground,
                   ':hover': {

@@ -39,7 +39,7 @@ const _SignInAccountSwitcher = () => {
               <PreviewButton
                 key={s.id}
                 onClick={handleSessionClicked(s)}
-                sx={theme => ({ height: theme.sizes.$14, justifyContent: 'flex-start' })}
+                sx={theme => ({ height: theme.sizes.$16, justifyContent: 'flex-start' })}
               >
                 <UserPreview user={s.user} />
               </PreviewButton>
