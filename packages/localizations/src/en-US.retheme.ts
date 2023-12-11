@@ -530,7 +530,7 @@ export const enUS: LocalizationResource = {
     personalWorkspace: 'Personal account',
     notSelected: 'No organization selected',
     action__createOrganization: 'Create Organization',
-    action__manageOrganization: 'Manage Organization',
+    action__manageOrganization: 'Manage',
     action__invitationAccept: 'Join',
     action__suggestionsAccept: 'Request to join',
     suggestionsAcceptedLabel: 'Pending approval',

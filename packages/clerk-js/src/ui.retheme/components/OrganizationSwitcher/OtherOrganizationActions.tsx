@@ -32,6 +32,12 @@ const CreateOrganizationButton = ({
       icon={Plus}
       label={localizationKeys('organizationSwitcher.action__createOrganization')}
       onClick={onCreateOrganizationClick}
+      sx={t => ({
+        color: t.colors.$blackAlpha600,
+        ':hover': {
+          color: t.colors.$blackAlpha600,
+        },
+      })}
     />
   );
 };

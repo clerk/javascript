@@ -24,7 +24,6 @@ export const PreviewButton = (props: PreviewButtonProps) => {
       sx={[
         t => ({
           minHeight: 'unset',
-          height: t.space.$12,
           justifyContent: 'space-between',
           padding: `${t.space.$4} ${t.space.$5}`,
           ...(showIconOnHover

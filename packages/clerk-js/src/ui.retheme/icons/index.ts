@@ -12,6 +12,7 @@ export { default as Billing } from './billing.svg';
 export { default as Caret } from './caret.svg';
 export { default as ChatAltIcon } from './chat-alt.svg';
 export { default as CheckCircle } from './check-circle.svg';
+export { default as ChevronDown } from './chevron-down.svg';
 export { default as Clipboard } from './clipboard.svg';
 export { default as Close } from './close.svg';
 export { default as CogFilled } from './cog-filled.svg';

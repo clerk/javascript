@@ -73,30 +73,24 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   );
 
   const sessionActions = (
-    <>
-      <SecondaryActions role='menu'>
-        {otherSessions.map(session => (
-          <PreviewButton
-            key={session.id}
-            icon={SwitchArrowRight}
-            sx={t => ({
-              height: t.sizes.$20,
-              borderRadius: 0,
-              borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-              backgroundColor: t.colors.$colorBackground,
-            })}
-            onClick={handleSessionClicked(session)}
-            role='menuitem'
-          >
-            <UserPreview
-              user={session.user}
-              size='sm'
-            />
-          </PreviewButton>
-        ))}
-        {addAccountButton}
-      </SecondaryActions>
-    </>
+    <SecondaryActions role='menu'>
+      {otherSessions.map(session => (
+        <PreviewButton
+          key={session.id}
+          icon={SwitchArrowRight}
+          sx={t => ({
+            borderRadius: 0,
+            borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+            backgroundColor: t.colors.$colorBackground,
+          })}
+          onClick={handleSessionClicked(session)}
+          role='menuitem'
+        >
+          <UserPreview user={session.user} />
+        </PreviewButton>
+      ))}
+      {addAccountButton}
+    </SecondaryActions>
   );
 
   return (
@@ -115,7 +109,6 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
             sx={t => ({
               padding: `${t.space.$4} ${t.space.$5}`,
             })}
-            size='sm'
             icon={
               <Icon
                 icon={CheckmarkFilled}

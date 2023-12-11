@@ -13,7 +13,7 @@ import { UserAvatar } from './UserAvatar';
 // - SamlAccountResource
 
 export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'elementId'> & {
-  size?: 'lg' | 'md' | 'sm';
+  size?: 'lg' | 'md' | 'sm' | 'xs';
   icon?: React.ReactNode;
   iconSx?: ThemableCssProp;
   badge?: React.ReactNode;
@@ -22,6 +22,7 @@ export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'el
   elementId?: UserPreviewId;
   avatarSx?: ThemableCssProp;
   mainIdentifierSx?: ThemableCssProp;
+  mainIdentifierVariant?: PropsOfComponent<typeof Text>['variant'];
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
   showAvatar?: boolean;
@@ -61,6 +62,7 @@ export const UserPreview = (props: UserPreviewProps) => {
     subtitle,
     avatarSx,
     mainIdentifierSx,
+    mainIdentifierVariant,
     ...rest
   } = props;
   const { t } = useLocalizations();
@@ -70,7 +72,11 @@ export const UserPreview = (props: UserPreviewProps) => {
 
   const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
 
-  const getAvatarSizes = (t: InternalTheme) => ({ sm: t.sizes.$9, md: t.sizes.$12, lg: t.sizes.$13 }[size]);
+  const getAvatarSizes = (t: InternalTheme) =>
+    (({ xs: t.sizes.$5, sm: t.sizes.$8, md: t.sizes.$9, lg: t.sizes.$12 } as const)[size]);
+
+  const mainIdentifierSize =
+    mainIdentifierVariant || ({ xs: 'subtitle', sm: 'caption', md: 'subtitle', lg: 'h1' } as const)[size];
 
   return (
     <Flex
@@ -135,13 +141,14 @@ export const UserPreview = (props: UserPreviewProps) => {
         <Text
           elementDescriptor={descriptors.userPreviewMainIdentifier}
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
-          variant={size === 'md' ? 'subtitle' : 'buttonSmall'}
+          variant={mainIdentifierSize}
           colorScheme='inherit'
           sx={[theme => ({ display: 'flex', gap: theme.sizes.$1, alignItems: 'center' }), mainIdentifierSx]}
         >
           <Text
             as='span'
             truncate
+            colorScheme='inherit'
             sx={{ fontSize: 'inherit', fontWeight: 'inherit' }}
           >
             {localizedTitle || name || identifier}

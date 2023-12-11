@@ -9,9 +9,10 @@ import { OrganizationAvatar } from './OrganizationAvatar';
 export type OrganizationPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'elementId'> & {
   organization: UserOrganizationInvitationResource['publicOrganizationData'];
   user?: UserResource;
-  size?: 'lg' | 'md' | 'sm';
+  size?: 'lg' | 'md' | 'sm' | 'xs';
   avatarSx?: ThemableCssProp;
   mainIdentifierSx?: ThemableCssProp;
+  mainIdentifierVariant?: PropsOfComponent<typeof Text>['variant'];
   icon?: React.ReactNode;
   badge?: React.ReactNode;
   rounded?: boolean;
@@ -29,16 +30,20 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
     user,
     avatarSx,
     mainIdentifierSx,
+    mainIdentifierVariant,
     elementId,
     ...rest
   } = props;
   const role = user?.organizationMemberships.find(membership => membership.organization.id === organization.id)?.role;
 
+  const mainTextSize =
+    mainIdentifierVariant || ({ xs: 'subtitle', sm: 'caption', md: 'subtitle', lg: 'h1' } as const)[size];
+
   return (
     <Flex
       elementDescriptor={descriptors.organizationPreview}
       elementId={descriptors.organizationPreview.setId(elementId)}
-      gap={4}
+      gap={3}
       align='center'
       sx={[{ minWidth: '0' }, sx]}
       {...rest}
@@ -53,7 +58,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           boxElementDescriptor={descriptors.organizationPreviewAvatarBox}
           imageElementDescriptor={descriptors.organizationPreviewAvatarImage}
           {...organization}
-          size={t => ({ sm: t.sizes.$8, md: t.sizes.$10, lg: t.sizes.$12 }[size])}
+          size={t => ({ xs: t.sizes.$5, sm: t.sizes.$8, md: t.sizes.$9, lg: t.sizes.$12 }[size])}
           sx={avatarSx}
           rounded={rounded}
         />
@@ -69,7 +74,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         <Text
           elementDescriptor={descriptors.organizationPreviewMainIdentifier}
           elementId={descriptors.organizationPreviewMainIdentifier.setId(elementId)}
-          variant={({ sm: 'caption', md: 'subtitle', lg: 'h1' } as const)[size]}
+          variant={mainTextSize}
           colorScheme='inherit'
           truncate
           sx={mainIdentifierSx}
