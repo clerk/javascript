@@ -1,9 +1,9 @@
-import { sanitizeAuthObject } from '@clerk/backend';
+import { AuthStatus, sanitizeAuthObject } from '@clerk/backend';
+import { redirect } from '@remix-run/server-runtime';
 
 import { noLoaderArgsPassedInGetAuth } from '../errors';
 import { authenticateRequest } from './authenticateRequest';
 import type { GetAuthReturn, LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
-import { interstitialJsonResponse, unknownResponse } from './utils';
 
 type GetAuthOptions = Pick<RootAuthLoaderOptions, 'secretKey'>;
 
@@ -13,12 +13,10 @@ export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): 
   }
   const requestState = await authenticateRequest(args, opts);
 
-  if (requestState.isUnknown) {
-    throw unknownResponse(requestState);
-  }
-
-  if (requestState.isInterstitial) {
-    throw interstitialJsonResponse(requestState, { loader: 'nested' }, args.context);
+  // TODO handle handshake
+  // this halts the execution of all nested loaders using getAuth
+  if (requestState.status === AuthStatus.Handshake) {
+    throw redirect('');
   }
 
   return sanitizeAuthObject(requestState.toAuth());
