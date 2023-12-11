@@ -594,7 +594,7 @@ test('Handshake result - dev - nominal', async () => {
   });
   const { token } = config.generateToken({ state: 'active' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
-  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const handshake = await config.generateHandshakeToken(cookiesToSet);
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
       Cookie: `${devBrowserCookie}`,
@@ -617,7 +617,7 @@ test('Handshake result - dev - skew - clock behind', async () => {
   });
   const { token } = config.generateToken({ state: 'early' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
-  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const handshake = await config.generateHandshakeToken(cookiesToSet);
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
       Cookie: `${devBrowserCookie}`,
@@ -636,7 +636,7 @@ test('Handshake result - dev - skew - clock ahead', async () => {
   });
   const { token } = config.generateToken({ state: 'expired' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
-  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const handshake = await config.generateHandshakeToken(cookiesToSet);
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
       Cookie: `${devBrowserCookie}`,
@@ -655,7 +655,7 @@ test('Handshake result - dev - mismatched keys', async () => {
   });
   const { token } = config.generateToken({ state: 'active' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
-  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const handshake = await config.generateHandshakeToken(cookiesToSet);
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
       Cookie: `${devBrowserCookie}`,
@@ -674,7 +674,7 @@ test('Handshake result - dev - new devbrowser', async () => {
   });
   const { token } = config.generateToken({ state: 'active' });
   const cookiesToSet = [`__session=${token};path=/`, '__clerk_db_jwt=asdf;path=/'];
-  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const handshake = await config.generateHandshakeToken(cookiesToSet);
   const res = await fetch(url + '/?__clerk_handshake=' + handshake, {
     headers: new Headers({
       Cookie: `${devBrowserCookie}`,
@@ -715,7 +715,7 @@ test('Handshake result - prod - nominal', async () => {
   });
   const { token } = config.generateToken({ state: 'active' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
-  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const handshake = await config.generateHandshakeToken(cookiesToSet);
   const res = await fetch(url + '/', {
     headers: new Headers({
       'X-Publishable-Key': config.pk,
@@ -737,7 +737,7 @@ test('Handshake result - prod - skew - clock behind', async () => {
   });
   const { token } = config.generateToken({ state: 'early' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
-  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const handshake = await config.generateHandshakeToken(cookiesToSet);
   const res = await fetch(url + '/', {
     headers: new Headers({
       'X-Publishable-Key': config.pk,
@@ -755,7 +755,7 @@ test('Handshake result - prod - skew - clock ahead', async () => {
   });
   const { token } = config.generateToken({ state: 'expired' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
-  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const handshake = await config.generateHandshakeToken(cookiesToSet);
   const res = await fetch(url + '/', {
     headers: new Headers({
       'X-Publishable-Key': config.pk,
@@ -774,7 +774,7 @@ test('Handshake result - prod - mismatched keys', async () => {
   });
   const { token } = config.generateToken({ state: 'active' });
   const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
-  const handshake = btoa(JSON.stringify(cookiesToSet));
+  const handshake = await config.generateHandshakeToken(cookiesToSet);
   const res = await fetch(url + '/', {
     headers: new Headers({
       'X-Publishable-Key': config.pk,
