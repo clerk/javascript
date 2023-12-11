@@ -8,12 +8,13 @@ import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
 import { createSignUpComponentPageObject } from './signUpPageObject';
 import { createUserProfileComponentPageObject } from './userProfilePageObject';
-import type { FakeUser } from './usersService';
+import type { FakeOrganization, FakeUser } from './usersService';
 import { createUserService } from './usersService';
 
-export type { FakeUser };
+export type { FakeUser, FakeOrganization };
 const createClerkClient = (app: Application) => {
   return backendCreateClerkClient({
+    apiUrl: app.env.privateVariables.get('CLERK_API_URL'),
     secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
     publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
   });

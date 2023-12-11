@@ -18,6 +18,7 @@ export const createLongRunningApps = () => {
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
     { id: 'remix.node.withEmailCodes', config: remix.remixNode, env: envs.withEmailCodes },
     { id: 'next.appRouter.withEmailCodes', config: next.appRouter, env: envs.withEmailCodes },
+    // { id: 'next.appRouter.withCustomRoles', config: next.appRouter, env: envs.withCustomRoles },
   ] as const;
 
   const apps = configs.map(longRunningApplication);
