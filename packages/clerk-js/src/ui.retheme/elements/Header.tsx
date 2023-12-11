@@ -10,39 +10,46 @@ const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
     <Col
       elementDescriptor={descriptors.header}
       gap={1}
-      sx={[{ textAlign: 'center' }, sx]}
+      sx={sx}
       {...rest}
     />
   );
 });
 
 const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element => {
+  const { sx, ...rest } = props;
   return (
     <Heading
       elementDescriptor={descriptors.headerTitle}
-      {...props}
+      textVariant='h2'
+      sx={sx}
+      {...rest}
     />
   );
 });
 
 const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element => {
+  const { sx, ...rest } = props;
   return (
     <Text
       elementDescriptor={descriptors.headerSubtitle}
-      variant='h2'
+      variant='body'
       colorScheme='neutral'
-      {...props}
+      sx={sx}
+      {...rest}
     />
   );
 });
 
 const BackLink = (props: PropsOfComponent<typeof BackLinkEl>) => {
+  const { sx, ...rest } = props;
   return (
     <BackLinkEl
       boxElementDescriptor={descriptors.headerBackRow}
       linkElementDescriptor={descriptors.headerBackLink}
       iconElementDescriptor={descriptors.headerBackIcon}
-      {...props}
+      sx={sx}
+      {...rest}
     />
   );
 };

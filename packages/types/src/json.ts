@@ -7,7 +7,7 @@ import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
 import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
-import type { MembershipRole, OrganizationPermission } from './organizationMembership';
+import type { MembershipRole, OrganizationPermissionKey } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
@@ -17,7 +17,7 @@ import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './sig
 import type { OAuthStrategy } from './strategies';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
-import type { Autocomplete, CamelToSnake } from './utils';
+import type { CamelToSnake } from './utils';
 import type { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
@@ -300,10 +300,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: 'organization_membership';
   id: string;
   organization: OrganizationJSON;
-  /**
-   * @experimental The property is experimental and subject to change in future releases.
-   */
-  permissions: Autocomplete<OrganizationPermission>[];
+  permissions: OrganizationPermissionKey[];
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;

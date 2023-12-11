@@ -40,8 +40,6 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       label={localizationKeys('userButton.action__addAccount')}
       onClick={handleAddAccountClicked}
       sx={t => ({
-        borderBottomLeftRadius: t.radii.$lg,
-        borderBottomRightRadius: t.radii.$lg,
         backgroundColor: t.colors.$colorBackground,
       })}
     />
@@ -52,7 +50,6 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       role='menu'
       sx={t => ({
         padding: t.space.$2,
-        backgroundColor: t.colors.$blackAlpha100,
         borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
       })}
     >
@@ -81,10 +78,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
 
   const sessionActions = (
     <>
-      <SecondaryActions
-        role='menu'
-        sx={t => ({ backgroundColor: t.colors.$blackAlpha100 })}
-      >
+      <SecondaryActions role='menu'>
         {otherSessions.map(session => (
           <PreviewButton
             key={session.id}
@@ -93,7 +87,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
               height: t.sizes.$20,
               borderRadius: 0,
               borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-              backgroundColor: t.colors.$white,
+              backgroundColor: t.colors.$colorBackground,
             })}
             onClick={handleSessionClicked(session)}
             role='menuitem'
@@ -106,7 +100,6 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         ))}
         {addAccountButton}
       </SecondaryActions>
-      {signOutAllButton}
     </>
   );
 
@@ -152,7 +145,9 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
             </>
           )}
         </PopoverCard.Main>
-        <PopoverCard.Footer elementDescriptor={descriptors.userButtonPopoverFooter} />
+        <PopoverCard.Footer elementDescriptor={descriptors.userButtonPopoverFooter}>
+          {!authConfig.singleSessionMode && signOutAllButton}
+        </PopoverCard.Footer>
       </PopoverCard.Root>
     </RootBox>
   );

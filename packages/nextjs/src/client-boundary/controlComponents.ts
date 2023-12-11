@@ -5,7 +5,7 @@ export {
   ClerkLoading,
   SignedOut,
   SignedIn,
-  Experimental__Gate,
+  Protect,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToUserProfile,

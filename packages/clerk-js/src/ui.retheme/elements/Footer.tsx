@@ -42,11 +42,7 @@ const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
       {...props}
       as='span'
       variant='body'
-      // colorScheme='neutral'
-      sx={t => ({
-        // TODO: Make the color theme-aware once we have dark mode colors
-        color: t.colors.$primary500,
-      })}
+      colorScheme='neutral'
     />
   );
 };

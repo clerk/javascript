@@ -188,13 +188,10 @@ const NavbarContainer = (
     <Col
       elementDescriptor={descriptors.navbar}
       sx={t => ({
-        maxWidth: t.space.$60,
-        borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha300}`,
-        backgroundColor: t.colors.$blackAlpha100,
         [mqu.md]: {
           display: 'none',
         },
-        padding: `${t.space.$10} ${t.space.$6} ${t.space.$3} ${t.space.$6}`,
+        padding: `${t.space.$9} ${t.space.$6} ${t.space.$3} ${t.space.$6}`,
         color: t.colors.$colorText,
         justifyContent: 'space-between',
       })}
