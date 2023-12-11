@@ -1,5 +1,4 @@
 import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import { useRouter } from 'next/router';
 import React from 'react';
 
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
@@ -12,6 +11,8 @@ __internal__setErrorThrowerOptions({ packageName: '@clerk/nextjs' });
 
 export function ClerkProvider({ children, ...props }: NextClerkProviderProps): JSX.Element {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { useRouter } = require('next/router');
   const { push } = useRouter();
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
