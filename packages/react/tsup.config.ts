@@ -13,7 +13,7 @@ export default defineConfig(overrideOptions => {
     entry: {
       index: 'src/index.ts',
     },
-    onSuccess: shouldPublish ? 'npm run publish:local' : undefined,
+    onSuccess: ['tsc --noEmit', shouldPublish ? 'npm run publish:local' : undefined].filter(Boolean).join(' && '),
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,
