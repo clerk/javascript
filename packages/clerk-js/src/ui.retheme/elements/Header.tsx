@@ -5,24 +5,21 @@ import type { PropsOfComponent } from '../styledSystem';
 import { BackLink as BackLinkEl } from './BackLink';
 
 const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
-  const { sx, ...rest } = props;
   return (
     <Col
       elementDescriptor={descriptors.header}
       gap={1}
-      sx={sx}
-      {...rest}
+      {...props}
     />
   );
 });
 
 const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element => {
-  const { sx, ...rest } = props;
   return (
     <Heading
       elementDescriptor={descriptors.headerTitle}
-      sx={sx}
-      {...rest}
+      textVariant='h2'
+      {...props}
     />
   );
 });
@@ -31,7 +28,7 @@ const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element 
   return (
     <Text
       elementDescriptor={descriptors.headerSubtitle}
-      variant='h2'
+      variant='body'
       colorScheme='neutral'
       {...props}
     />
