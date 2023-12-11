@@ -35,7 +35,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ClerkProvider
       appearance={{
         baseTheme: themes[selectedTheme],
-        variables: { colorPrimary: '#f85656' },
         layout: {
           shimmer: true,
         },

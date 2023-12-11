@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
-import { descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../customizables';
+import { Col, descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations } from '../styledSystem';
 import { BaseCard } from './Card';
@@ -32,7 +32,7 @@ const PopoverCardMain = (props: PropsOfComponent<typeof Flex>) => {
   return (
     <Flex
       direction='col'
-      sx={sx}
+      sx={[t => ({ backgroundColor: t.colors.$colorBackground, borderRadius: t.radii.$lg, overflow: 'hidden' }), sx]}
       {...rest}
     >
       {props.children}
@@ -41,7 +41,7 @@ const PopoverCardMain = (props: PropsOfComponent<typeof Flex>) => {
 };
 
 const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
-  const { sx, ...rest } = props;
+  const { sx, children, ...rest } = props;
   const { branded } = useEnvironment().displayConfig;
   const { privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
   const shouldShow = branded || privacyPageUrl || termsPageUrl;
@@ -51,25 +51,24 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
   }
 
   return (
-    <Flex
+    <Col
       justify='between'
       sx={[
-        t => ({
-          padding: `${t.space.$4} 0`,
+        {
           borderBottomLeftRadius: 'inherit',
           borderBottomRightRadius: 'inherit',
-          backgroundColor: t.colors.$blackAlpha100,
           '&:empty': {
             padding: '0',
           },
-        }),
+        },
         sx,
       ]}
       {...rest}
     >
-      <PoweredByClerkTag />
+      {children}
+      <PoweredByClerkTag sx={t => ({ padding: `${t.space.$4} 0` })} />
       <PopoverCardLinks />
-    </Flex>
+    </Col>
   );
 };
 

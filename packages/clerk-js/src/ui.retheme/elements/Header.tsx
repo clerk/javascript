@@ -10,17 +10,19 @@ const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
     <Col
       elementDescriptor={descriptors.header}
       gap={1}
-      sx={[{ textAlign: 'center' }, sx]}
+      sx={sx}
       {...rest}
     />
   );
 });
 
 const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element => {
+  const { sx, ...rest } = props;
   return (
     <Heading
       elementDescriptor={descriptors.headerTitle}
-      {...props}
+      sx={sx}
+      {...rest}
     />
   );
 });
