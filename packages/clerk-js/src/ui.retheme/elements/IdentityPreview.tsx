@@ -18,7 +18,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
   const edit = onClick && (
     <Button
       elementDescriptor={descriptors.identityPreviewEditButton}
-      variant='ghostIcon'
+      variant='link'
       onClick={onClick}
       aria-label={'Edit'}
     >
@@ -101,13 +101,9 @@ const Container = (props: React.PropsWithChildren) => {
     <Flex
       elementDescriptor={descriptors.identityPreview}
       align='center'
+      gap={2}
       sx={t => ({
-        minHeight: t.space.$10,
-        maxWidth: 'fit-content',
-        backgroundColor: t.colors.$blackAlpha20,
-        padding: `${t.space.$1x5} ${t.space.$4}`,
-        borderRadius: t.radii.$2xl,
-        border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+        margin: `${t.space.$none} auto`,
       })}
       {...props}
     />
