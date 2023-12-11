@@ -25,8 +25,6 @@ function assertSignedOut(
     proxyUrl: '',
     status: AuthStatus.SignedOut,
     isSignedIn: false,
-    isInterstitial: false,
-    isUnknown: false,
     isSatellite: false,
     signInUrl: '',
     signUpUrl: '',
@@ -81,24 +79,6 @@ function assertHandshake(
   });
 }
 
-function assertUnknown(assert, requestState: RequestState, reason: AuthReason) {
-  assert.propContains(requestState, {
-    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
-    status: AuthStatus.Unknown,
-    isSignedIn: false,
-    isInterstitial: false,
-    isUnknown: true,
-    isSatellite: false,
-    signInUrl: '',
-    signUpUrl: '',
-    afterSignInUrl: '',
-    afterSignUpUrl: '',
-    domain: '',
-    reason,
-    toAuth: {},
-  });
-}
-
 function assertSignedInToAuth(assert, requestState: RequestState) {
   assert.propContains(requestState.toAuth(), {
     sessionClaims: mockJwtPayload,
@@ -128,8 +108,6 @@ function assertSignedIn(
     proxyUrl: '',
     status: AuthStatus.SignedIn,
     isSignedIn: true,
-    isInterstitial: false,
-    isUnknown: false,
     isSatellite: false,
     signInUrl: '',
     signUpUrl: '',
@@ -141,7 +119,7 @@ function assertSignedIn(
 }
 
 export default (QUnit: QUnit) => {
-  const { module, test, skip } = QUnit;
+  const { module, test } = QUnit;
 
   const defaultHeaders: Record<string, string> = {
     host: 'example.com',
@@ -292,7 +270,7 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    test('cookieToken: returns interstitial when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async assert => {
+    test('cookieToken: returns handshake when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async assert => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies(
           {
@@ -347,7 +325,7 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    test('cookieToken: returns interstitial when app is satellite, returns from primary and is dev instance [13y]', async assert => {
+    test('cookieToken: returns handshake when app is satellite, returns from primary and is dev instance [13y]', async assert => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies({}, {}, `http://satellite.example/path?__clerk_synced=true&__clerk_db_jwt=${mockJwt}`),
         mockOptions({
@@ -368,7 +346,7 @@ export default (QUnit: QUnit) => {
       assert.strictEqual(requestState.toAuth(), null);
     });
 
-    test('cookieToken: returns interstitial when app is not satellite and responds to syncing on dev instances[12y]', async assert => {
+    test('cookieToken: returns handshake when app is not satellite and responds to syncing on dev instances[12y]', async assert => {
       const sp = new URLSearchParams();
       sp.set('__clerk_redirect_url', 'http://localhost:3000');
       const requestUrl = `http://clerk.com/path?${sp.toString()}`;
@@ -402,7 +380,7 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    test('cookieToken: returns interstitial when no clientUat in development [5y]', async assert => {
+    test('cookieToken: returns handshake when no clientUat in development [5y]', async assert => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies({}, { __session: mockJwt }),
         mockOptions({
@@ -442,7 +420,7 @@ export default (QUnit: QUnit) => {
       assertSignedInToAuth(assert, requestState);
     });
 
-    test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken [8y]', async assert => {
+    test('cookieToken: returns handshake when clientUat > 0 and no cookieToken [8y]', async assert => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies({}, { __client_uat: '12345' }),
         mockOptions({ secretKey: 'deadbeef' }),
@@ -462,7 +440,7 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    test('cookieToken: returns interstitial when clientUat > cookieToken.iat [10n]', async assert => {
+    test('cookieToken: returns handshake when clientUat > cookieToken.iat [10n]', async assert => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies(
           {},
