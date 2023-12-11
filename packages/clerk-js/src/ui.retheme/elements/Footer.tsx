@@ -13,6 +13,13 @@ const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
       {...props}
       justify='between'
       align='center'
+      sx={{
+        '&:empty': {
+          // Remove the element from the DOM if `Footer.Links` is the only child and is `null`,
+          // causing this element to be empty, creating an unwanted spacing
+          display: 'none',
+        },
+      }}
     />
   );
 };
@@ -72,8 +79,10 @@ const FooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
   );
 };
 
-const FooterLinks = React.memo((): JSX.Element => {
+const FooterLinks = React.memo((): JSX.Element | null => {
   const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+
+  if (!helpPageUrl && !privacyPageUrl && !termsPageUrl) return null;
 
   return (
     <Flex
