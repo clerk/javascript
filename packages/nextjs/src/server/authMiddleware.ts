@@ -204,21 +204,6 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       throw new Error('Unexpected handshake or unknown state without redirect');
     }
 
-    // if (requestState.isUnknown) {
-    //   logger.debug('authenticateRequest state is unknown', requestState);
-    //   return handleUnknownState(requestState);
-    // } else if (requestState.isInterstitial && isApiRoute(req)) {
-    //   logger.debug('authenticateRequest state is interstitial in an API route', requestState);
-    //   return handleUnknownState(requestState);
-    // } else if (requestState.isInterstitial) {
-    //   logger.debug('authenticateRequest state is interstitial', requestState);
-
-    //   assertClockSkew(requestState, options);
-
-    //   const res = handleInterstitialState(requestState, options);
-    //   return assertInfiniteRedirectionLoop(req, res, options, requestState);
-    // }
-
     const auth = Object.assign(requestState.toAuth(), {
       isPublicRoute: isPublicRoute(req),
       isApiRoute: isApiRoute(req),

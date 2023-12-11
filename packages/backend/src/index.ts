@@ -40,9 +40,6 @@ export function createClerkClient(options: ClerkOptions) {
   return {
     ...apiClient,
     ...requestState,
-    authenticateRequest: (request: Request, requestOptions: AuthenticateRequestOptions) => {
-      return requestState.authenticateRequest({ ...requestOptions, request });
-    },
     telemetry,
   };
 }
