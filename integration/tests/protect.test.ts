@@ -93,8 +93,6 @@ test.describe('authorization @nextjs', () => {
     fakeUser = m.services.users.createFakeUser();
     const { data: user } = await m.services.users.createBapiUser(fakeUser);
     fakeOrganization = await m.services.users.createFakeOrganization(user.id);
-
-    // await app.serve();
   });
 
   test.afterAll(async () => {
