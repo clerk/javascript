@@ -206,7 +206,6 @@ export const SelectNoResults = (props: PropsOfComponent<typeof Text>) => {
   return (
     <Text
       as='div'
-      variant='smallRegular'
       sx={[theme => ({ width: '100%', padding: `${theme.space.$2} 0 0 ${theme.space.$4}` }), sx]}
       {...rest}
     />
@@ -372,9 +371,8 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
       ref={reference}
-      colorScheme='secondary'
       variant='ghost'
-      textVariant='smallMedium'
+      textVariant='buttonLarge'
       onClick={onTriggerClick}
       sx={[
         theme => ({

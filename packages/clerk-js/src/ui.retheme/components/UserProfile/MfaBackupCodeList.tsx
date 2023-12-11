@@ -47,11 +47,11 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
       <Col gap={1}>
         <Text
           localizationKey={localizationKeys('userProfile.backupCodePage.title__codelist')}
-          variant='regularMedium'
+          variant='subtitle'
         />
         <Text
           localizationKey={subtitle}
-          variant='smallRegular'
+          variant='caption'
           colorScheme='neutral'
         />
       </Col>
@@ -75,7 +75,6 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
       <Flex gap={6}>
         <Button
           variant='link'
-          colorScheme='primary'
           onClick={onCopy}
           localizationKey={
             !hasCopied
@@ -86,14 +85,12 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
 
         <Button
           variant='link'
-          colorScheme='primary'
           onClick={onDownloadTxtFile}
           localizationKey={localizationKeys('userProfile.backupCodePage.actionLabel__download')}
         />
 
         <Button
           variant='link'
-          colorScheme='primary'
           onClick={print}
           localizationKey={localizationKeys('userProfile.backupCodePage.actionLabel__print')}
         />

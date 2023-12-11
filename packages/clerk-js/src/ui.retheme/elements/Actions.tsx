@@ -60,8 +60,7 @@ export const Action = (props: ActionProps) => {
     <Button
       size='md'
       variant='ghost'
-      colorScheme='secondary'
-      textVariant='buttonSmallRegular'
+      textVariant='buttonLarge'
       focusRing={false}
       hoverAsFocus
       // TODO: colors should be colorTextSecondary
@@ -111,7 +110,7 @@ export const Action = (props: ActionProps) => {
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
         as='span'
-        variant='smallMedium'
+        variant='buttonLarge'
         colorScheme='inherit'
       />
       {trailing}
@@ -152,8 +151,7 @@ export const SmallAction = (props: ActionProps) => {
     <Button
       size='xs'
       variant='ghost'
-      colorScheme='secondary'
-      textVariant='buttonSmallRegular'
+      textVariant='buttonSmall'
       focusRing={false}
       hoverAsFocus
       // TODO: colors should be colorTextSecondary
@@ -202,7 +200,7 @@ export const SmallAction = (props: ActionProps) => {
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
         as='span'
-        variant='extraSmallMedium'
+        variant='buttonSmall'
         colorScheme='inherit'
       />
       {trailing}

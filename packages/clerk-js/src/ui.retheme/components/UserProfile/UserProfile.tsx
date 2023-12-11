@@ -32,9 +32,11 @@ const _UserProfile = (_: UserProfileProps) => {
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
   return (
-    <ProfileCard sx={{ height: '100%' }}>
+    <ProfileCard
+      sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
+    >
       <UserProfileNavbar contentRef={contentRef}>
-        <UserProfileRoutes contentRef={contentRef} />
+        <UserProfileRoutes />
       </UserProfileNavbar>
     </ProfileCard>
   );

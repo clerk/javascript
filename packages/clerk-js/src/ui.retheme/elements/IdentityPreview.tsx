@@ -64,7 +64,6 @@ const IdentifierContainer = (props: React.PropsWithChildren) => {
   return (
     <Text
       elementDescriptor={descriptors.identityPreviewText}
-      variant='smallMedium'
       colorScheme='neutral'
       truncate
       {...props}
@@ -103,7 +102,12 @@ const Container = (props: React.PropsWithChildren) => {
       elementDescriptor={descriptors.identityPreview}
       align='center'
       sx={t => ({
-        margin: `${t.space.$none} auto`,
+        minHeight: t.space.$10,
+        maxWidth: 'fit-content',
+        backgroundColor: t.colors.$blackAlpha20,
+        padding: `${t.space.$1x5} ${t.space.$4}`,
+        borderRadius: t.radii.$2xl,
+        border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
       })}
       {...props}
     />

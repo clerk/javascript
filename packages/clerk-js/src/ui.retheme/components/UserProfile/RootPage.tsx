@@ -46,9 +46,8 @@ export const RootPage = withCardStateProvider(() => {
         <Header.Root id='cl-section-account'>
           <Header.Title
             localizationKey={localizationKeys('userProfile.start.headerTitle__account')}
-            textVariant='xxlargeMedium'
+            textVariant='h1'
           />
-          <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__account')} />
         </Header.Root>
 
         <UserProfileSection />
@@ -67,9 +66,8 @@ export const RootPage = withCardStateProvider(() => {
         <Header.Root id='cl-section-security'>
           <Header.Title
             localizationKey={localizationKeys('userProfile.start.headerTitle__security')}
-            textVariant='xxlargeMedium'
+            textVariant='h1'
           />
-          <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__security')} />
         </Header.Root>
         {showPassword && <PasswordSection />}
         {showMfa && <MfaSection />}

@@ -236,13 +236,10 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                       <Text
                         key={index}
                         as={'span'}
-                        sx={[
-                          t => ({
-                            lineHeight: t.lineHeights.$short,
-                            color: 'inherit',
-                            display: 'block',
-                          }),
-                        ]}
+                        sx={{
+                          color: 'inherit',
+                          display: 'block',
+                        }}
                         localizationKey={label}
                       />
                     ))}
@@ -251,7 +248,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                 <Header.Root>
                   <Header.Subtitle
                     localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
-                    variant='regularRegular'
+                    variant='subtitle'
                   />
                 </Header.Root>
                 <Form.Root
@@ -289,13 +286,10 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                       <Text
                         key={index}
                         as={'span'}
-                        sx={[
-                          t => ({
-                            lineHeight: t.lineHeights.$short,
-                            color: 'inherit',
-                            display: 'block',
-                          }),
-                        ]}
+                        sx={{
+                          color: 'inherit',
+                          display: 'block',
+                        }}
                         localizationKey={label}
                       />
                     ))}
@@ -312,7 +306,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                     actionLabel={localizationKeys(
                       'organizationProfile.verifiedDomainPage.dangerTab.removeDomainActionLabel__remove',
                     )}
-                    colorScheme='danger'
+                    variant='linkDanger'
                     onClick={() => navigate(`../../domain/${domain.id}/remove`)}
                   />
                 </Col>

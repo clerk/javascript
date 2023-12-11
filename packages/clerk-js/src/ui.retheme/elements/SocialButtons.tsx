@@ -165,9 +165,8 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       elementDescriptor={descriptors.socialButtonsIconButton}
       elementId={descriptors.socialButtonsIconButton.setId(id)}
       variant='secondary'
-      colorScheme='secondary'
       sx={t => ({
-        minHeight: t.sizes.$7x5,
+        minHeight: t.sizes.$8,
         width: '100%',
       })}
       {...rest}
@@ -186,7 +185,6 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
       elementDescriptor={descriptors.socialButtonsBlockButton}
       elementId={descriptors.socialButtonsBlockButton.setId(id)}
       variant='secondary'
-      colorScheme='secondary'
       block
       isLoading={isLoading}
       {...rest}
@@ -242,7 +240,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
           as='span'
           truncate
           colorScheme='inherit'
-          variant='buttonSmallRegular'
+          variant='buttonSmall'
           localizationKey={textLocalizationKey}
         >
           {label}

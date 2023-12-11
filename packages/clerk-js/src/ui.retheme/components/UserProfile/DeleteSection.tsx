@@ -16,19 +16,18 @@ export const DeleteSection = () => {
       >
         <Col gap={1}>
           <Text
-            variant='regularMedium'
+            variant='subtitle'
             localizationKey={localizationKeys('userProfile.start.dangerSection.deleteAccountTitle')}
           />
           <Text
-            variant='smallRegular'
             colorScheme='neutral'
             localizationKey={localizationKeys('userProfile.start.dangerSection.deleteAccountDescription')}
           />
         </Col>
         <Button
           aria-label='Delete account'
-          colorScheme='danger'
-          textVariant='buttonExtraSmallBold'
+          variant='primaryDanger'
+          textVariant='buttonSmall'
           onClick={() => navigate(`delete`)}
           localizationKey={localizationKeys('userProfile.start.dangerSection.deleteAccountButton')}
         />

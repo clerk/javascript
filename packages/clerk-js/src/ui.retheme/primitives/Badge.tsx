@@ -40,7 +40,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   defaultVariants: {
     colorScheme: 'primary',
-    textVariant: 'smallMedium',
+    textVariant: 'caption',
   },
 }));
 

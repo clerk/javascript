@@ -9,6 +9,7 @@ export const UserProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
 ) => {
   const { pages } = useUserProfileContext();
+
   return (
     <NavbarContextProvider>
       <NavBar

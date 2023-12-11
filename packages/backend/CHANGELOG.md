@@ -1,5 +1,21 @@
 # Change Log
 
+## 1.0.0-alpha-v5.7
+
+### Major Changes
+
+- Limit TokenVerificationError exports to TokenVerificationError and TokenVerificationErrorReason ([#2189](https://github.com/clerk/javascript/pull/2189)) by [@tmilewski](https://github.com/tmilewski)
+
+### Minor Changes
+
+- Add missing `createdAt` param in `User#createUser()` of `@clerk/backend`. ([#2284](https://github.com/clerk/javascript/pull/2284)) by [@dimkl](https://github.com/dimkl)
+
+  Fix `clerkClient.verifyToken()` signature to support a single `token: string` parameter.
+
+### Patch Changes
+
+- Added missing types for `clerkClient.invitations.createInvitation` ([#2268](https://github.com/clerk/javascript/pull/2268)) by [@royanger](https://github.com/royanger)
+
 ## 1.0.0-alpha-v5.6
 
 ### Minor Changes

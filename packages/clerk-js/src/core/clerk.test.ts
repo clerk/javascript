@@ -519,7 +519,7 @@ describe('Clerk singleton', () => {
     let logSpy;
 
     beforeEach(() => {
-      logSpy = jest.spyOn(console, 'log');
+      logSpy = jest.spyOn(console, 'log').mockReturnValue(void 0);
       sut = new Clerk(productionPublishableKey);
     });
 

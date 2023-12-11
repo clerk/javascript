@@ -53,7 +53,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           boxElementDescriptor={descriptors.organizationPreviewAvatarBox}
           imageElementDescriptor={descriptors.organizationPreviewAvatarImage}
           {...organization}
-          size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
+          size={t => ({ sm: t.sizes.$8, md: t.sizes.$10, lg: t.sizes.$12 }[size])}
           sx={avatarSx}
           rounded={rounded}
         />
@@ -69,7 +69,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         <Text
           elementDescriptor={descriptors.organizationPreviewMainIdentifier}
           elementId={descriptors.organizationPreviewMainIdentifier.setId(elementId)}
-          variant={({ sm: 'smallMedium', md: 'regularMedium', lg: 'regularMedium' } as const)[size]}
+          variant={({ sm: 'caption', md: 'subtitle', lg: 'h1' } as const)[size]}
           colorScheme='inherit'
           truncate
           sx={mainIdentifierSx}
@@ -81,7 +81,6 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
             elementDescriptor={descriptors.organizationPreviewSecondaryIdentifier}
             elementId={descriptors.organizationPreviewSecondaryIdentifier.setId(elementId)}
             localizationKey={role && roleLocalizationKey(role)}
-            variant='smallRegular'
             colorScheme='neutral'
             truncate
           />

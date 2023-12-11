@@ -30,7 +30,6 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
               opacity: 1,
             },
           })}
-          colorScheme='secondary'
           variant='ghost'
         >
           <Icon icon={ThreeDots} />

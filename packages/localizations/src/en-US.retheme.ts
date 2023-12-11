@@ -251,10 +251,8 @@ export const enUS: LocalizationResource = {
       description: 'Manage your account info.',
     },
     start: {
-      headerTitle__account: 'Account',
+      headerTitle__account: 'Profile',
       headerTitle__security: 'Security',
-      headerSubtitle__account: 'Manage your account information',
-      headerSubtitle__security: 'Manage your security preferences',
       profileSection: {
         title: 'Profile',
       },
@@ -553,8 +551,6 @@ export const enUS: LocalizationResource = {
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
-      headerSubtitle__members: 'View and manage organization members',
-      headerSubtitle__settings: 'Manage organization settings',
     },
     profilePage: {
       title: 'Organization Profile',

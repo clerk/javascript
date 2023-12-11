@@ -23,9 +23,8 @@ export const OrganizationSettings = () => {
         <Header.Root>
           <Header.Title
             localizationKey={localizationKeys('organizationProfile.start.headerTitle__settings')}
-            textVariant='xxlargeMedium'
+            textVariant='h1'
           />
-          <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__settings')} />
         </Header.Root>
         <OrganizationProfileSection />
         <Gate permission='org:sys_domains:read'>
@@ -127,9 +126,8 @@ const OrganizationDangerSection = () => {
               sx={t => ({ marginRight: t.space.$2 })}
             />
           }
-          variant='secondary'
-          colorScheme='danger'
-          textVariant='buttonExtraSmallBold'
+          variant='secondaryDanger'
+          textVariant='buttonSmall'
           onClick={() => navigate('leave')}
           localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
         />
@@ -143,9 +141,8 @@ const OrganizationDangerSection = () => {
                 sx={t => ({ marginRight: t.space.$2 })}
               />
             }
-            variant='secondary'
-            colorScheme='danger'
-            textVariant='buttonExtraSmallBold'
+            variant='secondaryDanger'
+            textVariant='buttonSmall'
             onClick={() => navigate('delete')}
             localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
           />

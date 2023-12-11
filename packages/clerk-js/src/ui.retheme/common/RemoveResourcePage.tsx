@@ -37,15 +37,9 @@ export const RemoveResourcePage = withCardStateProvider((props: RemovePageProps)
         Breadcrumbs={props.Breadcrumbs}
       >
         <Form.Root onSubmit={handleSubmit}>
-          <Text
-            localizationKey={messageLine1}
-            variant='regularRegular'
-          />
-          <Text
-            localizationKey={messageLine2}
-            variant='regularRegular'
-          />
-          <FormButtons colorScheme={'danger'} />
+          <Text localizationKey={messageLine1} />
+          <Text localizationKey={messageLine2} />
+          <FormButtons variant='primaryDanger' />
         </Form.Root>
       </ContentPage>
       <SuccessPage

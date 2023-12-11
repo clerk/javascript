@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.0.0-alpha-v5.9
+
+### Major Changes
+
+- Drop `Clerk.isReady(). Use `Clerk.loaded` instead.` ([#2294](https://github.com/clerk/javascript/pull/2294)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Add `permissions` to `meta` field of fapi error. ([#2282](https://github.com/clerk/javascript/pull/2282)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.0.0-alpha-v5.8
 
 ### Patch Changes

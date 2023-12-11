@@ -79,7 +79,7 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
     <Button
       elementDescriptor={descriptors.formButtonPrimary}
       block
-      hasArrow
+      textVariant='buttonSmall'
       isLoading={isLoading}
       isDisabled={isDisabled}
       type='submit'
@@ -96,7 +96,7 @@ const FormReset = (props: PropsOfComponent<typeof Button>) => {
       elementDescriptor={descriptors.formButtonReset}
       block
       variant='ghost'
-      textVariant='buttonExtraSmallBold'
+      textVariant='buttonSmall'
       type='reset'
       isDisabled={isLoading || isDisabled}
       {...props}

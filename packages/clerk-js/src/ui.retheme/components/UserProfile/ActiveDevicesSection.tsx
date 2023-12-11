@@ -62,7 +62,7 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
         {!isCurrent && (
           <LinkButtonWithDescription
             actionLabel={localizationKeys('userProfile.start.activeDevicesSection.destructiveAction')}
-            colorScheme='danger'
+            variant='linkDanger'
             onClick={revoke}
             subtitle={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionSubtitle')}
             title={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionTitle')}
@@ -128,7 +128,7 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
           center
           gap={2}
         >
-          <Text variant='smallMedium'>{title}</Text>
+          <Text>{title}</Text>
           {isCurrent && (
             <Badge
               localizationKey={localizationKeys('badge__thisDevice')}
@@ -145,24 +145,11 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
             />
           )}
         </Flex>
-        <Text
-          variant='smallRegular'
-          colorScheme='neutral'
-        >
-          {browser}
-        </Text>
-        <Text
-          variant='smallRegular'
-          colorScheme='neutral'
-        >
+        <Text colorScheme='neutral'>{browser}</Text>
+        <Text colorScheme='neutral'>
           {ipAddress} ({location})
         </Text>
-        <Text
-          variant='smallRegular'
-          colorScheme='neutral'
-        >
-          {t(getRelativeToNowDateKey(props.session.lastActiveAt))}
-        </Text>
+        <Text colorScheme='neutral'>{t(getRelativeToNowDateKey(props.session.lastActiveAt))}</Text>
       </Col>
     </Flex>
   );

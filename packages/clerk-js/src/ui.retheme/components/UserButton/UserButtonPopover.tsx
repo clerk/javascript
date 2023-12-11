@@ -68,8 +68,9 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         icon={SignOut}
         label={localizationKeys('userButton.action__signOutAll')}
         onClick={handleSignOutAllClicked}
-        colorScheme='danger'
+        variant='ghostDanger'
         sx={t => ({
+          color: t.colors.$colorText,
           padding: `${t.space.$2} ${t.space.$3}`,
           borderBottom: 'none',
           borderRadius: t.radii.$lg,
@@ -89,7 +90,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
             key={session.id}
             icon={SwitchArrowRight}
             sx={t => ({
-              height: t.sizes.$17,
+              height: t.sizes.$20,
               borderRadius: 0,
               borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
               backgroundColor: t.colors.$white,

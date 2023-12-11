@@ -34,7 +34,6 @@ export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props,
   return (
     <Text
       ref={ref}
-      variant='smallRegular'
       colorScheme='danger'
       aria-live='polite'
       id={errorMessageId}

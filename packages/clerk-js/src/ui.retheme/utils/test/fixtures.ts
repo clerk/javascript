@@ -4,7 +4,6 @@ import type {
   DisplayConfigJSON,
   EnvironmentJSON,
   OrganizationSettingsJSON,
-  PasswordSettingsData,
   UserJSON,
   UserSettingsJSON,
 } from '@clerk/types';

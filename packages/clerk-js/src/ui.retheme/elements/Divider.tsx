@@ -12,7 +12,7 @@ export const Divider = (props: Omit<PropsOfComponent<typeof Flex>, 'elementDescr
       <Text
         localizationKey={localizationKeys('dividerText')}
         elementDescriptor={descriptors.dividerText}
-        variant='smallRegular'
+        variant='subtitle'
         colorScheme='neutral'
         sx={t => ({ margin: `0 ${t.space.$4}` })}
       />
