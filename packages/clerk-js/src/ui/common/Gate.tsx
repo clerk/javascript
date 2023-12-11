@@ -1,30 +1,62 @@
-import type { CheckAuthorization } from '@clerk/types';
+import type { CheckAuthorization, MembershipRole, OrganizationPermissionKey } from '@clerk/types';
 import type { ComponentType, PropsWithChildren, ReactNode } from 'react';
 import React, { useEffect } from 'react';
 
 import { useCoreSession } from '../contexts';
 import { useRouter } from '../router';
 
-type GateParams = Parameters<CheckAuthorization>[0];
+type GateParams = Parameters<CheckAuthorization>[0] | ((has: CheckAuthorization) => boolean);
 type GateProps = PropsWithChildren<
-  GateParams & {
+  (
+    | {
+        condition?: never;
+        role: MembershipRole;
+        permission?: never;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission: OrganizationPermissionKey;
+      }
+    | {
+        condition: (has: CheckAuthorization) => boolean;
+        role?: never;
+        permission?: never;
+      }
+  ) & {
     fallback?: ReactNode;
     redirectTo?: string;
   }
 >;
 
 export const useGate = (params: GateParams) => {
-  const { experimental__checkAuthorization } = useCoreSession();
+  const { checkAuthorization, id } = useCoreSession();
+
+  if (!id) {
+    return { isAuthorizedUser: false };
+  }
+
+  /**
+   * if a function is passed and returns false then throw not found
+   */
+  if (typeof params === 'function') {
+    if (params(checkAuthorization)) {
+      return { isAuthorizedUser: true };
+    }
+    return { isAuthorizedUser: false };
+  }
 
   return {
-    isAuthorizedUser: experimental__checkAuthorization(params),
+    isAuthorizedUser: checkAuthorization(params),
   };
 };
 
 export const Gate = (gateProps: GateProps) => {
   const { children, fallback, redirectTo, ...restAuthorizedParams } = gateProps;
 
-  const { isAuthorizedUser } = useGate(restAuthorizedParams);
+  const { isAuthorizedUser } = useGate(
+    typeof restAuthorizedParams.condition === 'function' ? restAuthorizedParams.condition : restAuthorizedParams,
+  );
 
   const { navigate } = useRouter();
 

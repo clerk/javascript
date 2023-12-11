@@ -57,10 +57,11 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     organization,
     orgRole,
     orgSlug,
+    orgPermissions,
   } = derivedState;
 
   const authCtx = React.useMemo(() => {
-    const value = { sessionId, userId, actor, orgId, orgRole, orgSlug };
+    const value = { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions };
     return { value };
   }, [sessionId, userId, actor, orgId, orgRole, orgSlug]);
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
@@ -75,7 +76,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   }, [orgId, organization, lastOrganizationInvitation, lastOrganizationMember]);
 
   return (
-    // @ts-expect-error
+    // @ts-expect-error value passed is of type IsomorphicClerk where the context expects LoadedClerk
     <IsomorphicClerkContext.Provider value={clerkCtx}>
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>

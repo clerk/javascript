@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { ActJWTClaim, MembershipRole } from '@clerk/types';
+import type { ActJWTClaim, MembershipRole, OrganizationCustomPermissionKey } from '@clerk/types';
 
 export const [AuthContext, useAuthContext] = createContextAndHook<{
   userId: string | null | undefined;
@@ -8,4 +8,5 @@ export const [AuthContext, useAuthContext] = createContextAndHook<{
   orgId: string | null | undefined;
   orgRole: MembershipRole | null | undefined;
   orgSlug: string | null | undefined;
+  orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
 }>('AuthContext');

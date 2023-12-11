@@ -8,7 +8,7 @@ import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
 import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
-import type { MembershipRole, OrganizationPermission } from './organizationMembership';
+import type { MembershipRole, OrganizationPermissionKey } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
@@ -317,12 +317,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: 'organization_membership';
   id: string;
   organization: OrganizationJSON;
-  /**
-   * @experimental The property is experimental and subject to change in future releases.
-   */
-  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-  // eslint-disable-next-line
-  permissions: (OrganizationPermission | (string & {}))[];
+  permissions: OrganizationPermissionKey[];
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;

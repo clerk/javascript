@@ -6,7 +6,7 @@ import type {
   MembershipRole,
   OrganizationMembershipJSON,
   OrganizationMembershipResource,
-  OrganizationPermission,
+  OrganizationPermissionKey,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
@@ -18,12 +18,7 @@ export class OrganizationMembership extends BaseResource implements Organization
   publicMetadata: OrganizationMembershipPublicMetadata = {};
   publicUserData!: PublicUserData;
   organization!: Organization;
-  /**
-   * @experimental The property is experimental and subject to change in future releases.
-   */
-  // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-  // eslint-disable-next-line
-  permissions: (OrganizationPermission | (string & {}))[] = [];
+  permissions: OrganizationPermissionKey[] = [];
   role!: MembershipRole;
   createdAt!: Date;
   updatedAt!: Date;

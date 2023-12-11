@@ -1,4 +1,4 @@
-import type { AuthObject, Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
+import type { Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
 import {
   AuthStatus,
   constants,
@@ -14,25 +14,10 @@ import type { SecretKeyOrApiKey } from '@clerk/types';
 import { withLogger } from '../utils/debugLogger';
 import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerkClient';
 import { getAuthAuthHeaderMissing } from './errors';
-import type { RequestLike } from './types';
+import type { AuthObjectWithDeprecatedResources, RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 
 type GetAuthOpts = Partial<SecretKeyOrApiKey>;
-
-type AuthObjectWithDeprecatedResources<T extends AuthObject> = Omit<T, 'user' | 'organization' | 'session'> & {
-  /**
-   * @deprecated This will be removed in the next major version
-   */
-  user: T['user'];
-  /**
-   * @deprecated This will be removed in the next major version
-   */
-  organization: T['organization'];
-  /**
-   * @deprecated This will be removed in the next major version
-   */
-  session: T['session'];
-};
 
 export const createGetAuth = ({
   debugLoggerName,
