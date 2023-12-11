@@ -1,5 +1,5 @@
-import type { ClerkOptions, VerifyTokenOptions } from '@clerk/backend';
-import { Clerk as _Clerk, verifyToken as _verifyToken } from '@clerk/backend';
+import type { ClerkOptions } from '@clerk/backend';
+import { Clerk as _Clerk, verifyToken } from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
@@ -8,7 +8,7 @@ import { loadApiEnv, loadClientEnv } from './utils';
 type ExtendedClerk = ReturnType<typeof _Clerk> & {
   expressWithAuth: ReturnType<typeof createClerkExpressWithAuth>;
   expressRequireAuth: ReturnType<typeof createClerkExpressRequireAuth>;
-  verifyToken: typeof _verifyToken;
+  verifyToken: typeof verifyToken;
 };
 
 /**
@@ -20,9 +20,6 @@ export function Clerk(options: ClerkOptions): ExtendedClerk {
   const clerkClient = _Clerk(options);
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
-  const verifyToken = (token: string, verifyOpts?: VerifyTokenOptions) => {
-    return _verifyToken(token, { ...options, ...verifyOpts });
-  };
 
   return Object.assign(clerkClient, {
     expressWithAuth,

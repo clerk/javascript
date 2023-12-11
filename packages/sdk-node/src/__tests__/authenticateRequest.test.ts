@@ -1,5 +1,5 @@
-import { constants, createIsomorphicRequest } from '@clerk/backend';
-import type { Request } from 'express';
+import { constants } from '@clerk/backend';
+import { Request } from 'express';
 
 import { authenticateRequest } from '../authenticateRequest';
 
@@ -39,14 +39,6 @@ describe('authenticateRequest', () => {
     const searchParams = new URLSearchParams();
     searchParams.set('__query', 'true');
 
-    const expectedIsomorphicRequest = createIsomorphicRequest((Request, Headers) => {
-      // @ts-ignore
-      return new Request(req.url, {
-        // @ts-ignore
-        headers: new Headers(req.headers),
-      });
-    });
-
     await authenticateRequest({
       clerkClient: clerkClient as any,
       secretKey,
@@ -54,9 +46,10 @@ describe('authenticateRequest', () => {
       req,
       options,
     });
+
     expect(clerkClient.authenticateRequest).toHaveBeenCalledWith(
+      expect.any(Request),
       expect.objectContaining({
-        authorizedParties: ['party1'],
         secretKey: secretKey,
         publishableKey: publishableKey,
         jwtKey: 'jwtKey',
@@ -64,7 +57,7 @@ describe('authenticateRequest', () => {
         proxyUrl: '',
         signInUrl: '',
         domain: '',
-        request: expect.objectContaining(expectedIsomorphicRequest),
+        request: expect.any(Request),
       }),
     );
   });

@@ -50,7 +50,6 @@ exports[`module exports should not change unless explicitly set 1`] = `
   "emails",
   "hasValidSignature",
   "invitations",
-  "loadInterstitialFromLocal",
   "makeAuthObjectSerializable",
   "organizations",
   "phoneNumbers",
