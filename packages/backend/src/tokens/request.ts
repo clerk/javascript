@@ -9,6 +9,7 @@ import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
+import { verifyHandshakeToken } from './handshake';
 import { decodeJwt } from './jwt';
 import { verifyToken, type VerifyTokenOptions } from './verify';
 export type OptionalVerifyTokenOptions = Partial<
@@ -123,7 +124,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       'Access-Control-Allow-Credentials': 'true',
     });
 
-    const cookiesToSet = JSON.parse(atob(handshakeToken)) as string[];
+    const handshakePayload = await verifyHandshakeToken(handshakeToken, authenticateContext);
+    const cookiesToSet = handshakePayload.handshake;
 
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {
@@ -228,20 +230,19 @@ ${err.getFullMessage()}`,
     }
 
     if (
+      instanceType === 'development' &&
       authenticateContext.isSatellite &&
       authenticateContext.secFetchDest === 'document' &&
       !authenticateContext.derivedRequestUrl.searchParams.has('__clerk_synced')
     ) {
-      // Dev initiate MD sync
+      // initiate MD sync
 
-      // TODO: validate signInURL exists (find the old assert function)
+      // signInUrl exists, checked at the top of `authenticateRequest`
       const redirectURL = new URL(authenticateContext.signInUrl!);
       redirectURL.searchParams.append('__clerk_redirect_url', authenticateContext.derivedRequestUrl.toString());
 
       const headers = new Headers({ location: redirectURL.toString() });
       return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
-      // if dev, and satellite, and sec-fetch-dest document,
-      // redirect to sign in url (primary), set redirect_url param to current url, redirect back with __clerk_db_jwt and __clerk_synced params
     }
 
     const redirectUrl = new URL(authenticateContext.derivedRequestUrl).searchParams.get('__clerk_redirect_url');
@@ -262,10 +263,8 @@ ${err.getFullMessage()}`,
       return signedOut(authenticateContext, AuthErrorReason.CookieAndUATMissing);
     }
 
-    {
-      if (!hasActiveClient && !hasSessionToken) {
-        return signedOut(authenticateContext, AuthErrorReason.CookieAndUATMissing);
-      }
+    if (!hasActiveClient && !hasSessionToken) {
+      return signedOut(authenticateContext, AuthErrorReason.CookieAndUATMissing);
     }
 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev

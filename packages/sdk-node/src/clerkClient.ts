@@ -21,8 +21,7 @@ export function Clerk(options: ClerkOptions): ExtendedClerk {
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
   const verifyToken = (token: string, verifyOpts?: VerifyTokenOptions) => {
-    const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
-    return _verifyToken(token, { issuer, ...options, ...verifyOpts });
+    return _verifyToken(token, { ...options, ...verifyOpts });
   };
 
   return Object.assign(clerkClient, {
