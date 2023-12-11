@@ -4,6 +4,12 @@ import { DEV_OR_STAGING_SUFFIXES } from './constants';
 import { isomorphicAtob } from './isomorphicAtob';
 import { isomorphicBtoa } from './isomorphicBtoa';
 
+type ParsePublishableKeyOptions = {
+  fatal: boolean;
+  domain?: string;
+  proxyUrl?: string;
+};
+
 const PUBLISHABLE_KEY_LIVE_PREFIX = 'pk_live_';
 const PUBLISHABLE_KEY_TEST_PREFIX = 'pk_test_';
 
@@ -17,10 +23,24 @@ export function buildPublishableKey(frontendApi: string): string {
   return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`)}`;
 }
 
-export function parsePublishableKey(key: string | undefined): PublishableKey | null {
+export function parsePublishableKey(
+  key: string | undefined,
+  options: ParsePublishableKeyOptions & { fatal: true },
+): PublishableKey;
+export function parsePublishableKey(
+  key: string | undefined,
+  options?: ParsePublishableKeyOptions & { fatal: false },
+): PublishableKey | null;
+export function parsePublishableKey(
+  key: string | undefined,
+  options: { fatal?: boolean; domain?: string; proxyUrl?: string } = {},
+): PublishableKey | null {
   key = key || '';
 
-  if (!isPublishableKey(key)) {
+  if (!key || !isPublishableKey(key)) {
+    if (options.fatal) {
+      throw new Error('Publishable key not valid.');
+    }
     return null;
   }
 
@@ -28,11 +48,16 @@ export function parsePublishableKey(key: string | undefined): PublishableKey | n
 
   let frontendApi = isomorphicAtob(key.split('_')[2]);
 
-  if (!frontendApi.endsWith('$')) {
-    return null;
-  }
   // TODO(@dimkl): validate packages/clerk-js/src/utils/instance.ts
   frontendApi = frontendApi.slice(0, -1);
+
+  if (options.proxyUrl) {
+    frontendApi = options.proxyUrl;
+  } else if (instanceType !== 'development' && options.domain) {
+    frontendApi = `https://clerk.${options.domain}`;
+  } else {
+    frontendApi = `https://${frontendApi}`;
+  }
 
   return {
     instanceType,

@@ -43,10 +43,10 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const { apiClient } = params;
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
 
-  const authenticateRequest = (options: RunTimeOptions) => {
+  const authenticateRequest = (request: Request, options: RunTimeOptions) => {
     const { apiUrl, apiVersion } = buildTimeOptions;
     const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
-    return authenticateRequestOriginal({
+    return authenticateRequestOriginal(request, {
       ...options,
       ...runTimeOptions,
       // We should add all the omitted props from options here (eg apiUrl / apiVersion)

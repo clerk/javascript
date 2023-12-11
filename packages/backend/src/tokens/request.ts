@@ -19,7 +19,7 @@ export type OptionalVerifyTokenOptions = Partial<
   >
 >;
 
-export type AuthenticateRequestOptions = AuthStatusOptionsType & OptionalVerifyTokenOptions & { request: Request };
+export type AuthenticateRequestOptions = AuthStatusOptionsType & OptionalVerifyTokenOptions;
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
   if (!signInUrl && isDevelopmentFromSecretKey(key)) {
@@ -46,41 +46,11 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
   }
 }
 
-/**
- * Parse the provided publishable key, but adjust the returned frontendApi based on the provided domain and proxyUrl.
- */
-export function parsePublishableKeyWithOptions({
-  publishableKey,
-  domain,
-  proxyUrl,
-}: {
-  publishableKey?: string;
-  domain?: string;
-  proxyUrl?: string;
-}) {
-  if (!publishableKey || !isPublishableKey(publishableKey)) {
-    throw new Error('Publishable key not valid.');
-  }
-
-  const { frontendApi: frontendApiFromPK, instanceType } = parsePublishableKey(publishableKey)!;
-
-  let frontendApi = frontendApiFromPK;
-  if (proxyUrl) {
-    frontendApi = proxyUrl;
-  } else if (instanceType !== 'development' && domain) {
-    frontendApi = `https://clerk.${domain}`;
-  } else {
-    frontendApi = `https://${frontendApi}`;
-  }
-
-  return {
-    frontendApi,
-    instanceType,
-  };
-}
-
-export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
-  const { cookies, headers, searchParams, derivedRequestUrl } = buildRequest(options.request);
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions,
+): Promise<RequestState> {
+  const { cookies, headers, searchParams, derivedRequestUrl } = buildRequest(request);
 
   const authenticateContext = {
     ...options,
@@ -90,8 +60,9 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     derivedRequestUrl,
   };
 
-  const devBrowserToken = searchParams?.get('__clerk_db_jwt') || cookies('__clerk_db_jwt') || '';
-  const handshakeToken = searchParams?.get('__clerk_handshake') || cookies('__clerk_handshake') || '';
+  const devBrowserToken =
+    searchParams?.get(constants.Cookies.DevBrowser) || cookies(constants.Cookies.DevBrowser) || '';
+  const handshakeToken = searchParams?.get(constants.Cookies.Handshake) || cookies(constants.Cookies.Handshake) || '';
 
   assertValidSecretKey(authenticateContext.secretKey);
 
@@ -180,8 +151,8 @@ ${err.getFullMessage()}`,
     return signedIn(authenticateContext, verifyResult!, headers);
   }
 
-  const pk = parsePublishableKeyWithOptions({
-    publishableKey: options.publishableKey,
+  const pk = parsePublishableKey(options.publishableKey, {
+    fatal: true,
     proxyUrl: options.proxyUrl,
     domain: options.domain,
   });
@@ -200,7 +171,6 @@ ${err.getFullMessage()}`,
   async function authenticateRequestWithTokenInCookie() {
     const clientUat = parseInt(authenticateContext.clientUat || '', 10) || 0;
     const hasActiveClient = clientUat > 0;
-    // TODO rename this to sessionToken
     const sessionToken = authenticateContext.sessionTokenInCookie;
     const hasSessionToken = !!sessionToken;
 
@@ -214,54 +184,66 @@ ${err.getFullMessage()}`,
     /**
      * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
      */
-    if (instanceType === 'development' && authenticateContext.derivedRequestUrl.searchParams.has('__clerk_db_jwt')) {
+    if (
+      instanceType === 'development' &&
+      authenticateContext.derivedRequestUrl.searchParams.has(constants.Cookies.DevBrowser)
+    ) {
       const headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.DevBrowserSync, '', headers);
     }
 
+    /**
+     * Begin multi-domain sync flows
+     */
     if (
       instanceType === 'production' &&
       authenticateContext.isSatellite &&
       authenticateContext.secFetchDest === 'document' &&
-      !authenticateContext.derivedRequestUrl.searchParams.has('__clerk_synced')
+      !authenticateContext.derivedRequestUrl.searchParams.has(constants.QueryParameters.ClerkSynced)
     ) {
       const headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
+    // Multi-domain development sync flow
     if (
       instanceType === 'development' &&
       authenticateContext.isSatellite &&
       authenticateContext.secFetchDest === 'document' &&
-      !authenticateContext.derivedRequestUrl.searchParams.has('__clerk_synced')
+      !authenticateContext.derivedRequestUrl.searchParams.has(constants.QueryParameters.ClerkSynced)
     ) {
       // initiate MD sync
 
       // signInUrl exists, checked at the top of `authenticateRequest`
       const redirectURL = new URL(authenticateContext.signInUrl!);
-      redirectURL.searchParams.append('__clerk_redirect_url', authenticateContext.derivedRequestUrl.toString());
+      redirectURL.searchParams.append(
+        constants.QueryParameters.ClerkRedirectUrl,
+        authenticateContext.derivedRequestUrl.toString(),
+      );
 
       const headers = new Headers({ location: redirectURL.toString() });
       return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
-    const redirectUrl = new URL(authenticateContext.derivedRequestUrl).searchParams.get('__clerk_redirect_url');
+    // Multi-domain development sync flow
+    const redirectUrl = new URL(authenticateContext.derivedRequestUrl).searchParams.get(
+      constants.QueryParameters.ClerkRedirectUrl,
+    );
     if (instanceType === 'development' && !authenticateContext.isSatellite && redirectUrl) {
       // Dev MD sync from primary, redirect back to satellite w/ __clerk_db_jwt
       const redirectBackToSatelliteUrl = new URL(redirectUrl);
 
       if (devBrowserToken) {
-        redirectBackToSatelliteUrl.searchParams.append('__clerk_db_jwt', devBrowserToken);
+        redirectBackToSatelliteUrl.searchParams.append(constants.Cookies.DevBrowser, devBrowserToken);
       }
-      redirectBackToSatelliteUrl.searchParams.append('__clerk_synced', 'true');
+      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
 
       const headers = new Headers({ location: redirectBackToSatelliteUrl.toString() });
       return handshake(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
     }
-
-    if (instanceType === 'development' && !hasActiveClient && !hasSessionToken) {
-      return signedOut(authenticateContext, AuthErrorReason.CookieAndUATMissing);
-    }
+    /**
+     * End multi-domain sync flows
+     */
 
     if (!hasActiveClient && !hasSessionToken) {
       return signedOut(authenticateContext, AuthErrorReason.CookieAndUATMissing);

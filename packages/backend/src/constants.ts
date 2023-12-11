@@ -15,6 +15,13 @@ const Attributes = {
 const Cookies = {
   Session: '__session',
   ClientUat: '__client_uat',
+  Handshake: '__clerk_handshake',
+  DevBrowser: '__clerk_db_jwt',
+} as const;
+
+const QueryParameters = {
+  ClerkSynced: '__clerk_synced',
+  ClerkRedirectUrl: '__clerk_redirect_url',
 } as const;
 
 const Headers = {
@@ -50,4 +57,5 @@ export const constants = {
   Headers,
   SearchParams,
   ContentTypes,
+  QueryParameters,
 } as const;
