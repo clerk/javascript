@@ -23,6 +23,7 @@ exports[`constants from environment variables 1`] = `
     "Host": "host",
     "Origin": "origin",
     "Referrer": "referer",
+    "SecFetchDest": "sec-fetch-dest",
     "UserAgent": "user-agent",
   },
   "JWT_KEY": "CLERK_JWT_KEY",
