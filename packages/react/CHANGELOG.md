@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.29.0
+
+### Minor Changes
+
+- Deprecate `Clerk.isReady()` in favor of `Clerk.loaded` ([#2293](https://github.com/clerk/javascript/pull/2293)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Updated dependencies [[`a62479810`](https://github.com/clerk/javascript/commit/a624798102236f77a667d8da13363b77486640f8)]:
+  - @clerk/types@3.59.0
+
 ## 4.28.3
 
 ### Patch Changes
