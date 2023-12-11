@@ -14,7 +14,6 @@ import { createBackendApiClient } from '../api';
 type AuthObjectDebugData = Record<string, any>;
 type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
 type AuthObjectDebug = () => AuthObjectDebugData;
-type CheckAuthorizationSignedOut = undefined;
 
 export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
   token: string;
@@ -53,7 +52,7 @@ export type SignedOutAuthObject = {
   orgPermissions: null;
   organization: null;
   getToken: ServerGetToken;
-  has: CheckAuthorizationSignedOut;
+  has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
 };
 
@@ -127,7 +126,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgPermissions: null,
     organization: null,
     getToken: () => Promise.resolve(null),
-    has: undefined,
+    has: () => false,
     debug: createDebug(debugData),
   };
 }
