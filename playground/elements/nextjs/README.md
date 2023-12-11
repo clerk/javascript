@@ -5,7 +5,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 Running the development server (standalone, with built packages):
 
 ```sh
-turbo run dev --filter=elements-next
+turbo run dev --filter=elements-nextjs
 ```
 
 Running the development server (with hotloading `@clerk/elements`):

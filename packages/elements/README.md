@@ -46,7 +46,7 @@ turbo run dev --filter=...elements # Includes dependents of @clerk/elements
 turbo run dev --filter=elements
 
 # -- @clerk/elements (Only necessary if you're actively working on @clerk/elements)
-turbo run dev --filter=elements-next
+turbo run dev --filter=elements-nextjs
 ```
 
 **Note:** If you run into a "no workspaces found" issue with the playground, run the following: `(cd playground/elements/next && npx next telemetry disable)`
@@ -54,14 +54,14 @@ turbo run dev --filter=elements-next
 ### E2E Testing
 
 ```sh
-turbo run e2e --filter=elements-next
+turbo run e2e --filter=elements-nextjs
 
 # With UI: https://playwright.dev/docs/running-tests#run-tests-in-ui-mode
-turbo run e2e --filter=elements-next -- --ui
+turbo run e2e --filter=elements-nextjs -- --ui
 
 # Headed Mode: https://playwright.dev/docs/running-tests#run-tests-in-headed-mode
-turbo run e2e --filter=elements-next -- --headed
+turbo run e2e --filter=elements-nextjs -- --headed
 
 # Specific Tests: https://playwright.dev/docs/running-tests#run-specific-tests
-turbo run e2e --filter=elements-next -- e2e/elements.spec.ts
+turbo run e2e --filter=elements-nextjs -- e2e/elements.spec.ts
 ```

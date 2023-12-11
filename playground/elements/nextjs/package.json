@@ -1,12 +1,12 @@
 {
-  "name": "elements-next",
+  "name": "elements-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build:playground": "next build",
     "dev": "next dev",
     "e2e": "playwright test",
-    "lint": "next lint",
+    "lint:playground": "next lint",
     "start": "next start"
   },
   "dependencies": {
@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.40.1",
-    "@types/node": "^20",
+    "@types/node": "^18",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
