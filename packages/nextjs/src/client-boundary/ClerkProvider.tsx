@@ -15,7 +15,7 @@ export function ClerkProvider(props: NextClerkProviderProps) {
     const { useRouter } = require('next/compat/router');
     const router = useRouter();
 
-    return router ? <AppClerkProvider {...props} /> : <PageClerkProvider {...props} />;
+    return router ? <PageClerkProvider {...props} /> : <AppClerkProvider {...props} />;
   } catch (error) {
     // Silently ignore the error
     return <PageClerkProvider {...props} />;
