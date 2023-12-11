@@ -54,6 +54,7 @@ const textVariants = (t: InternalTheme) => {
     fontWeight: t.fontWeights.$medium,
     fontSize: t.fontSizes.$md,
     lineHeight: t.lineHeights.$small,
+    fontFamily: t.fonts.$buttons,
   } as const;
 
   const buttonSmall = {
@@ -61,6 +62,7 @@ const textVariants = (t: InternalTheme) => {
     fontWeight: t.fontWeights.$medium,
     fontSize: t.fontSizes.$sm,
     lineHeight: t.lineHeights.$none,
+    fontFamily: t.fonts.$buttons,
   } as const;
 
   return {
