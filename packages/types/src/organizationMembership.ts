@@ -8,6 +8,11 @@ interface Base {
   role: string;
 }
 
+interface Placeholder {
+  permission: unknown;
+  role: unknown;
+}
+
 declare global {
   interface ClerkAuthorization {}
 }
@@ -45,14 +50,16 @@ export interface OrganizationMembershipResource extends ClerkResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-export type OrganizationCustomPermissionKey = 'permission' extends keyof ClerkAuthorization
-  ? // @ts-ignore Typescript cannot infer the existence of the `permission` key even if we checking it above
-    ClerkAuthorization['permission']
+export type OrganizationCustomPermissionKey = ClerkAuthorization extends Placeholder
+  ? ClerkAuthorization['permission'] extends string
+    ? ClerkAuthorization['permission']
+    : Base['permission']
   : Base['permission'];
 
-export type OrganizationCustomRoleKey = 'role' extends keyof ClerkAuthorization
-  ? // @ts-ignore Typescript cannot infer the existence of the `role` key even if we checking it above
-    ClerkAuthorization['role']
+export type OrganizationCustomRoleKey = ClerkAuthorization extends Placeholder
+  ? ClerkAuthorization['role'] extends string
+    ? ClerkAuthorization['role']
+    : Base['role']
   : Base['role'];
 
 /**
