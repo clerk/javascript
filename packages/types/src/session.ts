@@ -28,26 +28,10 @@ export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
 type CheckAuthorizationParams =
   | {
-      some: (
-        | {
-            role: MembershipRole;
-            permission?: never;
-          }
-        | {
-            role?: never;
-            permission: OrganizationPermissionKey;
-          }
-      )[];
-      role?: never;
-      permission?: never;
-    }
-  | {
-      some?: never;
       role: MembershipRole;
       permission?: never;
     }
   | {
-      some?: never;
       role?: never;
       permission: OrganizationPermissionKey;
     };
@@ -67,10 +51,7 @@ export interface SessionResource extends ClerkResource {
   remove: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;
   getToken: GetToken;
-  /**
-   * @experimental The method is experimental and subject to change in future releases.
-   */
-  experimental__checkAuthorization: CheckAuthorization;
+  checkAuthorization: CheckAuthorization;
   clearCache: () => void;
   createdAt: Date;
   updatedAt: Date;

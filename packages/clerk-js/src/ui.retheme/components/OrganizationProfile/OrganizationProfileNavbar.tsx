@@ -14,16 +14,12 @@ export const OrganizationProfileNavbar = (
   const { organization } = useOrganization();
   const { pages } = useOrganizationProfileContext();
 
-  const { isAuthorizedUser: allowMembersRoute } = useGate({
-    some: [
-      {
+  const { isAuthorizedUser: allowMembersRoute } = useGate(
+    has =>
+      has({
         permission: 'org:sys_memberships:read',
-      },
-      {
-        permission: 'org:sys_memberships:manage',
-      },
-    ],
-  });
+      }) || has({ permission: 'org:sys_memberships:manage' }),
+  );
 
   if (!organization) {
     return null;

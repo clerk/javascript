@@ -77,7 +77,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
                   </Route>
                   <Route path=':id'>
                     <Gate
-                      permission={'org:sys_domains:manage'}
+                      permission='org:sys_domains:manage'
                       redirectTo='../../'
                     >
                       <VerifiedDomainPage />
@@ -130,7 +130,9 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
               </Route>
               <Route index>
                 <Gate
-                  some={[{ permission: 'org:sys_memberships:read' }, { permission: 'org:sys_memberships:manage' }]}
+                  condition={has =>
+                    has({ permission: 'org:sys_memberships:read' }) || has({ permission: 'org:sys_memberships:manage' })
+                  }
                   redirectTo={isSettingsPageRoot ? '../' : './organization-settings'}
                 >
                   <OrganizationMembers />
