@@ -135,28 +135,6 @@ export const OTPRoot = ({ children, ...props }: PropsWithChildren<OTPInputProps>
   return <OTPInputContext.Provider value={{ value: props }}>{children}</OTPInputContext.Provider>;
 };
 
-export const OTPInputLabel = () => {
-  const { label } = useOTPInputContext();
-  return (
-    <Text
-      localizationKey={label}
-      elementDescriptor={descriptors.formHeaderTitle}
-      variant='subtitle'
-    />
-  );
-};
-
-export const OTPInputDescription = () => {
-  const { description } = useOTPInputContext();
-  return (
-    <Text
-      localizationKey={description}
-      elementDescriptor={descriptors.formHeaderSubtitle}
-      colorScheme='neutral'
-    />
-  );
-};
-
 export const OTPResendButton = () => {
   const { resendButton, onResendCode, isLoading, otpControl } = useOTPInputContext();
 
