@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker';
 import { hash } from '../models/helpers';
 
 export type FakeUser = ReturnType<ReturnType<typeof createUserService>['createFakeUser']>;
+export type FakeOrganization = ReturnType<ReturnType<Awaited<typeof createUserService>>['createFakeOrganization']>;
 
 export const createUserService = (clerkClient: ReturnType<typeof Clerk>) => {
   const self = {
@@ -35,6 +36,18 @@ export const createUserService = (clerkClient: ReturnType<typeof Clerk>) => {
       if (id) {
         await clerkClient.users.deleteUser(id);
       }
+    },
+    createFakeOrganization: async (userId: string) => {
+      const name = faker.animal.dog();
+      const { data: organization } = await clerkClient.organizations.createOrganization({
+        name: faker.animal.dog(),
+        createdBy: userId,
+      });
+      return {
+        name,
+        organization,
+        delete: () => clerkClient.organizations.deleteOrganization(organization.id),
+      };
     },
   };
   return self;

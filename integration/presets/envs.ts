@@ -38,7 +38,17 @@ const withEmailLinks = environmentConfig()
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
   .setEnvVariable('public', 'CLERK_JS', process.env.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
 
+const withCustomRoles = environmentConfig()
+  .setId('withCustomRoles')
+  .setEnvVariable('private', 'CLERK_API_URL', process.env.E2E_APP_CLERK_API_URL)
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-custom-roles'].sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-custom-roles'].pk)
+  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
+  .setEnvVariable('public', 'CLERK_JS', process.env.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+
 export const envs = {
   withEmailCodes,
   withEmailLinks,
+  withCustomRoles,
 } as const;
