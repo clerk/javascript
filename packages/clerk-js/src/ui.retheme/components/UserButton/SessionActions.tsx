@@ -18,7 +18,6 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
       role='menu'
       elementDescriptor={descriptors.userButtonPopoverActions}
       elementId={descriptors.userButtonPopoverActions.setId('singleSession')}
-      sx={t => ({ backgroundColor: t.colors.$blackAlpha100 })}
     >
       <Action
         elementDescriptor={descriptors.userButtonPopoverActionButton}

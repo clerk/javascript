@@ -31,7 +31,13 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
   return (
     <Col
       elementDescriptor={descriptors.scrollBox}
-      sx={t => ({ position: 'relative', borderRadius: t.radii.$xl, width: '100%', overflowY: 'auto' })}
+      sx={t => ({
+        backgroundColor: t.colors.$colorBackground,
+        position: 'relative',
+        borderRadius: t.radii.$lg,
+        width: '100%',
+        overflowY: 'auto',
+      })}
     >
       <Col
         elementDescriptor={descriptors.pageScrollBox}

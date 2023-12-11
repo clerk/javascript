@@ -47,8 +47,10 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
               padding: t.space.$8,
               boxShadow:
                 '0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.06), 0px 0px 0px 1px rgba(25, 28, 33, 0.04)',
+              maxWidth: `calc(100vw - ${t.sizes.$20})`,
               width: t.sizes.$100,
-              borderRadius: `${t.radii.$xl} ${t.radii.$xl} ${t.radii.$lg} ${t.radii.$lg}`,
+              borderRadius: t.radii.$lg,
+              textAlign: 'center',
             }),
             sx,
           ]}
@@ -77,6 +79,7 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, r
       sx={[
         t => ({
           width: t.sizes.$220,
+          maxWidth: `calc(100vw - ${t.sizes.$20})`,
         }),
         sx,
       ]}
@@ -102,7 +105,7 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
       elementDescriptor={[descriptors.card, props.elementDescriptor as ElementDescriptor]}
       sx={[
         t => ({
-          backgroundColor: t.colors.$colorBackground,
+          background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
           overflow: 'hidden',
           willChange: 'transform, opacity, height',
           transitionProperty: t.transitionProperty.$common,
@@ -155,12 +158,8 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       justify='center'
       elementDescriptor={descriptors.cardFooter}
       sx={t => ({
-        '>:first-of-type': {
-          padding: `${t.space.$4} ${t.space.$2} ${t.space.$2} ${t.space.$2}`,
-          marginTop: `-${t.space.$2}`,
-        },
+        padding: t.space.$2,
         '>:not(:first-of-type)': {
-          padding: `${t.space.$2}`,
           borderTop: t.borders.$normal,
           borderColor: t.colors.$blackAlpha300,
         },
@@ -186,7 +185,6 @@ export const CardFooterItem = React.forwardRef<HTMLDivElement, CardFooterItemPro
           position: 'relative',
           width: '100%',
           borderRadius: `0 0 ${t.radii.$xl} ${t.radii.$xl}`,
-          backgroundColor: t.colors.$blackAlpha200,
         }),
       ]}
       {...rest}
