@@ -193,18 +193,18 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       ...handleMultiDomainAndProxy(req, options as AuthenticateRequestOptions),
     } as AuthenticateRequestOptions;
     const requestState = await clerkClient.authenticateRequest(req, authenticateRequestOptions);
+    const locationHeader = requestState.headers?.get('location');
 
-    if (requestState.status === AuthStatus.Handshake) {
-      const locationHeader = requestState.headers.get('location');
-      if (!locationHeader) {
-        throw new Error('Unexpected handshake without redirect');
-      }
-
+    if (locationHeader) {
       // triggering a handshake redirect
       return decorateResponseWithObservabilityHeaders(
         new Response(null, { status: 307, headers: requestState.headers }),
         requestState,
       );
+    }
+
+    if (requestState.status === AuthStatus.Handshake) {
+      throw new Error('Unexpected handshake without redirect');
     }
 
     const auth = Object.assign(requestState.toAuth(), {

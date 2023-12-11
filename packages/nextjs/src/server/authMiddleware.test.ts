@@ -6,6 +6,11 @@ import { NextURL } from 'next/dist/server/web/next-url';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { paths, setHeader } from '../utils';
+import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
+// used to assert the mock
+import { clerkClient } from './clerkClient';
+
 const mockRedirectToSignIn = jest.fn().mockImplementation(() => {
   const res = NextResponse.redirect(
     'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
@@ -18,11 +23,6 @@ jest.mock('./redirect', () => {
     redirectToSignIn: mockRedirectToSignIn,
   };
 });
-
-import { paths, setHeader } from '../utils';
-import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
-// used to assert the mock
-import { clerkClient } from './clerkClient';
 
 /**
  * Disable console warnings about config matchers
@@ -408,7 +408,7 @@ describe('authMiddleware(params)', () => {
   });
 
   describe('authenticateRequest', function () {
-    it('returns 401 with local interstitial for interstitial requestState', async () => {
+    it('returns handshake redirect for requestState.status === handshake', async () => {
       const mockLocationUrl = 'https://example.com';
       authenticateRequestMock.mockResolvedValueOnce({
         status: AuthStatus.Handshake,
