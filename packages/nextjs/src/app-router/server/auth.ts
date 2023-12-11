@@ -1,5 +1,8 @@
 import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend';
-import type { CheckAuthorizationWithCustomPermissions } from '@clerk/types';
+import type {
+  CheckAuthorizationParamsWithCustomPermissions,
+  CheckAuthorizationWithCustomPermissions,
+} from '@clerk/types';
 import { notFound } from 'next/navigation';
 
 import { authAuthHeaderMissing } from '../../server/errors';
@@ -16,7 +19,7 @@ type AuthSignedIn = AuthObjectWithDeprecatedResources<
      */
     protect: (
       params?:
-        | Parameters<CheckAuthorizationWithCustomPermissions>[0]
+        | CheckAuthorizationParamsWithCustomPermissions
         | ((has: CheckAuthorizationWithCustomPermissions) => boolean),
     ) => AuthObjectWithDeprecatedResources<SignedInAuthObject>;
   }
