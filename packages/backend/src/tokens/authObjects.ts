@@ -212,7 +212,7 @@ const createHasAuthorization =
   params => {
     if (!params?.permission && !params?.role) {
       throw new Error(
-        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed.',
+        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
       );
     }
 

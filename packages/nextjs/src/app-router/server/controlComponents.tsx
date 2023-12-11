@@ -34,32 +34,36 @@ export function Protect(props: ProtectServerComponentProps) {
   const { has, userId } = auth();
 
   /**
-   * If neither of the authorization params are passed behave as the `<SignedIn/>`.
-   * If fallback is present render that instead of rendering nothing.
+   * Fallback to UI provided by user or `null` if authorization checks failed
    */
-  if (!restAuthorizedParams.condition && !restAuthorizedParams.role && !restAuthorizedParams.permission) {
-    if (userId) {
-      return <>{children}</>;
-    }
-    return <>{fallback ?? null}</>;
+  const unauthorized = <>{fallback ?? null}</>;
+
+  const authorized = <>{children}</>;
+
+  if (!userId) {
+    return unauthorized;
   }
 
   /**
    * Check against the results of `has` called inside the callback
    */
   if (typeof restAuthorizedParams.condition === 'function') {
-    if (userId && restAuthorizedParams.condition(has)) {
-      return <>{children}</>;
+    if (restAuthorizedParams.condition(has)) {
+      return authorized;
     }
-    return <>{fallback ?? null}</>;
+    return unauthorized;
   }
 
-  if (userId && has(restAuthorizedParams)) {
-    return <>{children}</>;
+  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+    if (has(restAuthorizedParams)) {
+      return authorized;
+    }
+    return unauthorized;
   }
 
   /**
-   * Fallback to UI provided by user or `null` if authorization checks failed
+   * If neither of the authorization params are passed behave as the `<SignedIn/>`.
+   * If fallback is present render that instead of rendering nothing.
    */
-  return <>{fallback ?? null}</>;
+  return authorized;
 }
