@@ -63,8 +63,9 @@ function useAssertWrappedByClerkProvider(displayNameOrCustomHandler?: string | (
     }
 
     throw new Error(
-      `${displayNameOrCustomHandler || 'Clerk components'} must be wrapped within the <ClerkProvider> component.
-      Please see: https://clerk.com/docs/components/clerk-provider`,
+      `${
+        displayNameOrCustomHandler || 'Clerk components'
+      } must be wrapped within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
     );
   }
 }
