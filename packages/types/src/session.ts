@@ -14,7 +14,7 @@ export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boole
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
-type CheckAuthorizationParamsWithCustomPermissions =
+export type CheckAuthorizationParamsWithCustomPermissions =
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
