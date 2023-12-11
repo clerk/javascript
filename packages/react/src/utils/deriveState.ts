@@ -2,6 +2,7 @@ import type {
   ActiveSessionResource,
   InitialState,
   MembershipRole,
+  OrganizationCustomPermission,
   OrganizationResource,
   Resources,
   UserResource,
@@ -22,6 +23,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
   const organization = initialState.organization as OrganizationResource;
   const orgId = initialState.orgId;
   const orgRole = initialState.orgRole as MembershipRole;
+  const orgPermissions = initialState.orgPermissions as OrganizationCustomPermission[];
   const orgSlug = initialState.orgSlug;
   const actor = initialState.actor;
 
@@ -33,6 +35,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
     organization,
     orgId,
     orgRole,
+    orgPermissions,
     orgSlug,
     actor,
   };

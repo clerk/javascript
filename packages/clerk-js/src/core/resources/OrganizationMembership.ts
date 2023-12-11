@@ -1,12 +1,11 @@
 import type {
-  Autocomplete,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
   GetUserOrganizationMembershipParams,
   MembershipRole,
   OrganizationMembershipJSON,
   OrganizationMembershipResource,
-  OrganizationPermission,
+  OrganizationPermissionKey,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
@@ -18,10 +17,7 @@ export class OrganizationMembership extends BaseResource implements Organization
   publicMetadata: OrganizationMembershipPublicMetadata = {};
   publicUserData!: PublicUserData;
   organization!: Organization;
-  /**
-   * @experimental The property is experimental and subject to change in future releases.
-   */
-  permissions: Autocomplete<OrganizationPermission>[] = [];
+  permissions: OrganizationPermissionKey[] = [];
   role!: MembershipRole;
   createdAt!: Date;
   updatedAt!: Date;
@@ -37,7 +33,7 @@ export class OrganizationMembership extends BaseResource implements Organization
       method: 'GET',
       // `paginated` is used in some legacy endpoints to support clerk paginated responses
       // The parameter will be dropped in FAPI v2
-      search: convertPageToOffset({ ...retrieveMembershipsParams, paginated: true }) as any,
+      search: convertPageToOffset({ ...retrieveMembershipsParams, paginated: true }),
     })
       .then(res => {
         if (!res?.response) {

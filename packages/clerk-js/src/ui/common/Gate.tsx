@@ -1,13 +1,29 @@
 import { useSession } from '@clerk/shared/react';
-import type { CheckAuthorization } from '@clerk/types';
+import type { CheckAuthorization, MembershipRole, OrganizationPermissionKey } from '@clerk/types';
 import type { ComponentType, PropsWithChildren, ReactNode } from 'react';
 import React, { useEffect } from 'react';
 
 import { useRouter } from '../router';
 
-type GateParams = Parameters<CheckAuthorization>[0];
+type GateParams = Parameters<CheckAuthorization>[0] | ((has: CheckAuthorization) => boolean);
 type GateProps = PropsWithChildren<
-  GateParams & {
+  (
+    | {
+        condition?: never;
+        role: MembershipRole;
+        permission?: never;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission: OrganizationPermissionKey;
+      }
+    | {
+        condition: (has: CheckAuthorization) => boolean;
+        role?: never;
+        permission?: never;
+      }
+  ) & {
     fallback?: ReactNode;
     redirectTo?: string;
   }
@@ -16,15 +32,31 @@ type GateProps = PropsWithChildren<
 export const useGate = (params: GateParams) => {
   const { session } = useSession();
 
+  if (!session?.id) {
+    return { isAuthorizedUser: false };
+  }
+
+  /**
+   * if a function is passed and returns false then throw not found
+   */
+  if (typeof params === 'function') {
+    if (params(session.checkAuthorization)) {
+      return { isAuthorizedUser: true };
+    }
+    return { isAuthorizedUser: false };
+  }
+
   return {
-    isAuthorizedUser: session?.experimental__checkAuthorization(params),
+    isAuthorizedUser: session?.checkAuthorization(params),
   };
 };
 
 export const Gate = (gateProps: GateProps) => {
   const { children, fallback, redirectTo, ...restAuthorizedParams } = gateProps;
 
-  const { isAuthorizedUser } = useGate(restAuthorizedParams);
+  const { isAuthorizedUser } = useGate(
+    typeof restAuthorizedParams.condition === 'function' ? restAuthorizedParams.condition : restAuthorizedParams,
+  );
 
   const { navigate } = useRouter();
 
