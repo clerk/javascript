@@ -133,6 +133,12 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
     pk,
     sk,
     generateToken,
+    generateHandshakeToken(payload: string[]) {
+      return jwt.sign({ handshake: payload }, rsa.private, {
+        algorithm: 'RS256',
+        header: { kid: ins_id },
+      });
+    },
     jwks,
     pkHost,
   });
