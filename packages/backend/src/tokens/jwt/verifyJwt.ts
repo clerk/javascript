@@ -100,7 +100,7 @@ export async function verifyJwt(
   assertHeaderAlgorithm(alg);
 
   // Payload verifications
-  const { azp, sub, aud, iss, iat, exp, nbf } = payload;
+  const { azp, sub, aud, iat, exp, nbf } = payload;
 
   assertSubClaim(sub);
   assertAudienceClaim([aud], [audience]);
