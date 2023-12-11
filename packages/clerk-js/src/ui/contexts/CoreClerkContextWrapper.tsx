@@ -1,6 +1,5 @@
 import {
   ClerkInstanceContext,
-  ClerkProviderAssertionContext,
   ClientContext,
   OrganizationProvider,
   SessionContext,
@@ -48,19 +47,17 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
   );
 
   return (
-    <ClerkProviderAssertionContext.Provider value={{ inTree: true }}>
-      <ClerkInstanceContext.Provider value={clerkCtx}>
-        <ClientContext.Provider value={clientCtx}>
-          <SessionContext.Provider value={sessionCtx}>
-            <OrganizationProvider
-              {...organizationCtx.value}
-              swrConfig={props.swrConfig}
-            >
-              <UserContext.Provider value={userCtx}>{props.children}</UserContext.Provider>
-            </OrganizationProvider>
-          </SessionContext.Provider>
-        </ClientContext.Provider>
-      </ClerkInstanceContext.Provider>
-    </ClerkProviderAssertionContext.Provider>
+    <ClerkInstanceContext.Provider value={clerkCtx}>
+      <ClientContext.Provider value={clientCtx}>
+        <SessionContext.Provider value={sessionCtx}>
+          <OrganizationProvider
+            {...organizationCtx.value}
+            swrConfig={props.swrConfig}
+          >
+            <UserContext.Provider value={userCtx}>{props.children}</UserContext.Provider>
+          </OrganizationProvider>
+        </SessionContext.Provider>
+      </ClientContext.Provider>
+    </ClerkInstanceContext.Provider>
   );
 }

@@ -50,13 +50,10 @@ const OrganizationProvider = ({
   );
 };
 
-const ClerkProviderAssertionContext = React.createContext<{ inTree: true } | undefined>(undefined);
-ClerkProviderAssertionContext.displayName = 'ClerkProviderAssertionContext';
-
 function useAssertWrappedByClerkProvider(displayNameOrCustomHandler?: string | (() => void)): void {
-  const assertionCtx = React.useContext(ClerkProviderAssertionContext);
+  const ctx = React.useContext(ClerkInstanceContext);
 
-  if (!assertionCtx) {
+  if (!ctx) {
     if (typeof displayNameOrCustomHandler === 'function') {
       displayNameOrCustomHandler();
       return;
@@ -81,6 +78,5 @@ export {
   useSessionContext,
   ClerkInstanceContext,
   useClerkInstanceContext,
-  ClerkProviderAssertionContext,
   useAssertWrappedByClerkProvider,
 };
