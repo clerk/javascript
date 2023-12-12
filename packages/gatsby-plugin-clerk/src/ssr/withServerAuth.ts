@@ -1,10 +1,10 @@
+import { AuthStatus } from '@clerk/backend';
 import type { GetServerDataProps, GetServerDataReturn } from 'gatsby';
 
-import { PUBLISHABLE_KEY } from '../constants';
-import { authenticateRequest } from './authenticateRequest';
-import { clerkClient, constants } from './clerkClient';
+import { PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
+import { clerkClient } from './clerkClient';
 import type { WithServerAuthCallback, WithServerAuthOptions, WithServerAuthResult } from './types';
-import { injectAuthIntoContext, injectSSRStateIntoProps, sanitizeAuthObject } from './utils';
+import { gatsbyPropsToRequest, injectAuthIntoContext, injectSSRStateIntoProps, sanitizeAuthObject } from './utils';
 
 interface WithServerAuth {
   <CallbackReturn extends GetServerDataReturn, Options extends WithServerAuthOptions>(
@@ -19,16 +19,17 @@ export const withServerAuth: WithServerAuth = (cbOrOptions: any, options?: any):
   const opts = (options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {}) || {};
 
   return async (props: GetServerDataProps) => {
-    const requestState = await authenticateRequest(props, opts);
-    if (requestState.isInterstitial || requestState.isUnknown) {
-      const headers = {
-        [constants.Headers.AuthMessage]: requestState.message,
-        [constants.Headers.AuthStatus]: requestState.status,
-      };
-      const interstitialHtml = clerkClient.localInterstitial({
-        publishableKey: PUBLISHABLE_KEY,
-      });
-      return injectSSRStateIntoProps({ headers }, { __clerk_ssr_interstitial_html: interstitialHtml });
+    const req = gatsbyPropsToRequest(props);
+    const requestState = await clerkClient.authenticateRequest(req, {
+      ...opts,
+      secretKey: SECRET_KEY,
+      publishableKey: PUBLISHABLE_KEY,
+      request: req,
+    });
+
+    if (requestState.status === AuthStatus.Handshake) {
+      // @TODO handle handshake
+      return;
     }
 
     const contextWithAuth = injectAuthIntoContext(props, requestState.toAuth());

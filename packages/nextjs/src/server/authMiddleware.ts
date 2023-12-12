@@ -10,9 +10,8 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
-import { authenticateRequest } from './authenticateRequest';
 import { clerkClient } from './clerkClient';
-import { SECRET_KEY } from './constants';
+import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 import { informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
@@ -20,6 +19,8 @@ import { isDevAccountPortalOrigin } from './url';
 import {
   apiEndpointUnauthorizedNextResponse,
   decorateRequest,
+  decorateResponseWithObservabilityHeaders,
+  handleMultiDomainAndProxy,
   isCrossOrigin,
   setRequestHeadersOnNextResponse,
 } from './utils';
@@ -185,23 +186,24 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     }
 
     // TODO: fix type discrepancy between WithAuthOptions and AuthenticateRequestOptions
-    const requestState = await authenticateRequest(req, options as AuthenticateRequestOptions);
-    const requestStateHeaders = requestState.headers;
+    const authenticateRequestOptions = {
+      ...options,
+      secretKey: options.secretKey || SECRET_KEY,
+      publishableKey: options.publishableKey || PUBLISHABLE_KEY,
+      ...handleMultiDomainAndProxy(req, options as AuthenticateRequestOptions),
+    } as AuthenticateRequestOptions;
+    const requestState = await clerkClient.authenticateRequest(req, authenticateRequestOptions);
 
-    const locationHeader = requestStateHeaders?.get('location');
-
-    // triggering a handshake redirect
-    if (locationHeader) {
-      return new Response(null, { status: 307, headers: requestStateHeaders });
-    }
-
-    if (
-      requestState.status === AuthStatus.Handshake ||
-      requestState.status === AuthStatus.Unknown ||
-      requestState.status === AuthStatus.Interstitial
-    ) {
-      console.log(requestState);
-      throw new Error('Unexpected handshake or unknown state without redirect');
+    if (requestState.status === AuthStatus.Handshake) {
+      const locationHeader = requestState.headers.get('location');
+      if (!locationHeader) {
+        throw new Error('Unexpected handshake without redirect');
+      }
+      // triggering a handshake redirect
+      return decorateResponseWithObservabilityHeaders(
+        new Response(null, { status: 307, headers: requestState.headers }),
+        requestState,
+      );
     }
 
     const auth = Object.assign(requestState.toAuth(), {
@@ -226,8 +228,8 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     const result = decorateRequest(req, finalRes, requestState) || NextResponse.next();
 
-    if (requestStateHeaders) {
-      requestStateHeaders.forEach((value, key) => {
+    if (requestState.headers) {
+      requestState.headers.forEach((value, key) => {
         result.headers.append(key, value);
       });
     }

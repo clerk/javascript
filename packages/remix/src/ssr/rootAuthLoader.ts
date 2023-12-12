@@ -1,5 +1,6 @@
-import { sanitizeAuthObject } from '@clerk/backend';
+import { AuthStatus, sanitizeAuthObject } from '@clerk/backend';
 import type { defer } from '@remix-run/server-runtime';
+import { redirect } from '@remix-run/server-runtime';
 import { isDeferredData } from '@remix-run/server-runtime/dist/responses';
 
 import { invalidRootLoaderCallbackReturn } from '../errors';
@@ -10,10 +11,8 @@ import {
   injectAuthIntoRequest,
   injectRequestStateIntoDeferredData,
   injectRequestStateIntoResponse,
-  interstitialJsonResponse,
   isRedirect,
   isResponse,
-  unknownResponse,
 } from './utils';
 
 interface RootAuthLoader {
@@ -51,12 +50,9 @@ export const rootAuthLoader: RootAuthLoader = async (
 
   const requestState = await authenticateRequest(args, opts);
 
-  if (requestState.isUnknown) {
-    throw unknownResponse(requestState);
-  }
-
-  if (requestState.isInterstitial) {
-    throw interstitialJsonResponse(requestState, { loader: 'root' }, args.context);
+  // TODO handle handshake
+  if (requestState.status === AuthStatus.Handshake) {
+    throw redirect('');
   }
 
   if (!handler) {

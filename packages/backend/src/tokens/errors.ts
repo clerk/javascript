@@ -21,8 +21,6 @@ export enum TokenVerificationErrorReason {
   RemoteJWKMissing = 'jwk-remote-missing',
 
   JWKFailedToResolve = 'jwk-failed-to-resolve',
-
-  RemoteInterstitialFailedToLoad = 'interstitial-remote-failed-to-load',
 }
 
 export enum TokenVerificationErrorAction {

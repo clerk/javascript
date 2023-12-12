@@ -1,5 +1,5 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
-import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
+import { constants, debugRequestState } from '@clerk/backend';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { AppLoadContext, defer } from '@remix-run/server-runtime';
 import { json } from '@remix-run/server-runtime';
@@ -73,35 +73,6 @@ export const getClerkDebugHeaders = (headers: Headers) => {
   };
 };
 
-export const unknownResponse = (requestState: RequestState) => {
-  return json(null, { status: 401, headers: observabilityHeadersFromRequestState(requestState) });
-};
-
-export const interstitialJsonResponse = (
-  requestState: RequestState,
-  opts: { loader: 'root' | 'nested' },
-  context: AppLoadContext,
-) => {
-  return json(
-    wrapWithClerkState({
-      __loader: opts.loader,
-      __clerk_ssr_interstitial_html: loadInterstitialFromLocal({
-        debugData: debugRequestState(requestState),
-        publishableKey: requestState.publishableKey,
-        // TODO: This needs to be the version of clerk/remix not clerk/react
-        // pkgVersion: LIB_VERSION,
-        clerkJSUrl: getEnvVariable('CLERK_JS', context),
-        clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),
-        proxyUrl: requestState.proxyUrl,
-        isSatellite: requestState.isSatellite,
-        domain: requestState.domain,
-        signInUrl: requestState.signInUrl,
-      }),
-    }),
-    { status: 401, headers: observabilityHeadersFromRequestState(requestState) },
-  );
-};
-
 export const injectRequestStateIntoResponse = async (
   response: Response,
   requestState: RequestState,
@@ -150,7 +121,7 @@ export function injectRequestStateIntoDeferredData(
  * @internal
  */
 export function getResponseClerkState(requestState: RequestState, context: AppLoadContext) {
-  const { reason, message, isSignedIn, isInterstitial, ...rest } = requestState;
+  const { reason, message, isSignedIn, ...rest } = requestState;
   const clerkState = wrapWithClerkState({
     __clerk_ssr_state: rest.toAuth(),
     __publishableKey: requestState.publishableKey,

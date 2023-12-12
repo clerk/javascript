@@ -1,9 +1,5 @@
 import type { ClerkProviderProps } from '@clerk/clerk-react';
-import {
-  __internal__setErrorThrowerOptions,
-  ClerkLoaded,
-  ClerkProvider as ReactClerkProvider,
-} from '@clerk/clerk-react';
+import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { navigate } from 'gatsby';
 import React from 'react';
 
@@ -17,7 +13,7 @@ export type GatsbyClerkProviderProps = {
 
 export function ClerkProvider({ children, ...rest }: GatsbyClerkProviderProps) {
   const { clerkState, ...restProps } = rest;
-  const { __clerk_ssr_state, __clerk_ssr_interstitial_html } = clerkState?.__internal_clerk_state || {};
+  const { __clerk_ssr_state } = clerkState?.__internal_clerk_state || {};
 
   return (
     <ReactClerkProvider
@@ -33,17 +29,7 @@ export function ClerkProvider({ children, ...rest }: GatsbyClerkProviderProps) {
       }
       {...restProps}
     >
-      {__clerk_ssr_interstitial_html ? (
-        <ClerkLoaded>
-          <Interstitial html={__clerk_ssr_interstitial_html} />
-        </ClerkLoaded>
-      ) : (
-        children
-      )}
+      {children}
     </ReactClerkProvider>
   );
-}
-
-export function Interstitial({ html }: { html: string }) {
-  return <html dangerouslySetInnerHTML={{ __html: html }} />;
 }
