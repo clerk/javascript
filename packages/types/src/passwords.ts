@@ -2,7 +2,7 @@ import type { PasswordSettingsData } from './userSettings';
 
 export interface ZxcvbnResult {
   feedback: {
-    warning: string;
+    warning: string | null;
     suggestions: string[];
   };
   score: 0 | 1 | 2 | 3 | 4;
