@@ -69,11 +69,10 @@ export type OrganizationCustomRoleKey = ClerkAuthorization extends Placeholder
  * MembershipRole includes `admin`, `basic_member`, `guest_member`. With the introduction of "Custom roles"
  * these types will no longer match a developer's custom logic.
  */
-export type MembershipRole = 'role' extends keyof ClerkAuthorization
-  ? // @ts-ignore Typescript cannot infer the existence of the `role` key even if we checking it above
-    // Disabling eslint rule because the error causes the type to become any when accessing a property that does not exist
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    ClerkAuthorization['role'] | 'admin' | 'basic_member' | 'guest_member'
+export type MembershipRole = ClerkAuthorization extends Placeholder
+  ? ClerkAuthorization['role'] extends string
+    ? ClerkAuthorization['role'] | 'admin' | 'basic_member' | 'guest_member'
+    : Autocomplete<'admin' | 'basic_member' | 'guest_member'>
   : Autocomplete<'admin' | 'basic_member' | 'guest_member'>;
 
 export type OrganizationSystemPermissionKey =
@@ -88,11 +87,10 @@ export type OrganizationSystemPermissionKey =
  * OrganizationPermissionKey is a combination of system and custom permissions.
  * System permissions are only accessible from FAPI and client-side operations/utils
  */
-export type OrganizationPermissionKey = 'permission' extends keyof ClerkAuthorization
-  ? // @ts-ignore Typescript cannot infer the existence of the `permission` key even if we checking it above
-    // Disabling eslint rule because the error causes the type to become any when accessing a property that does not exist
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    ClerkAuthorization['permission'] | OrganizationSystemPermissionKey
+export type OrganizationPermissionKey = ClerkAuthorization extends Placeholder
+  ? ClerkAuthorization['permission'] extends string
+    ? ClerkAuthorization['permission'] | OrganizationSystemPermissionKey
+    : Autocomplete<OrganizationSystemPermissionKey>
   : Autocomplete<OrganizationSystemPermissionKey>;
 
 export type UpdateOrganizationMembershipParams = {
