@@ -2,7 +2,6 @@ export {
   ClerkLoaded,
   ClerkLoading,
   EmailLinkErrorCode,
-  MultisessionAppSupport,
   SignedIn,
   SignedOut,
   WithClerk,
@@ -26,6 +25,8 @@ export {
   withSession,
   withUser,
 } from '@clerk/clerk-react';
+
+export { MultisessionAppSupport } from '@clerk/clerk-react/internal';
 
 export { clerk as Clerk } from './singleton';
 

@@ -10,3 +10,5 @@ import { errorThrower } from './errors/errorThrower';
 export function setErrorThrowerOptions(options: ErrorThrowerOptions) {
   errorThrower.setMessages(options).setPackageName(options);
 }
+
+export { MultisessionAppSupport } from './components/controlComponents';

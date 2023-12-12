@@ -8,7 +8,6 @@ exports[`public exports should not include a breaking change 1`] = `
   "ClerkProvider",
   "CreateOrganization",
   "EmailLinkErrorCode",
-  "MultisessionAppSupport",
   "OrganizationList",
   "OrganizationProfile",
   "OrganizationSwitcher",

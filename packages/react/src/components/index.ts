@@ -19,7 +19,6 @@ export {
   RedirectToSignUp,
   RedirectToUserProfile,
   AuthenticateWithRedirectCallback,
-  MultisessionAppSupport,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
 } from './controlComponents';

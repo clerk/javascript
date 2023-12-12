@@ -10,7 +10,8 @@ export {
   RedirectToSignUp,
   RedirectToUserProfile,
   AuthenticateWithRedirectCallback,
-  MultisessionAppSupport,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
 } from '@clerk/clerk-react';
+
+export { MultisessionAppSupport } from '@clerk/clerk-react/internal';
