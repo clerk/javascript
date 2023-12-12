@@ -271,6 +271,8 @@ type _LocalizationResource = {
     start: {
       headerTitle__account: LocalizationValue;
       headerTitle__security: LocalizationValue;
+      headerSubtitle__account: LocalizationValue;
+      headerSubtitle__security: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
       };
@@ -554,6 +556,8 @@ type _LocalizationResource = {
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;
+      headerSubtitle__members: LocalizationValue;
+      headerSubtitle__settings: LocalizationValue;
     };
     profilePage: {
       title: LocalizationValue;
