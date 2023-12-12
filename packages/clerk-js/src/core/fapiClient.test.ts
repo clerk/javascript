@@ -170,12 +170,12 @@ describe('request', () => {
   });
 
   describe('for production instances', () => {
-    it.todo('does not append the __dev_session cookie value to the query string');
-    it.todo('does not set the __dev_session cookie from the response Clerk-Cookie header');
+    it.todo('does not append the __clerk_db_jwt cookie value to the query string');
+    it.todo('does not set the __clerk_db_jwt cookie from the response Clerk-Cookie header');
   });
 
   describe('for staging or development instances', () => {
-    it.todo('appends the __dev_session cookie value to the query string');
-    it.todo('sets the __dev_session cookie from the response Clerk-Cookie header');
+    it.todo('appends the __clerk_db_jwt cookie value to the query string');
+    it.todo('sets the __clerk_db_jwt cookie from the response Clerk-Cookie header');
   });
 });

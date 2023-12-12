@@ -293,7 +293,7 @@ describe('Clerk singleton - Redirects', () => {
         });
       });
 
-      it('redirects to the provided url without __dev_session in the url', async () => {
+      it('redirects to the provided url without __clerk_db_jwt in the url', async () => {
         await clerkForProductionInstance.redirectWithAuth('https://app.example.com');
         expect(mockHref).toHaveBeenNthCalledWith(1, 'https://app.example.com/');
 
@@ -326,7 +326,7 @@ describe('Clerk singleton - Redirects', () => {
         });
       });
 
-      it('redirects to the provided url with __dev_session in the url', async () => {
+      it('redirects to the provided url with __clerk_db_jwt in the url', async () => {
         await clerkForProductionInstance.redirectWithAuth('https://app.example.com');
         expect(mockHref).toHaveBeenNthCalledWith(1, 'https://app.example.com/');
 
