@@ -19,7 +19,6 @@ export const BackLink = (props: BackLinkProps) => {
         <Text
           localizationKey={localizationKeys('backButton')}
           elementDescriptor={linkElementDescriptor}
-          colorScheme='inherit'
           variant='body'
         />
       </RouterLink>

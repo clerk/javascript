@@ -237,7 +237,6 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                         key={index}
                         as={'span'}
                         sx={{
-                          color: 'inherit',
                           display: 'block',
                         }}
                         localizationKey={label}
@@ -287,7 +286,6 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                         key={index}
                         as={'span'}
                         sx={{
-                          color: 'inherit',
                           display: 'block',
                         }}
                         localizationKey={label}

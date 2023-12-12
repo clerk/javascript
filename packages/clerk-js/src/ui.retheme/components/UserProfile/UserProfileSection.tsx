@@ -24,10 +24,7 @@ export const UserProfileSection = () => {
           alignItems: 'center',
         }}
       >
-        <UserPreview
-          user={userWithoutIdentifiers}
-          size='lg'
-        />
+        <UserPreview user={userWithoutIdentifiers} />
 
         <Button
           variant='ghost'

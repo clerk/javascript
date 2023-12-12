@@ -75,7 +75,6 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           elementDescriptor={descriptors.organizationPreviewMainIdentifier}
           elementId={descriptors.organizationPreviewMainIdentifier.setId(elementId)}
           variant={mainTextSize}
-          colorScheme='inherit'
           truncate
           sx={mainIdentifierSx}
         >

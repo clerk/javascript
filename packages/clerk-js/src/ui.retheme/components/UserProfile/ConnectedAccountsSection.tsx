@@ -123,7 +123,6 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
       <Col gap={4}>
         <UserPreview
           externalAccount={account}
-          size='lg'
           icon={
             <Image
               alt={providerToDisplayData[account.provider].name}
