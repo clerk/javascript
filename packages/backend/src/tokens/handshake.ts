@@ -4,7 +4,7 @@ import { assertHeaderAlgorithm, assertHeaderType } from './jwt/assertions';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import type { VerifyTokenOptions } from './verify';
 
-export async function verifyHandshakeJwt(token: string, { key }: VerifyJwtOptions): Promise<{ handshake: string[] }> {
+async function verifyHandshakeJwt(token: string, { key }: VerifyJwtOptions): Promise<{ handshake: string[] }> {
   const decoded = decodeJwt(token);
 
   const { header, payload } = decoded;

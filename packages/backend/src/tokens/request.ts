@@ -91,6 +91,8 @@ export async function authenticateRequest(
   }
 
   async function resolveHandshake() {
+    const { derivedRequestUrl } = authenticateContext;
+
     const headers = new Headers({
       'Access-Control-Allow-Origin': 'null',
       'Access-Control-Allow-Credentials': 'true',
@@ -108,7 +110,7 @@ export async function authenticateRequest(
     });
 
     if (instanceType === 'development') {
-      const newUrl = new URL(authenticateContext.derivedRequestUrl);
+      const newUrl = new URL(derivedRequestUrl);
       newUrl.searchParams.delete('__clerk_handshake');
       newUrl.searchParams.delete('__clerk_help');
       headers.append('Location', newUrl.toString());
@@ -161,8 +163,10 @@ ${err.getFullMessage()}`,
   const instanceType = pk.instanceType;
 
   async function authenticateRequestWithTokenInHeader() {
+    const { sessionTokenInHeader } = authenticateContext;
+
     try {
-      const verifyResult = await verifyToken(authenticateContext.sessionTokenInHeader!, authenticateContext);
+      const verifyResult = await verifyToken(sessionTokenInHeader!, authenticateContext);
       return await signedIn(options, verifyResult);
     } catch (err) {
       return handleError(err, 'header');
@@ -170,10 +174,23 @@ ${err.getFullMessage()}`,
   }
 
   async function authenticateRequestWithTokenInCookie() {
-    const clientUat = parseInt(authenticateContext.clientUat || '', 10) || 0;
+    const {
+      derivedRequestUrl,
+      isSatellite,
+      secFetchDest,
+      signInUrl,
+      clientUat: clientUatRaw,
+      sessionTokenInCookie: sessionToken,
+    } = authenticateContext;
+
+    const clientUat = parseInt(clientUatRaw || '', 10) || 0;
     const hasActiveClient = clientUat > 0;
-    const sessionToken = authenticateContext.sessionTokenInCookie;
     const hasSessionToken = !!sessionToken;
+
+    const isRequestEligibleForMultiDomainSync =
+      isSatellite &&
+      secFetchDest === 'document' &&
+      !derivedRequestUrl.searchParams.has(constants.QueryParameters.ClerkSynced);
 
     /**
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
@@ -185,10 +202,7 @@ ${err.getFullMessage()}`,
     /**
      * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
      */
-    if (
-      instanceType === 'development' &&
-      authenticateContext.derivedRequestUrl.searchParams.has(constants.Cookies.DevBrowser)
-    ) {
+    if (instanceType === 'development' && derivedRequestUrl.searchParams.has(constants.Cookies.DevBrowser)) {
       const headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.DevBrowserSync, '', headers);
     }
@@ -196,41 +210,26 @@ ${err.getFullMessage()}`,
     /**
      * Begin multi-domain sync flows
      */
-    if (
-      instanceType === 'production' &&
-      authenticateContext.isSatellite &&
-      authenticateContext.secFetchDest === 'document' &&
-      !authenticateContext.derivedRequestUrl.searchParams.has(constants.QueryParameters.ClerkSynced)
-    ) {
+    if (instanceType === 'production' && isRequestEligibleForMultiDomainSync) {
       const headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
     // Multi-domain development sync flow
-    if (
-      instanceType === 'development' &&
-      authenticateContext.isSatellite &&
-      authenticateContext.secFetchDest === 'document' &&
-      !authenticateContext.derivedRequestUrl.searchParams.has(constants.QueryParameters.ClerkSynced)
-    ) {
+    if (instanceType === 'development' && isRequestEligibleForMultiDomainSync) {
       // initiate MD sync
 
       // signInUrl exists, checked at the top of `authenticateRequest`
-      const redirectURL = new URL(authenticateContext.signInUrl!);
-      redirectURL.searchParams.append(
-        constants.QueryParameters.ClerkRedirectUrl,
-        authenticateContext.derivedRequestUrl.toString(),
-      );
+      const redirectURL = new URL(signInUrl!);
+      redirectURL.searchParams.append(constants.QueryParameters.ClerkRedirectUrl, derivedRequestUrl.toString());
 
       const headers = new Headers({ location: redirectURL.toString() });
       return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
     // Multi-domain development sync flow
-    const redirectUrl = new URL(authenticateContext.derivedRequestUrl).searchParams.get(
-      constants.QueryParameters.ClerkRedirectUrl,
-    );
-    if (instanceType === 'development' && !authenticateContext.isSatellite && redirectUrl) {
+    const redirectUrl = new URL(derivedRequestUrl).searchParams.get(constants.QueryParameters.ClerkRedirectUrl);
+    if (instanceType === 'development' && !isSatellite && redirectUrl) {
       // Dev MD sync from primary, redirect back to satellite w/ __clerk_db_jwt
       const redirectBackToSatelliteUrl = new URL(redirectUrl);
 
@@ -247,7 +246,7 @@ ${err.getFullMessage()}`,
      */
 
     if (!hasActiveClient && !hasSessionToken) {
-      return signedOut(authenticateContext, AuthErrorReason.CookieAndUATMissing);
+      return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing);
     }
 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
