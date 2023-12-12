@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { multipleChildrenInButtonComponent } from '../errors';
+import { multipleChildrenInButtonComponent } from '../errors/messages';
 import { errorThrower } from './errorThrower';
 
 export const assertSingleChild =

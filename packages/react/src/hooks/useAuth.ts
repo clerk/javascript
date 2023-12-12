@@ -9,7 +9,7 @@ import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
-import { invalidStateError, useAuthHasRequiresRoleOrPermission } from '../errors';
+import { invalidStateError, useAuthHasRequiresRoleOrPermission } from '../errors/messages';
 import { errorThrower } from '../utils';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';

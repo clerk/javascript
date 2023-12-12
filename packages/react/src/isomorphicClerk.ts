@@ -36,7 +36,7 @@ import type {
   Without,
 } from '@clerk/types';
 
-import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
+import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors/messages';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,

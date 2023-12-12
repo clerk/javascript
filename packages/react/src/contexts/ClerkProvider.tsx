@@ -1,7 +1,7 @@
 import { isPublishableKey } from '@clerk/shared/keys';
 import React from 'react';
 
-import { multipleClerkProvidersError } from '../errors';
+import { multipleClerkProvidersError } from '../errors/messages';
 import type { ClerkProviderProps } from '../types';
 import { __internal__setErrorThrowerOptions, errorThrower, withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';

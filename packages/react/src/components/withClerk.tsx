@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { LoadedGuarantee } from '../contexts/StructureContext';
-import { hocChildrenNotAFunctionError } from '../errors';
+import { hocChildrenNotAFunctionError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 import { errorThrower } from '../utils';
 

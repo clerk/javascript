@@ -18,7 +18,7 @@ import {
   organizationProfilePageRenderedError,
   userProfileLinkRenderedError,
   userProfilePageRenderedError,
-} from '../errors';
+} from '../errors/messages';
 import type {
   MountProps,
   OrganizationProfileLinkProps,

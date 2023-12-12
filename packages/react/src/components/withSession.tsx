@@ -2,7 +2,7 @@ import type { SessionResource } from '@clerk/types';
 import React from 'react';
 
 import { useSessionContext } from '../contexts/SessionContext';
-import { hocChildrenNotAFunctionError } from '../errors';
+import { hocChildrenNotAFunctionError } from '../errors/messages';
 import { errorThrower } from '../utils';
 
 export const withSession = <P extends { session: SessionResource }>(
