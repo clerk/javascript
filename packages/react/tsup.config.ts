@@ -12,14 +12,14 @@ export default defineConfig(overrideOptions => {
   return {
     entry: {
       index: 'src/index.ts',
+      internal: 'src/internal.ts',
     },
-    onSuccess: shouldPublish ? 'npm run publish:local' : undefined,
+    onSuccess: shouldPublish ? 'tsc && npm run publish:local' : 'tsc',
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,
     minify: false,
     sourcemap: true,
-    dts: true,
     external: ['react', 'react-dom'],
     define: {
       PACKAGE_NAME: `"${name}"`,

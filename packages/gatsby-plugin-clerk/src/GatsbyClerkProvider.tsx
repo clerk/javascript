@@ -1,11 +1,9 @@
 import type { ClerkProviderProps } from '@clerk/clerk-react';
-import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { navigate } from 'gatsby';
 import React from 'react';
 
 import { SDK_METADATA, TELEMETRY_DEBUG, TELEMETRY_DISABLED } from './constants';
-
-__internal__setErrorThrowerOptions({ packageName: 'gatsby-plugin-clerk' });
 
 export type GatsbyClerkProviderProps = {
   clerkState: any;

@@ -1,6 +1,6 @@
 import { Clerk } from '@clerk/clerk-js';
 import type { ClerkProp, ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
-import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import { buildClerk } from './singleton';
@@ -10,10 +10,6 @@ Clerk.sdkMetadata = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
 };
-
-__internal__setErrorThrowerOptions({
-  packageName: '@clerk/chrome-extension',
-});
 
 type WebSSOClerkProviderCustomProps =
   | {

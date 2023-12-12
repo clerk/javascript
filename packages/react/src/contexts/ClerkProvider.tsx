@@ -1,16 +1,12 @@
 import { isPublishableKey } from '@clerk/shared/keys';
 import React from 'react';
 
-import { __internal__setErrorThrowerOptions, errorThrower } from '../errors/errorThrower';
+import { errorThrower } from '../errors/errorThrower';
 import { multipleClerkProvidersError } from '../errors/messages';
 import type { ClerkProviderProps } from '../types';
 import { withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';
 import { StructureContext, StructureContextStates } from './StructureContext';
-
-__internal__setErrorThrowerOptions({
-  packageName: '@clerk/clerk-react',
-});
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const { initialState, children, ...restIsomorphicClerkOptions } = props;
@@ -40,4 +36,4 @@ const ClerkProvider = withMaxAllowedInstancesGuard(ClerkProviderBase, 'ClerkProv
 
 ClerkProvider.displayName = 'ClerkProvider';
 
-export { ClerkProvider, __internal__setErrorThrowerOptions };
+export { ClerkProvider };

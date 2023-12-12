@@ -31,7 +31,6 @@ exports[`public exports should not include a breaking change 1`] = `
   "WithClerk",
   "WithSession",
   "WithUser",
-  "__internal__setErrorThrowerOptions",
   "isClerkAPIResponseError",
   "isEmailLinkError",
   "isKnownError",

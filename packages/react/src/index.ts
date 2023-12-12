@@ -21,3 +21,6 @@ export type {
   WithSessionProp,
   WithUserProp,
 } from './types';
+
+import { setErrorThrowerOptions } from './internal';
+setErrorThrowerOptions({ packageName: PACKAGE_NAME });

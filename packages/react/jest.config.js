@@ -1,4 +1,4 @@
-const { name } = require('./package.json');
+const { name, version } = require('./package.json');
 
 module.exports = {
   displayName: name.replace('@clerk', ''),
@@ -15,4 +15,10 @@ module.exports = {
 
   testRegex: ['/ui/.*/__tests__/.*.test.[jt]sx?$', '/.*.test.[jt]sx?$'],
   testPathIgnorePatterns: ['/node_modules/'],
+
+  globals: {
+    __DEV__: true,
+    PACKAGE_NAME: name,
+    PACKAGE_VERSION: version,
+  },
 };
