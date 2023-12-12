@@ -1177,7 +1177,6 @@ export class Clerk implements ClerkInterface {
   }
 
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
-  // @ts-expect-error @nikos
   #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
 
   #buildSyncUrlForDevelopmentInstances = (): string => {
