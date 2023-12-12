@@ -11,4 +11,5 @@ export {
   UserContext,
   useSessionContext,
   useUserContext,
+  useAssertWrappedByClerkProvider,
 } from './contexts';

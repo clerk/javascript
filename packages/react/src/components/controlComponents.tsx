@@ -11,10 +11,13 @@ import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { LoadedGuarantee } from '../contexts/StructureContext';
 import { useAuth } from '../hooks';
+import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
 export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+  useAssertWrappedByClerkProvider('SignedIn');
+
   const { userId } = useAuthContext();
   if (userId) {
     return <>{children}</>;
@@ -23,6 +26,8 @@ export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.El
 };
 
 export const SignedOut = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+  useAssertWrappedByClerkProvider('SignedOut');
+
   const { userId } = useAuthContext();
   if (userId === null) {
     return <>{children}</>;
@@ -31,6 +36,8 @@ export const SignedOut = ({ children }: React.PropsWithChildren<unknown>): JSX.E
 };
 
 export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+  useAssertWrappedByClerkProvider('ClerkLoaded');
+
   const isomorphicClerk = useIsomorphicClerkContext();
   if (!isomorphicClerk.loaded) {
     return null;
@@ -39,6 +46,8 @@ export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX
 };
 
 export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+  useAssertWrappedByClerkProvider('ClerkLoading');
+
   const isomorphicClerk = useIsomorphicClerkContext();
   if (isomorphicClerk.loaded) {
     return null;
@@ -86,6 +95,8 @@ type ProtectProps = React.PropsWithChildren<
  * ```
  */
 export const Protect = ({ children, fallback, ...restAuthorizedParams }: ProtectProps) => {
+  useAssertWrappedByClerkProvider('Protect');
+
   const { isLoaded, has, userId } = useAuth();
 
   /**
@@ -129,6 +140,7 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
    */
   return authorized;
 };
+/* eslint-enable react-hooks/rules-of-hooks */
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;
@@ -193,6 +205,8 @@ export const AuthenticateWithRedirectCallback = withClerk(
 );
 
 export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>): JSX.Element => {
+  useAssertWrappedByClerkProvider('MultisessionAppSupport');
+
   const session = useSessionContext();
   return <React.Fragment key={session ? session.id : 'no-users'}>{children}</React.Fragment>;
 };

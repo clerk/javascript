@@ -1,6 +1,6 @@
 import type { UserResource } from '@clerk/types';
 
-import { useUserContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
 
 type UseUserReturn =
   | { isLoaded: false; isSignedIn: undefined; user: undefined }
@@ -28,6 +28,8 @@ type UseUserReturn =
  * }
  */
 export function useUser(): UseUserReturn {
+  useAssertWrappedByClerkProvider('useUser');
+
   const user = useUserContext();
 
   if (user === undefined) {

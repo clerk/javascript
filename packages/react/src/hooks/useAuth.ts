@@ -11,6 +11,7 @@ import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError, useAuthHasRequiresRoleOrPermission } from '../errors';
 import { errorThrower } from '../utils';
+import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
 
 type CheckAuthorizationSignedOut = undefined;
@@ -109,6 +110,8 @@ type UseAuth = () => UseAuthReturn;
  * }
  */
 export const useAuth: UseAuth = () => {
+  useAssertWrappedByClerkProvider('useAuth');
+
   const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext();
 

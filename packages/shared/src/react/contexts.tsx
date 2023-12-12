@@ -50,6 +50,21 @@ const OrganizationProvider = ({
   );
 };
 
+function useAssertWrappedByClerkProvider(displayNameOrFn: string | (() => void)): void {
+  const ctx = React.useContext(ClerkInstanceContext);
+
+  if (!ctx) {
+    if (typeof displayNameOrFn === 'function') {
+      displayNameOrFn();
+      return;
+    }
+
+    throw new Error(
+      `${displayNameOrFn} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
+    );
+  }
+}
+
 export {
   ClientContext,
   useClientContext,
@@ -61,4 +76,5 @@ export {
   useSessionContext,
   ClerkInstanceContext,
   useClerkInstanceContext,
+  useAssertWrappedByClerkProvider,
 };
