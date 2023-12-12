@@ -4,47 +4,60 @@ import { DEV_BROWSER_JWT_MARKER } from '@clerk/shared';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
-import { CLIENT_JWT_KEY, STORAGE_KEY_CLIENT_JWT } from './constants';
+import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION, STORAGE_KEY_CLIENT_JWT } from './constants';
+import type { GetClientCookieParams } from './utils/cookies';
 import { getClientCookie } from './utils/cookies';
 import { assertPublishableKey, errorLogger } from './utils/errors';
+import { getValidPossibleManifestHosts, validateHostPermissionExistence, validateManifest } from './utils/manifest';
 import { BrowserStorageCache, type StorageCache } from './utils/storage';
-import { validateManifest } from './utils/validation';
 
 export let clerk: ClerkProp;
 
 type BuildClerkOptions = {
   publishableKey: string;
   storageCache?: StorageCache;
-  syncSessionHost?: string;
 };
 
 export async function buildClerk({
   publishableKey,
   storageCache = BrowserStorageCache,
-  syncSessionHost = 'http://localhost',
 }: BuildClerkOptions): Promise<ClerkProp> {
   if (clerk) {
     return clerk;
   }
 
-  // Will throw if manifest is invalid
-  validateManifest(browser.runtime.getManifest());
-
-  // Parse publishableKey and assert it's present/valid
+  // Parse publishableKey and assert it's present/valid, throw if not
   const key = parsePublishableKey(publishableKey);
   assertPublishableKey(key);
 
-  // Will throw if publishableKey is invalid
   const isProd = key.instanceType === 'production';
+  const hostHint = isProd ? key.frontendApi : DEFAULT_LOCAL_HOST_PERMISSION;
+  const manifest = browser.runtime.getManifest();
+
+  // Will throw if manifest is invalid
+  validateManifest(manifest);
+
+  const validHosts = getValidPossibleManifestHosts(manifest);
+
+  // Will throw if manifest host_permissions doesn't contain a valid host
+  validateHostPermissionExistence(validHosts, hostHint);
+
+  // Set up cookie params based on environment
+  const getClientCookieParams: GetClientCookieParams = isProd
+    ? {
+        urls: key.frontendApi,
+        name: CLIENT_JWT_KEY,
+      }
+    : {
+        urls: validHosts,
+        name: DEV_BROWSER_JWT_MARKER,
+      };
 
   // Get client cookie from browser
-  const clientCookie = await (isProd
-    ? getClientCookie(key.frontendApi, CLIENT_JWT_KEY)
-    : getClientCookie(syncSessionHost, DEV_BROWSER_JWT_MARKER)
-  ).catch(errorLogger);
+  const clientCookie = await getClientCookie(getClientCookieParams).catch(errorLogger);
 
   // Create StorageCache key
-  const CACHE_KEY = storageCache.createKey(isProd ? key.frontendApi : syncSessionHost, STORAGE_KEY_CLIENT_JWT);
+  const CACHE_KEY = storageCache.createKey(key.frontendApi, STORAGE_KEY_CLIENT_JWT);
 
   // Set client cookie in StorageCache
   if (clientCookie) {

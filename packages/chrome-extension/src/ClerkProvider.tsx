@@ -17,12 +17,10 @@ __internal__setErrorThrowerOptions({
 
 type WebSSOClerkProviderCustomProps =
   | {
-      syncSessionHost?: never;
       syncSessionWithTab?: false;
       storageCache?: never;
     }
   | {
-      syncSessionHost?: string;
       syncSessionWithTab: true;
       storageCache?: StorageCache;
     };
@@ -72,6 +70,6 @@ const StandaloneClerkProvider = (props: ClerkReactProviderProps): JSX.Element =>
 type ChromeExtensionClerkProviderProps = WebSSOClerkProviderProps;
 
 export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
-  const { syncSessionHost, storageCache, syncSessionWithTab, ...rest } = props;
+  const { storageCache, syncSessionWithTab, ...rest } = props;
   return syncSessionWithTab ? <WebSSOClerkProvider {...props} /> : <StandaloneClerkProvider {...rest} />;
 }

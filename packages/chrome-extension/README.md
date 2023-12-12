@@ -152,20 +152,16 @@ You must enable the following permissions in your `manifest.json` file:
 
 You must enable the following host permissions in your `manifest.json` file:
 
-- **Development:** `"host_permissions": ["*://localhost:*/*"]`
-  - If you're using a domain other than `localhost`, you'll want replace that entry with your domain: `*://<DOMAIN>/*`
-- **Production:** `"host_permissions": ["*://<YOUR_CLERK_FRONTEND_API_GOES_HERE>/"]`
+- **Development:** `"host_permissions": ["http://localhost"]`
+  - If you're using a domain other than `localhost`, you'll want replace that entry with your domain: `http://<DOMAIN>`
+- **Production:** `"host_permissions": ["https://<YOUR_CLERK_FRONTEND_API_GOES_HERE>/"]`
   - Your Frontend API URL can be found in `Clerk Dashboard > API Keys > Advanced > Clerk API URLs`.
 
 For more info on host permissions: (Google Developer `host_permissions` Reference)[https://developer.chrome.com/docs/extensions/mv3/declare_permissions/#host-permissions]
 
-#### ClerkProvider
-
-If your plan to sync sessions with a host application not on `localhost`, you'll need to use the `syncSessionHost` prop on `ClerkProvider` to specify the domain you're using, inclusive of the protocol. (eg: `https://<domain>`)
-
 <a name="clerk-settings"></a>
 
-### Clerk settings
+### Clerk Settings
 
 Add your Chrome extension origin to your instance allowed_origins using BAPI:
 

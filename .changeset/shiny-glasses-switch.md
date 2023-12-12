@@ -6,20 +6,32 @@ Expand the ability for `@clerk/chrome-extension` WebSSO to sync with host applic
 
 ### How to Update
 
-**WebSSO Local Development Host Permissions:**
+**WebSSO Host Permissions:**
 
-Add `*://localhost:*/*` to the `host_permissions` array in your `manifest.json` file:
+_Local Development: You must have your explicit development domain added to your `manifest.json` file in order to use the WebSSO flow._
+
+Example:
+
 ```json
 {
-  "host_permissions": ["*://localhost:*/*"]
+  "host_permissions": [
+    // ...
+    "http://localhost"
+    // ...
+  ]
 }
 ```
 
-If you're using a local domain other than `localhost`, you'll want replace that entry with your domain: `*://<DOMAIN>/*`
+_Production: You must have your explicit Clerk Frontend API domain added to your `manifest.json` file in order to use the WebSSO flow._
 
+Example:
 ```json
 {
-  "host_permissions": ["*://<DOMAIN>/*"]
+  "host_permissions": [
+    // ...
+    "https://clerk.example.com"
+    // ...
+  ]
 }
 ```
 
@@ -34,10 +46,6 @@ If you're using a local domain other than `localhost`, you'll want replace that 
 
   // tokenCache is now storageCache (See below)
   storageCache={/* ... */}
-
-  // [Development Only]: If the host application isn't on 
-  // `http://localhost`, you can provide it here:
-  syncSessionHost="http://<DOMAIN>"
 >
 ```
 
