@@ -6,7 +6,6 @@ import type { CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
 import type { CreateAuthenticateRequestOptions } from './tokens';
 import { createAuthenticateRequest } from './tokens';
-import type { AuthenticateRequestOptions } from './tokens/request';
 
 export { createIsomorphicRequest } from './util/IsomorphicRequest';
 

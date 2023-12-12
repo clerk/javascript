@@ -41,7 +41,6 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     isSatellite,
     domain,
     signInUrl,
-    request: req,
   });
 };
 

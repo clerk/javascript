@@ -1,4 +1,4 @@
-import { isPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
+import { parsePublishableKey } from '@clerk/shared/keys';
 import type { JwtPayload } from '@clerk/types';
 
 import { constants } from '../constants';
@@ -12,6 +12,7 @@ import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
 import { verifyHandshakeToken } from './handshake';
 import { decodeJwt } from './jwt';
 import { verifyToken, type VerifyTokenOptions } from './verify';
+
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
     VerifyTokenOptions,
