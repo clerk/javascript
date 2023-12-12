@@ -148,8 +148,12 @@ export default (QUnit: QUnit) => {
     'user-agent': 'Mozilla/TestAgent',
   };
 
+  const mockRequest = (headers = {}, requestUrl = 'http://clerk.com/path') => {
+    return new Request(requestUrl, { headers: { ...defaultHeaders, ...headers } });
+  };
+
   /* An otherwise bare state on a request. */
-  const defaultMockAuthenticateRequestOptions = (headers = defaultHeaders, requestUrl = 'http://clerk.com/path') =>
+  const mockOptions = (options?) =>
     ({
       secretKey: 'deadbeef',
       apiUrl: 'https://api.clerk.test',
@@ -163,34 +167,19 @@ export default (QUnit: QUnit) => {
       afterSignInUrl: '',
       afterSignUpUrl: '',
       domain: '',
-      request: new Request(requestUrl, { headers }),
+      ...options,
     } satisfies AuthenticateRequestOptions);
 
-  const defaultMockHeaderAuthOptions = (headers = defaultHeaders, requestUrl?) => {
-    return {
-      ...defaultMockAuthenticateRequestOptions(
-        {
-          authorization: mockJwt,
-          ...headers,
-        },
-        requestUrl,
-      ),
-    };
+  const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
+    return mockRequest({ authorization: mockJwt, ...headers }, requestUrl);
   };
 
-  const defaultMockCookieAuthOptions = (headers = defaultHeaders, cookies = {}, requestUrl?) => {
+  const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
     const cookieStr = Object.entries(cookies)
       .map(([k, v]) => `${k}=${v}`)
       .join(';');
-    return {
-      ...defaultMockAuthenticateRequestOptions(
-        {
-          cookie: cookieStr,
-          ...headers,
-        },
-        requestUrl,
-      ),
-    };
+
+    return mockRequest({ cookie: cookieStr, ...headers }, requestUrl);
   };
 
   module('tokens.authenticateRequest(options)', hooks => {
@@ -215,10 +204,12 @@ export default (QUnit: QUnit) => {
 
     test('returns signed out state if jwk fails to load from remote', async assert => {
       fakeFetch.onCall(0).returns(jsonOk({}));
-      const requestState = await authenticateRequest({
-        ...defaultMockHeaderAuthOptions(),
-        skipJwksCache: false,
-      });
+      const requestState = await authenticateRequest(
+        mockRequestWithHeaderAuth(),
+        mockOptions({
+          skipJwksCache: false,
+        }),
+      );
 
       const errMessage =
         'The JWKS endpoint did not contain any signing keys. Contact support@clerk.com. Contact support@clerk.com (reason=jwk-remote-failed-to-load, token-carrier=header)';
@@ -230,7 +221,7 @@ export default (QUnit: QUnit) => {
     });
 
     test('headerToken: returns signed in state when a valid token [1y.2y]', async assert => {
-      const requestState = await authenticateRequest(defaultMockHeaderAuthOptions());
+      const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
 
       assertSignedIn(assert, requestState);
       assertSignedInToAuth(assert, requestState);
@@ -244,10 +235,12 @@ export default (QUnit: QUnit) => {
     // );
 
     test('headerToken: returns signed out state when a token with invalid authorizedParties [1y.2n]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockHeaderAuthOptions(),
-        authorizedParties: ['whatever'],
-      });
+      const requestState = await authenticateRequest(
+        mockRequestWithHeaderAuth(),
+        mockOptions({
+          authorizedParties: ['whatever'],
+        }),
+      );
 
       const errMessage =
         'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-invalid-authorized-parties, token-carrier=header)';
@@ -262,7 +255,7 @@ export default (QUnit: QUnit) => {
       // advance clock for 1 hour
       fakeClock.tick(3600 * 1000);
 
-      const requestState = await authenticateRequest(defaultMockHeaderAuthOptions());
+      const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
 
       assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
       assert.strictEqual(requestState.toAuth(), null);
@@ -270,10 +263,10 @@ export default (QUnit: QUnit) => {
 
     test('headerToken: returns signed out state when invalid signature [1y.2n]', async assert => {
       const requestState = await authenticateRequest(
-        defaultMockHeaderAuthOptions({
-          ...defaultHeaders,
+        mockRequestWithHeaderAuth({
           authorization: mockInvalidSignatureJwt,
         }),
+        mockOptions(),
       );
 
       const errMessage = 'JWT signature is invalid. (reason=token-invalid-signature, token-carrier=header)';
@@ -286,10 +279,8 @@ export default (QUnit: QUnit) => {
 
     test('headerToken: returns signed out state when an malformed token [1y.1n]', async assert => {
       const requestState = await authenticateRequest(
-        defaultMockHeaderAuthOptions({
-          ...defaultHeaders,
-          authorization: 'test_header_token',
-        }),
+        mockRequestWithHeaderAuth({ authorization: 'test_header_token' }),
+        mockOptions(),
       );
 
       const errMessage =
@@ -302,20 +293,23 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns interstitial when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
           {
-            ...defaultHeaders,
             'Sec-Fetch-Dest': 'document',
           },
-          { __client_uat: '0' },
+          {
+            __client_uat: '0',
+          },
         ),
-        secretKey: 'deadbeef',
-        clientUat: '0',
-        isSatellite: true,
-        signInUrl: 'https://primary.dev/sign-in',
-        domain: 'satellite.dev',
-      });
+        mockOptions({
+          secretKey: 'deadbeef',
+          clientUat: '0',
+          isSatellite: true,
+          signInUrl: 'https://primary.dev/sign-in',
+          domain: 'satellite.dev',
+        }),
+      );
 
       assertHandshake(assert, requestState, {
         reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
@@ -328,19 +322,21 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns signed out is satellite but a non-browser request [11y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
           {
             ...defaultHeaders,
             'user-agent': '[some-agent]',
           },
           { __client_uat: '0' },
         ),
-        secretKey: 'deadbeef',
-        isSatellite: true,
-        signInUrl: 'https://primary.dev/sign-in',
-        domain: 'satellite.dev',
-      });
+        mockOptions({
+          secretKey: 'deadbeef',
+          isSatellite: true,
+          signInUrl: 'https://primary.dev/sign-in',
+          domain: 'satellite.dev',
+        }),
+      );
 
       assertSignedOut(assert, requestState, {
         reason: AuthErrorReason.CookieAndUATMissing,
@@ -352,17 +348,15 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns interstitial when app is satellite, returns from primary and is dev instance [13y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(
-          undefined,
-          undefined,
-          `http://satellite.example/path?__clerk_synced=true&__clerk_db_jwt=${mockJwt}`,
-        ),
-        secretKey: 'sk_test_deadbeef',
-        signInUrl: 'http://primary.example/sign-in',
-        isSatellite: true,
-        domain: 'satellite.example',
-      });
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies({}, {}, `http://satellite.example/path?__clerk_synced=true&__clerk_db_jwt=${mockJwt}`),
+        mockOptions({
+          secretKey: 'sk_test_deadbeef',
+          signInUrl: 'http://primary.example/sign-in',
+          isSatellite: true,
+          domain: 'satellite.example',
+        }),
+      );
 
       assertHandshake(assert, requestState, {
         reason: AuthErrorReason.DevBrowserSync,
@@ -378,15 +372,14 @@ export default (QUnit: QUnit) => {
       const sp = new URLSearchParams();
       sp.set('__clerk_redirect_url', 'http://localhost:3000');
       const requestUrl = `http://clerk.com/path?${sp.toString()}`;
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
           { ...defaultHeaders, 'sec-fetch-dest': 'document' },
           { __client_uat: '12345', __session: mockJwt },
           requestUrl,
         ),
-        secretKey: 'sk_test_deadbeef',
-        isSatellite: false,
-      });
+        mockOptions({ secretKey: 'sk_test_deadbeef', isSatellite: false }),
+      );
 
       assertHandshake(assert, requestState, {
         reason: AuthErrorReason.PrimaryRespondsToSyncing,
@@ -396,10 +389,12 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns signed out when no cookieToken and no clientUat in production [4y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(),
-        secretKey: 'live_deadbeef',
-      });
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(),
+        mockOptions({
+          secretKey: 'live_deadbeef',
+        }),
+      );
 
       assertSignedOut(assert, requestState, {
         reason: AuthErrorReason.CookieAndUATMissing,
@@ -408,10 +403,12 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns interstitial when no clientUat in development [5y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(defaultHeaders, { __session: mockJwt }),
-        secretKey: 'test_deadbeef',
-      });
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies({}, { __session: mockJwt }),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+        }),
+      );
 
       assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenWithoutClientUAT });
       assert.equal(requestState.message, '');
@@ -420,8 +417,8 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns undefined when crossOriginReferrer in development and is satellite [6n]', async assert => {
       // Scenario: after auth action on Clerk-hosted UIs
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
           {
             ...defaultHeaders,
             // this is not a typo, it's intentional to be `referer` to match HTTP header key
@@ -429,11 +426,13 @@ export default (QUnit: QUnit) => {
           },
           { __client_uat: '12345', __session: mockJwt },
         ),
-        secretKey: 'pk_test_deadbeef',
-        isSatellite: true,
-        signInUrl: 'https://localhost:3000/sign-in/',
-        domain: 'localhost:3001',
-      });
+        mockOptions({
+          secretKey: 'pk_test_deadbeef',
+          isSatellite: true,
+          signInUrl: 'https://localhost:3000/sign-in/',
+          domain: 'localhost:3001',
+        }),
+      );
 
       assertSignedIn(assert, requestState, {
         isSatellite: true,
@@ -444,10 +443,10 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken [8y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(defaultHeaders, { __client_uat: '12345' }),
-        secretKey: 'deadbeef',
-      });
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies({}, { __client_uat: '12345' }),
+        mockOptions({ secretKey: 'deadbeef' }),
+      );
 
       assertHandshake(assert, requestState, { reason: AuthErrorReason.ClientUATWithoutSessionToken });
       assert.equal(requestState.message, '');
@@ -455,9 +454,7 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns signed out when clientUat = 0 and no cookieToken [9y]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(defaultHeaders, { __client_uat: '0' }),
-      });
+      const requestState = await authenticateRequest(mockRequestWithCookies({}, { __client_uat: '0' }), mockOptions());
 
       assertSignedOut(assert, requestState, {
         reason: AuthErrorReason.CookieAndUATMissing,
@@ -467,10 +464,14 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns interstitial when clientUat > cookieToken.iat [10n]', async assert => {
       const requestState = await authenticateRequest(
-        defaultMockCookieAuthOptions(defaultHeaders, {
-          __client_uat: `${mockJwtPayload.iat + 10}`,
-          __session: mockJwt,
-        }),
+        mockRequestWithCookies(
+          {},
+          {
+            __client_uat: `${mockJwtPayload.iat + 10}`,
+            __session: mockJwt,
+          },
+        ),
+        mockOptions(),
       );
 
       assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
@@ -480,10 +481,14 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns signed out when cookieToken.iat >= clientUat and malformed token [10y.1n]', async assert => {
       const requestState = await authenticateRequest(
-        defaultMockCookieAuthOptions(defaultHeaders, {
-          __client_uat: `${mockJwtPayload.iat - 10}`,
-          __session: mockMalformedJwt,
-        }),
+        mockRequestWithCookies(
+          {},
+          {
+            __client_uat: `${mockJwtPayload.iat - 10}`,
+            __session: mockMalformedJwt,
+          },
+        ),
+        mockOptions(),
       );
 
       const errMessage =
@@ -497,10 +502,14 @@ export default (QUnit: QUnit) => {
 
     test('cookieToken: returns signed in when cookieToken.iat >= clientUat and valid token [10y.2y]', async assert => {
       const requestState = await authenticateRequest(
-        defaultMockCookieAuthOptions(defaultHeaders, {
-          __client_uat: `${mockJwtPayload.iat - 10}`,
-          __session: mockJwt,
-        }),
+        mockRequestWithCookies(
+          {},
+          {
+            __client_uat: `${mockJwtPayload.iat - 10}`,
+            __session: mockJwt,
+          },
+        ),
+        mockOptions(),
       );
 
       assertSignedIn(assert, requestState);
@@ -519,10 +528,14 @@ export default (QUnit: QUnit) => {
       fakeClock.tick(3600 * 1000);
 
       const requestState = await authenticateRequest(
-        defaultMockCookieAuthOptions(defaultHeaders, {
-          __client_uat: `${mockJwtPayload.iat - 10}`,
-          __session: mockJwt,
-        }),
+        mockRequestWithCookies(
+          {},
+          {
+            __client_uat: `${mockJwtPayload.iat - 10}`,
+            __session: mockJwt,
+          },
+        ),
+        mockOptions(),
       );
 
       assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
@@ -531,16 +544,16 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns signed in for Amazon Cloudfront userAgent', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockCookieAuthOptions(
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
           {
             ...defaultHeaders,
             'user-agent': 'Amazon CloudFront',
           },
           { __client_uat: `12345`, __session: mockJwt },
         ),
-        secretKey: 'test_deadbeef',
-      });
+        mockOptions({ secretKey: 'test_deadbeef' }),
+      );
 
       assertSignedIn(assert, requestState);
       assertSignedInToAuth(assert, requestState);

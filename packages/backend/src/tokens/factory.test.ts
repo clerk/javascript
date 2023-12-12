@@ -32,7 +32,7 @@ export default (QUnit: QUnit) => {
         apiClient: {} as ApiClient,
       });
 
-      const requestState = await authenticateRequest({ request: new Request('http://example.com/') });
+      const requestState = await authenticateRequest(new Request('http://example.com/'));
       assert.propContains(requestState.toAuth()?.debug(), buildTimeOptions);
     });
 
@@ -58,8 +58,7 @@ export default (QUnit: QUnit) => {
         secretKey: 'r-sk',
         publishableKey: TEST_PK,
       };
-      const requestState = await authenticateRequest({
-        request: new Request('http://example.com/'),
+      const requestState = await authenticateRequest(new Request('http://example.com/'), {
         ...overrides,
       });
       assert.propContains(requestState.toAuth()?.debug(), {
@@ -86,8 +85,7 @@ export default (QUnit: QUnit) => {
         apiClient: {} as ApiClient,
       });
 
-      const requestState = await authenticateRequest({
-        request: new Request('http://example.com/'),
+      const requestState = await authenticateRequest(new Request('http://example.com/'), {
         // @ts-expect-error is used to check runtime code
         apiUrl: 'r-apiUrl',
         apiVersion: 'r-apiVersion',
