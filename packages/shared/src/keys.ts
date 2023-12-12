@@ -5,7 +5,7 @@ import { isomorphicAtob } from './isomorphicAtob';
 import { isomorphicBtoa } from './isomorphicBtoa';
 
 type ParsePublishableKeyOptions = {
-  fatal: boolean;
+  fatal?: boolean;
   domain?: string;
   proxyUrl?: string;
 };
@@ -29,7 +29,7 @@ export function parsePublishableKey(
 ): PublishableKey;
 export function parsePublishableKey(
   key: string | undefined,
-  options?: ParsePublishableKeyOptions & { fatal: false },
+  options?: ParsePublishableKeyOptions,
 ): PublishableKey | null;
 export function parsePublishableKey(
   key: string | undefined,
@@ -54,9 +54,7 @@ export function parsePublishableKey(
   if (options.proxyUrl) {
     frontendApi = options.proxyUrl;
   } else if (instanceType !== 'development' && options.domain) {
-    frontendApi = `https://clerk.${options.domain}`;
-  } else {
-    frontendApi = `https://${frontendApi}`;
+    frontendApi = `clerk.${options.domain}`;
   }
 
   return {
