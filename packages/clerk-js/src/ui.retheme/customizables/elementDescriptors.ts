@@ -125,7 +125,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userButtonPopoverActionButton',
   'userButtonPopoverActionButtonIconBox',
   'userButtonPopoverActionButtonIcon',
-  'userButtonPopoverActionButtonText',
   'userButtonPopoverFooter',
   'userButtonPopoverFooterPages',
   'userButtonPopoverFooterPagesLink',
@@ -313,7 +312,7 @@ type ElementDescriptors = { [k in keyof ElementsConfig as ElementObjectKey<k>]: 
  * socialButtons-buttonIcon ->  cl-socialButtons-buttonIcon
  */
 const toTargettableClassname = <K extends keyof ElementsConfig>(key: K): TargettableClassname<K> => {
-  return (CLASS_PREFIX + key) as TargettableClassname<K>;
+  return (CLASS_PREFIX + (key as string)) as TargettableClassname<K>;
 };
 
 /**

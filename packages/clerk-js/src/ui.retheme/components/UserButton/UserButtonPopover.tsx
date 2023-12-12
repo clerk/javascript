@@ -5,7 +5,7 @@ import React from 'react';
 import { useEnvironment, useUserButtonContext } from '../../contexts';
 import { descriptors, Icon, localizationKeys } from '../../customizables';
 import { Action, Actions, PopoverCard, PreviewButton, RootBox, SecondaryActions, UserPreview } from '../../elements';
-import { CheckmarkFilled, Plus, SignOut, SwitchArrowRight } from '../../icons';
+import { Add, CheckmarkFilled, SignOut, SwitchArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { MultiSessionActions, SingleSessionActions } from './SessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
@@ -34,13 +34,15 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('addAccount')}
       iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
       iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('addAccount')}
-      textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
-      textElementId={descriptors.userButtonPopoverActionButtonText.setId('addAccount')}
-      icon={Plus}
+      icon={Add}
       label={localizationKeys('userButton.action__addAccount')}
       onClick={handleAddAccountClicked}
       sx={t => ({
         backgroundColor: t.colors.$colorBackground,
+      })}
+      iconSx={t => ({
+        width: t.sizes.$9,
+        height: t.sizes.$6,
       })}
     />
   );
@@ -60,8 +62,6 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('signOutAll')}
         iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
         iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('signOutAll')}
-        textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
-        textElementId={descriptors.userButtonPopoverActionButtonText.setId('signOutAll')}
         icon={SignOut}
         label={localizationKeys('userButton.action__signOutAll')}
         onClick={handleSignOutAllClicked}
@@ -77,30 +77,24 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   );
 
   const sessionActions = (
-    <>
-      <SecondaryActions role='menu'>
-        {otherSessions.map(session => (
-          <PreviewButton
-            key={session.id}
-            icon={SwitchArrowRight}
-            sx={t => ({
-              height: t.sizes.$20,
-              borderRadius: 0,
-              borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-              backgroundColor: t.colors.$colorBackground,
-            })}
-            onClick={handleSessionClicked(session)}
-            role='menuitem'
-          >
-            <UserPreview
-              user={session.user}
-              size='sm'
-            />
-          </PreviewButton>
-        ))}
-        {addAccountButton}
-      </SecondaryActions>
-    </>
+    <SecondaryActions role='menu'>
+      {otherSessions.map(session => (
+        <PreviewButton
+          key={session.id}
+          icon={SwitchArrowRight}
+          sx={t => ({
+            borderRadius: 0,
+            borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+            backgroundColor: t.colors.$colorBackground,
+          })}
+          onClick={handleSessionClicked(session)}
+          role='menuitem'
+        >
+          <UserPreview user={session.user} />
+        </PreviewButton>
+      ))}
+      {addAccountButton}
+    </SecondaryActions>
   );
 
   return (
@@ -119,7 +113,6 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
             sx={t => ({
               padding: `${t.space.$4} ${t.space.$5}`,
             })}
-            size='sm'
             icon={
               <Icon
                 icon={CheckmarkFilled}

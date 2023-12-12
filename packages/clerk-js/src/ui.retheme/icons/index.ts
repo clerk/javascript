@@ -4,6 +4,7 @@
  * Consequently, the files are correctly imported but the TS checker emits errors.
  * The above no-check is safe, as webpack will not allow compilation if for example a file is not resolved.
  */
+export { default as Add } from './add.svg';
 export { default as ArrowLeftIcon } from './arrow-left.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
 export { default as ArrowRightButtonIcon } from './arrow-right-button.svg';
@@ -12,6 +13,7 @@ export { default as Billing } from './billing.svg';
 export { default as Caret } from './caret.svg';
 export { default as ChatAltIcon } from './chat-alt.svg';
 export { default as CheckCircle } from './check-circle.svg';
+export { default as ChevronDown } from './chevron-down.svg';
 export { default as Clipboard } from './clipboard.svg';
 export { default as Close } from './close.svg';
 export { default as CogFilled } from './cog-filled.svg';

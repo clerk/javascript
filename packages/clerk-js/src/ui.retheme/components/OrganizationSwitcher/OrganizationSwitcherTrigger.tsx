@@ -5,7 +5,7 @@ import { NotificationCountBadge, useGate } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview, withAvatarShimmer } from '../../elements';
-import { Selector } from '../../icons';
+import { ChevronDown } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { organizationListParams } from './utils';
 
@@ -31,7 +31,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
       <Button
         elementDescriptor={descriptors.organizationSwitcherTrigger}
         variant='ghost'
-        sx={[t => ({ minHeight: 0, padding: `0 ${t.space.$2} 0 0`, position: 'relative' }), sx]}
+        sx={[t => ({ minHeight: 0, padding: `${t.space.$1} ${t.space.$2}`, position: 'relative' }), sx]}
         ref={ref}
         aria-label={`${props.isOpen ? 'Close' : 'Open'} organization switcher`}
         aria-expanded={props.isOpen}
@@ -42,17 +42,18 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
           <OrganizationPreview
             elementId={'organizationSwitcherTrigger'}
             gap={3}
-            size={'sm'}
+            size='xs'
             organization={organization}
-            sx={{ maxWidth: '30ch' }}
+            sx={t => ({ maxWidth: '30ch', color: t.colors.$blackAlpha600 })}
           />
         )}
         {!organization && (
           <PersonalWorkspacePreview
-            size={'sm'}
+            size='xs'
             gap={3}
             user={userWithoutIdentifiers}
             showAvatar={!hidePersonal}
+            sx={t => ({ color: t.colors.$blackAlpha600 })}
             title={
               hidePersonal
                 ? localizationKeys('organizationSwitcher.notSelected')
@@ -65,8 +66,8 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
 
         <Icon
           elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
-          icon={Selector}
-          sx={t => ({ opacity: t.opacity.$sm, marginLeft: `${t.space.$2}` })}
+          icon={ChevronDown}
+          sx={t => ({ color: t.colors.$blackAlpha400, marginLeft: `${t.space.$2}` })}
         />
       </Button>
     );
