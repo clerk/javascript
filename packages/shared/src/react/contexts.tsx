@@ -60,7 +60,7 @@ function useAssertWrappedByClerkProvider(displayNameOrFn: string | (() => void))
     }
 
     throw new Error(
-      `${displayNameOrFn} must be wrapped within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
+      `${displayNameOrFn} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
     );
   }
 }
