@@ -1,37 +1,22 @@
 ---
 '@clerk/backend': major
-'@clerk/nextjs': major
-'@clerk/remix': major
-'gatsby-plugin-clerk': major
 ---
 
 ## Breaking Changes
 
-### @clerk/backend
-
-Replace `Clerk` with `createClerkClient` [SDK-1058]
+Remove the named `Clerk` import from `@clerk/backend` and import `createClerkClient` instead. The latter is a factory method that will create a Clerk client instance for you. This aligns usage across our SDKs and will enable us to better ship DX improvements in the future. [SDK-1058]
 
 
+Inside your code, search for occurrences like these:
+	
 ```js
 import { Clerk } from '@clerk/backend';
 const clerk = Clerk({ secretKey: '...' });
 ```
 
-now becomes:
+You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
 ```js
 import { createClerkClient } from '@clerk/backend';
 const clerk = createClerkClient({ secretKey: '...' });
 ```
-
-### @clerk/gatsby-plugin-clerk
-
-No longer returning `Clerk`. Please replace with `createClerkClient`
-
-### @clerk/nextjs
-
-No longer returning `Clerk`. Please replace with `createClerkClient`
-
-### @clerk/remix
-
-No longer returning `Clerk`. Please replace with `createClerkClient`
