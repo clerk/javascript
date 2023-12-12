@@ -1,12 +1,7 @@
+import { AuthStatus } from '@clerk/backend';
 import type { createClerkClient } from '@clerk/backend';
 
-import {
-  authenticateRequest,
-  decorateResponseWithObservabilityHeaders,
-  handleInterstitialCase,
-  handleUnknownCase,
-  loadInterstitial,
-} from './authenticateRequest';
+import { authenticateRequest, decorateResponseWithObservabilityHeaders } from './authenticateRequest';
 import type { ClerkMiddlewareOptions, MiddlewareRequireAuthProp, RequireAuthProp } from './types';
 
 export type CreateClerkExpressMiddlewareOptions = {
@@ -29,22 +24,11 @@ export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMidd
         options,
       });
       decorateResponseWithObservabilityHeaders(res, requestState);
-      if (requestState.isUnknown) {
-        return handleUnknownCase(res, requestState);
-      }
-      if (requestState.isInterstitial) {
-        const interstitial = await loadInterstitial({
-          clerkClient,
-          requestState,
-        });
-        if (interstitial.errors) {
-          // Temporarily return Unauthenticated instead of the interstitial errors since we don't
-          // want to expose any internal error (possible errors are http 401, 500 response from BAPI)
-          // It will be dropped with the removal of fetching remotePrivateInterstitial
-          next(new Error('Unauthenticated'));
-          return;
-        }
-        return handleInterstitialCase(res, requestState, interstitial.data);
+
+      if (requestState.status === AuthStatus.Handshake) {
+        // TODO: Handle handshake
+        // This needs to be refactored and reused by clerkExpressWithAuth as well
+        return;
       }
 
       if (requestState.isSignedIn) {

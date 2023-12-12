@@ -10,9 +10,6 @@ import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMis
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 
-/**
- * @internal
- */
 export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<RequestState> {
   const { request, context } = args;
   const { loadSession, loadUser, loadOrganization } = opts;
@@ -89,6 +86,5 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
-    request,
   });
 }

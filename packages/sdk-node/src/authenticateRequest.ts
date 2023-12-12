@@ -1,66 +1,20 @@
 import type { RequestState } from '@clerk/backend';
-import { buildRequestUrl, constants, createIsomorphicRequest } from '@clerk/backend';
+import { buildRequestUrl, constants } from '@clerk/backend';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
-import type { ServerResponse } from 'http';
+import type { IncomingMessage, ServerResponse } from 'http';
 
-import type { AuthenticateRequestParams, ClerkClient } from './types';
+import type { AuthenticateRequestParams } from './types';
 import { loadApiEnv, loadClientEnv } from './utils';
 
-export async function loadInterstitial({
-  clerkClient,
-  requestState,
-}: {
-  clerkClient: ClerkClient;
-  requestState: RequestState;
-}) {
-  const { clerkJSVersion, clerkJSUrl } = loadClientEnv();
-  /**
-   * When publishable key is present utilize the localInterstitial method
-   * and avoid the extra network call
-   */
-  if (requestState.publishableKey) {
-    const data = clerkClient.localInterstitial({
-      publishableKey: requestState.publishableKey,
-      proxyUrl: requestState.proxyUrl,
-      signInUrl: requestState.signInUrl,
-      isSatellite: requestState.isSatellite,
-      domain: requestState.domain,
-      clerkJSVersion,
-      clerkJSUrl,
-    });
-
-    return {
-      data,
-      errors: null,
-    };
-  }
-
-  return clerkClient.remotePrivateInterstitial();
-}
-
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
-  const { clerkClient, secretKey, publishableKey, req, options } = opts;
+  const { clerkClient, secretKey, publishableKey, req: incomingMessage, options } = opts;
   const { jwtKey, authorizedParties, audience } = options || {};
 
+  const req = incomingMessageToRequest(incomingMessage);
   const env = { ...loadApiEnv(), ...loadClientEnv() };
-
-  const isomorphicRequest = createIsomorphicRequest((Request, Headers) => {
-    const headers = Object.keys(req.headers).reduce((acc, key) => Object.assign(acc, { [key]: req?.headers[key] }), {});
-
-    // @ts-ignore Optimistic attempt to get the protocol in case
-    // req extends IncomingMessage in a useful way. No guarantee
-    // it'll work.
-    const protocol = req.connection?.encrypted ? 'https' : 'http';
-    const dummyOriginReqUrl = new URL(req.url || '', `${protocol}://clerk-dummy`);
-    return new Request(dummyOriginReqUrl, {
-      method: req.method,
-      headers: new Headers(headers),
-    });
-  });
-
-  const requestUrl = buildRequestUrl(isomorphicRequest);
+  const requestUrl = buildRequestUrl(req);
   const isSatellite = handleValueOrFn(options?.isSatellite, requestUrl, env.isSatellite);
   const domain = handleValueOrFn(options?.domain, requestUrl) || env.domain;
   const signInUrl = options?.signInUrl || env.signInUrl;
@@ -77,7 +31,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
-  return clerkClient.authenticateRequest({
+  return clerkClient.authenticateRequest(req, {
     audience,
     secretKey,
     publishableKey,
@@ -87,23 +41,24 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     isSatellite,
     domain,
     signInUrl,
-    request: isomorphicRequest,
+    request: req,
   });
 };
-export const handleUnknownCase = (res: ServerResponse, requestState: RequestState) => {
-  if (requestState.isUnknown) {
-    res.writeHead(401, { 'Content-Type': 'text/html' });
-    res.end();
-  }
+
+const incomingMessageToRequest = (req: IncomingMessage): Request => {
+  const headers = Object.keys(req.headers).reduce((acc, key) => Object.assign(acc, { [key]: req?.headers[key] }), {});
+  // @ts-ignore Optimistic attempt to get the protocol in case
+  // req extends IncomingMessage in a useful way. No guarantee
+  // it'll work.
+  const protocol = req.connection?.encrypted ? 'https' : 'http';
+  const dummyOriginReqUrl = new URL(req.url || '', `${protocol}://clerk-dummy`);
+  return new Request(dummyOriginReqUrl, {
+    method: req.method,
+    headers: new Headers(headers),
+  });
 };
 
-export const handleInterstitialCase = (res: ServerResponse, requestState: RequestState, interstitial: string) => {
-  if (requestState.isInterstitial) {
-    res.writeHead(401, { 'Content-Type': 'text/html' });
-    res.end(interstitial);
-  }
-};
-
+// TODO: Move to backend
 export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, requestState: RequestState) => {
   requestState.message && res.setHeader(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
   requestState.reason && res.setHeader(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
