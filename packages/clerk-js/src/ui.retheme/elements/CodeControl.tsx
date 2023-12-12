@@ -121,7 +121,6 @@ const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOpt
 
 export type OTPInputProps = {
   label: string | LocalizationKey;
-  description: string | LocalizationKey;
   resendButton?: LocalizationKey;
   isLoading: boolean;
   isDisabled?: boolean;

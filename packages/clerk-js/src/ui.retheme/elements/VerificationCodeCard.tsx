@@ -15,8 +15,7 @@ import { IdentityPreview } from './IdentityPreview';
 export type VerificationCodeCardProps = {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
-  formTitle: LocalizationKey;
-  formSubtitle: LocalizationKey;
+  inputLabel: LocalizationKey;
   safeIdentifier?: string | undefined | null;
   resendButton?: LocalizationKey;
   profileImageUrl?: string;
@@ -62,8 +61,7 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
       >
         <Form.OTPInput
           {...otp}
-          label={props.formTitle}
-          description={props.formSubtitle}
+          label={props.inputLabel}
           resendButton={props.resendButton}
         />
         <Button

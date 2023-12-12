@@ -157,12 +157,10 @@ type _LocalizationResource = {
       blockButton__resetPassword: LocalizationValue;
     };
     forgotPassword: {
-      title_email: LocalizationValue;
-      title_phone: LocalizationValue;
-      subtitle: LocalizationValue;
-      formTitle: LocalizationValue;
-      formSubtitle_email: LocalizationValue;
-      formSubtitle_phone: LocalizationValue;
+      title: LocalizationValue;
+      subtitle_email: LocalizationValue;
+      subtitle_phone: LocalizationValue;
+      inputLabel: LocalizationValue;
       resendButton: LocalizationValue;
     };
     resetPassword: {
@@ -177,8 +175,7 @@ type _LocalizationResource = {
     emailCode: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue;
+      inputLabel: LocalizationValue;
       resendButton: LocalizationValue;
     };
     emailLink: {

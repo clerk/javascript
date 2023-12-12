@@ -96,12 +96,12 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
           <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
+          <IdentityPreview
+            identifier={signIn.identifier}
+            avatarUrl={signIn.userData.imageUrl}
+            onClick={goBack}
+          />
         </Header.Root>
-        <IdentityPreview
-          identifier={signIn.identifier}
-          avatarUrl={signIn.userData.imageUrl}
-          onClick={goBack}
-        />
         {/*TODO: extract main in its own component */}
         <Flex
           direction='col'
