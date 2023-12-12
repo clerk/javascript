@@ -239,10 +239,55 @@ If you need a fake user to login to the test site, use `createTestUtils`.
    });
    ```
 
+### Creating a new environment config
+
+If you need to run a test suite inside a different environment (e.g. a different first factor or optional/new features) you can create a new [environment config](#environment-configs) inside [`presets/envs.ts`](../integration/presets/envs.ts).
+
+1. Create a new instance inside the **Integration testing** organization on Clerk
+1. Add its secret and publishable key to the 1Password note with the name **JS SDKs integration tests**
+1. Add a new key to `.keys.json` (with a concise name) and add your keys to `sk` and `pk` respectively. Also add a placeholder to `.keys.json.sample`. For example:
+
+   ```json
+   {
+     "your-concise-name": {
+       "pk": "",
+       "sk": ""
+     }
+   }
+   ```
+
+1. Inside `presets/envs.ts`, create a new environment config:
+
+   ```ts
+   const yourConciseName = environmentConfig()
+     .setId('yourConciseName')
+     .setEnvVariable('private', 'CLERK_API_URL', process.env.E2E_APP_CLERK_API_URL)
+     .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['your-concise-name'].sk)
+     .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['your-concise-name'].pk)
+     .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
+     .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
+     .setEnvVariable('public', 'CLERK_JS', process.env.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+   ```
+
+1. Export `yourConciseName` from the file:
+
+   ```ts
+   export const envs = {
+     // Other exports...
+     yourConciseName,
+   } as const;
+   ```
+
+1. Ensure that your new keys are added to the `INTEGRATION_INSTANCE_KEYS` environment variable inside the repository so that GitHub actions can successfully run.
+
 ## Reference
 
 > [!TIP]
 > Have a look at the [existing tests](./tests/) or ask a maintainer/colleague if you need more examples.
+
+### Constants
+
+To get an overview of all the available environment variables you can set, read [`constants.ts`](../integration/constants.ts).
 
 ### Application configs
 
@@ -402,11 +447,26 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('your test
 
 An environment config can be passed into an application using the `withEnv` method. Environment configs usually define the PK and SK keys for a Clerk instance and can be reused among different applications.
 
-Example (also see [Application](#application)):
+Example usage of an existing config (also see [Application](#application)):
 
 ```ts
 await app.withEnv(appConfigs.envs.withEmailCodes);
 ```
+
+Inside [`presets/envs.ts`](../integration/presets/envs.ts) you can also create a completely new environment config:
+
+```ts
+const withCustomRoles = environmentConfig()
+  .setId('withCustomRoles')
+  .setEnvVariable('private', 'CLERK_API_URL', process.env.E2E_APP_CLERK_API_URL)
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-custom-roles'].sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-custom-roles'].pk)
+  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
+  .setEnvVariable('public', 'CLERK_JS', process.env.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+```
+
+Read [creating a new environment config](#creating-a-new-environment-config) to learn more.
 
 ### Deployments
 
@@ -443,9 +503,11 @@ Currently, `u` has:
 
 ## Concepts
 
-### Secret keys
+### Instance keys
 
-The integration suite uses these keys to set environment variables. It allows the suite to switch between Clerk instances and use third-party services to e.g. access emails.
+The integration suite uses [`presets/envs.ts`](../integration/presets/envs.ts) to create [environment configs](#environment-configs). It allows the suite to switch between Clerk instances and use third-party services to e.g. access emails. This way you can define environment variables and Clerk instance keys for each test suite.
+
+This is why you created the `.keys.json` file in the [initial setup](#initial-setup) step. Those secret and publishable keys are used to create environment configs. Inside GitHub actions these keys are provided through the `INTEGRATION_INSTANCE_KEYS` environment variable.
 
 Currently, we have two Clerk instances configured:
 
@@ -453,6 +515,7 @@ Currently, we have two Clerk instances configured:
 - **with-email-links**: a single session app with email links enabled and email codes disabled. Useful to test email links flows as the `<SignUp />` component currently does not support switching between email links and email codes.
 
 > [!NOTE]
+> The test suite also uses these environment variables to run some tests:
 >
 > - `MAILSAC_API_KEY`: Used for [Mailsac](https://mailsac.com/) to retrieve email codes and magic links from temporary email addresses.
 > - `VERCEL_PROJECT_ID`: Only required if you plan on running deployment tests locally. This is the Vercel project ID, and it points to an application created via the Vercel dashboard. The easiest way to get access to it is by linking a local app to the Vercel project using the Vercel CLI, and then copying the values from the `.vercel` directory.
