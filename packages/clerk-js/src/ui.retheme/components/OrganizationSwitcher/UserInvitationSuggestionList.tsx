@@ -88,7 +88,7 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
       textVariant='buttonSmall'
       variant='secondary'
-      size='sm'
+      size='xs'
       isLoading={card.isLoading}
       onClick={handleAccept}
       localizationKey={localizationKeys('organizationSwitcher.action__invitationAccept')}
@@ -110,17 +110,19 @@ const InvitationPreview = withCardStateProvider(
         align='center'
         gap={2}
         sx={t => ({
-          minHeight: 'unset',
-          height: t.space.$12,
           justifyContent: 'space-between',
-          padding: `0 ${t.space.$6}`,
+          padding: `${t.space.$4} ${t.space.$5}`,
         })}
       >
         <OrganizationPreview
           elementId='organizationSwitcherListedOrganization'
-          avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
           organization={publicOrganizationData}
-          size='sm'
+          sx={t => ({
+            color: t.colors.$blackAlpha600,
+            ':hover': {
+              color: t.colors.$blackAlpha600,
+            },
+          })}
         />
 
         {children}
