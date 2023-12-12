@@ -11,7 +11,12 @@ import type {
   OrganizationResource,
 } from '@clerk/types';
 
-import { useClerkInstanceContext, useOrganizationContext, useSessionContext } from '../contexts';
+import {
+  useAssertWrappedByClerkProvider,
+  useClerkInstanceContext,
+  useOrganizationContext,
+  useSessionContext,
+} from '../contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
@@ -110,6 +115,9 @@ export const useOrganization: UseOrganization = params => {
     memberships: membersListParams,
     invitations: invitationsListParams,
   } = params || {};
+
+  useAssertWrappedByClerkProvider('useOrganization');
+
   const { organization } = useOrganizationContext();
   const session = useSessionContext();
 

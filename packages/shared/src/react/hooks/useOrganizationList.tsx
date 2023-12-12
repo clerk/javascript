@@ -11,7 +11,7 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
-import { useClerkInstanceContext, useUserContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
 import type { PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
@@ -84,6 +84,8 @@ type UseOrganizationList = <T extends UseOrganizationListParams>(
 
 export const useOrganizationList: UseOrganizationList = params => {
   const { userMemberships, userInvitations, userSuggestions } = params || {};
+
+  useAssertWrappedByClerkProvider('useOrganizationList');
 
   const userMembershipsSafeValues = useWithSafeValues(userMemberships, {
     initialPage: 1,

@@ -190,6 +190,7 @@ const DefaultMessages = Object.freeze({
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
   InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key={{key}})`,
   MissingPublishableKeyErrorMessage: `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
+  MissingClerkProvider: `{{source}} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
 });
 
 type MessageKeys = keyof typeof DefaultMessages;
@@ -213,6 +214,9 @@ export interface ErrorThrower {
   throwInvalidProxyUrl(params: { url?: string }): never;
 
   throwMissingPublishableKeyError(): never;
+
+  throwMissingClerkProviderError(params: { source?: string }): never;
+
   throw(message: string): never;
 }
 
@@ -263,6 +267,10 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     throwMissingPublishableKeyError(): never {
       throw new Error(buildMessage(messages.MissingPublishableKeyErrorMessage));
+    },
+
+    throwMissingClerkProviderError(params: { source?: string }): never {
+      throw new Error(buildMessage(messages.MissingClerkProvider, params));
     },
 
     throw(message: string): never {

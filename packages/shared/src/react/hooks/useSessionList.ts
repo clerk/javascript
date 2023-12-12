@@ -1,6 +1,6 @@
 import type { SessionResource, SetActive } from '@clerk/types';
 
-import { useClerkInstanceContext, useClientContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientContext } from '../contexts';
 
 type UseSessionListReturn =
   | {
@@ -17,6 +17,8 @@ type UseSessionListReturn =
 type UseSessionList = () => UseSessionListReturn;
 
 export const useSessionList: UseSessionList = () => {
+  useAssertWrappedByClerkProvider('useSessionList');
+
   const isomorphicClerk = useClerkInstanceContext();
   const client = useClientContext();
 

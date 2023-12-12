@@ -4,6 +4,7 @@ import React from 'react';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { LoadedGuarantee } from '../contexts/StructureContext';
 import { hocChildrenNotAFunctionError } from '../errors';
+import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 import { errorThrower } from '../utils';
 
 export const withClerk = <P extends { clerk: LoadedClerk }>(
@@ -13,6 +14,8 @@ export const withClerk = <P extends { clerk: LoadedClerk }>(
   displayName = displayName || Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
   const HOC = (props: Without<P, 'clerk'>) => {
+    useAssertWrappedByClerkProvider(displayName || 'withClerk');
+
     const clerk = useIsomorphicClerkContext();
 
     if (!clerk.loaded) {

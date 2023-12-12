@@ -2,6 +2,7 @@ import { useClientContext } from '@clerk/shared/react';
 import type { SetActive, SignInResource } from '@clerk/types';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
+import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
 type UseSignInReturn =
   | {
@@ -18,6 +19,8 @@ type UseSignInReturn =
 type UseSignIn = () => UseSignInReturn;
 
 export const useSignIn: UseSignIn = () => {
+  useAssertWrappedByClerkProvider('useSignIn');
+
   const isomorphicClerk = useIsomorphicClerkContext();
   const client = useClientContext();
 

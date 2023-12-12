@@ -1,6 +1,6 @@
 import type { ActiveSessionResource } from '@clerk/types';
 
-import { useSessionContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useSessionContext } from '../contexts';
 
 type UseSessionReturn =
   | { isLoaded: false; isSignedIn: undefined; session: undefined }
@@ -30,6 +30,8 @@ type UseSession = () => UseSessionReturn;
  * }
  */
 export const useSession: UseSession = () => {
+  useAssertWrappedByClerkProvider('useSession');
+
   const session = useSessionContext();
 
   if (session === undefined) {
