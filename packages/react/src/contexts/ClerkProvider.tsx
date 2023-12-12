@@ -6,7 +6,6 @@ import { multipleClerkProvidersError } from '../errors/messages';
 import type { ClerkProviderProps } from '../types';
 import { withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';
-import { StructureContext, StructureContextStates } from './StructureContext';
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const { initialState, children, ...restIsomorphicClerkOptions } = props;
@@ -21,14 +20,12 @@ function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   }
 
   return (
-    <StructureContext.Provider value={StructureContextStates.noGuarantees}>
-      <ClerkContextProvider
-        initialState={initialState}
-        isomorphicClerkOptions={restIsomorphicClerkOptions}
-      >
-        {children}
-      </ClerkContextProvider>
-    </StructureContext.Provider>
+    <ClerkContextProvider
+      initialState={initialState}
+      isomorphicClerkOptions={restIsomorphicClerkOptions}
+    >
+      {children}
+    </ClerkContextProvider>
   );
 }
 

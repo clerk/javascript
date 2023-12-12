@@ -8,9 +8,6 @@ export {
 
 export const noClerkProviderError = 'You must wrap your application in a <ClerkProvider> component.';
 
-export const noGuaranteedLoadedError = (hookName: string) =>
-  `You're calling ${hookName} before there's a guarantee the client has been loaded. Call ${hookName} from a child of <SignedIn>, <SignedOut>, or <ClerkLoaded>, or use the withClerk() HOC.`;
-
 export const multipleClerkProvidersError =
   "You've added multiple <ClerkProvider> components in your React component tree. Wrap your components in a single <ClerkProvider>.";
 
