@@ -159,7 +159,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
 
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
-    clerk.redirectToUserProfile();
+    void clerk.redirectToUserProfile();
   }, []);
 
   return null;
@@ -167,7 +167,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
-    clerk.redirectToOrganizationProfile();
+    void clerk.redirectToOrganizationProfile();
   }, []);
 
   return null;
@@ -175,7 +175,7 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
 
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {
-    clerk.redirectToCreateOrganization();
+    void clerk.redirectToCreateOrganization();
   }, []);
 
   return null;
