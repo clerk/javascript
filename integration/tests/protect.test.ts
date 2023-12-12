@@ -130,12 +130,12 @@ test.describe('authorization @nextjs', () => {
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
 
-    await u.page.goToRelative('/switcher');
-    await u.page.waitForSelector('.cl-organizationSwitcher-root', { state: 'attached' });
-    await expect(u.page.getByText(/No organization selected/i)).toBeVisible();
-    await u.page.locator('.cl-organizationSwitcherTrigger').click();
+    await u.po.organizationSwitcher.goTo();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.expectNoOrganizationSelected();
+    await u.po.organizationSwitcher.toggleTrigger();
     await u.page.locator('.cl-organizationSwitcherPreviewButton').click();
-    await u.page.waitForSelector('.cl-userPreviewMainIdentifier__personalWorkspace', { state: 'detached' });
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
     await u.page.goToRelative('/settings/rsc-protect');
     await expect(u.page.getByText(/User has access/i)).toBeVisible();
@@ -176,12 +176,12 @@ test.describe('authorization @nextjs', () => {
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeViewer.email, password: fakeViewer.password });
     await u.po.expect.toBeSignedIn();
 
-    await u.page.goToRelative('/switcher');
-    await u.page.waitForSelector('.cl-organizationSwitcher-root', { state: 'attached' });
-    await expect(u.page.getByText(/No organization selected/i)).toBeVisible();
-    await u.page.locator('.cl-organizationSwitcherTrigger').click();
+    await u.po.organizationSwitcher.goTo();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.expectNoOrganizationSelected();
+    await u.po.organizationSwitcher.toggleTrigger();
     await u.page.locator('.cl-organizationSwitcherPreviewButton').click();
-    await u.page.waitForSelector('.cl-userPreviewMainIdentifier__personalWorkspace', { state: 'detached' });
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
     await u.page.goToRelative('/settings/rsc-protect');
     await expect(u.page.getByText(/User is not admin/i)).toBeVisible();
