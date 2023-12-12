@@ -1,8 +1,8 @@
 ---
 '@clerk/backend': major
-'@clerk/gatsby-plugin-clerk': major
 '@clerk/nextjs': major
 '@clerk/remix': major
+'gatsby-plugin-clerk': major
 ---
 
 ## Breaking Changes
