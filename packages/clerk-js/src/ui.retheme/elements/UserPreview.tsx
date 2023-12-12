@@ -82,9 +82,8 @@ export const UserPreview = (props: UserPreviewProps) => {
     <Flex
       elementDescriptor={descriptors.userPreview}
       elementId={descriptors.userPreview.setId(elementId)}
-      gap={3}
       align='center'
-      sx={[{ minWidth: '0px', width: '100%' }, sx]}
+      sx={[t => ({ minWidth: '0px', width: 'fit-content', gap: t.space.$4 }), sx]}
       {...rest}
     >
       {/*Do not attempt to render or reserve space based on height if image url is not defined*/}

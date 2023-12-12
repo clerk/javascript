@@ -273,6 +273,7 @@ type _LocalizationResource = {
       headerTitle__security: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
+        primaryButton: LocalizationValue;
       };
       usernameSection: {
         title: LocalizationValue;

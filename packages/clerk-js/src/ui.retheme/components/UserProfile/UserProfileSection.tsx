@@ -1,12 +1,9 @@
 import { useUser } from '@clerk/shared/react';
 
-import { localizationKeys } from '../../customizables';
+import { Button, descriptors, Flex, localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
-import { useRouter } from '../../router';
-import { BlockButton } from './UserProfileBlockButtons';
 
 export const UserProfileSection = () => {
-  const { navigate } = useRouter();
   const { user } = useUser();
 
   if (!user) {
@@ -20,12 +17,23 @@ export const UserProfileSection = () => {
       title={localizationKeys('userProfile.start.profileSection.title')}
       id='profile'
     >
-      <BlockButton onClick={() => navigate('profile')}>
+      <Flex
+        elementDescriptor={descriptors.profileSection}
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <UserPreview
           user={userWithoutIdentifiers}
           size='lg'
         />
-      </BlockButton>
+
+        <Button
+          variant='ghost'
+          localizationKey={localizationKeys('userProfile.start.profileSection.primaryButton')}
+        />
+      </Flex>
     </ProfileSection>
   );
 };
