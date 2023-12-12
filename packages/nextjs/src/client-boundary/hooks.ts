@@ -1,9 +1,6 @@
 'use client';
 
 export {
-  WithClerk,
-  WithSession,
-  WithUser,
   useAuth,
   useClerk,
   useEmailLink,
@@ -14,12 +11,7 @@ export {
   useSignIn,
   useSignUp,
   useUser,
-  withClerk,
-  withSession,
-  withUser,
 } from '@clerk/clerk-react';
-
-export type { WithClerkProp, WithSessionProp, WithUserProp } from '@clerk/clerk-react';
 
 export {
   EmailLinkErrorCode,

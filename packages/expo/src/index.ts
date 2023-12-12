@@ -4,9 +4,6 @@ export {
   EmailLinkErrorCode,
   SignedIn,
   SignedOut,
-  WithClerk,
-  WithSession,
-  WithUser,
   isClerkAPIResponseError,
   isEmailLinkError,
   isKnownError,
@@ -21,9 +18,6 @@ export {
   useSignIn,
   useSignUp,
   useUser,
-  withClerk,
-  withSession,
-  withUser,
 } from '@clerk/clerk-react';
 
 export { MultisessionAppSupport } from '@clerk/clerk-react/internal';
@@ -35,4 +29,5 @@ export * from './useOAuth';
 
 // Override Clerk React error thrower to show that errors come from @clerk/clerk-expo
 import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });

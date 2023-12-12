@@ -24,8 +24,6 @@ export {
 } from './controlComponents';
 
 export * from './withClerk';
-export * from './withUser';
-export * from './withSession';
 
 export * from './SignInButton';
 export * from './SignUpButton';

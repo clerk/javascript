@@ -7,10 +7,8 @@ import type {
   LoadedClerk,
   MultiDomainAndOrProxy,
   SDKMetadata,
-  SessionResource,
   SignInRedirectOptions,
   SignUpRedirectOptions,
-  UserResource,
   Without,
 } from '@clerk/types';
 import type React from 'react';
@@ -52,10 +50,6 @@ export interface HeadlessBrowserClerkConstructor {
 }
 
 export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk };
-
-export type WithUserProp<T = unknown> = T & { user: UserResource };
-
-export type WithSessionProp<T = unknown> = T & { session: SessionResource };
 
 // Clerk object
 export interface MountProps {

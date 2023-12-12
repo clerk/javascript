@@ -1,5 +1,7 @@
 import './polyfills';
 
+import { setErrorThrowerOptions } from './internal';
+
 export * from './components';
 export * from './contexts';
 export {
@@ -18,9 +20,6 @@ export type {
   ClerkProviderOptionsWrapper,
   ClerkProviderProps,
   WithClerkProp,
-  WithSessionProp,
-  WithUserProp,
 } from './types';
 
-import { setErrorThrowerOptions } from './internal';
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
