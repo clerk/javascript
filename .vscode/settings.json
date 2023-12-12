@@ -3,7 +3,7 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
+    "source.fixAll.eslint": "explicit",
   },
   "eslint.workingDirectories": [
     {
@@ -15,20 +15,5 @@
       "fileMatch": ["manifest.json"],
       "url": "https://json.schemastore.org/chrome-manifest.json"
     }
-  ],
-  "cSpell.words": [
-    "accountsstage",
-    "adduser",
-    "arethetypeswrong",
-    "attw",
-    "BAPI",
-    "citty",
-    "execa",
-    "FAPI",
-    "jwks",
-    "lclclerk",
-    "lclstage",
-    "nextjs",
-    "publint"
   ],
 }

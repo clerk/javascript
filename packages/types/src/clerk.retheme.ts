@@ -371,22 +371,22 @@ export interface Clerk {
   /**
    * Redirects to the configured URL where <UserProfile/> is mounted.
    */
-  redirectToUserProfile: () => void;
+  redirectToUserProfile: () => Promise<unknown>;
 
   /**
    * Redirects to the configured URL where <OrganizationProfile /> is mounted.
    */
-  redirectToOrganizationProfile: () => void;
+  redirectToOrganizationProfile: () => Promise<unknown>;
 
   /**
    * Redirects to the configured URL where <CreateOrganization /> is mounted.
    */
-  redirectToCreateOrganization: () => void;
+  redirectToCreateOrganization: () => Promise<unknown>;
 
   /**
    * Redirects to the configured home URL of the instance.
    */
-  redirectToHome: () => void;
+  redirectToHome: () => Promise<unknown>;
 
   /**
    * Completes an OAuth or SAML redirection flow started by

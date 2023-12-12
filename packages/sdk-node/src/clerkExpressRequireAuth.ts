@@ -11,7 +11,6 @@ import type { ClerkMiddlewareOptions, MiddlewareRequireAuthProp, RequireAuthProp
 
 export type CreateClerkExpressMiddlewareOptions = {
   clerkClient: ReturnType<typeof Clerk>;
-  /* Secret Key */
   secretKey?: string;
   publishableKey?: string;
   apiUrl?: string;
