@@ -131,9 +131,9 @@ export type ElementsConfig = {
   header: WithOptions;
   headerTitle: WithOptions;
   headerSubtitle: WithOptions;
-  headerBackRow: WithOptions;
-  headerBackLink: WithOptions;
-  headerBackIcon: WithOptions;
+
+  backRow: WithOptions;
+  backLink: WithOptions;
 
   main: WithOptions;
 

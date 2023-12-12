@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import React, { useCallback } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { descriptors, Flex, Input, Spinner, Text } from '../customizables';
+import { descriptors, Flex, Input, Spinner } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -34,6 +34,7 @@ type UseFieldOTP = <R = unknown>(params: {
   isLoading: boolean;
   otpControl: ReturnType<typeof useCodeControl>;
   onResendCode: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  onFakeContinue: () => void;
 };
 
 export const useFieldOTP: UseFieldOTP = params => {
@@ -68,6 +69,11 @@ export const useFieldOTP: UseFieldOTP = params => {
     paramsOnCodeEntryFinished(code, resolve, reject);
   });
 
+  const onFakeContinue = () => {
+    codeControlState.setError(undefined);
+    paramsOnCodeEntryFinished('', resolve, reject);
+  };
+
   const onResendCode = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     e => {
       codeControl.reset();
@@ -80,6 +86,7 @@ export const useFieldOTP: UseFieldOTP = params => {
     isLoading: status.isLoading,
     otpControl: codeControl,
     onResendCode: paramsOnResendCodeClicked ? onResendCode : undefined,
+    onFakeContinue,
   };
 };
 
@@ -128,28 +135,6 @@ export const OTPRoot = ({ children, ...props }: PropsWithChildren<OTPInputProps>
   return <OTPInputContext.Provider value={{ value: props }}>{children}</OTPInputContext.Provider>;
 };
 
-export const OTPInputLabel = () => {
-  const { label } = useOTPInputContext();
-  return (
-    <Text
-      localizationKey={label}
-      elementDescriptor={descriptors.formHeaderTitle}
-      variant='subtitle'
-    />
-  );
-};
-
-export const OTPInputDescription = () => {
-  const { description } = useOTPInputContext();
-  return (
-    <Text
-      localizationKey={description}
-      elementDescriptor={descriptors.formHeaderSubtitle}
-      colorScheme='neutral'
-    />
-  );
-};
-
 export const OTPResendButton = () => {
   const { resendButton, onResendCode, isLoading, otpControl } = useOTPInputContext();
 
@@ -164,7 +149,6 @@ export const OTPResendButton = () => {
       startDisabled
       isDisabled={otpControl.otpInputProps.feedbackType === 'success' || isLoading}
       showCounter={otpControl.otpInputProps.feedbackType !== 'success'}
-      sx={theme => ({ marginTop: theme.space.$6 })}
       localizationKey={resendButton}
     />
   );
@@ -341,17 +325,13 @@ const SingleCharInput = React.forwardRef<
         ...common.textVariants(theme).h2,
         padding: `${theme.space.$0x5} 0`,
         boxSizing: 'content-box',
-        minWidth: '1ch',
-        maxWidth: theme.sizes.$7,
-        borderRadius: theme.radii.$none,
+        height: theme.space.$10,
+        width: theme.space.$10,
+        borderRadius: theme.radii.$md,
         border: 'none',
-        borderBottom: theme.borders.$heavy,
         ...(isSuccessfullyFilled ? { borderColor: theme.colors.$success500 } : common.borderColor(theme, props)),
         backgroundColor: 'unset',
-        '&:focus': {
-          boxShadow: 'none',
-          borderColor: theme.colors.$primary500,
-        },
+        '&:focus': {},
       })}
       {...rest}
     />

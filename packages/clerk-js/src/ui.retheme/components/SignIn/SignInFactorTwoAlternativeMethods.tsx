@@ -32,7 +32,7 @@ export const SignInFactorTwoAlternativeMethods = (props: AlternativeMethodsProps
 };
 
 const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroubleClick: React.MouseEventHandler }) => {
-  const { onBackLinkClick, onHavingTroubleClick, onFactorSelected } = props;
+  const { onHavingTroubleClick, onFactorSelected } = props;
   const card = useCardState();
   const { supportedSecondFactors } = useCoreSignIn();
 
@@ -41,7 +41,6 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
           <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
         </Header.Root>
         {/*TODO: extract main in its own component */}

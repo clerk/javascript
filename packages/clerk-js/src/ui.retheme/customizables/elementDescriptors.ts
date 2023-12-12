@@ -26,9 +26,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'header',
   'headerTitle',
   'headerSubtitle',
-  'headerBackRow',
-  'headerBackLink',
-  'headerBackIcon',
 
   'main',
 
@@ -38,6 +35,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'footerActionLink',
   'footerPages',
   'footerPagesLink',
+
+  'backRow',
+  'backLink',
 
   'socialButtons',
   'socialButtonsIconButton',

@@ -13,6 +13,13 @@ const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
       {...props}
       justify='between'
       align='center'
+      sx={{
+        '&:empty': {
+          // Remove the element from the DOM if `Footer.Links` is the only child and is `null`,
+          // causing this element to be empty, creating an unwanted spacing
+          display: 'none',
+        },
+      }}
     />
   );
 };
@@ -28,6 +35,9 @@ const FooterAction = (props: FooterActionProps): JSX.Element => {
       elementId={descriptors.footerAction.setId(elementId)}
       {...rest}
       gap={1}
+      sx={t => ({
+        margin: `${t.space.$none} auto`,
+      })}
     />
   );
 };
@@ -49,7 +59,12 @@ const FooterActionLink = (props: PropsOfComponent<typeof RouterLink>): JSX.Eleme
     <RouterLink
       elementDescriptor={descriptors.footerActionLink}
       {...props}
-      colorScheme='primary'
+      // colorScheme='primary'
+      sx={t => ({
+        // TODO: Make the color theme-aware once we have dark mode colors
+        color: t.colors.$primary700,
+        fontWeight: t.fontWeights.$medium,
+      })}
     />
   );
 };
@@ -64,8 +79,10 @@ const FooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
   );
 };
 
-const FooterLinks = React.memo((): JSX.Element => {
+const FooterLinks = React.memo((): JSX.Element | null => {
   const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+
+  if (!helpPageUrl && !privacyPageUrl && !termsPageUrl) return null;
 
   return (
     <Flex

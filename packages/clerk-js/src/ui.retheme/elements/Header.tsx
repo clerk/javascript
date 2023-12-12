@@ -2,7 +2,6 @@ import React from 'react';
 
 import { Col, descriptors, Heading, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { BackLink as BackLinkEl } from './BackLink';
 
 const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
   const { sx, ...rest } = props;
@@ -10,7 +9,7 @@ const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
     <Col
       elementDescriptor={descriptors.header}
       gap={1}
-      sx={sx}
+      sx={{ ...sx, textAlign: 'center' }}
       {...rest}
     />
   );
@@ -41,22 +40,8 @@ const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element 
   );
 });
 
-const BackLink = (props: PropsOfComponent<typeof BackLinkEl>) => {
-  const { sx, ...rest } = props;
-  return (
-    <BackLinkEl
-      boxElementDescriptor={descriptors.headerBackRow}
-      linkElementDescriptor={descriptors.headerBackLink}
-      iconElementDescriptor={descriptors.headerBackIcon}
-      sx={sx}
-      {...rest}
-    />
-  );
-};
-
 export const Header = {
   Root,
   Title,
   Subtitle,
-  BackLink,
 };

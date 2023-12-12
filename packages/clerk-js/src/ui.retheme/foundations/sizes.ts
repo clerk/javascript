@@ -58,6 +58,7 @@ const sizes = Object.freeze({ ...space } as const);
 const radii = Object.freeze({
   none: '0px',
   circle: '50%',
+  card: '0.75rem', // TODO: rename to 'xl' (?) once we have the design system
   sm: '0.25rem',
   md: '0.375rem',
   lg: '0.5rem',

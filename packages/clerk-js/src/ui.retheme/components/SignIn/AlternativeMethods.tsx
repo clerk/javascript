@@ -3,7 +3,7 @@ import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, Flow, localizationKeys, Text } from '../../customizables';
-import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../../elements';
+import { ArrowBlockButton, BackLink, Card, CardAlert, Footer, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { ChatAltIcon, Email, LinkIcon, LockClosedIcon, RequestAuthIcon } from '../../icons';
@@ -37,10 +37,23 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
 
   return (
     <Flow.Part part={asForgotPassword ? 'forgotPasswordMethods' : 'alternativeMethods'}>
-      <Card>
+      <Card
+        footerItems={[
+          <Footer.Root key='signIn.alternativeMethods.actionLink'>
+            <Footer.Action elementId='havingTrouble'>
+              {/* TODO: Add text "Don’t have any of these?" */}
+              {/* <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} /> */}
+              <Footer.ActionLink
+                localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+                onClick={onHavingTroubleClick}
+              />
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root>,
+        ]}
+      >
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
           <Header.Title
             localizationKey={localizationKeys(
               asForgotPassword ? 'signIn.forgotPasswordAlternativeMethods.title' : 'signIn.alternativeMethods.title',
@@ -97,14 +110,15 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
               </Flex>
             </>
           )}
+          {onBackLinkClick && (
+            <BackLink
+              boxElementDescriptor={descriptors.backRow}
+              linkElementDescriptor={descriptors.backLink}
+              onClick={onBackLinkClick}
+            />
+          )}
         </Flex>
         <Footer.Root>
-          <Footer.Action elementId='havingTrouble'>
-            <Footer.ActionLink
-              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
-              onClick={onHavingTroubleClick}
-            />
-          </Footer.Action>
           <Footer.Links />
         </Footer.Root>
       </Card>
