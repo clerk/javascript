@@ -7,6 +7,7 @@ export default defineConfig(() => {
     entry: {
       index: uiRetheme ? 'src/index.retheme.ts' : 'src/index.ts',
     },
+    onSuccess: 'tsc',
     minify: false,
     clean: true,
     sourcemap: true,

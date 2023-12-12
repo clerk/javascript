@@ -70,5 +70,6 @@ export default defineConfig(_overrideOptions => {
     sourcemap: true,
     dts: true,
     splitting: false,
+    onSuccess: 'tsc',
   };
 });

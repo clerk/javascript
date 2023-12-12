@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "declaration": true,
     "declarationMap": false,
+    "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "importHelpers": true,
     "isolatedModules": true,

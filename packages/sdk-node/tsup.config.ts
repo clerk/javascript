@@ -13,6 +13,7 @@ export default defineConfig(overrideOptions => {
     minify: false,
     sourcemap: true,
     dts: true,
+    onSuccess: 'tsc',
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
