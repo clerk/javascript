@@ -6,10 +6,18 @@ import { NextURL } from 'next/dist/server/web/next-url';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { paths, setHeader } from '../utils';
-import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
-// used to assert the mock
-import { clerkClient } from './clerkClient';
+const authenticateRequestMock = jest.fn().mockResolvedValue({
+  toAuth: () => ({}),
+});
+
+jest.mock('./clerkClient', () => {
+  return {
+    clerkClient: {
+      authenticateRequest: authenticateRequestMock,
+      telemetry: { record: jest.fn() },
+    },
+  };
+});
 
 const mockRedirectToSignIn = jest.fn().mockImplementation(() => {
   const res = NextResponse.redirect(
@@ -24,6 +32,11 @@ jest.mock('./redirect', () => {
   };
 });
 
+import { paths, setHeader } from '../utils';
+import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
+// used to assert the mock
+import { clerkClient } from './clerkClient';
+
 /**
  * Disable console warnings about config matchers
  */
@@ -34,16 +47,6 @@ beforeAll(() => {
 });
 afterAll(() => {
   global.console.warn = consoleWarn;
-});
-
-const authenticateRequestMock = jest.fn().mockResolvedValue({
-  toAuth: () => ({}),
-});
-
-jest.mock('./clerkClient', () => {
-  return {
-    authenticateRequest: authenticateRequestMock,
-  };
 });
 
 // Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
@@ -408,7 +411,7 @@ describe('authMiddleware(params)', () => {
   });
 
   describe('authenticateRequest', function () {
-    it('returns handshake redirect for requestState.status === handshake', async () => {
+    it('returns 307 and starts the handshake flow for handshake requestState status', async () => {
       const mockLocationUrl = 'https://example.com';
       authenticateRequestMock.mockResolvedValueOnce({
         status: AuthStatus.Handshake,
@@ -443,7 +446,7 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
 
     expect(resp?.status).toEqual(307);
     expect(resp?.headers.get('location')).toEqual(
-      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__dev_session=test_jwt',
+      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__clerk_db_jwt=test_jwt',
     );
     expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(clerkClient.authenticateRequest).toBeCalled();

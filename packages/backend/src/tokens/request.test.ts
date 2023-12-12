@@ -67,7 +67,6 @@ function assertHandshake(
     proxyUrl: '',
     status: AuthStatus.Handshake,
     isSignedIn: false,
-    isUnknown: false,
     isSatellite: false,
     signInUrl: '',
     signUpUrl: '',

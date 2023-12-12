@@ -54,7 +54,6 @@ describe('withClerkMiddleware(options)', () => {
       expect.any(Request),
       expect.objectContaining({
         secretKey: 'TEST_SECRET_KEY',
-        request: expect.any(Request),
       }),
     );
   });
@@ -91,7 +90,6 @@ describe('withClerkMiddleware(options)', () => {
       expect.any(Request),
       expect.objectContaining({
         secretKey: 'TEST_SECRET_KEY',
-        request: expect.any(Request),
       }),
     );
   });
@@ -149,7 +147,6 @@ describe('withClerkMiddleware(options)', () => {
       expect.any(Request),
       expect.objectContaining({
         secretKey: 'TEST_SECRET_KEY',
-        request: expect.any(Request),
       }),
     );
   });

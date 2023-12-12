@@ -86,6 +86,5 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
-    request,
   });
 }

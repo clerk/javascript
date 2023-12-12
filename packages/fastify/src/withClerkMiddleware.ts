@@ -16,7 +16,6 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       ...options,
       secretKey,
       publishableKey,
-      request: req,
     });
 
     if (requestState.status === AuthStatus.Handshake) {

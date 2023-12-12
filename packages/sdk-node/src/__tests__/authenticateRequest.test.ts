@@ -57,7 +57,6 @@ describe('authenticateRequest', () => {
         proxyUrl: '',
         signInUrl: '',
         domain: '',
-        request: expect.any(Request),
       }),
     );
   });
