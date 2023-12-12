@@ -1,4 +1,4 @@
-import type { AuthObject, Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
+import type { Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
 import {
   AuthStatus,
   constants,
@@ -12,10 +12,8 @@ import {
 import { withLogger } from '../utils/debugLogger';
 import { API_URL, API_VERSION, SECRET_KEY } from './constants';
 import { getAuthAuthHeaderMissing } from './errors';
-import type { RequestLike } from './types';
+import type { AuthObjectWithoutResources, RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
-
-type AuthObjectWithoutResources<T extends AuthObject> = Omit<T, 'user' | 'organization' | 'session'>;
 
 export const createGetAuth = ({
   debugLoggerName,

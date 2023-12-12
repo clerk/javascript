@@ -73,7 +73,7 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      const isAuthorized = await session.experimental__checkAuthorization({ permission: 'org:sys_profile:delete' });
+      const isAuthorized = await session.checkAuthorization({ permission: 'org:sys_profile:delete' });
 
       expect(isAuthorized).toBe(true);
     });
@@ -93,7 +93,7 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      const isAuthorized = await session.experimental__checkAuthorization({ permission: 'org:sys_profile:delete' });
+      const isAuthorized = await session.checkAuthorization({ permission: 'org:sys_profile:delete' });
 
       expect(isAuthorized).toBe(false);
     });

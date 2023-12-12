@@ -1,4 +1,9 @@
-import type { experimental__CheckAuthorizationWithoutPermission, HandleOAuthCallbackParams } from '@clerk/types';
+import type {
+  CheckAuthorizationWithCustomPermissions,
+  HandleOAuthCallbackParams,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
+} from '@clerk/types';
 import React from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -41,23 +46,88 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JS
   return <>{children}</>;
 };
 
-type GateProps = React.PropsWithChildren<
-  Parameters<experimental__CheckAuthorizationWithoutPermission>[0] & {
+type ProtectProps = React.PropsWithChildren<
+  (
+    | {
+        condition?: never;
+        role: OrganizationCustomRoleKey;
+        permission?: never;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission: OrganizationCustomPermissionKey;
+      }
+    | {
+        condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
+        role?: never;
+        permission?: never;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission?: never;
+      }
+  ) & {
     fallback?: React.ReactNode;
   }
 >;
 
 /**
- * @experimental The component is experimental and subject to change in future releases.
+ * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
+ *
+ * Examples:
+ * ```
+ * <Protect permission="a_permission_key" />
+ * <Protect role="a_role_key" />
+ * <Protect condition={(has) => has({permission:"a_permission_key"})} />
+ * <Protect condition={(has) => has({role:"a_role_key"})} />
+ * <Protect fallback={<p>Unauthorized</p>} />
+ * ```
  */
-export const experimental__Gate = ({ children, fallback, ...restAuthorizedParams }: GateProps) => {
-  const { experimental__has } = useAuth();
+export const Protect = ({ children, fallback, ...restAuthorizedParams }: ProtectProps) => {
+  const { isLoaded, has, userId } = useAuth();
 
-  if (experimental__has(restAuthorizedParams)) {
-    return <>{children}</>;
+  /**
+   * Avoid flickering children or fallback while clerk is loading sessionId or userId
+   */
+  if (!isLoaded) {
+    return null;
   }
 
-  return <>{fallback ?? null}</>;
+  /**
+   * Fallback to UI provided by user or `null` if authorization checks failed
+   */
+  const unauthorized = <>{fallback ?? null}</>;
+
+  const authorized = <>{children}</>;
+
+  if (!userId) {
+    return unauthorized;
+  }
+
+  /**
+   * Check against the results of `has` called inside the callback
+   */
+  if (typeof restAuthorizedParams.condition === 'function') {
+    if (restAuthorizedParams.condition(has)) {
+      return authorized;
+    }
+    return unauthorized;
+  }
+
+  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+    if (has(restAuthorizedParams)) {
+      return authorized;
+    }
+    return unauthorized;
+  }
+
+  /**
+   * If neither of the authorization params are passed behave as the `<SignedIn/>`.
+   * If fallback is present render that instead of rendering nothing.
+   */
+  return authorized;
 };
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
@@ -89,7 +159,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
 
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
-    clerk.redirectToUserProfile();
+    void clerk.redirectToUserProfile();
   }, []);
 
   return null;
@@ -97,7 +167,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
-    clerk.redirectToOrganizationProfile();
+    void clerk.redirectToOrganizationProfile();
   }, []);
 
   return null;
@@ -105,7 +175,7 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
 
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {
-    clerk.redirectToCreateOrganization();
+    void clerk.redirectToCreateOrganization();
   }, []);
 
   return null;

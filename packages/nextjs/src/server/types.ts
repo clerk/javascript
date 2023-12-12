@@ -1,4 +1,4 @@
-import type { OptionalVerifyTokenOptions } from '@clerk/backend';
+import type { AuthObject, OptionalVerifyTokenOptions } from '@clerk/backend';
 import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { IncomingMessage } from 'http';
 import type { NextApiRequest } from 'next';
@@ -20,3 +20,5 @@ export type WithAuthOptions = OptionalVerifyTokenOptions &
   };
 
 export type NextMiddlewareResult = Awaited<ReturnType<NextMiddleware>>;
+
+export type AuthObjectWithoutResources<T extends AuthObject> = Omit<T, 'user' | 'organization' | 'session'>;

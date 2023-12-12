@@ -21,6 +21,7 @@ const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element 
   return (
     <Heading
       elementDescriptor={descriptors.headerTitle}
+      textVariant='h2'
       sx={sx}
       {...rest}
     />
@@ -28,23 +29,27 @@ const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element 
 });
 
 const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element => {
+  const { sx, ...rest } = props;
   return (
     <Text
       elementDescriptor={descriptors.headerSubtitle}
-      variant='h2'
+      variant='body'
       colorScheme='neutral'
-      {...props}
+      sx={sx}
+      {...rest}
     />
   );
 });
 
 const BackLink = (props: PropsOfComponent<typeof BackLinkEl>) => {
+  const { sx, ...rest } = props;
   return (
     <BackLinkEl
       boxElementDescriptor={descriptors.headerBackRow}
       linkElementDescriptor={descriptors.headerBackLink}
       iconElementDescriptor={descriptors.headerBackIcon}
-      {...props}
+      sx={sx}
+      {...rest}
     />
   );
 };
