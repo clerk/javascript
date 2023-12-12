@@ -50,19 +50,17 @@ const OrganizationProvider = ({
   );
 };
 
-function useAssertWrappedByClerkProvider(displayNameOrCustomHandler?: string | (() => void)): void {
+function useAssertWrappedByClerkProvider(displayNameOrFn: string | (() => void)): void {
   const ctx = React.useContext(ClerkInstanceContext);
 
   if (!ctx) {
-    if (typeof displayNameOrCustomHandler === 'function') {
-      displayNameOrCustomHandler();
+    if (typeof displayNameOrFn === 'function') {
+      displayNameOrFn();
       return;
     }
 
     throw new Error(
-      `${
-        displayNameOrCustomHandler || 'Clerk components'
-      } must be wrapped within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
+      `${displayNameOrFn} must be wrapped within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
     );
   }
 }
