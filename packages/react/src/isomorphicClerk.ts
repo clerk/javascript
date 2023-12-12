@@ -75,9 +75,6 @@ type IsomorphicLoadedClerk = Without<
   | 'buildOrganizationProfileUrl'
   | 'buildHomeUrl'
   | 'buildUrlWithAuth'
-  | 'redirectWithAuth'
-  | 'redirectToSignIn'
-  | 'redirectToSignUp'
   | 'handleRedirectCallback'
   | 'handleUnauthenticated'
   | 'authenticateWithMetamask'
@@ -93,12 +90,6 @@ type IsomorphicLoadedClerk = Without<
   | 'mountUserProfile'
   | 'client'
 > & {
-  // TODO: Align return type
-  redirectWithAuth: (...args: Parameters<Clerk['redirectWithAuth']>) => void;
-  // TODO: Align return type
-  redirectToSignIn: (options: SignInRedirectOptions) => void;
-  // TODO: Align return type
-  redirectToSignUp: (options: SignUpRedirectOptions) => void;
   // TODO: Align return type and parms
   handleRedirectCallback: (params: HandleOAuthCallbackParams) => void;
   handleUnauthenticated: () => void;
@@ -777,66 +768,73 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  redirectWithAuth = (...args: Parameters<Clerk['redirectWithAuth']>): void => {
+  redirectWithAuth = async (...args: Parameters<Clerk['redirectWithAuth']>): Promise<unknown> => {
     const callback = () => this.clerkjs?.redirectWithAuth(...args);
     if (this.clerkjs && this.#loaded) {
-      void callback();
+      return callback();
     } else {
       this.premountMethodCalls.set('redirectWithAuth', callback);
+      return;
     }
   };
 
-  redirectToSignIn = (opts: SignInRedirectOptions): void => {
+  redirectToSignIn = async (opts: SignInRedirectOptions): Promise<unknown> => {
     const callback = () => this.clerkjs?.redirectToSignIn(opts as any);
     if (this.clerkjs && this.#loaded) {
-      void callback();
+      return callback();
     } else {
       this.premountMethodCalls.set('redirectToSignIn', callback);
+      return;
     }
   };
 
-  redirectToSignUp = (opts: SignUpRedirectOptions): void => {
+  redirectToSignUp = async (opts: SignUpRedirectOptions): Promise<unknown> => {
     const callback = () => this.clerkjs?.redirectToSignUp(opts as any);
     if (this.clerkjs && this.#loaded) {
-      void callback();
+      return callback();
     } else {
       this.premountMethodCalls.set('redirectToSignUp', callback);
+      return;
     }
   };
 
-  redirectToUserProfile = (): void => {
+  redirectToUserProfile = async (): Promise<unknown> => {
     const callback = () => this.clerkjs?.redirectToUserProfile();
     if (this.clerkjs && this.#loaded) {
-      callback();
+      return callback();
     } else {
       this.premountMethodCalls.set('redirectToUserProfile', callback);
+      return;
     }
   };
 
-  redirectToHome = (): void => {
+  redirectToHome = async (): Promise<unknown> => {
     const callback = () => this.clerkjs?.redirectToHome();
     if (this.clerkjs && this.#loaded) {
-      callback();
+      return callback();
     } else {
       this.premountMethodCalls.set('redirectToHome', callback);
+      return;
     }
   };
 
-  redirectToOrganizationProfile = (): void => {
+  redirectToOrganizationProfile = async (): Promise<unknown> => {
     const callback = () => this.clerkjs?.redirectToOrganizationProfile();
     if (this.clerkjs && this.#loaded) {
-      callback();
+      return callback();
     } else {
       this.premountMethodCalls.set('redirectToOrganizationProfile', callback);
+      return;
     }
   };
 
-  redirectToCreateOrganization = (): void => {
+  redirectToCreateOrganization = async (): Promise<unknown> => {
     const callback = () => this.clerkjs?.redirectToCreateOrganization();
     if (this.clerkjs && this.#loaded) {
-      callback();
+      return callback();
     } else {
       this.premountMethodCalls.set('redirectToCreateOrganization', callback);
+      return;
     }
   };
 
