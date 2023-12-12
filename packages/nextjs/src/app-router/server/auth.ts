@@ -3,7 +3,7 @@ import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
 } from '@clerk/types';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { authAuthHeaderMissing } from '../../server/errors';
 import { buildClerkProps, createGetAuth } from '../../server/getAuth';
@@ -21,6 +21,7 @@ type AuthSignedIn = AuthObjectWithDeprecatedResources<
       params?:
         | CheckAuthorizationParamsWithCustomPermissions
         | ((has: CheckAuthorizationWithCustomPermissions) => boolean),
+      options?: { redirectUrl: string },
     ) => AuthObjectWithDeprecatedResources<SignedInAuthObject>;
   }
 >;
@@ -42,12 +43,18 @@ export const auth = () => {
     noAuthStatusMessage: authAuthHeaderMissing(),
   })(buildRequestLike());
 
-  (authObject as AuthSignedIn).protect = params => {
+  (authObject as AuthSignedIn).protect = (params, options) => {
+    const handleUnauthorized = (): never => {
+      if (options?.redirectUrl) {
+        redirect(options.redirectUrl);
+      }
+      notFound();
+    };
     /**
      * User is not authenticated
      */
     if (!authObject.userId) {
-      notFound();
+      return handleUnauthorized();
     }
 
     /**
@@ -64,7 +71,7 @@ export const auth = () => {
       if (params(authObject.has)) {
         return { ...authObject };
       }
-      notFound();
+      return handleUnauthorized();
     }
 
     /**
@@ -74,7 +81,7 @@ export const auth = () => {
       return { ...authObject };
     }
 
-    notFound();
+    return handleUnauthorized();
   };
 
   return authObject as AuthSignedIn | AuthSignedOut;
