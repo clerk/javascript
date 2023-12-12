@@ -1206,10 +1206,7 @@ export class Clerk implements ClerkInterface {
 
   #shouldSyncWithPrimary = (): boolean => {
     if (this.#hasJustSynced()) {
-      // TODO @nikos
-      // if (!this.#options.isInterstitial) {
-      //   this.#clearJustSynced();
-      // }
+      this.#clearJustSynced();
       return false;
     }
 
