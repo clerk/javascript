@@ -47,7 +47,6 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
     <Card>
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
-        {props.onBackLinkClicked && <Header.BackLink onClick={props.onBackLinkClicked} />}
         <Header.Title localizationKey={props.cardTitle} />
         <Header.Subtitle localizationKey={props.cardSubtitle} />
         <IdentityPreview
