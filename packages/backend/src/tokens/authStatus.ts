@@ -53,28 +53,15 @@ export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
 };
 
 export enum AuthErrorReason {
-  DevBrowserSync = 'dev-browser-sync',
-  SessionTokenMissing = 'session-token-missing',
-  SessionTokenWithoutClientUAT = 'session-token-but-no-client-uat',
   ClientUATWithoutSessionToken = 'client-uat-but-no-session-token',
-  SessionTokenOutdated = 'session-token-outdated',
-  ClockSkew = 'clock-skew',
-  UnexpectedError = 'unexpected-error',
-  Unknown = 'unknown',
-
-  // Delete these old crap
-  CookieAndUATMissing = 'cookie-and-uat-missing',
-  CookieMissing = 'cookie-missing',
-  CookieOutDated = 'cookie-outdated',
-  CookieUATMissing = 'uat-missing',
-  CrossOriginReferrer = 'cross-origin-referrer',
-  HeaderMissingCORS = 'header-missing-cors',
-  HeaderMissingNonBrowser = 'header-missing-non-browser',
-  SatelliteCookieNeedsSyncing = 'satellite-needs-syncing',
-  SatelliteReturnsFromPrimary = 'satellite-returns-from-primary',
+  DevBrowserSync = 'dev-browser-sync',
   PrimaryRespondsToSyncing = 'primary-responds-to-syncing',
-  StandardSignedIn = 'standard-signed-in',
-  StandardSignedOut = 'standard-signed-out',
+  SatelliteCookieNeedsSyncing = 'satellite-needs-syncing',
+  SessionTokenAndUATMissing = 'session-token-and-uat-missing',
+  SessionTokenMissing = 'session-token-missing',
+  SessionTokenOutdated = 'session-token-outdated',
+  SessionTokenWithoutClientUAT = 'session-token-but-no-client-uat',
+  UnexpectedError = 'unexpected-error',
 }
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;

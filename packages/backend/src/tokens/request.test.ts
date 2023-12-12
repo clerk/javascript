@@ -316,7 +316,7 @@ export default (QUnit: QUnit) => {
       );
 
       assertSignedOut(assert, requestState, {
-        reason: AuthErrorReason.CookieAndUATMissing,
+        reason: AuthErrorReason.SessionTokenAndUATMissing,
         isSatellite: true,
         signInUrl: 'https://primary.dev/sign-in',
         domain: 'satellite.dev',
@@ -374,7 +374,7 @@ export default (QUnit: QUnit) => {
       );
 
       assertSignedOut(assert, requestState, {
-        reason: AuthErrorReason.CookieAndUATMissing,
+        reason: AuthErrorReason.SessionTokenAndUATMissing,
       });
       assertSignedOutToAuth(assert, requestState);
     });
@@ -434,7 +434,7 @@ export default (QUnit: QUnit) => {
       const requestState = await authenticateRequest(mockRequestWithCookies({}, { __client_uat: '0' }), mockOptions());
 
       assertSignedOut(assert, requestState, {
-        reason: AuthErrorReason.CookieAndUATMissing,
+        reason: AuthErrorReason.SessionTokenAndUATMissing,
       });
       assertSignedOutToAuth(assert, requestState);
     });
