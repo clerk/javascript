@@ -1,5 +1,5 @@
+import { errorThrower } from '../errors/errorThrower';
 import { noClerkProviderError, noGuaranteedLoadedError } from '../errors/messages';
-import { errorThrower } from '../utils';
 
 export function assertWrappedByClerkProvider(contextVal: unknown): asserts contextVal {
   if (!contextVal) {

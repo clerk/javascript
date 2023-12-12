@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { errorThrower } from '../errors/errorThrower';
 import { multipleChildrenInButtonComponent } from '../errors/messages';
-import { errorThrower } from './errorThrower';
 
 export const assertSingleChild =
   (children: React.ReactNode) =>
