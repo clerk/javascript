@@ -25,7 +25,7 @@ export type ClerkOptions = CreateBackendApiOptions &
     >
   > & { sdkMetadata?: SDKMetadata; telemetry?: Pick<TelemetryCollectorOptions, 'disabled' | 'debug'> };
 
-export function Clerk(options: ClerkOptions) {
+export function createClerkClient(options: ClerkOptions) {
   const opts = { ...options };
   const apiClient = createBackendApiClient(opts);
   const requestState = createAuthenticateRequest({ options: opts, apiClient });

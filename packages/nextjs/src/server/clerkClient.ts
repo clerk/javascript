@@ -1,4 +1,4 @@
-import { Clerk } from '@clerk/backend';
+import { createClerkClient } from '@clerk/backend';
 
 import {
   API_URL,
@@ -12,7 +12,7 @@ import {
   TELEMETRY_DISABLED,
 } from './constants';
 
-const clerkClient = Clerk({
+const clerkClient = createClerkClient({
   secretKey: SECRET_KEY,
   apiUrl: API_URL,
   apiVersion: API_VERSION,
@@ -28,10 +28,5 @@ const clerkClient = Clerk({
   },
 });
 
-const createClerkClient = Clerk;
-
-// eslint-disable-next-line import/export
-export { Clerk, clerkClient, createClerkClient };
-
-// eslint-disable-next-line import/export
+export { clerkClient };
 export * from '@clerk/backend';

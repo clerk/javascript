@@ -1,4 +1,4 @@
-import type { Clerk } from '@clerk/backend';
+import type { createClerkClient } from '@clerk/backend';
 
 import {
   authenticateRequest,
@@ -10,7 +10,7 @@ import {
 import type { ClerkMiddlewareOptions, MiddlewareRequireAuthProp, RequireAuthProp } from './types';
 
 export type CreateClerkExpressMiddlewareOptions = {
-  clerkClient: ReturnType<typeof Clerk>;
+  clerkClient: ReturnType<typeof createClerkClient>;
   secretKey?: string;
   publishableKey?: string;
   apiUrl?: string;

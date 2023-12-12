@@ -9,7 +9,7 @@ const localInterstitialMock = jest.fn();
 jest.mock('@clerk/backend', () => {
   return {
     ...jest.requireActual('@clerk/backend'),
-    Clerk: () => {
+    createClerkClient: () => {
       return {
         authenticateRequest: (...args: any) => authenticateRequestMock(...args),
         localInterstitial: (...args: any) => localInterstitialMock(...args),
