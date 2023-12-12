@@ -43,12 +43,23 @@
         "default": "./dist/internal.js"
       }
     },
+    "./errors": {
+      "import": {
+        "types": "./dist/errors.d.mts",
+        "default": "./dist/errors.mjs"
+      },
+      "require": {
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
     "dist",
-    "internal"
+    "internal",
+    "errors"
   ],
   "scripts": {
     "build": "tsup",
