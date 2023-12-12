@@ -3,7 +3,7 @@ import React from 'react';
 
 import { descriptors, localizationKeys } from '../../customizables';
 import { Action, SecondaryActions } from '../../elements';
-import { Plus } from '../../icons';
+import { Add } from '../../icons';
 import { UserInvitationSuggestionList } from './UserInvitationSuggestionList';
 import type { UserMembershipListProps } from './UserMembershipList';
 import { UserMembershipList } from './UserMembershipList';
@@ -29,7 +29,7 @@ const CreateOrganizationButton = ({
       iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('createOrganization')}
       iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
       iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('createOrganization')}
-      icon={Plus}
+      icon={Add}
       label={localizationKeys('organizationSwitcher.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({
@@ -37,6 +37,10 @@ const CreateOrganizationButton = ({
         ':hover': {
           color: t.colors.$blackAlpha600,
         },
+      })}
+      iconSx={t => ({
+        width: t.sizes.$9,
+        height: t.sizes.$6,
       })}
     />
   );

@@ -5,7 +5,7 @@ import React from 'react';
 import { useEnvironment, useUserButtonContext } from '../../contexts';
 import { descriptors, Icon, localizationKeys } from '../../customizables';
 import { Action, Actions, PopoverCard, PreviewButton, RootBox, SecondaryActions, UserPreview } from '../../elements';
-import { CheckmarkFilled, Plus, SignOut, SwitchArrowRight } from '../../icons';
+import { Add, CheckmarkFilled, SignOut, SwitchArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { MultiSessionActions, SingleSessionActions } from './SessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
@@ -34,11 +34,15 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('addAccount')}
       iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
       iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('addAccount')}
-      icon={Plus}
+      icon={Add}
       label={localizationKeys('userButton.action__addAccount')}
       onClick={handleAddAccountClicked}
       sx={t => ({
         backgroundColor: t.colors.$colorBackground,
+      })}
+      iconSx={t => ({
+        width: t.sizes.$9,
+        height: t.sizes.$6,
       })}
     />
   );

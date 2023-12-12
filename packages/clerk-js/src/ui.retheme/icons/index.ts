@@ -4,6 +4,7 @@
  * Consequently, the files are correctly imported but the TS checker emits errors.
  * The above no-check is safe, as webpack will not allow compilation if for example a file is not resolved.
  */
+export { default as Add } from './add.svg';
 export { default as ArrowLeftIcon } from './arrow-left.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
 export { default as ArrowRightButtonIcon } from './arrow-right-button.svg';
