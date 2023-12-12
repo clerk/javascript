@@ -1,7 +1,7 @@
 import type { ActJWTClaim, ClerkJWTClaims } from './jwt';
 import type { ActClaim, JwtPayload } from './jwtv2';
 import type { OrganizationResource } from './organization';
-import type { MembershipRole } from './organizationMembership';
+import type { MembershipRole, OrganizationCustomPermissionKey } from './organizationMembership';
 import type { SessionResource } from './session';
 import type { UserResource } from './user';
 import type { Serializable } from './utils';
@@ -30,5 +30,6 @@ export type InitialState = Serializable<{
   orgId: string | undefined;
   orgRole: MembershipRole | undefined;
   orgSlug: string | undefined;
+  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   organization: OrganizationResource | undefined;
 }>;

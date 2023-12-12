@@ -1,6 +1,6 @@
 import type {
   ActJWTClaim,
-  experimental__CheckAuthorizationWithoutPermission,
+  CheckAuthorizationWithCustomPermissions,
   GetToken,
   MembershipRole,
   SignOut,
@@ -9,13 +9,12 @@ import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
-import { invalidStateError } from '../errors';
+import { invalidStateError, useAuthHasRequiresRoleOrPermission } from '../errors';
 import type IsomorphicClerk from '../isomorphicClerk';
 import { createGetToken, createSignOut } from './utils';
 
-type experimental__CheckAuthorizationSignedOut = (
-  params?: Parameters<experimental__CheckAuthorizationWithoutPermission>[0],
-) => false;
+type CheckAuthorizationSignedOut = undefined;
+type CheckAuthorizationWithoutOrgOrUser = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 type UseAuthReturn =
   | {
@@ -27,10 +26,7 @@ type UseAuthReturn =
       orgId: undefined;
       orgRole: undefined;
       orgSlug: undefined;
-      /**
-       * @experimental The method is experimental and subject to change in future releases.
-       */
-      experimental__has: experimental__CheckAuthorizationSignedOut;
+      has: CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -43,10 +39,7 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      /**
-       * @experimental The method is experimental and subject to change in future releases.
-       */
-      experimental__has: experimental__CheckAuthorizationSignedOut;
+      has: CheckAuthorizationWithoutOrgOrUser;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -59,10 +52,7 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      /**
-       * @experimental The method is experimental and subject to change in future releases.
-       */
-      experimental__has: experimental__CheckAuthorizationSignedOut;
+      has: CheckAuthorizationWithoutOrgOrUser;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -75,10 +65,7 @@ type UseAuthReturn =
       orgId: string;
       orgRole: MembershipRole;
       orgSlug: string | null;
-      /**
-       * @experimental The method is experimental and subject to change in future releases.
-       */
-      experimental__has: experimental__CheckAuthorizationWithoutPermission;
+      has: CheckAuthorizationWithCustomPermissions;
       signOut: SignOut;
       getToken: GetToken;
     };
@@ -125,28 +112,33 @@ type UseAuth = () => UseAuthReturn;
  * }
  */
 export const useAuth: UseAuth = () => {
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug } = useAuthContext();
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
   const has = useCallback(
-    (params?: Parameters<experimental__CheckAuthorizationWithoutPermission>[0]) => {
-      if (!orgId || !userId || !orgRole) {
+    (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
+      if (!params?.permission && !params?.role) {
+        throw new Error(useAuthHasRequiresRoleOrPermission);
+      }
+
+      if (!orgId || !userId || !orgRole || !orgPermissions) {
         return false;
       }
 
-      if (!params) {
-        return false;
+      if (params.permission) {
+        return orgPermissions.includes(params.permission);
       }
 
       if (params.role) {
         return orgRole === params.role;
       }
+
       return false;
     },
-    [orgId, orgRole, userId],
+    [orgId, orgRole, userId, orgPermissions],
   );
 
   if (sessionId === undefined && userId === undefined) {
@@ -159,7 +151,7 @@ export const useAuth: UseAuth = () => {
       orgId: undefined,
       orgRole: undefined,
       orgSlug: undefined,
-      experimental__has: () => false,
+      has: undefined,
       signOut,
       getToken,
     };
@@ -175,7 +167,7 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      experimental__has: () => false,
+      has: () => false,
       signOut,
       getToken,
     };
@@ -191,7 +183,7 @@ export const useAuth: UseAuth = () => {
       orgId,
       orgRole,
       orgSlug: orgSlug || null,
-      experimental__has: has,
+      has,
       signOut,
       getToken,
     };
@@ -207,7 +199,7 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      experimental__has: () => false,
+      has: () => false,
       signOut,
       getToken,
     };

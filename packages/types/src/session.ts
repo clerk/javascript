@@ -1,55 +1,39 @@
 import type { ActJWTClaim } from './jwt';
-import type { OrganizationPermission } from './organizationMembership';
+import type {
+  MembershipRole,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
+  OrganizationPermissionKey,
+} from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
-export type experimental__CheckAuthorizationWithoutPermission = (
-  isAuthorizedParams: CheckAuthorizationParamsWithoutPermission,
-) => boolean;
+export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
-type CheckAuthorizationParamsWithoutPermission =
+export type CheckAuthorizationWithCustomPermissions =
+  CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
+
+export type CheckAuthorizationParamsWithCustomPermissions =
   | {
-      some: {
-        role: string;
-      }[];
-      role?: never;
+      role: OrganizationCustomRoleKey;
+      permission?: never;
     }
   | {
-      some?: never;
-      role: string;
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
     };
 
-export type CheckAuthorization = (isAuthorizedParams: CheckAuthorizationParams) => boolean;
+export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
 type CheckAuthorizationParams =
   | {
-      some: (
-        | {
-            role: string;
-            permission?: never;
-          }
-        | {
-            role?: never;
-            // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-            // eslint-disable-next-line
-            permission: OrganizationPermission | (string & {});
-          }
-      )[];
-      role?: never;
+      role: MembershipRole;
       permission?: never;
     }
   | {
-      some?: never;
-      role: string;
-      permission?: never;
-    }
-  | {
-      some?: never;
       role?: never;
-      // Adding (string & {}) allows for getting eslint autocomplete but also accepts any string
-      // eslint-disable-next-line
-      permission: OrganizationPermission | (string & {});
+      permission: OrganizationPermissionKey;
     };
 
 export interface SessionResource extends ClerkResource {
@@ -67,10 +51,7 @@ export interface SessionResource extends ClerkResource {
   remove: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;
   getToken: GetToken;
-  /**
-   * @experimental The method is experimental and subject to change in future releases.
-   */
-  experimental__checkAuthorization: CheckAuthorization;
+  checkAuthorization: CheckAuthorization;
   clearCache: () => void;
   createdAt: Date;
   updatedAt: Date;

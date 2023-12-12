@@ -1,8 +1,10 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
   ActClaim,
-  experimental__CheckAuthorizationWithoutPermission,
+  CheckAuthorizationWithCustomPermissions,
   JwtPayload,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
   ServerGetToken,
   ServerGetTokenOptions,
 } from '@clerk/types';
@@ -38,14 +40,12 @@ export type SignedInAuthObject = {
   userId: string;
   user: User | undefined;
   orgId: string | undefined;
-  orgRole: string | undefined;
+  orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
+  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   organization: Organization | undefined;
   getToken: ServerGetToken;
-  /**
-   * @experimental The method is experimental and subject to change in future releases.
-   */
-  experimental__has: experimental__CheckAuthorizationWithoutPermission;
+  has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
 };
 
@@ -59,12 +59,10 @@ export type SignedOutAuthObject = {
   orgId: null;
   orgRole: null;
   orgSlug: null;
+  orgPermissions: null;
   organization: null;
   getToken: ServerGetToken;
-  /**
-   * @experimental The method is experimental and subject to change in future releases.
-   */
-  experimental__has: experimental__CheckAuthorizationWithoutPermission;
+  has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
 };
 
@@ -91,6 +89,7 @@ export function signedInAuthObject(
     org_id: orgId,
     org_role: orgRole,
     org_slug: orgSlug,
+    org_permissions: orgPermissions,
     sub: userId,
   } = sessionClaims;
   const { apiKey, secretKey, apiUrl, apiVersion, token, session, user, organization } = options;
@@ -122,9 +121,10 @@ export function signedInAuthObject(
     orgId,
     orgRole,
     orgSlug,
+    orgPermissions,
     organization,
     getToken,
-    experimental__has: createHasAuthorization({ orgId, orgRole, userId }),
+    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
     debug: createDebug({ ...options, ...debugData }),
   };
 }
@@ -144,9 +144,10 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgId: null,
     orgRole: null,
     orgSlug: null,
+    orgPermissions: null,
     organization: null,
     getToken: () => Promise.resolve(null),
-    experimental__has: () => false,
+    has: () => false,
     debug: createDebug(debugData),
   };
 }
@@ -192,7 +193,7 @@ export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T
 export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(obj: T): T => {
   // remove any non-serializable props from the returned object
 
-  const { debug, getToken, experimental__has, ...rest } = obj as unknown as AuthObject;
+  const { debug, getToken, has, ...rest } = obj as unknown as AuthObject;
   return rest as unknown as T;
 };
 
@@ -221,27 +222,30 @@ const createHasAuthorization =
     orgId,
     orgRole,
     userId,
+    orgPermissions,
   }: {
     userId: string;
     orgId: string | undefined;
     orgRole: string | undefined;
-  }): experimental__CheckAuthorizationWithoutPermission =>
+    orgPermissions: string[] | undefined;
+  }): CheckAuthorizationWithCustomPermissions =>
   params => {
-    if (!orgId || !userId) {
+    if (!params?.permission && !params?.role) {
+      throw new Error(
+        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
+      );
+    }
+
+    if (!orgId || !userId || !orgRole || !orgPermissions) {
       return false;
+    }
+
+    if (params.permission) {
+      return orgPermissions.includes(params.permission);
     }
 
     if (params.role) {
       return orgRole === params.role;
-    }
-
-    if (params.some) {
-      return !!params.some.find(permObj => {
-        if (permObj.role) {
-          return orgRole === permObj.role;
-        }
-        return false;
-      });
     }
 
     return false;

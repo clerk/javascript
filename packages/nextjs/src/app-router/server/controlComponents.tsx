@@ -1,5 +1,4 @@
-import type { experimental__CheckAuthorizationWithoutPermission } from '@clerk/types';
-import { redirect } from 'next/navigation';
+import type { Protect as ProtectClientComponent } from '@clerk/clerk-react';
 import React from 'react';
 
 import { auth } from './auth';
@@ -16,37 +15,55 @@ export function SignedOut(props: React.PropsWithChildren) {
   return userId ? null : <>{children}</>;
 }
 
-type GateServerComponentProps = React.PropsWithChildren<
-  Parameters<experimental__CheckAuthorizationWithoutPermission>[0] & {
-    fallback?: React.ReactNode;
-    redirectTo?: string;
-  }
->;
+type ProtectServerComponentProps = React.ComponentProps<typeof ProtectClientComponent>;
 
 /**
- * @experimental The component is experimental and subject to change in future releases.
+ * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
+ *
+ * Examples:
+ * ```
+ * <Protect permission="a_permission_key" />
+ * <Protect role="a_role_key" />
+ * <Protect condition={(has) => has({permission:"a_permission_key"})} />
+ * <Protect condition={(has) => has({role:"a_role_key"})} />
+ * <Protect fallback={<p>Unauthorized</p>} />
+ * ```
  */
-export function experimental__Gate(gateProps: GateServerComponentProps) {
-  const { children, fallback, redirectTo, ...restAuthorizedParams } = gateProps;
-  const { experimental__has } = auth();
+export function Protect(props: ProtectServerComponentProps) {
+  const { children, fallback, ...restAuthorizedParams } = props;
+  const { has, userId } = auth();
 
-  const isAuthorizedUser = experimental__has(restAuthorizedParams);
+  /**
+   * Fallback to UI provided by user or `null` if authorization checks failed
+   */
+  const unauthorized = <>{fallback ?? null}</>;
 
-  const handleFallback = () => {
-    if (!redirectTo && !fallback) {
-      throw new Error('Provide `<Gate />` with a `fallback` or `redirectTo`');
-    }
+  const authorized = <>{children}</>;
 
-    if (redirectTo) {
-      return redirect(redirectTo);
-    }
-
-    return <>{fallback}</>;
-  };
-
-  if (!isAuthorizedUser) {
-    return handleFallback();
+  if (!userId) {
+    return unauthorized;
   }
 
-  return <>{children}</>;
+  /**
+   * Check against the results of `has` called inside the callback
+   */
+  if (typeof restAuthorizedParams.condition === 'function') {
+    if (restAuthorizedParams.condition(has)) {
+      return authorized;
+    }
+    return unauthorized;
+  }
+
+  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+    if (has(restAuthorizedParams)) {
+      return authorized;
+    }
+    return unauthorized;
+  }
+
+  /**
+   * If neither of the authorization params are passed behave as the `<SignedIn/>`.
+   * If fallback is present render that instead of rendering nothing.
+   */
+  return authorized;
 }

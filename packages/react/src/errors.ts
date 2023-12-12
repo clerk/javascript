@@ -50,3 +50,6 @@ export const customPageWrongProps = (componentName: string) =>
 
 export const customLinkWrongProps = (componentName: string) =>
   `Clerk: Missing props. <${componentName}.Link /> component requires the following props: url, label and labelIcon.`;
+
+export const useAuthHasRequiresRoleOrPermission =
+  'Clerk: Missing parameters. `has` from `useAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`';

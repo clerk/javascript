@@ -76,10 +76,7 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
-  /**
-   * @experimental The method is experimental and subject to change in future releases.
-   */
-  experimental__checkAuthorization: CheckAuthorization = params => {
+  checkAuthorization: CheckAuthorization = params => {
     // if there is no active organization user can not be authorized
     if (!this.lastActiveOrganizationId || !this.user) {
       return false;
@@ -102,18 +99,6 @@ export class Session extends BaseResource implements SessionResource {
     }
     if (params.role) {
       return activeOrganizationRole === params.role;
-    }
-
-    if (params.some) {
-      return !!params.some.find(permObj => {
-        if (permObj.permission) {
-          return activeOrganizationPermissions.includes(permObj.permission);
-        }
-        if (permObj.role) {
-          return activeOrganizationRole === permObj.role;
-        }
-        return false;
-      });
     }
 
     return false;

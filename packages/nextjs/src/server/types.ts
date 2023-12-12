@@ -1,4 +1,4 @@
-import type { OptionalVerifyTokenOptions } from '@clerk/backend';
+import type { AuthObject, OptionalVerifyTokenOptions } from '@clerk/backend';
 import type { MultiDomainAndOrProxy, PublishableKeyOrFrontendApi, SecretKeyOrApiKey } from '@clerk/types';
 import type { IncomingMessage } from 'http';
 import type { NextApiRequest } from 'next';
@@ -20,3 +20,18 @@ export type WithAuthOptions = Partial<PublishableKeyOrFrontendApi> &
   };
 
 export type NextMiddlewareResult = Awaited<ReturnType<NextMiddleware>>;
+
+export type AuthObjectWithDeprecatedResources<T extends AuthObject> = Omit<T, 'user' | 'organization' | 'session'> & {
+  /**
+   * @deprecated This will be removed in the next major version
+   */
+  user: T['user'];
+  /**
+   * @deprecated This will be removed in the next major version
+   */
+  organization: T['organization'];
+  /**
+   * @deprecated This will be removed in the next major version
+   */
+  session: T['session'];
+};
