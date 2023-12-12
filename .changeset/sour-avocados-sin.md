@@ -2,11 +2,9 @@
 '@clerk/nextjs': major
 ---
 
-## Breaking Changes
-
 (Note: This is only relevant if, in the unlikely case, you are using `Clerk` from `@clerk/nextjs` directly. If not, you can safely ignore this change.)
 
-Remove the named `Clerk` import from `@clerk/nextjs` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future. [SDK-1058]
+Remove the named `Clerk` import from `@clerk/nextjs` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
 ```js
 import { Clerk } from '@clerk/nextjs';

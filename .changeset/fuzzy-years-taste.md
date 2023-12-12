@@ -2,9 +2,7 @@
 '@clerk/backend': major
 ---
 
-## Breaking Changes
-
-Remove the named `Clerk` import from `@clerk/backend` and import `createClerkClient` instead. The latter is a factory method that will create a Clerk client instance for you. This aligns usage across our SDKs and will enable us to better ship DX improvements in the future. [SDK-1058]
+Remove the named `Clerk` import from `@clerk/backend` and import `createClerkClient` instead. The latter is a factory method that will create a Clerk client instance for you. This aligns usage across our SDKs and will enable us to better ship DX improvements in the future.
 
 
 Inside your code, search for occurrences like these:

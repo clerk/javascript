@@ -2,9 +2,7 @@
 'gatsby-plugin-clerk': major
 ---
 
-## Breaking Changes
-
-Remove the named `Clerk` import from `gatsby-plugin-clerk` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future. [SDK-1058]
+Remove the named `Clerk` import from `gatsby-plugin-clerk` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
 Inside your code, search for occurrences like these:
 	
