@@ -105,7 +105,7 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
     nbf: number;
   };
   const generateToken = ({ state }: { state: 'active' | 'expired' | 'early' }) => {
-    let claims = { sub: 'user_12345' } as Claims;
+    const claims = { sub: 'user_12345' } as Claims;
 
     const now = Math.floor(Date.now() / 1000);
     if (state === 'active') {
