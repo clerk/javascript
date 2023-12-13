@@ -70,7 +70,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
-  return createClerkClient({ apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({
+  return createClerkClient({ apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest(request, {
     audience,
     secretKey,
     jwtKey,
