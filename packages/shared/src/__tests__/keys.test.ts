@@ -1,7 +1,9 @@
 import {
   buildPublishableKey,
   createDevOrStagingUrlCache,
+  isDevelopmentFromPublishableKey,
   isDevelopmentFromSecretKey,
+  isProductionFromPublishableKey,
   isProductionFromSecretKey,
   isPublishableKey,
   parsePublishableKey,
@@ -105,6 +107,34 @@ describe('isDevOrStagingUrl(url)', () => {
   });
 });
 
+describe('isDevelopmentFromPublishableKey(key)', () => {
+  const cases: Array<[string, boolean]> = [
+    ['pk_live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk', false],
+    ['pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk', true],
+    ['live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk', false],
+    ['test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk', true],
+  ];
+
+  test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expected) => {
+    const result = isDevelopmentFromPublishableKey(publishableKeyStr);
+    expect(result).toEqual(expected);
+  });
+});
+
+describe('isProductionFromPublishableKey(key)', () => {
+  const cases: Array<[string, boolean]> = [
+    ['pk_live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk', true],
+    ['pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk', false],
+    ['live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk', true],
+    ['test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk', false],
+  ];
+
+  test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expected) => {
+    const result = isProductionFromPublishableKey(publishableKeyStr);
+    expect(result).toEqual(expected);
+  });
+});
+
 describe('isDevelopmentFromSecretKey(key)', () => {
   const cases: Array<[string, boolean]> = [
     ['sk_live_Y2xlcmsuY2xlcmsuZGV2JA==', false],
@@ -113,8 +143,8 @@ describe('isDevelopmentFromSecretKey(key)', () => {
     ['test_Y2xlcmsuY2xlcmsuZGV2JA==', true],
   ];
 
-  test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expected) => {
-    const result = isDevelopmentFromSecretKey(publishableKeyStr);
+  test.each(cases)('given %p as a secret key string, returns %p', (secretKeyStr, expected) => {
+    const result = isDevelopmentFromSecretKey(secretKeyStr);
     expect(result).toEqual(expected);
   });
 });
@@ -127,8 +157,8 @@ describe('isProductionFromSecretKey(key)', () => {
     ['test_Y2xlcmsuY2xlcmsuZGV2JA==', false],
   ];
 
-  test.each(cases)('given %p as a publishable key string, returns %p', (publishableKeyStr, expected) => {
-    const result = isProductionFromSecretKey(publishableKeyStr);
+  test.each(cases)('given %p as a secret key string, returns %p', (secretKeyStr, expected) => {
+    const result = isProductionFromSecretKey(secretKeyStr);
     expect(result).toEqual(expected);
   });
 });

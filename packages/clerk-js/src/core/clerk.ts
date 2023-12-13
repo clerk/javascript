@@ -327,7 +327,8 @@ export class Clerk implements ClerkInterface {
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotOpenSignUpOrSignUp);
+      console.info(warnings.cannotOpenSignUpOrSignUp);
+      return;
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignIn' })
@@ -372,7 +373,8 @@ export class Clerk implements ClerkInterface {
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotOpenOrgProfile);
+      console.info(warnings.cannotOpenOrgProfile);
+      return;
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'OrganizationProfile' })
@@ -443,7 +445,8 @@ export class Clerk implements ClerkInterface {
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotRenderComponentWhenUserDoesNotExist);
+      console.info(warnings.cannotRenderComponentWhenUserDoesNotExist);
+      return;
     }
     void this.#componentControls.ensureMounted({ preloadHint: 'UserProfile' }).then(controls =>
       controls.mountComponent({
@@ -469,7 +472,8 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
+      console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
+      return;
     }
     void this.#componentControls.ensureMounted({ preloadHint: 'OrganizationProfile' }).then(controls =>
       controls.mountComponent({
@@ -743,7 +747,7 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildAfterSignInUrl(): string {
-    if (this.#options.afterSignInUrl === undefined) {
+    if (!this.#options.afterSignInUrl) {
       return '/';
     }
 
@@ -751,7 +755,7 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildAfterSignUpUrl(): string {
-    if (this.#options.afterSignUpUrl === undefined) {
+    if (!this.#options.afterSignUpUrl) {
       return '/';
     }
 

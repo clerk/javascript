@@ -1,3 +1,4 @@
+import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import { useClerk } from '@clerk/shared/react';
 import type { Clerk, ClerkOptions, EnvironmentResource } from '@clerk/types';
 import type { ComponentType } from 'react';
@@ -30,7 +31,7 @@ export function withRedirect<P extends AvailableComponentProps>(
     const shouldRedirect = condition(clerk, environment, options);
     React.useEffect(() => {
       if (shouldRedirect) {
-        if (warning && environment.displayConfig.instanceEnvironmentType === 'development') {
+        if (warning && isDevelopmentFromPublishableKey(clerk.publishableKey)) {
           console.info(warning);
         }
         // TODO: Fix this properly

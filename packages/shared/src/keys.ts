@@ -93,6 +93,14 @@ export function createDevOrStagingUrlCache() {
   };
 }
 
+export function isDevelopmentFromPublishableKey(apiKey: string): boolean {
+  return apiKey.startsWith('test_') || apiKey.startsWith('pk_test_');
+}
+
+export function isProductionFromPublishableKey(apiKey: string): boolean {
+  return apiKey.startsWith('live_') || apiKey.startsWith('pk_live_');
+}
+
 export function isDevelopmentFromSecretKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
 }
