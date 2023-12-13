@@ -1,106 +1,18 @@
 import type { OrganizationMembershipRole } from '@clerk/backend';
 import { expect, test } from '@playwright/test';
 
-import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import type { FakeOrganization, FakeUser } from '../testUtils';
-import { createTestUtils } from '../testUtils';
+import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
-test.describe('authorization @nextjs', () => {
-  test.describe.configure({ mode: 'parallel' });
-  let app: Application;
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authorization @nextjs', ({ app }) => {
+  test.describe.configure({ mode: 'serial' });
+
   let fakeAdmin: FakeUser;
   let fakeViewer: FakeUser;
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
-    app = await appConfigs.next.appRouter
-      .clone()
-      .addFile(
-        'src/app/settings/rsc-protect/page.tsx',
-        () => `
-      import { Protect } from '@clerk/nextjs';
-      export default function Page() {
-        return (
-          <Protect role="admin" fallback={<p>User is not admin</p>}>
-              <p>User has access</p>
-          </Protect>
-        );
-      }`,
-      )
-      .addFile(
-        'src/app/settings/rcc-protect/page.tsx',
-        () => `
-      "use client";
-      import { Protect } from '@clerk/nextjs';
-      export default function Page() {
-        return (
-          <Protect permission="org:posts:manage" fallback={<p>User is missing permissions</p>}>
-              <p>User has access</p>
-          </Protect>
-        );
-      }`,
-      )
-      .addFile(
-        'src/app/settings/useAuth-has/page.tsx',
-        () => `
-      "use client";
-      import { useAuth } from '@clerk/nextjs';
-      export default function Page() {
-        const {has, isLoaded} = useAuth()
-        if(!isLoaded) return <p>Loading</p>
-        if(!has({role: 'admin'})) {
-            return <p>User is not admin</p>
-        }
-        return <p>User has access</p>
-      }`,
-      )
-      .addFile(
-        'src/app/settings/auth-has/page.tsx',
-        () => `
-      import { auth } from '@clerk/nextjs/server';
-      export default function Page() {
-        const {userId, has} = auth()
-        if(!userId || !has({permission: 'org:posts:manage'})) {
-            return <p>User is missing permissions</p>
-        }
-        return <p>User has access</p>
-      }`,
-      )
-      .addFile(
-        'src/app/settings/auth-protect/page.tsx',
-        () => `
-      import { auth } from '@clerk/nextjs/server';
-      export default function Page() {
-        const { user } = auth().protect({role: 'admin'})
-        return <p>User has access</p>
-      }`,
-      )
-      .addFile(
-        'src/app/api/settings/route.ts',
-        () => `
-      import { auth } from '@clerk/nextjs/server';
-      export function GET() {
-        const { userId } = auth().protect(has => has({ role: 'admin' }) || has({role: 'org:editor'}));
-        return new Response(JSON.stringify({userId}));
-      }`,
-      )
-      .addFile(
-        'src/app/switcher/page.tsx',
-        () => `
-      import { OrganizationSwitcher } from '@clerk/nextjs';
-
-      export default function Page() {
-        return (
-          <OrganizationSwitcher hidePersonal={true}/>
-        );
-      }`,
-      )
-      .commit();
-    await app.setup();
-    await app.withEnv(appConfigs.envs.withCustomRoles);
-    await app.dev();
-
     const m = createTestUtils({ app });
     fakeAdmin = m.services.users.createFakeUser();
     const { data: admin } = await m.services.users.createBapiUser(fakeAdmin);
