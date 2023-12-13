@@ -1,4 +1,4 @@
-import { withRedirectToHomeSingleSessionGuard } from '../../common';
+import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, Icon } from '../../customizables';
 import { Card, CardAlert, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
@@ -77,6 +77,4 @@ const _SignInAccountSwitcher = () => {
     </Flow.Part>
   );
 };
-export const SignInAccountSwitcher = withRedirectToHomeSingleSessionGuard(
-  withCardStateProvider(_SignInAccountSwitcher),
-);
+export const SignInAccountSwitcher = withRedirectToAfterSignIn(withCardStateProvider(_SignInAccountSwitcher));

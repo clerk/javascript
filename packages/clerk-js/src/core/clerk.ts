@@ -327,7 +327,8 @@ export class Clerk implements ClerkInterface {
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotOpenSignUpOrSignUp);
+      console.info(warnings.cannotOpenSignUpOrSignUp);
+      return;
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignIn' })
@@ -372,7 +373,8 @@ export class Clerk implements ClerkInterface {
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotOpenOrgProfile);
+      console.info(warnings.cannotOpenOrgProfile);
+      return;
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'OrganizationProfile' })
@@ -442,6 +444,10 @@ export class Clerk implements ClerkInterface {
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (noUserExists(this) && this.#instanceType === 'development') {
+      console.info(warnings.cannotRenderComponentWhenUserDoesNotExist);
+      return;
+    }
     void this.#componentControls.ensureMounted({ preloadHint: 'UserProfile' }).then(controls =>
       controls.mountComponent({
         name: 'UserProfile',
@@ -465,6 +471,10 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
     this.assertComponentsReady(this.#componentControls);
+    if (noOrganizationExists(this) && this.#instanceType === 'development') {
+      console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
+      return;
+    }
     void this.#componentControls.ensureMounted({ preloadHint: 'OrganizationProfile' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationProfile',
@@ -736,6 +746,22 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#environment.displayConfig.homeUrl);
   }
 
+  public buildAfterSignInUrl(): string {
+    if (!this.#options.afterSignInUrl) {
+      return '/';
+    }
+
+    return this.buildUrlWithAuth(this.#options.afterSignInUrl);
+  }
+
+  public buildAfterSignUpUrl(): string {
+    if (!this.#options.afterSignUpUrl) {
+      return '/';
+    }
+
+    return this.buildUrlWithAuth(this.#options.afterSignUpUrl);
+  }
+
   public buildCreateOrganizationUrl(): string {
     if (!this.#environment || !this.#environment.displayConfig) {
       return '';
@@ -812,9 +838,16 @@ export class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToHome = async (): Promise<unknown> => {
+  public redirectToAfterSignIn = async (): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildHomeUrl());
+      return this.navigate(this.buildAfterSignInUrl());
+    }
+    return;
+  };
+
+  public redirectToAfterSignUp = async (): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildAfterSignUpUrl());
     }
     return;
   };

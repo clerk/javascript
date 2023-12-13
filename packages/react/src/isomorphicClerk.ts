@@ -73,7 +73,8 @@ type IsomorphicLoadedClerk = Without<
   | 'buildUserProfileUrl'
   | 'buildCreateOrganizationUrl'
   | 'buildOrganizationProfileUrl'
-  | 'buildHomeUrl'
+  | 'buildAfterSignUpUrl'
+  | 'buildAfterSignInUrl'
   | 'buildUrlWithAuth'
   | 'handleRedirectCallback'
   | 'handleUnauthenticated'
@@ -111,10 +112,11 @@ type IsomorphicLoadedClerk = Without<
   // TODO: Align return type
   buildOrganizationProfileUrl: () => string | void;
   // TODO: Align return type
-  buildHomeUrl: () => string | void;
-  // TODO: Align return type
   buildUrlWithAuth: (to: string, opts?: BuildUrlWithAuthParams | undefined) => string | void;
-
+  // TODO: Align return type
+  buildAfterSignInUrl: () => string | void;
+  // TODO: Align return type
+  buildAfterSignUpUrl: () => string | void;
   // TODO: Align optional props
   mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
   mountOrganizationList: (node: HTMLDivElement, props: OrganizationListProps) => void;
@@ -260,6 +262,24 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  buildAfterSignInUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildAfterSignInUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildAfterSignInUrl', callback);
+    }
+  };
+
+  buildAfterSignUpUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildAfterSignUpUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildAfterSignUpUrl', callback);
+    }
+  };
+
   buildUserProfileUrl = (): string | void => {
     const callback = () => this.clerkjs?.buildUserProfileUrl() || '';
     if (this.clerkjs && this.#loaded) {
@@ -284,15 +304,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('buildOrganizationProfileUrl', callback);
-    }
-  };
-
-  buildHomeUrl = (): string | void => {
-    const callback = () => this.clerkjs?.buildHomeUrl() || '';
-    if (this.clerkjs && this.#loaded) {
-      return callback();
-    } else {
-      this.premountMethodCalls.set('buildHomeUrl', callback);
     }
   };
 
@@ -808,13 +819,21 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  redirectToHome = async (): Promise<unknown> => {
-    const callback = () => this.clerkjs?.redirectToHome();
+  redirectToAfterSignUp = (): void => {
+    const callback = () => this.clerkjs?.redirectToAfterSignUp();
     if (this.clerkjs && this.#loaded) {
       return callback();
     } else {
-      this.premountMethodCalls.set('redirectToHome', callback);
-      return;
+      this.premountMethodCalls.set('redirectToAfterSignUp', callback);
+    }
+  };
+
+  redirectToAfterSignIn = (): void => {
+    const callback = () => this.clerkjs?.redirectToAfterSignIn();
+    if (this.clerkjs && this.#loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('redirectToAfterSignIn', callback);
     }
   };
 

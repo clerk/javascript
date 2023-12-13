@@ -1,4 +1,3 @@
-import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { Col, descriptors, localizationKeys, Spinner, Text } from '../../customizables';
 import { Card, CardAlert, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useSetSessionWithTimeout } from '../../hooks/useSetSessionWithTimeout';
@@ -33,4 +32,4 @@ export const _ResetPasswordSuccess = () => {
   );
 };
 
-export const ResetPasswordSuccess = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_ResetPasswordSuccess));
+export const ResetPasswordSuccess = withCardStateProvider(_ResetPasswordSuccess);

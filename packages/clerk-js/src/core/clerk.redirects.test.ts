@@ -95,7 +95,7 @@ describe('Clerk singleton - Redirects', () => {
     mockNavigate = jest.fn((to: string) => Promise.resolve(to));
   });
 
-  describe('.redirectTo(SignUp|SignIn|UserProfile|Home|CreateOrganization|OrganizationProfile)', () => {
+  describe('.redirectTo(SignUp|SignIn|UserProfile|AfterSignIn|AfterSignUp|CreateOrganization|OrganizationProfile)', () => {
     let clerkForProductionInstance: Clerk;
     let clerkForDevelopmentInstance: Clerk;
 
@@ -152,12 +152,20 @@ describe('Clerk singleton - Redirects', () => {
         expect(mockNavigate).toHaveBeenNthCalledWith(2, '/user-profile');
       });
 
-      it('redirects to home', async () => {
-        await clerkForProductionInstance.redirectToHome();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/home');
+      it('redirects to afterSignUp', async () => {
+        await clerkForProductionInstance.redirectToAfterSignUp();
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/');
 
-        await clerkForDevelopmentInstance.redirectToHome();
-        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/home');
+        await clerkForDevelopmentInstance.redirectToAfterSignUp();
+        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/');
+      });
+
+      it('redirects to afterSignIn', async () => {
+        await clerkForProductionInstance.redirectToAfterSignIn();
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/');
+
+        await clerkForDevelopmentInstance.redirectToAfterSignIn();
+        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/');
       });
 
       it('redirects to create organization', async () => {
@@ -240,14 +248,6 @@ describe('Clerk singleton - Redirects', () => {
 
         await clerkForDevelopmentInstance.redirectToUserProfile();
         expect(mockHref).toHaveBeenNthCalledWith(2, 'http://another-test.host/user-profile#__clerk_db_jwt[deadbeef]');
-      });
-
-      it('redirects to home', async () => {
-        await clerkForProductionInstance.redirectToHome();
-        expect(mockHref).toHaveBeenNthCalledWith(1, 'http://another-test.host/home');
-
-        await clerkForDevelopmentInstance.redirectToHome();
-        expect(mockHref).toHaveBeenNthCalledWith(2, 'http://another-test.host/home#__clerk_db_jwt[deadbeef]');
       });
 
       it('redirects to create organization', async () => {

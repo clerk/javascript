@@ -1,7 +1,7 @@
 import type { ResetPasswordCodeFactor, SignInFactor } from '@clerk/types';
 import React from 'react';
 
-import { withRedirectToHomeSingleSessionGuard } from '../../common';
+import { withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, withCardStateProvider } from '../../elements';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
@@ -197,4 +197,4 @@ export function _SignInFactorOne(): JSX.Element {
   }
 }
 
-export const SignInFactorOne = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_SignInFactorOne));
+export const SignInFactorOne = withRedirectToAfterSignIn(withCardStateProvider(_SignInFactorOne));
