@@ -10,7 +10,6 @@ export default (QUnit: QUnit) => {
       const exportedApiKeys = [
         'AllowlistIdentifier',
         'AuthStatus',
-        'Clerk',
         'Client',
         'DeletedObject',
         'Email',
@@ -37,6 +36,7 @@ export default (QUnit: QUnit) => {
         'buildRequestUrl',
         'constants',
         'createAuthenticateRequest',
+        'createClerkClient',
         'createIsomorphicRequest',
         'debugRequestState',
         'decodeJwt',
