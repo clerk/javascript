@@ -117,12 +117,13 @@ WebSSO usage snippet:
 // ...
 <ClerkProvider
   publishableKey={publishableKey}
-  navigate={to => navigate(to)}
+  routerPush={to => navigate(to)}
+  routerReplace={to => navigate(to, { replace: true })}
   syncSessionWithTab
 >
   {/* ... */}
 </ClerkProvider>
-//...
+// ...
 ```
 
 Examples of a chrome extension using the `@clerk/chrome-extension` package for authentication
@@ -134,22 +135,33 @@ The 2 supported cases (links to different branches of the same repository):
 
 ## WebSSO required settings
 
-### Permissions (in manifest.json)
+### Extension Manifest (`manifest.json`)
 
-- "cookies" for more info see (here)[https://developer.chrome.com/docs/extensions/reference/cookies/]
-- "storage" for more info see (here)[https://developer.chrome.com/docs/extensions/reference/storage/]
+#### Permissions
 
-### Host permissions (in manifest.json)
-
-You will need your Frontend API URL, which can be found in your `Dashboard > API Keys > Advanced > Clerk API URLs`.
+You must enable the following permissions in your `manifest.json` file:
 
 ```
-"host_permissions": ["*://YOUR_CLERK_FRONTEND_API_GOES_HERE/"],
+"permissions": ["cookies", "storage"]
 ```
+
+- For more info on the "cookies" permission: (Google Developer Cookies Reference)[https://developer.chrome.com/docs/extensions/reference/cookies/]
+- For more info on the "storage" permission: (Google Developer Storage Reference)[https://developer.chrome.com/docs/extensions/reference/storage/]
+
+#### Host Permissions
+
+You must enable the following host permissions in your `manifest.json` file:
+
+- **Development:** `"host_permissions": ["http://localhost"]`
+  - If you're using a domain other than `localhost`, you'll want replace that entry with your domain: `http://<DOMAIN>`
+- **Production:** `"host_permissions": ["https://<YOUR_CLERK_FRONTEND_API_GOES_HERE>/"]`
+  - Your Frontend API URL can be found in `Clerk Dashboard > API Keys > Advanced > Clerk API URLs`.
+
+For more info on host permissions: (Google Developer `host_permissions` Reference)[https://developer.chrome.com/docs/extensions/mv3/declare_permissions/#host-permissions]
 
 <a name="clerk-settings"></a>
 
-### Clerk settings
+### Clerk Settings
 
 Add your Chrome extension origin to your instance allowed_origins using BAPI:
 
@@ -159,10 +171,6 @@ curl  -X PATCH https://api.clerk.com/v1/instance \
       -H "Content-type: application/json" \
       -d '{"allowed_origins": ["chrome-extension://extension_id_goes_here"]}'
 ```
-
-## Development
-
-The `Enable URL-based session syncing` should be `DISABLED` from the `Clerk Dashboard > Setting` for a development instance to support @clerk/chrome-extension functionality.
 
 ## Deploy to Production
 
