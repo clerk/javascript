@@ -38,7 +38,6 @@ export {
  * If you do, app router will break.
  */
 export {
-  EmailLinkErrorCode,
   isClerkAPIResponseError,
   isEmailLinkError,
   isKnownError,

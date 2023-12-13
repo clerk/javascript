@@ -4,13 +4,7 @@ import { setErrorThrowerOptions } from './errors/errorThrower';
 
 export * from './components';
 export * from './contexts';
-export {
-  EmailLinkErrorCode,
-  isClerkAPIResponseError,
-  isEmailLinkError,
-  isKnownError,
-  isMetamaskError,
-} from './errors/messages';
+
 export * from './hooks';
 export { useEmailLink } from './hooks/useEmailLink';
 export type {

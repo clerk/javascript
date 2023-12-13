@@ -1,11 +1,3 @@
-export {
-  EmailLinkErrorCode,
-  isClerkAPIResponseError,
-  isEmailLinkError,
-  isKnownError,
-  isMetamaskError,
-} from '@clerk/shared/error';
-
 export const noClerkProviderError = 'You must wrap your application in a <ClerkProvider> component.';
 
 export const multipleClerkProvidersError =
