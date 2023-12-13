@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { Col, descriptors, localizationKeys } from '../customizables';
+import { Button, Col, descriptors, localizationKeys } from '../customizables';
 import type { LocalizationKey } from '../localization';
 import { CardAlert } from './Alert';
 import { Card } from './Card';
@@ -47,16 +47,15 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
     <Card>
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
-        {props.onBackLinkClicked && <Header.BackLink onClick={props.onBackLinkClicked} />}
         <Header.Title localizationKey={props.cardTitle} />
         <Header.Subtitle localizationKey={props.cardSubtitle} />
+        <IdentityPreview
+          identifier={props.safeIdentifier}
+          avatarUrl={props.profileImageUrl}
+          onClick={!props.onBackLinkClicked ? props.onIdentityPreviewEditClicked : undefined}
+        />
       </Header.Root>
       {children}
-      <IdentityPreview
-        identifier={props.safeIdentifier}
-        avatarUrl={props.profileImageUrl}
-        onClick={!props.onBackLinkClicked ? props.onIdentityPreviewEditClicked : undefined}
-      />
       <Col
         elementDescriptor={descriptors.main}
         gap={8}
@@ -66,6 +65,13 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
           label={props.formTitle}
           description={props.formSubtitle}
           resendButton={props.resendButton}
+        />
+        <Button
+          elementDescriptor={descriptors.formButtonPrimary}
+          block
+          hasArrow
+          localizationKey={localizationKeys('formButtonPrimary')}
+          onClick={otp.onFakeContinue}
         />
       </Col>
 

@@ -32,13 +32,13 @@ export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionPr
         >
           <Text
             localizationKey={title}
-            variant='regularMedium'
+            variant='subtitle'
           />
           {titleLabel}
         </Flex>
         <Text
           localizationKey={subtitle}
-          variant='smallRegular'
+          variant='caption'
           colorScheme='neutral'
         />
       </Col>
@@ -46,7 +46,6 @@ export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionPr
         <Button
           localizationKey={actionLabel}
           loadingText={t(actionLabel)}
-          colorScheme='primary'
           variant='link'
           {...rest}
           isLoading={status.isLoading}

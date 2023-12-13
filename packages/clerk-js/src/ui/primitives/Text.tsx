@@ -17,7 +17,6 @@ const { applyVariants, filterProps } = createVariants(theme => {
     },
     variants: {
       variant: common.textVariants(theme),
-      size: common.fontSizeVariants(theme),
       colorScheme: {
         primary: { color: theme.colors.$colorText },
         onPrimaryBg: { color: theme.colors.$colorTextOnPrimaryBackground },
@@ -35,7 +34,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
       },
     },
     defaultVariants: {
-      variant: 'regularRegular',
+      variant: 'body',
+      colorScheme: 'inherit',
     },
   };
 });
@@ -45,12 +45,12 @@ export type TextProps = PrimitiveProps<'p'> & { isDisabled?: boolean } & StyleVa
     as?: 'p' | 'div' | 'label' | 'code' | 'span' | 'li' | 'a';
   };
 
-export const Text = React.forwardRef<HTMLElement, TextProps>((props, ref): JSX.Element => {
+export const Text = React.forwardRef<HTMLElement, TextProps>((props, ref) => {
   const { as: As = 'p', ...rest } = props;
   return (
     <As
       {...applyDataStateProps(filterProps(rest))}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
       ref={ref as unknown as any}
     />
   );

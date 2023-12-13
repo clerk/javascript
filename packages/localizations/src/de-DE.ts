@@ -212,8 +212,6 @@ export const deDE: LocalizationResource = {
     start: {
       headerTitle__account: 'Konto',
       headerTitle__security: 'Sicherheit',
-      headerSubtitle__account: 'Verwalten Sie Ihre Kontoinformationen',
-      headerSubtitle__security: 'Verwalten Sie Ihre Sicherheitseinstellungen',
       profileSection: {
         title: 'Profil',
       },
@@ -498,8 +496,6 @@ export const deDE: LocalizationResource = {
     start: {
       headerTitle__members: 'Mitglieder',
       headerTitle__settings: 'Einstellungen',
-      headerSubtitle__members: 'Anzeigen und Verwalten von Organisationsmitgliedern',
-      headerSubtitle__settings: 'Organisationseinstellungen verwalten',
     },
     profilePage: {
       title: 'Organisationsprofil',

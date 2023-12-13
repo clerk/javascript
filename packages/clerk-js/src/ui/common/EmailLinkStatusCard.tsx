@@ -61,13 +61,13 @@ const StatusRow = (props: { status: VerificationStatus }) => {
           size='xl'
           colorScheme='primary'
           sx={theme => ({ margin: `${theme.space.$12} 0` })}
+          elementDescriptor={descriptors.spinner}
         />
       ) : (
         <>
           <StatusIcon status={props.status} />
           <Text
             elementDescriptor={descriptors.verificationLinkStatusText}
-            variant='regularRegular'
             colorScheme='neutral'
             localizationKey={localizationKeys('signIn.emailLink.unusedTab.title')}
           />

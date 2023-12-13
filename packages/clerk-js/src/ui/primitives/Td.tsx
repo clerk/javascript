@@ -21,7 +21,7 @@ export const Td = React.forwardRef<HTMLTableCellElement, TdProps>((props, ref) =
     <Box
       as='td'
       {...filterProps(props)}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
       ref={ref}
     />
   );

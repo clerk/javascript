@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 
-import { descriptors, Flex } from '../customizables';
-import { Spinner } from '../primitives';
+import { descriptors, Flex, Spinner } from '../customizables';
 import { CardAlert } from './Alert';
 import { Card } from './Card';
 import { useCardState, withCardStateProvider } from './contexts';
@@ -15,12 +14,13 @@ export const LoadingCardContainer = ({ children }: PropsWithChildren) => {
       gap={8}
       sx={theme => ({
         marginTop: theme.space.$16,
-        marginBottom: theme.space.$14,
+        marginBottom: theme.space.$13,
       })}
     >
       <Spinner
         size='xl'
         colorScheme='primary'
+        elementDescriptor={descriptors.spinner}
       />
       {children}
     </Flex>

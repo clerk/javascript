@@ -62,8 +62,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
       <ArrowBlockButton
         elementDescriptor={descriptors.accordionTriggerButton}
         variant='ghost'
-        colorScheme='neutral'
-        textVariant='smallRegular'
+        textVariant='body'
         leftIcon={icon}
         rightIcon={Caret}
         rightIconSx={t => ({

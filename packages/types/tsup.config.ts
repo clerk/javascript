@@ -1,11 +1,9 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig(() => {
-  const uiRetheme = process.env.CLERK_RETHEME === '1' || process.env.CLERK_RETHEME === 'true';
-
   return {
     entry: {
-      index: uiRetheme ? 'src/index.retheme.ts' : 'src/index.ts',
+      index: 'src/index.ts',
     },
     minify: false,
     clean: true,

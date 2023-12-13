@@ -73,12 +73,12 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
       <Text
         colorScheme='neutral'
         elementDescriptor={descriptors.impersonationFabTitle}
-        variant='regularMedium'
+        variant='buttonLarge'
         truncate
         localizationKey={title}
       />
       <Link
-        variant='regularMedium'
+        variant='buttonLarge'
         elementDescriptor={descriptors.impersonationFabActionLink}
         sx={t => ({
           alignSelf: 'flex-start',
@@ -90,7 +90,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
         localizationKey={signOutText}
         onClick={async () => {
           // clerk-js has been loaded at this point so we can safely access session
-          await signOut({ sessionId: session!.id });
+          await signOut({ sessionId: session.id });
         }}
       />
     </Col>

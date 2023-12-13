@@ -233,8 +233,6 @@ export const ruRU: LocalizationResource = {
     start: {
       headerTitle__account: 'Аккаунт',
       headerTitle__security: 'Безопасность',
-      headerSubtitle__account: 'Управление информацией об аккаунте',
-      headerSubtitle__security: 'Управление настройками безопасности',
       profileSection: {
         title: 'Профиль',
       },
@@ -509,8 +507,6 @@ export const ruRU: LocalizationResource = {
     start: {
       headerTitle__members: 'Участники',
       headerTitle__settings: 'Настройки',
-      headerSubtitle__members: 'Просмотр и управление участниками организации',
-      headerSubtitle__settings: 'Управление настройками организации',
     },
     profilePage: {
       title: 'Профиль организации',

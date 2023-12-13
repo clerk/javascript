@@ -36,7 +36,7 @@ export const Icon = (props: IconProps): JSX.Element => {
     <Icon
       {...filterProps(rest)}
       // @ts-expect-error
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     />
   );
 };

@@ -1,7 +1,9 @@
 import type { UserResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
-import { bindCreateFixtures, fireEvent, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
+import { fireEvent, render, screen, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { ResetPassword } from '../../SignIn/ResetPassword';
 import { PasswordPage } from '../PasswordPage';
 

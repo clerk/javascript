@@ -37,12 +37,7 @@ export const CalloutWithAction = (props: PropsWithChildren<CalloutWithActionProp
         <Col gap={4}>
           <Text
             colorScheme='neutral'
-            sx={[
-              t => ({
-                lineHeight: t.lineHeights.$base,
-              }),
-              textSx,
-            ]}
+            sx={textSx}
             localizationKey={text}
           >
             {props.children}
@@ -51,7 +46,7 @@ export const CalloutWithAction = (props: PropsWithChildren<CalloutWithActionProp
           {actionLabel && (
             <Link
               colorScheme={'primary'}
-              variant='regularMedium'
+              variant='subtitle'
               localizationKey={actionLabel}
               onClick={onClick}
             />

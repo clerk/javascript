@@ -7,7 +7,7 @@ import { useOrganizationSwitcherContext } from '../../contexts';
 import { Box, descriptors, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview, PreviewButton } from '../../elements';
 import { useInView } from '../../hooks';
-import { SwitchArrows } from '../../icons';
+import { SwitchArrowRight } from '../../icons';
 import { common } from '../../styledSystem';
 import { organizationListParams } from './utils';
 
@@ -61,7 +61,6 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   return (
     <Box
       sx={t => ({
-        maxHeight: `calc(4 * ${t.sizes.$12})`,
         overflowY: 'auto',
         ...common.unstyledScrollbar(t),
       })}
@@ -71,16 +70,21 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
       {currentOrg && !hidePersonal && (
         <PreviewButton
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
-          icon={SwitchArrows}
-          sx={{ borderRadius: 0 }}
+          icon={SwitchArrowRight}
+          sx={t => ({ borderRadius: 0, borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}` })}
           onClick={onPersonalWorkspaceClick}
           role='menuitem'
         >
           <PersonalWorkspacePreview
             user={userWithoutIdentifiers}
-            size='sm'
-            avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
+            mainIdentifierVariant={'buttonLarge'}
             title={localizationKeys('organizationSwitcher.personalWorkspace')}
+            mainIdentifierSx={t => ({
+              color: t.colors.$blackAlpha600,
+              ':hover': {
+                color: t.colors.$blackAlpha600,
+              },
+            })}
           />
         </PreviewButton>
       )}
@@ -88,16 +92,20 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         <PreviewButton
           key={organization.id}
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
-          icon={SwitchArrows}
-          sx={{ borderRadius: 0 }}
+          icon={SwitchArrowRight}
+          sx={t => ({ borderRadius: 0, borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}` })}
           onClick={() => onOrganizationClick(organization)}
           role='menuitem'
         >
           <OrganizationPreview
             elementId='organizationSwitcherListedOrganization'
-            avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
             organization={organization}
-            size='sm'
+            sx={t => ({
+              color: t.colors.$blackAlpha600,
+              ':hover': {
+                color: t.colors.$blackAlpha600,
+              },
+            })}
           />
         </PreviewButton>
       ))}

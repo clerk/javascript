@@ -60,6 +60,7 @@ export const DataTable = (props: MembersListTableProps) => {
                   <Spinner
                     colorScheme='primary'
                     sx={{ margin: 'auto', display: 'block' }}
+                    elementDescriptor={descriptors.spinner}
                   />
                 </Td>
               </Tr>

@@ -38,19 +38,18 @@ export const OrganizationMembersTabInvitations = () => {
                 localizationKey={localizationKeys(
                   'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
                 )}
-                textVariant='largeMedium'
+                textVariant='h2'
               />
               <Header.Subtitle
                 localizationKey={localizationKeys(
                   'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
                 )}
-                variant='regularRegular'
+                variant='subtitle'
               />
             </Header.Root>
             <DomainList
               fallback={
                 <BlockButton
-                  colorScheme='primary'
                   textLocalizationKey={localizationKeys(
                     'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
                   )}
@@ -82,13 +81,13 @@ export const OrganizationMembersTabInvitations = () => {
               localizationKey={localizationKeys(
                 'organizationProfile.membersPage.invitationsTab.manualInvitations.headerTitle',
               )}
-              textVariant='largeMedium'
+              textVariant='h2'
             />
             <Header.Subtitle
               localizationKey={localizationKeys(
                 'organizationProfile.membersPage.invitationsTab.manualInvitations.headerSubtitle',
               )}
-              variant='regularRegular'
+              variant='subtitle'
             />
           </Header.Root>
 
@@ -103,7 +102,7 @@ export const OrganizationMembersTabInvitations = () => {
                 sx={t => ({ marginRight: t.space.$2 })}
               />
             }
-            textVariant='buttonExtraSmallBold'
+            textVariant='buttonSmall'
             localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
           />
         </Flex>

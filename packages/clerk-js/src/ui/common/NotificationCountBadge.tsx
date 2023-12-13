@@ -3,13 +3,12 @@ import { useDelayedVisibility, usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 
-export const NotificationCountBadge = ({
-  notificationCount,
-  containerSx,
-}: {
+type NotificationCountBadgeProps = {
   notificationCount: number;
   containerSx?: ThemableCssProp;
-}) => {
+};
+
+export const NotificationCountBadge = ({ notificationCount, containerSx }: NotificationCountBadgeProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const showNotification = useDelayedVisibility(notificationCount > 0, 350) || false;
 
@@ -25,9 +24,11 @@ export const NotificationCountBadge = ({
     <Box
       sx={[
         t => ({
-          position: 'relative',
-          width: t.sizes.$4,
-          height: t.sizes.$4,
+          position: 'absolute',
+          top: `-${t.space.$2}`,
+          right: `-${t.space.$1}`,
+          width: t.sizes.$2,
+          height: t.sizes.$2,
         }),
         containerSx,
       ]}

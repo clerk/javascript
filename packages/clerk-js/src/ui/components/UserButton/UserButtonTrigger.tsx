@@ -29,7 +29,7 @@ export const UserButtonTrigger = withAvatarShimmer(
           boxElementDescriptor={descriptors.userButtonAvatarBox}
           imageElementDescriptor={descriptors.userButtonAvatarImage}
           {...user}
-          size={theme => theme.sizes.$8}
+          size={theme => theme.sizes.$7}
         />
       </Button>
     );

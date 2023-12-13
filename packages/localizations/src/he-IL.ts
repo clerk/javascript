@@ -235,8 +235,6 @@ export const heIL: LocalizationResource = {
     start: {
       headerTitle__account: 'חשבון',
       headerTitle__security: 'אבטחה',
-      headerSubtitle__account: 'נהל את מידע החשבון שלך',
-      headerSubtitle__security: 'נהל את העדפות האבטחה שלך',
       profileSection: {
         title: 'פרופיל',
       },
@@ -505,8 +503,6 @@ export const heIL: LocalizationResource = {
     start: {
       headerTitle__members: 'חברים',
       headerTitle__settings: 'הגדרות',
-      headerSubtitle__members: 'הצג ונהל את חברי הארגון',
-      headerSubtitle__settings: 'נהל הגדרות ארגון',
     },
     profilePage: {
       title: 'פרופיל ארגון',

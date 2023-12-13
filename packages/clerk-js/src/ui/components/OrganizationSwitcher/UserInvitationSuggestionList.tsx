@@ -51,7 +51,6 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
   if (props.status === 'accepted') {
     return (
       <Text
-        variant='smallRegular'
         colorScheme='neutral'
         localizationKey={localizationKeys('organizationSwitcher.suggestionsAcceptedLabel')}
       />
@@ -61,9 +60,8 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
   return (
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
-      textVariant='buttonExtraSmallBold'
-      variant='outline'
-      colorScheme='neutral'
+      textVariant='buttonSmall'
+      variant='secondary'
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
@@ -88,10 +86,9 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
   return (
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
-      textVariant='buttonExtraSmallBold'
-      variant='outline'
-      colorScheme='neutral'
-      size='sm'
+      textVariant='buttonSmall'
+      variant='secondary'
+      size='xs'
       isLoading={card.isLoading}
       onClick={handleAccept}
       localizationKey={localizationKeys('organizationSwitcher.action__invitationAccept')}
@@ -113,17 +110,19 @@ const InvitationPreview = withCardStateProvider(
         align='center'
         gap={2}
         sx={t => ({
-          minHeight: 'unset',
-          height: t.space.$12,
           justifyContent: 'space-between',
-          padding: `0 ${t.space.$6}`,
+          padding: `${t.space.$4} ${t.space.$5}`,
         })}
       >
         <OrganizationPreview
           elementId='organizationSwitcherListedOrganization'
-          avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
           organization={publicOrganizationData}
-          size='sm'
+          sx={t => ({
+            color: t.colors.$blackAlpha600,
+            ':hover': {
+              color: t.colors.$blackAlpha600,
+            },
+          })}
         />
 
         {children}
@@ -137,7 +136,7 @@ const SwitcherInvitationActions = (props: PropsOfComponent<typeof Flex> & { show
   return (
     <Actions
       sx={t => ({
-        borderTop: showBorder ? `${t.borders.$normal} ${t.colors.$blackAlpha200}` : 'none',
+        borderBottom: showBorder ? `${t.borders.$normal} ${t.colors.$blackAlpha200}` : 'none',
       })}
       role='menu'
       {...restProps}

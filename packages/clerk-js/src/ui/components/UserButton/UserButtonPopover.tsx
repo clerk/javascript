@@ -3,11 +3,11 @@ import type { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
 import { useEnvironment, useUserButtonContext } from '../../contexts';
-import { descriptors, localizationKeys } from '../../customizables';
-import { Action, Actions, PopoverCard, PreviewButton, SecondaryActions, UserPreview } from '../../elements';
-import { RootBox } from '../../elements/RootBox';
-import { CogFilled, Plus, SignOut, SignOutDouble, SwitchArrows } from '../../icons';
+import { descriptors, Icon, localizationKeys } from '../../customizables';
+import { Action, Actions, PopoverCard, PreviewButton, RootBox, SecondaryActions, UserPreview } from '../../elements';
+import { Add, CheckmarkFilled, SignOut, SwitchArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
+import { MultiSessionActions, SingleSessionActions } from './SessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
 
 type UserButtonPopoverProps = { close: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
@@ -28,42 +28,75 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
 
   const addAccountButton = (
     <Action
-      icon={Plus}
+      elementDescriptor={descriptors.userButtonPopoverActionButton}
+      elementId={descriptors.userButtonPopoverActionButton.setId('addAccount')}
+      iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
+      iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('addAccount')}
+      iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
+      iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('addAccount')}
+      icon={Add}
       label={localizationKeys('userButton.action__addAccount')}
       onClick={handleAddAccountClicked}
+      sx={t => ({
+        backgroundColor: t.colors.$colorBackground,
+      })}
+      iconSx={t => ({
+        color: t.colors.$blackAlpha400,
+        width: t.sizes.$9,
+        height: t.sizes.$6,
+      })}
     />
   );
 
-  const sessionActions = authConfig.singleSessionMode ? null : otherSessions.length > 0 ? (
-    <>
-      <SecondaryActions role='menu'>
-        {otherSessions.map(session => (
-          <PreviewButton
-            key={session.id}
-            icon={SwitchArrows}
-            sx={t => ({ height: t.sizes.$14, borderRadius: 0 })}
-            onClick={handleSessionClicked(session)}
-            role='menuitem'
-          >
-            <UserPreview
-              user={session.user}
-              size='sm'
-              avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
-            />
-          </PreviewButton>
-        ))}
-        {addAccountButton}
-      </SecondaryActions>
-      <Actions role='menu'>
-        <Action
-          icon={SignOutDouble}
-          label={localizationKeys('userButton.action__signOutAll')}
-          onClick={handleSignOutAllClicked}
-        />
-      </Actions>
-    </>
-  ) : (
-    <SecondaryActions role='menu'>{addAccountButton}</SecondaryActions>
+  const signOutAllButton = (
+    <Actions
+      role='menu'
+      sx={t => ({
+        padding: t.space.$2,
+        borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+      })}
+    >
+      <Action
+        elementDescriptor={descriptors.userButtonPopoverActionButton}
+        elementId={descriptors.userButtonPopoverActionButton.setId('signOutAll')}
+        iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
+        iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('signOutAll')}
+        iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
+        iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('signOutAll')}
+        icon={SignOut}
+        label={localizationKeys('userButton.action__signOutAll')}
+        onClick={handleSignOutAllClicked}
+        variant='ghostDanger'
+        sx={t => ({
+          color: t.colors.$blackAlpha700,
+          padding: `${t.space.$2} ${t.space.$3}`,
+          borderBottom: 'none',
+          borderRadius: t.radii.$lg,
+        })}
+      />
+    </Actions>
+  );
+
+  const sessionActions = (
+    <SecondaryActions role='menu'>
+      {otherSessions.map(session => (
+        <PreviewButton
+          key={session.id}
+          icon={SwitchArrowRight}
+          sx={t => ({
+            height: t.sizes.$20,
+            borderRadius: 0,
+            borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+            backgroundColor: t.colors.$colorBackground,
+          })}
+          onClick={handleSessionClicked(session)}
+          role='menuitem'
+        >
+          <UserPreview user={session.user} />
+        </PreviewButton>
+      ))}
+      {addAccountButton}
+    </SecondaryActions>
   );
 
   return (
@@ -79,42 +112,37 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
           <UserPreview
             elementId={'userButton'}
             user={user}
-            sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$2 })}
+            sx={t => ({
+              padding: `${t.space.$4} ${t.space.$5}`,
+            })}
+            icon={
+              <Icon
+                icon={CheckmarkFilled}
+                sx={t => ({ width: t.sizes.$3x5, height: t.sizes.$3x5 })}
+              />
+            }
+            iconSx={t => ({ left: 'unset', right: 0, color: t.colors.$primary500 })}
           />
-          <Actions
-            role='menu'
-            elementDescriptor={descriptors.userButtonPopoverActions}
-          >
-            <Action
-              elementDescriptor={descriptors.userButtonPopoverActionButton}
-              elementId={descriptors.userButtonPopoverActionButton.setId('manageAccount')}
-              iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
-              iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('manageAccount')}
-              iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
-              iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('manageAccount')}
-              textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
-              textElementId={descriptors.userButtonPopoverActionButtonText.setId('manageAccount')}
-              icon={CogFilled}
-              label={localizationKeys('userButton.action__manageAccount')}
-              onClick={handleManageAccountClicked}
+          {authConfig.singleSessionMode ? (
+            <SingleSessionActions
+              handleManageAccountClicked={handleManageAccountClicked}
+              handleSignOutSessionClicked={handleSignOutSessionClicked}
+              session={session}
             />
-            <Action
-              elementDescriptor={descriptors.userButtonPopoverActionButton}
-              elementId={descriptors.userButtonPopoverActionButton.setId('signOut')}
-              iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
-              iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('signOut')}
-              iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
-              iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('signOut')}
-              textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
-              textElementId={descriptors.userButtonPopoverActionButtonText.setId('signOut')}
-              icon={SignOut}
-              label={localizationKeys('userButton.action__signOut')}
-              onClick={handleSignOutSessionClicked(session)}
-            />
-          </Actions>
-          {sessionActions}
+          ) : (
+            <>
+              <MultiSessionActions
+                handleManageAccountClicked={handleManageAccountClicked}
+                handleSignOutSessionClicked={handleSignOutSessionClicked}
+                session={session}
+              />
+              {sessionActions}
+            </>
+          )}
         </PopoverCard.Main>
-        <PopoverCard.Footer elementDescriptor={descriptors.userButtonPopoverFooter} />
+        <PopoverCard.Footer elementDescriptor={descriptors.userButtonPopoverFooter}>
+          {!authConfig.singleSessionMode && signOutAllButton}
+        </PopoverCard.Footer>
       </PopoverCard.Root>
     </RootBox>
   );

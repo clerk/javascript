@@ -264,13 +264,16 @@ type _LocalizationResource = {
     formButtonPrimary__continue: LocalizationValue;
     formButtonPrimary__finish: LocalizationValue;
     formButtonReset: LocalizationValue;
+    navbar: {
+      title: LocalizationValue;
+      description: LocalizationValue;
+    };
     start: {
       headerTitle__account: LocalizationValue;
       headerTitle__security: LocalizationValue;
-      headerSubtitle__account: LocalizationValue;
-      headerSubtitle__security: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
+        primaryButton: LocalizationValue;
       };
       usernameSection: {
         title: LocalizationValue;
@@ -545,11 +548,13 @@ type _LocalizationResource = {
     badge__automaticInvitation: LocalizationValue;
     badge__automaticSuggestion: LocalizationValue;
     badge__manualInvitation: LocalizationValue;
+    navbar: {
+      title: LocalizationValue;
+      description: LocalizationValue;
+    };
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;
-      headerSubtitle__members: LocalizationValue;
-      headerSubtitle__settings: LocalizationValue;
     };
     profilePage: {
       title: LocalizationValue;

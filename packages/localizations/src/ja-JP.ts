@@ -236,8 +236,6 @@ export const jaJP: LocalizationResource = {
     start: {
       headerTitle__account: 'アカウント',
       headerTitle__security: 'セキュリティ',
-      headerSubtitle__account: 'アカウント情報の管理',
-      headerSubtitle__security: 'セキュリティ設定の管理',
       profileSection: {
         title: 'プロフィール',
       },
@@ -504,8 +502,6 @@ export const jaJP: LocalizationResource = {
     start: {
       headerTitle__members: 'メンバー',
       headerTitle__settings: '設定',
-      headerSubtitle__members: '組織のメンバーを表示および管理する',
-      headerSubtitle__settings: '組織の設定を管理する',
     },
     profilePage: {
       title: '組織プロフィール',

@@ -99,7 +99,7 @@ const AcceptRejectRequestButtons = (props: { onAccept: () => unknown; onReject: 
   return (
     <Flex gap={2}>
       <Button
-        textVariant='buttonExtraSmallBold'
+        textVariant='buttonSmall'
         variant='ghost'
         isLoading={card.isLoading && card.loadingMetadata === 'reject'}
         isDisabled={card.isLoading && card.loadingMetadata !== 'reject'}
@@ -108,8 +108,8 @@ const AcceptRejectRequestButtons = (props: { onAccept: () => unknown; onReject: 
       />
 
       <Button
-        textVariant='buttonExtraSmallBold'
-        variant='solid'
+        textVariant='buttonSmall'
+        variant='primary'
         isLoading={card.isLoading && card.loadingMetadata === 'accept'}
         isDisabled={card.isLoading && card.loadingMetadata !== 'accept'}
         onClick={props.onAccept}

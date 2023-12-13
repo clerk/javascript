@@ -211,8 +211,6 @@ export const daDK: LocalizationResource = {
     start: {
       headerTitle__account: 'Konto',
       headerTitle__security: 'Sikkerhed',
-      headerSubtitle__account: 'Administrere dine kontooplysninger',
-      headerSubtitle__security: 'Administrere dine sikkerhedspræferencer',
       profileSection: {
         title: 'Profil',
       },
@@ -485,8 +483,6 @@ export const daDK: LocalizationResource = {
     start: {
       headerTitle__members: 'Medlemmer',
       headerTitle__settings: 'Indstillinger',
-      headerSubtitle__members: 'Se og administrer organisationsmedlemmer',
-      headerSubtitle__settings: 'Administrer organisationsindstillinger',
     },
     profilePage: {
       title: 'Organisationsprofil',

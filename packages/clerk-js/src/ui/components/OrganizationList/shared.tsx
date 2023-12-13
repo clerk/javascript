@@ -85,6 +85,7 @@ export const PreviewListSpinner = forwardRef<HTMLDivElement>((_, ref) => {
         <Spinner
           size='sm'
           colorScheme='primary'
+          elementDescriptor={descriptors.spinner}
         />
       </Box>
     </Box>
@@ -95,9 +96,8 @@ export const PreviewListItemButton = (props: Parameters<typeof Button>[0]) => {
   return (
     <Button
       elementDescriptor={descriptors.organizationListPreviewItemActionButton}
-      textVariant='buttonExtraSmallBold'
-      variant='outline'
-      colorScheme='neutral'
+      textVariant='buttonSmall'
+      variant='secondary'
       size='sm'
       {...props}
     />

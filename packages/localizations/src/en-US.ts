@@ -246,13 +246,16 @@ export const enUS: LocalizationResource = {
     formButtonPrimary__continue: 'Continue',
     formButtonPrimary__finish: 'Finish',
     formButtonReset: 'Cancel',
+    navbar: {
+      title: 'Account',
+      description: 'Manage your account info.',
+    },
     start: {
-      headerTitle__account: 'Account',
+      headerTitle__account: 'Profile details',
       headerTitle__security: 'Security',
-      headerSubtitle__account: 'Manage your account information',
-      headerSubtitle__security: 'Manage your security preferences',
       profileSection: {
         title: 'Profile',
+        primaryButton: 'Edit Profile',
       },
       usernameSection: {
         title: 'Username',
@@ -528,7 +531,7 @@ export const enUS: LocalizationResource = {
     personalWorkspace: 'Personal account',
     notSelected: 'No organization selected',
     action__createOrganization: 'Create Organization',
-    action__manageOrganization: 'Manage Organization',
+    action__manageOrganization: 'Manage',
     action__invitationAccept: 'Join',
     action__suggestionsAccept: 'Request to join',
     suggestionsAcceptedLabel: 'Pending approval',
@@ -542,11 +545,13 @@ export const enUS: LocalizationResource = {
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
+    navbar: {
+      title: 'Organization',
+      description: 'Manage your organization.',
+    },
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
-      headerSubtitle__members: 'View and manage organization members',
-      headerSubtitle__settings: 'Manage organization settings',
     },
     profilePage: {
       title: 'Organization Profile',

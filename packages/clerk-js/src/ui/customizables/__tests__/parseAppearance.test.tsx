@@ -1,9 +1,10 @@
 // eslint-disable-next-line simple-import-sort/imports
 import { render } from '../../../testUtils';
+import React from 'react';
 
-import { renderHook } from '@testing-library/react';
 import { Box, useAppearance } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
+import { renderHook } from '@testing-library/react';
 import { knownColors } from './testUtils';
 
 const themeAColor = 'blue';

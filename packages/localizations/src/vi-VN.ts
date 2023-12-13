@@ -235,8 +235,6 @@ export const viVN: LocalizationResource = {
     start: {
       headerTitle__account: 'Tài khoản',
       headerTitle__security: 'Bảo mật',
-      headerSubtitle__account: 'Quản lý thông tin tài khoản của bạn',
-      headerSubtitle__security: 'Quản lý các tùy chọn bảo mật',
       profileSection: {
         title: 'Hồ sơ',
       },
@@ -524,8 +522,6 @@ export const viVN: LocalizationResource = {
     start: {
       headerTitle__members: 'Thành viên',
       headerTitle__settings: 'Cài đặt',
-      headerSubtitle__members: 'Xem và quản lý thành viên tổ chức',
-      headerSubtitle__settings: 'Quản lý cài đặt tổ chức',
     },
     profilePage: {
       title: 'Hồ sơ Tổ chức',

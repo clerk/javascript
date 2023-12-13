@@ -1,7 +1,8 @@
-import { bindCreateFixtures, renderHook } from '../../testUtils';
+import { renderHook } from '../../testUtils';
 import { OptionsProvider } from '../contexts';
 import { useLocalizations } from '../customizables';
 import { createPasswordError } from './passwordUtils';
+import { bindCreateFixtures } from './test/createFixtures';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 

@@ -12,7 +12,7 @@ export const Divider = (props: Omit<PropsOfComponent<typeof Flex>, 'elementDescr
       <Text
         localizationKey={localizationKeys('dividerText')}
         elementDescriptor={descriptors.dividerText}
-        variant='smallMedium'
+        variant='subtitle'
         colorScheme='neutral'
         sx={t => ({ margin: `0 ${t.space.$4}` })}
       />
@@ -28,7 +28,7 @@ const DividerLine = () => {
       sx={t => ({
         flex: '1',
         height: '1px',
-        backgroundColor: t.colors.$blackAlpha300,
+        backgroundColor: t.colors.$blackAlpha200,
       })}
     />
   );
