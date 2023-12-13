@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
     env:
-      TURBO_SUMMARIZE: true
+      TURBO_SUMMARIZE: false
 
     steps:
       - name: Checkout Repo
@@ -90,7 +90,7 @@ jobs:
     timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
 
     env:
-      TURBO_SUMMARIZE: true
+      TURBO_SUMMARIZE: false
 
     strategy:
       matrix:
