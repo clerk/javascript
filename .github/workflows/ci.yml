@@ -34,7 +34,6 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-remote-only: false
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -49,27 +48,31 @@ jobs:
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run format:check
 
+      - name: Build Packages
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
+        run: npx turbo build $TURBO_ARGS --only
+
       - name: Lint packages using publint
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:publint $TURBO_ARGS --filter=!@clerk/clerk-js
+        run: npx turbo lint:publint $TURBO_ARGS --filter=!@clerk/clerk-js --only
 
       - name: Lint packages using publint [Errors Allowed]
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:publint $TURBO_ARGS --filter=@clerk/clerk-js --continue
+        run: npx turbo lint:publint $TURBO_ARGS --filter=@clerk/clerk-js --continue  --only
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Lint types using attw
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:attw --filter=!@clerk/clerk-sdk-node --filter=!@clerk/nextjs --filter=!@clerk/clerk-react --filter=!@clerk/shared
+        run: npx turbo lint:attw --filter=!@clerk/clerk-sdk-node --filter=!@clerk/nextjs --filter=!@clerk/clerk-react --filter=!@clerk/shared --only
 
       - name: Lint types using attw [Errors Allowed]
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:attw --filter=@clerk/clerk-sdk-node --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --continue
+        run: npx turbo lint:attw --filter=@clerk/clerk-sdk-node --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --continue --only
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint $TURBO_ARGS -- --quiet
+        run: npx turbo lint $TURBO_ARGS --only -- --quiet
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v3
