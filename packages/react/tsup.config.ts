@@ -10,11 +10,7 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   return {
-    entry: {
-      index: 'src/index.ts',
-      internal: 'src/internal.ts',
-      errors: 'src/errors/errors.ts',
-    },
+    entry: ['src/index.ts', 'src/internal.ts', 'src/errors/errors.ts'],
     onSuccess: shouldPublish ? 'tsc && npm run publish:local' : 'tsc',
     format: ['cjs', 'esm'],
     bundle: true,
