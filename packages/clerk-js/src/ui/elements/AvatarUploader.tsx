@@ -72,7 +72,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         <Col gap={1}>
           <Text
             localizationKey={title}
-            variant='regularMedium'
+            variant='subtitle'
           />
           <Flex
             elementDescriptor={descriptors.avatarImageActions}

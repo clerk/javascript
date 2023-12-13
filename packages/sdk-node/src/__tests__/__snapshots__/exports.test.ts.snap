@@ -4,7 +4,6 @@ exports[`module exports should not change unless explicitly set 1`] = `
 [
   "AllowlistIdentifier",
   "AuthStatus",
-  "Clerk",
   "ClerkExpressRequireAuth",
   "ClerkExpressWithAuth",
   "Client",

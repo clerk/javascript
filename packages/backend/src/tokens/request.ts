@@ -125,27 +125,26 @@ export async function authenticateRequest(
     try {
       verifyResult = await verifyToken(sessionToken, authenticateContext);
     } catch (err) {
-      if (err instanceof TokenVerificationError) {
+      if (
+        err instanceof TokenVerificationError &&
+        instanceType === 'development' &&
+        (err.reason === TokenVerificationErrorReason.TokenExpired ||
+          err.reason === TokenVerificationErrorReason.TokenNotActiveYet)
+      ) {
         err.tokenCarrier = 'cookie';
-        if (
-          instanceType === 'development' &&
-          (err.reason === TokenVerificationErrorReason.TokenExpired ||
-            err.reason === TokenVerificationErrorReason.TokenNotActiveYet)
-        ) {
-          // This probably means we're dealing with clock skew
-          console.error(
-            `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will attempt to account for the clock skew in development.
+        // This probably means we're dealing with clock skew
+        console.error(
+          `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will attempt to account for the clock skew in development.
 
 To resolve this issue, make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
 
 ---
 
 ${err.getFullMessage()}`,
-          );
+        );
 
-          // Retry with a generous clock skew allowance (1 day)
-          verifyResult = await verifyToken(sessionToken, { ...authenticateContext, clockSkewInMs: 86_400_000 });
-        }
+        // Retry with a generous clock skew allowance (1 day)
+        verifyResult = await verifyToken(sessionToken, { ...authenticateContext, clockSkewInMs: 86_400_000 });
       } else {
         throw err;
       }

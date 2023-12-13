@@ -18,9 +18,8 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     width: props.type === 'checkbox' ? theme.sizes.$4 : '100%',
     aspectRatio: props.type === 'checkbox' ? '1/1' : 'unset',
     accentColor: theme.colors.$primary500,
-    ...common.textVariants(theme).smallRegular,
+    ...common.textVariants(theme).body,
     ...common.borderVariants(theme, props).normal,
-    ...(props.focusRing === false ? {} : common.focusRingInput(theme, props)),
     ...common.disabled(theme),
     [mqu.ios]: {
       fontSize: theme.fontSizes.$md,

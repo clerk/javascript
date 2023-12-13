@@ -33,7 +33,7 @@
     "build": "npm run build:bundle && npm run build:declarations",
     "build:analyze": "webpack-bundle-analyzer stats.json dist/",
     "build:bundle": "npm run clean && webpack --config webpack.config.js --env production",
-    "build:declarations": "if [ \"$CLERK_RETHEME\" = \"true\" ] || [ \"$CLERK_RETHEME\" = \"1\" ]; then tsc -p tsconfig.declarations.retheme.json; else tsc -p tsconfig.declarations.json; fi",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "build:stats": "webpack --config webpack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
     "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
     "clean": "rimraf ./dist",

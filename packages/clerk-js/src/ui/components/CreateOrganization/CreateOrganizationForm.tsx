@@ -104,8 +104,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
     slugField.setValue(val);
   };
 
-  const headerTitleTextVariant = props.flow === 'organizationList' ? 'xlargeMedium' : undefined;
-  const headerSubtitleTextVariant = props.flow === 'organizationList' ? 'headingRegularRegular' : undefined;
+  const headerTitleTextVariant = props.flow === 'organizationList' ? 'h2' : undefined;
+  const headerSubtitleTextVariant = props.flow === 'organizationList' ? 'subtitle' : undefined;
 
   return (
     <Wizard {...wizard.props}>
@@ -125,7 +125,6 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             avatarPreviewPlaceholder={
               <IconButton
                 variant='ghost'
-                colorScheme='neutral'
                 aria-label='Upload organization logo'
                 icon={
                   <Icon
@@ -137,8 +136,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
                   />
                 }
                 sx={theme => ({
-                  width: theme.sizes.$11,
-                  height: theme.sizes.$11,
+                  width: theme.sizes.$12,
+                  height: theme.sizes.$12,
                   borderRadius: theme.radii.$md,
                   backgroundColor: theme.colors.$avatarBackground,
                   ':hover': {

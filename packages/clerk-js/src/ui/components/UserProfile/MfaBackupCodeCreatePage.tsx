@@ -49,10 +49,7 @@ export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
         <FullHeightLoader />
       ) : (
         <>
-          <Text
-            localizationKey={localizationKeys('userProfile.backupCodePage.successMessage')}
-            variant='regularRegular'
-          />
+          <Text localizationKey={localizationKeys('userProfile.backupCodePage.successMessage')} />
 
           <MfaBackupCodeList
             subtitle={localizationKeys('userProfile.backupCodePage.subtitle__codelist')}
@@ -61,7 +58,6 @@ export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
 
           <FormButtonContainer>
             <NavigateToFlowStartButton
-              variant='solid'
               autoFocus
               localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
               elementDescriptor={descriptors.formButtonPrimary}

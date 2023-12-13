@@ -234,8 +234,6 @@ export const zhCN: LocalizationResource = {
     start: {
       headerTitle__account: '账户',
       headerTitle__security: '安全',
-      headerSubtitle__account: '管理您的账户信息',
-      headerSubtitle__security: '管理您的安全设置',
       profileSection: {
         title: '个人资料',
       },
@@ -496,8 +494,6 @@ export const zhCN: LocalizationResource = {
     start: {
       headerTitle__members: '成员',
       headerTitle__settings: '设置',
-      headerSubtitle__members: '查看并管理组织成员',
-      headerSubtitle__settings: '管理组织设置',
     },
     profilePage: {
       title: '组织简介',

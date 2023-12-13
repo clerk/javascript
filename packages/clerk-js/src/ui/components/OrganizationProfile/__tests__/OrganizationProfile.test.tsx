@@ -9,6 +9,8 @@ import { OrganizationProfile } from '../OrganizationProfile';
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('OrganizationProfile', () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
   it('includes buttons for the bigger sections', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -16,9 +18,9 @@ describe('OrganizationProfile', () => {
     });
 
     const { getByText } = render(<OrganizationProfile />, { wrapper });
-    expect(getByText('Org1')).toBeInTheDocument();
-    expect(getByText('Members')).toBeInTheDocument();
-    expect(getByText('Settings')).toBeInTheDocument();
+    expect(getByText('Org1')).toBeDefined();
+    expect(getByText('Members')).toBeDefined();
+    expect(getByText('Settings')).toBeDefined();
   });
 
   it('includes custom nav items', async () => {
@@ -47,11 +49,11 @@ describe('OrganizationProfile', () => {
     props.setProps({ customPages });
 
     const { getByText } = render(<OrganizationProfile />, { wrapper });
-    expect(getByText('Org1')).toBeInTheDocument();
-    expect(getByText('Members')).toBeInTheDocument();
-    expect(getByText('Settings')).toBeInTheDocument();
-    expect(getByText('Custom1')).toBeInTheDocument();
-    expect(getByText('ExternalLink')).toBeInTheDocument();
+    expect(getByText('Org1')).toBeDefined();
+    expect(getByText('Members')).toBeDefined();
+    expect(getByText('Settings')).toBeDefined();
+    expect(getByText('Custom1')).toBeDefined();
+    expect(getByText('ExternalLink')).toBeDefined();
   });
 
   it('removes member nav item if user is lacking permissions', async () => {

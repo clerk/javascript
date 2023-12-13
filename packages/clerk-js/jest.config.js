@@ -1,7 +1,5 @@
 const { name } = require('./package.json');
 
-const uiRetheme = process.env.CLERK_RETHEME === '1' || process.env.CLERK_RETHEME === 'true';
-
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 const config = {
   displayName: name.replace('@clerk', ''),
@@ -16,7 +14,7 @@ const config = {
     '/ui/.*/__tests__/.*.test.[jt]sx?$',
     '/(core|utils)/.*.test.[jt]sx?$',
   ],
-  testPathIgnorePatterns: ['/node_modules/', uiRetheme ? '<rootDir>/src/ui/' : '<rootDir>/src/ui.retheme/'],
+  testPathIgnorePatterns: ['/node_modules/'],
   collectCoverage: false,
   coverageProvider: 'v8',
   coverageDirectory: 'coverage',

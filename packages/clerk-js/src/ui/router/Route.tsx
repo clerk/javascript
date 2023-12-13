@@ -18,7 +18,6 @@ interface UnguardedRouteProps {
   flowStart?: boolean;
   canActivate?: never;
 }
-
 type GuardedRouteProps = {
   path?: string;
   index?: boolean;

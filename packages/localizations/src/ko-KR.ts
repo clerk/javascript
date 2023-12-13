@@ -235,8 +235,6 @@ export const koKR: LocalizationResource = {
     start: {
       headerTitle__account: '계정',
       headerTitle__security: '보안',
-      headerSubtitle__account: '계정 정보 관리',
-      headerSubtitle__security: '보안 환경설정 관리',
       profileSection: {
         title: '프로필',
       },
@@ -513,8 +511,6 @@ export const koKR: LocalizationResource = {
     start: {
       headerTitle__members: '멤버',
       headerTitle__settings: '설정',
-      headerSubtitle__members: '조직 구성원 보기 및 관리',
-      headerSubtitle__settings: '조직 설정 관리',
     },
     profilePage: {
       title: '조직 프로필',

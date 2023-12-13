@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys, useLocalizations } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
@@ -96,7 +95,6 @@ export const _ResetPassword = () => {
     <Card>
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
-        <Header.BackLink onClick={() => navigate('../')} />
         <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
       </Header.Root>
       <Col
@@ -149,4 +147,4 @@ export const _ResetPassword = () => {
   );
 };
 
-export const ResetPassword = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_ResetPassword));
+export const ResetPassword = withCardStateProvider(_ResetPassword);

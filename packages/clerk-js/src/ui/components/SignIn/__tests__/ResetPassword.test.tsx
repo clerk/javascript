@@ -1,7 +1,9 @@
 import type { SignInResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
-import { bindCreateFixtures, fireEvent, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
+import { fireEvent, render, screen, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { ResetPassword } from '../ResetPassword';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -129,7 +131,8 @@ describe('ResetPassword', () => {
       });
     }, 10000);
 
-    it('navigates to the root page upon pressing the back link', async () => {
+    // TODO-RETHEME: Replace back button whith the new edit (pencil) icon
+    it.skip('navigates to the root page upon pressing the back link', async () => {
       const { wrapper, fixtures } = await createFixtures();
 
       const { userEvent } = render(<ResetPassword />, { wrapper });

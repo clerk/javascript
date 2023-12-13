@@ -6,11 +6,7 @@ import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
-import {
-  getIdentifierControlDisplayValues,
-  groupIdentifiers,
-  withRedirectToHomeSingleSessionGuard,
-} from '../../common';
+import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
@@ -291,7 +287,20 @@ export function _SignInStart(): JSX.Element {
   const { action, ...identifierFieldProps } = identifierField.props;
   return (
     <Flow.Part part='start'>
-      <Card>
+      <Card
+        footerItems={[
+          <Footer.Root key='signIn.start.actionLink'>
+            <Footer.Action elementId='signIn'>
+              <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
+              <Footer.ActionLink
+                localizationKey={localizationKeys('signIn.start.actionLink')}
+                to={clerk.buildUrlWithAuth(signUpUrl)}
+              />
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root>,
+        ]}
+      >
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
@@ -325,16 +334,6 @@ export function _SignInStart(): JSX.Element {
             ) : null}
           </SocialButtonsReversibleContainerWithDivider>
         </Col>
-        <Footer.Root>
-          <Footer.Action elementId='signIn'>
-            <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
-            <Footer.ActionLink
-              localizationKey={localizationKeys('signIn.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signUpUrl)}
-            />
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
       </Card>
     </Flow.Part>
   );
@@ -387,4 +386,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_SignInStart));
+export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(_SignInStart));

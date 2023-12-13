@@ -16,6 +16,9 @@ const camelize = (s: string) => s.replace(/-./g, x => x[1].toUpperCase());
 export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'rootBox',
   'card',
+  'cardContent',
+  'cardFooter',
+  'cardFooterItem',
 
   'logoBox',
   'logoImage',
@@ -23,9 +26,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'header',
   'headerTitle',
   'headerSubtitle',
-  'headerBackRow',
-  'headerBackLink',
-  'headerBackIcon',
 
   'main',
 
@@ -36,6 +36,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'footerPages',
   'footerPagesLink',
 
+  'backRow',
+  'backLink',
+
   'socialButtons',
   'socialButtonsIconButton',
   'socialButtonsBlockButton',
@@ -44,7 +47,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsProviderIcon',
 
   'enterpriseButtonsProviderIcon',
-
   'alternativeMethods',
   'alternativeMethodsBlockButton',
   'alternativeMethodsBlockButtonText',
@@ -123,7 +125,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userButtonPopoverActionButton',
   'userButtonPopoverActionButtonIconBox',
   'userButtonPopoverActionButtonIcon',
-  'userButtonPopoverActionButtonText',
   'userButtonPopoverFooter',
   'userButtonPopoverFooterPages',
   'userButtonPopoverFooterPagesLink',
@@ -155,6 +156,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userPreviewAvatarContainer',
   'userPreviewAvatarBox',
   'userPreviewAvatarImage',
+  'userPreviewAvatarIcon',
   'userPreviewTextContainer',
   'userPreviewMainIdentifier',
   'userPreviewSecondaryIdentifier',
@@ -277,6 +279,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'notificationBadge',
   'button',
   'providerIcon',
+  'spinner',
   // Decide if we want to keep the keys as camel cased in HTML as well,
   // if yes, refactor and remove the .map(camelize) method
 ] as const).map(camelize) as (keyof ElementsConfig)[];
@@ -309,7 +312,7 @@ type ElementDescriptors = { [k in keyof ElementsConfig as ElementObjectKey<k>]: 
  * socialButtons-buttonIcon ->  cl-socialButtons-buttonIcon
  */
 const toTargettableClassname = <K extends keyof ElementsConfig>(key: K): TargettableClassname<K> => {
-  return (CLASS_PREFIX + key) as TargettableClassname<K>;
+  return (CLASS_PREFIX + (key as string)) as TargettableClassname<K>;
 };
 
 /**

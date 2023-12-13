@@ -33,7 +33,7 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
 
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <Button
-          textVariant='buttonExtraSmallBold'
+          textVariant='buttonSmall'
           onClick={onContinue}
           localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
           elementDescriptor={descriptors.formButtonPrimary}

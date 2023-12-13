@@ -203,8 +203,6 @@ export const nlNL: LocalizationResource = {
     start: {
       headerTitle__account: 'Account',
       headerTitle__security: 'Beveiliging',
-      headerSubtitle__account: 'Beheer uw accountinformatie',
-      headerSubtitle__security: 'Beheer uw veiligheidsvoorkeuren',
       profileSection: {
         title: 'Profiel',
       },
@@ -470,8 +468,6 @@ export const nlNL: LocalizationResource = {
     start: {
       headerTitle__members: 'Leden',
       headerTitle__settings: 'Instellingen',
-      headerSubtitle__members: 'Organisatieleden bekijken en beheren',
-      headerSubtitle__settings: 'Organisatie-instellingen beheren',
     },
     profilePage: {
       title: 'Organisatieprofiel',

@@ -1,6 +1,6 @@
 import type { ClerkAPIError } from '@clerk/types';
 import type { ChangeEvent } from 'react';
-import { forwardRef, useRef, useState } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 
 import { DEBOUNCE_MS } from '../../core/constants';
 import { useEnvironment } from '../contexts';
@@ -21,7 +21,7 @@ type PasswordInputProps = PropsOfComponent<typeof Input> & {
 };
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
-  const [hidden, setHidden] = useState(true);
+  const [hidden, setHidden] = React.useState(true);
   const {
     id,
     onChange: onChangeProp,
@@ -101,9 +101,9 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         elementDescriptor={descriptors.formFieldInputShowPasswordButton}
         iconElementDescriptor={descriptors.formFieldInputShowPasswordIcon}
         aria-label={`${hidden ? 'Show' : 'Hide'} password`}
-        variant='ghostIcon'
+        variant='ghost'
+        size='xs'
         tabIndex={-1}
-        colorScheme={'neutral'}
         onClick={() => setHidden(s => !s)}
         sx={theme => ({
           position: 'absolute',

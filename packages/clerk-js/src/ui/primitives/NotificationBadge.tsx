@@ -25,7 +25,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   defaultVariants: {
     colorScheme: 'primary',
-    textVariant: 'extraSmallRegular',
+    textVariant: 'caption',
   },
 }));
 
@@ -39,7 +39,7 @@ export const NotificationBadge = (props: NotificationBadgeProps) => {
       center
       as='span'
       css={[
-        applyVariants(props),
+        applyVariants(props) as any,
         {
           lineHeight: 0,
         },

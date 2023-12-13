@@ -55,7 +55,7 @@ export const DeletePage = withCardStateProvider(() => {
         </Form.ControlRow>
         <FormButtons
           submitLabel={localizationKeys('userProfile.deletePage.confirm')}
-          colorScheme='danger'
+          variant='primaryDanger'
           isDisabled={!canSubmit}
         />
       </Form.Root>

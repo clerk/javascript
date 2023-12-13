@@ -5,19 +5,20 @@ import React from 'react';
 import { runIfFunctionOrReturn } from '../../../utils';
 import { NotificationCountBadge, withGate } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
-import { descriptors, localizationKeys } from '../../customizables';
+import { descriptors, Flex, localizationKeys } from '../../customizables';
 import {
-  Action,
   Actions,
+  ExtraSmallAction,
   OrganizationPreview,
   PersonalWorkspacePreview,
   PopoverCard,
+  SmallAction,
   useCardState,
 } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { Billing, CogFilled } from '../../icons';
 import { useRouter } from '../../router';
-import type { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
 type OrganizationSwitcherPopoverProps = { close: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
@@ -101,30 +102,90 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       });
     };
 
-    const manageOrganizationButton = (
-      <Action
+    const manageOrganizationSmallIconButton = (
+      <ExtraSmallAction
         elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
         elementId={descriptors.organizationSwitcherPopoverActionButton.setId('manageOrganization')}
         iconBoxElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIconBox}
         iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('manageOrganization')}
         iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
         iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
-        textElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonText}
-        textElementId={descriptors.organizationSwitcherPopoverActionButtonText.setId('manageOrganization')}
         icon={CogFilled}
-        label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={handleManageOrganizationClicked}
         trailing={<NotificationCountBadgeManageButton />}
       />
     );
 
+    const manageOrganizationButton = (
+      <SmallAction
+        elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
+        elementId={descriptors.organizationSwitcherPopoverActionButton.setId('manageOrganization')}
+        iconBoxElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIconBox}
+        iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('manageOrganization')}
+        iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
+        iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
+        icon={CogFilled}
+        label={localizationKeys('organizationSwitcher.action__manageOrganization')}
+        onClick={handleManageOrganizationClicked}
+        trailing={<NotificationCountBadgeManageButton sx={{ right: 0 }} />}
+      />
+    );
+
     const billingOrganizationButton = (
-      <Action
+      <SmallAction
         icon={Billing}
-        label={runIfFunctionOrReturn(__unstable_manageBillingLabel) || 'Manage billing'}
+        label={runIfFunctionOrReturn(__unstable_manageBillingLabel) || 'Upgrade'}
         onClick={() => router.navigate(runIfFunctionOrReturn(__unstable_manageBillingUrl))}
       />
     );
+
+    const selectedOrganizationPreview = (currentOrg: OrganizationResource) =>
+      __unstable_manageBillingUrl ? (
+        <>
+          <OrganizationPreview
+            elementId={'organizationSwitcherActiveOrganization'}
+            organization={currentOrg}
+            user={user}
+            mainIdentifierVariant='buttonLarge'
+            sx={t => ({
+              padding: `${t.space.$4} ${t.space.$5}`,
+            })}
+          />
+          <Actions
+            role='menu'
+            sx={t => ({ borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}` })}
+          >
+            <Flex
+              justify='between'
+              sx={t => ({ marginLeft: t.space.$12, padding: `0 ${t.space.$5} ${t.space.$4}`, gap: t.space.$2 })}
+            >
+              {manageOrganizationButton}
+              {billingOrganizationButton}
+            </Flex>
+          </Actions>
+        </>
+      ) : (
+        <Flex
+          justify='between'
+          align='center'
+          sx={t => ({
+            width: '100%',
+            paddingRight: t.space.$5,
+            borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          })}
+        >
+          <OrganizationPreview
+            elementId={'organizationSwitcherActiveOrganization'}
+            organization={currentOrg}
+            user={user}
+            mainIdentifierVariant='buttonLarge'
+            sx={t => ({
+              padding: `${t.space.$4} ${t.space.$5}`,
+            })}
+          />
+          <Actions role='menu'>{manageOrganizationSmallIconButton}</Actions>
+        </Flex>
+      );
 
     return (
       <RootBox elementDescriptor={descriptors.organizationSwitcherPopoverRootBox}>
@@ -136,30 +197,18 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           {...rest}
         >
           <PopoverCard.Main elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
-            {currentOrg ? (
-              <>
-                <OrganizationPreview
-                  elementId={'organizationSwitcherActiveOrganization'}
-                  gap={4}
-                  organization={currentOrg}
-                  user={user}
-                  sx={theme => t => ({ padding: `0 ${theme.space.$6}`, marginBottom: t.space.$2 })}
-                />
-                <Actions role='menu'>
-                  {manageOrganizationButton}
-                  {__unstable_manageBillingUrl && billingOrganizationButton}
-                </Actions>
-              </>
-            ) : (
-              !hidePersonal && (
-                <PersonalWorkspacePreview
-                  gap={4}
-                  user={userWithoutIdentifiers}
-                  sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$6 })}
-                  title={localizationKeys('organizationSwitcher.personalWorkspace')}
-                />
-              )
-            )}
+            {currentOrg
+              ? selectedOrganizationPreview(currentOrg)
+              : !hidePersonal && (
+                  <PersonalWorkspacePreview
+                    user={userWithoutIdentifiers}
+                    sx={t => ({
+                      padding: `${t.space.$4} ${t.space.$5}`,
+                      borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+                    })}
+                    title={localizationKeys('organizationSwitcher.personalWorkspace')}
+                  />
+                )}
             <OrganizationActionList
               onCreateOrganizationClick={handleCreateOrganizationClicked}
               onPersonalWorkspaceClick={handlePersonalWorkspaceClicked}
@@ -174,7 +223,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
 );
 
 const NotificationCountBadgeManageButton = withGate(
-  () => {
+  ({ sx }: { sx?: ThemableCssProp }) => {
     const { organizationSettings } = useEnvironment();
 
     const isDomainsEnabled = organizationSettings?.domains?.enabled;
@@ -183,7 +232,12 @@ const NotificationCountBadgeManageButton = withGate(
       membershipRequests: isDomainsEnabled || undefined,
     });
 
-    return <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />;
+    return (
+      <NotificationCountBadge
+        notificationCount={membershipRequests?.count || 0}
+        containerSx={sx}
+      />
+    );
   },
   {
     // if the user is not able to accept a request we should not notify them

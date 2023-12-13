@@ -235,8 +235,6 @@ export const nbNO: LocalizationResource = {
     start: {
       headerTitle__account: 'Konto',
       headerTitle__security: 'Sikkerhet',
-      headerSubtitle__account: 'Administrer kontoinformasjonen din',
-      headerSubtitle__security: 'Administrer sikkerhetsinnstillingene dine',
       profileSection: {
         title: 'Profil',
       },
@@ -526,8 +524,6 @@ export const nbNO: LocalizationResource = {
     start: {
       headerTitle__members: 'Medlemmer',
       headerTitle__settings: 'Innstillinger',
-      headerSubtitle__members: 'Vis og administrer organisasjonsmedlemmer',
-      headerSubtitle__settings: 'Administrer organisasjonsinnstillinger',
     },
     profilePage: {
       title: 'Organisasjonsprofil',

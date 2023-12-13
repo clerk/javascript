@@ -48,8 +48,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
 
   return (
     <SimpleButton
-      variant='outline'
-      colorScheme='neutral'
+      variant='secondary'
       block
       isLoading={isLoading}
       {...rest}
@@ -114,8 +113,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           elementId={textElementId}
           as='span'
           truncate
-          colorScheme='inherit'
-          variant='buttonSmallRegular'
+          variant='buttonSmall'
           localizationKey={textLocalizationKey}
         >
           {children}

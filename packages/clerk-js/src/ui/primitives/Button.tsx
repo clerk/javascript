@@ -1,13 +1,12 @@
+import type { PropsWithChildren } from 'react';
 import React from 'react';
 
+import { descriptors, Icon, Spinner } from '../customizables';
+import { ArrowRightButtonIcon } from '../icons';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
-import { common, createCssVariables, createVariants } from '../styledSystem';
-import { colors } from '../utils';
+import { common, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
-import { Spinner } from './Spinner';
-
-const vars = createCssVariables('accent', 'accentDark', 'accentDarker', 'accentLighter', 'accentLightest', 'border');
 
 const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) => {
   return {
@@ -21,6 +20,8 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       backgroundColor: 'unset',
       color: 'currentColor',
       borderRadius: theme.radii.$md,
+      position: 'relative',
+      isolation: 'isolate',
       ...common.centeredFlex('inline-flex'),
       ...common.disabled(theme),
       transitionProperty: theme.transitionProperty.$common,
@@ -29,11 +30,11 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
     variants: {
       textVariant: common.textVariants(theme),
       size: {
-        iconLg: { minHeight: theme.sizes.$14, width: theme.sizes.$14 },
+        iconLg: { minHeight: theme.sizes.$13, width: theme.sizes.$13 },
         xs: { minHeight: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
         sm: {
-          minHeight: theme.sizes.$8,
-          padding: `${theme.space.$2} ${theme.space.$3x5}`,
+          minHeight: theme.sizes.$7,
+          padding: `${theme.space.$1x5} ${theme.space.$3x5}`,
         },
         md: {
           minHeight: theme.sizes.$9,
@@ -41,81 +42,134 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           letterSpacing: theme.sizes.$xxs,
         },
       },
-      colorScheme: {
-        primary: {
-          [vars.accentLightest]: colors.setAlpha(theme.colors.$primary400, 0.3),
-          [vars.accentLighter]: colors.setAlpha(theme.colors.$primary500, 0.3),
-          [vars.accent]: theme.colors.$primary500,
-          [vars.accentDark]: theme.colors.$primary600,
-          [vars.accentDarker]: theme.colors.$primary700,
-        },
-        danger: {
-          [vars.accentLightest]: colors.setAlpha(theme.colors.$danger400, 0.3),
-          [vars.accentLighter]: colors.setAlpha(theme.colors.$danger500, 0.3),
-          [vars.accent]: theme.colors.$danger500,
-          [vars.accentDark]: theme.colors.$danger600,
-          [vars.accentDarker]: theme.colors.$danger700,
-        },
-        neutral: {
-          [vars.border]: theme.colors.$blackAlpha200,
-          [vars.accentLightest]: theme.colors.$blackAlpha50,
-          [vars.accentLighter]: theme.colors.$blackAlpha300,
-          [vars.accent]: theme.colors.$colorText,
-          [vars.accentDark]: theme.colors.$blackAlpha600,
-          [vars.accentDarker]: theme.colors.$blackAlpha700,
-        },
-      },
       variant: {
-        solid: {
-          backgroundColor: vars.accent,
+        primary: {
+          backgroundColor: theme.colors.$primary500,
           color: theme.colors.$colorTextOnPrimaryBackground,
-          '&:hover': { backgroundColor: vars.accentDark },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentDark } : undefined,
-          '&:active': { backgroundColor: vars.accentDarker },
+          ...common.buttonShadow,
+          ':before': {
+            position: 'absolute',
+            content: '""',
+            borderRadius: 'inherit',
+            zIndex: -1,
+            inset: 0,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%)`,
+          },
+          ':after': {
+            position: 'absolute',
+            content: '""',
+            borderRadius: 'inherit',
+            zIndex: -1,
+            inset: 0,
+            opacity: 0,
+            transitionProperty: theme.transitionProperty.$common,
+            transitionDuration: theme.transitionDuration.$controls,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha200} 0%, ${theme.colors.$transparent} 100%)`,
+          },
+          ':hover::after': {
+            opacity: 1,
+          },
+          ':active::after': {
+            opacity: 0,
+          },
         },
-        outline: {
-          border: theme.borders.$normal,
-          borderColor: vars.accentLighter,
-          color: vars.accent,
-          '&:hover': { backgroundColor: vars.accentLightest },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
-          '&:active': { backgroundColor: vars.accentLighter },
+        primaryDanger: {
+          backgroundColor: theme.colors.$danger500,
+          color: theme.colors.$colorTextOnPrimaryBackground,
+          ...common.buttonShadow,
+          ':before': {
+            position: 'absolute',
+            content: '""',
+            borderRadius: 'inherit',
+            zIndex: -1,
+            inset: 0,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%)`,
+          },
+          ':after': {
+            position: 'absolute',
+            content: '""',
+            borderRadius: 'inherit',
+            zIndex: -1,
+            inset: 0,
+            opacity: 0,
+            transitionProperty: theme.transitionProperty.$common,
+            transitionDuration: theme.transitionDuration.$controls,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha200} 0%, ${theme.colors.$transparent} 100%)`,
+          },
+          ':hover::after': {
+            opacity: 1,
+          },
+          ':active::after': {
+            opacity: 0,
+          },
+        },
+        secondary: {
+          backgroundColor: theme.colors.$colorBackground,
+          color: theme.colors.$blackAlpha700,
+          '&:hover': {
+            backgroundColor: theme.colors.$blackAlpha50,
+            color: theme.colors.$blackAlpha950,
+          },
+          '&:focus': props.hoverAsFocus
+            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
+            : undefined,
+          '&:active': { backgroundColor: theme.colors.$colorBackground },
+          boxShadow: theme.shadows.$secondaryButtonShadow,
+        },
+        secondaryDanger: {
+          backgroundColor: theme.colors.$colorBackground,
+          color: theme.colors.$danger500,
+          '&:hover': {
+            backgroundColor: theme.colors.$danger50,
+            color: theme.colors.$danger500,
+          },
+          '&:focus': props.hoverAsFocus
+            ? { backgroundColor: theme.colors.$danger50, color: theme.colors.$danger500 }
+            : undefined,
+          '&:active': { backgroundColor: theme.colors.$colorBackground },
+          boxShadow: theme.shadows.$secondaryButtonShadow,
         },
         ghost: {
-          color: vars.accent,
-          '&:hover': { backgroundColor: vars.accentLightest },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
-          '&:active': { backgroundColor: vars.accentLighter },
+          color: theme.colors.$blackAlpha700,
+          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 },
+          '&:focus': props.hoverAsFocus
+            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
+            : undefined,
+          '&:active': { backgroundColor: theme.colors.$transparent },
         },
-        icon: {
-          color: vars.accent,
-          border: theme.borders.$normal,
-          borderRadius: theme.radii.$lg,
-          borderColor: vars.border,
-          '&:hover': { backgroundColor: vars.accentLightest },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
-          '&:active': { backgroundColor: vars.accentLighter },
+        ghostPrimary: {
+          color: theme.colors.$primary500,
+          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$primary500 },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$blackAlpha50 } : undefined,
+          '&:active': { backgroundColor: theme.colors.$transparent },
         },
-        ghostIcon: {
-          color: vars.accent,
-          minHeight: theme.sizes.$6,
-          width: theme.sizes.$6,
-          padding: `${theme.space.$1} ${theme.space.$1}`,
-          '&:hover': { color: vars.accentDark },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentDark } : undefined,
-          '&:active': { color: vars.accentDarker },
+        ghostDanger: {
+          color: theme.colors.$danger500,
+          '&:hover': { backgroundColor: theme.colors.$danger50, color: theme.colors.$danger500 },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$danger50 } : undefined,
+          '&:active': { backgroundColor: theme.colors.$transparent },
         },
         link: {
-          ...common.textVariants(theme).smallRegular,
+          ...common.textVariants(theme).buttonSmall,
           minHeight: 'fit-content',
           height: 'fit-content',
           width: 'fit-content',
           textTransform: 'none',
           padding: 0,
-          color: vars.accent,
+          color: theme.colors.$primary500,
           '&:hover': { textDecoration: 'underline' },
           '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
-          '&:active': { color: vars.accentDark },
+        },
+        linkDanger: {
+          ...common.textVariants(theme).buttonSmall,
+          minHeight: 'fit-content',
+          height: 'fit-content',
+          width: 'fit-content',
+          textTransform: 'none',
+          padding: 0,
+          color: theme.colors.$danger500,
+          '&:hover': { textDecoration: 'underline' },
+          '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
         },
         roundWrapper: { padding: 0, margin: 0, height: 'unset', width: 'unset', minHeight: 'unset' },
       },
@@ -127,10 +181,9 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       },
     },
     defaultVariants: {
-      textVariant: 'buttonRegularRegular',
-      colorScheme: 'primary',
-      variant: 'solid',
-      size: 'md',
+      textVariant: 'buttonLarge',
+      variant: 'primary',
+      size: 'sm',
       focusRing: true,
     },
   };
@@ -141,8 +194,29 @@ type OwnProps = PrimitiveProps<'button'> & {
   isDisabled?: boolean;
   isActive?: boolean;
   hoverAsFocus?: boolean;
+  hasArrow?: boolean;
 };
+
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
+
+const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
+  return (
+    <Flex
+      align='center'
+      gap={2}
+    >
+      {children}
+      <Icon
+        icon={ArrowRightButtonIcon}
+        sx={t => ({
+          width: t.sizes.$2x5,
+          height: t.sizes.$2x5,
+          opacity: t.opacity.$inactive,
+        })}
+      />
+    </Flex>
+  );
+};
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
@@ -152,6 +226,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
     hoverAsFocus,
     loadingText,
     children,
+    hasArrow,
     onClick: onClickProp,
     ...rest
   } = filterProps(parsedProps);
@@ -172,7 +247,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
       type={undefined}
       onClick={onClick}
       disabled={isDisabled}
-      css={applyVariants(parsedProps)}
+      css={applyVariants(parsedProps) as any}
       ref={ref}
     >
       {isLoading && (
@@ -185,13 +260,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           }}
         >
           <Spinner
-            css={{ position: loadingText ? undefined : 'absolute' }}
             aria-label={loadingText || 'Loading'}
+            elementDescriptor={descriptors.spinner}
+            sx={{
+              position: loadingText ? undefined : 'absolute',
+            }}
           />
           {loadingText || <span style={{ opacity: 0 }}>{children}</span>}
         </Flex>
       )}
-      {!isLoading && children}
+      {!isLoading && (hasArrow ? <ButtonChildrenWithArrow>{children}</ButtonChildrenWithArrow> : children)}
     </button>
   );
 });
@@ -214,10 +292,9 @@ const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, re
       // Explicitly remove type=submit or type=button
       // to prevent global css resets (eg tailwind) from affecting
       // the default styles of our components
-      // eslint-disable-next-line react/button-has-type
       type={undefined}
       onClick={onClick}
-      css={applyVariants(parsedProps)}
+      css={applyVariants(parsedProps) as any}
       disabled={isDisabled}
       ref={ref}
     >

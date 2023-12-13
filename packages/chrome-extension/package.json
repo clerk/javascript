@@ -37,7 +37,6 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "prepublishOnly": "npm run build",
     "publish:local": "npx yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
@@ -46,15 +45,19 @@
   },
   "dependencies": {
     "@clerk/clerk-js": "5.0.0-alpha-v5.9",
-    "@clerk/clerk-react": "5.0.0-alpha-v5.9"
+    "@clerk/clerk-react": "5.0.0-alpha-v5.9",
+    "@clerk/shared": "2.0.0-alpha-v5.5",
+    "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
     "@types/chrome": "*",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "@types/webextension-polyfill": "^0.10.7",
     "eslint-config-custom": "*",
     "tsup": "*",
+    "type-fest": "^4.8.3",
     "typescript": "*"
   },
   "peerDependencies": {

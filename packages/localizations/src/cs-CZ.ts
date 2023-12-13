@@ -236,8 +236,6 @@ export const csCZ: LocalizationResource = {
     start: {
       headerTitle__account: 'Účet',
       headerTitle__security: 'Bezpečnost',
-      headerSubtitle__account: 'Spravujte své údaje o účtu',
-      headerSubtitle__security: 'Spravujte své bezpečnostní nastavení',
       profileSection: {
         title: 'Profil',
       },
@@ -508,8 +506,6 @@ export const csCZ: LocalizationResource = {
     start: {
       headerTitle__members: 'Členové',
       headerTitle__settings: 'Nastavení',
-      headerSubtitle__members: 'Zobrazit a spravovat členy organizace',
-      headerSubtitle__settings: 'Spravovat nastavení organizace',
     },
     profilePage: {
       title: 'Profil organizace',

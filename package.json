@@ -61,8 +61,8 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/cross-spawn": "^6.0.3",
     "@types/jest": "^29.3.1",
-    "@types/react": "^18.2.28",
-    "@types/react-dom": "^18.2.13",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.17",
     "citty": "^0.1.4",
     "conventional-changelog-conventionalcommits": "^4.6.3",
     "cpy-cli": "^5.0.0",
@@ -80,6 +80,7 @@
     "http-server": "^14.1.1",
     "husky": "^8.0.3",
     "jest": "^29.7.0",
+    "jest-chrome": "^0.8.0",
     "jest-environment-jsdom": "^29.3.1",
     "lint-staged": "^14.0.1",
     "npm-cli-adduser": "^1.1.4",
@@ -101,5 +102,8 @@
   "engines": {
     "node": ">=18.17.0",
     "npm": ">=8.5.0"
+  },
+  "overrides": {
+    "jest": "$jest"
   }
 }

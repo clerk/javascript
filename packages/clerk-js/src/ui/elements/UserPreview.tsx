@@ -13,14 +13,16 @@ import { UserAvatar } from './UserAvatar';
 // - SamlAccountResource
 
 export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'elementId'> & {
-  size?: 'lg' | 'md' | 'sm';
+  size?: 'lg' | 'md' | 'sm' | 'xs';
   icon?: React.ReactNode;
+  iconSx?: ThemableCssProp;
   badge?: React.ReactNode;
   imageUrl?: string | null;
   rounded?: boolean;
   elementId?: UserPreviewId;
   avatarSx?: ThemableCssProp;
   mainIdentifierSx?: ThemableCssProp;
+  mainIdentifierVariant?: PropsOfComponent<typeof Text>['variant'];
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
   showAvatar?: boolean;
@@ -50,6 +52,7 @@ export const UserPreview = (props: UserPreviewProps) => {
     size = 'md',
     showAvatar = true,
     icon,
+    iconSx,
     rounded = true,
     imageUrl: imageUrlProp,
     badge,
@@ -59,6 +62,7 @@ export const UserPreview = (props: UserPreviewProps) => {
     subtitle,
     avatarSx,
     mainIdentifierSx,
+    mainIdentifierVariant,
     ...rest
   } = props;
   const { t } = useLocalizations();
@@ -68,15 +72,18 @@ export const UserPreview = (props: UserPreviewProps) => {
 
   const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
 
-  const getAvatarSizes = (t: InternalTheme) => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size]);
+  const getAvatarSizes = (t: InternalTheme) =>
+    (({ xs: t.sizes.$5, sm: t.sizes.$8, md: t.sizes.$9, lg: t.sizes.$12 } as const)[size]);
+
+  const mainIdentifierSize =
+    mainIdentifierVariant || ({ xs: 'subtitle', sm: 'caption', md: 'subtitle', lg: 'h1' } as const)[size];
 
   return (
     <Flex
       elementDescriptor={descriptors.userPreview}
       elementId={descriptors.userPreview.setId(elementId)}
-      gap={4}
       align='center'
-      sx={[{ minWidth: '0px', width: '100%' }, sx]}
+      sx={[t => ({ minWidth: '0px', width: 'fit-content', gap: t.space.$4 }), sx]}
       {...rest}
     >
       {/*Do not attempt to render or reserve space based on height if image url is not defined*/}
@@ -101,7 +108,14 @@ export const UserPreview = (props: UserPreviewProps) => {
               rounded={rounded}
             />
 
-            {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
+            {icon && (
+              <Flex
+                elementDescriptor={descriptors.userPreviewAvatarIcon}
+                sx={[{ position: 'absolute', left: 0, bottom: 0 }, iconSx]}
+              >
+                {icon}
+              </Flex>
+            )}
           </Flex>
         ) : (
           // Reserve layout space when avatar is not visible
@@ -126,14 +140,14 @@ export const UserPreview = (props: UserPreviewProps) => {
         <Text
           elementDescriptor={descriptors.userPreviewMainIdentifier}
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
-          variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
+          variant={mainIdentifierSize}
           colorScheme='inherit'
           sx={[theme => ({ display: 'flex', gap: theme.sizes.$1, alignItems: 'center' }), mainIdentifierSx]}
         >
           <Text
             as='span'
-            colorScheme='inherit'
             truncate
+            colorScheme='inherit'
             sx={{ fontSize: 'inherit', fontWeight: 'inherit' }}
           >
             {localizedTitle || name || identifier}
@@ -146,7 +160,6 @@ export const UserPreview = (props: UserPreviewProps) => {
           <Text
             elementDescriptor={descriptors.userPreviewSecondaryIdentifier}
             elementId={descriptors.userPreviewSecondaryIdentifier.setId(elementId)}
-            variant='smallRegular'
             colorScheme='neutral'
             truncate
             localizationKey={subtitle || identifier}

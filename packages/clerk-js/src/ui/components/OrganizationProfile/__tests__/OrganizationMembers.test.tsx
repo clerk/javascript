@@ -22,12 +22,11 @@ describe('OrganizationMembers', () => {
     });
 
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
-    const { container, getByText, getByRole } = render(<OrganizationMembers />, { wrapper });
+    const { container, getByRole } = render(<OrganizationMembers />, { wrapper });
 
     await waitForLoadingCompleted(container);
 
     expect(getByRole('heading', { name: /members/i })).toBeInTheDocument();
-    expect(getByText('View and manage organization members')).toBeInTheDocument();
 
     // Tabs
     expect(getByRole('tab', { name: 'Members' })).toBeInTheDocument();

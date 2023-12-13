@@ -1,10 +1,11 @@
 import { useClerk } from '@clerk/shared/react';
-import { forwardRef, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 
-import { descriptors, Flex, Input, Text } from '../../customizables';
+import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
+import { Check } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
-import { getFlagEmojiFromCountryIso, mergeRefs } from '../../utils';
+import { mergeRefs } from '../../utils';
 import type { CountryEntry, CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
@@ -66,28 +67,25 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
     <Flex
       elementDescriptor={descriptors.phoneInputBox}
       direction='row'
-      center
       hasError={rest.hasError}
       sx={theme => ({
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
-        border: theme.borders.$normal,
-        borderColor: theme.colors.$blackAlpha300, // we use this value in the Input primitive
       })}
     >
       <Select
         elementId='countryCode'
         value={selectedCountryOption.value}
         options={countryOptions}
-        optionBuilder={(option, _index, isFocused) => (
+        renderOption={(option, _index, isSelected) => (
           <CountryCodeListItem
             sx={theme => ({
-              ...(isFocused && { backgroundColor: theme.colors.$blackAlpha200 }),
-              '&:hover': {
+              '&:hover, &[data-focused="true"]': {
                 backgroundColor: theme.colors.$blackAlpha200,
               },
             })}
+            isSelected={isSelected}
             country={option.country}
           />
         )}
@@ -99,63 +97,78 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         searchPlaceholder='Search country or code'
         comparator={(term, option) => option.searchTerm.toLowerCase().includes(term.toLowerCase())}
       >
-        <Flex
-          sx={{
-            zIndex: 2,
-          }}
+        <SelectButton
+          sx={t => ({
+            border: 'none',
+            borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
+            borderBottomRightRadius: '0',
+            borderTopRightRadius: '0',
+            ':hover': {
+              zIndex: 2,
+            },
+            ':focus': {
+              zIndex: 2,
+            },
+          })}
+          isDisabled={rest.isDisabled}
         >
-          <SelectButton
-            sx={theme => ({
-              backgroundColor: theme.colors.$blackAlpha50,
-              border: 'none',
-              borderBottomRightRadius: '0',
-              borderTopRightRadius: '0',
-            })}
-            isDisabled={rest.isDisabled}
+          <Text
+            sx={{
+              textTransform: 'uppercase',
+            }}
           >
-            <Flag iso={iso} />
-            <Text
-              variant={'smallRegular'}
-              sx={{ paddingLeft: '4px' }}
-            >
-              +{selectedCountryOption.country.code}
-            </Text>
-          </SelectButton>
-        </Flex>
+            {iso}
+          </Text>
+        </SelectButton>
         <SelectOptionList
           sx={{ width: '100%', padding: '0 0' }}
           containerSx={{ gap: 0 }}
         />
       </Select>
-      <Input
-        value={formattedNumber}
-        onPaste={handlePaste}
-        onChange={handlePhoneNumberChange}
-        maxLength={25}
-        type='tel'
-        sx={[
-          {
-            borderColor: 'transparent',
-            height: '100%',
-            borderTopLeftRadius: '0',
-            borderBottomLeftRadius: '0',
-          },
-          sx,
-        ]}
-        //use our internal ref while forwarding
-        //@ts-expect-error
-        ref={mergeRefs(phoneInputRef, ref)}
-        {...rest}
-      />
+
+      <Flex
+        sx={{
+          position: 'relative',
+          width: '100%',
+        }}
+      >
+        <Text
+          sx={{ position: 'absolute', left: '1ch', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+        >
+          +{selectedCountryOption.country.code}
+        </Text>
+        <Input
+          value={formattedNumber}
+          onPaste={handlePaste}
+          onChange={handlePhoneNumberChange}
+          maxLength={25}
+          type='tel'
+          sx={[
+            {
+              border: 'none',
+              height: '100%',
+              borderTopLeftRadius: '0',
+              borderBottomLeftRadius: '0',
+              paddingLeft: `${`+${selectedCountryOption.country.code}`.length + 1.5}ch`,
+            },
+            sx,
+          ]}
+          //use our internal ref while forwarding
+          //@ts-expect-error
+          ref={mergeRefs(phoneInputRef, ref)}
+          {...rest}
+        />
+      </Flex>
     </Flex>
   );
 });
 
 type CountryCodeListItemProps = PropsOfComponent<typeof Flex> & {
+  isSelected?: boolean;
   country: CountryEntry;
 };
 const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
-  const { country, sx, ...rest } = props;
+  const { country, isSelected, sx, ...rest } = props;
   return (
     <Flex
       center
@@ -169,41 +182,21 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       ]}
       {...rest}
     >
-      <Flag iso={country.iso} />
+      <Icon
+        icon={Check}
+        size='sm'
+        sx={{ visibility: isSelected ? 'visible' : 'hidden' }}
+      />
       <Text
         as='div'
-        variant='smallRegular'
         sx={{ width: '100%' }}
       >
         {country.name}
       </Text>
-      <Text
-        variant='smallRegular'
-        colorScheme='neutral'
-      >
-        +{country.code}
-      </Text>
+      <Text colorScheme='neutral'>+{country.code}</Text>
     </Flex>
   );
 });
-
-const Flag = (props: { iso: CountryIso }) => {
-  const [supportsCountryEmoji, setSupportsCountryEmoji] = useState(false);
-
-  useLayoutEffect(() => {
-    setSupportsCountryEmoji(!window.navigator.userAgent.includes('Windows'));
-  }, []);
-
-  return (
-    <>
-      {supportsCountryEmoji ? (
-        <Flex sx={theme => ({ fontSize: theme.fontSizes.$md })}>{getFlagEmojiFromCountryIso(props.iso)}</Flex>
-      ) : (
-        <Text variant='smallBold'>{props.iso.toUpperCase()}</Text>
-      )}
-    </>
-  );
-};
 
 export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref) => {
   // @ts-expect-error

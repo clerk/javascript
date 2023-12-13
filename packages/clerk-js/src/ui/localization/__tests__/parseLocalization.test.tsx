@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { bindCreateFixtures, renderHook } from '../../../testUtils';
+import { renderHook } from '../../../testUtils';
 import { OptionsProvider } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
+import { bindCreateFixtures } from '../../utils/test/createFixtures';
 import { defaultResource } from '../defaultEnglishResource';
 
 const { createFixtures } = bindCreateFixtures('SignIn');

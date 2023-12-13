@@ -1,4 +1,4 @@
-import { Flex, Spinner } from '../customizables';
+import { descriptors, Flex, Spinner } from '../customizables';
 
 export const FullHeightLoader = (): JSX.Element => {
   return (
@@ -9,6 +9,7 @@ export const FullHeightLoader = (): JSX.Element => {
       <Spinner
         colorScheme='primary'
         size='lg'
+        elementDescriptor={descriptors.spinner}
       />
     </Flex>
   );

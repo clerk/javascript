@@ -342,9 +342,14 @@ export interface Clerk {
   buildOrganizationProfileUrl(): string;
 
   /**
-   * Returns the configured home URL of the instance.
+   * Returns the configured afterSignIn url of the instance.
    */
-  buildHomeUrl(): string;
+  buildAfterSignInUrl(): string;
+
+  /**
+   * Returns the configured afterSignIn url of the instance.
+   */
+  buildAfterSignUpUrl(): string;
 
   /**
    *
@@ -384,9 +389,14 @@ export interface Clerk {
   redirectToCreateOrganization: () => Promise<unknown>;
 
   /**
-   * Redirects to the configured home URL of the instance.
+   * Redirects to the configured afterSignIn URL.
    */
-  redirectToHome: () => Promise<unknown>;
+  redirectToAfterSignIn: () => void;
+
+  /**
+   * Redirects to the configured afterSignUp URL.
+   */
+  redirectToAfterSignUp: () => void;
 
   /**
    * Completes an OAuth or SAML redirection flow started by

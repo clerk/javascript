@@ -1,6 +1,6 @@
-import { useRouter } from '../../../ui/router';
 import { runIfFunctionOrReturn } from '../../../utils';
 import { AlertIcon, Flex, Link, Text } from '../../customizables';
+import { useRouter } from '../../router';
 
 export const BillingWidget = ({
   __unstable_manageBillingUrl,
@@ -20,17 +20,10 @@ export const BillingWidget = ({
         colorScheme='danger'
         sx={t => ({ marginTop: t.space.$1 })}
       />
-      <Text
-        variant='regularRegular'
-        sx={t => ({
-          fontWeight: t.fontWeights.$normal,
-          lineHeight: t.lineHeights.$tall,
-        })}
-      >
+      <Text>
         This organization is limited to {runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)} members.
         <br />
         <Link
-          variant='regularRegular'
           sx={t => ({
             alignSelf: 'flex-start',
             color: t.colors.$primary500,

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { render, screen } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignUpVerifyEmail } from '../SignUpVerifyEmail';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
@@ -52,7 +53,8 @@ describe('SignUpVerifyEmail', () => {
     );
 
     render(<SignUpVerifyEmail />, { wrapper });
-    screen.getAllByText(/Verification Code/i);
+    screen.getByText(/Verify your email/i);
+    screen.getByText(/to continue to TestApp/i);
   });
 
   it('clicking on the edit icon navigates to the previous route', async () => {

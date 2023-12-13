@@ -239,8 +239,6 @@ export const elGR: LocalizationResource = {
     start: {
       headerTitle__account: 'Λογαριασμός',
       headerTitle__security: 'Ασφάλεια',
-      headerSubtitle__account: 'Διαχείριση πληροφοριών λογαριασμού',
-      headerSubtitle__security: 'Διαχείριση προτιμήσεων ασφάλειας',
       profileSection: {
         title: 'Προφίλ',
       },
@@ -539,8 +537,6 @@ export const elGR: LocalizationResource = {
     start: {
       headerTitle__members: 'Μέλη',
       headerTitle__settings: 'Ρυθμίσεις',
-      headerSubtitle__members: 'Προβολή και διαχείριση μελών του οργανισμού',
-      headerSubtitle__settings: 'Διαχείριση ρυθμίσεων οργανισμού',
     },
     profilePage: {
       title: 'Προφίλ Οργανισμού',

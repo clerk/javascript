@@ -1,5 +1,5 @@
 export * from '@clerk/clerk-react';
+export type { StorageCache } from './utils/storage';
 
-// order matters since we want override @clerk/clerk-react ClerkProvider
-
+// The order matters since we want override @clerk/clerk-react ClerkProvider
 export { ClerkProvider } from './ClerkProvider';

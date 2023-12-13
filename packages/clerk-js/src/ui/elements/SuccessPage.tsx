@@ -28,7 +28,6 @@ export const SuccessPage = (props: SuccessPageProps) => {
             <Text
               key={t.key}
               localizationKey={t}
-              variant='regularRegular'
               sx={t => ({
                 display: 'inline',
                 ':not(:last-of-type)': {
@@ -38,17 +37,13 @@ export const SuccessPage = (props: SuccessPageProps) => {
             />
           ))
         ) : (
-          <Text
-            localizationKey={text}
-            variant='regularRegular'
-          />
+          <Text localizationKey={text} />
         )}
       </Box>
       {contents}
 
       <FormButtonContainer>
         <NavigateToFlowStartButton
-          variant='solid'
           autoFocus
           //Do we need a separate key here?
           localizationKey={finishLabel || localizationKeys('userProfile.formButtonPrimary__finish')}

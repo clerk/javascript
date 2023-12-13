@@ -1,8 +1,9 @@
 import React from 'react';
 
 import { EmailLinkError, EmailLinkErrorCode } from '../../../../core/resources';
-import { bindCreateFixtures, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
+import { render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
 import { SignUpEmailLinkFlowComplete } from '../../../common/EmailLinkCompleteFlowCard';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
 

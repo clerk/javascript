@@ -68,6 +68,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
           <Spinner
             size={'lg'}
             colorScheme={'primary'}
+            elementDescriptor={descriptors.spinner}
           />
         </Flex>
       )}
@@ -204,10 +205,8 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
           <Button
             elementDescriptor={descriptors.button}
             block
-            colorScheme='neutral'
-            // size='sm'
-            variant='outline'
-            textVariant='buttonExtraSmallBold'
+            variant='secondary'
+            textVariant='buttonSmall'
             onClick={handleCreateOrganizationClicked}
             localizationKey={localizationKeys('organizationList.action__createOrganization')}
           />

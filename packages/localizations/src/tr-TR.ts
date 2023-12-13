@@ -235,8 +235,6 @@ export const trTR: LocalizationResource = {
     start: {
       headerTitle__account: 'Hesap',
       headerTitle__security: 'Güvenlik',
-      headerSubtitle__account: 'Hesap bilgilerini yönet',
-      headerSubtitle__security: 'Güvenlik ayarlarını yönet',
       profileSection: {
         title: 'Profil',
       },
@@ -511,8 +509,6 @@ export const trTR: LocalizationResource = {
     start: {
       headerTitle__members: 'Üyeler',
       headerTitle__settings: 'Ayarlar',
-      headerSubtitle__members: 'Organizasyon üyelerini yönet',
-      headerSubtitle__settings: 'Organizasyon ayarlarını yönet',
     },
     profilePage: {
       title: 'Organizasyon profili',

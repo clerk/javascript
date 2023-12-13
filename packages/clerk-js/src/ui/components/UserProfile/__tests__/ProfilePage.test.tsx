@@ -1,8 +1,8 @@
 import type { ImageResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import React from 'react';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { render, screen } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { ProfilePage } from '../ProfilePage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

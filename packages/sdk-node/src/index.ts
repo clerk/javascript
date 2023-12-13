@@ -1,4 +1,4 @@
-import { Clerk, clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, createClerkClient } from './clerkClient';
+import { clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, createClerkClient } from './clerkClient';
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import type {
@@ -18,7 +18,7 @@ export * from '@clerk/backend';
  * 2 additional apis: clerk.expressWithAuth, clerk.expressRequireAuth
  */
 // eslint-disable-next-line import/export
-export { Clerk, clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, createClerkClient };
+export { clerkClient, ClerkExpressRequireAuth, ClerkExpressWithAuth, createClerkClient };
 
 const {
   users,

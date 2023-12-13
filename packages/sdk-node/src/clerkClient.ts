@@ -1,11 +1,11 @@
 import type { ClerkOptions } from '@clerk/backend';
-import { createClerkClient, verifyToken } from '@clerk/backend';
+import { createClerkClient as _createClerkClient, verifyToken } from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import { loadApiEnv, loadClientEnv } from './utils';
 
-type ClerkClient = ReturnType<typeof createClerkClient> & {
+type ClerkClient = ReturnType<typeof _createClerkClient> & {
   expressWithAuth: ReturnType<typeof createClerkExpressWithAuth>;
   expressRequireAuth: ReturnType<typeof createClerkExpressRequireAuth>;
   verifyToken: typeof verifyToken;
@@ -16,8 +16,8 @@ type ClerkClient = ReturnType<typeof createClerkClient> & {
  * new Clerk() syntax for v4 compatibility.
  * Arrow functions can never be called with the new keyword because they do not have the [[Construct]] method
  */
-export function Clerk(options: ClerkOptions): ClerkClient {
-  const clerkClient = createClerkClient(options);
+export function createClerkClient(options: ClerkOptions): ClerkClient {
+  const clerkClient = _createClerkClient(options);
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
 
@@ -28,9 +28,7 @@ export function Clerk(options: ClerkOptions): ClerkClient {
   });
 }
 
-export { createClerkClient } from '@clerk/backend';
-
-let clerkClientSingleton = {} as unknown as ReturnType<typeof Clerk>;
+let clerkClientSingleton = {} as unknown as ReturnType<typeof createClerkClient>;
 
 export const clerkClient = new Proxy(clerkClientSingleton, {
   get(_target, property) {
@@ -42,7 +40,7 @@ export const clerkClient = new Proxy(clerkClientSingleton, {
 
     const env = { ...loadApiEnv(), ...loadClientEnv() };
     if (env.secretKey) {
-      clerkClientSingleton = Clerk({ ...env, userAgent: '@clerk/clerk-sdk-node' });
+      clerkClientSingleton = createClerkClient({ ...env, userAgent: '@clerk/clerk-sdk-node' });
       // @ts-expect-error - Element implicitly has an 'any' type because expression of type 'string | symbol' can't be used to index type 'ExtendedClerk'.
       return clerkClientSingleton[property];
     }

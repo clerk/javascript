@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
-import { buildSSOCallbackURL, withRedirectToHomeSingleSessionGuard } from '../../common';
+import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
@@ -289,4 +289,4 @@ function _SignUpStart(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_SignUpStart));
+export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(_SignUpStart));

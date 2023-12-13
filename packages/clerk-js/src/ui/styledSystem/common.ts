@@ -4,139 +4,115 @@ const textVariants = (t: InternalTheme) => {
   const base = {
     WebkitFontSmoothing: t.options.$fontSmoothing,
     fontFamily: 'inherit',
+    letterSpacing: t.letterSpacings.$normal,
   };
 
-  const smallRegular = {
-    ...base,
-    fontWeight: t.fontWeights.$normal,
-    fontSize: t.fontSizes.$xs,
-    lineHeight: t.lineHeights.$shorter,
-  } as const;
-
-  const smallMedium = {
-    ...smallRegular,
-    fontWeight: t.fontWeights.$medium,
-    lineHeight: t.lineHeights.$short,
-  } as const;
-
-  const smallBold = {
-    ...smallMedium,
-    fontWeight: t.fontWeights.$bold,
-  } as const;
-
-  const extraSmallRegular = {
-    ...base,
-    fontWeight: t.fontWeights.$normal,
-    fontSize: t.fontSizes.$2xs,
-    letterSpacing: t.letterSpacings.$normal,
-    lineHeight: t.lineHeights.$none,
-  } as const;
-
-  const extraSmallMedium = {
+  const h1 = {
     ...base,
     fontWeight: t.fontWeights.$medium,
-    fontSize: t.fontSizes.$2xs,
-    letterSpacing: t.letterSpacings.$normal,
-    lineHeight: t.lineHeights.$shortest,
-  } as const;
-
-  const regularRegular = {
-    ...base,
-    fontWeight: t.fontWeights.$normal,
-    fontSize: t.fontSizes.$sm,
-    lineHeight: t.lineHeights.$shorter,
-  } as const;
-
-  const regularMedium = {
-    ...regularRegular,
-    fontWeight: t.fontWeights.$medium,
-  } as const;
-
-  const largeBold = {
-    ...base,
-    fontWeight: t.fontWeights.$bold,
-    fontSize: t.fontSizes.$md,
-    lineHeight: t.lineHeights.$taller,
-  } as const;
-
-  const largeMedium = {
-    ...largeBold,
-    fontWeight: t.fontWeights.$medium,
-  };
-
-  const xlargeMedium = {
-    ...largeBold,
     fontSize: t.fontSizes.$xl,
+    lineHeight: t.lineHeights.$large,
   } as const;
 
-  const xxlargeMedium = {
-    ...xlargeMedium,
-    fontSize: t.fontSizes.$2xl,
-  } as const;
-
-  const buttonExtraSmallBold = {
-    ...extraSmallRegular,
+  const h2 = {
+    ...base,
     fontWeight: t.fontWeights.$bold,
-    textTransform: 'uppercase',
-    fontFamily: t.fonts.$buttons,
+    fontSize: t.fontSizes.$lg,
+    lineHeight: t.lineHeights.$medium,
   } as const;
 
-  const buttonSmallRegular = {
-    ...smallRegular,
-    fontFamily: t.fonts.$buttons,
-  };
-
-  const buttonRegularRegular = {
-    ...regularRegular,
-    fontFamily: t.fonts.$buttons,
-    lineHeight: t.lineHeights.$none,
-  };
-
-  const buttonRegularMedium = {
-    ...regularMedium,
-    fontFamily: t.fonts.$buttons,
-    lineHeight: t.lineHeights.$none,
-  };
-
-  const headingRegularRegular = {
-    ...regularRegular,
+  const h3 = {
+    ...base,
+    fontWeight: t.fontWeights.$bold,
     fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+  } as const;
+
+  const subtitle = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+  } as const;
+
+  const body = {
+    ...base,
+    fontWeight: t.fontWeights.$normal,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+  } as const;
+
+  const caption = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$xs,
+    lineHeight: t.lineHeights.$none,
+  } as const;
+
+  const buttonLarge = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+    fontFamily: t.fonts.$buttons,
+  } as const;
+
+  const buttonSmall = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$sm,
+    lineHeight: t.lineHeights.$none,
+    fontFamily: t.fonts.$buttons,
   } as const;
 
   return {
-    headingRegularRegular,
-    buttonExtraSmallBold,
-    buttonSmallRegular,
-    buttonRegularRegular,
-    buttonRegularMedium,
-    extraSmallRegular,
-    extraSmallMedium,
-    smallRegular,
-    smallMedium,
-    smallBold,
-    regularRegular,
-    regularMedium,
-    largeMedium,
-    largeBold,
-    xlargeMedium,
-    xxlargeMedium,
-  } as const;
-};
-
-const fontSizeVariants = (t: InternalTheme) => {
-  return {
-    xss: { fontSize: t.fontSizes.$2xs },
-    xs: { fontSize: t.fontSizes.$xs },
-    sm: { fontSize: t.fontSizes.$sm },
+    h1,
+    h2,
+    h3,
+    subtitle,
+    body,
+    caption,
+    buttonLarge,
+    buttonSmall,
   } as const;
 };
 
 const borderVariants = (t: InternalTheme, props?: any) => {
+  const defaultBoxShadow = t.shadows.$input
+    .replace('{{color1}}', t.colors.$blackAlpha200)
+    .replace('{{color2}}', t.colors.$blackAlpha300);
+  const hoverBoxShadow = t.shadows.$inputHover
+    .replace('{{color1}}', t.colors.$blackAlpha300)
+    .replace('{{color2}}', t.colors.$blackAlpha400);
+  const hoverStyles = {
+    '&:hover': {
+      WebkitTapHighlightColor: 'transparent',
+      boxShadow: [defaultBoxShadow, hoverBoxShadow].toString(),
+    },
+  };
+  const focusStyles =
+    props?.focusRing === false
+      ? {}
+      : {
+          '&:focus': {
+            WebkitTapHighlightColor: 'transparent',
+            boxShadow: [
+              defaultBoxShadow,
+              hoverBoxShadow,
+              t.shadows.$focusRing.replace('{{color}}', props?.hasError ? t.colors.$danger300 : t.colors.$primary300),
+            ].toString(),
+          },
+        };
   return {
     normal: {
-      borderRadius: t.radii.$md,
-      border: t.borders.$normal,
-      ...borderColor(t, props),
+      borderRadius: t.radii.$lg,
+      border: 'none',
+      boxShadow: defaultBoxShadow,
+      transitionProperty: t.transitionProperty.$common,
+      transitionTimingFunction: t.transitionTiming.$common,
+      transitionDuration: t.transitionDuration.$focusRing,
+      ...hoverStyles,
+      ...focusStyles,
     },
   } as const;
 };
@@ -164,15 +140,19 @@ const focusRingInput = (t: InternalTheme, props?: any) => {
   return {
     '&:focus': {
       WebkitTapHighlightColor: 'transparent',
-      boxShadow: t.shadows.$focusRingInput.replace(
+      boxShadow: t.shadows.$focusRing.replace(
         '{{color}}',
-        props?.hasError ? t.colors.$danger200 : t.colors.$primary200,
+        props?.hasError ? t.colors.$danger400 : t.colors.$primary400,
       ),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
     },
   } as const;
+};
+
+const buttonShadow = (t: InternalTheme) => {
+  return { boxShadow: t.shadows.$buttonShadow.replace('{{color}}', t.colors.$primary800) };
 };
 
 const disabled = (t: InternalTheme) => {
@@ -214,10 +194,10 @@ const maxHeightScroller = (t: InternalTheme) =>
 
 export const common = {
   textVariants,
-  fontSizeVariants,
   borderVariants,
   focusRing,
   focusRingInput,
+  buttonShadow,
   disabled,
   borderColor,
   centeredFlex,

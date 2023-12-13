@@ -63,7 +63,6 @@ const EnterpriseAccountAccordion = ({ account }: { account: SamlAccountResource 
       <Col gap={4}>
         <UserPreview
           samlAccount={account}
-          size='lg'
           icon={
             <Image
               alt={providerName}

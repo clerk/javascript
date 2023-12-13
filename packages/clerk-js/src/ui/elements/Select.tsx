@@ -1,16 +1,16 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { SelectId } from '@clerk/types';
-import type { PropsWithChildren, ReactElement } from 'react';
+import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import React, { useState } from 'react';
 
-import { usePopover, useSearchInput } from '../../ui/hooks';
-import { Button, descriptors, Flex, Icon, Text } from '../customizables';
-import { Caret, MagnifyingGlass } from '../icons';
+import { Button, descriptors, Flex, Icon, Input, Text } from '../customizables';
+import { usePopover, useSearchInput } from '../hooks';
+import { ArrowUpDown } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations, common } from '../styledSystem';
 import { colors } from '../utils';
 import { withFloatingTree } from './contexts';
-import { InputWithIcon } from './InputWithIcon';
+import type { InputWithIcon } from './InputWithIcon';
 import { Popover } from './Popover';
 
 type UsePopoverReturn = ReturnType<typeof usePopover>;
@@ -18,7 +18,7 @@ type UseSearchInputReturn = ReturnType<typeof useSearchInput>;
 
 type Option = { value: string | null; label?: string };
 
-type OptionBuilder<O extends Option> = (option: O, index?: number, isFocused?: boolean) => JSX.Element;
+type RenderOption<O extends Option> = (option: O, index?: number, isSelected?: boolean) => ReactNode;
 
 type SelectProps<O extends Option> = {
   options: O[];
@@ -28,18 +28,18 @@ type SelectProps<O extends Option> = {
   placeholder?: string;
   comparator?: (term: string, option: O) => boolean;
   noResultsMessage?: string;
-  optionBuilder?: OptionBuilder<O>;
+  renderOption?: RenderOption<O>;
   elementId?: SelectId;
 };
 
 type SelectState<O extends Option> = Pick<
   SelectProps<O>,
-  'placeholder' | 'searchPlaceholder' | 'elementId' | 'comparator' | 'noResultsMessage'
+  'placeholder' | 'searchPlaceholder' | 'elementId' | 'value' | 'comparator' | 'noResultsMessage'
 > & {
   popoverCtx: UsePopoverReturn;
   searchInputCtx: UseSearchInputReturn;
-  optionBuilder: OptionBuilder<O>;
-  buttonOptionBuilder: OptionBuilder<O>;
+  renderOption: RenderOption<O>;
+  buttonRenderOption: RenderOption<O>;
   selectedOption: Option | null;
   select: (option: O) => void;
   focusedItemRef: React.RefObject<HTMLDivElement>;
@@ -48,7 +48,7 @@ type SelectState<O extends Option> = Pick<
 
 const [SelectStateCtx, useSelectState] = createContextAndHook<SelectState<any>>('SelectState');
 
-const defaultOptionBuilder = <O extends Option>(option: O, _index?: number, isFocused?: boolean) => {
+const defaultRenderOption = <O extends Option>(option: O, _index?: number, isFocused?: boolean) => {
   return (
     <Flex
       sx={theme => ({
@@ -67,8 +67,8 @@ const defaultOptionBuilder = <O extends Option>(option: O, _index?: number, isFo
   );
 };
 
-const defaultButtonOptionBuilder = <O extends Option>(option: O) => {
-  return <>{option.label || option.value}</>;
+const defaultButtonRenderOption = <O extends Option>(option: O) => {
+  return option.label || option.value;
 };
 
 export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildren<SelectProps<O>>) => {
@@ -76,7 +76,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     value,
     options,
     onChange,
-    optionBuilder,
+    renderOption,
     noResultsMessage,
     comparator,
     placeholder = 'Select an option',
@@ -117,8 +117,9 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
           selectedOption: options.find(o => o.value === value) || null,
           noResultsMessage,
           focusedItemRef,
-          optionBuilder: optionBuilder || defaultOptionBuilder,
-          buttonOptionBuilder: optionBuilder || defaultButtonOptionBuilder,
+          value,
+          renderOption: renderOption || defaultRenderOption,
+          buttonRenderOption: renderOption || defaultButtonRenderOption,
           placeholder,
           searchPlaceholder,
           comparator,
@@ -134,18 +135,19 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   );
 }) as <O extends Option>(props: PropsWithChildren<SelectProps<O>>) => ReactElement;
 
-type SelectOptionBuilderProps<O extends Option> = {
+type SelectrenderOptionProps<O extends Option> = {
   option: Option;
   index: number;
-  optionBuilder: OptionBuilder<O>;
+  renderOption: RenderOption<O>;
   handleSelect: (option: Option) => void;
-  isFocused: boolean;
+  isFocused?: boolean;
+  isSelected?: boolean;
   elementId?: SelectId;
 };
 
-const SelectOptionBuilder = React.memo(
-  React.forwardRef((props: SelectOptionBuilderProps<any>, ref?: React.ForwardedRef<HTMLDivElement>) => {
-    const { option, optionBuilder, index, handleSelect, isFocused, elementId } = props;
+const SelectRenderOption = React.memo(
+  React.forwardRef((props: SelectrenderOptionProps<any>, ref?: React.ForwardedRef<HTMLDivElement>) => {
+    const { option, renderOption, isSelected, index, handleSelect, isFocused, elementId } = props;
 
     return (
       <Flex
@@ -158,10 +160,12 @@ const SelectOptionBuilder = React.memo(
           handleSelect(option);
         }}
       >
-        {React.cloneElement(optionBuilder(option, index, isFocused) as React.ReactElement<unknown>, {
+        {React.cloneElement(renderOption(option, index, isSelected) as React.ReactElement<unknown>, {
           //@ts-expect-error
           elementDescriptor: descriptors.selectOption,
           elementId: descriptors.selectOption.setId(elementId),
+          'data-selected': isSelected,
+          'data-focused': isFocused,
         })}
       </Flex>
     );
@@ -177,18 +181,20 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
   const { elementId } = useSelectState();
 
   return (
-    <Flex sx={theme => ({ borderBottom: theme.borders.$normal, borderColor: theme.colors.$blackAlpha200 })}>
-      <InputWithIcon
+    <Flex sx={t => ({ padding: t.space.$1 })}>
+      <Input
         elementDescriptor={descriptors.selectSearchInput}
         elementId={descriptors.selectSearchInput.setId(elementId)}
         focusRing={false}
-        leftIcon={
-          <Icon
-            colorScheme='neutral'
-            icon={MagnifyingGlass}
-          />
-        }
-        sx={[{ border: 'none', borderRadius: '0' }, sx]}
+        sx={[
+          t => ({
+            border: 'none',
+            borderRadius: t.radii.$md,
+            backgroundColor: t.colors.$blackAlpha200,
+            padding: t.space.$2,
+          }),
+          sx,
+        ]}
         {...rest}
       />
     </Flex>
@@ -200,7 +206,6 @@ export const SelectNoResults = (props: PropsOfComponent<typeof Text>) => {
   return (
     <Text
       as='div'
-      variant='smallRegular'
       sx={[theme => ({ width: '100%', padding: `${theme.space.$2} 0 0 ${theme.space.$4}` }), sx]}
       {...rest}
     />
@@ -216,7 +221,8 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   const {
     popoverCtx,
     searchInputCtx,
-    optionBuilder,
+    value,
+    renderOption,
     searchPlaceholder,
     comparator,
     focusedItemRef,
@@ -292,7 +298,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
             overflow: 'hidden',
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: theme.shadows.$cardDropShadow,
+            boxShadow: theme.shadows.$cardShadow,
             zIndex: theme.zIndices.$dropdown,
           }),
           sx,
@@ -323,13 +329,16 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
         >
           {options.map((option, index) => {
             const isFocused = index === focusedIndex;
+            const isSelected = value === option.value;
+
             return (
-              <SelectOptionBuilder
-                key={index}
+              <SelectRenderOption
+                key={option.value}
                 index={index}
                 ref={isFocused ? focusedItemRef : undefined}
                 option={option}
-                optionBuilder={optionBuilder}
+                renderOption={renderOption}
+                isSelected={isSelected}
                 isFocused={isFocused}
                 handleSelect={select}
                 elementId={elementId}
@@ -345,13 +354,13 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 
 export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
   const { sx, children, ...rest } = props;
-  const { popoverCtx, onTriggerClick, buttonOptionBuilder, selectedOption, placeholder, elementId } = useSelectState();
-  const { isOpen, reference } = popoverCtx;
+  const { popoverCtx, onTriggerClick, buttonRenderOption, selectedOption, placeholder, elementId } = useSelectState();
+  const { reference } = popoverCtx;
 
   let show: React.ReactNode = children;
   if (!children) {
     show = selectedOption ? (
-      buttonOptionBuilder(selectedOption)
+      buttonRenderOption(selectedOption)
     ) : (
       <Text sx={t => ({ opacity: t.opacity.$inactive })}>{placeholder}</Text>
     );
@@ -362,18 +371,19 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
       ref={reference}
-      colorScheme='neutral'
       variant='ghost'
-      textVariant='smallMedium'
+      textVariant='buttonLarge'
       onClick={onTriggerClick}
       sx={[
         theme => ({
+          gap: theme.space.$2,
           fontWeight: theme.fontWeights.$normal,
           color: theme.colors.$colorInputText,
           backgroundColor: theme.colors.$colorInputBackground,
           ...common.borderVariants(theme).normal,
           paddingLeft: theme.space.$3x5,
           paddingRight: theme.space.$3x5,
+          alignItems: 'center',
           '> *': { pointerEvents: 'none' },
         }),
         sx,
@@ -384,14 +394,8 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       <Icon
         elementDescriptor={descriptors.selectButtonIcon}
         elementId={descriptors.selectButtonIcon.setId(elementId)}
-        icon={Caret}
-        sx={theme => ({
-          width: theme.sizes.$3x5,
-          marginLeft: theme.space.$1,
-          transitionProperty: theme.transitionProperty.$common,
-          transitionDuration: theme.transitionDuration.$controls,
-          transform: `rotate(${isOpen ? '180' : '0'}deg)`,
-        })}
+        size='md'
+        icon={ArrowUpDown}
       />
     </Button>
   );

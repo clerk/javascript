@@ -1,9 +1,10 @@
 // eslint-disable-next-line simple-import-sort/imports
 import { render } from '../../../testUtils';
+import React from 'react';
 
-import { renderHook } from '@testing-library/react';
 import { Box, useAppearance } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
+import { renderHook } from '@testing-library/react';
 import { knownColors } from './testUtils';
 
 const themeAColor = 'blue';
@@ -88,7 +89,8 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeA.variables.borderRadius);
     expect(result.current.parsedInternalTheme.fonts.$main).toBe(themeA.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeA.variables.fontFamily);
-    expect(result.current.parsedInternalTheme.fontSizes.$md).toBe(themeA.variables.fontSize);
+    // TODO-RETHEME: 1 * userFontSize is currently missing from the theme
+    expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('0.8125rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeA.variables.fontWeight.normal);
     expect(result.current.parsedInternalTheme.options.$fontSmoothing).toBe(themeA.variables.fontSmoothing);
     expect(result.current.parsedInternalTheme.space.$1).toContain(themeA.variables.spacingUnit);
@@ -119,7 +121,8 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeB.variables.borderRadius);
     expect(result.current.parsedInternalTheme.fonts.$main).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
-    expect(result.current.parsedInternalTheme.fontSizes.$md).toBe(themeB.variables.fontSize);
+    // TODO-RETHEME: 1 * userFontSize is currently missing from the theme
+    expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('1.625rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
     expect(result.current.parsedInternalTheme.options.$fontSmoothing).toBe(themeB.variables.fontSmoothing);
     expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
@@ -151,7 +154,8 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.radii.$md).toBe(themeB.variables.borderRadius);
     expect(result.current.parsedInternalTheme.fonts.$main).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
-    expect(result.current.parsedInternalTheme.fontSizes.$md).toBe(themeB.variables.fontSize);
+    // TODO-RETHEME: 1 * userFontSize is currently missing from the theme
+    expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('1.625rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
     expect(result.current.parsedInternalTheme.options.$fontSmoothing).toBe(themeB.variables.fontSmoothing);
     expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);

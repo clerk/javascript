@@ -98,8 +98,8 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
     <Route path='sign-up'>
       <ComponentContext.Provider
         value={{
-          ...signUpProps,
           componentName: 'SignUp',
+          ...signUpProps,
           routing: 'virtual',
         }}
       >

@@ -1,37 +1,27 @@
 const fontWeights = Object.freeze({
   normal: 400,
   medium: 500,
-  bold: 600,
+  bold: 700,
 } as const);
 
 const lineHeights = Object.freeze({
   normal: 'normal',
-  none: 1,
-  shortest: 1.1,
-  shorter: 1.25,
-  short: 1.375,
-  base: 1.5,
-  tall: 1.625,
-  taller: 2,
+  none: '1rem',
+  small: '1.125rem',
+  medium: '1.5rem',
+  large: '2rem',
 } as const);
 
 const letterSpacings = Object.freeze({
-  tighter: '-0.05em',
-  tight: '-0.025em',
   normal: '0',
-  wide: '0.025em',
-  wider: '0.05em',
-  widest: '0.1em',
 } as const);
 
 const fontSizes = Object.freeze({
-  '2xs': '0.6875rem',
-  xs: '0.8125rem',
-  sm: '0.875rem',
-  md: '1rem',
-  lg: '1.125rem',
-  xl: '1.25rem',
-  '2xl': '2rem',
+  xs: '0.6875rem',
+  sm: '0.75rem',
+  md: '0.8125rem',
+  lg: '1.0625rem',
+  xl: '1.5rem',
 } as const);
 
 const fontStyles = Object.freeze({

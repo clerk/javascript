@@ -246,8 +246,6 @@ export const arSA: LocalizationResource = {
     start: {
       headerTitle__account: 'الحساب',
       headerTitle__security: 'الأمان',
-      headerSubtitle__account: 'إدارة معلومات حسابك',
-      headerSubtitle__security: 'إدارة تفضيلات الأمان الخاصة بك',
       profileSection: {
         title: 'الملف الشخصي',
       },
@@ -537,8 +535,6 @@ export const arSA: LocalizationResource = {
     start: {
       headerTitle__members: 'الأعضاء',
       headerTitle__settings: 'الأعدادات',
-      headerSubtitle__members: 'عرض وإدارة أعضاء المنظمة',
-      headerSubtitle__settings: 'إدارة اعدادات المنظمة',
     },
     profilePage: {
       title: 'الملف الشخصي للمنظمة',

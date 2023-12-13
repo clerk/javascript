@@ -1,8 +1,7 @@
-import { withRedirectToHomeSingleSessionGuard } from '../../common';
-import { Col, descriptors, localizationKeys, Text } from '../../customizables';
+import { Col, descriptors, localizationKeys, Spinner, Text } from '../../customizables';
 import { Card, CardAlert, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useSetSessionWithTimeout } from '../../hooks/useSetSessionWithTimeout';
-import { Flex, Spinner } from '../../primitives';
+import { Flex } from '../../primitives';
 
 export const _ResetPasswordSuccess = () => {
   const card = useCardState();
@@ -17,11 +16,7 @@ export const _ResetPasswordSuccess = () => {
         elementDescriptor={descriptors.main}
         gap={8}
       >
-        <Text
-          localizationKey={localizationKeys('signIn.resetPassword.successMessage')}
-          variant='smallRegular'
-          colorScheme='inherit'
-        />
+        <Text localizationKey={localizationKeys('signIn.resetPassword.successMessage')} />
         <Flex
           direction='row'
           center
@@ -29,6 +24,7 @@ export const _ResetPasswordSuccess = () => {
           <Spinner
             size='xl'
             colorScheme='primary'
+            elementDescriptor={descriptors.spinner}
           />
         </Flex>
       </Col>
@@ -36,4 +32,4 @@ export const _ResetPasswordSuccess = () => {
   );
 };
 
-export const ResetPasswordSuccess = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_ResetPasswordSuccess));
+export const ResetPasswordSuccess = withCardStateProvider(_ResetPasswordSuccess);

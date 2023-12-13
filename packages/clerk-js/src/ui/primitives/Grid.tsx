@@ -57,7 +57,7 @@ export const Grid = React.forwardRef<HTMLDivElement, GridProps>((props, ref) => 
   return (
     <Box
       {...filterProps(props)}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
       ref={ref}
     />
   );
