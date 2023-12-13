@@ -29,7 +29,7 @@ export class OrganizationSuggestion extends BaseResource implements Organization
     return await BaseResource._fetch({
       path: '/me/organization_suggestions',
       method: 'GET',
-      search: convertPageToOffset(params) as any,
+      search: convertPageToOffset(params),
     })
       .then(res => {
         const { data: suggestions, total_count } =
