@@ -17,14 +17,22 @@ type AuthSignedIn = AuthObjectWithoutResources<
      * This function is experimental as it throws a Nextjs notFound error if user is not authenticated or authorized.
      * In the future we would investigate a way to throw a more appropriate error that clearly describes the not authorized of authenticated status.
      */
-    protect: (
-      params?:
-        | CheckAuthorizationParamsWithCustomPermissions
-        | ((has: CheckAuthorizationWithCustomPermissions) => boolean),
-      options?: { redirectUrl: string },
-    ) => AuthObjectWithoutResources<SignedInAuthObject>;
+    protect: {
+      (
+        params?:
+          | CheckAuthorizationParamsWithCustomPermissions
+          | ((has: CheckAuthorizationWithCustomPermissions) => boolean),
+        options?: { redirectUrl: string },
+      ): AuthObjectWithoutResources<SignedInAuthObject>;
+
+      (params?: { redirectUrl: string }): AuthObjectWithoutResources<SignedInAuthObject>;
+    };
   }
 >;
+
+type ProtectGeneric = {
+  protect: (params?: unknown, options?: unknown) => AuthObjectWithoutResources<SignedInAuthObject>;
+};
 
 type AuthSignedOut = AuthObjectWithoutResources<
   SignedOutAuthObject & {
@@ -43,13 +51,21 @@ export const auth = () => {
     noAuthStatusMessage: authAuthHeaderMissing(),
   })(buildRequestLike());
 
-  (authObject as AuthSignedIn).protect = (params, options) => {
+  (authObject as unknown as ProtectGeneric).protect = (params: any, options: any) => {
+    const paramsOrFunction = params?.redirectUrl
+      ? undefined
+      : (params as
+          | CheckAuthorizationParamsWithCustomPermissions
+          | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
+    const redirectUrl = (params?.redirectUrl || options?.redirectUrl) as string | undefined;
+
     const handleUnauthorized = (): never => {
-      if (options?.redirectUrl) {
-        redirect(options.redirectUrl);
+      if (redirectUrl) {
+        redirect(redirectUrl);
       }
       notFound();
     };
+
     /**
      * User is not authenticated
      */
@@ -60,15 +76,15 @@ export const auth = () => {
     /**
      * User is authenticated
      */
-    if (!params) {
+    if (!paramsOrFunction) {
       return { ...authObject };
     }
 
     /**
      * if a function is passed and returns false then throw not found
      */
-    if (typeof params === 'function') {
-      if (params(authObject.has)) {
+    if (typeof paramsOrFunction === 'function') {
+      if (paramsOrFunction(authObject.has)) {
         return { ...authObject };
       }
       return handleUnauthorized();
@@ -77,7 +93,7 @@ export const auth = () => {
     /**
      * Checking if user is authorized when permission or role is passed
      */
-    if (authObject.has(params)) {
+    if (authObject.has(paramsOrFunction)) {
       return { ...authObject };
     }
 
