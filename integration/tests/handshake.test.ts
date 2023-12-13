@@ -1,7 +1,6 @@
 import * as http from 'node:http';
 
 import { expect, test } from '@playwright/test';
-import { request as apiRequest } from 'playwright';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
@@ -9,7 +8,7 @@ import { generateConfig, getJwksFromSecretKey } from '../testUtils/handshake';
 
 const PORT = 4199;
 
-test.describe('Client handshake', () => {
+test.describe('Client handshake @generic', () => {
   test.describe.configure({ mode: 'serial' });
 
   let app: Application;
@@ -66,8 +65,6 @@ test.describe('Client handshake', () => {
     await app.setup();
     await app.withEnv(env);
     await app.dev();
-
-    request = await apiRequest.newContext({ baseURL: app.serverUrl });
   });
 
   test.afterAll(async () => {
