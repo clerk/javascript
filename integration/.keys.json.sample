@@ -6,5 +6,9 @@
   "with-email-links": {
     "pk": "",
     "sk": ""
+  },
+  "with-custom-roles": {
+    "pk": "",
+    "sk": ""
   }
 }
