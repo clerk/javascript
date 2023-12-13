@@ -1,5 +1,5 @@
 import type { User } from '@clerk/backend';
-import { Clerk } from '@clerk/backend';
+import { createClerkClient } from '@clerk/backend';
 import { test as setup } from '@playwright/test';
 
 import { appConfigs } from '../presets/';
@@ -13,7 +13,7 @@ setup('cleanup instances ', async () => {
 
   for (const secretKey of secretKeys) {
     console.log(`Cleanup for ${secretKey.replace(/(sk_test_)(.+)(...)/, '$1***$3')}`);
-    const clerkClient = Clerk({ secretKey });
+    const clerkClient = createClerkClient({ secretKey });
     const { data: users, errors } = await clerkClient.users.getUserList({
       orderBy: '-created_at',
       query: 'clerkcookie',

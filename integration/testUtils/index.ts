@@ -1,4 +1,4 @@
-import { Clerk } from '@clerk/backend';
+import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 
 import type { Application } from '../models/application';
@@ -13,7 +13,7 @@ import { createUserService } from './usersService';
 
 export type { FakeUser };
 const createClerkClient = (app: Application) => {
-  return Clerk({
+  return backendCreateClerkClient({
     secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
     publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
   });
