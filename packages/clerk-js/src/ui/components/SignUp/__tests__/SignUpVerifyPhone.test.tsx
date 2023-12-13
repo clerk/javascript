@@ -28,7 +28,8 @@ describe('SignUpVerifyPhone', () => {
       f.startSignUpWithPhoneNumber();
     });
     render(<SignUpVerifyPhone />, { wrapper });
-    screen.getAllByText(/Verification Code/i);
+    screen.getByText(/Verify your phone/i);
+    screen.getByText(/to continue to TestApp/i);
   });
 
   it('clicking on the edit icon navigates to the previous route', async () => {
