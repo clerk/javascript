@@ -127,6 +127,21 @@
     "format:check": {
       "dependsOn": [],
       "outputs": []
+    },
+    "//#test:integration:express": {
+      "dependsOn": ["^@clerk/clerk-sdk-node#build", "^@clerk/clerk-react#build"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
+    },
+    "//#test:integration:generic": {
+      "dependsOn": ["^@clerk/clerk-react#build"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
+    },
+    "//#test:integration:nextjs": {
+      "dependsOn": ["^@clerk/nextjs#build"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
     }
   }
 }
