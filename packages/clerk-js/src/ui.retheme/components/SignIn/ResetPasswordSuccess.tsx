@@ -17,10 +17,7 @@ export const _ResetPasswordSuccess = () => {
         elementDescriptor={descriptors.main}
         gap={8}
       >
-        <Text
-          localizationKey={localizationKeys('signIn.resetPassword.successMessage')}
-          colorScheme='inherit'
-        />
+        <Text localizationKey={localizationKeys('signIn.resetPassword.successMessage')} />
         <Flex
           direction='row'
           center

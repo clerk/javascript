@@ -27,7 +27,7 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
     return await BaseResource._fetch({
       path: '/me/organization_invitations',
       method: 'GET',
-      search: convertPageToOffset(params) as any,
+      search: convertPageToOffset(params),
     })
       .then(res => {
         const { data: invites, total_count } =

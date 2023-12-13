@@ -239,7 +239,6 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
           elementId={descriptors.socialButtonsBlockButtonText.setId(id)}
           as='span'
           truncate
-          colorScheme='inherit'
           variant='buttonSmall'
           localizationKey={textLocalizationKey}
         >

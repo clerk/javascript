@@ -1,11 +1,11 @@
-const ClerkMock = jest.fn(() => {
+const createClerkClientMock = jest.fn(() => {
   return 'clerkClient';
 });
 
 jest.mock('@clerk/backend', () => {
   return {
     ...jest.requireActual('@clerk/backend'),
-    Clerk: ClerkMock,
+    createClerkClient: createClerkClientMock,
   };
 });
 
@@ -17,7 +17,7 @@ describe('clerk', () => {
   });
 
   test('initializes clerk with constants', () => {
-    expect(ClerkMock.mock.calls).toMatchSnapshot();
+    expect(createClerkClientMock.mock.calls).toMatchSnapshot();
     expect(clerkClient).toEqual('clerkClient');
   });
 });

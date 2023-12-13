@@ -1,11 +1,11 @@
 import type { ClerkOptions } from '@clerk/backend';
-import { Clerk as _Clerk, verifyToken } from '@clerk/backend';
+import { createClerkClient, verifyToken } from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import { loadApiEnv, loadClientEnv } from './utils';
 
-type ExtendedClerk = ReturnType<typeof _Clerk> & {
+type ClerkClient = ReturnType<typeof createClerkClient> & {
   expressWithAuth: ReturnType<typeof createClerkExpressWithAuth>;
   expressRequireAuth: ReturnType<typeof createClerkExpressRequireAuth>;
   verifyToken: typeof verifyToken;
@@ -16,8 +16,8 @@ type ExtendedClerk = ReturnType<typeof _Clerk> & {
  * new Clerk() syntax for v4 compatibility.
  * Arrow functions can never be called with the new keyword because they do not have the [[Construct]] method
  */
-export function Clerk(options: ClerkOptions): ExtendedClerk {
-  const clerkClient = _Clerk(options);
+export function Clerk(options: ClerkOptions): ClerkClient {
+  const clerkClient = createClerkClient(options);
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
 
@@ -36,18 +36,18 @@ export const clerkClient = new Proxy(clerkClientSingleton, {
   get(_target, property) {
     const hasBeenInitialised = !!clerkClientSingleton.authenticateRequest;
     if (hasBeenInitialised) {
-      // @ts-expect-error
+      // @ts-expect-error - Element implicitly has an 'any' type because expression of type 'string | symbol' can't be used to index type 'ExtendedClerk'.
       return clerkClientSingleton[property];
     }
 
     const env = { ...loadApiEnv(), ...loadClientEnv() };
     if (env.secretKey) {
       clerkClientSingleton = Clerk({ ...env, userAgent: '@clerk/clerk-sdk-node' });
-      // @ts-expect-error
+      // @ts-expect-error - Element implicitly has an 'any' type because expression of type 'string | symbol' can't be used to index type 'ExtendedClerk'.
       return clerkClientSingleton[property];
     }
 
-    // @ts-expect-error
+    // @ts-expect-error - Element implicitly has an 'any' type because expression of type 'string | symbol' can't be used to index type 'ExtendedClerk'.
     return Clerk({ ...env, userAgent: '@clerk/clerk-sdk-node' })[property];
   },
   set() {

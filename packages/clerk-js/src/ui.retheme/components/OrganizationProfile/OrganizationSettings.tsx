@@ -44,12 +44,7 @@ const OrganizationProfileSection = () => {
     return null;
   }
 
-  const profile = (
-    <OrganizationPreview
-      organization={organization}
-      size='lg'
-    />
-  );
+  const profile = <OrganizationPreview organization={organization} />;
 
   return (
     <ProfileSection
