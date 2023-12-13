@@ -113,7 +113,10 @@ type IsomorphicLoadedClerk = Without<
   buildOrganizationProfileUrl: () => string | void;
   // TODO: Align return type
   buildUrlWithAuth: (to: string, opts?: BuildUrlWithAuthParams | undefined) => string | void;
-
+  // TODO: Align return type
+  buildAfterSignInUrl: () => string | void;
+  // TODO: Align return type
+  buildAfterSignUpUrl: () => string | void;
   // TODO: Align optional props
   mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
   mountOrganizationList: (node: HTMLDivElement, props: OrganizationListProps) => void;
@@ -256,6 +259,24 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('buildSignUpUrl', callback);
+    }
+  };
+
+  buildAfterSignInUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildAfterSignInUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildAfterSignInUrl', callback);
+    }
+  };
+
+  buildAfterSignUpUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildAfterSignUpUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildAfterSignUpUrl', callback);
     }
   };
 
