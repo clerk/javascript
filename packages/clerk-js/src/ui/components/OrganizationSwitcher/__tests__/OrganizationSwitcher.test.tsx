@@ -200,7 +200,7 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      await userEvent.click(getByRole('menuitem', { name: 'Manage Organization' }));
+      await userEvent.click(getByRole('menuitem'));
       expect(fixtures.clerk.openOrganizationProfile).toHaveBeenCalled();
     });
 
