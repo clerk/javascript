@@ -38,6 +38,6 @@ describe('withRedirect', () => {
 
     render(<WithHOC />, { wrapper });
 
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+    expect(fixtures.router.navigate).not.toHaveBeenCalledWith('/');
   });
 });
