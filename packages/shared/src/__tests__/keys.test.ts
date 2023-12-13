@@ -36,6 +36,10 @@ describe('parsePublishableKey(key)', () => {
       'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk',
       { instanceType: 'development', frontendApi: 'foo-bar-13.clerk.accounts.dev' },
     ],
+    [
+      'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk',
+      { instanceType: 'development', frontendApi: 'foo-bar-13.clerk.accounts.dev' },
+    ],
   ];
 
   // @ts-ignore
@@ -43,6 +47,24 @@ describe('parsePublishableKey(key)', () => {
     // @ts-ignore
     const result = parsePublishableKey(publishableKeyStr);
     expect(result).toEqual(expectedPublishableKey);
+  });
+
+  it('throws an error if the key is not a valid publishable key, when fatal: true', () => {
+    expect(() => parsePublishableKey('fake_pk', { fatal: true })).toThrowError('Publishable key not valid.');
+  });
+
+  it('applies the proxyUrl if provided', () => {
+    expect(parsePublishableKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==', { proxyUrl: 'example.com/__clerk' })).toEqual({
+      frontendApi: 'example.com/__clerk',
+      instanceType: 'production',
+    });
+  });
+
+  it('applies the domain if provided for production keys', () => {
+    expect(parsePublishableKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==', { domain: 'example.com' })).toEqual({
+      frontendApi: 'clerk.example.com',
+      instanceType: 'production',
+    });
   });
 });
 

@@ -134,7 +134,6 @@ const defaultOptions: ClerkOptions = {
   signUpUrl: undefined,
   afterSignInUrl: undefined,
   afterSignUpUrl: undefined,
-  isInterstitial: false,
 };
 
 export class Clerk implements ClerkInterface {
@@ -1204,9 +1203,7 @@ export class Clerk implements ClerkInterface {
 
   #shouldSyncWithPrimary = (): boolean => {
     if (this.#hasJustSynced()) {
-      if (!this.#options.isInterstitial) {
-        this.#clearJustSynced();
-      }
+      this.#clearJustSynced();
       return false;
     }
 

@@ -1,9 +1,23 @@
 // There is no need to execute the complete authenticateRequest to test authMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
+import { AuthStatus } from '@clerk/backend';
 import { expectTypeOf } from 'expect-type';
 import { NextURL } from 'next/dist/server/web/next-url';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
+const authenticateRequestMock = jest.fn().mockResolvedValue({
+  toAuth: () => ({}),
+});
+
+jest.mock('./clerkClient', () => {
+  return {
+    clerkClient: {
+      authenticateRequest: authenticateRequestMock,
+      telemetry: { record: jest.fn() },
+    },
+  };
+});
 
 const mockRedirectToSignIn = jest.fn().mockImplementation(() => {
   const res = NextResponse.redirect(
@@ -19,8 +33,6 @@ jest.mock('./redirect', () => {
 });
 
 import { paths, setHeader } from '../utils';
-// used to assert the mock
-import { authenticateRequest } from './authenticateRequest';
 import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
 // used to assert the mock
 import { clerkClient } from './clerkClient';
@@ -35,17 +47,6 @@ beforeAll(() => {
 });
 afterAll(() => {
   global.console.warn = consoleWarn;
-});
-
-jest.mock('./authenticateRequest', () => {
-  const { handleInterstitialState, handleUnknownState } = jest.requireActual('./authenticateRequest');
-  return {
-    authenticateRequest: jest.fn().mockResolvedValue({
-      toAuth: () => ({}),
-    }),
-    handleInterstitialState,
-    handleUnknownState,
-  };
 });
 
 // Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
@@ -197,13 +198,8 @@ describe('default ignored routes matcher', () => {
 });
 
 describe('authMiddleware(params)', () => {
-  beforeAll(() => {
-    clerkClient.localInterstitial = jest.fn().mockResolvedValue('<html>interstitial</html>');
-  });
-
   beforeEach(() => {
-    (authenticateRequest as jest.Mock).mockClear();
-    (clerkClient.localInterstitial as jest.Mock).mockClear();
+    authenticateRequestMock.mockClear();
   });
 
   describe('without params', function () {
@@ -244,7 +240,7 @@ describe('authMiddleware(params)', () => {
       })(mockRequest({ url: '/ignored' }), {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
-      expect(authenticateRequest).not.toBeCalled();
+      expect(clerkClient.authenticateRequest).not.toBeCalled();
       expect(beforeAuthSpy).not.toBeCalled();
       expect(afterAuthSpy).not.toBeCalled();
     });
@@ -259,7 +255,7 @@ describe('authMiddleware(params)', () => {
       })(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
-      expect(authenticateRequest).toBeCalled();
+      expect(clerkClient.authenticateRequest).toBeCalled();
       expect(beforeAuthSpy).toBeCalled();
       expect(afterAuthSpy).toBeCalled();
     });
@@ -326,7 +322,7 @@ describe('authMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('skip');
-      expect(authenticateRequest).not.toBeCalled();
+      expect(clerkClient.authenticateRequest).not.toBeCalled();
       expect(afterAuthSpy).not.toBeCalled();
     });
 
@@ -338,7 +334,7 @@ describe('authMiddleware(params)', () => {
       })(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
-      expect(authenticateRequest).toBeCalled();
+      expect(clerkClient.authenticateRequest).toBeCalled();
       expect(afterAuthSpy).toBeCalled();
     });
 
@@ -352,7 +348,7 @@ describe('authMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/custom-redirect');
       expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
-      expect(authenticateRequest).not.toBeCalled();
+      expect(clerkClient.authenticateRequest).not.toBeCalled();
       expect(afterAuthSpy).not.toBeCalled();
     });
 
@@ -375,7 +371,7 @@ describe('authMiddleware(params)', () => {
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get('x-before-auth-header')).toEqual('before');
       expect(resp?.headers.get('x-after-auth-header')).toEqual('after');
-      expect(authenticateRequest).toBeCalled();
+      expect(clerkClient.authenticateRequest).toBeCalled();
     });
   });
 
@@ -390,19 +386,18 @@ describe('authMiddleware(params)', () => {
         'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
       );
       expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
-      expect(authenticateRequest).toBeCalled();
+      expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
     it('uses authenticateRequest result as auth', async () => {
       const req = mockRequest({ url: '/protected' });
       const event = {} as NextFetchEvent;
-      // @ts-ignore
-      authenticateRequest.mockResolvedValueOnce({ toAuth: () => ({ userId: null }) });
+      authenticateRequestMock.mockResolvedValueOnce({ toAuth: () => ({ userId: null }) });
       const afterAuthSpy = jest.fn();
 
       await authMiddleware({ afterAuth: afterAuthSpy })(req, event);
 
-      expect(authenticateRequest).toBeCalled();
+      expect(clerkClient.authenticateRequest).toBeCalled();
       expect(afterAuthSpy).toBeCalledWith(
         {
           userId: null,
@@ -416,37 +411,16 @@ describe('authMiddleware(params)', () => {
   });
 
   describe('authenticateRequest', function () {
-    it('returns 401 with local interstitial for interstitial requestState', async () => {
-      // @ts-ignore
-      authenticateRequest.mockResolvedValueOnce({ isInterstitial: true });
+    it('returns 307 and starts the handshake flow for handshake requestState status', async () => {
+      const mockLocationUrl = 'https://example.com';
+      authenticateRequestMock.mockResolvedValueOnce({
+        status: AuthStatus.Handshake,
+        headers: new Headers({ Location: mockLocationUrl }),
+      });
       const resp = await authMiddleware()(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
 
-      expect(resp?.status).toEqual(401);
-      expect(resp?.headers.get('content-type')).toEqual('text/html');
-      expect(clerkClient.localInterstitial).toBeCalled();
-    });
-
-    it('returns 401 for unknown requestState', async () => {
-      // @ts-ignore
-      authenticateRequest.mockResolvedValueOnce({ isUnknown: true });
-      const resp = await authMiddleware()(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
-
-      expect(resp?.status).toEqual(401);
-      expect(resp?.headers.get('content-type')).toEqual('application/json');
-      expect(clerkClient.localInterstitial).not.toBeCalled();
-    });
-
-    it('returns 401 for interstitial requestState in an API route', async () => {
-      // @ts-ignore
-      authenticateRequest.mockResolvedValueOnce({ isInterstitial: true });
-      const resp = await authMiddleware({ apiRoutes: ['/api/items'] })(
-        mockRequest({ url: '/api/items' }),
-        {} as NextFetchEvent,
-      );
-
-      expect(resp?.status).toEqual(401);
-      expect(resp?.headers.get('content-type')).toEqual('application/json');
-      expect(clerkClient.localInterstitial).not.toBeCalled();
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('Location')).toEqual(mockLocationUrl);
     });
   });
 });
@@ -462,7 +436,7 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
     expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
-    expect(authenticateRequest).toBeCalled();
+    expect(clerkClient.authenticateRequest).toBeCalled();
   });
 
   it('appends the Dev Browser JWT to the search when cookie __clerk_db_jwt exists and location is an Account Portal URL', async () => {
@@ -472,10 +446,10 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
 
     expect(resp?.status).toEqual(307);
     expect(resp?.headers.get('location')).toEqual(
-      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__dev_session=test_jwt',
+      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__clerk_db_jwt=test_jwt',
     );
     expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
-    expect(authenticateRequest).toBeCalled();
+    expect(clerkClient.authenticateRequest).toBeCalled();
   });
 
   it('does NOT append the Dev Browser JWT if x-clerk-redirect-to header is not set', async () => {
@@ -493,7 +467,7 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
     expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
-    expect(authenticateRequest).toBeCalled();
+    expect(clerkClient.authenticateRequest).toBeCalled();
   });
 });
 

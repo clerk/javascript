@@ -1,27 +1,18 @@
+import { parsePublishableKey } from '@clerk/shared/keys';
+import type { JwtPayload } from '@clerk/types';
+
 import { constants } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
-import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
+import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
-import type { InterstitialRuleOptions } from './interstitialRule';
-import {
-  crossOriginRequestWithoutHeader,
-  hasPositiveClientUatButCookieIsMissing,
-  hasValidCookieToken,
-  hasValidHeaderToken,
-  isNormalSignedOutState,
-  isPrimaryInDevAndRedirectsToSatellite,
-  isSatelliteAndNeedsSyncing,
-  nonBrowserRequestInDevRule,
-  potentialFirstLoadInDevWhenUATMissing,
-  potentialFirstRequestOnProductionEnvironment,
-  potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
-  runInterstitialRules,
-} from './interstitialRule';
-import type { VerifyTokenOptions } from './verify';
+import { verifyHandshakeToken } from './handshake';
+import { decodeJwt } from './jwt';
+import { verifyToken, type VerifyTokenOptions } from './verify';
+
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
     VerifyTokenOptions,
@@ -29,7 +20,7 @@ export type OptionalVerifyTokenOptions = Partial<
   >
 >;
 
-export type AuthenticateRequestOptions = AuthStatusOptionsType & OptionalVerifyTokenOptions & { request: Request };
+export type AuthenticateRequestOptions = AuthStatusOptionsType & OptionalVerifyTokenOptions;
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
   if (!signInUrl && isDevelopmentFromSecretKey(key)) {
@@ -56,85 +47,266 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
   }
 }
 
-export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
-  const { cookies, headers, searchParams } = buildRequest(options?.request);
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions,
+): Promise<RequestState> {
+  const { cookies, headers, searchParams, derivedRequestUrl } = buildRequest(request);
 
-  const ruleOptions = {
+  const authenticateContext = {
     ...options,
     ...loadOptionsFromHeaders(headers),
     ...loadOptionsFromCookies(cookies),
     searchParams,
-  } satisfies InterstitialRuleOptions;
+    derivedRequestUrl,
+  };
 
-  assertValidSecretKey(ruleOptions.secretKey);
+  const devBrowserToken =
+    searchParams?.get(constants.Cookies.DevBrowser) || cookies(constants.Cookies.DevBrowser) || '';
+  const handshakeToken = searchParams?.get(constants.Cookies.Handshake) || cookies(constants.Cookies.Handshake) || '';
 
-  if (ruleOptions.isSatellite) {
-    assertSignInUrlExists(ruleOptions.signInUrl, ruleOptions.secretKey);
-    if (ruleOptions.signInUrl && ruleOptions.origin) {
-      assertSignInUrlFormatAndOrigin(ruleOptions.signInUrl, ruleOptions.origin);
+  assertValidSecretKey(authenticateContext.secretKey);
+
+  if (authenticateContext.isSatellite) {
+    assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
+    if (authenticateContext.signInUrl && authenticateContext.origin) {
+      assertSignInUrlFormatAndOrigin(authenticateContext.signInUrl, authenticateContext.origin);
     }
-    assertProxyUrlOrDomain(ruleOptions.proxyUrl || ruleOptions.domain);
+    assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
   }
 
-  async function authenticateRequestWithTokenInHeader() {
+  function buildRedirectToHandshake() {
+    const redirectUrl = new URL(derivedRequestUrl);
+    redirectUrl.searchParams.delete('__clerk_db_jwt');
+    const frontendApiNoProtocol = pk.frontendApi.replace(/http(s)?:\/\//, '');
+
+    const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
+    url.searchParams.append('redirect_url', redirectUrl?.href || '');
+
+    if (pk?.instanceType === 'development' && devBrowserToken) {
+      url.searchParams.append('__clerk_db_jwt', devBrowserToken);
+    }
+
+    return new Headers({ location: url.href });
+  }
+
+  async function resolveHandshake() {
+    const { derivedRequestUrl } = authenticateContext;
+
+    const headers = new Headers({
+      'Access-Control-Allow-Origin': 'null',
+      'Access-Control-Allow-Credentials': 'true',
+    });
+
+    const handshakePayload = await verifyHandshakeToken(handshakeToken, authenticateContext);
+    const cookiesToSet = handshakePayload.handshake;
+
+    let sessionToken = '';
+    cookiesToSet.forEach((x: string) => {
+      headers.append('Set-Cookie', x);
+      if (x.startsWith('__session=')) {
+        sessionToken = x.split(';')[0].substring(10);
+      }
+    });
+
+    if (instanceType === 'development') {
+      const newUrl = new URL(derivedRequestUrl);
+      newUrl.searchParams.delete('__clerk_handshake');
+      newUrl.searchParams.delete('__clerk_help');
+      headers.append('Location', newUrl.toString());
+    }
+
+    if (sessionToken === '') {
+      return signedOut(authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
+    }
+
+    let verifyResult: JwtPayload;
+
     try {
-      const state = await runInterstitialRules(ruleOptions, [hasValidHeaderToken]);
-      return state;
+      verifyResult = await verifyToken(sessionToken, authenticateContext);
+    } catch (err) {
+      if (err instanceof TokenVerificationError) {
+        err.tokenCarrier = 'cookie';
+        if (
+          instanceType === 'development' &&
+          (err.reason === TokenVerificationErrorReason.TokenExpired ||
+            err.reason === TokenVerificationErrorReason.TokenNotActiveYet)
+        ) {
+          // This probably means we're dealing with clock skew
+          console.error(
+            `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will attempt to account for the clock skew in development.
+
+To resolve this issue, make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
+
+---
+
+${err.getFullMessage()}`,
+          );
+
+          // Retry with a generous clock skew allowance (1 day)
+          verifyResult = await verifyToken(sessionToken, { ...authenticateContext, clockSkewInMs: 86_400_000 });
+        }
+      } else {
+        throw err;
+      }
+    }
+
+    return signedIn(authenticateContext, verifyResult!, headers);
+  }
+
+  const pk = parsePublishableKey(options.publishableKey, {
+    fatal: true,
+    proxyUrl: options.proxyUrl,
+    domain: options.domain,
+  });
+
+  const instanceType = pk.instanceType;
+
+  async function authenticateRequestWithTokenInHeader() {
+    const { sessionTokenInHeader } = authenticateContext;
+
+    try {
+      const verifyResult = await verifyToken(sessionTokenInHeader!, authenticateContext);
+      return await signedIn(options, verifyResult);
     } catch (err) {
       return handleError(err, 'header');
     }
   }
 
   async function authenticateRequestWithTokenInCookie() {
-    try {
-      const state = await runInterstitialRules(ruleOptions, [
-        crossOriginRequestWithoutHeader,
-        nonBrowserRequestInDevRule,
-        isSatelliteAndNeedsSyncing,
-        isPrimaryInDevAndRedirectsToSatellite,
-        potentialFirstRequestOnProductionEnvironment,
-        potentialFirstLoadInDevWhenUATMissing,
-        potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
-        hasPositiveClientUatButCookieIsMissing,
-        isNormalSignedOutState,
-        hasValidCookieToken,
-      ]);
+    const {
+      derivedRequestUrl,
+      isSatellite,
+      secFetchDest,
+      signInUrl,
+      clientUat: clientUatRaw,
+      sessionTokenInCookie: sessionToken,
+    } = authenticateContext;
 
-      return state;
+    const clientUat = parseInt(clientUatRaw || '', 10) || 0;
+    const hasActiveClient = clientUat > 0;
+    const hasSessionToken = !!sessionToken;
+
+    const isRequestEligibleForMultiDomainSync =
+      isSatellite &&
+      secFetchDest === 'document' &&
+      !derivedRequestUrl.searchParams.has(constants.QueryParameters.ClerkSynced);
+
+    /**
+     * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
+     */
+    if (handshakeToken) {
+      return resolveHandshake();
+    }
+
+    /**
+     * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
+     */
+    if (instanceType === 'development' && derivedRequestUrl.searchParams.has(constants.Cookies.DevBrowser)) {
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.DevBrowserSync, '', headers);
+    }
+
+    /**
+     * Begin multi-domain sync flows
+     */
+    if (instanceType === 'production' && isRequestEligibleForMultiDomainSync) {
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+    }
+
+    // Multi-domain development sync flow
+    if (instanceType === 'development' && isRequestEligibleForMultiDomainSync) {
+      // initiate MD sync
+
+      // signInUrl exists, checked at the top of `authenticateRequest`
+      const redirectURL = new URL(signInUrl!);
+      redirectURL.searchParams.append(constants.QueryParameters.ClerkRedirectUrl, derivedRequestUrl.toString());
+
+      const headers = new Headers({ location: redirectURL.toString() });
+      return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+    }
+
+    // Multi-domain development sync flow
+    const redirectUrl = new URL(derivedRequestUrl).searchParams.get(constants.QueryParameters.ClerkRedirectUrl);
+    if (instanceType === 'development' && !isSatellite && redirectUrl) {
+      // Dev MD sync from primary, redirect back to satellite w/ __clerk_db_jwt
+      const redirectBackToSatelliteUrl = new URL(redirectUrl);
+
+      if (devBrowserToken) {
+        redirectBackToSatelliteUrl.searchParams.append(constants.Cookies.DevBrowser, devBrowserToken);
+      }
+      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
+
+      const headers = new Headers({ location: redirectBackToSatelliteUrl.toString() });
+      return handshake(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
+    }
+    /**
+     * End multi-domain sync flows
+     */
+
+    if (!hasActiveClient && !hasSessionToken) {
+      return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing);
+    }
+
+    // This can eagerly run handshake since client_uat is SameSite=Strict in dev
+    if (!hasActiveClient && hasSessionToken) {
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.SessionTokenWithoutClientUAT, '', headers);
+    }
+
+    if (hasActiveClient && !hasSessionToken) {
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '', headers);
+    }
+
+    const decodeResult = decodeJwt(sessionToken!);
+
+    if (decodeResult.payload.iat < clientUat) {
+      const headers = buildRedirectToHandshake();
+      return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, '', headers);
+    }
+
+    try {
+      const verifyResult = await verifyToken(sessionToken!, authenticateContext);
+      if (verifyResult) {
+        return signedIn(authenticateContext, verifyResult);
+      }
     } catch (err) {
       return handleError(err, 'cookie');
     }
+
+    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
   function handleError(err: unknown, tokenCarrier: TokenCarrier) {
     if (err instanceof TokenVerificationError) {
       err.tokenCarrier = tokenCarrier;
 
-      const reasonToReturnInterstitial = [
+      const reasonToHandshake = [
         TokenVerificationErrorReason.TokenExpired,
         TokenVerificationErrorReason.TokenNotActiveYet,
       ].includes(err.reason);
 
-      if (reasonToReturnInterstitial) {
-        if (tokenCarrier === 'header') {
-          return unknownState(ruleOptions, err.reason, err.getFullMessage());
-        }
-        return interstitial(ruleOptions, err.reason, err.getFullMessage());
+      if (reasonToHandshake) {
+        const headers = buildRedirectToHandshake();
+        return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, err.getFullMessage(), headers);
       }
-      return signedOut(ruleOptions, err.reason, err.getFullMessage());
+      return signedOut(authenticateContext, err.reason, err.getFullMessage());
     }
-    return signedOut(ruleOptions, AuthErrorReason.UnexpectedError, (err as Error).message);
+
+    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
-  if (ruleOptions.headerToken) {
+  if (authenticateContext.sessionTokenInHeader) {
     return authenticateRequestWithTokenInHeader();
   }
   return authenticateRequestWithTokenInCookie();
 }
 
 export const debugRequestState = (params: RequestState) => {
-  const { isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain } = params;
-  return { isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain };
+  const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
+  return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
 export type DebugRequestSate = ReturnType<typeof debugRequestState>;
@@ -148,13 +320,14 @@ export const loadOptionsFromHeaders = (headers: ReturnType<typeof buildRequest>[
   }
 
   return {
-    headerToken: stripAuthorizationHeader(headers(constants.Headers.Authorization)),
+    sessionTokenInHeader: stripAuthorizationHeader(headers(constants.Headers.Authorization)),
     origin: headers(constants.Headers.Origin),
     host: headers(constants.Headers.Host),
     forwardedHost: headers(constants.Headers.ForwardedHost),
     forwardedProto: headers(constants.Headers.CloudFrontForwardedProto) || headers(constants.Headers.ForwardedProto),
     referrer: headers(constants.Headers.Referrer),
     userAgent: headers(constants.Headers.UserAgent),
+    secFetchDest: headers(constants.Headers.SecFetchDest),
   };
 };
 
@@ -167,7 +340,7 @@ export const loadOptionsFromCookies = (cookies: ReturnType<typeof buildRequest>[
   }
 
   return {
-    cookieToken: cookies?.(constants.Cookies.Session),
+    sessionTokenInCookie: cookies?.(constants.Cookies.Session),
     clientUat: cookies?.(constants.Cookies.ClientUat),
   };
 };

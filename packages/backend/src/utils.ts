@@ -3,18 +3,19 @@ import { constants } from './constants';
 const getHeader = (req: Request, key: string) => req.headers.get(key);
 const getFirstValueFromHeader = (value?: string | null) => value?.split(',')[0];
 
-type BuildRequestUrl = (request: Request, path?: string) => URL;
-export const buildRequestUrl: BuildRequestUrl = (request, path) => {
+type BuildRequestUrl = (request: Request) => URL;
+export const buildRequestUrl: BuildRequestUrl = request => {
   const initialUrl = new URL(request.url);
 
   const forwardedProto = getHeader(request, constants.Headers.ForwardedProto);
   const forwardedHost = getHeader(request, constants.Headers.ForwardedHost);
+
   const host = getHeader(request, constants.Headers.Host);
   const protocol = initialUrl.protocol;
 
   const base = buildOrigin({ protocol, forwardedProto, forwardedHost, host: host || initialUrl.host });
 
-  return new URL(path || initialUrl.pathname, base);
+  return new URL(initialUrl.pathname + initialUrl.search, base);
 };
 
 type BuildOriginParams = {

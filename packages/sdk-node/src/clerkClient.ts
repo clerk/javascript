@@ -1,14 +1,14 @@
-import type { ClerkOptions, VerifyTokenOptions } from '@clerk/backend';
-import { createClerkClient, verifyToken as _verifyToken } from '@clerk/backend';
+import type { ClerkOptions } from '@clerk/backend';
+import { createClerkClient, verifyToken } from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import { loadApiEnv, loadClientEnv } from './utils';
 
-type ExtendedClerk = ReturnType<typeof createClerkClient> & {
+type ClerkClient = ReturnType<typeof createClerkClient> & {
   expressWithAuth: ReturnType<typeof createClerkExpressWithAuth>;
   expressRequireAuth: ReturnType<typeof createClerkExpressRequireAuth>;
-  verifyToken: (token: string, verifyOpts?: Parameters<typeof _verifyToken>[1]) => ReturnType<typeof _verifyToken>;
+  verifyToken: typeof verifyToken;
 };
 
 /**
@@ -16,14 +16,10 @@ type ExtendedClerk = ReturnType<typeof createClerkClient> & {
  * new Clerk() syntax for v4 compatibility.
  * Arrow functions can never be called with the new keyword because they do not have the [[Construct]] method
  */
-export function Clerk(options: ClerkOptions): ExtendedClerk {
+export function Clerk(options: ClerkOptions): ClerkClient {
   const clerkClient = createClerkClient(options);
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
-  const verifyToken = (token: string, verifyOpts?: VerifyTokenOptions) => {
-    const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
-    return _verifyToken(token, { issuer, ...options, ...verifyOpts });
-  };
 
   return Object.assign(clerkClient, {
     expressWithAuth,

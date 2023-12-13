@@ -3,6 +3,8 @@ import type QUnit from 'qunit';
 import type { ApiClient } from '../api';
 import { createAuthenticateRequest } from './factory';
 
+const TEST_PK = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
+
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;
 
@@ -19,7 +21,7 @@ export default (QUnit: QUnit) => {
         apiUrl: 'apiUrl',
         apiVersion: 'apiVersion',
         proxyUrl: 'proxyUrl',
-        publishableKey: 'pk',
+        publishableKey: TEST_PK,
         isSatellite: false,
         domain: 'domain',
         audience: 'domain',
@@ -30,7 +32,7 @@ export default (QUnit: QUnit) => {
         apiClient: {} as ApiClient,
       });
 
-      const requestState = await authenticateRequest({ request: new Request('http://example.com/') });
+      const requestState = await authenticateRequest(new Request('http://example.com/'));
       assert.propContains(requestState.toAuth()?.debug(), buildTimeOptions);
     });
 
@@ -41,7 +43,7 @@ export default (QUnit: QUnit) => {
         apiUrl: 'apiUrl',
         apiVersion: 'apiVersion',
         proxyUrl: 'proxyUrl',
-        publishableKey: 'pk',
+        publishableKey: TEST_PK,
         isSatellite: false,
         domain: 'domain',
         audience: 'domain',
@@ -54,10 +56,9 @@ export default (QUnit: QUnit) => {
 
       const overrides = {
         secretKey: 'r-sk',
-        publishableKey: 'r-pk',
+        publishableKey: TEST_PK,
       };
-      const requestState = await authenticateRequest({
-        request: new Request('http://example.com/'),
+      const requestState = await authenticateRequest(new Request('http://example.com/'), {
         ...overrides,
       });
       assert.propContains(requestState.toAuth()?.debug(), {
@@ -73,7 +74,7 @@ export default (QUnit: QUnit) => {
         apiUrl: 'apiUrl',
         apiVersion: 'apiVersion',
         proxyUrl: 'proxyUrl',
-        publishableKey: 'pk',
+        publishableKey: TEST_PK,
         isSatellite: false,
         domain: 'domain',
         audience: 'domain',
@@ -84,8 +85,7 @@ export default (QUnit: QUnit) => {
         apiClient: {} as ApiClient,
       });
 
-      const requestState = await authenticateRequest({
-        request: new Request('http://example.com/'),
+      const requestState = await authenticateRequest(new Request('http://example.com/'), {
         // @ts-expect-error is used to check runtime code
         apiUrl: 'r-apiUrl',
         apiVersion: 'r-apiVersion',

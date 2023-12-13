@@ -6,7 +6,6 @@ import runtime from '../../runtime';
 import { base64url } from '../../util/rfc4648';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import { getCryptoAlgorithm } from './algorithms';
-import type { IssuerResolver } from './assertions';
 import {
   assertActivationClaim,
   assertAudienceClaim,
@@ -15,7 +14,6 @@ import {
   assertHeaderAlgorithm,
   assertHeaderType,
   assertIssuedAtClaim,
-  assertIssuerClaim,
   assertSubClaim,
 } from './assertions';
 import { importKey } from './cryptoKeys';
@@ -82,13 +80,12 @@ export type VerifyJwtOptions = {
   audience?: string | string[];
   authorizedParties?: string[];
   clockSkewInMs?: number;
-  issuer: IssuerResolver | string | null;
   key: JsonWebKey | string;
 };
 
 export async function verifyJwt(
   token: string,
-  { audience, authorizedParties, clockSkewInMs, issuer, key }: VerifyJwtOptions,
+  { audience, authorizedParties, clockSkewInMs, key }: VerifyJwtOptions,
 ): Promise<JwtPayload> {
   const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
 
@@ -103,12 +100,11 @@ export async function verifyJwt(
   assertHeaderAlgorithm(alg);
 
   // Payload verifications
-  const { azp, sub, aud, iss, iat, exp, nbf } = payload;
+  const { azp, sub, aud, iat, exp, nbf } = payload;
 
   assertSubClaim(sub);
   assertAudienceClaim([aud], [audience]);
   assertAuthorizedPartiesClaim(azp, authorizedParties);
-  assertIssuerClaim(iss, issuer);
   assertExpirationClaim(exp, clockSkew);
   assertActivationClaim(nbf, clockSkew);
   assertIssuedAtClaim(iat, clockSkew);

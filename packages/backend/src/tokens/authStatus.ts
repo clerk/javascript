@@ -8,8 +8,8 @@ import type { TokenVerificationErrorReason } from './errors';
 export enum AuthStatus {
   SignedIn = 'signed-in',
   SignedOut = 'signed-out',
-  Interstitial = 'interstitial',
-  Unknown = 'unknown',
+  Handshake = 'handshake',
+  SessionTokenOutdated = 'SessionTokenOutdated',
 }
 
 export type SignedInState = {
@@ -25,9 +25,8 @@ export type SignedInState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: true;
-  isInterstitial: false;
-  isUnknown: false;
   toAuth: () => SignedInAuthObject;
+  headers: Headers;
 };
 
 export type SignedOutState = {
@@ -43,43 +42,31 @@ export type SignedOutState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: false;
-  isInterstitial: false;
-  isUnknown: false;
   toAuth: () => SignedOutAuthObject;
+  headers: Headers;
 };
 
-export type InterstitialState = Omit<SignedOutState, 'isInterstitial' | 'status' | 'toAuth'> & {
-  status: AuthStatus.Interstitial;
-  isInterstitial: true;
+export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
+  status: AuthStatus.Handshake;
+  headers: Headers;
   toAuth: () => null;
 };
 
-export type UnknownState = Omit<InterstitialState, 'status' | 'isInterstitial' | 'isUnknown'> & {
-  status: AuthStatus.Unknown;
-  isInterstitial: false;
-  isUnknown: true;
-};
-
 export enum AuthErrorReason {
-  CookieAndUATMissing = 'cookie-and-uat-missing',
-  CookieMissing = 'cookie-missing',
-  CookieOutDated = 'cookie-outdated',
-  CookieUATMissing = 'uat-missing',
-  CrossOriginReferrer = 'cross-origin-referrer',
-  HeaderMissingCORS = 'header-missing-cors',
-  HeaderMissingNonBrowser = 'header-missing-non-browser',
-  SatelliteCookieNeedsSyncing = 'satellite-needs-syncing',
-  SatelliteReturnsFromPrimary = 'satellite-returns-from-primary',
+  ClientUATWithoutSessionToken = 'client-uat-but-no-session-token',
+  DevBrowserSync = 'dev-browser-sync',
   PrimaryRespondsToSyncing = 'primary-responds-to-syncing',
-  StandardSignedIn = 'standard-signed-in',
-  StandardSignedOut = 'standard-signed-out',
+  SatelliteCookieNeedsSyncing = 'satellite-needs-syncing',
+  SessionTokenAndUATMissing = 'session-token-and-uat-missing',
+  SessionTokenMissing = 'session-token-missing',
+  SessionTokenOutdated = 'session-token-outdated',
+  SessionTokenWithoutClientUAT = 'session-token-but-no-client-uat',
   UnexpectedError = 'unexpected-error',
-  Unknown = 'unknown',
 }
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState = SignedInState | SignedOutState | InterstitialState | UnknownState;
+export type RequestState = SignedInState | SignedOutState | HandshakeState;
 
 type LoadResourcesOptions = {
   loadSession?: boolean;
@@ -99,12 +86,12 @@ type RequestStateParams = {
 };
 
 type AuthParams = {
-  /* Client token cookie value */
-  cookieToken?: string;
+  /* Session token cookie value */
+  sessionTokenInCookie?: string;
+  /* Client token header value */
+  sessionTokenInHeader?: string;
   /* Client uat cookie value */
   clientUat?: string;
-  /* Client token header value */
-  headerToken?: string;
 };
 
 export type AuthStatusOptionsType = LoadResourcesOptions &
@@ -115,6 +102,7 @@ export type AuthStatusOptionsType = LoadResourcesOptions &
 export async function signedIn<T extends AuthStatusOptionsType>(
   options: T,
   sessionClaims: JwtPayload,
+  headers: Headers = new Headers(),
 ): Promise<SignedInState> {
   const {
     publishableKey = '',
@@ -128,8 +116,8 @@ export async function signedIn<T extends AuthStatusOptionsType>(
     secretKey,
     apiUrl,
     apiVersion,
-    cookieToken,
-    headerToken,
+    sessionTokenInCookie,
+    sessionTokenInHeader,
     loadSession,
     loadUser,
     loadOrganization,
@@ -159,7 +147,7 @@ export async function signedIn<T extends AuthStatusOptionsType>(
       secretKey,
       apiUrl,
       apiVersion,
-      token: cookieToken || headerToken || '',
+      token: sessionTokenInCookie || sessionTokenInHeader || '',
       session,
       user,
       organization,
@@ -180,15 +168,15 @@ export async function signedIn<T extends AuthStatusOptionsType>(
     afterSignInUrl,
     afterSignUpUrl,
     isSignedIn: true,
-    isInterstitial: false,
-    isUnknown: false,
     toAuth: () => authObject,
+    headers,
   };
 }
 export function signedOut<T extends AuthStatusOptionsType>(
   options: T,
   reason: AuthReason,
   message = '',
+  headers: Headers = new Headers(),
 ): SignedOutState {
   const {
     publishableKey = '',
@@ -214,17 +202,17 @@ export function signedOut<T extends AuthStatusOptionsType>(
     afterSignInUrl,
     afterSignUpUrl,
     isSignedIn: false,
-    isInterstitial: false,
-    isUnknown: false,
+    headers,
     toAuth: () => signedOutAuthObject({ ...options, status: AuthStatus.SignedOut, reason, message }),
   };
 }
 
-export function interstitial<T extends AuthStatusOptionsType>(
+export function handshake<T extends AuthStatusOptionsType>(
   options: T,
   reason: AuthReason,
   message = '',
-): InterstitialState {
+  headers: Headers,
+): HandshakeState {
   const {
     publishableKey = '',
     proxyUrl = '',
@@ -237,7 +225,7 @@ export function interstitial<T extends AuthStatusOptionsType>(
   } = options;
 
   return {
-    status: AuthStatus.Interstitial,
+    status: AuthStatus.Handshake,
     reason,
     message,
     publishableKey,
@@ -249,39 +237,7 @@ export function interstitial<T extends AuthStatusOptionsType>(
     afterSignInUrl,
     afterSignUpUrl,
     isSignedIn: false,
-    isInterstitial: true,
-    isUnknown: false,
-    toAuth: () => null,
-  };
-}
-
-export function unknownState(options: AuthStatusOptionsType, reason: AuthReason, message = ''): UnknownState {
-  const {
-    publishableKey = '',
-    proxyUrl = '',
-    isSatellite = false,
-    domain = '',
-    signInUrl = '',
-    signUpUrl = '',
-    afterSignInUrl = '',
-    afterSignUpUrl = '',
-  } = options;
-
-  return {
-    status: AuthStatus.Unknown,
-    reason,
-    message,
-    publishableKey,
-    isSatellite,
-    domain,
-    proxyUrl,
-    signInUrl,
-    signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
-    isSignedIn: false,
-    isInterstitial: false,
-    isUnknown: true,
+    headers,
     toAuth: () => null,
   };
 }

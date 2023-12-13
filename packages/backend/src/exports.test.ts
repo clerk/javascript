@@ -42,7 +42,6 @@ export default (QUnit: QUnit) => {
         'decodeJwt',
         'deserialize',
         'hasValidSignature',
-        'loadInterstitialFromLocal',
         'makeAuthObjectSerializable',
         'prunePrivateMetadata',
         'redirect',
