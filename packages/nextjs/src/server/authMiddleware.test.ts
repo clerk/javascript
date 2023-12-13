@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 
 const authenticateRequestMock = jest.fn().mockResolvedValue({
   toAuth: () => ({}),
+  headers: new Headers(),
 });
 
 jest.mock('./clerkClient', () => {
@@ -392,7 +393,7 @@ describe('authMiddleware(params)', () => {
     it('uses authenticateRequest result as auth', async () => {
       const req = mockRequest({ url: '/protected' });
       const event = {} as NextFetchEvent;
-      authenticateRequestMock.mockResolvedValueOnce({ toAuth: () => ({ userId: null }) });
+      authenticateRequestMock.mockResolvedValueOnce({ toAuth: () => ({ userId: null }), headers: new Headers() });
       const afterAuthSpy = jest.fn();
 
       await authMiddleware({ afterAuth: afterAuthSpy })(req, event);
