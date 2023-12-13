@@ -1,23 +1,31 @@
 'use client';
 
-import { SignIn as BaseSignIn, SignUp as BaseSignUp } from '@clerk/clerk-react';
+import {
+  CreateOrganization as BaseCreateOrganization,
+  OrganizationProfile as BaseOrganizationProfile,
+  SignIn as BaseSignIn,
+  SignUp as BaseSignUp,
+  UserProfile as BaseUserProfile,
+  withPathDefaultRouting,
+} from '@clerk/clerk-react';
 import type { SignInProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
 import { useClerkNextOptions } from './NextOptionsContext';
 
 export {
-  CreateOrganization,
   OrganizationList,
-  OrganizationProfile,
   OrganizationSwitcher,
   SignInButton,
   SignInWithMetamaskButton,
   SignOutButton,
   SignUpButton,
   UserButton,
-  UserProfile,
 } from '@clerk/clerk-react';
+
+export const UserProfile = withPathDefaultRouting(BaseUserProfile);
+export const CreateOrganization = withPathDefaultRouting(BaseCreateOrganization);
+export const OrganizationProfile = withPathDefaultRouting(BaseOrganizationProfile);
 
 export const SignIn = (props: SignInProps) => {
   const { signInUrl: repoLevelSignInUrl } = useClerkNextOptions();
