@@ -2,7 +2,7 @@ import { useClerk, useUser } from '@clerk/shared/react';
 
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
-import { ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
@@ -41,7 +41,7 @@ export const DeletePage = withCardStateProvider(() => {
   const canSubmit = confirmationField.value === 'Delete account';
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={localizationKeys('userProfile.deletePage.title')}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -59,6 +59,6 @@ export const DeletePage = withCardStateProvider(() => {
           isDisabled={!canSubmit}
         />
       </Form.Root>
-    </ContentPage>
+    </FormContent>
   );
 });

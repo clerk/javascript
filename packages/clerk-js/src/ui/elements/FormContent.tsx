@@ -3,7 +3,7 @@ import React from 'react';
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { CardAlert, Header, NavbarMenuButtonRow, useCardState } from './index';
+import { CardAlert, Header, useCardState } from './index';
 
 type PageProps = PropsOfComponent<typeof Col> & {
   headerTitle: LocalizationKey | string;
@@ -14,7 +14,7 @@ type PageProps = PropsOfComponent<typeof Col> & {
   headerSubtitleTextVariant?: PropsOfComponent<typeof Header.Subtitle>['variant'];
 };
 
-export const ContentPage = (props: PageProps) => {
+export const FormContent = (props: PageProps) => {
   const {
     headerTitle,
     headerTitleTextVariant,
@@ -33,26 +33,18 @@ export const ContentPage = (props: PageProps) => {
       elementDescriptor={descriptors.page}
       gap={8}
       {...rest}
-      sx={[t => ({ minHeight: t.sizes.$120 }), sx]}
+      sx={[sx]}
     >
-      <NavbarMenuButtonRow />
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
-        {Breadcrumbs && (
-          <Breadcrumbs
-            title={breadcrumbTitle || headerTitle}
-            sx={(t: any) => ({ marginBottom: t.space.$5 })}
-          />
-        )}
         <Header.Title
-          // TODO: Align them between user profile and org profile
           localizationKey={headerTitle}
-          textVariant={headerTitleTextVariant || 'h1'}
+          textVariant='h3'
         />
         {headerSubtitle && (
           <Header.Subtitle
-            variant={headerSubtitleTextVariant || 'subtitle'}
             localizationKey={headerSubtitle}
+            variant='body'
           />
         )}
       </Header.Root>

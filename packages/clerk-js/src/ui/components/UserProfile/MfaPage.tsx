@@ -5,8 +5,8 @@ import React from 'react';
 import { useEnvironment } from '../../contexts';
 import { Col, Grid, localizationKeys, Text } from '../../customizables';
 import {
-  ContentPage,
   FormButtonContainer,
+  FormContent,
   NavigateToFlowStartButton,
   TileButton,
   useCardState,
@@ -45,7 +45,7 @@ export const MfaPage = withCardStateProvider(() => {
 
   if (card.error) {
     return (
-      <ContentPage
+      <FormContent
         headerTitle={title}
         Breadcrumbs={UserProfileBreadcrumbs}
       />
@@ -58,7 +58,7 @@ export const MfaPage = withCardStateProvider(() => {
   }
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={title}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -87,7 +87,7 @@ export const MfaPage = withCardStateProvider(() => {
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
-    </ContentPage>
+    </FormContent>
   );
 });
 

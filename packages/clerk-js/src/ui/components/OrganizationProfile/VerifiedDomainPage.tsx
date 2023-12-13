@@ -10,9 +10,9 @@ import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import {
-  ContentPage,
   Form,
   FormButtons,
+  FormContent,
   Header,
   Tab,
   TabPanel,
@@ -200,7 +200,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   }
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={domain.name}
       headerSubtitle={allowsEdit ? undefined : subtitle}
       breadcrumbTitle={breadcrumbTitle}
@@ -313,6 +313,6 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
           </TabPanels>
         </Tabs>
       </Col>
-    </ContentPage>
+    </FormContent>
   );
 });

@@ -1,25 +1,30 @@
 import type { ImageResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
-import { render, screen } from '../../../../testUtils';
+import { render, screen, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { ProfilePage } from '../ProfilePage';
+import { UserProfileSection } from '../UserProfileSection';
 
-const { createFixtures } = bindCreateFixtures('UserProfile');
+const { createFixtures } = bindCreateFixtures('UserProfileSection');
 
 describe('ProfilePage', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
-    render(<ProfilePage />, { wrapper });
+    render(<UserProfileSection />, { wrapper });
   });
 
   it('shows the title', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
-    render(<ProfilePage />, { wrapper });
+    const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+    await userEvent.click(screen.getByText(/edit profile/i));
+    await waitFor(() => {
+      screen.getByText(/update profile/i);
+    });
 
     screen.getByRole('heading', { name: /Update Profile/i });
   });
@@ -34,7 +39,12 @@ describe('ProfilePage', () => {
           last_name: 'L',
         });
       });
-      render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       const firstNameInput: HTMLInputElement = screen.getByLabelText(/first name/i);
       const lastNameInput: HTMLInputElement = screen.getByLabelText(/last name/i);
@@ -70,7 +80,12 @@ describe('ProfilePage', () => {
 
       const { wrapper } = await createFixtures(config);
 
-      render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       expect(screen.getByRole('textbox', { name: 'First name' })).toBeDisabled();
       expect(screen.getByRole('textbox', { name: 'Last name' })).toBeDisabled();
@@ -104,7 +119,12 @@ describe('ProfilePage', () => {
 
       const { wrapper } = await createFixtures(config);
 
-      render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       expect(screen.getByRole('textbox', { name: 'First name' })).not.toBeDisabled();
       expect(screen.getByRole('textbox', { name: 'Last name' })).not.toBeDisabled();
@@ -127,7 +147,7 @@ describe('ProfilePage', () => {
           last_name: 'L',
         });
       });
-      render(<ProfilePage />, { wrapper });
+      render(<UserProfileSection />, { wrapper });
 
       screen.getByRole('img', { name: 'F L' });
     });
@@ -138,7 +158,12 @@ describe('ProfilePage', () => {
           email_addresses: ['test@clerk.com'],
         });
       });
-      const { userEvent } = render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       expect(screen.queryByText(/select file/i)).toBeNull();
       await userEvent.click(screen.getByText(/upload image/i));
@@ -154,22 +179,32 @@ describe('ProfilePage', () => {
         });
       });
       fixtures.clerk.user?.setProfileImage.mockReturnValueOnce(Promise.resolve({} as ImageResource));
-      const { userEvent } = render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       await userEvent.click(screen.getByText(/remove image/i));
       expect(fixtures.clerk.user?.setProfileImage).toHaveBeenCalledWith({ file: null });
     });
 
-    it.skip('"Remove image" is not shown when a default image exists', async () => {
+    it('"Remove image" is not shown when a default image exists', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.com'],
           image_url:
-            'https://img.clerkstage.dev/64656661756c742f696e735f3248326461375851494c494b727555654e464967456b73396878362f757365725f3249454d6b59705573514465427162327564677843717565345757?initials=GD',
+            'https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18yUDNBd2hvMFhUSEtLRjJra3dyaUZXaTFlT0wiLCJyaWQiOiJ1c2VyXzJYQmZkNXZLRG9CbWV3QUtXNDh2NUhIdXNvWCIsImluaXRpYWxzIjoiR0QifQ?width=160',
         });
       });
       fixtures.clerk.user?.setProfileImage.mockReturnValueOnce(Promise.resolve({} as ImageResource));
-      render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       expect(screen.queryByText(/remove image/i)).not.toBeInTheDocument();
     });
@@ -183,36 +218,35 @@ describe('ProfilePage', () => {
           email_addresses: ['test@clerk.com'],
         });
       });
-      render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       screen.getByRole('button', { name: /cancel/i });
       screen.getByRole('button', { name: /continue/i });
     });
 
-    it('pressing cancel navigates to the root page', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+    it('pressing cancel shows previous content', async () => {
+      const { wrapper } = await createFixtures(f => {
         f.withName();
         f.withUser({
           email_addresses: ['test@clerk.com'],
         });
       });
-      const { userEvent } = render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
-    });
-
-    it('pressing cancel navigates to the root page', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withName();
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-        });
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
       });
-      const { userEvent } = render(<ProfilePage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      await waitFor(() => {
+        screen.getByText(/edit profile/i);
+      });
     });
 
     it('continue button is disabled by default', async () => {
@@ -222,7 +256,12 @@ describe('ProfilePage', () => {
           email_addresses: ['test@clerk.com'],
         });
       });
-      render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       expect(screen.getByText(/continue/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
     });
@@ -234,7 +273,12 @@ describe('ProfilePage', () => {
           email_addresses: ['test@clerk.com'],
         });
       });
-      const { userEvent } = render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       expect(screen.getByText(/continue/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
       await userEvent.type(screen.getByText(/First name/i), 'George');
@@ -251,7 +295,12 @@ describe('ProfilePage', () => {
         });
       });
       fixtures.clerk.user?.update.mockReturnValueOnce(Promise.resolve({} as any));
-      const { userEvent } = render(<ProfilePage />, { wrapper });
+      const { userEvent } = render(<UserProfileSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/edit profile/i));
+      await waitFor(() => {
+        screen.getByText(/update profile/i);
+      });
 
       await userEvent.type(screen.getByLabelText(/first name/i), 'George');
       await userEvent.type(screen.getByLabelText(/last name/i), 'Clerk');

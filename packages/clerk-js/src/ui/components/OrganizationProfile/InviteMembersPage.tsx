@@ -4,7 +4,7 @@ import { runIfFunctionOrReturn } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Text } from '../../customizables';
-import { ContentPage, IconCircle, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { FormContent, IconCircle, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { Email } from '../../icons';
 import { BillingWidget } from './BillingWidget';
 import { InviteMembersForm } from './InviteMembersForm';
@@ -30,7 +30,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage
+      <FormContent
         headerTitle={title}
         headerSubtitle={subtitle}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
@@ -42,11 +42,10 @@ export const InviteMembersPage = withCardStateProvider(() => {
           />
         )}
         <InviteMembersForm onSuccess={wizard.nextStep} />
-      </ContentPage>
+      </FormContent>
       <SuccessPage
         title={title}
         contents={<InvitationsSentMessage />}
-        Breadcrumbs={OrganizationProfileBreadcrumbs}
       />
     </Wizard>
   );

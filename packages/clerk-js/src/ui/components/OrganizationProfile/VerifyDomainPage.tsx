@@ -6,10 +6,10 @@ import { useEnvironment } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import {
-  ContentPage,
   Form,
   FormButtonContainer,
   FormButtons,
+  FormContent,
   useCardState,
   useFieldOTP,
   withCardStateProvider,
@@ -123,7 +123,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage
+      <FormContent
         headerTitle={title}
         breadcrumbTitle={breadcrumbTitle}
         headerSubtitle={subtitle}
@@ -139,9 +139,9 @@ export const VerifyDomainPage = withCardStateProvider(() => {
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
-      </ContentPage>
+      </FormContent>
 
-      <ContentPage
+      <FormContent
         headerTitle={title}
         breadcrumbTitle={breadcrumbTitle}
         headerSubtitle={subtitleVerificationCodeScreen}
@@ -170,7 +170,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
             localizationKey={localizationKeys('userProfile.formButtonReset')}
           />
         </FormButtonContainer>
-      </ContentPage>
+      </FormContent>
     </Wizard>
   );
 });

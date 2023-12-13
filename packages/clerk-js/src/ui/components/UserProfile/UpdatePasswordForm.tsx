@@ -1,8 +1,9 @@
 import { useSession, useUser } from '@clerk/shared/react';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
+import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, useLocalizations } from '../../customizables';
 import {
   Form,
@@ -16,10 +17,9 @@ import {
 } from '../../elements';
 import { useConfirmPassword, useNavigateToFlowStart } from '../../hooks';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
-  const localizedTexts = [];
+  const localizedTexts: LocalizationKey[] = [];
 
   if (userHasPassword) {
     localizedTexts.push(localizationKeys('userProfile.passwordPage.changePasswordSuccessMessage'));
@@ -34,7 +34,7 @@ const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boole
   return localizedTexts;
 };
 
-export const PasswordPage = withCardStateProvider(() => {
+export const UpdatePasswordForm = withCardStateProvider(() => {
   const { user } = useUser();
 
   if (!user) {
@@ -42,9 +42,6 @@ export const PasswordPage = withCardStateProvider(() => {
   }
 
   const { session } = useSession();
-  const title = user.passwordEnabled
-    ? localizationKeys('userProfile.passwordPage.changePasswordTitle')
-    : localizationKeys('userProfile.passwordPage.title');
   const card = useCardState();
   const wizard = useWizard();
   const { navigateToFlowStart } = useNavigateToFlowStart();
@@ -128,10 +125,7 @@ export const PasswordPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
-        headerTitle={title}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      >
+      <FormContent>
         {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
 
         <Form.Root

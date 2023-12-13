@@ -4,7 +4,7 @@ import React from 'react';
 import { isDefaultImage } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { localizationKeys } from '../../customizables';
-import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
@@ -77,7 +77,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage
+      <FormContent
         headerTitle={title}
         headerSubtitle={subtitle}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
@@ -103,11 +103,10 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
-      </ContentPage>
+      </FormContent>
       <SuccessPage
         title={title}
         text={localizationKeys('organizationProfile.profilePage.successMessage')}
-        Breadcrumbs={OrganizationProfileBreadcrumbs}
       />
     </Wizard>
   );

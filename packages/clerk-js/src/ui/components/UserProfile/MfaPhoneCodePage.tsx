@@ -7,8 +7,8 @@ import type { LocalizationKey } from '../../customizables';
 import { Col, localizationKeys, Text } from '../../customizables';
 import {
   ArrowBlockButton,
-  ContentPage,
   FormButtonContainer,
+  FormContent,
   NavigateToFlowStartButton,
   SuccessPage,
   useCardState,
@@ -55,7 +55,6 @@ export const MfaPhoneCodePage = withCardStateProvider(() => {
             backupCodes={ref.current?.backupCodes}
           />
         }
-        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );
@@ -99,7 +98,7 @@ const AddMfa = (props: AddMfaProps) => {
   };
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={title}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -150,6 +149,6 @@ const AddMfa = (props: AddMfaProps) => {
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
-    </ContentPage>
+    </FormContent>
   );
 };

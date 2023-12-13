@@ -3,7 +3,7 @@ import { useUser } from '@clerk/shared/react';
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -39,7 +39,7 @@ export const UsernamePage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage
+      <FormContent
         headerTitle={localizationKeys('userProfile.usernamePage.title')}
         Breadcrumbs={UserProfileBreadcrumbs}
       >
@@ -53,11 +53,10 @@ export const UsernamePage = withCardStateProvider(() => {
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
-      </ContentPage>
+      </FormContent>
       <SuccessPage
         title={localizationKeys('userProfile.usernamePage.title')}
         text={localizationKeys('userProfile.usernamePage.successMessage')}
-        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );

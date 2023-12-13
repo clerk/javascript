@@ -3,7 +3,7 @@ import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { ContentPage, Form, FormButtonContainer, NavigateToFlowStartButton, useFieldOTP } from '../../elements';
+import { Form, FormButtonContainer, FormContent, NavigateToFlowStartButton, useFieldOTP } from '../../elements';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type VerifyTOTPProps = {
@@ -29,7 +29,7 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
   });
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={localizationKeys('userProfile.mfaTOTPPage.title')}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -47,6 +47,6 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
           elementDescriptor={descriptors.formButtonReset}
         />
       </FormButtonContainer>
-    </ContentPage>
+    </FormContent>
   );
 };

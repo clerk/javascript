@@ -6,21 +6,21 @@ import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import {
-  ContentPage,
   Form,
   FormButtons,
+  FormContent,
   InformationBox,
   SuccessPage,
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const ProfilePage = withCardStateProvider(() => {
-  const title = localizationKeys('userProfile.profilePage.title');
+export const UpdateProfileForm = withCardStateProvider(() => {
   const card = useCardState();
+  const { toggle } = useActionContext();
   const { user } = useUser();
 
   if (!user) {
@@ -97,10 +97,7 @@ export const ProfilePage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage
-        headerTitle={title}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      >
+      <FormContent headerTitle={localizationKeys('userProfile.profilePage.title')}>
         {nameEditDisabled && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
 
         <Form.Root onSubmit={onSubmit}>
@@ -109,30 +106,34 @@ export const ProfilePage = withCardStateProvider(() => {
             onAvatarChange={uploadAvatar}
             onAvatarRemove={isDefaultImage(user.imageUrl) ? null : onAvatarRemove}
           />
-          {showFirstName && (
-            <Form.ControlRow elementId={firstNameField.id}>
-              <Form.PlainInput
-                {...firstNameField.props}
-                isDisabled={nameEditDisabled}
-                autoFocus
-              />
+          {(showFirstName || showLastName) && (
+            <Form.ControlRow elementId='name'>
+              {showFirstName && (
+                <Form.PlainInput
+                  {...firstNameField.props}
+                  isDisabled={nameEditDisabled}
+                  autoFocus
+                />
+              )}
+              {showLastName && (
+                <Form.PlainInput
+                  {...lastNameField.props}
+                  isDisabled={nameEditDisabled}
+                  autoFocus={!showFirstName}
+                />
+              )}
             </Form.ControlRow>
           )}
-          {showLastName && (
-            <Form.ControlRow elementId={lastNameField.id}>
-              <Form.PlainInput
-                {...lastNameField.props}
-                isDisabled={nameEditDisabled}
-              />
-            </Form.ControlRow>
-          )}
-          <FormButtons isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged} />
+
+          <FormButtons
+            isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged}
+            onReset={toggle}
+          />
         </Form.Root>
-      </ContentPage>
+      </FormContent>
       <SuccessPage
-        title={title}
         text={localizationKeys('userProfile.profilePage.successMessage')}
-        Breadcrumbs={UserProfileBreadcrumbs}
+        onFinish={toggle}
       />
     </Wizard>
   );

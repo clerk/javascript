@@ -4,8 +4,8 @@ import React from 'react';
 
 import { descriptors, localizationKeys, Text } from '../../customizables';
 import {
-  ContentPage,
   FormButtonContainer,
+  FormContent,
   FullHeightLoader,
   NavigateToFlowStartButton,
   useCardState,
@@ -33,7 +33,7 @@ export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
 
   if (card.error) {
     return (
-      <ContentPage
+      <FormContent
         headerTitle={localizationKeys('userProfile.backupCodePage.title')}
         Breadcrumbs={UserProfileBreadcrumbs}
       />
@@ -41,7 +41,7 @@ export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
   }
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={localizationKeys('userProfile.backupCodePage.title')}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -65,6 +65,6 @@ export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
           </FormButtonContainer>
         </>
       )}
-    </ContentPage>
+    </FormContent>
   );
 });

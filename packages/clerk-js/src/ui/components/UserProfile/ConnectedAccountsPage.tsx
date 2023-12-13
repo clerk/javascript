@@ -8,8 +8,8 @@ import { useUserProfileContext } from '../../contexts';
 import { Col, Image, localizationKeys, Text } from '../../customizables';
 import {
   ArrowBlockButton,
-  ContentPage,
   FormButtonContainer,
+  FormContent,
   NavigateToFlowStartButton,
   SuccessPage,
   useCardState,
@@ -37,7 +37,6 @@ export const ConnectedAccountsPage = withCardStateProvider(() => {
       <SuccessPage
         title={title}
         text={localizationKeys('userProfile.connectedAccountPage.successMessage')}
-        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );
@@ -86,7 +85,7 @@ const AddConnectedAccount = () => {
   };
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={localizationKeys('userProfile.connectedAccountPage.title')}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -123,6 +122,6 @@ const AddConnectedAccount = () => {
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
-    </ContentPage>
+    </FormContent>
   );
 };

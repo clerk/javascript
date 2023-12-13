@@ -7,8 +7,8 @@ import { useWizard, Wizard } from '../../common';
 import { Col, descriptors, Image, localizationKeys, Text } from '../../customizables';
 import {
   ArrowBlockButton,
-  ContentPage,
   FormButtonContainer,
+  FormContent,
   NavigateToFlowStartButton,
   SuccessPage,
   useCardState,
@@ -34,7 +34,6 @@ export const Web3Page = withCardStateProvider(() => {
       <SuccessPage
         title={localizationKeys('userProfile.web3WalletPage.title')}
         text={localizationKeys('userProfile.web3WalletPage.successMessage')}
-        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );
@@ -82,7 +81,7 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
   };
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={localizationKeys('userProfile.web3WalletPage.title')}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -126,6 +125,6 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
-    </ContentPage>
+    </FormContent>
   );
 };

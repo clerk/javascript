@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Text } from '../customizables';
-import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../elements';
+import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../elements';
 import type { LocalizationKey } from '../localization';
 import { handleError } from '../utils';
 import { useWizard, Wizard } from './Wizard';
@@ -31,7 +31,7 @@ export const RemoveResourcePage = withCardStateProvider((props: RemovePageProps)
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage
+      <FormContent
         headerTitle={title}
         breadcrumbTitle={breadcrumbTitle}
         Breadcrumbs={props.Breadcrumbs}
@@ -41,11 +41,10 @@ export const RemoveResourcePage = withCardStateProvider((props: RemovePageProps)
           <Text localizationKey={messageLine2} />
           <FormButtons variant='primaryDanger' />
         </Form.Root>
-      </ContentPage>
+      </FormContent>
       <SuccessPage
         title={title}
         text={successMessage}
-        Breadcrumbs={props.Breadcrumbs}
       />
     </Wizard>
   );
