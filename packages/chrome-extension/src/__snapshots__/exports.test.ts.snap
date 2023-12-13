@@ -47,6 +47,7 @@ exports[`public exports should not include a breaking change 1`] = `
   "useSignUp",
   "useUser",
   "withClerk",
+  "withPathDefaultRouting",
   "withSession",
   "withUser",
 ]

@@ -34,7 +34,6 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-remote-only: false
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -48,6 +47,10 @@ jobs:
       - name: Check Formatting
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run format:check
+
+      - name: Build Packages
+        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
+        run: npx turbo build $TURBO_ARGS
 
       - name: Lint packages using publint
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
@@ -104,6 +107,7 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
+          cache-version: ${{ env.CACHE_VERSION }}
           node-version: ${{ matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
@@ -145,6 +149,7 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
+          cache-version: ${{ env.CACHE_VERSION }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
