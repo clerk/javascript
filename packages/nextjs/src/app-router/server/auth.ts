@@ -3,7 +3,7 @@ import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
 } from '@clerk/types';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { authAuthHeaderMissing } from '../../server/errors';
 import { buildClerkProps, createGetAuth } from '../../server/getAuth';
@@ -17,13 +17,22 @@ type AuthSignedIn = AuthObjectWithDeprecatedResources<
      * This function is experimental as it throws a Nextjs notFound error if user is not authenticated or authorized.
      * In the future we would investigate a way to throw a more appropriate error that clearly describes the not authorized of authenticated status.
      */
-    protect: (
-      params?:
-        | CheckAuthorizationParamsWithCustomPermissions
-        | ((has: CheckAuthorizationWithCustomPermissions) => boolean),
-    ) => AuthObjectWithDeprecatedResources<SignedInAuthObject>;
+    protect: {
+      (
+        params?:
+          | CheckAuthorizationParamsWithCustomPermissions
+          | ((has: CheckAuthorizationWithCustomPermissions) => boolean),
+        options?: { redirectUrl: string },
+      ): AuthObjectWithDeprecatedResources<SignedInAuthObject>;
+
+      (params?: { redirectUrl: string }): AuthObjectWithDeprecatedResources<SignedInAuthObject>;
+    };
   }
 >;
+
+type ProtectGeneric = {
+  protect: (params?: unknown, options?: unknown) => AuthObjectWithDeprecatedResources<SignedInAuthObject>;
+};
 
 type AuthSignedOut = AuthObjectWithDeprecatedResources<
   SignedOutAuthObject & {
@@ -42,39 +51,53 @@ export const auth = () => {
     noAuthStatusMessage: authAuthHeaderMissing(),
   })(buildRequestLike());
 
-  (authObject as AuthSignedIn).protect = params => {
+  (authObject as unknown as ProtectGeneric).protect = (params: any, options: any) => {
+    const paramsOrFunction = params?.redirectUrl
+      ? undefined
+      : (params as
+          | CheckAuthorizationParamsWithCustomPermissions
+          | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
+    const redirectUrl = (params?.redirectUrl || options?.redirectUrl) as string | undefined;
+
+    const handleUnauthorized = (): never => {
+      if (redirectUrl) {
+        redirect(redirectUrl);
+      }
+      notFound();
+    };
+
     /**
      * User is not authenticated
      */
     if (!authObject.userId) {
-      notFound();
+      return handleUnauthorized();
     }
 
     /**
      * User is authenticated
      */
-    if (!params) {
+    if (!paramsOrFunction) {
       return { ...authObject };
     }
 
     /**
      * if a function is passed and returns false then throw not found
      */
-    if (typeof params === 'function') {
-      if (params(authObject.has)) {
+    if (typeof paramsOrFunction === 'function') {
+      if (paramsOrFunction(authObject.has)) {
         return { ...authObject };
       }
-      notFound();
+      return handleUnauthorized();
     }
 
     /**
      * Checking if user is authorized when permission or role is passed
      */
-    if (authObject.has(params)) {
+    if (authObject.has(paramsOrFunction)) {
       return { ...authObject };
     }
 
-    notFound();
+    return handleUnauthorized();
   };
 
   return authObject as AuthSignedIn | AuthSignedOut;
