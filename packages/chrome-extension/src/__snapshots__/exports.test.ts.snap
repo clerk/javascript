@@ -7,7 +7,6 @@ exports[`public exports should not include a breaking change 1`] = `
   "ClerkLoading",
   "ClerkProvider",
   "CreateOrganization",
-  "EmailLinkErrorCode",
   "OrganizationList",
   "OrganizationProfile",
   "OrganizationSwitcher",
@@ -28,12 +27,6 @@ exports[`public exports should not include a breaking change 1`] = `
   "UserButton",
   "UserProfile",
   "WithClerk",
-  "WithSession",
-  "WithUser",
-  "isClerkAPIResponseError",
-  "isEmailLinkError",
-  "isKnownError",
-  "isMetamaskError",
   "useAuth",
   "useClerk",
   "useEmailLink",
@@ -45,7 +38,5 @@ exports[`public exports should not include a breaking change 1`] = `
   "useSignUp",
   "useUser",
   "withClerk",
-  "withSession",
-  "withUser",
 ]
 `;
