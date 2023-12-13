@@ -35,6 +35,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
     },
     defaultVariants: {
       variant: 'body',
+      colorScheme: 'inherit',
     },
   };
 });

@@ -17,21 +17,21 @@ export const whiteAlpha = Object.freeze({
 } as const);
 
 export const blackAlpha = Object.freeze({
-  blackAlpha20: 'hsla(0, 0%, 0%, 0.02)',
-  blackAlpha50: 'hsla(0, 0%, 0%, 0.04)',
-  blackAlpha100: 'hsla(0, 0%, 0%, 0.06)',
-  blackAlpha150: 'hsla(0, 0%, 0%, 0.07)',
-  blackAlpha200: 'hsla(0, 0%, 0%, 0.08)',
-  blackAlpha300: 'hsla(0, 0%, 0%, 0.16)',
-  blackAlpha400: 'hsla(0, 0%, 0%, 0.24)',
-  blackAlpha500: 'hsla(0, 0%, 0%, 0.36)',
-  blackAlpha600: 'hsla(0, 0%, 0%, 0.48)',
-  blackAlpha700: 'hsla(0, 0%, 0%, 0.64)',
-  blackAlpha750: 'hsla(0, 0%, 0%, 0.72)',
-  blackAlpha800: 'hsla(0, 0%, 0%, 0.80)',
-  blackAlpha850: 'hsla(0, 0%, 0%, 0.86)',
-  blackAlpha900: 'hsla(0, 0%, 0%, 0.92)',
-  blackAlpha950: 'hsla(0, 0%, 0%, 0.96)',
+  blackAlpha25: 'hsla(0, 0%, 0%, 0.02)',
+  blackAlpha50: 'hsla(0, 0%, 0%, 0.03)',
+  blackAlpha100: 'hsla(0, 0%, 0%, 0.07)',
+  blackAlpha150: 'hsla(0, 0%, 0%, 0.11)',
+  blackAlpha200: 'hsla(0, 0%, 0%, 0.15)',
+  blackAlpha300: 'hsla(0, 0%, 0%, 0.28)',
+  blackAlpha400: 'hsla(0, 0%, 0%, 0.41)',
+  blackAlpha500: 'hsla(0, 0%, 0%, 0.53)',
+  blackAlpha600: 'hsla(0, 0%, 0%, 0.62)',
+  blackAlpha700: 'hsla(0, 0%, 0%, 0.73)',
+  blackAlpha750: 'hsla(0, 0%, 0%, 0.78)',
+  blackAlpha800: 'hsla(0, 0%, 0%, 0.81)',
+  blackAlpha850: 'hsla(0, 0%, 0%, 0.84)',
+  blackAlpha900: 'hsla(0, 0%, 0%, 0.87)',
+  blackAlpha950: 'hsla(0, 0%, 0%, 0.92)',
 } as const);
 
 export const colors = Object.freeze({

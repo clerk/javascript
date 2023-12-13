@@ -48,8 +48,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
               position: 'relative',
               backgroundColor: t.colors.$colorBackground,
               padding: t.space.$8,
-              boxShadow:
-                '0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.06), 0px 0px 0px 1px rgba(25, 28, 33, 0.04)',
+              boxShadow: t.shadows.$cardShadow,
               maxWidth: `calc(100vw - ${t.sizes.$20})`,
               width: t.sizes.$100,
               borderRadius: `${t.radii.$card} ${t.radii.$card} ${t.radii.$lg} ${t.radii.$lg}`,
@@ -190,7 +189,7 @@ export const CardFooterItem = React.forwardRef<HTMLDivElement, CardFooterItemPro
         t => ({
           position: 'relative',
           width: '100%',
-          backgroundColor: t.colors.$blackAlpha200,
+          backgroundColor: t.colors.$blackAlpha50,
         }),
       ]}
       {...rest}

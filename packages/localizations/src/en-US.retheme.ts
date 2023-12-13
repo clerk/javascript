@@ -255,6 +255,7 @@ export const enUS: LocalizationResource = {
       headerTitle__security: 'Security',
       profileSection: {
         title: 'Profile',
+        primaryButton: 'Edit Profile',
       },
       usernameSection: {
         title: 'Username',

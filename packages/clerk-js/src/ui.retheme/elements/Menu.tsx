@@ -128,7 +128,7 @@ export const MenuList = (props: MenuListProps) => {
             top: `calc(100% + ${theme.space.$2})`,
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: theme.shadows.$boxShadow1,
+            boxShadow: theme.shadows.$menuShadow,
             zIndex: theme.zIndices.$dropdown,
           }),
           sx,
