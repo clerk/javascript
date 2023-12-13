@@ -42,7 +42,7 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
   const isPrimary = user?.primaryEmailAddressId === email.id;
   const isVerified = email.verification.status === 'verified';
   const setPrimary = () => {
-    return user.update({ primaryEmailAddressId: email.id }).catch(e => handleError(e, [], card.setError));
+    return user!.update({ primaryEmailAddressId: email.id }).catch(e => handleError(e, [], card.setError));
   };
 
   return (
