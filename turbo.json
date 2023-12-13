@@ -4,6 +4,7 @@
     "signature": true
   },
   "globalDependencies": [
+    ".github/.cache-version",
     "jest.*.ts",
     "package.json",
     "package-lock.json",
@@ -15,7 +16,6 @@
     "CLERK_*",
     "GATSBY_CLERK_*",
     "NEXT_PUBLIC_CLERK_*",
-    "MAILSAC_API_KEY",
     "NODE_ENV",
     "NODE_VERSION",
     "NPM_VERSION",
@@ -23,12 +23,12 @@
     "VERCEL",
     "VITE_CLERK_*"
   ],
+  "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN"],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": [
         "*.d.ts",
-        "**/package.json",
         "bundlewatch.config.json",
         "src/**",
         "tsconfig.json",
@@ -44,11 +44,12 @@
         "!**/__snapshots__/**",
         "!CHANGELOG.md",
         "!coverage/**",
+        "!dist/**",
         "!examples/**",
         "!node_modules/**"
       ],
       "outputMode": "new-only",
-      "outputs": ["dist/**"]
+      "outputs": ["*/package.json", "dist/**", "scripts/**"]
     },
     "dev": {
       "dependsOn": [],
@@ -67,7 +68,6 @@
       "dependsOn": ["build"],
       "inputs": [
         "*.d.ts",
-        "**/package.json",
         "bundlewatch.config.json",
         "jest.*",
         "src/**",
@@ -78,6 +78,7 @@
         "!**/__snapshots__/**",
         "!CHANGELOG.md",
         "!coverage/**",
+        "!dist/**",
         "!examples/**",
         "!node_modules/**"
       ],
@@ -89,15 +90,35 @@
     },
     "lint": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.json",
+        "**/*.md",
+        "**/*.mdx",
+        ".github/**",
+
+        "!*/package.json",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
       "outputs": []
     },
     "lint:publint": {
       "dependsOn": ["build"],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "lint:attw": {
       "dependsOn": [],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "bundlewatch": {
       "dependsOn": ["build"],

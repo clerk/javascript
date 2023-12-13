@@ -101,7 +101,7 @@ runs:
       id: npm-cache
       with:
         path: ./node_modules
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('package-lock.json') }}
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-${{ hashFiles('.github/.cache-version') }}-node-modules-${{ hashFiles('package-lock.json') }}
 
     - name: Install NPM Dependencies
       if: steps.npm-cache.outputs.cache-hit != 'true'
@@ -120,7 +120,7 @@ runs:
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
+        key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('.github/.cache-version') }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
 
     - name: Install Playwright Browsers
       if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
