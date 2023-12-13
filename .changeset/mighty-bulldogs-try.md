@@ -7,7 +7,7 @@
 '@clerk/clerk-expo': major
 ---
 
-- Introduce `@clerk/clerk-react/error` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
+- Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
     ```typescript
     // Before
     import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
@@ -17,7 +17,7 @@
     // Before
     import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
     // After
-    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/error';
+    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
 
     // Before
     import { MultisessionAppSupport } from '@clerk/clerk-react';
@@ -29,6 +29,6 @@
     - `WithClerkProp` type
     - `MultisessionAppSupport` component (moved to /internal subpath)
     - `EmailLinkErrorCode` enum
-- Drop `StructureContext` and related error to reduce to reduce code complexity since it seems that it was not being used.
+- Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
 - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react` 
   to reduce the export surface since it's trivial to implement if needed.

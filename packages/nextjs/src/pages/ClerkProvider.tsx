@@ -41,7 +41,6 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
 
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
-      {/*@ts-expect-error*/}
       <ReactClerkProvider
         {...mergedProps}
         initialState={initialState}

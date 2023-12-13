@@ -3,7 +3,8 @@ import { isTruthy } from '@clerk/shared/underscore';
 import { SDK_METADATA } from '../server/constants';
 import type { NextClerkProviderProps } from '../types';
 
-export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, 'children'>) => {
+// @ts-ignore - https://github.com/microsoft/TypeScript/issues/47663
+export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, 'children'>): any => {
   return {
     ...props,
     publishableKey: props.publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',

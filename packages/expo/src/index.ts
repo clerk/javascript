@@ -15,7 +15,7 @@ export {
   useUser,
 } from '@clerk/clerk-react';
 
-export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/error';
+export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
 export { MultisessionAppSupport } from '@clerk/clerk-react/internal';
 
 export { clerk as Clerk } from './singleton';

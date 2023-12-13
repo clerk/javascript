@@ -43,14 +43,14 @@
         "default": "./dist/internal.js"
       }
     },
-    "./error": {
+    "./errors": {
       "import": {
-        "types": "./dist/error.d.ts",
-        "default": "./dist/error.mjs"
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.mjs"
       },
       "require": {
-        "types": "./dist/error.d.ts",
-        "default": "./dist/error.js"
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.js"
       }
     },
     "./package.json": "./package.json"
@@ -59,7 +59,7 @@
   "files": [
     "dist",
     "internal",
-    "error"
+    "errors"
   ],
   "scripts": {
     "build": "tsup",

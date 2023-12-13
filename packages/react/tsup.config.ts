@@ -13,9 +13,10 @@ export default defineConfig(overrideOptions => {
     entry: {
       index: 'src/index.ts',
       internal: 'src/internal.ts',
-      error: 'src/error.ts',
+      errors: 'src/errors.ts',
     },
-    onSuccess: shouldPublish ? 'tsc && npm run publish:local' : 'tsc',
+    dts: true,
+    onSuccess: shouldPublish ? 'npm run publish:local' : undefined,
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,
