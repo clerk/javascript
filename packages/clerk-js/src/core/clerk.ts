@@ -442,6 +442,9 @@ export class Clerk implements ClerkInterface {
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (noUserExists(this) && this.#instanceType === 'development') {
+      return console.info(warnings.cannotRenderComponentWhenUserDoesNotExist);
+    }
     void this.#componentControls.ensureMounted({ preloadHint: 'UserProfile' }).then(controls =>
       controls.mountComponent({
         name: 'UserProfile',
@@ -465,6 +468,9 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
     this.assertComponentsReady(this.#componentControls);
+    if (noOrganizationExists(this) && this.#instanceType === 'development') {
+      return console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
+    }
     void this.#componentControls.ensureMounted({ preloadHint: 'OrganizationProfile' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationProfile',

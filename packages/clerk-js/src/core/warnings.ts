@@ -10,8 +10,8 @@ const warnings = {
   cannotRenderSignInComponentWhenSessionExists:
     'The <SignIn/> component cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the `afterSignIn` URL instead.',
   cannotRenderComponentWhenUserDoesNotExist:
-    '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, Clerk is redirecting to the Home URL instead. (This notice only appears in development.)',
-  cannotRenderComponentWhenOrgDoesNotExist: `<OrganizationProfile/> cannot render unless an organization is active. Since no organization is currently active, Clerk is redirecting to the Home URL instead.`,
+    '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
+  cannotRenderComponentWhenOrgDoesNotExist: `<OrganizationProfile/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
   cannotOpenOrgProfile:
     'The OrganizationProfile cannot render unless an organization is active. Since no organization is currently active, this is no-op.',
   cannotOpenUserProfile:
