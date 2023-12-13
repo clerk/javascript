@@ -5,14 +5,14 @@ import React from 'react';
 
 import { warnings } from '../../core/warnings';
 import type { ComponentGuard } from '../../utils';
-import { noOrganizationExists, noUserExists, sessionExistsAndSingleSessionModeEnabled } from '../../utils';
+import { sessionExistsAndSingleSessionModeEnabled } from '../../utils';
 import { useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../contexts';
 import { useRouter } from '../router';
 import type { AvailableComponentProps } from '../types';
 
 type RedirectUrl = (opts: { clerk: Clerk; environment: EnvironmentResource; options: ClerkOptions }) => string;
 
-function withRedirect<P extends AvailableComponentProps>(
+export function withRedirect<P extends AvailableComponentProps>(
   Component: ComponentType<P>,
   condition: ComponentGuard,
   redirectUrl: RedirectUrl,
@@ -95,20 +95,4 @@ export const withRedirectToHomeSingleSessionGuard = <P extends AvailableComponen
     sessionExistsAndSingleSessionModeEnabled,
     ({ environment }) => environment.displayConfig.homeUrl,
     warnings.cannotRenderComponentWhenSessionExists,
-  );
-
-export const withRedirectToHomeUserGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
-  withRedirect(
-    Component,
-    noUserExists,
-    ({ environment }) => environment.displayConfig.homeUrl,
-    warnings.cannotRenderComponentWhenUserDoesNotExist,
-  );
-
-export const withRedirectToHomeOrganizationGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
-  withRedirect(
-    Component,
-    noOrganizationExists,
-    ({ environment }) => environment.displayConfig.homeUrl,
-    warnings.cannotRenderComponentWhenOrgDoesNotExist,
   );
