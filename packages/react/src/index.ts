@@ -19,7 +19,6 @@ export type {
   HeadlessBrowserClerk,
   ClerkProviderOptionsWrapper,
   ClerkProviderProps,
-  WithClerkProp,
 } from './types';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
