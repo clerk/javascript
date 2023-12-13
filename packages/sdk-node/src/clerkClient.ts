@@ -1,5 +1,5 @@
-import type { ClerkOptions, createClerkClient as _createClerkClient } from '@clerk/backend';
-import { verifyToken } from '@clerk/backend';
+import type { ClerkOptions } from '@clerk/backend';
+import { createClerkClient as _createClerkClient, verifyToken } from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
@@ -17,7 +17,7 @@ type ClerkClient = ReturnType<typeof _createClerkClient> & {
  * Arrow functions can never be called with the new keyword because they do not have the [[Construct]] method
  */
 export function createClerkClient(options: ClerkOptions): ClerkClient {
-  const clerkClient = createClerkClient(options);
+  const clerkClient = _createClerkClient(options);
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
 
