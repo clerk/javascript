@@ -40,7 +40,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   defaultVariants: {
     colorScheme: 'primary',
-    textVariant: 'smallMedium',
+    textVariant: 'caption',
   },
 }));
 
@@ -53,7 +53,7 @@ export const Badge = (props: BadgeProps) => {
       {...filterProps(props)}
       center
       as='span'
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     />
   );
 };

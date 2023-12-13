@@ -236,8 +236,6 @@ export const ukUA: LocalizationResource = {
     start: {
       headerTitle__account: 'Обліковий запис',
       headerTitle__security: 'Безпека',
-      headerSubtitle__account: 'Керування інформацією про обліковий запис',
-      headerSubtitle__security: 'Керування налаштуваннями безпеки',
       profileSection: {
         title: 'Профіль',
       },
@@ -522,8 +520,6 @@ export const ukUA: LocalizationResource = {
     start: {
       headerTitle__members: 'Учасники',
       headerTitle__settings: 'Налаштування',
-      headerSubtitle__members: 'Перегляд і управління учасниками організації',
-      headerSubtitle__settings: 'Управління налаштуваннями організації',
     },
     profilePage: {
       title: 'Профіль організації',

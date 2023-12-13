@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 
-import { Box, Spinner } from '../customizables';
+import { Box, descriptors, Spinner } from '../customizables';
 
 export const InfiniteListSpinner = forwardRef<HTMLDivElement>((_, ref) => {
   return (
@@ -24,6 +24,7 @@ export const InfiniteListSpinner = forwardRef<HTMLDivElement>((_, ref) => {
         <Spinner
           size='sm'
           colorScheme='primary'
+          elementDescriptor={descriptors.spinner}
         />
       </Box>
     </Box>

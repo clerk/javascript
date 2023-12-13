@@ -25,8 +25,6 @@ const variantToSourceFile = {
 
 /** @returns { import('webpack').Configuration } */
 const common = ({ mode }) => {
-  const uiRetheme = process.env.CLERK_RETHEME === '1' || process.env.CLERK_RETHEME === 'true';
-
   return {
     mode,
     resolve: {
@@ -34,7 +32,7 @@ const common = ({ mode }) => {
       // @see https://webpack.js.org/configuration/resolve/#resolveextensions
       extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
       alias: {
-        '~ui': uiRetheme ? './ui.retheme' : './ui',
+        '~ui': './ui',
       },
     },
     plugins: [
@@ -167,22 +165,22 @@ const commonForProd = () => {
   };
 };
 
-/** @type { () => (import('webpack').Configuration) } */
-const externalsForHeadless = () => {
-  return {
-    externals: {
-      react: 'react',
-      'react-dom': 'react-dom',
-    },
-  };
-};
+// /** @type { () => (import('webpack').Configuration) } */
+// const externalsForHeadless = () => {
+//   return {
+//     externals: {
+//       react: 'react',
+//       'react-dom': 'react-dom',
+//     },
+//   };
+// };
 
 const entryForVariant = variant => {
   return { entry: { [variant]: variantToSourceFile[variant] } };
 };
 
 /** @type { () => (import('webpack').Configuration)[] } */
-const prodConfig = ({ mode, env }) => {
+const prodConfig = ({ mode }) => {
   const clerkBrowser = merge(entryForVariant(variants.clerkBrowser), common({ mode }), commonForProd());
 
   const clerkHeadless = merge(

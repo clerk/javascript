@@ -1,7 +1,8 @@
 import { OAUTH_PROVIDERS } from '@clerk/types';
 import React from 'react';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { render, screen } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignUpContinue } from '../SignUpContinue';
 
 const { createFixtures } = bindCreateFixtures('SignUp');

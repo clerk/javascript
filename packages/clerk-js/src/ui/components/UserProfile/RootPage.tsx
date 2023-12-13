@@ -34,21 +34,20 @@ export const RootPage = withCardStateProvider(() => {
   return (
     <Col
       elementDescriptor={descriptors.page}
-      gap={8}
+      sx={t => ({ gap: t.space.$8 })}
     >
       <NavbarMenuButtonRow />
       <CardAlert>{card.error}</CardAlert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('account')}
-        gap={8}
       >
         <Header.Root id='cl-section-account'>
           <Header.Title
             localizationKey={localizationKeys('userProfile.start.headerTitle__account')}
-            textVariant='xxlargeMedium'
+            sx={t => ({ marginBottom: t.space.$4 })}
+            textVariant='h2'
           />
-          <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__account')} />
         </Header.Root>
 
         <UserProfileSection />
@@ -67,9 +66,8 @@ export const RootPage = withCardStateProvider(() => {
         <Header.Root id='cl-section-security'>
           <Header.Title
             localizationKey={localizationKeys('userProfile.start.headerTitle__security')}
-            textVariant='xxlargeMedium'
+            textVariant='h1'
           />
-          <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__security')} />
         </Header.Root>
         {showPassword && <PasswordSection />}
         {showMfa && <MfaSection />}

@@ -68,7 +68,6 @@ export const EmailPage = withCardStateProvider(() => {
                 ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
                 : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
             }
-            variant='regularRegular'
           />
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>

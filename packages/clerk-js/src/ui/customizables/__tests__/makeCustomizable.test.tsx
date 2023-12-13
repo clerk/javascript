@@ -1,10 +1,11 @@
+// eslint-disable-next-line simple-import-sort/imports
+import { render, screen } from '../../../testUtils';
 import React from 'react';
 
-import { render, screen } from '../../../testUtils';
-import { InternalThemeProvider } from '../../styledSystem';
 import { Box, descriptors } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
 import { knownColors } from './testUtils';
+import { InternalThemeProvider } from '../../styledSystem';
 
 describe('Theme used in sx callback', () => {
   it('styles match the theme/globalAppearance', () => {

@@ -96,7 +96,6 @@ export const _ResetPassword = () => {
     <Card>
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
-        <Header.BackLink onClick={() => navigate('../')} />
         <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
       </Header.Root>
       <Col

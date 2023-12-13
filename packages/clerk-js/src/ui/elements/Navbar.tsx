@@ -2,7 +2,17 @@ import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared/react';
 import React, { useEffect } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../customizables';
+import {
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Heading,
+  Icon,
+  localizationKeys,
+  Text,
+  useLocalizations,
+} from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useNavigateToFlowStart, usePopover } from '../hooks';
 import { Menu } from '../icons';
@@ -12,6 +22,7 @@ import { animations, mqu } from '../styledSystem';
 import { colors, sleep } from '../utils';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
+import { PoweredByClerkTag } from './PoweredByClerk';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
 export const [NavbarContext, useNavbarContext, useUnsafeNavbarContext] =
@@ -34,6 +45,8 @@ export type NavbarRoute = {
 };
 type RouteId = NavbarRoute['id'];
 type NavBarProps = {
+  title: LocalizationKey;
+  description: LocalizationKey;
   contentRef: React.RefObject<HTMLDivElement>;
   routes: NavbarRoute[];
   header?: React.ReactNode;
@@ -42,7 +55,7 @@ type NavBarProps = {
 const getSectionId = (id: RouteId) => `#cl-section-${id}`;
 
 export const NavBar = (props: NavBarProps) => {
-  const { contentRef, routes, header } = props;
+  const { contentRef, title, description, routes, header } = props;
   const [activeId, setActiveId] = React.useState<RouteId>('');
   const { close } = useNavbarContext();
   const { navigate } = useRouter();
@@ -129,7 +142,10 @@ export const NavBar = (props: NavBarProps) => {
   }, [router.currentPath]);
 
   const items = (
-    <Col elementDescriptor={descriptors.navbarButtons}>
+    <Col
+      elementDescriptor={descriptors.navbarButtons}
+      sx={t => ({ gap: t.space.$0x5 })}
+    >
       {routes.map(r => (
         <NavButton
           key={r.id}
@@ -149,7 +165,10 @@ export const NavBar = (props: NavBarProps) => {
 
   return (
     <>
-      <NavbarContainer>
+      <NavbarContainer
+        title={title}
+        description={description}
+      >
         {header}
         {items}
       </NavbarContainer>
@@ -161,22 +180,41 @@ export const NavBar = (props: NavBarProps) => {
   );
 };
 
-const NavbarContainer = (props: React.PropsWithChildren<Record<never, never>>) => {
+const NavbarContainer = (
+  props: React.PropsWithChildren<{ title: LocalizationKey | string; description: LocalizationKey | string }>,
+) => {
+  const { title, description } = props;
   return (
     <Col
       elementDescriptor={descriptors.navbar}
       sx={t => ({
-        flex: `0 0 ${t.space.$60}`,
-        maxWidth: t.space.$60,
-        borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha300}`,
-        padding: `${t.space.$9x5} ${t.space.$6}`,
         [mqu.md]: {
           display: 'none',
         },
+        padding: `${t.space.$9} ${t.space.$6} ${t.space.$3} ${t.space.$6}`,
         color: t.colors.$colorText,
+        justifyContent: 'space-between',
       })}
     >
-      {props.children}
+      <Col sx={t => ({ gap: t.space.$6, flex: `0 0 ${t.space.$60}` })}>
+        <Col
+          sx={t => ({
+            gap: t.space.$0x5,
+          })}
+        >
+          <Heading
+            as='h1'
+            localizationKey={title}
+          />
+
+          <Text
+            colorScheme='neutral'
+            localizationKey={description}
+          />
+        </Col>
+        {props.children}
+      </Col>
+      <PoweredByClerkTag sx={{ justifyContent: 'start' }} />
     </Col>
   );
 };
@@ -233,9 +271,9 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
             borderTopRightRadius: t.radii.$lg,
             borderBottomRightRadius: t.radii.$lg,
             borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-            padding: `${t.space.$9x5} ${t.space.$6}`,
+            padding: `${t.space.$10} ${t.space.$6}`,
             animation: `${animations.navbarSlideIn} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-            boxShadow: t.shadows.$cardDropShadow,
+            boxShadow: t.shadows.$cardShadow,
           })}
         >
           {props.children}
@@ -257,14 +295,14 @@ const NavButton = (props: NavButtonProps) => {
   return (
     <Button
       variant='ghost'
-      colorScheme='neutral'
-      textVariant='buttonRegularMedium'
+      textVariant='buttonLarge'
+      size='md'
       isActive={isActive}
       {...rest}
       sx={t => ({
         gap: t.space.$4,
         justifyContent: 'flex-start',
-        backgroundColor: isActive ? t.colors.$blackAlpha50 : undefined,
+        backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
         opacity: isActive ? 1 : 0.6,
       })}
     >
@@ -305,7 +343,6 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
         onClick={open}
         size='xs'
         variant='ghost'
-        colorScheme='neutral'
         sx={t => ({
           color: t.colors.$colorText,
           gap: t.space.$1x5,

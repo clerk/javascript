@@ -21,7 +21,6 @@ export const AddBlockButton = (props: BlockButtonProps) => {
   const { leftIcon, ...rest } = props;
   return (
     <BlockButton
-      colorScheme='primary'
       {...rest}
       sx={theme => ({ justifyContent: 'flex-start', gap: theme.space.$2 })}
       leftIcon={

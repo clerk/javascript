@@ -119,6 +119,9 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
 export type ElementsConfig = {
   rootBox: WithOptions;
   card: WithOptions;
+  cardContent: WithOptions;
+  cardFooter: WithOptions;
+  cardFooterItem: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
@@ -128,9 +131,9 @@ export type ElementsConfig = {
   header: WithOptions;
   headerTitle: WithOptions;
   headerSubtitle: WithOptions;
-  headerBackRow: WithOptions;
-  headerBackLink: WithOptions;
-  headerBackIcon: WithOptions;
+
+  backRow: WithOptions;
+  backLink: WithOptions;
 
   main: WithOptions;
 
@@ -225,11 +228,10 @@ export type ElementsConfig = {
   userButtonPopoverCard: WithOptions;
   userButtonPopoverMain: WithOptions;
   userButtonPopoverUserPreview: WithOptions;
-  userButtonPopoverActions: WithOptions;
-  userButtonPopoverActionButton: WithOptions<'manageAccount' | 'signOut'>;
-  userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'signOut'>;
-  userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'signOut'>;
-  userButtonPopoverActionButtonText: WithOptions<'manageAccount' | 'signOut'>;
+  userButtonPopoverActions: WithOptions<'singleSession' | 'multiSession'>;
+  userButtonPopoverActionButton: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
+  userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
+  userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverFooter: WithOptions;
   userButtonPopoverFooterPages: WithOptions;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
@@ -271,6 +273,7 @@ export type ElementsConfig = {
   userPreviewAvatarContainer: WithOptions<UserPreviewId>;
   userPreviewAvatarBox: WithOptions<UserPreviewId>;
   userPreviewAvatarImage: WithOptions<UserPreviewId>;
+  userPreviewAvatarIcon: WithOptions<UserPreviewId>;
   userPreviewTextContainer: WithOptions<UserPreviewId>;
   userPreviewMainIdentifier: WithOptions<UserPreviewId>;
   userPreviewSecondaryIdentifier: WithOptions<UserPreviewId>;
@@ -395,6 +398,7 @@ export type ElementsConfig = {
   notificationBadge: WithOptions;
   button: WithOptions<never, LoadingState>;
   providerIcon: WithOptions<OAuthProvider | Web3Provider>;
+  spinner: WithOptions;
 };
 
 export type Elements = {

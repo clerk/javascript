@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.declarations.json",
-  "compilerOptions": {
-    "paths": {
-      "~ui/*": ["./ui.retheme/*"]
-    }
-  }
-}

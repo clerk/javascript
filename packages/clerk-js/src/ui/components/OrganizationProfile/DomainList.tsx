@@ -10,7 +10,7 @@ import React, { useMemo } from 'react';
 import { stripOrigin, toURL, trimLeadingSlash } from '../../../utils';
 import { useGate, withGate } from '../../common';
 import type { LocalizationKey } from '../../customizables';
-import { Box, Col, localizationKeys, Spinner } from '../../customizables';
+import { Box, Col, descriptors, localizationKeys, Spinner } from '../../customizables';
 import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
 import { useInView } from '../../hooks';
 import { useRouter } from '../../router';
@@ -35,7 +35,6 @@ const useMenuActions = (
   domainId: string,
 ): { label: LocalizationKey; onClick: () => Promise<unknown>; isDestructive?: boolean }[] => {
   const { isAuthorizedUser: canManageDomain } = useGate({ permission: 'org:sys_domains:manage' });
-
   const { navigate } = useRouter();
 
   const menuActions = [];
@@ -45,6 +44,7 @@ const useMenuActions = (
       label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify'),
       onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'verify')),
     });
+
     menuActions.push({
       label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove'),
       isDestructive: true,
@@ -144,7 +144,6 @@ export const DomainList = withGate(
             <ArrowBlockButton
               key={d.id}
               variant='ghost'
-              colorScheme='neutral'
               badge={!verificationStatus ? <EnrollmentBadge organizationDomain={d} /> : undefined}
               sx={t => ({
                 padding: `${t.space.$3} ${t.space.$4}`,
@@ -180,6 +179,7 @@ export const DomainList = withGate(
               <Spinner
                 size='sm'
                 colorScheme='primary'
+                elementDescriptor={descriptors.spinner}
               />
             </Box>
           </Box>

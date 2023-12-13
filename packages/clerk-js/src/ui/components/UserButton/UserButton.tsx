@@ -60,7 +60,7 @@ const UserButtonTopLevelIdentifier = () => {
   }
   return showName ? (
     <Text
-      variant='regularMedium'
+      variant='subtitle'
       elementDescriptor={descriptors.userButtonOuterIdentifier}
     >
       {getFullName(user) || getIdentifier(user)}

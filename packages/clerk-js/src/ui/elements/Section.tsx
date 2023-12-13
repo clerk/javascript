@@ -12,13 +12,18 @@ type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
 };
 
 export const ProfileSection = (props: ProfileSectionProps) => {
-  const { title, children, id, subtitle, ...rest } = props;
+  const { title, children, id, subtitle, sx, ...rest } = props;
   return (
     <Col
-      elementDescriptor={descriptors.profileSection}
-      elementId={descriptors.profileSection.setId(id)}
+      sx={[
+        t => ({
+          borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          padding: `${t.space.$4} 0`,
+          gap: t.space.$4,
+        }),
+        sx,
+      ]}
       {...rest}
-      gap={2}
     >
       <SectionHeader
         localizationKey={title}
@@ -27,22 +32,30 @@ export const ProfileSection = (props: ProfileSectionProps) => {
         textElementDescriptor={descriptors.profileSectionTitleText}
         textElementId={descriptors.profileSectionTitleText.setId(id)}
       />
-      {subtitle && (
-        <SectionSubHeader
-          localizationKey={subtitle}
-          elementDescriptor={descriptors.profileSectionSubtitle}
-          elementId={descriptors.profileSectionSubtitle.setId(id)}
-          textElementDescriptor={descriptors.profileSectionSubtitleText}
-          textElementId={descriptors.profileSectionSubtitleText.setId(id)}
-        />
-      )}
-      <Col
-        elementDescriptor={descriptors.profileSectionContent}
-        elementId={descriptors.profileSectionContent.setId(id)}
+      <Flex
+        align='center'
+        elementDescriptor={descriptors.profileSection}
+        elementId={descriptors.profileSection.setId(id)}
         gap={2}
       >
-        {children}
-      </Col>
+        {subtitle && (
+          <SectionSubHeader
+            localizationKey={subtitle}
+            elementDescriptor={descriptors.profileSectionSubtitle}
+            elementId={descriptors.profileSectionSubtitle.setId(id)}
+            textElementDescriptor={descriptors.profileSectionSubtitleText}
+            textElementId={descriptors.profileSectionSubtitleText.setId(id)}
+          />
+        )}
+        <Col
+          elementDescriptor={descriptors.profileSectionContent}
+          elementId={descriptors.profileSectionContent.setId(id)}
+          gap={2}
+          sx={{ width: '100%' }}
+        >
+          {children}
+        </Col>
+      </Flex>
     </Col>
   );
 };
@@ -56,13 +69,10 @@ type SectionHeaderProps = PropsOfComponent<typeof Flex> & {
 export const SectionHeader = (props: SectionHeaderProps) => {
   const { textElementDescriptor, textElementId, localizationKey, ...rest } = props;
   return (
-    <Flex
-      {...rest}
-      sx={theme => ({ borderBottom: `${theme.borders.$normal} ${theme.colors.$blackAlpha100}` })}
-    >
+    <Flex {...rest}>
       <Text
         localizationKey={localizationKey}
-        variant='largeMedium'
+        variant='h3'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
       />
@@ -78,7 +88,6 @@ export const SectionSubHeader = (props: SectionHeaderProps) => {
     >
       <Text
         localizationKey={localizationKey}
-        variant='regularRegular'
         colorScheme='neutral'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}

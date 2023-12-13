@@ -205,8 +205,6 @@ export const itIT: LocalizationResource = {
     start: {
       headerTitle__account: 'Account',
       headerTitle__security: 'Sicurezza',
-      headerSubtitle__account: 'Gestisci le informazioni del tuo account',
-      headerSubtitle__security: 'Gestisci le tue preferenze di sicurezza',
       profileSection: {
         title: 'Profilo',
       },
@@ -476,8 +474,6 @@ export const itIT: LocalizationResource = {
     start: {
       headerTitle__members: 'Membri',
       headerTitle__settings: 'Impostazioni',
-      headerSubtitle__members: "Consulta e gestisci i membri dell'organizzazione",
-      headerSubtitle__settings: "Gestisci le impostazioni dell'organizzazione",
     },
     profilePage: {
       title: "Profilo dell'organizzazione",

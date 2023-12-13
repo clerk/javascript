@@ -1,14 +1,30 @@
 import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
-import React from 'react';
+import type { Ref } from 'react';
+import React, { forwardRef, isValidElement } from 'react';
 
-import { Button, descriptors, Grid, Image, localizationKeys, useAppearance } from '../customizables';
-import { useEnabledThirdPartyProviders } from '../hooks';
+import type { LocalizationKey } from '../customizables';
+import {
+  Button,
+  descriptors,
+  Flex,
+  Grid,
+  Icon,
+  Image,
+  localizationKeys,
+  SimpleButton,
+  Spinner,
+  Text,
+  useAppearance,
+} from '../customizables';
+import { useEnabledThirdPartyProviders, useResizeObserver } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
-import { ArrowBlockButton } from './ArrowBlockButton';
 import { useCardState } from './contexts';
+import { distributeStrategiesIntoRows } from './utils';
 
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
+const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
+const MAX_STRATEGIES_PER_ROW = 6;
 
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
@@ -29,6 +45,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
+  const [firstStrategyRef, firstElementRect] = useResizeObserver();
 
   const strategies = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
@@ -38,6 +55,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   if (!strategies.length) {
     return null;
   }
+
+  const strategyRows = distributeStrategiesIntoRows([...strategies], MAX_STRATEGIES_PER_ROW);
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
@@ -63,112 +82,169 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   };
 
   const ButtonElement = preferBlockButtons ? SocialButtonBlock : SocialButtonIcon;
-  const WrapperElement = preferBlockButtons ? ButtonRows : ButtonGrid;
 
   return (
-    <WrapperElement>
-      {strategies.map(strategy => (
-        <ButtonElement
-          key={strategy}
-          id={strategyToDisplayData[strategy].id}
-          providerName={strategyToDisplayData[strategy].name}
-          onClick={startOauth(strategy)}
-          isLoading={card.loadingMetadata === strategy}
-          isDisabled={card.isLoading}
-          label={`Continue with ${strategyToDisplayData[strategy].name}`}
-          icon={
-            <Image
-              elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
-              elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
-              isLoading={card.loadingMetadata === strategy}
-              isDisabled={card.isLoading}
-              src={strategyToDisplayData[strategy].iconUrl}
-              alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-              sx={theme => ({ width: theme.sizes.$5, height: 'auto', maxWidth: '100%' })}
-            />
-          }
-        />
+    <Flex
+      direction='col'
+      gap={2}
+    >
+      {strategyRows.map((row, rowIndex) => (
+        <Grid
+          key={row.join('-')}
+          elementDescriptor={descriptors.socialButtons}
+          gap={2}
+          sx={{
+            // Allow the first row items to use the entire row's width, but the rest should have a fixed width based on the first row's items
+            gridTemplateColumns: `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
+            justifyContent: 'center',
+          }}
+        >
+          {row.map((strategy, strategyIndex) => {
+            const label =
+              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+                ? `Continue with ${strategyToDisplayData[strategy].name}`
+                : strategyToDisplayData[strategy].name;
+
+            const localizedText =
+              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+                ? localizationKeys('socialButtonsBlockButton', {
+                    provider: strategyToDisplayData[strategy].name,
+                  })
+                : undefined;
+
+            // When strategies break into 2 rows or more, use the first item of the first
+            // row as reference for the width of the buttons in the second row and beyond
+            const ref =
+              strategies.length > MAX_STRATEGIES_PER_ROW && rowIndex === 0 && strategyIndex === 0
+                ? firstStrategyRef
+                : null;
+
+            return (
+              <ButtonElement
+                key={strategy}
+                id={strategyToDisplayData[strategy].id}
+                ref={ref}
+                onClick={startOauth(strategy)}
+                isLoading={card.loadingMetadata === strategy}
+                isDisabled={card.isLoading}
+                label={label}
+                textLocalizationKey={localizedText}
+                icon={
+                  <Image
+                    elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
+                    elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
+                    isLoading={card.loadingMetadata === strategy}
+                    isDisabled={card.isLoading}
+                    src={strategyToDisplayData[strategy].iconUrl}
+                    alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                    sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
+                  />
+                }
+              />
+            );
+          })}
+        </Grid>
       ))}
-    </WrapperElement>
+    </Flex>
   );
 });
-
-const ButtonGrid = (props: React.PropsWithChildren<any>) => {
-  return (
-    <Grid
-      elementDescriptor={descriptors.socialButtons}
-      gap={2}
-      sx={t => ({
-        gridTemplateColumns: `repeat(auto-fit, minmax(${t.sizes.$12}, 1fr))`,
-        gridAutoRows: t.sizes.$12,
-      })}
-    >
-      {props.children}
-    </Grid>
-  );
-};
-
-const ButtonRows = (props: React.PropsWithChildren<any>) => {
-  return (
-    <Grid
-      elementDescriptor={descriptors.socialButtons}
-      columns={1}
-      gap={2}
-    >
-      {props.children}
-    </Grid>
-  );
-};
 
 type SocialButtonProps = PropsOfComponent<typeof Button> & {
   icon: React.ReactElement;
   id: OAuthProvider | Web3Provider;
-  providerName: string;
+  textLocalizationKey: LocalizationKey | undefined;
   label?: string;
 };
 
-const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
-  const { icon, label, id, providerName, ...rest } = props;
+const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButtonElement> | null): JSX.Element => {
+  const { icon, label, id, textLocalizationKey, ...rest } = props;
+
   return (
     <Button
+      ref={ref}
       elementDescriptor={descriptors.socialButtonsIconButton}
       elementId={descriptors.socialButtonsIconButton.setId(id)}
-      variant='icon'
-      colorScheme='neutral'
+      variant='secondary'
       sx={t => ({
-        padding: 0,
-        borderColor: t.colors.$blackAlpha200,
+        minHeight: t.sizes.$8,
+        width: '100%',
       })}
       {...rest}
     >
       {icon}
     </Button>
   );
-};
+});
 
 const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
-  const { label, id, providerName, sx, icon, ...rest } = props;
+  const { id, icon, isLoading, label, textLocalizationKey, ...rest } = props;
+  const isIconElement = isValidElement(icon);
 
   return (
-    <ArrowBlockButton
+    <SimpleButton
       elementDescriptor={descriptors.socialButtonsBlockButton}
       elementId={descriptors.socialButtonsBlockButton.setId(id)}
-      textElementDescriptor={descriptors.socialButtonsBlockButtonText}
-      textElementId={descriptors.socialButtonsBlockButtonText.setId(id)}
-      textLocalizationKey={localizationKeys('socialButtonsBlockButton', { provider: providerName })}
-      arrowElementDescriptor={descriptors.socialButtonsBlockButtonArrow}
-      arrowElementId={descriptors.socialButtonsBlockButtonArrow.setId(id)}
-      leftIcon={icon}
-      sx={[
-        {
-          textOverflow: 'ellipsis',
-          overflow: 'hidden',
-        },
-        sx,
-      ]}
+      variant='secondary'
+      block
+      isLoading={isLoading}
       {...rest}
+      sx={theme => [
+        {
+          gap: theme.space.$4,
+          position: 'relative',
+          justifyContent: 'flex-start',
+          borderColor: theme.colors.$blackAlpha200,
+        },
+        props.sx,
+      ]}
     >
-      {label}
-    </ArrowBlockButton>
+      <Flex
+        justify='center'
+        align='center'
+        gap={3}
+        sx={{
+          width: '100%',
+          overflow: 'hidden',
+        }}
+      >
+        {(isLoading || icon) && (
+          <Flex
+            as='span'
+            center
+            sx={theme => ({ flex: `0 0 ${theme.space.$4}` })}
+          >
+            {isLoading ? (
+              <Spinner
+                size='sm'
+                elementDescriptor={descriptors.spinner}
+              />
+            ) : !isIconElement && icon ? (
+              <Icon
+                icon={icon as unknown as React.ComponentType}
+                sx={[
+                  theme => ({
+                    color: theme.colors.$blackAlpha600,
+                    width: theme.sizes.$4,
+                    position: 'absolute',
+                  }),
+                ]}
+              />
+            ) : (
+              icon
+            )}
+          </Flex>
+        )}
+        <Text
+          elementDescriptor={descriptors.socialButtonsBlockButtonText}
+          elementId={descriptors.socialButtonsBlockButtonText.setId(id)}
+          as='span'
+          truncate
+          variant='buttonSmall'
+          localizationKey={textLocalizationKey}
+        >
+          {label}
+        </Text>
+      </Flex>
+    </SimpleButton>
   );
 };

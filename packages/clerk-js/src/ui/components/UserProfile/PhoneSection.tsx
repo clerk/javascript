@@ -66,17 +66,11 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
       title={formattedPhone}
       badge={
         <>
-          {isPrimary && (
-            <Badge
-              localizationKey={localizationKeys('badge__primary')}
-              textVariant={'extraSmallMedium'}
-            />
-          )}
+          {isPrimary && <Badge localizationKey={localizationKeys('badge__primary')} />}
           {!isVerified && (
             <Badge
               localizationKey={localizationKeys('badge__unverified')}
               colorScheme='danger'
-              textVariant={'extraSmallMedium'}
             />
           )}
         </>
@@ -117,7 +111,7 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
           title={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionTitle')}
           subtitle={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionSubtitle')}
           actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction')}
-          colorScheme='danger'
+          variant='linkDanger'
           onClick={() => navigate(`phone-number/${phone.id}/remove`)}
         />
       </Col>

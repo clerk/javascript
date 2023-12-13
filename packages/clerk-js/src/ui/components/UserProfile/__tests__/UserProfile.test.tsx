@@ -2,7 +2,8 @@ import type { CustomPage } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { render, screen } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { UserProfile } from '../UserProfile';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

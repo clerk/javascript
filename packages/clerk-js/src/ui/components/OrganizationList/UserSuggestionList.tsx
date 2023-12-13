@@ -24,7 +24,6 @@ export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResou
   if (props.status === 'accepted') {
     return (
       <Text
-        variant='smallRegular'
         colorScheme='neutral'
         localizationKey={localizationKeys('organizationList.suggestionsAcceptedLabel')}
       />

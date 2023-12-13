@@ -201,7 +201,7 @@ const hwbTupleToRgbTuple = (hwb: ColorTuple): ColorTuple => {
       b = n;
       break;
   }
-  // eslint-enable max-statements-per-line, no-multi-spaces
+  /* eslint-enable max-statements-per-line,no-multi-spaces */
 
   return [r * 255, g * 255, b * 255, a];
 };
@@ -227,7 +227,7 @@ const rgbaTupleToHslaColor = (rgb: ColorTuple): HslaColor => {
     h = 4 + (r - g) / delta;
   }
 
-  // @ts-expect-error - TODO: fix this, h could be undefined
+  // @ts-ignore
   h = Math.min(h * 60, 360);
 
   if (h < 0) {

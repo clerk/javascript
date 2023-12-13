@@ -73,12 +73,12 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
       <Text
         colorScheme='neutral'
         elementDescriptor={descriptors.impersonationFabTitle}
-        variant='regularMedium'
+        variant='buttonLarge'
         truncate
         localizationKey={title}
       />
       <Link
-        variant='regularMedium'
+        variant='buttonLarge'
         elementDescriptor={descriptors.impersonationFabActionLink}
         sx={t => ({
           alignSelf: 'flex-start',

@@ -106,7 +106,7 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
 
           <FormButtonContainer sx={{ marginTop: 0 }}>
             <Button
-              textVariant='buttonExtraSmallBold'
+              textVariant='buttonSmall'
               onClick={onContinue}
               localizationKey={localizationKeys('userProfile.formButtonPrimary__continue')}
               elementDescriptor={descriptors.formButtonPrimary}

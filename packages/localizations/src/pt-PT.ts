@@ -242,8 +242,6 @@ export const ptBR: LocalizationResource = {
     start: {
       headerTitle__account: 'Conta',
       headerTitle__security: 'Segurança',
-      headerSubtitle__account: 'Configurar as informações da conta',
-      headerSubtitle__security: 'Configurar as preferências de segurança',
       profileSection: {
         title: 'Perfil',
       },
@@ -539,8 +537,6 @@ export const ptBR: LocalizationResource = {
     start: {
       headerTitle__members: 'Membros',
       headerTitle__settings: 'Configurações',
-      headerSubtitle__members: 'Veja e configure os membros da organização',
-      headerSubtitle__settings: 'Configure as configurações da organização',
     },
     profilePage: {
       title: 'Perfil da organização',

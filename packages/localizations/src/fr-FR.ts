@@ -238,8 +238,6 @@ export const frFR: LocalizationResource = {
     start: {
       headerTitle__account: 'Compte',
       headerTitle__security: 'Sécurité',
-      headerSubtitle__account: 'Gérer les informations de votre compte',
-      headerSubtitle__security: 'Gérer vos préférences de sécurité',
       profileSection: {
         title: 'Profil',
       },
@@ -529,8 +527,6 @@ export const frFR: LocalizationResource = {
     start: {
       headerTitle__members: 'Membres',
       headerTitle__settings: 'Réglages',
-      headerSubtitle__members: "Afficher et gérer les membres de l'organisation",
-      headerSubtitle__settings: "Gérer les paramètres de l'organisation",
     },
     profilePage: {
       title: 'Profil de l’organisation',

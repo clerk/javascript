@@ -25,14 +25,7 @@ export const PasswordSection = () => {
       title={localizationKeys('userProfile.start.passwordSection.title')}
       id='password'
     >
-      {passwordEnabled && (
-        <Text
-          variant='smallRegular'
-          sx={t => ({ padding: `${t.space.$2} ${t.space.$4}` })}
-        >
-          ••••••••••
-        </Text>
-      )}
+      {passwordEnabled && <Text sx={t => ({ padding: `${t.space.$2} ${t.space.$4}` })}>••••••••••</Text>}
       <AddBlockButton
         id='password'
         onClick={navigateToPage}

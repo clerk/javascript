@@ -206,8 +206,6 @@ export const svSE: LocalizationResource = {
     start: {
       headerTitle__account: 'Konto',
       headerTitle__security: 'Säkerhet',
-      headerSubtitle__account: 'Hantera din kontoinformation',
-      headerSubtitle__security: 'Hantera dina säkerhetsinställningar',
       profileSection: {
         title: 'Profil',
       },
@@ -485,8 +483,6 @@ export const svSE: LocalizationResource = {
     start: {
       headerTitle__members: 'Medlemmar',
       headerTitle__settings: 'Inställningar',
-      headerSubtitle__members: 'Visa och hantera organisationsmedlemmar',
-      headerSubtitle__settings: 'Hantera organisationsinställningar',
     },
     profilePage: {
       title: 'Organisationsprofil',

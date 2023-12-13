@@ -4,7 +4,9 @@ import { describe, it, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { act, bindCreateFixtures, render, runFakeTimers, screen } from '../../../../testUtils';
+import { act, render, screen } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');

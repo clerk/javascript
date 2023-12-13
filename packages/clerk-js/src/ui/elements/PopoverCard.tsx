@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
-import { descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../customizables';
+import { Col, descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations } from '../styledSystem';
 import { BaseCard } from './Card';
-import { PoweredByClerkText } from './PoweredByClerk';
+import { PoweredByClerkTag } from './PoweredByClerk';
 
 const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof BaseCard>>((props, ref) => {
   return (
@@ -14,11 +14,11 @@ const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof
         {...props}
         ref={ref}
         sx={t => ({
-          padding: `${t.space.$6} 0`,
           width: t.sizes.$94,
           maxWidth: `calc(100vw - ${t.sizes.$8})`,
           zIndex: t.zIndices.$modal,
           animation: `${animations.dropdownSlideInScaleAndFade} 140ms `,
+          border: `1px solid ${t.colors.$blackAlpha200}`,
         })}
       >
         {props.children}
@@ -32,7 +32,7 @@ const PopoverCardMain = (props: PropsOfComponent<typeof Flex>) => {
   return (
     <Flex
       direction='col'
-      sx={sx}
+      sx={[t => ({ backgroundColor: t.colors.$colorBackground, borderRadius: t.radii.$lg, overflow: 'hidden' }), sx]}
       {...rest}
     >
       {props.children}
@@ -41,7 +41,7 @@ const PopoverCardMain = (props: PropsOfComponent<typeof Flex>) => {
 };
 
 const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
-  const { sx, ...rest } = props;
+  const { sx, children, ...rest } = props;
   const { branded } = useEnvironment().displayConfig;
   const { privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
   const shouldShow = branded || privacyPageUrl || termsPageUrl;
@@ -51,23 +51,24 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
   }
 
   return (
-    <Flex
+    <Col
       justify='between'
       sx={[
-        theme => ({
-          padding: `${theme.space.$6}`,
-          paddingBottom: 0,
+        {
+          borderBottomLeftRadius: 'inherit',
+          borderBottomRightRadius: 'inherit',
           '&:empty': {
             padding: '0',
           },
-        }),
+        },
         sx,
       ]}
       {...rest}
     >
-      <PoweredByClerkText />
+      {children}
+      <PoweredByClerkTag sx={t => ({ padding: `${t.space.$4} 0` })} />
       <PopoverCardLinks />
-    </Flex>
+    </Col>
   );
 };
 
@@ -76,7 +77,6 @@ const PopoverCardLink = (props: PropsOfComponent<typeof Link>) => {
     <Link
       colorScheme='neutral'
       isExternal
-      size='xss'
       {...props}
     />
   );

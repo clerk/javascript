@@ -2,7 +2,8 @@ import type { SessionWithActivitiesResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 
-import { bindCreateFixtures, render, screen, waitFor } from '../../../../testUtils';
+import { render, screen, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { RootPage } from '../RootPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

@@ -50,17 +50,11 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
       title={email.emailAddress}
       badge={
         <>
-          {isPrimary && (
-            <Badge
-              localizationKey={localizationKeys('badge__primary')}
-              textVariant={'extraSmallMedium'}
-            />
-          )}
+          {isPrimary && <Badge localizationKey={localizationKeys('badge__primary')} />}
           {!isVerified && (
             <Badge
               localizationKey={localizationKeys('badge__unverified')}
               colorScheme='danger'
-              textVariant={'extraSmallMedium'}
             />
           )}
         </>
@@ -101,7 +95,7 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
           title={localizationKeys('userProfile.start.emailAddressesSection.destructiveActionTitle')}
           subtitle={localizationKeys('userProfile.start.emailAddressesSection.destructiveActionSubtitle')}
           actionLabel={localizationKeys('userProfile.start.emailAddressesSection.destructiveAction')}
-          colorScheme='danger'
+          variant='linkDanger'
           onClick={() => navigate(`email-address/${email.id}/remove`)}
         />
       </Col>

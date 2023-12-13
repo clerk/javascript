@@ -92,12 +92,11 @@ export const VerificationLink = (props: VerificationLinkProps) => {
         <Text
           localizationKey={props.formTitle}
           elementDescriptor={descriptors.formHeaderTitle}
-          variant='smallMedium'
+          variant='subtitle'
         />
         <Text
           localizationKey={props.formSubtitle}
           elementDescriptor={descriptors.formHeaderSubtitle}
-          variant='smallRegular'
           colorScheme='neutral'
         />
       </Col>

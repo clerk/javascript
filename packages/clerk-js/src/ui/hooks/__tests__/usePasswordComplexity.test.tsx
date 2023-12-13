@@ -1,4 +1,5 @@
-import { act, bindCreateFixtures, renderHook } from '../../../testUtils';
+import { act, renderHook } from '../../../testUtils';
+import { bindCreateFixtures } from '../../utils/test/createFixtures';
 import { usePasswordComplexity } from '../usePasswordComplexity';
 
 const { createFixtures } = bindCreateFixtures('SignIn');

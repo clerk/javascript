@@ -1,6 +1,7 @@
 import { describe, it } from '@jest/globals';
 
-import { bindCreateFixtures, render } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignInAccountSwitcher } from '../SignInAccountSwitcher';
 
 const { createFixtures } = bindCreateFixtures('SignIn');

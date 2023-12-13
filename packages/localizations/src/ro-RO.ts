@@ -250,8 +250,6 @@ export const roRO: LocalizationResource = {
     start: {
       headerTitle__account: 'Cont',
       headerTitle__security: 'Securitate',
-      headerSubtitle__account: 'Gestionați informațiile contului dvs',
-      headerSubtitle__security: 'Gestionați-vă preferințele de securitate',
       profileSection: {
         title: 'Profil',
       },
@@ -554,8 +552,6 @@ export const roRO: LocalizationResource = {
     start: {
       headerTitle__members: 'Membri',
       headerTitle__settings: 'Setări',
-      headerSubtitle__members: 'Vizualizați și gestionați membrii organizației',
-      headerSubtitle__settings: 'Gestionați setările organizației',
     },
     profilePage: {
       title: 'Profilul organizației',

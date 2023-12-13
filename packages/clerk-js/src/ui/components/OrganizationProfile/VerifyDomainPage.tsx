@@ -115,6 +115,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
         <Spinner
           size={'lg'}
           colorScheme={'primary'}
+          elementDescriptor={descriptors.spinner}
         />
       </Flex>
     );
@@ -158,7 +159,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
             elementDescriptor={descriptors.formButtonReset}
             block={false}
             variant='ghost'
-            textVariant='buttonExtraSmallBold'
+            textVariant='buttonSmall'
             type='reset'
             isDisabled={otp.isLoading || otp.otpControl.otpInputProps.feedbackType === 'success'}
             onClick={() => {

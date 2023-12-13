@@ -1,4 +1,4 @@
-import { bindCreateFixtures, render, renderHook, screen } from '../../../testUtils';
+import { render, renderHook, screen } from '../../../testUtils';
 import {
   Badge,
   Button,
@@ -11,6 +11,7 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
+import { bindCreateFixtures } from '../../utils/test/createFixtures';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 

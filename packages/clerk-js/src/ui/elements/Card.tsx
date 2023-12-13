@@ -12,10 +12,13 @@ import { IconButton } from './IconButton';
 import { useUnsafeModalContext } from './Modal';
 import { PoweredByClerkTag } from './PoweredByClerk';
 
-type CardProps = PropsOfComponent<typeof BaseCard> & React.PropsWithChildren<Record<never, never>>;
+type CardProps = PropsOfComponent<typeof BaseCard> &
+  React.PropsWithChildren<{
+    footerItems?: React.ReactNode[];
+  }>;
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
-  const { sx, children, ...rest } = props;
+  const { sx, children, footerItems, ...rest } = props;
   const appearance = useAppearance();
   const flowMetadata = useFlowMetadata();
   const { branded } = useEnvironment().displayConfig;
@@ -25,7 +28,6 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
       {appearance.parsedLayout.logoPlacement === 'outside' && (
         <ApplicationLogo
           sx={t => ({
-            margin: branded ? `0 ${t.space.$7} ${t.space.$8} ${t.space.$7}` : undefined,
             [mqu.sm]: {
               margin: `0 0 ${t.space.$7} 0`,
             },
@@ -33,31 +35,41 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
         />
       )}
       <BaseCard
-        elementDescriptor={descriptors.card}
         className={generateFlowPartClassname(flowMetadata)}
-        gap={8}
-        {...rest}
-        sx={[
-          t => ({
-            width: t.sizes.$100,
-            maxWidth: `calc(100vw - ${t.sizes.$20})`,
-            margin: branded ? `0 ${t.space.$7}` : undefined,
-            [mqu.sm]: {
-              maxWidth: `calc(100vw - ${t.sizes.$3})`,
-              margin: branded ? `0 0 ${t.space.$7} 0` : '0',
-            },
-            padding: `${t.space.$9x5} ${t.space.$8} ${t.space.$12} ${t.space.$8}`,
-            [mqu.xs]: {
-              padding: `${t.space.$8} ${t.space.$5} ${t.space.$10} ${t.space.$5}`,
-            },
-          }),
-          sx,
-        ]}
         ref={ref}
       >
-        {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo />}
-        {children}
-        {branded && <PoweredByClerkTag />}
+        <Flex
+          elementDescriptor={descriptors.cardContent}
+          direction='col'
+          gap={8}
+          sx={[
+            t => ({
+              zIndex: t.zIndices.$card,
+              position: 'relative',
+              backgroundColor: t.colors.$colorBackground,
+              padding: t.space.$8,
+              boxShadow: t.shadows.$cardShadow,
+              maxWidth: `calc(100vw - ${t.sizes.$20})`,
+              width: t.sizes.$100,
+              borderRadius: `${t.radii.$card} ${t.radii.$card} ${t.radii.$lg} ${t.radii.$lg}`,
+            }),
+            sx,
+          ]}
+          {...rest}
+        >
+          {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo />}
+          {children}
+        </Flex>
+        <CardFooter>
+          {footerItems?.map((item, index) => (
+            <CardFooterItem key={index}>{item}</CardFooterItem>
+          ))}
+          {branded && (
+            <CardFooterItem>
+              <PoweredByClerkTag />
+            </CardFooterItem>
+          )}
+        </CardFooter>
       </BaseCard>
     </>
   );
@@ -65,28 +77,19 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
 
 export const ProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const { sx, children, ...rest } = props;
-  const { branded } = useEnvironment().displayConfig;
   return (
     <BaseCard
-      direction='row'
+      ref={ref}
       sx={[
         t => ({
-          padding: 0,
           width: t.sizes.$220,
           maxWidth: `calc(100vw - ${t.sizes.$20})`,
-          margin: branded ? `0 ${t.space.$7}` : undefined,
-          [mqu.sm]: {
-            maxWidth: `calc(100vw - ${t.sizes.$3})`,
-            margin: branded ? `0 0 ${t.space.$7} 0` : '0',
-          },
         }),
         sx,
       ]}
       {...rest}
-      ref={ref}
     >
       {children}
-      {branded && <PoweredByClerkTag />}
     </BaseCard>
   );
 });
@@ -106,13 +109,15 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
       elementDescriptor={[descriptors.card, props.elementDescriptor as ElementDescriptor]}
       sx={[
         t => ({
+          background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+          overflow: 'hidden',
           willChange: 'transform, opacity, height',
-          borderRadius: t.radii.$xl,
-          backgroundColor: t.colors.$colorBackground,
           transitionProperty: t.transitionProperty.$common,
           transitionDuration: '200ms',
-          boxShadow: t.shadows.$cardDropShadow,
-          border: '1px solid transparent',
+          borderRadius: t.radii.$xl,
+          boxShadow:
+            '0px 5px 15px 0px rgba(0, 0, 0, 0.08), 0px 15px 35px -5px rgba(25, 28, 33, 0.20), 0px 0px 0px 1px rgba(25, 28, 33, 0.06)',
+          backdropFilter: 'blur(10px)',
         }),
         sx,
       ]}
@@ -122,7 +127,6 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
         <IconButton
           elementDescriptor={descriptors.modalCloseButton}
           variant='ghost'
-          colorScheme='neutral'
           aria-label='Close modal'
           onClick={toggle}
           icon={
@@ -132,19 +136,64 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
             />
           }
           sx={t => ({
+            color: t.colors.$colorTextTertiary,
             zIndex: t.zIndices.$modal,
-            opacity: t.opacity.$inactive,
-            ':hover': {
-              opacity: 0.8,
-            },
             position: 'absolute',
-            top: t.space.$3,
+            top: t.space.$none,
+            right: t.space.$none,
             padding: t.space.$3,
-            right: t.space.$3,
           })}
         />
       )}
       {children}
     </Flex>
+  );
+});
+
+type CardFooterProps = PropsOfComponent<typeof Flex>;
+export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((props, ref) => {
+  return (
+    <Flex
+      direction='col'
+      align='center'
+      justify='center'
+      elementDescriptor={descriptors.cardFooter}
+      sx={t => ({
+        '>:first-of-type': {
+          padding: `${t.space.$6} ${t.space.$2} ${t.space.$4} ${t.space.$2}`,
+          marginTop: `-${t.space.$2}`,
+        },
+        '>:not(:first-of-type)': {
+          padding: `${t.space.$4} ${t.space.$2}`,
+          borderTop: t.borders.$normal,
+          borderColor: t.colors.$blackAlpha100,
+        },
+      })}
+      {...props}
+      ref={ref}
+    />
+  );
+});
+
+type CardFooterItemProps = PropsOfComponent<typeof Flex>;
+export const CardFooterItem = React.forwardRef<HTMLDivElement, CardFooterItemProps>((props, ref) => {
+  const { sx, ...rest } = props;
+
+  return (
+    <Flex
+      align='center'
+      justify='center'
+      elementDescriptor={descriptors.cardFooterItem}
+      sx={[
+        sx,
+        t => ({
+          position: 'relative',
+          width: '100%',
+          backgroundColor: t.colors.$blackAlpha50,
+        }),
+      ]}
+      {...rest}
+      ref={ref}
+    />
   );
 });

@@ -189,12 +189,7 @@ const TagPill = (props: TagPillProps) => {
         overflow: 'hidden',
       })}
     >
-      <Text
-        variant={'smallRegular'}
-        truncate
-      >
-        {children}
-      </Text>
+      <Text truncate>{children}</Text>
       <Icon
         elementDescriptor={descriptors.tagPillIcon}
         size='sm'

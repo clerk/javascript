@@ -5,6 +5,7 @@ import { useGate } from '../../common';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
 import { Breadcrumbs, NavBar, NavbarContextProvider, OrganizationPreview } from '../../elements';
+import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
 
 export const OrganizationProfileNavbar = (
@@ -27,6 +28,8 @@ export const OrganizationProfileNavbar = (
   return (
     <NavbarContextProvider>
       <NavBar
+        title={localizationKeys('organizationProfile.navbar.title')}
+        description={localizationKeys('organizationProfile.navbar.description')}
         header={
           <OrganizationPreview
             size='sm'

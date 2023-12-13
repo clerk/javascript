@@ -235,8 +235,6 @@ export const zhTW: LocalizationResource = {
     start: {
       headerTitle__account: '帳戶',
       headerTitle__security: '安全',
-      headerSubtitle__account: '管理您的帳戶資訊',
-      headerSubtitle__security: '管理您的安全設定',
       profileSection: {
         title: '個人資料',
       },
@@ -510,8 +508,6 @@ export const zhTW: LocalizationResource = {
     start: {
       headerTitle__members: '成員',
       headerTitle__settings: '設置',
-      headerSubtitle__members: '查看並管理組織成員',
-      headerSubtitle__settings: '管理組織設置',
     },
     profilePage: {
       title: '組織簡介',

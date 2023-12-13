@@ -8,7 +8,7 @@ import type {
 import { CalloutWithAction, useGate } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Col, Flex, localizationKeys, Spinner, Text } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -189,6 +189,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
         <Spinner
           size={'lg'}
           colorScheme={'primary'}
+          elementDescriptor={descriptors.spinner}
         />
       </Flex>
     );
@@ -235,13 +236,9 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                       <Text
                         key={index}
                         as={'span'}
-                        sx={[
-                          t => ({
-                            lineHeight: t.lineHeights.$short,
-                            color: 'inherit',
-                            display: 'block',
-                          }),
-                        ]}
+                        sx={{
+                          display: 'block',
+                        }}
                         localizationKey={label}
                       />
                     ))}
@@ -250,7 +247,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                 <Header.Root>
                   <Header.Subtitle
                     localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
-                    variant='regularRegular'
+                    variant='subtitle'
                   />
                 </Header.Root>
                 <Form.Root
@@ -288,13 +285,9 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                       <Text
                         key={index}
                         as={'span'}
-                        sx={[
-                          t => ({
-                            lineHeight: t.lineHeights.$short,
-                            color: 'inherit',
-                            display: 'block',
-                          }),
-                        ]}
+                        sx={{
+                          display: 'block',
+                        }}
                         localizationKey={label}
                       />
                     ))}
@@ -311,7 +304,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                     actionLabel={localizationKeys(
                       'organizationProfile.verifiedDomainPage.dangerTab.removeDomainActionLabel__remove',
                     )}
-                    colorScheme='danger'
+                    variant='linkDanger'
                     onClick={() => navigate(`../../domain/${domain.id}/remove`)}
                   />
                 </Col>

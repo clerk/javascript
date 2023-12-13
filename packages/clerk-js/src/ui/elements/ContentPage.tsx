@@ -47,11 +47,11 @@ export const ContentPage = (props: PageProps) => {
         <Header.Title
           // TODO: Align them between user profile and org profile
           localizationKey={headerTitle}
-          textVariant={headerTitleTextVariant || 'xxlargeMedium'}
+          textVariant={headerTitleTextVariant || 'h1'}
         />
         {headerSubtitle && (
           <Header.Subtitle
-            variant={headerSubtitleTextVariant || 'regularRegular'}
+            variant={headerSubtitleTextVariant || 'subtitle'}
             localizationKey={headerSubtitle}
           />
         )}

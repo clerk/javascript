@@ -18,7 +18,6 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   variants: {
     variant: common.textVariants(theme),
-    size: common.fontSizeVariants(theme),
     colorScheme: {
       primary: {
         color: theme.colors.$primary500,
@@ -38,7 +37,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   defaultVariants: {
     colorScheme: 'primary',
-    variant: 'smallRegular',
+    variant: 'body',
   },
 }));
 
@@ -66,7 +65,7 @@ export const Link = (props: LinkProps): JSX.Element => {
       href={href || ''}
       target={href && isExternal ? '_blank' : undefined}
       rel={href && isExternal ? 'noopener' : undefined}
-      css={applyVariants(props)}
+      css={applyVariants(props) as any}
     >
       {children}
     </a>

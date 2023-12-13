@@ -31,7 +31,7 @@ export const MfaTOTPAccordion = () => {
           title={localizationKeys('userProfile.start.mfaSection.totp.destructiveActionTitle')}
           subtitle={localizationKeys('userProfile.start.mfaSection.totp.destructiveActionSubtitle')}
           actionLabel={localizationKeys('userProfile.start.mfaSection.totp.destructiveActionLabel')}
-          colorScheme='danger'
+          variant='linkDanger'
           onClick={() => navigate(`multi-factor/totp/remove`)}
         />
       </Col>
