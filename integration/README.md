@@ -261,7 +261,7 @@ If you need to run a test suite inside a different environment (e.g. a different
    ```ts
    const yourConciseName = environmentConfig()
      .setId('yourConciseName')
-     .setEnvVariable('private', 'CLERK_API_URL', process.env.E2E_APP_CLERK_API_URL)
+     .setEnvVariable('private', 'CLERK_API_URL', process.env.E2E_APP_STAGING_CLERK_API_URL)
      .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['your-concise-name'].sk)
      .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['your-concise-name'].pk)
      .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
@@ -458,7 +458,7 @@ Inside [`presets/envs.ts`](../integration/presets/envs.ts) you can also create a
 ```ts
 const withCustomRoles = environmentConfig()
   .setId('withCustomRoles')
-  .setEnvVariable('private', 'CLERK_API_URL', process.env.E2E_APP_CLERK_API_URL)
+  .setEnvVariable('private', 'CLERK_API_URL', process.env.E2E_APP_STAGING_CLERK_API_URL)
   .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-custom-roles'].sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-custom-roles'].pk)
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')

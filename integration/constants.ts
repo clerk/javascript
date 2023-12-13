@@ -54,4 +54,12 @@ export const constants = {
    * The version of the dependency to use, controlled programmatically.
    */
   E2E_CLERK_VERSION: process.env.E2E_CLERK_VERSION,
+  /**
+   * The staging BAPI url
+   */
+  E2E_APP_STAGING_CLERK_API_URL: process.env.E2E_APP_STAGING_CLERK_API_URL,
+  /**
+   * PK and SK pairs from the env to use for integration tests.
+   */
+  INTEGRATION_INSTANCE_KEYS: process.env.INTEGRATION_INSTANCE_KEYS,
 } as const;
