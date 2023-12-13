@@ -1,4 +1,4 @@
-import type { AuthenticateRequestOptions, AuthObject, Clerk, SignedInAuthObject } from '@clerk/backend';
+import type { AuthenticateRequestOptions, AuthObject, createClerkClient, SignedInAuthObject } from '@clerk/backend';
 import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { NextFunction, Request, Response } from 'express';
 import type { IncomingMessage } from 'http';
@@ -36,7 +36,7 @@ export type ClerkMiddlewareOptions = {
   signInUrl?: string;
 } & MultiDomainAndOrProxy;
 
-export type ClerkClient = ReturnType<typeof Clerk>;
+export type ClerkClient = ReturnType<typeof createClerkClient>;
 
 export type AuthenticateRequestParams = {
   clerkClient: ClerkClient;

@@ -19,8 +19,8 @@ type GetInvitationListParams = {
    * @example
    * get all revoked invitations
    *
-   * import { Clerk } from '@clerk/backend';
-   * const clerkClient = Clerk(...)
+   * import { createClerkClient } from '@clerk/backend';
+   * const clerkClient = createClerkClient(...)
    * await clerkClient.invitations.getInvitationList({ status: 'revoked })
    *
    */

@@ -1,5 +1,5 @@
 import type { RequestState } from '@clerk/backend';
-import { buildRequestUrl, Clerk } from '@clerk/backend';
+import { buildRequestUrl, createClerkClient } from '@clerk/backend';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
@@ -10,9 +10,6 @@ import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMis
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 
-/**
- * @internal
- */
 export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<RequestState> {
   const { request, context } = args;
   const { loadSession, loadUser, loadOrganization } = opts;
@@ -73,7 +70,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
-  return Clerk({ apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({
+  return createClerkClient({ apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest(request, {
     audience,
     secretKey,
     jwtKey,
@@ -89,6 +86,5 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
-    request,
   });
 }

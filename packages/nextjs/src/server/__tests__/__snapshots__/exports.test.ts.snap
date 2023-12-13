@@ -4,7 +4,6 @@ exports[`/server public exports should not include a breaking change 1`] = `
 [
   "AllowlistIdentifier",
   "AuthStatus",
-  "Clerk",
   "Client",
   "DeletedObject",
   "Email",
@@ -43,7 +42,6 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "deserialize",
   "getAuth",
   "hasValidSignature",
-  "loadInterstitialFromLocal",
   "makeAuthObjectSerializable",
   "prunePrivateMetadata",
   "redirect",

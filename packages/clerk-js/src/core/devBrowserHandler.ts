@@ -14,7 +14,7 @@ export interface DevBrowserHandler {
 
   setup(): Promise<void>;
 
-  getDevBrowserJWT(): string | null;
+  getDevBrowserJWT(): string | undefined;
 
   setDevBrowserJWT(jwt: string): void;
 
@@ -39,11 +39,10 @@ export function createDevBrowserHandler({
   let usesUrlBasedSessionSyncing = true;
 
   function getDevBrowserJWT() {
-    return localStorage.getItem(key);
+    return cookieHandler.getDevBrowserCookie();
   }
 
   function setDevBrowserJWT(jwt: string) {
-    localStorage.setItem(key, jwt);
     // Append dev browser JWT to cookies, because server-side redirects (e.g. middleware) has no access to local storage
     cookieHandler.setDevBrowserCookie(jwt);
   }
@@ -116,7 +115,7 @@ export function createDevBrowserHandler({
     }
 
     // 2. If no JWT is found in the first step, check if a JWT is already available in the local cache
-    if (getDevBrowserJWT() !== null) {
+    if (getDevBrowserJWT()) {
       return;
     }
 

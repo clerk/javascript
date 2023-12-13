@@ -87,7 +87,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       {
         path: `/organizations/${this.id}/roles`,
         method: 'GET',
-        search: convertPageToOffset(getRolesParams) as any,
+        search: convertPageToOffset(getRolesParams),
       },
       {
         forceUpdateClient: true,
@@ -109,7 +109,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       {
         path: `/organizations/${this.id}/domains`,
         method: 'GET',
-        search: convertPageToOffset(getDomainParams) as any,
+        search: convertPageToOffset(getDomainParams),
       },
       {
         forceUpdateClient: true,
@@ -146,7 +146,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/membership_requests`,
       method: 'GET',
-      search: convertPageToOffset(getRequestParam) as any,
+      search: convertPageToOffset(getRequestParam),
     })
       .then(res => {
         const { data: requests, total_count } =
@@ -173,7 +173,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       method: 'GET',
       // `paginated` is used in some legacy endpoints to support clerk paginated responses
       // The parameter will be dropped in FAPI v2
-      search: convertPageToOffset({ ...getMembershipsParams, paginated: true }) as any,
+      search: convertPageToOffset({ ...getMembershipsParams, paginated: true }),
     })
       .then(res => {
         const { data: suggestions, total_count } =
@@ -199,7 +199,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       {
         path: `/organizations/${this.id}/invitations`,
         method: 'GET',
-        search: convertPageToOffset(getInvitationsParams) as any,
+        search: convertPageToOffset(getInvitationsParams),
       },
       {
         forceUpdateClient: true,

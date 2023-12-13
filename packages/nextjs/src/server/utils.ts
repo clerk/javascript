@@ -1,4 +1,4 @@
-import type { RequestState } from '@clerk/backend';
+import type { AuthenticateRequestOptions, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 import { constants as nextConstants } from '../constants';
 import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
-import type { NextMiddlewareResult, RequestLike, WithAuthOptions } from './types';
+import type { NextMiddlewareResult, RequestLike } from './types';
 
 type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
 
@@ -221,7 +221,7 @@ export const isCrossOrigin = (from: string | URL, to: string | URL) => {
   return fromUrl.origin !== toUrl.origin;
 };
 
-export const handleMultiDomainAndProxy = (req: NextRequest, opts: WithAuthOptions) => {
+export const handleMultiDomainAndProxy = (req: NextRequest, opts: AuthenticateRequestOptions) => {
   const requestURL = buildRequestUrl(req);
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, requestURL, PROXY_URL);
   let proxyUrl;
@@ -239,7 +239,7 @@ export const handleMultiDomainAndProxy = (req: NextRequest, opts: WithAuthOption
     throw new Error(missingDomainAndProxy);
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(SECRET_KEY)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(opts.secretKey || SECRET_KEY)) {
     throw new Error(missingSignInUrlInDev);
   }
 
@@ -249,4 +249,11 @@ export const handleMultiDomainAndProxy = (req: NextRequest, opts: WithAuthOption
     domain,
     signInUrl,
   };
+};
+
+export const decorateResponseWithObservabilityHeaders = (res: Response, requestState: RequestState): Response => {
+  requestState.message && res.headers.set(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
+  requestState.reason && res.headers.set(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
+  requestState.status && res.headers.set(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
+  return res;
 };

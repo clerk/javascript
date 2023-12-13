@@ -1,7 +1,5 @@
 import type { ApiClient } from '../api';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
-import type { LoadInterstitialOptions } from './interstitial';
-import { loadInterstitialFromLocal } from './interstitial';
 import type { AuthenticateRequestOptions } from './request';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
 
@@ -40,13 +38,12 @@ export type CreateAuthenticateRequestOptions = {
 };
 
 export function createAuthenticateRequest(params: CreateAuthenticateRequestOptions) {
-  const { apiClient } = params;
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
 
-  const authenticateRequest = (options: RunTimeOptions) => {
+  const authenticateRequest = (request: Request, options: RunTimeOptions = {}) => {
     const { apiUrl, apiVersion } = buildTimeOptions;
     const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
-    return authenticateRequestOriginal({
+    return authenticateRequestOriginal(request, {
       ...options,
       ...runTimeOptions,
       // We should add all the omitted props from options here (eg apiUrl / apiVersion)
@@ -56,18 +53,8 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     });
   };
 
-  const localInterstitial = (options: Omit<LoadInterstitialOptions, 'apiUrl'>) => {
-    const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
-    return loadInterstitialFromLocal({ ...options, ...runTimeOptions });
-  };
-
-  // TODO: Replace this function with remotePublicInterstitial
-  const remotePrivateInterstitial = () => apiClient.interstitial.getInterstitial();
-
   return {
     authenticateRequest,
-    localInterstitial,
-    remotePrivateInterstitial,
     debugRequestState,
   };
 }

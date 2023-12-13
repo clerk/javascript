@@ -21,7 +21,7 @@ export const PoweredByClerkTag = React.memo(
       >
         {branded ? (
           <>
-            <Text sx={{ color: 'inherit' }}>Secured by</Text>
+            <Text>Secured by</Text>
             <LogoMarkIconLink />
           </>
         ) : null}
@@ -34,11 +34,7 @@ const LogoMarkIconLink = () => {
   return (
     <Link
       href='https://www.clerk.com?utm_source=clerk&utm_medium=components'
-      colorScheme='neutral'
-      sx={{
-        color: 'inherit',
-        '&:hover': { color: 'inherit' },
-      }}
+      colorScheme='inherit'
       isExternal
       aria-label='Clerk logo'
     >

@@ -40,7 +40,6 @@ This package provides Clerk Backend API resources and low-level authentication u
 - Support multiple CLERK_API_KEY for multiple instance REST access.
 - Align JWT key resolution algorithm across all environments (Function param > Environment variable > JWKS from API).
 - Tested automatically across different runtimes (Node, CF Workers, Vercel Edge middleware.)
-- Clean up Clerk interstitial logic.
 - Refactor the Rest Client API to return `{data, errors}` instead of throwing errors.
 - Export a generic verifyToken for Clerk JWTs verification.
 - Align AuthData interface for SSR.
@@ -55,23 +54,23 @@ npm install @clerk/backend
 ```
 
 ```
-import { Clerk } from '@clerk/backend';
+import { createClerkClient } from '@clerk/backend';
 
-const clerk = Clerk({ secretKey: '...' });
+const clerk = createClerkClient({ secretKey: '...' });
 
 await clerk.users.getUser("user_...");
 ```
 
 ### API
 
-#### Clerk(options: ClerkOptions)
+#### createClerkClient(options: ClerkOptions)
 
 Create Clerk SDK that includes an HTTP Rest client for the Backend API and session verification helpers. The clerk object contains the following APIs and methods:
 
 ```js
-import { Clerk } from '@clerk/backend';
+import { createClerkClient } from '@clerk/backend';
 
-const clerk = Clerk({ secretKey: '...' });
+const clerk = createClerkClient({ secretKey: '...' });
 
 await clerk.users.getUser('user_...');
 
@@ -80,7 +79,6 @@ clerk.allowlistIdentifiers;
 clerk.clients;
 clerk.emailAddresses;
 clerk.emails;
-clerk.interstitial;
 clerk.invitations;
 clerk.organizations;
 clerk.phoneNumbers;
@@ -96,12 +94,6 @@ clerk.authenticateRequest(options);
 
 // Build debug payload of the request state.
 clerk.debugRequestState(requestState);
-
-// Load clerk interstitial from this package
-clerk.localInterstitial(options);
-
-// Load clerk interstitial from the public Private API endpoint (Deprecated)
-clerk.remotePrivateInterstitial(options);
 ```
 
 #### verifyToken(token: string, options: VerifyTokenOptions)
@@ -159,20 +151,6 @@ Generates a debug payload for the request state
 import { debugRequestState } from '@clerk/backend';
 
 debugRequestState(requestState);
-```
-
-#### loadInterstitialFromLocal(options)
-
-Generates a debug payload for the request state. The debug payload is available via `window.__clerk_debug`.
-
-```js
-import { loadInterstitialFromLocal } from '@clerk/backend';
-
-loadInterstitialFromLocal({
-  frontendApi: '...',
-  clerkJSVersion: '...',
-  debugData: {},
-});
 ```
 
 #### signedInAuthObject(sessionClaims, options)

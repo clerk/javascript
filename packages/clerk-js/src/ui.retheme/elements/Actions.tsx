@@ -177,12 +177,13 @@ export const Action = (props: ActionProps) => {
       focusRing={false}
       hoverAsFocus
       sx={[
-        theme => ({
+        t => ({
           flex: '1',
+          color: t.colors.$blackAlpha700,
           borderRadius: 0,
-          borderBottom: `${theme.borders.$normal} ${theme.colors.$blackAlpha200}`,
-          gap: theme.space.$3,
-          padding: `${theme.space.$4} ${theme.space.$5}`,
+          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+          gap: t.space.$3,
+          padding: `${t.space.$4} ${t.space.$5}`,
           justifyContent: 'flex-start',
         }),
         sx,
@@ -196,7 +197,7 @@ export const Action = (props: ActionProps) => {
         elementDescriptor={iconBoxElementDescriptor}
         elementId={iconBoxElementId}
         justify='center'
-        sx={[theme => ({ flex: `0 0 ${theme.sizes.$9}` }), iconBoxSx]}
+        sx={[t => ({ flex: `0 0 ${t.sizes.$9}`, gap: t.space.$2 }), iconBoxSx]}
       >
         {status.isLoading ? (
           <Spinner
@@ -209,9 +210,9 @@ export const Action = (props: ActionProps) => {
             elementId={iconElementId}
             icon={icon}
             sx={[
-              theme => ({
-                width: theme.sizes.$4,
-                height: theme.sizes.$6,
+              t => ({
+                width: t.sizes.$4,
+                height: t.sizes.$6,
               }),
               iconSx,
             ]}
