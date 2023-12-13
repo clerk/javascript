@@ -40,7 +40,8 @@ const withEmailLinks = environmentConfig()
 
 const withCustomRoles = environmentConfig()
   .setId('withCustomRoles')
-  .setEnvVariable('private', 'CLERK_API_URL', constants.E2E_APP_STAGING_CLERK_API_URL)
+  // Temporarily use the stage api until the custom roles feature is released to prod
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-custom-roles'].sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-custom-roles'].pk)
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
