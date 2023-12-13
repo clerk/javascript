@@ -12,7 +12,12 @@ describe('withRedirect', () => {
       f.withUser({});
     });
 
-    const WithHOC = withRedirect(<></>, true, () => '/', 'Redirecting to /');
+    const WithHOC = withRedirect(
+      () => <></>,
+      () => true,
+      () => '/',
+      'Redirecting to /',
+    );
 
     render(<WithHOC />, { wrapper });
 
@@ -24,7 +29,12 @@ describe('withRedirect', () => {
       f.withUser({});
     });
 
-    const WithHOC = withRedirect(<></>, false, () => '/', 'Redirecting to /');
+    const WithHOC = withRedirect(
+      () => <></>,
+      () => false,
+      () => '/',
+      'Redirecting to /',
+    );
 
     render(<WithHOC />, { wrapper });
 
