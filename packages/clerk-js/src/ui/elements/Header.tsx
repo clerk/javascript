@@ -9,7 +9,7 @@ const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
     <Col
       elementDescriptor={descriptors.header}
       gap={1}
-      sx={{ ...sx, textAlign: 'center' }}
+      sx={{ ...sx }}
       {...rest}
     />
   );

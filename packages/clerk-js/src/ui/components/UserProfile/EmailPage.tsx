@@ -5,7 +5,7 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
-import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
@@ -51,7 +51,7 @@ export const EmailPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage
+      <FormContent
         headerTitle={title}
         Breadcrumbs={UserProfileBreadcrumbs}
       >
@@ -71,9 +71,9 @@ export const EmailPage = withCardStateProvider(() => {
           />
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
-      </ContentPage>
+      </FormContent>
 
-      <ContentPage
+      <FormContent
         headerTitle={title}
         Breadcrumbs={UserProfileBreadcrumbs}
       >
@@ -90,7 +90,7 @@ export const EmailPage = withCardStateProvider(() => {
             prepareVerification={() => emailAddressRef.current?.prepareVerification({ strategy: 'email_code' })}
           />
         )}
-      </ContentPage>
+      </FormContent>
 
       <SuccessPage
         title={title}
@@ -103,7 +103,6 @@ export const EmailPage = withCardStateProvider(() => {
                 identifier: emailAddressRef.current?.emailAddress || '',
               })
         }
-        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );

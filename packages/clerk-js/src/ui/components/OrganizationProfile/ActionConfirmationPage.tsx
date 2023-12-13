@@ -5,9 +5,9 @@ import { useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
 import {
-  ContentPage,
   Form,
   FormButtonContainer,
+  FormContent,
   SuccessPage,
   useCardState,
   withCardStateProvider,
@@ -131,7 +131,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage
+      <FormContent
         headerTitle={title}
         breadcrumbTitle={localizationKeys('organizationProfile.profilePage.dangerSection.title')}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
@@ -162,7 +162,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
             />
           </FormButtonContainer>
         </Form.Root>
-      </ContentPage>
+      </FormContent>
       <SuccessPage
         title={title}
         text={successMessage}

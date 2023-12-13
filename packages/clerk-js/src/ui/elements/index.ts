@@ -40,7 +40,7 @@ export * from './OrganizationPreview';
 export * from './PersonalWorkspacePreview';
 export * from './Navbar';
 export * from './Breadcrumbs';
-export * from './ContentPage';
+export * from './FormContent';
 export * from './ProfileCardContent';
 export * from './IconButton';
 export * from './AvatarUploader';

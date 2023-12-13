@@ -1,13 +1,15 @@
 import React from 'react';
 
-import { Box, descriptors, Text } from '../customizables';
-import { ContentPage, FormButtonContainer, NavigateToFlowStartButton } from '../elements';
+import type { Flex } from '../customizables';
+import { Box, Button, Col, descriptors, Text } from '../customizables';
+import { FormButtonContainer } from '../elements';
+import { useNavigateToFlowStart } from '../hooks';
 import type { LocalizationKey } from '../localization';
 import { localizationKeys } from '../localization';
 import type { PropsOfComponent } from '../styledSystem';
 
-type SuccessPageProps = Omit<PropsOfComponent<typeof ContentPage>, 'headerTitle' | 'title'> & {
-  title: LocalizationKey;
+type SuccessPageProps = Omit<PropsOfComponent<typeof Flex>, 'headerTitle' | 'title'> & {
+  title?: LocalizationKey;
   text?: LocalizationKey | LocalizationKey[];
   finishLabel?: LocalizationKey;
   contents?: React.ReactNode;
@@ -16,12 +18,10 @@ type SuccessPageProps = Omit<PropsOfComponent<typeof ContentPage>, 'headerTitle'
 
 export const SuccessPage = (props: SuccessPageProps) => {
   const { text, title, finishLabel, onFinish, contents, ...rest } = props;
+  const { navigateToFlowStart } = useNavigateToFlowStart();
 
   return (
-    <ContentPage
-      headerTitle={title}
-      {...rest}
-    >
+    <Col {...rest}>
       <Box>
         {Array.isArray(text) ? (
           text.map(t => (
@@ -43,14 +43,14 @@ export const SuccessPage = (props: SuccessPageProps) => {
       {contents}
 
       <FormButtonContainer>
-        <NavigateToFlowStartButton
+        <Button
           autoFocus
           //Do we need a separate key here?
           localizationKey={finishLabel || localizationKeys('userProfile.formButtonPrimary__finish')}
           elementDescriptor={descriptors.formButtonPrimary}
-          {...(onFinish ? { onClick: onFinish } : {})}
+          onClick={onFinish || navigateToFlowStart}
         />
       </FormButtonContainer>
-    </ContentPage>
+    </Col>
   );
 };

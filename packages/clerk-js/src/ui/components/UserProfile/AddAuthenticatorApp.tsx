@@ -7,8 +7,8 @@ import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, localizationKeys, Text } from '../../customizables';
 import {
   ClipboardInput,
-  ContentPage,
   FormButtonContainer,
+  FormContent,
   FullHeightLoader,
   NavigateToFlowStartButton,
   useCardState,
@@ -40,11 +40,11 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
   }, []);
 
   if (card.error) {
-    return <ContentPage headerTitle={title} />;
+    return <FormContent headerTitle={title} />;
   }
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={title}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -119,6 +119,6 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
           </FormButtonContainer>
         </>
       )}
-    </ContentPage>
+    </FormContent>
   );
 };

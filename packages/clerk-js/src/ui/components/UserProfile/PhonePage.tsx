@@ -5,7 +5,7 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
-import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
@@ -37,7 +37,6 @@ export const PhonePage = withCardStateProvider(() => {
         text={localizationKeys('userProfile.phoneNumberPage.successMessage', {
           identifier: phoneNumberRef.current?.phoneNumber || '',
         })}
-        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );
@@ -74,7 +73,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   };
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={title}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -92,7 +91,7 @@ export const AddPhone = (props: AddPhoneProps) => {
         />
         <FormButtons isDisabled={!canSubmit} />
       </Form.Root>
-    </ContentPage>
+    </FormContent>
   );
 };
 
@@ -100,7 +99,7 @@ export const VerifyPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, resourceRef } = props;
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={title}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -110,6 +109,6 @@ export const VerifyPhone = (props: AddPhoneProps) => {
         identifier={resourceRef.current?.phoneNumber}
         prepareVerification={resourceRef.current?.prepareVerification}
       />
-    </ContentPage>
+    </FormContent>
   );
 };

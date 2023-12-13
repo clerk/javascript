@@ -44,6 +44,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
           gap={8}
           sx={[
             t => ({
+              textAlign: 'center',
               zIndex: t.zIndices.$card,
               position: 'relative',
               backgroundColor: t.colors.$colorBackground,

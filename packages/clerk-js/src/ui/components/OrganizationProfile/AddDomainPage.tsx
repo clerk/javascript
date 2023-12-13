@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { ContentPage, Form, FormButtons, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
@@ -46,7 +46,7 @@ export const AddDomainPage = withCardStateProvider(() => {
   };
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={title}
       headerSubtitle={subtitle}
       breadcrumbTitle={breadcrumbTitle}
@@ -62,6 +62,6 @@ export const AddDomainPage = withCardStateProvider(() => {
         </Form.ControlRow>
         <FormButtons isDisabled={!canSubmit} />
       </Form.Root>
-    </ContentPage>
+    </FormContent>
   );
 });

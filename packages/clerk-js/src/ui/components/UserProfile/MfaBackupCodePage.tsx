@@ -1,6 +1,6 @@
 import { useWizard, Wizard } from '../../common';
 import { Button, descriptors, localizationKeys, Text } from '../../customizables';
-import { ContentPage, FormButtonContainer, NavigateToFlowStartButton, withCardStateProvider } from '../../elements';
+import { FormButtonContainer, FormContent, NavigateToFlowStartButton, withCardStateProvider } from '../../elements';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -24,7 +24,7 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
   const { onContinue } = props;
 
   return (
-    <ContentPage
+    <FormContent
       headerTitle={localizationKeys('userProfile.backupCodePage.title')}
       Breadcrumbs={UserProfileBreadcrumbs}
     >
@@ -44,6 +44,6 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
           elementDescriptor={descriptors.formButtonReset}
         />
       </FormButtonContainer>
-    </ContentPage>
+    </FormContent>
   );
 };

@@ -1,13 +1,10 @@
 import type { ComponentProps } from 'react';
 
-import { Col, type LocalizationKey, Text } from '../customizables';
+import { Col } from '../../customizables';
 
-type ActionCardProps = ComponentProps<typeof Col> & {
-  title: LocalizationKey;
-};
-
+type ActionCardProps = ComponentProps<typeof Col>;
 export const ActionCard = (props: ActionCardProps) => {
-  const { title, children, sx, ...rest } = props;
+  const { children, sx, ...rest } = props;
   return (
     <Col
       sx={[
@@ -16,16 +13,12 @@ export const ActionCard = (props: ActionCardProps) => {
           boxShadow: t.shadows.$actionCardShadow,
           borderRadius: t.radii.$lg,
           backgroundColor: t.colors.$colorBackground,
+          padding: t.space.$6,
         }),
         sx,
       ]}
       {...rest}
     >
-      <Text
-        localizationKey={title}
-        variant='h3'
-      />
-
       {children}
     </Col>
   );

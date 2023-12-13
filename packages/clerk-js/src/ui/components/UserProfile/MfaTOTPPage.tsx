@@ -6,7 +6,6 @@ import { localizationKeys } from '../../customizables';
 import { SuccessPage, withCardStateProvider } from '../../elements';
 import { AddAuthenticatorApp } from './AddAuthenticatorApp';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { VerifyTOTP } from './VerifyTOTP';
 
 export const MfaTOTPPage = withCardStateProvider(() => {
@@ -34,7 +33,6 @@ export const MfaTOTPPage = withCardStateProvider(() => {
             backupCodes={ref.current?.backupCodes}
           />
         }
-        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );

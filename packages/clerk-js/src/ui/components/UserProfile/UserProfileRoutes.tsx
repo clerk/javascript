@@ -11,7 +11,6 @@ import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { MfaPage } from './MfaPage';
 import { PasswordPage } from './PasswordPage';
 import { PhonePage } from './PhonePage';
-import { ProfilePage } from './ProfilePage';
 import {
   RemoveConnectedAccountPage,
   RemoveEmailPage,
@@ -51,12 +50,6 @@ export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardCont
       <Switch>
         {customPageRoutesWithContents}
         <Route path={isAccountPageRoot ? undefined : 'account'}>
-          <Route
-            path='profile'
-            flowStart
-          >
-            <ProfilePage />
-          </Route>
           <Route
             path='email-address'
             flowStart

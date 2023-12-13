@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { Icon } from '../../customizables';
-import { ContentPage, Form, FormButtonContainer, IconButton, SuccessPage, useCardState } from '../../elements';
+import { Form, FormButtonContainer, FormContent, IconButton, SuccessPage, useCardState } from '../../elements';
 import { QuestionMark, Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
@@ -109,7 +109,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage
+      <FormContent
         Breadcrumbs={null}
         headerTitle={props.startPage.headerTitle}
         headerSubtitle={props.startPage.headerSubtitle}
@@ -183,8 +183,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             )}
           </FormButtonContainer>
         </Form.Root>
-      </ContentPage>
-      <ContentPage
+      </FormContent>
+      <FormContent
         Breadcrumbs={null}
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
         headerTitleTextVariant={headerTitleTextVariant}
@@ -198,10 +198,9 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             onReset={completeFlow}
           />
         )}
-      </ContentPage>
+      </FormContent>
       <SuccessPage
         title={localizationKeys('organizationProfile.invitePage.title')}
-        headerTitleTextVariant={headerTitleTextVariant}
         contents={<InvitationsSentMessage />}
         sx={t => ({ minHeight: t.sizes.$60 })}
         onFinish={completeFlow}
