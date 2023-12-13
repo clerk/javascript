@@ -25,6 +25,7 @@ export {
 
 export type { ProtectProps } from './controlComponents';
 
+export { withPathDefaultRouting } from './withPathDefaultRouting';
 export { SignInButton } from './SignInButton';
 export { SignUpButton } from './SignUpButton';
 export { SignOutButton } from './SignOutButton';
