@@ -196,7 +196,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           aria-label={`${currentOrg?.name} is active`}
           {...rest}
         >
-          <PopoverCard.Main elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
+          <PopoverCard.Content elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
             {currentOrg
               ? selectedOrganizationPreview(currentOrg)
               : !hidePersonal && (
@@ -214,7 +214,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
               onPersonalWorkspaceClick={handlePersonalWorkspaceClicked}
               onOrganizationClick={handleOrganizationClicked}
             />
-          </PopoverCard.Main>
+          </PopoverCard.Content>
           <PopoverCard.Footer elementDescriptor={descriptors.organizationSwitcherPopoverFooter} />
         </PopoverCard.Root>
       </RootBox>

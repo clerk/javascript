@@ -5,7 +5,6 @@ import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts'
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
-  CardAlert,
   Footer,
   Header,
   LoadingCard,
@@ -160,8 +159,8 @@ function _SignUpContinue() {
 
   return (
     <Flow.Part part='complete'>
-      <Card>
-        <CardAlert>{card.error}</CardAlert>
+      <Card.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signUp.continue.title')} />
           <Header.Subtitle localizationKey={localizationKeys('signUp.continue.subtitle')} />
@@ -197,7 +196,7 @@ function _SignUpContinue() {
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
-      </Card>
+      </Card.Root>
     </Flow.Part>
   );
 }

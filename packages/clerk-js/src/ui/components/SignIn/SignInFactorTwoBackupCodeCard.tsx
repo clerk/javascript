@@ -6,7 +6,7 @@ import React from 'react';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { Card, CardAlert, Footer, Form, Header, useCardState } from '../../elements';
+import { Card, Footer, Form, Header, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
@@ -64,8 +64,8 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
   };
 
   return (
-    <Card>
-      <CardAlert>{card.error}</CardAlert>
+    <Card.Root>
+      <Card.Alert>{card.error}</Card.Alert>
       <Header.Root>
         <Header.Title localizationKey={localizationKeys('signIn.backupCodeMfa.title')} />
         <Header.Subtitle
@@ -104,6 +104,6 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
         </Footer.Action>
         <Footer.Links />
       </Footer.Root>
-    </Card>
+    </Card.Root>
   );
 };

@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { Card, CardAlert, Divider, Header, useCardState, withCardStateProvider } from '../../elements';
+import { Card, Divider, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
 import { PreviewListItems, PreviewListSpinner } from './shared';
@@ -48,13 +48,13 @@ export const OrganizationListPage = withCardStateProvider(() => {
   const { hidePersonal } = useOrganizationListContext();
 
   return (
-    <Card
+    <Card.Root
       sx={t => ({
         padding: `${t.space.$8} ${t.space.$none}`,
       })}
       gap={6}
     >
-      <CardAlert>{card.error}</CardAlert>
+      <Card.Alert>{card.error}</Card.Alert>
       {isLoading && (
         <Flex
           direction={'row'}
@@ -74,7 +74,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
       )}
 
       {!isLoading && <OrganizationListFlows showListInitially={!(hidePersonal && !hasAnyData)} />}
-    </Card>
+    </Card.Root>
   );
 });
 

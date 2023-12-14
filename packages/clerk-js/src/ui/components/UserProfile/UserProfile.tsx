@@ -5,7 +5,6 @@ import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
-import { mqu } from '../../styledSystem';
 import type { UserProfileCtx } from '../../types';
 import { UserProfileNavbar } from './UserProfileNavbar';
 import { UserProfileRoutes } from './UserProfileRoutes';
@@ -32,21 +31,13 @@ const _UserProfile = (_: UserProfileProps) => {
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
   return (
-    <ProfileCard
-      sx={t => ({
-        display: 'grid',
-        gridTemplateColumns: '1fr 2.5fr',
-        [mqu.md]: {
-          display: 'block',
-        },
-        height: t.sizes.$176,
-        overflow: 'hidden',
-      })}
-    >
+    <ProfileCard.Root>
       <UserProfileNavbar contentRef={contentRef}>
-        <UserProfileRoutes />
+        <ProfileCard.Content contentRef={contentRef}>
+          <UserProfileRoutes />
+        </ProfileCard.Content>
       </UserProfileNavbar>
-    </ProfileCard>
+    </ProfileCard.Root>
   );
 });
 

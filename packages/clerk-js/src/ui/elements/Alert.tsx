@@ -1,9 +1,6 @@
-import React from 'react';
-
 import type { LocalizationKey } from '../customizables';
 import { Alert as AlertCust, AlertIcon, Col, descriptors, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations } from '../styledSystem';
 
 type _AlertProps = {
   variant?: 'danger' | 'warning';
@@ -60,16 +57,3 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     </AlertCust>
   );
 };
-
-export const CardAlert = React.memo((props: AlertProps) => {
-  return (
-    <Alert
-      variant='danger'
-      sx={theme => ({
-        willChange: 'transform, opacity, height',
-        animation: `${animations.textInBig} ${theme.transitionDuration.$slow}`,
-      })}
-      {...props}
-    />
-  );
-});

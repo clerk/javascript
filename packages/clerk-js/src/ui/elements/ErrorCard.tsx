@@ -4,7 +4,6 @@ import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Flow, Icon, localizationKeys, Text } from '../customizables';
 import { useSupportEmail } from '../hooks/useSupportEmail';
 import { Email } from '../icons';
-import { CardAlert } from './Alert';
 import { ArrowBlockButton } from './ArrowBlockButton';
 import { Card } from './Card';
 import { useCardState } from './contexts';
@@ -28,8 +27,8 @@ export const ErrorCard = (props: ErrorCardProps) => {
 
   return (
     <Flow.Part part='havingTrouble'>
-      <Card>
-        <CardAlert>{card.error}</CardAlert>
+      <Card.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Header.Root>
           <Header.Title localizationKey={props.cardTitle || 'Error'} />
           {props.cardSubtitle && <Header.Subtitle localizationKey={props.cardSubtitle} />}
@@ -66,7 +65,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
           <Footer.Action />
           <Footer.Links />
         </Footer.Root>
-      </Card>
+      </Card.Root>
     </Flow.Part>
   );
 };

@@ -2,7 +2,7 @@ import { useUser } from '@clerk/shared/react';
 
 import { useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { CardAlert, Header, useCardState, withCardStateProvider } from '../../elements';
+import { Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { NavbarMenuButtonRow } from '../../elements/Navbar';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
@@ -37,7 +37,7 @@ export const RootPage = withCardStateProvider(() => {
       sx={t => ({ gap: t.space.$8 })}
     >
       <NavbarMenuButtonRow />
-      <CardAlert>{card.error}</CardAlert>
+      <Card.Alert>{card.error}</Card.Alert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('account')}
