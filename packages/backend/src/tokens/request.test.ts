@@ -123,6 +123,7 @@ export default (QUnit: QUnit) => {
   const defaultHeaders: Record<string, string> = {
     host: 'example.com',
     'user-agent': 'Mozilla/TestAgent',
+    'sec-fetch-dest': 'document',
   };
 
   const mockRequest = (headers = {}, requestUrl = 'http://clerk.com/path') => {
@@ -272,9 +273,7 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns handshake when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async assert => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies(
-          {
-            'Sec-Fetch-Dest': 'document',
-          },
+          {},
           {
             __client_uat: '0',
           },
@@ -303,6 +302,7 @@ export default (QUnit: QUnit) => {
         mockRequestWithCookies(
           {
             ...defaultHeaders,
+            'sec-fetch-dest': 'empty',
             'user-agent': '[some-agent]',
           },
           { __client_uat: '0' },
@@ -392,12 +392,13 @@ export default (QUnit: QUnit) => {
       assert.strictEqual(requestState.toAuth(), null);
     });
 
-    test('cookieToken: returns undefined when crossOriginReferrer in development and is satellite [6n]', async assert => {
+    test('cookieToken: returns signedIn when satellite but valid token and clientUat', async assert => {
       // Scenario: after auth action on Clerk-hosted UIs
       const requestState = await authenticateRequest(
         mockRequestWithCookies(
           {
             ...defaultHeaders,
+            'sec-fetch-dest': 'empty',
             // this is not a typo, it's intentional to be `referer` to match HTTP header key
             referer: 'https://clerk.com',
           },
