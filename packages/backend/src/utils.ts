@@ -4,6 +4,9 @@ const getHeader = (req: Request, key: string) => req.headers.get(key);
 const getFirstValueFromHeader = (value?: string | null) => value?.split(',')[0];
 
 type BuildRequestUrl = (request: Request) => URL;
+/**
+ * @internal
+ */
 export const buildRequestUrl: BuildRequestUrl = request => {
   const initialUrl = new URL(request.url);
 
@@ -25,6 +28,9 @@ type BuildOriginParams = {
   host?: string | null;
 };
 type BuildOrigin = (params: BuildOriginParams) => string;
+/**
+ * @internal
+ */
 export const buildOrigin: BuildOrigin = ({ protocol, forwardedProto, forwardedHost, host }) => {
   const resolvedHost = getFirstValueFromHeader(forwardedHost) ?? host;
   const resolvedProtocol = getFirstValueFromHeader(forwardedProto) ?? protocol?.replace(/[:/]/, '');

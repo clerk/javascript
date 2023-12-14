@@ -32,6 +32,9 @@ type RedirectParams = {
   publishableKey?: string;
 };
 
+/**
+ * @internal
+ */
 export function redirect({ redirectAdapter, signUpUrl, signInUrl, publishableKey }: RedirectParams) {
   const frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
   const accountsBaseUrl = buildAccountsBaseUrl(frontendApi);

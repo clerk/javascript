@@ -4,18 +4,12 @@ import type { SDKMetadata } from '@clerk/types';
 
 import type { ApiClient, CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
-import type { CreateAuthenticateRequestOptions } from './tokens';
-import { createAuthenticateRequest } from './tokens';
-
-export { createIsomorphicRequest } from './util/IsomorphicRequest';
+import type { CreateAuthenticateRequestOptions } from './tokens/factory';
+import { createAuthenticateRequest } from './tokens/factory';
 
 export * from './api/resources';
-export * from './tokens';
 export * from './tokens/jwt';
 export * from './tokens/verify';
-export { constants } from './constants';
-export { redirect } from './redirections';
-export { buildRequestUrl } from './utils';
 
 export type ClerkOptions = CreateBackendApiOptions &
   Partial<

@@ -47,6 +47,9 @@ const ContentTypes = {
   Json: 'application/json',
 } as const;
 
+/**
+ * @internal
+ */
 export const constants = {
   Attributes,
   Cookies,

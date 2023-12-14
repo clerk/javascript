@@ -1,4 +1,4 @@
-import type { RequestState } from '@clerk/backend';
+import type { RequestState } from '@clerk/backend/internal';
 import type { NextFunction, Request, Response } from 'express';
 
 import { createClerkExpressRequireAuth } from '../clerkExpressRequireAuth';

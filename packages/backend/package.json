@@ -45,6 +45,16 @@
         "default": "./dist/errors.js"
       }
     },
+    "./internal": {
+      "import": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.mjs"
+      },
+      "require": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",

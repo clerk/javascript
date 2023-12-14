@@ -15,6 +15,9 @@ type AuthObjectDebugData = Record<string, any>;
 type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
 type AuthObjectDebug = () => AuthObjectDebugData;
 
+/**
+ * @internal
+ */
 export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
   token: string;
   session?: Session;
@@ -22,6 +25,9 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
   organization?: Organization;
 };
 
+/**
+ * @internal
+ */
 export type SignedInAuthObject = {
   sessionClaims: JwtPayload;
   sessionId: string;
@@ -39,6 +45,9 @@ export type SignedInAuthObject = {
   debug: AuthObjectDebug;
 };
 
+/**
+ * @internal
+ */
 export type SignedOutAuthObject = {
   sessionClaims: null;
   sessionId: null;
@@ -56,6 +65,9 @@ export type SignedOutAuthObject = {
   debug: AuthObjectDebug;
 };
 
+/**
+ * @internal
+ */
 export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
 
 const createDebug: CreateAuthObjectDebug = data => {
@@ -67,6 +79,9 @@ const createDebug: CreateAuthObjectDebug = data => {
   };
 };
 
+/**
+ * @internal
+ */
 export function signedInAuthObject(
   sessionClaims: JwtPayload,
   options: SignedInAuthObjectOptions,
@@ -112,6 +127,9 @@ export function signedInAuthObject(
   };
 }
 
+/**
+ * @internal
+ */
 export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutAuthObject {
   return {
     sessionClaims: null,
@@ -131,6 +149,9 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
   };
 }
 
+/**
+ * @internal
+ */
 export function prunePrivateMetadata(
   resource?:
     | {
@@ -152,6 +173,9 @@ export function prunePrivateMetadata(
   return resource;
 }
 
+/**
+ * @internal
+ */
 export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T {
   const user = authObject.user ? { ...authObject.user } : authObject.user;
   const organization = authObject.organization ? { ...authObject.organization } : authObject.organization;
@@ -168,6 +192,7 @@ export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T
  * Some frameworks like Remix or Next (/pages dir only) handle this serialization by simply
  * ignoring any non-serializable keys, however Nextjs /app directory is stricter and
  * throws an error if a non-serializable value is found.
+ * @internal
  */
 export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(obj: T): T => {
   // remove any non-serializable props from the returned object

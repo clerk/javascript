@@ -2,6 +2,7 @@ import type QUnit from 'qunit';
 
 import * as errorExports from '../errors';
 import * as publicExports from '../index';
+import * as internalExports from '../internal';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;
@@ -10,7 +11,6 @@ export default (QUnit: QUnit) => {
     test('should not include a breaking change', assert => {
       const exportedApiKeys = [
         'AllowlistIdentifier',
-        'AuthStatus',
         'Client',
         'DeletedObject',
         'Email',
@@ -32,21 +32,10 @@ export default (QUnit: QUnit) => {
         'Token',
         'User',
         'Verification',
-        'buildRequestUrl',
-        'constants',
-        'createAuthenticateRequest',
         'createClerkClient',
-        'createIsomorphicRequest',
-        'debugRequestState',
         'decodeJwt',
         'hasValidSignature',
-        'makeAuthObjectSerializable',
-        'prunePrivateMetadata',
-        'redirect',
-        'sanitizeAuthObject',
         'signJwt',
-        'signedInAuthObject',
-        'signedOutAuthObject',
         'verifyJwt',
         'verifyToken',
       ];
@@ -63,6 +52,26 @@ export default (QUnit: QUnit) => {
         'TokenVerificationErrorReason',
       ];
       assert.deepEqual(Object.keys(errorExports).sort(), exportedApiKeys);
+    });
+  });
+
+  module('subpath /internal exports', () => {
+    test('should not include a breaking change', assert => {
+      const exportedApiKeys = [
+        'AuthStatus',
+        'buildRequestUrl',
+        'constants',
+        'createAuthenticateRequest',
+        'createIsomorphicRequest',
+        'debugRequestState',
+        'makeAuthObjectSerializable',
+        'prunePrivateMetadata',
+        'redirect',
+        'sanitizeAuthObject',
+        'signedInAuthObject',
+        'signedOutAuthObject',
+      ];
+      assert.deepEqual(Object.keys(internalExports).sort(), exportedApiKeys);
     });
   });
 };

@@ -13,6 +13,9 @@ import { verifyHandshakeToken } from './handshake';
 import { decodeJwt } from './jwt';
 import { verifyToken, type VerifyTokenOptions } from './verify';
 
+/**
+ * @internal
+ */
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
     VerifyTokenOptions,
@@ -20,6 +23,9 @@ export type OptionalVerifyTokenOptions = Partial<
   >
 >;
 
+/**
+ * @internal
+ */
 export type AuthenticateRequestOptions = AuthStatusOptionsType & OptionalVerifyTokenOptions;
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
@@ -303,6 +309,9 @@ ${err.getFullMessage()}`,
   return authenticateRequestWithTokenInCookie();
 }
 
+/**
+ * @internal
+ */
 export const debugRequestState = (params: RequestState) => {
   const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
