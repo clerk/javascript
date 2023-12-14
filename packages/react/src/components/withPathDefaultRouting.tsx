@@ -10,6 +10,7 @@ export function withPathDefaultRouting<T, P extends RoutingOptions>(Component: T
     if (!props.path && !props.routing) {
       errorThrower.throw('You must specify path and routing props');
     }
+
     if (props.path) {
       return (
         <BaseComponent

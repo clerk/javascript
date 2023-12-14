@@ -9,15 +9,19 @@ import {
 import type { SignInProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
+import { errorThrower } from '../errorThrower';
 import { useClerkRemixOptions } from './RemixOptionsContext';
 
-export const UserProfile = withPathDefaultRouting(BaseUserProfile);
-export const CreateOrganization = withPathDefaultRouting(BaseCreateOrganization);
-export const OrganizationProfile = withPathDefaultRouting(BaseOrganizationProfile);
+export const UserProfile: typeof BaseUserProfile = withPathDefaultRouting(BaseUserProfile);
+export const CreateOrganization: typeof BaseCreateOrganization = withPathDefaultRouting(BaseCreateOrganization);
+export const OrganizationProfile: typeof BaseOrganizationProfile = withPathDefaultRouting(BaseOrganizationProfile);
 
 export const SignIn = (props: SignInProps) => {
   const { signInUrl } = useClerkRemixOptions();
   const path = props.path || signInUrl;
+  if (!path && !props.routing) {
+    errorThrower.throw('You must specify path and routing props');
+  }
 
   if (path) {
     return (
@@ -35,6 +39,9 @@ export const SignIn = (props: SignInProps) => {
 export const SignUp = (props: SignUpProps) => {
   const { signUpUrl } = useClerkRemixOptions();
   const path = props.path || signUpUrl;
+  if (!path && !props.routing) {
+    errorThrower.throw('You must specify path and routing props');
+  }
 
   if (path) {
     return (
