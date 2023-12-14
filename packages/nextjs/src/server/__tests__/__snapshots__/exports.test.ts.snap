@@ -30,13 +30,9 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "clerkClient",
   "createClerkClient",
   "currentUser",
-  "decodeJwt",
   "getAuth",
-  "hasValidSignature",
   "redirectToSignIn",
   "redirectToSignUp",
-  "signJwt",
-  "verifyJwt",
   "verifyToken",
 ]
 `;

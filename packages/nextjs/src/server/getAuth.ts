@@ -1,5 +1,4 @@
 import type { Organization, Session, User } from '@clerk/backend';
-import { decodeJwt } from '@clerk/backend';
 import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import {
   AuthStatus,
@@ -9,6 +8,7 @@ import {
   signedInAuthObject,
   signedOutAuthObject,
 } from '@clerk/backend/internal';
+import { decodeJwt } from '@clerk/backend/jwt';
 
 import { withLogger } from '../utils/debugLogger';
 import { API_URL, API_VERSION, SECRET_KEY } from './constants';

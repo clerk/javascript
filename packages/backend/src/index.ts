@@ -8,8 +8,8 @@ import type { CreateAuthenticateRequestOptions } from './tokens/factory';
 import { createAuthenticateRequest } from './tokens/factory';
 
 export * from './api/resources';
-export * from './tokens/jwt';
-export * from './tokens/verify';
+export type { VerifyTokenOptions } from './tokens/verify';
+export { verifyToken } from './tokens/verify';
 
 export type ClerkOptions = CreateBackendApiOptions &
   Partial<
