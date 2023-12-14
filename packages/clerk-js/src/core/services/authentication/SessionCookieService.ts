@@ -1,14 +1,14 @@
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
-import type { CookieHandler } from '../../../utils';
-import { createCookieHandler, inBrowser } from '../../../utils';
+import { inBrowser } from '../../../utils';
+import { setClientUatCookie } from '../../../utils/cookies/clientUat';
+import { removeSessionCookie, setSessionCookie } from '../../../utils/cookies/session';
 import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
 import { eventBus, events } from '../../events';
 import { SessionCookiePoller } from './SessionCookiePoller';
 
 export class SessionCookieService {
-  private cookies: CookieHandler = createCookieHandler();
   private environment: EnvironmentResource | undefined;
   private poller: SessionCookiePoller | null = null;
 
@@ -61,31 +61,22 @@ export class SessionCookieService {
     }
 
     try {
-      this.updateSessionCookie(await this.getNewToken());
+      this.updateSessionCookie(await this.clerk.session?.getToken());
     } catch (e) {
       return this.handleGetTokenError(e);
     }
   }
 
-  private getNewToken() {
-    return this.clerk.session?.getToken();
-  }
-
-  private setSessionCookie(token: TokenResource | string) {
-    this.cookies.setSessionCookie(typeof token === 'string' ? token : token.getRawString());
-  }
-
   private updateSessionCookie(token: TokenResource | string | undefined | null) {
-    return token ? this.setSessionCookie(token) : this.removeSessionCookie();
-  }
-
-  private removeSessionCookie() {
-    this.cookies.removeSessionCookie();
+    if (token) {
+      return setSessionCookie(typeof token === 'string' ? token : token.getRawString());
+    }
+    return removeSessionCookie();
   }
 
   private setClientUatCookieForDevelopmentInstances() {
     if (this.environment && this.environment.isDevelopmentOrStaging() && this.inCustomDevelopmentDomain()) {
-      this.cookies.setClientUatCookie(this.clerk.client);
+      setClientUatCookie(this.clerk.client);
     }
   }
 

@@ -10,14 +10,13 @@ jest.mock('./resources/Client');
 jest.mock('./resources/Environment');
 
 // Because Jest, don't ask me why...
-jest.mock('./devBrowserHandler', () => ({
-  createDevBrowserHandler: () => ({
+jest.mock('./devBrowser', () => ({
+  createDevBrowser: () => ({
     clear: jest.fn(),
     setup: jest.fn(),
     getDevBrowserJWT: jest.fn(() => 'deadbeef'),
     setDevBrowserJWT: jest.fn(),
     removeDevBrowserJWT: jest.fn(),
-    usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
   }),
 }));
 
@@ -278,61 +277,35 @@ describe('Clerk singleton - Redirects', () => {
     let clerkForProductionInstance: Clerk;
     let clerkForDevelopmentInstance: Clerk;
 
-    describe('for cookie-based dev instances', () => {
-      beforeEach(async () => {
-        mockUsesUrlBasedSessionSync.mockReturnValue(false);
+    beforeEach(async () => {
+      mockUsesUrlBasedSessionSync.mockReturnValue(true);
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: { urlBasedSessionSyncing: true } as AuthConfig,
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfigWithDifferentOrigin,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
 
-        clerkForProductionInstance = new Clerk(productionPublishableKey);
-        await clerkForProductionInstance.load({
-          routerPush: mockNavigate,
-        });
-
-        clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
-        await clerkForDevelopmentInstance.load({
-          routerPush: mockNavigate,
-        });
+      clerkForProductionInstance = new Clerk(productionPublishableKey);
+      await clerkForProductionInstance.load({
+        routerPush: mockNavigate,
       });
 
-      it('redirects to the provided url without __clerk_db_jwt in the url', async () => {
-        await clerkForProductionInstance.redirectWithAuth('https://app.example.com');
-        expect(mockHref).toHaveBeenNthCalledWith(1, 'https://app.example.com/');
-
-        await clerkForDevelopmentInstance.redirectWithAuth('https://app.example.com');
-        expect(mockHref).toHaveBeenNthCalledWith(2, 'https://app.example.com/');
+      clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
+      await clerkForDevelopmentInstance.load({
+        routerPush: mockNavigate,
       });
     });
 
-    describe('for dev instances that use url based session syncing', () => {
-      beforeEach(async () => {
-        mockUsesUrlBasedSessionSync.mockReturnValue(true);
-        mockEnvironmentFetch.mockReturnValue(
-          Promise.resolve({
-            authConfig: { urlBasedSessionSyncing: true } as AuthConfig,
-            userSettings: mockUserSettings,
-            displayConfig: mockDisplayConfigWithDifferentOrigin,
-            isProduction: () => false,
-            isDevelopmentOrStaging: () => true,
-          }),
-        );
+    it('redirects to the provided url with __clerk_db_jwt in the url', async () => {
+      await clerkForProductionInstance.redirectWithAuth('https://app.example.com');
+      expect(mockHref).toHaveBeenNthCalledWith(1, 'https://app.example.com/');
 
-        clerkForProductionInstance = new Clerk(productionPublishableKey);
-        await clerkForProductionInstance.load({
-          routerPush: mockNavigate,
-        });
-
-        clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
-        await clerkForDevelopmentInstance.load({
-          routerPush: mockNavigate,
-        });
-      });
-
-      it('redirects to the provided url with __clerk_db_jwt in the url', async () => {
-        await clerkForProductionInstance.redirectWithAuth('https://app.example.com');
-        expect(mockHref).toHaveBeenNthCalledWith(1, 'https://app.example.com/');
-
-        await clerkForDevelopmentInstance.redirectWithAuth('https://app.example.com');
-        expect(mockHref).toHaveBeenNthCalledWith(2, 'https://app.example.com/#__clerk_db_jwt[deadbeef]');
-      });
+      await clerkForDevelopmentInstance.redirectWithAuth('https://app.example.com');
+      expect(mockHref).toHaveBeenNthCalledWith(2, 'https://app.example.com/#__clerk_db_jwt[deadbeef]');
     });
   });
 });

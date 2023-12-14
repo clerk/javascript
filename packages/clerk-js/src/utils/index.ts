@@ -1,6 +1,5 @@
 export * from './beforeUnloadTracker';
 export * from './componentGuards';
-export * from './cookies';
 export * from './dynamicParamParser';
 export * from './email';
 export * from './encoders';
@@ -9,7 +8,6 @@ export * from './errorThrower';
 export * from './getClerkQueryParam';
 export * from './getClerkQueryParam';
 export * from './hex';
-export * from './iframe';
 export * from './ignoreEventValue';
 export * from './instance';
 export * from './jwt';
