@@ -83,6 +83,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -101,6 +102,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         Authorization: `Bearer ${token}`,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -118,6 +120,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `__client_uat=${clientUat}; __session=${token}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -153,6 +156,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -175,6 +179,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `__client_uat=${clientUat}; __session=${token}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -196,6 +201,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         Authorization: `Bearer ${token}`,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -216,6 +222,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -239,6 +246,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         Authorization: `Bearer ${token}`,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -262,6 +270,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         'X-Proxy-Url': 'https://example.com/clerk',
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -285,6 +294,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         'X-Proxy-Url': 'https://example.com/clerk',
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -306,6 +316,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         'X-Domain': 'localhost:3000',
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -329,6 +340,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         'X-Domain': 'example.com',
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -347,6 +359,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie} __client_uat=1`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -367,6 +380,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `__client_uat=1`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -385,6 +399,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie} __client_uat=0`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -400,6 +415,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `__client_uat=0`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -415,6 +431,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -429,6 +446,7 @@ test.describe('Client handshake @generic', () => {
       headers: new Headers({
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -496,6 +514,7 @@ test.describe('Client handshake @generic', () => {
       headers: new Headers({
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -513,6 +532,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -535,6 +555,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `__client_uat=${clientUat}; __session=${token}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -559,6 +580,7 @@ test.describe('Client handshake @generic', () => {
         'X-Secret-Key': config.sk,
         'X-Forwarded-Host': 'example.com',
         'X-Forwarded-Proto': 'https',
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -581,6 +603,7 @@ test.describe('Client handshake @generic', () => {
         'X-Secret-Key': config.sk,
         'X-Forwarded-Host': 'example.com',
         'X-Forwarded-Proto': 'https',
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -603,6 +626,7 @@ test.describe('Client handshake @generic', () => {
         'X-Secret-Key': config.sk,
         'X-Forwarded-Host': 'example.com:3213',
         'X-Forwarded-Proto': 'https',
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -625,6 +649,7 @@ test.describe('Client handshake @generic', () => {
         'X-Secret-Key': config.sk,
         'X-Forwarded-Host': 'example.com:3213',
         'X-Forwarded-Proto': 'https',
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -646,6 +671,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -669,6 +695,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -688,6 +715,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -707,6 +735,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -726,6 +755,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -746,6 +776,7 @@ test.describe('Client handshake @generic', () => {
         Cookie: `${devBrowserCookie}`,
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -769,6 +800,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         Cookie: `__clerk_handshake=${handshake}`,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -791,6 +823,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         Cookie: `__clerk_handshake=${handshake}`,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -809,6 +842,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         Cookie: `__clerk_handshake=${handshake}`,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
@@ -828,6 +862,7 @@ test.describe('Client handshake @generic', () => {
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
         Cookie: `__clerk_handshake=${handshake}`,
+        'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });

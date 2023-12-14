@@ -35,6 +35,7 @@ const Headers = {
   ForwardedPort: 'x-forwarded-port',
   ForwardedProto: 'x-forwarded-proto',
   ForwardedHost: 'x-forwarded-host',
+  Accept: 'accept',
   Referrer: 'referer',
   UserAgent: 'user-agent',
   Origin: 'origin',

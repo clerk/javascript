@@ -47,6 +47,25 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
   }
 }
 
+/**
+ * Currently, a request is only eligible for a handshake if we can say it's *probably* a request for a document, not a fetch or some other exotic request.
+ * This heuristic should give us a reliable enough signal for browsers that support `Sec-Fetch-Dest` and for those that don't.
+ */
+function isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: string; accept?: string }) {
+  const { accept, secFetchDest } = authenticateContext;
+
+  // NOTE: we could also check sec-fetch-mode === navigate here, but according to the spec, sec-fetch-dest: document should indicate that the request is the result of a user navigation.
+  if (secFetchDest === 'document') {
+    return true;
+  }
+
+  if (!secFetchDest && accept?.startsWith('text/html')) {
+    return true;
+  }
+
+  return false;
+}
+
 export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions,
@@ -153,6 +172,20 @@ ${err.getFullMessage()}`,
     return signedIn(authenticateContext, verifyResult!, headers);
   }
 
+  function handleMaybeHandshakeStatus(
+    context: typeof authenticateContext,
+    reason: AuthErrorReason,
+    message: string,
+    headers?: Headers,
+  ) {
+    if (isRequestEligibleForHandshake(context)) {
+      // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
+      // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
+      return handshake(context, reason, message, headers ?? buildRedirectToHandshake());
+    }
+    return signedOut(context, reason, message, new Headers());
+  }
+
   const pk = parsePublishableKey(options.publishableKey, {
     fatal: true,
     proxyUrl: options.proxyUrl,
@@ -175,9 +208,7 @@ ${err.getFullMessage()}`,
   async function authenticateRequestWithTokenInCookie() {
     const {
       derivedRequestUrl,
-      devBrowser,
       isSatellite,
-      origin,
       secFetchDest,
       signInUrl,
       clientUat: clientUatRaw,
@@ -187,23 +218,11 @@ ${err.getFullMessage()}`,
     const clientUat = parseInt(clientUatRaw || '', 10) || 0;
     const hasActiveClient = clientUat > 0;
     const hasSessionToken = !!sessionToken;
-    const isTaintedDevRedirect = !!devBrowser && origin === 'null';
 
     const isRequestEligibleForMultiDomainSync =
       isSatellite &&
       secFetchDest === 'document' &&
       !derivedRequestUrl.searchParams.has(constants.QueryParameters.ClerkSynced);
-
-    let headers = new Headers({});
-
-    /**
-     * In dev, the redirect chain for fetch requests eventually results in a "tainted redirect" in which the origin gets set to "null" and the request is treated as cross-origin, even if it's technically not.
-     * In order to allow the handshake to succeed in this edge case, we need to add the proper CORS headers to the response.
-     */
-    if (isTaintedDevRedirect) {
-      headers.set('Access-Control-Allow-Origin', 'null');
-      headers.set('Access-Control-Allow-Credentials', 'true');
-    }
 
     /**
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
@@ -216,16 +235,14 @@ ${err.getFullMessage()}`,
      * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
      */
     if (instanceType === 'development' && derivedRequestUrl.searchParams.has(constants.Cookies.DevBrowser)) {
-      headers = buildRedirectToHandshake();
-      return handshake(authenticateContext, AuthErrorReason.DevBrowserSync, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserSync, '');
     }
 
     /**
      * Begin multi-domain sync flows
      */
     if (instanceType === 'production' && isRequestEligibleForMultiDomainSync) {
-      headers = buildRedirectToHandshake();
-      return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '');
     }
 
     // Multi-domain development sync flow
@@ -236,8 +253,8 @@ ${err.getFullMessage()}`,
       const redirectURL = new URL(signInUrl!);
       redirectURL.searchParams.append(constants.QueryParameters.ClerkRedirectUrl, derivedRequestUrl.toString());
 
-      headers.set('location', redirectURL.toString());
-      return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+      const headers = new Headers({ location: redirectURL.toString() });
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
     // Multi-domain development sync flow
@@ -251,39 +268,36 @@ ${err.getFullMessage()}`,
       }
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
 
-      headers.set('location', redirectBackToSatelliteUrl.toString());
-      return handshake(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
+      const headers = new Headers({ location: redirectBackToSatelliteUrl.toString() });
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
     }
     /**
      * End multi-domain sync flows
      */
 
     if (!hasActiveClient && !hasSessionToken) {
-      return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing, '', headers);
+      return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing, '');
     }
 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
     if (!hasActiveClient && hasSessionToken) {
-      headers = buildRedirectToHandshake();
-      return handshake(authenticateContext, AuthErrorReason.SessionTokenWithoutClientUAT, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenWithoutClientUAT, '');
     }
 
     if (hasActiveClient && !hasSessionToken) {
-      headers = buildRedirectToHandshake();
-      return handshake(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '');
     }
 
     const decodeResult = decodeJwt(sessionToken!);
 
     if (decodeResult.payload.iat < clientUat) {
-      headers = buildRedirectToHandshake();
-      return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenOutdated, '');
     }
 
     try {
       const verifyResult = await verifyToken(sessionToken!, authenticateContext);
       if (verifyResult) {
-        return signedIn(authenticateContext, verifyResult, headers);
+        return signedIn(authenticateContext, verifyResult);
       }
     } catch (err) {
       return handleError(err, 'cookie');
@@ -302,8 +316,11 @@ ${err.getFullMessage()}`,
       ].includes(err.reason);
 
       if (reasonToHandshake) {
-        const headers = buildRedirectToHandshake();
-        return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, err.getFullMessage(), headers);
+        return handleMaybeHandshakeStatus(
+          authenticateContext,
+          AuthErrorReason.SessionTokenOutdated,
+          err.getFullMessage(),
+        );
       }
       return signedOut(authenticateContext, err.reason, err.getFullMessage());
     }
@@ -341,6 +358,7 @@ export const loadOptionsFromHeaders = (headers: ReturnType<typeof buildRequest>[
     referrer: headers(constants.Headers.Referrer),
     userAgent: headers(constants.Headers.UserAgent),
     secFetchDest: headers(constants.Headers.SecFetchDest),
+    accept: headers(constants.Headers.Accept),
   };
 };
 
@@ -355,6 +373,5 @@ export const loadOptionsFromCookies = (cookies: ReturnType<typeof buildRequest>[
   return {
     sessionTokenInCookie: cookies?.(constants.Cookies.Session),
     clientUat: cookies?.(constants.Cookies.ClientUat),
-    devBrowser: cookies?.(constants.Cookies.DevBrowser),
   };
 };
