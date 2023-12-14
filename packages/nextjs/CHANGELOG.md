@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.28.1
+
+### Patch Changes
+
+- Update NextJS quickstart link in error message ([#2354](https://github.com/clerk/javascript/pull/2354)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.28.0
 
 ### Minor Changes
