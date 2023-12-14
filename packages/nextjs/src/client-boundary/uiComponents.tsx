@@ -23,15 +23,21 @@ export {
   UserButton,
 } from '@clerk/clerk-react';
 
-export const UserProfile: typeof BaseUserProfile = withPathDefaultRouting(BaseUserProfile);
-export const CreateOrganization: typeof BaseCreateOrganization = withPathDefaultRouting(BaseCreateOrganization);
-export const OrganizationProfile: typeof BaseOrganizationProfile = withPathDefaultRouting(BaseOrganizationProfile);
+export const UserProfile: typeof BaseUserProfile = withPathDefaultRouting(BaseUserProfile, 'UserProfile');
+export const CreateOrganization: typeof BaseCreateOrganization = withPathDefaultRouting(
+  BaseCreateOrganization,
+  'CreateOrganization',
+);
+export const OrganizationProfile: typeof BaseOrganizationProfile = withPathDefaultRouting(
+  BaseOrganizationProfile,
+  'OrganizationProfile',
+);
 
 export const SignIn = (props: SignInProps) => {
   const { signInUrl: repoLevelSignInUrl } = useClerkNextOptions();
   const path = props.path || repoLevelSignInUrl;
   if (!path && !props.routing) {
-    throw Error('You must specify path and routing props');
+    throw Error('Missing path prop. <SignIn/> requires a path prop.');
   }
 
   if (path) {
@@ -49,7 +55,7 @@ export const SignUp = (props: SignUpProps) => {
   const { signUpUrl: repoLevelSignUpUrl } = useClerkNextOptions();
   const path = props.path || repoLevelSignUpUrl;
   if (!path && !props.routing) {
-    throw Error('You must specify path and routing props');
+    throw Error('Missing path prop. <SignUp/> requires a path prop.');
   }
 
   if (path) {
