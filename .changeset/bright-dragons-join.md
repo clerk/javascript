@@ -13,7 +13,7 @@ import { SignOutButton } from "@clerk/clerk-react";
 
 export const Signout = () => {
   return (
-    <SignOutButton signOutCallback={() => window.location.href = "/your-path"}>
+    <SignOutButton signOutCallback={() => { window.location.href = "/your-path" }}>
       <button>Sign Out</button>
     </SignOutButton>
   )
