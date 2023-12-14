@@ -2,6 +2,7 @@ import { CustomPageContentContainer } from '../../common/CustomPageContentContai
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
+import { AccountPage } from './AccountPage';
 import { ConnectedAccountsPage } from './ConnectedAccountsPage';
 import { DeletePage } from './DeletePage';
 import { EmailPage } from './EmailPage';
@@ -17,7 +18,7 @@ import {
   RemovePhonePage,
   RemoveWeb3WalletPage,
 } from './RemoveResourcePage';
-import { RootPage } from './RootPage';
+import { SecurityPage } from './SecurityPage';
 import { UsernamePage } from './UsernamePage';
 import { Web3Page } from './Web3Page';
 
@@ -146,8 +147,11 @@ export const UserProfileRoutes = () => {
         >
           <DeletePage />
         </Route>
+        <Route path='security'>
+          <SecurityPage />
+        </Route>
         <Route index>
-          <RootPage />
+          <AccountPage />
         </Route>
       </Route>
     </Switch>

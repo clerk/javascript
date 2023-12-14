@@ -1,4 +1,4 @@
-import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared/react';
+import { createContextAndHook } from '@clerk/shared/react';
 import React, { useEffect } from 'react';
 
 import type { LocalizationKey } from '../customizables';
@@ -19,7 +19,7 @@ import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, mqu } from '../styledSystem';
-import { colors, sleep } from '../utils';
+import { colors } from '../utils';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
 import { PoweredByClerkTag } from './PoweredByClerk';
@@ -52,8 +52,6 @@ type NavBarProps = {
   header?: React.ReactNode;
 };
 
-const getSectionId = (id: RouteId) => `#cl-section-${id}`;
-
 export const NavBar = (props: NavBarProps) => {
   const { contentRef, title, description, routes, header } = props;
   const [activeId, setActiveId] = React.useState<RouteId>('');
@@ -67,11 +65,11 @@ export const NavBar = (props: NavBarProps) => {
     if (route?.external) {
       return () => navigate(route.path);
     } else {
-      return () => navigateAndScroll(route);
+      return () => navigateToInternalRoute(route);
     }
   };
 
-  const navigateAndScroll = async (route: NavbarRoute) => {
+  const navigateToInternalRoute = async (route: NavbarRoute) => {
     if (contentRef.current) {
       setActiveId(route.id);
       close();
@@ -82,52 +80,8 @@ export const NavBar = (props: NavBarProps) => {
       } else {
         await navigate(route.path);
       }
-      const el = contentRef.current?.querySelector(getSectionId(route.id));
-      //sleep to avoid conflict with floating-ui close
-      await sleep(10);
-      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-
-  useSafeLayoutEffect(
-    function selectNavItemBasedOnVisibleSection() {
-      const callback: IntersectionObserverCallback = entries => {
-        for (const entry of entries) {
-          const id = entry.target?.id?.split('section-')[1];
-          if (entry.isIntersecting && id) {
-            return setActiveId(id);
-          }
-        }
-      };
-      const observer = new IntersectionObserver(callback, { root: contentRef.current, threshold: 1 });
-
-      const mountObservers = () => {
-        const ids = routes.map(r => r.id);
-        const sectionElements = ids
-          .map(getSectionId)
-          .map(id => contentRef.current?.querySelector(id))
-          .filter(s => s);
-
-        if (sectionElements.length === 0) {
-          return false;
-        }
-
-        sectionElements.forEach(section => section && observer.observe(section));
-        return true;
-      };
-
-      const intervalId = setInterval(() => {
-        if (mountObservers()) {
-          clearInterval(intervalId);
-        }
-      }, 50);
-
-      return () => {
-        observer.disconnect();
-      };
-    },
-    [router],
-  );
 
   useEffect(() => {
     routes.every(route => {
