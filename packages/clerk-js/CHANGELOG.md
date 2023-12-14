@@ -1,5 +1,44 @@
 # Change Log
 
+## 5.0.0-alpha-v5.10
+
+### Major Changes
+
+- Drop `redirectToHome` redirect method in favour of `redirectToAfterSignUp` or `redirectToAfterSignIn`. ([#2251](https://github.com/clerk/javascript/pull/2251)) by [@octoper](https://github.com/octoper)
+
+  When the `<SignIn/>` and `<SignUp/>` components are rendered while a user is already logged in, they will now redirect to the configured `afterSignIn` and `afterSignUp` URLs, respectively. Previously, the redirect URL was set to the home URL configured in the dashboard.
+
+### Minor Changes
+
+- Introduce Protect for authorization. ([#2170](https://github.com/clerk/javascript/pull/2170)) by [@panteliselef](https://github.com/panteliselef)
+
+  Changes in public APIs:
+
+  - Rename Gate to Protect
+  - Support for permission checks. (Previously only roles could be used)
+  - Remove the `experimental` tags and prefixes
+  - Drop `some` from the `has` utility and Protect. Protect now accepts a `condition` prop where a function is expected with the `has` being exposed as the param.
+  - Protect can now be used without required props. In this case behaves as `<SignedIn>`, if no authorization props are passed.
+  - `has` will throw an error if neither `permission` or `role` is passed.
+  - `auth().protect()` for Nextjs App Router. Allow per page protection in app router. This utility will automatically throw a 404 error if user is not authorized or authenticated.
+    - inside a page or layout file it will render the nearest `not-found` component set by the developer
+    - inside a route handler it will return empty response body with a 404 status code
+
+### Patch Changes
+
+- Update `@zxcvbn-ts/core` from `2.2.1` to `3.0.4`. Update `@zxcvbn-ts/language-common` from `3.0.2` to `3.0.4`. ([#2326](https://github.com/clerk/javascript/pull/2326)) by [@LekoArts](https://github.com/LekoArts)
+
+- Add `useAssertWrappedByClerkProvider` to internal code. If you use hooks like `useAuth` outside of the `<ClerkProvider />` context an error will be thrown. For example: ([#2299](https://github.com/clerk/javascript/pull/2299)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```shell
+  @clerk/clerk-react: useAuth can only be used within the <ClerkProvider /> component
+  ```
+
+- Updated dependencies [[`896cb6104`](https://github.com/clerk/javascript/commit/896cb610409f84c0ff7a4f502f0b4ccee1afc157), [`69ce3e185`](https://github.com/clerk/javascript/commit/69ce3e185b89283956cb711629bc61703166b1c9), [`ab4eb56a5`](https://github.com/clerk/javascript/commit/ab4eb56a5c34baf496ebb8ac412ad6171b9bd79c), [`46040a2f3`](https://github.com/clerk/javascript/commit/46040a2f34d0991072fca490e031c1994b2e2296), [`75ea300bc`](https://github.com/clerk/javascript/commit/75ea300bce16a0ce401a225263bb267ad2a217b8), [`370b17b12`](https://github.com/clerk/javascript/commit/370b17b123c22aab2915207aad8cbc37c06cfa26), [`844847e0b`](https://github.com/clerk/javascript/commit/844847e0becf20243fba3c659b2b77a238dd270a)]:
+  - @clerk/shared@2.0.0-alpha-v5.6
+  - @clerk/types@4.0.0-alpha-v5.10
+  - @clerk/localizations@2.0.0-alpha-v5.7
+
 ## 5.0.0-alpha-v5.9
 
 ### Major Changes

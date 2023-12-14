@@ -1,5 +1,49 @@
 # Change Log
 
+## 1.0.0-alpha-v5.10
+
+### Major Changes
+
+- - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg ([#2328](https://github.com/clerk/javascript/pull/2328)) by [@dimkl](https://github.com/dimkl)
+
+    ```typescript
+    // Before
+    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
+    // After
+    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+
+    // Before
+    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    // After
+    import {
+      isClerkAPIResponseError,
+      isEmailLinkError,
+      isKnownError,
+      isMetamaskError,
+    } from '@clerk/clerk-react/errors';
+
+    // Before
+    import { MultisessionAppSupport } from '@clerk/clerk-react';
+    // After
+    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+    ```
+
+  - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
+    - `__internal__setErrorThrowerOptions` internal utility (moved to /internal subpath)
+    - `WithClerkProp` type
+    - `MultisessionAppSupport` component (moved to /internal subpath)
+    - `EmailLinkErrorCode` enum
+  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
+    to reduce the export surface since it's trivial to implement if needed.
+
+### Patch Changes
+
+- Updated dependencies [[`69ce3e185`](https://github.com/clerk/javascript/commit/69ce3e185b89283956cb711629bc61703166b1c9), [`896cb6104`](https://github.com/clerk/javascript/commit/896cb610409f84c0ff7a4f502f0b4ccee1afc157), [`8aea39cd6`](https://github.com/clerk/javascript/commit/8aea39cd6907e3a8ac01091aa6df64ebd6a42ed2), [`ab4eb56a5`](https://github.com/clerk/javascript/commit/ab4eb56a5c34baf496ebb8ac412ad6171b9bd79c), [`46040a2f3`](https://github.com/clerk/javascript/commit/46040a2f34d0991072fca490e031c1994b2e2296), [`75ea300bc`](https://github.com/clerk/javascript/commit/75ea300bce16a0ce401a225263bb267ad2a217b8), [`844847e0b`](https://github.com/clerk/javascript/commit/844847e0becf20243fba3c659b2b77a238dd270a)]:
+  - @clerk/clerk-js@5.0.0-alpha-v5.10
+  - @clerk/shared@2.0.0-alpha-v5.6
+  - @clerk/clerk-react@5.0.0-alpha-v5.10
+
 ## 1.0.0-alpha-v5.9
 
 ### Patch Changes

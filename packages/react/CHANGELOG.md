@@ -1,5 +1,83 @@
 # Change Log
 
+## 5.0.0-alpha-v5.10
+
+### Major Changes
+
+- - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg ([#2328](https://github.com/clerk/javascript/pull/2328)) by [@dimkl](https://github.com/dimkl)
+
+    ```typescript
+    // Before
+    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
+    // After
+    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+
+    // Before
+    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    // After
+    import {
+      isClerkAPIResponseError,
+      isEmailLinkError,
+      isKnownError,
+      isMetamaskError,
+    } from '@clerk/clerk-react/errors';
+
+    // Before
+    import { MultisessionAppSupport } from '@clerk/clerk-react';
+    // After
+    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+    ```
+
+  - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
+    - `__internal__setErrorThrowerOptions` internal utility (moved to /internal subpath)
+    - `WithClerkProp` type
+    - `MultisessionAppSupport` component (moved to /internal subpath)
+    - `EmailLinkErrorCode` enum
+  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
+    to reduce the export surface since it's trivial to implement if needed.
+
+- Drop `redirectToHome` redirect method in favour of `redirectToAfterSignUp` or `redirectToAfterSignIn`. ([#2251](https://github.com/clerk/javascript/pull/2251)) by [@octoper](https://github.com/octoper)
+
+  When the `<SignIn/>` and `<SignUp/>` components are rendered while a user is already logged in, they will now redirect to the configured `afterSignIn` and `afterSignUp` URLs, respectively. Previously, the redirect URL was set to the home URL configured in the dashboard.
+
+- Align return types for redirectTo\* methods in ClerkJS [SDK-1037] ([#2316](https://github.com/clerk/javascript/pull/2316)) by [@tmilewski](https://github.com/tmilewski)
+
+  Breaking Changes:
+
+  - `redirectToUserProfile` now returns `Promise<unknown>` instead of `void`
+  - `redirectToOrganizationProfile` now returns `Promise<unknown>` instead of `void`
+  - `redirectToCreateOrganization` now returns `Promise<unknown>` instead of `void`
+  - `redirectToHome` now returns `Promise<unknown>` instead of `void`
+
+### Minor Changes
+
+- Introduce Protect for authorization. ([#2170](https://github.com/clerk/javascript/pull/2170)) by [@panteliselef](https://github.com/panteliselef)
+
+  Changes in public APIs:
+
+  - Rename Gate to Protect
+  - Support for permission checks. (Previously only roles could be used)
+  - Remove the `experimental` tags and prefixes
+  - Drop `some` from the `has` utility and Protect. Protect now accepts a `condition` prop where a function is expected with the `has` being exposed as the param.
+  - Protect can now be used without required props. In this case behaves as `<SignedIn>`, if no authorization props are passed.
+  - `has` will throw an error if neither `permission` or `role` is passed.
+  - `auth().protect()` for Nextjs App Router. Allow per page protection in app router. This utility will automatically throw a 404 error if user is not authorized or authenticated.
+    - inside a page or layout file it will render the nearest `not-found` component set by the developer
+    - inside a route handler it will return empty response body with a 404 status code
+
+### Patch Changes
+
+- Add `useAssertWrappedByClerkProvider` to internal code. If you use hooks like `useAuth` outside of the `<ClerkProvider />` context an error will be thrown. For example: ([#2299](https://github.com/clerk/javascript/pull/2299)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```shell
+  @clerk/clerk-react: useAuth can only be used within the <ClerkProvider /> component
+  ```
+
+- Updated dependencies [[`896cb6104`](https://github.com/clerk/javascript/commit/896cb610409f84c0ff7a4f502f0b4ccee1afc157), [`69ce3e185`](https://github.com/clerk/javascript/commit/69ce3e185b89283956cb711629bc61703166b1c9), [`ab4eb56a5`](https://github.com/clerk/javascript/commit/ab4eb56a5c34baf496ebb8ac412ad6171b9bd79c), [`46040a2f3`](https://github.com/clerk/javascript/commit/46040a2f34d0991072fca490e031c1994b2e2296), [`75ea300bc`](https://github.com/clerk/javascript/commit/75ea300bce16a0ce401a225263bb267ad2a217b8), [`844847e0b`](https://github.com/clerk/javascript/commit/844847e0becf20243fba3c659b2b77a238dd270a)]:
+  - @clerk/shared@2.0.0-alpha-v5.6
+  - @clerk/types@4.0.0-alpha-v5.10
+
 ## 5.0.0-alpha-v5.9
 
 ### Major Changes

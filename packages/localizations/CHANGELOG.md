@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.7
+
+### Patch Changes
+
+- Update es-ES.ts ([#2341](https://github.com/clerk/javascript/pull/2341)) by [@codesjedi](https://github.com/codesjedi)
+
 ## 2.0.0-alpha-v5.6
 
 ### Patch Changes

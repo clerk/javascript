@@ -1,5 +1,128 @@
 # Change Log
 
+## 1.0.0-alpha-v5.10
+
+### Major Changes
+
+- - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg ([#2328](https://github.com/clerk/javascript/pull/2328)) by [@dimkl](https://github.com/dimkl)
+
+    ```typescript
+    // Before
+    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
+    // After
+    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+
+    // Before
+    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    // After
+    import {
+      isClerkAPIResponseError,
+      isEmailLinkError,
+      isKnownError,
+      isMetamaskError,
+    } from '@clerk/clerk-react/errors';
+
+    // Before
+    import { MultisessionAppSupport } from '@clerk/clerk-react';
+    // After
+    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+    ```
+
+  - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
+    - `__internal__setErrorThrowerOptions` internal utility (moved to /internal subpath)
+    - `WithClerkProp` type
+    - `MultisessionAppSupport` component (moved to /internal subpath)
+    - `EmailLinkErrorCode` enum
+  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
+    to reduce the export surface since it's trivial to implement if needed.
+
+- Expand the ability for `@clerk/chrome-extension` WebSSO to sync with host applications which use URL-based session syncing. ([#2277](https://github.com/clerk/javascript/pull/2277)) by [@tmilewski](https://github.com/tmilewski)
+
+  ### How to Update
+
+  **WebSSO Host Permissions:**
+
+  _Local Development: You must have your explicit development domain added to your `manifest.json` file in order to use the WebSSO flow._
+
+  Example:
+
+  ```json
+  {
+    "host_permissions": [
+      // ...
+      "http://localhost"
+      // ...
+    ]
+  }
+  ```
+
+  _Production: You must have your explicit Clerk Frontend API domain added to your `manifest.json` file in order to use the WebSSO flow._
+
+  Example:
+
+  ```json
+  {
+    "host_permissions": [
+      // ...
+      "https://clerk.example.com"
+      // ...
+    ]
+  }
+  ```
+
+  **WebSSO Provider settings:**
+
+  ```tsx
+  <ClerkProvider
+    publishableKey={publishableKey}
+    routerPush={to => navigate(to)}
+    routerReplace={to => navigate(to, { replace: true })}
+    syncSessionWithTab
+
+    // tokenCache is now storageCache (See below)
+    storageCache={/* ... */}
+  >
+  ```
+
+  **WebSSO Storage Cache Interface:**
+
+  With the prop change from `tokenCache` to `storageCache`, the interface has been expanded to allow for more flexibility.
+
+  The new interface is as follows:
+
+  ```ts
+  type StorageCache = {
+    createKey: (...keys: string[]) => string;
+    get: <T = any>(key: string) => Promise<T>;
+    remove: (key: string) => Promise<void>;
+    set: (key: string, value: string) => Promise<void>;
+  };
+  ```
+
+### Minor Changes
+
+- Introduce Protect for authorization. ([#2170](https://github.com/clerk/javascript/pull/2170)) by [@panteliselef](https://github.com/panteliselef)
+
+  Changes in public APIs:
+
+  - Rename Gate to Protect
+  - Support for permission checks. (Previously only roles could be used)
+  - Remove the `experimental` tags and prefixes
+  - Drop `some` from the `has` utility and Protect. Protect now accepts a `condition` prop where a function is expected with the `has` being exposed as the param.
+  - Protect can now be used without required props. In this case behaves as `<SignedIn>`, if no authorization props are passed.
+  - `has` will throw an error if neither `permission` or `role` is passed.
+  - `auth().protect()` for Nextjs App Router. Allow per page protection in app router. This utility will automatically throw a 404 error if user is not authorized or authenticated.
+    - inside a page or layout file it will render the nearest `not-found` component set by the developer
+    - inside a route handler it will return empty response body with a 404 status code
+
+### Patch Changes
+
+- Updated dependencies [[`69ce3e185`](https://github.com/clerk/javascript/commit/69ce3e185b89283956cb711629bc61703166b1c9), [`896cb6104`](https://github.com/clerk/javascript/commit/896cb610409f84c0ff7a4f502f0b4ccee1afc157), [`8aea39cd6`](https://github.com/clerk/javascript/commit/8aea39cd6907e3a8ac01091aa6df64ebd6a42ed2), [`ab4eb56a5`](https://github.com/clerk/javascript/commit/ab4eb56a5c34baf496ebb8ac412ad6171b9bd79c), [`46040a2f3`](https://github.com/clerk/javascript/commit/46040a2f34d0991072fca490e031c1994b2e2296), [`75ea300bc`](https://github.com/clerk/javascript/commit/75ea300bce16a0ce401a225263bb267ad2a217b8), [`844847e0b`](https://github.com/clerk/javascript/commit/844847e0becf20243fba3c659b2b77a238dd270a)]:
+  - @clerk/clerk-js@5.0.0-alpha-v5.10
+  - @clerk/shared@2.0.0-alpha-v5.6
+  - @clerk/clerk-react@5.0.0-alpha-v5.10
+
 ## 1.0.0-alpha-v5.9
 
 ### Patch Changes

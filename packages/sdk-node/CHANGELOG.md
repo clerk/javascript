@@ -1,5 +1,31 @@
 # Change Log
 
+## 5.0.0-alpha-v5.8
+
+### Major Changes
+
+- (Note: This is only relevant if, in the unlikely case, you are using `Clerk` from `@clerk/clerk-sdk-node` directly. If not, you can safely ignore this change.) ([#2317](https://github.com/clerk/javascript/pull/2317)) by [@tmilewski](https://github.com/tmilewski)
+
+  Remove the named `Clerk` import from `@clerk/clerk-sdk-node` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
+
+  ```js
+  import { Clerk } from '@clerk/clerk-sdk-node';
+  const clerk = Clerk({ secretKey: '...' });
+  ```
+
+  You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
+
+  ```js
+  import { createClerkClient } from '@clerk/clerk-sdk-node';
+  const clerk = createClerkClient({ secretKey: '...' });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`896cb6104`](https://github.com/clerk/javascript/commit/896cb610409f84c0ff7a4f502f0b4ccee1afc157), [`02976d494`](https://github.com/clerk/javascript/commit/02976d49473958b8c3fea38d4e389dc1bee7e8c4), [`86d52fb5c`](https://github.com/clerk/javascript/commit/86d52fb5cf68f1dc7adf617605b922134e21268f), [`46040a2f3`](https://github.com/clerk/javascript/commit/46040a2f34d0991072fca490e031c1994b2e2296), [`75ea300bc`](https://github.com/clerk/javascript/commit/75ea300bce16a0ce401a225263bb267ad2a217b8)]:
+  - @clerk/shared@2.0.0-alpha-v5.6
+  - @clerk/backend@1.0.0-alpha-v5.8
+
 ## 5.0.0-alpha-v5.7
 
 ### Major Changes

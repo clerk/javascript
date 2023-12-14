@@ -1,5 +1,32 @@
 # Change Log
 
+## 1.0.0-alpha-v5.10
+
+### Major Changes
+
+- (Note: This is only relevant if, in the unlikely case, you are using `Clerk` from `@clerk/fastify` directly. If not, you can safely ignore this change.) ([#2317](https://github.com/clerk/javascript/pull/2317)) by [@tmilewski](https://github.com/tmilewski)
+
+  Remove the named `Clerk` import from `@clerk/fastify` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
+
+  ```js
+  import { Clerk } from '@clerk/fastify';
+  const clerk = Clerk({ secretKey: '...' });
+  ```
+
+  You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
+
+  ```js
+  import { createClerkClient } from '@clerk/fastify';
+  const clerk = createClerkClient({ secretKey: '...' });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`896cb6104`](https://github.com/clerk/javascript/commit/896cb610409f84c0ff7a4f502f0b4ccee1afc157), [`02976d494`](https://github.com/clerk/javascript/commit/02976d49473958b8c3fea38d4e389dc1bee7e8c4), [`69ce3e185`](https://github.com/clerk/javascript/commit/69ce3e185b89283956cb711629bc61703166b1c9), [`86d52fb5c`](https://github.com/clerk/javascript/commit/86d52fb5cf68f1dc7adf617605b922134e21268f), [`ab4eb56a5`](https://github.com/clerk/javascript/commit/ab4eb56a5c34baf496ebb8ac412ad6171b9bd79c), [`46040a2f3`](https://github.com/clerk/javascript/commit/46040a2f34d0991072fca490e031c1994b2e2296), [`75ea300bc`](https://github.com/clerk/javascript/commit/75ea300bce16a0ce401a225263bb267ad2a217b8), [`844847e0b`](https://github.com/clerk/javascript/commit/844847e0becf20243fba3c659b2b77a238dd270a)]:
+  - @clerk/shared@2.0.0-alpha-v5.6
+  - @clerk/backend@1.0.0-alpha-v5.8
+  - @clerk/types@4.0.0-alpha-v5.10
+
 ## 1.0.0-alpha-v5.9
 
 ### Patch Changes
