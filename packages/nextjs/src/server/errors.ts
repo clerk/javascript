@@ -36,7 +36,7 @@ export const authAuthHeaderMissing = (helperName = 'auth') =>
 - Your Middleware matcher is configured to match this route or page.
 - If you are using the src directory, make sure the Middleware file is inside of it.
 
-For more details, see https://clerk.com/docs/quickstarts/get-started-with-nextjs.
+For more details, see https://clerk.com/docs/quickstarts/nextjs.
 `;
 
 export const clockSkewDetected = (verifyMessage: string) =>
