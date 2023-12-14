@@ -11,6 +11,7 @@ exports[`constants from environment variables 1`] = `
     "Session": "__session",
   },
   "Headers": {
+    "Accept": "accept",
     "AuthMessage": "x-clerk-auth-message",
     "AuthReason": "x-clerk-auth-reason",
     "AuthStatus": "x-clerk-auth-status",
