@@ -6,6 +6,7 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "authMiddleware",
   "buildClerkProps",
   "clerkClient",
+  "createClerkClient",
   "currentUser",
   "getAuth",
   "redirectToSignIn",
