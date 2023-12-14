@@ -37,10 +37,6 @@ export {
  * If you do, app router will break.
  */
 export {
-  isClerkAPIResponseError,
-  isEmailLinkError,
-  isKnownError,
-  isMetamaskError,
   useAuth,
   useClerk,
   useEmailLink,

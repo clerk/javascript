@@ -34,14 +34,17 @@
       "types": "./dist/types/server/index.d.ts",
       "import": "./dist/esm/server/index.js",
       "require": "./dist/cjs/server/index.js"
+    },
+    "./errors": {
+      "types": "./dist/types/errors.d.ts",
+      "import": "./dist/esm/errors.js",
+      "require": "./dist/cjs/errors.js"
     }
   },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
-    "server"
+    "server",
+    "errors"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
