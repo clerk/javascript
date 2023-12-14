@@ -45,7 +45,6 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "publish:local": "npx yalc push --replace --sig",
     "build:lib": "tsup --env.NODE_ENV production",
     "build:tests": "tsc -p tsconfig.test.json",
