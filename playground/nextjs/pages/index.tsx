@@ -38,6 +38,9 @@ const Home: NextPage = () => {
             <Link href={'/create-organization'}>Create organization</Link>
           </li>
           <li>
+            <Link href={'/organization-list'}>Organization List</Link>
+          </li>
+          <li>
             <Link href={'/redirect-helpers'}>Redirect helpers</Link>
           </li>
           <li>

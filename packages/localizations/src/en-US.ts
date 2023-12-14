@@ -530,7 +530,7 @@ export const enUS: LocalizationResource = {
   organizationSwitcher: {
     personalWorkspace: 'Personal account',
     notSelected: 'No organization selected',
-    action__createOrganization: 'Create Organization',
+    action__createOrganization: 'Create organization',
     action__manageOrganization: 'Manage',
     action__invitationAccept: 'Join',
     action__suggestionsAccept: 'Request to join',
@@ -698,8 +698,8 @@ export const enUS: LocalizationResource = {
   },
   organizationList: {
     createOrganization: 'Create Organization',
-    title: 'Select an account',
-    titleWithoutPersonal: 'Select an organization',
+    title: 'Choose an account',
+    titleWithoutPersonal: 'Choose an organization',
     subtitle: 'to continue to {{applicationName}}',
     action__invitationAccept: 'Join',
     invitationAcceptedLabel: 'Joined',

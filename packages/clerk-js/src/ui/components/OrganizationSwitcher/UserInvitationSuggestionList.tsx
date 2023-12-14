@@ -136,7 +136,7 @@ const SwitcherInvitationActions = (props: PropsOfComponent<typeof Flex> & { show
   return (
     <Actions
       sx={t => ({
-        borderBottom: showBorder ? `${t.borders.$normal} ${t.colors.$blackAlpha200}` : 'none',
+        borderBottom: showBorder ? `${t.borders.$normal} ${t.colors.$blackAlpha100}` : 'none',
       })}
       role='menu'
       {...restProps}
