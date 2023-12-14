@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 
 import { descriptors, Flex, Spinner } from '../customizables';
-import { CardAlert } from './Alert';
 import { Card } from './Card';
 import { useCardState, withCardStateProvider } from './contexts';
 
@@ -30,9 +29,9 @@ export const LoadingCardContainer = ({ children }: PropsWithChildren) => {
 export const LoadingCard = withCardStateProvider(() => {
   const card = useCardState();
   return (
-    <Card>
-      <CardAlert>{card.error}</CardAlert>
+    <Card.Root>
+      <Card.Alert>{card.error}</Card.Alert>
       <LoadingCardContainer />
-    </Card>
+    </Card.Root>
   );
 });

@@ -1,7 +1,7 @@
 import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, Icon } from '../../customizables';
-import { Card, CardAlert, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
+import { Card, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
 import { ArrowBlockButton } from '../../elements/ArrowBlockButton';
 import { useCardState } from '../../elements/contexts';
 import { Plus, SignOutDouble } from '../../icons';
@@ -24,8 +24,8 @@ const _SignInAccountSwitcher = () => {
 
   return (
     <Flow.Part part='accountSwitcher'>
-      <Card>
-        <CardAlert>{card.error}</CardAlert>
+      <Card.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Header.Root>
           <Header.Title>Signed out</Header.Title>
           <Header.Subtitle>Select account to continue to {applicationName}</Header.Subtitle>
@@ -73,7 +73,7 @@ const _SignInAccountSwitcher = () => {
             </ArrowBlockButton>
           </Col>
         </Col>
-      </Card>
+      </Card.Root>
     </Flow.Part>
   );
 };

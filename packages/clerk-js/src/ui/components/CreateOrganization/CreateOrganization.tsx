@@ -3,7 +3,7 @@ import type { CreateOrganizationModalProps } from '@clerk/types';
 import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { ProfileCard, ProfileCardContent, withCardStateProvider } from '../../elements';
+import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { CreateOrganizationCtx } from '../../types';
 import { CreateOrganizationPage } from './CreateOrganizationPage';
@@ -24,11 +24,11 @@ const _CreateOrganization = () => {
 
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   return (
-    <ProfileCard sx={t => ({ width: t.sizes.$120 })}>
-      <ProfileCardContent>
+    <ProfileCard.Root sx={t => ({ width: t.sizes.$120 })}>
+      <ProfileCard.Content>
         <CreateOrganizationPage />
-      </ProfileCardContent>
-    </ProfileCard>
+      </ProfileCard.Content>
+    </ProfileCard.Root>
   );
 });
 

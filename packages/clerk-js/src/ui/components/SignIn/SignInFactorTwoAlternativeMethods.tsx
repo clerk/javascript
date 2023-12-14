@@ -4,7 +4,7 @@ import React from 'react';
 import { useCoreSignIn } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../../elements';
+import { ArrowBlockButton, Card, Footer, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { backupCodePrefFactorComparator, formatSafeIdentifier } from '../../utils';
 import { HavingTrouble } from './HavingTrouble';
@@ -38,8 +38,8 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 
   return (
     <Flow.Part part='alternativeMethods'>
-      <Card>
-        <CardAlert>{card.error}</CardAlert>
+      <Card.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
         </Header.Root>
@@ -71,7 +71,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
-      </Card>
+      </Card.Root>
     </Flow.Part>
   );
 };

@@ -3,7 +3,7 @@ import React from 'react';
 import type { VerificationStatus } from '../../utils/getClerkQueryParam';
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Flex, Flow, Icon, localizationKeys, Spinner, Text } from '../customizables';
-import { Card, CardAlert, Header } from '../elements';
+import { Card, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { ExclamationTriangle, SwitchArrows, TickShield } from '../icons';
 import type { InternalTheme } from '../styledSystem';
@@ -34,8 +34,8 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
   const card = useCardState();
   return (
     <Flow.Part part='emailLinkStatus'>
-      <Card>
-        <CardAlert>{card.error}</CardAlert>
+      <Card.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Header.Root>
           <Header.Title localizationKey={props.title} />
           <Header.Subtitle localizationKey={props.subtitle} />
@@ -43,7 +43,7 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
         <Col elementDescriptor={descriptors.main}>
           <StatusRow status={props.status} />
         </Col>
-      </Card>
+      </Card.Root>
     </Flow.Part>
   );
 };

@@ -3,7 +3,7 @@ import React from 'react';
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { CardAlert, Header, useCardState } from './index';
+import { Card, Header, useCardState } from './index';
 
 type PageProps = PropsOfComponent<typeof Col> & {
   headerTitle: LocalizationKey | string;
@@ -35,7 +35,7 @@ export const FormContent = (props: PageProps) => {
       {...rest}
       sx={[sx]}
     >
-      <CardAlert>{card.error}</CardAlert>
+      <Card.Alert>{card.error}</Card.Alert>
       <Header.Root>
         <Header.Title
           localizationKey={headerTitle}

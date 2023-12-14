@@ -3,7 +3,7 @@ import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk
 import React from 'react';
 
 import { Flow } from '../customizables';
-import { Card, CardAlert, LoadingCardContainer, useCardState, withCardStateProvider } from '../elements';
+import { Card, LoadingCardContainer, useCardState, withCardStateProvider } from '../elements';
 import { useRouter } from '../router';
 import { handleError } from '../utils';
 
@@ -32,10 +32,10 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
 
   return (
     <Flow.Part part='ssoCallback'>
-      <Card>
-        <CardAlert>{card.error}</CardAlert>
+      <Card.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <LoadingCardContainer />
-      </Card>
+      </Card.Root>
     </Flow.Part>
   );
 };

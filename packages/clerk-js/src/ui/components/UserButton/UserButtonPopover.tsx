@@ -39,6 +39,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       onClick={handleAddAccountClicked}
       sx={t => ({
         backgroundColor: t.colors.$colorBackground,
+        borderBottom: 'none',
       })}
       iconSx={t => ({
         color: t.colors.$blackAlpha400,
@@ -108,7 +109,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         aria-label='User button popover'
         {...rest}
       >
-        <PopoverCard.Main elementDescriptor={descriptors.userButtonPopoverMain}>
+        <PopoverCard.Content elementDescriptor={descriptors.userButtonPopoverMain}>
           <UserPreview
             elementId={'userButton'}
             user={user}
@@ -139,7 +140,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
               {sessionActions}
             </>
           )}
-        </PopoverCard.Main>
+        </PopoverCard.Content>
         <PopoverCard.Footer elementDescriptor={descriptors.userButtonPopoverFooter}>
           {!authConfig.singleSessionMode && signOutAllButton}
         </PopoverCard.Footer>

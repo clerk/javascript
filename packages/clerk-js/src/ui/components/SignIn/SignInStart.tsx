@@ -12,7 +12,6 @@ import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts'
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
-  CardAlert,
   Footer,
   Form,
   Header,
@@ -287,8 +286,44 @@ export function _SignInStart(): JSX.Element {
   const { action, ...identifierFieldProps } = identifierField.props;
   return (
     <Flow.Part part='start'>
-      <Card
-        footerItems={[
+      <Card.Root>
+        <Card.Content>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Header.Root>
+            <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
+          </Header.Root>
+          {/*TODO: extract main in its own component */}
+          <Col
+            elementDescriptor={descriptors.main}
+            gap={8}
+          >
+            <SocialButtonsReversibleContainerWithDivider>
+              {hasSocialOrWeb3Buttons && (
+                <SignInSocialButtons
+                  enableWeb3Providers
+                  enableOAuthProviders
+                />
+              )}
+              {standardFormAttributes.length ? (
+                <Form.Root onSubmit={handleFirstPartySubmit}>
+                  <Form.ControlRow elementId={identifierField.id}>
+                    <DynamicField
+                      actionLabel={nextIdentifier?.action}
+                      onActionClicked={switchToNextIdentifier}
+                      {...identifierFieldProps}
+                      autoFocus={shouldAutofocus}
+                    />
+                  </Form.ControlRow>
+                  <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                  <Form.SubmitButton />
+                </Form.Root>
+              ) : null}
+            </SocialButtonsReversibleContainerWithDivider>
+          </Col>
+        </Card.Content>
+
+        <Card.Footer>
           <Footer.Root key='signIn.start.actionLink'>
             <Footer.Action elementId='signIn'>
               <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
@@ -298,43 +333,9 @@ export function _SignInStart(): JSX.Element {
               />
             </Footer.Action>
             <Footer.Links />
-          </Footer.Root>,
-        ]}
-      >
-        <CardAlert>{card.error}</CardAlert>
-        <Header.Root>
-          <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
-        </Header.Root>
-        {/*TODO: extract main in its own component */}
-        <Col
-          elementDescriptor={descriptors.main}
-          gap={8}
-        >
-          <SocialButtonsReversibleContainerWithDivider>
-            {hasSocialOrWeb3Buttons && (
-              <SignInSocialButtons
-                enableWeb3Providers
-                enableOAuthProviders
-              />
-            )}
-            {standardFormAttributes.length ? (
-              <Form.Root onSubmit={handleFirstPartySubmit}>
-                <Form.ControlRow elementId={identifierField.id}>
-                  <DynamicField
-                    actionLabel={nextIdentifier?.action}
-                    onActionClicked={switchToNextIdentifier}
-                    {...identifierFieldProps}
-                    autoFocus={shouldAutofocus}
-                  />
-                </Form.ControlRow>
-                <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
-                <Form.SubmitButton />
-              </Form.Root>
-            ) : null}
-          </SocialButtonsReversibleContainerWithDivider>
-        </Col>
-      </Card>
+          </Footer.Root>
+        </Card.Footer>
+      </Card.Root>
     </Flow.Part>
   );
 }

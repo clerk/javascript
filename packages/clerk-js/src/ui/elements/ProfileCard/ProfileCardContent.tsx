@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { Col, descriptors } from '../customizables';
-import { useRouter } from '../router';
-import { common, mqu } from '../styledSystem';
+import { Col, descriptors } from '../../customizables';
+import { useRouter } from '../../router';
+import type { PropsOfComponent } from '../../styledSystem';
+import { animations, common, mqu } from '../../styledSystem';
+import { Alert } from '..';
 
 type ProfileCardContentProps = React.PropsWithChildren<{ contentRef?: React.RefObject<HTMLDivElement> }>;
-
 export const ProfileCardContent = (props: ProfileCardContentProps) => {
   const { contentRef, children } = props;
   const router = useRouter();
@@ -37,7 +38,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         borderRadius: t.radii.$lg,
         width: '100%',
         overflowY: 'auto',
-        boxShadow: t.shadows.$cardShadow,
+        boxShadow: t.shadows.$cardContentShadow,
       })}
     >
       <Col
@@ -57,3 +58,16 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
     </Col>
   );
 };
+
+export const CardAlert = React.memo((props: PropsOfComponent<typeof Alert>) => {
+  return (
+    <Alert
+      variant='danger'
+      sx={theme => ({
+        willChange: 'transform, opacity, height',
+        animation: `${animations.textInBig} ${theme.transitionDuration.$slow}`,
+      })}
+      {...props}
+    />
+  );
+});
