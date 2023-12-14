@@ -7,7 +7,7 @@ import { createBackendApiClient } from './api';
 import type { CreateAuthenticateRequestOptions } from './tokens/factory';
 import { createAuthenticateRequest } from './tokens/factory';
 
-export * from './api/resources';
+export type { Organization, Session, User, WebhookEvent, WebhookEventType } from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
 export { verifyToken } from './tokens/verify';
 
