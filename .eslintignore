@@ -4,9 +4,9 @@ packages/*/dist/**
 packages/eslint-config-custom/**
 **/dist/*
 **/build/*
+**/.turbo/*
 playground
 packages/*/examples
-.github
 .idea
 .vscode
 .turbo

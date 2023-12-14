@@ -112,6 +112,10 @@ runs:
       run: npm ci --audit=false --fund=false
       shell: bash
 
+    - name: Lint GitHub Actions Workflows
+      run: npx eslint .github
+      shell: bash
+
     - name: Get Playwright Version
       if: inputs.playwright-enabled == 'true'
       shell: bash
