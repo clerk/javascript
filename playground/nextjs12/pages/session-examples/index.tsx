@@ -1,4 +1,4 @@
-import { WithSession, withSession, WithSessionProp, useSession } from '@clerk/nextjs';
+import { useSession } from '@clerk/nextjs';
 import { PublicUserData } from '@clerk/types';
 import type { NextPage } from 'next';
 import React from 'react';
@@ -20,36 +20,12 @@ function PublicMetadataWithHook() {
   return <Template publicUserData={session?.publicUserData} />;
 }
 
-class PublicMetadataClass extends React.Component<WithSessionProp> {
-  render() {
-    return <Template publicUserData={this.props.session.publicUserData} />;
-  }
-}
-
-export const PublicMetadataClassHOC = withSession(PublicMetadataClass);
-
-const PublicMetadataFn = (props: WithSessionProp) => {
-  const { session } = props;
-  return <Template publicUserData={session?.publicUserData} />;
-};
-
-export const PublicMetadataFnHOC = withSession(PublicMetadataFn);
-
-class PublicMetadataFaaC extends React.Component {
-  render() {
-    return <WithSession>{session => <Template publicUserData={session?.publicUserData} />}</WithSession>;
-  }
-}
-
 const SessionExamplesPage: NextPage = () => {
   return (
     <div
       style={{ display: 'flex', flexDirection: 'column', gap: '2rem', justifyContent: 'center', alignItems: 'center' }}
     >
       <PublicMetadataWithHook />
-      <PublicMetadataClassHOC />
-      <PublicMetadataFnHOC />
-      <PublicMetadataFaaC />
     </div>
   );
 };
