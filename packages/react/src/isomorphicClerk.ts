@@ -36,7 +36,8 @@ import type {
   Without,
 } from '@clerk/types';
 
-import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
+import { errorThrower } from './errors/errorThrower';
+import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors/messages';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
@@ -45,7 +46,7 @@ import type {
   HeadlessBrowserClerkConstructor,
   IsomorphicClerkOptions,
 } from './types';
-import { errorThrower, isConstructor, loadClerkJsScript } from './utils';
+import { isConstructor, loadClerkJsScript } from './utils';
 
 const SDK_METADATA = { name: PACKAGE_NAME, version: PACKAGE_VERSION };
 

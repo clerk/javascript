@@ -9,7 +9,7 @@ import {
   UserProfileLink,
   UserProfilePage,
 } from '../components/uiComponents';
-import { customLinkWrongProps, customPagesIgnoredComponent, customPageWrongProps } from '../errors';
+import { customLinkWrongProps, customPagesIgnoredComponent, customPageWrongProps } from '../errors/messages';
 import type { UserProfilePageProps } from '../types';
 import type { UseCustomElementPortalParams, UseCustomElementPortalReturn } from './useCustomElementPortal';
 import { useCustomElementPortal } from './useCustomElementPortal';

@@ -6,7 +6,6 @@ export {
   AuthenticateWithRedirectCallback,
   ClerkLoaded,
   ClerkLoading,
-  MultisessionAppSupport,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   RedirectToSignIn,
@@ -38,10 +37,6 @@ export {
  * If you do, app router will break.
  */
 export {
-  EmailLinkErrorCode,
-  WithClerk,
-  WithSession,
-  WithUser,
   isClerkAPIResponseError,
   isEmailLinkError,
   isKnownError,
@@ -56,12 +51,7 @@ export {
   useSignIn,
   useSignUp,
   useUser,
-  withClerk,
-  withSession,
-  withUser,
 } from './client-boundary/hooks';
-
-export type { WithClerkProp, WithSessionProp, WithUserProp } from './client-boundary/hooks';
 
 /**
  * Conditionally export components that exhibit different behavior
@@ -89,7 +79,7 @@ export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsS
 export const SignedIn = ComponentsModule.SignedIn as ServerComponentsServerModuleTypes['SignedIn'];
 export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerModuleTypes['SignedOut'];
 
-export const Protect = ComponentsModule.Protect as ServerComponentsServerModuleTypes['Protect'];
+export const Protect = ComponentsModule.Protect;
 
 export const auth = ServerHelperModule.auth as ServerHelpersServerModuleTypes['auth'];
 export const currentUser = ServerHelperModule.currentUser as ServerHelpersServerModuleTypes['currentUser'];

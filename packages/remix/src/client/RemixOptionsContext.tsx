@@ -7,7 +7,7 @@ type ClerkRemixContextValue = Partial<Omit<RemixClerkProviderProps, 'children'>>
 const ClerkRemixOptionsCtx = React.createContext<{ value: ClerkRemixContextValue } | undefined>(undefined);
 ClerkRemixOptionsCtx.displayName = 'ClerkRemixOptionsCtx';
 
-const useClerkRemixOptions = () => {
+const useClerkRemixOptions = (): ClerkRemixContextValue => {
   const ctx = React.useContext(ClerkRemixOptionsCtx) as { value: ClerkRemixContextValue };
   return ctx.value;
 };

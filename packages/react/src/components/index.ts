@@ -19,14 +19,11 @@ export {
   RedirectToSignUp,
   RedirectToUserProfile,
   AuthenticateWithRedirectCallback,
-  MultisessionAppSupport,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
 } from './controlComponents';
 
 export * from './withClerk';
-export * from './withUser';
-export * from './withSession';
 
 export * from './SignInButton';
 export * from './SignUpButton';

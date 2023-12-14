@@ -1,1 +1,1 @@
-export { ClerkProvider, __internal__setErrorThrowerOptions } from './ClerkProvider';
+export { ClerkProvider } from './ClerkProvider';

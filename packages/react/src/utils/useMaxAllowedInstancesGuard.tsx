@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { errorThrower } from './errorThrower';
+import { errorThrower } from '../errors/errorThrower';
 
 const counts = new Map<string, number>();
 

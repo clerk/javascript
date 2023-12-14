@@ -3,8 +3,8 @@ import { loadScript } from '@clerk/shared/loadScript';
 import { isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import { addClerkPrefix } from '@clerk/shared/url';
 
+import { errorThrower } from '../errors/errorThrower';
 import type { IsomorphicClerkOptions } from '../types';
-import { errorThrower } from './errorThrower';
 import { isDevOrStagingUrl } from './isDevOrStageUrl';
 import { versionSelector } from './versionSelector';
 

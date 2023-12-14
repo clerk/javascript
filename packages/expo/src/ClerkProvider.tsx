@@ -1,17 +1,13 @@
 import './polyfills';
 
 import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
-import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import type { TokenCache } from './cache';
 import { MemoryTokenCache } from './cache';
 import { isReactNative } from './runtime';
 import { buildClerk } from './singleton';
-
-__internal__setErrorThrowerOptions({
-  packageName: '@clerk/expo',
-});
 
 export type ClerkProviderProps = ClerkReactProviderProps & {
   tokenCache?: TokenCache;

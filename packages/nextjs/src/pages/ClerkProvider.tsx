@@ -1,4 +1,6 @@
-import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+// Override Clerk React error thrower to show that errors come from @clerk/nextjs
+import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -7,8 +9,7 @@ import { useSafeLayoutEffect } from '../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../types';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
-
-__internal__setErrorThrowerOptions({ packageName: '@clerk/nextjs' });
+setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 
 export function ClerkProvider({ children, ...props }: NextClerkProviderProps): JSX.Element {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
@@ -40,7 +41,6 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
 
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
-      {/*@ts-expect-error*/}
       <ReactClerkProvider
         {...mergedProps}
         initialState={initialState}

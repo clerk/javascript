@@ -9,7 +9,6 @@ import React from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useSessionContext } from '../contexts/SessionContext';
-import { LoadedGuarantee } from '../contexts/StructureContext';
 import { useAuth } from '../hooks';
 import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
@@ -42,7 +41,7 @@ export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX
   if (!isomorphicClerk.loaded) {
     return null;
   }
-  return <LoadedGuarantee>{children}</LoadedGuarantee>;
+  return <>{children}</>;
 };
 
 export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
