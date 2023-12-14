@@ -23,41 +23,14 @@ export function getCustomAttributeFromRequest(req: RequestLike, key: string): st
 }
 
 export function getAuthKeyFromRequest(req: RequestLike, key: AuthKey): string | null | undefined {
-  return (
-    getCustomAttributeFromRequest(req, constants.Attributes[key]) ||
-    getHeader(req, constants.Headers[key]) ||
-    (key === 'AuthStatus' ? getQueryParam(req, constants.SearchParams.AuthStatus) : undefined)
-  );
+  return getCustomAttributeFromRequest(req, constants.Attributes[key]) || getHeader(req, constants.Headers[key]);
 }
 
-// Tries to extract auth status from the request using several strategies
 // TODO: Rename Auth status and align the naming across media
 export function getAuthStatusFromRequest(req: RequestLike): string | null | undefined {
   return (
-    getCustomAttributeFromRequest(req, constants.Attributes.AuthStatus) ||
-    getHeader(req, constants.Headers.AuthStatus) ||
-    getQueryParam(req, constants.SearchParams.AuthStatus)
+    getCustomAttributeFromRequest(req, constants.Attributes.AuthStatus) || getHeader(req, constants.Headers.AuthStatus)
   );
-}
-
-function getQueryParam(req: RequestLike, name: string): string | null | undefined {
-  if (isNextRequest(req)) {
-    return req.nextUrl.searchParams.get(name);
-  }
-
-  // Check if the request contains a parsed query object
-  // NextApiRequest does, but the IncomingMessage in the GetServerSidePropsContext case does not
-  let queryParam: string | null | undefined;
-  if ('query' in req) {
-    queryParam = req.query[name] as string | undefined;
-  }
-
-  // Fall back to query string
-  if (!queryParam) {
-    const qs = (req.url || '').split('?')[1];
-    queryParam = new URLSearchParams(qs).get(name);
-  }
-  return queryParam;
 }
 
 export function getHeader(req: RequestLike, name: string): string | null | undefined {
@@ -124,22 +97,6 @@ export const setRequestHeadersOnNextResponse = (
   });
 };
 
-/**
- * Test whether the currently installed nextjs version supports overriding the request headers.
- * This feature was added in nextjs v13.0.1
- * https://github.com/vercel/next.js/pull/41380
- */
-export const nextJsVersionCanOverrideRequestHeaders = () => {
-  try {
-    const headerKey = 'clerkTest';
-    const headerKeyInRes = `${MIDDLEWARE_HEADER_PREFIX}-${headerKey}`;
-    const res = NextResponse.next({ request: { headers: new Headers({ [headerKey]: 'true' }) } });
-    return res.headers.has(headerKeyInRes);
-  } catch (e) {
-    return false;
-  }
-};
-
 export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
   // Serializing the state on dev env is a temp workaround for the following issue:
   // https://github.com/vercel/next.js/discussions/11209|Next.js
@@ -188,23 +145,11 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
-    if (nextJsVersionCanOverrideRequestHeaders()) {
-      // If we detect that the host app is using a nextjs installation that reliably sets the
-      // request headers, we don't need to fall back to the searchParams strategy.
-      // In this case, we won't set them at all in order to avoid having them visible in the req.url
-      setRequestHeadersOnNextResponse(res, req, {
-        [constants.Headers.AuthStatus]: status,
-        [constants.Headers.AuthMessage]: message || '',
-        [constants.Headers.AuthReason]: reason || '',
-      });
-    } else {
-      res.headers.set(constants.Headers.AuthStatus, status);
-      res.headers.set(constants.Headers.AuthMessage, message || '');
-      res.headers.set(constants.Headers.AuthReason, reason || '');
-      rewriteURL.searchParams.set(constants.SearchParams.AuthStatus, status);
-      rewriteURL.searchParams.set(constants.Headers.AuthMessage, message || '');
-      rewriteURL.searchParams.set(constants.Headers.AuthReason, reason || '');
-    }
+    setRequestHeadersOnNextResponse(res, req, {
+      [constants.Headers.AuthStatus]: status,
+      [constants.Headers.AuthMessage]: message || '',
+      [constants.Headers.AuthReason]: reason || '',
+    });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }
 

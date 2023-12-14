@@ -1,12 +1,8 @@
-// import { headers } from 'next/headers';
+import { headers } from 'next/headers';
 import { NextRequest } from 'next/server';
 
 export const buildRequestLike = () => {
   try {
-    // Dynamically import next/headers, otherwise Next12 apps will break
-    // because next/headers was introduced in next@13
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { headers } = require('next/headers');
     return new NextRequest('https://placeholder.com', { headers: headers() });
   } catch (e: any) {
     if (

@@ -132,6 +132,10 @@ export interface AuthMiddleware {
   (params?: AuthMiddlewareParams): NextMiddleware;
 }
 
+/**
+ * @deprecated Use `clerkMiddleware` instead.
+ * Migration guide: https://clerk.com/docs/upgrade-guides/v5-introduction
+ */
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
   const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...options } = params;
