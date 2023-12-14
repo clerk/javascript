@@ -1,5 +1,5 @@
 import type { AuthenticateRequestOptions, AuthObject, ClerkRequest, RequestState } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest, redirect } from '@clerk/backend/internal';
+import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -157,8 +157,7 @@ export const createAuthenticateRequestOptions = (clerkRequest: ClerkRequest, opt
 };
 
 const redirectAdapter = (url: string | URL) => {
-  const res = NextResponse.redirect(url);
-  return setHeader(res, constants.Headers.ClerkRedirectTo, 'true');
+  return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
 };
 
 const createMiddlewareRedirectToSignIn = (
@@ -166,12 +165,15 @@ const createMiddlewareRedirectToSignIn = (
   requestState: RequestState,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
-    return redirect({
+    return createRedirect({
       redirectAdapter,
+      baseUrl: clerkRequest.clerkUrl,
       signInUrl: requestState.signInUrl,
       signUpUrl: requestState.signUpUrl,
       publishableKey: PUBLISHABLE_KEY,
-    }).redirectToSignIn({ returnBackUrl: opts.returnBackUrl === null ? '' : clerkRequest.clerkUrl.toString() });
+    }).redirectToSignIn({
+      returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkRequest.clerkUrl.toString(),
+    });
   };
 };
 
