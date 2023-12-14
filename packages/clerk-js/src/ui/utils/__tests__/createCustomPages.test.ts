@@ -130,7 +130,7 @@ describe('createCustomPages', () => {
       expect(routes.length).toEqual(4);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('account');
-      expect(routes[2].path).toEqual('account');
+      expect(routes[2].path).toEqual('security');
       expect(routes[3].path).toEqual('custom2');
     });
 
@@ -159,7 +159,7 @@ describe('createCustomPages', () => {
       expect(routes.length).toEqual(4);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('custom1');
-      expect(routes[2].path).toEqual('/');
+      expect(routes[2].path).toEqual('security');
       expect(routes[3].path).toEqual('custom2');
     });
 
@@ -188,7 +188,7 @@ describe('createCustomPages', () => {
       expect(routes.length).toEqual(4);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('custom1');
-      expect(routes[2].path).toEqual('/');
+      expect(routes[2].path).toEqual('account');
       expect(routes[3].path).toEqual('custom2');
     });
 

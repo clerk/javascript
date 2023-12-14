@@ -52,7 +52,7 @@ export const createUserProfileCustomPages = (customPages: CustomPage[]) => {
     customPages,
     getDefaultRoutes: getUserProfileDefaultRoutes,
     setFirstPathToRoot: setFirstPathToUserProfileRoot,
-    excludedPathsFromDuplicateWarning: ['/', 'account'],
+    excludedPathsFromDuplicateWarning: [],
   });
 };
 
@@ -158,18 +158,8 @@ const getRoutesAndContents = ({ customPages, defaultRoutes }: GetRoutesAndConten
   return { allRoutes, contents };
 };
 
-// Set the path of the first route to '/' or if the first route is account or security, set the path of both account and security to '/'
 const setFirstPathToUserProfileRoot = (routes: NavbarRoute[]): NavbarRoute[] => {
-  if (routes[0].id === 'account' || routes[0].id === 'security') {
-    return routes.map(r => {
-      if (r.id === 'account' || r.id === 'security') {
-        return { ...r, path: '/' };
-      }
-      return r;
-    });
-  } else {
-    return routes.map((r, index) => (index === 0 ? { ...r, path: '/' } : r));
-  }
+  return routes.map((r, index) => (index === 0 ? { ...r, path: '/' } : r));
 };
 
 const setFirstPathToOrganizationProfileRoot = (routes: NavbarRoute[]): NavbarRoute[] => {
@@ -255,7 +245,7 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       name: localizationKeys('userProfile.start.headerTitle__security'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
       icon: TickShield,
-      path: 'account',
+      path: 'security',
     },
   ];
 
