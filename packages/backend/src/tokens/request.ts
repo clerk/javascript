@@ -175,7 +175,9 @@ ${err.getFullMessage()}`,
   async function authenticateRequestWithTokenInCookie() {
     const {
       derivedRequestUrl,
+      devBrowser,
       isSatellite,
+      origin,
       secFetchDest,
       signInUrl,
       clientUat: clientUatRaw,
@@ -185,11 +187,23 @@ ${err.getFullMessage()}`,
     const clientUat = parseInt(clientUatRaw || '', 10) || 0;
     const hasActiveClient = clientUat > 0;
     const hasSessionToken = !!sessionToken;
+    const isTaintedDevRedirect = !!devBrowser && origin === 'null';
 
     const isRequestEligibleForMultiDomainSync =
       isSatellite &&
       secFetchDest === 'document' &&
       !derivedRequestUrl.searchParams.has(constants.QueryParameters.ClerkSynced);
+
+    let headers = new Headers({});
+
+    /**
+     * In dev, the redirect chain for fetch requests eventually results in a "tainted redirect" in which the origin gets set to "null" and the request is treated as cross-origin, even if it's technically not.
+     * In order to allow the handshake to succeed in this edge case, we need to add the proper CORS headers to the response.
+     */
+    if (isTaintedDevRedirect) {
+      headers.set('Access-Control-Allow-Origin', 'null');
+      headers.set('Access-Control-Allow-Credentials', 'true');
+    }
 
     /**
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
@@ -202,7 +216,7 @@ ${err.getFullMessage()}`,
      * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
      */
     if (instanceType === 'development' && derivedRequestUrl.searchParams.has(constants.Cookies.DevBrowser)) {
-      const headers = buildRedirectToHandshake();
+      headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.DevBrowserSync, '', headers);
     }
 
@@ -210,7 +224,7 @@ ${err.getFullMessage()}`,
      * Begin multi-domain sync flows
      */
     if (instanceType === 'production' && isRequestEligibleForMultiDomainSync) {
-      const headers = buildRedirectToHandshake();
+      headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
@@ -222,7 +236,7 @@ ${err.getFullMessage()}`,
       const redirectURL = new URL(signInUrl!);
       redirectURL.searchParams.append(constants.QueryParameters.ClerkRedirectUrl, derivedRequestUrl.toString());
 
-      const headers = new Headers({ location: redirectURL.toString() });
+      headers.set('location', redirectURL.toString());
       return handshake(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
@@ -237,7 +251,7 @@ ${err.getFullMessage()}`,
       }
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
 
-      const headers = new Headers({ location: redirectBackToSatelliteUrl.toString() });
+      headers.set('location', redirectBackToSatelliteUrl.toString());
       return handshake(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
     }
     /**
@@ -245,31 +259,31 @@ ${err.getFullMessage()}`,
      */
 
     if (!hasActiveClient && !hasSessionToken) {
-      return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing);
+      return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing, '', headers);
     }
 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
     if (!hasActiveClient && hasSessionToken) {
-      const headers = buildRedirectToHandshake();
+      headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.SessionTokenWithoutClientUAT, '', headers);
     }
 
     if (hasActiveClient && !hasSessionToken) {
-      const headers = buildRedirectToHandshake();
+      headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '', headers);
     }
 
     const decodeResult = decodeJwt(sessionToken!);
 
     if (decodeResult.payload.iat < clientUat) {
-      const headers = buildRedirectToHandshake();
+      headers = buildRedirectToHandshake();
       return handshake(authenticateContext, AuthErrorReason.SessionTokenOutdated, '', headers);
     }
 
     try {
       const verifyResult = await verifyToken(sessionToken!, authenticateContext);
       if (verifyResult) {
-        return signedIn(authenticateContext, verifyResult);
+        return signedIn(authenticateContext, verifyResult, headers);
       }
     } catch (err) {
       return handleError(err, 'cookie');
@@ -341,5 +355,6 @@ export const loadOptionsFromCookies = (cookies: ReturnType<typeof buildRequest>[
   return {
     sessionTokenInCookie: cookies?.(constants.Cookies.Session),
     clientUat: cookies?.(constants.Cookies.ClientUat),
+    devBrowser: cookies?.(constants.Cookies.DevBrowser),
   };
 };
