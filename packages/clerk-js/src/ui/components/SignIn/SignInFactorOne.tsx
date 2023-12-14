@@ -169,8 +169,7 @@ export function _SignInFactorOne(): JSX.Element {
             }));
             toggleForgotPasswordStrategies();
           }}
-          cardTitle={localizationKeys('signIn.forgotPassword.title_phone')}
-          formSubtitle={localizationKeys('signIn.forgotPassword.formSubtitle_phone')}
+          cardSubtitle={localizationKeys('signIn.forgotPassword.subtitle_phone')}
         />
       );
 
@@ -188,8 +187,7 @@ export function _SignInFactorOne(): JSX.Element {
             }));
             toggleForgotPasswordStrategies();
           }}
-          cardTitle={localizationKeys('signIn.forgotPassword.title_email')}
-          formSubtitle={localizationKeys('signIn.forgotPassword.formSubtitle_email')}
+          cardSubtitle={localizationKeys('signIn.forgotPassword.subtitle_email')}
         />
       );
     default:

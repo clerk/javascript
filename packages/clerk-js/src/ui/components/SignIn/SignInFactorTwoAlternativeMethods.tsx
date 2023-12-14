@@ -39,38 +39,44 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
   return (
     <Flow.Part part='alternativeMethods'>
       <Card.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
-          <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
-        </Header.Root>
-        {/*TODO: extract main in its own component */}
-        <Col
-          elementDescriptor={descriptors.main}
-          gap={8}
-        >
-          <Col gap={2}>
-            {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
-              <ArrowBlockButton
-                textLocalizationKey={getButtonLabel(factor)}
-                elementDescriptor={descriptors.alternativeMethodsBlockButton}
-                textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
-                arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
-                key={i}
-                isDisabled={card.isLoading}
-                onClick={() => onFactorSelected(factor)}
-              />
-            ))}
+        <Card.Content>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Header.Root>
+            <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
+          </Header.Root>
+          {/*TODO: extract main in its own component */}
+          <Col
+            elementDescriptor={descriptors.main}
+            gap={8}
+          >
+            <Col gap={2}>
+              {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
+                <ArrowBlockButton
+                  textLocalizationKey={getButtonLabel(factor)}
+                  elementDescriptor={descriptors.alternativeMethodsBlockButton}
+                  textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+                  arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
+                  key={i}
+                  isDisabled={card.isLoading}
+                  onClick={() => onFactorSelected(factor)}
+                />
+              ))}
+            </Col>
           </Col>
-        </Col>
-        <Footer.Root>
-          <Footer.Action elementId='havingTrouble'>
-            <Footer.ActionLink
-              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
-              onClick={onHavingTroubleClick}
-            />
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
+        </Card.Content>
+        <Card.Footer>
+          <Footer.Root key='signIn.alternativeMethods.actionLink'>
+            <Footer.Action elementId='havingTrouble'>
+              <Footer.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
+              <Footer.ActionLink
+                localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+                onClick={onHavingTroubleClick}
+              />
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root>
+        </Card.Footer>
       </Card.Root>
     </Flow.Part>
   );

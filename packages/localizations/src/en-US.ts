@@ -3,7 +3,7 @@ import type { LocalizationResource } from '@clerk/types';
 const commonTexts = {
   signIn: {
     phoneCode: {
-      title: 'Check your phone',
+      title: 'Two-step verification',
       subtitle: 'to continue to {{applicationName}}',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your phone number',
@@ -132,7 +132,7 @@ export const enUS: LocalizationResource = {
     start: {
       title: 'Sign in',
       subtitle: 'to continue to {{applicationName}}',
-      actionText: 'No account?',
+      actionText: 'Don’t have an account?',
       actionLink: 'Sign up',
       actionLink__use_email: 'Use email',
       actionLink__use_phone: 'Use phone',
@@ -140,8 +140,8 @@ export const enUS: LocalizationResource = {
       actionLink__use_email_username: 'Use email or username',
     },
     password: {
-      title: 'Enter your password',
-      subtitle: 'to continue to {{applicationName}}',
+      title: 'Enter password',
+      subtitle: 'Enter the password associated with your email ID',
       actionLink: 'Use another method',
     },
     forgotPasswordAlternativeMethods: {
@@ -150,12 +150,10 @@ export const enUS: LocalizationResource = {
       blockButton__resetPassword: 'Reset your password',
     },
     forgotPassword: {
-      title_email: 'Check your email',
-      title_phone: 'Check your phone',
-      subtitle: 'to reset your password',
-      formTitle: 'Reset password code',
-      formSubtitle_email: 'Enter the code sent to your email address',
-      formSubtitle_phone: 'Enter the code sent to your phone number',
+      title: 'Reset password',
+      subtitle_email: 'First, enter the code sent to your email ID',
+      subtitle_phone: 'First, enter the code sent to your phone',
+      inputLabel: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
     },
     resetPassword: {
@@ -170,9 +168,8 @@ export const enUS: LocalizationResource = {
     },
     emailCode: {
       title: 'Check your email',
-      subtitle: 'to continue to {{applicationName}}',
-      formTitle: 'Verification code',
-      formSubtitle: 'Enter the verification code sent to your email address',
+      subtitle: 'Enter the verification code sent to your email ID',
+      inputLabel: 'Verification code',
       resendButton: "Didn't receive a code? Resend",
     },
     emailLink: {
@@ -207,7 +204,10 @@ export const enUS: LocalizationResource = {
       },
     },
     phoneCode: { ...commonTexts.signIn.phoneCode },
-    phoneCodeMfa: { ...commonTexts.signIn.phoneCode, subtitle: '' },
+    phoneCodeMfa: {
+      ...commonTexts.signIn.phoneCode,
+      subtitle: 'To continue, please enter the verification code sent to your phone ending in',
+    },
     totpMfa: {
       title: 'Two-step verification',
       subtitle: '',
@@ -222,6 +222,8 @@ export const enUS: LocalizationResource = {
     },
     alternativeMethods: {
       title: 'Use another method',
+      subtitle: 'Facing issues? You can use any of these methods to sign in.',
+      actionText: 'Don’t have any of these?',
       actionLink: 'Get help',
       blockButton__emailLink: 'Email link to {{identifier}}',
       blockButton__emailCode: 'Email code to {{identifier}}',

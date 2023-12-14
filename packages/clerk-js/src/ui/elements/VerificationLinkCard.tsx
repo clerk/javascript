@@ -33,38 +33,37 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
   return (
     <Flow.Part part='emailLinkVerify'>
       <Card.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
-          <Header.Title localizationKey={props.cardTitle} />
-          <Header.Subtitle localizationKey={props.cardSubtitle} />
-        </Header.Root>
-        <IdentityPreview
-          identifier={props.safeIdentifier}
-          avatarUrl={props.profileImageUrl}
-          onClick={goBack}
-        />
-        <Col
-          elementDescriptor={descriptors.main}
-          gap={8}
-        >
-          <VerificationLink
-            formTitle={props.formTitle}
-            formSubtitle={props.formSubtitle}
-            resendButton={props.resendButton}
-            onResendCodeClicked={props.onResendCodeClicked}
-          />
-        </Col>
-        <Footer.Root>
-          <Footer.Action elementId='alternativeMethods'>
-            {props.onShowAlternativeMethodsClicked && (
-              <Footer.ActionLink
-                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-                onClick={props.onShowAlternativeMethodsClicked}
+        <Card.Content>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Header.Root>
+            <Header.Title localizationKey={props.cardTitle} />
+            <VerificationLink
+              formTitle={props.formTitle}
+              formSubtitle={props.formSubtitle}
+              resendButton={props.resendButton}
+              onResendCodeClicked={props.onResendCodeClicked}
+            >
+              {' '}
+              <IdentityPreview
+                identifier={props.safeIdentifier}
+                avatarUrl={props.profileImageUrl}
+                onClick={goBack}
               />
-            )}
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
+            </VerificationLink>
+          </Header.Root>
+          <Footer.Root>
+            <Footer.Action elementId='alternativeMethods'>
+              {props.onShowAlternativeMethodsClicked && (
+                <Footer.ActionLink
+                  localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                  onClick={props.onShowAlternativeMethodsClicked}
+                />
+              )}
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root>
+        </Card.Content>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );
@@ -75,6 +74,7 @@ type VerificationLinkProps = {
   formSubtitle: LocalizationKey;
   resendButton: LocalizationKey;
   onResendCodeClicked: React.MouseEventHandler;
+  children?: React.ReactNode;
 };
 
 export const VerificationLink = (props: VerificationLinkProps) => {
@@ -89,15 +89,11 @@ export const VerificationLink = (props: VerificationLinkProps) => {
         gap={1}
       >
         <Text
-          localizationKey={props.formTitle}
-          elementDescriptor={descriptors.formHeaderTitle}
-          variant='subtitle'
-        />
-        <Text
           localizationKey={props.formSubtitle}
           elementDescriptor={descriptors.formHeaderSubtitle}
           colorScheme='neutral'
         />
+        {props.children}
       </Col>
       <TimerButton
         localizationKey={props.resendButton}
@@ -106,7 +102,7 @@ export const VerificationLink = (props: VerificationLinkProps) => {
         startDisabled
         isDisabled={card.isLoading}
         throttleTimeInSec={60}
-        sx={theme => ({ marginTop: theme.space.$4 })}
+        sx={theme => ({ marginTop: theme.space.$4, width: '100%' })}
       />
     </Col>
   );

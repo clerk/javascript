@@ -92,52 +92,55 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   return (
     <Flow.Part part='password'>
       <Card.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
-          <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
-        </Header.Root>
-        <IdentityPreview
-          identifier={signIn.identifier}
-          avatarUrl={signIn.userData.imageUrl}
-          onClick={goBack}
-        />
-        {/*TODO: extract main in its own component */}
-        <Flex
-          direction='col'
-          elementDescriptor={descriptors.main}
-          gap={8}
-        >
-          <Form.Root onSubmit={handlePasswordSubmit}>
-            {/* For password managers */}
-            <input
-              readOnly
-              id='identifier-field'
-              name='identifier'
-              value={signIn.identifier || ''}
-              style={{ display: 'none' }}
+        <Card.Content>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Header.Root gap={1}>
+            <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
+            <IdentityPreview
+              identifier={signIn.identifier}
+              avatarUrl={signIn.userData.imageUrl}
+              onClick={goBack}
             />
-            <Form.ControlRow elementId={passwordControl.id}>
-              <Form.PasswordInput
-                {...passwordControl.props}
-                autoFocus
+          </Header.Root>
+          {/*TODO: extract main in its own component */}
+          <Flex
+            direction='col'
+            elementDescriptor={descriptors.main}
+            gap={4}
+          >
+            <Form.Root onSubmit={handlePasswordSubmit}>
+              {/* For password managers */}
+              <input
+                readOnly
+                id='identifier-field'
+                name='identifier'
+                value={signIn.identifier || ''}
+                style={{ display: 'none' }}
               />
-            </Form.ControlRow>
-            <Form.SubmitButton />
-          </Form.Root>
-        </Flex>
+              <Form.ControlRow elementId={passwordControl.id}>
+                <Form.PasswordInput
+                  {...passwordControl.props}
+                  autoFocus
+                />
+              </Form.ControlRow>
+              <Form.SubmitButton />
+            </Form.Root>
+          </Flex>
 
-        <Footer.Root>
-          <Footer.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
-            <Footer.ActionLink
-              localizationKey={localizationKeys(
-                onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
-              )}
-              onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
-            />
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
+          <Footer.Root>
+            <Footer.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
+              <Footer.ActionLink
+                localizationKey={localizationKeys(
+                  onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
+                )}
+                onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
+              />
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root>
+        </Card.Content>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );

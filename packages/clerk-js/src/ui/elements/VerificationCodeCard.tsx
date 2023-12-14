@@ -44,47 +44,49 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
 
   return (
     <Card.Root>
-      <Card.Alert>{card.error}</Card.Alert>
-      <Header.Root>
-        <Header.Title localizationKey={props.cardTitle} />
-        <Header.Subtitle localizationKey={props.cardSubtitle} />
-        <IdentityPreview
-          identifier={props.safeIdentifier}
-          avatarUrl={props.profileImageUrl}
-          onClick={!props.onBackLinkClicked ? props.onIdentityPreviewEditClicked : undefined}
-        />
-      </Header.Root>
-      {children}
-      <Col
-        elementDescriptor={descriptors.main}
-        gap={8}
-      >
-        <Form.OTPInput
-          {...otp}
-          label={props.formTitle}
-          description={props.formSubtitle}
-          resendButton={props.resendButton}
-        />
-        <Button
-          elementDescriptor={descriptors.formButtonPrimary}
-          block
-          hasArrow
-          localizationKey={localizationKeys('formButtonPrimary')}
-          onClick={otp.onFakeContinue}
-        />
-      </Col>
+      <Card.Content>
+        <Card.Alert>{card.error}</Card.Alert>
+        <Header.Root>
+          <Header.Title localizationKey={props.cardTitle} />
+          <Header.Subtitle localizationKey={props.cardSubtitle} />
+          <IdentityPreview
+            identifier={props.safeIdentifier}
+            avatarUrl={props.profileImageUrl}
+            onClick={!props.onBackLinkClicked ? props.onIdentityPreviewEditClicked : undefined}
+          />
+        </Header.Root>
+        {children}
+        <Col
+          elementDescriptor={descriptors.main}
+          gap={8}
+        >
+          <Form.OTPInput
+            {...otp}
+            label={props.inputLabel}
+            resendButton={props.resendButton}
+          />
+          <Button
+            elementDescriptor={descriptors.formButtonPrimary}
+            block
+            hasArrow
+            localizationKey={localizationKeys('formButtonPrimary')}
+            onClick={otp.onFakeContinue}
+          />
+        </Col>
 
-      {showAlternativeMethods && props.onShowAlternativeMethodsClicked && (
-        <Footer.Root>
-          <Footer.Action elementId='alternativeMethods'>
-            <Footer.ActionLink
-              localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-              onClick={props.onShowAlternativeMethodsClicked}
-            />
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
-      )}
+        {showAlternativeMethods && props.onShowAlternativeMethodsClicked && (
+          <Footer.Root>
+            <Footer.Action elementId='alternativeMethods'>
+              <Footer.ActionLink
+                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                onClick={props.onShowAlternativeMethodsClicked}
+              />
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root>
+        )}
+      </Card.Content>
+      <Card.Footer />
     </Card.Root>
   );
 };
