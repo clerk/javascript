@@ -10,32 +10,7 @@ export default (QUnit: QUnit) => {
 
   module('public exports', () => {
     test('should not include a breaking change', assert => {
-      const exportedApiKeys = [
-        'AllowlistIdentifier',
-        'Client',
-        'DeletedObject',
-        'Email',
-        'EmailAddress',
-        'ExternalAccount',
-        'IdentificationLink',
-        'Invitation',
-        'OauthAccessToken',
-        'ObjectType',
-        'Organization',
-        'OrganizationInvitation',
-        'OrganizationMembership',
-        'OrganizationMembershipPublicUserData',
-        'PhoneNumber',
-        'RedirectUrl',
-        'SMSMessage',
-        'Session',
-        'SignInToken',
-        'Token',
-        'User',
-        'Verification',
-        'createClerkClient',
-        'verifyToken',
-      ];
+      const exportedApiKeys = ['createClerkClient', 'verifyToken'];
       assert.deepEqual(Object.keys(publicExports).sort(), exportedApiKeys);
     });
   });
