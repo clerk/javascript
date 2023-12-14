@@ -1,5 +1,5 @@
 import { Col, descriptors, localizationKeys, Spinner, Text } from '../../customizables';
-import { Card, CardAlert, Header, useCardState, withCardStateProvider } from '../../elements';
+import { Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useSetSessionWithTimeout } from '../../hooks/useSetSessionWithTimeout';
 import { Flex } from '../../primitives';
 
@@ -7,8 +7,8 @@ export const _ResetPasswordSuccess = () => {
   const card = useCardState();
   useSetSessionWithTimeout();
   return (
-    <Card>
-      <CardAlert>{card.error}</CardAlert>
+    <Card.Root>
+      <Card.Alert>{card.error}</Card.Alert>
       <Header.Root>
         <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
       </Header.Root>
@@ -28,7 +28,7 @@ export const _ResetPasswordSuccess = () => {
           />
         </Flex>
       </Col>
-    </Card>
+    </Card.Root>
   );
 };
 

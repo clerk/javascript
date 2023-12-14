@@ -3,8 +3,7 @@ import React from 'react';
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Flow, localizationKeys, Text } from '../customizables';
 import { useRouter } from '../router';
-import { CardAlert } from './Alert';
-import { Card } from './Card';
+import { Card } from '.';
 import { useCardState } from './contexts';
 import { Footer } from './Footer';
 import { Header } from './Header';
@@ -33,8 +32,8 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
 
   return (
     <Flow.Part part='emailLinkVerify'>
-      <Card>
-        <CardAlert>{card.error}</CardAlert>
+      <Card.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Header.Root>
           <Header.Title localizationKey={props.cardTitle} />
           <Header.Subtitle localizationKey={props.cardSubtitle} />
@@ -66,7 +65,7 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
-      </Card>
+      </Card.Root>
     </Flow.Part>
   );
 };

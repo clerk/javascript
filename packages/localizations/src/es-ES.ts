@@ -369,7 +369,7 @@ export const esES: LocalizationResource = {
       title: 'Agregar cuenta conectada',
       formHint: 'Seleccione un proveedor para conectar su cuenta.',
       formHint__noAccounts: 'No hay proveedores de cuentas externas disponibles.',
-      socialButtonsBlockButton: 'Conectar {{provider|titleize}} cuenta',
+      socialButtonsBlockButton: 'Conectar cuenta de {{provider|titleize}}',
       successMessage: 'El proveedor ha sido agregado a su cuenta',
       removeResource: {
         title: 'Eliminar cuenta conectada',

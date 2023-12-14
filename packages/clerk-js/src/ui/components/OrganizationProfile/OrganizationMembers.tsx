@@ -4,7 +4,7 @@ import { NotificationCountBadge, useGate } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
-  CardAlert,
+  Card,
   Header,
   NavbarMenuButtonRow,
   Tab,
@@ -42,7 +42,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
       elementDescriptor={descriptors.page}
       gap={8}
     >
-      <CardAlert>{card.error}</CardAlert>
+      <Card.Alert>{card.error}</Card.Alert>
       <NavbarMenuButtonRow />
       <Col
         elementDescriptor={descriptors.profilePage}

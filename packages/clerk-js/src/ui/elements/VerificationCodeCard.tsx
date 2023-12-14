@@ -3,7 +3,6 @@ import React from 'react';
 
 import { Button, Col, descriptors, localizationKeys } from '../customizables';
 import type { LocalizationKey } from '../localization';
-import { CardAlert } from './Alert';
 import { Card } from './Card';
 import { useFieldOTP } from './CodeControl';
 import { useCardState } from './contexts';
@@ -44,8 +43,8 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
   });
 
   return (
-    <Card>
-      <CardAlert>{card.error}</CardAlert>
+    <Card.Root>
+      <Card.Alert>{card.error}</Card.Alert>
       <Header.Root>
         <Header.Title localizationKey={props.cardTitle} />
         <Header.Subtitle localizationKey={props.cardSubtitle} />
@@ -86,6 +85,6 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
           <Footer.Links />
         </Footer.Root>
       )}
-    </Card>
+    </Card.Root>
   );
 };

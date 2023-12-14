@@ -8,7 +8,6 @@ import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts'
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
-  CardAlert,
   Footer,
   Header,
   LoadingCard,
@@ -244,8 +243,8 @@ function _SignUpStart(): JSX.Element {
 
   return (
     <Flow.Part part='start'>
-      <Card>
-        <CardAlert>{card.error}</CardAlert>
+      <Card.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signUp.start.title')} />
           <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')} />
@@ -284,7 +283,7 @@ function _SignUpStart(): JSX.Element {
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
-      </Card>
+      </Card.Root>
     </Flow.Part>
   );
 }

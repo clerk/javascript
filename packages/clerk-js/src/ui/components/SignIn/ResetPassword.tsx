@@ -3,7 +3,7 @@ import React from 'react';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys, useLocalizations } from '../../customizables';
-import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
+import { Card, Form, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useConfirmPassword } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
@@ -92,8 +92,8 @@ export const _ResetPassword = () => {
   };
 
   return (
-    <Card>
-      <CardAlert>{card.error}</CardAlert>
+    <Card.Root>
+      <Card.Alert>{card.error}</Card.Alert>
       <Header.Root>
         <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
       </Header.Root>
@@ -143,7 +143,7 @@ export const _ResetPassword = () => {
           />
         </Form.Root>
       </Col>
-    </Card>
+    </Card.Root>
   );
 };
 

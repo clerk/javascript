@@ -298,7 +298,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
             overflow: 'hidden',
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: theme.shadows.$cardShadow,
+            boxShadow: theme.shadows.$cardContentShadow,
             zIndex: theme.zIndices.$dropdown,
           }),
           sx,

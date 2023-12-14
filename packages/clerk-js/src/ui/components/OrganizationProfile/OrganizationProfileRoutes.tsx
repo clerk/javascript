@@ -2,9 +2,7 @@ import { Gate } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
-import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
-import type { PropsOfComponent } from '../../styledSystem';
 import { DeleteOrganizationPage, LeaveOrganizationPage } from './ActionConfirmationPage';
 import { AddDomainPage } from './AddDomainPage';
 import { InviteMembersPage } from './InviteMembersPage';
@@ -15,7 +13,7 @@ import { RemoveDomainPage } from './RemoveDomainPage';
 import { VerifiedDomainPage } from './VerifiedDomainPage';
 import { VerifyDomainPage } from './VerifyDomainPage';
 
-export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof ProfileCardContent>) => {
+export const OrganizationProfileRoutes = () => {
   const { pages } = useOrganizationProfileContext();
   const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
   const isSettingsPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS;
@@ -37,111 +35,109 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
   });
 
   return (
-    <ProfileCardContent contentRef={props.contentRef}>
-      <Switch>
-        {customPageRoutesWithContents}
-        <Route>
-          <Route path={isSettingsPageRoot ? undefined : 'organization-settings'}>
-            <Switch>
-              <Route
-                path='profile'
-                flowStart
+    <Switch>
+      {customPageRoutesWithContents}
+      <Route>
+        <Route path={isSettingsPageRoot ? undefined : 'organization-settings'}>
+          <Switch>
+            <Route
+              path='profile'
+              flowStart
+            >
+              <Gate
+                permission={'org:sys_profile:manage'}
+                redirectTo='../'
               >
-                <Gate
-                  permission={'org:sys_profile:manage'}
-                  redirectTo='../'
-                >
-                  <ProfileSettingsPage />
-                </Gate>
-              </Route>
-              <Route
-                path='domain'
-                flowStart
+                <ProfileSettingsPage />
+              </Gate>
+            </Route>
+            <Route
+              path='domain'
+              flowStart
+            >
+              <Switch>
+                <Route path=':id/verify'>
+                  <Gate
+                    permission={'org:sys_domains:manage'}
+                    redirectTo='../../'
+                  >
+                    <VerifyDomainPage />
+                  </Gate>
+                </Route>
+                <Route path=':id/remove'>
+                  <Gate
+                    permission={'org:sys_domains:manage'}
+                    redirectTo='../../'
+                  >
+                    <RemoveDomainPage />
+                  </Gate>
+                </Route>
+                <Route path=':id'>
+                  <Gate
+                    permission='org:sys_domains:manage'
+                    redirectTo='../../'
+                  >
+                    <VerifiedDomainPage />
+                  </Gate>
+                </Route>
+                <Route index>
+                  <Gate
+                    permission={'org:sys_domains:manage'}
+                    redirectTo='../'
+                  >
+                    <AddDomainPage />
+                  </Gate>
+                </Route>
+              </Switch>
+            </Route>
+            <Route
+              path='leave'
+              flowStart
+            >
+              <LeaveOrganizationPage />
+            </Route>
+            <Route
+              path='delete'
+              flowStart
+            >
+              <Gate
+                permission={'org:sys_profile:delete'}
+                redirectTo='../'
               >
-                <Switch>
-                  <Route path=':id/verify'>
-                    <Gate
-                      permission={'org:sys_domains:manage'}
-                      redirectTo='../../'
-                    >
-                      <VerifyDomainPage />
-                    </Gate>
-                  </Route>
-                  <Route path=':id/remove'>
-                    <Gate
-                      permission={'org:sys_domains:manage'}
-                      redirectTo='../../'
-                    >
-                      <RemoveDomainPage />
-                    </Gate>
-                  </Route>
-                  <Route path=':id'>
-                    <Gate
-                      permission='org:sys_domains:manage'
-                      redirectTo='../../'
-                    >
-                      <VerifiedDomainPage />
-                    </Gate>
-                  </Route>
-                  <Route index>
-                    <Gate
-                      permission={'org:sys_domains:manage'}
-                      redirectTo='../'
-                    >
-                      <AddDomainPage />
-                    </Gate>
-                  </Route>
-                </Switch>
-              </Route>
-              <Route
-                path='leave'
-                flowStart
-              >
-                <LeaveOrganizationPage />
-              </Route>
-              <Route
-                path='delete'
-                flowStart
-              >
-                <Gate
-                  permission={'org:sys_profile:delete'}
-                  redirectTo='../'
-                >
-                  <DeleteOrganizationPage />
-                </Gate>
-              </Route>
-              <Route index>
-                <OrganizationSettings />
-              </Route>
-            </Switch>
-          </Route>
-          <Route path={isMembersPageRoot ? undefined : 'organization-members'}>
-            <Switch>
-              <Route
-                path='invite-members'
-                flowStart
-              >
-                <Gate
-                  permission={'org:sys_memberships:manage'}
-                  redirectTo='../'
-                >
-                  <InviteMembersPage />
-                </Gate>
-              </Route>
-              <Route index>
-                <Gate
-                  condition={has =>
-                    has({ permission: 'org:sys_memberships:read' }) || has({ permission: 'org:sys_memberships:manage' })
-                  }
-                  redirectTo={isSettingsPageRoot ? '../' : './organization-settings'}
-                >
-                  <OrganizationMembers />
-                </Gate>
-              </Route>
-            </Switch>
-          </Route>
+                <DeleteOrganizationPage />
+              </Gate>
+            </Route>
+            <Route index>
+              <OrganizationSettings />
+            </Route>
+          </Switch>
         </Route>
-      </Switch>
-    </ProfileCardContent>
+        <Route path={isMembersPageRoot ? undefined : 'organization-members'}>
+          <Switch>
+            <Route
+              path='invite-members'
+              flowStart
+            >
+              <Gate
+                permission={'org:sys_memberships:manage'}
+                redirectTo='../'
+              >
+                <InviteMembersPage />
+              </Gate>
+            </Route>
+            <Route index>
+              <Gate
+                condition={has =>
+                  has({ permission: 'org:sys_memberships:read' }) || has({ permission: 'org:sys_memberships:manage' })
+                }
+                redirectTo={isSettingsPageRoot ? '../' : './organization-settings'}
+              >
+                <OrganizationMembers />
+              </Gate>
+            </Route>
+          </Switch>
+        </Route>
+      </Route>
+    </Switch>
   );
 };

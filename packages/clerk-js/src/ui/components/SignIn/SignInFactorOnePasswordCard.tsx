@@ -6,7 +6,7 @@ import React from 'react';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
-import { Card, CardAlert, Footer, Form, Header, IdentityPreview, useCardState } from '../../elements';
+import { Card, Footer, Form, Header, IdentityPreview, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
 import { handleError, useFormControl } from '../../utils';
@@ -91,8 +91,8 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
 
   return (
     <Flow.Part part='password'>
-      <Card>
-        <CardAlert>{card.error}</CardAlert>
+      <Card.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
           <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
@@ -138,7 +138,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
-      </Card>
+      </Card.Root>
     </Flow.Part>
   );
 };

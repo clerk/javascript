@@ -4,35 +4,43 @@ import { useEnvironment } from '../contexts';
 import { Col, descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations } from '../styledSystem';
-import { BaseCard } from './Card';
+import { Card } from '.';
 import { PoweredByClerkTag } from './PoweredByClerk';
 
-const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof BaseCard>>((props, ref) => {
+const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card.Content>>((props, ref) => {
   return (
     <Flow.Part part='popover'>
-      <BaseCard
+      <Card.Root
         {...props}
         ref={ref}
         sx={t => ({
           width: t.sizes.$94,
           maxWidth: `calc(100vw - ${t.sizes.$8})`,
           zIndex: t.zIndices.$modal,
+          borderRadius: t.radii.$lg,
           animation: `${animations.dropdownSlideInScaleAndFade} 140ms `,
-          border: `1px solid ${t.colors.$blackAlpha200}`,
         })}
       >
         {props.children}
-      </BaseCard>
+      </Card.Root>
     </Flow.Part>
   );
 });
 
-const PopoverCardMain = (props: PropsOfComponent<typeof Flex>) => {
+const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
   const { sx, ...rest } = props;
   return (
     <Flex
       direction='col'
-      sx={[t => ({ backgroundColor: t.colors.$colorBackground, borderRadius: t.radii.$lg, overflow: 'hidden' }), sx]}
+      sx={[
+        t => ({
+          backgroundColor: t.colors.$colorBackground,
+          overflow: 'hidden',
+          borderRadius: t.radii.$lg,
+          boxShadow: t.shadows.$cardContentShadow,
+        }),
+        sx,
+      ]}
       {...rest}
     >
       {props.children}
@@ -118,6 +126,6 @@ const PopoverCardLinks = (props: PropsOfComponent<typeof Flex>) => {
 
 export const PopoverCard = {
   Root: PopoverCardRoot,
-  Main: PopoverCardMain,
+  Content: PopoverCardContent,
   Footer: PopoverCardFooter,
 };
