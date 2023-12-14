@@ -10,7 +10,7 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['src/index.ts', 'src/errors.ts', 'src/internal.ts', 'src/jwt.ts'],
+    entry: ['src/index.ts', 'src/errors.ts', 'src/internal.ts', 'src/jwt/index.ts'],
     onSuccess: `cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime`,
     sourcemap: true,
     define: {

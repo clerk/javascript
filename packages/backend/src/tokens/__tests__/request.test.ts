@@ -2,10 +2,10 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import { TokenVerificationErrorReason } from '../../errors';
+import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from '../../fixtures';
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
-import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from '../fixtures';
 import type { AuthenticateRequestOptions } from '../request';
 import { authenticateRequest, loadOptionsFromHeaders } from '../request';
 
