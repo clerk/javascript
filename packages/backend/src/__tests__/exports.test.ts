@@ -39,7 +39,6 @@ export default (QUnit: QUnit) => {
         'createIsomorphicRequest',
         'debugRequestState',
         'decodeJwt',
-        'deserialize',
         'hasValidSignature',
         'makeAuthObjectSerializable',
         'prunePrivateMetadata',

@@ -37,7 +37,6 @@ exports[`module exports should not change unless explicitly set 1`] = `
   "createIsomorphicRequest",
   "debugRequestState",
   "decodeJwt",
-  "deserialize",
   "hasValidSignature",
   "makeAuthObjectSerializable",
   "prunePrivateMetadata",
