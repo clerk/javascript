@@ -1,5 +1,65 @@
 # Change Log
 
+## 5.0.0-alpha-v5.10
+
+### Major Changes
+
+- Remove the named `Clerk` import from `gatsby-plugin-clerk` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future. ([#2317](https://github.com/clerk/javascript/pull/2317)) by [@tmilewski](https://github.com/tmilewski)
+
+  Inside your code, search for occurrences like these:
+
+  ```js
+  import { Clerk } from 'gatsby-plugin-clerk';
+  const clerk = Clerk({ secretKey: '...' });
+  ```
+
+  You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
+
+  ```js
+  import { createClerkClient } from 'gatsby-plugin-clerk';
+  const clerk = createClerkClient({ secretKey: '...' });
+  ```
+
+- - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg ([#2328](https://github.com/clerk/javascript/pull/2328)) by [@dimkl](https://github.com/dimkl)
+
+    ```typescript
+    // Before
+    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
+    // After
+    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+
+    // Before
+    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    // After
+    import {
+      isClerkAPIResponseError,
+      isEmailLinkError,
+      isKnownError,
+      isMetamaskError,
+    } from '@clerk/clerk-react/errors';
+
+    // Before
+    import { MultisessionAppSupport } from '@clerk/clerk-react';
+    // After
+    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+    ```
+
+  - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
+    - `__internal__setErrorThrowerOptions` internal utility (moved to /internal subpath)
+    - `WithClerkProp` type
+    - `MultisessionAppSupport` component (moved to /internal subpath)
+    - `EmailLinkErrorCode` enum
+  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
+    to reduce the export surface since it's trivial to implement if needed.
+
+### Patch Changes
+
+- Updated dependencies [[`02976d494`](https://github.com/clerk/javascript/commit/02976d49473958b8c3fea38d4e389dc1bee7e8c4), [`02976d494`](https://github.com/clerk/javascript/commit/02976d49473958b8c3fea38d4e389dc1bee7e8c4), [`8aea39cd6`](https://github.com/clerk/javascript/commit/8aea39cd6907e3a8ac01091aa6df64ebd6a42ed2), [`86d52fb5c`](https://github.com/clerk/javascript/commit/86d52fb5cf68f1dc7adf617605b922134e21268f), [`ab4eb56a5`](https://github.com/clerk/javascript/commit/ab4eb56a5c34baf496ebb8ac412ad6171b9bd79c), [`46040a2f3`](https://github.com/clerk/javascript/commit/46040a2f34d0991072fca490e031c1994b2e2296), [`75ea300bc`](https://github.com/clerk/javascript/commit/75ea300bce16a0ce401a225263bb267ad2a217b8), [`844847e0b`](https://github.com/clerk/javascript/commit/844847e0becf20243fba3c659b2b77a238dd270a)]:
+  - @clerk/clerk-sdk-node@5.0.0-alpha-v5.8
+  - @clerk/backend@1.0.0-alpha-v5.8
+  - @clerk/clerk-react@5.0.0-alpha-v5.10
+
 ## 5.0.0-alpha-v5.9
 
 ### Patch Changes
