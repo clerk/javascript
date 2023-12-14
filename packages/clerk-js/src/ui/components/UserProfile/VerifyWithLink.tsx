@@ -4,18 +4,19 @@ import React from 'react';
 import { EmailLinkStatusCard } from '../../common';
 import { buildEmailLinkRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
-import { descriptors, localizationKeys } from '../../customizables';
-import { FormButtonContainer, NavigateToFlowStartButton, useCardState, VerificationLink } from '../../elements';
+import { Button, descriptors, localizationKeys } from '../../customizables';
+import { FormButtonContainer, useCardState, VerificationLink } from '../../elements';
 import { useEmailLink } from '../../hooks';
 import { handleError } from '../../utils';
 
 type VerifyWithLinkProps = {
   email: EmailAddressResource;
+  onReset: () => void;
   nextStep: () => void;
 };
 
 export const VerifyWithLink = (props: VerifyWithLinkProps) => {
-  const { email, nextStep } = props;
+  const { email, nextStep, onReset } = props;
   const card = useCardState();
   const profileContext = useUserProfileContext();
   const { startEmailLinkFlow } = useEmailLink(email);
@@ -53,9 +54,11 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
         onResendCodeClicked={startVerification}
       />
       <FormButtonContainer>
-        <NavigateToFlowStartButton
+        <Button
+          variant='ghost'
           localizationKey={localizationKeys('userProfile.formButtonReset')}
           elementDescriptor={descriptors.formButtonReset}
+          onClick={onReset}
         />
       </FormButtonContainer>
     </>

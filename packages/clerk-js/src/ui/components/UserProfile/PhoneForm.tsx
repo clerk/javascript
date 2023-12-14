@@ -6,16 +6,18 @@ import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
 import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { useRouter } from '../../router';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError, useFormControl } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { VerifyWithCode } from './VerifyWithCode';
 
-export const PhonePage = withCardStateProvider(() => {
-  const { user } = useUser();
+type PhoneFormProps = {
+  phoneId?: string;
+};
 
-  const { params } = useRouter();
-  const { id } = params || {};
+export const PhoneForm = withCardStateProvider((props: PhoneFormProps) => {
+  const { phoneId: id } = props;
+  const { user } = useUser();
+  const { close } = useActionContext();
 
   const phoneNumberRef = React.useRef<PhoneNumberResource | undefined>(user?.phoneNumbers.find(a => a.id === id));
   const wizard = useWizard({ defaultStep: phoneNumberRef.current ? 1 : 0 });
@@ -37,6 +39,7 @@ export const PhonePage = withCardStateProvider(() => {
         text={localizationKeys('userProfile.phoneNumberPage.successMessage', {
           identifier: phoneNumberRef.current?.phoneNumber || '',
         })}
+        onFinish={close}
       />
     </Wizard>
   );
@@ -50,6 +53,7 @@ type AddPhoneProps = {
 
 export const AddPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, resourceRef } = props;
+  const { close } = useActionContext();
   const card = useCardState();
   const { user } = useUser();
 
@@ -73,10 +77,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   };
 
   return (
-    <FormContent
-      headerTitle={title}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={title}>
       <Form.Root onSubmit={addPhone}>
         <Form.ControlRow elementId={phoneField.id}>
           <Form.PhoneInput
@@ -89,7 +90,10 @@ export const AddPhone = (props: AddPhoneProps) => {
           colorScheme='neutral'
           localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText__secondary')}
         />
-        <FormButtons isDisabled={!canSubmit} />
+        <FormButtons
+          isDisabled={!canSubmit}
+          onReset={close}
+        />
       </Form.Root>
     </FormContent>
   );
@@ -97,17 +101,16 @@ export const AddPhone = (props: AddPhoneProps) => {
 
 export const VerifyPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, resourceRef } = props;
+  const { close } = useActionContext();
 
   return (
-    <FormContent
-      headerTitle={title}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={title}>
       <VerifyWithCode
         nextStep={onSuccess}
         identification={resourceRef.current}
         identifier={resourceRef.current?.phoneNumber}
         prepareVerification={resourceRef.current?.prepareVerification}
+        onReset={close}
       />
     </FormContent>
   );

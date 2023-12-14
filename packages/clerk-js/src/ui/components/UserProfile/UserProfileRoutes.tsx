@@ -5,21 +5,16 @@ import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
 import { ConnectedAccountsPage } from './ConnectedAccountsPage';
 import { DeletePage } from './DeletePage';
-import { EmailPage } from './EmailPage';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { MfaPage } from './MfaPage';
 import { PasswordPage } from './PasswordPage';
-import { PhonePage } from './PhonePage';
 import {
   RemoveConnectedAccountPage,
-  RemoveEmailPage,
   RemoveMfaPhoneCodePage,
   RemoveMfaTOTPPage,
-  RemovePhonePage,
   RemoveWeb3WalletPage,
 } from './RemoveResourcePage';
 import { SecurityPage } from './SecurityPage';
-import { UsernamePage } from './UsernamePage';
 import { Web3Page } from './Web3Page';
 
 export const UserProfileRoutes = () => {
@@ -49,38 +44,6 @@ export const UserProfileRoutes = () => {
       <Route>
         <Route path={isAccountPageRoot ? undefined : 'account'}>
           <Switch>
-            <Route
-              path='email-address'
-              flowStart
-            >
-              <Switch>
-                <Route path=':id/remove'>
-                  <RemoveEmailPage />
-                </Route>
-                <Route path=':id'>
-                  <EmailPage />
-                </Route>
-                <Route index>
-                  <EmailPage />
-                </Route>
-              </Switch>
-            </Route>
-            <Route
-              path='phone-number'
-              flowStart
-            >
-              <Switch>
-                <Route path=':id/remove'>
-                  <RemovePhonePage />
-                </Route>
-                <Route path=':id'>
-                  <PhonePage />
-                </Route>
-                <Route index>
-                  <PhonePage />
-                </Route>
-              </Switch>
-            </Route>
             <Route
               path='multi-factor'
               flowStart
@@ -128,12 +91,6 @@ export const UserProfileRoutes = () => {
                   <Web3Page />
                 </Route>
               </Switch>
-            </Route>
-            <Route
-              path='username'
-              flowStart
-            >
-              <UsernamePage />
             </Route>
             <Route index>
               <AccountPage />

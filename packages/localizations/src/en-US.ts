@@ -265,34 +265,51 @@ export const enUS: LocalizationResource = {
       emailAddressesSection: {
         title: 'Email addresses',
         primaryButton: 'Add an email address',
+        //TODO-RETHEME remove
         detailsTitle__primary: 'Primary email address',
+        //TODO-RETHEME remove
         detailsSubtitle__primary: 'This email address is the primary email address',
+        //TODO-RETHEME remove
         detailsAction__primary: 'Complete verification',
-        detailsTitle__nonPrimary: 'Set as primary email address',
+        //TODO-RETHEME remove
+        detailsTitle__nonPrimary: 'Set as primary',
+        //TODO-RETHEME remove
         detailsSubtitle__nonPrimary:
           'Set this email address as the primary to receive communications regarding your account.',
         detailsAction__nonPrimary: 'Set as primary',
+        //TODO-RETHEME remove
         detailsTitle__unverified: 'Verify email address',
+        //TODO-RETHEME remove
         detailsSubtitle__unverified: 'Complete verification to access all features with this email address',
-        detailsAction__unverified: 'Verify email address',
+        detailsAction__unverified: 'Verify',
+        //TODO-RETHEME remove
         destructiveActionTitle: 'Remove',
+        //TODO-RETHEME remove
         destructiveActionSubtitle: 'Delete this email address and remove it from your account',
-        destructiveAction: 'Remove email address',
+        destructiveAction: 'Remove email',
       },
       phoneNumbersSection: {
         title: 'Phone numbers',
         primaryButton: 'Add a phone number',
+        //TODO-RETHEME remove
         detailsTitle__primary: 'Primary phone number',
+        //TODO-RETHEME remove
         detailsSubtitle__primary: 'This phone number is the primary phone number',
         detailsAction__primary: 'Complete verification',
+        //TODO-RETHEME remove
         detailsTitle__nonPrimary: 'Set as primary phone number',
+        //TODO-RETHEME remove
         detailsSubtitle__nonPrimary:
           'Set this phone number as the primary to receive communications regarding your account.',
         detailsAction__nonPrimary: 'Set as primary',
+        //TODO-RETHEME remove
         detailsTitle__unverified: 'Verify phone number',
+        //TODO-RETHEME remove
         detailsSubtitle__unverified: 'Complete verification to access all features with this phone number',
         detailsAction__unverified: 'Verify phone number',
+        //TODO-RETHEME remove
         destructiveActionTitle: 'Remove',
+        //TODO-RETHEME remove
         destructiveActionSubtitle: 'Delete this phone number and remove it from your account',
         destructiveAction: 'Remove phone number',
       },

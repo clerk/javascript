@@ -2,11 +2,11 @@ import type { UserResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 
-import { render, screen } from '../../../../testUtils';
+import { render, screen, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { UsernamePage } from '../UsernamePage';
+import { UsernameSection } from '../UsernameSection';
 
-const { createFixtures } = bindCreateFixtures('UserProfile');
+const { createFixtures } = bindCreateFixtures('UsernameSection');
 
 const initConfig = createFixtures.config(f => {
   f.withUser({ username: 'georgeclerk' });
@@ -16,13 +16,18 @@ describe('UsernamePage', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(initConfig);
 
-    render(<UsernamePage />, { wrapper });
+    render(<UsernameSection />, { wrapper });
   });
 
   it('shows the title', async () => {
     const { wrapper } = await createFixtures(initConfig);
 
-    render(<UsernamePage />, { wrapper });
+    const { userEvent } = render(<UsernameSection />, { wrapper });
+
+    await userEvent.click(screen.getByText(/change username/i));
+    await waitFor(() => {
+      screen.getByText(/update username/i);
+    });
 
     screen.getByRole('heading', { name: /Update username/i });
   });
@@ -32,7 +37,12 @@ describe('UsernamePage', () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.clerk.user?.update.mockResolvedValue({} as UserResource);
-      const { userEvent } = render(<UsernamePage />, { wrapper });
+      const { userEvent } = render(<UsernameSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/change username/i));
+      await waitFor(() => {
+        screen.getByText(/update username/i);
+      });
 
       await userEvent.type(screen.getByLabelText(/username/i), 'test');
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));
@@ -40,16 +50,25 @@ describe('UsernamePage', () => {
 
       expect(await screen.findByText(/updated/i));
       await userEvent.click(screen.getByRole('button', { name: /finish/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      await waitFor(() => {
+        screen.getByText(/change username/i);
+      });
     });
 
-    it('navigates to the root page upon pressing cancel', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
+    it('shows the previous content upon pressing cancel', async () => {
+      const { wrapper } = await createFixtures(initConfig);
 
-      const { userEvent } = render(<UsernamePage />, { wrapper });
+      const { userEvent } = render(<UsernameSection />, { wrapper });
+
+      await userEvent.click(screen.getByText(/change username/i));
+      await waitFor(() => {
+        screen.getByText(/update username/i);
+      });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      await waitFor(() => {
+        screen.getByText(/change username/i);
+      });
     });
   });
 });

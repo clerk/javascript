@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Text } from '../customizables';
 import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../elements';
+import { useActionContext } from '../elements/Action/ActionRoot';
 import type { LocalizationKey } from '../localization';
 import { handleError } from '../utils';
 import { useWizard, Wizard } from './Wizard';
@@ -17,9 +18,10 @@ type RemovePageProps = {
 };
 
 export const RemoveResourcePage = withCardStateProvider((props: RemovePageProps) => {
-  const { title, messageLine1, messageLine2, breadcrumbTitle, successMessage, deleteResource } = props;
+  const { title, messageLine1, messageLine2, successMessage, deleteResource } = props;
   const wizard = useWizard();
   const card = useCardState();
+  const { close } = useActionContext();
 
   const handleSubmit = async () => {
     try {
@@ -31,15 +33,14 @@ export const RemoveResourcePage = withCardStateProvider((props: RemovePageProps)
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
-        headerTitle={title}
-        breadcrumbTitle={breadcrumbTitle}
-        Breadcrumbs={props.Breadcrumbs}
-      >
+      <FormContent headerTitle={title}>
         <Form.Root onSubmit={handleSubmit}>
           <Text localizationKey={messageLine1} />
           <Text localizationKey={messageLine2} />
-          <FormButtons variant='primaryDanger' />
+          <FormButtons
+            variant='primaryDanger'
+            onReset={close}
+          />
         </Form.Root>
       </FormContent>
       <SuccessPage

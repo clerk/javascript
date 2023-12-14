@@ -7,9 +7,13 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const RemoveEmailPage = () => {
+type RemoveEmailFormProps = {
+  emailId: string;
+};
+
+export const RemoveEmailForm = (props: RemoveEmailFormProps) => {
   const { user } = useUser();
-  const { id } = useRouter().params;
+  const { emailId: id } = props;
   const resource = user?.emailAddresses.find(e => e.id === id);
   const ref = React.useRef(resource?.emailAddress);
 
@@ -33,9 +37,13 @@ export const RemoveEmailPage = () => {
   );
 };
 
-export const RemovePhonePage = () => {
+type RemovePhoneFormProps = {
+  phoneId: string;
+};
+
+export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
+  const { phoneId: id } = props;
   const { user } = useUser();
-  const { id } = useRouter().params;
   const resource = user?.phoneNumbers.find(e => e.id === id);
   const ref = React.useRef(resource?.phoneNumber);
 

@@ -1,14 +1,12 @@
 import { useUser } from '@clerk/shared/react';
 
-import { localizationKeys, Text } from '../../customizables';
+import { Button, Flex, localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
-import { Pencil } from '../../icons';
-import { useRouter } from '../../router';
-import { AddBlockButton } from './UserProfileBlockButtons';
+import { Action } from '../../elements/Action';
+import { UsernameForm } from './UsernameForm';
 
 export const UsernameSection = () => {
   const { user } = useUser();
-  const { navigate } = useRouter();
 
   if (!user) {
     return null;
@@ -19,17 +17,36 @@ export const UsernameSection = () => {
       title={localizationKeys('userProfile.start.usernameSection.title')}
       id='username'
     >
-      {user.username && <Text sx={t => ({ padding: `${t.space.$2} ${t.space.$4}` })}>{user.username}</Text>}
-      <AddBlockButton
-        id='username'
-        onClick={() => navigate('username')}
-        leftIcon={user.username ? Pencil : undefined}
-        textLocalizationKey={
-          user.username
-            ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')
-            : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
-        }
-      />
+      <Action.Root>
+        <Action.Closed value='edit'>
+          <Flex
+            sx={{
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            {user.username && <Text sx={t => ({ padding: `${t.space.$2} ${t.space.$4}` })}>{user.username}</Text>}
+
+            <Action.Trigger value='edit'>
+              <Button
+                id='username'
+                variant='ghost'
+                localizationKey={
+                  user.username
+                    ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')
+                    : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
+                }
+              />
+            </Action.Trigger>
+          </Flex>
+        </Action.Closed>
+
+        <Action.Open value='edit'>
+          <Action.Card>
+            <UsernameForm />
+          </Action.Card>
+        </Action.Open>
+      </Action.Root>
     </ProfileSection>
   );
 };

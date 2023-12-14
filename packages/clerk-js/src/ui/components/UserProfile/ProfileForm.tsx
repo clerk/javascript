@@ -18,9 +18,9 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 
-export const UpdateProfileForm = withCardStateProvider(() => {
+export const ProfileForm = withCardStateProvider(() => {
   const card = useCardState();
-  const { toggle } = useActionContext();
+  const { close } = useActionContext();
   const { user } = useUser();
 
   if (!user) {
@@ -127,13 +127,13 @@ export const UpdateProfileForm = withCardStateProvider(() => {
 
           <FormButtons
             isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged}
-            onReset={toggle}
+            onReset={close}
           />
         </Form.Root>
       </FormContent>
       <SuccessPage
         text={localizationKeys('userProfile.profilePage.successMessage')}
-        onFinish={toggle}
+        onFinish={close}
       />
     </Wizard>
   );

@@ -16,7 +16,7 @@ import {
 } from '../../elements';
 import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
-import { AddPhone, VerifyPhone } from './PhonePage';
+import { AddPhone, VerifyPhone } from './PhoneForm';
 import { AddBlockButton } from './UserProfileBlockButtons';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
