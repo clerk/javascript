@@ -64,6 +64,9 @@ export const createSpaceScale = (theme: Theme) => {
   );
 };
 
+// We want to keep the same ratio between the font sizes we have for the default theme
+// This is directly related to the fontSizes object in the theme default foundations
+// ref: src/ui/foundations/typography.ts
 export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes, string> | undefined => {
   const { fontSize } = theme.variables || {};
   if (fontSize === undefined) {
@@ -71,11 +74,11 @@ export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes
   }
   const { numericValue, unit = 'rem' } = splitCssUnit(fontSize);
   return {
-    xs: (numericValue * 0.6875).toString() + unit,
-    sm: (numericValue * 0.75).toString() + unit,
-    md: (numericValue * 0.8125).toString() + unit,
-    lg: (numericValue * 1.0625).toString() + unit,
-    xl: (numericValue * 1.5).toString() + unit,
+    xs: (numericValue * 0.8).toString() + unit,
+    sm: (numericValue * 0.9).toString() + unit,
+    md: fontSize,
+    lg: (numericValue * 1.3).toString() + unit,
+    xl: (numericValue * 1.85).toString() + unit,
   };
 };
 
