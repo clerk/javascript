@@ -10,6 +10,10 @@ inputs:
     description: 'Enable Playwright?'
     required: false
     default: 'false'
+  cache-suffix:
+    description: 'The cache suffix to use'
+    required: false
+    default: ''
   turbo-summarize:
     description: 'The token to use for Turbo task summaries'
     required: false
@@ -101,7 +105,7 @@ runs:
       id: npm-cache
       with:
         path: ./node_modules
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-${{ hashFiles('.github/.cache-version') }}-node-modules-${{ hashFiles('package-lock.json') }}
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-${{ hashFiles('.github/.cache-version') }}-node-modules-${{ hashFiles('package-lock.json') }}${{ inputs.cache-suffix }}
 
     - name: Install NPM Dependencies
       if: steps.npm-cache.outputs.cache-hit != 'true'

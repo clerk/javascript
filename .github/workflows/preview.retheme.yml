@@ -29,6 +29,7 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
+          cache-suffix: "-retheme"
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
