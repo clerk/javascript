@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.0-alpha-v5.9
+
+### Major Changes
+
+- Drop unused SearchParams.AuthStatus constant ([#2347](https://github.com/clerk/javascript/pull/2347)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.0.0-alpha-v5.8
 
 ### Major Changes
