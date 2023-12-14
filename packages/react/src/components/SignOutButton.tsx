@@ -27,7 +27,7 @@ export const SignOutButton = withClerk(
     };
 
     const wrappedChildClickHandler: React.MouseEventHandler = async e => {
-      await safeExecute(child.props.onClick)(e);
+      await safeExecute((child as any).props.onClick)(e);
       return clickHandler();
     };
 
