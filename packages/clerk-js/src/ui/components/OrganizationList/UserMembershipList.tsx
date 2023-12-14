@@ -26,7 +26,6 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
     <OrganizationListPreviewButton onClick={() => handleOrganizationClicked(props.organization)}>
       <OrganizationPreview
         elementId='organizationList'
-        size={'sm'}
         mainIdentifierSx={sharedMainIdentifierSx}
         organization={props.organization}
       />
@@ -66,7 +65,6 @@ export const PersonalAccountPreview = withCardStateProvider(() => {
     <OrganizationListPreviewButton onClick={handlePersonalClicked}>
       <PersonalWorkspacePreview
         user={userWithoutIdentifiers}
-        size={'sm'}
         mainIdentifierSx={sharedMainIdentifierSx}
         title={localizationKeys('organizationSwitcher.personalWorkspace')}
       />

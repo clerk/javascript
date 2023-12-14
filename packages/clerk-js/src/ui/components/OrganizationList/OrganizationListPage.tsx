@@ -1,10 +1,20 @@
-import { useOrganizationList } from '@clerk/shared/react';
+import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { Card, Divider, Header, useCardState, withCardStateProvider } from '../../elements';
+import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
+import {
+  Action,
+  Card,
+  Header,
+  OrganizationAvatar,
+  SecondaryActions,
+  useCardState,
+  UserAvatar,
+  withCardStateProvider,
+} from '../../elements';
 import { useInView } from '../../hooks';
+import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
 import { PreviewListItems, PreviewListSpinner } from './shared';
 import { InvitationPreview } from './UserInvitationList';
@@ -48,32 +58,30 @@ export const OrganizationListPage = withCardStateProvider(() => {
   const { hidePersonal } = useOrganizationListContext();
 
   return (
-    <Card.Root
-      sx={t => ({
-        padding: `${t.space.$8} ${t.space.$none}`,
-      })}
-      gap={6}
-    >
-      <Card.Alert>{card.error}</Card.Alert>
-      {isLoading && (
-        <Flex
-          direction={'row'}
-          align={'center'}
-          justify={'center'}
-          sx={t => ({
-            height: '100%',
-            minHeight: t.sizes.$60,
-          })}
-        >
-          <Spinner
-            size={'lg'}
-            colorScheme={'primary'}
-            elementDescriptor={descriptors.spinner}
-          />
-        </Flex>
-      )}
+    <Card.Root>
+      <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
+        <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
+        {isLoading && (
+          <Flex
+            direction={'row'}
+            align={'center'}
+            justify={'center'}
+            sx={t => ({
+              height: '100%',
+              minHeight: t.sizes.$60,
+            })}
+          >
+            <Spinner
+              size={'lg'}
+              colorScheme={'primary'}
+              elementDescriptor={descriptors.spinner}
+            />
+          </Flex>
+        )}
 
-      {!isLoading && <OrganizationListFlows showListInitially={!(hidePersonal && !hasAnyData)} />}
+        {!isLoading && <OrganizationListFlows showListInitially={!(hidePersonal && !hasAnyData)} />}
+      </Card.Content>
+      <Card.Footer />
     </Card.Root>
   );
 });
@@ -91,7 +99,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
       {isCreateOrganizationFlow && (
         <Box
           sx={t => ({
-            padding: `${t.space.$none} ${t.space.$8}`,
+            padding: `${t.space.$8}`,
           })}
         >
           <CreateOrganizationForm
@@ -121,6 +129,8 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
 
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const { hidePersonal } = useOrganizationListContext();
+  const { organization } = useOrganization();
+  const { user } = useUser();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
@@ -135,6 +145,24 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
           padding: `${t.space.$none} ${t.space.$8}`,
         })}
       >
+        <Flex
+          justify='center'
+          sx={t => ({ paddingBottom: t.space.$6 })}
+        >
+          {organization && (
+            <OrganizationAvatar
+              {...organization}
+              size={t => t.sizes.$8}
+            />
+          )}
+          {!organization && (
+            <UserAvatar
+              {...user}
+              rounded={false}
+              size={t => t.sizes.$8}
+            />
+          )}
+        </Flex>
         <Header.Title
           localizationKey={localizationKeys(
             !hidePersonal ? 'organizationList.title' : 'organizationList.titleWithoutPersonal',
@@ -148,69 +176,59 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
       </Header.Root>
       <Col
         elementDescriptor={descriptors.main}
-        gap={6}
+        sx={t => ({ borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}` })}
       >
         <PreviewListItems>
-          <PersonalAccountPreview />
-          {(userMemberships.count || 0) > 0 &&
-            userMemberships.data?.map(inv => {
-              return (
-                <MembershipPreview
-                  key={inv.id}
-                  {...inv}
-                />
-              );
-            })}
+          <SecondaryActions role='menu'>
+            <PersonalAccountPreview />
+            {(userMemberships.count || 0) > 0 &&
+              userMemberships.data?.map(inv => {
+                return (
+                  <MembershipPreview
+                    key={inv.id}
+                    {...inv}
+                  />
+                );
+              })}
 
-          {!userMemberships.hasNextPage &&
-            (userInvitations.count || 0) > 0 &&
-            userInvitations.data?.map(inv => {
-              return (
-                <InvitationPreview
-                  key={inv.id}
-                  {...inv}
-                />
-              );
-            })}
+            {!userMemberships.hasNextPage &&
+              (userInvitations.count || 0) > 0 &&
+              userInvitations.data?.map(inv => {
+                return (
+                  <InvitationPreview
+                    key={inv.id}
+                    {...inv}
+                  />
+                );
+              })}
 
-          {!userMemberships.hasNextPage &&
-            !userInvitations.hasNextPage &&
-            (userSuggestions.count || 0) > 0 &&
-            userSuggestions.data?.map(inv => {
-              return (
-                <SuggestionPreview
-                  key={inv.id}
-                  {...inv}
-                />
-              );
-            })}
+            {!userMemberships.hasNextPage &&
+              !userInvitations.hasNextPage &&
+              (userSuggestions.count || 0) > 0 &&
+              userSuggestions.data?.map(inv => {
+                return (
+                  <SuggestionPreview
+                    key={inv.id}
+                    {...inv}
+                  />
+                );
+              })}
 
-          {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
+            {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
+          </SecondaryActions>
         </PreviewListItems>
 
-        <Divider
-          key={`divider`}
-          sx={t => ({
-            padding: `${t.space.$none} ${t.space.$8}`,
+        <Action
+          elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
+          icon={Add}
+          label={localizationKeys('organizationList.action__createOrganization')}
+          onClick={handleCreateOrganizationClicked}
+          sx={{ borderBottom: 'none' }}
+          iconSx={t => ({
+            width: t.sizes.$9,
+            height: t.sizes.$6,
           })}
         />
-
-        <Flex
-          align='center'
-          justify='between'
-          sx={t => ({
-            padding: `${t.space.$none} ${t.space.$8}`,
-          })}
-        >
-          <Button
-            elementDescriptor={descriptors.button}
-            block
-            variant='secondary'
-            textVariant='buttonSmall'
-            onClick={handleCreateOrganizationClicked}
-            localizationKey={localizationKeys('organizationList.action__createOrganization')}
-          />
-        </Flex>
       </Col>
     </>
   );

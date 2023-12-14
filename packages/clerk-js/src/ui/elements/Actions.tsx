@@ -179,12 +179,15 @@ export const Action = (props: ActionProps) => {
       sx={[
         t => ({
           flex: '1',
-          color: t.colors.$blackAlpha700,
           borderRadius: 0,
-          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           gap: t.space.$3,
           padding: `${t.space.$4} ${t.space.$5}`,
           justifyContent: 'flex-start',
+          color: t.colors.$blackAlpha600,
+          ':hover': {
+            color: t.colors.$blackAlpha600,
+          },
         }),
         sx,
       ]}

@@ -4,7 +4,7 @@ import { forwardRef } from 'react';
 
 import { Box, Button, Col, descriptors, Flex, Spinner } from '../../customizables';
 import { OrganizationPreview, PreviewButton } from '../../elements';
-import { ArrowRightIcon } from '../../icons';
+import { SwitchArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 
@@ -24,14 +24,15 @@ export const PreviewListItems = (props: PropsWithChildren) => {
 };
 
 const sharedStyles: ThemableCssProp = t => ({
-  height: t.space.$12,
-  padding: `${t.space.$2} ${t.space.$8}`,
+  padding: `${t.space.$4} ${t.space.$5}`,
+  borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
 });
 
 export const sharedMainIdentifierSx: ThemableCssProp = t => ({
-  fontSize: t.fontSizes.$md,
-  fontWeight: t.fontWeights.$normal,
-  color: t.colors.$colorText,
+  color: t.colors.$blackAlpha950,
+  ':hover': {
+    color: t.colors.$blackAlpha950,
+  },
 });
 
 export const PreviewListItem = (
@@ -44,17 +45,16 @@ export const PreviewListItem = (
       align='center'
       gap={2}
       sx={[
-        _ => ({
+        {
           minHeight: 'unset',
           justifyContent: 'space-between',
-        }),
+        },
         sharedStyles,
       ]}
       elementDescriptor={descriptors.organizationListPreviewItem}
     >
       <OrganizationPreview
         elementId='organizationList'
-        size={'sm'}
         mainIdentifierSx={sharedMainIdentifierSx}
         organization={props.organizationData}
       />
@@ -98,7 +98,7 @@ export const PreviewListItemButton = (props: Parameters<typeof Button>[0]) => {
       elementDescriptor={descriptors.organizationListPreviewItemActionButton}
       textVariant='buttonSmall'
       variant='secondary'
-      size='sm'
+      size='xs'
       {...props}
     />
   );
@@ -109,10 +109,7 @@ export const OrganizationListPreviewButton = (props: PropsWithChildren<{ onClick
     <PreviewButton
       elementDescriptor={descriptors.organizationListPreviewButton}
       sx={[sharedStyles]}
-      icon={ArrowRightIcon}
-      iconProps={{
-        size: 'md',
-      }}
+      icon={SwitchArrowRight}
       showIconOnHover={false}
       {...props}
     />

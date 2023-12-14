@@ -15,13 +15,13 @@ export const PoweredByClerkTag = React.memo(
         gap={1}
         align='center'
         justify='center'
-        sx={[t => ({ width: '100%', color: t.colors.$colorTextSecondary }), sx]}
+        sx={[t => ({ width: '100%', color: t.colors.$blackAlpha500 }), sx]}
         {...rest}
         ref={ref}
       >
         {branded ? (
           <>
-            <Text>Secured by</Text>
+            <Text variant='buttonSmall'>Secured by</Text>
             <LogoMarkIconLink />
           </>
         ) : null}

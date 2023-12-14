@@ -31,7 +31,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       textVariant: common.textVariants(theme),
       size: {
         iconLg: { minHeight: theme.sizes.$13, width: theme.sizes.$13 },
-        xs: { minHeight: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
+        xs: { minHeight: theme.sizes.$1x5, padding: `${theme.space.$1} ${theme.space.$2}` },
         sm: {
           minHeight: theme.sizes.$7,
           padding: `${theme.space.$1x5} ${theme.space.$3x5}`,
