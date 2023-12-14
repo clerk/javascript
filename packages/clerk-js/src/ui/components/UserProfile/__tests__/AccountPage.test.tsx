@@ -1,37 +1,23 @@
-import type { SessionWithActivitiesResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 
 import { render, screen, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { RootPage } from '../RootPage';
+import { AccountPage } from '../AccountPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
-describe('RootPage', () => {
+describe('AccountPage', () => {
   it('renders the component', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
     fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
 
-    render(<RootPage />, { wrapper });
-    await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
+    render(<AccountPage />, { wrapper });
   });
 
   describe('Sections', () => {
-    it('shows the bigger sections', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['test@clerk.com'] });
-      });
-      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
-
-      render(<RootPage />, { wrapper });
-      await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
-      screen.getAllByText(/Profile/i);
-      screen.getAllByText(/Security/i);
-    });
-
     // TODO-RETHEME: Revise the test when the UI is done
     it.skip('shows the profile section along with the identifier of the user and has a button', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
@@ -39,7 +25,7 @@ describe('RootPage', () => {
       });
       fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<RootPage />, { wrapper });
+      render(<AccountPage />, { wrapper });
       await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
       screen.getByText(/Profile details/i);
       const button = screen.getByText('George Clerk');
@@ -53,7 +39,7 @@ describe('RootPage', () => {
       });
       fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<RootPage />, { wrapper });
+      render(<AccountPage />, { wrapper });
       await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
       screen.getByText(/Profile details/i);
       const button = screen.getByText('George Clerk');
@@ -72,8 +58,7 @@ describe('RootPage', () => {
       });
       fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<RootPage />, { wrapper });
-      await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
+      render(<AccountPage />, { wrapper });
       screen.getByText(/Email addresses/i);
       const emailButtons: HTMLElement[] = [];
       emails.forEach(email => {
@@ -96,8 +81,7 @@ describe('RootPage', () => {
       });
       fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<RootPage />, { wrapper });
-      await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
+      render(<AccountPage />, { wrapper });
       screen.getByText(/Phone numbers/i);
       const numberButtons: HTMLElement[] = [];
       numbers.forEach(number => {
@@ -119,8 +103,7 @@ describe('RootPage', () => {
       });
       fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<RootPage />, { wrapper });
-      await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
+      render(<AccountPage />, { wrapper });
       screen.getByText(/Connected Accounts/i);
       screen.getByText(/testgoogle@clerk.com/i);
       const externalAccountButton = screen.getByText(/google/i);
@@ -152,53 +135,9 @@ describe('RootPage', () => {
       });
       fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<RootPage />, { wrapper });
-      await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
+      render(<AccountPage />, { wrapper });
       screen.getByText(/Enterprise Accounts/i);
       screen.getByText(/Okta Workforce/i);
-    });
-
-    it('shows the active devices of the user and has appropriate buttons', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withSocialProvider({ provider: 'google' });
-        f.withUser({
-          external_accounts: ['google'],
-          first_name: 'George',
-          last_name: 'Clerk',
-        });
-      });
-      fixtures.clerk.user!.getSessions.mockReturnValue(
-        Promise.resolve([
-          {
-            pathRoot: '/me/sessions',
-            id: 'sess_2HyQfBh8wRJUbpvCtPNllWdsHFK',
-            status: 'active',
-            expireAt: '2022-12-01T01:55:44.636Z',
-            abandonAt: '2022-12-24T01:55:44.636Z',
-            lastActiveAt: '2022-11-24T12:11:49.328Z',
-            latestActivity: {
-              id: 'sess_activity_2HyQwElm529O5NDL1KNpJAGWVJZ',
-              deviceType: 'Macintosh',
-              browserName: 'Chrome',
-              browserVersion: '107.0.0.0',
-              country: 'Greece',
-              city: 'Athens',
-              isMobile: false,
-            },
-            actor: null,
-          } as any as SessionWithActivitiesResource,
-        ]),
-      );
-
-      render(<RootPage />, { wrapper });
-      await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
-      screen.getByText(/Active Devices/i);
-      expect(await screen.findByText(/Chrome/i)).toBeInTheDocument();
-      screen.getByText(/107.0.0.0/i);
-      screen.getByText(/Athens/i);
-      screen.getByText(/Greece/i);
-      const externalAccountButton = await screen.findByText(/Macintosh/i);
-      expect(externalAccountButton.closest('button')).not.toBeNull();
     });
   });
 });
