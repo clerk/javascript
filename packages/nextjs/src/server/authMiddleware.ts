@@ -1,5 +1,5 @@
-import type { AuthenticateRequestOptions, AuthObject } from '@clerk/backend';
-import { AuthStatus, buildRequestUrl, constants } from '@clerk/backend';
+import type { AuthenticateRequestOptions, AuthObject } from '@clerk/backend/internal';
+import { AuthStatus, buildRequestUrl, constants } from '@clerk/backend/internal';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';

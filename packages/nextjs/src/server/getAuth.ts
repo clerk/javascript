@@ -1,13 +1,14 @@
-import type { Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
+import type { Organization, Session, User } from '@clerk/backend';
+import { decodeJwt } from '@clerk/backend';
+import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import {
   AuthStatus,
   constants,
-  decodeJwt,
   makeAuthObjectSerializable,
   sanitizeAuthObject,
   signedInAuthObject,
   signedOutAuthObject,
-} from '@clerk/backend';
+} from '@clerk/backend/internal';
 
 import { withLogger } from '../utils/debugLogger';
 import { API_URL, API_VERSION, SECRET_KEY } from './constants';

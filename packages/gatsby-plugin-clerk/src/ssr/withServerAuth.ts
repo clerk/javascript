@@ -1,4 +1,4 @@
-import { AuthStatus } from '@clerk/backend';
+import { AuthStatus } from '@clerk/backend/internal';
 import type { GetServerDataProps, GetServerDataReturn } from 'gatsby';
 
 import { PUBLISHABLE_KEY, SECRET_KEY } from '../constants';

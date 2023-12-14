@@ -8,7 +8,7 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   return {
-    entry: ['src/index.ts', 'src/errors.ts'],
+    entry: ['src/index.ts', 'src/errors.ts', 'src/internal.ts'],
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,

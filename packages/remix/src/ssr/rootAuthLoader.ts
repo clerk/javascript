@@ -1,4 +1,4 @@
-import { AuthStatus, sanitizeAuthObject } from '@clerk/backend';
+import { AuthStatus, sanitizeAuthObject } from '@clerk/backend/internal';
 import type { defer } from '@remix-run/server-runtime';
 import { redirect } from '@remix-run/server-runtime';
 import { isDeferredData } from '@remix-run/server-runtime/dist/responses';

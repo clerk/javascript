@@ -1,4 +1,4 @@
-import { AuthStatus } from '@clerk/backend';
+import { AuthStatus } from '@clerk/backend/internal';
 import type { FastifyRequest } from 'fastify';
 
 import { clerkClient } from './clerkClient';
