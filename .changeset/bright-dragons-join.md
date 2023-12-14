@@ -9,16 +9,11 @@ If you previously used the `signOutCallback` prop to navigate to another page, y
 Before:
 
 ```jsx
-"use client"
-
-import { useRouter } from "next/navigation"
-import { SignOutButton } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/clerk-react";
 
 export const Signout = () => {
-  const router = useRouter()
-
   return (
-    <SignOutButton signOutCallback={() => router.push("/your-path")}>
+    <SignOutButton signOutCallback={() => window.location.href = "/your-path"}>
       <button>Sign Out</button>
     </SignOutButton>
   )
@@ -28,9 +23,7 @@ export const Signout = () => {
 After:
 
 ```jsx
-"use client"
-
-import { SignOutButton } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/clerk-react";
 
 export const Signout = () => {
   return (
