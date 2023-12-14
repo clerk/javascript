@@ -3,7 +3,6 @@ import { NextRequest } from 'next/server';
 
 export const buildRequestLike = () => {
   try {
-    console.log(NextRequest);
     return new NextRequest('https://placeholder.com', { headers: headers() });
   } catch (e: any) {
     if (

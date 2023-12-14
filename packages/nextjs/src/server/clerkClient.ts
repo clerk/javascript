@@ -29,4 +29,3 @@ const clerkClient = createClerkClient({
 });
 
 export { clerkClient };
-export * from '@clerk/backend';

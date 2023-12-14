@@ -41,6 +41,7 @@
       "require": "./dist/cjs/errors.js"
     }
   },
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
     "server",
