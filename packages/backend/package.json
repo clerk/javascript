@@ -57,12 +57,12 @@
     },
     "./jwt": {
       "import": {
-        "types": "./dist/jwt.d.ts",
-        "default": "./dist/jwt.mjs"
+        "types": "./dist/jwt/index.d.ts",
+        "default": "./dist/jwt/index.mjs"
       },
       "require": {
-        "types": "./dist/jwt.d.ts",
-        "default": "./dist/jwt.js"
+        "types": "./dist/jwt/index.d.ts",
+        "default": "./dist/jwt/index.js"
       }
     },
     "./package.json": "./package.json"

@@ -1,6 +1,7 @@
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
-import { decodeJwt, hasValidSignature, type VerifyJwtOptions } from './jwt';
-import { assertHeaderAlgorithm, assertHeaderType } from './jwt/assertions';
+import type { VerifyJwtOptions } from '../jwt';
+import { decodeJwt, hasValidSignature } from '../jwt';
+import { assertHeaderAlgorithm, assertHeaderType } from '../jwt/assertions';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import type { VerifyTokenOptions } from './verify';
 

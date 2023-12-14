@@ -2,8 +2,6 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../../errors';
-import runtime from '../../runtime';
-import { jsonError, jsonOk } from '../../util/testUtils';
 import {
   mockJwks,
   mockJwtPayload,
@@ -12,7 +10,9 @@ import {
   mockPEMKey,
   mockRsaJwk,
   mockRsaJwkKid,
-} from '../fixtures';
+} from '../../fixtures';
+import runtime from '../../runtime';
+import { jsonError, jsonOk } from '../../util/testUtils';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from '../keys';
 
 export default (QUnit: QUnit) => {
