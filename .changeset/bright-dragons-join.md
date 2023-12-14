@@ -4,7 +4,7 @@
 
 Replace the `signOutCallback` prop on the `<SignOutButton />` with `redirectUrl`. This aligns the API surface with other UI components provided by `@clerk/clerk-react`.
 
-If you previously used the `signOutCallback` prop to navigate to another page, you can migrate the as shown below.
+If you previously used the `signOutCallback` prop to navigate to another page, you can migrate as shown below.
 
 Before:
 
