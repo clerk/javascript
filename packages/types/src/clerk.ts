@@ -308,9 +308,8 @@ export interface Clerk {
    * Decorates the provided url with the auth token for development instances.
    *
    * @param {string} to
-   * @param opts A {@link BuildUrlWithAuthParams} object
    */
-  buildUrlWithAuth(to: string, opts?: BuildUrlWithAuthParams): string;
+  buildUrlWithAuth(to: string): string;
 
   /**
    * Returns the configured url where <SignIn/> is mounted or a custom sign-in page is rendered.
@@ -491,13 +490,6 @@ export type HandleOAuthCallbackParams = {
 };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
-
-export type BuildUrlWithAuthParams = {
-  /**
-   * Controls if dev browser JWT is added as a query param
-   */
-  useQueryParam?: boolean | null;
-};
 
 export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | void;
 

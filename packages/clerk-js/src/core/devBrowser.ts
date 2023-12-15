@@ -48,7 +48,7 @@ export function createDevBrowser({ frontendApi, fapiClient }: CreateDevBrowserOp
     fapiClient.onBeforeRequest(request => {
       const devBrowserJWT = getDevBrowserJWT();
       if (devBrowserJWT && request?.url) {
-        request.url = setDevBrowserJWTInURL(request.url, devBrowserJWT, true);
+        request.url = setDevBrowserJWTInURL(request.url, devBrowserJWT);
       }
     });
 

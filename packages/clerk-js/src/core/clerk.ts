@@ -17,7 +17,6 @@ import { eventComponentMounted, TelemetryCollector } from '@clerk/shared/telemet
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
-  BuildUrlWithAuthParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkOptions,
@@ -702,7 +701,7 @@ export class Clerk implements ClerkInterface {
     return await customNavigate(stripOrigin(toURL));
   };
 
-  public buildUrlWithAuth(to: string, options?: BuildUrlWithAuthParams): string {
+  public buildUrlWithAuth(to: string): string {
     if (this.#instanceType === 'production') {
       return to;
     }
@@ -718,10 +717,7 @@ export class Clerk implements ClerkInterface {
       return clerkMissingDevBrowserJwt();
     }
 
-    // Use query param for Account Portal pages so that SSR can access the dev_browser JWT
-    const asQueryParam = !!options?.useQueryParam || isDevAccountPortalOrigin(toURL.hostname);
-
-    return setDevBrowserJWTInURL(toURL, devBrowserJwt, asQueryParam).href;
+    return setDevBrowserJWTInURL(toURL, devBrowserJwt).href;
   }
 
   public buildSignInUrl(options?: SignInRedirectOptions): string {
@@ -1329,7 +1325,7 @@ export class Clerk implements ClerkInterface {
      * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
     if (this.#instanceType === 'production') {
-      await this.#devBrowser.clear();
+      this.#devBrowser.clear();
     } else {
       await this.#devBrowser.setup();
     }
@@ -1386,7 +1382,7 @@ export class Clerk implements ClerkInterface {
         break;
       } catch (err) {
         if (isError(err, 'dev_browser_unauthenticated')) {
-          await this.#devBrowser.clear();
+          this.#devBrowser.clear();
           await this.#devBrowser.setup();
         } else if (!isValidBrowserOnline()) {
           console.warn(err);
@@ -1579,8 +1575,7 @@ export class Clerk implements ClerkInterface {
       return false;
     }
 
-    const buildUrlWithAuthParams: BuildUrlWithAuthParams = { useQueryParam: true };
-    await this.navigate(this.buildUrlWithAuth(redirectUrl, buildUrlWithAuthParams));
+    await this.navigate(this.buildUrlWithAuth(redirectUrl));
     return true;
   };
 }
