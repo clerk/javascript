@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.0.0-alpha-v5.11
+
+### Major Changes
+
+- Drop support for NextJS v12: v12 was released on 26 Oct 2021. Support for security updates stopped on 21 Nov 2022. ([#2347](https://github.com/clerk/javascript/pull/2347)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Drop support for NextJS <13.0.4: Various header-related bugs were introduced with the 12.1.0, 12.2.0, 13.0.1, 13.0.2, 13.0.3 NextJS releases which are now fixed since next@^13.0.4. We will be dropping support for these problematic versions in order to greatly reduce complexity in our codebase.
+
+  Drop support for NextJS < 14.0.3 because of the issues described here: https://github.com/clerk/javascript/issues/1436.
+
+  Deprecate `authMiddleware` in favor of `clerkMiddleware`. For more information, see https://clerk.com/docs/upgrade-guides/v5-introduction
+
+  Move the server-side APIs from `@clerk/nextjs` to the `@clerk/nextjs/server` module: `WebhookEventType`, `WebhookEvent`, `verifyToken`, `redirectToSignIn`, `auth`, `buildClerkProps`, `clerkClient`, `currentUser`, `getAuth`, `redirectToSignUp` and `authMiddleware`. For more information, see https://clerk.com/docs/upgrade-guides/v5-introduction
+
+### Patch Changes
+
+- Updated dependencies [[`e602d6c1f`](https://github.com/clerk/javascript/commit/e602d6c1fde7a7757d292f24dfaddecd14ac1623)]:
+  - @clerk/backend@1.0.0-alpha-v5.9
+
 ## 5.0.0-alpha-v5.10
 
 ### Major Changes
