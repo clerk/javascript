@@ -1,8 +1,9 @@
-import type { JwtPayload, ReturnWithError } from '@clerk/types';
+import type { JwtPayload } from '@clerk/types';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
 import { decodeJwt, verifyJwt } from '../jwt';
+import type { JwtReturnType } from '../jwt/types';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 
@@ -16,7 +17,7 @@ export type VerifyTokenOptions = Pick<VerifyJwtOptions, 'authorizedParties' | 'a
 export async function verifyToken(
   token: string,
   options: VerifyTokenOptions,
-): Promise<ReturnWithError<JwtPayload, TokenVerificationError>> {
+): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
   const {
     secretKey,
     apiUrl,

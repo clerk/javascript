@@ -1,4 +1,4 @@
-import type { Jwt, JwtPayload, ReturnWithError } from '@clerk/types';
+import type { Jwt, JwtPayload } from '@clerk/types';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
@@ -17,10 +17,11 @@ import {
   assertSubClaim,
 } from './assertions';
 import { importKey } from './cryptoKeys';
+import type { JwtReturnType } from './types';
 
 const DEFAULT_CLOCK_SKEW_IN_SECONDS = 5 * 1000;
 
-export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Promise<ReturnWithError<boolean, Error>> {
+export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Promise<JwtReturnType<boolean, Error>> {
   const { header, signature, raw } = jwt;
   const encoder = new TextEncoder();
   const data = encoder.encode([raw.header, raw.payload].join('.'));
@@ -41,7 +42,7 @@ export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Pro
   }
 }
 
-export function decodeJwt(token: string): ReturnWithError<Jwt, TokenVerificationError> {
+export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationError> {
   const tokenParts = (token || '').toString().split('.');
   if (tokenParts.length !== 3) {
     return {
@@ -100,7 +101,7 @@ export type VerifyJwtOptions = {
 export async function verifyJwt(
   token: string,
   { audience, authorizedParties, clockSkewInMs, key }: VerifyJwtOptions,
-): Promise<ReturnWithError<JwtPayload, TokenVerificationError>> {
+): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
   const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
 
   const { data: decoded, error } = decodeJwt(token);
