@@ -45,7 +45,7 @@ type AuthSignedOut = AuthObjectWithoutResources<
   }
 >;
 
-export const auth = () => {
+export const auth = (): AuthSignedIn | AuthSignedOut => {
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing(),

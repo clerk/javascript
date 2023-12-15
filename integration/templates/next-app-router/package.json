@@ -9,11 +9,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "@clerk/backend": "file:.yalc/@clerk/backend",
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
-    "@clerk/nextjs": "file:.yalc/@clerk/nextjs",
-    "@clerk/shared": "file:.yalc/@clerk/shared",
-    "@clerk/types": "file:.yalc/@clerk/types",
     "@types/node": "^18.17.0",
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",

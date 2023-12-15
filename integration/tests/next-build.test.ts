@@ -6,7 +6,6 @@ import { appConfigs } from '../presets';
 test.describe('next build @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
-  const output = [];
 
   test.beforeAll(async () => {
     app = await appConfigs.next.appRouter
@@ -55,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   });
 
   test.afterAll(async () => {
-    await app.teardown();
+    // await app.teardown();
   });
 
   test('When <ClerkProvider /> is used as a client component, builds successfully and does not force dynamic rendering', () => {

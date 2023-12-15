@@ -26,7 +26,6 @@ exports[`public exports should not include a breaking change 1`] = `
   "SignedOut",
   "UserButton",
   "UserProfile",
-  "WithClerk",
   "useAuth",
   "useClerk",
   "useEmailLink",
@@ -37,6 +36,5 @@ exports[`public exports should not include a breaking change 1`] = `
   "useSignIn",
   "useSignUp",
   "useUser",
-  "withClerk",
 ]
 `;

@@ -1,21 +1,19 @@
-import type { Protect as ProtectClientComponent } from '@clerk/clerk-react';
+import type { ProtectProps } from '@clerk/clerk-react';
 import React from 'react';
 
 import { auth } from './auth';
 
-export function SignedIn(props: React.PropsWithChildren) {
+export function SignedIn(props: React.PropsWithChildren): React.JSX.Element | null {
   const { children } = props;
   const { userId } = auth();
   return userId ? <>{children}</> : null;
 }
 
-export function SignedOut(props: React.PropsWithChildren) {
+export function SignedOut(props: React.PropsWithChildren): React.JSX.Element | null {
   const { children } = props;
   const { userId } = auth();
   return userId ? null : <>{children}</>;
 }
-
-type ProtectServerComponentProps = React.ComponentProps<typeof ProtectClientComponent>;
 
 /**
  * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
@@ -29,14 +27,14 @@ type ProtectServerComponentProps = React.ComponentProps<typeof ProtectClientComp
  * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
-export function Protect(props: ProtectServerComponentProps) {
+export function Protect(props: ProtectProps): React.JSX.Element | null {
   const { children, fallback, ...restAuthorizedParams } = props;
   const { has, userId } = auth();
 
   /**
    * Fallback to UI provided by user or `null` if authorization checks failed
    */
-  const unauthorized = <>{fallback ?? null}</>;
+  const unauthorized = fallback ? <>{fallback}</> : null;
 
   const authorized = <>{children}</>;
 
