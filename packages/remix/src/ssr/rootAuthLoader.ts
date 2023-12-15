@@ -1,6 +1,5 @@
 import { AuthStatus, sanitizeAuthObject } from '@clerk/backend/internal';
 import type { defer } from '@remix-run/server-runtime';
-import { redirect } from '@remix-run/server-runtime';
 import { isDeferredData } from '@remix-run/server-runtime/dist/responses';
 
 import { invalidRootLoaderCallbackReturn } from '../errors';
@@ -50,9 +49,14 @@ export const rootAuthLoader: RootAuthLoader = async (
 
   const requestState = await authenticateRequest(args, opts);
 
-  // TODO handle handshake
+  const hasLocationHeader = requestState.headers.get('location');
+  if (hasLocationHeader) {
+    // triggering a handshake redirect
+    return new Response(null, { status: 307, headers: requestState.headers });
+  }
+
   if (requestState.status === AuthStatus.Handshake) {
-    throw redirect('');
+    throw new Error('Clerk: unexpected handshake without redirect');
   }
 
   if (!handler) {
