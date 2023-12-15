@@ -265,48 +265,70 @@ export const enUS: LocalizationResource = {
       emailAddressesSection: {
         title: 'Email addresses',
         primaryButton: 'Add an email address',
+        //TODO-RETHEME remove
         detailsTitle__primary: 'Primary email address',
+        //TODO-RETHEME remove
         detailsSubtitle__primary: 'This email address is the primary email address',
+        //TODO-RETHEME remove
         detailsAction__primary: 'Complete verification',
-        detailsTitle__nonPrimary: 'Set as primary email address',
+        //TODO-RETHEME remove
+        detailsTitle__nonPrimary: 'Set as primary',
+        //TODO-RETHEME remove
         detailsSubtitle__nonPrimary:
           'Set this email address as the primary to receive communications regarding your account.',
         detailsAction__nonPrimary: 'Set as primary',
+        //TODO-RETHEME remove
         detailsTitle__unverified: 'Verify email address',
+        //TODO-RETHEME remove
         detailsSubtitle__unverified: 'Complete verification to access all features with this email address',
-        detailsAction__unverified: 'Verify email address',
+        detailsAction__unverified: 'Verify',
+        //TODO-RETHEME remove
         destructiveActionTitle: 'Remove',
+        //TODO-RETHEME remove
         destructiveActionSubtitle: 'Delete this email address and remove it from your account',
-        destructiveAction: 'Remove email address',
+        destructiveAction: 'Remove email',
       },
       phoneNumbersSection: {
         title: 'Phone numbers',
         primaryButton: 'Add a phone number',
+        //TODO-RETHEME remove
         detailsTitle__primary: 'Primary phone number',
+        //TODO-RETHEME remove
         detailsSubtitle__primary: 'This phone number is the primary phone number',
         detailsAction__primary: 'Complete verification',
+        //TODO-RETHEME remove
         detailsTitle__nonPrimary: 'Set as primary phone number',
+        //TODO-RETHEME remove
         detailsSubtitle__nonPrimary:
           'Set this phone number as the primary to receive communications regarding your account.',
         detailsAction__nonPrimary: 'Set as primary',
+        //TODO-RETHEME remove
         detailsTitle__unverified: 'Verify phone number',
+        //TODO-RETHEME remove
         detailsSubtitle__unverified: 'Complete verification to access all features with this phone number',
         detailsAction__unverified: 'Verify phone number',
+        //TODO-RETHEME remove
         destructiveActionTitle: 'Remove',
+        //TODO-RETHEME remove
         destructiveActionSubtitle: 'Delete this phone number and remove it from your account',
         destructiveAction: 'Remove phone number',
       },
       connectedAccountsSection: {
         title: 'Connected accounts',
         primaryButton: 'Connect account',
+        //TODO-RETHEME remove
         title__connectionFailed: 'Retry failed connection',
+        //TODO-RETHEME remove
         title__reauthorize: 'Reauthorization required',
+        //TODO-RETHEME remove
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         actionLabel__connectionFailed: 'Try again',
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Remove',
+        //TODO-RETHEME remove
         destructiveActionSubtitle: 'Remove this connected account from your account',
+        //TODO-RETHEME remove
         destructiveActionAccordionSubtitle: 'Remove connected account',
       },
       enterpriseAccountsSection: {
@@ -321,29 +343,41 @@ export const enUS: LocalizationResource = {
         title: 'Two-step verification',
         primaryButton: 'Add two-step verification',
         phoneCode: {
+          //TODO-RETHEME remove
           destructiveActionTitle: 'Remove',
+          //TODO-RETHEME remove
           destructiveActionSubtitle: 'Remove this phone number from the two-step verification methods',
-          destructiveActionLabel: 'Remove phone number',
+          destructiveActionLabel: 'Remove',
+          //TODO-RETHEME remove
           title__default: 'Default factor',
+          //TODO-RETHEME remove
           title__setDefault: 'Set as Default factor',
+          //TODO-RETHEME remove
           subtitle__default: 'This factor will be used as the default two-step verification method when signing in.',
+          //TODO-RETHEME remove
           subtitle__setDefault:
             'Set this factor as the default factor to use it as the default two-step verification method when signing in.',
           actionLabel__setDefault: 'Set as default',
         },
         backupCodes: {
           headerTitle: 'Backup codes',
+          //TODO-RETHEME remove
           title__regenerate: 'Regenerate backup codes',
+          //TODO-RETHEME remove
           subtitle__regenerate:
             'Get a fresh set of secure backup codes. Prior backup codes will be deleted and cannot be used.',
-          actionLabel__regenerate: 'Regenerate codes',
+          actionLabel__regenerate: 'Regenerate',
         },
         totp: {
           headerTitle: 'Authenticator application',
+          //TODO-RETHEME remove
           title: 'Default factor',
+          //TODO-RETHEME remove
           subtitle: 'This factor will be used as the default two-step verification method when signing in.',
           destructiveActionTitle: 'Remove',
+          //TODO-RETHEME remove
           destructiveActionSubtitle: 'Remove authenticator application from the two-step verification methods',
+          //TODO-RETHEME remove
           destructiveActionLabel: 'Remove authenticator application',
         },
       },
@@ -364,9 +398,11 @@ export const enUS: LocalizationResource = {
         destructiveAction: 'Remove wallet',
       },
       dangerSection: {
-        title: 'Danger',
+        title: 'Account termination',
         deleteAccountButton: 'Delete Account',
+        //TODO-RETHEME remove
         deleteAccountTitle: 'Delete Account',
+        //TODO-RETHEME remove
         deleteAccountDescription: 'Delete your account and all its associated data',
       },
     },

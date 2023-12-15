@@ -2,21 +2,22 @@ import { useUser } from '@clerk/shared/react';
 import type { BackupCodeResource } from '@clerk/types';
 import React from 'react';
 
-import { descriptors, localizationKeys, Text } from '../../customizables';
+import { Button, descriptors, localizationKeys, Text } from '../../customizables';
 import {
   FormButtonContainer,
   FormContent,
   FullHeightLoader,
-  NavigateToFlowStartButton,
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
+export const MfaBackupCodeCreateForm = withCardStateProvider(() => {
   const { user } = useUser();
+  const { close } = useActionContext();
   const card = useCardState();
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
 
@@ -57,8 +58,9 @@ export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
           />
 
           <FormButtonContainer>
-            <NavigateToFlowStartButton
+            <Button
               autoFocus
+              onClick={close}
               localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
               elementDescriptor={descriptors.formButtonPrimary}
             />

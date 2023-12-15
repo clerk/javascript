@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
@@ -91,59 +91,61 @@ export default function Page() {
     await app.teardown();
   });
 
-  test('user profile with path routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.expect.toBeSignedIn();
+  //TODO-RETHEME: Refactor this, because this path doesn't exist anymore
+  // test('user profile with path routing', async ({ page, context }) => {
+  //   const u = createTestUtils({ app, page, context });
+  //   await u.po.signIn.goTo();
+  //   await u.po.signIn.waitForMounted();
+  //   await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+  //   await u.po.expect.toBeSignedIn();
+  //
+  //   await u.po.userProfile.goTo();
+  //   await u.po.userProfile.waitForMounted();
+  //
+  //   await u.page.getByText(/Set username/i).click();
+  //
+  //   await u.page.waitForURL(`${app.serverUrl}/user/username`);
+  //
+  //   await u.page.getByText(/Cancel/i).click();
+  //
+  //   await u.page.waitForURL(`${app.serverUrl}/user`);
+  //
+  //   await u.page.getByText(/Add an email address/i).click();
+  //
+  //   await u.page.waitForURL(`${app.serverUrl}/user/email-address`);
+  //
+  //   await u.page.getByText(/Cancel/i).click();
+  //
+  //   await u.page.waitForURL(`${app.serverUrl}/user`);
+  // });
 
-    await u.po.userProfile.goTo();
-    await u.po.userProfile.waitForMounted();
-
-    await u.page.getByText(/Set username/i).click();
-
-    await u.page.waitForURL(`${app.serverUrl}/user/username`);
-
-    await u.page.getByText(/Cancel/i).click();
-
-    await u.page.waitForURL(`${app.serverUrl}/user`);
-
-    await u.page.getByText(/Add an email address/i).click();
-
-    await u.page.waitForURL(`${app.serverUrl}/user/email-address`);
-
-    await u.page.getByText(/Cancel/i).click();
-
-    await u.page.waitForURL(`${app.serverUrl}/user`);
-  });
-
-  test('user profile with hash routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.expect.toBeSignedIn();
-
-    await u.page.goToRelative('/hash/user');
-    await u.po.userProfile.waitForMounted();
-
-    await u.page.getByText(/Set username/i).click();
-
-    expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#/username`);
-
-    await u.page.getByText(/Cancel/i).click();
-
-    expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#`);
-
-    await u.page.getByText(/Add an email address/i).click();
-
-    expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#/email-address`);
-
-    await u.page.getByText(/Cancel/i).click();
-
-    expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#`);
-  });
+  //TODO-RETHEME: Refactor this, because this path doesn't exist anymore
+  // test('user profile with hash routing', async ({ page, context }) => {
+  //   const u = createTestUtils({ app, page, context });
+  //   await u.po.signIn.goTo();
+  //   await u.po.signIn.waitForMounted();
+  //   await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+  //   await u.po.expect.toBeSignedIn();
+  //
+  //   await u.page.goToRelative('/hash/user');
+  //   await u.po.userProfile.waitForMounted();
+  //
+  //   await u.page.getByText(/Set username/i).click();
+  //
+  //   expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#/username`);
+  //
+  //   await u.page.getByText(/Cancel/i).click();
+  //
+  //   expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#`);
+  //
+  //   await u.page.getByText(/Add an email address/i).click();
+  //
+  //   expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#/email-address`);
+  //
+  //   await u.page.getByText(/Cancel/i).click();
+  //
+  //   expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#`);
+  // });
 
   test('sign in with path routing', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });

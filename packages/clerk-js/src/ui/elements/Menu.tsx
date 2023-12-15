@@ -182,6 +182,7 @@ export const MenuItem = (props: MenuItemProps) => {
       }}
       sx={[
         theme => ({
+          boxShadow: 'none',
           justifyContent: 'start',
           borderRadius: theme.radii.$none,
           paddingLeft: theme.space.$4,

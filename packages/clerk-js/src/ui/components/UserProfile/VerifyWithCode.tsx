@@ -1,8 +1,8 @@
 import type { EmailAddressResource, PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
-import { descriptors, localizationKeys } from '../../customizables';
-import { Form, FormButtonContainer, NavigateToFlowStartButton, useCardState, useFieldOTP } from '../../elements';
+import { Button, descriptors, localizationKeys } from '../../customizables';
+import { Form, FormButtonContainer, useCardState, useFieldOTP } from '../../elements';
 import { handleError } from '../../utils';
 
 type VerifyWithCodeProps = {
@@ -10,11 +10,12 @@ type VerifyWithCodeProps = {
   identification?: EmailAddressResource | PhoneNumberResource;
   identifier?: string;
   prepareVerification?: () => Promise<any> | undefined;
+  onReset: () => void;
 };
 
 export const VerifyWithCode = (props: VerifyWithCodeProps) => {
   const card = useCardState();
-  const { nextStep, identification, identifier, prepareVerification } = props;
+  const { nextStep, identification, identifier, onReset, prepareVerification } = props;
 
   const prepare = () => {
     return prepareVerification?.()?.catch(err => handleError(err, [], card.setError));
@@ -44,9 +45,11 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
         resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
       />
       <FormButtonContainer>
-        <NavigateToFlowStartButton
+        <Button
+          variant='ghost'
           localizationKey={localizationKeys('userProfile.formButtonReset')}
           elementDescriptor={descriptors.formButtonReset}
+          onClick={onReset}
         />
       </FormButtonContainer>
     </>

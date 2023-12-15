@@ -28,12 +28,12 @@ export const SecurityPage = withCardStateProvider(() => {
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('security')}
-        gap={8}
       >
         <Header.Root>
           <Header.Title
             localizationKey={localizationKeys('userProfile.start.headerTitle__security')}
-            textVariant='h1'
+            sx={t => ({ marginBottom: t.space.$4 })}
+            textVariant='h2'
           />
         </Header.Root>
         {showPassword && <PasswordSection />}

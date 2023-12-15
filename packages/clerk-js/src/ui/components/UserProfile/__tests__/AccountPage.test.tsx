@@ -46,7 +46,7 @@ describe('AccountPage', () => {
       expect(button.closest('button')).not.toBeNull();
     });
 
-    it('shows the email addresses section with the email addresses of the user and has appropriate buttons', async () => {
+    it('shows the email addresses section with the email addresses of the user', async () => {
       const emails = ['test@clerk.com', 'test2@clerk.com'];
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
@@ -60,12 +60,9 @@ describe('AccountPage', () => {
 
       render(<AccountPage />, { wrapper });
       screen.getByText(/Email addresses/i);
-      const emailButtons: HTMLElement[] = [];
+      const emailTexts: HTMLElement[] = [];
       emails.forEach(email => {
-        emailButtons.push(screen.getByText(email));
-      });
-      emailButtons.forEach(emailButton => {
-        expect(emailButton.closest('button')).not.toBeNull();
+        emailTexts.push(screen.getByText(email));
       });
     });
 
@@ -87,16 +84,13 @@ describe('AccountPage', () => {
       numbers.forEach(number => {
         numberButtons.push(screen.getByText(number));
       });
-      numberButtons.forEach(numberButton => {
-        expect(numberButton.closest('button')).not.toBeNull();
-      });
     });
 
-    it('shows the connected accounts of the user and has appropriate buttons', async () => {
+    it('shows the connected accounts of the user', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
         f.withUser({
-          external_accounts: [{ provider: 'google', email_address: 'testgoogle@clerk.com' }],
+          external_accounts: [{ provider: 'google', email_address: 'test@clerk.com' }],
           first_name: 'George',
           last_name: 'Clerk',
         });
@@ -105,9 +99,8 @@ describe('AccountPage', () => {
 
       render(<AccountPage />, { wrapper });
       screen.getByText(/Connected Accounts/i);
-      screen.getByText(/testgoogle@clerk.com/i);
-      const externalAccountButton = screen.getByText(/google/i);
-      expect(externalAccountButton.closest('button')).not.toBeNull();
+      screen.getByText(/test@clerk.com/i);
+      screen.getByText(/google/i);
     });
 
     it('shows the enterprise accounts of the user', async () => {

@@ -5,14 +5,8 @@ import React from 'react';
 import { QRCode } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, localizationKeys, Text } from '../../customizables';
-import {
-  ClipboardInput,
-  FormButtonContainer,
-  FormContent,
-  FullHeightLoader,
-  NavigateToFlowStartButton,
-  useCardState,
-} from '../../elements';
+import { ClipboardInput, FormButtonContainer, FormContent, FullHeightLoader, useCardState } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -26,6 +20,7 @@ type DisplayFormat = 'qr' | 'uri';
 export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
   const { title, onContinue } = props;
   const { user } = useUser();
+  const { close } = useActionContext();
   const card = useCardState();
   const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');
@@ -112,7 +107,9 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
               elementDescriptor={descriptors.formButtonPrimary}
             />
 
-            <NavigateToFlowStartButton
+            <Button
+              variant='ghost'
+              onClick={close}
               localizationKey={localizationKeys('userProfile.formButtonReset')}
               elementDescriptor={descriptors.formButtonReset}
             />

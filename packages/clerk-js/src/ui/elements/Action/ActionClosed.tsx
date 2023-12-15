@@ -2,13 +2,13 @@ import { type PropsWithChildren } from 'react';
 
 import { useActionContext } from './ActionRoot';
 
-type ActionClosedProps = PropsWithChildren;
+type ActionClosedProps = PropsWithChildren<{ value: string }>;
 
 export const ActionClosed = (props: ActionClosedProps) => {
-  const { children } = props;
-  const { isOpen } = useActionContext();
+  const { children, value } = props;
+  const { active } = useActionContext();
 
-  if (isOpen) {
+  if (active === value) {
     return null;
   }
 

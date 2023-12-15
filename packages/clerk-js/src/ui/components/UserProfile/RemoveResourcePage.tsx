@@ -7,9 +7,13 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const RemoveEmailPage = () => {
+type RemoveEmailFormProps = {
+  emailId: string;
+};
+
+export const RemoveEmailForm = (props: RemoveEmailFormProps) => {
   const { user } = useUser();
-  const { id } = useRouter().params;
+  const { emailId: id } = props;
   const resource = user?.emailAddresses.find(e => e.id === id);
   const ref = React.useRef(resource?.emailAddress);
 
@@ -33,9 +37,13 @@ export const RemoveEmailPage = () => {
   );
 };
 
-export const RemovePhonePage = () => {
+type RemovePhoneFormProps = {
+  phoneId: string;
+};
+
+export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
+  const { phoneId: id } = props;
   const { user } = useUser();
-  const { id } = useRouter().params;
   const resource = user?.phoneNumbers.find(e => e.id === id);
   const ref = React.useRef(resource?.phoneNumber);
 
@@ -59,9 +67,13 @@ export const RemovePhonePage = () => {
   );
 };
 
-export const RemoveConnectedAccountPage = () => {
+type ConnectedAccountFormProps = {
+  accountId: string;
+};
+
+export const RemoveConnectedAccountForm = (props: ConnectedAccountFormProps) => {
+  const { accountId: id } = props;
   const { user } = useUser();
-  const { id } = useRouter().params;
   const resource = user?.externalAccounts.find(e => e.id === id);
   const ref = React.useRef(resource?.provider);
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
@@ -112,9 +124,13 @@ export const RemoveWeb3WalletPage = () => {
   );
 };
 
-export const RemoveMfaPhoneCodePage = () => {
+type RemoveMfaPhoneCodeFormProps = {
+  phoneId: string;
+};
+
+export const RemoveMfaPhoneCodeForm = (props: RemoveMfaPhoneCodeFormProps) => {
   const { user } = useUser();
-  const { id } = useRouter().params;
+  const { phoneId: id } = props;
   // TODO: This logic will need to change when we add more 2fa methods
   const resource = user?.phoneNumbers.find(e => e.id === id);
   const ref = React.useRef(resource?.phoneNumber);
@@ -139,15 +155,20 @@ export const RemoveMfaPhoneCodePage = () => {
   );
 };
 
-export const RemoveMfaTOTPPage = () => {
+export const RemoveMfaTOTPForm = () => {
   const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <RemoveResourcePage
       title={localizationKeys('userProfile.mfaTOTPPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine1')}
       messageLine2={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.mfaTOTPPage.removeResource.successMessage')}
-      deleteResource={user!.disableTOTP}
+      deleteResource={user.disableTOTP}
       Breadcrumbs={UserProfileBreadcrumbs}
     />
   );

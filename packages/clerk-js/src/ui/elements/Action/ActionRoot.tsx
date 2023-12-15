@@ -5,17 +5,22 @@ import { useCallback, useState } from 'react';
 type ActionRootProps = PropsWithChildren;
 
 export const [ActionContext, useActionContext, _] = createContextAndHook<{
-  isOpen: boolean;
-  toggle: () => void;
+  active: string | null;
+  open: (value: string) => void;
+  close: () => void;
 }>('ActionContext');
 
 export const ActionRoot = (props: ActionRootProps) => {
   const { children } = props;
-  const [isOpen, setIsOpen] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
 
-  const toggle = useCallback(() => {
-    setIsOpen(open => !open);
+  const close = useCallback(() => {
+    setActive(null);
   }, []);
 
-  return <ActionContext.Provider value={{ value: { isOpen, toggle } }}>{children}</ActionContext.Provider>;
+  const open = useCallback((value: string) => {
+    setActive(value);
+  }, []);
+
+  return <ActionContext.Provider value={{ value: { active, open, close } }}>{children}</ActionContext.Provider>;
 };

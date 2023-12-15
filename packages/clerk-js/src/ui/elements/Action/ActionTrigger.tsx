@@ -2,18 +2,20 @@ import { Children, cloneElement, isValidElement, type PropsWithChildren } from '
 
 import { useActionContext } from './ActionRoot';
 
-type ActionTriggerProps = PropsWithChildren;
+type ActionTriggerProps = PropsWithChildren<{
+  value: string;
+}>;
 
 export const ActionTrigger = (props: ActionTriggerProps) => {
-  const { children } = props;
-  const { isOpen, toggle } = useActionContext();
+  const { children, value } = props;
+  const { active, open } = useActionContext();
 
   const validChildren = Children.only(children);
   if (!isValidElement(validChildren)) {
     throw new Error('Children of ActionTrigger must be a valid element');
   }
 
-  if (isOpen) {
+  if (active === value) {
     return null;
   }
 
@@ -22,7 +24,7 @@ export const ActionTrigger = (props: ActionTriggerProps) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onClick: async () => {
       await validChildren.props.onClick?.();
-      toggle();
+      open(value);
     },
   });
 };

@@ -1,9 +1,9 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Button, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Button, Flex, localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
 import { Action } from '../../elements/Action';
-import { UpdateProfileForm } from './UpdateProfileForm';
+import { ProfileForm } from './ProfileForm';
 
 export const UserProfileSection = () => {
   const { user } = useUser();
@@ -20,9 +20,8 @@ export const UserProfileSection = () => {
       id='profile'
     >
       <Action.Root>
-        <Action.Closed>
+        <Action.Closed value='edit'>
           <Flex
-            elementDescriptor={descriptors.profileSection}
             sx={{
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -30,7 +29,7 @@ export const UserProfileSection = () => {
           >
             <UserPreview user={userWithoutIdentifiers} />
 
-            <Action.Trigger>
+            <Action.Trigger value='edit'>
               <Button
                 variant='ghost'
                 localizationKey={localizationKeys('userProfile.start.profileSection.primaryButton')}
@@ -39,9 +38,9 @@ export const UserProfileSection = () => {
           </Flex>
         </Action.Closed>
 
-        <Action.Open>
+        <Action.Open value='edit'>
           <Action.Card>
-            <UpdateProfileForm />
+            <ProfileForm />
           </Action.Card>
         </Action.Open>
       </Action.Root>

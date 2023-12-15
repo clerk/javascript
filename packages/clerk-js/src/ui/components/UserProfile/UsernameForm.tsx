@@ -4,11 +4,13 @@ import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const UsernamePage = withCardStateProvider(() => {
+export const UsernameForm = withCardStateProvider(() => {
   const { user } = useUser();
+  const { close } = useActionContext();
 
   if (!user) {
     return null;
@@ -51,12 +53,16 @@ export const UsernamePage = withCardStateProvider(() => {
               isRequired
             />
           </Form.ControlRow>
-          <FormButtons isDisabled={!canSubmit} />
+          <FormButtons
+            isDisabled={!canSubmit}
+            onReset={close}
+          />
         </Form.Root>
       </FormContent>
       <SuccessPage
         title={localizationKeys('userProfile.usernamePage.title')}
         text={localizationKeys('userProfile.usernamePage.successMessage')}
+        onFinish={close}
       />
     </Wizard>
   );

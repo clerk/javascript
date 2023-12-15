@@ -5,27 +5,30 @@ import React from 'react';
 import { appendModalState } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useUserProfileContext } from '../../contexts';
-import { Col, Image, localizationKeys, Text } from '../../customizables';
+import { Button, Col, Image, localizationKeys, Text } from '../../customizables';
 import {
   ArrowBlockButton,
   FormButtonContainer,
   FormContent,
-  NavigateToFlowStartButton,
   SuccessPage,
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const ConnectedAccountsPage = withCardStateProvider(() => {
+type ConnectedAccountsFormProps = {
+  accountId?: string;
+};
+
+export const ConnectedAccountsForm = withCardStateProvider((props: ConnectedAccountsFormProps) => {
+  const { accountId: id } = props;
   const title = localizationKeys('userProfile.connectedAccountPage.title');
   const { user } = useUser();
-
-  const { params } = useRouter();
-  const { id } = params || {};
+  const { close } = useActionContext();
 
   const ref = React.useRef<ExternalAccountResource | undefined>(user?.externalAccounts.find(a => a.id === id));
   const wizard = useWizard({ defaultStep: ref.current ? 1 : 0 });
@@ -37,6 +40,7 @@ export const ConnectedAccountsPage = withCardStateProvider(() => {
       <SuccessPage
         title={title}
         text={localizationKeys('userProfile.connectedAccountPage.successMessage')}
+        onFinish={close}
       />
     </Wizard>
   );
@@ -49,6 +53,7 @@ const AddConnectedAccount = () => {
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
+  const { close } = useActionContext();
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
   const connectedStrategies = user?.verifiedExternalAccounts.map(a => `oauth_${a.provider}`) as OAuthStrategy[];
@@ -120,7 +125,11 @@ const AddConnectedAccount = () => {
         ))}
       </Col>
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
+        <Button
+          variant='ghost'
+          localizationKey={localizationKeys('userProfile.formButtonReset')}
+          onClick={close}
+        />
       </FormButtonContainer>
     </FormContent>
   );

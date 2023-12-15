@@ -3,25 +3,20 @@ import type { VerificationStrategy } from '@clerk/types';
 import React from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { Col, Grid, localizationKeys, Text } from '../../customizables';
-import {
-  FormButtonContainer,
-  FormContent,
-  NavigateToFlowStartButton,
-  TileButton,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
+import { Button, Col, Grid, localizationKeys, Text } from '../../customizables';
+import { FormButtonContainer, FormContent, TileButton, useCardState, withCardStateProvider } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { AuthApp, DotCircle, Mobile } from '../../icons';
 import { mqu } from '../../styledSystem';
-import { MfaBackupCodePage } from './MfaBackupCodePage';
-import { MfaPhoneCodePage } from './MfaPhoneCodePage';
-import { MfaTOTPPage } from './MfaTOTPPage';
+import { MfaBackupCodeScreen } from './MfaBackupCodeScreen';
+import { MfaPhoneCodeScreen } from './MfaPhoneCodeScreen';
+import { MfaTOTPScreen } from './MfaTOTPScreen';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { getSecondFactorsAvailableToAdd } from './utils';
 
-export const MfaPage = withCardStateProvider(() => {
+export const MfaForm = withCardStateProvider(() => {
   const card = useCardState();
+  const { close } = useActionContext();
   const {
     userSettings: { attributes },
   } = useEnvironment();
@@ -85,7 +80,11 @@ export const MfaPage = withCardStateProvider(() => {
       </Col>
 
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
+        <Button
+          variant='ghost'
+          localizationKey={localizationKeys('userProfile.formButtonReset')}
+          onClick={close}
+        />
       </FormButtonContainer>
     </FormContent>
   );
@@ -100,11 +99,11 @@ const MfaPageIfSingleOrCurrent = (props: MfaPageIfSingleOrCurrentProps) => {
 
   switch (method) {
     case 'phone_code':
-      return <MfaPhoneCodePage />;
+      return <MfaPhoneCodeScreen />;
     case 'totp':
-      return <MfaTOTPPage />;
+      return <MfaTOTPScreen />;
     case 'backup_code':
-      return <MfaBackupCodePage />;
+      return <MfaBackupCodeScreen />;
     default:
       return null;
   }

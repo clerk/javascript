@@ -6,22 +6,24 @@ import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { useRouter } from '../../router';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithLink } from './VerifyWithLink';
 
-export const EmailPage = withCardStateProvider(() => {
+type EmailFormProps = {
+  emailId?: string;
+};
+export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
+  const { emailId: id } = props;
   const title = localizationKeys('userProfile.emailAddressPage.title');
   const card = useCardState();
   const { user } = useUser();
+  const { close } = useActionContext();
   const environment = useEnvironment();
   const preferEmailLinks = emailLinksEnabledForInstance(environment);
-
-  const { params } = useRouter();
-  const { id } = params || {};
 
   const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user?.emailAddresses.find(a => a.id === id));
   const wizard = useWizard({
@@ -69,7 +71,10 @@ export const EmailPage = withCardStateProvider(() => {
                 : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
             }
           />
-          <FormButtons isDisabled={!canSubmit} />
+          <FormButtons
+            isDisabled={!canSubmit}
+            onReset={close}
+          />
         </Form.Root>
       </FormContent>
 
@@ -81,6 +86,7 @@ export const EmailPage = withCardStateProvider(() => {
           <VerifyWithLink
             nextStep={wizard.nextStep}
             email={emailAddressRef.current as any}
+            onReset={close}
           />
         ) : (
           <VerifyWithCode
@@ -88,6 +94,7 @@ export const EmailPage = withCardStateProvider(() => {
             identification={emailAddressRef.current}
             identifier={emailAddressRef.current?.emailAddress}
             prepareVerification={() => emailAddressRef.current?.prepareVerification({ strategy: 'email_code' })}
+            onReset={close}
           />
         )}
       </FormContent>
@@ -103,6 +110,7 @@ export const EmailPage = withCardStateProvider(() => {
                 identifier: emailAddressRef.current?.emailAddress || '',
               })
         }
+        onFinish={close}
       />
     </Wizard>
   );

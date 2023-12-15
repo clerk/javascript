@@ -5,7 +5,7 @@ import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { NavbarMenuButtonRow } from '../../elements/Navbar';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
-import { EmailsSection } from './EmailSection';
+import { EmailsSection } from './EmailsSection';
 import { EnterpriseAccountsSection } from './EnterpriseAccountsSection';
 import { PhoneSection } from './PhoneSection';
 import { UsernameSection } from './UsernameSection';

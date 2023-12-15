@@ -3,12 +3,14 @@ import { useClerk, useUser } from '@clerk/shared/react';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const DeletePage = withCardStateProvider(() => {
+export const DeleteUserForm = withCardStateProvider(() => {
   const card = useCardState();
+  const { close } = useActionContext();
   const environment = useEnvironment();
   const router = useRouter();
   const { user } = useUser();
@@ -57,6 +59,7 @@ export const DeletePage = withCardStateProvider(() => {
           submitLabel={localizationKeys('userProfile.deletePage.confirm')}
           variant='primaryDanger'
           isDisabled={!canSubmit}
+          onReset={close}
         />
       </Form.Root>
     </FormContent>

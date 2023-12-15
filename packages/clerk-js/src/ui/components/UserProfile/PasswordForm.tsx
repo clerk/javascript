@@ -14,7 +14,8 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useConfirmPassword, useNavigateToFlowStart } from '../../hooks';
+import { useActionContext } from '../../elements/Action/ActionRoot';
+import { useConfirmPassword } from '../../hooks';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -34,8 +35,9 @@ const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boole
   return localizedTexts;
 };
 
-export const PasswordPage = withCardStateProvider(() => {
+export const PasswordForm = withCardStateProvider(() => {
   const { user } = useUser();
+  const { close } = useActionContext();
 
   if (!user) {
     return null;
@@ -47,7 +49,6 @@ export const PasswordPage = withCardStateProvider(() => {
     : localizationKeys('userProfile.passwordPage.title');
   const card = useCardState();
   const wizard = useWizard();
-  const { navigateToFlowStart } = useNavigateToFlowStart();
 
   const passwordEditDisabled = user.samlAccounts.some(sa => sa.active);
 
@@ -192,16 +193,22 @@ export const PasswordPage = withCardStateProvider(() => {
               <Form.ResetButton
                 localizationKey={localizationKeys('userProfile.formButtonReset')}
                 block={false}
-                onClick={navigateToFlowStart}
+                onClick={close}
               />
             </FormButtonContainer>
           ) : (
-            <FormButtons isDisabled={!canSubmit} />
+            <FormButtons
+              isDisabled={!canSubmit}
+              onReset={close}
+            />
           )}
         </Form.Root>
       </FormContent>
 
-      <SuccessPage {...successPagePropsRef.current} />
+      <SuccessPage
+        {...successPagePropsRef.current}
+        onFinish={close}
+      />
     </Wizard>
   );
 });
