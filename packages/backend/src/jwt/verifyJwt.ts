@@ -17,27 +17,40 @@ import {
   assertSubClaim,
 } from './assertions';
 import { importKey } from './cryptoKeys';
+import type { JwtReturnType } from './types';
 
 const DEFAULT_CLOCK_SKEW_IN_SECONDS = 5 * 1000;
 
-export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string) {
+export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Promise<JwtReturnType<boolean, Error>> {
   const { header, signature, raw } = jwt;
   const encoder = new TextEncoder();
   const data = encoder.encode([raw.header, raw.payload].join('.'));
   const algorithm = getCryptoAlgorithm(header.alg);
 
-  const cryptoKey = await importKey(key, algorithm, 'verify');
+  try {
+    const cryptoKey = await importKey(key, algorithm, 'verify');
 
-  return runtime.crypto.subtle.verify(algorithm.name, cryptoKey, signature, data);
+    const verified = await runtime.crypto.subtle.verify(algorithm.name, cryptoKey, signature, data);
+    return { data: verified };
+  } catch (error) {
+    return {
+      error: new TokenVerificationError({
+        reason: TokenVerificationErrorReason.TokenInvalidSignature,
+        message: (error as Error)?.message,
+      }),
+    };
+  }
 }
 
-export function decodeJwt(token: string): Jwt {
+export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationError> {
   const tokenParts = (token || '').toString().split('.');
   if (tokenParts.length !== 3) {
-    throw new TokenVerificationError({
-      reason: TokenVerificationErrorReason.TokenInvalid,
-      message: `Invalid JWT form. A JWT consists of three parts separated by dots.`,
-    });
+    return {
+      error: new TokenVerificationError({
+        reason: TokenVerificationErrorReason.TokenInvalid,
+        message: `Invalid JWT form. A JWT consists of three parts separated by dots.`,
+      }),
+    };
   }
 
   const [rawHeader, rawPayload, rawSignature] = tokenParts;
@@ -63,7 +76,7 @@ export function decodeJwt(token: string): Jwt {
   const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
   const signature = base64url.parse(rawSignature, { loose: true });
 
-  return {
+  const data = {
     header,
     payload,
     signature,
@@ -73,7 +86,9 @@ export function decodeJwt(token: string): Jwt {
       signature: rawSignature,
       text: token,
     },
-  };
+  } satisfies Jwt;
+
+  return { data };
 }
 
 export type VerifyJwtOptions = {
@@ -86,47 +101,54 @@ export type VerifyJwtOptions = {
 export async function verifyJwt(
   token: string,
   { audience, authorizedParties, clockSkewInMs, key }: VerifyJwtOptions,
-): Promise<JwtPayload> {
+): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
   const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
 
-  const decoded = decodeJwt(token);
+  const { data: decoded, error } = decodeJwt(token);
+  if (error) {
+    return { error };
+  }
 
   const { header, payload } = decoded;
-
-  // Header verifications
-  const { typ, alg } = header;
-
-  assertHeaderType(typ);
-  assertHeaderAlgorithm(alg);
-
-  // Payload verifications
-  const { azp, sub, aud, iat, exp, nbf } = payload;
-
-  assertSubClaim(sub);
-  assertAudienceClaim([aud], [audience]);
-  assertAuthorizedPartiesClaim(azp, authorizedParties);
-  assertExpirationClaim(exp, clockSkew);
-  assertActivationClaim(nbf, clockSkew);
-  assertIssuedAtClaim(iat, clockSkew);
-
-  let signatureValid: boolean;
-
   try {
-    signatureValid = await hasValidSignature(decoded, key);
+    // Header verifications
+    const { typ, alg } = header;
+
+    assertHeaderType(typ);
+    assertHeaderAlgorithm(alg);
+
+    // Payload verifications
+    const { azp, sub, aud, iat, exp, nbf } = payload;
+
+    assertSubClaim(sub);
+    assertAudienceClaim([aud], [audience]);
+    assertAuthorizedPartiesClaim(azp, authorizedParties);
+    assertExpirationClaim(exp, clockSkew);
+    assertActivationClaim(nbf, clockSkew);
+    assertIssuedAtClaim(iat, clockSkew);
   } catch (err) {
-    throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.EnsureClerkJWT,
-      reason: TokenVerificationErrorReason.TokenVerificationFailed,
-      message: `Error verifying JWT signature. ${err}`,
-    });
+    return { error: err as TokenVerificationError };
+  }
+
+  const { data: signatureValid, error: signatureError } = await hasValidSignature(decoded, key);
+  if (signatureError) {
+    return {
+      error: new TokenVerificationError({
+        action: TokenVerificationErrorAction.EnsureClerkJWT,
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message: `Error verifying JWT signature. ${signatureError}`,
+      }),
+    };
   }
 
   if (!signatureValid) {
-    throw new TokenVerificationError({
-      reason: TokenVerificationErrorReason.TokenInvalidSignature,
-      message: 'JWT signature is invalid.',
-    });
+    return {
+      error: new TokenVerificationError({
+        reason: TokenVerificationErrorReason.TokenInvalidSignature,
+        message: 'JWT signature is invalid.',
+      }),
+    };
   }
 
-  return payload;
+  return { data: payload };
 }

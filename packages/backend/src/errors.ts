@@ -60,3 +60,5 @@ export class TokenVerificationError extends Error {
     })`;
   }
 }
+
+export class SignJWTError extends Error {}

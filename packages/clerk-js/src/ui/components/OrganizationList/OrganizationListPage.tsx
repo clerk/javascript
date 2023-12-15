@@ -1,18 +1,9 @@
-import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useOrganizationList } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import {
-  Action,
-  Card,
-  Header,
-  OrganizationAvatar,
-  SecondaryActions,
-  useCardState,
-  UserAvatar,
-  withCardStateProvider,
-} from '../../elements';
+import { Action, Card, Header, SecondaryActions, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
@@ -87,7 +78,6 @@ export const OrganizationListPage = withCardStateProvider(() => {
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
-  const environment = useEnvironment();
   const { navigateAfterSelectOrganization, skipInvitationScreen } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
   return (
@@ -99,18 +89,19 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
       {isCreateOrganizationFlow && (
         <Box
           sx={t => ({
-            padding: `${t.space.$8}`,
+            padding: `${t.space.$none} ${t.space.$5} ${t.space.$5}`,
           })}
         >
+          <Header.Root
+            sx={t => ({
+              padding: `${t.space.$4} ${t.space.$5}`,
+            })}
+          >
+            <Header.Title localizationKey={localizationKeys('createOrganization.title')} />
+          </Header.Root>
           <CreateOrganizationForm
             flow='organizationList'
             skipInvitationScreen={skipInvitationScreen}
-            startPage={{
-              headerTitle: localizationKeys('createOrganization.title'),
-              headerSubtitle: localizationKeys('organizationList.subtitle', {
-                applicationName: environment.displayConfig.applicationName,
-              }),
-            }}
             navigateAfterCreateOrganization={org =>
               navigateAfterSelectOrganization(org).then(() => setCreateOrganizationFlow(false))
             }
@@ -129,8 +120,6 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
 
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const { hidePersonal } = useOrganizationListContext();
-  const { organization } = useOrganization();
-  const { user } = useUser();
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
@@ -145,24 +134,6 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
           padding: `${t.space.$none} ${t.space.$8}`,
         })}
       >
-        <Flex
-          justify='center'
-          sx={t => ({ paddingBottom: t.space.$6 })}
-        >
-          {organization && (
-            <OrganizationAvatar
-              {...organization}
-              size={t => t.sizes.$8}
-            />
-          )}
-          {!organization && (
-            <UserAvatar
-              {...user}
-              rounded={false}
-              size={t => t.sizes.$8}
-            />
-          )}
-        </Flex>
         <Header.Title
           localizationKey={localizationKeys(
             !hidePersonal ? 'organizationList.title' : 'organizationList.titleWithoutPersonal',

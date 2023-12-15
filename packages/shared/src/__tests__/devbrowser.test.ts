@@ -3,22 +3,26 @@ import { getDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '../devBrowser';
 const DUMMY_URL_BASE = 'http://clerk-dummy';
 
 describe('setDevBrowserJWTInURL(url, jwt)', () => {
-  const testCases: Array<[string, string, boolean, string]> = [
-    ['', 'deadbeef', false, '#__clerk_db_jwt[deadbeef]'],
-    ['foo', 'deadbeef', false, 'foo#__clerk_db_jwt[deadbeef]'],
-    ['/foo', 'deadbeef', false, '/foo#__clerk_db_jwt[deadbeef]'],
-    ['#foo', 'deadbeef', false, '#foo__clerk_db_jwt[deadbeef]'],
-    ['/foo?bar=42#qux', 'deadbeef', false, '/foo?bar=42#qux__clerk_db_jwt[deadbeef]'],
-    ['/foo#__clerk_db_jwt[deadbeef]', 'deadbeef', false, '/foo#__clerk_db_jwt[deadbeef]'],
-    ['/foo?bar=42#qux__clerk_db_jwt[deadbeef]', 'deadbeef', false, '/foo?bar=42#qux__clerk_db_jwt[deadbeef]'],
-    ['/foo', 'deadbeef', true, '/foo?__clerk_db_jwt=deadbeef'],
-    ['/foo?bar=42', 'deadbeef', true, '/foo?bar=42&__clerk_db_jwt=deadbeef'],
+  const testCases: Array<[string, string, string]> = [
+    ['', 'deadbeef', '?__clerk_db_jwt=deadbeef'],
+    ['foo', 'deadbeef', 'foo?__clerk_db_jwt=deadbeef'],
+    ['/foo', 'deadbeef', '/foo?__clerk_db_jwt=deadbeef'],
+    ['#foo', 'deadbeef', '?__clerk_db_jwt=deadbeef#foo'],
+    ['/foo?bar=42#qux', 'deadbeef', '/foo?bar=42&__clerk_db_jwt=deadbeef#qux'],
+    ['/foo#__clerk_db_jwt[deadbeef2]', 'deadbeef', '/foo?__clerk_db_jwt=deadbeef#__clerk_db_jwt[deadbeef2]'],
+    [
+      '/foo?bar=42#qux__clerk_db_jwt[deadbeef2]',
+      'deadbeef',
+      '/foo?bar=42&__clerk_db_jwt=deadbeef#qux__clerk_db_jwt[deadbeef2]',
+    ],
+    ['/foo', 'deadbeef', '/foo?__clerk_db_jwt=deadbeef'],
+    ['/foo?bar=42', 'deadbeef', '/foo?bar=42&__clerk_db_jwt=deadbeef'],
   ];
 
   test.each(testCases)(
     'sets the dev browser JWT at the end of the provided url. Params: url=(%s), jwt=(%s), expected url=(%s)',
-    (input, paramName, asQueryParam, expected) => {
-      expect(setDevBrowserJWTInURL(new URL(input, DUMMY_URL_BASE), paramName, asQueryParam).href).toEqual(
+    (input, paramName, expected) => {
+      expect(setDevBrowserJWTInURL(new URL(input, DUMMY_URL_BASE), paramName).href).toEqual(
         new URL(expected, DUMMY_URL_BASE).href,
       );
     },
@@ -27,7 +31,7 @@ describe('setDevBrowserJWTInURL(url, jwt)', () => {
 
 const oldHistory = globalThis.history;
 
-describe('getDevBrowserJWTFromURL(url,)', () => {
+describe('getDevBrowserJWTFromURL(url)', () => {
   const replaceStateMock = jest.fn();
 
   beforeEach(() => {
@@ -53,11 +57,15 @@ describe('getDevBrowserJWTFromURL(url,)', () => {
   const testCases: Array<[string, string, null | string]> = [
     ['', '', null],
     ['foo', '', null],
-    ['#__clerk_db_jwt[deadbeef]', 'deadbeef', ''],
-    ['foo#__clerk_db_jwt[deadbeef]', 'deadbeef', 'foo'],
-    ['/foo#__clerk_db_jwt[deadbeef]', 'deadbeef', '/foo'],
-    ['#foo__clerk_db_jwt[deadbeef]', 'deadbeef', '#foo'],
-    ['/foo?bar=42#qux__clerk_db_jwt[deadbeef]', 'deadbeef', '/foo?bar=42#qux'],
+    ['?__clerk_db_jwt=deadbeef', 'deadbeef', ''],
+    ['foo?__clerk_db_jwt=deadbeef', 'deadbeef', 'foo'],
+    ['/foo?__clerk_db_jwt=deadbeef', 'deadbeef', '/foo'],
+    ['?__clerk_db_jwt=deadbeef#foo', 'deadbeef', '#foo'],
+    [
+      '/foo?bar=42&__clerk_db_jwt=deadbeef#qux__clerk_db_jwt[deadbeef2]',
+      'deadbeef',
+      '/foo?bar=42#qux__clerk_db_jwt[deadbeef2]',
+    ],
   ];
 
   test.each(testCases)(

@@ -6,7 +6,7 @@ import type { PropsOfComponent } from '../styledSystem';
 import { Card, Header, useCardState } from './index';
 
 type PageProps = PropsOfComponent<typeof Col> & {
-  headerTitle: LocalizationKey | string;
+  headerTitle?: LocalizationKey | string;
   headerTitleTextVariant?: PropsOfComponent<typeof Header.Title>['textVariant'];
   breadcrumbTitle?: LocalizationKey;
   Breadcrumbs?: React.ComponentType<any> | null;
@@ -37,10 +37,12 @@ export const FormContent = (props: PageProps) => {
     >
       <Card.Alert>{card.error}</Card.Alert>
       <Header.Root>
-        <Header.Title
-          localizationKey={headerTitle}
-          textVariant='h3'
-        />
+        {headerTitle && (
+          <Header.Title
+            localizationKey={headerTitle}
+            textVariant='h3'
+          />
+        )}
         {headerSubtitle && (
           <Header.Subtitle
             localizationKey={headerSubtitle}

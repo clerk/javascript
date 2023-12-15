@@ -1,5 +1,4 @@
 import { parsePublishableKey } from '@clerk/shared/keys';
-import type { JwtPayload } from '@clerk/types';
 
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
@@ -60,7 +59,7 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
 function isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: string; accept?: string }) {
   const { accept, secFetchDest } = authenticateContext;
 
-  // NOTE: we could also check sec-fetch-mode === navigate here, but according to the spec, sec-fetch-dest: document should indicate that the request is the result of a user navigation.
+  // NOTE: we could also check sec-fetch-mode === navigate here, but according to the spec, sec-fetch-dest: document should indicate that the request is the data of a user navigation.
   if (secFetchDest === 'document') {
     return true;
   }
@@ -145,37 +144,41 @@ export async function authenticateRequest(
       return signedOut(authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
     }
 
-    let verifyResult: JwtPayload;
+    const { data, error } = await verifyToken(sessionToken, authenticateContext);
+    if (data) {
+      return signedIn(authenticateContext, data, headers);
+    }
 
-    try {
-      verifyResult = await verifyToken(sessionToken, authenticateContext);
-    } catch (err) {
-      if (
-        err instanceof TokenVerificationError &&
-        instanceType === 'development' &&
-        (err.reason === TokenVerificationErrorReason.TokenExpired ||
-          err.reason === TokenVerificationErrorReason.TokenNotActiveYet)
-      ) {
-        err.tokenCarrier = 'cookie';
-        // This probably means we're dealing with clock skew
-        console.error(
-          `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will attempt to account for the clock skew in development.
+    if (
+      instanceType === 'development' &&
+      (error.reason === TokenVerificationErrorReason.TokenExpired ||
+        error.reason === TokenVerificationErrorReason.TokenNotActiveYet)
+    ) {
+      error.tokenCarrier = 'cookie';
+      // This probably means we're dealing with clock skew
+      console.error(
+        `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will attempt to account for the clock skew in development.
 
 To resolve this issue, make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
 
 ---
 
-${err.getFullMessage()}`,
-        );
+${error.getFullMessage()}`,
+      );
 
-        // Retry with a generous clock skew allowance (1 day)
-        verifyResult = await verifyToken(sessionToken, { ...authenticateContext, clockSkewInMs: 86_400_000 });
-      } else {
-        throw err;
+      // Retry with a generous clock skew allowance (1 day)
+      const { data: retryResult, error: retryError } = await verifyToken(sessionToken, {
+        ...authenticateContext,
+        clockSkewInMs: 86_400_000,
+      });
+      if (retryResult) {
+        return signedIn(authenticateContext, retryResult, headers);
       }
+
+      throw retryError;
     }
 
-    return signedIn(authenticateContext, verifyResult!, headers);
+    throw error;
   }
 
   function handleMaybeHandshakeStatus(
@@ -204,8 +207,12 @@ ${err.getFullMessage()}`,
     const { sessionTokenInHeader } = authenticateContext;
 
     try {
-      const verifyResult = await verifyToken(sessionTokenInHeader!, authenticateContext);
-      return await signedIn(options, verifyResult);
+      const { data, error } = await verifyToken(sessionTokenInHeader!, authenticateContext);
+      if (error) {
+        throw error;
+      }
+      // use `await` to force this try/catch handle the signedIn invocation
+      return await signedIn(options, data);
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -294,17 +301,22 @@ ${err.getFullMessage()}`,
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '');
     }
 
-    const decodeResult = decodeJwt(sessionToken!);
+    const { data: decodeResult, error: decodedError } = decodeJwt(sessionToken!);
+    if (decodedError) {
+      return handleError(decodedError, 'cookie');
+    }
 
     if (decodeResult.payload.iat < clientUat) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenOutdated, '');
     }
 
     try {
-      const verifyResult = await verifyToken(sessionToken!, authenticateContext);
-      if (verifyResult) {
-        return signedIn(authenticateContext, verifyResult);
+      const { data, error } = await verifyToken(sessionToken!, authenticateContext);
+      if (error) {
+        throw error;
       }
+      // use `await` to force this try/catch handle the signedIn invocation
+      return await signedIn(authenticateContext, data);
     } catch (err) {
       return handleError(err, 'cookie');
     }

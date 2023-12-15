@@ -1,17 +1,17 @@
 import { Clerk } from './clerk';
-import type { AuthConfig, DisplayConfig } from './resources/internal';
+import type { DevBrowser } from './devBrowser';
+import type { DisplayConfig } from './resources/internal';
 import { Client, Environment } from './resources/internal';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();
-const mockUsesUrlBasedSessionSync = jest.fn();
 
 jest.mock('./resources/Client');
 jest.mock('./resources/Environment');
 
 // Because Jest, don't ask me why...
 jest.mock('./devBrowser', () => ({
-  createDevBrowser: () => ({
+  createDevBrowser: (): DevBrowser => ({
     clear: jest.fn(),
     setup: jest.fn(),
     getDevBrowserJWT: jest.fn(() => 'deadbeef'),
@@ -57,7 +57,9 @@ const developmentPublishableKey = 'pk_test_Y2xlcmsuYWJjZWYuMTIzNDUuZGV2LmxjbGNsZ
 const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
 
 describe('Clerk singleton - Redirects', () => {
-  let mockNavigate = jest.fn();
+  const mockNavigate = jest.fn((to: string) => Promise.resolve(to));
+  const mockedLoadOptions = { routerPush: mockNavigate, routerReplace: mockNavigate };
+
   let mockWindowLocation;
   let mockHref: jest.Mock;
 
@@ -90,9 +92,9 @@ describe('Clerk singleton - Redirects', () => {
         activeSessions: [],
       }),
     );
-
-    mockNavigate = jest.fn((to: string) => Promise.resolve(to));
   });
+
+  afterEach(() => mockNavigate.mockReset());
 
   describe('.redirectTo(SignUp|SignIn|UserProfile|AfterSignIn|AfterSignUp|CreateOrganization|OrganizationProfile)', () => {
     let clerkForProductionInstance: Clerk;
@@ -102,7 +104,6 @@ describe('Clerk singleton - Redirects', () => {
       beforeEach(async () => {
         mockEnvironmentFetch.mockReturnValue(
           Promise.resolve({
-            authConfig: { urlBasedSessionSyncing: true } as AuthConfig,
             userSettings: mockUserSettings,
             displayConfig: mockDisplayConfigWithSameOrigin,
             isProduction: () => false,
@@ -110,17 +111,11 @@ describe('Clerk singleton - Redirects', () => {
           }),
         );
 
-        mockUsesUrlBasedSessionSync.mockReturnValue(true);
-
         clerkForProductionInstance = new Clerk(productionPublishableKey);
-        await clerkForProductionInstance.load({
-          routerPush: mockNavigate,
-        });
-
         clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
-        await clerkForDevelopmentInstance.load({
-          routerPush: mockNavigate,
-        });
+
+        await clerkForProductionInstance.load(mockedLoadOptions);
+        await clerkForDevelopmentInstance.load(mockedLoadOptions);
       });
 
       afterEach(() => {
@@ -129,57 +124,57 @@ describe('Clerk singleton - Redirects', () => {
 
       it('redirects to signInUrl', async () => {
         await clerkForProductionInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
-
         await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
         expect(mockNavigate).toHaveBeenNthCalledWith(2, '/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
       });
 
       it('redirects to signUpUrl', async () => {
         await clerkForProductionInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
-
         await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
         expect(mockNavigate).toHaveBeenNthCalledWith(2, '/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
       });
 
       it('redirects to userProfileUrl', async () => {
         await clerkForProductionInstance.redirectToUserProfile();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/user-profile');
-
         await clerkForDevelopmentInstance.redirectToUserProfile();
+
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/user-profile');
         expect(mockNavigate).toHaveBeenNthCalledWith(2, '/user-profile');
       });
 
       it('redirects to afterSignUp', async () => {
         await clerkForProductionInstance.redirectToAfterSignUp();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/');
-
         await clerkForDevelopmentInstance.redirectToAfterSignUp();
+
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/');
         expect(mockNavigate).toHaveBeenNthCalledWith(2, '/');
       });
 
       it('redirects to afterSignIn', async () => {
         await clerkForProductionInstance.redirectToAfterSignIn();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/');
-
         await clerkForDevelopmentInstance.redirectToAfterSignIn();
+
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/');
         expect(mockNavigate).toHaveBeenNthCalledWith(2, '/');
       });
 
       it('redirects to create organization', async () => {
         await clerkForProductionInstance.redirectToCreateOrganization();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/create-organization');
-
         await clerkForDevelopmentInstance.redirectToCreateOrganization();
+
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/create-organization');
         expect(mockNavigate).toHaveBeenNthCalledWith(2, '/create-organization');
       });
 
       it('redirects to organization profile', async () => {
         await clerkForProductionInstance.redirectToOrganizationProfile();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/organization-profile');
-
         await clerkForDevelopmentInstance.redirectToOrganizationProfile();
+
+        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/organization-profile');
         expect(mockNavigate).toHaveBeenNthCalledWith(2, '/organization-profile');
       });
     });
@@ -188,7 +183,6 @@ describe('Clerk singleton - Redirects', () => {
       beforeEach(async () => {
         mockEnvironmentFetch.mockReturnValue(
           Promise.resolve({
-            authConfig: { urlBasedSessionSyncing: true } as AuthConfig,
             userSettings: mockUserSettings,
             displayConfig: mockDisplayConfigWithDifferentOrigin,
             isProduction: () => false,
@@ -196,79 +190,64 @@ describe('Clerk singleton - Redirects', () => {
           }),
         );
 
-        mockUsesUrlBasedSessionSync.mockReturnValue(true);
-
         clerkForProductionInstance = new Clerk(productionPublishableKey);
-        await clerkForProductionInstance.load({
-          routerPush: mockNavigate,
-        });
-
         clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
-        await clerkForDevelopmentInstance.load({
-          routerPush: mockNavigate,
-        });
+
+        await clerkForProductionInstance.load(mockedLoadOptions);
+        await clerkForDevelopmentInstance.load(mockedLoadOptions);
       });
 
       afterEach(() => {
         mockEnvironmentFetch.mockRestore();
       });
 
+      const host = 'http://another-test.host';
+
       it('redirects to signInUrl', async () => {
         await clerkForProductionInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
-        expect(mockHref).toHaveBeenNthCalledWith(
-          1,
-          'http://another-test.host/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
-        );
-
         await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+
+        expect(mockHref).toHaveBeenNthCalledWith(1, `${host}/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F`);
+
         expect(mockHref).toHaveBeenNthCalledWith(
           2,
-          'http://another-test.host/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F__clerk_db_jwt[deadbeef]',
+          `${host}/sign-in?__clerk_db_jwt=deadbeef#/?redirect_url=https%3A%2F%2Fwww.example.com%2F`,
         );
       });
 
       it('redirects to signUpUrl', async () => {
         await clerkForProductionInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
-        expect(mockHref).toHaveBeenNthCalledWith(
-          1,
-          'http://another-test.host/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
-        );
-
         await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+
+        expect(mockHref).toHaveBeenNthCalledWith(1, `${host}/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F`);
         expect(mockHref).toHaveBeenNthCalledWith(
           2,
-          'http://another-test.host/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F__clerk_db_jwt[deadbeef]',
+          `${host}/sign-up?__clerk_db_jwt=deadbeef#/?redirect_url=https%3A%2F%2Fwww.example.com%2F`,
         );
       });
 
       it('redirects to userProfileUrl', async () => {
         await clerkForProductionInstance.redirectToUserProfile();
-        expect(mockHref).toHaveBeenNthCalledWith(1, 'http://another-test.host/user-profile');
-
         await clerkForDevelopmentInstance.redirectToUserProfile();
-        expect(mockHref).toHaveBeenNthCalledWith(2, 'http://another-test.host/user-profile#__clerk_db_jwt[deadbeef]');
+
+        expect(mockHref).toHaveBeenNthCalledWith(1, `${host}/user-profile`);
+        expect(mockHref).toHaveBeenNthCalledWith(2, `${host}/user-profile?__clerk_db_jwt=deadbeef`);
       });
 
       it('redirects to create organization', async () => {
         await clerkForProductionInstance.redirectToCreateOrganization();
-        expect(mockHref).toHaveBeenNthCalledWith(1, 'http://another-test.host/create-organization');
-
         await clerkForDevelopmentInstance.redirectToCreateOrganization();
-        expect(mockHref).toHaveBeenNthCalledWith(
-          2,
-          'http://another-test.host/create-organization#__clerk_db_jwt[deadbeef]',
-        );
+
+        expect(mockHref).toHaveBeenNthCalledWith(1, `${host}/create-organization`);
+        expect(mockHref).toHaveBeenNthCalledWith(2, `${host}/create-organization?__clerk_db_jwt=deadbeef`);
       });
 
       it('redirects to organization profile', async () => {
         await clerkForProductionInstance.redirectToOrganizationProfile();
-        expect(mockHref).toHaveBeenNthCalledWith(1, 'http://another-test.host/organization-profile');
-
         await clerkForDevelopmentInstance.redirectToOrganizationProfile();
-        expect(mockHref).toHaveBeenNthCalledWith(
-          2,
-          'http://another-test.host/organization-profile#__clerk_db_jwt[deadbeef]',
-        );
+
+        expect(mockHref).toHaveBeenNthCalledWith(1, `${host}/organization-profile`);
+        expect(mockHref).toHaveBeenNthCalledWith(2, `${host}/organization-profile?__clerk_db_jwt=deadbeef`);
       });
     });
   });
@@ -278,10 +257,8 @@ describe('Clerk singleton - Redirects', () => {
     let clerkForDevelopmentInstance: Clerk;
 
     beforeEach(async () => {
-      mockUsesUrlBasedSessionSync.mockReturnValue(true);
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
-          authConfig: { urlBasedSessionSyncing: true } as AuthConfig,
           userSettings: mockUserSettings,
           displayConfig: mockDisplayConfigWithDifferentOrigin,
           isProduction: () => false,
@@ -290,22 +267,20 @@ describe('Clerk singleton - Redirects', () => {
       );
 
       clerkForProductionInstance = new Clerk(productionPublishableKey);
-      await clerkForProductionInstance.load({
-        routerPush: mockNavigate,
-      });
-
       clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
-      await clerkForDevelopmentInstance.load({
-        routerPush: mockNavigate,
-      });
+
+      await clerkForProductionInstance.load(mockedLoadOptions);
+      await clerkForDevelopmentInstance.load(mockedLoadOptions);
     });
 
-    it('redirects to the provided url with __clerk_db_jwt in the url', async () => {
-      await clerkForProductionInstance.redirectWithAuth('https://app.example.com');
-      expect(mockHref).toHaveBeenNthCalledWith(1, 'https://app.example.com/');
+    const host = 'https://app.example.com';
 
-      await clerkForDevelopmentInstance.redirectWithAuth('https://app.example.com');
-      expect(mockHref).toHaveBeenNthCalledWith(2, 'https://app.example.com/#__clerk_db_jwt[deadbeef]');
+    it('redirects to the provided url with __clerk_db_jwt in the url', async () => {
+      await clerkForProductionInstance.redirectWithAuth(host);
+      await clerkForDevelopmentInstance.redirectWithAuth(host);
+
+      expect(mockHref).toHaveBeenNthCalledWith(1, `${host}/`);
+      expect(mockHref).toHaveBeenNthCalledWith(2, `${host}/?__clerk_db_jwt=deadbeef`);
     });
   });
 });

@@ -103,7 +103,7 @@ Verifies a Clerk generated JWT (i.e. Clerk Session JWT and Clerk JWT templates).
 ```js
 import { verifyToken } from '@clerk/backend';
 
-verifyToken(token, {
+const { result, error } = await verifyToken(token, {
   issuer: '...',
   authorizedParties: '...',
 });
@@ -114,11 +114,10 @@ verifyToken(token, {
 Verifies a Clerk generated JWT (i.e. Clerk Session JWT and Clerk JWT templates). The key needs to be provided in the options.
 
 ```js
-import { verifyJwt } from '@clerk/backend';
+import { verifyJwt } from '@clerk/backend/jwt';
 
-verifyJwt(token, {
+const { result, error } = verifyJwt(token, {
   key: JsonWebKey | string,
-  issuer: '...',
   authorizedParties: '...',
 });
 ```
@@ -128,9 +127,9 @@ verifyJwt(token, {
 Decodes a JWT.
 
 ```js
-import { decodeJwt } from '@clerk/backend';
+import { decodeJwt } from '@clerk/backend/jwt';
 
-decodeJwt(token);
+const { result, error } = decodeJwt(token);
 ```
 
 #### hasValidSignature(jwt: Jwt, key: JsonWebKey | string)
@@ -138,9 +137,9 @@ decodeJwt(token);
 Verifies that the JWT has a valid signature. The key needs to be provided.
 
 ```js
-import { hasValidSignature } from '@clerk/backend';
+import { hasValidSignature } from '@clerk/backend/jwt';
 
-hasValidSignature(token, jwk);
+const { result, error } = await hasValidSignature(token, jwk);
 ```
 
 #### debugRequestState(requestState)
@@ -148,7 +147,7 @@ hasValidSignature(token, jwk);
 Generates a debug payload for the request state
 
 ```js
-import { debugRequestState } from '@clerk/backend';
+import { debugRequestState } from '@clerk/backend/internal';
 
 debugRequestState(requestState);
 ```
@@ -158,7 +157,7 @@ debugRequestState(requestState);
 Builds the AuthObject when the user is signed in.
 
 ```js
-import { signedInAuthObject } from '@clerk/backend';
+import { signedInAuthObject } from '@clerk/backend/internal';
 
 signedInAuthObject(jwtPayload, options);
 ```
@@ -168,7 +167,7 @@ signedInAuthObject(jwtPayload, options);
 Builds the empty AuthObject when the user is signed out.
 
 ```js
-import { signedOutAuthObject } from '@clerk/backend';
+import { signedOutAuthObject } from '@clerk/backend/internal';
 
 signedOutAuthObject();
 ```
@@ -178,7 +177,7 @@ signedOutAuthObject();
 Removes sensitive private metadata from user and organization resources in the AuthObject
 
 ```js
-import { sanitizeAuthObject } from '@clerk/backend';
+import { sanitizeAuthObject } from '@clerk/backend/internal';
 
 sanitizeAuthObject(authObject);
 ```
@@ -188,7 +187,7 @@ sanitizeAuthObject(authObject);
 Removes any `private_metadata` and `privateMetadata` attributes from the object to avoid leaking sensitive information to the browser during SSR.
 
 ```js
-import { prunePrivateMetadata } from '@clerk/backend';
+import { prunePrivateMetadata } from '@clerk/backend/internal';
 
 prunePrivateMetadata(obj);
 ```

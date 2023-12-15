@@ -4,7 +4,6 @@ import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
-  BuildUrlWithAuthParams,
   Clerk,
   ClientResource,
   CreateOrganizationParams,
@@ -112,8 +111,6 @@ type IsomorphicLoadedClerk = Without<
   buildCreateOrganizationUrl: () => string | void;
   // TODO: Align return type
   buildOrganizationProfileUrl: () => string | void;
-  // TODO: Align return type
-  buildUrlWithAuth: (to: string, opts?: BuildUrlWithAuthParams | undefined) => string | void;
   // TODO: Align return type
   buildAfterSignInUrl: () => string | void;
   // TODO: Align return type
@@ -308,8 +305,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  buildUrlWithAuth = (to: string, opts?: BuildUrlWithAuthParams | undefined): string | void => {
-    const callback = () => this.clerkjs?.buildUrlWithAuth(to, opts) || '';
+  buildUrlWithAuth = (to: string): string | void => {
+    const callback = () => this.clerkjs?.buildUrlWithAuth(to) || '';
     if (this.clerkjs && this.#loaded) {
       return callback();
     } else {

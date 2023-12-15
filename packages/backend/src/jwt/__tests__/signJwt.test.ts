@@ -9,6 +9,7 @@ import {
   publicJwks,
   signingJwks,
 } from '../../fixtures';
+import { assertOk } from '../../util/testUtils';
 import { signJwt } from '../signJwt';
 import { verifyJwt } from '../verifyJwt';
 
@@ -26,22 +27,24 @@ export default (QUnit: QUnit) => {
     });
 
     test('signs a JWT with a JWK formatted secret', async assert => {
-      const jwt = await signJwt(payload, signingJwks, {
+      const { data } = await signJwt(payload, signingJwks, {
         algorithm: mockJwtHeader.alg,
         header: mockJwtHeader,
       });
+      assertOk(assert, data);
 
-      const verifiedPayload = await verifyJwt(jwt, { key: publicJwks });
+      const { data: verifiedPayload } = await verifyJwt(data, { key: publicJwks });
       assert.deepEqual(verifiedPayload, payload);
     });
 
     test('signs a JWT with a pkcs8 formatted secret', async assert => {
-      const jwt = await signJwt(payload, pemEncodedSignKey, {
+      const { data } = await signJwt(payload, pemEncodedSignKey, {
         algorithm: mockJwtHeader.alg,
         header: mockJwtHeader,
       });
+      assertOk(assert, data);
 
-      const verifiedPayload = await verifyJwt(jwt, { key: pemEncodedPublicKey });
+      const { data: verifiedPayload } = await verifyJwt(data, { key: pemEncodedPublicKey });
       assert.deepEqual(verifiedPayload, payload);
     });
   });

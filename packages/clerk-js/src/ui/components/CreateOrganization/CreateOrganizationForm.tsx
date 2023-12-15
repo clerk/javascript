@@ -3,12 +3,12 @@ import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { Icon } from '../../customizables';
+import { Col, Icon, Text } from '../../customizables';
 import { Form, FormButtonContainer, FormContent, IconButton, SuccessPage, useCardState } from '../../elements';
-import { QuestionMark, Upload } from '../../icons';
+import { Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import { colors, createSlug, handleError, useFormControl } from '../../utils';
+import { createSlug, handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
@@ -19,8 +19,8 @@ type CreateOrganizationFormProps = {
   onCancel?: () => void;
   onComplete?: () => void;
   flow: 'default' | 'organizationList';
-  startPage: {
-    headerTitle: LocalizationKey;
+  startPage?: {
+    headerTitle?: LocalizationKey;
     headerSubtitle?: LocalizationKey;
   };
 };
@@ -111,45 +111,59 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
     <Wizard {...wizard.props}>
       <FormContent
         Breadcrumbs={null}
-        headerTitle={props.startPage.headerTitle}
-        headerSubtitle={props.startPage.headerSubtitle}
+        headerTitle={props?.startPage?.headerTitle}
+        headerSubtitle={props?.startPage?.headerSubtitle}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
-        sx={t => ({ minHeight: t.sizes.$60 })}
+        sx={t => ({ minHeight: t.sizes.$60, gap: 0 })}
       >
         <Form.Root onSubmit={onSubmit}>
-          <OrganizationProfileAvatarUploader
-            organization={{ name: nameField.value }}
-            onAvatarChange={async file => await setFile(file)}
-            onAvatarRemove={file ? onAvatarRemove : null}
-            avatarPreviewPlaceholder={
-              <IconButton
-                variant='ghost'
-                aria-label='Upload organization logo'
-                icon={
-                  <Icon
-                    size='md'
-                    icon={Upload}
-                    sx={theme => ({
-                      transitionDuration: theme.transitionDuration.$controls,
-                    })}
-                  />
-                }
-                sx={theme => ({
-                  width: theme.sizes.$12,
-                  height: theme.sizes.$12,
-                  borderRadius: theme.radii.$md,
-                  backgroundColor: theme.colors.$avatarBackground,
-                  ':hover': {
-                    backgroundColor: colors.makeTransparent(theme.colors.$avatarBackground, 0.2),
-                    svg: {
-                      transform: 'scale(1.2)',
+          <Col>
+            <Text
+              variant='subtitle'
+              sx={t => ({
+                textAlign: 'left',
+                marginBottom: t.space.$2,
+                color: t.colors.$blackAlpha700,
+              })}
+            >
+              Logo
+            </Text>
+            <OrganizationProfileAvatarUploader
+              organization={{ name: nameField.value }}
+              onAvatarChange={async file => await setFile(file)}
+              onAvatarRemove={file ? onAvatarRemove : null}
+              avatarPreviewPlaceholder={
+                <IconButton
+                  variant='ghost'
+                  aria-label='Upload organization logo'
+                  icon={
+                    <Icon
+                      size='md'
+                      icon={Upload}
+                      sx={t => ({
+                        color: t.colors.$blackAlpha400,
+                        transitionDuration: t.transitionDuration.$controls,
+                      })}
+                    />
+                  }
+                  sx={t => ({
+                    width: t.sizes.$16,
+                    height: t.sizes.$16,
+                    borderRadius: t.radii.$md,
+                    border: `${t.borders.$dashed} ${t.colors.$blackAlpha200}`,
+                    backgroundColor: t.colors.$blackAlpha50,
+                    ':hover': {
+                      backgroundColor: t.colors.$blackAlpha50,
+                      svg: {
+                        transform: 'scale(1.2)',
+                      },
                     },
-                  },
-                })}
-              />
-            }
-          />
+                  })}
+                />
+              }
+            />
+          </Col>
           <Form.ControlRow elementId={nameField.id}>
             <Form.PlainInput
               {...nameField.props}
@@ -163,13 +177,13 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             <Form.PlainInput
               {...slugField.props}
               sx={{ flexBasis: '80%' }}
-              icon={QuestionMark}
               onChange={onChangeSlug}
               isRequired
             />
           </Form.ControlRow>
           <FormButtonContainer>
             <Form.SubmitButton
+              hasArrow={false}
               block={false}
               isDisabled={!canSubmit}
               localizationKey={localizationKeys('createOrganization.formButtonSubmit')}
@@ -184,6 +198,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
           </FormButtonContainer>
         </Form.Root>
       </FormContent>
+
       <FormContent
         Breadcrumbs={null}
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
