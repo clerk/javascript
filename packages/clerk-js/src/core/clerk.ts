@@ -1,3 +1,4 @@
+import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
   handleValueOrFn,
@@ -6,7 +7,6 @@ import {
   isHttpOrHttps,
   isValidBrowserOnline,
   isValidProxyUrl,
-  LocalStorageBroadcastChannel,
   noop,
   parsePublishableKey,
   proxyUrlToAbsoluteURL,
@@ -1348,9 +1348,6 @@ export class Clerk implements ClerkInterface {
     this.#authService = new SessionCookieService(this);
     this.#pageLifecycle = createPageLifecycle();
 
-    const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
-
-    this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
     this.#setupListeners();
 
     let retries = 0;
@@ -1358,7 +1355,8 @@ export class Clerk implements ClerkInterface {
       retries++;
 
       try {
-        const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
+        const shouldTouchEnv =
+          this.#instanceType === 'development' && !isDevAccountPortalOrigin(window?.location.hostname);
 
         const [environment, client] = await Promise.all([
           Environment.getInstance().fetch({ touch: shouldTouchEnv }),
