@@ -1,6 +1,6 @@
 import { Clerk } from '@clerk/clerk-js';
 import type { ClerkProp } from '@clerk/clerk-react';
-import { DEV_BROWSER_JWT_MARKER } from '@clerk/shared';
+import { DEV_BROWSER_JWT_KEY } from '@clerk/shared';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
@@ -50,7 +50,7 @@ export async function buildClerk({
       }
     : {
         urls: validHosts,
-        name: DEV_BROWSER_JWT_MARKER,
+        name: DEV_BROWSER_JWT_KEY,
       };
 
   // Get client cookie from browser

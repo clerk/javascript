@@ -64,7 +64,6 @@ import {
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
-  createCookieHandler,
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
@@ -86,10 +85,11 @@ import {
   toURL,
   windowNavigate,
 } from '../utils';
+import { getClientUatCookie } from '../utils/cookies/clientUat';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
-import type { DevBrowserHandler } from './devBrowserHandler';
-import { createDevBrowserHandler } from './devBrowserHandler';
+import type { DevBrowser } from './devBrowser';
+import { createDevBrowser } from './devBrowser';
 import {
   clerkErrorInitFailed,
   clerkInvalidSignInUrlFormat,
@@ -160,7 +160,7 @@ export class Clerk implements ClerkInterface {
   #authService: SessionCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
-  #devBrowserHandler: DevBrowserHandler | null = null;
+  #devBrowser: DevBrowser | null = null;
   #environment?: EnvironmentResource | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
@@ -703,7 +703,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public buildUrlWithAuth(to: string, options?: BuildUrlWithAuthParams): string {
-    if (this.#instanceType === 'production' || !this.#devBrowserHandler?.usesUrlBasedSessionSync()) {
+    if (this.#instanceType === 'production') {
       return to;
     }
 
@@ -713,7 +713,7 @@ export class Clerk implements ClerkInterface {
       return toURL.href;
     }
 
-    const devBrowserJwt = this.#devBrowserHandler?.getDevBrowserJWT();
+    const devBrowserJwt = this.#devBrowser?.getDevBrowserJWT();
     if (!devBrowserJwt) {
       return clerkMissingDevBrowserJwt();
     }
@@ -1244,8 +1244,7 @@ export class Clerk implements ClerkInterface {
       return false;
     }
 
-    const cookieHandler = createCookieHandler();
-    return cookieHandler.getClientUatCookie() <= 0;
+    return getClientUatCookie() <= 0;
   };
 
   #shouldRedirectToSatellite = (): boolean => {
@@ -1306,7 +1305,7 @@ export class Clerk implements ClerkInterface {
      * At this point the devBrowser is not yet setup, but its API is ready for use
      * Multi-domain SSO needs this handler to be initiated
      */
-    this.#devBrowserHandler = createDevBrowserHandler({
+    this.#devBrowser = createDevBrowser({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
     });
@@ -1330,9 +1329,9 @@ export class Clerk implements ClerkInterface {
      * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
     if (this.#instanceType === 'production') {
-      await this.#devBrowserHandler.clear();
+      await this.#devBrowser.clear();
     } else {
-      await this.#devBrowserHandler.setup();
+      await this.#devBrowser.setup();
     }
 
     /**
@@ -1387,9 +1386,8 @@ export class Clerk implements ClerkInterface {
         break;
       } catch (err) {
         if (isError(err, 'dev_browser_unauthenticated')) {
-          // Purge and try setup again
-          await this.#devBrowserHandler.clear();
-          await this.#devBrowserHandler.setup();
+          await this.#devBrowser.clear();
+          await this.#devBrowser.setup();
         } else if (!isValidBrowserOnline()) {
           console.warn(err);
           return false;

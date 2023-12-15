@@ -1,6 +1,6 @@
 import type { AuthenticateRequestOptions, AuthObject } from '@clerk/backend/internal';
 import { AuthStatus, buildRequestUrl, constants } from '@clerk/backend/internal';
-import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
+import { DEV_BROWSER_JWT_KEY, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
@@ -322,7 +322,7 @@ const appendDevBrowserOnCrossOrigin = (req: WithClerkUrl<NextRequest>, res: Resp
     isDevelopmentFromSecretKey(opts.secretKey || SECRET_KEY) &&
     isCrossOrigin(req.experimental_clerkUrl, location)
   ) {
-    const dbJwt = req.cookies.get(DEV_BROWSER_JWT_MARKER)?.value || '';
+    const dbJwt = req.cookies.get(DEV_BROWSER_JWT_KEY)?.value || '';
 
     // Next.js 12.1+ allows redirects only to absolute URLs
     const url = new URL(location);

@@ -17,14 +17,13 @@ jest.mock('./resources/Client');
 jest.mock('./resources/Environment');
 
 // Because Jest, don't ask me why...
-jest.mock('./devBrowserHandler', () => ({
-  createDevBrowserHandler: () => ({
+jest.mock('./devBrowser', () => ({
+  createDevBrowser: () => ({
     clear: jest.fn(),
     setup: jest.fn(),
     getDevBrowserJWT: jest.fn(() => 'deadbeef'),
     setDevBrowserJWT: jest.fn(),
     removeDevBrowserJWT: jest.fn(),
-    usesUrlBasedSessionSync: mockUsesUrlBasedSessionSync,
   }),
 }));
 
@@ -1853,26 +1852,6 @@ describe('Clerk singleton', () => {
 
     it('returns what was passed when in production', async () => {
       const sut = new Clerk(productionPublishableKey);
-      await sut.load();
-
-      const url = sut.buildUrlWithAuth('foo');
-      expect(url).toBe('foo');
-    });
-
-    it('returns what was passed when not using url based session syncing', async () => {
-      mockUsesUrlBasedSessionSync.mockReturnValue(false);
-      mockEnvironmentFetch.mockReturnValue(
-        Promise.resolve({
-          authConfig: {},
-          userSettings: mockUserSettings,
-          displayConfig: mockDisplayConfig,
-          isSingleSession: () => false,
-          isProduction: () => false,
-          isDevelopmentOrStaging: () => true,
-        }),
-      );
-
-      const sut = new Clerk(developmentPublishableKey);
       await sut.load();
 
       const url = sut.buildUrlWithAuth('foo');

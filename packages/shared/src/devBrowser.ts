@@ -1,9 +1,7 @@
-export const DEV_BROWSER_SSO_JWT_PARAMETER = '__clerk_db_jwt';
-export const DEV_BROWSER_JWT_MARKER = '__clerk_db_jwt';
-export const DEV_BROWSER_SSO_JWT_KEY = 'clerk-db-jwt';
+export const DEV_BROWSER_JWT_KEY = '__clerk_db_jwt';
+export const DEV_BROWSER_JWT_HEADER = 'Clerk-Db-Jwt';
 
 const DEV_BROWSER_JWT_MARKER_REGEXP = /__clerk_db_jwt\[(.*)\]/;
-const DEV_BROWSER_SSO_JWT_HTTP_HEADER = 'Clerk-Cookie';
 
 // Sets the dev_browser JWT in the hash or the search
 export function setDevBrowserJWTInURL(url: URL, jwt: string, asQueryParam: boolean): URL {
@@ -17,17 +15,17 @@ export function setDevBrowserJWTInURL(url: URL, jwt: string, asQueryParam: boole
   }
 
   // extract & strip existing jwt from search
-  const jwtFromSearch = resultURL.searchParams.get(DEV_BROWSER_SSO_JWT_PARAMETER);
-  resultURL.searchParams.delete(DEV_BROWSER_SSO_JWT_PARAMETER);
+  const jwtFromSearch = resultURL.searchParams.get(DEV_BROWSER_JWT_KEY);
+  resultURL.searchParams.delete(DEV_BROWSER_JWT_KEY);
 
   // Existing jwt takes precedence
   const jwtToSet = jwtFromHash || jwtFromSearch || jwt;
 
   if (jwtToSet) {
     if (asQueryParam) {
-      resultURL.searchParams.append(DEV_BROWSER_SSO_JWT_PARAMETER, jwtToSet);
+      resultURL.searchParams.append(DEV_BROWSER_JWT_KEY, jwtToSet);
     } else {
-      resultURL.hash = resultURL.hash + `${DEV_BROWSER_JWT_MARKER}[${jwtToSet}]`;
+      resultURL.hash = resultURL.hash + `${DEV_BROWSER_JWT_KEY}[${jwtToSet}]`;
     }
   }
 
@@ -48,8 +46,8 @@ export function getDevBrowserJWTFromURL(url: URL): string {
   }
 
   // extract & strip existing jwt from search
-  const jwtFromSearch = resultURL.searchParams.get(DEV_BROWSER_SSO_JWT_PARAMETER) || '';
-  resultURL.searchParams.delete(DEV_BROWSER_SSO_JWT_PARAMETER);
+  const jwtFromSearch = resultURL.searchParams.get(DEV_BROWSER_JWT_KEY) || '';
+  resultURL.searchParams.delete(DEV_BROWSER_JWT_KEY);
 
   const jwt = jwtFromHash || jwtFromSearch;
 
@@ -59,10 +57,6 @@ export function getDevBrowserJWTFromURL(url: URL): string {
   }
 
   return jwt;
-}
-
-export function getDevBrowserJWTFromResponse({ headers }: { headers?: Headers } = {}) {
-  return headers?.get(DEV_BROWSER_SSO_JWT_HTTP_HEADER);
 }
 
 function extractDevBrowserJWTFromHash(hash: string): string {
