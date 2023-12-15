@@ -1,10 +1,10 @@
 import type QUnit from 'qunit';
 import sinon from 'sinon';
 
-import runtime from '../runtime';
-import { jsonOk } from '../util/mockFetch';
-import { mockJwks, mockJwt, mockJwtPayload } from './fixtures';
-import { verifyToken } from './verify';
+import runtime from '../../runtime';
+import { jsonOk } from '../../util/testUtils';
+import { mockJwks, mockJwt, mockJwtPayload } from '../fixtures';
+import { verifyToken } from '../verify';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

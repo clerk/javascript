@@ -1,11 +1,19 @@
 import type QUnit from 'qunit';
 import sinon from 'sinon';
 
-import runtime from '../runtime';
-import { jsonError, jsonOk } from '../util/mockFetch';
-import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
-import { mockJwks, mockJwtPayload, mockPEMJwk, mockPEMJwtKey, mockPEMKey, mockRsaJwk, mockRsaJwkKid } from './fixtures';
-import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
+import runtime from '../../runtime';
+import { jsonError, jsonOk } from '../../util/testUtils';
+import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
+import {
+  mockJwks,
+  mockJwtPayload,
+  mockPEMJwk,
+  mockPEMJwtKey,
+  mockPEMKey,
+  mockRsaJwk,
+  mockRsaJwkKid,
+} from '../fixtures';
+import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from '../keys';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

@@ -1,6 +1,6 @@
 import type QUnit from 'qunit';
 
-import { checkCrossOrigin } from './request';
+import { checkCrossOrigin } from '../request';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

@@ -1,6 +1,6 @@
 import type QUnit from 'qunit';
 
-import { makeAuthObjectSerializable, signedOutAuthObject } from './authObjects';
+import { makeAuthObjectSerializable, signedOutAuthObject } from '../authObjects';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;

@@ -1,6 +1,6 @@
 import type QUnit from 'qunit';
 
-import { joinPaths } from './path';
+import { joinPaths } from '../path';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;
