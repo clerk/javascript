@@ -1,4 +1,4 @@
-import { Box, NotificationBadge } from '../customizables';
+import { Flex, NotificationBadge } from '../customizables';
 import { useDelayedVisibility, usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
@@ -21,19 +21,17 @@ export const NotificationCountBadge = ({ notificationCount, containerSx }: Notif
   });
 
   return (
-    <Box
+    <Flex
+      justify='center'
+      align='center'
       sx={[
         t => ({
-          position: 'absolute',
-          top: `-${t.space.$2}`,
-          right: `-${t.space.$1}`,
-          width: t.sizes.$2,
-          height: t.sizes.$2,
+          marginLeft: t.space.$1x5,
         }),
         containerSx,
       ]}
     >
       {showNotification && <NotificationBadge sx={enterExitAnimation}>{notificationCount}</NotificationBadge>}
-    </Box>
+    </Flex>
   );
 };

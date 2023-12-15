@@ -7,11 +7,11 @@ const vars = createCssVariables('accent', 'bg');
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     color: vars.accent,
-    backgroundColor: vars.bg,
-    borderRadius: theme.radii.$sm,
+    background: vars.bg,
+    borderRadius: theme.radii.$lg,
     height: theme.space.$4,
-    minWidth: theme.space.$4,
-    padding: `${theme.space.$0x5}`,
+    minWidth: theme.space.$5,
+    padding: `${theme.space.$0x5} ${theme.space.$1}`,
     display: 'inline-flex',
   },
   variants: {
@@ -19,7 +19,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     colorScheme: {
       primary: {
         [vars.accent]: theme.colors.$colorTextOnPrimaryBackground,
-        [vars.bg]: theme.colors.$primary500,
+        [vars.bg]: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%), ${theme.colors.$primary500}`,
       },
     },
   },

@@ -80,7 +80,6 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
         elementDescriptor={iconBoxElementDescriptor}
         elementId={iconBoxElementId}
         justify='center'
-        // sx={[theme => ({ flex: `0 0 ${theme.sizes.$9}` }), iconBoxSx]}
       >
         {status.isLoading ? (
           <Spinner
@@ -172,7 +171,7 @@ export const Action = (props: ActionProps) => {
   return (
     <Button
       size='md'
-      variant='ghost'
+      variant='ghostAction'
       textVariant='buttonLarge'
       focusRing={false}
       hoverAsFocus
@@ -184,10 +183,6 @@ export const Action = (props: ActionProps) => {
           gap: t.space.$3,
           padding: `${t.space.$4} ${t.space.$5}`,
           justifyContent: 'flex-start',
-          color: t.colors.$blackAlpha600,
-          ':hover': {
-            color: t.colors.$blackAlpha600,
-          },
         }),
         sx,
       ]}

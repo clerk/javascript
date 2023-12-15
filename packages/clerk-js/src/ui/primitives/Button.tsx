@@ -137,6 +137,14 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
             : undefined,
           '&:active': { backgroundColor: theme.colors.$transparent },
         },
+        ghostAction: {
+          color: theme.colors.$blackAlpha600,
+          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha600 },
+          '&:focus': props.hoverAsFocus
+            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha600 }
+            : undefined,
+          '&:active': { backgroundColor: theme.colors.$transparent },
+        },
         ghostPrimary: {
           color: theme.colors.$primary500,
           '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$primary500 },

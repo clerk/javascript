@@ -91,10 +91,16 @@ const NotificationCountBadgeSwitcherTrigger = () => {
   const notificationCount =
     (userInvitations.count || 0) + (userSuggestions.count || 0) + (membershipRequests?.count || 0);
 
+  if (!notificationCount) {
+    return null;
+  }
+
   return (
     <NotificationCountBadge
       containerSx={t => ({
-        marginLeft: `${t.space.$2}`,
+        position: 'absolute',
+        top: `-${t.space.$2}`,
+        right: 0,
       })}
       notificationCount={notificationCount}
     />
