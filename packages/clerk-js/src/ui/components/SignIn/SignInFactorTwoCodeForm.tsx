@@ -24,8 +24,11 @@ export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlt
 type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
-  formTitle: LocalizationKey;
-  formSubtitle: LocalizationKey;
+  // TODO-RETHEME remove
+  formTitle?: LocalizationKey;
+  // TODO-RETHEME remove
+  formSubtitle?: LocalizationKey;
+  inputLabel: LocalizationKey;
   resendButton?: LocalizationKey;
 };
 
@@ -99,9 +102,12 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       cardSubtitle={
         isResettingPassword(signIn) ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle
       }
+      // TODO-RETHEME remove
       formTitle={props.formTitle}
+      // TODO-RETHEME remove
       formSubtitle={props.formSubtitle}
       resendButton={props.resendButton}
+      inputLabel={props.inputLabel}
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}

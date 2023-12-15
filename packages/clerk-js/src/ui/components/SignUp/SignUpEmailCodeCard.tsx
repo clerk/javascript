@@ -28,8 +28,7 @@ export const SignUpEmailCodeCard = () => {
       <SignUpVerificationCodeForm
         cardTitle={localizationKeys('signUp.emailCode.title')}
         cardSubtitle={localizationKeys('signUp.emailCode.subtitle')}
-        formTitle={localizationKeys('signUp.emailCode.formTitle')}
-        formSubtitle={localizationKeys('signUp.emailCode.formSubtitle')}
+        inputLabel={localizationKeys('signUp.emailCode.formSubtitle')}
         resendButton={localizationKeys('signUp.emailCode.resendButton')}
         prepare={prepare}
         attempt={attempt}

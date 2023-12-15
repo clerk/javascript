@@ -40,7 +40,6 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
         ]}
         {...rest}
       >
-        {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo />}
         {children}
       </Col>
     </>

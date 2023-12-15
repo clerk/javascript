@@ -4,7 +4,7 @@ import type { SignInResource } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, Footer, Form, Header, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -19,7 +19,6 @@ type SignInFactorTwoBackupCodeCardProps = {
 export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCardProps) => {
   const { onShowAlternativeMethodsClicked } = props;
   const signIn = useCoreSignIn();
-  const { displayConfig } = useEnvironment();
   const { navigateAfterSignIn } = useSignInContext();
   const { setActive } = useClerk();
   const { navigate } = useRouter();
@@ -65,45 +64,46 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
 
   return (
     <Card.Root>
-      <Card.Alert>{card.error}</Card.Alert>
-      <Header.Root>
-        <Header.Title localizationKey={localizationKeys('signIn.backupCodeMfa.title')} />
-        <Header.Subtitle
-          localizationKey={
-            isResettingPassword(signIn)
-              ? localizationKeys('signIn.forgotPassword.subtitle')
-              : localizationKeys('signIn.backupCodeMfa.subtitle', {
-                  applicationName: displayConfig.applicationName,
-                })
-          }
-        />
-      </Header.Root>
-      <Col
-        elementDescriptor={descriptors.main}
-        gap={8}
-      >
-        <Form.Root onSubmit={handleBackupCodeSubmit}>
-          <Form.ControlRow elementId={codeControl.id}>
-            <Form.PlainInput
-              {...codeControl.props}
-              autoFocus
-              onActionClicked={onShowAlternativeMethodsClicked}
-            />
-          </Form.ControlRow>
-          <Form.SubmitButton />
-        </Form.Root>
-      </Col>
-      <Footer.Root>
-        <Footer.Action elementId='alternativeMethods'>
-          {onShowAlternativeMethodsClicked && (
-            <Footer.ActionLink
-              localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-              onClick={onShowAlternativeMethodsClicked}
-            />
-          )}
-        </Footer.Action>
-        <Footer.Links />
-      </Footer.Root>
+      <Card.Content>
+        <Card.Alert>{card.error}</Card.Alert>
+        <Header.Root>
+          <Header.Title localizationKey={localizationKeys('signIn.backupCodeMfa.title')} />
+          <Header.Subtitle
+            localizationKey={
+              isResettingPassword(signIn)
+                ? localizationKeys('signIn.forgotPassword.subtitle')
+                : localizationKeys('signIn.backupCodeMfa.subtitle')
+            }
+          />
+        </Header.Root>
+        <Col
+          elementDescriptor={descriptors.main}
+          gap={8}
+        >
+          <Form.Root onSubmit={handleBackupCodeSubmit}>
+            <Form.ControlRow elementId={codeControl.id}>
+              <Form.PlainInput
+                {...codeControl.props}
+                autoFocus
+                onActionClicked={onShowAlternativeMethodsClicked}
+              />
+            </Form.ControlRow>
+            <Form.SubmitButton />
+          </Form.Root>
+        </Col>
+        <Footer.Root>
+          <Footer.Action elementId='alternativeMethods'>
+            {onShowAlternativeMethodsClicked && (
+              <Footer.ActionLink
+                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                onClick={onShowAlternativeMethodsClicked}
+              />
+            )}
+          </Footer.Action>
+          <Footer.Links />
+        </Footer.Root>
+      </Card.Content>
+      <Card.Footer />
     </Card.Root>
   );
 };

@@ -14,8 +14,11 @@ import { IdentityPreview } from './IdentityPreview';
 export type VerificationCodeCardProps = {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
-  formTitle: LocalizationKey;
-  formSubtitle: LocalizationKey;
+  //TODO-RETHEME remove
+  formTitle?: LocalizationKey;
+  //TODO-RETHEME remove
+  formSubtitle?: LocalizationKey;
+  inputLabel: LocalizationKey;
   safeIdentifier?: string | undefined | null;
   resendButton?: LocalizationKey;
   profileImageUrl?: string;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button, descriptors, Flex, Icon, Text } from '../customizables';
-import { AuthApp, PencilEdit } from '../icons';
+import { PencilEdit } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
 import { formatSafeIdentifier, getFlagEmojiFromCountryIso, isMaskedIdentifier, parsePhoneString } from '../utils';
 
@@ -30,12 +30,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
   );
 
   if (!refs.current.identifier) {
-    return (
-      <Container {...rest}>
-        <Authenticator />
-        {edit}
-      </Container>
-    );
+    return <Container {...rest}>{edit}</Container>;
   }
 
   if (isMaskedIdentifier(refs.current.identifier) || !refs.current.identifier.startsWith('+')) {
@@ -80,18 +75,6 @@ const PhoneIdentifier = (props: { identifier: string; flag?: string }) => {
     <>
       <Text sx={t => ({ fontSize: t.fontSizes.$sm })}>{props.flag}</Text>
       <IdentifierContainer>{props.identifier}</IdentifierContainer>
-    </>
-  );
-};
-
-const Authenticator = () => {
-  return (
-    <>
-      <Icon
-        icon={AuthApp}
-        sx={t => ({ color: t.colors.$blackAlpha700 })}
-      />
-      <IdentifierContainer>Authenticator app</IdentifierContainer>
     </>
   );
 };

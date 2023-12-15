@@ -95,7 +95,9 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           gap={2}
           sx={{
             // Allow the first row items to use the entire row's width, but the rest should have a fixed width based on the first row's items
-            gridTemplateColumns: `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
+            gridTemplateColumns: preferBlockButtons
+              ? `repeat(1, 1fr)`
+              : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
             justifyContent: 'center',
           }}
         >

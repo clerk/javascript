@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { descriptors, Flex, generateFlowPartClassname, Icon } from '../../customizables';
+import { descriptors, Flex, generateFlowPartClassname, Icon, useAppearance } from '../../customizables';
 import { shadows } from '../../foundations/shadows';
 import { Close } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
+import { ApplicationLogo } from '..';
 import { useFlowMetadata } from '../contexts';
 import { IconButton } from '../IconButton';
 import { useUnsafeModalContext } from '../Modal';
@@ -12,6 +13,7 @@ type CardContentProps = PropsOfComponent<typeof Flex>;
 export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((props, ref) => {
   const { children, sx, ...rest } = props;
   const flowMetadata = useFlowMetadata();
+  const appearance = useAppearance();
   const { toggle } = useUnsafeModalContext();
 
   return (
@@ -34,12 +36,15 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           borderRadius: `${t.radii.$card} ${t.radii.$card} ${t.radii.$lg} ${t.radii.$lg}`,
           position: 'relative',
           padding: t.space.$8,
-          gap: t.space.$8,
+          gap: t.space.$4,
+          justifyContent: 'center',
+          alignContent: 'center',
         }),
         sx,
       ]}
       ref={ref}
     >
+      {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo />}
       {toggle && (
         <IconButton
           elementDescriptor={descriptors.modalCloseButton}

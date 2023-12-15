@@ -162,6 +162,18 @@ type _LocalizationResource = {
       subtitle_phone: LocalizationValue;
       inputLabel: LocalizationValue;
       resendButton: LocalizationValue;
+      // TODO-RETHEME remove
+      title_email: LocalizationValue;
+      // TODO-RETHEME remove
+      title_phone: LocalizationValue;
+      // TODO-RETHEME remove
+      subtitle: LocalizationValue;
+      // TODO-RETHEME remove
+      formTitle: LocalizationValue;
+      // TODO-RETHEME remove
+      formSubtitle_email: LocalizationValue;
+      // TODO-RETHEME remove
+      formSubtitle_phone: LocalizationValue;
     };
     resetPassword: {
       title: LocalizationValue;
@@ -177,6 +189,10 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       inputLabel: LocalizationValue;
       resendButton: LocalizationValue;
+      // TODO-RETHEME remove
+      formTitle: LocalizationValue;
+      // TODO-RETHEME remove
+      formSubtitle: LocalizationValue;
     };
     emailLink: {
       title: LocalizationValue;
@@ -218,14 +234,18 @@ type _LocalizationResource = {
     };
     phoneCodeMfa: {
       title: LocalizationValue;
-      subtitle: LocalizationValue;
+      // TODO-RETHEME remove
       formTitle: LocalizationValue;
+      // TODO-RETHEME remove
       formSubtitle: LocalizationValue;
+      subtitle: LocalizationValue;
+      inputLabel: LocalizationValue;
       resendButton: LocalizationValue;
     };
     totpMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      inputLabel: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
     };
@@ -238,6 +258,8 @@ type _LocalizationResource = {
     alternativeMethods: {
       title: LocalizationValue;
       actionLink: LocalizationValue;
+      actionText: LocalizationValue;
+      subtitle: LocalizationValue;
       blockButton__emailLink: LocalizationValue;
       blockButton__emailCode: LocalizationValue;
       blockButton__phoneCode: LocalizationValue;
