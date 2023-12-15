@@ -6,7 +6,6 @@ import { AccountPage } from './AccountPage';
 import { DeletePage } from './DeletePage';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { MfaPage } from './MfaPage';
-import { PasswordPage } from './PasswordPage';
 import { RemoveMfaPhoneCodePage, RemoveMfaTOTPPage, RemoveWeb3WalletPage } from './RemoveResourcePage';
 import { SecurityPage } from './SecurityPage';
 import { Web3Page } from './Web3Page';
@@ -80,12 +79,6 @@ export const UserProfileRoutes = () => {
         </Route>
         <Route path={isSecurityPageRoot ? undefined : 'security'}>
           <Switch>
-            <Route
-              path='password'
-              flowStart
-            >
-              <PasswordPage />
-            </Route>
             <Route
               path='delete'
               flowStart
