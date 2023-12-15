@@ -147,7 +147,7 @@ const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource })
       error || reauthorizationRequired
         ? {
             label: actionLabel,
-            onClick: () => handleOnClick,
+            onClick: handleOnClick,
           }
         : null,
       {

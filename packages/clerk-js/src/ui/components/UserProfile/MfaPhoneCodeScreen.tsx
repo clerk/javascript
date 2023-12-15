@@ -4,25 +4,18 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
-import { Col, localizationKeys, Text } from '../../customizables';
-import {
-  ArrowBlockButton,
-  FormButtonContainer,
-  FormContent,
-  NavigateToFlowStartButton,
-  SuccessPage,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
-import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../../utils';
+import { Button, Col, localizationKeys, Text } from '../../customizables';
+import { FormButtonContainer, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
+import { handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { AddPhone, VerifyPhone } from './PhoneForm';
-import { AddBlockButton } from './UserProfileBlockButtons';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const MfaPhoneCodePage = withCardStateProvider(() => {
+export const MfaPhoneCodeScreen = withCardStateProvider(() => {
   const ref = React.useRef<PhoneNumberResource>();
   const wizard = useWizard({ defaultStep: 2 });
+  const { close } = useActionContext();
 
   return (
     <Wizard {...wizard.props}>
@@ -49,6 +42,7 @@ export const MfaPhoneCodePage = withCardStateProvider(() => {
       <SuccessPage
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         text={localizationKeys('userProfile.mfaPhoneCodePage.successMessage')}
+        onFinish={close}
         contents={
           <MfaBackupCodeList
             subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
@@ -72,6 +66,7 @@ const AddMfa = (props: AddMfaProps) => {
   const { onSuccess, title, onAddPhoneClick, onUnverifiedPhoneClick, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
+  const { close } = useActionContext();
 
   if (!user) {
     return null;
@@ -112,42 +107,33 @@ const AddMfa = (props: AddMfaProps) => {
       <Col gap={2}>
         {availableMethods.map(phone => {
           const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
-          const flag = getFlagEmojiFromCountryIso(parsePhoneString(phone.phoneNumber).iso);
 
           return (
-            <ArrowBlockButton
-              // elementDescriptor={descriptors.socialButtonsButtonBlock}
-              // elementId={descriptors.socialButtonsButtonBlock.setId(strategy)}
-              // textElementDescriptor={descriptors.socialButtonsButtonBlockText}
-              // textElementId={descriptors.socialButtonsButtonBlockText.setId(strategy)}
-              // arrowElementDescriptor={descriptors.socialButtonsButtonBlockArrow}
-              // arrowElementId={descriptors.socialButtonsButtonBlockArrow.setId(strategy)}
+            <Button
               key={phone.id}
-              // id={strategyToDisplayData[strategy].id}
+              variant='ghost'
+              sx={{ justifyContent: 'start' }}
               onClick={() => enableMfa(phone)}
               isLoading={card.loadingMetadata === phone.id}
               isDisabled={card.isLoading}
-              leftIcon={
-                <Text
-                  as='span'
-                  sx={theme => ({ fontSize: theme.fontSizes.$sm })}
-                >
-                  {flag}
-                </Text>
-              }
             >
               {formattedPhone}
-            </ArrowBlockButton>
+            </Button>
           );
         })}
-        <AddBlockButton
-          block={false}
+        <Button
+          variant='ghost'
+          sx={{ justifyContent: 'start' }}
           onClick={onAddPhoneClick}
-          textLocalizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}
+          localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}
         />
       </Col>
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
+        <Button
+          variant='ghost'
+          localizationKey={localizationKeys('userProfile.formButtonReset')}
+          onClick={close}
+        />
       </FormButtonContainer>
     </FormContent>
   );

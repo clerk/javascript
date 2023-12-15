@@ -4,7 +4,7 @@ import React from 'react';
 
 import { render, screen } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { MfaPage } from '../MfaPage';
+import { MfaSection } from '../MfaSection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
@@ -18,13 +18,13 @@ describe.skip('MfaPage', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(initConfig);
 
-    render(<MfaPage />, { wrapper });
+    render(<MfaSection />, { wrapper });
   });
 
   it('shows the title', async () => {
     const { wrapper } = await createFixtures(initConfig);
 
-    render(<MfaPage />, { wrapper });
+    render(<MfaSection />, { wrapper });
 
     screen.getAllByText('Add SMS code verification');
   });
@@ -33,7 +33,7 @@ describe.skip('MfaPage', () => {
     it('shows the phone number of the user with a button', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      render(<MfaPage />, { wrapper });
+      render(<MfaSection />, { wrapper });
 
       const phoneNumberEl = screen.getByText('+30 691 1111111');
       expect(phoneNumberEl.closest('button')).not.toBeNull();
@@ -42,7 +42,7 @@ describe.skip('MfaPage', () => {
     it('shows the "add a phone number" button', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      render(<MfaPage />, { wrapper });
+      render(<MfaSection />, { wrapper });
 
       const phoneNumberEl = screen.getByText(/add a phone number/i);
       expect(phoneNumberEl.closest('button')).not.toBeNull();
@@ -51,7 +51,7 @@ describe.skip('MfaPage', () => {
     it('navigates to the root page upon clicking cancel', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
-      const { userEvent } = render(<MfaPage />, { wrapper });
+      const { userEvent } = render(<MfaSection />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
       expect(fixtures.router.navigate).toBeCalledWith('/');
@@ -60,7 +60,7 @@ describe.skip('MfaPage', () => {
     it('renders the "add a phone number" page upon clicking the button', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      const { userEvent } = render(<MfaPage />, { wrapper });
+      const { userEvent } = render(<MfaSection />, { wrapper });
 
       await userEvent.click(screen.getByText(/add a phone number/i));
       screen.getByLabelText(/phone number/i);
@@ -73,7 +73,7 @@ describe.skip('MfaPage', () => {
       fixtures.clerk.user?.phoneNumbers[0].setReservedForSecondFactor = jest
         .fn()
         .mockResolvedValue({} as PhoneNumberResource);
-      const { userEvent } = render(<MfaPage />, { wrapper });
+      const { userEvent } = render(<MfaSection />, { wrapper });
 
       await userEvent.click(screen.getByText(/\+30 691 1111111/i));
       expect(await screen.findByText(/enabled/i)).toBeInTheDocument();

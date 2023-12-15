@@ -2,8 +2,9 @@ import { useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
-import { Col, descriptors, localizationKeys } from '../../customizables';
-import { Form, FormButtonContainer, FormContent, NavigateToFlowStartButton, useFieldOTP } from '../../elements';
+import { Button, Col, descriptors, localizationKeys } from '../../customizables';
+import { Form, FormButtonContainer, FormContent, useFieldOTP } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type VerifyTOTPProps = {
@@ -14,6 +15,7 @@ type VerifyTOTPProps = {
 export const VerifyTOTP = (props: VerifyTOTPProps) => {
   const { onVerified, resourceRef } = props;
   const { user } = useUser();
+  const { close } = useActionContext();
 
   const otp = useFieldOTP<TOTPResource>({
     onCodeEntryFinished: (code, resolve, reject) => {
@@ -42,7 +44,9 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
       </Col>
 
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton
+        <Button
+          onClick={close}
+          variant='ghost'
           localizationKey={localizationKeys('userProfile.formButtonReset')}
           elementDescriptor={descriptors.formButtonReset}
         />

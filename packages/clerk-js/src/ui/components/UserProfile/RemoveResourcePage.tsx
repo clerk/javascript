@@ -124,9 +124,13 @@ export const RemoveWeb3WalletPage = () => {
   );
 };
 
-export const RemoveMfaPhoneCodePage = () => {
+type RemoveMfaPhoneCodeFormProps = {
+  phoneId: string;
+};
+
+export const RemoveMfaPhoneCodeForm = (props: RemoveMfaPhoneCodeFormProps) => {
   const { user } = useUser();
-  const { id } = useRouter().params;
+  const { phoneId: id } = props;
   // TODO: This logic will need to change when we add more 2fa methods
   const resource = user?.phoneNumbers.find(e => e.id === id);
   const ref = React.useRef(resource?.phoneNumber);
@@ -151,15 +155,20 @@ export const RemoveMfaPhoneCodePage = () => {
   );
 };
 
-export const RemoveMfaTOTPPage = () => {
+export const RemoveMfaTOTPForm = () => {
   const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <RemoveResourcePage
       title={localizationKeys('userProfile.mfaTOTPPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine1')}
       messageLine2={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.mfaTOTPPage.removeResource.successMessage')}
-      deleteResource={user!.disableTOTP}
+      deleteResource={user.disableTOTP}
       Breadcrumbs={UserProfileBreadcrumbs}
     />
   );

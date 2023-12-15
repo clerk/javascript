@@ -8,7 +8,7 @@ import { AddAuthenticatorApp } from './AddAuthenticatorApp';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { VerifyTOTP } from './VerifyTOTP';
 
-export const MfaTOTPPage = withCardStateProvider(() => {
+export const MfaTOTPScreen = withCardStateProvider(() => {
   const wizard = useWizard();
   const ref = React.useRef<TOTPResource>();
 

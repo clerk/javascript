@@ -343,29 +343,41 @@ export const enUS: LocalizationResource = {
         title: 'Two-step verification',
         primaryButton: 'Add two-step verification',
         phoneCode: {
+          //TODO-RETHEME remove
           destructiveActionTitle: 'Remove',
+          //TODO-RETHEME remove
           destructiveActionSubtitle: 'Remove this phone number from the two-step verification methods',
-          destructiveActionLabel: 'Remove phone number',
+          destructiveActionLabel: 'Remove',
+          //TODO-RETHEME remove
           title__default: 'Default factor',
+          //TODO-RETHEME remove
           title__setDefault: 'Set as Default factor',
+          //TODO-RETHEME remove
           subtitle__default: 'This factor will be used as the default two-step verification method when signing in.',
+          //TODO-RETHEME remove
           subtitle__setDefault:
             'Set this factor as the default factor to use it as the default two-step verification method when signing in.',
           actionLabel__setDefault: 'Set as default',
         },
         backupCodes: {
           headerTitle: 'Backup codes',
+          //TODO-RETHEME remove
           title__regenerate: 'Regenerate backup codes',
+          //TODO-RETHEME remove
           subtitle__regenerate:
             'Get a fresh set of secure backup codes. Prior backup codes will be deleted and cannot be used.',
-          actionLabel__regenerate: 'Regenerate codes',
+          actionLabel__regenerate: 'Regenerate',
         },
         totp: {
           headerTitle: 'Authenticator application',
+          //TODO-RETHEME remove
           title: 'Default factor',
+          //TODO-RETHEME remove
           subtitle: 'This factor will be used as the default two-step verification method when signing in.',
           destructiveActionTitle: 'Remove',
+          //TODO-RETHEME remove
           destructiveActionSubtitle: 'Remove authenticator application from the two-step verification methods',
+          //TODO-RETHEME remove
           destructiveActionLabel: 'Remove authenticator application',
         },
       },

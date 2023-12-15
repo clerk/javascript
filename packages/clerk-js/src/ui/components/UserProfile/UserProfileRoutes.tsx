@@ -3,9 +3,7 @@ import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
-import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
-import { MfaPage } from './MfaPage';
-import { RemoveMfaPhoneCodePage, RemoveMfaTOTPPage, RemoveWeb3WalletPage } from './RemoveResourcePage';
+import { RemoveWeb3WalletPage } from './RemoveResourcePage';
 import { SecurityPage } from './SecurityPage';
 import { Web3Page } from './Web3Page';
 
@@ -36,28 +34,6 @@ export const UserProfileRoutes = () => {
       <Route>
         <Route path={isAccountPageRoot ? undefined : 'account'}>
           <Switch>
-            <Route
-              path='multi-factor'
-              flowStart
-            >
-              <Switch>
-                <Route path='totp/remove'>
-                  <RemoveMfaTOTPPage />
-                </Route>
-                <Route path='backup_code/add'>
-                  <MfaBackupCodeCreatePage />
-                </Route>
-                <Route path=':id/remove'>
-                  <RemoveMfaPhoneCodePage />
-                </Route>
-                <Route path=':id'>
-                  <MfaPage />
-                </Route>
-                <Route index>
-                  <MfaPage />
-                </Route>
-              </Switch>
-            </Route>
             <Route
               path='web3-wallet'
               flowStart

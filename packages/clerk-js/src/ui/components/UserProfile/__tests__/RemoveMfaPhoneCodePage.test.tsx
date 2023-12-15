@@ -3,7 +3,7 @@ import React from 'react';
 
 import { render, screen } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { RemoveMfaPhoneCodePage } from '../RemoveResourcePage';
+import { MfaSection } from '../MfaSection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
@@ -17,14 +17,14 @@ describe.skip('RemoveMfaPhoneCodePage', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(initConfig);
 
-    render(<RemoveMfaPhoneCodePage />, { wrapper });
+    render(<MfaSection />, { wrapper });
   });
 
   it('shows the title and phone number', async () => {
     const { wrapper, fixtures } = await createFixtures(initConfig);
 
     fixtures.router.params.id = 'id';
-    render(<RemoveMfaPhoneCodePage />, { wrapper });
+    render(<MfaSection />, { wrapper });
 
     screen.getByRole('heading', { name: /remove two-step verification/i });
     screen.getByText(/\+306911111111/);
@@ -35,7 +35,7 @@ describe.skip('RemoveMfaPhoneCodePage', () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
-      const { userEvent } = render(<RemoveMfaPhoneCodePage />, { wrapper });
+      const { userEvent } = render(<MfaSection />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
       expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
@@ -47,7 +47,7 @@ describe.skip('RemoveMfaPhoneCodePage', () => {
       fixtures.router.params.id = 'id';
       //@ts-expect-error
       fixtures.clerk.user?.phoneNumbers[0].setReservedForSecondFactor = jest.fn().mockResolvedValue({});
-      const { userEvent } = render(<RemoveMfaPhoneCodePage />, { wrapper });
+      const { userEvent } = render(<MfaSection />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));
       expect(fixtures.clerk.user?.phoneNumbers[0].setReservedForSecondFactor).toHaveBeenCalledWith({ reserved: false });

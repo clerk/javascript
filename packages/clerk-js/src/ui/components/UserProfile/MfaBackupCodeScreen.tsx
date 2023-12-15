@@ -1,17 +1,18 @@
 import { useWizard, Wizard } from '../../common';
 import { Button, descriptors, localizationKeys, Text } from '../../customizables';
-import { FormButtonContainer, FormContent, NavigateToFlowStartButton, withCardStateProvider } from '../../elements';
-import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
+import { FormButtonContainer, FormContent, withCardStateProvider } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
+import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const MfaBackupCodePage = withCardStateProvider(() => {
+export const MfaBackupCodeScreen = withCardStateProvider(() => {
   const wizard = useWizard();
 
   return (
     <Wizard {...wizard.props}>
       <AddBackupCode onContinue={wizard.nextStep} />
 
-      <MfaBackupCodeCreatePage />
+      <MfaBackupCodeCreateForm />
     </Wizard>
   );
 });
@@ -22,6 +23,7 @@ type AddBackupCodeProps = {
 
 const AddBackupCode = (props: AddBackupCodeProps) => {
   const { onContinue } = props;
+  const { close } = useActionContext();
 
   return (
     <FormContent
@@ -39,7 +41,9 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
           elementDescriptor={descriptors.formButtonPrimary}
         />
 
-        <NavigateToFlowStartButton
+        <Button
+          variant='ghost'
+          onClick={close}
           localizationKey={localizationKeys('userProfile.formButtonReset')}
           elementDescriptor={descriptors.formButtonReset}
         />
