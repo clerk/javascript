@@ -100,8 +100,7 @@ describe('AccountPage', () => {
       render(<AccountPage />, { wrapper });
       screen.getByText(/Connected Accounts/i);
       screen.getByText(/testgoogle@clerk.com/i);
-      const externalAccountButton = screen.getByText(/google/i);
-      expect(externalAccountButton.closest('button')).not.toBeNull();
+      screen.getByText(/google/i);
     });
 
     it('shows the enterprise accounts of the user', async () => {

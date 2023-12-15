@@ -67,9 +67,13 @@ export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
   );
 };
 
-export const RemoveConnectedAccountPage = () => {
+type ConnectedAccountFormProps = {
+  accountId: string;
+};
+
+export const RemoveConnectedAccountForm = (props: ConnectedAccountFormProps) => {
+  const { accountId: id } = props;
   const { user } = useUser();
-  const { id } = useRouter().params;
   const resource = user?.externalAccounts.find(e => e.id === id);
   const ref = React.useRef(resource?.provider);
   const { providerToDisplayData } = useEnabledThirdPartyProviders();

@@ -3,17 +3,11 @@ import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
-import { ConnectedAccountsPage } from './ConnectedAccountsPage';
 import { DeletePage } from './DeletePage';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { MfaPage } from './MfaPage';
 import { PasswordPage } from './PasswordPage';
-import {
-  RemoveConnectedAccountPage,
-  RemoveMfaPhoneCodePage,
-  RemoveMfaTOTPPage,
-  RemoveWeb3WalletPage,
-} from './RemoveResourcePage';
+import { RemoveMfaPhoneCodePage, RemoveMfaTOTPPage, RemoveWeb3WalletPage } from './RemoveResourcePage';
 import { SecurityPage } from './SecurityPage';
 import { Web3Page } from './Web3Page';
 
@@ -63,19 +57,6 @@ export const UserProfileRoutes = () => {
                 </Route>
                 <Route index>
                   <MfaPage />
-                </Route>
-              </Switch>
-            </Route>
-            <Route
-              path='connected-account'
-              flowStart
-            >
-              <Switch>
-                <Route path=':id/remove'>
-                  <RemoveConnectedAccountPage />
-                </Route>
-                <Route index>
-                  <ConnectedAccountsPage />
                 </Route>
               </Switch>
             </Route>

@@ -316,14 +316,19 @@ export const enUS: LocalizationResource = {
       connectedAccountsSection: {
         title: 'Connected accounts',
         primaryButton: 'Connect account',
+        //TODO-RETHEME remove
         title__connectionFailed: 'Retry failed connection',
+        //TODO-RETHEME remove
         title__reauthorize: 'Reauthorization required',
+        //TODO-RETHEME remove
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         actionLabel__connectionFailed: 'Try again',
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Remove',
+        //TODO-RETHEME remove
         destructiveActionSubtitle: 'Remove this connected account from your account',
+        //TODO-RETHEME remove
         destructiveActionAccordionSubtitle: 'Remove connected account',
       },
       enterpriseAccountsSection: {

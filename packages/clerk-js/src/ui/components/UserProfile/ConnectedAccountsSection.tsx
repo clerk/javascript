@@ -3,21 +3,26 @@ import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy 
 
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
-import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
-import { ProfileSection, useCardState, UserPreview } from '../../elements';
+import { Badge, Button, Col, Flex, localizationKeys, Text } from '../../customizables';
+import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
+import { Action } from '../../elements/Action';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
+import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { LinkButtonWithDescription } from './LinkButtonWithDescription';
-import { UserProfileAccordion } from './UserProfileAccordion';
-import { AddBlockButton } from './UserProfileBlockButtons';
+import { ConnectedAccountsForm } from './ConnectedAccountsPage';
+import { RemoveConnectedAccountForm } from './RemoveResourcePage';
 
 export const ConnectedAccountsSection = () => {
   const { user } = useUser();
-  const { navigate } = useRouter();
+  const { providerToDisplayData } = useEnabledThirdPartyProviders();
+  const { additionalOAuthScopes } = useUserProfileContext();
+
   if (!user) {
     return null;
   }
+
   const accounts = [
     ...user.verifiedExternalAccounts,
     ...user.unverifiedExternalAccounts.filter(a => a.verification?.error),
@@ -28,41 +33,71 @@ export const ConnectedAccountsSection = () => {
       title={localizationKeys('userProfile.start.connectedAccountsSection.title')}
       id='connectedAccounts'
     >
-      {accounts.map(account => (
-        <ConnectedAccountAccordion
-          key={account.id}
-          account={account}
-        />
-      ))}
-      <AddBlockButton
-        textLocalizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
-        id='connectedAccounts'
-        onClick={() => navigate(`connected-account`)}
-      />
+      <Action.Root>
+        <Col sx={t => ({ gap: t.space.$1 })}>
+          {accounts.map(account => {
+            const label = account.username || account.emailAddress;
+            const error = account.verification?.error?.longMessage;
+            const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
+            const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
+
+            return (
+              <Action.Root key={account.id}>
+                <Action.Closed value=''>
+                  <Flex sx={t => ({ justifyContent: 'space-between', padding: `${t.space.$0x5} ${t.space.$4}` })}>
+                    <Text>
+                      {`${providerToDisplayData[account.provider].name} ${label ? `(${label})` : ''}`}
+                      {(error || reauthorizationRequired) && (
+                        <Badge
+                          colorScheme='danger'
+                          localizationKey={localizationKeys('badge__requiresAction')}
+                        />
+                      )}
+                    </Text>
+
+                    <ConnectedAccountMenu account={account} />
+                  </Flex>
+                </Action.Closed>
+
+                <Action.Open value='remove'>
+                  <Action.Card>
+                    <RemoveConnectedAccountForm accountId={account.id} />
+                  </Action.Card>
+                </Action.Open>
+              </Action.Root>
+            );
+          })}
+
+          <Action.Trigger value='add'>
+            <Button
+              id='connectedAccounts'
+              variant='ghost'
+              sx={t => ({ justifyContent: 'start', padding: `${t.space.$0x5} ${t.space.$4}` })}
+              localizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
+            />
+          </Action.Trigger>
+        </Col>
+
+        <Action.Open value='add'>
+          <Action.Card>
+            <ConnectedAccountsForm />
+          </Action.Card>
+        </Action.Open>
+      </Action.Root>
     </ProfileSection>
   );
 };
 
-const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResource }) => {
+const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource }) => {
   const card = useCardState();
   const { user } = useUser();
   const { navigate } = useRouter();
-  const router = useRouter();
-  const { providerToDisplayData } = useEnabledThirdPartyProviders();
+  const { open } = useActionContext();
   const error = account.verification?.error?.longMessage;
-  const label = account.username || account.emailAddress;
-  const defaultOpen = !!router.urlStateParam?.componentName;
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
-  const visitedProvider = account.provider === router.urlStateParam?.socialProvider;
   const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
   const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
-  const title = !reauthorizationRequired
-    ? localizationKeys('userProfile.start.connectedAccountsSection.title__connectionFailed')
-    : localizationKeys('userProfile.start.connectedAccountsSection.title__reauthorize');
-  const subtitle = !reauthorizationRequired
-    ? (error as any)
-    : localizationKeys('userProfile.start.connectedAccountsSection.subtitle__reauthorize');
   const actionLabel = !reauthorizationRequired
     ? localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__connectionFailed')
     : localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__reauthorize');
@@ -92,66 +127,23 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
     }
   };
 
-  return (
-    <UserProfileAccordion
-      defaultOpen={visitedProvider && defaultOpen}
-      onCloseCallback={router.urlStateParam?.clearUrlStateParam}
-      icon={
-        <Image
-          elementDescriptor={[descriptors.providerIcon]}
-          elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
-          alt={providerToDisplayData[account.provider].name}
-          src={providerToDisplayData[account.provider].iconUrl}
-          sx={theme => ({ width: theme.sizes.$4 })}
-        />
-      }
-      title={
-        <Flex
-          gap={2}
-          center
-        >
-          {`${providerToDisplayData[account.provider].name} ${label ? `(${label})` : ''}`}
-          {(error || reauthorizationRequired) && (
-            <Badge
-              colorScheme='danger'
-              localizationKey={localizationKeys('badge__requiresAction')}
-            />
-          )}
-        </Flex>
-      }
-    >
-      <Col gap={4}>
-        <UserPreview
-          externalAccount={account}
-          icon={
-            <Image
-              alt={providerToDisplayData[account.provider].name}
-              src={providerToDisplayData[account.provider].iconUrl}
-              sx={theme => ({ width: theme.sizes.$4 })}
-            />
+  const actions = (
+    [
+      error || reauthorizationRequired
+        ? {
+            label: actionLabel,
+            onClick: () => handleOnClick,
           }
-        />
-        {(error || reauthorizationRequired) && (
-          <LinkButtonWithDescription
-            title={title}
-            subtitle={subtitle}
-            actionLabel={actionLabel}
-            onClick={handleOnClick}
-          />
-        )}
+        : null,
+      {
+        label: localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionTitle'),
+        isDestructive: true,
+        onClick: () => open('remove'),
+      },
+    ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
+  ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
 
-        <LinkButtonWithDescription
-          title={localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionTitle')}
-          subtitle={localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionSubtitle')}
-          actionLabel={localizationKeys(
-            'userProfile.start.connectedAccountsSection.destructiveActionAccordionSubtitle',
-          )}
-          variant='linkDanger'
-          onClick={() => navigate(`connected-account/${account.id}/remove`)}
-        />
-      </Col>
-    </UserProfileAccordion>
-  );
+  return <ThreeDotsMenu actions={actions} />;
 };
 
 function findAdditionalScopes(
