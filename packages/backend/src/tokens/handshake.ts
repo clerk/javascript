@@ -6,7 +6,10 @@ import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import type { VerifyTokenOptions } from './verify';
 
 async function verifyHandshakeJwt(token: string, { key }: VerifyJwtOptions): Promise<{ handshake: string[] }> {
-  const decoded = decodeJwt(token);
+  const { data: decoded, error } = decodeJwt(token);
+  if (error) {
+    throw error;
+  }
 
   const { header, payload } = decoded;
 
@@ -16,14 +19,11 @@ async function verifyHandshakeJwt(token: string, { key }: VerifyJwtOptions): Pro
   assertHeaderType(typ);
   assertHeaderAlgorithm(alg);
 
-  let signatureValid: boolean;
-
-  try {
-    signatureValid = await hasValidSignature(decoded, key);
-  } catch (err) {
+  const { data: signatureValid, error: signatureError } = await hasValidSignature(decoded, key);
+  if (signatureError) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
-      message: `Error verifying handshake token. ${err}`,
+      message: `Error verifying handshake token. ${signatureError}`,
     });
   }
 
@@ -46,8 +46,12 @@ export async function verifyHandshakeToken(
 ): Promise<{ handshake: string[] }> {
   const { secretKey, apiUrl, apiVersion, jwksCacheTtlInMs, jwtKey, skipJwksCache } = options;
 
-  const { header } = decodeJwt(token);
-  const { kid } = header;
+  const { data, error } = decodeJwt(token);
+  if (error) {
+    throw error;
+  }
+
+  const { kid } = data.header;
 
   let key;
 

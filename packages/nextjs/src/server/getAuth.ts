@@ -119,5 +119,11 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
 const parseJwt = (req: RequestLike) => {
   const cookieToken = getCookie(req, constants.Cookies.Session);
   const headerToken = getHeader(req, 'authorization')?.replace('Bearer ', '');
-  return decodeJwt(cookieToken || headerToken || '');
+  const { data, error } = decodeJwt(cookieToken || headerToken || '');
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 };

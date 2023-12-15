@@ -301,7 +301,10 @@ ${error.getFullMessage()}`,
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '');
     }
 
-    const decodeResult = decodeJwt(sessionToken!);
+    const { data: decodeResult, error: decodedError } = decodeJwt(sessionToken!);
+    if (decodedError) {
+      return handleError(decodedError, 'cookie');
+    }
 
     if (decodeResult.payload.iat < clientUat) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenOutdated, '');

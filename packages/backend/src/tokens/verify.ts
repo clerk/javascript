@@ -29,7 +29,12 @@ export async function verifyToken(
     skipJwksCache,
   } = options;
 
-  const { header } = decodeJwt(token);
+  const { data: decodedResult, error: decodedError } = decodeJwt(token);
+  if (decodedError) {
+    return { error: decodedError };
+  }
+
+  const { header } = decodedResult;
   const { kid } = header;
 
   try {
@@ -50,14 +55,12 @@ export async function verifyToken(
       };
     }
 
-    const data = await verifyJwt(token, {
+    return await verifyJwt(token, {
       audience,
       authorizedParties,
       clockSkewInMs,
       key,
     });
-
-    return { data };
   } catch (error) {
     return { error: error as TokenVerificationError };
   }
