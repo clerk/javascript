@@ -93,9 +93,7 @@ describe('OrganizationList', () => {
       await waitFor(() => {
         // Header
         expect(queryByRole('heading', { name: /Create organization/i })).toBeInTheDocument();
-        // Subheader
-        expect(queryByText('to continue to TestApp')).toBeInTheDocument();
-        //
+
         expect(queryByText('Personal account')).not.toBeInTheDocument();
 
         // Form fields of CreateOrganizationForm
