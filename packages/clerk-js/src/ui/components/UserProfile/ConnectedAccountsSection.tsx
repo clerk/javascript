@@ -3,7 +3,7 @@ import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy 
 
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
-import { Badge, Button, Col, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { Badge, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -12,7 +12,7 @@ import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { ConnectedAccountsForm } from './ConnectedAccountsPage';
-import { RemoveConnectedAccountForm } from './RemoveResourcePage';
+import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 
 export const ConnectedAccountsSection = () => {
   const { user } = useUser();
@@ -29,12 +29,12 @@ export const ConnectedAccountsSection = () => {
   ];
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('userProfile.start.connectedAccountsSection.title')}
       id='connectedAccounts'
     >
       <Action.Root>
-        <Col sx={t => ({ gap: t.space.$1 })}>
+        <ProfileSection.ItemList id='connectedAccounts'>
           {accounts.map(account => {
             const label = account.username || account.emailAddress;
             const error = account.verification?.error?.longMessage;
@@ -44,7 +44,7 @@ export const ConnectedAccountsSection = () => {
             return (
               <Action.Root key={account.id}>
                 <Action.Closed value=''>
-                  <Flex sx={t => ({ justifyContent: 'space-between', padding: `${t.space.$0x5} ${t.space.$4}` })}>
+                  <ProfileSection.Item id='connectedAccounts'>
                     <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2 })}>
                       <Image
                         elementDescriptor={[descriptors.providerIcon]}
@@ -71,7 +71,7 @@ export const ConnectedAccountsSection = () => {
                     </Flex>
 
                     <ConnectedAccountMenu account={account} />
-                  </Flex>
+                  </ProfileSection.Item>
                 </Action.Closed>
 
                 <Action.Open value='remove'>
@@ -84,14 +84,12 @@ export const ConnectedAccountsSection = () => {
           })}
 
           <Action.Trigger value='add'>
-            <Button
+            <ProfileSection.Button
               id='connectedAccounts'
-              variant='ghost'
-              sx={t => ({ justifyContent: 'start', padding: `${t.space.$0x5} ${t.space.$4}` })}
               localizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
             />
           </Action.Trigger>
-        </Col>
+        </ProfileSection.ItemList>
 
         <Action.Open value='add'>
           <Action.Card>
@@ -99,7 +97,7 @@ export const ConnectedAccountsSection = () => {
           </Action.Card>
         </Action.Open>
       </Action.Root>
-    </ProfileSection>
+    </ProfileSection.Root>
   );
 };
 

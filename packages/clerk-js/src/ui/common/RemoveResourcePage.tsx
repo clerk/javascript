@@ -14,7 +14,7 @@ type RemovePageProps = {
   messageLine2: LocalizationKey;
   successMessage: LocalizationKey;
   deleteResource: () => Promise<any>;
-  Breadcrumbs: React.ComponentType<any> | null;
+  Breadcrumbs?: React.ComponentType<any> | null;
 };
 
 export const RemoveResourcePage = withCardStateProvider((props: RemovePageProps) => {

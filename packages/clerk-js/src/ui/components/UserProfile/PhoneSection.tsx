@@ -1,30 +1,30 @@
 import { useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/types';
 
-import { Badge, Button, Col, Flex, localizationKeys, Text } from '../../customizables';
+import { Badge, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError, stringToFormattedPhoneString } from '../../utils';
 import { PhoneForm } from './PhoneForm';
-import { RemovePhoneForm } from './RemoveResourcePage';
+import { RemovePhoneForm } from './RemoveResourceForm';
 import { primaryIdentificationFirst } from './utils';
 
 export const PhoneSection = () => {
   const { user } = useUser();
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('userProfile.start.phoneNumbersSection.title')}
       id='phoneNumbers'
     >
       <Action.Root>
-        <Col sx={t => ({ gap: t.space.$1 })}>
+        <ProfileSection.ItemList id='phoneNumbers'>
           {user?.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
-            <Action.Root key={phone.phoneNumber}>
+            <Action.Root key={phone.id}>
               <Action.Closed value=''>
-                <Flex sx={t => ({ justifyContent: 'space-between', padding: `${t.space.$0x5} ${t.space.$4}` })}>
+                <ProfileSection.Item id='phoneNumbers'>
                   <Text>
                     {stringToFormattedPhoneString(phone.phoneNumber)}{' '}
                     {user?.primaryPhoneNumberId === phone.id && (
@@ -36,7 +36,7 @@ export const PhoneSection = () => {
                   </Text>
 
                   <PhoneMenu phone={phone} />
-                </Flex>
+                </ProfileSection.Item>
               </Action.Closed>
 
               <Action.Open value='remove'>
@@ -54,14 +54,12 @@ export const PhoneSection = () => {
           ))}
 
           <Action.Trigger value='add'>
-            <Button
+            <ProfileSection.Button
               id='phoneNumbers'
-              variant='ghost'
-              sx={t => ({ justifyContent: 'start', padding: `${t.space.$0x5} ${t.space.$4}` })}
               localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
             />
           </Action.Trigger>
-        </Col>
+        </ProfileSection.ItemList>
 
         <Action.Open value='add'>
           <Action.Card>
@@ -69,7 +67,7 @@ export const PhoneSection = () => {
           </Action.Card>
         </Action.Open>
       </Action.Root>
-    </ProfileSection>
+    </ProfileSection.Root>
   );
 };
 

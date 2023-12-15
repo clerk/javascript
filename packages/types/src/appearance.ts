@@ -333,6 +333,8 @@ export type ElementsConfig = {
   modalCloseButton: WithOptions;
 
   profileSection: WithOptions<ProfileSectionId>;
+  profileSectionItemList: WithOptions<ProfileSectionId>;
+  profileSectionItem: WithOptions<ProfileSectionId>;
   profileSectionTitle: WithOptions<ProfileSectionId>;
   profileSectionTitleText: WithOptions<ProfileSectionId>;
   profileSectionSubtitle: WithOptions<ProfileSectionId>;

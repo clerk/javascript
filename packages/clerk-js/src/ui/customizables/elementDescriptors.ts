@@ -216,6 +216,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'modalCloseButton',
 
   'profileSection',
+  'profileSectionItemList',
+  'profileSectionItem',
   'profileSectionTitle',
   'profileSectionTitleText',
   'profileSectionSubtitle',

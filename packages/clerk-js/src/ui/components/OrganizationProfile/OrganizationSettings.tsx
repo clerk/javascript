@@ -47,7 +47,7 @@ const OrganizationProfileSection = () => {
   const profile = <OrganizationPreview organization={organization} />;
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('organizationProfile.profilePage.title')}
       id='organizationProfile'
     >
@@ -57,7 +57,7 @@ const OrganizationProfileSection = () => {
       >
         <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton>
       </Gate>
-    </ProfileSection>
+    </ProfileSection.Root>
   );
 };
 
@@ -76,7 +76,7 @@ const OrganizationDomainsSection = () => {
   }
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
       subtitle={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
       id='organizationDomains'
@@ -90,7 +90,7 @@ const OrganizationDomainsSection = () => {
           onClick={() => navigate('domain')}
         />
       </Gate>
-    </ProfileSection>
+    </ProfileSection.Root>
   );
 };
 
@@ -106,7 +106,7 @@ const OrganizationDangerSection = () => {
   const adminDeleteEnabled = organization.adminDeleteEnabled;
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       id='organizationDanger'
       title={localizationKeys('organizationProfile.profilePage.dangerSection.title')}
       sx={t => ({ marginBottom: t.space.$4 })}
@@ -143,6 +143,6 @@ const OrganizationDangerSection = () => {
           />
         )}
       </Flex>
-    </ProfileSection>
+    </ProfileSection.Root>
   );
 };

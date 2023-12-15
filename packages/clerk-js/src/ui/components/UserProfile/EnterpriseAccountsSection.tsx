@@ -1,77 +1,48 @@
 import { useUser } from '@clerk/shared/react';
-import type { SamlAccountResource } from '@clerk/types';
 
-import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
-import { ProfileSection, UserPreview } from '../../elements';
+import { Badge, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { ProfileSection } from '../../elements';
 import { useSaml } from '../../hooks';
-import { useRouter } from '../../router';
-import { UserProfileAccordion } from './UserProfileAccordion';
 
 export const EnterpriseAccountsSection = () => {
   const { user } = useUser();
+  const { getSamlProviderLogoUrl, getSamlProviderName } = useSaml();
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('userProfile.start.enterpriseAccountsSection.title')}
       id='enterpriseAccounts'
     >
-      {user?.samlAccounts.map(account => (
-        <EnterpriseAccountAccordion
-          key={account.id}
-          account={account}
-        />
-      ))}
-    </ProfileSection>
-  );
-};
+      <ProfileSection.Item id='enterpriseAccounts'>
+        {user?.samlAccounts.map(account => {
+          const label = account.emailAddress;
+          const providerName = getSamlProviderName(account.provider);
+          const providerLogoUrl = getSamlProviderLogoUrl(account.provider);
+          const error = account.verification?.error?.longMessage;
 
-const EnterpriseAccountAccordion = ({ account }: { account: SamlAccountResource }) => {
-  const router = useRouter();
-  const { getSamlProviderLogoUrl, getSamlProviderName } = useSaml();
-  const error = account.verification?.error?.longMessage;
-  const label = account.emailAddress;
-  const providerName = getSamlProviderName(account.provider);
-  const providerLogoUrl = getSamlProviderLogoUrl(account.provider);
-
-  return (
-    <UserProfileAccordion
-      onCloseCallback={router.urlStateParam?.clearUrlStateParam}
-      icon={
-        <Image
-          elementDescriptor={[descriptors.providerIcon]}
-          elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
-          alt={providerName}
-          src={providerLogoUrl}
-          sx={theme => ({ width: theme.sizes.$4 })}
-        />
-      }
-      title={
-        <Flex
-          gap={2}
-          center
-        >
-          {`${providerName} ${label ? `(${label})` : ''}`}
-          {error && (
-            <Badge
-              colorScheme='danger'
-              localizationKey={localizationKeys('badge__requiresAction')}
-            />
-          )}
-        </Flex>
-      }
-    >
-      <Col gap={4}>
-        <UserPreview
-          samlAccount={account}
-          icon={
-            <Image
-              alt={providerName}
-              src={providerLogoUrl}
-              sx={theme => ({ width: theme.sizes.$4 })}
-            />
-          }
-        />
-      </Col>
-    </UserProfileAccordion>
+          return (
+            <Flex
+              key={account.id}
+              sx={t => ({ gap: t.space.$2 })}
+            >
+              <Image
+                elementDescriptor={[descriptors.providerIcon]}
+                elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+                alt={providerName}
+                src={providerLogoUrl}
+                sx={theme => ({ width: theme.sizes.$4 })}
+              />
+              <Text>{`${providerName} ${label ? `(${label})` : ''}`}</Text>
+              {error && (
+                <Badge
+                  colorScheme='danger'
+                  localizationKey={localizationKeys('badge__requiresAction')}
+                />
+              )}
+            </Flex>
+          );
+        })}
+      </ProfileSection.Item>
+    </ProfileSection.Root>
   );
 };

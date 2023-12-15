@@ -1,30 +1,30 @@
 import { useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
 
-import { Badge, Button, Col, Flex, localizationKeys, Text } from '../../customizables';
+import { Badge, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { EmailForm } from './EmailForm';
-import { RemoveEmailForm } from './RemoveResourcePage';
+import { RemoveEmailForm } from './RemoveResourceForm';
 import { primaryIdentificationFirst } from './utils';
 
 export const EmailsSection = () => {
   const { user } = useUser();
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('userProfile.start.emailAddressesSection.title')}
       id='emailAddresses'
     >
       <Action.Root>
-        <Col sx={t => ({ gap: t.space.$1 })}>
+        <ProfileSection.ItemList id='emailAddresses'>
           {user?.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
             <Action.Root key={email.emailAddress}>
               <Action.Closed value=''>
-                <Flex sx={t => ({ justifyContent: 'space-between', padding: `${t.space.$0x5} ${t.space.$4}` })}>
+                <ProfileSection.Item id='emailAddresses'>
                   <Text>
                     {email.emailAddress}{' '}
                     {user?.primaryEmailAddressId === email.id && (
@@ -36,7 +36,7 @@ export const EmailsSection = () => {
                   </Text>
 
                   <EmailMenu email={email} />
-                </Flex>
+                </ProfileSection.Item>
               </Action.Closed>
 
               <Action.Open value='remove'>
@@ -54,14 +54,12 @@ export const EmailsSection = () => {
           ))}
 
           <Action.Trigger value='add'>
-            <Button
+            <ProfileSection.Button
               id='emailAddresses'
-              variant='ghost'
-              sx={t => ({ justifyContent: 'start', padding: `${t.space.$1} ${t.space.$4}` })}
               localizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
             />
           </Action.Trigger>
-        </Col>
+        </ProfileSection.ItemList>
 
         <Action.Open value='add'>
           <Action.Card>
@@ -69,7 +67,7 @@ export const EmailsSection = () => {
           </Action.Card>
         </Action.Open>
       </Action.Root>
-    </ProfileSection>
+    </ProfileSection.Root>
   );
 };
 
@@ -80,7 +78,7 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
   const isPrimary = user?.primaryEmailAddressId === email.id;
   const isVerified = email.verification.status === 'verified';
   const setPrimary = () => {
-    return user!.update({ primaryEmailAddressId: email.id }).catch(e => handleError(e, [], card.setError));
+    return user?.update({ primaryEmailAddressId: email.id }).catch(e => handleError(e, [], card.setError));
   };
 
   const actions = (
