@@ -13,7 +13,7 @@ describe('ResetPassword', () => {
     const { wrapper } = await createFixtures();
 
     render(<ResetPassword />, { wrapper });
-    screen.getByRole('heading', { name: /Reset password/i });
+    screen.getByRole('heading', { name: /Set new password/i });
 
     screen.getByLabelText(/New password/i);
     screen.getByLabelText(/Confirm password/i);
@@ -34,7 +34,7 @@ describe('ResetPassword', () => {
 
     await runFakeTimers(async () => {
       render(<ResetPassword />, { wrapper });
-      screen.getByRole('heading', { name: /Reset password/i });
+      screen.getByRole('heading', { name: /Set new password/i });
 
       const passwordField = screen.getByLabelText(/New password/i);
       fireEvent.focus(passwordField);

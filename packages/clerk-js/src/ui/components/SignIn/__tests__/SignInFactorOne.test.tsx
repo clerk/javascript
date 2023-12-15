@@ -141,7 +141,7 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText(/Forgot password/i));
         screen.getByText('Use another method');
-        expect(screen.queryByText('Or, sign in with another method.')).not.toBeInTheDocument();
+        expect(screen.queryByText('Or, sign in with another method')).not.toBeInTheDocument();
         screen.getByText(`Email code to ${email}`);
         expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
       });
@@ -162,10 +162,9 @@ describe('SignInFactorOne', () => {
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         await userEvent.click(screen.getByText(/Forgot password/i));
         screen.getByText('Forgot Password?');
-        screen.getByText('Or, sign in with another method.');
+        screen.getByText('Or, sign in with another method');
         await userEvent.click(screen.getByText('Reset your password'));
-        screen.getByText('Check your email');
-        screen.getByText('to reset your password');
+        screen.getByText('First, enter the code sent to your email ID');
       });
 
       it('shows a UI error when submission fails', async () => {
@@ -247,8 +246,7 @@ describe('SignInFactorOne', () => {
         screen.getByText('Forgot Password?');
 
         await userEvent.click(screen.getByText('Reset your password'));
-        screen.getByText('Check your phone');
-        screen.getByText('to reset your password');
+        screen.getByText('First, enter the code sent to your phone');
       });
 
       it('redirects to `reset-password` on successful code verification', async () => {
@@ -701,7 +699,7 @@ describe('SignInFactorOne', () => {
       screen.getByText(`Email link to ${email}`);
       await userEvent.click(screen.getByText(`Email link to ${email}`));
       screen.getByText('Check your email');
-      screen.getByText('Verification link');
+      screen.getByText('Use the verification link sent to your email');
     });
 
     it('clicking the email code method should show the email code input', async () => {
