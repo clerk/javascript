@@ -1,4 +1,4 @@
-import { AuthStatus, sanitizeAuthObject } from '@clerk/backend';
+import { AuthStatus, sanitizeAuthObject } from '@clerk/backend/internal';
 import { redirect } from '@remix-run/server-runtime';
 
 import { noLoaderArgsPassedInGetAuth } from '../errors';

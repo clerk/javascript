@@ -1,5 +1,5 @@
-import type { AuthenticateRequestOptions, RequestState } from '@clerk/backend';
-import { buildRequestUrl, constants } from '@clerk/backend';
+import type { AuthenticateRequestOptions, RequestState } from '@clerk/backend/internal';
+import { buildRequestUrl, constants } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';

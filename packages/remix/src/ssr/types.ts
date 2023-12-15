@@ -1,4 +1,5 @@
-import type { AuthObject, Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
+import type { Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
+import type { AuthObject } from '@clerk/backend/internal';
 import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 

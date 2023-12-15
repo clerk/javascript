@@ -1,10 +1,9 @@
-import type { AuthObject } from '@clerk/backend';
-import { prunePrivateMetadata } from '@clerk/backend';
+import type { AuthObject } from '@clerk/backend/internal';
+import { constants, prunePrivateMetadata } from '@clerk/backend/internal';
 import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
 
 import { SECRET_KEY } from '../constants';
-import { constants } from './clerkClient';
 
 /**
  * @internal

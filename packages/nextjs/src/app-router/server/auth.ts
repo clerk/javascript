@@ -1,4 +1,4 @@
-import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend';
+import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,

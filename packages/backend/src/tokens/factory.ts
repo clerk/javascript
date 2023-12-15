@@ -32,11 +32,17 @@ const defaultOptions = {
   audience: '',
 } satisfies BuildTimeOptions;
 
+/**
+ * @internal
+ */
 export type CreateAuthenticateRequestOptions = {
   options: BuildTimeOptions;
   apiClient: ApiClient;
 };
 
+/**
+ * @internal
+ */
 export function createAuthenticateRequest(params: CreateAuthenticateRequestOptions) {
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
 

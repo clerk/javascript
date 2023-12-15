@@ -1,4 +1,4 @@
-import { constants, redirect } from '@clerk/backend';
+import { constants, redirect } from '@clerk/backend/internal';
 import { NextResponse } from 'next/server';
 
 import { setHeader } from '../utils';
