@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useEnvironment } from '../../contexts';
 import { descriptors, Flex } from '../../customizables';
 import type { PropsOfComponent } from '../../styledSystem';
 import { PoweredByClerkTag } from '..';
@@ -29,6 +30,7 @@ const CardFooterItem = React.forwardRef<HTMLDivElement, CardFooterItemProps>((pr
 type CardFooterProps = PropsOfComponent<typeof Flex>;
 export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((props, ref) => {
   const { children, sx, ...rest } = props;
+  const { branded } = useEnvironment().displayConfig;
   return (
     <Flex
       direction='col'
@@ -53,9 +55,11 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       ref={ref}
     >
       {children}
-      <CardFooterItem>
-        <PoweredByClerkTag />
-      </CardFooterItem>
+      {branded && (
+        <CardFooterItem>
+          <PoweredByClerkTag />
+        </CardFooterItem>
+      )}
     </Flex>
   );
 });

@@ -120,9 +120,10 @@ const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOpt
 };
 
 export type OTPInputProps = {
-  label: string | LocalizationKey;
-  description: string | LocalizationKey;
+  // TODO-RETHEME make label required again
+  label?: string | LocalizationKey;
   resendButton?: LocalizationKey;
+  description?: string | LocalizationKey;
   isLoading: boolean;
   isDisabled?: boolean;
   onResendCode?: React.MouseEventHandler<HTMLButtonElement>;

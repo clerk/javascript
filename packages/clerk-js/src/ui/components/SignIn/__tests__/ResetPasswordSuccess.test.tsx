@@ -18,7 +18,7 @@ describe('ResetPasswordSuccess', () => {
     const { wrapper } = await createFixtures();
 
     render(<ResetPasswordSuccess />, { wrapper });
-    screen.getByRole('heading', { name: /Reset password/i });
+    screen.getByRole('heading', { name: /Set new password/i });
     screen.getByText(/Your password was successfully changed. Signing you in, please wait a moment/i);
   });
 

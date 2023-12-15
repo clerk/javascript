@@ -1,7 +1,12 @@
+import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, localizationKeys, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 
-export const Divider = (props: Omit<PropsOfComponent<typeof Flex>, 'elementDescriptor'>) => {
+type DividerProps = Omit<PropsOfComponent<typeof Flex>, 'elementDescriptor'> & {
+  deviderText?: LocalizationKey;
+};
+
+export const Divider = (props: DividerProps) => {
   return (
     <Flex
       center
@@ -10,7 +15,7 @@ export const Divider = (props: Omit<PropsOfComponent<typeof Flex>, 'elementDescr
     >
       <DividerLine />
       <Text
-        localizationKey={localizationKeys('dividerText')}
+        localizationKey={!props.deviderText ? localizationKeys('dividerText') : props.deviderText}
         elementDescriptor={descriptors.dividerText}
         variant='subtitle'
         colorScheme='neutral'

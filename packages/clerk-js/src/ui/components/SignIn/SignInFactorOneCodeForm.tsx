@@ -24,8 +24,11 @@ export type SignInFactorOneCodeCard = Pick<
 export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
-  formTitle: LocalizationKey;
-  formSubtitle: LocalizationKey;
+  inputLabel: LocalizationKey;
+  // TODO-RETHEME remove
+  formTitle?: LocalizationKey;
+  // TODO-RETHEME remove
+  formSubtitle?: LocalizationKey;
   resendButton: LocalizationKey;
 };
 
@@ -86,8 +89,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     <VerificationCodeCard
       cardTitle={props.cardTitle}
       cardSubtitle={props.cardSubtitle}
-      formTitle={props.formTitle}
-      formSubtitle={props.formSubtitle}
+      inputLabel={props.inputLabel}
       resendButton={props.resendButton}
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}

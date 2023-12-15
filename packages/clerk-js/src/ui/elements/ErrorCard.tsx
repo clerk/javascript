@@ -4,6 +4,7 @@ import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Flow, Icon, localizationKeys, Text } from '../customizables';
 import { useSupportEmail } from '../hooks/useSupportEmail';
 import { Email } from '../icons';
+import { useRouter } from '../router';
 import { ArrowBlockButton } from './ArrowBlockButton';
 import { Card } from './Card';
 import { useCardState } from './contexts';
@@ -19,52 +20,65 @@ type ErrorCardProps = {
 
 export const ErrorCard = (props: ErrorCardProps) => {
   const card = useCardState();
+  const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
 
   const handleEmailSupport = () => {
     window.location.href = `mailto:${supportEmail}`;
   };
 
+  const goBack = () => {
+    void navigate('../');
+  };
+
   return (
     <Flow.Part part='havingTrouble'>
       <Card.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
-          <Header.Title localizationKey={props.cardTitle || 'Error'} />
-          {props.cardSubtitle && <Header.Subtitle localizationKey={props.cardSubtitle} />}
-        </Header.Root>
-        {/*TODO: extract main in its own component */}
-        <Flex
-          direction='col'
-          elementDescriptor={descriptors.main}
-          gap={4}
-        >
-          {props.message && (
+        <Card.Content>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Header.Root>
+            <Header.Title localizationKey={props.cardTitle || 'Error'} />
+            {props.cardSubtitle && <Header.Subtitle localizationKey={props.cardSubtitle} />}
+          </Header.Root>
+          {/*TODO: extract main in its own component */}
+          <Flex
+            direction='col'
+            elementDescriptor={descriptors.main}
+            gap={4}
+          >
+            {props.message && (
+              <Text
+                colorScheme='neutral'
+                localizationKey={props.message}
+              />
+            )}
+            {/*TODO: extract  */}
             <Text
               colorScheme='neutral'
-              localizationKey={props.message}
+              localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.content')}
             />
-          )}
-          {/*TODO: extract  */}
-          <Text
-            colorScheme='neutral'
-            localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.content')}
-          />
-          <ArrowBlockButton
-            textLocalizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
-            onClick={handleEmailSupport}
-            leftIcon={
-              <Icon
-                icon={Email}
-                sx={theme => ({ color: theme.colors.$blackAlpha500 })}
+            <ArrowBlockButton
+              textLocalizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
+              onClick={handleEmailSupport}
+              leftIcon={
+                <Icon
+                  icon={Email}
+                  sx={theme => ({ color: theme.colors.$blackAlpha500 })}
+                />
+              }
+            />
+          </Flex>
+          <Footer.Root>
+            <Footer.Action elementId='alternativeMethods'>
+              <Footer.ActionLink
+                localizationKey={localizationKeys('backButton')}
+                onClick={goBack}
               />
-            }
-          />
-        </Flex>
-        <Footer.Root>
-          <Footer.Action />
-          <Footer.Links />
-        </Footer.Root>
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root>
+        </Card.Content>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );

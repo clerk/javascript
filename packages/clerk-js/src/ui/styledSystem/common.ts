@@ -105,7 +105,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
         };
   return {
     normal: {
-      borderRadius: t.radii.$lg,
+      borderRadius: t.radii.$md,
       border: 'none',
       boxShadow: defaultBoxShadow,
       transitionProperty: t.transitionProperty.$common,

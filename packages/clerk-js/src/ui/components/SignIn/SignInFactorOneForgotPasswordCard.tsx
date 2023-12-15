@@ -5,7 +5,7 @@ import type { SignInFactorOneCodeCard, SignInFactorOneCodeFormProps } from './Si
 import { SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
 
 type SignInForgotPasswordCardProps = SignInFactorOneCodeCard &
-  Pick<SignInFactorOneCodeFormProps, 'cardTitle' | 'formSubtitle'> & {
+  Pick<SignInFactorOneCodeFormProps, 'cardSubtitle'> & {
     factor: ResetPasswordCodeFactor;
   };
 
@@ -15,8 +15,8 @@ export const SignInFactorOneForgotPasswordCard = (props: SignInForgotPasswordCar
       <SignInFactorOneCodeForm
         {...props}
         showAlternativeMethods={false}
-        cardSubtitle={localizationKeys('signIn.forgotPassword.subtitle')}
-        formTitle={localizationKeys('signIn.forgotPassword.formTitle')}
+        cardTitle={localizationKeys('signIn.forgotPassword.title')}
+        inputLabel={localizationKeys('signIn.forgotPassword.inputLabel')}
         resendButton={localizationKeys('signIn.forgotPassword.resendButton')}
       />
     </Flow.Part>

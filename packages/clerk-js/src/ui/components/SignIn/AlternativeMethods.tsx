@@ -2,8 +2,8 @@ import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { descriptors, Flex, Flow, localizationKeys, Text } from '../../customizables';
-import { ArrowBlockButton, BackLink, Card, Footer, Header } from '../../elements';
+import { Button, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
+import { ArrowBlockButton, BackLink, Card, Divider, Footer, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { ChatAltIcon, Email, LinkIcon, LockClosedIcon, RequestAuthIcon } from '../../icons';
@@ -46,20 +46,20 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                 asForgotPassword ? 'signIn.forgotPasswordAlternativeMethods.title' : 'signIn.alternativeMethods.title',
               )}
             />
+            {!asForgotPassword && (
+              <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
+            )}
           </Header.Root>
           {/*TODO: extract main in its own component */}
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}
-            gap={6}
+            gap={4}
           >
             {asForgotPassword && resetPasswordFactor && (
-              <ArrowBlockButton
-                leftIcon={getButtonIcon(resetPasswordFactor)}
-                textLocalizationKey={getButtonLabel(resetPasswordFactor)}
+              <Button
+                localizationKey={getButtonLabel(resetPasswordFactor)}
                 elementDescriptor={descriptors.alternativeMethodsBlockButton}
-                textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
-                arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
                 isDisabled={card.isLoading}
                 onClick={() => onFactorSelected(resetPasswordFactor)}
               />
@@ -67,10 +67,8 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
             {hasAnyStrategy && (
               <>
                 {asForgotPassword && (
-                  <Text
-                    localizationKey={localizationKeys(
-                      'signIn.forgotPasswordAlternativeMethods.label__alternativeMethods',
-                    )}
+                  <Divider
+                    deviderText={localizationKeys('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}
                   />
                 )}
                 <Flex
@@ -113,8 +111,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
         <Card.Footer>
           <Footer.Root key='signIn.alternativeMethods.actionLink'>
             <Footer.Action elementId='havingTrouble'>
-              {/* TODO: Add text "Don’t have any of these?" */}
-              {/* <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} /> */}
+              <Footer.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
               <Footer.ActionLink
                 localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
                 onClick={onHavingTroubleClick}

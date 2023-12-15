@@ -11,8 +11,11 @@ import { completeSignUpFlow } from './util';
 type SignInFactorOneCodeFormProps = {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
-  formTitle: LocalizationKey;
-  formSubtitle: LocalizationKey;
+  inputLabel?: LocalizationKey;
+  // TODO-RETHEME remove
+  formTitle?: LocalizationKey;
+  // TODO-RETHEME remove
+  formSubtitle?: LocalizationKey;
   resendButton: LocalizationKey;
   prepare: () => Promise<SignUpResource> | undefined;
   attempt: (code: string) => Promise<SignUpResource>;

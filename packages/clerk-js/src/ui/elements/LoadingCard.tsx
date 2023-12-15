@@ -30,8 +30,10 @@ export const LoadingCard = withCardStateProvider(() => {
   const card = useCardState();
   return (
     <Card.Root>
-      <Card.Alert>{card.error}</Card.Alert>
-      <LoadingCardContainer />
+      <Card.Content>
+        <Card.Alert>{card.error}</Card.Alert>
+        <LoadingCardContainer />
+      </Card.Content>
     </Card.Root>
   );
 });

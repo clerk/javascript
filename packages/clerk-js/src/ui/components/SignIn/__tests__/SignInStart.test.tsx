@@ -14,7 +14,7 @@ describe('SignInStart', () => {
       f.withSupportEmail();
     });
     render(<SignInStart />, { wrapper });
-    screen.getByText('Sign in');
+    screen.getAllByText(/sign in to .*/i);
   });
 
   describe('Login Methods', () => {

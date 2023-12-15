@@ -56,8 +56,9 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         {
           gap: theme.space.$4,
           position: 'relative',
-          justifyContent: 'flex-start',
+          justifyContent: 'center',
           borderColor: theme.colors.$blackAlpha200,
+          alignItems: 'center',
           '--arrow-opacity': '0',
           '--arrow-transform': `translateX(-${theme.space.$2});`,
           '&:hover,&:focus ': {
@@ -71,7 +72,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
       {(isLoading || leftIcon) && (
         <Flex
           as='span'
-          center
           sx={theme => ({ flex: `0 0 ${theme.space.$5}` })}
         >
           {isLoading ? (
@@ -89,7 +89,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
                 theme => ({
                   color: theme.colors.$blackAlpha600,
                   width: theme.sizes.$5,
-                  position: 'absolute',
                 }),
                 leftIconSx,
               ]}
@@ -100,11 +99,8 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         </Flex>
       )}
       <Flex
-        justify='start'
-        align='center'
         gap={2}
         sx={{
-          width: '100%',
           overflow: 'hidden',
         }}
       >
