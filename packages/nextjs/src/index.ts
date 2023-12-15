@@ -61,8 +61,8 @@ import * as ComponentsModule from '#components';
 
 import type { ServerComponentsServerModuleTypes } from './components.server';
 
-export const ClerkProvider =
-  ComponentsModule.ClerkProvider as unknown as ServerComponentsServerModuleTypes['ClerkProvider'];
-export const SignedIn = ComponentsModule.SignedIn as unknown as ServerComponentsServerModuleTypes['SignedIn'];
-export const SignedOut = ComponentsModule.SignedOut as unknown as ServerComponentsServerModuleTypes['SignedOut'];
-export const Protect = ComponentsModule.Protect as unknown as ServerComponentsServerModuleTypes['Protect'];
+export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsServerModuleTypes['ClerkProvider'];
+export const SignedIn = ComponentsModule.SignedIn as ServerComponentsServerModuleTypes['SignedIn'];
+export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerModuleTypes['SignedOut'];
+
+export const Protect = ComponentsModule.Protect;

@@ -15,7 +15,6 @@ export function ClerkProvider(props: NextAppClerkProviderProps) {
   return (
     <ClientClerkProvider
       {...mergeNextClerkPropsWithEnv(rest)}
-      // @ts-ignore
       initialState={state}
     >
       {children}
