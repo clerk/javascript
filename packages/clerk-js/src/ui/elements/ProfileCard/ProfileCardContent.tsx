@@ -2,9 +2,7 @@ import React from 'react';
 
 import { Col, descriptors } from '../../customizables';
 import { useRouter } from '../../router';
-import type { PropsOfComponent } from '../../styledSystem';
-import { animations, common, mqu } from '../../styledSystem';
-import { Alert } from '..';
+import { common, mqu } from '../../styledSystem';
 
 type ProfileCardContentProps = React.PropsWithChildren<{ contentRef?: React.RefObject<HTMLDivElement> }>;
 export const ProfileCardContent = (props: ProfileCardContentProps) => {
@@ -45,7 +43,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         elementDescriptor={descriptors.pageScrollBox}
         sx={theme => ({
           flex: `1`,
-          padding: `${theme.space.$10} ${theme.space.$8}`,
+          padding: `${theme.space.$7} ${theme.space.$8}`,
           [mqu.xs]: {
             padding: `${theme.space.$8} ${theme.space.$5}`,
           },
@@ -58,16 +56,3 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
     </Col>
   );
 };
-
-export const CardAlert = React.memo((props: PropsOfComponent<typeof Alert>) => {
-  return (
-    <Alert
-      variant='danger'
-      sx={theme => ({
-        willChange: 'transform, opacity, height',
-        animation: `${animations.textInBig} ${theme.transitionDuration.$slow}`,
-      })}
-      {...props}
-    />
-  );
-});

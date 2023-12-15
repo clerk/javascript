@@ -21,7 +21,7 @@ export const DeleteSection = () => {
           </Action.Trigger>
         </Action.Closed>
 
-        <Action.Open value='edit'>
+        <Action.Open value='delete'>
           <Action.Card>
             <DeleteUserForm />
           </Action.Card>

@@ -275,7 +275,7 @@ export const enUS: LocalizationResource = {
       description: 'Manage your account info.',
     },
     start: {
-      headerTitle__account: 'Profile details',
+      headerTitle__account: 'Profile',
       headerTitle__security: 'Security',
       usernameSection: {
         title: 'Username',
