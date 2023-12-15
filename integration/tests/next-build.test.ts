@@ -54,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   });
 
   test.afterAll(async () => {
-    await app.teardown();
+    // await app.teardown();
   });
 
   test('When <ClerkProvider /> is used as a client component, builds successfully and does not force dynamic rendering', () => {
