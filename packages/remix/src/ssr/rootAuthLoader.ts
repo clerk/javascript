@@ -47,6 +47,7 @@ export const rootAuthLoader: RootAuthLoader = async (
     ? handlerOrOptions
     : {};
 
+  // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
   const requestState = await authenticateRequest(args, opts);
 
   if (!handler) {

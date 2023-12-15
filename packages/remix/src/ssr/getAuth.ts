@@ -10,6 +10,8 @@ export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): 
   if (!args || (args && (!args.request || !args.context))) {
     throw new Error(noLoaderArgsPassedInGetAuth);
   }
+
+  // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
   const requestState = await authenticateRequest(args, opts);
 
   return sanitizeAuthObject(requestState.toAuth());
