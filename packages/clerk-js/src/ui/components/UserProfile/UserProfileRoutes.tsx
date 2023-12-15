@@ -3,7 +3,6 @@ import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
-import { DeletePage } from './DeletePage';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { MfaPage } from './MfaPage';
 import { RemoveMfaPhoneCodePage, RemoveMfaTOTPPage, RemoveWeb3WalletPage } from './RemoveResourcePage';
@@ -79,12 +78,6 @@ export const UserProfileRoutes = () => {
         </Route>
         <Route path={isSecurityPageRoot ? undefined : 'security'}>
           <Switch>
-            <Route
-              path='delete'
-              flowStart
-            >
-              <DeletePage />
-            </Route>
             <Route index>
               <SecurityPage />
             </Route>

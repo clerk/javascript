@@ -386,9 +386,11 @@ export const enUS: LocalizationResource = {
         destructiveAction: 'Remove wallet',
       },
       dangerSection: {
-        title: 'Danger',
+        title: 'Account termination',
         deleteAccountButton: 'Delete Account',
+        //TODO-RETHEME remove
         deleteAccountTitle: 'Delete Account',
+        //TODO-RETHEME remove
         deleteAccountDescription: 'Delete your account and all its associated data',
       },
     },

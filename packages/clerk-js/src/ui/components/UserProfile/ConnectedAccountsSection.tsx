@@ -3,7 +3,7 @@ import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy 
 
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
-import { Badge, Button, Col, Flex, localizationKeys, Text } from '../../customizables';
+import { Badge, Button, Col, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -45,15 +45,30 @@ export const ConnectedAccountsSection = () => {
               <Action.Root key={account.id}>
                 <Action.Closed value=''>
                   <Flex sx={t => ({ justifyContent: 'space-between', padding: `${t.space.$0x5} ${t.space.$4}` })}>
-                    <Text>
-                      {`${providerToDisplayData[account.provider].name} ${label ? `(${label})` : ''}`}
+                    <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2 })}>
+                      <Image
+                        elementDescriptor={[descriptors.providerIcon]}
+                        elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
+                        alt={providerToDisplayData[account.provider].name}
+                        src={providerToDisplayData[account.provider].iconUrl}
+                        sx={theme => ({ width: theme.sizes.$4 })}
+                      />
+                      <Text>
+                        <Text as='span'>{`${providerToDisplayData[account.provider].name}`}</Text>{' '}
+                        <Text
+                          as='span'
+                          sx={t => ({ color: t.colors.$blackAlpha400 })}
+                        >
+                          {label ? `• ${label}` : ''}
+                        </Text>
+                      </Text>
                       {(error || reauthorizationRequired) && (
                         <Badge
                           colorScheme='danger'
                           localizationKey={localizationKeys('badge__requiresAction')}
                         />
                       )}
-                    </Text>
+                    </Flex>
 
                     <ConnectedAccountMenu account={account} />
                   </Flex>
