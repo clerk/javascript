@@ -18,7 +18,7 @@ export type VerificationCodeCardProps = {
   formTitle?: LocalizationKey;
   //TODO-RETHEME remove
   formSubtitle?: LocalizationKey;
-  inputLabel: LocalizationKey;
+  inputLabel?: LocalizationKey;
   safeIdentifier?: string | undefined | null;
   resendButton?: LocalizationKey;
   profileImageUrl?: string;

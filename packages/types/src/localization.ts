@@ -228,6 +228,7 @@ type _LocalizationResource = {
     phoneCode: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      inputLabel: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
