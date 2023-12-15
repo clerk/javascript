@@ -207,7 +207,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     }
 
     if (requestState.status === AuthStatus.Handshake) {
-      throw new Error('Unexpected handshake without redirect');
+      throw new Error('Clerk: unexpected handshake without redirect');
     }
 
     const auth = Object.assign(requestState.toAuth(), {

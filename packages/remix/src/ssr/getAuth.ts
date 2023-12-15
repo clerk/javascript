@@ -1,5 +1,4 @@
-import { AuthStatus, sanitizeAuthObject } from '@clerk/backend/internal';
-import { redirect } from '@remix-run/server-runtime';
+import { sanitizeAuthObject } from '@clerk/backend/internal';
 
 import { noLoaderArgsPassedInGetAuth } from '../errors';
 import { authenticateRequest } from './authenticateRequest';
@@ -11,13 +10,9 @@ export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): 
   if (!args || (args && (!args.request || !args.context))) {
     throw new Error(noLoaderArgsPassedInGetAuth);
   }
-  const requestState = await authenticateRequest(args, opts);
 
-  // TODO handle handshake
-  // this halts the execution of all nested loaders using getAuth
-  if (requestState.status === AuthStatus.Handshake) {
-    throw redirect('');
-  }
+  // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
+  const requestState = await authenticateRequest(args, opts);
 
   return sanitizeAuthObject(requestState.toAuth());
 }

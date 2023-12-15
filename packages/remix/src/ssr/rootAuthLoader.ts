@@ -1,6 +1,5 @@
-import { AuthStatus, sanitizeAuthObject } from '@clerk/backend/internal';
+import { sanitizeAuthObject } from '@clerk/backend/internal';
 import type { defer } from '@remix-run/server-runtime';
-import { redirect } from '@remix-run/server-runtime';
 import { isDeferredData } from '@remix-run/server-runtime/dist/responses';
 
 import { invalidRootLoaderCallbackReturn } from '../errors';
@@ -48,12 +47,8 @@ export const rootAuthLoader: RootAuthLoader = async (
     ? handlerOrOptions
     : {};
 
+  // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
   const requestState = await authenticateRequest(args, opts);
-
-  // TODO handle handshake
-  if (requestState.status === AuthStatus.Handshake) {
-    throw redirect('');
-  }
 
   if (!handler) {
     // if the user did not provide a handler, simply inject requestState into an empty response
