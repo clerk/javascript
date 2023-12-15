@@ -88,8 +88,8 @@ export const enUS: LocalizationResource = {
   signUp: {
     start: {
       title: 'Create your account',
-      subtitle: 'to continue to {{applicationName}}',
-      actionText: 'Have an account?',
+      subtitle: 'Welcome! Please fill in the details to get started.',
+      actionText: 'Already have an account?',
       actionLink: 'Sign in',
     },
     emailLink: {
@@ -112,22 +112,22 @@ export const enUS: LocalizationResource = {
     },
     emailCode: {
       title: 'Verify your email',
-      subtitle: 'to continue to {{applicationName}}',
+      subtitle: 'Enter the verification code sent to your email',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your email address',
       resendButton: "Didn't receive a code? Resend",
     },
     phoneCode: {
       title: 'Verify your phone',
-      subtitle: 'to continue to {{applicationName}}',
+      subtitle: 'Enter the verification code sent to your phone',
       formTitle: 'Verification code',
       formSubtitle: 'Enter the verification code sent to your phone number',
       resendButton: "Didn't receive a code? Resend",
     },
     continue: {
       title: 'Fill in missing fields',
-      subtitle: 'to continue to {{applicationName}}',
-      actionText: 'Have an account?',
+      subtitle: 'Please fill in the remaining details to continue.',
+      actionText: 'Already have an account?',
       actionLink: 'Sign in',
     },
   },
@@ -135,7 +135,7 @@ export const enUS: LocalizationResource = {
     start: {
       title: 'Sign in to {{applicationName}}',
       subtitle: 'Welcome back! Please sign in to continue',
-      actionText: 'No account?',
+      actionText: 'Don’t have an account?',
       actionLink: 'Sign up',
       actionLink__use_email: 'Use email',
       actionLink__use_phone: 'Use phone',
