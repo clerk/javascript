@@ -13,7 +13,7 @@
  */
 
 // @ts-ignore - These are package subpaths
-import crypto from '#crypto';
+import { webcrypto as crypto } from '#crypto';
 
 type Runtime = {
   crypto: Crypto;
