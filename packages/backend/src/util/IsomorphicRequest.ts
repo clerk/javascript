@@ -4,6 +4,9 @@ import runtime from '../runtime';
 import { buildRequestUrl } from '../utils';
 
 type IsomorphicRequestOptions = (Request: typeof runtime.Request, Headers: typeof runtime.Headers) => Request;
+/**
+ * @internal
+ */
 export const createIsomorphicRequest = (cb: IsomorphicRequestOptions): Request => {
   const req = cb(runtime.Request, runtime.Headers);
   // Used to fix request.url using the x-forwarded-* headers

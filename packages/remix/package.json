@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.0.0-alpha-v5.9",
+  "version": "4.0.0-alpha-v5.11",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -69,14 +69,14 @@
     "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/backend": "1.0.0-alpha-v5.7",
-    "@clerk/clerk-react": "5.0.0-alpha-v5.9",
-    "@clerk/shared": "2.0.0-alpha-v5.5",
+    "@clerk/backend": "1.0.0-alpha-v5.9",
+    "@clerk/clerk-react": "5.0.0-alpha-v5.10",
+    "@clerk/shared": "2.0.0-alpha-v5.6",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-alpha-v5.9",
+    "@clerk/types": "4.0.0-alpha-v5.10",
     "@remix-run/react": "^2.0.0",
     "@remix-run/server-runtime": "^2.0.0",
     "@types/cookie": "^0.5.0",

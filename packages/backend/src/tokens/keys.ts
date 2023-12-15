@@ -1,16 +1,16 @@
 import { API_URL, API_VERSION, JWKS_CACHE_TTL_MS, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
+import {
+  TokenVerificationError,
+  TokenVerificationErrorAction,
+  TokenVerificationErrorCode,
+  TokenVerificationErrorReason,
+} from '../errors';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
 import { joinPaths } from '../util/path';
 import { getErrorObjectByCode } from '../util/request';
 import { callWithRetry } from '../util/shared';
-import {
-  TokenVerificationError,
-  TokenVerificationErrorAction,
-  TokenVerificationErrorCode,
-  TokenVerificationErrorReason,
-} from './errors';
 
 type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 
@@ -147,7 +147,10 @@ export async function loadClerkJWKFromRemote({
 
   if (!jwk) {
     const cacheValues = getCacheValues();
-    const jwkKeys = cacheValues.map(jwk => jwk.kid).join(', ');
+    const jwkKeys = cacheValues
+      .map(jwk => jwk.kid)
+      .sort()
+      .join(', ');
 
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.ContactSupport,

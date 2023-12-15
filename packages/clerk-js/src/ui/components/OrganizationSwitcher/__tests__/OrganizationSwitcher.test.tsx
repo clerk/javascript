@@ -119,7 +119,7 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      expect(getByText('Create Organization')).toBeInTheDocument();
+      expect(getByText('Create organization')).toBeInTheDocument();
     });
 
     it('lists all organizations the user belongs to', async () => {
@@ -217,7 +217,7 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      await userEvent.click(getByRole('menuitem', { name: 'Create Organization' }));
+      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
     });
 
@@ -233,7 +233,7 @@ describe('OrganizationSwitcher', () => {
 
       props.setProps({ hidePersonal: true });
       const { queryByRole } = await act(() => render(<OrganizationSwitcher />, { wrapper }));
-      expect(queryByRole('button', { name: 'Create Organization' })).not.toBeInTheDocument();
+      expect(queryByRole('button', { name: 'Create organization' })).not.toBeInTheDocument();
     });
 
     it('displays a list of user invitations', async () => {

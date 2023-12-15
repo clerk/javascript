@@ -1,4 +1,4 @@
-import { AuthStatus } from '@clerk/backend';
+import { AuthStatus } from '@clerk/backend/internal';
 
 import { authenticateRequest, decorateResponseWithObservabilityHeaders } from './authenticateRequest';
 import type { CreateClerkExpressMiddlewareOptions } from './clerkExpressRequireAuth';

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "1.0.0-alpha-v5.7",
+  "version": "1.0.0-alpha-v5.9",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -17,13 +17,47 @@
       "edge-light": "./dist/runtime/browser/crypto.mjs",
       "worker": "./dist/runtime/browser/crypto.mjs",
       "browser": "./dist/runtime/browser/crypto.mjs",
-      "node": "./dist/runtime/node/crypto.js",
+      "node": {
+        "require": "./dist/runtime/node/crypto.js",
+        "import": "./dist/runtime/node/crypto.mjs"
+      },
       "default": "./dist/runtime/browser/crypto.mjs"
     }
   },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./errors": {
+      "import": {
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.mjs"
+      },
+      "require": {
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.js"
+      }
+    },
+    "./internal": {
+      "import": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.mjs"
+      },
+      "require": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "main": "./dist/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
   "files": [
     "dist"
   ],
@@ -48,13 +82,13 @@
     "test:cloudflare-workerd": "tests/cloudflare-workerd/run.sh"
   },
   "dependencies": {
-    "@clerk/shared": "2.0.0-alpha-v5.5",
+    "@clerk/shared": "2.0.0-alpha-v5.6",
     "cookie": "0.5.0",
     "snakecase-keys": "5.4.4",
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-alpha-v5.9",
+    "@clerk/types": "4.0.0-alpha-v5.10",
     "@cloudflare/workers-types": "^3.18.0",
     "@types/chai": "^4.3.3",
     "@types/cookie": "^0.5.1",

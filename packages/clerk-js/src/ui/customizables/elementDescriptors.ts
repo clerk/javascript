@@ -151,6 +151,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationListPreviewItem',
   'organizationListPreviewButton',
   'organizationListPreviewItemActionButton',
+  'organizationListCreateOrganizationActionButton',
 
   'userPreview',
   'userPreviewAvatarContainer',

@@ -2,20 +2,14 @@ import type { TelemetryCollectorOptions } from '@clerk/shared/telemetry';
 import { TelemetryCollector } from '@clerk/shared/telemetry';
 import type { SDKMetadata } from '@clerk/types';
 
-import type { CreateBackendApiOptions } from './api';
+import type { ApiClient, CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
-import type { CreateAuthenticateRequestOptions } from './tokens';
-import { createAuthenticateRequest } from './tokens';
-
-export { createIsomorphicRequest } from './util/IsomorphicRequest';
+import type { CreateAuthenticateRequestOptions } from './tokens/factory';
+import { createAuthenticateRequest } from './tokens/factory';
 
 export * from './api/resources';
-export * from './tokens';
 export * from './tokens/jwt';
 export * from './tokens/verify';
-export { constants } from './constants';
-export { redirect } from './redirections';
-export { buildRequestUrl } from './utils';
 
 export type ClerkOptions = CreateBackendApiOptions &
   Partial<
@@ -25,7 +19,14 @@ export type ClerkOptions = CreateBackendApiOptions &
     >
   > & { sdkMetadata?: SDKMetadata; telemetry?: Pick<TelemetryCollectorOptions, 'disabled' | 'debug'> };
 
-export function createClerkClient(options: ClerkOptions) {
+// The current exported type resolves the following issue in packages importing createClerkClient
+// TS4023: Exported variable 'clerkClient' has or is using name 'AuthErrorReason' from external module "/packages/backend/dist/index" but cannot be named.
+export type ClerkClient = {
+  telemetry: TelemetryCollector;
+} & ApiClient &
+  ReturnType<typeof createAuthenticateRequest>;
+
+export function createClerkClient(options: ClerkOptions): ClerkClient {
   const opts = { ...options };
   const apiClient = createBackendApiClient(opts);
   const requestState = createAuthenticateRequest({ options: opts, apiClient });

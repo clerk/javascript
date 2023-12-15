@@ -1,4 +1,4 @@
-import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
+import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../../errors';
 import { algs } from './algorithms';
 
 export type IssuerResolver = string | ((iss: string) => boolean);

@@ -3,4 +3,5 @@ module.exports = {
   JAVASCRIPT_FILES: ['*.js?(x)', '*.mjs'],
   TYPESCRIPT_FILES: ['*.ts?(x)'],
   TEST_FILES: ['*.test.js?(x)', '*.test.ts?(x)', 'test/**', '__tests__/**'],
+  YAML_FILES: ['*.yml', '*.yaml'],
 };

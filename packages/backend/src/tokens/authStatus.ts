@@ -1,10 +1,13 @@
 import type { JwtPayload } from '@clerk/types';
 
 import { createBackendApiClient } from '../api';
+import type { TokenVerificationErrorReason } from '../errors';
 import type { SignedInAuthObject, SignedInAuthObjectOptions, SignedOutAuthObject } from './authObjects';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';
-import type { TokenVerificationErrorReason } from './errors';
 
+/**
+ * @internal
+ */
 export enum AuthStatus {
   SignedIn = 'signed-in',
   SignedOut = 'signed-out',
@@ -66,6 +69,9 @@ export enum AuthErrorReason {
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
+/**
+ * @internal
+ */
 export type RequestState = SignedInState | SignedOutState | HandshakeState;
 
 type LoadResourcesOptions = {

@@ -1,5 +1,42 @@
 # Change Log
 
+## 4.0.0-alpha-v5.10
+
+### Major Changes
+
+- Align return types for redirectTo\* methods in ClerkJS [SDK-1037] ([#2316](https://github.com/clerk/javascript/pull/2316)) by [@tmilewski](https://github.com/tmilewski)
+
+  Breaking Changes:
+
+  - `redirectToUserProfile` now returns `Promise<unknown>` instead of `void`
+  - `redirectToOrganizationProfile` now returns `Promise<unknown>` instead of `void`
+  - `redirectToCreateOrganization` now returns `Promise<unknown>` instead of `void`
+  - `redirectToHome` now returns `Promise<unknown>` instead of `void`
+
+### Minor Changes
+
+- Introduce Protect for authorization. ([#2170](https://github.com/clerk/javascript/pull/2170)) by [@panteliselef](https://github.com/panteliselef)
+
+  Changes in public APIs:
+
+  - Rename Gate to Protect
+  - Support for permission checks. (Previously only roles could be used)
+  - Remove the `experimental` tags and prefixes
+  - Drop `some` from the `has` utility and Protect. Protect now accepts a `condition` prop where a function is expected with the `has` being exposed as the param.
+  - Protect can now be used without required props. In this case behaves as `<SignedIn>`, if no authorization props are passed.
+  - `has` will throw an error if neither `permission` or `role` is passed.
+  - `auth().protect()` for Nextjs App Router. Allow per page protection in app router. This utility will automatically throw a 404 error if user is not authorized or authenticated.
+    - inside a page or layout file it will render the nearest `not-found` component set by the developer
+    - inside a route handler it will return empty response body with a 404 status code
+
+### Patch Changes
+
+- Adjust `ZxcvbnResult` interface to use current `feedback.warning` type as used in the upstream `@zxcvbn-ts/core` library. ([#2326](https://github.com/clerk/javascript/pull/2326)) by [@LekoArts](https://github.com/LekoArts)
+
+- Drop `redirectToHome` redirect method in favour of `redirectToAfterSignUp` or `redirectToAfterSignIn`. ([#2251](https://github.com/clerk/javascript/pull/2251)) by [@octoper](https://github.com/octoper)
+
+  When the `<SignIn/>` and `<SignUp/>` components are rendered while a user is already logged in, they will now redirect to the configured `afterSignIn` and `afterSignUp` URLs, respectively. Previously, the redirect URL was set to the home URL configured in the dashboard.
+
 ## 4.0.0-alpha-v5.9
 
 ### Major Changes

@@ -1,20 +1,11 @@
-import {
-  auth,
-  clerkClient,
-  currentUser,
-  OrganizationSwitcher,
-  SignedIn,
-  SignedOut,
-  SignIn,
-  UserButton,
-} from '@clerk/nextjs';
+import { OrganizationSwitcher, SignedIn, SignedOut, SignIn, UserButton } from '@clerk/nextjs';
+import { auth, clerkClient, currentUser } from '@clerk/nextjs/server';
 import Link from 'next/link';
 
 export default async function Page() {
   const { userId } = auth();
   const currentUser_ = await currentUser();
   const user = userId ? await clerkClient.users.getUser(userId) : null;
-  console.log({ userId, currentUser_, user });
 
   return (
     <main>

@@ -42,7 +42,7 @@
     "version": "changeset version && ./scripts/version-info.sh",
     "version:canary": "./scripts/canary.mjs",
     "version:snapshot": "./scripts/snapshot.mjs",
-    "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace --sig; cd '../../'; done"
+    "yalc:all": "for d in packages/*/; do echo $d; cd $d; npx yalc push --replace --sig; cd '../../'; done"
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",

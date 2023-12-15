@@ -2,17 +2,20 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import type { JwtPayload } from '@clerk/types';
 
 import { constants } from '../constants';
+import type { TokenCarrier } from '../errors';
+import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { buildRequest, stripAuthorizationHeader } from '../util/IsomorphicRequest';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthStatusOptionsType, RequestState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
-import type { TokenCarrier } from './errors';
-import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
 import { verifyHandshakeToken } from './handshake';
 import { decodeJwt } from './jwt';
 import { verifyToken, type VerifyTokenOptions } from './verify';
 
+/**
+ * @internal
+ */
 export type OptionalVerifyTokenOptions = Partial<
   Pick<
     VerifyTokenOptions,
@@ -20,6 +23,9 @@ export type OptionalVerifyTokenOptions = Partial<
   >
 >;
 
+/**
+ * @internal
+ */
 export type AuthenticateRequestOptions = AuthStatusOptionsType & OptionalVerifyTokenOptions;
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
@@ -334,6 +340,9 @@ ${err.getFullMessage()}`,
   return authenticateRequestWithTokenInCookie();
 }
 
+/**
+ * @internal
+ */
 export const debugRequestState = (params: RequestState) => {
   const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };

@@ -31,7 +31,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       textVariant: common.textVariants(theme),
       size: {
         iconLg: { minHeight: theme.sizes.$13, width: theme.sizes.$13 },
-        xs: { minHeight: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
+        xs: { minHeight: theme.sizes.$1x5, padding: `${theme.space.$1} ${theme.space.$2}` },
         sm: {
           minHeight: theme.sizes.$7,
           padding: `${theme.space.$1x5} ${theme.space.$3x5}`,
@@ -134,6 +134,14 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 },
           '&:focus': props.hoverAsFocus
             ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
+            : undefined,
+          '&:active': { backgroundColor: theme.colors.$transparent },
+        },
+        ghostAction: {
+          color: theme.colors.$blackAlpha600,
+          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha600 },
+          '&:focus': props.hoverAsFocus
+            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha600 }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$transparent },
         },

@@ -1,1 +1,1 @@
-export default crypto;
+export const webcrypto = crypto;

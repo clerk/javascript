@@ -1,5 +1,6 @@
-import type { RequestState } from '@clerk/backend';
-import { buildRequestUrl, createClerkClient } from '@clerk/backend';
+import { createClerkClient } from '@clerk/backend';
+import type { RequestState } from '@clerk/backend/internal';
+import { buildRequestUrl } from '@clerk/backend/internal';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';

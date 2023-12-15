@@ -1,6 +1,6 @@
 // There is no need to execute the complete authenticateRequest to test authMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
-import { AuthStatus } from '@clerk/backend';
+import { AuthStatus } from '@clerk/backend/internal';
 import { expectTypeOf } from 'expect-type';
 import { NextURL } from 'next/dist/server/web/next-url';
 import type { NextFetchEvent, NextRequest } from 'next/server';

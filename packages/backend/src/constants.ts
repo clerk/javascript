@@ -44,19 +44,17 @@ const Headers = {
   SecFetchDest: 'sec-fetch-dest',
 } as const;
 
-const SearchParams = {
-  AuthStatus: Headers.AuthStatus,
-} as const;
-
 const ContentTypes = {
   Json: 'application/json',
 } as const;
 
+/**
+ * @internal
+ */
 export const constants = {
   Attributes,
   Cookies,
   Headers,
-  SearchParams,
   ContentTypes,
   QueryParameters,
 } as const;

@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.0.0-alpha-v5.6
+
+### Patch Changes
+
+- Add `react-dom` to `peerDependenciesMeta` key inside `package.json` ([#2322](https://github.com/clerk/javascript/pull/2322)) by [@LekoArts](https://github.com/LekoArts)
+
+- Add `useAssertWrappedByClerkProvider` to internal code. If you use hooks like `useAuth` outside of the `<ClerkProvider />` context an error will be thrown. For example: ([#2299](https://github.com/clerk/javascript/pull/2299)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```shell
+  @clerk/clerk-react: useAuth can only be used within the <ClerkProvider /> component
+  ```
+
 ## 2.0.0-alpha-v5.5
 
 ### Patch Changes

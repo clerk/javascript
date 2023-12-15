@@ -1,4 +1,4 @@
-import type { AuthObject, OptionalVerifyTokenOptions } from '@clerk/backend';
+import type { AuthObject, OptionalVerifyTokenOptions } from '@clerk/backend/internal';
 import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { IncomingMessage } from 'http';
 import type { NextApiRequest } from 'next';

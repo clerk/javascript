@@ -127,7 +127,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         icon={CogFilled}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={handleManageOrganizationClicked}
-        trailing={<NotificationCountBadgeManageButton sx={{ right: 0 }} />}
+        trailing={<NotificationCountBadgeManageButton />}
       />
     );
 
@@ -205,6 +205,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                     sx={t => ({
                       padding: `${t.space.$4} ${t.space.$5}`,
                       borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+                      width: '100%',
                     })}
                     title={localizationKeys('organizationSwitcher.personalWorkspace')}
                   />
@@ -232,9 +233,13 @@ const NotificationCountBadgeManageButton = withGate(
       membershipRequests: isDomainsEnabled || undefined,
     });
 
+    if (!membershipRequests?.count) {
+      return null;
+    }
+
     return (
       <NotificationCountBadge
-        notificationCount={membershipRequests?.count || 0}
+        notificationCount={membershipRequests.count}
         containerSx={sx}
       />
     );

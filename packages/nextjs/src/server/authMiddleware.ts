@@ -1,5 +1,5 @@
-import type { AuthenticateRequestOptions, AuthObject } from '@clerk/backend';
-import { AuthStatus, buildRequestUrl, constants } from '@clerk/backend';
+import type { AuthenticateRequestOptions, AuthObject } from '@clerk/backend/internal';
+import { AuthStatus, buildRequestUrl, constants } from '@clerk/backend/internal';
 import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
@@ -132,6 +132,10 @@ export interface AuthMiddleware {
   (params?: AuthMiddlewareParams): NextMiddleware;
 }
 
+/**
+ * @deprecated Use `clerkMiddleware` instead.
+ * Migration guide: https://clerk.com/docs/upgrade-guides/v5-introduction
+ */
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
   const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...options } = params;

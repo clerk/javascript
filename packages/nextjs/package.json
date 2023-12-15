@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "5.0.0-alpha-v5.9",
+  "version": "5.0.0-alpha-v5.11",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -34,14 +34,18 @@
       "types": "./dist/types/server/index.d.ts",
       "import": "./dist/esm/server/index.js",
       "require": "./dist/cjs/server/index.js"
+    },
+    "./errors": {
+      "types": "./dist/types/errors.d.ts",
+      "import": "./dist/esm/errors.js",
+      "require": "./dist/cjs/errors.js"
     }
   },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
-    "server"
+    "server",
+    "errors"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
@@ -58,13 +62,13 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/backend": "1.0.0-alpha-v5.7",
-    "@clerk/clerk-react": "5.0.0-alpha-v5.9",
-    "@clerk/shared": "2.0.0-alpha-v5.5",
+    "@clerk/backend": "1.0.0-alpha-v5.9",
+    "@clerk/clerk-react": "5.0.0-alpha-v5.10",
+    "@clerk/shared": "2.0.0-alpha-v5.6",
     "path-to-regexp": "6.2.1"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-alpha-v5.9",
+    "@clerk/types": "4.0.0-alpha-v5.10",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
@@ -74,7 +78,7 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "next": ">=10",
+    "next": "^13.0.4 || ^14.0.3",
     "react": ">=18",
     "react-dom": ">=18"
   },
