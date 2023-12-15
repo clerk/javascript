@@ -58,7 +58,7 @@ jobs:
           cd $FULL_TMP_FOLDER
           vercel build --yes --prod
         env:
-          NEXT_PUBLIC_CLERK_JS: /clerk-js/clerk.browser.js
+          NEXT_PUBLIC_CLERK_JS_URL: /clerk-js/clerk.browser.js
 
       - name: Deploy to Vercel (prebuilt)
         id: vercel-deploy

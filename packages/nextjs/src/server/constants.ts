@@ -2,7 +2,7 @@ import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey
 import { isTruthy } from '@clerk/shared/underscore';
 
 export const CLERK_JS_VERSION = process.env.NEXT_PUBLIC_CLERK_JS_VERSION || '';
-export const CLERK_JS_URL = process.env.NEXT_PUBLIC_CLERK_JS || '';
+export const CLERK_JS_URL = process.env.NEXT_PUBLIC_CLERK_JS_URL || '';
 export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 export const SECRET_KEY = process.env.CLERK_SECRET_KEY || '';
 export const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
