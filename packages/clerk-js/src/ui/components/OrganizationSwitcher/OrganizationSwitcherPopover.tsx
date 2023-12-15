@@ -127,7 +127,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         icon={CogFilled}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={handleManageOrganizationClicked}
-        trailing={<NotificationCountBadgeManageButton sx={{ right: 0 }} />}
+        trailing={<NotificationCountBadgeManageButton />}
       />
     );
 
@@ -232,9 +232,13 @@ const NotificationCountBadgeManageButton = withGate(
       membershipRequests: isDomainsEnabled || undefined,
     });
 
+    if (!membershipRequests?.count) {
+      return null;
+    }
+
     return (
       <NotificationCountBadge
-        notificationCount={membershipRequests?.count || 0}
+        notificationCount={membershipRequests.count}
         containerSx={sx}
       />
     );

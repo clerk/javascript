@@ -80,7 +80,6 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
         elementDescriptor={iconBoxElementDescriptor}
         elementId={iconBoxElementId}
         justify='center'
-        // sx={[theme => ({ flex: `0 0 ${theme.sizes.$9}` }), iconBoxSx]}
       >
         {status.isLoading ? (
           <Spinner
