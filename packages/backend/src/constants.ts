@@ -42,6 +42,7 @@ const Headers = {
   Host: 'host',
   ContentType: 'content-type',
   SecFetchDest: 'sec-fetch-dest',
+  Location: 'location',
 } as const;
 
 const ContentTypes = {
@@ -58,3 +59,5 @@ export const constants = {
   ContentTypes,
   QueryParameters,
 } as const;
+
+export type Constants = typeof constants;

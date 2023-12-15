@@ -33,9 +33,10 @@ jest.mock('./redirect', () => {
 });
 
 import { paths, setHeader } from '../utils';
-import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
+import { authMiddleware, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
 // used to assert the mock
 import { clerkClient } from './clerkClient';
+import { createRouteMatcher } from './routeMatcher';
 
 /**
  * Disable console warnings about config matchers

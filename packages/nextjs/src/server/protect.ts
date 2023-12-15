@@ -3,7 +3,6 @@ import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
 } from '@clerk/types';
-import { notFound, redirect } from 'next/navigation';
 
 type AuthProtectOptions = { redirectUrl?: string };
 
@@ -21,8 +20,28 @@ export interface AuthProtect {
   (options?: AuthProtectOptions): SignedInAuthObject;
 }
 
-export const createProtect = (authObj: AuthObject): AuthProtect => {
-  return (...args: any[]) => {
+export const createProtect = (opts: {
+  authObject: AuthObject;
+  /**
+   * middleware and pages throw a notFound error if signed out
+   * but the middleware needs to throw an error it can catch
+   * use this callback to customise the behavior
+   */
+  notFound: () => never;
+  /**
+   * see {@link notFound} above
+   */
+  redirect: (url: string) => void;
+  /**
+   * protect() in middleware redirects to signInUrl if signed out
+   * protect() in pages throws a notFound error if signed out
+   * use this callback to customise the behavior
+   */
+  handleUnauthenticated?: () => void;
+}): AuthProtect => {
+  const { handleUnauthenticated, authObject, redirect, notFound } = opts;
+
+  return ((...args: any[]) => {
     const paramsOrFunction = args[0]?.redirectUrl
       ? undefined
       : (args[0] as
@@ -30,7 +49,7 @@ export const createProtect = (authObj: AuthObject): AuthProtect => {
           | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
     const redirectUrl = (args[0]?.redirectUrl || args[1]?.redirectUrl) as string | undefined;
 
-    const handleUnauthorized = (): never => {
+    const handleUnauthorized = () => {
       if (redirectUrl) {
         redirect(redirectUrl);
       }
@@ -40,23 +59,23 @@ export const createProtect = (authObj: AuthObject): AuthProtect => {
     /**
      * User is not authenticated
      */
-    if (!authObj.userId) {
-      return handleUnauthorized();
+    if (!authObject.userId) {
+      return handleUnauthenticated ? handleUnauthenticated() : handleUnauthorized();
     }
 
     /**
      * User is authenticated
      */
     if (!paramsOrFunction) {
-      return authObj;
+      return authObject;
     }
 
     /**
      * if a function is passed and returns false then throw not found
      */
     if (typeof paramsOrFunction === 'function') {
-      if (paramsOrFunction(authObj.has)) {
-        return authObj;
+      if (paramsOrFunction(authObject.has)) {
+        return authObject;
       }
       return handleUnauthorized();
     }
@@ -64,10 +83,10 @@ export const createProtect = (authObj: AuthObject): AuthProtect => {
     /**
      * Checking if user is authorized when permission or role is passed
      */
-    if (authObj.has(paramsOrFunction)) {
-      return authObj;
+    if (authObject.has(paramsOrFunction)) {
+      return authObject;
     }
 
     return handleUnauthorized();
-  };
+  }) as AuthProtect;
 };

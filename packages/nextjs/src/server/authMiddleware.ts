@@ -1,38 +1,26 @@
 import type { AuthenticateRequestOptions, AuthObject, ClerkRequest } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
-import { DEV_BROWSER_JWT_KEY, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { Autocomplete } from '@clerk/types';
-import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
+import { appendDevBrowserOnCrossOrigin, isRedirect, mergeResponses, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
-import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
+import { createAuthenticateRequestOptions } from './clerkMiddleware';
+import { SECRET_KEY } from './constants';
 import { informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
-import type { NextMiddlewareResult } from './types';
+import type { RouteMatcherParam } from './routeMatcher';
+import { createRouteMatcher } from './routeMatcher';
+import type { NextMiddlewareReturn } from './types';
 import {
   apiEndpointUnauthorizedNextResponse,
   decorateRequest,
   decorateResponseWithObservabilityHeaders,
-  handleMultiDomainAndProxy,
-  isCrossOrigin,
   setRequestHeadersOnNextResponse,
 } from './utils';
-
-type WithPathPatternWildcard<T> = `${T & string}(.*)`;
-type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
-
-// For extra safety, we won't recommend using a `/(.*)` route matcher.
-type ExcludeRootPath<T> = T extends '/' ? never : T;
-
-type RouteMatcherWithNextTypedRoutes = Autocomplete<
-  WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>> | NextTypedRoute
->;
 
 /**
  * The default ideal matcher that excludes the _next directory (internals) and all static files,
@@ -50,16 +38,10 @@ export const DEFAULT_IGNORED_ROUTES = [`/((?!api|trpc))(_next.*|.+\\.[\\w]+$)`];
  */
 export const DEFAULT_API_ROUTES = ['/api/(.*)', '/trpc/(.*)'];
 
-type RouteMatcherParam =
-  | Array<RegExp | RouteMatcherWithNextTypedRoutes>
-  | RegExp
-  | RouteMatcherWithNextTypedRoutes
-  | ((req: NextRequest) => boolean);
-
 type IgnoredRoutesParam = Array<RegExp | string> | RegExp | string | ((req: NextRequest) => boolean);
 type ApiRoutesParam = IgnoredRoutesParam;
 
-type WithClerkUrl<T> = T & {
+type WithExperimentalClerkUrl<T> = T & {
   /**
    * When a NextJs app is hosted on a platform different from Vercel
    * or inside a container (Netlify, Fly.io, AWS Amplify, docker etc),
@@ -73,15 +55,15 @@ type WithClerkUrl<T> = T & {
 };
 
 type BeforeAuthHandler = (
-  req: WithClerkUrl<NextRequest>,
+  req: WithExperimentalClerkUrl<NextRequest>,
   evt: NextFetchEvent,
-) => NextMiddlewareResult | Promise<NextMiddlewareResult> | false | Promise<false>;
+) => NextMiddlewareReturn | false | Promise<false>;
 
 type AfterAuthHandler = (
   auth: AuthObject & { isPublicRoute: boolean; isApiRoute: boolean },
-  req: WithClerkUrl<NextRequest>,
+  req: WithExperimentalClerkUrl<NextRequest>,
   evt: NextFetchEvent,
-) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
+) => NextMiddlewareReturn;
 
 type AuthMiddlewareParams = AuthenticateRequestOptions & {
   /**
@@ -132,7 +114,7 @@ export interface AuthMiddleware {
 }
 
 /**
- * @deprecated Use `clerkMiddleware` instead.
+ * @deprecated Use {@link clerkMiddleware}` instead.
  * Migration guide: https://clerk.com/docs/upgrade-guides/v5-introduction
  */
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
@@ -167,6 +149,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       nextUrl: nextRequest.nextUrl.href,
       clerkUrl: nextRequest.experimental_clerkUrl.href,
     });
+
     logger.debug('Options debug', { ...options, beforeAuth: !!beforeAuth, afterAuth: !!afterAuth });
 
     if (isIgnoredRoute(nextRequest)) {
@@ -192,14 +175,10 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return setHeader(beforeAuthRes, constants.Headers.AuthReason, 'redirect');
     }
 
-    // TODO: fix type discrepancy between WithAuthOptions and AuthenticateRequestOptions
-    const authenticateRequestOptions = {
-      ...options,
-      secretKey: options.secretKey || SECRET_KEY,
-      publishableKey: options.publishableKey || PUBLISHABLE_KEY,
-      ...handleMultiDomainAndProxy(clerkRequest, options as AuthenticateRequestOptions),
-    } as AuthenticateRequestOptions;
-    const requestState = await clerkClient.authenticateRequest(clerkRequest, authenticateRequestOptions);
+    const requestState = await clerkClient.authenticateRequest(
+      clerkRequest,
+      createAuthenticateRequestOptions(clerkRequest, options),
+    );
 
     const locationHeader = requestState.headers.get('location');
     if (locationHeader) {
@@ -218,6 +197,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       isPublicRoute: isPublicRoute(nextRequest),
       isApiRoute: isApiRoute(nextRequest),
     });
+
     logger.debug(() => ({ auth: JSON.stringify(auth), debug: auth.debug() }));
     const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, nextRequest, evt);
     const finalRes = mergeResponses(beforeAuthRes, afterAuthRes) || NextResponse.next();
@@ -226,7 +206,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
       const res = setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
-      return appendDevBrowserOnCrossOrigin(nextRequest, res, options);
+      return appendDevBrowserOnCrossOrigin(clerkRequest, res, options);
     }
 
     if (options.debug) {
@@ -248,27 +228,12 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
 export { authMiddleware };
 
-/**
- * Create a function that matches a request against the specified routes.
- * Precomputes the glob matchers for the public routes, so we don't have to
- * recompile the regular expressions on every request.
- */
-export const createRouteMatcher = (routes: RouteMatcherParam) => {
-  if (typeof routes === 'function') {
-    return (req: NextRequest) => routes(req);
-  }
-
-  const routePatterns = [routes || ''].flat().filter(Boolean);
-  const matchers = precomputePathRegex(routePatterns);
-  return (req: NextRequest) => matchers.some(matcher => matcher.test(req.nextUrl.pathname));
-};
-
 const createDefaultAfterAuth = (
   isPublicRoute: ReturnType<typeof createRouteMatcher>,
   isApiRoute: ReturnType<typeof createApiRoutes>,
   params: AuthMiddlewareParams,
 ) => {
-  return (auth: AuthObject, req: WithClerkUrl<NextRequest>) => {
+  return (auth: AuthObject, req: WithExperimentalClerkUrl<NextRequest>) => {
     if (!auth.userId && !isPublicRoute(req)) {
       if (isApiRoute(req)) {
         informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, true);
@@ -280,10 +245,6 @@ const createDefaultAfterAuth = (
     }
     return NextResponse.next();
   };
-};
-
-const precomputePathRegex = (patterns: Array<string | RegExp>) => {
-  return patterns.map(pattern => (pattern instanceof RegExp ? pattern : paths.toRegexp(pattern)));
 };
 
 const matchRoutesStartingWith = (path: string) => {
@@ -312,31 +273,6 @@ const withDefaultPublicRoutes = (publicRoutes: RouteMatcherParam | undefined) =>
   return routes;
 };
 
-// Grabs the dev browser JWT from cookies and appends it to the redirect URL when redirecting to cross-origin.
-// Middleware runs on the server side, before clerk-js is loaded, that's why we need Cookies.
-const appendDevBrowserOnCrossOrigin = (req: WithClerkUrl<NextRequest>, res: Response, opts: AuthMiddlewareParams) => {
-  const location = res.headers.get('location');
-
-  const shouldAppendDevBrowser = res.headers.get(constants.Headers.ClerkRedirectTo) === 'true';
-
-  if (
-    shouldAppendDevBrowser &&
-    !!location &&
-    isDevelopmentFromSecretKey(opts.secretKey || SECRET_KEY) &&
-    isCrossOrigin(req.experimental_clerkUrl, location)
-  ) {
-    const dbJwt = req.cookies.get(DEV_BROWSER_JWT_KEY)?.value || '';
-
-    // Next.js 12.1+ allows redirects only to absolute URLs
-    const url = new URL(location);
-
-    const urlWithDevBrowser = setDevBrowserJWTInURL(url, dbJwt);
-
-    return NextResponse.redirect(urlWithDevBrowser.href, res);
-  }
-  return res;
-};
-
 // - Default behavior:
 //    If the route path is `['/api/(.*)*', '*/trpc/(.*)']`
 //    or Request has `Content-Type: application/json`
@@ -345,12 +281,14 @@ const appendDevBrowserOnCrossOrigin = (req: WithClerkUrl<NextRequest>, res: Resp
 //
 // - If the user has provided a specific `apiRoutes` prop in `authMiddleware` then all the above are discarded,
 //   and only routes that match the user’s provided paths are considered API routes.
-const createApiRoutes = (apiRoutes: RouteMatcherParam | undefined): ((req: WithClerkUrl<NextRequest>) => boolean) => {
+const createApiRoutes = (
+  apiRoutes: RouteMatcherParam | undefined,
+): ((req: WithExperimentalClerkUrl<NextRequest>) => boolean) => {
   if (apiRoutes) {
     return createRouteMatcher(apiRoutes);
   }
   const isDefaultApiRoute = createRouteMatcher(DEFAULT_API_ROUTES);
-  return (req: WithClerkUrl<NextRequest>) =>
+  return (req: WithExperimentalClerkUrl<NextRequest>) =>
     isDefaultApiRoute(req) || isRequestMethodIndicatingApiRoute(req) || isRequestContentTypeJson(req);
 };
 
@@ -364,7 +302,10 @@ const isRequestMethodIndicatingApiRoute = (req: NextRequest): boolean => {
   return !['get', 'head', 'options'].includes(requestMethod);
 };
 
-const withNormalizedClerkUrl = (clerkRequest: ClerkRequest, nextRequest: NextRequest): WithClerkUrl<NextRequest> => {
+const withNormalizedClerkUrl = (
+  clerkRequest: ClerkRequest,
+  nextRequest: NextRequest,
+): WithExperimentalClerkUrl<NextRequest> => {
   const res = nextRequest.nextUrl.clone();
   res.port = clerkRequest.clerkUrl.port;
   res.protocol = clerkRequest.clerkUrl.protocol;

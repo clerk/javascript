@@ -12,7 +12,6 @@ export function ClerkApp(App: () => JSX.Element, opts: ClerkAppOptions = {}) {
   return () => {
     const { clerkState } = useLoaderData();
     return (
-      // @ts-expect-error
       <ClerkProvider
         {...opts}
         clerkState={clerkState}
