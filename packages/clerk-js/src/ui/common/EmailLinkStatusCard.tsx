@@ -35,14 +35,17 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
   return (
     <Flow.Part part='emailLinkStatus'>
       <Card.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
-          <Header.Title localizationKey={props.title} />
-          <Header.Subtitle localizationKey={props.subtitle} />
-        </Header.Root>
-        <Col elementDescriptor={descriptors.main}>
-          <StatusRow status={props.status} />
-        </Col>
+        <Card.Content>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Header.Root>
+            <Header.Title localizationKey={props.title} />
+            <Header.Subtitle localizationKey={props.subtitle} />
+          </Header.Root>
+          <Col elementDescriptor={descriptors.main}>
+            <StatusRow status={props.status} />
+          </Col>
+        </Card.Content>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );

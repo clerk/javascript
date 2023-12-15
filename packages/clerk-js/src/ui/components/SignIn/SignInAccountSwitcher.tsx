@@ -25,54 +25,57 @@ const _SignInAccountSwitcher = () => {
   return (
     <Flow.Part part='accountSwitcher'>
       <Card.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
-          <Header.Title>Signed out</Header.Title>
-          <Header.Subtitle>Select account to continue to {applicationName}</Header.Subtitle>
-        </Header.Root>
-        <Col
-          elementDescriptor={descriptors.main}
-          gap={8}
-        >
-          <Col>
-            {activeSessions.map(s => (
-              <PreviewButton
-                key={s.id}
-                onClick={handleSessionClicked(s)}
-                sx={theme => ({ height: theme.sizes.$16, justifyContent: 'flex-start' })}
+        <Card.Content>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Header.Root>
+            <Header.Title>Signed out</Header.Title>
+            <Header.Subtitle>Select account to continue to {applicationName}</Header.Subtitle>
+          </Header.Root>
+          <Col
+            elementDescriptor={descriptors.main}
+            gap={8}
+          >
+            <Col>
+              {activeSessions.map(s => (
+                <PreviewButton
+                  key={s.id}
+                  onClick={handleSessionClicked(s)}
+                  sx={theme => ({ height: theme.sizes.$16, justifyContent: 'flex-start' })}
+                >
+                  <UserPreview user={s.user} />
+                </PreviewButton>
+              ))}
+            </Col>
+            <Col gap={2}>
+              <ArrowBlockButton
+                isDisabled={card.isLoading}
+                leftIcon={
+                  <Icon
+                    size='sm'
+                    icon={Plus}
+                    sx={theme => ({ color: theme.colors.$blackAlpha500 })}
+                  />
+                }
+                onClick={handleAddAccountClicked}
               >
-                <UserPreview user={s.user} />
-              </PreviewButton>
-            ))}
+                Add account
+              </ArrowBlockButton>
+              <ArrowBlockButton
+                isDisabled={card.isLoading}
+                leftIcon={
+                  <Icon
+                    icon={SignOutDouble}
+                    sx={theme => ({ color: theme.colors.$blackAlpha500 })}
+                  />
+                }
+                onClick={handleSignOutAllClicked}
+              >
+                Sign out of all accounts
+              </ArrowBlockButton>
+            </Col>
           </Col>
-          <Col gap={2}>
-            <ArrowBlockButton
-              isDisabled={card.isLoading}
-              leftIcon={
-                <Icon
-                  size='sm'
-                  icon={Plus}
-                  sx={theme => ({ color: theme.colors.$blackAlpha500 })}
-                />
-              }
-              onClick={handleAddAccountClicked}
-            >
-              Add account
-            </ArrowBlockButton>
-            <ArrowBlockButton
-              isDisabled={card.isLoading}
-              leftIcon={
-                <Icon
-                  icon={SignOutDouble}
-                  sx={theme => ({ color: theme.colors.$blackAlpha500 })}
-                />
-              }
-              onClick={handleSignOutAllClicked}
-            >
-              Sign out of all accounts
-            </ArrowBlockButton>
-          </Col>
-        </Col>
+        </Card.Content>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );

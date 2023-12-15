@@ -34,6 +34,7 @@ export const LoadingCard = withCardStateProvider(() => {
         <Card.Alert>{card.error}</Card.Alert>
         <LoadingCardContainer />
       </Card.Content>
+      <Card.Footer />
     </Card.Root>
   );
 });
