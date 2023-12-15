@@ -41,7 +41,7 @@ type AuthSignedOut = AuthObjectWithoutResources<
      * This function is experimental as it throws a Nextjs notFound error if user is not authenticated or authorized.
      * In the future we would investigate a way to throw a more appropriate error that clearly describes the not authorized of authenticated status.
      */
-    protect: never;
+    protect: () => never;
   }
 >;
 
