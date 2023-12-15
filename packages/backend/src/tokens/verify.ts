@@ -1,4 +1,4 @@
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload, ReturnWithError } from '@clerk/types';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
@@ -13,7 +13,10 @@ export type VerifyTokenOptions = Pick<VerifyJwtOptions, 'authorizedParties' | 'a
   jwtKey?: string;
 } & Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'apiVersion' | 'jwksCacheTtlInMs' | 'skipJwksCache'>;
 
-export async function verifyToken(token: string, options: VerifyTokenOptions): Promise<JwtPayload> {
+export async function verifyToken(
+  token: string,
+  options: VerifyTokenOptions,
+): Promise<ReturnWithError<JwtPayload, TokenVerificationError>> {
   const {
     secretKey,
     apiUrl,
@@ -29,25 +32,33 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
   const { header } = decodeJwt(token);
   const { kid } = header;
 
-  let key;
+  try {
+    let key;
 
-  if (jwtKey) {
-    key = loadClerkJWKFromLocal(jwtKey);
-  } else if (secretKey) {
-    // Fetch JWKS from Backend API using the key
-    key = await loadClerkJWKFromRemote({ secretKey, apiUrl, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache });
-  } else {
-    throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.SetClerkJWTKey,
-      message: 'Failed to resolve JWK during verification.',
-      reason: TokenVerificationErrorReason.JWKFailedToResolve,
+    if (jwtKey) {
+      key = loadClerkJWKFromLocal(jwtKey);
+    } else if (secretKey) {
+      // Fetch JWKS from Backend API using the key
+      key = await loadClerkJWKFromRemote({ secretKey, apiUrl, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache });
+    } else {
+      return {
+        error: new TokenVerificationError({
+          action: TokenVerificationErrorAction.SetClerkJWTKey,
+          message: 'Failed to resolve JWK during verification.',
+          reason: TokenVerificationErrorReason.JWKFailedToResolve,
+        }),
+      };
+    }
+
+    const data = await verifyJwt(token, {
+      audience,
+      authorizedParties,
+      clockSkewInMs,
+      key,
     });
-  }
 
-  return await verifyJwt(token, {
-    audience,
-    authorizedParties,
-    clockSkewInMs,
-    key,
-  });
+    return { data };
+  } catch (error) {
+    return { error: error as TokenVerificationError };
+  }
 }

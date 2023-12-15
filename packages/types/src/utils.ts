@@ -96,3 +96,13 @@ export type Autocomplete<U extends T, T = string> = U | (T & Record<never, never
 export type Without<T, W> = {
   [P in keyof T as Exclude<P, W>]: T[P];
 };
+
+export type ReturnWithError<R, E extends Error> =
+  | {
+      data: R;
+      error?: undefined;
+    }
+  | {
+      data?: undefined;
+      error: E;
+    };

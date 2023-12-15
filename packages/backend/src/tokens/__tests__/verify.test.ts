@@ -26,19 +26,19 @@ export default (QUnit: QUnit) => {
     });
 
     test('verifies the provided session JWT', async assert => {
-      const payload = await verifyToken(mockJwt, {
+      const { data } = await verifyToken(mockJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
         authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
         skipJwksCache: true,
       });
 
-      assert.propEqual(payload, mockJwtPayload);
+      assert.propEqual(data, mockJwtPayload);
       assert.ok(fakeFetch.calledOnce);
     });
 
     test('verifies the token by fetching the JWKs from Backend API when secretKey is provided ', async assert => {
-      const payload = await verifyToken(mockJwt, {
+      const { data } = await verifyToken(mockJwt, {
         secretKey: 'a-valid-key',
         authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
         skipJwksCache: true,
@@ -52,7 +52,7 @@ export default (QUnit: QUnit) => {
           'Clerk-Backend-SDK': '@clerk/backend',
         },
       });
-      assert.propEqual(payload, mockJwtPayload);
+      assert.propEqual(data, mockJwtPayload);
     });
   });
 };
