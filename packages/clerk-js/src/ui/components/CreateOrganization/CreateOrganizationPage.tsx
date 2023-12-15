@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 
 import { useCreateOrganizationContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { withCardStateProvider } from '../../elements';
+import { Card, Header, withCardStateProvider } from '../../elements';
 import { CreateOrganizationForm } from './CreateOrganizationForm';
 
 export const CreateOrganizationPage = withCardStateProvider(() => {
@@ -12,18 +12,27 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const { mode, navigateAfterCreateOrganization, skipInvitationScreen } = useCreateOrganizationContext();
 
   return (
-    <CreateOrganizationForm
-      skipInvitationScreen={skipInvitationScreen}
-      navigateAfterCreateOrganization={navigateAfterCreateOrganization}
-      flow={'default'}
-      startPage={{
-        headerTitle: title,
-      }}
-      onComplete={() => {
-        if (mode === 'modal') {
-          closeCreateOrganization();
-        }
-      }}
-    />
+    <Card.Root sx={t => ({ width: t.sizes.$120 })}>
+      <Header.Root
+        sx={t => ({
+          padding: `${t.space.$4} ${t.space.$5}`,
+        })}
+      >
+        <Header.Title localizationKey={title} />
+      </Header.Root>
+      <Card.Content sx={t => ({ padding: `${t.space.$5}` })}>
+        <CreateOrganizationForm
+          skipInvitationScreen={skipInvitationScreen}
+          navigateAfterCreateOrganization={navigateAfterCreateOrganization}
+          flow={'default'}
+          onComplete={() => {
+            if (mode === 'modal') {
+              closeCreateOrganization();
+            }
+          }}
+        />
+      </Card.Content>
+      <Card.Footer />
+    </Card.Root>
   );
 });

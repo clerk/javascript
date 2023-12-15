@@ -78,7 +78,6 @@ export const OrganizationListPage = withCardStateProvider(() => {
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
-  const environment = useEnvironment();
   const { navigateAfterSelectOrganization, skipInvitationScreen } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
   return (
@@ -90,18 +89,19 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
       {isCreateOrganizationFlow && (
         <Box
           sx={t => ({
-            padding: `${t.space.$8}`,
+            padding: `${t.space.$none} ${t.space.$5} ${t.space.$5}`,
           })}
         >
+          <Header.Root
+            sx={t => ({
+              padding: `${t.space.$4} ${t.space.$5}`,
+            })}
+          >
+            <Header.Title localizationKey={localizationKeys('createOrganization.title')} />
+          </Header.Root>
           <CreateOrganizationForm
             flow='organizationList'
             skipInvitationScreen={skipInvitationScreen}
-            startPage={{
-              headerTitle: localizationKeys('createOrganization.title'),
-              headerSubtitle: localizationKeys('organizationList.subtitle', {
-                applicationName: environment.displayConfig.applicationName,
-              }),
-            }}
             navigateAfterCreateOrganization={org =>
               navigateAfterSelectOrganization(org).then(() => setCreateOrganizationFlow(false))
             }
