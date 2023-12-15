@@ -1,32 +1,26 @@
 import { useUser } from '@clerk/shared/react';
-import type { Web3Strategy, Web3WalletResource } from '@clerk/types';
-import React from 'react';
+import type { Web3Strategy } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier } from '../../../utils/web3';
 import { useWizard, Wizard } from '../../common';
-import { Col, descriptors, Image, localizationKeys, Text } from '../../customizables';
+import { Button, Col, descriptors, Image, localizationKeys, Text } from '../../customizables';
 import {
   ArrowBlockButton,
   FormButtonContainer,
   FormContent,
-  NavigateToFlowStartButton,
   SuccessPage,
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
-import { useRouter } from '../../router';
 import { getFieldError, handleError } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const Web3Page = withCardStateProvider(() => {
-  const { user } = useUser();
+export const Web3Form = withCardStateProvider(() => {
+  const { close } = useActionContext();
 
-  const { params } = useRouter();
-  const { id } = params || {};
-
-  const ref = React.useRef<Web3WalletResource | undefined>(user?.web3Wallets.find(a => a.id === id));
-  const wizard = useWizard({ defaultStep: ref.current ? 1 : 0 });
+  const wizard = useWizard();
 
   return (
     <Wizard {...wizard.props}>
@@ -34,6 +28,7 @@ export const Web3Page = withCardStateProvider(() => {
       <SuccessPage
         title={localizationKeys('userProfile.web3WalletPage.title')}
         text={localizationKeys('userProfile.web3WalletPage.successMessage')}
+        onFinish={close}
       />
     </Wizard>
   );
@@ -42,6 +37,7 @@ export const Web3Page = withCardStateProvider(() => {
 const AddWeb3Wallet = (props: { nextStep: () => void }) => {
   const { nextStep } = props;
   const card = useCardState();
+  const { close } = useActionContext();
   const { user } = useUser();
   const { strategyToDisplayData } = useEnabledThirdPartyProviders();
 
@@ -123,7 +119,11 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
         ))}
       </Col>
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
+        <Button
+          variant='ghost'
+          onClick={close}
+          localizationKey={localizationKeys('userProfile.formButtonReset')}
+        />
       </FormButtonContainer>
     </FormContent>
   );

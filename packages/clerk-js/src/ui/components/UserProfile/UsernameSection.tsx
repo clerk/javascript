@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Button, Flex, localizationKeys, Text } from '../../customizables';
+import { Button, localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { UsernameForm } from './UsernameForm';
@@ -13,19 +13,14 @@ export const UsernameSection = () => {
   }
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('userProfile.start.usernameSection.title')}
       id='username'
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <Flex
-            sx={{
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            {user.username && <Text sx={t => ({ padding: `${t.space.$2} ${t.space.$4}` })}>{user.username}</Text>}
+          <ProfileSection.Item id='username'>
+            {user.username && <Text>{user.username}</Text>}
 
             <Action.Trigger value='edit'>
               <Button
@@ -38,7 +33,7 @@ export const UsernameSection = () => {
                 }
               />
             </Action.Trigger>
-          </Flex>
+          </ProfileSection.Item>
         </Action.Closed>
 
         <Action.Open value='edit'>
@@ -47,6 +42,6 @@ export const UsernameSection = () => {
           </Action.Card>
         </Action.Open>
       </Action.Root>
-    </ProfileSection>
+    </ProfileSection.Root>
   );
 };

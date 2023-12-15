@@ -3,9 +3,7 @@ import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
-import { RemoveWeb3WalletPage } from './RemoveResourcePage';
 import { SecurityPage } from './SecurityPage';
-import { Web3Page } from './Web3Page';
 
 export const UserProfileRoutes = () => {
   const { pages } = useUserProfileContext();
@@ -34,19 +32,6 @@ export const UserProfileRoutes = () => {
       <Route>
         <Route path={isAccountPageRoot ? undefined : 'account'}>
           <Switch>
-            <Route
-              path='web3-wallet'
-              flowStart
-            >
-              <Switch>
-                <Route path=':id/remove'>
-                  <RemoveWeb3WalletPage />
-                </Route>
-                <Route index>
-                  <Web3Page />
-                </Route>
-              </Switch>
-            </Route>
             <Route index>
               <AccountPage />
             </Route>

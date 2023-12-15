@@ -416,9 +416,12 @@ export const enUS: LocalizationResource = {
       },
       web3WalletsSection: {
         title: 'Web3 wallets',
+        //TODO-RETHEME remove
         primaryButton: 'Web3 wallets',
         destructiveActionTitle: 'Remove',
+        //TODO-RETHEME remove
         destructiveActionSubtitle: 'Remove this web3 wallet from your account',
+        //TODO-RETHEME remove
         destructiveAction: 'Remove wallet',
       },
       dangerSection: {

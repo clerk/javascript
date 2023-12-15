@@ -21,7 +21,7 @@ export const ActiveDevicesSection = () => {
   }, [user]);
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('userProfile.start.activeDevicesSection.title')}
       id='activeDevices'
     >
@@ -33,7 +33,7 @@ export const ActiveDevicesSection = () => {
             session={sa}
           />
         ))}
-    </ProfileSection>
+    </ProfileSection.Root>
   );
 };
 

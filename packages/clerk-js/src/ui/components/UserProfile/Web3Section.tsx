@@ -1,68 +1,86 @@
 import { useUser } from '@clerk/shared/react';
-import type { Web3WalletResource } from '@clerk/types';
 
-import { Col, Flex, Image, localizationKeys } from '../../customizables';
-import { ProfileSection } from '../../elements';
+import { Flex, Image, localizationKeys } from '../../customizables';
+import { ProfileSection, ThreeDotsMenu } from '../../elements';
+import { Action } from '../../elements/Action';
 import { useEnabledThirdPartyProviders } from '../../hooks';
-import { useRouter } from '../../router';
-import { LinkButtonWithDescription } from './LinkButtonWithDescription';
-import { UserProfileAccordion } from './UserProfileAccordion';
-import { AddBlockButton } from './UserProfileBlockButtons';
+import type { PropsOfComponent } from '../../styledSystem';
+import { RemoveWeb3WalletForm } from './RemoveResourceForm';
+import { Web3Form } from './Web3Form';
 
 export const Web3Section = () => {
   const { user } = useUser();
-  const { navigate } = useRouter();
+  const { strategyToDisplayData } = useEnabledThirdPartyProviders();
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('userProfile.start.web3WalletsSection.title')}
       id='web3Wallets'
     >
-      {user?.web3Wallets.map(wallet => (
-        <Web3WalletAccordion
-          key={wallet.id}
-          wallet={wallet}
-        />
-      ))}
-      <AddBlockButton
-        id='password'
-        onClick={() => navigate(`web3-wallet`)}
-        textLocalizationKey={localizationKeys('userProfile.start.web3WalletsSection.primaryButton')}
-      />
-    </ProfileSection>
+      <Action.Root>
+        <ProfileSection.ItemList id='web3Wallets'>
+          {user?.web3Wallets.map(wallet => {
+            const strategy = wallet.verification.strategy as keyof typeof strategyToDisplayData;
+
+            return (
+              <Action.Root key={wallet.id}>
+                <Action.Closed value=''>
+                  <ProfileSection.Item
+                    key={wallet.id}
+                    id='web3Wallets'
+                  >
+                    <Flex
+                      align='center'
+                      gap={2}
+                    >
+                      <Image
+                        src={strategyToDisplayData[strategy].iconUrl}
+                        alt={strategyToDisplayData[strategy].name}
+                        sx={theme => ({ width: theme.sizes.$4 })}
+                      />
+                      {strategyToDisplayData[strategy].name} ({wallet.web3Wallet})
+                    </Flex>
+
+                    <Web3WalletMenu />
+                  </ProfileSection.Item>
+                </Action.Closed>
+
+                <Action.Open value='remove'>
+                  <Action.Card>
+                    <RemoveWeb3WalletForm walletId={wallet.id} />
+                  </Action.Card>
+                </Action.Open>
+              </Action.Root>
+            );
+          })}
+
+          <Action.Trigger value='add'>
+            <ProfileSection.Button
+              id='web3Wallets'
+              localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
+            />
+          </Action.Trigger>
+        </ProfileSection.ItemList>
+
+        <Action.Open value='add'>
+          <Action.Card>
+            <Web3Form />
+          </Action.Card>
+        </Action.Open>
+      </Action.Root>
+    </ProfileSection.Root>
   );
 };
 
-const Web3WalletAccordion = ({ wallet }: { wallet: Web3WalletResource }) => {
-  const { navigate } = useRouter();
-  const { strategyToDisplayData } = useEnabledThirdPartyProviders();
-  const strategy = wallet.verification.strategy as keyof typeof strategyToDisplayData;
+const Web3WalletMenu = () => {
+  const actions = (
+    [
+      {
+        label: localizationKeys('userProfile.start.web3WalletsSection.destructiveAction'),
+        onClick: () => open('verify'),
+      },
+    ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
+  ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
 
-  return (
-    <UserProfileAccordion
-      title={
-        <Flex
-          align='center'
-          gap={4}
-        >
-          <Image
-            src={strategyToDisplayData[strategy].iconUrl}
-            alt={strategyToDisplayData[strategy].name}
-            sx={theme => ({ width: theme.sizes.$4 })}
-          />
-          {strategyToDisplayData[strategy].name} ({wallet.web3Wallet})
-        </Flex>
-      }
-    >
-      <Col gap={4}>
-        <LinkButtonWithDescription
-          title={localizationKeys('userProfile.start.web3WalletsSection.destructiveActionTitle')}
-          subtitle={localizationKeys('userProfile.start.web3WalletsSection.destructiveActionSubtitle')}
-          actionLabel={localizationKeys('userProfile.start.web3WalletsSection.destructiveAction')}
-          variant='linkDanger'
-          onClick={() => navigate(`web3-wallet/${wallet.id}/remove`)}
-        />
-      </Col>
-    </UserProfileAccordion>
-  );
+  return <ThreeDotsMenu actions={actions} />;
 };

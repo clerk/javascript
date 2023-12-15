@@ -2,7 +2,7 @@ import { useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/types';
 
 import { useEnvironment } from '../../contexts';
-import { Badge, Button, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { FormattedPhoneNumberText, ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -11,7 +11,7 @@ import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';
 import { MfaForm } from './MfaForm';
-import { RemoveMfaPhoneCodeForm, RemoveMfaTOTPForm } from './RemoveResourcePage';
+import { RemoveMfaPhoneCodeForm, RemoveMfaTOTPForm } from './RemoveResourceForm';
 import { defaultFirst, getSecondFactors, getSecondFactorsAvailableToAdd } from './utils';
 
 export const MfaSection = () => {
@@ -36,111 +36,111 @@ export const MfaSection = () => {
     .sort(defaultFirst);
 
   return (
-    <ProfileSection
+    <ProfileSection.Root
       title={localizationKeys('userProfile.start.mfaSection.title')}
       id='mfa'
     >
       <Action.Root>
-        {showTOTP && (
-          <Action.Root>
-            <Flex sx={{ justifyContent: 'space-between' }}>
-              <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
-                <Icon
-                  icon={AuthApp}
-                  sx={theme => ({ color: theme.colors.$blackAlpha700 })}
-                />
-
-                <Text localizationKey={localizationKeys('userProfile.start.mfaSection.totp.headerTitle')} />
-
-                <Badge localizationKey={localizationKeys('badge__default')} />
-              </Flex>
-
-              <MfaTOTPMenu />
-            </Flex>
-
-            <Action.Open value='remove'>
-              <Action.Card>
-                <RemoveMfaTOTPForm />
-              </Action.Card>
-            </Action.Open>
-          </Action.Root>
-        )}
-
-        {secondFactors.includes('phone_code') &&
-          mfaPhones.map(phone => {
-            const isDefault = !showTOTP && phone.defaultSecondFactor;
-            return (
-              <Action.Root key={phone.id}>
-                <Flex sx={{ justifyContent: 'space-between' }}>
-                  <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
-                    <Icon
-                      icon={Mobile}
-                      sx={theme => ({ color: theme.colors.$blackAlpha700 })}
-                    />
-                    <Text>
-                      SMS Code <FormattedPhoneNumberText value={phone.phoneNumber} />
-                    </Text>
-                    {isDefault && <Badge localizationKey={localizationKeys('badge__default')} />}
-                  </Flex>
-
-                  <MfaPhoneCodeMenu
-                    phone={phone}
-                    showTOTP={showTOTP}
+        <ProfileSection.ItemList id='mfa'>
+          {showTOTP && (
+            <Action.Root>
+              <ProfileSection.Item id='mfa'>
+                <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
+                  <Icon
+                    icon={AuthApp}
+                    sx={theme => ({ color: theme.colors.$blackAlpha700 })}
                   />
+
+                  <Text localizationKey={localizationKeys('userProfile.start.mfaSection.totp.headerTitle')} />
+
+                  <Badge localizationKey={localizationKeys('badge__default')} />
                 </Flex>
 
-                <Action.Open value='remove'>
-                  <Action.Card>
-                    <RemoveMfaPhoneCodeForm phoneId={phone.id} />
-                  </Action.Card>
-                </Action.Open>
-              </Action.Root>
-            );
-          })}
+                <MfaTOTPMenu />
+              </ProfileSection.Item>
 
-        {showBackupCode && (
-          <Action.Root>
-            <Flex sx={{ justifyContent: 'space-between' }}>
-              <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
-                <Icon
-                  icon={DotCircle}
-                  sx={theme => ({ color: theme.colors.$blackAlpha700 })}
+              <Action.Open value='remove'>
+                <Action.Card>
+                  <RemoveMfaTOTPForm />
+                </Action.Card>
+              </Action.Open>
+            </Action.Root>
+          )}
+
+          {secondFactors.includes('phone_code') &&
+            mfaPhones.map(phone => {
+              const isDefault = !showTOTP && phone.defaultSecondFactor;
+              return (
+                <Action.Root key={phone.id}>
+                  <ProfileSection.Item id='mfa'>
+                    <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
+                      <Icon
+                        icon={Mobile}
+                        sx={theme => ({ color: theme.colors.$blackAlpha700 })}
+                      />
+                      <Text>
+                        SMS Code <FormattedPhoneNumberText value={phone.phoneNumber} />
+                      </Text>
+                      {isDefault && <Badge localizationKey={localizationKeys('badge__default')} />}
+                    </Flex>
+
+                    <MfaPhoneCodeMenu
+                      phone={phone}
+                      showTOTP={showTOTP}
+                    />
+                  </ProfileSection.Item>
+
+                  <Action.Open value='remove'>
+                    <Action.Card>
+                      <RemoveMfaPhoneCodeForm phoneId={phone.id} />
+                    </Action.Card>
+                  </Action.Open>
+                </Action.Root>
+              );
+            })}
+
+          {showBackupCode && (
+            <Action.Root>
+              <ProfileSection.Item id='mfa'>
+                <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
+                  <Icon
+                    icon={DotCircle}
+                    sx={theme => ({ color: theme.colors.$blackAlpha700 })}
+                  />
+
+                  <Text localizationKey={localizationKeys('userProfile.start.mfaSection.backupCodes.headerTitle')} />
+                </Flex>
+
+                <MfaBackupCodeMenu />
+              </ProfileSection.Item>
+
+              <Action.Open value='regenerate'>
+                <Action.Card>
+                  <MfaBackupCodeCreateForm />
+                </Action.Card>
+              </Action.Open>
+            </Action.Root>
+          )}
+
+          {secondFactorsAvailableToAdd.length > 0 && (
+            <>
+              <Action.Trigger value='multi-factor'>
+                <ProfileSection.Button
+                  id='mfa'
+                  localizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
                 />
+              </Action.Trigger>
 
-                <Text localizationKey={localizationKeys('userProfile.start.mfaSection.backupCodes.headerTitle')} />
-              </Flex>
-
-              <MfaBackupCodeMenu />
-            </Flex>
-
-            <Action.Open value='regenerate'>
-              <Action.Card>
-                <MfaBackupCodeCreateForm />
-              </Action.Card>
-            </Action.Open>
-          </Action.Root>
-        )}
-
-        {secondFactorsAvailableToAdd.length > 0 && (
-          <>
-            <Action.Trigger value='multi-factor'>
-              <Button
-                id='mfa'
-                variant='ghost'
-                localizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
-                sx={{ justifyContent: 'start' }}
-              />
-            </Action.Trigger>
-
-            <Action.Open value='multi-factor'>
-              <Action.Card>
-                <MfaForm />
-              </Action.Card>
-            </Action.Open>
-          </>
-        )}
+              <Action.Open value='multi-factor'>
+                <Action.Card>
+                  <MfaForm />
+                </Action.Card>
+              </Action.Open>
+            </>
+          )}
+        </ProfileSection.ItemList>
       </Action.Root>
-    </ProfileSection>
+    </ProfileSection.Root>
   );
 };
 

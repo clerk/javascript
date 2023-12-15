@@ -4,8 +4,6 @@ import React from 'react';
 import { RemoveResourcePage } from '../../common';
 import { localizationKeys } from '../../customizables';
 import { useEnabledThirdPartyProviders } from '../../hooks';
-import { useRouter } from '../../router';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type RemoveEmailFormProps = {
   emailId: string;
@@ -32,7 +30,6 @@ export const RemoveEmailForm = (props: RemoveEmailFormProps) => {
         emailAddress: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
-      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
@@ -62,7 +59,6 @@ export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
         phoneNumber: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
-      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
@@ -93,14 +89,17 @@ export const RemoveConnectedAccountForm = (props: ConnectedAccountFormProps) => 
         connectedAccount: providerToDisplayData[ref.current]?.name,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
-      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
 
-export const RemoveWeb3WalletPage = () => {
+type RemoveWeb3WalletFormProps = {
+  walletId: string;
+};
+
+export const RemoveWeb3WalletForm = (props: RemoveWeb3WalletFormProps) => {
   const { user } = useUser();
-  const { id } = useRouter().params;
+  const { walletId: id } = props;
   const resource = user?.web3Wallets.find(e => e.id === id);
   const ref = React.useRef(resource?.web3Wallet);
 
@@ -119,7 +118,6 @@ export const RemoveWeb3WalletPage = () => {
         web3Wallet: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
-      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
@@ -150,7 +148,6 @@ export const RemoveMfaPhoneCodeForm = (props: RemoveMfaPhoneCodeFormProps) => {
         mfaPhoneCode: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.setReservedForSecondFactor({ reserved: false }))}
-      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
@@ -169,7 +166,6 @@ export const RemoveMfaTOTPForm = () => {
       messageLine2={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.mfaTOTPPage.removeResource.successMessage')}
       deleteResource={user.disableTOTP}
-      Breadcrumbs={UserProfileBreadcrumbs}
     />
   );
 };
