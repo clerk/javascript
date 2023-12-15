@@ -160,42 +160,46 @@ function _SignUpContinue() {
   return (
     <Flow.Part part='complete'>
       <Card.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
-          <Header.Title localizationKey={localizationKeys('signUp.continue.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('signUp.continue.subtitle')} />
-        </Header.Root>
-        <Flex
-          direction='col'
-          elementDescriptor={descriptors.main}
-          gap={8}
-        >
-          <SocialButtonsReversibleContainerWithDivider>
-            {(showOauthProviders || showWeb3Providers) && (
-              <SignUpSocialButtons
-                enableOAuthProviders={showOauthProviders}
-                enableWeb3Providers={showWeb3Providers}
+        <Card.Content>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Header.Root>
+            <Header.Title localizationKey={localizationKeys('signUp.continue.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signUp.continue.subtitle')} />
+          </Header.Root>
+          <Flex
+            direction='col'
+            elementDescriptor={descriptors.main}
+            gap={8}
+          >
+            <SocialButtonsReversibleContainerWithDivider>
+              {(showOauthProviders || showWeb3Providers) && (
+                <SignUpSocialButtons
+                  enableOAuthProviders={showOauthProviders}
+                  enableWeb3Providers={showWeb3Providers}
+                />
+              )}
+              <SignUpForm
+                handleSubmit={handleSubmit}
+                fields={fields}
+                formState={formState}
+                canToggleEmailPhone={canToggleEmailPhone}
+                handleEmailPhoneToggle={handleChangeActive}
               />
-            )}
-            <SignUpForm
-              handleSubmit={handleSubmit}
-              fields={fields}
-              formState={formState}
-              canToggleEmailPhone={canToggleEmailPhone}
-              handleEmailPhoneToggle={handleChangeActive}
-            />
-          </SocialButtonsReversibleContainerWithDivider>
-        </Flex>
-        <Footer.Root>
-          <Footer.Action elementId='signUp'>
-            <Footer.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
-            <Footer.ActionLink
-              localizationKey={localizationKeys('signUp.continue.actionLink')}
-              to={clerk.buildUrlWithAuth(signInUrl)}
-            />
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
+            </SocialButtonsReversibleContainerWithDivider>
+          </Flex>
+        </Card.Content>
+        <Card.Footer>
+          <Footer.Root>
+            <Footer.Action elementId='signUp'>
+              <Footer.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
+              <Footer.ActionLink
+                localizationKey={localizationKeys('signUp.continue.actionLink')}
+                to={clerk.buildUrlWithAuth(signInUrl)}
+              />
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root>
+        </Card.Footer>
       </Card.Root>
     </Flow.Part>
   );

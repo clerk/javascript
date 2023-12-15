@@ -54,7 +54,7 @@ describe('SignUpVerifyEmail', () => {
 
     render(<SignUpVerifyEmail />, { wrapper });
     screen.getByText(/Verify your email/i);
-    screen.getByText(/to continue to TestApp/i);
+    screen.getByText(/Enter the verification code sent to your email/i);
   });
 
   it('clicking on the edit icon navigates to the previous route', async () => {

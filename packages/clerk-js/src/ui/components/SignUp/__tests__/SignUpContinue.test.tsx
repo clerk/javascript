@@ -82,7 +82,7 @@ describe('SignUpContinue', () => {
       });
       render(<SignUpContinue />, { wrapper });
 
-      const signInLink = screen.getByText('Have an account?').nextElementSibling;
+      const signInLink = screen.getByText('Already have an account?').nextElementSibling;
       expect(signInLink?.textContent).toBe('Sign in');
       expect(signInLink?.tagName.toUpperCase()).toBe('A');
       expect(signInLink?.getAttribute('href')).toMatch(fixtures.environment.displayConfig.signInUrl);

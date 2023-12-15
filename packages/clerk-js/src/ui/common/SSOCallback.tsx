@@ -37,6 +37,7 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
           <Card.Alert>{card.error}</Card.Alert>
           <LoadingCardContainer />
         </Card.Content>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );
