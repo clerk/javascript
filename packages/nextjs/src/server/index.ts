@@ -1,6 +1,8 @@
 /**
  * Generic exports
  */
+import { createRouteMatcher } from './routeMatcher';
+
 export { verifyToken, createClerkClient } from '@clerk/backend';
 export type { WebhookEvent, WebhookEventType } from '@clerk/backend';
 export { clerkClient } from './clerkClient';
@@ -13,3 +15,6 @@ export { redirectToSignIn, redirectToSignUp } from './redirect';
 export { auth } from '../app-router/server/auth';
 export { currentUser } from '../app-router/server/currentUser';
 export { authMiddleware } from './authMiddleware';
+export { clerkMiddleware } from './clerkMiddleware';
+
+export const experimental_createRouteMatcher = createRouteMatcher;
