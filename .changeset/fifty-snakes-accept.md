@@ -2,7 +2,7 @@
 '@clerk/clerk-sdk-node': major
 ---
 
-Internal top-level BAPI resources was dropped to resolve some issues with our type resolution and also make our exposed API cleaner.
+Drop all pre-instantiated Backend API resources (`allowlistIdentifiers`, `clients`, `emailAddresses`, `emails`, `invitations`, `organizations`, `phoneNumbers`, `redirectUrls`, `sessions`, `signInTokens`, `users`, `domains`). Use the `clerkClient` import instead.
 ```typescript
 // Before
 import { users } from "@clerk/clerk-sdk-node"
