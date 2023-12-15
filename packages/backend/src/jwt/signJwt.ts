@@ -1,7 +1,9 @@
+import { SignJWTError } from '../errors';
 import runtime from '../runtime';
 import { base64url } from '../util/rfc4648';
 import { getCryptoAlgorithm } from './algorithms';
 import { importKey } from './cryptoKeys';
+import type { JwtReturnType } from './types';
 
 export interface SignJwtOptions {
   algorithm?: string;
@@ -32,7 +34,7 @@ export async function signJwt(
   payload: Record<string, unknown>,
   key: string | JsonWebKey,
   options: SignJwtOptions,
-): Promise<string> {
+): Promise<JwtReturnType<string, Error>> {
   if (!options.algorithm) {
     throw new Error('No algorithm specified');
   }
@@ -53,7 +55,11 @@ export async function signJwt(
   const encodedPayload = encodeJwtData(payload);
   const firstPart = `${encodedHeader}.${encodedPayload}`;
 
-  const signature = await runtime.crypto.subtle.sign(algorithm, cryptoKey, encoder.encode(firstPart));
-
-  return `${firstPart}.${base64url.stringify(new Uint8Array(signature), { pad: false })}`;
+  try {
+    const signature = await runtime.crypto.subtle.sign(algorithm, cryptoKey, encoder.encode(firstPart));
+    const encodedSignature = `${firstPart}.${base64url.stringify(new Uint8Array(signature), { pad: false })}`;
+    return { data: encodedSignature };
+  } catch (error) {
+    return { error: new SignJWTError((error as Error)?.message) };
+  }
 }

@@ -84,3 +84,9 @@ const mockHeadersGet = (key: string) => {
 
   return null;
 };
+
+// used instead of the explicitly invoking assert.ok to avoid
+// type casting the data param
+export function assertOk<T = string>(assert: Assert, data: unknown): asserts data is T {
+  assert.ok(data);
+}

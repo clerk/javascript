@@ -18,6 +18,7 @@ export default (QUnit: QUnit) => {
   module('subpath /errors exports', () => {
     test('should not include a breaking change', assert => {
       const exportedApiKeys = [
+        'SignJWTError',
         'TokenVerificationError',
         'TokenVerificationErrorAction',
         'TokenVerificationErrorCode',
