@@ -25,4 +25,4 @@ export {
 export { createIsomorphicRequest } from './util/IsomorphicRequest';
 
 export { AuthStatus } from './tokens/authStatus';
-export type { RequestState } from './tokens/authStatus';
+export type { RequestState, SignedInState, SignedOutState } from './tokens/authStatus';

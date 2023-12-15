@@ -1,6 +1,6 @@
 import { createClerkClient } from '@clerk/backend';
-import type { RequestState } from '@clerk/backend/internal';
-import { buildRequestUrl } from '@clerk/backend/internal';
+import type { SignedInState, SignedOutState } from '@clerk/backend/internal';
+import { AuthStatus, buildRequestUrl } from '@clerk/backend/internal';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
@@ -11,7 +11,10 @@ import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMis
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 
-export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<RequestState> {
+export async function authenticateRequest(
+  args: LoaderFunctionArgs,
+  opts: RootAuthLoaderOptions = {},
+): Promise<SignedInState | SignedOutState> {
   const { request, context } = args;
   const { loadSession, loadUser, loadOrganization } = opts;
   const { audience, authorizedParties } = opts;
@@ -71,7 +74,14 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
-  return createClerkClient({ apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest(request, {
+  const requestState = await createClerkClient({
+    apiUrl,
+    secretKey,
+    jwtKey,
+    proxyUrl,
+    isSatellite,
+    domain,
+  }).authenticateRequest(request, {
     audience,
     secretKey,
     jwtKey,
@@ -88,4 +98,16 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     afterSignInUrl,
     afterSignUpUrl,
   });
+
+  const hasLocationHeader = requestState.headers.get('location');
+  if (hasLocationHeader) {
+    // triggering a handshake redirect
+    throw new Response(null, { status: 307, headers: requestState.headers });
+  }
+
+  if (requestState.status === AuthStatus.Handshake) {
+    throw new Error('Clerk: unexpected handshake without redirect');
+  }
+
+  return requestState;
 }
