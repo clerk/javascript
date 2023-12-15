@@ -1,5 +1,5 @@
-import runtime from '../../runtime';
-import { base64url } from '../../util/rfc4648';
+import runtime from '../runtime';
+import { base64url } from '../util/rfc4648';
 import { getCryptoAlgorithm } from './algorithms';
 import { importKey } from './cryptoKeys';
 

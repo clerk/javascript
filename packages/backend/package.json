@@ -55,6 +55,16 @@
         "default": "./dist/internal.js"
       }
     },
+    "./jwt": {
+      "import": {
+        "types": "./dist/jwt/index.d.ts",
+        "default": "./dist/jwt/index.mjs"
+      },
+      "require": {
+        "types": "./dist/jwt/index.d.ts",
+        "default": "./dist/jwt/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
