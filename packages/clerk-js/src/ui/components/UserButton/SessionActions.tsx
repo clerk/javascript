@@ -48,6 +48,7 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
           t => ({
             borderBottomLeftRadius: t.radii.$lg,
             borderBottomRightRadius: t.radii.$lg,
+            borderBottom: 'none',
             ':hover': {
               backgroundColor: t.colors.$danger50,
               color: t.colors.$danger400,

@@ -205,6 +205,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                     sx={t => ({
                       padding: `${t.space.$4} ${t.space.$5}`,
                       borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+                      width: '100%',
                     })}
                     title={localizationKeys('organizationSwitcher.personalWorkspace')}
                   />
