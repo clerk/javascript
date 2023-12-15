@@ -1,9 +1,9 @@
 import type { JwtPayload } from '@clerk/types';
 
 import { createBackendApiClient } from '../api';
+import type { TokenVerificationErrorReason } from '../errors';
 import type { SignedInAuthObject, SignedInAuthObjectOptions, SignedOutAuthObject } from './authObjects';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';
-import type { TokenVerificationErrorReason } from './errors';
 
 export enum AuthStatus {
   SignedIn = 'signed-in',

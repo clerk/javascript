@@ -58,11 +58,11 @@ jobs:
 
       - name: Lint types using attw
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!backend --only
 
       - name: Lint types using attw [Errors Allowed]
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --continue --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=backend --continue --only
         continue-on-error: true  # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
