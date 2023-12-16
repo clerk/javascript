@@ -1,8 +1,5 @@
-import { SECRET_KEY } from 'gatsby-plugin-clerk/dist/constants';
-
 import type { CreateBackendApiOptions, Organization, Session, User } from '../api';
 import { createBackendApiClient } from '../api';
-import { API_URL, API_VERSION } from '../constants';
 import type { AuthObject } from '../tokens/authObjects';
 
 type DecorateAuthWithResourcesOptions = {
@@ -26,12 +23,7 @@ export const decorateObjectWithResources = async <T extends object>(
   const { loadSession, loadUser, loadOrganization } = opts || {};
   const { userId, sessionId, orgId } = authObj;
 
-  const { sessions, users, organizations } = createBackendApiClient({
-    secretKey: SECRET_KEY,
-    apiUrl: API_URL,
-    apiVersion: API_VERSION,
-    ...apiClientOptions,
-  });
+  const { sessions, users, organizations } = createBackendApiClient({ ...apiClientOptions });
 
   const [sessionResp, userResp, organizationResp] = await Promise.all([
     loadSession && sessionId ? sessions.getSession(sessionId) : Promise.resolve(undefined),
