@@ -16,7 +16,6 @@ export async function authenticateRequest(
   opts: RootAuthLoaderOptions = {},
 ): Promise<SignedInState | SignedOutState> {
   const { request, context } = args;
-  const { loadSession, loadUser, loadOrganization } = opts;
   const { audience, authorizedParties } = opts;
 
   // Fetch environment variables across Remix runtime.
@@ -86,9 +85,6 @@ export async function authenticateRequest(
     secretKey,
     jwtKey,
     publishableKey,
-    loadUser,
-    loadSession,
-    loadOrganization,
     authorizedParties,
     proxyUrl,
     isSatellite,

@@ -1,22 +1,8 @@
-import type { AuthObject } from '@clerk/backend/internal';
 import { constants, prunePrivateMetadata } from '@clerk/backend/internal';
 import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
 
 import { SECRET_KEY } from '../constants';
-
-/**
- * @internal
- */
-export function injectAuthIntoContext(context: GetServerDataProps, authData: AuthObject) {
-  const { user, session } = authData || {};
-  return {
-    ...context,
-    auth: authData,
-    user: user || null,
-    session: session || null,
-  };
-}
 
 /**
  *  @internal
