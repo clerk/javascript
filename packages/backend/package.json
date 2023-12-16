@@ -69,7 +69,10 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "errors",
+    "internal",
+    "jwt"
   ],
   "scripts": {
     "build": "tsup",
