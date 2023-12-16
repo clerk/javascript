@@ -281,6 +281,8 @@ type _LocalizationResource = {
   };
   userProfile: {
     mobileButton__menu: LocalizationValue;
+    formButtonPrimary__save: LocalizationValue;
+    // TODO-RETHEME remove
     formButtonPrimary__continue: LocalizationValue;
     formButtonPrimary__finish: LocalizationValue;
     formButtonReset: LocalizationValue;

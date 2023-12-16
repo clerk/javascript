@@ -34,6 +34,9 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
         <Box
           sx={t => ({
             padding: t.space.$3,
+            [mqu.md]: {
+              padding: `${t.space.$1x5} ${t.space.$2}`,
+            },
             zIndex: t.zIndices.$modal,
             position: 'absolute',
             top: t.space.$none,

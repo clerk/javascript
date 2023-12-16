@@ -1,9 +1,11 @@
 import type { ProfileSectionId } from '@clerk/types';
 
-import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, Text } from '../customizables';
+import type { Button, LocalizationKey } from '../customizables';
+import { Col, descriptors, Flex, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
+import { Plus } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
+import { ArrowBlockButton } from '.';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
@@ -89,7 +91,7 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
-        padding: `${t.space.$0x5} ${t.space.$4}`,
+        padding: `${t.space.$2} ${t.space.$4}`,
       })}
       {...rest}
     >
@@ -103,17 +105,20 @@ type ProfileSectionButtonProps = PropsOfComponent<typeof Button> & {
 };
 
 const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
-  const { children, id, sx, ...rest } = props;
+  const { children, id, sx, localizationKey, ...rest } = props;
   return (
-    <Button
+    <ArrowBlockButton
       elementDescriptor={descriptors.profileSectionPrimaryButton}
       elementId={descriptors.profileSectionPrimaryButton.setId(id)}
       variant='ghost'
-      sx={[t => ({ justifyContent: 'start', padding: `${t.space.$2} ${t.space.$4}` }), sx]}
+      sx={[t => ({ justifyContent: 'start', gap: t.space.$2, padding: `${t.space.$2} ${t.space.$4}` }), sx]}
+      textLocalizationKey={localizationKey}
+      leftIcon={Plus}
+      leftIconSx={t => ({ width: t.sizes.$2x5, height: t.sizes.$2x5 })}
       {...rest}
     >
       {children}
-    </Button>
+    </ArrowBlockButton>
   );
 };
 

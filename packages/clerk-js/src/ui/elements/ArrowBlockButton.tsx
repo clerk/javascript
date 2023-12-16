@@ -20,7 +20,7 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   arrowElementId?: ElementId;
   spinnerElementDescriptor?: ElementDescriptor;
   spinnerElementId?: ElementId;
-  textLocalizationKey?: LocalizationKey;
+  textLocalizationKey?: LocalizationKey | string;
 };
 
 export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {

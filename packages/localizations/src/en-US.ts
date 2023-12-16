@@ -267,6 +267,8 @@ export const enUS: LocalizationResource = {
   },
   userProfile: {
     mobileButton__menu: 'Menu',
+    formButtonPrimary__save: 'Save',
+    // TODO-RETHEME remove
     formButtonPrimary__continue: 'Continue',
     formButtonPrimary__finish: 'Finish',
     formButtonReset: 'Cancel',
@@ -432,8 +434,8 @@ export const enUS: LocalizationResource = {
     profilePage: {
       title: 'Update profile',
       imageFormTitle: 'Profile image',
-      imageFormSubtitle: 'Upload image',
-      imageFormDestructiveActionSubtitle: 'Remove image',
+      imageFormSubtitle: 'Upload',
+      imageFormDestructiveActionSubtitle: 'Remove',
       fileDropAreaTitle: 'Drag file here, or...',
       fileDropAreaAction: 'Select file',
       fileDropAreaHint: 'Upload a JPG, PNG, GIF, or WEBP image smaller than 10 MB',
