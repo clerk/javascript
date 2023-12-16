@@ -172,7 +172,12 @@ const NavbarContainer = (
         </Col>
         {props.children}
       </Col>
-      <PoweredByClerkTag sx={{ justifyContent: 'start' }} />
+      <PoweredByClerkTag
+        sx={theme => ({
+          justifyContent: 'start',
+          paddingLeft: theme.space.$3,
+        })}
+      />
     </Col>
   );
 };
@@ -290,12 +295,13 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
   return (
     <Flex
       elementDescriptor={descriptors.navbarMobileMenuRow}
-      sx={{
+      sx={t => ({
         display: 'none',
+        padding: `${t.space.$2} ${t.space.$3}`,
         [mqu.md]: {
           display: 'flex',
         },
-      }}
+      })}
     >
       <Button
         elementDescriptor={descriptors.navbarMobileMenuButton}
@@ -303,12 +309,14 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
         // @ts-ignore
         onClick={open}
         size='xs'
+        textVariant='h2'
         variant='ghost'
         sx={t => ({
           color: t.colors.$colorText,
-          gap: t.space.$1x5,
+          gap: t.space.$2x5,
           width: 'fit-content',
           alignItems: 'center',
+          justifyContent: 'center',
         })}
       >
         <Icon
@@ -316,7 +324,7 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
           icon={Menu}
           size='sm'
         />
-        {t(localizationKeys('userProfile.mobileButton__menu'))}
+        {t(localizationKeys('userProfile.navbar.title'))}
       </Button>
     </Flex>
   );

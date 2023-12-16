@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
 
-import { Badge, localizationKeys, Text } from '../../customizables';
+import { Badge, Flex, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -25,14 +25,19 @@ export const EmailsSection = () => {
             <Action.Root key={email.emailAddress}>
               <Action.Closed value=''>
                 <ProfileSection.Item id='emailAddresses'>
-                  <Text>
-                    {email.emailAddress}{' '}
-                    {user?.primaryEmailAddressId === email.id && (
-                      <Badge localizationKey={localizationKeys('badge__primary')} />
-                    )}
-                    {email.verification.status !== 'verified' && (
-                      <Badge localizationKey={localizationKeys('badge__unverified')} />
-                    )}
+                  <Text sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                    <Flex
+                      gap={2}
+                      center
+                    >
+                      {email.emailAddress}{' '}
+                      {user?.primaryEmailAddressId === email.id && (
+                        <Badge localizationKey={localizationKeys('badge__primary')} />
+                      )}
+                      {email.verification.status !== 'verified' && (
+                        <Badge localizationKey={localizationKeys('badge__unverified')} />
+                      )}
+                    </Flex>
                   </Text>
 
                   <EmailMenu email={email} />

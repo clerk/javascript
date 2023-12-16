@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { ProfileCard, withCardStateProvider } from '../../elements';
+import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { UserProfileCtx } from '../../types';
 import { UserProfileNavbar } from './UserProfileNavbar';
@@ -33,6 +33,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   return (
     <ProfileCard.Root>
       <UserProfileNavbar contentRef={contentRef}>
+        <NavbarMenuButtonRow />
         <ProfileCard.Content contentRef={contentRef}>
           <UserProfileRoutes />
         </ProfileCard.Content>

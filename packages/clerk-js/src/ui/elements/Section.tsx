@@ -85,7 +85,12 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
     <Flex
       elementDescriptor={descriptors.profileSectionItem}
       elementId={descriptors.profileSectionItem.setId(id)}
-      sx={t => ({ justifyContent: 'space-between', alignItems: 'center', padding: `${t.space.$0x5} ${t.space.$4}` })}
+      sx={t => ({
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        padding: `${t.space.$0x5} ${t.space.$4}`,
+      })}
       {...rest}
     >
       {children}
@@ -104,7 +109,7 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
       elementDescriptor={descriptors.profileSectionPrimaryButton}
       elementId={descriptors.profileSectionPrimaryButton.setId(id)}
       variant='ghost'
-      sx={[t => ({ justifyContent: 'start', padding: `${t.space.$1} ${t.space.$4}` }), sx]}
+      sx={[t => ({ justifyContent: 'start', padding: `${t.space.$2} ${t.space.$4}` }), sx]}
       {...rest}
     >
       {children}
