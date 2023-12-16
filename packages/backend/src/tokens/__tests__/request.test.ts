@@ -82,13 +82,10 @@ function assertSignedInToAuth(assert, requestState: RequestState) {
   assert.propContains(requestState.toAuth(), {
     sessionClaims: mockJwtPayload,
     sessionId: mockJwtPayload.sid,
-    session: undefined,
     userId: mockJwtPayload.sub,
-    user: undefined,
     orgId: undefined,
     orgRole: undefined,
     orgSlug: undefined,
-    organization: undefined,
     getToken: {},
   });
 }

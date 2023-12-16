@@ -9,7 +9,6 @@ import {
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
 import { joinPaths } from '../util/path';
-import { getErrorObjectByCode } from '../util/request';
 import { callWithRetry } from '../util/shared';
 
 type JsonWebKeyWithKid = JsonWebKey & { kid: string };
@@ -211,3 +210,17 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
 function cacheHasExpired() {
   return Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
 }
+
+type ErrorFields = {
+  message: string;
+  long_message: string;
+  code: string;
+};
+
+const getErrorObjectByCode = (errors: ErrorFields[], code: string) => {
+  if (!errors) {
+    return null;
+  }
+
+  return errors.find((err: ErrorFields) => err.code === code);
+};
