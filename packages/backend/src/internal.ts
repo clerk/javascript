@@ -15,14 +15,14 @@ export type {
   SignedOutAuthObject,
   AuthObject,
 } from './tokens/authObjects';
-export {
-  makeAuthObjectSerializable,
-  sanitizeAuthObject,
-  prunePrivateMetadata,
-  signedOutAuthObject,
-  signedInAuthObject,
-} from './tokens/authObjects';
+export { makeAuthObjectSerializable, signedOutAuthObject, signedInAuthObject } from './tokens/authObjects';
 export { createIsomorphicRequest } from './util/IsomorphicRequest';
 
 export { AuthStatus } from './tokens/authStatus';
 export type { RequestState, SignedInState, SignedOutState } from './tokens/authStatus';
+
+export {
+  decorateObjectWithResources,
+  sanitizeAuthObject,
+  prunePrivateMetadata,
+} from './util/decorateObjectWithResources';

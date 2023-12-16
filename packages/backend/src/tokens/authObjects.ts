@@ -8,7 +8,7 @@ import type {
   ServerGetTokenOptions,
 } from '@clerk/types';
 
-import type { CreateBackendApiOptions, Organization, Session, User } from '../api';
+import type { CreateBackendApiOptions } from '../api';
 import { createBackendApiClient } from '../api';
 
 type AuthObjectDebugData = Record<string, any>;
@@ -20,9 +20,6 @@ type AuthObjectDebug = () => AuthObjectDebugData;
  */
 export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
   token: string;
-  session?: Session;
-  user?: User;
-  organization?: Organization;
 };
 
 /**
@@ -31,15 +28,12 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
 export type SignedInAuthObject = {
   sessionClaims: JwtPayload;
   sessionId: string;
-  session: Session | undefined;
   actor: ActClaim | undefined;
   userId: string;
-  user: User | undefined;
   orgId: string | undefined;
   orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
-  organization: Organization | undefined;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -96,7 +90,7 @@ export function signedInAuthObject(
     org_permissions: orgPermissions,
     sub: userId,
   } = sessionClaims;
-  const { secretKey, apiUrl, apiVersion, token, session, user, organization } = options;
+  const { secretKey, apiUrl, apiVersion, token } = options;
   const { sessions } = createBackendApiClient({
     secretKey,
     apiUrl,
@@ -113,14 +107,11 @@ export function signedInAuthObject(
     actor,
     sessionClaims,
     sessionId,
-    session,
     userId,
-    user,
     orgId,
     orgRole,
     orgSlug,
     orgPermissions,
-    organization,
     getToken,
     has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
     debug: createDebug({ ...options, ...debugData }),
@@ -147,43 +138,6 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     has: () => false,
     debug: createDebug(debugData),
   };
-}
-
-/**
- * @internal
- */
-export function prunePrivateMetadata(
-  resource?:
-    | {
-        private_metadata: any;
-      }
-    | {
-        privateMetadata: any;
-      }
-    | null,
-) {
-  // Delete sensitive private metadata from resource before rendering in SSR
-  if (resource) {
-    // @ts-ignore
-    delete resource['privateMetadata'];
-    // @ts-ignore
-    delete resource['private_metadata'];
-  }
-
-  return resource;
-}
-
-/**
- * @internal
- */
-export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T {
-  const user = authObject.user ? { ...authObject.user } : authObject.user;
-  const organization = authObject.organization ? { ...authObject.organization } : authObject.organization;
-
-  prunePrivateMetadata(user);
-  prunePrivateMetadata(organization);
-
-  return { ...authObject, user, organization };
 }
 
 /**

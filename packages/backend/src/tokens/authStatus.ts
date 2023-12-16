@@ -1,6 +1,5 @@
 import type { JwtPayload } from '@clerk/types';
 
-import { createBackendApiClient } from '../api';
 import type { TokenVerificationErrorReason } from '../errors';
 import type { SignedInAuthObject, SignedInAuthObjectOptions, SignedOutAuthObject } from './authObjects';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';
@@ -12,7 +11,6 @@ export enum AuthStatus {
   SignedIn = 'signed-in',
   SignedOut = 'signed-out',
   Handshake = 'handshake',
-  SessionTokenOutdated = 'SessionTokenOutdated',
 }
 
 export type SignedInState = {
@@ -74,12 +72,6 @@ export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
  */
 export type RequestState = SignedInState | SignedOutState | HandshakeState;
 
-type LoadResourcesOptions = {
-  loadSession?: boolean;
-  loadUser?: boolean;
-  loadOrganization?: boolean;
-};
-
 type RequestStateParams = {
   publishableKey?: string;
   domain?: string;
@@ -100,16 +92,13 @@ type AuthParams = {
   clientUat?: string;
 };
 
-export type AuthStatusOptionsType = LoadResourcesOptions &
-  Partial<SignedInAuthObjectOptions> &
-  RequestStateParams &
-  AuthParams;
+export type AuthStatusOptionsType = Partial<SignedInAuthObjectOptions> & RequestStateParams & AuthParams;
 
-export async function signedIn<T extends AuthStatusOptionsType>(
+export function signedIn<T extends AuthStatusOptionsType>(
   options: T,
   sessionClaims: JwtPayload,
   headers: Headers = new Headers(),
-): Promise<SignedInState> {
+): SignedInState {
   const {
     publishableKey = '',
     proxyUrl = '',
@@ -124,28 +113,7 @@ export async function signedIn<T extends AuthStatusOptionsType>(
     apiVersion,
     sessionTokenInCookie,
     sessionTokenInHeader,
-    loadSession,
-    loadUser,
-    loadOrganization,
   } = options;
-
-  const { sid: sessionId, org_id: orgId, sub: userId } = sessionClaims;
-
-  const { sessions, users, organizations } = createBackendApiClient({
-    secretKey,
-    apiUrl,
-    apiVersion,
-  });
-
-  const [sessionResp, userResp, organizationResp] = await Promise.all([
-    loadSession ? sessions.getSession(sessionId) : Promise.resolve(undefined),
-    loadUser ? users.getUser(userId) : Promise.resolve(undefined),
-    loadOrganization && orgId ? organizations.getOrganization({ organizationId: orgId }) : Promise.resolve(undefined),
-  ]);
-
-  const session = sessionResp && !sessionResp.errors ? sessionResp.data : undefined;
-  const user = userResp && !userResp.errors ? userResp.data : undefined;
-  const organization = organizationResp && !organizationResp.errors ? organizationResp.data : undefined;
 
   const authObject = signedInAuthObject(
     sessionClaims,
@@ -154,9 +122,6 @@ export async function signedIn<T extends AuthStatusOptionsType>(
       apiUrl,
       apiVersion,
       token: sessionTokenInCookie || sessionTokenInHeader || '',
-      session,
-      user,
-      organization,
     },
     { ...options, status: AuthStatus.SignedIn },
   );
