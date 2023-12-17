@@ -100,8 +100,9 @@ export type VerifyJwtOptions = {
 
 export async function verifyJwt(
   token: string,
-  { audience, authorizedParties, clockSkewInMs, key }: VerifyJwtOptions,
+  options: VerifyJwtOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
+  const { audience, authorizedParties, clockSkewInMs, key } = options;
   const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
 
   const { data: decoded, error } = decodeJwt(token);
