@@ -15,18 +15,23 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useFetch } from '../../hooks';
-import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
+import { VerifiedDomainForm } from './VerifiedDomainForm';
 
-export const VerifyDomainPage = withCardStateProvider(() => {
+type VerifyDomainFormProps = {
+  domainId: string;
+  onSubmit?: () => void;
+};
+
+export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormProps) => {
+  const { domainId: id, onSubmit } = props;
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
   const { organization } = useOrganization();
-  const { params, navigate } = useRouter();
 
   const { data: domain, status: domainStatus } = useFetch(organization?.getDomain, {
-    domainId: params.id,
+    domainId: id,
   });
   const title = localizationKeys('organizationProfile.verifyDomainPage.title');
   const subtitle = localizationKeys('organizationProfile.verifyDomainPage.subtitle', {
@@ -59,8 +64,11 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       .then(async res => {
         await resolve();
         if (res.verification?.status === 'verified') {
-          return navigate(`../../../domain/${res.id}?mode=select`);
+          wizard.nextStep();
+        } else {
+          onSubmit?.();
         }
+
         return;
       })
       .catch(err => reject(err));
@@ -107,10 +115,6 @@ export const VerifyDomainPage = withCardStateProvider(() => {
         direction={'row'}
         align={'center'}
         justify={'center'}
-        sx={t => ({
-          height: '100%',
-          minHeight: t.sizes.$120,
-        })}
       >
         <Spinner
           size={'lg'}
@@ -137,7 +141,10 @@ export const VerifyDomainPage = withCardStateProvider(() => {
               groupSuffix={emailDomainSuffix}
             />
           </Form.ControlRow>
-          <FormButtons isDisabled={!canSubmit} />
+          <FormButtons
+            isDisabled={!canSubmit}
+            onReset={close}
+          />
         </Form.Root>
       </FormContent>
 
@@ -171,6 +178,13 @@ export const VerifyDomainPage = withCardStateProvider(() => {
           />
         </FormButtonContainer>
       </FormContent>
+
+      <VerifiedDomainForm
+        domainId={id}
+        mode='select'
+        onSubmit={onSubmit}
+        onReset={onSubmit}
+      />
     </Wizard>
   );
 });

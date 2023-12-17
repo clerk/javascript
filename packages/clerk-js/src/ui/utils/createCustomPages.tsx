@@ -15,7 +15,7 @@ export type CustomPageContent = {
 };
 
 type ProfileReorderItem = {
-  label: 'account' | 'security' | 'members' | 'settings';
+  label: 'account' | 'security' | 'members' | 'general';
 };
 
 type ProfileCustomPage = {
@@ -268,25 +268,25 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
 const getOrganizationProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
-      name: localizationKeys('organizationProfile.start.headerTitle__members'),
+      name: localizationKeys('organizationProfile.navbar.general'),
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL,
+      icon: CogFilled,
+      path: 'organization-general',
+    },
+    {
+      name: localizationKeys('organizationProfile.navbar.members'),
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS,
       icon: User,
       path: 'organization-members',
-    },
-    {
-      name: localizationKeys('organizationProfile.start.headerTitle__settings'),
-      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS,
-      icon: CogFilled,
-      path: 'organization-settings',
     },
   ];
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
     'invite-members': INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS) as NavbarRoute,
-    domain: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS) as NavbarRoute,
-    profile: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS) as NavbarRoute,
-    leave: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS) as NavbarRoute,
-    delete: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS) as NavbarRoute,
+    domain: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL) as NavbarRoute,
+    profile: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL) as NavbarRoute,
+    leave: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL) as NavbarRoute,
+    delete: INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL) as NavbarRoute,
   };
 
   const validReorderItemLabels: string[] = INITIAL_ROUTES.map(r => r.id);

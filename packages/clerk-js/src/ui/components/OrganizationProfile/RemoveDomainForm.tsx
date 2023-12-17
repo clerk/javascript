@@ -5,21 +5,26 @@ import React from 'react';
 import { RemoveResourcePage } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Spinner } from '../../customizables';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFetch } from '../../hooks';
 import { localizationKeys } from '../../localization';
-import { useRouter } from '../../router';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
-export const RemoveDomainPage = () => {
+type RemoveDomainFormProps = {
+  domainId: string;
+};
+
+export const RemoveDomainForm = (props: RemoveDomainFormProps) => {
   const { organizationSettings } = useEnvironment();
   const { organization } = useOrganization();
-  const { params } = useRouter();
+  const { close } = useActionContext();
+  const { domainId: id } = props;
 
   const ref = React.useRef<OrganizationDomainResource>();
   const { data: domain, status: domainStatus } = useFetch(
     organization?.getDomain,
     {
-      domainId: params.id,
+      domainId: id,
     },
     {
       onSuccess(domain) {
@@ -44,10 +49,6 @@ export const RemoveDomainPage = () => {
         direction={'row'}
         align={'center'}
         justify={'center'}
-        sx={t => ({
-          height: '100%',
-          minHeight: t.sizes.$120,
-        })}
       >
         <Spinner
           size={'lg'}
@@ -68,7 +69,12 @@ export const RemoveDomainPage = () => {
       successMessage={localizationKeys('organizationProfile.removeDomainPage.successMessage', {
         domain: ref.current?.name,
       })}
-      deleteResource={() => domain?.delete().then(() => domains?.revalidate?.())}
+      deleteResource={() =>
+        domain?.delete().then(async () => {
+          await domains?.revalidate?.();
+          close();
+        })
+      }
       breadcrumbTitle={localizationKeys('organizationProfile.profilePage.domainSection.title')}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     />

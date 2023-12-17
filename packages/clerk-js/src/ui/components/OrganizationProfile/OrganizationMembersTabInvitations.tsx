@@ -1,8 +1,7 @@
 import { BlockButton, Gate } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
-import { Header, IconButton } from '../../elements';
-import { UserAdd } from '../../icons';
+import { Col, Flex, localizationKeys } from '../../customizables';
+import { Header } from '../../elements';
 import { useRouter } from '../../router';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';
@@ -90,21 +89,6 @@ export const OrganizationMembersTabInvitations = () => {
               variant='subtitle'
             />
           </Header.Root>
-
-          <IconButton
-            elementDescriptor={descriptors.membersPageInviteButton}
-            aria-label='Invite'
-            onClick={() => navigate('invite-members')}
-            icon={
-              <Icon
-                icon={UserAdd}
-                size={'sm'}
-                sx={t => ({ marginRight: t.space.$2 })}
-              />
-            }
-            textVariant='buttonSmall'
-            localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
-          />
         </Flex>
         <InvitedMembersList />
       </Flex>

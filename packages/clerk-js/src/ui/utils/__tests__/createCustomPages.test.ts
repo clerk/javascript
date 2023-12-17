@@ -313,8 +313,8 @@ describe('createCustomPages', () => {
     it('should return the default pages if no custom pages are passed', () => {
       const { routes, contents } = createOrganizationProfileCustomPages([]);
       expect(routes.length).toEqual(2);
-      expect(routes[0].id).toEqual('members');
-      expect(routes[1].id).toEqual('settings');
+      expect(routes[0].id).toEqual('general');
+      expect(routes[1].id).toEqual('members');
       expect(contents.length).toEqual(0);
     });
 
@@ -339,8 +339,8 @@ describe('createCustomPages', () => {
       ];
       const { routes, contents } = createOrganizationProfileCustomPages(customPages);
       expect(routes.length).toEqual(4);
-      expect(routes[0].id).toEqual('members');
-      expect(routes[1].id).toEqual('settings');
+      expect(routes[0].id).toEqual('general');
+      expect(routes[1].id).toEqual('members');
       expect(routes[2].name).toEqual('Custom1');
       expect(routes[3].name).toEqual('Custom2');
       expect(contents.length).toEqual(2);
@@ -358,8 +358,8 @@ describe('createCustomPages', () => {
           mountIcon: () => undefined,
           unmountIcon: () => undefined,
         },
+        { label: 'general' },
         { label: 'members' },
-        { label: 'settings' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -372,8 +372,8 @@ describe('createCustomPages', () => {
       const { routes, contents } = createOrganizationProfileCustomPages(customPages);
       expect(routes.length).toEqual(4);
       expect(routes[0].name).toEqual('Custom1');
-      expect(routes[1].id).toEqual('members');
-      expect(routes[2].id).toEqual('settings');
+      expect(routes[1].id).toEqual('general');
+      expect(routes[2].id).toEqual('members');
       expect(routes[3].name).toEqual('Custom2');
       expect(contents.length).toEqual(2);
       expect(contents[0].url).toEqual('custom1');
@@ -390,8 +390,8 @@ describe('createCustomPages', () => {
           mountIcon: () => undefined,
           unmountIcon: () => undefined,
         },
+        { label: 'general' },
         { label: 'members' },
-        { label: 'settings' },
         { label: 'Aaaaaa' },
         { label: 'members', mount: () => undefined },
         {
@@ -406,8 +406,8 @@ describe('createCustomPages', () => {
       const { routes } = createOrganizationProfileCustomPages(customPages);
       expect(routes.length).toEqual(4);
       expect(routes[0].name).toEqual('Custom1');
-      expect(routes[1].id).toEqual('members');
-      expect(routes[2].id).toEqual('settings');
+      expect(routes[1].id).toEqual('general');
+      expect(routes[2].id).toEqual('members');
       expect(routes[3].name).toEqual('Custom2');
     });
 
@@ -421,8 +421,8 @@ describe('createCustomPages', () => {
           mountIcon: () => undefined,
           unmountIcon: () => undefined,
         },
+        { label: 'general' },
         { label: 'members' },
-        { label: 'settings' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -435,8 +435,8 @@ describe('createCustomPages', () => {
       const { routes } = createOrganizationProfileCustomPages(customPages);
       expect(routes.length).toEqual(4);
       expect(routes[0].path).toEqual('/');
-      expect(routes[1].path).toEqual('organization-members');
-      expect(routes[2].path).toEqual('organization-settings');
+      expect(routes[1].path).toEqual('organization-general');
+      expect(routes[2].path).toEqual('organization-members');
       expect(routes[3].path).toEqual('custom2');
     });
 
@@ -450,7 +450,7 @@ describe('createCustomPages', () => {
           mountIcon: () => undefined,
           unmountIcon: () => undefined,
         },
-        { label: 'settings' },
+        { label: 'general' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -464,13 +464,13 @@ describe('createCustomPages', () => {
       expect(routes.length).toEqual(4);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('custom1');
-      expect(routes[2].path).toEqual('organization-settings');
+      expect(routes[2].path).toEqual('organization-general');
       expect(routes[3].path).toEqual('custom2');
     });
 
     it('sets the path of settings pages to root (/) if it is first', () => {
       const customPages: CustomPage[] = [
-        { label: 'settings' },
+        { label: 'general' },
         { label: 'members' },
 
         {
@@ -505,8 +505,8 @@ describe('createCustomPages', () => {
           mountIcon: () => undefined,
           unmountIcon: () => undefined,
         },
+        { label: 'general' },
         { label: 'members' },
-        { label: 'settings' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -538,8 +538,8 @@ describe('createCustomPages', () => {
       ];
       const { routes, contents } = createOrganizationProfileCustomPages(customPages);
       expect(routes.length).toEqual(4);
-      expect(routes[0].id).toEqual('members');
-      expect(routes[1].id).toEqual('settings');
+      expect(routes[0].id).toEqual('general');
+      expect(routes[1].id).toEqual('members');
       expect(routes[2].name).toEqual('Custom1');
       expect(routes[3].name).toEqual('Link1');
       expect(contents.length).toEqual(1);

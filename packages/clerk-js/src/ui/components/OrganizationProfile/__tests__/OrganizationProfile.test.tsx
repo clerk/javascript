@@ -19,8 +19,8 @@ describe('OrganizationProfile', () => {
 
     const { getByText } = render(<OrganizationProfile />, { wrapper });
     expect(getByText('Org1')).toBeDefined();
+    expect(getByText('General')).toBeDefined();
     expect(getByText('Members')).toBeDefined();
-    expect(getByText('Settings')).toBeDefined();
   });
 
   it('includes custom nav items', async () => {
@@ -51,7 +51,7 @@ describe('OrganizationProfile', () => {
     const { getByText } = render(<OrganizationProfile />, { wrapper });
     expect(getByText('Org1')).toBeDefined();
     expect(getByText('Members')).toBeDefined();
-    expect(getByText('Settings')).toBeDefined();
+    expect(getByText('General')).toBeDefined();
     expect(getByText('Custom1')).toBeDefined();
     expect(getByText('ExternalLink')).toBeDefined();
   });
@@ -73,6 +73,6 @@ describe('OrganizationProfile', () => {
     const { queryByText } = render(<OrganizationProfile />, { wrapper });
     expect(queryByText('Org1')).toBeInTheDocument();
     expect(queryByText('Members')).not.toBeInTheDocument();
-    expect(queryByText('Settings')).toBeInTheDocument();
+    expect(queryByText('General')).toBeInTheDocument();
   });
 });

@@ -5,7 +5,7 @@ import type {
   OrganizationSettingsResource,
 } from '@clerk/types';
 
-import { CalloutWithAction, useGate } from '../../common';
+import { CalloutWithAction } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
@@ -22,11 +22,9 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useFetch, useNavigateToFlowStart } from '../../hooks';
+import { useFetch } from '../../hooks';
 import { InformationCircle } from '../../icons';
-import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
-import { LinkButtonWithDescription } from '../UserProfile/LinkButtonWithDescription';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 const useCalloutLabel = (
@@ -96,7 +94,15 @@ const useEnrollmentOptions = () => {
   return buildEnrollmentOptions(organizationSettings);
 };
 
-export const VerifiedDomainPage = withCardStateProvider(() => {
+type VerifiedDomainFormProps = {
+  domainId: string;
+  mode?: 'select' | 'edit';
+  onSubmit?: () => void;
+  onReset?: () => void;
+};
+
+export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFormProps) => {
+  const { domainId: id, mode = 'edit', onSubmit, onReset } = props;
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
 
@@ -105,12 +111,6 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
       infinite: true,
     },
   });
-
-  const { isAuthorizedUser: canManageDomain } = useGate({ permission: 'org:sys_domains:manage' });
-
-  const { navigateToFlowStart } = useNavigateToFlowStart();
-  const { params, navigate, queryParams } = useRouter();
-  const mode = (queryParams.mode || 'edit') as 'select' | 'edit';
 
   const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const allowsEdit = mode === 'edit';
@@ -130,7 +130,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   const { data: domain, status: domainStatus } = useFetch(
     organization?.getDomain,
     {
-      domainId: params.id,
+      domainId: id,
     },
     {
       onSuccess(d) {
@@ -148,10 +148,6 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     infoLabel: localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutInfoLabel`),
   });
 
-  const dangerCalloutLabel = useCalloutLabel(domain, {
-    infoLabel: localizationKeys(`organizationProfile.verifiedDomainPage.dangerTab.calloutInfoLabel`),
-  });
-
   const updateEnrollmentMode = async () => {
     if (!domain || !organization || !membership || !domains) {
       return;
@@ -165,7 +161,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
 
       await domains.revalidate();
 
-      await navigate('../../');
+      (onSubmit || onReset)?.();
     } catch (e) {
       handleError(e, [enrollmentMode], card.setError);
     }
@@ -196,7 +192,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
   }
 
   if (!(domain.verification && domain.verification.status === 'verified')) {
-    void navigateToFlowStart();
+    onReset?.();
   }
 
   return (
@@ -210,106 +206,59 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
       <Col gap={6}>
         <Tabs>
           <TabsList>
-            {canManageDomain && (
-              <Tab
-                localizationKey={localizationKeys(
-                  'organizationProfile.verifiedDomainPage.start.headerTitle__enrollment',
-                )}
-              />
-            )}
-            {allowsEdit && canManageDomain && (
-              <Tab
-                localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.start.headerTitle__danger')}
-              />
-            )}
+            <Tab
+              localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.start.headerTitle__enrollment')}
+            />
           </TabsList>
           <TabPanels>
-            {canManageDomain && (
-              <TabPanel
-                sx={{ width: '100%' }}
-                direction={'col'}
-                gap={4}
+            <TabPanel
+              sx={{ width: '100%' }}
+              direction={'col'}
+              gap={4}
+            >
+              {calloutLabel.length > 0 && (
+                <CalloutWithAction icon={InformationCircle}>
+                  {calloutLabel.map((label, index) => (
+                    <Text
+                      key={index}
+                      as={'span'}
+                      sx={{
+                        display: 'block',
+                      }}
+                      localizationKey={label}
+                    />
+                  ))}
+                </CalloutWithAction>
+              )}
+              <Header.Root>
+                <Header.Subtitle
+                  localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
+                  variant='subtitle'
+                />
+              </Header.Root>
+              <Form.Root
+                onSubmit={updateEnrollmentMode}
+                gap={6}
               >
-                {calloutLabel.length > 0 && (
-                  <CalloutWithAction icon={InformationCircle}>
-                    {calloutLabel.map((label, index) => (
-                      <Text
-                        key={index}
-                        as={'span'}
-                        sx={{
-                          display: 'block',
-                        }}
-                        localizationKey={label}
-                      />
-                    ))}
-                  </CalloutWithAction>
-                )}
-                <Header.Root>
-                  <Header.Subtitle
-                    localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
-                    variant='subtitle'
-                  />
-                </Header.Root>
-                <Form.Root
-                  onSubmit={updateEnrollmentMode}
-                  gap={6}
-                >
-                  <Form.ControlRow elementId={enrollmentMode.id}>
-                    <Form.RadioGroup {...enrollmentMode.props} />
+                <Form.ControlRow elementId={enrollmentMode.id}>
+                  <Form.RadioGroup {...enrollmentMode.props} />
+                </Form.ControlRow>
+
+                {allowsEdit && (
+                  <Form.ControlRow elementId={deletePending.id}>
+                    <Form.Checkbox {...deletePending.props} />
                   </Form.ControlRow>
-
-                  {allowsEdit && (
-                    <Form.ControlRow elementId={deletePending.id}>
-                      <Form.Checkbox {...deletePending.props} />
-                    </Form.ControlRow>
-                  )}
-
-                  <FormButtons
-                    localizationKey={localizationKeys(
-                      'organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save',
-                    )}
-                    isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
-                  />
-                </Form.Root>
-              </TabPanel>
-            )}
-            {allowsEdit && canManageDomain && (
-              <TabPanel
-                direction={'col'}
-                gap={4}
-                sx={{ width: '100%' }}
-              >
-                {dangerCalloutLabel.length > 0 && (
-                  <CalloutWithAction icon={InformationCircle}>
-                    {dangerCalloutLabel.map((label, index) => (
-                      <Text
-                        key={index}
-                        as={'span'}
-                        sx={{
-                          display: 'block',
-                        }}
-                        localizationKey={label}
-                      />
-                    ))}
-                  </CalloutWithAction>
                 )}
-                <Col
-                  sx={t => ({
-                    padding: `${t.space.$none} ${t.space.$4}`,
-                  })}
-                >
-                  <LinkButtonWithDescription
-                    title={localizationKeys('organizationProfile.verifiedDomainPage.dangerTab.removeDomainTitle')}
-                    subtitle={localizationKeys('organizationProfile.verifiedDomainPage.dangerTab.removeDomainSubtitle')}
-                    actionLabel={localizationKeys(
-                      'organizationProfile.verifiedDomainPage.dangerTab.removeDomainActionLabel__remove',
-                    )}
-                    variant='linkDanger'
-                    onClick={() => navigate(`../../domain/${domain.id}/remove`)}
-                  />
-                </Col>
-              </TabPanel>
-            )}
+
+                <FormButtons
+                  localizationKey={localizationKeys(
+                    'organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save',
+                  )}
+                  isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
+                  onReset={onReset}
+                />
+              </Form.Root>
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </Col>

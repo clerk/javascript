@@ -4,12 +4,15 @@ import React from 'react';
 import { isDefaultImage } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { localizationKeys } from '../../customizables';
+import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
-import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
-export const ProfileSettingsPage = withCardStateProvider(() => {
+type ProfileFormProps = FormProps;
+
+export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
+  const { onSuccess, onReset } = props;
   const title = localizationKeys('organizationProfile.profilePage.title');
   const subtitle = localizationKeys('organizationProfile.profilePage.subtitle');
   const card = useCardState();
@@ -80,7 +83,6 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
       <FormContent
         headerTitle={title}
         headerSubtitle={subtitle}
-        Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <Form.Root onSubmit={onSubmit}>
           <OrganizationProfileAvatarUploader
@@ -101,12 +103,16 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
               onChange={onChangeSlug}
             />
           </Form.ControlRow>
-          <FormButtons isDisabled={!canSubmit} />
+          <FormButtons
+            isDisabled={!canSubmit}
+            onReset={onReset}
+          />
         </Form.Root>
       </FormContent>
       <SuccessPage
         title={title}
         text={localizationKeys('organizationProfile.profilePage.successMessage')}
+        onFinish={onSuccess}
       />
     </Wizard>
   );
