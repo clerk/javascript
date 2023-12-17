@@ -10,6 +10,7 @@ module.exports = {
       rules: {
         // TODO: It's an issue specific to QUnit tests
         '@typescript-eslint/unbound-method': 'off',
+        '@typescript-eslint/no-unsafe-declaration-merging': 'off',
       },
     },
   ],
