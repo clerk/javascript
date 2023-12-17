@@ -35,7 +35,6 @@ export default (QUnit: QUnit) => {
         'buildRequestUrl',
         'constants',
         'createAuthenticateRequest',
-        'createIsomorphicRequest',
         'debugRequestState',
         'decorateObjectWithResources',
         'makeAuthObjectSerializable',
