@@ -36,7 +36,23 @@ describe('InviteMembersPage', () => {
         });
       });
 
-      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 1,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
       const { getByText, getByRole, userEvent, getByTestId } = render(<InviteMembersPage />, { wrapper });
       expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
 
@@ -58,18 +74,34 @@ describe('InviteMembersPage', () => {
         });
       });
 
-      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
       const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
       await userEvent.click(getByRole('button', { name: 'Select an option' }));
-      await userEvent.click(getByText('Member'));
+      await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
       await waitFor(() => {
         expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
           emailAddresses: ['test+1@clerk.com'],
-          role: 'basic_member' as MembershipRole,
+          role: 'member' as MembershipRole,
         });
       });
     });
@@ -123,7 +155,23 @@ describe('InviteMembersPage', () => {
         });
       });
 
-      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
       const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(
@@ -131,13 +179,13 @@ describe('InviteMembersPage', () => {
         'test+1@clerk.com,test+2@clerk.com,test+3@clerk.com,test+4@clerk.com,',
       );
       await userEvent.click(getByRole('button', { name: 'Select an option' }));
-      await userEvent.click(getByText('Member'));
+      await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
       await waitFor(() => {
         expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
           emailAddresses: ['test+1@clerk.com', 'test+2@clerk.com', 'test+3@clerk.com', 'test+4@clerk.com'],
-          role: 'basic_member' as MembershipRole,
+          role: 'member' as MembershipRole,
         });
       });
     });
@@ -151,7 +199,23 @@ describe('InviteMembersPage', () => {
         });
       });
 
-      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
       const { getByRole, userEvent, getByText, getByTestId } = render(<InviteMembersPage />, { wrapper });
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
@@ -175,7 +239,23 @@ describe('InviteMembersPage', () => {
         });
       });
 
-      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
       fixtures.clerk.organization?.inviteMembers.mockRejectedValueOnce(
         new ClerkAPIResponseError('Error', {
           data: [
@@ -213,7 +293,23 @@ describe('InviteMembersPage', () => {
         });
       });
 
-      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
       fixtures.clerk.organization?.inviteMembers.mockRejectedValueOnce(
         new ClerkAPIResponseError('Error', {
           data: [
@@ -247,7 +343,23 @@ describe('InviteMembersPage', () => {
         });
       });
 
-      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
       fixtures.clerk.organization?.inviteMembers.mockRejectedValueOnce(
         new ClerkAPIResponseError('Error', {
           data: [
