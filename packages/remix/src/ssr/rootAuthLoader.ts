@@ -56,7 +56,7 @@ export const rootAuthLoader: RootAuthLoader = async (
 
   const authObj = requestState.toAuth();
   Object.assign(args.request, { auth: authObj });
-  const handlerResult = await handler(await decorateObjectWithResources(args, authObj, opts, opts));
+  const handlerResult = await handler(await decorateObjectWithResources(args, authObj, opts));
   assertValidHandlerResult(handlerResult, invalidRootLoaderCallbackReturn);
 
   // When using defer(), we need to inject the clerk auth state into its internal data object.

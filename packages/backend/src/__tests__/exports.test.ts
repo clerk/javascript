@@ -39,11 +39,10 @@ export default (QUnit: QUnit) => {
         'debugRequestState',
         'decorateObjectWithResources',
         'makeAuthObjectSerializable',
-        'prunePrivateMetadata',
         'redirect',
-        'sanitizeAuthObject',
         'signedInAuthObject',
         'signedOutAuthObject',
+        'stripPrivateDataFromObject',
       ];
       assert.deepEqual(Object.keys(internalExports).sort(), exportedApiKeys);
     });

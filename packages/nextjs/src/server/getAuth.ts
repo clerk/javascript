@@ -4,9 +4,9 @@ import {
   AuthStatus,
   constants,
   makeAuthObjectSerializable,
-  sanitizeAuthObject,
   signedInAuthObject,
   signedOutAuthObject,
+  stripPrivateDataFromObject,
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 
@@ -109,7 +109,7 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
     authObject = signedInAuthObject(payload, { ...options, token: raw.text });
   }
 
-  const sanitizedAuthObject = makeAuthObjectSerializable(sanitizeAuthObject({ ...authObject, ...initState }));
+  const sanitizedAuthObject = makeAuthObjectSerializable(stripPrivateDataFromObject({ ...authObject, ...initState }));
   return injectSSRStateIntoObject({}, sanitizedAuthObject);
 };
 

@@ -21,8 +21,4 @@ export { createIsomorphicRequest } from './util/IsomorphicRequest';
 export { AuthStatus } from './tokens/authStatus';
 export type { RequestState, SignedInState, SignedOutState } from './tokens/authStatus';
 
-export {
-  decorateObjectWithResources,
-  sanitizeAuthObject,
-  prunePrivateMetadata,
-} from './util/decorateObjectWithResources';
+export { decorateObjectWithResources, stripPrivateDataFromObject } from './util/decorateObjectWithResources';
