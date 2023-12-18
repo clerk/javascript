@@ -25,6 +25,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
           gridTemplateColumns: '1fr 2.5fr',
           overflow: 'hidden',
           height: t.sizes.$176,
+          position: 'relative',
         }),
         sx,
       ]}
