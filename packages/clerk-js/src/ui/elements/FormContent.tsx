@@ -22,9 +22,9 @@ type PageProps = PropsOfComponent<typeof Col> & {
 export const FormContent = (props: PageProps) => {
   const {
     headerTitle,
-    headerTitleTextVariant,
+    headerTitleTextVariant = 'h3',
     headerSubtitle,
-    headerSubtitleTextVariant,
+    headerSubtitleTextVariant = 'body',
     breadcrumbTitle,
     children,
     Breadcrumbs,
@@ -45,13 +45,13 @@ export const FormContent = (props: PageProps) => {
         {headerTitle && (
           <Header.Title
             localizationKey={headerTitle}
-            textVariant='h3'
+            textVariant={headerTitleTextVariant}
           />
         )}
         {headerSubtitle && (
           <Header.Subtitle
             localizationKey={headerSubtitle}
-            variant='body'
+            variant={headerSubtitleTextVariant}
           />
         )}
       </Header.Root>

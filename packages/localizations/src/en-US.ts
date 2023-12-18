@@ -613,6 +613,7 @@ export const enUS: LocalizationResource = {
       profileSection: {
         title: 'Organization Profile',
         primaryButton: 'Edit profile',
+        uploadAction__title: 'Logo',
       },
       domainSection: {
         title: 'Verified domains',
