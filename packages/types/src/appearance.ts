@@ -401,6 +401,7 @@ export type ElementsConfig = {
   badge: WithOptions<'primary' | 'actionRequired'>;
   notificationBadge: WithOptions;
   button: WithOptions<never, LoadingState>;
+  buttonArrowIcon: WithOptions;
   providerIcon: WithOptions<OAuthProvider | Web3Provider>;
   spinner: WithOptions;
 };
