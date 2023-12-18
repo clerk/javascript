@@ -2,11 +2,14 @@
   "name": "elements-nextjs",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "../.."
+  ],
   "scripts": {
-    "build:playground": "next build",
+    "build": "next build",
     "dev": "next dev",
     "e2e": "playwright test",
-    "lint:playground": "next lint",
+    "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {

@@ -1,9 +1,0 @@
-{
-  "extends": ["//"],
-  "pipeline": {
-    "dev": {
-      "cache": false,
-      "persistent": true
-    }
-  }
-}

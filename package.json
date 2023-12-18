@@ -5,8 +5,7 @@
   "license": "MIT",
   "workspaces": {
     "packages": [
-      "packages/*",
-      "playground/elements/*"
+      "packages/*"
     ]
   },
   "scripts": {

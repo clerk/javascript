@@ -42,6 +42,10 @@
     "dist"
   ],
   "scripts": {
+    "app:build": "(cd examples/nextjs && npm run build)",
+    "app:dev": "(cd examples/nextjs && npm run dev)",
+    "app:e2e": "(cd examples/nextjs && npm run e2e)",
+    "app:lint": "(cd examples/nextjs && npm run lint)",
     "build": "npm run clean && tsup",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
@@ -53,7 +57,7 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/clerk-react": "*"
+    "@clerk/clerk-react": "5.0.0-alpha-v5.10"
   },
   "devDependencies": {
     "@types/node": "^18.17.0",

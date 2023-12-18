@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://clerk.com?utm_source=github&utm_medium=clerk_react" target="_blank" rel="noopener noreferrer">
+  <a href="https://clerk.com?utm_source=github&utm_medium=clerk_elements" target="_blank" rel="noopener noreferrer">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://images.clerk.com/static/logo-dark-mode-400x400.png">
       <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
@@ -13,7 +13,7 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_react)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_elements)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/react/CHANGELOG.md)
