@@ -32,7 +32,6 @@ export default (QUnit: QUnit) => {
     test('should not include a breaking change', assert => {
       const exportedApiKeys = [
         'AuthStatus',
-        'buildRequestUrl',
         'constants',
         'createAuthenticateRequest',
         'debugRequestState',

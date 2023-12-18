@@ -16,8 +16,8 @@ export type WithClerkUrl<T> = T & {
 };
 
 class ClerkRequest extends Request {
-  clerkUrl: URL;
-  cookies: Map<string, string>;
+  readonly clerkUrl: URL;
+  readonly cookies: Map<string, string>;
 
   public constructor(req: Request) {
     super(req);
@@ -42,7 +42,7 @@ class ClerkRequest extends Request {
 
     const resolvedHost = this.getFirstValueFromHeader(forwardedHost) ?? host;
     const resolvedProtocol = this.getFirstValueFromHeader(forwardedProto) ?? protocol?.replace(/[:/]/, '');
-    const origin = resolvedHost && resolvedProtocol ? `${resolvedProtocol}://${resolvedHost}` : '';
+    const origin = resolvedHost && resolvedProtocol ? `${resolvedProtocol}://${resolvedHost}` : initialUrl.origin;
 
     return new URL(initialUrl.pathname + initialUrl.search, origin);
   }
@@ -52,8 +52,8 @@ class ClerkRequest extends Request {
   }
 
   private parseCookies(req: Request) {
-    const cookiesRecord = parseCookies(req.headers.get('cookie') || '');
-    return new Map(Object.entries(cookiesRecord).map(([key, value]) => [key, this.decodeCookieValue(value)]));
+    const cookiesRecord = parseCookies(this.decodeCookieValue(req.headers.get('cookie') || ''));
+    return new Map(Object.entries(cookiesRecord));
   }
 
   private decodeCookieValue(str: string) {

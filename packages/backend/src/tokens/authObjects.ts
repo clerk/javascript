@@ -11,7 +11,6 @@ import type {
 import type { CreateBackendApiOptions } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
-import { AuthStatus } from './authStatus';
 
 type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
@@ -108,7 +107,7 @@ export function signedInAuthObject(
     orgPermissions,
     getToken,
     has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
-    debug: createDebug({ ...authenticateContext, status: AuthStatus.SignedIn }),
+    debug: createDebug({ ...authenticateContext }),
   };
 }
 
