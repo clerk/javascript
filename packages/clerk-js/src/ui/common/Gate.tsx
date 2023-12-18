@@ -1,5 +1,5 @@
 import { useSession } from '@clerk/shared/react';
-import type { CheckAuthorization, MembershipRole, OrganizationPermissionKey } from '@clerk/types';
+import type { CheckAuthorization, OrganizationCustomRoleKey, OrganizationPermissionKey } from '@clerk/types';
 import type { ComponentType, PropsWithChildren, ReactNode } from 'react';
 import React, { useEffect } from 'react';
 
@@ -10,7 +10,7 @@ type GateProps = PropsWithChildren<
   (
     | {
         condition?: never;
-        role: MembershipRole;
+        role: OrganizationCustomRoleKey;
         permission?: never;
       }
     | {

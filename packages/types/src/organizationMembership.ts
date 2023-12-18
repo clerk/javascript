@@ -43,7 +43,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
   permissions: OrganizationPermissionKey[];
   publicMetadata: OrganizationMembershipPublicMetadata;
   publicUserData: PublicUserData;
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
   createdAt: Date;
   updatedAt: Date;
   destroy: () => Promise<OrganizationMembershipResource>;
@@ -56,23 +56,14 @@ export type OrganizationCustomPermissionKey = ClerkAuthorization extends Placeho
     : Base['permission']
   : Base['permission'];
 
+/**
+ * OrganizationCustomRoleKey will be string unless the developer has provided their own types through `ClerkAuthorization`
+ */
 export type OrganizationCustomRoleKey = ClerkAuthorization extends Placeholder
   ? ClerkAuthorization['role'] extends string
     ? ClerkAuthorization['role']
     : Base['role']
   : Base['role'];
-
-/**
- * @deprecated This type is deprecated and will be removed in the next major release.
- * Use `OrganizationCustomRoleKey` instead.
- * MembershipRole includes `admin`, `basic_member`, `guest_member`. With the introduction of "Custom roles"
- * these types will no longer match a developer's custom logic.
- */
-export type MembershipRole = ClerkAuthorization extends Placeholder
-  ? ClerkAuthorization['role'] extends string
-    ? ClerkAuthorization['role'] | 'admin' | 'basic_member' | 'guest_member'
-    : Autocomplete<'admin' | 'basic_member' | 'guest_member'>
-  : Autocomplete<'admin' | 'basic_member' | 'guest_member'>;
 
 export type OrganizationSystemPermissionKey =
   | 'org:sys_domains:manage'
@@ -93,5 +84,5 @@ export type OrganizationPermissionKey = ClerkAuthorization extends Placeholder
   : Autocomplete<OrganizationSystemPermissionKey>;
 
 export type UpdateOrganizationMembershipParams = {
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
 };

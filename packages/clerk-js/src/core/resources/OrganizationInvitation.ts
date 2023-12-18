@@ -1,7 +1,7 @@
 import type {
   CreateBulkOrganizationInvitationParams,
   CreateOrganizationInvitationParams,
-  MembershipRole,
+  OrganizationCustomRoleKey,
   OrganizationInvitationJSON,
   OrganizationInvitationResource,
   OrganizationInvitationStatus,
@@ -16,7 +16,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
   organizationId!: string;
   publicMetadata: OrganizationInvitationPublicMetadata = {};
   status!: OrganizationInvitationStatus;
-  role!: MembershipRole;
+  role!: OrganizationCustomRoleKey;
   createdAt!: Date;
   updatedAt!: Date;
 

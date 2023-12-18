@@ -1,4 +1,3 @@
-import type { MembershipRole } from '@clerk/types';
 import React, { useMemo } from 'react';
 
 import type { LocalizationKey } from '../../customizables';
@@ -121,7 +120,7 @@ export const RowContainer = (props: PropsOfComponent<typeof Tr>) => {
 
 export const RoleSelect = (props: {
   roles: { label: string; value: string }[] | undefined;
-  value: MembershipRole;
+  value: string;
   onChange: (params: string) => unknown;
   isDisabled?: boolean;
   triggerSx?: ThemableCssProp;

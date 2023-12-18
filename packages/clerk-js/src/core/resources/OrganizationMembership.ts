@@ -2,7 +2,7 @@ import type {
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
   GetUserOrganizationMembershipParams,
-  MembershipRole,
+  OrganizationCustomRoleKey,
   OrganizationMembershipJSON,
   OrganizationMembershipResource,
   OrganizationPermissionKey,
@@ -18,7 +18,7 @@ export class OrganizationMembership extends BaseResource implements Organization
   publicUserData!: PublicUserData;
   organization!: Organization;
   permissions: OrganizationPermissionKey[] = [];
-  role!: MembershipRole;
+  role!: OrganizationCustomRoleKey;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -117,7 +117,7 @@ export class OrganizationMembership extends BaseResource implements Organization
 }
 
 export type UpdateOrganizationMembershipParams = {
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
 };
 
 export type GetOrganizationMembershipsClass = (

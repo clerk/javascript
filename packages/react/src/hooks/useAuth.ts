@@ -2,7 +2,7 @@ import type {
   ActJWTClaim,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
-  MembershipRole,
+  OrganizationCustomRoleKey,
   SignOut,
 } from '@clerk/types';
 import { useCallback } from 'react';
@@ -64,7 +64,7 @@ type UseAuthReturn =
       sessionId: string;
       actor: ActJWTClaim | null;
       orgId: string;
-      orgRole: MembershipRole;
+      orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;
       has: CheckAuthorizationWithCustomPermissions;
       signOut: SignOut;

@@ -1,6 +1,6 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useOrganization } from '@clerk/shared/react';
-import type { ClerkAPIError, MembershipRole } from '@clerk/types';
+import type { ClerkAPIError } from '@clerk/types';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
@@ -76,7 +76,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     return organization
       .inviteMembers({
         emailAddresses: emailAddressField.value.split(','),
-        role: submittedData.get('role') as MembershipRole,
+        role: submittedData.get('role') as string,
       })
       .then(async () => {
         await invitations?.revalidate?.();
