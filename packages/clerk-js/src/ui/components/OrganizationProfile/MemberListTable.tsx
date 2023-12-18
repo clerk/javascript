@@ -1,5 +1,5 @@
 import type { MembershipRole } from '@clerk/types';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
@@ -129,24 +129,20 @@ export const RoleSelect = (props: {
 }) => {
   const { value, roles, onChange, isDisabled, triggerSx, optionListSx } = props;
 
-  const shouldDisplayLegacyRoles = !roles;
-
-  const legacyRoles: Array<{ label: string; value: MembershipRole }> = [
-    { label: 'admin', value: 'admin' },
-    { label: 'basic_member', value: 'basic_member' },
-  ];
-
-  const legacyExcludedRoles: Array<{ label: string; value: MembershipRole }> = [
-    { label: 'guest_member', value: 'guest_member' },
-  ];
   const { localizeCustomRole } = useLocalizeCustomRoles();
 
-  const selectedRole = [...(roles || []), ...legacyRoles, ...legacyExcludedRoles].find(r => r.value === value);
+  const fetchedRoles = useMemo(() => [...(roles || [])], [roles]);
 
-  const localizedOptions = (!shouldDisplayLegacyRoles ? roles : legacyRoles).map(role => ({
-    value: role.value,
-    label: localizeCustomRole(role.value) || role.label,
-  }));
+  const selectedRole = useMemo(() => fetchedRoles.find(r => r.value === value), [fetchedRoles]);
+
+  const localizedOptions = useMemo(
+    () =>
+      fetchedRoles.map(role => ({
+        value: role.value,
+        label: localizeCustomRole(role.value) || role.label,
+      })),
+    [fetchedRoles, localizeCustomRole],
+  );
 
   return (
     <Select
