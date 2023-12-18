@@ -211,12 +211,14 @@ const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
   return (
     <Flex
       align='center'
-      gap={2}
+      as='span'
     >
       {children}
       <Icon
+        elementDescriptor={descriptors.buttonArrowIcon}
         icon={ArrowRightButtonIcon}
         sx={t => ({
+          marginLeft: t.space.$2,
           width: t.sizes.$2x5,
           height: t.sizes.$2x5,
           opacity: t.opacity.$inactive,
