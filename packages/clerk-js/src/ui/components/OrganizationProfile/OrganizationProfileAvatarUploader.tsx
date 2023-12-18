@@ -19,7 +19,7 @@ export const OrganizationProfileAvatarUploader = (
           marginBottom: t.space.$2,
           color: t.colors.$blackAlpha700,
         })}
-        localizationKey={localizationKeys('organizationProfile.general.profileSection.uploadOrganizationImageTitle')}
+        localizationKey={localizationKeys('organizationProfile.general.profileSection.uploadAction__title')}
       />
       <AvatarUploader
         {...rest}
