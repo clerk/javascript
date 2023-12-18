@@ -30,23 +30,23 @@ export {
 } from '@clerk/clerk-react';
 
 export const UserProfile = (props: UserProfileProps) => {
-  return <BaseUserProfile {...useRoutingProps(BaseUserProfile.displayName, props)} />;
+  return <BaseUserProfile {...useRoutingProps('UserProfile', props)} />;
 };
 
 export const CreateOrganization = (props: CreateOrganizationProps) => {
-  return <BaseCreateOrganization {...useRoutingProps(BaseCreateOrganization.displayName, props)} />;
+  return <BaseCreateOrganization {...useRoutingProps('CreateOrganization', props)} />;
 };
 
 export const OrganizationProfile = (props: OrganizationProfileProps) => {
-  return <BaseOrganizationProfile {...useRoutingProps(BaseOrganizationProfile.displayName, props)} />;
+  return <BaseOrganizationProfile {...useRoutingProps('OrganizationProfile', props)} />;
 };
 
 export const SignIn = (props: SignInProps) => {
   const { signInUrl } = useClerkNextOptions();
-  return <BaseSignIn {...useRoutingProps(BaseSignIn.displayName, props, { path: signInUrl })} />;
+  return <BaseSignIn {...useRoutingProps('SignIn', props, { path: signInUrl })} />;
 };
 
 export const SignUp = (props: SignUpProps) => {
   const { signUpUrl } = useClerkNextOptions();
-  return <BaseSignUp {...useRoutingProps(BaseSignUp.displayName, props, { path: signUpUrl })} />;
+  return <BaseSignUp {...useRoutingProps('SignUp', props, { path: signUpUrl })} />;
 };
