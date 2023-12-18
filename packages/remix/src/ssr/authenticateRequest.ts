@@ -1,6 +1,6 @@
 import { createClerkClient } from '@clerk/backend';
 import type { SignedInState, SignedOutState } from '@clerk/backend/internal';
-import { AuthStatus, buildRequestUrl } from '@clerk/backend/internal';
+import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
@@ -16,6 +16,7 @@ export async function authenticateRequest(
   opts: RootAuthLoaderOptions = {},
 ): Promise<SignedInState | SignedOutState> {
   const { request, context } = args;
+  const clerkRequest = createClerkRequest(request);
   const { audience, authorizedParties } = opts;
 
   // Fetch environment variables across Remix runtime.
@@ -42,17 +43,15 @@ export async function authenticateRequest(
     isTruthy(getEnvVariable('CLERK_IS_SATELLITE', context)) ||
     false;
 
-  const requestURL = buildRequestUrl(request);
-
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(
     opts?.proxyUrl,
-    requestURL,
+    clerkRequest.clerkUrl,
     getEnvVariable('CLERK_PROXY_URL', context),
   );
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
-    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, requestURL).toString();
+    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, clerkRequest.clerkUrl).toString();
   } else {
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }

@@ -6,8 +6,8 @@ import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalform
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
-import type { AuthenticateRequestOptions } from '../request';
-import { authenticateRequest, loadOptionsFromHeaders } from '../request';
+import { authenticateRequest } from '../request';
+import type { AuthenticateRequestOptions } from '../types';
 
 function assertSignedOut(
   assert,
@@ -528,33 +528,6 @@ export default (QUnit: QUnit) => {
 
       assertSignedIn(assert, requestState);
       assertSignedInToAuth(assert, requestState);
-    });
-  });
-
-  module('tokens.loadOptionsFromHeaders', () => {
-    test('returns forwarded headers from headers', assert => {
-      const headersData = { 'x-forwarded-proto': 'http', 'x-forwarded-port': '80', 'x-forwarded-host': 'example.com' };
-      const headers = key => headersData[key] || '';
-
-      assert.propContains(loadOptionsFromHeaders(headers), {
-        forwardedProto: 'http',
-        forwardedHost: 'example.com',
-      });
-    });
-
-    test('returns Cloudfront forwarded proto from headers even if forwarded proto header exists', assert => {
-      const headersData = {
-        'cloudfront-forwarded-proto': 'https',
-        'x-forwarded-proto': 'http',
-        'x-forwarded-port': '80',
-        'x-forwarded-host': 'example.com',
-      };
-      const headers = key => headersData[key] || '';
-
-      assert.propContains(loadOptionsFromHeaders(headers), {
-        forwardedProto: 'https',
-        forwardedHost: 'example.com',
-      });
     });
   });
 };

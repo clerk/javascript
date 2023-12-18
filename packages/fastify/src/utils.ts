@@ -19,7 +19,7 @@ export const fastifyRequestToRequest = (req: FastifyRequest): Request => {
 
   // Making some manual tests it seems that FastifyRequest populates the req protocol / hostname
   // based on the forwarded headers. Nevertheless, we are gonna use a dummy base and the request
-  // will be fixed by the createIsomorphicRequest.
+  // will be fixed by the internals of the clerk/backend package
   const dummyOriginReqUrl = new URL(req.url || '', `${req.protocol}://clerk-dummy`);
   return new Request(dummyOriginReqUrl, { method: req.method, headers });
 };

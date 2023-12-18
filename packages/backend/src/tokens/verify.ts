@@ -7,29 +7,13 @@ import type { JwtReturnType } from '../jwt/types';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 
-/**
- *
- */
-export type VerifyTokenOptions = Pick<VerifyJwtOptions, 'authorizedParties' | 'audience' | 'clockSkewInMs'> & {
-  jwtKey?: string;
-} & Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'apiVersion' | 'jwksCacheTtlInMs' | 'skipJwksCache'>;
+export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
+  Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & { jwtKey?: string };
 
 export async function verifyToken(
   token: string,
   options: VerifyTokenOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
-  const {
-    secretKey,
-    apiUrl,
-    apiVersion,
-    audience,
-    authorizedParties,
-    clockSkewInMs,
-    jwksCacheTtlInMs,
-    jwtKey,
-    skipJwksCache,
-  } = options;
-
   const { data: decodedResult, error: decodedError } = decodeJwt(token);
   if (decodedError) {
     return { error: decodedError };
@@ -41,11 +25,11 @@ export async function verifyToken(
   try {
     let key;
 
-    if (jwtKey) {
-      key = loadClerkJWKFromLocal(jwtKey);
-    } else if (secretKey) {
+    if (options.jwtKey) {
+      key = loadClerkJWKFromLocal(options.jwtKey);
+    } else if (options.secretKey) {
       // Fetch JWKS from Backend API using the key
-      key = await loadClerkJWKFromRemote({ secretKey, apiUrl, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache });
+      key = await loadClerkJWKFromRemote({ ...options, kid });
     } else {
       return {
         error: new TokenVerificationError({
@@ -56,12 +40,7 @@ export async function verifyToken(
       };
     }
 
-    return await verifyJwt(token, {
-      audience,
-      authorizedParties,
-      clockSkewInMs,
-      key,
-    });
+    return await verifyJwt(token, { ...options, key });
   } catch (error) {
     return { error: error as TokenVerificationError };
   }

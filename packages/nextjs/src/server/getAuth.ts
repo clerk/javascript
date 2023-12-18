@@ -58,7 +58,8 @@ export const createGetAuth = ({
 
       const jwt = parseJwt(req);
       logger.debug('JWT debug', jwt.raw.text);
-      return signedInAuthObject(jwt.payload, { ...options, token: jwt.raw.text });
+      // @ts-expect-error - TODO @nikos: Align types
+      return signedInAuthObject({ ...options, sessionToken: jwt.raw.text }, jwt.payload);
     };
   });
 
@@ -106,7 +107,8 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
     authObject = signedOutAuthObject(options);
   } else {
     const { payload, raw } = parseJwt(req);
-    authObject = signedInAuthObject(payload, { ...options, token: raw.text });
+    // @ts-expect-error - TODO @nikos: Align types
+    authObject = signedInAuthObject({ ...options, sessionToken: raw.text }, payload);
   }
 
   const sanitizedAuthObject = makeAuthObjectSerializable(stripPrivateDataFromObject({ ...authObject, ...initState }));

@@ -1,12 +1,10 @@
 import type { JwtPayload } from '@clerk/types';
 
 import type { TokenVerificationErrorReason } from '../errors';
-import type { SignedInAuthObject, SignedInAuthObjectOptions, SignedOutAuthObject } from './authObjects';
+import type { AuthenticateContext } from './authenticateContext';
+import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';
 
-/**
- * @internal
- */
 export enum AuthStatus {
   SignedIn = 'signed-in',
   SignedOut = 'signed-out',
@@ -67,146 +65,74 @@ export enum AuthErrorReason {
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-/**
- * @internal
- */
 export type RequestState = SignedInState | SignedOutState | HandshakeState;
 
-type RequestStateParams = {
-  publishableKey?: string;
-  domain?: string;
-  isSatellite?: boolean;
-  proxyUrl?: string;
-  signInUrl?: string;
-  signUpUrl?: string;
-  afterSignInUrl?: string;
-  afterSignUpUrl?: string;
-};
-
-type AuthParams = {
-  /* Session token cookie value */
-  sessionTokenInCookie?: string;
-  /* Client token header value */
-  sessionTokenInHeader?: string;
-  /* Client uat cookie value */
-  clientUat?: string;
-};
-
-export type AuthStatusOptionsType = Partial<SignedInAuthObjectOptions> & RequestStateParams & AuthParams;
-
-export function signedIn<T extends AuthStatusOptionsType>(
-  options: T,
+export function signedIn(
+  authenticateContext: AuthenticateContext,
   sessionClaims: JwtPayload,
   headers: Headers = new Headers(),
 ): SignedInState {
-  const {
-    publishableKey = '',
-    proxyUrl = '',
-    isSatellite = false,
-    domain = '',
-    signInUrl = '',
-    signUpUrl = '',
-    afterSignInUrl = '',
-    afterSignUpUrl = '',
-    secretKey,
-    apiUrl,
-    apiVersion,
-    sessionTokenInCookie,
-    sessionTokenInHeader,
-  } = options;
-
-  const authObject = signedInAuthObject(
-    sessionClaims,
-    {
-      secretKey,
-      apiUrl,
-      apiVersion,
-      token: sessionTokenInCookie || sessionTokenInHeader || '',
-    },
-    { ...options, status: AuthStatus.SignedIn },
-  );
-
+  const authObject = signedInAuthObject(authenticateContext, sessionClaims);
   return {
     status: AuthStatus.SignedIn,
     reason: null,
     message: null,
-    proxyUrl,
-    publishableKey,
-    domain,
-    isSatellite,
-    signInUrl,
-    signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
+    proxyUrl: authenticateContext.proxyUrl || '',
+    publishableKey: authenticateContext.publishableKey || '',
+    isSatellite: authenticateContext.isSatellite || false,
+    domain: authenticateContext.domain || '',
+    signInUrl: authenticateContext.signInUrl || '',
+    signUpUrl: authenticateContext.signUpUrl || '',
+    afterSignInUrl: authenticateContext.afterSignInUrl || '',
+    afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: true,
     toAuth: () => authObject,
     headers,
   };
 }
-export function signedOut<T extends AuthStatusOptionsType>(
-  options: T,
+
+export function signedOut(
+  authenticateContext: AuthenticateContext,
   reason: AuthReason,
   message = '',
   headers: Headers = new Headers(),
 ): SignedOutState {
-  const {
-    publishableKey = '',
-    proxyUrl = '',
-    isSatellite = false,
-    domain = '',
-    signInUrl = '',
-    signUpUrl = '',
-    afterSignInUrl = '',
-    afterSignUpUrl = '',
-  } = options;
-
   return {
     status: AuthStatus.SignedOut,
     reason,
     message,
-    proxyUrl,
-    publishableKey,
-    isSatellite,
-    domain,
-    signInUrl,
-    signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
+    proxyUrl: authenticateContext.proxyUrl || '',
+    publishableKey: authenticateContext.publishableKey || '',
+    isSatellite: authenticateContext.isSatellite || false,
+    domain: authenticateContext.domain || '',
+    signInUrl: authenticateContext.signInUrl || '',
+    signUpUrl: authenticateContext.signUpUrl || '',
+    afterSignInUrl: authenticateContext.afterSignInUrl || '',
+    afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
     headers,
-    toAuth: () => signedOutAuthObject({ ...options, status: AuthStatus.SignedOut, reason, message }),
+    toAuth: () => signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message }),
   };
 }
 
-export function handshake<T extends AuthStatusOptionsType>(
-  options: T,
+export function handshake(
+  authenticateContext: AuthenticateContext,
   reason: AuthReason,
   message = '',
   headers: Headers,
 ): HandshakeState {
-  const {
-    publishableKey = '',
-    proxyUrl = '',
-    isSatellite = false,
-    domain = '',
-    signInUrl = '',
-    signUpUrl = '',
-    afterSignInUrl = '',
-    afterSignUpUrl = '',
-  } = options;
-
   return {
     status: AuthStatus.Handshake,
     reason,
     message,
-    publishableKey,
-    isSatellite,
-    domain,
-    proxyUrl,
-    signInUrl,
-    signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
+    publishableKey: authenticateContext.publishableKey || '',
+    isSatellite: authenticateContext.isSatellite || false,
+    domain: authenticateContext.domain || '',
+    proxyUrl: authenticateContext.proxyUrl || '',
+    signInUrl: authenticateContext.signInUrl || '',
+    signUpUrl: authenticateContext.signUpUrl || '',
+    afterSignInUrl: authenticateContext.afterSignInUrl || '',
+    afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
     headers,
     toAuth: () => null,

@@ -1,10 +1,9 @@
 import type { ApiClient } from '../api';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
-import type { AuthenticateRequestOptions } from './request';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
+import type { AuthenticateRequestOptions } from './types';
 
 type RunTimeOptions = Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>;
-
 type BuildTimeOptions = Partial<
   Pick<
     AuthenticateRequestOptions,
