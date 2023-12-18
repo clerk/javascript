@@ -84,10 +84,11 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
 
       <VerifyDomainForm
         domainId={domainId}
-        onSubmit={() => {
+        onSuccess={() => {
           domains?.revalidate?.();
           onSuccess?.();
         }}
+        onReset={onReset}
       />
     </Wizard>
   );

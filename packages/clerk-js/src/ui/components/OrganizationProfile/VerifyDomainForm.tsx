@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import type { VerificationCodeCardProps } from '../../elements';
+import type { FormProps, VerificationCodeCardProps } from '../../elements';
 import {
   Form,
   FormButtonContainer,
@@ -19,13 +19,12 @@ import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 import { VerifiedDomainForm } from './VerifiedDomainForm';
 
-type VerifyDomainFormProps = {
+type VerifyDomainFormProps = FormProps & {
   domainId: string;
-  onSubmit?: () => void;
 };
 
 export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormProps) => {
-  const { domainId: id, onSubmit } = props;
+  const { domainId: id, onSuccess, onReset } = props;
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
   const { organization } = useOrganization();
@@ -66,7 +65,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
         if (res.verification?.status === 'verified') {
           wizard.nextStep();
         } else {
-          onSubmit?.();
+          onSuccess?.();
         }
 
         return;
@@ -143,7 +142,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
           </Form.ControlRow>
           <FormButtons
             isDisabled={!canSubmit}
-            onReset={close}
+            onReset={onReset}
           />
         </Form.Root>
       </FormContent>
@@ -182,8 +181,8 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
       <VerifiedDomainForm
         domainId={id}
         mode='select'
-        onSubmit={onSubmit}
-        onReset={onSubmit}
+        onSuccess={onSuccess}
+        onReset={onReset}
       />
     </Wizard>
   );

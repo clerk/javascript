@@ -9,6 +9,7 @@ import { CalloutWithAction } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
+import type { FormProps } from '../../elements';
 import {
   Form,
   FormButtons,
@@ -94,15 +95,13 @@ const useEnrollmentOptions = () => {
   return buildEnrollmentOptions(organizationSettings);
 };
 
-type VerifiedDomainFormProps = {
+type VerifiedDomainFormProps = FormProps & {
   domainId: string;
   mode?: 'select' | 'edit';
-  onSubmit?: () => void;
-  onReset?: () => void;
 };
 
 export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFormProps) => {
-  const { domainId: id, mode = 'edit', onSubmit, onReset } = props;
+  const { domainId: id, mode = 'edit', onSuccess, onReset } = props;
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
 
@@ -161,7 +160,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
 
       await domains.revalidate();
 
-      (onSubmit || onReset)?.();
+      onSuccess();
     } catch (e) {
       handleError(e, [enrollmentMode], card.setError);
     }
@@ -177,10 +176,9 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
         direction={'row'}
         align={'center'}
         justify={'center'}
-        sx={t => ({
+        sx={{
           height: '100%',
-          minHeight: t.sizes.$120,
-        })}
+        }}
       >
         <Spinner
           size={'lg'}
