@@ -2,17 +2,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-Running the Elements development process:
+### Development Process
 
-```sh
-turbo dev --filter=elements
-```
-
-Running the example development server (with hotloading `@clerk/elements`):
-
-```sh
-(cd packages/elements/examples/next && npm run dev)
-```
+Please see the [package development documentation](../../README.md#package-development) for more information.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 

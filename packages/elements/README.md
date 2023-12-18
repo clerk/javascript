@@ -32,19 +32,29 @@
 
 Clerk is the easiest way to add authentication and user management to your React application. Add sign up, sign in, and profile management to your application in minutes.
 
-## Development
-
-### Playground
+## Package Development
 
 ```sh
-# -- @clerk/elements
 turbo dev --filter=elements
+```
 
-# -- NextJS Example App
+### Examples NextJS Development
+
+#### Setup:
+
+```sh
+cd examples/nextjs && npm i
+```
+
+#### Development Server:
+
+Changes in the `packages/elements` directory will be hotloaded in the example app.
+
+```sh
 cd examples/nextjs && npm run dev
 ```
 
-### E2E Testing
+#### E2E Testing
 
 ```sh
 cd examples/nextjs && npm run e2e
