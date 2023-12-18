@@ -57,7 +57,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
       </Col>
       <Box
         sx={t => ({
-          border: `1px solid ${t.colors.$blackAlpha100}`,
+          border: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           borderRadius: t.radii.$card,
         })}
       >
