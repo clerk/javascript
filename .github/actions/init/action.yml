@@ -71,7 +71,6 @@ runs:
 
           core.exportVariable('TURBO_ARGS',
             [
-              '--filter=!elements-*',
               '--output-logs=new-only',
               `--cache-dir=${CACHE_DIR}`,
               `--concurrency=${cpus}`,

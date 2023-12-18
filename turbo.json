@@ -60,10 +60,6 @@
       "dependsOn": ["^build", "dev"],
       "persistent": true
     },
-    "e2e": {
-      "cache": false,
-      "dependsOn": ["^build"]
-    },
     "clean": {
       "dependsOn": [],
       "cache": false

@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-Running the development process:
+Running the Elements development process:
 
 ```sh
 turbo dev --filter=elements

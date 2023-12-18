@@ -1,7 +1,8 @@
 {
   "name": "@clerk/elements",
   "version": "0.0.1",
-  "description": "Clerk Elements ",
+  "private": true,
+  "description": "Clerk Elements",
   "keywords": [
     "clerk",
     "typescript",
@@ -46,7 +47,7 @@
     "app:dev": "(cd examples/nextjs && npm run dev)",
     "app:e2e": "(cd examples/nextjs && npm run e2e)",
     "app:lint": "(cd examples/nextjs && npm run lint)",
-    "build": "npm run clean && tsup",
+    "build": "tsup",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
@@ -69,9 +70,14 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "next": ">=10",
+    "next": ">=13.0.4",
     "react": ">=18",
     "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=18.17.0"

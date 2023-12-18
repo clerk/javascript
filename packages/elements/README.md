@@ -16,7 +16,7 @@
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_elements)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-[Changelog](https://github.com/clerk/javascript/blob/main/packages/react/CHANGELOG.md)
+[Changelog](https://github.com/clerk/javascript/blob/main/packages/elements/CHANGELOG.md)
 ·
 [Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
@@ -37,31 +37,24 @@ Clerk is the easiest way to add authentication and user management to your React
 ### Playground
 
 ```sh
-# Togther:
-turbo run dev --filter=...elements # Includes dependents of @clerk/elements
+# -- @clerk/elements
+turbo dev --filter=elements
 
-# Separate:
-
-# -- NextJS playground
-turbo run dev --filter=elements
-
-# -- @clerk/elements (Only necessary if you're actively working on @clerk/elements)
-turbo run dev --filter=elements-nextjs
+# -- NextJS Example App
+cd examples/nextjs && npm run dev
 ```
-
-**Note:** If you run into a "no workspaces found" issue with the playground, run the following: `(cd playground/elements/next && npx next telemetry disable)`
 
 ### E2E Testing
 
 ```sh
-turbo run e2e --filter=elements-nextjs
+cd examples/nextjs && npm run e2e
 
 # With UI: https://playwright.dev/docs/running-tests#run-tests-in-ui-mode
-turbo run e2e --filter=elements-nextjs -- --ui
+npm run e2e -- --ui
 
 # Headed Mode: https://playwright.dev/docs/running-tests#run-tests-in-headed-mode
-turbo run e2e --filter=elements-nextjs -- --headed
+npm run e2e -- --headed
 
 # Specific Tests: https://playwright.dev/docs/running-tests#run-specific-tests
-turbo run e2e --filter=elements-nextjs -- e2e/elements.spec.ts
+npm run e2e -- e2e/elements.spec.ts
 ```
