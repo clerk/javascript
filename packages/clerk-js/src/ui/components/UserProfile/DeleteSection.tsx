@@ -22,7 +22,7 @@ export const DeleteSection = () => {
         </Action.Closed>
 
         <Action.Open value='delete'>
-          <Action.Card>
+          <Action.Card isDestructive>
             <DeleteUserForm />
           </Action.Card>
         </Action.Open>
