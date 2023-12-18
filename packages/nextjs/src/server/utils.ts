@@ -1,5 +1,5 @@
-import type { AuthenticateRequestOptions, RequestState } from '@clerk/backend/internal';
-import { buildRequestUrl, constants } from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@clerk/backend/internal';
+import { constants } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 import { constants as nextConstants } from '../constants';
 import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
-import type { NextMiddlewareResult, RequestLike } from './types';
+import type { RequestLike } from './types';
 
 type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
 
@@ -77,7 +77,7 @@ const MIDDLEWARE_HEADER_PREFIX = 'x-middleware-request' as string;
 
 export const setRequestHeadersOnNextResponse = (
   res: NextResponse | Response,
-  req: NextRequest,
+  req: Request,
   newHeaders: Record<string, string>,
 ) => {
   if (!res.headers.get(OVERRIDE_HEADERS)) {
@@ -107,11 +107,7 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
 };
 
 // Auth result will be set as both a query param & header when applicable
-export function decorateRequest(
-  req: NextRequest,
-  res: NextMiddlewareResult,
-  requestState: RequestState,
-): NextMiddlewareResult {
+export function decorateRequest(req: Request, res: Response, requestState: RequestState): Response {
   const { reason, message, status } = requestState;
   // pass-through case, convert to next()
   if (!res) {
@@ -166,18 +162,18 @@ export const isCrossOrigin = (from: string | URL, to: string | URL) => {
   return fromUrl.origin !== toUrl.origin;
 };
 
-export const handleMultiDomainAndProxy = (req: NextRequest, opts: AuthenticateRequestOptions) => {
-  const requestURL = buildRequestUrl(req);
-  const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, requestURL, PROXY_URL);
+export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: AuthenticateRequestOptions) => {
+  const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, clerkRequest.clerkUrl, PROXY_URL);
+
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
-    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, requestURL).toString();
+    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, clerkRequest.clerkUrl).toString();
   } else {
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  const isSatellite = handleValueOrFn(opts.isSatellite, new URL(req.url), IS_SATELLITE);
-  const domain = handleValueOrFn(opts.domain, new URL(req.url), DOMAIN);
+  const isSatellite = handleValueOrFn(opts.isSatellite, new URL(clerkRequest.url), IS_SATELLITE);
+  const domain = handleValueOrFn(opts.domain, new URL(clerkRequest.url), DOMAIN);
   const signInUrl = opts?.signInUrl || SIGN_IN_URL;
 
   if (isSatellite && !proxyUrl && !domain) {

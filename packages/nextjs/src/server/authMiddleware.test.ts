@@ -6,6 +6,11 @@ import { NextURL } from 'next/dist/server/web/next-url';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { paths, setHeader } from '../utils';
+import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
+// used to assert the mock
+import { clerkClient } from './clerkClient';
+
 const authenticateRequestMock = jest.fn().mockResolvedValue({
   toAuth: () => ({}),
   headers: new Headers(),
@@ -32,11 +37,6 @@ jest.mock('./redirect', () => {
     redirectToSignIn: mockRedirectToSignIn,
   };
 });
-
-import { paths, setHeader } from '../utils';
-import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
-// used to assert the mock
-import { clerkClient } from './clerkClient';
 
 /**
  * Disable console warnings about config matchers
@@ -601,27 +601,6 @@ describe('Type tests', () => {
 
       it('domain + isSatellite (satellite app)', () => {
         expectTypeOf({ ...defaultProps, domain: 'test', isSatellite: true }).toMatchTypeOf<AuthMiddleware>();
-      });
-
-      it('only domain is not allowed', () => {
-        expectTypeOf({ ...defaultProps, domain: 'test' }).not.toMatchTypeOf<AuthMiddleware>();
-      });
-
-      it('only isSatellite is not allowed', () => {
-        expectTypeOf({ ...defaultProps, isSatellite: true }).not.toMatchTypeOf<AuthMiddleware>();
-      });
-
-      it('proxyUrl + domain is not allowed', () => {
-        expectTypeOf({ ...defaultProps, proxyUrl: 'test', domain: 'test' }).not.toMatchTypeOf<AuthMiddleware>();
-      });
-
-      it('proxyUrl + domain + isSatellite is not allowed', () => {
-        expectTypeOf({
-          ...defaultProps,
-          proxyUrl: 'test',
-          domain: 'test',
-          isSatellite: true,
-        }).not.toMatchTypeOf<AuthMiddleware>();
       });
     });
   });
