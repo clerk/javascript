@@ -36,6 +36,5 @@ exports[`public exports should not include a breaking change 1`] = `
   "useSignIn",
   "useSignUp",
   "useUser",
-  "withPathDefaultRouting",
 ]
 `;

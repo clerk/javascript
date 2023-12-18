@@ -4,55 +4,37 @@ import {
   SignIn as BaseSignIn,
   SignUp as BaseSignUp,
   UserProfile as BaseUserProfile,
-  withPathDefaultRouting,
 } from '@clerk/clerk-react';
-import type { SignInProps, SignUpProps } from '@clerk/types';
+import { useRoutingProps } from '@clerk/clerk-react/internal';
+import type {
+  CreateOrganizationProps,
+  OrganizationProfileProps,
+  SignInProps,
+  SignUpProps,
+  UserProfileProps,
+} from '@clerk/types';
 import React from 'react';
 
-import { errorThrower } from '../errorThrower';
 import { useClerkRemixOptions } from './RemixOptionsContext';
 
-export const UserProfile: typeof BaseUserProfile = withPathDefaultRouting(BaseUserProfile, 'UserProfile');
-export const CreateOrganization: typeof BaseCreateOrganization = withPathDefaultRouting(
-  BaseCreateOrganization,
-  'CreateOrganization',
-);
-export const OrganizationProfile: typeof BaseOrganizationProfile = withPathDefaultRouting(BaseOrganizationProfile, '');
+export const UserProfile = (props: UserProfileProps) => {
+  return <BaseUserProfile {...useRoutingProps(BaseUserProfile.displayName, props)} />;
+};
+
+export const CreateOrganization = (props: CreateOrganizationProps) => {
+  return <BaseCreateOrganization {...useRoutingProps(BaseCreateOrganization.displayName, props)} />;
+};
+
+export const OrganizationProfile = (props: OrganizationProfileProps) => {
+  return <BaseOrganizationProfile {...useRoutingProps(BaseOrganizationProfile.displayName, props)} />;
+};
 
 export const SignIn = (props: SignInProps) => {
   const { signInUrl } = useClerkRemixOptions();
-  const path = props.path || signInUrl;
-  if (!path && !props.routing) {
-    errorThrower.throw('Missing path prop. <SignIn/> requires a path prop.');
-  }
-
-  if (path) {
-    return (
-      <BaseSignIn
-        {...props}
-        routing='path'
-        path={path}
-      />
-    );
-  }
-
-  return <BaseSignIn {...props} />;
+  return <BaseSignIn {...useRoutingProps(BaseSignIn.displayName, props, { path: signInUrl })} />;
 };
 
 export const SignUp = (props: SignUpProps) => {
   const { signUpUrl } = useClerkRemixOptions();
-  const path = props.path || signUpUrl;
-  if (!path && !props.routing) {
-    errorThrower.throw('Missing path prop. <SignUp/> requires a path prop.');
-  }
-
-  if (path) {
-    return (
-      <BaseSignUp
-        routing='path'
-        path={path}
-      />
-    );
-  }
-  return <BaseSignUp {...props} />;
+  return <BaseSignUp {...useRoutingProps(BaseSignUp.displayName, props, { path: signUpUrl })} />;
 };

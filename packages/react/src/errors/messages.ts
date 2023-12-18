@@ -37,4 +37,4 @@ export const useAuthHasRequiresRoleOrPermission =
   'Missing parameters. `has` from `useAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`';
 
 export const noPathProvidedError = (componentName: string) =>
-  `Missing path prop. <${componentName}/> requires a path prop.`;
+  `<${componentName}/> is missing a path prop to work with path based routing`;
