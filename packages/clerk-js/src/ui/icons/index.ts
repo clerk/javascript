@@ -53,3 +53,6 @@ export { default as UserAdd } from './userAdd.svg';
 export { default as Check } from './check.svg';
 export { default as ArrowUpDown } from './arrow-up-down.svg';
 export { default as CheckmarkFilled } from './checkmark-filled.svg';
+export { default as Copy } from './copy.svg';
+export { default as Download } from './download.svg';
+export { default as Print } from './print.svg';
