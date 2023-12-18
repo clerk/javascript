@@ -27,7 +27,7 @@ export const ActiveDevicesSection = () => {
     >
       {!sessionsWithActivities.length && <FullHeightLoader />}
       {!!sessionsWithActivities.length &&
-        sessionsWithActivities.sort(currentSessionFirst(session.id)).map(sa => (
+        sessionsWithActivities.sort(currentSessionFirst(session!.id)).map(sa => (
           <DeviceAccordion
             key={sa.id}
             session={sa}
