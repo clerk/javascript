@@ -1,5 +1,40 @@
 # Change Log
 
+## 4.0.0-alpha-v5.11
+
+### Major Changes
+
+- - Remove `BuildUrlWithAuthParams` type ([#2367](https://github.com/clerk/javascript/pull/2367)) by [@tmilewski](https://github.com/tmilewski)
+
+  - `AuthConfigResource` no longer has a `urlBasedSessionSyncing` property
+  - `buildUrlWithAuth` no longer accepts an `options` argument of `BuildUrlWithAuthParams`.
+
+- Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters. ([#2367](https://github.com/clerk/javascript/pull/2367)) by [@tmilewski](https://github.com/tmilewski)
+
+- Change return values of `signJwt`, `hasValidSignature`, `decodeJwt`, `verifyJwt` ([#2377](https://github.com/clerk/javascript/pull/2377)) by [@dimkl](https://github.com/dimkl)
+
+  to return `{ data, error }`. Example of keeping the same behavior using those utilities:
+
+  ```typescript
+  import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt';
+
+  const { data, error } = await signJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await hasValidSignature(...)
+  if (error) throw error;
+
+  const { data, error } = decodeJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await verifyJwt(...)
+  if (error) throw error;
+  ```
+
+### Minor Changes
+
+- Introduce new `ResultWithError` type in `@clerk/types` ([#2377](https://github.com/clerk/javascript/pull/2377)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.0.0-alpha-v5.10
 
 ### Major Changes
