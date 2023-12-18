@@ -20,7 +20,7 @@ class ClerkRequest extends Request {
   readonly cookies: Map<string, string>;
 
   public constructor(req: Request) {
-    super(req);
+    super(req, req);
     this.clerkUrl = this.deriveUrlFromHeaders(req);
     this.cookies = this.parseCookies(req);
   }

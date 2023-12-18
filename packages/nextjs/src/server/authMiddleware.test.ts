@@ -2,14 +2,8 @@
 // This mock SHOULD exist before the import of authenticateRequest
 import { AuthStatus } from '@clerk/backend/internal';
 import { expectTypeOf } from 'expect-type';
-import { NextURL } from 'next/dist/server/web/next-url';
-import type { NextFetchEvent, NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-
-import { paths, setHeader } from '../utils';
-import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
-// used to assert the mock
-import { clerkClient } from './clerkClient';
+import type { NextFetchEvent } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const authenticateRequestMock = jest.fn().mockResolvedValue({
   toAuth: () => ({}),
@@ -37,6 +31,11 @@ jest.mock('./redirect', () => {
     redirectToSignIn: mockRedirectToSignIn,
   };
 });
+
+import { paths, setHeader } from '../utils';
+import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
+// used to assert the mock
+import { clerkClient } from './clerkClient';
 
 /**
  * Disable console warnings about config matchers
@@ -72,15 +71,14 @@ const mockRequest = ({
   method = 'GET',
   headers = new Headers(),
 }: MockRequestParams) => {
-  return {
-    url: new URL(url, 'https://www.clerk.com').toString(),
-    nextUrl: new NextURL(url, 'https://www.clerk.com'),
-    cookies: {
-      get: () => (appendDevBrowserCookie ? { name: '__clerk_db_jwt', value: 'test_jwt' } : {}) as any,
-    },
+  const headersWithCookie = new Headers(headers);
+  if (appendDevBrowserCookie) {
+    headersWithCookie.append('cookie', '__clerk_db_jwt=test_jwt');
+  }
+  return new NextRequest(new URL(url, 'https://www.clerk.com').toString(), {
     method,
-    headers,
-  } as NextRequest;
+    headers: headersWithCookie,
+  });
 };
 
 describe('isPublicRoute', () => {

@@ -4,7 +4,7 @@ export default (QUnit: QUnit) => {
   const { module, test: it } = QUnit;
 
   module('createClerkRequest', () => {
-    module.skip('cookies', () => {
+    module('cookies', () => {
       it('should parse and return cookies', assert => {
         const req = createClerkRequest(
           new Request('http://localhost:3000', { headers: new Headers({ cookie: 'foo=bar' }) }),

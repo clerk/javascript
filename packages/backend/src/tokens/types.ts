@@ -1,6 +1,6 @@
 import type { VerifyTokenOptions } from './verify';
 
-type RequestStateParams = {
+export type AuthenticateRequestOptions = {
   publishableKey?: string;
   domain?: string;
   isSatellite?: boolean;
@@ -9,6 +9,4 @@ type RequestStateParams = {
   signUpUrl?: string;
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
-};
-
-export type AuthenticateRequestOptions = RequestStateParams & VerifyTokenOptions;
+} & VerifyTokenOptions;

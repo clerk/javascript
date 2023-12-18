@@ -34,6 +34,7 @@ export default (QUnit: QUnit) => {
         'AuthStatus',
         'constants',
         'createAuthenticateRequest',
+        'createClerkRequest',
         'debugRequestState',
         'decorateObjectWithResources',
         'makeAuthObjectSerializable',

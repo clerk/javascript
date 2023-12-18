@@ -1,5 +1,5 @@
 import type { RequestState } from '@clerk/backend/internal';
-import { buildRequestUrl, constants } from '@clerk/backend/internal';
+import { constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
@@ -12,15 +12,14 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, secretKey, publishableKey, req: incomingMessage, options } = opts;
   const { jwtKey, authorizedParties, audience } = options || {};
 
-  const req = incomingMessageToRequest(incomingMessage);
+  const clerkRequest = createClerkRequest(incomingMessageToRequest(incomingMessage));
   const env = { ...loadApiEnv(), ...loadClientEnv() };
-  const requestUrl = buildRequestUrl(req);
-  const isSatellite = handleValueOrFn(options?.isSatellite, requestUrl, env.isSatellite);
-  const domain = handleValueOrFn(options?.domain, requestUrl) || env.domain;
+  const isSatellite = handleValueOrFn(options?.isSatellite, clerkRequest.clerkUrl, env.isSatellite);
+  const domain = handleValueOrFn(options?.domain, clerkRequest.clerkUrl) || env.domain;
   const signInUrl = options?.signInUrl || env.signInUrl;
   const proxyUrl = absoluteProxyUrl(
-    handleValueOrFn(options?.proxyUrl, requestUrl, env.proxyUrl),
-    requestUrl.toString(),
+    handleValueOrFn(options?.proxyUrl, clerkRequest.clerkUrl, env.proxyUrl),
+    clerkRequest.clerkUrl.toString(),
   );
 
   if (isSatellite && !proxyUrl && !domain) {
@@ -31,7 +30,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
-  return clerkClient.authenticateRequest(req, {
+  return clerkClient.authenticateRequest(clerkRequest, {
     audience,
     secretKey,
     publishableKey,
