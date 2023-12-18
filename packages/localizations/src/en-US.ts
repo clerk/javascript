@@ -277,6 +277,10 @@ export const enUS: LocalizationResource = {
       description: 'Manage your account info.',
     },
     start: {
+      profileSection: {
+        title: 'Profile',
+        primaryButton: 'Edit Profile',
+      },
       headerTitle__account: 'Profile',
       headerTitle__security: 'Security',
       usernameSection: {
