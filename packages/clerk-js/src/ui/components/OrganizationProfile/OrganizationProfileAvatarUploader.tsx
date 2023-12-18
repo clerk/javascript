@@ -1,5 +1,6 @@
 import type { OrganizationResource } from '@clerk/types';
 
+import { Text } from '../../customizables';
 import type { AvatarUploaderProps } from '../../elements';
 import { AvatarUploader, OrganizationAvatar } from '../../elements';
 import { localizationKeys } from '../../localization';
@@ -10,15 +11,26 @@ export const OrganizationProfileAvatarUploader = (
   const { organization, ...rest } = props;
 
   return (
-    <AvatarUploader
-      {...rest}
-      title={localizationKeys('userProfile.profilePage.imageFormTitle')}
-      avatarPreview={
-        <OrganizationAvatar
-          size={theme => theme.sizes.$12}
-          {...organization}
-        />
-      }
-    />
+    <>
+      <Text
+        variant='subtitle'
+        sx={t => ({
+          textAlign: 'left',
+          marginBottom: t.space.$2,
+          color: t.colors.$blackAlpha700,
+        })}
+        localizationKey={localizationKeys('organizationProfile.general.profileSection.uploadOrganizationImageTitle')}
+      />
+      <AvatarUploader
+        {...rest}
+        title={localizationKeys('userProfile.profilePage.imageFormTitle')}
+        avatarPreview={
+          <OrganizationAvatar
+            size={theme => theme.sizes.$12}
+            {...organization}
+          />
+        }
+      />
+    </>
   );
 };

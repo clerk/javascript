@@ -577,6 +577,7 @@ type _LocalizationResource = {
       profileSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
+        uploadOrganizationImageTitle: LocalizationValue;
       };
       domainSection: {
         title: LocalizationValue;

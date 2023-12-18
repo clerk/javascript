@@ -3,7 +3,7 @@ import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { Col, Icon, Text } from '../../customizables';
+import { Col, Icon } from '../../customizables';
 import { Form, FormButtonContainer, FormContent, IconButton, SuccessPage, useCardState } from '../../elements';
 import { Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
@@ -104,7 +104,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
     slugField.setValue(val);
   };
 
-  const headerTitleTextVariant = props.flow === 'organizationList' ? 'h2' : undefined;
+  const headerTitleTextVariant = 'h2';
   const headerSubtitleTextVariant = props.flow === 'organizationList' ? 'subtitle' : undefined;
 
   return (
@@ -115,20 +115,10 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
         headerSubtitle={props?.startPage?.headerSubtitle}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
-        sx={t => ({ minHeight: t.sizes.$60, gap: 0 })}
+        sx={t => ({ minHeight: t.sizes.$60, gap: t.space.$6 })}
       >
         <Form.Root onSubmit={onSubmit}>
           <Col>
-            <Text
-              variant='subtitle'
-              sx={t => ({
-                textAlign: 'left',
-                marginBottom: t.space.$2,
-                color: t.colors.$blackAlpha700,
-              })}
-            >
-              Logo
-            </Text>
             <OrganizationProfileAvatarUploader
               organization={{ name: nameField.value }}
               onAvatarChange={async file => await setFile(file)}

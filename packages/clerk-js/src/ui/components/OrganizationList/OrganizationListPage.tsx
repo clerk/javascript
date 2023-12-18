@@ -92,15 +92,9 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
             padding: `${t.space.$none} ${t.space.$5} ${t.space.$5}`,
           })}
         >
-          <Header.Root
-            sx={t => ({
-              padding: `${t.space.$4} ${t.space.$5}`,
-            })}
-          >
-            <Header.Title localizationKey={localizationKeys('createOrganization.title')} />
-          </Header.Root>
           <CreateOrganizationForm
             flow='organizationList'
+            startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>
               navigateAfterSelectOrganization(org).then(() => setCreateOrganizationFlow(false))
