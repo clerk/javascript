@@ -37,12 +37,12 @@ export default (QUnit: QUnit) => {
         'createAuthenticateRequest',
         'createIsomorphicRequest',
         'debugRequestState',
+        'decorateObjectWithResources',
         'makeAuthObjectSerializable',
-        'prunePrivateMetadata',
         'redirect',
-        'sanitizeAuthObject',
         'signedInAuthObject',
         'signedOutAuthObject',
+        'stripPrivateDataFromObject',
       ];
       assert.deepEqual(Object.keys(internalExports).sort(), exportedApiKeys);
     });

@@ -16,7 +16,7 @@ test.describe('navigation modes @generic', () => {
       .addFile(
         'src/app/provider.tsx',
         () => `'use client'
-import { ClerkProvider } from "@clerk/nextjs"
+import { ClerkProvider } from "@clerk/nextjs";
 
 export function Provider({ children }: { children: any }) {
   return (

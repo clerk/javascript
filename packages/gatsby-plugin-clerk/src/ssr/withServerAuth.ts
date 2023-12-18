@@ -1,10 +1,10 @@
-import { AuthStatus } from '@clerk/backend/internal';
+import { AuthStatus, decorateObjectWithResources, stripPrivateDataFromObject } from '@clerk/backend/internal';
 import type { GetServerDataProps, GetServerDataReturn } from 'gatsby';
 
 import { PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import { clerkClient } from './clerkClient';
 import type { WithServerAuthCallback, WithServerAuthOptions, WithServerAuthResult } from './types';
-import { gatsbyPropsToRequest, injectAuthIntoContext, injectSSRStateIntoProps, sanitizeAuthObject } from './utils';
+import { gatsbyPropsToRequest, injectSSRStateIntoProps } from './utils';
 
 interface WithServerAuth {
   <CallbackReturn extends GetServerDataReturn, Options extends WithServerAuthOptions>(
@@ -16,7 +16,7 @@ interface WithServerAuth {
 
 export const withServerAuth: WithServerAuth = (cbOrOptions: any, options?: any): any => {
   const callback = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
-  const opts = (options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {}) || {};
+  const opts: WithServerAuthOptions = (options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {}) || {};
 
   return async (props: GetServerDataProps) => {
     const req = gatsbyPropsToRequest(props);
@@ -24,7 +24,6 @@ export const withServerAuth: WithServerAuth = (cbOrOptions: any, options?: any):
       ...opts,
       secretKey: SECRET_KEY,
       publishableKey: PUBLISHABLE_KEY,
-      request: req,
     });
 
     if (requestState.status === AuthStatus.Handshake) {
@@ -32,8 +31,16 @@ export const withServerAuth: WithServerAuth = (cbOrOptions: any, options?: any):
       return;
     }
 
-    const contextWithAuth = injectAuthIntoContext(props, requestState.toAuth());
-    const callbackResult = (await callback?.(contextWithAuth)) || {};
-    return injectSSRStateIntoProps(callbackResult, { __clerk_ssr_state: sanitizeAuthObject(contextWithAuth.auth) });
+    const authObject = requestState.toAuth();
+    const propsWithAuth = Object.assign(props, { auth: authObject });
+    await decorateObjectWithResources(propsWithAuth, authObject, {
+      secretKey: SECRET_KEY,
+      ...opts,
+    });
+
+    const callbackResult = (await callback?.(propsWithAuth)) || {};
+    return injectSSRStateIntoProps(callbackResult, {
+      __clerk_ssr_state: stripPrivateDataFromObject(propsWithAuth.auth),
+    });
   };
 };

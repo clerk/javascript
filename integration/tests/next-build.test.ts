@@ -6,7 +6,6 @@ import { appConfigs } from '../presets';
 test.describe('next build @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
-  const output = [];
 
   test.beforeAll(async () => {
     app = await appConfigs.next.appRouter

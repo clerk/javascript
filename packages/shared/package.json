@@ -89,7 +89,7 @@
   "dependencies": {
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.1",
-    "swr": "2.2.4"
+    "swr": "2.2.0"
   },
   "devDependencies": {
     "@clerk/types": "4.0.0-alpha-v5.10",

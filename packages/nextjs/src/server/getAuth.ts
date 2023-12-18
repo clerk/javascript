@@ -1,19 +1,19 @@
 import type { Organization, Session, User } from '@clerk/backend';
-import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import type { AuthObject } from '@clerk/backend/internal';
 import {
   AuthStatus,
   constants,
   makeAuthObjectSerializable,
-  sanitizeAuthObject,
   signedInAuthObject,
   signedOutAuthObject,
+  stripPrivateDataFromObject,
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 
 import { withLogger } from '../utils/debugLogger';
 import { API_URL, API_VERSION, SECRET_KEY } from './constants';
 import { getAuthAuthHeaderMissing } from './errors';
-import type { AuthObjectWithoutResources, RequestLike } from './types';
+import type { RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 
 export const createGetAuth = ({
@@ -24,10 +24,7 @@ export const createGetAuth = ({
   debugLoggerName: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (
-      req: RequestLike,
-      opts?: { secretKey?: string },
-    ): AuthObjectWithoutResources<SignedInAuthObject> | AuthObjectWithoutResources<SignedOutAuthObject> => {
+    return (req: RequestLike, opts?: { secretKey?: string }): AuthObject => {
       const debug = getHeader(req, constants.Headers.EnableDebug) === 'true';
       if (debug) {
         logger.enable();
@@ -112,7 +109,7 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
     authObject = signedInAuthObject(payload, { ...options, token: raw.text });
   }
 
-  const sanitizedAuthObject = makeAuthObjectSerializable(sanitizeAuthObject({ ...authObject, ...initState }));
+  const sanitizedAuthObject = makeAuthObjectSerializable(stripPrivateDataFromObject({ ...authObject, ...initState }));
   return injectSSRStateIntoObject({}, sanitizedAuthObject);
 };
 

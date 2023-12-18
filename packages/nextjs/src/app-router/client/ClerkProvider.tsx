@@ -17,7 +17,7 @@ declare global {
 }
 
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
-  const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
+  const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
   const navigate = useAwaitableNavigate();
 
@@ -39,10 +39,10 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     routerPush: navigate,
     routerReplace: to => router.replace(to),
   });
+
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
-      {/*// @ts-ignore*/}
-      <ReactClerkProvider {...mergedProps} />
+      <ReactClerkProvider {...mergedProps}>{children}</ReactClerkProvider>
     </ClerkNextOptionsProvider>
   );
 };

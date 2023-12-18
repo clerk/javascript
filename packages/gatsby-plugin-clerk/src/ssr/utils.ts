@@ -1,35 +1,9 @@
-import type { AuthObject } from '@clerk/backend/internal';
-import { constants, prunePrivateMetadata } from '@clerk/backend/internal';
+import { constants } from '@clerk/backend/internal';
 import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
 
 import { SECRET_KEY } from '../constants';
 
-/**
- * @internal
- */
-export function injectAuthIntoContext(context: GetServerDataProps, authData: AuthObject) {
-  const { user, session } = authData || {};
-  return {
-    ...context,
-    auth: authData,
-    user: user || null,
-    session: session || null,
-  };
-}
-
-/**
- *  @internal
- */
-export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T {
-  const user = authObject.user ? { ...authObject.user } : authObject.user;
-  const organization = authObject.organization ? { ...authObject.organization } : authObject.organization;
-
-  prunePrivateMetadata(user);
-  prunePrivateMetadata(organization);
-
-  return { ...authObject, user, organization };
-}
 /**
  * Wraps obscured clerk internals with a readable `clerkState` key.
  * This is intended to be passed by the user into <ClerkProvider>

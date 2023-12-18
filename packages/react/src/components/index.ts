@@ -23,9 +23,9 @@ export {
   RedirectToOrganizationProfile,
 } from './controlComponents';
 
-export * from './withClerk';
+export type { ProtectProps } from './controlComponents';
 
-export * from './SignInButton';
-export * from './SignUpButton';
-export * from './SignOutButton';
-export * from './SignInWithMetamaskButton';
+export { SignInButton } from './SignInButton';
+export { SignUpButton } from './SignUpButton';
+export { SignOutButton } from './SignOutButton';
+export { SignInWithMetamaskButton } from './SignInWithMetamaskButton';

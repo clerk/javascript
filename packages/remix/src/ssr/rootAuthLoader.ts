@@ -1,4 +1,4 @@
-import { sanitizeAuthObject } from '@clerk/backend/internal';
+import { decorateObjectWithResources } from '@clerk/backend/internal';
 import type { defer } from '@remix-run/server-runtime';
 import { isDeferredData } from '@remix-run/server-runtime/dist/responses';
 
@@ -7,7 +7,6 @@ import { authenticateRequest } from './authenticateRequest';
 import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertValidHandlerResult,
-  injectAuthIntoRequest,
   injectRequestStateIntoDeferredData,
   injectRequestStateIntoResponse,
   isRedirect,
@@ -55,7 +54,9 @@ export const rootAuthLoader: RootAuthLoader = async (
     return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState, args.context);
   }
 
-  const handlerResult = await handler(injectAuthIntoRequest(args, sanitizeAuthObject(requestState.toAuth())));
+  const authObj = requestState.toAuth();
+  Object.assign(args.request, { auth: authObj });
+  const handlerResult = await handler(await decorateObjectWithResources(args, authObj, opts));
   assertValidHandlerResult(handlerResult, invalidRootLoaderCallbackReturn);
 
   // When using defer(), we need to inject the clerk auth state into its internal data object.

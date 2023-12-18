@@ -12,7 +12,9 @@ const useClerkNextOptions = () => {
   return ctx.value;
 };
 
-const ClerkNextOptionsProvider = (props: React.PropsWithChildren<{ options: ClerkNextContextValue }>) => {
+const ClerkNextOptionsProvider = (
+  props: React.PropsWithChildren<{ options: ClerkNextContextValue }>,
+): React.JSX.Element => {
   const { children, options } = props;
   return <ClerkNextOptionsCtx.Provider value={{ value: options }}>{children}</ClerkNextOptionsCtx.Provider>;
 };

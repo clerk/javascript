@@ -54,7 +54,7 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JS
   return <>{children}</>;
 };
 
-type ProtectProps = React.PropsWithChildren<
+export type ProtectProps = React.PropsWithChildren<
   (
     | {
         condition?: never;

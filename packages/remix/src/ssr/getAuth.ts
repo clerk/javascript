@@ -1,4 +1,4 @@
-import { sanitizeAuthObject } from '@clerk/backend/internal';
+import { stripPrivateDataFromObject } from '@clerk/backend/internal';
 
 import { noLoaderArgsPassedInGetAuth } from '../errors';
 import { authenticateRequest } from './authenticateRequest';
@@ -12,7 +12,7 @@ export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): 
   }
 
   // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
-  const requestState = await authenticateRequest(args, opts);
+  const requestState = await authenticateRequest(args, opts || {});
 
-  return sanitizeAuthObject(requestState.toAuth());
+  return stripPrivateDataFromObject(requestState.toAuth());
 }
