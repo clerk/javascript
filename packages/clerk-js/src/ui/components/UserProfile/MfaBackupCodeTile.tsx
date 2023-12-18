@@ -7,9 +7,7 @@ export const MfaBackupCodeTile = (props: { code: string }) => {
     <Flex
       center
       sx={t => ({
-        backgroundColor: t.colors.$blackAlpha50,
         padding: `${t.space.$1} ${t.space.$4}`,
-        borderRadius: t.radii.$sm,
       })}
     >
       <Text>{code}</Text>

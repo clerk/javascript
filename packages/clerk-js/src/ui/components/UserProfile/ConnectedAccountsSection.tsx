@@ -45,7 +45,7 @@ export const ConnectedAccountsSection = () => {
               <Action.Root key={account.id}>
                 <Action.Closed value=''>
                   <ProfileSection.Item id='connectedAccounts'>
-                    <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2 })}>
+                    <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
                       <Image
                         elementDescriptor={[descriptors.providerIcon]}
                         elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
@@ -53,21 +53,26 @@ export const ConnectedAccountsSection = () => {
                         src={providerToDisplayData[account.provider].iconUrl}
                         sx={theme => ({ width: theme.sizes.$4 })}
                       />
-                      <Text>
-                        <Text as='span'>{`${providerToDisplayData[account.provider].name}`}</Text>{' '}
-                        <Text
-                          as='span'
-                          sx={t => ({ color: t.colors.$blackAlpha400 })}
+                      <Text sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                        <Flex
+                          gap={2}
+                          center
                         >
-                          {label ? `• ${label}` : ''}
-                        </Text>
+                          {`${providerToDisplayData[account.provider].name}`}
+                          <Text
+                            as='span'
+                            sx={t => ({ color: t.colors.$blackAlpha400 })}
+                          >
+                            {label ? `• ${label}` : ''}
+                          </Text>
+                          {(error || reauthorizationRequired) && (
+                            <Badge
+                              colorScheme='danger'
+                              localizationKey={localizationKeys('badge__requiresAction')}
+                            />
+                          )}
+                        </Flex>
                       </Text>
-                      {(error || reauthorizationRequired) && (
-                        <Badge
-                          colorScheme='danger'
-                          localizationKey={localizationKeys('badge__requiresAction')}
-                        />
-                      )}
                     </Flex>
 
                     <ConnectedAccountMenu account={account} />

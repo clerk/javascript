@@ -3,7 +3,6 @@ import { useUser } from '@clerk/shared/react';
 import { useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, Header, useCardState, withCardStateProvider } from '../../elements';
-import { NavbarMenuButtonRow } from '../../elements/Navbar';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { DeleteSection } from './DeleteSection';
 import { MfaSection } from './MfaSection';
@@ -23,7 +22,6 @@ export const SecurityPage = withCardStateProvider(() => {
       elementDescriptor={descriptors.page}
       sx={t => ({ gap: t.space.$8 })}
     >
-      <NavbarMenuButtonRow />
       <Card.Alert>{card.error}</Card.Alert>
       <Col
         elementDescriptor={descriptors.profilePage}
