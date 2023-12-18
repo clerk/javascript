@@ -7,14 +7,17 @@ import type {
 } from '@clerk/types';
 import React, { useMemo } from 'react';
 
-import { stripOrigin, toURL, trimLeadingSlash } from '../../../utils';
 import { useGate, withGate } from '../../common';
-import type { LocalizationKey } from '../../customizables';
-import { Box, Col, descriptors, localizationKeys, Spinner } from '../../customizables';
-import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
+import { Box, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
+import { ProfileSection, ThreeDotsMenu } from '../../elements';
+import { Action } from '../../elements/Action';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useInView } from '../../hooks';
-import { useRouter } from '../../router';
+import type { PropsOfComponent } from '../../styledSystem';
 import { EnrollmentBadge } from './EnrollmentBadge';
+import { RemoveDomainForm } from './RemoveDomainForm';
+import { VerifiedDomainForm } from './VerifiedDomainForm';
+import { VerifyDomainForm } from './VerifyDomainForm';
 
 type DomainListProps = GetDomainsParams & {
   verificationStatus?: OrganizationDomainVerificationStatus;
@@ -27,41 +30,35 @@ type DomainListProps = GetDomainsParams & {
   fallback?: React.ReactNode;
 };
 
-const buildDomainListRelativeURL = (parentPath: string, domainId: string, mode?: 'verify' | 'remove') =>
-  trimLeadingSlash(stripOrigin(toURL(`${parentPath}/${domainId}/${mode || ''}`)));
+const useMenuActions = (domain: OrganizationDomainResource): PropsOfComponent<typeof ThreeDotsMenu>['actions'] => {
+  const { open } = useActionContext();
 
-const useMenuActions = (
-  parentPath: string,
-  domainId: string,
-): { label: LocalizationKey; onClick: () => Promise<unknown>; isDestructive?: boolean }[] => {
-  const { isAuthorizedUser: canManageDomain } = useGate({ permission: 'org:sys_domains:manage' });
-  const { navigate } = useRouter();
+  const menuActions: PropsOfComponent<typeof ThreeDotsMenu>['actions'] = [];
 
-  const menuActions = [];
-
-  if (canManageDomain) {
+  if (domain.verification && domain.verification.status === 'verified') {
     menuActions.push({
-      label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify'),
-      onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'verify')),
+      label: localizationKeys('organizationProfile.general.domainSection.menuAction__manage'),
+      onClick: () => open('manage'),
     });
-
+  } else {
     menuActions.push({
-      label: localizationKeys('organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove'),
-      isDestructive: true,
-      onClick: () => navigate(buildDomainListRelativeURL(parentPath, domainId, 'remove')),
+      label: localizationKeys('organizationProfile.general.domainSection.menuAction__verify'),
+      onClick: () => open('verify'),
     });
   }
+
+  menuActions.push({
+    label: localizationKeys('organizationProfile.general.domainSection.menuAction__remove'),
+    isDestructive: true,
+    onClick: () => open('remove'),
+  });
 
   return menuActions;
 };
 
-const DomainListDotMenu = ({
-  redirectSubPath,
-  domainId,
-}: Pick<DomainListProps, 'redirectSubPath'> & {
-  domainId: OrganizationDomainResource['id'];
-}) => {
-  const actions = useMenuActions(redirectSubPath, domainId);
+type DomainListMenuProps = { domain: OrganizationDomainResource };
+const DomainListMenu = ({ domain }: DomainListMenuProps) => {
+  const actions = useMenuActions(domain);
   return <ThreeDotsMenu actions={actions} />;
 };
 
@@ -84,7 +81,6 @@ export const DomainList = withGate(
         }
       },
     });
-    const { navigate } = useRouter();
 
     const domainList = useMemo(() => {
       if (!domains?.data) {
@@ -109,53 +105,43 @@ export const DomainList = withGate(
       return null;
     }
 
-    // TODO: Split this to smaller components
     return (
-      <Col>
+      <ProfileSection.ItemList id='organizationDomains'>
         {domainList.length === 0 && !domains?.isLoading && fallback}
-        {domainList.map(d => {
-          if (!(d.verification && d.verification.status === 'verified') || !canManageDomain) {
-            return (
-              <BlockWithTrailingComponent
-                key={d.id}
-                sx={t => ({
-                  '&:hover': {
-                    backgroundColor: t.colors.$blackAlpha50,
-                  },
-                  padding: `${t.space.$none} ${t.space.$4}`,
-                  minHeight: t.sizes.$10,
-                })}
-                badge={<EnrollmentBadge organizationDomain={d} />}
-                trailingComponent={
-                  canManageDomain ? (
-                    <DomainListDotMenu
-                      redirectSubPath={redirectSubPath}
-                      domainId={d.id}
-                    />
-                  ) : undefined
-                }
-              >
-                {d.name}
-              </BlockWithTrailingComponent>
-            );
-          }
-
+        {domainList.map(domain => {
           return (
-            <ArrowBlockButton
-              key={d.id}
-              variant='ghost'
-              badge={!verificationStatus ? <EnrollmentBadge organizationDomain={d} /> : undefined}
-              sx={t => ({
-                padding: `${t.space.$3} ${t.space.$4}`,
-                minHeight: t.sizes.$10,
-              })}
-              onClick={() => navigate(buildDomainListRelativeURL(redirectSubPath, d.id))}
-            >
-              {d.name}
-            </ArrowBlockButton>
+            <Action.Root key={domain.id}>
+              <ProfileSection.Item id='organizationDomains'>
+                <Flex sx={t => ({ gap: t.space.$1 })}>
+                  <Text>{domain.name}</Text>
+                  <EnrollmentBadge organizationDomain={domain} />
+                </Flex>
+
+                {canManageDomain && <DomainListMenu domain={domain} />}
+              </ProfileSection.Item>
+
+              <Action.Open value='remove'>
+                <Action.Card>
+                  <RemoveDomainForm domainId={domain.id} />
+                </Action.Card>
+              </Action.Open>
+
+              <Action.Open value='verify'>
+                <Action.Card>
+                  <VerifyDomainForm domainId={domain.id} />
+                </Action.Card>
+              </Action.Open>
+
+              <Action.Open value='manage'>
+                <Action.Card>
+                  <VerifiedDomainForm domainId={domain.id} />
+                </Action.Card>
+              </Action.Open>
+            </Action.Root>
           );
         })}
-        {(domains?.hasNextPage || domains?.isFetching) && (
+
+        {(domains?.hasNextPage || domains?.isFetching) && domains.data.length === 0 && (
           <Box
             ref={domains?.isFetching ? undefined : ref}
             sx={[
@@ -184,7 +170,7 @@ export const DomainList = withGate(
             </Box>
           </Box>
         )}
-      </Col>
+      </ProfileSection.ItemList>
     );
   },
   {

@@ -2,10 +2,11 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { NotificationCountBadge, useGate } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
+  IconButton,
   NavbarMenuButtonRow,
   Tab,
   TabPanel,
@@ -15,7 +16,10 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { Action } from '../../elements/Action';
+import { UserAdd } from '../../icons';
 import { ActiveMembersList } from './ActiveMembersList';
+import { InviteMembersScreen } from './InviteMembersScreen';
 import { MembershipWidget } from './MembershipWidget';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
@@ -49,12 +53,34 @@ export const OrganizationMembers = withCardStateProvider(() => {
         elementId={descriptors.profilePage.setId('organizationMembers')}
         gap={8}
       >
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
-            textVariant='h1'
-          />
-        </Header.Root>
+        <Action.Root>
+          <Header.Root sx={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+            <Header.Title
+              localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
+              textVariant='h1'
+            />
+            <Action.Trigger value='invite'>
+              <IconButton
+                elementDescriptor={descriptors.membersPageInviteButton}
+                aria-label='Invite'
+                icon={
+                  <Icon
+                    icon={UserAdd}
+                    size={'sm'}
+                    sx={t => ({ marginRight: t.space.$2 })}
+                  />
+                }
+                textVariant='buttonSmall'
+                localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
+              />
+            </Action.Trigger>
+          </Header.Root>
+          <Action.Open value='invite'>
+            <Action.Card>
+              <InviteMembersScreen />
+            </Action.Card>
+          </Action.Open>
+        </Action.Root>
         <Tabs>
           <TabsList>
             {canReadMemberships && (

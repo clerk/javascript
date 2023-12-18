@@ -5,12 +5,19 @@ import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { FormContent, IconCircle, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { Email } from '../../icons';
 import { BillingWidget } from './BillingWidget';
 import { InviteMembersForm } from './InviteMembersForm';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
-export const InviteMembersPage = withCardStateProvider(() => {
+type InviteMembersScreenProps = {
+  onReset?: () => void;
+};
+
+export const InviteMembersScreen = withCardStateProvider((props: InviteMembersScreenProps) => {
+  const { close } = useActionContext();
+  const { onReset = close } = props;
   const title = localizationKeys('organizationProfile.invitePage.title');
   const subtitle = localizationKeys('organizationProfile.invitePage.subtitle');
   const card = useCardState();
@@ -41,10 +48,14 @@ export const InviteMembersPage = withCardStateProvider(() => {
             __unstable_manageBillingMembersLimit={__unstable_manageBillingMembersLimit}
           />
         )}
-        <InviteMembersForm onSuccess={wizard.nextStep} />
+        <InviteMembersForm
+          onSuccess={wizard.nextStep}
+          onReset={onReset}
+        />
       </FormContent>
       <SuccessPage
         title={title}
+        onFinish={close}
         contents={<InvitationsSentMessage />}
       />
     </Wizard>

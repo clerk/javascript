@@ -1,6 +1,6 @@
 import type { OrganizationInvitationResource, OrganizationMembershipResource } from '@clerk/types';
 import { describe } from '@jest/globals';
-import { waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { render } from '../../../../testUtils';
@@ -102,7 +102,7 @@ describe('OrganizationMembers', () => {
     expect(queryByRole('tab', { name: 'Requests' })).not.toBeInTheDocument();
   });
 
-  it('navigates to invite screen when user clicks on Invite button', async () => {
+  it('shows the invite screen when user clicks on Invite button', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
@@ -117,7 +117,9 @@ describe('OrganizationMembers', () => {
     await userEvent.click(getByRole('tab', { name: 'Invitations' }));
     await userEvent.click(getByRole('button', { name: 'Invite' }));
 
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('invite-members');
+    await waitFor(() => {
+      screen.getByRole('heading', { name: /invite members/i });
+    });
   });
 
   it('lists all the members of the Organization', async () => {

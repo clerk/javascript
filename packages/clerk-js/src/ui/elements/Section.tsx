@@ -15,29 +15,30 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
   const { title, children, id, subtitle, sx, ...rest } = props;
   return (
     <Col
+      elementDescriptor={descriptors.profileSection}
+      elementId={descriptors.profileSection.setId(id)}
       sx={[
         t => ({
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           padding: `${t.space.$4} 0`,
-          gap: t.space.$4,
+          gap: t.space.$2,
         }),
         sx,
       ]}
       {...rest}
     >
-      <SectionHeader
-        localizationKey={title}
-        elementDescriptor={descriptors.profileSectionTitle}
-        elementId={descriptors.profileSectionTitle.setId(id)}
-        textElementDescriptor={descriptors.profileSectionTitleText}
-        textElementId={descriptors.profileSectionTitleText.setId(id)}
-      />
-      <Flex
-        align='center'
-        elementDescriptor={descriptors.profileSection}
-        elementId={descriptors.profileSection.setId(id)}
-        gap={2}
+      <Col
+        elementDescriptor={descriptors.profileSectionHeader}
+        elementId={descriptors.profileSectionHeader.setId(id)}
+        sx={t => ({ gap: t.space.$1 })}
       >
+        <SectionHeader
+          localizationKey={title}
+          elementDescriptor={descriptors.profileSectionTitle}
+          elementId={descriptors.profileSectionTitle.setId(id)}
+          textElementDescriptor={descriptors.profileSectionTitleText}
+          textElementId={descriptors.profileSectionTitleText.setId(id)}
+        />
         {subtitle && (
           <SectionSubHeader
             localizationKey={subtitle}
@@ -47,15 +48,15 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
             textElementId={descriptors.profileSectionSubtitleText.setId(id)}
           />
         )}
-        <Col
-          elementDescriptor={descriptors.profileSectionContent}
-          elementId={descriptors.profileSectionContent.setId(id)}
-          gap={2}
-          sx={{ width: '100%' }}
-        >
-          {children}
-        </Col>
-      </Flex>
+      </Col>
+      <Col
+        elementDescriptor={descriptors.profileSectionContent}
+        elementId={descriptors.profileSectionContent.setId(id)}
+        gap={2}
+        sx={{ width: '100%' }}
+      >
+        {children}
+      </Col>
     </Col>
   );
 };

@@ -4,6 +4,7 @@ import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
+import type { FormProps } from '../../elements';
 import {
   Form,
   FormButtonContainer,
@@ -12,11 +13,11 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
-export const LeaveOrganizationPage = () => {
+type LeaveOrganizationFormProps = FormProps;
+export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
   const { organization } = useOrganization();
@@ -45,11 +46,13 @@ export const LeaveOrganizationPage = () => {
         'organizationProfile.profilePage.dangerSection.leaveOrganization.successMessage',
       )}
       onConfirmation={leave}
+      {...props}
     />
   );
 };
 
-export const DeleteOrganizationPage = () => {
+type DeleteOrganizationFormProps = FormProps;
+export const DeleteOrganizationForm = (props: DeleteOrganizationFormProps) => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
   const { organization } = useOrganization();
@@ -77,11 +80,12 @@ export const DeleteOrganizationPage = () => {
         'organizationProfile.profilePage.dangerSection.deleteOrganization.successMessage',
       )}
       onConfirmation={deleteOrg}
+      {...props}
     />
   );
 };
 
-type ActionConfirmationPageProps = {
+type ActionConfirmationPageProps = FormProps & {
   title: LocalizationKey;
   messageLine1: LocalizationKey;
   messageLine2: LocalizationKey;
@@ -102,12 +106,13 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     organizationName,
     successMessage,
     submitLabel,
+    onSuccess,
+    onReset,
     onConfirmation,
     variant = 'primaryDanger',
   } = props;
   const wizard = useWizard();
   const card = useCardState();
-  const { navigate } = useRouter();
 
   const confirmationField = useFormControl('deleteOrganizationConfirmation', '', {
     type: 'text',
@@ -157,7 +162,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
               localizationKey={localizationKeys('userProfile.formButtonReset')}
               block={false}
               onClick={async () => {
-                await navigate('..');
+                onReset?.();
               }}
             />
           </FormButtonContainer>
@@ -166,6 +171,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
       <SuccessPage
         title={title}
         text={successMessage}
+        onFinish={onSuccess}
       />
     </Wizard>
   );

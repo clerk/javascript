@@ -9,22 +9,20 @@ import { Form, FormButtonContainer, TagInput, useCardState } from '../../element
 import { useFetchRoles } from '../../hooks/useFetchRoles';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys, useLocalizations } from '../../localization';
-import { useRouter } from '../../router';
 import { createListFormat, handleError, useFormControl } from '../../utils';
 import { RoleSelect } from './MemberListTable';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 
 type InviteMembersFormProps = {
-  onSuccess: () => void;
+  onSuccess?: () => void;
   onReset?: () => void;
   primaryButtonLabel?: LocalizationKey;
   resetButtonLabel?: LocalizationKey;
 };
 
 export const InviteMembersForm = (props: InviteMembersFormProps) => {
-  const { navigate } = useRouter();
-  const { onSuccess, onReset = () => navigate('..'), resetButtonLabel } = props;
+  const { onSuccess, onReset, resetButtonLabel } = props;
   const { organization, invitations } = useOrganization({
     invitations: {
       pageSize: 10,
@@ -80,7 +78,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       })
       .then(async () => {
         await invitations?.revalidate?.();
-        return onSuccess();
+        return onSuccess?.();
       })
       .catch(err => {
         if (isClerkAPIResponseError(err)) {

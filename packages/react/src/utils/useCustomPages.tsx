@@ -30,7 +30,7 @@ export const useUserProfileCustomPages = (children: React.ReactNode | React.Reac
 };
 
 export const useOrganizationProfileCustomPages = (children: React.ReactNode | React.ReactNode[]) => {
-  const reorderItemsLabels = ['members', 'settings'];
+  const reorderItemsLabels = ['general', 'members'];
   return useCustomPages({
     children,
     reorderItemsLabels,

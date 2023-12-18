@@ -335,6 +335,7 @@ export type ElementsConfig = {
   profileSection: WithOptions<ProfileSectionId>;
   profileSectionItemList: WithOptions<ProfileSectionId>;
   profileSectionItem: WithOptions<ProfileSectionId>;
+  profileSectionHeader: WithOptions<ProfileSectionId>;
   profileSectionTitle: WithOptions<ProfileSectionId>;
   profileSectionTitleText: WithOptions<ProfileSectionId>;
   profileSectionSubtitle: WithOptions<ProfileSectionId>;

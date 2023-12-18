@@ -277,10 +277,6 @@ export const enUS: LocalizationResource = {
     start: {
       headerTitle__account: 'Profile details',
       headerTitle__security: 'Security',
-      profileSection: {
-        title: 'Profile',
-        primaryButton: 'Edit Profile',
-      },
       usernameSection: {
         title: 'Username',
         primaryButton__changeUsername: 'Change username',
@@ -604,14 +600,39 @@ export const enUS: LocalizationResource = {
     action__signOut: 'Sign out',
   },
   organizationProfile: {
+    navbar: {
+      title: 'Organization',
+      description: 'Manage your organization.',
+      general: 'General',
+      members: 'Members',
+    },
+    general: {
+      title: 'General',
+      profileSection: {
+        title: 'Organization Profile',
+        primaryButton: 'Edit profile',
+      },
+      domainSection: {
+        title: 'Verified domains',
+        subtitle:
+          'Allow users to join the organization automatically or request to join based on a verified email domain.',
+        primaryButton: 'Add domain',
+        menuAction__verify: 'Verify',
+        menuAction__remove: 'Delete',
+        menuAction__manage: 'Manage',
+        //TODO-RETHEME remove
+        unverifiedDomain_menuAction__verify: 'Verify domain',
+        //TODO-RETHEME remove
+        unverifiedDomain_menuAction__remove: 'Delete domain',
+      },
+    },
+    members: {
+      title: 'Members',
+    },
     badge__unverified: 'Unverified',
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
-    navbar: {
-      title: 'Organization',
-      description: 'Manage your organization.',
-    },
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',

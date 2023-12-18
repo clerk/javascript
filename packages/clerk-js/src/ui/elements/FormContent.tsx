@@ -5,6 +5,11 @@ import { Col, descriptors } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { Card, Header, useCardState } from './index';
 
+export type FormProps = {
+  onSuccess: () => void;
+  onReset?: () => void;
+};
+
 type PageProps = PropsOfComponent<typeof Col> & {
   headerTitle?: LocalizationKey | string;
   headerTitleTextVariant?: PropsOfComponent<typeof Header.Title>['textVariant'];

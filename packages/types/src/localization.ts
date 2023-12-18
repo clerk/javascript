@@ -564,14 +564,36 @@ type _LocalizationResource = {
     action__signOut: LocalizationValue;
   };
   organizationProfile: {
+    navbar: {
+      title: LocalizationValue;
+      description: LocalizationValue;
+      general: LocalizationValue;
+      members: LocalizationValue;
+    };
+    general: {
+      title: LocalizationValue;
+      profileSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+      };
+      domainSection: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        primaryButton: LocalizationValue;
+        menuAction__verify: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+        menuAction__manage: LocalizationValue;
+        unverifiedDomain_menuAction__verify: LocalizationValue;
+        unverifiedDomain_menuAction__remove: LocalizationValue;
+      };
+    };
+    members: {
+      title: LocalizationValue;
+    };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
     badge__automaticSuggestion: LocalizationValue;
     badge__manualInvitation: LocalizationValue;
-    navbar: {
-      title: LocalizationValue;
-      description: LocalizationValue;
-    };
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;

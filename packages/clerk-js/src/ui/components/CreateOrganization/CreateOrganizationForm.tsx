@@ -10,7 +10,7 @@ import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { createSlug, handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
-import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage';
+import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersScreen';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
 
 type CreateOrganizationFormProps = {
