@@ -22,7 +22,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     ...common.borderVariants(theme, props).normal,
     ...common.disabled(theme),
     [mqu.ios]: {
-      fontSize: theme.fontSizes.$md,
+      fontSize: theme.fontSizes.$lg,
     },
     ':autofill': {
       animationName: 'onAutoFillStart',
