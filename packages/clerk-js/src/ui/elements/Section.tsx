@@ -89,7 +89,6 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
       elementId={descriptors.profileSectionItem.setId(id)}
       sx={t => ({
         justifyContent: 'space-between',
-        alignItems: 'center',
         width: '100%',
         padding: `${t.space.$2} ${t.space.$4}`,
       })}

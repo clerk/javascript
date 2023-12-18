@@ -45,11 +45,7 @@ export const PhoneSection = () => {
               </Action.Closed>
 
               <Action.Open value='remove'>
-                <Action.Card
-                  sx={{
-                    alignItems: 'start',
-                  }}
-                >
+                <Action.Card>
                   <RemovePhoneForm phoneId={phone.id} />
                 </Action.Card>
               </Action.Open>

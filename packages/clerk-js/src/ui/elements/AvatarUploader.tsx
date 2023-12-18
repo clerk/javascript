@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, localizationKeys } from '../customizables';
+import { Button, Col, descriptors, Flex, localizationKeys, SimpleButton } from '../customizables';
 import { handleError } from '../utils';
 import { useCardState } from './contexts';
 import { FileDropArea } from './FileDropArea';
@@ -74,7 +74,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
             elementDescriptor={descriptors.avatarImageActions}
             gap={2}
           >
-            <Button
+            <SimpleButton
               elementDescriptor={descriptors.avatarImageActionsUpload}
               localizationKey={
                 !showUpload
@@ -82,7 +82,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
                   : localizationKeys('userProfile.formButtonReset')
               }
               isDisabled={card.isLoading}
-              variant='ghostPrimary'
+              variant='secondary'
               onClick={(e: any) => {
                 e.target?.blur();
                 toggle();

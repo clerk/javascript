@@ -1,7 +1,7 @@
 import { useClerk, useUser } from '@clerk/shared/react';
 
 import { useEnvironment } from '../../contexts';
-import { localizationKeys, Text } from '../../customizables';
+import { Col, localizationKeys, Text } from '../../customizables';
 import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useRouter } from '../../router';
@@ -35,7 +35,7 @@ export const DeleteUserForm = withCardStateProvider(() => {
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__confirmDeletion'),
+    label: localizationKeys('userProfile.deletePage.actionDescription'),
     isRequired: true,
     placeholder: localizationKeys('formFieldInputPlaceholder__confirmDeletionUserAccount'),
   });
@@ -48,9 +48,10 @@ export const DeleteUserForm = withCardStateProvider(() => {
       Breadcrumbs={UserProfileBreadcrumbs}
     >
       <Form.Root onSubmit={deleteUser}>
-        <Text localizationKey={localizationKeys('userProfile.deletePage.messageLine1')} />
-        <Text localizationKey={localizationKeys('userProfile.deletePage.messageLine2')} />
-        <Text localizationKey={localizationKeys('userProfile.deletePage.actionDescription')} />
+        <Col gap={1}>
+          <Text localizationKey={localizationKeys('userProfile.deletePage.messageLine1')} />
+          <Text localizationKey={localizationKeys('userProfile.deletePage.messageLine2')} />
+        </Col>
 
         <Form.ControlRow elementId={confirmationField.id}>
           <Form.PlainInput {...confirmationField.props} />

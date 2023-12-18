@@ -19,12 +19,12 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
           width: t.sizes.$220,
           maxWidth: `calc(100vw - ${t.sizes.$20})`,
           display: 'grid',
-          gridTemplateColumns: '1fr 2.5fr',
           [mqu.md]: {
-            display: 'block',
+            display: 'flex',
           },
+          gridTemplateColumns: '1fr 2.5fr',
           overflow: 'hidden',
-          position: 'relative',
+          height: t.sizes.$176,
         }),
         sx,
       ]}

@@ -2,6 +2,7 @@ import { useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
+import { useUserProfileContext } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection } from '../../elements';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
@@ -27,7 +28,7 @@ export const ActiveDevicesSection = () => {
     >
       {!sessionsWithActivities.length && <FullHeightLoader />}
       {!!sessionsWithActivities.length &&
-        sessionsWithActivities.sort(currentSessionFirst(session!.id)).map(sa => (
+        sessionsWithActivities.sort(currentSessionFirst(session.id)).map(sa => (
           <DeviceAccordion
             key={sa.id}
             session={sa}
@@ -39,6 +40,7 @@ export const ActiveDevicesSection = () => {
 
 const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useSession().session?.id === props.session.id;
+  const isModal = useUserProfileContext().mode === 'modal';
   const revoke = async () => {
     if (isCurrent || !props.session) {
       return;
@@ -48,15 +50,22 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
 
   return (
     <UserProfileAccordion
+      scrollOnOpen={isModal}
       elementDescriptor={descriptors.activeDeviceListItem}
       elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
       title={<DeviceInfo session={props.session} />}
+      sx={{
+        width: '100%',
+      }}
     >
       <Col gap={4}>
         {isCurrent && (
           <LinkButtonWithDescription
             subtitle={localizationKeys('userProfile.start.activeDevicesSection.detailsSubtitle')}
             title={localizationKeys('userProfile.start.activeDevicesSection.detailsTitle')}
+            sx={{
+              width: '100%',
+            }}
           />
         )}
         {!isCurrent && (
@@ -88,16 +97,13 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
     <Flex
       elementDescriptor={descriptors.activeDevice}
       elementId={isCurrent ? descriptors.activeDevice.setId('current') : undefined}
-      align='center'
       sx={t => ({
-        gap: t.space.$8,
+        gap: t.space.$4,
         [mqu.xs]: { gap: t.space.$2 },
       })}
     >
       <Flex
-        center
         sx={theme => ({
-          padding: `0 ${theme.space.$3}`,
           [mqu.sm]: { padding: `0` },
           borderRadius: theme.radii.$md,
         })}
@@ -111,12 +117,8 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
             '--cl-chassis-back': '#343434',
             '--cl-chassis-screen': '#575757',
             '--cl-screen': '#000000',
-            width: theme.space.$20,
-            height: theme.space.$20,
-            [mqu.sm]: {
-              width: theme.space.$10,
-              height: theme.space.$10,
-            },
+            width: theme.space.$10,
+            height: theme.space.$10,
           })}
         />
       </Flex>

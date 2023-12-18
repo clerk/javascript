@@ -36,7 +36,7 @@ export const FormContent = (props: PageProps) => {
   return (
     <Col
       elementDescriptor={descriptors.page}
-      gap={8}
+      gap={4}
       {...rest}
       sx={[sx]}
     >

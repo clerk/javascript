@@ -578,7 +578,7 @@ export const enUS: LocalizationResource = {
       title: 'Delete account',
       messageLine1: 'Are you sure you want to delete your account?',
       messageLine2: 'This action is permanent and irreversible.',
-      actionDescription: 'Type Delete account below to continue.',
+      actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
     },
   },
