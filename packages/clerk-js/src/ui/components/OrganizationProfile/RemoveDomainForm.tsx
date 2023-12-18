@@ -5,20 +5,18 @@ import React from 'react';
 import { RemoveResourcePage } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Spinner } from '../../customizables';
-import { useActionContext } from '../../elements/Action/ActionRoot';
+import type { FormProps } from '../../elements';
 import { useFetch } from '../../hooks';
 import { localizationKeys } from '../../localization';
-import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
-type RemoveDomainFormProps = {
+type RemoveDomainFormProps = FormProps & {
   domainId: string;
 };
 
 export const RemoveDomainForm = (props: RemoveDomainFormProps) => {
   const { organizationSettings } = useEnvironment();
   const { organization } = useOrganization();
-  const { close } = useActionContext();
-  const { domainId: id } = props;
+  const { domainId: id, onSuccess, onReset } = props;
 
   const ref = React.useRef<OrganizationDomainResource>();
   const { data: domain, status: domainStatus } = useFetch(
@@ -66,17 +64,14 @@ export const RemoveDomainForm = (props: RemoveDomainFormProps) => {
         domain: ref.current?.name,
       })}
       messageLine2={localizationKeys('organizationProfile.removeDomainPage.messageLine2')}
-      successMessage={localizationKeys('organizationProfile.removeDomainPage.successMessage', {
-        domain: ref.current?.name,
-      })}
       deleteResource={() =>
         domain?.delete().then(async () => {
           await domains?.revalidate?.();
-          close();
+          onSuccess();
         })
       }
-      breadcrumbTitle={localizationKeys('organizationProfile.profilePage.domainSection.title')}
-      Breadcrumbs={OrganizationProfileBreadcrumbs}
+      onSuccess={onSuccess}
+      onReset={onReset}
     />
   );
 };
