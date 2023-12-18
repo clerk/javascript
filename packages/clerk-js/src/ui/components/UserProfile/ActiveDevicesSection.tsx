@@ -2,7 +2,6 @@ import { useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
-import { useUserProfileContext } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection } from '../../elements';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
@@ -40,7 +39,6 @@ export const ActiveDevicesSection = () => {
 
 const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useSession().session?.id === props.session.id;
-  const isModal = useUserProfileContext().mode === 'modal';
   const revoke = async () => {
     if (isCurrent || !props.session) {
       return;
@@ -50,7 +48,6 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
 
   return (
     <UserProfileAccordion
-      scrollOnOpen={isModal}
       elementDescriptor={descriptors.activeDeviceListItem}
       elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
       title={<DeviceInfo session={props.session} />}
