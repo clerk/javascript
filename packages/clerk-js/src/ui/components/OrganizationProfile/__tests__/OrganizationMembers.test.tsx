@@ -134,7 +134,7 @@ describe('OrganizationMembers', () => {
       createFakeMember({
         id: '2',
         orgId: '1',
-        role: 'basic_member',
+        role: 'member',
         identifier: 'test_user2',
         firstName: 'First2',
         lastName: 'Last2',
@@ -172,7 +172,33 @@ describe('OrganizationMembers', () => {
       }),
     );
 
-    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+    fixtures.clerk.organization?.getRoles.mockResolvedValue({
+      total_count: 2,
+      data: [
+        {
+          pathRoot: '',
+          reload: jest.fn(),
+          id: 'member',
+          key: 'member',
+          name: 'Member',
+          description: '',
+          permissions: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          pathRoot: '',
+          reload: jest.fn(),
+          id: 'admin',
+          key: 'admin',
+          name: 'Admin',
+          description: '',
+          permissions: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    });
 
     const { container, queryByText, queryAllByRole } = render(<OrganizationMembers />, { wrapper });
 
