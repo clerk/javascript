@@ -6,14 +6,15 @@ import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { FormButtonContainer, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { FormButtonContainer, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, stringToFormattedPhoneString } from '../../utils';
+import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { AddPhone, VerifyPhone } from './PhoneForm';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type MfaPhoneCodeScreenProps = FormProps;
 export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScreenProps) => {
-  const { onSuccess, onReset } = props;
+  const { onReset } = props;
   const ref = React.useRef<PhoneNumberResource>();
   const wizard = useWizard({ defaultStep: 2 });
 
@@ -32,7 +33,7 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
         onReset={wizard.prevStep}
       />
       <AddMfa
-        onSuccess={onSuccess}
+        onSuccess={wizard.nextStep}
         onReset={onReset}
         onAddPhoneClick={() => wizard.goToStep(0)}
         onUnverifiedPhoneClick={phone => {
@@ -41,6 +42,17 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
         }}
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
+      />
+      <SuccessPage
+        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
+        text={localizationKeys('userProfile.mfaPhoneCodePage.successMessage')}
+        onFinish={onReset}
+        contents={
+          <MfaBackupCodeList
+            subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
+            backupCodes={ref.current?.backupCodes}
+          />
+        }
       />
     </Wizard>
   );
