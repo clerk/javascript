@@ -7,7 +7,6 @@ import {
   Card,
   Header,
   IconButton,
-  NavbarMenuButtonRow,
   Tab,
   TabPanel,
   TabPanels,
@@ -47,7 +46,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
       gap={8}
     >
       <Card.Alert>{card.error}</Card.Alert>
-      <NavbarMenuButtonRow />
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('organizationMembers')}

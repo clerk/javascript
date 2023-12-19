@@ -2,17 +2,7 @@ import { createContextAndHook } from '@clerk/shared/react';
 import React, { useEffect } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import {
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Heading,
-  Icon,
-  localizationKeys,
-  Text,
-  useLocalizations,
-} from '../customizables';
+import { Button, Col, descriptors, Flex, Heading, Icon, Text, useLocalizations } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useNavigateToFlowStart, usePopover } from '../hooks';
 import { Menu } from '../icons';
@@ -283,7 +273,11 @@ const NavButton = (props: NavButtonProps) => {
   );
 };
 
-export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
+type NavbarMenuButtonRowProps = PropsOfComponent<typeof Button> & {
+  navbarTitleLocalizationKey?: LocalizationKey;
+};
+
+export const NavbarMenuButtonRow = (props: NavbarMenuButtonRowProps) => {
   const { open } = useUnsafeNavbarContext();
   const { t } = useLocalizations();
 
@@ -324,7 +318,7 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
           icon={Menu}
           size='sm'
         />
-        {t(localizationKeys('userProfile.navbar.title'))}
+        {t(props.navbarTitleLocalizationKey)}
       </Button>
     </Flex>
   );

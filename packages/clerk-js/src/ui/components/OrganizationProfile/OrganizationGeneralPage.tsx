@@ -3,7 +3,7 @@ import { useOrganization } from '@clerk/shared/react';
 import { Gate, useGate } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { Button, Col, descriptors, localizationKeys } from '../../customizables';
-import { Header, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
+import { Header, OrganizationPreview, ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { DeleteOrganizationForm, LeaveOrganizationForm } from './ActionConfirmationPage';
@@ -57,7 +57,6 @@ export const OrganizationGeneralPage = () => {
       elementDescriptor={descriptors.page}
       sx={t => ({ gap: t.space.$8 })}
     >
-      <NavbarMenuButtonRow />
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('organizationSettings')}
