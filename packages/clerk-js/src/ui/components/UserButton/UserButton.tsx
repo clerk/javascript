@@ -1,9 +1,7 @@
-import { useUser } from '@clerk/shared/react';
 import { useId } from 'react';
 
-import { getFullName, getIdentifier } from '../../../utils/user';
 import { useUserButtonContext, withCoreUserGuard } from '../../contexts';
-import { descriptors, Flex, Flow, Text } from '../../customizables';
+import { Flow } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
 import { UserButtonPopover } from './UserButtonPopover';
@@ -21,51 +19,26 @@ const _UserButton = withFloatingTree(() => {
 
   return (
     <Flow.Root flow='userButton'>
-      <Flex
-        elementDescriptor={descriptors.userButtonBox}
+      <UserButtonTrigger
+        ref={reference}
+        onClick={toggle}
         isOpen={isOpen}
-        align='center'
-        gap={2}
+        aria-controls={userButtonMenuId}
+      />
+      <Popover
+        nodeId={nodeId}
+        context={context}
+        isOpen={isOpen}
       >
-        <UserButtonTopLevelIdentifier />
-        <UserButtonTrigger
-          ref={reference}
-          onClick={toggle}
-          isOpen={isOpen}
-          aria-controls={userButtonMenuId}
+        <UserButtonPopover
+          id={userButtonMenuId}
+          close={toggle}
+          ref={floating}
+          style={{ ...styles }}
         />
-        <Popover
-          nodeId={nodeId}
-          context={context}
-          isOpen={isOpen}
-        >
-          <UserButtonPopover
-            id={userButtonMenuId}
-            close={toggle}
-            ref={floating}
-            style={{ ...styles }}
-          />
-        </Popover>
-      </Flex>
+      </Popover>
     </Flow.Root>
   );
 });
-
-const UserButtonTopLevelIdentifier = () => {
-  const { user } = useUser();
-
-  const { showName } = useUserButtonContext();
-  if (!user) {
-    return null;
-  }
-  return showName ? (
-    <Text
-      variant='subtitle'
-      elementDescriptor={descriptors.userButtonOuterIdentifier}
-    >
-      {getFullName(user) || getIdentifier(user)}
-    </Text>
-  ) : null;
-};
 
 export const UserButton = withCoreUserGuard(withCardStateProvider(_UserButton));
