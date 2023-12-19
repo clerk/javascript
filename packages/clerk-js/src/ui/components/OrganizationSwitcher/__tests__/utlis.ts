@@ -1,5 +1,5 @@
 import type {
-  MembershipRole,
+  OrganizationCustomRoleKey,
   OrganizationInvitationStatus,
   OrganizationMembershipResource,
   OrganizationSuggestionResource,
@@ -15,7 +15,7 @@ type FakeOrganizationInvitationParams = {
   id: string;
   createdAt?: Date;
   emailAddress: string;
-  role?: MembershipRole;
+  role?: OrganizationCustomRoleKey;
   status?: OrganizationInvitationStatus;
   publicOrganizationData?: { hasImage?: boolean; id?: string; imageUrl?: string; name?: string; slug?: string };
 };
@@ -48,7 +48,7 @@ export const createFakeUserOrganizationInvitation = (
 type FakeUserOrganizationMembershipParams = {
   id: string;
   createdAt?: Date;
-  role?: MembershipRole;
+  role?: OrganizationCustomRoleKey;
   organization: FakeOrganizationParams;
 };
 
@@ -59,6 +59,7 @@ export const createFakeUserOrganizationMembership = (
     organization: createFakeOrganization(params.organization),
     pathRoot: '',
     role: params.role || 'basic_member',
+    permissions: [],
     id: params.id,
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
@@ -74,7 +75,7 @@ type FakeOrganizationSuggestionParams = {
   id: string;
   createdAt?: Date;
   emailAddress: string;
-  role?: MembershipRole;
+  role?: OrganizationCustomRoleKey;
   status?: OrganizationSuggestionStatus;
   publicOrganizationData?: { hasImage?: boolean; id?: string; imageUrl?: string; name?: string; slug?: string };
 };

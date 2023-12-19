@@ -10,9 +10,9 @@ import type {
 
 import type { CreateBackendApiOptions } from '../api';
 import { createBackendApiClient } from '../api';
+import type { AuthenticateContext } from './authenticateContext';
 
 type AuthObjectDebugData = Record<string, any>;
-type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
 type AuthObjectDebug = () => AuthObjectDebugData;
 
 /**
@@ -64,9 +64,9 @@ export type SignedOutAuthObject = {
  */
 export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
 
-const createDebug: CreateAuthObjectDebug = data => {
+const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
-    const res = { ...data } || {};
+    const res = { ...data };
     res.secretKey = (res.secretKey || '').substring(0, 7);
     res.jwtKey = (res.jwtKey || '').substring(0, 7);
     return { ...res };
@@ -77,9 +77,8 @@ const createDebug: CreateAuthObjectDebug = data => {
  * @internal
  */
 export function signedInAuthObject(
+  authenticateContext: AuthenticateContext,
   sessionClaims: JwtPayload,
-  options: SignedInAuthObjectOptions,
-  debugData?: AuthObjectDebugData,
 ): SignedInAuthObject {
   const {
     act: actor,
@@ -90,17 +89,11 @@ export function signedInAuthObject(
     org_permissions: orgPermissions,
     sub: userId,
   } = sessionClaims;
-  const { secretKey, apiUrl, apiVersion, token } = options;
-  const { sessions } = createBackendApiClient({
-    secretKey,
-    apiUrl,
-    apiVersion,
-  });
-
+  const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
-    sessionToken: token,
-    fetcher: (...args) => sessions.getToken(...args),
+    sessionToken: authenticateContext.sessionToken || '',
+    fetcher: (...args) => apiClient.sessions.getToken(...args),
   });
 
   return {
@@ -114,7 +107,7 @@ export function signedInAuthObject(
     orgPermissions,
     getToken,
     has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
-    debug: createDebug({ ...options, ...debugData }),
+    debug: createDebug({ ...authenticateContext }),
   };
 }
 
@@ -175,19 +168,15 @@ const createGetToken: CreateGetToken = params => {
   };
 };
 
-const createHasAuthorization =
-  ({
-    orgId,
-    orgRole,
-    userId,
-    orgPermissions,
-  }: {
-    userId: string;
-    orgId: string | undefined;
-    orgRole: string | undefined;
-    orgPermissions: string[] | undefined;
-  }): CheckAuthorizationWithCustomPermissions =>
-  params => {
+const createHasAuthorization = (options: {
+  userId: string;
+  orgId: string | undefined;
+  orgRole: string | undefined;
+  orgPermissions: string[] | undefined;
+}): CheckAuthorizationWithCustomPermissions => {
+  const { orgId, orgRole, userId, orgPermissions } = options;
+
+  return params => {
     if (!params?.permission && !params?.role) {
       throw new Error(
         'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
@@ -208,3 +197,4 @@ const createHasAuthorization =
 
     return false;
   };
+};

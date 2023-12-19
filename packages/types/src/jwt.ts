@@ -1,4 +1,4 @@
-import type { MembershipRole } from './organizationMembership';
+import type { OrganizationCustomRoleKey } from './organizationMembership';
 
 export interface JWT {
   encoded: { header: string; payload: string; signature: string };
@@ -84,7 +84,7 @@ export interface ClerkJWTClaims {
   /**
    * Active organization role
    */
-  org_role?: MembershipRole;
+  org_role?: OrganizationCustomRoleKey;
 
   /**
    * Any other JWT Claim Set member.
@@ -100,4 +100,4 @@ export interface ActJWTClaim {
   [x: string]: unknown;
 }
 
-export type OrganizationsJWTClaim = Record<string, MembershipRole>;
+export type OrganizationsJWTClaim = Record<string, OrganizationCustomRoleKey>;

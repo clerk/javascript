@@ -1,5 +1,5 @@
-import type { AuthenticateRequestOptions, AuthObject } from '@clerk/backend/internal';
-import { AuthStatus, buildRequestUrl, constants } from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, AuthObject, ClerkRequest } from '@clerk/backend/internal';
+import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { DEV_BROWSER_JWT_KEY, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
@@ -14,7 +14,7 @@ import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 import { informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
-import type { NextMiddlewareResult, WithAuthOptions } from './types';
+import type { NextMiddlewareResult } from './types';
 import {
   apiEndpointUnauthorizedNextResponse,
   decorateRequest,
@@ -83,7 +83,7 @@ type AfterAuthHandler = (
   evt: NextFetchEvent,
 ) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
 
-type AuthMiddlewareParams = WithAuthOptions & {
+type AuthMiddlewareParams = AuthenticateRequestOptions & {
   /**
    * A function that is called before the authentication middleware is executed.
    * If a redirect response is returned, the middleware will respect it and redirect the user.
@@ -157,28 +157,32 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     if (options.debug) {
       logger.enable();
     }
-    const req = withNormalizedClerkUrl(_req);
+    const clerkRequest = createClerkRequest(_req);
+    const nextRequest = withNormalizedClerkUrl(clerkRequest, _req);
 
     logger.debug('URL debug', {
-      url: req.nextUrl.href,
-      method: req.method,
-      headers: stringifyHeaders(req.headers),
-      nextUrl: req.nextUrl.href,
-      clerkUrl: req.experimental_clerkUrl.href,
+      url: nextRequest.nextUrl.href,
+      method: nextRequest.method,
+      headers: stringifyHeaders(nextRequest.headers),
+      nextUrl: nextRequest.nextUrl.href,
+      clerkUrl: nextRequest.experimental_clerkUrl.href,
     });
     logger.debug('Options debug', { ...options, beforeAuth: !!beforeAuth, afterAuth: !!afterAuth });
 
-    if (isIgnoredRoute(req)) {
+    if (isIgnoredRoute(nextRequest)) {
       logger.debug({ isIgnoredRoute: true });
       if (isDevelopmentFromSecretKey(options.secretKey || SECRET_KEY) && !params.ignoredRoutes) {
         console.warn(
-          receivedRequestForIgnoredRoute(req.experimental_clerkUrl.href, JSON.stringify(DEFAULT_CONFIG_MATCHER)),
+          receivedRequestForIgnoredRoute(
+            nextRequest.experimental_clerkUrl.href,
+            JSON.stringify(DEFAULT_CONFIG_MATCHER),
+          ),
         );
       }
       return setHeader(NextResponse.next(), constants.Headers.AuthReason, 'ignored-route');
     }
 
-    const beforeAuthRes = await (beforeAuth && beforeAuth(req, evt));
+    const beforeAuthRes = await (beforeAuth && beforeAuth(nextRequest, evt));
 
     if (beforeAuthRes === false) {
       logger.debug('Before auth returned false, skipping');
@@ -193,9 +197,9 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       ...options,
       secretKey: options.secretKey || SECRET_KEY,
       publishableKey: options.publishableKey || PUBLISHABLE_KEY,
-      ...handleMultiDomainAndProxy(req, options as AuthenticateRequestOptions),
+      ...handleMultiDomainAndProxy(clerkRequest, options as AuthenticateRequestOptions),
     } as AuthenticateRequestOptions;
-    const requestState = await clerkClient.authenticateRequest(req, authenticateRequestOptions);
+    const requestState = await clerkClient.authenticateRequest(clerkRequest, authenticateRequestOptions);
 
     const locationHeader = requestState.headers.get('location');
     if (locationHeader) {
@@ -211,26 +215,26 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     }
 
     const auth = Object.assign(requestState.toAuth(), {
-      isPublicRoute: isPublicRoute(req),
-      isApiRoute: isApiRoute(req),
+      isPublicRoute: isPublicRoute(nextRequest),
+      isApiRoute: isApiRoute(nextRequest),
     });
     logger.debug(() => ({ auth: JSON.stringify(auth), debug: auth.debug() }));
-    const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, req, evt);
+    const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, nextRequest, evt);
     const finalRes = mergeResponses(beforeAuthRes, afterAuthRes) || NextResponse.next();
     logger.debug(() => ({ mergedHeaders: stringifyHeaders(finalRes.headers) }));
 
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
       const res = setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
-      return appendDevBrowserOnCrossOrigin(req, res, options);
+      return appendDevBrowserOnCrossOrigin(nextRequest, res, options);
     }
 
     if (options.debug) {
-      setRequestHeadersOnNextResponse(finalRes, req, { [constants.Headers.EnableDebug]: 'true' });
+      setRequestHeadersOnNextResponse(finalRes, nextRequest, { [constants.Headers.EnableDebug]: 'true' });
       logger.debug(`Added ${constants.Headers.EnableDebug} on request`);
     }
 
-    const result = decorateRequest(req, finalRes, requestState) || NextResponse.next();
+    const result = decorateRequest(nextRequest, finalRes, requestState) || NextResponse.next();
 
     if (requestState.headers) {
       requestState.headers.forEach((value, key) => {
@@ -360,16 +364,12 @@ const isRequestMethodIndicatingApiRoute = (req: NextRequest): boolean => {
   return !['get', 'head', 'options'].includes(requestMethod);
 };
 
-const withNormalizedClerkUrl = (req: NextRequest): WithClerkUrl<NextRequest> => {
-  const clerkUrl = req.nextUrl.clone();
-
-  const originUrl = buildRequestUrl(req);
-
-  clerkUrl.port = originUrl.port;
-  clerkUrl.protocol = originUrl.protocol;
-  clerkUrl.host = originUrl.host;
-
-  return Object.assign(req, { experimental_clerkUrl: clerkUrl });
+const withNormalizedClerkUrl = (clerkRequest: ClerkRequest, nextRequest: NextRequest): WithClerkUrl<NextRequest> => {
+  const res = nextRequest.nextUrl.clone();
+  res.port = clerkRequest.clerkUrl.port;
+  res.protocol = clerkRequest.clerkUrl.protocol;
+  res.host = clerkRequest.clerkUrl.host;
+  return Object.assign(nextRequest, { experimental_clerkUrl: res });
 };
 
 const informAboutProtectedRoute = (path: string, params: AuthMiddlewareParams, isApiRoute: boolean) => {

@@ -39,7 +39,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    return (dataChanged ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
+    return (canSubmit ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
       .then(onSuccess)
       .catch(err => {
         handleError(err, [nameField, slugField], card.setError);

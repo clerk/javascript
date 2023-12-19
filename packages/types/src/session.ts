@@ -1,6 +1,5 @@
 import type { ActJWTClaim } from './jwt';
 import type {
-  MembershipRole,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationPermissionKey,
@@ -28,7 +27,7 @@ export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
 type CheckAuthorizationParams =
   | {
-      role: MembershipRole;
+      role: OrganizationCustomRoleKey;
       permission?: never;
     }
   | {

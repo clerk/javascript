@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.7
+
+### Major Changes
+
+- Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters. ([#2367](https://github.com/clerk/javascript/pull/2367)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 2.0.0-alpha-v5.6
 
 ### Patch Changes

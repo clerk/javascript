@@ -103,8 +103,9 @@ const OrganizationProfileSection = () => {
               {profile}
 
               <Action.Trigger value='edit'>
-                <ProfileSection.Button
+                <Button
                   id='organizationProfile'
+                  variant='ghost'
                   localizationKey={localizationKeys('organizationProfile.general.profileSection.primaryButton')}
                 />
               </Action.Trigger>

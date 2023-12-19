@@ -6,7 +6,7 @@ const CreateOrganizationPage: NextPage = () => {
     <div
       style={{ display: 'flex', flexDirection: 'column', gap: '2rem', justifyContent: 'center', alignItems: 'center' }}
     >
-      <CreateOrganization />
+      <CreateOrganization path='/create-organization' />
     </div>
   );
 };

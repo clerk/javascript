@@ -7,7 +7,7 @@ import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
 import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
-import type { MembershipRole, OrganizationPermissionKey } from './organizationMembership';
+import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
@@ -303,7 +303,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   permissions: OrganizationPermissionKey[];
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
   created_at: number;
   updated_at: number;
 }
@@ -315,7 +315,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   organization_id: string;
   public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
   created_at: number;
   updated_at: number;
 }
@@ -403,7 +403,7 @@ export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
   public_organization_data: PublicOrganizationDataJSON;
   public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
   created_at: number;
   updated_at: number;
 }
