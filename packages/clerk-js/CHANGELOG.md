@@ -1,5 +1,23 @@
 # Change Log
 
+## 5.0.0-alpha-v5.11
+
+### Major Changes
+
+- Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters. ([#2367](https://github.com/clerk/javascript/pull/2367)) by [@tmilewski](https://github.com/tmilewski)
+
+- - `buildUrlWithAuth` no longer accepts an `options` argument. ([#2367](https://github.com/clerk/javascript/pull/2367)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Remove legacy roles fallback ([#2385](https://github.com/clerk/javascript/pull/2385)) by [@panteliselef](https://github.com/panteliselef)
+
+  After the release of Custom Roles, roles should always be dynamically fetched.
+
+- Updated dependencies [[`5f58a2274`](https://github.com/clerk/javascript/commit/5f58a22746aba94f76bef5dbbc94fa93ea3b0b7e), [`a9fe242be`](https://github.com/clerk/javascript/commit/a9fe242be4dbaaa02c6643fea0688f1fb23f23e7), [`5f58a2274`](https://github.com/clerk/javascript/commit/5f58a22746aba94f76bef5dbbc94fa93ea3b0b7e), [`a9fe242be`](https://github.com/clerk/javascript/commit/a9fe242be4dbaaa02c6643fea0688f1fb23f23e7)]:
+  - @clerk/types@4.0.0-alpha-v5.11
+  - @clerk/shared@2.0.0-alpha-v5.7
+
 ## 5.0.0-alpha-v5.10
 
 ### Major Changes
