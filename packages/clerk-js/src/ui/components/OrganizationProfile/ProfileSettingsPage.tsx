@@ -40,7 +40,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
   // eslint-disable-next-line @typescript-eslint/require-await
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    return (dataChanged ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
+    return (canSubmit ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
       .then(wizard.nextStep)
       .catch(err => {
         handleError(err, [nameField, slugField], card.setError);
