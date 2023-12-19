@@ -76,9 +76,13 @@ export const AccordionItem = (props: AccordionItemProps) => {
           backgroundColor: isOpen ? t.colors.$blackAlpha50 : undefined,
           padding: `${t.space.$3} ${t.space.$4}`,
           minHeight: t.sizes.$10,
+          justifyContent: 'start',
         })}
         onClick={toggle}
         isDisabled={!toggleable}
+        childrenSx={{
+          width: '100%',
+        }}
       >
         {title}
       </ArrowBlockButton>

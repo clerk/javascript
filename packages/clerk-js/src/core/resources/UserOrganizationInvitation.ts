@@ -1,7 +1,7 @@
 import type {
   ClerkPaginatedResponse,
   GetUserOrganizationInvitationsParams,
-  MembershipRole,
+  OrganizationCustomRoleKey,
   OrganizationInvitationStatus,
   UserOrganizationInvitationJSON,
   UserOrganizationInvitationResource,
@@ -17,7 +17,7 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
   publicOrganizationData!: UserOrganizationInvitationResource['publicOrganizationData'];
   publicMetadata: OrganizationInvitationPublicMetadata = {};
   status!: OrganizationInvitationStatus;
-  role!: MembershipRole;
+  role!: OrganizationCustomRoleKey;
   createdAt!: Date;
   updatedAt!: Date;
 

@@ -1,4 +1,4 @@
-import { localizationKeys } from '../../customizables';
+import { Button, localizationKeys } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { DeleteUserForm } from './DeleteUserPage';
@@ -12,7 +12,7 @@ export const DeleteSection = () => {
       <Action.Root>
         <Action.Closed value='delete'>
           <Action.Trigger value='delete'>
-            <ProfileSection.Button
+            <Button
               id='danger'
               variant='ghostDanger'
               sx={{ alignSelf: 'start' }}
@@ -21,7 +21,7 @@ export const DeleteSection = () => {
           </Action.Trigger>
         </Action.Closed>
 
-        <Action.Open value='edit'>
+        <Action.Open value='delete'>
           <Action.Card>
             <DeleteUserForm />
           </Action.Card>

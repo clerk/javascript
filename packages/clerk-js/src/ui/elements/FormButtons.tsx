@@ -21,7 +21,7 @@ export const FormButtons = (props: FormButtonsProps) => {
         block={false}
         isDisabled={isDisabled}
         // Should the default key come from userProfile?
-        localizationKey={submitLabel || localizationKeys('userProfile.formButtonPrimary__continue')}
+        localizationKey={submitLabel || localizationKeys('userProfile.formButtonPrimary__save')}
         {...rest}
       />
       <Form.ResetButton

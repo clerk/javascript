@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
-import { localizationKeys } from '../../customizables';
+import { Button, localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
 import { Action } from '../../elements/Action';
 import { ProfileForm } from './ProfileForm';
@@ -25,8 +25,9 @@ export const UserProfileSection = () => {
             <UserPreview user={userWithoutIdentifiers} />
 
             <Action.Trigger value='edit'>
-              <ProfileSection.Button
+              <Button
                 id='profile'
+                variant='ghost'
                 localizationKey={localizationKeys('userProfile.start.profileSection.primaryButton')}
               />
             </Action.Trigger>

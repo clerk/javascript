@@ -1,5 +1,153 @@
 # Change Log
 
+## 1.0.0-alpha-v5.10
+
+### Major Changes
+
+- Change return value of `verifyToken()` from `@clerk/backend` to `{ data, error}`. ([#2377](https://github.com/clerk/javascript/pull/2377)) by [@dimkl](https://github.com/dimkl)
+
+  To replicate the current behaviour use this:
+
+  ```typescript
+  import { verifyToken } from '@clerk/backend'
+
+  const { data, error }  = await verifyToken(...);
+  if(error){
+      throw error;
+  }
+  ```
+
+- Change return values of `signJwt`, `hasValidSignature`, `decodeJwt`, `verifyJwt` ([#2377](https://github.com/clerk/javascript/pull/2377)) by [@dimkl](https://github.com/dimkl)
+
+  to return `{ data, error }`. Example of keeping the same behavior using those utilities:
+
+  ```typescript
+  import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt';
+
+  const { data, error } = await signJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await hasValidSignature(...)
+  if (error) throw error;
+
+  const { data, error } = decodeJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await verifyJwt(...)
+  if (error) throw error;
+  ```
+
+- Changes in exports of `@clerk/backend`: ([#2363](https://github.com/clerk/javascript/pull/2363)) by [@dimkl](https://github.com/dimkl)
+
+  - Expose the following helpers and enums from `@clerk/backend/internal`:
+    ```typescript
+    import {
+      AuthStatus,
+      buildRequestUrl,
+      constants,
+      createAuthenticateRequest,
+      createIsomorphicRequest,
+      debugRequestState,
+      makeAuthObjectSerializable,
+      prunePrivateMetadata,
+      redirect,
+      sanitizeAuthObject,
+      signedInAuthObject,
+      signedOutAuthObject,
+    } from '@clerk/backend/internal';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { AuthStatus, ... } from '@clerk/backend';
+    // After
+    import { AuthStatus, ... } from '@clerk/backend/internal';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+
+- Changes in exports of `@clerk/backend`: ([#2365](https://github.com/clerk/javascript/pull/2365)) by [@dimkl](https://github.com/dimkl)
+
+  - Drop the following internal exports from the top-level api:
+    ```typescript
+    // Before
+    import {
+      AllowlistIdentifier,
+      Client,
+      DeletedObject,
+      Email,
+      EmailAddress,
+      ExternalAccount,
+      IdentificationLink,
+      Invitation,
+      OauthAccessToken,
+      ObjectType,
+      Organization,
+      OrganizationInvitation,
+      OrganizationMembership,
+      OrganizationMembershipPublicUserData,
+      PhoneNumber,
+      RedirectUrl,
+      SMSMessage,
+      Session,
+      SignInToken,
+      Token,
+      User,
+      Verification,
+    } from '@clerk/backend';
+    // After : no alternative since there is no need to use those classes
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+  - Keep those 3 resource related type exports
+    ```typescript
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    ```
+
+- Changes in exports of `@clerk/backend`: ([#2364](https://github.com/clerk/javascript/pull/2364)) by [@dimkl](https://github.com/dimkl)
+
+  - Expose the following helpers and enums from `@clerk/backend/jwt`:
+    ```typescript
+    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { decodeJwt, ... } from '@clerk/backend';
+    // After
+    import { decodeJwt, ... } from '@clerk/backend/jwt';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+
+- Changes in `@clerk/backend` exports: ([#2362](https://github.com/clerk/javascript/pull/2362)) by [@dimkl](https://github.com/dimkl)
+
+  - Drop Internal `deserialize` helper
+  - Introduce `/errors` subpath export, eg:
+    ```typescript
+    import {
+      TokenVerificationError,
+      TokenVerificationErrorAction,
+      TokenVerificationErrorCode,
+      TokenVerificationErrorReason,
+    } from '@clerk/backend/errors';
+    ```
+  - Drop errors from top-level export
+    ```typescript
+    // Before
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
+    // After
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
+    ```
+
+### Minor Changes
+
+- Improve ESM support in `@clerk/backend` for Node by using .mjs for #crypto subpath import ([#2360](https://github.com/clerk/javascript/pull/2360)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Update the handshake flow to only trigger for document requests. ([#2352](https://github.com/clerk/javascript/pull/2352)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`5f58a2274`](https://github.com/clerk/javascript/commit/5f58a22746aba94f76bef5dbbc94fa93ea3b0b7e)]:
+  - @clerk/shared@2.0.0-alpha-v5.7
+
 ## 1.0.0-alpha-v5.9
 
 ### Major Changes

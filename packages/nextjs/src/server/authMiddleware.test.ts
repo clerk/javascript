@@ -2,9 +2,8 @@
 // This mock SHOULD exist before the import of authenticateRequest
 import { AuthStatus } from '@clerk/backend/internal';
 import { expectTypeOf } from 'expect-type';
-import { NextURL } from 'next/dist/server/web/next-url';
-import type { NextFetchEvent, NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import type { NextFetchEvent } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const authenticateRequestMock = jest.fn().mockResolvedValue({
   toAuth: () => ({}),
@@ -72,15 +71,14 @@ const mockRequest = ({
   method = 'GET',
   headers = new Headers(),
 }: MockRequestParams) => {
-  return {
-    url: new URL(url, 'https://www.clerk.com').toString(),
-    nextUrl: new NextURL(url, 'https://www.clerk.com'),
-    cookies: {
-      get: () => (appendDevBrowserCookie ? { name: '__clerk_db_jwt', value: 'test_jwt' } : {}) as any,
-    },
+  const headersWithCookie = new Headers(headers);
+  if (appendDevBrowserCookie) {
+    headersWithCookie.append('cookie', '__clerk_db_jwt=test_jwt');
+  }
+  return new NextRequest(new URL(url, 'https://www.clerk.com').toString(), {
     method,
-    headers,
-  } as NextRequest;
+    headers: headersWithCookie,
+  });
 };
 
 describe('isPublicRoute', () => {
@@ -601,27 +599,6 @@ describe('Type tests', () => {
 
       it('domain + isSatellite (satellite app)', () => {
         expectTypeOf({ ...defaultProps, domain: 'test', isSatellite: true }).toMatchTypeOf<AuthMiddleware>();
-      });
-
-      it('only domain is not allowed', () => {
-        expectTypeOf({ ...defaultProps, domain: 'test' }).not.toMatchTypeOf<AuthMiddleware>();
-      });
-
-      it('only isSatellite is not allowed', () => {
-        expectTypeOf({ ...defaultProps, isSatellite: true }).not.toMatchTypeOf<AuthMiddleware>();
-      });
-
-      it('proxyUrl + domain is not allowed', () => {
-        expectTypeOf({ ...defaultProps, proxyUrl: 'test', domain: 'test' }).not.toMatchTypeOf<AuthMiddleware>();
-      });
-
-      it('proxyUrl + domain + isSatellite is not allowed', () => {
-        expectTypeOf({
-          ...defaultProps,
-          proxyUrl: 'test',
-          domain: 'test',
-          isSatellite: true,
-        }).not.toMatchTypeOf<AuthMiddleware>();
       });
     });
   });

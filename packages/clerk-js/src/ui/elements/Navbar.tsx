@@ -110,6 +110,9 @@ export const NavBar = (props: NavBarProps) => {
           onClick={handleNavigate(r)}
           icon={r.icon}
           isActive={activeId === r.id}
+          sx={t => ({
+            padding: `${t.space.$1x5} ${t.space.$3}`,
+          })}
         >
           {t(r.name)}
         </NavButton>
@@ -145,7 +148,7 @@ const NavbarContainer = (
         [mqu.md]: {
           display: 'none',
         },
-        padding: `${t.space.$9} ${t.space.$6} ${t.space.$3} ${t.space.$6}`,
+        padding: `${t.space.$6} ${t.space.$3} ${t.space.$3}`,
         color: t.colors.$colorText,
         justifyContent: 'space-between',
       })}
@@ -154,6 +157,7 @@ const NavbarContainer = (
         <Col
           sx={t => ({
             gap: t.space.$0x5,
+            padding: `${t.space.$none} ${t.space.$3}`,
           })}
         >
           <Heading
@@ -168,7 +172,12 @@ const NavbarContainer = (
         </Col>
         {props.children}
       </Col>
-      <PoweredByClerkTag sx={{ justifyContent: 'start' }} />
+      <PoweredByClerkTag
+        sx={theme => ({
+          justifyContent: 'start',
+          paddingLeft: theme.space.$3,
+        })}
+      />
     </Col>
   );
 };
@@ -245,7 +254,7 @@ type NavButtonProps = PropsOfComponent<typeof Button> & {
 };
 
 const NavButton = (props: NavButtonProps) => {
-  const { icon, children, isActive, iconElementDescriptor, iconElementId, ...rest } = props;
+  const { icon, children, isActive, iconElementDescriptor, iconElementId, sx, ...rest } = props;
   return (
     <Button
       variant='ghost'
@@ -253,12 +262,15 @@ const NavButton = (props: NavButtonProps) => {
       size='md'
       isActive={isActive}
       {...rest}
-      sx={t => ({
-        gap: t.space.$4,
-        justifyContent: 'flex-start',
-        backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
-        opacity: isActive ? 1 : 0.6,
-      })}
+      sx={[
+        t => ({
+          gap: t.space.$4,
+          justifyContent: 'flex-start',
+          backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
+          opacity: isActive ? 1 : 0.6,
+        }),
+        sx,
+      ]}
     >
       <Icon
         elementDescriptor={iconElementDescriptor}
@@ -283,12 +295,13 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
   return (
     <Flex
       elementDescriptor={descriptors.navbarMobileMenuRow}
-      sx={{
+      sx={t => ({
         display: 'none',
+        padding: `${t.space.$2} ${t.space.$3}`,
         [mqu.md]: {
           display: 'flex',
         },
-      }}
+      })}
     >
       <Button
         elementDescriptor={descriptors.navbarMobileMenuButton}
@@ -296,12 +309,14 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
         // @ts-ignore
         onClick={open}
         size='xs'
+        textVariant='h2'
         variant='ghost'
         sx={t => ({
           color: t.colors.$colorText,
-          gap: t.space.$1x5,
+          gap: t.space.$2x5,
           width: 'fit-content',
           alignItems: 'center',
+          justifyContent: 'center',
         })}
       >
         <Icon
@@ -309,7 +324,7 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
           icon={Menu}
           size='sm'
         />
-        {t(localizationKeys('userProfile.mobileButton__menu'))}
+        {t(localizationKeys('userProfile.navbar.title'))}
       </Button>
     </Flex>
   );

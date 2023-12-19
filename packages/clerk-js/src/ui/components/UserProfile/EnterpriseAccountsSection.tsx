@@ -23,7 +23,7 @@ export const EnterpriseAccountsSection = () => {
           return (
             <Flex
               key={account.id}
-              sx={t => ({ gap: t.space.$2 })}
+              sx={t => ({ gap: t.space.$2, width: '100%' })}
             >
               <Image
                 elementDescriptor={[descriptors.providerIcon]}
@@ -32,13 +32,20 @@ export const EnterpriseAccountsSection = () => {
                 src={providerLogoUrl}
                 sx={theme => ({ width: theme.sizes.$4 })}
               />
-              <Text>{`${providerName} ${label ? `(${label})` : ''}`}</Text>
-              {error && (
-                <Badge
-                  colorScheme='danger'
-                  localizationKey={localizationKeys('badge__requiresAction')}
-                />
-              )}
+              <Text sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                <Flex
+                  gap={2}
+                  center
+                >
+                  <Text>{`${providerName} ${label ? `(${label})` : ''}`}</Text>
+                  {error && (
+                    <Badge
+                      colorScheme='danger'
+                      localizationKey={localizationKeys('badge__requiresAction')}
+                    />
+                  )}
+                </Flex>
+              </Text>
             </Flex>
           );
         })}

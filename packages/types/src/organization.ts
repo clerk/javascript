@@ -1,6 +1,6 @@
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
-import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
+import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationMembershipRequestResource } from './organizationMembershipRequest';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
@@ -67,7 +67,7 @@ export interface OrganizationResource extends ClerkResource {
 export type GetRolesParams = ClerkPaginationParams;
 
 export type GetMembersParams = ClerkPaginationParams<{
-  role?: MembershipRole[];
+  role?: OrganizationCustomRoleKey[];
 }>;
 
 export type GetDomainsParams = ClerkPaginationParams<{
@@ -84,22 +84,22 @@ export type GetMembershipRequestParams = ClerkPaginationParams<{
 
 export interface AddMemberParams {
   userId: string;
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
 }
 
 export interface InviteMemberParams {
   emailAddress: string;
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
 }
 
 export interface InviteMembersParams {
   emailAddresses: string[];
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
 }
 
 export interface UpdateMembershipParams {
   userId: string;
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
 }
 
 export interface UpdateOrganizationParams {

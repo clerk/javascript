@@ -2,10 +2,9 @@ import { useOrganization } from '@clerk/shared/react';
 import React from 'react';
 
 import { isDefaultImage } from '../../../utils';
-import { useWizard, Wizard } from '../../common';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 
@@ -18,8 +17,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const card = useCardState();
   const [avatarChanged, setAvatarChanged] = React.useState(false);
   const { organization } = useOrganization();
-
-  const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const nameField = useFormControl('name', organization?.name || '', {
     type: 'text',
@@ -42,8 +39,8 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    return (dataChanged ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
-      .then(wizard.nextStep)
+    return (canSubmit ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
+      .then(onSuccess)
       .catch(err => {
         handleError(err, [nameField, slugField], card.setError);
       });
@@ -79,41 +76,34 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   };
 
   return (
-    <Wizard {...wizard.props}>
-      <FormContent
-        headerTitle={title}
-        headerSubtitle={subtitle}
-      >
-        <Form.Root onSubmit={onSubmit}>
-          <OrganizationProfileAvatarUploader
-            organization={organization}
-            onAvatarChange={uploadAvatar}
-            onAvatarRemove={isDefaultImage(organization.imageUrl) ? null : onAvatarRemove}
+    <FormContent
+      headerTitle={title}
+      headerSubtitle={subtitle}
+    >
+      <Form.Root onSubmit={onSubmit}>
+        <OrganizationProfileAvatarUploader
+          organization={organization}
+          onAvatarChange={uploadAvatar}
+          onAvatarRemove={isDefaultImage(organization.imageUrl) ? null : onAvatarRemove}
+        />
+        <Form.ControlRow elementId={nameField.id}>
+          <Form.PlainInput
+            {...nameField.props}
+            autoFocus
+            isRequired
           />
-          <Form.ControlRow elementId={nameField.id}>
-            <Form.PlainInput
-              {...nameField.props}
-              autoFocus
-              isRequired
-            />
-          </Form.ControlRow>
-          <Form.ControlRow elementId={slugField.id}>
-            <Form.PlainInput
-              {...slugField.props}
-              onChange={onChangeSlug}
-            />
-          </Form.ControlRow>
-          <FormButtons
-            isDisabled={!canSubmit}
-            onReset={onReset}
+        </Form.ControlRow>
+        <Form.ControlRow elementId={slugField.id}>
+          <Form.PlainInput
+            {...slugField.props}
+            onChange={onChangeSlug}
           />
-        </Form.Root>
-      </FormContent>
-      <SuccessPage
-        title={title}
-        text={localizationKeys('organizationProfile.profilePage.successMessage')}
-        onFinish={onSuccess}
-      />
-    </Wizard>
+        </Form.ControlRow>
+        <FormButtons
+          isDisabled={!canSubmit}
+          onReset={onReset}
+        />
+      </Form.Root>
+    </FormContent>
   );
 });

@@ -4,9 +4,9 @@ import { getIdentifier } from '../../../utils/user';
 import { PrintableComponent, usePrintable } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Button, Col, Flex, Grid, Heading, localizationKeys, Text } from '../../customizables';
+import { Box, Button, Col, Grid, Heading, Icon, localizationKeys, Text } from '../../customizables';
 import { useClipboard } from '../../hooks';
-import { mqu } from '../../styledSystem';
+import { Check, Copy, Download, Print } from '../../icons';
 import { MfaBackupCodeTile } from './MfaBackupCodeTile';
 
 type MfaBackupCodeListProps = {
@@ -55,46 +55,69 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
           colorScheme='neutral'
         />
       </Col>
-      <Grid
-        gap={2}
+      <Box
         sx={t => ({
-          gridTemplateColumns: `repeat(5, minmax(${t.sizes.$12}, 1fr))`,
-          [mqu.sm]: {
-            gridTemplateColumns: `repeat(2, minmax(${t.sizes.$12}, 1fr))`,
-          },
+          border: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          borderRadius: t.radii.$card,
         })}
       >
-        {backupCodes.map((code, i) => (
-          <MfaBackupCodeTile
-            key={i}
-            code={code}
-          />
-        ))}
-      </Grid>
+        <Grid
+          gap={2}
+          sx={t => ({
+            gridTemplateColumns: `repeat(2, minmax(${t.sizes.$12}, 1fr))`,
+            padding: `${t.space.$4} ${t.space.$6}`,
+          })}
+        >
+          {backupCodes.map((code, i) => (
+            <MfaBackupCodeTile
+              key={i}
+              code={code}
+            />
+          ))}
+        </Grid>
 
-      <Flex gap={6}>
-        <Button
-          variant='link'
-          onClick={onCopy}
-          localizationKey={
-            !hasCopied
-              ? localizationKeys('userProfile.backupCodePage.actionLabel__copy')
-              : localizationKeys('userProfile.backupCodePage.actionLabel__copied')
-          }
-        />
+        <Grid
+          sx={t => ({
+            borderTop: `1px solid ${t.colors.$blackAlpha100}`,
+            gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
+            '>:not([hidden])~:not([hidden])': {
+              borderRightWidth: '0px',
+              borderLeftWidth: '1px',
+              borderStyle: 'solid',
+              borderColor: t.colors.$blackAlpha100,
+            },
+            '>:first-child': {
+              borderBottomLeftRadius: t.radii.$card,
+            },
+            '>:last-child': {
+              borderBottomRightRadius: t.radii.$card,
+            },
+          })}
+        >
+          <Button
+            variant='ghost'
+            sx={t => ({ width: '100%', padding: `${t.space.$2} 0`, borderRadius: 0 })}
+            onClick={onDownloadTxtFile}
+          >
+            <Icon icon={Download} />
+          </Button>
 
-        <Button
-          variant='link'
-          onClick={onDownloadTxtFile}
-          localizationKey={localizationKeys('userProfile.backupCodePage.actionLabel__download')}
-        />
-
-        <Button
-          variant='link'
-          onClick={print}
-          localizationKey={localizationKeys('userProfile.backupCodePage.actionLabel__print')}
-        />
-      </Flex>
+          <Button
+            variant='ghost'
+            sx={t => ({ width: '100%', padding: `${t.space.$2} 0`, borderRadius: 0 })}
+            onClick={print}
+          >
+            <Icon icon={Print} />
+          </Button>
+          <Button
+            variant='ghost'
+            onClick={onCopy}
+            sx={t => ({ width: '100%', padding: `${t.space.$2} 0`, borderRadius: 0 })}
+          >
+            <Icon icon={hasCopied ? Check : Copy} />
+          </Button>
+        </Grid>
+      </Box>
 
       <PrintableComponent {...printableProps}>
         <Heading>

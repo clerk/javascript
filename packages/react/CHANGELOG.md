@@ -1,5 +1,55 @@
 # Change Log
 
+## 5.0.0-alpha-v5.11
+
+### Major Changes
+
+- Replace the `signOutCallback` prop on the `<SignOutButton />` with `redirectUrl`. This aligns the API surface with other UI components provided by `@clerk/clerk-react`. ([#2348](https://github.com/clerk/javascript/pull/2348)) by [@LekoArts](https://github.com/LekoArts)
+
+  If you previously used the `signOutCallback` prop to navigate to another page, you can migrate as shown below.
+
+  Before:
+
+  ```jsx
+  import { SignOutButton } from '@clerk/clerk-react';
+
+  export const Signout = () => {
+    return (
+      <SignOutButton
+        signOutCallback={() => {
+          window.location.href = '/your-path';
+        }}
+      >
+        <button>Sign Out</button>
+      </SignOutButton>
+    );
+  };
+  ```
+
+  After:
+
+  ```jsx
+  import { SignOutButton } from '@clerk/clerk-react';
+
+  export const Signout = () => {
+    return (
+      <SignOutButton redirectUrl='/your-path'>
+        <button>Sign Out</button>
+      </SignOutButton>
+    );
+  };
+  ```
+
+- Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters. ([#2367](https://github.com/clerk/javascript/pull/2367)) by [@tmilewski](https://github.com/tmilewski)
+
+- - `buildUrlWithAuth` no longer accepts an `options` argument. ([#2367](https://github.com/clerk/javascript/pull/2367)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`5f58a2274`](https://github.com/clerk/javascript/commit/5f58a22746aba94f76bef5dbbc94fa93ea3b0b7e), [`a9fe242be`](https://github.com/clerk/javascript/commit/a9fe242be4dbaaa02c6643fea0688f1fb23f23e7), [`5f58a2274`](https://github.com/clerk/javascript/commit/5f58a22746aba94f76bef5dbbc94fa93ea3b0b7e), [`a9fe242be`](https://github.com/clerk/javascript/commit/a9fe242be4dbaaa02c6643fea0688f1fb23f23e7)]:
+  - @clerk/types@4.0.0-alpha-v5.11
+  - @clerk/shared@2.0.0-alpha-v5.7
+
 ## 5.0.0-alpha-v5.10
 
 ### Major Changes

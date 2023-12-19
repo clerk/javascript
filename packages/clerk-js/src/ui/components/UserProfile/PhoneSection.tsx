@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/types';
 
-import { Badge, localizationKeys, Text } from '../../customizables';
+import { Badge, Flex, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -25,14 +25,19 @@ export const PhoneSection = () => {
             <Action.Root key={phone.id}>
               <Action.Closed value=''>
                 <ProfileSection.Item id='phoneNumbers'>
-                  <Text>
-                    {stringToFormattedPhoneString(phone.phoneNumber)}{' '}
-                    {user?.primaryPhoneNumberId === phone.id && (
-                      <Badge localizationKey={localizationKeys('badge__primary')} />
-                    )}
-                    {phone.verification.status !== 'verified' && (
-                      <Badge localizationKey={localizationKeys('badge__unverified')} />
-                    )}
+                  <Text sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                    <Flex
+                      gap={2}
+                      center
+                    >
+                      {stringToFormattedPhoneString(phone.phoneNumber)}{' '}
+                      {user?.primaryPhoneNumberId === phone.id && (
+                        <Badge localizationKey={localizationKeys('badge__primary')} />
+                      )}
+                      {phone.verification.status !== 'verified' && (
+                        <Badge localizationKey={localizationKeys('badge__unverified')} />
+                      )}
+                    </Flex>
                   </Text>
 
                   <PhoneMenu phone={phone} />

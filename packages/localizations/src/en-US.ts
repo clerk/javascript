@@ -267,6 +267,8 @@ export const enUS: LocalizationResource = {
   },
   userProfile: {
     mobileButton__menu: 'Menu',
+    formButtonPrimary__save: 'Save',
+    // TODO-RETHEME remove
     formButtonPrimary__continue: 'Continue',
     formButtonPrimary__finish: 'Finish',
     formButtonReset: 'Cancel',
@@ -275,7 +277,11 @@ export const enUS: LocalizationResource = {
       description: 'Manage your account info.',
     },
     start: {
-      headerTitle__account: 'Profile details',
+      profileSection: {
+        title: 'Profile',
+        primaryButton: 'Edit Profile',
+      },
+      headerTitle__account: 'Profile',
       headerTitle__security: 'Security',
       usernameSection: {
         title: 'Username',
@@ -432,8 +438,8 @@ export const enUS: LocalizationResource = {
     profilePage: {
       title: 'Update profile',
       imageFormTitle: 'Profile image',
-      imageFormSubtitle: 'Upload image',
-      imageFormDestructiveActionSubtitle: 'Remove image',
+      imageFormSubtitle: 'Upload',
+      imageFormDestructiveActionSubtitle: 'Remove',
       fileDropAreaTitle: 'Drag file here, or...',
       fileDropAreaAction: 'Select file',
       fileDropAreaHint: 'Upload a JPG, PNG, GIF, or WEBP image smaller than 10 MB',
@@ -576,7 +582,7 @@ export const enUS: LocalizationResource = {
       title: 'Delete account',
       messageLine1: 'Are you sure you want to delete your account?',
       messageLine2: 'This action is permanent and irreversible.',
-      actionDescription: 'Type Delete account below to continue.',
+      actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
     },
   },
@@ -611,6 +617,7 @@ export const enUS: LocalizationResource = {
       profileSection: {
         title: 'Organization Profile',
         primaryButton: 'Edit profile',
+        uploadAction__title: 'Logo',
       },
       domainSection: {
         title: 'Verified domains',

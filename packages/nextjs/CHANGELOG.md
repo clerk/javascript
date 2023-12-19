@@ -1,5 +1,140 @@
 # Change Log
 
+## 5.0.0-alpha-v5.12
+
+### Major Changes
+
+- Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters. ([#2367](https://github.com/clerk/javascript/pull/2367)) by [@tmilewski](https://github.com/tmilewski)
+
+- Change return values of `signJwt`, `hasValidSignature`, `decodeJwt`, `verifyJwt` ([#2377](https://github.com/clerk/javascript/pull/2377)) by [@dimkl](https://github.com/dimkl)
+
+  to return `{ data, error }`. Example of keeping the same behavior using those utilities:
+
+  ```typescript
+  import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt';
+
+  const { data, error } = await signJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await hasValidSignature(...)
+  if (error) throw error;
+
+  const { data, error } = decodeJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await verifyJwt(...)
+  if (error) throw error;
+  ```
+
+- Changes in exports of `@clerk/backend`: ([#2363](https://github.com/clerk/javascript/pull/2363)) by [@dimkl](https://github.com/dimkl)
+
+  - Expose the following helpers and enums from `@clerk/backend/internal`:
+    ```typescript
+    import {
+      AuthStatus,
+      buildRequestUrl,
+      constants,
+      createAuthenticateRequest,
+      createIsomorphicRequest,
+      debugRequestState,
+      makeAuthObjectSerializable,
+      prunePrivateMetadata,
+      redirect,
+      sanitizeAuthObject,
+      signedInAuthObject,
+      signedOutAuthObject,
+    } from '@clerk/backend/internal';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { AuthStatus, ... } from '@clerk/backend';
+    // After
+    import { AuthStatus, ... } from '@clerk/backend/internal';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+
+- Changes in exports of `@clerk/backend`: ([#2365](https://github.com/clerk/javascript/pull/2365)) by [@dimkl](https://github.com/dimkl)
+
+  - Drop the following internal exports from the top-level api:
+    ```typescript
+    // Before
+    import {
+      AllowlistIdentifier,
+      Client,
+      DeletedObject,
+      Email,
+      EmailAddress,
+      ExternalAccount,
+      IdentificationLink,
+      Invitation,
+      OauthAccessToken,
+      ObjectType,
+      Organization,
+      OrganizationInvitation,
+      OrganizationMembership,
+      OrganizationMembershipPublicUserData,
+      PhoneNumber,
+      RedirectUrl,
+      SMSMessage,
+      Session,
+      SignInToken,
+      Token,
+      User,
+      Verification,
+    } from '@clerk/backend';
+    // After : no alternative since there is no need to use those classes
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+  - Keep those 3 resource related type exports
+    ```typescript
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    ```
+
+- Changes in exports of `@clerk/backend`: ([#2364](https://github.com/clerk/javascript/pull/2364)) by [@dimkl](https://github.com/dimkl)
+
+  - Expose the following helpers and enums from `@clerk/backend/jwt`:
+    ```typescript
+    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { decodeJwt, ... } from '@clerk/backend';
+    // After
+    import { decodeJwt, ... } from '@clerk/backend/jwt';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+
+- Changes in `@clerk/backend` exports: ([#2362](https://github.com/clerk/javascript/pull/2362)) by [@dimkl](https://github.com/dimkl)
+
+  - Drop Internal `deserialize` helper
+  - Introduce `/errors` subpath export, eg:
+    ```typescript
+    import {
+      TokenVerificationError,
+      TokenVerificationErrorAction,
+      TokenVerificationErrorCode,
+      TokenVerificationErrorReason,
+    } from '@clerk/backend/errors';
+    ```
+  - Drop errors from top-level export
+    ```typescript
+    // Before
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
+    // After
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
+    ```
+
+- Use `NEXT_PUBLIC_CLERK_JS_URL` instead of `NEXT_PUBLIC_CLERK_JS` to pin a specific @clerk/clerk-js version. ([#2374](https://github.com/clerk/javascript/pull/2374)) by [@SokratisVidros](https://github.com/SokratisVidros)
+
+### Patch Changes
+
+- Updated dependencies [[`2a67f729d`](https://github.com/clerk/javascript/commit/2a67f729da58b3400df24da634fc4bf786065f25), [`a9fe242be`](https://github.com/clerk/javascript/commit/a9fe242be4dbaaa02c6643fea0688f1fb23f23e7), [`1e98187b4`](https://github.com/clerk/javascript/commit/1e98187b4fba0f872576510d7bccf8b75a2579bd), [`d08ec6d8f`](https://github.com/clerk/javascript/commit/d08ec6d8f52a2bc037c0eb586123a9f7816e4b64), [`5f58a2274`](https://github.com/clerk/javascript/commit/5f58a22746aba94f76bef5dbbc94fa93ea3b0b7e), [`5f58a2274`](https://github.com/clerk/javascript/commit/5f58a22746aba94f76bef5dbbc94fa93ea3b0b7e), [`a9fe242be`](https://github.com/clerk/javascript/commit/a9fe242be4dbaaa02c6643fea0688f1fb23f23e7), [`0ec3a146c`](https://github.com/clerk/javascript/commit/0ec3a146cc4cbe4a80d1f990a440431ae4490183), [`1ad910eb9`](https://github.com/clerk/javascript/commit/1ad910eb92dce056731f29df0caaaad74d08bd7f), [`f58a9949b`](https://github.com/clerk/javascript/commit/f58a9949bc78737ca4e096ed5501b4e578a2d493), [`9b02c1aae`](https://github.com/clerk/javascript/commit/9b02c1aae1cae286ea305c5e216ae93cbbbc0f90)]:
+  - @clerk/clerk-react@5.0.0-alpha-v5.11
+  - @clerk/backend@1.0.0-alpha-v5.10
+  - @clerk/shared@2.0.0-alpha-v5.7
+
 ## 5.0.0-alpha-v5.11
 
 ### Major Changes

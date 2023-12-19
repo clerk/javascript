@@ -1,5 +1,5 @@
 import type {
-  MembershipRole,
+  OrganizationCustomRoleKey,
   OrganizationDomainResource,
   OrganizationDomainVerification,
   OrganizationEnrollmentMode,
@@ -15,7 +15,7 @@ import { jest } from '@jest/globals';
 type FakeMemberParams = {
   id: string;
   orgId: string;
-  role?: MembershipRole;
+  role?: OrganizationCustomRoleKey;
   identifier?: string;
   firstName?: string;
   lastName?: string;
@@ -78,7 +78,7 @@ export const createFakeDomain = (params: FakeDomainParams): OrganizationDomainRe
 
 type FakeInvitationParams = {
   id: string;
-  role?: MembershipRole;
+  role?: OrganizationCustomRoleKey;
   status?: OrganizationInvitationStatus;
   emailAddress: string;
   organizationId: string;

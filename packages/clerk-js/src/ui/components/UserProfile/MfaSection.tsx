@@ -188,6 +188,8 @@ const MfaBackupCodeMenu = () => {
 };
 
 const MfaTOTPMenu = () => {
+  const { open } = useActionContext();
+
   const actions = (
     [
       {

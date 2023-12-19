@@ -45,7 +45,7 @@ describe('UsernamePage', () => {
       });
 
       await userEvent.type(screen.getByLabelText(/username/i), 'test');
-      await userEvent.click(screen.getByRole('button', { name: /continue/i }));
+      await userEvent.click(screen.getByRole('button', { name: /save/i }));
       expect(fixtures.clerk.user?.update).toHaveBeenCalledWith({ username: 'georgeclerktest' });
 
       expect(await screen.findByText(/updated/i));

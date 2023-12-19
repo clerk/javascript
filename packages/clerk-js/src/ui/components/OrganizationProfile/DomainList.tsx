@@ -15,9 +15,9 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useInView } from '../../hooks';
 import type { PropsOfComponent } from '../../styledSystem';
 import { EnrollmentBadge } from './EnrollmentBadge';
-import { RemoveDomainForm } from './RemoveDomainForm';
-import { VerifiedDomainForm } from './VerifiedDomainForm';
-import { VerifyDomainForm } from './VerifyDomainForm';
+import { RemoveDomainScreen } from './RemoveDomainScreen';
+import { VerifiedDomainScreen } from './VerifiedDomainScreen';
+import { VerifyDomainScreen } from './VerifyDomainScreen';
 
 type DomainListProps = GetDomainsParams & {
   verificationStatus?: OrganizationDomainVerificationStatus;
@@ -105,6 +105,8 @@ export const DomainList = withGate(
       return null;
     }
 
+    const hasNextOrFetching = domains?.hasNextPage || domains?.isFetching;
+
     return (
       <ProfileSection.ItemList id='organizationDomains'>
         {domainList.length === 0 && !domains?.isLoading && fallback}
@@ -122,28 +124,32 @@ export const DomainList = withGate(
 
               <Action.Open value='remove'>
                 <Action.Card>
-                  <RemoveDomainForm domainId={domain.id} />
+                  <RemoveDomainScreen domainId={domain.id} />
                 </Action.Card>
               </Action.Open>
 
               <Action.Open value='verify'>
                 <Action.Card>
-                  <VerifyDomainForm domainId={domain.id} />
+                  <VerifyDomainScreen domainId={domain.id} />
                 </Action.Card>
               </Action.Open>
 
               <Action.Open value='manage'>
                 <Action.Card>
-                  <VerifiedDomainForm domainId={domain.id} />
+                  <VerifiedDomainScreen domainId={domain.id} />
                 </Action.Card>
               </Action.Open>
             </Action.Root>
           );
         })}
 
-        {(domains?.hasNextPage || domains?.isFetching) && domains.data.length === 0 && (
+        <Box
+          ref={domains?.hasNextPage && !domains.isFetching ? ref : undefined}
+          sx={{ visibility: 'hidden' }}
+        />
+
+        {hasNextOrFetching && domains.data.length === 0 && (
           <Box
-            ref={domains?.isFetching ? undefined : ref}
             sx={[
               t => ({
                 width: '100%',
