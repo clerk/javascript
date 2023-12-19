@@ -211,13 +211,13 @@ const OrganizationDangerSection = () => {
         </Action.Closed>
 
         <Action.Open value='leave'>
-          <Action.Card>
+          <Action.Card variant='destructive'>
             <LeaveOrganizationScreen />
           </Action.Card>
         </Action.Open>
 
         <Action.Open value='delete'>
-          <Action.Card>
+          <Action.Card variant='destructive'>
             <DeleteOrganizationScreen />
           </Action.Card>
         </Action.Open>

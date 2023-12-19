@@ -3,7 +3,7 @@ import { useOrganization, useUser } from '@clerk/shared/react';
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { localizationKeys, Text } from '../../customizables';
+import { Col, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
 import {
   Form,
@@ -116,7 +116,9 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
 
   const confirmationField = useFormControl('deleteOrganizationConfirmation', '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__confirmDeletion'),
+    label:
+      actionDescription ||
+      localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.actionDescription'),
     isRequired: true,
     placeholder: organizationName,
   });
@@ -142,10 +144,16 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <Form.Root onSubmit={handleSubmit}>
-          <Text localizationKey={messageLine1} />
-          <Text localizationKey={messageLine2} />
-
-          <Text localizationKey={actionDescription} />
+          <Col gap={1}>
+            <Text
+              localizationKey={messageLine1}
+              colorScheme='neutral'
+            />
+            <Text
+              localizationKey={messageLine2}
+              colorScheme='danger'
+            />
+          </Col>
 
           <Form.ControlRow elementId={confirmationField.id}>
             <Form.PlainInput {...confirmationField.props} />
