@@ -18,4 +18,5 @@ export const shadows = Object.freeze({
   input: '0px 1px 1px 0px {{color1}}, 0px 0px 0px 1px {{color2}}',
   inputHover: '0px 0px 0px 1px {{color1}}, 0px 1px 1px 0px {{color2}}',
   focusRing: '0px 0px 0px 4px {{color}}',
+  badge: '0px 0px 0px 1px {{color}}, 0px 2px 0px -1px rgba(0, 0, 0, 0.04)',
 } as const);
