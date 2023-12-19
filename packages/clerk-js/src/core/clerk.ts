@@ -301,8 +301,11 @@ export class Clerk implements ClerkInterface {
     if (!this.client || this.client.sessions.length === 0) {
       return;
     }
-    const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
+
+    const redirectUrl = opts?.redirectUrl || '/';
+    const defaultCb = () => this.navigate(redirectUrl);
+    const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
       await this.client.destroy();

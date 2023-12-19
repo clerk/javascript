@@ -39,6 +39,10 @@ export type SignOutOptions = {
    * multi-session applications.
    */
   sessionId?: string;
+  /**
+   * Specify a redirect URL to navigate after sign out is complete.
+   */
+  redirectUrl?: string;
 };
 
 export interface SignOut {
