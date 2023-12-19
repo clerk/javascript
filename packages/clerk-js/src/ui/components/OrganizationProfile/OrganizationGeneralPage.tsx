@@ -141,7 +141,7 @@ const OrganizationDomainsSection = () => {
       id='organizationDomains'
     >
       <Action.Root>
-        <DomainList redirectSubPath={'domain'} />
+        <DomainList />
 
         <Gate permission='org:sys_domains:manage'>
           <Action.Trigger value='add'>

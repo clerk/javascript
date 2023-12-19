@@ -10,19 +10,7 @@ import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import {
-  Form,
-  FormButtons,
-  FormContent,
-  Header,
-  Tab,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  TabsList,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
+import { Form, FormButtons, FormContent, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { InformationCircle } from '../../icons';
 import { handleError, useFormControl } from '../../utils';
@@ -139,6 +127,9 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
   );
 
   const isFormDirty = deletePending.checked || domain?.enrollmentMode !== enrollmentMode.value;
+  const title = localizationKeys('organizationProfile.verifiedDomainPage.title', {
+    domain: domain?.name,
+  });
   const subtitle = localizationKeys('organizationProfile.verifiedDomainPage.subtitle', {
     domain: domain?.name,
   });
@@ -195,70 +186,53 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
 
   return (
     <FormContent
-      headerTitle={domain.name}
+      headerTitle={title}
       headerSubtitle={allowsEdit ? undefined : subtitle}
       breadcrumbTitle={breadcrumbTitle}
       gap={4}
       Breadcrumbs={OrganizationProfileBreadcrumbs}
     >
       <Col gap={6}>
-        <Tabs>
-          <TabsList>
-            <Tab
-              localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.start.headerTitle__enrollment')}
-            />
-          </TabsList>
-          <TabPanels>
-            <TabPanel
-              sx={{ width: '100%' }}
-              direction={'col'}
-              gap={4}
-            >
-              {calloutLabel.length > 0 && (
-                <CalloutWithAction icon={InformationCircle}>
-                  {calloutLabel.map((label, index) => (
-                    <Text
-                      key={index}
-                      as={'span'}
-                      sx={{
-                        display: 'block',
-                      }}
-                      localizationKey={label}
-                    />
-                  ))}
-                </CalloutWithAction>
-              )}
-              <Header.Root>
-                <Header.Subtitle
-                  localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
-                  variant='subtitle'
-                />
-              </Header.Root>
-              <Form.Root
-                onSubmit={updateEnrollmentMode}
-                gap={6}
-              >
-                <Form.ControlRow elementId={enrollmentMode.id}>
-                  <Form.RadioGroup {...enrollmentMode.props} />
-                </Form.ControlRow>
+        {calloutLabel.length > 0 && (
+          <CalloutWithAction icon={InformationCircle}>
+            {calloutLabel.map((label, index) => (
+              <Text
+                key={index}
+                as={'span'}
+                sx={{
+                  display: 'block',
+                }}
+                localizationKey={label}
+              />
+            ))}
+          </CalloutWithAction>
+        )}
+        <Header.Root>
+          <Header.Subtitle
+            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
+            variant='subtitle'
+          />
+        </Header.Root>
+        <Form.Root
+          onSubmit={updateEnrollmentMode}
+          gap={6}
+        >
+          <Form.ControlRow elementId={enrollmentMode.id}>
+            <Form.RadioGroup {...enrollmentMode.props} />
+          </Form.ControlRow>
 
-                {allowsEdit && (
-                  <Form.ControlRow elementId={deletePending.id}>
-                    <Form.Checkbox {...deletePending.props} />
-                  </Form.ControlRow>
-                )}
+          {allowsEdit && (
+            <Form.ControlRow elementId={deletePending.id}>
+              <Form.Checkbox {...deletePending.props} />
+            </Form.ControlRow>
+          )}
 
-                <FormButtons
-                  localizationKey={localizationKeys(
-                    'organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save',
-                  )}
-                  isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
-                  onReset={onReset}
-                />
-              </Form.Root>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+          <FormButtons
+            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save')}
+            isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
+            onReset={onReset}
+          />
+        </Form.Root>
       </Col>
     </FormContent>
   );

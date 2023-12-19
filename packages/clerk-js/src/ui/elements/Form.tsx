@@ -219,15 +219,23 @@ const RadioGroup = (
     <Field.Root {...fieldProps}>
       <Col
         elementDescriptor={descriptors.formFieldRadioGroup}
-        gap={2}
+        gap={3}
       >
         {radioOptions?.map(({ value, description, label }) => (
-          <Field.RadioItem
+          <Flex
             key={value}
-            value={value}
-            label={label}
-            description={description}
-          />
+            sx={t => ({
+              border: `1px solid ${t.colors.$blackAlpha100}`,
+              borderRadius: t.radii.$md,
+              padding: t.space.$2,
+            })}
+          >
+            <Field.RadioItem
+              value={value}
+              label={label}
+              description={description}
+            />
+          </Flex>
         ))}
       </Col>
 

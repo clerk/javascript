@@ -8,9 +8,7 @@ import { Box } from './Box';
 const { applyVariants, filterProps } = createVariants(theme => {
   return {
     base: {
-      borderBottom: theme.borders.$normal,
-      borderColor: theme.colors.$blackAlpha300,
-      borderCollapse: 'separate',
+      borderCollapse: 'collapse',
       borderSpacing: '0',
       'td:not(:first-of-type)': {
         paddingLeft: theme.space.$2,
@@ -24,6 +22,14 @@ const { applyVariants, filterProps } = createVariants(theme => {
         paddingLeft: theme.space.$4,
         paddingRight: theme.space.$4,
       },
+      'tbody > :not([hidden])~:not([hidden])': {
+        borderBottomWidth: '0px',
+        borderTopWidth: '1px',
+        borderStyle: 'solid',
+        borderLeftWidth: '0px',
+        borderRightWidth: '0px',
+        borderColor: theme.colors.$blackAlpha100,
+      },
       'tr > th:first-of-type': {
         paddingLeft: theme.space.$5,
       },
@@ -32,19 +38,15 @@ const { applyVariants, filterProps } = createVariants(theme => {
         display: 'block',
         paddingBottom: theme.space.$2,
       },
+      'tbody::before': {
+        content: '""',
+        display: 'block',
+        paddingTop: theme.space.$2,
+      },
       'tbody::after': {
         content: '""',
         display: 'block',
         paddingBottom: theme.space.$2,
-      },
-      // border-radius for hover
-      'tr > td:first-of-type': {
-        borderTopLeftRadius: theme.radii.$md,
-        borderBottomLeftRadius: theme.radii.$md,
-      },
-      'tr > td:last-of-type': {
-        borderTopRightRadius: theme.radii.$md,
-        borderBottomRightRadius: theme.radii.$md,
       },
       width: '100%',
     },

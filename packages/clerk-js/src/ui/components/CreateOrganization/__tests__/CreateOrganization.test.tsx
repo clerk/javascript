@@ -96,7 +96,7 @@ describe('CreateOrganization', () => {
     const { getByRole, userEvent, getByLabelText, queryByText } = render(<CreateOrganization />, {
       wrapper,
     });
-    await userEvent.type(getByLabelText(/Organization name/i), 'new org');
+    await userEvent.type(getByLabelText(/Name/i), 'new org');
     await userEvent.click(getByRole('button', { name: /create organization/i }));
 
     await waitFor(() => {
@@ -124,7 +124,7 @@ describe('CreateOrganization', () => {
     const { getByRole, userEvent, getByLabelText, queryByText } = render(<CreateOrganization />, {
       wrapper,
     });
-    await userEvent.type(getByLabelText(/Organization name/i), 'new org');
+    await userEvent.type(getByLabelText(/Name/i), 'new org');
     await userEvent.click(getByRole('button', { name: /create organization/i }));
 
     await waitFor(() => {
@@ -151,7 +151,7 @@ describe('CreateOrganization', () => {
     const { getByRole, userEvent, getByLabelText, queryByText } = render(<CreateOrganization />, {
       wrapper,
     });
-    await userEvent.type(getByLabelText(/Organization name/i), 'new org');
+    await userEvent.type(getByLabelText(/Name/i), 'new org');
     await userEvent.click(getByRole('button', { name: /create organization/i }));
 
     await waitFor(() => {
@@ -178,7 +178,7 @@ describe('CreateOrganization', () => {
       const { getByRole, userEvent, getByLabelText } = render(<CreateOrganization />, {
         wrapper,
       });
-      await userEvent.type(getByLabelText(/Organization name/i), 'new org');
+      await userEvent.type(getByLabelText(/Name/i), 'new org');
       await userEvent.click(getByRole('button', { name: /create organization/i }));
 
       expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/${createdOrg.id}`);
@@ -202,7 +202,7 @@ describe('CreateOrganization', () => {
       const { getByRole, userEvent, getByLabelText } = render(<CreateOrganization />, {
         wrapper,
       });
-      await userEvent.type(getByLabelText(/Organization name/i), 'new org');
+      await userEvent.type(getByLabelText(/Name/i), 'new org');
       await userEvent.click(getByRole('button', { name: /create organization/i }));
 
       expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/${createdOrg.slug}`);

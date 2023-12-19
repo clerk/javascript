@@ -97,8 +97,8 @@ describe('OrganizationList', () => {
         expect(queryByText('Personal account')).not.toBeInTheDocument();
 
         // Form fields of CreateOrganizationForm
-        expect(queryByLabelText(/organization name/i)).toBeInTheDocument();
-        expect(queryByLabelText(/slug url/i)).toBeInTheDocument();
+        expect(queryByLabelText(/name/i)).toBeInTheDocument();
+        expect(queryByLabelText(/slug/i)).toBeInTheDocument();
 
         expect(queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
         expect(queryByRole('button', { name: 'Create organization' })).toBeInTheDocument();

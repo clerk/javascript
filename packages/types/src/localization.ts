@@ -643,6 +643,7 @@ type _LocalizationResource = {
       resendButton: LocalizationValue;
     };
     verifiedDomainPage: {
+      title: LocalizationValue;
       subtitle: LocalizationValue;
       start: {
         headerTitle__enrollment: LocalizationValue;
