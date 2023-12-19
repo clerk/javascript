@@ -22,7 +22,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
 
   return (
     <Col {...rest}>
-      <FormContent headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
+      <FormContent headerTitle={title}>
         <Box>
           {Array.isArray(text) ? (
             text.map(t => (
