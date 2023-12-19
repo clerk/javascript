@@ -3,12 +3,12 @@ import type { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
-import { FullHeightLoader, ProfileSection } from '../../elements';
+import { FullHeightLoader, ProfileSection, ThreeDotsMenu } from '../../elements';
+import { Action } from '../../elements/Action';
+import { useLoadingStatus } from '../../hooks';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
-import { mqu } from '../../styledSystem';
+import { mqu, type PropsOfComponent } from '../../styledSystem';
 import { getRelativeToNowDateKey } from '../../utils';
-import { LinkButtonWithDescription } from './LinkButtonWithDescription';
-import { UserProfileAccordion } from './UserProfileAccordion';
 import { currentSessionFirst } from './utils';
 
 export const ActiveDevicesSection = () => {
@@ -25,57 +25,55 @@ export const ActiveDevicesSection = () => {
       title={localizationKeys('userProfile.start.activeDevicesSection.title')}
       id='activeDevices'
     >
-      {!sessionsWithActivities.length && <FullHeightLoader />}
-      {!!sessionsWithActivities.length &&
-        sessionsWithActivities.sort(currentSessionFirst(session!.id)).map(sa => (
-          <DeviceAccordion
-            key={sa.id}
-            session={sa}
-          />
-        ))}
+      <ProfileSection.ItemList id='activeDevices'>
+        {!sessionsWithActivities.length && <FullHeightLoader />}
+        {!!sessionsWithActivities.length &&
+          sessionsWithActivities.sort(currentSessionFirst(session!.id)).map(sa => (
+            <DeviceAccordion
+              key={sa.id}
+              session={sa}
+            />
+          ))}
+      </ProfileSection.ItemList>
     </ProfileSection.Root>
   );
 };
 
-const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
-  const isCurrent = useSession().session?.id === props.session.id;
+const DeviceAccordion = ({ session }: { session: SessionWithActivitiesResource }) => {
+  const isCurrent = useSession().session?.id === session.id;
+  const status = useLoadingStatus();
   const revoke = async () => {
-    if (isCurrent || !props.session) {
+    if (isCurrent || !session) {
       return;
     }
-    return props.session.revoke();
+    status.setLoading();
+    return session.revoke().finally(() => status.setIdle());
   };
 
   return (
-    <UserProfileAccordion
-      elementDescriptor={descriptors.activeDeviceListItem}
-      elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
-      title={<DeviceInfo session={props.session} />}
-      sx={{
-        width: '100%',
-      }}
-    >
-      <Col gap={4}>
-        {isCurrent && (
-          <LinkButtonWithDescription
-            subtitle={localizationKeys('userProfile.start.activeDevicesSection.detailsSubtitle')}
-            title={localizationKeys('userProfile.start.activeDevicesSection.detailsTitle')}
-            sx={{
-              width: '100%',
-            }}
-          />
-        )}
-        {!isCurrent && (
-          <LinkButtonWithDescription
-            actionLabel={localizationKeys('userProfile.start.activeDevicesSection.destructiveAction')}
-            variant='linkDanger'
-            onClick={revoke}
-            subtitle={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionSubtitle')}
-            title={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionTitle')}
-          />
-        )}
-      </Col>
-    </UserProfileAccordion>
+    <Action.Root>
+      <Action.Closed value=''>
+        <ProfileSection.Item
+          id='activeDevices'
+          elementDescriptor={descriptors.activeDeviceListItem}
+          elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
+          sx={t => ({
+            alignItems: 'flex-start',
+            padding: `${t.space.$2} ${t.space.$4}`,
+            borderRadius: t.radii.$md,
+            ':hover': { backgroundColor: t.colors.$blackAlpha50 },
+          })}
+        >
+          {status.isLoading && <FullHeightLoader />}
+          {!status.isLoading && (
+            <>
+              <DeviceInfo session={session} />
+              {!isCurrent && <ActiveDeviceMenu revoke={revoke} />}
+            </>
+          )}
+        </ProfileSection.Item>
+      </Action.Closed>
+    </Action.Root>
   );
 };
 
@@ -95,6 +93,8 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
       elementDescriptor={descriptors.activeDevice}
       elementId={isCurrent ? descriptors.activeDevice.setId('current') : undefined}
       sx={t => ({
+        width: '100%',
+        overflow: 'hidden',
         gap: t.space.$4,
         [mqu.xs]: { gap: t.space.$2 },
       })}
@@ -152,4 +152,18 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
       </Col>
     </Flex>
   );
+};
+
+const ActiveDeviceMenu = ({ revoke }: { revoke: () => Promise<any> }) => {
+  const actions = (
+    [
+      {
+        label: localizationKeys('userProfile.start.activeDevicesSection.destructiveAction'),
+        isDestructive: true,
+        onClick: revoke,
+      },
+    ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
+  ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
+
+  return <ThreeDotsMenu actions={actions} />;
 };
