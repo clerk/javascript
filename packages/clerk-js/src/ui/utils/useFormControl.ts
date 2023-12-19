@@ -110,6 +110,8 @@ export const useFormControl = <Id extends string>(
   const setError: FormControlState['setError'] = error => {
     if (error) {
       setFeedback({ message: translateError(error), type: 'error' });
+    } else {
+      clearFeedback();
     }
   };
   const setSuccess: FormControlState['setSuccess'] = message => {
