@@ -21,7 +21,7 @@ export const UserButtonTrigger = withAvatarShimmer(
       <Button
         elementDescriptor={descriptors.userButtonTrigger}
         variant='roundWrapper'
-        sx={[theme => ({ borderRadius: showName ? theme.radii.$xl : theme.radii.$circle }), sx]}
+        sx={[theme => ({ borderRadius: showName ? theme.radii.$md : theme.radii.$circle }), sx]}
         ref={ref}
         aria-label={`${props.isOpen ? 'Close' : 'Open'} user button`}
         aria-expanded={props.isOpen}
