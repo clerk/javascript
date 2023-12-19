@@ -65,8 +65,8 @@ export const _ResetPassword = () => {
   };
 
   const resetPassword = async () => {
-    passwordField.setError(undefined);
-    confirmField.setError(undefined);
+    passwordField.clearFeedback();
+    confirmField.clearFeedback();
     try {
       const { status, createdSessionId } = await signIn.resetPassword({
         password: passwordField.value,

@@ -41,7 +41,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
   const canSubmit = nameField.value.trim() !== '';
 
   const onSubmit = (e: React.FormEvent) => {
-    nameField.setError(undefined);
+    nameField.clearFeedback();
     e.preventDefault();
     return organization
       .createDomain(nameField.value)
