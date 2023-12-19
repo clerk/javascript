@@ -147,11 +147,16 @@ ${error.getFullMessage()}`,
       if (retryResult) {
         return signedIn(authenticateContext, retryResult, headers);
       }
-
-      throw retryError;
+      console.error(retryError);
     }
 
-    throw error;
+    console.error(error);
+    return signedOut(
+      authenticateContext,
+      AuthErrorReason.UnexpectedError,
+      'handshake token verification failed',
+      headers,
+    );
   }
 
   function handleMaybeHandshakeStatus(

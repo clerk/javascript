@@ -739,7 +739,11 @@ test.describe('Client handshake @generic', () => {
       }),
       redirect: 'manual',
     });
-    expect(res.status).toBe(500);
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get('x-clerk-auth-status')).toBe('');
+    expect(res.headers.get('x-clerk-auth-reason')).toBe('');
+    expect(res.headers.get('x-clerk-auth-message')).toBe('');
   });
 
   // I don't know if we need this one? We might pass new devbrowser back in handshake
@@ -827,7 +831,11 @@ test.describe('Client handshake @generic', () => {
       }),
       redirect: 'manual',
     });
-    expect(res.status).toBe(500);
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get('x-clerk-auth-status')).toBe('');
+    expect(res.headers.get('x-clerk-auth-reason')).toBe('');
+    expect(res.headers.get('x-clerk-auth-message')).toBe('');
   });
 
   test('Handshake result - prod - skew - clock ahead', async () => {
@@ -846,7 +854,11 @@ test.describe('Client handshake @generic', () => {
       }),
       redirect: 'manual',
     });
-    expect(res.status).toBe(500);
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get('x-clerk-auth-status')).toBe('');
+    expect(res.headers.get('x-clerk-auth-reason')).toBe('');
+    expect(res.headers.get('x-clerk-auth-message')).toBe('');
   });
 
   test('Handshake result - prod - mismatched keys', async () => {
@@ -866,6 +878,10 @@ test.describe('Client handshake @generic', () => {
       }),
       redirect: 'manual',
     });
-    expect(res.status).toBe(500);
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get('x-clerk-auth-status')).toBe('');
+    expect(res.headers.get('x-clerk-auth-reason')).toBe('');
+    expect(res.headers.get('x-clerk-auth-message')).toBe('');
   });
 });
