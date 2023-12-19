@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { Col, Icon } from '../../customizables';
-import { Form, FormButtonContainer, FormContent, IconButton, SuccessPage, useCardState } from '../../elements';
+import { Form, FormButtonContainer, FormContent, Header, IconButton, SuccessPage, useCardState } from '../../elements';
 import { Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
@@ -115,7 +115,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
         headerSubtitle={props?.startPage?.headerSubtitle}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
-        sx={t => ({ minHeight: t.sizes.$60, gap: t.space.$6 })}
+        sx={t => ({ minHeight: t.sizes.$60, gap: t.space.$6, textAlign: 'left' })}
       >
         <Form.Root onSubmit={onSubmit}>
           <Col>
@@ -194,7 +194,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
-        sx={t => ({ minHeight: t.sizes.$60 })}
+        sx={t => ({ minHeight: t.sizes.$60, textAlign: 'left' })}
       >
         {organization && (
           <InviteMembersForm
@@ -204,12 +204,19 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
           />
         )}
       </FormContent>
-      <SuccessPage
-        title={localizationKeys('organizationProfile.invitePage.title')}
-        contents={<InvitationsSentMessage />}
-        sx={t => ({ minHeight: t.sizes.$60 })}
-        onFinish={completeFlow}
-      />
+      <Col>
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('organizationProfile.invitePage.title')}
+            sx={{ textAlign: 'left' }}
+          />
+        </Header.Root>
+        <SuccessPage
+          contents={<InvitationsSentMessage />}
+          sx={t => ({ minHeight: t.sizes.$60 })}
+          onFinish={completeFlow}
+        />
+      </Col>
     </Wizard>
   );
 };

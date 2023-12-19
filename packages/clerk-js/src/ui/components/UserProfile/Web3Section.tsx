@@ -57,7 +57,7 @@ export const Web3Section = () => {
           <Action.Trigger value='add'>
             <ProfileSection.Button
               id='web3Wallets'
-              localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
+              localizationKey={localizationKeys('userProfile.start.web3WalletsSection.primaryButton')}
             />
           </Action.Trigger>
         </ProfileSection.ItemList>

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useAppearance } from '../../customizables';
 import { Form } from '../../elements';
+import { mqu } from '../../styledSystem';
 import type { FormControlState } from '../../utils';
 import type { ActiveIdentifier, Fields } from './signUpFormHelpers';
 
@@ -30,7 +31,14 @@ export const SignUpForm = (props: SignUpFormProps) => {
   return (
     <Form.Root onSubmit={handleSubmit}>
       {(shouldShow('firstName') || shouldShow('lastName')) && (
-        <Form.ControlRow elementId='name'>
+        <Form.ControlRow
+          elementId='name'
+          sx={{
+            [mqu.sm]: {
+              flexWrap: 'wrap',
+            },
+          }}
+        >
           {shouldShow('firstName') && (
             <Form.PlainInput
               {...formState.firstName.props}
