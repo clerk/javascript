@@ -12,7 +12,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
 const UserProfilePage: NextPage = () => {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <UserProfile />
+      <UserProfile path='/user' />
     </div>
   );
 };
