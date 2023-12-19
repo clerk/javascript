@@ -5,8 +5,7 @@ import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { isRedirect, mergeResponses, setHeader, stringifyHeaders } from '../utils';
-import { appendDevBrowserOnCrossOrigin } from '../utils/appendDevBrowserOnCrossOrigin';
+import { appendDevBrowserOnCrossOrigin, isRedirect, mergeResponses, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
 import { createAuthenticateRequestOptions } from './clerkMiddleware';
