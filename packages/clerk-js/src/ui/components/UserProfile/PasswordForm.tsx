@@ -1,20 +1,18 @@
 import { useSession, useUser } from '@clerk/shared/react';
 import { useRef } from 'react';
 
-import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
+import type { FormProps, SuccessPage } from '../../elements';
 import {
   Form,
   FormButtonContainer,
   FormButtons,
   FormContent,
   InformationBox,
-  SuccessPage,
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useConfirmPassword } from '../../hooks';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
@@ -35,9 +33,10 @@ const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boole
   return localizedTexts;
 };
 
-export const PasswordForm = withCardStateProvider(() => {
+type PasswordFormProps = FormProps;
+export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => {
+  const { onSuccess, onReset } = props;
   const { user } = useUser();
-  const { close } = useActionContext();
 
   if (!user) {
     return null;
@@ -48,7 +47,6 @@ export const PasswordForm = withCardStateProvider(() => {
     ? localizationKeys('userProfile.passwordPage.changePasswordTitle')
     : localizationKeys('userProfile.passwordPage.title');
   const card = useCardState();
-  const wizard = useWizard();
 
   const passwordEditDisabled = user.samlAccounts.some(sa => sa.active);
 
@@ -121,94 +119,87 @@ export const PasswordForm = withCardStateProvider(() => {
       };
 
       await user.updatePassword(opts);
-      wizard.nextStep();
+      onSuccess();
     } catch (e) {
       handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);
     }
   };
 
   return (
-    <Wizard {...wizard.props}>
-      <FormContent
-        headerTitle={title}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      >
-        {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
+    <FormContent
+      headerTitle={title}
+      Breadcrumbs={UserProfileBreadcrumbs}
+    >
+      {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
 
-        <Form.Root
-          onSubmit={updatePassword}
-          onBlur={validateForm}
-        >
-          {/* For password managers */}
-          <input
-            readOnly
-            id='identifier-field'
-            name='identifier'
-            value={session?.publicUserData.identifier || ''}
-            style={{ display: 'none' }}
-          />
-          {user.passwordEnabled && (
-            <Form.ControlRow elementId={currentPasswordField.id}>
-              <Form.PasswordInput
-                {...currentPasswordField.props}
-                minLength={6}
-                isRequired
-                autoFocus
-                isDisabled={passwordEditDisabled}
-              />
-            </Form.ControlRow>
-          )}
-          <Form.ControlRow elementId={passwordField.id}>
+      <Form.Root
+        onSubmit={updatePassword}
+        onBlur={validateForm}
+      >
+        {/* For password managers */}
+        <input
+          readOnly
+          id='identifier-field'
+          name='identifier'
+          value={session?.publicUserData.identifier || ''}
+          style={{ display: 'none' }}
+        />
+        {user.passwordEnabled && (
+          <Form.ControlRow elementId={currentPasswordField.id}>
             <Form.PasswordInput
-              {...passwordField.props}
+              {...currentPasswordField.props}
               minLength={6}
               isRequired
-              autoFocus={!user.passwordEnabled}
+              autoFocus
               isDisabled={passwordEditDisabled}
             />
           </Form.ControlRow>
-          <Form.ControlRow elementId={confirmField.id}>
-            <Form.PasswordInput
-              {...confirmField.props}
-              onChange={e => {
-                if (e.target.value) {
-                  setConfirmPasswordFeedback(e.target.value);
-                }
-                return confirmField.props.onChange(e);
-              }}
-              isRequired
-              isDisabled={passwordEditDisabled}
+        )}
+        <Form.ControlRow elementId={passwordField.id}>
+          <Form.PasswordInput
+            {...passwordField.props}
+            minLength={6}
+            isRequired
+            autoFocus={!user.passwordEnabled}
+            isDisabled={passwordEditDisabled}
+          />
+        </Form.ControlRow>
+        <Form.ControlRow elementId={confirmField.id}>
+          <Form.PasswordInput
+            {...confirmField.props}
+            onChange={e => {
+              if (e.target.value) {
+                setConfirmPasswordFeedback(e.target.value);
+              }
+              return confirmField.props.onChange(e);
+            }}
+            isRequired
+            isDisabled={passwordEditDisabled}
+          />
+        </Form.ControlRow>
+        <Form.ControlRow elementId={sessionsField.id}>
+          <Form.Checkbox
+            {...sessionsField.props}
+            //TODO: localize this
+            description={'It is advised to logout of all other devices that may user an old password'}
+            isDisabled={passwordEditDisabled}
+          />
+        </Form.ControlRow>
+        {passwordEditDisabled ? (
+          <FormButtonContainer>
+            <Form.ResetButton
+              localizationKey={localizationKeys('userProfile.formButtonReset')}
+              block={false}
+              onClick={onReset}
             />
-          </Form.ControlRow>
-          <Form.ControlRow elementId={sessionsField.id}>
-            <Form.Checkbox
-              {...sessionsField.props}
-              //TODO: localize this
-              description={'It is advised to logout of all other devices that may user an old password'}
-              isDisabled={passwordEditDisabled}
-            />
-          </Form.ControlRow>
-          {passwordEditDisabled ? (
-            <FormButtonContainer>
-              <Form.ResetButton
-                localizationKey={localizationKeys('userProfile.formButtonReset')}
-                block={false}
-                onClick={close}
-              />
-            </FormButtonContainer>
-          ) : (
-            <FormButtons
-              isDisabled={!canSubmit}
-              onReset={close}
-            />
-          )}
-        </Form.Root>
-      </FormContent>
-
-      <SuccessPage
-        {...successPagePropsRef.current}
-        onFinish={close}
-      />
-    </Wizard>
+          </FormButtonContainer>
+        ) : (
+          <FormButtons
+            isDisabled={!canSubmit}
+            onReset={onReset}
+          />
+        )}
+      </Form.Root>
+    </FormContent>
   );
 });

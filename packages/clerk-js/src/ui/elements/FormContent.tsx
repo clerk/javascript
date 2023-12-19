@@ -7,7 +7,7 @@ import { Card, Header, useCardState } from './index';
 
 export type FormProps = {
   onSuccess: () => void;
-  onReset?: () => void;
+  onReset: () => void;
 };
 
 type PageProps = PropsOfComponent<typeof Col> & {

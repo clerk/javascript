@@ -11,6 +11,30 @@ import { EmailForm } from './EmailForm';
 import { RemoveEmailForm } from './RemoveResourceForm';
 import { primaryIdentificationFirst } from './utils';
 
+type RemoveEmailScreenProps = { emailId: string };
+const RemoveEmailScreen = (props: RemoveEmailScreenProps) => {
+  const { close } = useActionContext();
+  return (
+    <RemoveEmailForm
+      onSuccess={close}
+      onReset={close}
+      {...props}
+    />
+  );
+};
+
+type EmailScreenProps = { emailId?: string };
+const EmailScreen = (props: EmailScreenProps) => {
+  const { close } = useActionContext();
+  return (
+    <EmailForm
+      onSuccess={close}
+      onReset={close}
+      {...props}
+    />
+  );
+};
+
 export const EmailsSection = () => {
   const { user } = useUser();
 
@@ -46,13 +70,13 @@ export const EmailsSection = () => {
 
               <Action.Open value='remove'>
                 <Action.Card>
-                  <RemoveEmailForm emailId={email.id} />
+                  <RemoveEmailScreen emailId={email.id} />
                 </Action.Card>
               </Action.Open>
 
               <Action.Open value='verify'>
                 <Action.Card>
-                  <EmailForm emailId={email.id} />
+                  <EmailScreen emailId={email.id} />
                 </Action.Card>
               </Action.Open>
             </Action.Root>
@@ -68,7 +92,7 @@ export const EmailsSection = () => {
 
         <Action.Open value='add'>
           <Action.Card>
-            <EmailForm />
+            <EmailScreen />
           </Action.Card>
         </Action.Open>
       </Action.Root>

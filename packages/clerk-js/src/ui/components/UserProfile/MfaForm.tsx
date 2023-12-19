@@ -4,19 +4,19 @@ import React from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { Button, Col, Grid, localizationKeys, Text } from '../../customizables';
+import type { FormProps } from '../../elements';
 import { FormButtonContainer, FormContent, TileButton, useCardState, withCardStateProvider } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
 import { AuthApp, DotCircle, Mobile } from '../../icons';
 import { mqu } from '../../styledSystem';
 import { MfaBackupCodeScreen } from './MfaBackupCodeScreen';
 import { MfaPhoneCodeScreen } from './MfaPhoneCodeScreen';
 import { MfaTOTPScreen } from './MfaTOTPScreen';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { getSecondFactorsAvailableToAdd } from './utils';
 
-export const MfaForm = withCardStateProvider(() => {
+type MfaFormProps = FormProps;
+export const MfaForm = withCardStateProvider((props: MfaFormProps) => {
+  const { onSuccess, onReset } = props;
   const card = useCardState();
-  const { close } = useActionContext();
   const {
     userSettings: { attributes },
   } = useEnvironment();
@@ -39,24 +39,22 @@ export const MfaForm = withCardStateProvider(() => {
   }, []);
 
   if (card.error) {
-    return (
-      <FormContent
-        headerTitle={title}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      />
-    );
+    return <FormContent headerTitle={title} />;
   }
 
   // If there is only an available method or one has been selected, render the dedicated page instead
   if (secondFactorsAvailableToAdd.length === 1 || selectedMethod) {
-    return <MfaPageIfSingleOrCurrent method={selectedMethod || secondFactorsAvailableToAdd[0]} />;
+    return (
+      <MfaPageIfSingleOrCurrent
+        onSuccess={onSuccess}
+        onReset={onReset}
+        method={selectedMethod || secondFactorsAvailableToAdd[0]}
+      />
+    );
   }
 
   return (
-    <FormContent
-      headerTitle={title}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={title}>
       <Col gap={4}>
         <Text localizationKey={localizationKeys('userProfile.mfaPage.formHint')} />
         <Grid
@@ -83,27 +81,42 @@ export const MfaForm = withCardStateProvider(() => {
         <Button
           variant='ghost'
           localizationKey={localizationKeys('userProfile.formButtonReset')}
-          onClick={close}
+          onClick={onReset}
         />
       </FormButtonContainer>
     </FormContent>
   );
 });
 
-type MfaPageIfSingleOrCurrentProps = {
+type MfaPageIfSingleOrCurrentProps = FormProps & {
   method: string;
 };
 
 const MfaPageIfSingleOrCurrent = (props: MfaPageIfSingleOrCurrentProps) => {
-  const { method } = props;
+  const { method, onSuccess, onReset } = props;
 
   switch (method) {
     case 'phone_code':
-      return <MfaPhoneCodeScreen />;
+      return (
+        <MfaPhoneCodeScreen
+          onSuccess={onSuccess}
+          onReset={onReset}
+        />
+      );
     case 'totp':
-      return <MfaTOTPScreen />;
+      return (
+        <MfaTOTPScreen
+          onSuccess={onSuccess}
+          onReset={onReset}
+        />
+      );
     case 'backup_code':
-      return <MfaBackupCodeScreen />;
+      return (
+        <MfaBackupCodeScreen
+          onSuccess={onSuccess}
+          onReset={onReset}
+        />
+      );
     default:
       return null;
   }

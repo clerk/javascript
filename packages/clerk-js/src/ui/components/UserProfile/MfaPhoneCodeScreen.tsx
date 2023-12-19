@@ -5,17 +5,17 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, localizationKeys, Text } from '../../customizables';
-import { FormButtonContainer, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
+import type { FormProps } from '../../elements';
+import { FormButtonContainer, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, stringToFormattedPhoneString } from '../../utils';
-import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { AddPhone, VerifyPhone } from './PhoneForm';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const MfaPhoneCodeScreen = withCardStateProvider(() => {
+type MfaPhoneCodeScreenProps = FormProps;
+export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScreenProps) => {
+  const { onSuccess, onReset } = props;
   const ref = React.useRef<PhoneNumberResource>();
   const wizard = useWizard({ defaultStep: 2 });
-  const { close } = useActionContext();
 
   return (
     <Wizard {...wizard.props}>
@@ -23,14 +23,17 @@ export const MfaPhoneCodeScreen = withCardStateProvider(() => {
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
         onSuccess={wizard.nextStep}
+        onReset={onReset}
       />
       <VerifyPhone
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
         onSuccess={wizard.nextStep}
+        onReset={wizard.prevStep}
       />
       <AddMfa
-        onSuccess={wizard.nextStep}
+        onSuccess={onSuccess}
+        onReset={onReset}
         onAddPhoneClick={() => wizard.goToStep(0)}
         onUnverifiedPhoneClick={phone => {
           ref.current = phone;
@@ -39,34 +42,21 @@ export const MfaPhoneCodeScreen = withCardStateProvider(() => {
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
       />
-      <SuccessPage
-        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
-        text={localizationKeys('userProfile.mfaPhoneCodePage.successMessage')}
-        onFinish={close}
-        contents={
-          <MfaBackupCodeList
-            subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
-            backupCodes={ref.current?.backupCodes}
-          />
-        }
-      />
     </Wizard>
   );
 });
 
-type AddMfaProps = {
+type AddMfaProps = FormProps & {
   onAddPhoneClick: React.MouseEventHandler;
   onUnverifiedPhoneClick: (phone: PhoneNumberResource) => void;
-  onSuccess: () => void;
   title: LocalizationKey;
   resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
 };
 
 const AddMfa = (props: AddMfaProps) => {
-  const { onSuccess, title, onAddPhoneClick, onUnverifiedPhoneClick, resourceRef } = props;
+  const { onSuccess, onReset, title, onAddPhoneClick, onUnverifiedPhoneClick, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
-  const { close } = useActionContext();
 
   if (!user) {
     return null;
@@ -132,7 +122,7 @@ const AddMfa = (props: AddMfaProps) => {
         <Button
           variant='ghost'
           localizationKey={localizationKeys('userProfile.formButtonReset')}
-          onClick={close}
+          onClick={onReset}
         />
       </FormButtonContainer>
     </FormContent>

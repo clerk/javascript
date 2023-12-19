@@ -190,7 +190,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
   }
 
   if (!(domain.verification && domain.verification.status === 'verified')) {
-    onReset?.();
+    onReset();
   }
 
   return (

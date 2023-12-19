@@ -3,7 +3,18 @@ import { useUser } from '@clerk/shared/react';
 import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { PasswordForm } from './PasswordForm';
+
+const PasswordScreen = () => {
+  const { close } = useActionContext();
+  return (
+    <PasswordForm
+      onSuccess={close}
+      onReset={close}
+    />
+  );
+};
 
 export const PasswordSection = () => {
   const { user } = useUser();
@@ -39,7 +50,7 @@ export const PasswordSection = () => {
 
         <Action.Open value='edit'>
           <Action.Card>
-            <PasswordForm />
+            <PasswordScreen />
           </Action.Card>
         </Action.Open>
       </Action.Root>

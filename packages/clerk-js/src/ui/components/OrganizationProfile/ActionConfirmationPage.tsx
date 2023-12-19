@@ -169,9 +169,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
             <Form.ResetButton
               localizationKey={localizationKeys('userProfile.formButtonReset')}
               block={false}
-              onClick={async () => {
-                onReset?.();
-              }}
+              onClick={onReset}
             />
           </FormButtonContainer>
         </Form.Root>

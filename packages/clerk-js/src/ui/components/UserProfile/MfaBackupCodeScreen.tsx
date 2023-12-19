@@ -1,18 +1,24 @@
 import { useWizard, Wizard } from '../../common';
 import { Button, descriptors, localizationKeys, Text } from '../../customizables';
+import type { FormProps } from '../../elements';
 import { FormButtonContainer, FormContent, withCardStateProvider } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const MfaBackupCodeScreen = withCardStateProvider(() => {
+type MfaBackupCodeScreenProps = FormProps;
+export const MfaBackupCodeScreen = withCardStateProvider((props: MfaBackupCodeScreenProps) => {
+  const { onSuccess, onReset } = props;
   const wizard = useWizard();
 
   return (
     <Wizard {...wizard.props}>
       <AddBackupCode onContinue={wizard.nextStep} />
 
-      <MfaBackupCodeCreateForm />
+      <MfaBackupCodeCreateForm
+        onSuccess={onSuccess}
+        onReset={onReset}
+      />
     </Wizard>
   );
 });

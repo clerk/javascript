@@ -5,23 +5,22 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
-import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
+import type { FormProps } from '../../elements';
+import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithLink } from './VerifyWithLink';
 
-type EmailFormProps = {
+type EmailFormProps = FormProps & {
   emailId?: string;
 };
 export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
-  const { emailId: id } = props;
+  const { emailId: id, onSuccess, onReset } = props;
   const title = localizationKeys('userProfile.emailAddressPage.title');
   const card = useCardState();
   const { user } = useUser();
-  const { close } = useActionContext();
   const environment = useEnvironment();
   const preferEmailLinks = emailLinksEnabledForInstance(environment);
 
@@ -73,7 +72,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
           />
           <FormButtons
             isDisabled={!canSubmit}
-            onReset={close}
+            onReset={onReset}
           />
         </Form.Root>
       </FormContent>
@@ -84,34 +83,20 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
       >
         {preferEmailLinks ? (
           <VerifyWithLink
-            nextStep={wizard.nextStep}
+            nextStep={onSuccess}
             email={emailAddressRef.current as any}
-            onReset={close}
+            onReset={wizard.prevStep}
           />
         ) : (
           <VerifyWithCode
-            nextStep={wizard.nextStep}
+            nextStep={onSuccess}
             identification={emailAddressRef.current}
             identifier={emailAddressRef.current?.emailAddress}
             prepareVerification={() => emailAddressRef.current?.prepareVerification({ strategy: 'email_code' })}
-            onReset={close}
+            onReset={wizard.prevStep}
           />
         )}
       </FormContent>
-
-      <SuccessPage
-        title={title}
-        text={
-          preferEmailLinks
-            ? localizationKeys('userProfile.emailAddressPage.emailLink.successMessage', {
-                identifier: emailAddressRef.current?.emailAddress || '',
-              })
-            : localizationKeys('userProfile.emailAddressPage.emailCode.successMessage', {
-                identifier: emailAddressRef.current?.emailAddress || '',
-              })
-        }
-        onFinish={close}
-      />
     </Wizard>
   );
 });

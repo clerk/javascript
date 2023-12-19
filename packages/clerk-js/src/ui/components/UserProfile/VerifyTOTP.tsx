@@ -3,19 +3,17 @@ import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
 import { Button, Col, descriptors, localizationKeys } from '../../customizables';
+import type { FormProps } from '../../elements';
 import { Form, FormButtonContainer, FormContent, useFieldOTP } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-type VerifyTOTPProps = {
-  onVerified: () => void;
+type VerifyTOTPProps = FormProps & {
   resourceRef: React.MutableRefObject<TOTPResource | undefined>;
 };
 
 export const VerifyTOTP = (props: VerifyTOTPProps) => {
-  const { onVerified, resourceRef } = props;
+  const { onSuccess, onReset, resourceRef } = props;
   const { user } = useUser();
-  const { close } = useActionContext();
 
   const otp = useFieldOTP<TOTPResource>({
     onCodeEntryFinished: (code, resolve, reject) => {
@@ -26,7 +24,7 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
     },
     onResolve: a => {
       resourceRef.current = a;
-      onVerified();
+      onSuccess();
     },
   });
 
@@ -45,7 +43,7 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
 
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <Button
-          onClick={close}
+          onClick={onReset}
           variant='ghost'
           localizationKey={localizationKeys('userProfile.formButtonReset')}
           elementDescriptor={descriptors.formButtonReset}

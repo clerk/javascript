@@ -1,16 +1,17 @@
 import { useUser } from '@clerk/shared/react';
 
-import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
+import type { FormProps } from '../../elements';
+import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const UsernameForm = withCardStateProvider(() => {
+type UsernameFormProps = FormProps;
+
+export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => {
+  const { onSuccess, onReset } = props;
   const { user } = useUser();
-  const { close } = useActionContext();
 
   if (!user) {
     return null;
@@ -18,7 +19,6 @@ export const UsernameForm = withCardStateProvider(() => {
 
   const { userSettings } = useEnvironment();
   const card = useCardState();
-  const wizard = useWizard();
   const usernameField = useFormControl('username', user.username || '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__username'),
@@ -33,37 +33,30 @@ export const UsernameForm = withCardStateProvider(() => {
   const updatePassword = async () => {
     try {
       await user.update({ username: usernameField.value });
-      wizard.nextStep();
+      onSuccess();
     } catch (e) {
       handleError(e, [usernameField], card.setError);
     }
   };
 
   return (
-    <Wizard {...wizard.props}>
-      <FormContent
-        headerTitle={localizationKeys('userProfile.usernamePage.title')}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      >
-        <Form.Root onSubmit={updatePassword}>
-          <Form.ControlRow elementId={usernameField.id}>
-            <Form.PlainInput
-              {...usernameField.props}
-              autoFocus
-              isRequired
-            />
-          </Form.ControlRow>
-          <FormButtons
-            isDisabled={!canSubmit}
-            onReset={close}
+    <FormContent
+      headerTitle={localizationKeys('userProfile.usernamePage.title')}
+      Breadcrumbs={UserProfileBreadcrumbs}
+    >
+      <Form.Root onSubmit={updatePassword}>
+        <Form.ControlRow elementId={usernameField.id}>
+          <Form.PlainInput
+            {...usernameField.props}
+            autoFocus
+            isRequired
           />
-        </Form.Root>
-      </FormContent>
-      <SuccessPage
-        title={localizationKeys('userProfile.usernamePage.title')}
-        text={localizationKeys('userProfile.usernamePage.successMessage')}
-        onFinish={close}
-      />
-    </Wizard>
+        </Form.ControlRow>
+        <FormButtons
+          isDisabled={!canSubmit}
+          onReset={onReset}
+        />
+      </Form.Root>
+    </FormContent>
   );
 });
