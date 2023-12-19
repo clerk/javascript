@@ -2,25 +2,18 @@ import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import { isDefaultImage } from '../../../utils';
-import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import {
-  Form,
-  FormButtons,
-  FormContent,
-  InformationBox,
-  SuccessPage,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
+import type { FormProps } from '../../elements';
+import { Form, FormButtons, FormContent, InformationBox, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 
-export const ProfileForm = withCardStateProvider(() => {
+type ProfileFormProps = FormProps;
+
+export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
+  const { onSuccess, onReset } = props;
   const card = useCardState();
-  const { close } = useActionContext();
   const { user } = useUser();
 
   if (!user) {
@@ -33,8 +26,6 @@ export const ProfileForm = withCardStateProvider(() => {
   const showLastName = last_name.enabled;
   const userFirstName = user.firstName || '';
   const userLastName = user.lastName || '';
-
-  const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const firstNameField = useFormControl('firstName', user.firstName || '', {
     type: 'text',
@@ -67,9 +58,7 @@ export const ProfileForm = withCardStateProvider(() => {
         ? user.update({ firstName: firstNameField.value, lastName: lastNameField.value })
         : Promise.resolve()
     )
-      .then(() => {
-        wizard.nextStep();
-      })
+      .then(onSuccess)
       .catch(err => {
         handleError(err, [firstNameField, lastNameField], card.setError);
       });
@@ -96,45 +85,39 @@ export const ProfileForm = withCardStateProvider(() => {
   };
 
   return (
-    <Wizard {...wizard.props}>
-      <FormContent headerTitle={localizationKeys('userProfile.profilePage.title')}>
-        {nameEditDisabled && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
+    <FormContent headerTitle={localizationKeys('userProfile.profilePage.title')}>
+      {nameEditDisabled && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
 
-        <Form.Root onSubmit={onSubmit}>
-          <UserProfileAvatarUploader
-            user={user}
-            onAvatarChange={uploadAvatar}
-            onAvatarRemove={isDefaultImage(user.imageUrl) ? null : onAvatarRemove}
-          />
-          {(showFirstName || showLastName) && (
-            <Form.ControlRow elementId='name'>
-              {showFirstName && (
-                <Form.PlainInput
-                  {...firstNameField.props}
-                  isDisabled={nameEditDisabled}
-                  autoFocus
-                />
-              )}
-              {showLastName && (
-                <Form.PlainInput
-                  {...lastNameField.props}
-                  isDisabled={nameEditDisabled}
-                  autoFocus={!showFirstName}
-                />
-              )}
-            </Form.ControlRow>
-          )}
+      <Form.Root onSubmit={onSubmit}>
+        <UserProfileAvatarUploader
+          user={user}
+          onAvatarChange={uploadAvatar}
+          onAvatarRemove={isDefaultImage(user.imageUrl) ? null : onAvatarRemove}
+        />
+        {(showFirstName || showLastName) && (
+          <Form.ControlRow elementId='name'>
+            {showFirstName && (
+              <Form.PlainInput
+                {...firstNameField.props}
+                isDisabled={nameEditDisabled}
+                autoFocus
+              />
+            )}
+            {showLastName && (
+              <Form.PlainInput
+                {...lastNameField.props}
+                isDisabled={nameEditDisabled}
+                autoFocus={!showFirstName}
+              />
+            )}
+          </Form.ControlRow>
+        )}
 
-          <FormButtons
-            isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged}
-            onReset={close}
-          />
-        </Form.Root>
-      </FormContent>
-      <SuccessPage
-        text={localizationKeys('userProfile.profilePage.successMessage')}
-        onFinish={close}
-      />
-    </Wizard>
+        <FormButtons
+          isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged}
+          onReset={onReset}
+        />
+      </Form.Root>
+    </FormContent>
   );
 });

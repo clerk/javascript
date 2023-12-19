@@ -5,22 +5,20 @@ import React from 'react';
 import { QRCode } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, localizationKeys, Text } from '../../customizables';
+import type { FormProps } from '../../elements';
 import { ClipboardInput, FormButtonContainer, FormContent, FullHeightLoader, useCardState } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-type AddAuthenticatorAppProps = {
+type AddAuthenticatorAppProps = FormProps & {
   title: LocalizationKey;
-  onContinue: () => void;
 };
 
 type DisplayFormat = 'qr' | 'uri';
 
 export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
-  const { title, onContinue } = props;
+  const { title, onSuccess, onReset } = props;
   const { user } = useUser();
-  const { close } = useActionContext();
   const card = useCardState();
   const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');
@@ -102,14 +100,14 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
           <FormButtonContainer sx={{ marginTop: 0 }}>
             <Button
               textVariant='buttonSmall'
-              onClick={onContinue}
+              onClick={onSuccess}
               localizationKey={localizationKeys('userProfile.formButtonPrimary__continue')}
               elementDescriptor={descriptors.formButtonPrimary}
             />
 
             <Button
               variant='ghost'
-              onClick={close}
+              onClick={onReset}
               localizationKey={localizationKeys('userProfile.formButtonReset')}
               elementDescriptor={descriptors.formButtonReset}
             />

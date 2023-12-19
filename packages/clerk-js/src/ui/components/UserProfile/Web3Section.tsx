@@ -3,10 +3,35 @@ import { useUser } from '@clerk/shared/react';
 import { Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu } from '../../elements';
 import { Action } from '../../elements/Action';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import type { PropsOfComponent } from '../../styledSystem';
 import { RemoveWeb3WalletForm } from './RemoveResourceForm';
-import { Web3Form } from './Web3Form';
+import { AddWeb3Wallet } from './Web3Form';
+
+type RemoveWeb3WalletScreenProps = { walletId: string };
+const RemoveWeb3WalletScreen = (props: RemoveWeb3WalletScreenProps) => {
+  const { close } = useActionContext();
+  return (
+    <RemoveWeb3WalletForm
+      onSuccess={close}
+      onReset={close}
+      {...props}
+    />
+  );
+};
+
+type Web3WalletScreenProps = { walletId?: string };
+const Web3WalletScreen = (props: Web3WalletScreenProps) => {
+  const { close } = useActionContext();
+  return (
+    <AddWeb3Wallet
+      onSuccess={close}
+      onReset={close}
+      {...props}
+    />
+  );
+};
 
 export const Web3Section = () => {
   const { user } = useUser();
@@ -47,7 +72,7 @@ export const Web3Section = () => {
 
                 <Action.Open value='remove'>
                   <Action.Card>
-                    <RemoveWeb3WalletForm walletId={wallet.id} />
+                    <RemoveWeb3WalletScreen walletId={wallet.id} />
                   </Action.Card>
                 </Action.Open>
               </Action.Root>
@@ -64,7 +89,7 @@ export const Web3Section = () => {
 
         <Action.Open value='add'>
           <Action.Card>
-            <Web3Form />
+            <Web3WalletScreen />
           </Action.Card>
         </Action.Open>
       </Action.Root>

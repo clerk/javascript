@@ -3,12 +3,15 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { localizationKeys } from '../../customizables';
+import type { FormProps } from '../../elements';
 import { SuccessPage, withCardStateProvider } from '../../elements';
 import { AddAuthenticatorApp } from './AddAuthenticatorApp';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { VerifyTOTP } from './VerifyTOTP';
 
-export const MfaTOTPScreen = withCardStateProvider(() => {
+type MfaTOTPFormProps = FormProps;
+export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => {
+  const { onReset } = props;
   const wizard = useWizard();
   const ref = React.useRef<TOTPResource>();
 
@@ -16,11 +19,13 @@ export const MfaTOTPScreen = withCardStateProvider(() => {
     <Wizard {...wizard.props}>
       <AddAuthenticatorApp
         title={localizationKeys('userProfile.mfaTOTPPage.title')}
-        onContinue={wizard.nextStep}
+        onSuccess={wizard.nextStep}
+        onReset={onReset}
       />
 
       <VerifyTOTP
-        onVerified={wizard.nextStep}
+        onSuccess={wizard.nextStep}
+        onReset={onReset}
         resourceRef={ref}
       />
 

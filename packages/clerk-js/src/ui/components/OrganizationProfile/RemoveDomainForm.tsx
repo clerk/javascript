@@ -2,7 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationDomainResource } from '@clerk/types';
 import React from 'react';
 
-import { RemoveResourcePage } from '../../common';
+import { RemoveResourceForm } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Spinner } from '../../customizables';
 import type { FormProps } from '../../elements';
@@ -58,7 +58,7 @@ export const RemoveDomainForm = (props: RemoveDomainFormProps) => {
   }
 
   return (
-    <RemoveResourcePage
+    <RemoveResourceForm
       title={localizationKeys('organizationProfile.removeDomainPage.title')}
       messageLine1={localizationKeys('organizationProfile.removeDomainPage.messageLine1', {
         domain: ref.current?.name,

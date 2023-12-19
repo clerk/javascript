@@ -2,42 +2,17 @@ import { useUser } from '@clerk/shared/react';
 import type { Web3Strategy } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier } from '../../../utils/web3';
-import { useWizard, Wizard } from '../../common';
 import { Button, Col, descriptors, Image, localizationKeys, Text } from '../../customizables';
-import {
-  ArrowBlockButton,
-  FormButtonContainer,
-  FormContent,
-  SuccessPage,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
+import type { FormProps } from '../../elements';
+import { ArrowBlockButton, FormButtonContainer, FormContent, useCardState } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { getFieldError, handleError } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const Web3Form = withCardStateProvider(() => {
-  const { close } = useActionContext();
-
-  const wizard = useWizard();
-
-  return (
-    <Wizard {...wizard.props}>
-      <AddWeb3Wallet nextStep={wizard.nextStep} />
-      <SuccessPage
-        title={localizationKeys('userProfile.web3WalletPage.title')}
-        text={localizationKeys('userProfile.web3WalletPage.successMessage')}
-        onFinish={close}
-      />
-    </Wizard>
-  );
-});
-
-const AddWeb3Wallet = (props: { nextStep: () => void }) => {
-  const { nextStep } = props;
+type AddWeb3WalletProps = FormProps;
+export const AddWeb3Wallet = (props: AddWeb3WalletProps) => {
+  const { onSuccess, onReset } = props;
   const card = useCardState();
-  const { close } = useActionContext();
   const { user } = useUser();
   const { strategyToDisplayData } = useEnabledThirdPartyProviders();
 
@@ -63,7 +38,7 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
       const signature = await generateSignatureWithMetamask({ identifier, nonce });
       await web3Wallet.attemptVerification({ signature });
       card.setIdle();
-      nextStep();
+      onSuccess();
     } catch (err) {
       card.setIdle();
       console.log(err);
@@ -121,7 +96,7 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <Button
           variant='ghost'
-          onClick={close}
+          onClick={onReset}
           localizationKey={localizationKeys('userProfile.formButtonReset')}
         />
       </FormButtonContainer>

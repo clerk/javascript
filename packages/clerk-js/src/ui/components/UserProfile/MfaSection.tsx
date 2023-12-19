@@ -9,9 +9,7 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 import { AuthApp, DotCircle, Mobile } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';
-import { MfaForm } from './MfaForm';
-import { RemoveMfaPhoneCodeForm, RemoveMfaTOTPForm } from './RemoveResourceForm';
+import { MfaBackupCodeCreateScreen, MfaScreen, RemoveMfaPhoneCodeScreen, RemoveMfaTOTPScreen } from './MfaScreens';
 import { defaultFirst, getSecondFactors, getSecondFactorsAvailableToAdd } from './utils';
 
 export const MfaSection = () => {
@@ -61,7 +59,7 @@ export const MfaSection = () => {
 
               <Action.Open value='remove'>
                 <Action.Card>
-                  <RemoveMfaTOTPForm />
+                  <RemoveMfaTOTPScreen />
                 </Action.Card>
               </Action.Open>
             </Action.Root>
@@ -92,7 +90,7 @@ export const MfaSection = () => {
 
                   <Action.Open value='remove'>
                     <Action.Card>
-                      <RemoveMfaPhoneCodeForm phoneId={phone.id} />
+                      <RemoveMfaPhoneCodeScreen phoneId={phone.id} />
                     </Action.Card>
                   </Action.Open>
                 </Action.Root>
@@ -116,7 +114,7 @@ export const MfaSection = () => {
 
               <Action.Open value='regenerate'>
                 <Action.Card>
-                  <MfaBackupCodeCreateForm />
+                  <MfaBackupCodeCreateScreen />
                 </Action.Card>
               </Action.Open>
             </Action.Root>
@@ -133,7 +131,7 @@ export const MfaSection = () => {
 
               <Action.Open value='multi-factor'>
                 <Action.Card>
-                  <MfaForm />
+                  <MfaScreen />
                 </Action.Card>
               </Action.Open>
             </>

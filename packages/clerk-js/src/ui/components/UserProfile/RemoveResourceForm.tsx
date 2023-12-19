@@ -1,15 +1,17 @@
 import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
-import { RemoveResourcePage } from '../../common';
+import { RemoveResourceForm } from '../../common';
 import { localizationKeys } from '../../customizables';
+import type { FormProps } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 
-type RemoveEmailFormProps = {
+type RemoveEmailFormProps = FormProps & {
   emailId: string;
 };
 
 export const RemoveEmailForm = (props: RemoveEmailFormProps) => {
+  const { onSuccess, onReset } = props;
   const { user } = useUser();
   const { emailId: id } = props;
   const resource = user?.emailAddresses.find(e => e.id === id);
@@ -20,7 +22,7 @@ export const RemoveEmailForm = (props: RemoveEmailFormProps) => {
   }
 
   return (
-    <RemoveResourcePage
+    <RemoveResourceForm
       title={localizationKeys('userProfile.emailAddressPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.emailAddressPage.removeResource.messageLine1', {
         identifier: ref.current,
@@ -30,16 +32,18 @@ export const RemoveEmailForm = (props: RemoveEmailFormProps) => {
         emailAddress: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
+      onSuccess={onSuccess}
+      onReset={onReset}
     />
   );
 };
 
-type RemovePhoneFormProps = {
+type RemovePhoneFormProps = FormProps & {
   phoneId: string;
 };
 
 export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
-  const { phoneId: id } = props;
+  const { phoneId: id, onSuccess, onReset } = props;
   const { user } = useUser();
   const resource = user?.phoneNumbers.find(e => e.id === id);
   const ref = React.useRef(resource?.phoneNumber);
@@ -49,7 +53,7 @@ export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
   }
 
   return (
-    <RemoveResourcePage
+    <RemoveResourceForm
       title={localizationKeys('userProfile.phoneNumberPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine1', {
         identifier: ref.current,
@@ -59,16 +63,18 @@ export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
         phoneNumber: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
+      onSuccess={onSuccess}
+      onReset={onReset}
     />
   );
 };
 
-type ConnectedAccountFormProps = {
+type ConnectedAccountFormProps = FormProps & {
   accountId: string;
 };
 
 export const RemoveConnectedAccountForm = (props: ConnectedAccountFormProps) => {
-  const { accountId: id } = props;
+  const { accountId: id, onSuccess, onReset } = props;
   const { user } = useUser();
   const resource = user?.externalAccounts.find(e => e.id === id);
   const ref = React.useRef(resource?.provider);
@@ -79,7 +85,7 @@ export const RemoveConnectedAccountForm = (props: ConnectedAccountFormProps) => 
   }
 
   return (
-    <RemoveResourcePage
+    <RemoveResourceForm
       title={localizationKeys('userProfile.connectedAccountPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.connectedAccountPage.removeResource.messageLine1', {
         identifier: providerToDisplayData[ref.current]?.name,
@@ -89,17 +95,19 @@ export const RemoveConnectedAccountForm = (props: ConnectedAccountFormProps) => 
         connectedAccount: providerToDisplayData[ref.current]?.name,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
+      onSuccess={onSuccess}
+      onReset={onReset}
     />
   );
 };
 
-type RemoveWeb3WalletFormProps = {
+type RemoveWeb3WalletFormProps = FormProps & {
   walletId: string;
 };
 
 export const RemoveWeb3WalletForm = (props: RemoveWeb3WalletFormProps) => {
   const { user } = useUser();
-  const { walletId: id } = props;
+  const { walletId: id, onSuccess, onReset } = props;
   const resource = user?.web3Wallets.find(e => e.id === id);
   const ref = React.useRef(resource?.web3Wallet);
 
@@ -108,7 +116,7 @@ export const RemoveWeb3WalletForm = (props: RemoveWeb3WalletFormProps) => {
   }
 
   return (
-    <RemoveResourcePage
+    <RemoveResourceForm
       title={localizationKeys('userProfile.web3WalletPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.web3WalletPage.removeResource.messageLine1', {
         identifier: ref.current,
@@ -118,17 +126,19 @@ export const RemoveWeb3WalletForm = (props: RemoveWeb3WalletFormProps) => {
         web3Wallet: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.destroy())}
+      onSuccess={onSuccess}
+      onReset={onReset}
     />
   );
 };
 
-type RemoveMfaPhoneCodeFormProps = {
+type RemoveMfaPhoneCodeFormProps = FormProps & {
   phoneId: string;
 };
 
 export const RemoveMfaPhoneCodeForm = (props: RemoveMfaPhoneCodeFormProps) => {
   const { user } = useUser();
-  const { phoneId: id } = props;
+  const { phoneId: id, onSuccess, onReset } = props;
   // TODO: This logic will need to change when we add more 2fa methods
   const resource = user?.phoneNumbers.find(e => e.id === id);
   const ref = React.useRef(resource?.phoneNumber);
@@ -138,7 +148,7 @@ export const RemoveMfaPhoneCodeForm = (props: RemoveMfaPhoneCodeFormProps) => {
   }
 
   return (
-    <RemoveResourcePage
+    <RemoveResourceForm
       title={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.messageLine1', {
         identifier: ref.current,
@@ -148,11 +158,15 @@ export const RemoveMfaPhoneCodeForm = (props: RemoveMfaPhoneCodeFormProps) => {
         mfaPhoneCode: ref.current,
       })}
       deleteResource={() => Promise.resolve(resource?.setReservedForSecondFactor({ reserved: false }))}
+      onSuccess={onSuccess}
+      onReset={onReset}
     />
   );
 };
 
-export const RemoveMfaTOTPForm = () => {
+type RemoveMfaTOTPFormProps = FormProps;
+export const RemoveMfaTOTPForm = (props: RemoveMfaTOTPFormProps) => {
+  const { onSuccess, onReset } = props;
   const { user } = useUser();
 
   if (!user) {
@@ -160,12 +174,14 @@ export const RemoveMfaTOTPForm = () => {
   }
 
   return (
-    <RemoveResourcePage
+    <RemoveResourceForm
       title={localizationKeys('userProfile.mfaTOTPPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine1')}
       messageLine2={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.mfaTOTPPage.removeResource.successMessage')}
       deleteResource={user.disableTOTP}
+      onSuccess={onSuccess}
+      onReset={onReset}
     />
   );
 };

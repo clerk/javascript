@@ -11,6 +11,30 @@ import { PhoneForm } from './PhoneForm';
 import { RemovePhoneForm } from './RemoveResourceForm';
 import { primaryIdentificationFirst } from './utils';
 
+type RemovePhoneScreenProps = { phoneId: string };
+const RemovePhoneScreen = (props: RemovePhoneScreenProps) => {
+  const { close } = useActionContext();
+  return (
+    <RemovePhoneForm
+      onSuccess={close}
+      onReset={close}
+      {...props}
+    />
+  );
+};
+
+type PhoneScreenProps = { phoneId?: string };
+const PhoneScreen = (props: PhoneScreenProps) => {
+  const { close } = useActionContext();
+  return (
+    <PhoneForm
+      onSuccess={close}
+      onReset={close}
+      {...props}
+    />
+  );
+};
+
 export const PhoneSection = () => {
   const { user } = useUser();
 
@@ -46,13 +70,13 @@ export const PhoneSection = () => {
 
               <Action.Open value='remove'>
                 <Action.Card>
-                  <RemovePhoneForm phoneId={phone.id} />
+                  <RemovePhoneScreen phoneId={phone.id} />
                 </Action.Card>
               </Action.Open>
 
               <Action.Open value='verify'>
                 <Action.Card>
-                  <PhoneForm phoneId={phone.id} />
+                  <PhoneScreen phoneId={phone.id} />
                 </Action.Card>
               </Action.Open>
             </Action.Root>
@@ -68,7 +92,7 @@ export const PhoneSection = () => {
 
         <Action.Open value='add'>
           <Action.Card>
-            <PhoneForm />
+            <PhoneScreen />
           </Action.Card>
         </Action.Open>
       </Action.Root>

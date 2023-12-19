@@ -1,7 +1,18 @@
 import { Button, localizationKeys } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
-import { DeleteUserForm } from './DeleteUserPage';
+import { useActionContext } from '../../elements/Action/ActionRoot';
+import { DeleteUserForm } from './DeleteUserForm';
+
+const DeleteUserScreen = () => {
+  const { close } = useActionContext();
+  return (
+    <DeleteUserForm
+      onSuccess={close}
+      onReset={close}
+    />
+  );
+};
 
 export const DeleteSection = () => {
   return (
@@ -23,7 +34,7 @@ export const DeleteSection = () => {
 
         <Action.Open value='delete'>
           <Action.Card variant='destructive'>
-            <DeleteUserForm />
+            <DeleteUserScreen />
           </Action.Card>
         </Action.Open>
       </Action.Root>

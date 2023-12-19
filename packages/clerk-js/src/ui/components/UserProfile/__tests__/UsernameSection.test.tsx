@@ -12,7 +12,7 @@ const initConfig = createFixtures.config(f => {
   f.withUser({ username: 'georgeclerk' });
 });
 
-describe('UsernamePage', () => {
+describe('UsernameScreen', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(initConfig);
 
@@ -33,7 +33,7 @@ describe('UsernamePage', () => {
   });
 
   describe('Actions', () => {
-    it('calls the appropriate function upon pressing continue and finish', async () => {
+    it('calls the appropriate function upon pressing continue', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.clerk.user?.update.mockResolvedValue({} as UserResource);
@@ -47,12 +47,6 @@ describe('UsernamePage', () => {
       await userEvent.type(screen.getByLabelText(/username/i), 'test');
       await userEvent.click(screen.getByRole('button', { name: /save/i }));
       expect(fixtures.clerk.user?.update).toHaveBeenCalledWith({ username: 'georgeclerktest' });
-
-      expect(await screen.findByText(/updated/i));
-      await userEvent.click(screen.getByRole('button', { name: /finish/i }));
-      await waitFor(() => {
-        screen.getByText(/change username/i);
-      });
     });
 
     it('shows the previous content upon pressing cancel', async () => {

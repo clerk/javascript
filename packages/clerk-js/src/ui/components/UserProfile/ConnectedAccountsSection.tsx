@@ -11,8 +11,32 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { ConnectedAccountsForm } from './ConnectedAccountsPage';
+import { ConnectedAccountsForm } from './ConnectedAccountsForm';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
+
+type RemoveConnectedAccountScreenProps = { accountId: string };
+const RemoveConnectedAccountScreen = (props: RemoveConnectedAccountScreenProps) => {
+  const { close } = useActionContext();
+  return (
+    <RemoveConnectedAccountForm
+      onSuccess={close}
+      onReset={close}
+      {...props}
+    />
+  );
+};
+
+type ConnectedAccountsScreenProps = { accountId?: string };
+const ConnectedAccountsScreen = (props: ConnectedAccountsScreenProps) => {
+  const { close } = useActionContext();
+  return (
+    <ConnectedAccountsForm
+      onSuccess={close}
+      onReset={close}
+      {...props}
+    />
+  );
+};
 
 export const ConnectedAccountsSection = () => {
   const { user } = useUser();
@@ -81,7 +105,7 @@ export const ConnectedAccountsSection = () => {
 
                 <Action.Open value='remove'>
                   <Action.Card>
-                    <RemoveConnectedAccountForm accountId={account.id} />
+                    <RemoveConnectedAccountScreen accountId={account.id} />
                   </Action.Card>
                 </Action.Open>
               </Action.Root>
@@ -98,7 +122,7 @@ export const ConnectedAccountsSection = () => {
 
         <Action.Open value='add'>
           <Action.Card>
-            <ConnectedAccountsForm />
+            <ConnectedAccountsScreen />
           </Action.Card>
         </Action.Open>
       </Action.Root>

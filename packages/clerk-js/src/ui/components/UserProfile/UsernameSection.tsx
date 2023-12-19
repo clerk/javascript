@@ -3,7 +3,18 @@ import { useUser } from '@clerk/shared/react';
 import { Button, localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { UsernameForm } from './UsernameForm';
+
+const UsernameScreen = () => {
+  const { close } = useActionContext();
+  return (
+    <UsernameForm
+      onSuccess={close}
+      onReset={close}
+    />
+  );
+};
 
 export const UsernameSection = () => {
   const { user } = useUser();
@@ -38,7 +49,7 @@ export const UsernameSection = () => {
 
         <Action.Open value='edit'>
           <Action.Card>
-            <UsernameForm />
+            <UsernameScreen />
           </Action.Card>
         </Action.Open>
       </Action.Root>

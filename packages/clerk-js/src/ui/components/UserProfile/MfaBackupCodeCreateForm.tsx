@@ -3,6 +3,7 @@ import type { BackupCodeResource } from '@clerk/types';
 import React from 'react';
 
 import { Button, descriptors, localizationKeys, Text } from '../../customizables';
+import type { FormProps } from '../../elements';
 import {
   FormButtonContainer,
   FormContent,
@@ -10,14 +11,14 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const MfaBackupCodeCreateForm = withCardStateProvider(() => {
+type MfaBackupCodeCreateFormProps = FormProps;
+export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCodeCreateFormProps) => {
+  const { onSuccess } = props;
   const { user } = useUser();
-  const { close } = useActionContext();
   const card = useCardState();
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
 
@@ -60,7 +61,7 @@ export const MfaBackupCodeCreateForm = withCardStateProvider(() => {
           <FormButtonContainer>
             <Button
               autoFocus
-              onClick={close}
+              onClick={onSuccess}
               localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
               elementDescriptor={descriptors.formButtonPrimary}
             />

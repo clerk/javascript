@@ -5,19 +5,18 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
-import { Form, FormButtons, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
+import type { FormProps } from '../../elements';
+import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { VerifyWithCode } from './VerifyWithCode';
 
-type PhoneFormProps = {
+type PhoneFormProps = FormProps & {
   phoneId?: string;
 };
 
 export const PhoneForm = withCardStateProvider((props: PhoneFormProps) => {
-  const { phoneId: id } = props;
+  const { phoneId: id, onSuccess, onReset } = props;
   const { user } = useUser();
-  const { close } = useActionContext();
 
   const phoneNumberRef = React.useRef<PhoneNumberResource | undefined>(user?.phoneNumbers.find(a => a.id === id));
   const wizard = useWizard({ defaultStep: phoneNumberRef.current ? 1 : 0 });
@@ -28,32 +27,25 @@ export const PhoneForm = withCardStateProvider((props: PhoneFormProps) => {
         resourceRef={phoneNumberRef}
         title={localizationKeys('userProfile.phoneNumberPage.title')}
         onSuccess={wizard.nextStep}
+        onReset={onReset}
       />
       <VerifyPhone
         resourceRef={phoneNumberRef}
         title={localizationKeys('userProfile.phoneNumberPage.title')}
-        onSuccess={wizard.nextStep}
-      />
-      <SuccessPage
-        title={localizationKeys('userProfile.phoneNumberPage.title')}
-        text={localizationKeys('userProfile.phoneNumberPage.successMessage', {
-          identifier: phoneNumberRef.current?.phoneNumber || '',
-        })}
-        onFinish={close}
+        onSuccess={onSuccess}
+        onReset={wizard.prevStep}
       />
     </Wizard>
   );
 });
 
-type AddPhoneProps = {
+type AddPhoneProps = FormProps & {
   title: LocalizationKey;
   resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
-  onSuccess: () => void;
 };
 
 export const AddPhone = (props: AddPhoneProps) => {
-  const { title, onSuccess, resourceRef } = props;
-  const { close } = useActionContext();
+  const { title, onSuccess, onReset, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
 
@@ -92,7 +84,7 @@ export const AddPhone = (props: AddPhoneProps) => {
         />
         <FormButtons
           isDisabled={!canSubmit}
-          onReset={close}
+          onReset={onReset}
         />
       </Form.Root>
     </FormContent>
@@ -100,8 +92,7 @@ export const AddPhone = (props: AddPhoneProps) => {
 };
 
 export const VerifyPhone = (props: AddPhoneProps) => {
-  const { title, onSuccess, resourceRef } = props;
-  const { close } = useActionContext();
+  const { title, onSuccess, resourceRef, onReset } = props;
 
   return (
     <FormContent headerTitle={title}>
@@ -110,7 +101,7 @@ export const VerifyPhone = (props: AddPhoneProps) => {
         identification={resourceRef.current}
         identifier={resourceRef.current?.phoneNumber}
         prepareVerification={resourceRef.current?.prepareVerification}
-        onReset={close}
+        onReset={onReset}
       />
     </FormContent>
   );
