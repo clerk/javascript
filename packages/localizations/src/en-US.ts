@@ -43,8 +43,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
-  formFieldInputPlaceholder__emailAddresses:
-    'Enter or paste one or more email addresses, separated by spaces or commas',
+  formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
   formFieldInputPlaceholder__emailAddress_username: '',
@@ -722,8 +721,8 @@ export const enUS: LocalizationResource = {
       },
     },
     invitePage: {
-      title: 'Invite members',
-      subtitle: 'Invite new members to this organization',
+      title: 'Invite new members',
+      subtitle: 'Enter or paste one or more email addresses, separated by spaces or commas.',
       successMessage: 'Invitations successfully sent',
       detailsTitle__inviteFailed:
         'The invitations could not be sent. There are already pending invitations for the following email addresses: {{email_addresses}}.',

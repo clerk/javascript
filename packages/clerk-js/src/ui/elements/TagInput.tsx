@@ -126,6 +126,7 @@ export const TagInput = (props: TagInputProps) => {
           minHeight: t.sizes.$20,
           maxHeight: t.sizes.$60,
           overflowY: 'auto',
+          cursor: 'text',
           ...common.borderVariants(t).normal,
         }),
         sx,
@@ -161,6 +162,13 @@ export const TagInput = (props: TagInputProps) => {
           padding: 0,
           lineHeight: t.space.$6,
           paddingLeft: t.space.$1,
+          boxShadow: 'none',
+          ':hover': {
+            boxShadow: 'none',
+          },
+          '::placeholder': {
+            color: t.colors.$colorTextTertiary,
+          },
         })}
       />
     </Flex>
@@ -179,9 +187,11 @@ const TagPill = (props: TagPillProps) => {
       center
       {...rest}
       sx={t => ({
-        padding: `${t.space.$1x5} ${t.space.$3}`,
+        padding: `${t.space.$0x5} ${t.space.$1x5}`,
         backgroundColor: t.colors.$blackAlpha50,
+        color: t.colors.$blackAlpha700,
         borderRadius: t.radii.$sm,
+        boxShadow: t.shadows.$badge.replace('{{color}}', t.colors.$blackAlpha100),
         cursor: 'pointer',
         ':hover svg': {
           color: t.colors.$danger500,
@@ -189,12 +199,17 @@ const TagPill = (props: TagPillProps) => {
         overflow: 'hidden',
       })}
     >
-      <Text truncate>{children}</Text>
+      <Text
+        truncate
+        variant='buttonSmall'
+      >
+        {children}
+      </Text>
       <Icon
         elementDescriptor={descriptors.tagPillIcon}
         size='sm'
         icon={Plus}
-        sx={t => ({ color: t.colors.$blackAlpha500, transform: 'translateY(1px) rotate(45deg)' })}
+        sx={t => ({ color: t.colors.$colorTextTertiary, transform: 'translateY(1px) rotate(45deg)' })}
       />
     </Flex>
   );
