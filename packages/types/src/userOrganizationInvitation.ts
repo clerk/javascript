@@ -1,5 +1,5 @@
 import type { OrganizationInvitationStatus } from './organizationInvitation';
-import type { MembershipRole } from './organizationMembership';
+import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkResource } from './resource';
 
 declare global {
@@ -28,7 +28,7 @@ export interface UserOrganizationInvitationResource extends ClerkResource {
     slug: string | null;
   };
   publicMetadata: UserOrganizationInvitationPublicMetadata;
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
   status: OrganizationInvitationStatus;
   createdAt: Date;
   updatedAt: Date;

@@ -15,7 +15,7 @@ import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
-import type { MembershipRole } from './organizationMembership';
+import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ActiveSessionResource } from './session';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
@@ -935,12 +935,12 @@ export interface HandleEmailLinkVerificationParams {
 
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
 };
 
 export type CreateBulkOrganizationInvitationParams = {
   emailAddresses: string[];
-  role: MembershipRole;
+  role: OrganizationCustomRoleKey;
 };
 
 export interface CreateOrganizationParams {
