@@ -19,7 +19,7 @@ export const EnrollmentBadge = (props: { organizationDomain: OrganizationDomainR
     return (
       <Badge
         localizationKey={localizationKeys('organizationProfile.badge__unverified')}
-        colorScheme={'danger'}
+        colorScheme='warning'
       />
     );
   }
@@ -27,7 +27,7 @@ export const EnrollmentBadge = (props: { organizationDomain: OrganizationDomainR
   return (
     <Badge
       localizationKey={badgeLabelsMap[organizationDomain.enrollmentMode]}
-      colorScheme={organizationDomain.enrollmentMode === 'manual_invitation' ? 'neutral' : 'primary'}
+      colorScheme={organizationDomain.enrollmentMode === 'manual_invitation' ? 'primary' : 'success'}
     />
   );
 };

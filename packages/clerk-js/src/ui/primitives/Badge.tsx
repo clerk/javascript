@@ -1,40 +1,40 @@
 import type { PropsOfComponent, StyleVariants } from '../styledSystem';
 import { common, createCssVariables, createVariants } from '../styledSystem';
-import { colors } from '../utils';
 import { Flex } from './Flex';
 
-const vars = createCssVariables('accent', 'bg');
+const vars = createCssVariables('accent', 'bg', 'shadow');
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     color: vars.accent,
     backgroundColor: vars.bg,
+    boxShadow: vars.shadow,
     borderRadius: theme.radii.$sm,
-    padding: `${theme.space.$0x5} ${theme.space.$1x5}`,
+    padding: `${theme.space.$none} ${theme.space.$1x5}`,
     display: 'inline-flex',
   },
   variants: {
     textVariant: { ...common.textVariants(theme) },
     colorScheme: {
       primary: {
-        [vars.accent]: theme.colors.$primary500,
-        [vars.bg]: colors.setAlpha(theme.colors.$primary400, 0.2),
+        [vars.accent]: theme.colors.$blackAlpha500,
+        [vars.bg]: theme.colors.$blackAlpha50,
+        [vars.shadow]: theme.shadows.$badge.replace('{{color}}', theme.colors.$blackAlpha100),
       },
       danger: {
         [vars.accent]: theme.colors.$danger500,
-        [vars.bg]: theme.colors.$danger100,
-      },
-      neutral: {
-        [vars.accent]: theme.colors.$blackAlpha600,
-        [vars.bg]: theme.colors.$blackAlpha200,
+        [vars.bg]: theme.colors.$danger50,
+        [vars.shadow]: theme.shadows.$badge.replace('{{color}}', theme.colors.$danger200),
       },
       success: {
         [vars.accent]: theme.colors.$success500,
-        [vars.bg]: colors.setAlpha(theme.colors.$success50, 0.2),
+        [vars.bg]: theme.colors.$success50,
+        [vars.shadow]: theme.shadows.$badge.replace('{{color}}', theme.colors.$success200),
       },
       warning: {
-        [vars.accent]: theme.colors.$warning600,
-        [vars.bg]: theme.colors.$warning100,
+        [vars.accent]: theme.colors.$warning500,
+        [vars.bg]: theme.colors.$warning50,
+        [vars.shadow]: theme.shadows.$badge.replace('{{color}}', theme.colors.$warning200),
       },
     },
   },
