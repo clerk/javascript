@@ -272,6 +272,7 @@ export interface UserJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
   last_active_at: number | null;
+  create_organization_enabled: boolean;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
