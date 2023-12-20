@@ -1,11 +1,15 @@
 import type { AuthObject, SignedInAuthObject } from '@clerk/backend/internal';
+import { constants } from '@clerk/backend/internal';
+// import { constants } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
 } from '@clerk/types';
+import { headers } from 'next/headers';
+// import { actionAsyncStorage } from 'next/dist/client/components/action-async-storage.external';
+// import { headers } from 'next/headers';
 
 type AuthProtectOptions = { redirectUrl?: string };
-
 /**
  * @experimental
  * This function is experimental as it throws a Nextjs notFound error if user is not authenticated or authorized.
@@ -53,6 +57,57 @@ export const createProtect = (opts: {
       if (redirectUrl) {
         redirect(redirectUrl);
       }
+
+      /**
+       * TODO:
+       * - Detect if is page
+       * - Detect if is component
+       * - Detect if is api
+       * - Detect if is server action
+       */
+
+      // if (headers().get(constants.Headers.SecFetchDest) === 'document' && !actionAsyncStorage.getStore()?.isAppRoute) {
+      //   // redirect to sign-in
+      //   redirect('/sign-in2');
+      // }
+
+      console.log('headers sec fetch', headers().get(constants.Headers.SecFetchDest));
+      console.log('headers content type', headers().get(constants.Headers.ContentType));
+      console.log('headers accept', headers().get(constants.Headers.Accept));
+      console.log('headers action', headers().get('next-action'));
+      console.log('headers tree', Object.fromEntries(headers().entries()));
+
+      if (headers().get(constants.Headers.Accept) === 'text/x-component') {
+        console.log('is server action');
+        redirect('/sign-in2');
+      }
+
+      if (headers().get(constants.Headers.ContentType)?.startsWith('multipart/form-data')) {
+        console.log('is server action');
+      }
+
+      if (typeof headers().get('next-action') === 'string') {
+        console.log('is server action');
+      }
+
+      if (
+        headers().get(constants.Headers.Accept)?.includes('text/html') &&
+        headers().get(constants.Headers.SecFetchDest) === 'document'
+      ) {
+        console.log('Probably component or page');
+      }
+
+      if (
+        // headers() is not populated with `Next-Router-State-Tree`😭
+        typeof headers().get('Next-Router-State-Tree'.toLowerCase()) === 'string' &&
+        headers().get(constants.Headers.SecFetchDest) === 'empty'
+      ) {
+        console.log('component or page in app');
+      }
+      // console.log('Is App Route', actionAsyncStorage.getStore()?.isAppRoute);
+      console.log('headers sec fetch', headers().get(constants.Headers.SecFetchDest));
+      console.log('headers content type', headers().get(constants.Headers.ContentType));
+      console.log('headers accept', headers().get(constants.Headers.Accept));
       notFound();
     };
 
@@ -71,7 +126,7 @@ export const createProtect = (opts: {
     }
 
     /**
-     * if a function is passed and returns false then throw not found
+     * if a function is passed and returns false then continue as unauthorized
      */
     if (typeof paramsOrFunction === 'function') {
       if (paramsOrFunction(authObject.has)) {

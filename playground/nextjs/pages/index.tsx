@@ -19,6 +19,12 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+        <button onClick={async() => {
+          const res = await fetch('/api/authed');
+          console.log(res.status)
+        }}>
+          Fetch
+        </button>
         <h1 className={styles.title}>Clerk x Nextjs</h1>
         <p className={styles.description}>Get started by editing visiting one of the pages below</p>
         <ul>
