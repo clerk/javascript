@@ -69,7 +69,7 @@ export const EmailsSection = () => {
               </Action.Closed>
 
               <Action.Open value='remove'>
-                <Action.Card>
+                <Action.Card variant='destructive'>
                   <RemoveEmailScreen emailId={email.id} />
                 </Action.Card>
               </Action.Open>

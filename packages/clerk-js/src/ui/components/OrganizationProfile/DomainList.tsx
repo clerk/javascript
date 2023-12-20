@@ -118,7 +118,7 @@ export const DomainList = withGate(
               </ProfileSection.Item>
 
               <Action.Open value='remove'>
-                <Action.Card>
+                <Action.Card variant='destructive'>
                   <RemoveDomainScreen domainId={domain.id} />
                 </Action.Card>
               </Action.Open>

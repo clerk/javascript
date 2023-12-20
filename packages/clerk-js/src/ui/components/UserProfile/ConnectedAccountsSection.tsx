@@ -104,7 +104,7 @@ export const ConnectedAccountsSection = () => {
                 </Action.Closed>
 
                 <Action.Open value='remove'>
-                  <Action.Card>
+                  <Action.Card variant='destructive'>
                     <RemoveConnectedAccountScreen accountId={account.id} />
                   </Action.Card>
                 </Action.Open>

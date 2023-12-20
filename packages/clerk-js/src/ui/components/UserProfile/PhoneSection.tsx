@@ -69,7 +69,7 @@ export const PhoneSection = () => {
               </Action.Closed>
 
               <Action.Open value='remove'>
-                <Action.Card>
+                <Action.Card variant='destructive'>
                   <RemovePhoneScreen phoneId={phone.id} />
                 </Action.Card>
               </Action.Open>
