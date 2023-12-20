@@ -17,11 +17,31 @@ import {
 } from '../../elements';
 import { Action } from '../../elements/Action';
 import { UserAdd } from '../../icons';
+import { mqu, type ThemableCssProp } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
 import { InviteMembersScreen } from './InviteMembersScreen';
 import { MembershipWidget } from './MembershipWidget';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
+
+export const InviteMembersButton = (props: { sx?: ThemableCssProp }) => {
+  return (
+    <IconButton
+      {...props}
+      elementDescriptor={descriptors.membersPageInviteButton}
+      aria-label='Invite'
+      icon={
+        <Icon
+          icon={UserAdd}
+          size={'sm'}
+          sx={t => ({ marginRight: t.space.$2 })}
+        />
+      }
+      textVariant='buttonSmall'
+      localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
+    />
+  );
+};
 
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
@@ -57,72 +77,84 @@ export const OrganizationMembers = withCardStateProvider(() => {
               localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
               textVariant='h2'
             />
-            <Action.Trigger value='invite'>
-              <IconButton
-                elementDescriptor={descriptors.membersPageInviteButton}
-                aria-label='Invite'
-                icon={
-                  <Icon
-                    icon={UserAdd}
-                    size={'sm'}
-                    sx={t => ({ marginRight: t.space.$2 })}
-                  />
-                }
-                sx={t => ({ height: t.space.$8 })}
-                textVariant='buttonSmall'
-                localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
-              />
-            </Action.Trigger>
-          </Header.Root>
-          <Action.Open value='invite'>
-            <Action.Card>
-              <InviteMembersScreen />
-            </Action.Card>
-          </Action.Open>
-        </Action.Root>
-        <Tabs>
-          <TabsList>
-            {canReadMemberships && (
-              <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
-            )}
             {canManageMemberships && (
-              <Tab
-                localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
-              />
-            )}
-            {canManageMemberships && isDomainsEnabled && (
-              <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
-                <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />
-              </Tab>
-            )}
-          </TabsList>
-          <TabPanels>
-            {canReadMemberships && (
-              <TabPanel sx={{ width: '100%' }}>
-                <Flex
-                  gap={4}
-                  direction='col'
+              <Action.Trigger value='invite'>
+                <InviteMembersButton
                   sx={{
-                    width: '100%',
+                    display: 'none',
+                    [mqu.md]: {
+                      display: 'inline-flex',
+                    },
                   }}
-                >
-                  {canManageMemberships && __unstable_manageBillingUrl && <MembershipWidget />}
-                  <ActiveMembersList />
-                </Flex>
-              </TabPanel>
+                />
+              </Action.Trigger>
             )}
-            {canManageMemberships && (
-              <TabPanel sx={{ width: '100%' }}>
-                <OrganizationMembersTabInvitations />
-              </TabPanel>
+          </Header.Root>
+          <Tabs>
+            <TabsList>
+              {canReadMemberships && (
+                <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
+              )}
+              {canManageMemberships && (
+                <Tab
+                  localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
+                />
+              )}
+              {canManageMemberships && isDomainsEnabled && (
+                <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
+                  <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />
+                </Tab>
+              )}
+              <Col
+                sx={{
+                  marginLeft: 'auto',
+                  [mqu.md]: {
+                    display: 'none',
+                  },
+                }}
+              >
+                {canManageMemberships && (
+                  <Action.Trigger value='invite'>
+                    <InviteMembersButton />
+                  </Action.Trigger>
+                )}
+              </Col>
+            </TabsList>
+            {canReadMemberships && (
+              <Action.Open value='invite'>
+                <Action.Card>
+                  <InviteMembersScreen />
+                </Action.Card>
+              </Action.Open>
             )}
-            {canManageMemberships && isDomainsEnabled && (
-              <TabPanel sx={{ width: '100%' }}>
-                <OrganizationMembersTabRequests />
-              </TabPanel>
-            )}
-          </TabPanels>
-        </Tabs>
+            <TabPanels>
+              {canReadMemberships && (
+                <TabPanel sx={{ width: '100%' }}>
+                  <Flex
+                    gap={4}
+                    direction='col'
+                    sx={{
+                      width: '100%',
+                    }}
+                  >
+                    {canManageMemberships && __unstable_manageBillingUrl && <MembershipWidget />}
+                    <ActiveMembersList />
+                  </Flex>
+                </TabPanel>
+              )}
+              {canManageMemberships && (
+                <TabPanel sx={{ width: '100%' }}>
+                  <OrganizationMembersTabInvitations />
+                </TabPanel>
+              )}
+              {canManageMemberships && isDomainsEnabled && (
+                <TabPanel sx={{ width: '100%' }}>
+                  <OrganizationMembersTabRequests />
+                </TabPanel>
+              )}
+            </TabPanels>
+          </Tabs>
+        </Action.Root>
       </Col>
     </Col>
   );
