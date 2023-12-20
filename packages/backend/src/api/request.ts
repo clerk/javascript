@@ -114,7 +114,7 @@ export function buildRequest(options: BuildRequestOptions) {
       if (!res.ok) {
         return {
           data: null,
-          errors: responseBody?.errors || responseBody,
+          errors: parseErrors(responseBody),
           status: res?.status,
           statusText: res?.statusText,
           clerkTraceId: getTraceId(responseBody, res?.headers),
