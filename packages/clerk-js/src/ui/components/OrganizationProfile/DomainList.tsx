@@ -7,7 +7,7 @@ import type {
 } from '@clerk/types';
 import React, { useMemo } from 'react';
 
-import { useGate, withGate } from '../../common';
+import { Protect, withProtect } from '../../common';
 import { Box, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu } from '../../elements';
 import { Action } from '../../elements/Action';
@@ -57,7 +57,7 @@ const DomainListMenu = ({ domain }: DomainListMenuProps) => {
   return <ThreeDotsMenu actions={actions} />;
 };
 
-export const DomainList = withGate(
+export const DomainList = withProtect(
   (props: DomainListProps) => {
     const { verificationStatus, enrollmentMode, fallback, ...rest } = props;
     const { organization, domains } = useOrganization({
@@ -67,7 +67,6 @@ export const DomainList = withGate(
       },
     });
 
-    const { isAuthorizedUser: canManageDomain } = useGate({ permission: 'org:sys_domains:manage' });
     const { ref } = useInView({
       threshold: 0,
       onChange: inView => {
@@ -114,7 +113,9 @@ export const DomainList = withGate(
                   <EnrollmentBadge organizationDomain={domain} />
                 </Flex>
 
-                {canManageDomain && <DomainListMenu domain={domain} />}
+                <Protect permission='org:sys_domains:manage'>
+                  <DomainListMenu domain={domain} />
+                </Protect>
               </ProfileSection.Item>
 
               <Action.Open value='remove'>

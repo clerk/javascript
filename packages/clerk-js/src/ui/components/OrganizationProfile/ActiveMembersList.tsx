@@ -1,7 +1,7 @@
 import { useOrganization, useUser } from '@clerk/shared/react';
 import type { OrganizationMembershipResource } from '@clerk/types';
 
-import { Gate } from '../../common/Gate';
+import { Protect } from '../../common/Gate';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
@@ -93,7 +93,7 @@ const MemberRow = (props: {
       </Td>
       <Td>{membership.createdAt.toLocaleDateString()}</Td>
       <Td>
-        <Gate
+        <Protect
           permission={'org:sys_memberships:manage'}
           fallback={
             <Text sx={t => ({ opacity: t.opacity.$inactive })}>
@@ -107,10 +107,10 @@ const MemberRow = (props: {
             onChange={onRoleChange}
             roles={options}
           />
-        </Gate>
+        </Protect>
       </Td>
       <Td>
-        <Gate permission={'org:sys_memberships:manage'}>
+        <Protect permission={'org:sys_memberships:manage'}>
           <ThreeDotsMenu
             actions={[
               {
@@ -122,7 +122,7 @@ const MemberRow = (props: {
             ]}
             elementId={'member'}
           />
-        </Gate>
+        </Protect>
       </Td>
     </RowContainer>
   );

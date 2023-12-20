@@ -1,7 +1,7 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
-import { NotificationCountBadge, useGate } from '../../common';
+import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview, withAvatarShimmer } from '../../elements';
@@ -80,7 +80,7 @@ const NotificationCountBadgeSwitcherTrigger = () => {
    */
   const { userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
   const { organizationSettings } = useEnvironment();
-  const { isAuthorizedUser: canAcceptRequests } = useGate({
+  const canAcceptRequests = useProtect({
     permission: 'org:sys_memberships:manage',
   });
   const isDomainsEnabled = organizationSettings?.domains?.enabled;

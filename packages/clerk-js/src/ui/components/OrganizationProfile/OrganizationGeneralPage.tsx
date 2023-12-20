@@ -1,6 +1,6 @@
 import { useOrganization } from '@clerk/shared/react';
 
-import { Gate, useGate } from '../../common';
+import { Protect, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { Button, Col, descriptors, localizationKeys } from '../../customizables';
 import { Header, OrganizationPreview, ProfileSection } from '../../elements';
@@ -69,9 +69,9 @@ export const OrganizationGeneralPage = () => {
           />
         </Header.Root>
         <OrganizationProfileSection />
-        <Gate permission='org:sys_domains:read'>
+        <Protect permission='org:sys_domains:read'>
           <OrganizationDomainsSection />
-        </Gate>
+        </Protect>
         <OrganizationDangerSection />
       </Col>
     </Col>
@@ -93,7 +93,7 @@ const OrganizationProfileSection = () => {
       id='organizationProfile'
     >
       <Action.Root>
-        <Gate
+        <Protect
           permission={'org:sys_profile:manage'}
           fallback={profile}
         >
@@ -110,7 +110,7 @@ const OrganizationProfileSection = () => {
               </Action.Trigger>
             </ProfileSection.Item>
           </Action.Closed>
-        </Gate>
+        </Protect>
 
         <Action.Open value='edit'>
           <Action.Card>
@@ -143,7 +143,7 @@ const OrganizationDomainsSection = () => {
       <Action.Root>
         <DomainList />
 
-        <Gate permission='org:sys_domains:manage'>
+        <Protect permission='org:sys_domains:manage'>
           <Action.Trigger value='add'>
             <ProfileSection.Button
               localizationKey={localizationKeys('organizationProfile.general.domainSection.primaryButton')}
@@ -156,7 +156,7 @@ const OrganizationDomainsSection = () => {
               <AddDomainScreen />
             </Action.Card>
           </Action.Open>
-        </Gate>
+        </Protect>
       </Action.Root>
     </ProfileSection.Root>
   );
@@ -164,7 +164,7 @@ const OrganizationDomainsSection = () => {
 
 const OrganizationDangerSection = () => {
   const { organization } = useOrganization();
-  const { isAuthorizedUser: canDeleteOrganization } = useGate({ permission: 'org:sys_profile:delete' });
+  const canDeleteOrganization = useProtect({ permission: 'org:sys_profile:delete' });
 
   if (!organization) {
     return null;

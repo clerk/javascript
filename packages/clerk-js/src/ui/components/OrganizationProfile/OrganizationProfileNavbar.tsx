@@ -1,7 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import React from 'react';
 
-import { useGate } from '../../common';
+import { useProtect } from '../../common';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
 import { Breadcrumbs, NavBar, NavbarContextProvider, OrganizationPreview } from '../../elements';
@@ -14,7 +14,7 @@ export const OrganizationProfileNavbar = (
   const { organization } = useOrganization();
   const { pages } = useOrganizationProfileContext();
 
-  const { isAuthorizedUser: allowMembersRoute } = useGate(
+  const allowMembersRoute = useProtect(
     has =>
       has({
         permission: 'org:sys_memberships:read',

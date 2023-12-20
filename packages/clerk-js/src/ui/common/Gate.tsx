@@ -5,8 +5,9 @@ import React, { useEffect } from 'react';
 
 import { useRouter } from '../router';
 
-type GateParams = Parameters<CheckAuthorization>[0] | ((has: CheckAuthorization) => boolean);
-type GateProps = PropsWithChildren<
+type ProtectParams = Parameters<CheckAuthorization>[0] | ((has: CheckAuthorization) => boolean);
+
+type ProtectProps = PropsWithChildren<
   (
     | {
         condition?: never;
@@ -29,46 +30,40 @@ type GateProps = PropsWithChildren<
   }
 >;
 
-export const useGate = (params: GateParams) => {
+/**
+ * `useProtect` is just an abstraction on top of `useSession` that improves the internal DX for authorization
+ * @param params
+ */
+export const useProtect = (params: ProtectParams): boolean => {
   const { session } = useSession();
 
   if (!session?.id) {
-    return { isAuthorizedUser: false };
+    return false;
   }
 
-  /**
-   * if a function is passed and returns false then throw not found
-   */
   if (typeof params === 'function') {
-    if (params(session.checkAuthorization)) {
-      return { isAuthorizedUser: true };
-    }
-    return { isAuthorizedUser: false };
+    return params(session.checkAuthorization);
   }
 
-  return {
-    isAuthorizedUser: session?.checkAuthorization(params),
-  };
+  return session.checkAuthorization(params);
 };
 
-export const Gate = (gateProps: GateProps) => {
-  const { children, fallback, redirectTo, ...restAuthorizedParams } = gateProps;
+export const Protect = (protectProps: ProtectProps) => {
+  const { children, fallback, redirectTo, ...restAuthorizedParams } = protectProps;
 
-  const { isAuthorizedUser } = useGate(
+  const isAuthorizedUser = useProtect(
     typeof restAuthorizedParams.condition === 'function' ? restAuthorizedParams.condition : restAuthorizedParams,
   );
 
   const { navigate } = useRouter();
 
   useEffect(() => {
-    // wait for promise to resolve
-    if (typeof isAuthorizedUser === 'boolean' && !isAuthorizedUser && redirectTo) {
+    if (!isAuthorizedUser && redirectTo) {
       void navigate(redirectTo);
     }
   }, [isAuthorizedUser, redirectTo]);
 
-  // wait for promise to resolve
-  if (typeof isAuthorizedUser === 'boolean' && !isAuthorizedUser && fallback) {
+  if (!isAuthorizedUser && fallback) {
     return <>{fallback}</>;
   }
 
@@ -79,17 +74,17 @@ export const Gate = (gateProps: GateProps) => {
   return null;
 };
 
-export function withGate<P>(Component: ComponentType<P>, gateProps: GateProps): React.ComponentType<P> {
+export function withProtect<P>(Component: ComponentType<P>, protectProps: ProtectProps): React.ComponentType<P> {
   const displayName = Component.displayName || Component.name || 'Component';
   const HOC = (props: P) => {
     return (
-      <Gate {...gateProps}>
+      <Protect {...protectProps}>
         <Component {...(props as any)} />
-      </Gate>
+      </Protect>
     );
   };
 
-  HOC.displayName = `withGate(${displayName})`;
+  HOC.displayName = `withProtect(${displayName})`;
 
   return HOC;
 }
