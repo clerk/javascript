@@ -1,11 +1,8 @@
-'use client'
-import { SignIn, SignInFactorOne, SignInFactorTwo, SignInSSOCallback, SignInStart, useNextRouter } from '@clerk/elements'
+import { SignIn, SignInFactorOne, SignInFactorTwo, SignInSSOCallback, SignInStart } from '@clerk/elements'
 
 export default function SignInPage() {
-  const router = useNextRouter()
-
   return (
-    <SignIn router={router}>
+    <SignIn>
       <SignInStart>
         Start child
       </SignInStart>
