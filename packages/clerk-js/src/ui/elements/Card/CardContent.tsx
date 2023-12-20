@@ -25,7 +25,6 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
       sx={[
         t => ({
           backgroundColor: t.colors.$colorBackground,
-          overflow: 'hidden',
           willChange: 'transform, opacity, height',
           transitionProperty: t.transitionProperty.$common,
           transitionDuration: '200ms',
