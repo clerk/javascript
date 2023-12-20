@@ -1,6 +1,7 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { buildRequestUrl, constants } from '@clerk/backend';
+import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -9,7 +10,6 @@ import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
 import { SECRET_KEY } from './clerkClient';
-import { DEV_BROWSER_JWT_MARKER, setDevBrowserJWTInURL } from './devBrowser';
 import {
   clockSkewDetected,
   infiniteRedirectLoopDetected,

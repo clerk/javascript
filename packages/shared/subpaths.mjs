@@ -8,6 +8,7 @@ export const subpathNames = [
   'cookie',
   'date',
   'deprecated',
+  'devBrowser',
   'error',
   'file',
   'globs',
