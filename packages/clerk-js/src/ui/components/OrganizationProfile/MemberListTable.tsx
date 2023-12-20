@@ -1,7 +1,21 @@
 import React, { useMemo } from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import {
+  Col,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useLocalizations,
+} from '../../customizables';
 import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
@@ -129,6 +143,7 @@ export const RoleSelect = (props: {
   const { value, roles, onChange, isDisabled, triggerSx, optionListSx } = props;
 
   const { localizeCustomRole } = useLocalizeCustomRoles();
+  const { t } = useLocalizations();
 
   const fetchedRoles = useMemo(() => [...(roles || [])], [roles]);
 
@@ -167,7 +182,25 @@ export const RoleSelect = (props: {
         }
         isDisabled={isDisabled}
       >
-        {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
+        {(selectedRole?.label || selectedRole?.value) && (
+          <Flex
+            as='span'
+            gap={1}
+          >
+            <Text
+              as='span'
+              sx={t => ({ color: t.colors.$blackAlpha400 })}
+            >
+              {`${t(localizationKeys('formFieldLabel__role'))}:`}
+            </Text>
+            <Text
+              as='span'
+              sx={t => ({ color: t.colors.$blackAlpha950 })}
+            >
+              {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
+            </Text>
+          </Flex>
+        )}
       </SelectButton>
       <SelectOptionList sx={optionListSx} />
     </Select>

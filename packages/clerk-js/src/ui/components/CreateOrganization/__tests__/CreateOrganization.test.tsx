@@ -128,7 +128,7 @@ describe('CreateOrganization', () => {
     await userEvent.click(getByRole('button', { name: /create organization/i }));
 
     await waitFor(() => {
-      expect(queryByText(/Invite members/i)).toBeInTheDocument();
+      expect(queryByText(/Invite new members/i)).toBeInTheDocument();
     });
   });
 

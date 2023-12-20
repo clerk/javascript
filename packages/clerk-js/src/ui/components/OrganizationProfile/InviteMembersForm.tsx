@@ -4,11 +4,12 @@ import type { ClerkAPIError } from '@clerk/types';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
-import { Flex, Text } from '../../customizables';
+import { Flex } from '../../customizables';
 import { Form, FormButtonContainer, TagInput, useCardState } from '../../elements';
 import { useFetchRoles } from '../../hooks/useFetchRoles';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys, useLocalizations } from '../../localization';
+import { mqu } from '../../styledSystem';
 import { createListFormat, handleError, useFormControl } from '../../utils';
 import { RoleSelect } from './MemberListTable';
 
@@ -110,41 +111,40 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   return (
     <Form.Root onSubmit={onSubmit}>
       <Form.ControlRow elementId={emailAddressField.id}>
-        <Flex
-          direction='col'
-          gap={2}
+        <TagInput
+          {...restEmailAddressProps}
+          autoFocus
+          validate={isEmail}
           sx={{ width: '100%' }}
-        >
-          <Text localizationKey={localizationKeys('formFieldLabel__emailAddresses')} />
-
-          <Text
-            localizationKey={localizationKeys('formFieldInputPlaceholder__emailAddresses')}
-            colorScheme='neutral'
-            sx={t => ({ fontSize: t.fontSizes.$xs })}
-          />
-
-          <TagInput
-            {...restEmailAddressProps}
-            autoFocus
-            validate={isEmail}
-            sx={{ width: '100%' }}
-            validateUnsubmittedEmail={validateUnsubmittedEmail}
-          />
-        </Flex>
+          validateUnsubmittedEmail={validateUnsubmittedEmail}
+          placeholder={localizationKeys('formFieldInputPlaceholder__emailAddresses')}
+        />
       </Form.ControlRow>
-      <AsyncRoleSelect {...roleField} />
-      <FormButtonContainer>
-        <Form.SubmitButton
-          block={false}
-          isDisabled={!canSubmit}
-          localizationKey={localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')}
-        />
-        <Form.ResetButton
-          localizationKey={resetButtonLabel || localizationKeys('userProfile.formButtonReset')}
-          block={false}
-          onClick={onReset}
-        />
-      </FormButtonContainer>
+      <Flex
+        align='center'
+        justify='between'
+        sx={t => ({
+          marginTop: t.space.$2,
+          gap: t.space.$4,
+          flexWrap: 'wrap',
+          [mqu.sm]: { justifyContent: 'center' },
+        })}
+      >
+        <AsyncRoleSelect {...roleField} />
+        <FormButtonContainer sx={t => ({ margin: t.space.$none, flexWrap: 'wrap', justifyContent: 'center' })}>
+          <Form.SubmitButton
+            block={false}
+            hasArrow={false}
+            isDisabled={!canSubmit}
+            localizationKey={localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')}
+          />
+          <Form.ResetButton
+            localizationKey={resetButtonLabel || localizationKeys('userProfile.formButtonReset')}
+            block={false}
+            onClick={onReset}
+          />
+        </FormButtonContainer>
+      </Flex>
     </Form.Root>
   );
 };
@@ -158,13 +158,12 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
         direction='col'
         gap={2}
       >
-        <Text localizationKey={field.label} />
         <RoleSelect
           {...field.props}
           roles={options}
           isDisabled={isLoading}
           onChange={value => field.setValue(value)}
-          triggerSx={t => ({ width: t.sizes.$48, justifyContent: 'space-between', display: 'flex' })}
+          triggerSx={t => ({ width: t.sizes.$40, justifyContent: 'space-between', display: 'flex' })}
           optionListSx={t => ({ minWidth: t.sizes.$48 })}
         />
       </Flex>
