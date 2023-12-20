@@ -25,6 +25,7 @@ type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
   iconElementDescriptor?: ElementDescriptor;
   iconElementId?: ElementId;
   iconSx?: ThemableCssProp;
+  spinnerSize?: PropsOfComponent<typeof Spinner>['size'];
 };
 
 export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
@@ -41,6 +42,7 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
     iconBoxElementId,
     iconBoxSx,
     trailing,
+    spinnerSize,
     ...rest
   } = props;
 
@@ -83,7 +85,7 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
       >
         {status.isLoading ? (
           <Spinner
-            size='xs'
+            size={spinnerSize || 'xs'}
             elementDescriptor={descriptors.spinner}
           />
         ) : (
@@ -117,7 +119,7 @@ export const SmallAction = (props: ActionProps) => {
         t => ({
           borderRadius: t.radii.$lg,
           borderBottom: 'none',
-          gap: 0,
+          gap: t.space.$0x5,
           justifyContent: 'center',
           flex: '1 1 0',
           padding: `${t.space.$1} ${t.space.$1x5}`,
@@ -128,7 +130,6 @@ export const SmallAction = (props: ActionProps) => {
         t => ({
           width: t.sizes.$4,
           height: t.sizes.$4,
-          marginRight: t.space.$2,
         }),
         iconSx,
       ]}
@@ -154,6 +155,7 @@ export const Action = (props: ActionProps) => {
     iconBoxElementId,
     iconBoxSx,
     trailing,
+    spinnerSize,
     ...rest
   } = props;
 
@@ -181,7 +183,6 @@ export const Action = (props: ActionProps) => {
           borderRadius: 0,
           borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           gap: t.space.$3,
-          padding: `${t.space.$4} ${t.space.$5}`,
           justifyContent: 'flex-start',
         }),
         sx,
@@ -195,12 +196,15 @@ export const Action = (props: ActionProps) => {
         elementDescriptor={iconBoxElementDescriptor}
         elementId={iconBoxElementId}
         justify='center'
-        sx={[t => ({ flex: `0 0 ${t.sizes.$9}`, gap: t.space.$2 }), iconBoxSx]}
+        sx={[t => ({ flex: `0 0 ${t.sizes.$9}`, gap: t.space.$2, alignItems: 'center' }), iconBoxSx]}
       >
         {status.isLoading ? (
           <Spinner
-            size='xs'
+            size={spinnerSize || 'xs'}
             elementDescriptor={descriptors.spinner}
+            sx={t => ({
+              marginRight: t.space.$1,
+            })}
           />
         ) : (
           <Icon
@@ -210,7 +214,8 @@ export const Action = (props: ActionProps) => {
             sx={[
               t => ({
                 width: t.sizes.$4,
-                height: t.sizes.$6,
+                height: 'auto',
+                maxWidth: '100%',
               }),
               iconSx,
             ]}
