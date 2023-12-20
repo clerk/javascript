@@ -39,6 +39,10 @@ export type SignOutOptions = {
    * multi-session applications.
    */
   sessionId?: string;
+  /**
+   * Specify a redirect URL to navigate after sign out is complete.
+   */
+  redirectUrl?: string;
 };
 
 export interface SignOut {
@@ -341,14 +345,19 @@ export interface Clerk {
   buildOrganizationProfileUrl(): string;
 
   /**
-   * Returns the configured afterSignIn url of the instance.
+   * Returns the configured afterSignInUrl of the instance.
    */
   buildAfterSignInUrl(): string;
 
   /**
-   * Returns the configured afterSignIn url of the instance.
+   * Returns the configured afterSignInUrl of the instance.
    */
   buildAfterSignUpUrl(): string;
+
+  /**
+   * Returns the configured afterSignOutUrl of the instance.
+   */
+  buildAfterSignOutUrl(): string;
 
   /**
    *
@@ -398,6 +407,11 @@ export interface Clerk {
   redirectToAfterSignUp: () => void;
 
   /**
+   * Redirects to the configured afterSignOut URL.
+   */
+  redirectToAfterSignOut: () => void;
+
+  /**
    * Completes an OAuth or SAML redirection flow started by
    * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
    */
@@ -435,17 +449,7 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 }
 
-export type HandleOAuthCallbackParams = {
-  /**
-   * Full URL or path to navigate after successful sign up.
-   */
-  afterSignUpUrl?: string | null;
-
-  /**
-   * Full URL or path to navigate after successful sign in.
-   */
-  afterSignInUrl?: string | null;
-
+export type HandleOAuthCallbackParams = AfterActionURLs & {
   /**
    * Full URL or path to navigate after successful sign in
    * or sign up.
@@ -513,35 +517,34 @@ type ClerkOptionsNavigation = ClerkOptionsNavigationFn & {
   routerDebug?: boolean;
 };
 
-export type ClerkOptions = ClerkOptionsNavigation & {
-  appearance?: Appearance;
-  localization?: LocalizationResource;
-  polling?: boolean;
-  selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
-  /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
-  standardBrowser?: boolean;
-  /** Optional support email for display in authentication screens */
-  supportEmail?: string;
-  touchSession?: boolean;
-  signInUrl?: string;
-  signUpUrl?: string;
-  afterSignInUrl?: string;
-  afterSignUpUrl?: string;
-  allowedRedirectOrigins?: Array<string | RegExp>;
-  isSatellite?: boolean | ((url: URL) => boolean);
+export type ClerkOptions = ClerkOptionsNavigation &
+  AfterActionURLs & {
+    appearance?: Appearance;
+    localization?: LocalizationResource;
+    polling?: boolean;
+    selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
+    /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
+    standardBrowser?: boolean;
+    /** Optional support email for display in authentication screens */
+    supportEmail?: string;
+    touchSession?: boolean;
+    signInUrl?: string;
+    signUpUrl?: string;
+    allowedRedirectOrigins?: Array<string | RegExp>;
+    isSatellite?: boolean | ((url: URL) => boolean);
 
-  /**
-   * Telemetry options
-   */
-  telemetry?:
-    | false
-    | {
-        disabled?: boolean;
-        debug?: boolean;
-      };
+    /**
+     * Telemetry options
+     */
+    telemetry?:
+      | false
+      | {
+          disabled?: boolean;
+          debug?: boolean;
+        };
 
-  sdkMetadata?: SDKMetadata;
-};
+    sdkMetadata?: SDKMetadata;
+  };
 
 export interface NavigateOptions {
   replace?: boolean;
@@ -572,7 +575,7 @@ export type SignUpInitialValues = {
   username?: string;
 };
 
-export type RedirectOptions = {
+type AfterActionURLs = {
   /**
    * Full URL or path to navigate after successful sign in.
    */
@@ -584,6 +587,13 @@ export type RedirectOptions = {
    */
   afterSignUpUrl?: string | null;
 
+  /**
+   * Full URL or path to navigate after successful sign out.
+   */
+  afterSignOutUrl?: string | null;
+};
+
+export type RedirectOptions = AfterActionURLs & {
   /**
    * Full URL or path to navigate after successful sign in,
    * or sign up.

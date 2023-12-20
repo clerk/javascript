@@ -443,7 +443,10 @@ describe('Clerk singleton', () => {
       await sut.signOut();
       await waitFor(() => {
         expect(mockClientDestroy).toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({ session: null });
+        expect(sut.setActive).toHaveBeenCalledWith({
+          session: null,
+          beforeEmit: expect.any(Function),
+        });
       });
     });
 
@@ -463,7 +466,7 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockClientDestroy).toHaveBeenCalled();
         expect(mockSession1.remove).not.toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({ session: null });
+        expect(sut.setActive).toHaveBeenCalledWith({ session: null, beforeEmit: expect.any(Function) });
       });
     });
 
@@ -485,6 +488,7 @@ describe('Clerk singleton', () => {
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(sut.setActive).not.toHaveBeenCalledWith({
           session: null,
+          beforeEmit: expect.any(Function),
         });
       });
     });
@@ -505,7 +509,29 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSession1.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({ session: null });
+        expect(sut.setActive).toHaveBeenCalledWith({ session: null, beforeEmit: expect.any(Function) });
+      });
+    });
+
+    it('removes and signs out the session and redirects to the provided redirectUrl ', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession1, mockSession2],
+          sessions: [mockSession1, mockSession2],
+          destroy: mockClientDestroy,
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.setActive = jest.fn(({ beforeEmit }) => beforeEmit());
+      sut.navigate = jest.fn();
+      await sut.load();
+      await sut.signOut({ sessionId: '1', redirectUrl: '/after-sign-out' });
+      await waitFor(() => {
+        expect(mockSession1.remove).toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(sut.setActive).toHaveBeenCalledWith({ session: null, beforeEmit: expect.any(Function) });
+        expect(sut.navigate).toHaveBeenCalledWith('/after-sign-out');
       });
     });
   });

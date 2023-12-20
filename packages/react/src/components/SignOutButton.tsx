@@ -18,14 +18,7 @@ export const SignOutButton = withClerk(
     children = normalizeWithDefaultValue(children, 'Sign out');
     const child = assertSingleChild(children)('SignOutButton');
 
-    const navigateToRedirectUrl = () => {
-      return clerk.navigate(redirectUrl);
-    };
-
-    const clickHandler = () => {
-      return clerk.signOut(navigateToRedirectUrl, signOutOptions);
-    };
-
+    const clickHandler = () => clerk.signOut({ redirectUrl });
     const wrappedChildClickHandler: React.MouseEventHandler = async e => {
       await safeExecute((child as any).props.onClick)(e);
       return clickHandler();

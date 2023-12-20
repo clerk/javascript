@@ -75,6 +75,7 @@ type IsomorphicLoadedClerk = Without<
   | 'buildOrganizationProfileUrl'
   | 'buildAfterSignUpUrl'
   | 'buildAfterSignInUrl'
+  | 'buildAfterSignOutUrl'
   | 'buildUrlWithAuth'
   | 'handleRedirectCallback'
   | 'handleUnauthenticated'
@@ -115,6 +116,8 @@ type IsomorphicLoadedClerk = Without<
   buildAfterSignInUrl: () => string | void;
   // TODO: Align return type
   buildAfterSignUpUrl: () => string | void;
+  // TODO: Align return type
+  buildAfterSignOutUrl: () => string | void;
   // TODO: Align optional props
   mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
   mountOrganizationList: (node: HTMLDivElement, props: OrganizationListProps) => void;
@@ -275,6 +278,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('buildAfterSignUpUrl', callback);
+    }
+  };
+
+  buildAfterSignOutUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildAfterSignOutUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildAfterSignOutUrl', callback);
     }
   };
 
@@ -832,6 +844,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       callback();
     } else {
       this.premountMethodCalls.set('redirectToAfterSignIn', callback);
+    }
+  };
+
+  redirectToAfterSignOut = (): void => {
+    const callback = () => this.clerkjs?.redirectToAfterSignOut();
+    if (this.clerkjs && this.#loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('redirectToAfterSignOut', callback);
     }
   };
 

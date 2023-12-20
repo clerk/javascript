@@ -133,6 +133,7 @@ const defaultOptions: ClerkOptions = {
   signUpUrl: undefined,
   afterSignInUrl: undefined,
   afterSignUpUrl: undefined,
+  afterSignOutUrl: undefined,
 };
 
 export class Clerk implements ClerkInterface {
@@ -301,8 +302,11 @@ export class Clerk implements ClerkInterface {
     if (!this.client || this.client.sessions.length === 0) {
       return;
     }
-    const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
+
+    const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
+    const defaultCb = () => this.navigate(redirectUrl);
+    const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
       await this.client.destroy();
@@ -758,6 +762,14 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#options.afterSignUpUrl);
   }
 
+  public buildAfterSignOutUrl(): string {
+    if (!this.#options.afterSignOutUrl) {
+      return '/';
+    }
+
+    return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
+  }
+
   public buildCreateOrganizationUrl(): string {
     if (!this.#environment || !this.#environment.displayConfig) {
       return '';
@@ -844,6 +856,13 @@ export class Clerk implements ClerkInterface {
   public redirectToAfterSignUp = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildAfterSignUpUrl());
+    }
+    return;
+  };
+
+  public redirectToAfterSignOut = async (): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildAfterSignOutUrl());
     }
     return;
   };

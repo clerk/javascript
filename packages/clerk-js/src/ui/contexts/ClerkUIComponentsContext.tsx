@@ -232,7 +232,7 @@ export const useUserButtonContext = () => {
   const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;
   const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
 
-  const afterSignOutUrl = ctx.afterSignOutUrl || '/';
+  const afterSignOutUrl = ctx.afterSignOutUrl || clerk.buildAfterSignOutUrl();
   const navigateAfterSignOut = () => navigate(afterSignOutUrl);
 
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
