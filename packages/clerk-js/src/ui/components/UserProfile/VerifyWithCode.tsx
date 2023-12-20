@@ -49,7 +49,7 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
           variant='primary'
           isLoading={otp.isLoading}
           localizationKey={localizationKeys('formButtonPrimary__verify')}
-          elementDescriptor={descriptors.formButtonSubmit}
+          elementDescriptor={descriptors.formButtonPrimary}
           onClick={otp.onFakeContinue}
         />
         <Button
