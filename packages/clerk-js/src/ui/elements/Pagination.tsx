@@ -1,7 +1,9 @@
 import { useState } from 'react';
 
-import { Button, descriptors, Flex, localizationKeys, Text } from '../customizables';
-import type { PropsOfComponent } from '../styledSystem';
+import { Button, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../customizables';
+import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
+import { CaretLeft, CaretRight } from '../icons';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
 import { range } from '../utils';
 
@@ -16,23 +18,40 @@ export const usePagination = (props?: UsePaginationProps) => {
   return { page, changePage: setPage };
 };
 
-const PageButton = (props: PropsOfComponent<typeof Button> & { isActive?: boolean }) => {
-  const { sx, isActive, ...rest } = props;
+export type PageButtonProps = PropsOfComponent<typeof Button> & {
+  isActive?: boolean;
+  icon?: React.ComponentType | React.ReactElement;
+  iconElementDescriptor?: ElementDescriptor;
+  iconElementId?: ElementId;
+  iconSx?: ThemableCssProp;
+};
+
+const PageButton = (props: PageButtonProps) => {
+  const { sx, isActive, children, ...rest } = props;
 
   return (
     <Button
       size='xs'
-      variant='ghost'
+      variant='secondary'
       sx={t => [
         {
           color: t.colors.$colorText,
           opacity: isActive ? 1 : t.opacity.$inactive,
+          padding: `${t.space.$0x5} ${t.space.$0x5}`,
         },
         sx,
       ]}
       elementDescriptor={descriptors.paginationButton}
       {...rest}
-    />
+    >
+      {props.icon && (
+        <Icon
+          elementDescriptor={descriptors.paginationButtonIcon}
+          icon={props.icon as React.ComponentType}
+        />
+      )}
+      {children}
+    </Button>
   );
 };
 
@@ -114,13 +133,14 @@ type PaginationProps = {
 
 export const Pagination = (props: PaginationProps) => {
   const { page, count, rowInfo, siblingCount = 1, onChange } = props;
+  const { t } = useLocalizations();
 
   return (
     <Flex
       justify={rowInfo ? 'between' : 'center'}
       align='center'
       sx={t => ({
-        fontSize: t.fontSizes.$xs,
+        fontSize: t.fontSizes.$sm,
         '*': {
           fontSize: 'inherit',
         },
@@ -135,7 +155,8 @@ export const Pagination = (props: PaginationProps) => {
       <Flex gap={2}>
         <PageButton
           isDisabled={page <= 1}
-          localizationKey={localizationKeys('paginationButton__previous')}
+          icon={CaretLeft}
+          aria-label={t(localizationKeys('paginationButton__previous'))}
           onClick={() => {
             onChange?.(page - 1);
           }}
@@ -146,6 +167,7 @@ export const Pagination = (props: PaginationProps) => {
               <PageButton
                 key={p}
                 isActive={p === page}
+                variant='ghost'
                 onClick={() => {
                   onChange?.(p);
                 }}
@@ -163,7 +185,8 @@ export const Pagination = (props: PaginationProps) => {
         })}
         <PageButton
           isDisabled={page >= count || page < 1}
-          localizationKey={localizationKeys('paginationButton__next')}
+          icon={CaretRight}
+          aria-label={t(localizationKeys('paginationButton__next'))}
           onClick={() => {
             onChange?.(page + 1);
           }}

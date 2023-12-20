@@ -2,7 +2,7 @@ import type { UserProfileModalProps, UserProfileProps } from '@clerk/types';
 import React from 'react';
 
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
-import { Flow } from '../../customizables';
+import { Flow, localizationKeys } from '../../customizables';
 import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { UserProfileCtx } from '../../types';
@@ -33,7 +33,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   return (
     <ProfileCard.Root>
       <UserProfileNavbar contentRef={contentRef}>
-        <NavbarMenuButtonRow />
+        <NavbarMenuButtonRow navbarTitleLocalizationKey={localizationKeys('userProfile.navbar.title')} />
         <ProfileCard.Content contentRef={contentRef}>
           <UserProfileRoutes />
         </ProfileCard.Content>

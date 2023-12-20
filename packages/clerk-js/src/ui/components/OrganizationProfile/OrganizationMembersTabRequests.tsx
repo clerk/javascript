@@ -53,10 +53,9 @@ export const OrganizationMembersTabRequests = () => {
                     'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
                   )}
                   id='manageVerifiedDomains'
-                  onClick={() => navigate('organization-settings/domain')}
+                  onClick={() => navigate('../')}
                 />
               }
-              redirectSubPath={'organization-settings/domain'}
               verificationStatus={'verified'}
               enrollmentMode={'automatic_suggestion'}
             />

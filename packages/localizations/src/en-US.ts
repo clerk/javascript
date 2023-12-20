@@ -33,8 +33,8 @@ export const enUS: LocalizationResource = {
   formFieldLabel__firstName: 'First name',
   formFieldLabel__lastName: 'Last name',
   formFieldLabel__backupCode: 'Backup code',
-  formFieldLabel__organizationName: 'Organization name',
-  formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__organizationName: 'Name',
+  formFieldLabel__organizationSlug: 'Slug',
   formFieldLabel__organizationDomain: 'Domain',
   formFieldLabel__organizationDomainEmailAddress: 'Verification email address',
   formFieldLabel__organizationDomainEmailAddressDescription:
@@ -688,6 +688,7 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
     },
     verifiedDomainPage: {
+      title: 'Update {{domain}}',
       subtitle: 'The domain {{domain}} is now verified. Continue by selecting enrollment mode.',
       start: {
         headerTitle__enrollment: 'Enrollment options',

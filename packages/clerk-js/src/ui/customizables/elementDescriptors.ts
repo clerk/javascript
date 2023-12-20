@@ -196,6 +196,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tableHead',
 
   'paginationButton',
+  'paginationButtonIcon',
   'paginationRowText',
 
   'selectButton',

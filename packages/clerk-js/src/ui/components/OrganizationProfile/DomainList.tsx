@@ -22,11 +22,6 @@ import { VerifyDomainScreen } from './VerifyDomainScreen';
 type DomainListProps = GetDomainsParams & {
   verificationStatus?: OrganizationDomainVerificationStatus;
   enrollmentMode?: OrganizationEnrollmentMode;
-  /**
-   * Enables internal links to navigate to the correct page
-   * based on when this component is used
-   */
-  redirectSubPath: 'organization-settings/domain' | 'domain';
   fallback?: React.ReactNode;
 };
 
@@ -64,7 +59,7 @@ const DomainListMenu = ({ domain }: DomainListMenuProps) => {
 
 export const DomainList = withGate(
   (props: DomainListProps) => {
-    const { verificationStatus, enrollmentMode, redirectSubPath, fallback, ...rest } = props;
+    const { verificationStatus, enrollmentMode, fallback, ...rest } = props;
     const { organization, domains } = useOrganization({
       domains: {
         infinite: true,

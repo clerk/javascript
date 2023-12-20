@@ -7,7 +7,7 @@ import { Button, descriptors, Flex, Icon, Input, Text } from '../customizables';
 import { usePopover, useSearchInput } from '../hooks';
 import { ArrowUpDown } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { animations, common } from '../styledSystem';
+import { animations } from '../styledSystem';
 import { colors } from '../utils';
 import { withFloatingTree } from './contexts';
 import type { InputWithIcon } from './InputWithIcon';
@@ -292,13 +292,11 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
         sx={[
           theme => ({
             backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
-            border: theme.borders.$normal,
             borderRadius: theme.radii.$lg,
-            borderColor: theme.colors.$blackAlpha200,
             overflow: 'hidden',
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: theme.shadows.$cardContentShadow,
+            boxShadow: theme.shadows.$menuShadow,
             zIndex: theme.zIndices.$dropdown,
           }),
           sx,
@@ -380,7 +378,8 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
           fontWeight: theme.fontWeights.$normal,
           color: theme.colors.$colorInputText,
           backgroundColor: theme.colors.$colorInputBackground,
-          ...common.borderVariants(theme).normal,
+          borderRadius: theme.radii.$md,
+          boxShadow: theme.shadows.$selectButtonShadow,
           paddingLeft: theme.space.$3x5,
           paddingRight: theme.space.$3x5,
           alignItems: 'center',

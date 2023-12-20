@@ -39,7 +39,7 @@ export const DataTable = (props: MembersListTableProps) => {
       gap={4}
       sx={{ width: '100%' }}
     >
-      <Flex sx={{ overflowX: 'auto' }}>
+      <Flex sx={t => ({ overflowX: 'auto', padding: t.space.$1 })}>
         <Table sx={{ width: '100%' }}>
           <Thead>
             <Tr>
@@ -162,6 +162,7 @@ export const RoleSelect = (props: {
           (t => ({
             color: t.colors.$colorTextSecondary,
             backgroundColor: 'transparent',
+            textWrap: 'nowrap',
           }))
         }
         isDisabled={isDisabled}

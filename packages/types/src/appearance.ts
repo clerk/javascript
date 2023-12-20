@@ -313,6 +313,7 @@ export type ElementsConfig = {
   tableHead: WithOptions;
 
   paginationButton: WithOptions;
+  paginationButtonIcon: WithOptions;
   paginationRowText: WithOptions<'allRowsCount' | 'rowsCount' | 'displaying'>;
 
   selectButton: WithOptions<SelectId>;

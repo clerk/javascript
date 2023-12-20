@@ -56,3 +56,7 @@ export { default as CheckmarkFilled } from './checkmark-filled.svg';
 export { default as Copy } from './copy.svg';
 export { default as Download } from './download.svg';
 export { default as Print } from './print.svg';
+export { default as CaretLeft } from './caret-left.svg';
+export { default as CaretRight } from './caret-right.svg';
+export { default as Organization } from './organization.svg';
+export { default as Users } from './users.svg';

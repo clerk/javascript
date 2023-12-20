@@ -4,8 +4,8 @@ import React from 'react';
 
 import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
-import { Flow } from '../../customizables';
-import { ProfileCard, withCardStateProvider } from '../../elements';
+import { Flow, localizationKeys } from '../../customizables';
+import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
@@ -38,6 +38,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
       <OrganizationProfileNavbar contentRef={contentRef}>
+        <NavbarMenuButtonRow navbarTitleLocalizationKey={localizationKeys('organizationProfile.navbar.title')} />
         <ProfileCard.Content contentRef={contentRef}>
           <OrganizationProfileRoutes />
         </ProfileCard.Content>

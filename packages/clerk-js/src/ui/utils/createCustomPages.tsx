@@ -4,7 +4,7 @@ import type { CustomPage } from '@clerk/types';
 import { isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements';
-import { CogFilled, TickShield, User } from '../icons';
+import { Organization, TickShield, User, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 
@@ -270,13 +270,13 @@ const getOrganizationProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
     {
       name: localizationKeys('organizationProfile.navbar.general'),
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL,
-      icon: CogFilled,
+      icon: Organization,
       path: 'organization-general',
     },
     {
       name: localizationKeys('organizationProfile.navbar.members'),
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS,
-      icon: User,
+      icon: Users,
       path: 'organization-members',
     },
   ];

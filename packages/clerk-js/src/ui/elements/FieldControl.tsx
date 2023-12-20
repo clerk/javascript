@@ -221,6 +221,10 @@ const CheckboxIndicator = forwardRef<HTMLInputElement>((_, ref) => {
       sx={t => ({
         width: 'fit-content',
         marginTop: t.space.$0x5,
+        boxShadow: 'none',
+        ':hover': {
+          boxShadow: 'none',
+        },
       })}
       type='checkbox'
     />
