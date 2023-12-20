@@ -409,10 +409,15 @@ export const enUS: LocalizationResource = {
       },
       activeDevicesSection: {
         title: 'Active devices',
+        //TODO-RETHEME remove
         primaryButton: 'Active devices',
+        //TODO-RETHEME remove
         detailsTitle: 'Current device',
+        //TODO-RETHEME remove
         detailsSubtitle: 'This is the device you are currently using',
+        //TODO-RETHEME remove
         destructiveActionTitle: 'Sign out',
+        //TODO-RETHEME remove
         destructiveActionSubtitle: 'Sign out from your account on this device',
         destructiveAction: 'Sign out of device',
       },
