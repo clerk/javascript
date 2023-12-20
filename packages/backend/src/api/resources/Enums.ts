@@ -1,3 +1,5 @@
+import type { MembershipRole } from '@clerk/types';
+
 export type OAuthProvider =
   | 'facebook'
   | 'google'
@@ -20,7 +22,7 @@ export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
 export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
 
-export type OrganizationMembershipRole = 'basic_member' | 'guest_member' | 'admin';
+export type OrganizationMembershipRole = MembershipRole;
 
 export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_factor_two' | 'complete';
 
