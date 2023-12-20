@@ -118,7 +118,7 @@ describe('OrganizationMembers', () => {
     await userEvent.click(getByRole('button', { name: 'Invite' }));
 
     await waitFor(() => {
-      screen.getByRole('heading', { name: /invite members/i });
+      screen.getByRole('heading', { name: /invite new members/i });
     });
   });
 
