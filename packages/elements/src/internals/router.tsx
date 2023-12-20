@@ -1,5 +1,4 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { createContext, useContext } from 'react';
 
 /**
  * This type represents a generic router interface that Clerk relies on to interact with the host router.
@@ -13,9 +12,11 @@ export type ClerkHostRouter = {
 
 export type ClerkRouter = {
   child: (childBasePath: string) => ClerkRouter;
-  matches: (path: string) => boolean;
+  match: (path?: string, index?: boolean) => boolean;
   push: ClerkHostRouter['push'];
   replace: ClerkHostRouter['replace'];
+  pathname: ClerkHostRouter['pathname'];
+  searchParams: ClerkHostRouter['searchParams'];
 };
 
 /**
@@ -29,10 +30,16 @@ function normalizePath(path: string) {
 export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/'): ClerkRouter {
   const normalizedBasePath = normalizePath(basePath);
 
-  function matches(path: string) {
-    const normalizedPath = normalizePath(path);
+  function match(path?: string, index?: boolean) {
+    const pathToMatch = path ?? (index && '/');
 
-    return normalizePath(`${normalizedBasePath}${normalizedPath}`) === router.pathname();
+    if (!pathToMatch) {
+      throw new Error('Route must have a path or index prop');
+    }
+
+    const normalizedPath = normalizePath(pathToMatch);
+
+    return normalizePath(`${normalizedBasePath}${normalizedPath}`) === normalizePath(router.pathname());
   }
 
   function child(childBasePath: string) {
@@ -41,53 +48,12 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
 
   return {
     child,
-    matches,
+    match,
     push: router.push,
     replace: router.replace,
+    pathname: router.pathname,
+    searchParams: router.searchParams,
   };
-}
-
-export const ClerkRouterContext = createContext<ClerkRouter | null>(null);
-
-function useClerkRouter() {
-  return useContext(ClerkRouterContext);
-}
-
-export function Router({
-  children,
-  router,
-  basePath,
-}: {
-  router: ClerkHostRouter;
-  children: React.ReactNode;
-  basePath?: string;
-}) {
-  const clerkRouter = createClerkRouter(router, basePath);
-
-  return <ClerkRouterContext.Provider value={clerkRouter}>{children}</ClerkRouterContext.Provider>;
-}
-
-type RouteProps = { path?: string; index?: boolean };
-
-export function Route({ path, children, index }: RouteProps & { children: React.ReactNode }) {
-  // check for parent router, if exists, create child router, otherwise create one
-  const parentRouter = useClerkRouter();
-
-  if (!path && !index) {
-    return children;
-  }
-
-  const pathToMatch = path ?? (index && '/');
-
-  if (!pathToMatch) {
-    throw new Error('Route must have a path or index prop');
-  }
-
-  if (!parentRouter?.matches(pathToMatch)) {
-    return null;
-  }
-
-  return children;
 }
 
 /**
