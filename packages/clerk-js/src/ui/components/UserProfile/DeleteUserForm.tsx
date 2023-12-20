@@ -57,7 +57,6 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
           <Form.PlainInput {...confirmationField.props} />
         </Form.ControlRow>
         <FormButtons
-          hasArrow={false}
           submitLabel={localizationKeys('userProfile.deletePage.confirm')}
           variant='primaryDanger'
           isDisabled={!canSubmit}

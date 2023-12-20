@@ -173,9 +173,9 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
           </Form.ControlRow>
           <FormButtonContainer>
             <Form.SubmitButton
-              hasArrow={false}
               block={false}
               isDisabled={!canSubmit}
+              hasArrow
               localizationKey={localizationKeys('createOrganization.formButtonSubmit')}
             />
             {props.onCancel && (

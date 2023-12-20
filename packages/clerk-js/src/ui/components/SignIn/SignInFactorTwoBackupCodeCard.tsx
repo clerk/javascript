@@ -88,7 +88,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
                 onActionClicked={onShowAlternativeMethodsClicked}
               />
             </Form.ControlRow>
-            <Form.SubmitButton />
+            <Form.SubmitButton hasArrow />
           </Form.Root>
         </Col>
         <Footer.Root>

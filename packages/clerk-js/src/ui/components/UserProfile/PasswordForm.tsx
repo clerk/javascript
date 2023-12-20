@@ -195,7 +195,6 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
           </FormButtonContainer>
         ) : (
           <FormButtons
-            hasArrow={false}
             isDisabled={!canSubmit}
             onReset={onReset}
           />

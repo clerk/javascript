@@ -124,7 +124,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
                   autoFocus
                 />
               </Form.ControlRow>
-              <Form.SubmitButton />
+              <Form.SubmitButton hasArrow />
             </Form.Root>
           </Flex>
 

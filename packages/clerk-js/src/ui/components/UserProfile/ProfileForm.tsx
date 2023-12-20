@@ -116,7 +116,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
         <FormButtons
           isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged}
           onReset={onReset}
-          hasArrow={false}
         />
       </Form.Root>
     </FormContent>

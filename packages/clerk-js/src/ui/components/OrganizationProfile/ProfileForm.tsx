@@ -100,7 +100,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
           />
         </Form.ControlRow>
         <FormButtons
-          hasArrow={false}
           isDisabled={!canSubmit}
           onReset={onReset}
         />

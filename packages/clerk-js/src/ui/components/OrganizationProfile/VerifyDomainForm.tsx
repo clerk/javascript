@@ -141,7 +141,6 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
             />
           </Form.ControlRow>
           <FormButtons
-            hasArrow={false}
             isDisabled={!canSubmit}
             onReset={onReset}
           />
