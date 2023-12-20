@@ -239,7 +239,7 @@ describe('OrganizationMembers', () => {
 
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
-    const { container, getByText } = render(<OrganizationMembers />, { wrapper });
+    const { container, getByText, getByLabelText } = render(<OrganizationMembers />, { wrapper });
 
     await waitForLoadingCompleted(container);
 
@@ -247,8 +247,7 @@ describe('OrganizationMembers', () => {
     expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
     expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
 
-    // TODO-RETHEME fix
-    // await userEvent.click(getByText(/next/i));
+    await userEvent.click(getByLabelText(/next/i));
 
     await waitFor(async () => {
       const pagination = getByText(/displaying/i).closest('p');
@@ -274,15 +273,14 @@ describe('OrganizationMembers', () => {
 
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
-    const { container, getByText } = render(<OrganizationMembers />, { wrapper });
+    const { container, getByText, getByLabelText } = render(<OrganizationMembers />, { wrapper });
 
     await waitForLoadingCompleted(container);
 
     const pagination = getByText(/displaying/i).closest('p');
     expect(pagination?.textContent).toEqual('Displaying 1 – 5 of 5');
 
-    // TODO-RETHEME fix
-    // expect(getByText(/next/i)).toBeDisabled();
+    expect(getByLabelText(/next/i)).toBeDisabled();
   });
 
   // TODO: Bring this test back once we can determine the last admin by permissions.

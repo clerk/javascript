@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button, descriptors, Flex, Icon, localizationKeys, Text } from '../customizables';
+import { Button, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { CaretLeft, CaretRight } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
@@ -133,6 +133,7 @@ type PaginationProps = {
 
 export const Pagination = (props: PaginationProps) => {
   const { page, count, rowInfo, siblingCount = 1, onChange } = props;
+  const { t } = useLocalizations();
 
   return (
     <Flex
@@ -155,6 +156,7 @@ export const Pagination = (props: PaginationProps) => {
         <PageButton
           isDisabled={page <= 1}
           icon={CaretLeft}
+          aria-label={t(localizationKeys('paginationButton__previous'))}
           onClick={() => {
             onChange?.(page - 1);
           }}
@@ -184,6 +186,7 @@ export const Pagination = (props: PaginationProps) => {
         <PageButton
           isDisabled={page >= count || page < 1}
           icon={CaretRight}
+          aria-label={t(localizationKeys('paginationButton__next'))}
           onClick={() => {
             onChange?.(page + 1);
           }}
