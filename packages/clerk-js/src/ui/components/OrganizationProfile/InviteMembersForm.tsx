@@ -125,11 +125,13 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
         justify='between'
         sx={t => ({
           marginTop: t.space.$2,
-          [mqu.sm]: { flexDirection: 'column', gap: t.space.$4 },
+          gap: t.space.$4,
+          flexWrap: 'wrap',
+          [mqu.sm]: { justifyContent: 'center' },
         })}
       >
         <AsyncRoleSelect {...roleField} />
-        <FormButtonContainer sx={t => ({ margin: t.space.$none })}>
+        <FormButtonContainer sx={t => ({ margin: t.space.$none, flexWrap: 'wrap', justifyContent: 'center' })}>
           <Form.SubmitButton
             block={false}
             hasArrow={false}
