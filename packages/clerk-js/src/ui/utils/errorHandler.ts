@@ -32,7 +32,12 @@ function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: Cl
       return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
     });
 
-    field.setError(errorsArray.length ? buildErrorMessage(errorsArray) : undefined);
+    const errorMessage = buildErrorMessage(errorsArray);
+    if (errorsArray.length && errorMessage) {
+      field.setError(errorMessage);
+    } else {
+      field.clearFeedback();
+    }
   });
 }
 

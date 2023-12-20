@@ -52,7 +52,7 @@ type FieldStateProps<Id> = {
   onFocus: React.FocusEventHandler<HTMLInputElement>;
   feedback: string;
   feedbackType: FeedbackType;
-  setError: (error: string | ClerkAPIError | undefined) => void;
+  setError: (error: string | ClerkAPIError) => void;
   setWarning: (warning: string) => void;
   setSuccess: (message: string) => void;
   setInfo: (info: string) => void;
@@ -63,7 +63,7 @@ type FieldStateProps<Id> = {
 } & Omit<Options, 'defaultChecked'>;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
-  setError: (error: string | ClerkAPIError | undefined) => void;
+  setError: (error: string | ClerkAPIError) => void;
   setSuccess: (message: string) => void;
   setInfo: (info: string) => void;
   setValue: (val: string | undefined) => void;
@@ -108,28 +108,18 @@ export const useFormControl = <Id extends string>(
   const setValue: FormControlState['setValue'] = val => setValueInternal(val || '');
   const setChecked: FormControlState['setChecked'] = checked => setCheckedInternal(checked);
   const setError: FormControlState['setError'] = error => {
-    if (error) {
-      setFeedback({ message: translateError(error), type: 'error' });
-    } else {
-      clearFeedback();
-    }
+    setFeedback({ message: translateError(error), type: 'error' });
   };
   const setSuccess: FormControlState['setSuccess'] = message => {
-    if (message) {
-      setFeedback({ message, type: 'success' });
-    }
+    setFeedback({ message, type: 'success' });
   };
 
   const setWarning: FormControlState['setWarning'] = warning => {
-    if (warning) {
-      setFeedback({ message: translateError(warning), type: 'warning' });
-    }
+    setFeedback({ message: translateError(warning), type: 'warning' });
   };
 
   const setInfo: FormControlState['setInfo'] = info => {
-    if (info) {
-      setFeedback({ message: info, type: 'info' });
-    }
+    setFeedback({ message: info, type: 'info' });
   };
 
   const clearFeedback: FormControlState['clearFeedback'] = () => {

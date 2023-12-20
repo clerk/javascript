@@ -65,12 +65,12 @@ export const useFieldOTP: UseFieldOTP = params => {
 
   codeControl.onCodeEntryFinished(code => {
     status.setLoading();
-    codeControlState.setError(undefined);
+    codeControlState.clearFeedback();
     paramsOnCodeEntryFinished(code, resolve, reject);
   });
 
   const onFakeContinue = () => {
-    codeControlState.setError(undefined);
+    codeControlState.clearFeedback();
     paramsOnCodeEntryFinished('', resolve, reject);
   };
 

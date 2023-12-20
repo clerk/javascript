@@ -72,7 +72,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
 
   const updateSlugField = (val: string) => {
     slugField.setValue(val);
-    slugField.setError(undefined);
+    slugField.clearFeedback();
   };
 
   return (
