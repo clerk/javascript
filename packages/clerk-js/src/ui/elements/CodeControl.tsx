@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import React, { useCallback } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { descriptors, Flex, Input, Spinner } from '../customizables';
+import { descriptors, Flex, Input } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -301,13 +301,13 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
           name={`codeInput-${index}`}
         />
       ))}
-      {isLoading && (
+      {/* {isLoading && (
         <Spinner
           colorScheme='neutral'
           sx={theme => ({ marginLeft: theme.space.$2 })}
           elementDescriptor={descriptors.spinner}
         />
-      )}
+      )} */}
     </Flex>
   );
 });

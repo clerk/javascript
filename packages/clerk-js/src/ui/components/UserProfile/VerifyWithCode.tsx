@@ -21,7 +21,7 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
     return prepareVerification?.()?.catch(err => handleError(err, [], card.setError));
   };
 
-  const otp = useFieldOTP({
+  const { isLoading, ...otp } = useFieldOTP({
     onCodeEntryFinished: (code, resolve, reject) => {
       identification
         ?.attemptVerification({ code: code })
@@ -45,6 +45,12 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
         resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
       />
       <FormButtonContainer>
+        <Button
+          variant='primary'
+          localizationKey={localizationKeys('formButtonPrimary__verify')}
+          elementDescriptor={descriptors.formButtonSubmit}
+          onClick={otp.onFakeContinue}
+        />
         <Button
           variant='ghost'
           localizationKey={localizationKeys('userProfile.formButtonReset')}

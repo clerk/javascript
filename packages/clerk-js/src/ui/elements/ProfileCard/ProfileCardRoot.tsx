@@ -34,7 +34,6 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
       {toggle && (
         <Box
           sx={t => ({
-            padding: t.space.$3,
             [mqu.md]: {
               padding: `${t.space.$1x5} ${t.space.$2}`,
             },
