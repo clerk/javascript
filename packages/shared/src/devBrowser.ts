@@ -49,5 +49,8 @@ export function extractDevBrowserJWTFromURLSearchParams(url: URL) {
   const jwtFromDevSession = url.searchParams.get(DEV_BROWSER_SSO_JWT_PARAMETER);
   url.searchParams.delete(DEV_BROWSER_SSO_JWT_PARAMETER);
 
-  return jwtFromDevSession || '';
+  const jwtFromClerkDbJwt = url.searchParams.get(DEV_BROWSER_JWT_MARKER);
+  url.searchParams.delete(DEV_BROWSER_JWT_MARKER);
+
+  return jwtFromDevSession || jwtFromClerkDbJwt || '';
 }
