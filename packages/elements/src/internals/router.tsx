@@ -10,12 +10,33 @@ export type ClerkHostRouter = {
   searchParams: () => URLSearchParams;
 };
 
+/**
+ * Internal Clerk router, used by Clerk components to interact with the host's router.
+ */
 export type ClerkRouter = {
+  /**
+   * Creates a child router instance scoped to the provided base path.
+   */
   child: (childBasePath: string) => ClerkRouter;
+  /**
+   * Matches the provided path against the router's current path. If index is provided, matches against the root route of the router.
+   */
   match: (path?: string, index?: boolean) => boolean;
+  /**
+   * Navigates to the provided path via a history push
+   */
   push: ClerkHostRouter['push'];
+  /**
+   * Navigates to the provided path via a history replace
+   */
   replace: ClerkHostRouter['replace'];
+  /**
+   * Returns the current pathname (including the base path)
+   */
   pathname: ClerkHostRouter['pathname'];
+  /**
+   * Returns the current search params
+   */
   searchParams: ClerkHostRouter['searchParams'];
 };
 
@@ -27,6 +48,13 @@ function normalizePath(path: string) {
   return pathNoTrailingSlash.startsWith('/') ? pathNoTrailingSlash : `/${pathNoTrailingSlash}`;
 }
 
+/**
+ * Factory function to create an instance of ClerkRouter with the provided host router.
+ *
+ * @param router host router instance to be used by the router
+ * @param basePath base path of the router, navigation and matching will be scoped to this path
+ * @returns A ClerkRouter instance
+ */
 export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/'): ClerkRouter {
   const normalizedBasePath = normalizePath(basePath);
 
