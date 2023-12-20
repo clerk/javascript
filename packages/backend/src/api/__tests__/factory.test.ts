@@ -187,7 +187,12 @@ export default (QUnit: QUnit) => {
     });
 
     test('executes a failed backend API request and parses the error response', async assert => {
-      const mockErrorPayload = { code: 'whatever_error', message: 'whatever error', meta: {} };
+      const mockErrorPayload = {
+        code: 'whatever_error',
+        message: 'whatever error',
+        long_message: 'some long message',
+        meta: { param_name: 'some param' },
+      };
       const traceId = 'trace_id_123';
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonNotOk({ errors: [mockErrorPayload], clerk_trace_id: traceId }));
@@ -199,6 +204,9 @@ export default (QUnit: QUnit) => {
       assert.equal(response.status, 422);
       assert.equal(response.statusText, '422');
       assert.equal(response.errors[0].code, 'whatever_error');
+      assert.equal(response.errors[0].message, 'whatever error');
+      assert.equal(response.errors[0].longMessage, 'some long message');
+      assert.equal(response.errors[0].meta.paramName, 'some param');
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {
