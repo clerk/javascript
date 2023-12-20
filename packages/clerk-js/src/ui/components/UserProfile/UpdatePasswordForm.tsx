@@ -190,7 +190,10 @@ export const UpdatePasswordForm = withCardStateProvider(() => {
               />
             </FormButtonContainer>
           ) : (
-            <FormButtons isDisabled={!canSubmit} />
+            <FormButtons
+              hasArrow={false}
+              isDisabled={!canSubmit}
+            />
           )}
         </Form.Root>
       </FormContent>

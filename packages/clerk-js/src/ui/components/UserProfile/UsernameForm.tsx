@@ -53,6 +53,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
           />
         </Form.ControlRow>
         <FormButtons
+          hasArrow={false}
           isDisabled={!canSubmit}
           onReset={onReset}
         />

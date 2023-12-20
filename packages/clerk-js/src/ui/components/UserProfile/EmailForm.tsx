@@ -71,6 +71,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
             }
           />
           <FormButtons
+            hasArrow={false}
             isDisabled={!canSubmit}
             onReset={onReset}
           />

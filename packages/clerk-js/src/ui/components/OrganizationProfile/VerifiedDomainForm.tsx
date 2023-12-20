@@ -228,6 +228,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
           )}
 
           <FormButtons
+            hasArrow={false}
             localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save')}
             isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
             onReset={onReset}

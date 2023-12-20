@@ -76,6 +76,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
             />
           </Form.ControlRow>
           <FormButtons
+            hasArrow={false}
             isDisabled={!canSubmit}
             onReset={onReset}
           />

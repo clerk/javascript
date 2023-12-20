@@ -83,6 +83,7 @@ export const AddPhone = (props: AddPhoneProps) => {
           localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText__secondary')}
         />
         <FormButtons
+          hasArrow={false}
           isDisabled={!canSubmit}
           onReset={onReset}
         />
