@@ -62,7 +62,7 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
     const pathToMatch = path ?? (index && '/');
 
     if (!pathToMatch) {
-      throw new Error('Route must have a path or index prop');
+      throw new Error('[clerk] router.match() requires either a path to match, or the index flag must be set to true.');
     }
 
     const normalizedPath = normalizePath(pathToMatch);
