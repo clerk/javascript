@@ -1,4 +1,4 @@
-import { BlockButton, Gate } from '../../common';
+import { BlockButton, Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
@@ -25,7 +25,7 @@ export const OrganizationMembersTabRequests = () => {
       {__unstable_manageBillingUrl && <MembershipWidget />}
 
       {isDomainsEnabled && (
-        <Gate permission='org:sys_domains:manage'>
+        <Protect permission='org:sys_domains:manage'>
           <Col
             gap={2}
             sx={{
@@ -60,7 +60,7 @@ export const OrganizationMembersTabRequests = () => {
               enrollmentMode={'automatic_suggestion'}
             />
           </Col>
-        </Gate>
+        </Protect>
       )}
 
       <Flex

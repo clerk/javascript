@@ -3,7 +3,7 @@ import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { runIfFunctionOrReturn } from '../../../utils';
-import { NotificationCountBadge, withGate } from '../../common';
+import { NotificationCountBadge, withProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import {
@@ -223,7 +223,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
   },
 );
 
-const NotificationCountBadgeManageButton = withGate(
+const NotificationCountBadgeManageButton = withProtect(
   ({ sx }: { sx?: ThemableCssProp }) => {
     const { organizationSettings } = useEnvironment();
 

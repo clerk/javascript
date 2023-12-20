@@ -1,4 +1,4 @@
-import { Gate } from '../../common';
+import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
@@ -41,14 +41,14 @@ export const OrganizationProfileRoutes = () => {
         <Route path={isMembersPageRoot ? undefined : 'organization-members'}>
           <Switch>
             <Route index>
-              <Gate
+              <Protect
                 condition={has =>
                   has({ permission: 'org:sys_memberships:read' }) || has({ permission: 'org:sys_memberships:manage' })
                 }
                 redirectTo={isSettingsPageRoot ? '../' : './organization-settings'}
               >
                 <OrganizationMembers />
-              </Gate>
+              </Protect>
             </Route>
           </Switch>
         </Route>
