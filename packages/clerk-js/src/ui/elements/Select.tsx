@@ -190,7 +190,7 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
           t => ({
             border: 'none',
             borderRadius: t.radii.$md,
-            backgroundColor: t.colors.$blackAlpha200,
+            backgroundColor: t.colors.$blackAlpha50,
             padding: t.space.$2,
           }),
           sx,

@@ -189,7 +189,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       />
       <Text
         as='div'
-        sx={{ width: '100%' }}
+        sx={{ width: '100%', textAlign: 'left' }}
       >
         {country.name}
       </Text>
