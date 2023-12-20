@@ -68,6 +68,7 @@ type _LocalizationResource = {
   formFieldHintText__optional: LocalizationValue;
   formFieldHintText__slug: LocalizationValue;
   formButtonPrimary: LocalizationValue;
+  formButtonPrimary__verify: LocalizationValue;
   signInEnterPasswordTitle: LocalizationValue;
   backButton: LocalizationValue;
   footerActionLink__useAnotherMethod: LocalizationValue;
