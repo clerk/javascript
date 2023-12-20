@@ -71,7 +71,7 @@ export const Web3Section = () => {
                 </Action.Closed>
 
                 <Action.Open value='remove'>
-                  <Action.Card>
+                  <Action.Card variant='destructive'>
                     <RemoveWeb3WalletScreen walletId={wallet.id} />
                   </Action.Card>
                 </Action.Open>

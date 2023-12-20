@@ -58,7 +58,7 @@ export const MfaSection = () => {
               </ProfileSection.Item>
 
               <Action.Open value='remove'>
-                <Action.Card>
+                <Action.Card variant='destructive'>
                   <RemoveMfaTOTPScreen />
                 </Action.Card>
               </Action.Open>
@@ -89,7 +89,7 @@ export const MfaSection = () => {
                   </ProfileSection.Item>
 
                   <Action.Open value='remove'>
-                    <Action.Card>
+                    <Action.Card variant='destructive'>
                       <RemoveMfaPhoneCodeScreen phoneId={phone.id} />
                     </Action.Card>
                   </Action.Open>
