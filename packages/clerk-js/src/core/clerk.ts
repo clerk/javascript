@@ -12,6 +12,7 @@ import {
   noop,
   parsePublishableKey,
   proxyUrlToAbsoluteURL,
+  setDevBrowserJWTInURL,
   stripScheme,
 } from '@clerk/shared';
 import type {
@@ -84,7 +85,6 @@ import {
   removeClerkQueryParam,
   requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
-  setDevBrowserJWTInURL,
   stripOrigin,
   stripSameOrigin,
   toURL,
