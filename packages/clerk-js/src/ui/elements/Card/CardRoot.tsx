@@ -35,6 +35,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
             width: t.sizes.$100,
             boxShadow: t.shadows.$cardRootShadow,
             borderRadius: t.radii.$xl,
+            color: t.colors.$colorText,
           }),
           sx,
         ]}
