@@ -26,7 +26,7 @@ export const OrganizationProfileAvatarUploader = (
         title={localizationKeys('userProfile.profilePage.imageFormTitle')}
         avatarPreview={
           <OrganizationAvatar
-            size={theme => theme.sizes.$12}
+            size={theme => theme.sizes.$16}
             {...organization}
           />
         }

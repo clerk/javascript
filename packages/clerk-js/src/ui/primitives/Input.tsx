@@ -9,12 +9,13 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
   base: {
     boxSizing: 'inherit',
     margin: 0,
-    padding: `${theme.space.$2x5} ${theme.space.$4}`,
+    padding: `${theme.space.$1x5} ${theme.space.$3}`,
     backgroundColor: theme.colors.$colorInputBackground,
     color: theme.colors.$colorInputText,
     // outline support for Windows contrast themes
     outline: 'transparent solid 2px',
     outlineOffset: '2px',
+    maxHeight: theme.sizes.$9,
     width: props.type === 'checkbox' ? theme.sizes.$4 : '100%',
     aspectRatio: props.type === 'checkbox' ? '1/1' : 'unset',
     accentColor: theme.colors.$primary500,
