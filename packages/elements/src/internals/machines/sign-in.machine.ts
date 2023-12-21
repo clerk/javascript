@@ -66,7 +66,7 @@ export const SignInMachine = setup({
     hasClerkAPIErrorCode: ({ context }, params?: { code?: string }) =>
       params?.code
         ? isClerkAPIResponseError(context.error)
-          ? context.error.errors[0].code === params.code
+          ? Boolean(context.error.errors.find(e => e.code === params.code))
           : false
         : false,
   },
@@ -161,7 +161,7 @@ export const SignInMachine = setup({
         input: ({ context }) => ({
           client: context.client,
           params: {},
-        }), //
+        }),
         onDone: {
           target: STATES.FirstFactor,
           actions: [
@@ -176,7 +176,7 @@ export const SignInMachine = setup({
         },
         onError: {
           target: STATES.Start,
-          actions: ['assignErrorMessageToContext'], // strategy_for_user_invalid
+          actions: ['assignErrorMessageToContext'],
         },
       },
     },
@@ -196,7 +196,7 @@ export const SignInMachine = setup({
         input: ({ context }) => ({
           client: context.client,
           params: {},
-        }), //
+        }),
         onDone: {
           target: STATES.FirstFactor,
           actions: [
@@ -242,7 +242,7 @@ export const SignInMachine = setup({
         input: ({ context }) => ({
           client: context.client,
           params: {},
-        }), //
+        }),
         onDone: {
           target: STATES.SecondFactorIdle,
           actions: ['assignResourceToContext'],
@@ -270,7 +270,7 @@ export const SignInMachine = setup({
         input: ({ context }) => ({
           client: context.client,
           params: {},
-        }), //
+        }),
         onDone: {
           target: STATES.SecondFactorIdle,
           actions: [
@@ -285,7 +285,7 @@ export const SignInMachine = setup({
         },
         onError: {
           target: STATES.SecondFactorIdle,
-          actions: ['assignErrorMessageToContext'], // strategy_for_user_invalid
+          actions: ['assignErrorMessageToContext'],
         },
       },
       [STATES.SecondFactorFailure]: {
