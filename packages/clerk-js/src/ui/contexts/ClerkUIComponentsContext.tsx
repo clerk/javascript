@@ -184,6 +184,19 @@ export const useSignInContext = (): SignInContextType => {
   };
 };
 
+export type SignOutContextType = {
+  navigateAfterSignOut: () => any;
+};
+
+export const useSignOutContext = (): SignOutContextType => {
+  const { navigate } = useRouter();
+  const clerk = useClerk();
+
+  const navigateAfterSignOut = () => navigate(clerk.buildAfterSignOutUrl());
+
+  return { navigateAfterSignOut };
+};
+
 type PagesType = {
   routes: NavbarRoute[];
   contents: CustomPageContent[];
@@ -229,11 +242,11 @@ export const useUserButtonContext = () => {
   const signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
-  const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;
-  const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
-
   const afterSignOutUrl = ctx.afterSignOutUrl || clerk.buildAfterSignOutUrl();
   const navigateAfterSignOut = () => navigate(afterSignOutUrl);
+
+  const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || afterSignOutUrl;
+  const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
 
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);

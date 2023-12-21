@@ -1,21 +1,20 @@
 import { withRedirectToAfterSignIn } from '../../common';
-import { useEnvironment, useSignInContext } from '../../contexts';
+import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, Icon } from '../../customizables';
 import { Card, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
 import { ArrowBlockButton } from '../../elements/ArrowBlockButton';
 import { useCardState } from '../../elements/contexts';
 import { Plus, SignOutDouble } from '../../icons';
-import { useRouter } from '../../router';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
 const _SignInAccountSwitcher = () => {
   const card = useCardState();
-  const { navigate } = useRouter();
-  const { applicationName, userProfileUrl, signInUrl, afterSignOutAllUrl } = useEnvironment().displayConfig;
+  const { applicationName, userProfileUrl, signInUrl } = useEnvironment().displayConfig;
   const { navigateAfterSignIn } = useSignInContext();
+  const { navigateAfterSignOut } = useSignOutContext();
   const { handleSignOutAllClicked, handleSessionClicked, activeSessions, handleAddAccountClicked } =
     useMultisessionActions({
-      navigateAfterSignOut: () => navigate(afterSignOutAllUrl),
+      navigateAfterSignOut,
       navigateAfterSwitchSession: navigateAfterSignIn,
       userProfileUrl,
       signInUrl,

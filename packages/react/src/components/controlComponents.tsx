@@ -143,15 +143,11 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;
-  // TODO: Remove temp use of __unstable__environment
-  const { __unstable__environment } = clerk as any;
-
   const hasActiveSessions = client.activeSessions && client.activeSessions.length > 0;
 
   React.useEffect(() => {
-    if (session === null && hasActiveSessions && __unstable__environment) {
-      const { afterSignOutOneUrl } = __unstable__environment.displayConfig;
-      void clerk.navigate(afterSignOutOneUrl);
+    if (session === null && hasActiveSessions) {
+      void clerk.redirectToAfterSignOut();
     } else {
       void clerk.redirectToSignIn(props);
     }
