@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.36.1
+
+### Patch Changes
+
+- `OrganizationMembershipRole` should respect authorization types provided by the developer if those exist. ([#2405](https://github.com/clerk/javascript/pull/2405)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`df40705d3`](https://github.com/clerk/javascript/commit/df40705d3fbb22b8b4d6fd8ee0a52b100146d88a)]:
+  - @clerk/shared@1.2.0
+
 ## 0.36.0
 
 ### Minor Changes
