@@ -75,6 +75,7 @@ interface UpdateUserParams extends UserMetadataParams {
   backupCodes?: string[];
   externalId?: string;
   createdAt?: Date;
+  createOrganizationEnabled?: boolean;
 }
 
 type GetOrganizationMembershipListParams = {

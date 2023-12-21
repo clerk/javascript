@@ -38,6 +38,7 @@ export class User {
     readonly phoneNumbers: PhoneNumber[] = [],
     readonly web3Wallets: Web3Wallet[] = [],
     readonly externalAccounts: ExternalAccount[] = [],
+    readonly createOrganizationEnabled: boolean,
   ) {}
 
   static fromJSON(data: UserJSON): User {
@@ -70,6 +71,7 @@ export class User {
       (data.phone_numbers || []).map(x => PhoneNumber.fromJSON(x)),
       (data.web3_wallets || []).map(x => Web3Wallet.fromJSON(x)),
       (data.external_accounts || []).map((x: ExternalAccountJSON) => ExternalAccount.fromJSON(x)),
+      data.create_organization_enabled,
     );
   }
 }
