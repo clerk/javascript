@@ -8,7 +8,7 @@ export default function SignInPage() {
       </SignInStart>
       <SignInFactorOne>
         Factor one child
-        </SignInFactorOne>
+      </SignInFactorOne>
       <SignInFactorTwo>
         Factor two child
       </SignInFactorTwo>
