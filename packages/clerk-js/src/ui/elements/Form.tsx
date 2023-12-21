@@ -135,7 +135,7 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
         elementDescriptor={descriptors.formField}
         elementId={descriptors.formField.setId(fieldProps.id)}
         sx={{ position: 'relative', flex: '1 1 auto' }}
-        gap={2}
+        gap={1}
       >
         <Field.LabelRow>
           <Field.Label />
