@@ -13,7 +13,9 @@ export function setDevBrowserJWTInURL(url: URL, jwt: string, asQueryParam: boole
 
   if (jwtToSet) {
     if (asQueryParam) {
+      // Temporarily add the dev browser jwt to both the `__clerk_db_jwt` and `__dev_session`
       resultURL.searchParams.append(DEV_BROWSER_SSO_JWT_PARAMETER, jwtToSet);
+      resultURL.searchParams.append(DEV_BROWSER_JWT_MARKER, jwtToSet);
     } else {
       resultURL.hash = resultURL.hash + `${DEV_BROWSER_JWT_MARKER}[${jwtToSet}]`;
     }

@@ -474,7 +474,7 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
 
     expect(resp?.status).toEqual(307);
     expect(resp?.headers.get('location')).toEqual(
-      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__dev_session=test_jwt',
+      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__dev_session=test_jwt&__clerk_db_jwt=test_jwt',
     );
     expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(authenticateRequest).toBeCalled();
