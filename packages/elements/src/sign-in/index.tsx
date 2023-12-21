@@ -37,7 +37,7 @@ export function SubmitButton() {
 
   return (
     <button
-      className='font-bold block'
+      style={{ fontWeight: 'bold', backgroundColor: '#eee', padding: '0.5rem 1rem', borderRadius: '0.25rem' }}
       onClick={() => ref.send({ type: 'SUBMIT' })}
       type='button'
     >
@@ -58,7 +58,7 @@ export function SignInStart({ children }: { children: React.ReactNode }) {
   return (
     <Route index>
       <SignInStartInner>
-        Start
+        <h1>Start</h1>
         {children}
         <SubmitButton />
       </SignInStartInner>
@@ -69,7 +69,7 @@ export function SignInStart({ children }: { children: React.ReactNode }) {
 export function SignInFactorOne({ children }: { children: React.ReactNode }) {
   return (
     <Route path='factor-one'>
-      Factor One
+      <h1>Factor One</h1>
       {children}
     </Route>
   );
@@ -78,7 +78,7 @@ export function SignInFactorOne({ children }: { children: React.ReactNode }) {
 export function SignInFactorTwo({ children }: { children: React.ReactNode }) {
   return (
     <Route path='factor-two'>
-      Factor Two
+      <h1>Factor Two</h1>
       {children}
     </Route>
   );
