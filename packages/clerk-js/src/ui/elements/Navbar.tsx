@@ -277,7 +277,7 @@ type NavbarMenuButtonRowProps = PropsOfComponent<typeof Button> & {
   navbarTitleLocalizationKey?: LocalizationKey;
 };
 
-export const NavbarMenuButtonRow = (props: NavbarMenuButtonRowProps) => {
+export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: NavbarMenuButtonRowProps) => {
   const { open } = useUnsafeNavbarContext();
   const { t } = useLocalizations();
 
@@ -300,7 +300,6 @@ export const NavbarMenuButtonRow = (props: NavbarMenuButtonRowProps) => {
       <Button
         elementDescriptor={descriptors.navbarMobileMenuButton}
         {...props}
-        // @ts-ignore
         onClick={open}
         size='xs'
         textVariant='h2'
@@ -318,7 +317,7 @@ export const NavbarMenuButtonRow = (props: NavbarMenuButtonRowProps) => {
           icon={Menu}
           size='sm'
         />
-        {t(props.navbarTitleLocalizationKey)}
+        {t(navbarTitleLocalizationKey)}
       </Button>
     </Flex>
   );
