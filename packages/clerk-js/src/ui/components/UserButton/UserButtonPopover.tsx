@@ -46,6 +46,12 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         width: t.sizes.$9,
         height: t.sizes.$6,
       })}
+      iconBoxSx={t => ({
+        minHeight: t.sizes.$9,
+        minWidth: t.sizes.$6,
+        alignItems: 'center',
+      })}
+      spinnerSize='md'
     />
   );
 
@@ -74,6 +80,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
           borderBottom: 'none',
           borderRadius: t.radii.$lg,
         })}
+        spinnerSize='md'
       />
     </Actions>
   );

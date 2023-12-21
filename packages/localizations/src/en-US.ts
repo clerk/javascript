@@ -63,6 +63,7 @@ export const enUS: LocalizationResource = {
   formFieldHintText__optional: 'Optional',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
   formButtonPrimary: 'Continue',
+  formButtonPrimary__verify: 'Verify',
   signInEnterPasswordTitle: 'Enter your password',
   backButton: 'Back',
   footerActionLink__useAnotherMethod: 'Use another method',

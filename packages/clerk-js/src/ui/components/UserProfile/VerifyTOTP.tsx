@@ -45,6 +45,7 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
         <Button
           onClick={onReset}
           variant='ghost'
+          isDisabled={otp.isLoading}
           localizationKey={localizationKeys('userProfile.formButtonReset')}
           elementDescriptor={descriptors.formButtonReset}
         />

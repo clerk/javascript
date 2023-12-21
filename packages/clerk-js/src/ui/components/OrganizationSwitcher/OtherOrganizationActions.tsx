@@ -43,6 +43,11 @@ const CreateOrganizationButton = ({
         width: t.sizes.$9,
         height: t.sizes.$6,
       })}
+      iconBoxSx={t => ({
+        width: t.sizes.$9,
+        height: t.sizes.$6,
+      })}
+      spinnerSize='sm'
     />
   );
 };

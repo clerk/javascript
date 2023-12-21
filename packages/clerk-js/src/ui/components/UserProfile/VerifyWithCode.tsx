@@ -46,7 +46,15 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
       />
       <FormButtonContainer>
         <Button
+          variant='primary'
+          isLoading={otp.isLoading}
+          localizationKey={localizationKeys('formButtonPrimary__verify')}
+          elementDescriptor={descriptors.formButtonPrimary}
+          onClick={otp.onFakeContinue}
+        />
+        <Button
           variant='ghost'
+          isDisabled={otp.isLoading}
           localizationKey={localizationKeys('userProfile.formButtonReset')}
           elementDescriptor={descriptors.formButtonReset}
           onClick={onReset}
