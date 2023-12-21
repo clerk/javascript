@@ -35,12 +35,12 @@ export const InvitationPreview = withCardStateProvider((props: UserOrganizationI
     return card
       .runAsync(async () => {
         const updatedItem = await props.accept();
+        await userInvitations?.revalidate?.();
         const organization = await getOrganization(props.publicOrganizationData.id);
         return [updatedItem, organization] as const;
       })
       .then(([updatedItem, organization]) => {
         // Update cache in case another listener depends on it
-        userInvitations?.revalidate();
         void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
         setAcceptedOrganization(organization);
       })

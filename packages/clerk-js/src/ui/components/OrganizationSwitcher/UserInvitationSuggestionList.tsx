@@ -44,11 +44,12 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
 
   const handleAccept = () => {
     return card
-      .runAsync(props.accept)
-      .then(updatedItem => {
-        userMemberships?.revalidate();
-        userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages));
+      .runAsync(async () => {
+        const updatedItem = await props.accept();
+        await userMemberships.revalidate?.();
+        return updatedItem;
       })
+      .then(updatedItem => userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages)))
       .catch(err => handleError(err, [], card.setError));
   };
 
@@ -83,11 +84,12 @@ const AcceptRejectInvitationButtons = (props: UserOrganizationInvitationResource
 
   const handleAccept = () => {
     return card
-      .runAsync(props.accept)
-      .then(updatedItem => {
-        userMemberships?.revalidate();
-        userInvitations?.setData?.(pages => populateCacheRemoveItem(updatedItem, pages));
+      .runAsync(async () => {
+        const updatedItem = await props.accept();
+        await userMemberships?.revalidate?.();
+        return updatedItem;
       })
+      .then(updatedItem => userInvitations?.setData?.(pages => populateCacheRemoveItem(updatedItem, pages)))
       .catch(err => handleError(err, [], card.setError));
   };
 
