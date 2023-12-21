@@ -15,10 +15,20 @@ export interface Cache<Data = any> {
   set(key: string, value: State<Data>): void;
 
   delete(key: string): void;
+
+  clear(): void;
 }
 
-const map = new WeakMap<Cache, State>();
+let requestCache = new WeakMap<Cache, State>();
 const subscribers = new Set<() => void>();
+
+/**
+ * This utility should only be used in tests to clear previously fetched data
+ */
+export const clearFetchCache = () => {
+  requestCache = new WeakMap<Cache, State>();
+};
+
 const useCache = (
   param: any,
 ): {
@@ -26,12 +36,10 @@ const useCache = (
   set: (state: State) => void;
   subscribe: (callback: () => void) => () => void;
 } => {
-  // const subscribers = useRef(new Set<() => void>());
-
-  const get = useCallback(() => map.get(param), [param]);
+  const get = useCallback(() => requestCache.get(param), [param]);
   const set = useCallback(
     (data: State) => {
-      map.set(param, data);
+      requestCache.set(param, data);
       subscribers.forEach(callback => callback());
     },
     [param],

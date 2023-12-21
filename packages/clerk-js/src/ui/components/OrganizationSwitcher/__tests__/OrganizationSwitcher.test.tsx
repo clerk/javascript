@@ -56,6 +56,7 @@ describe('OrganizationSwitcher', () => {
         });
       });
 
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
       fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
         Promise.resolve({
           data: [],
