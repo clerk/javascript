@@ -31,7 +31,15 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
       <Button
         elementDescriptor={descriptors.organizationSwitcherTrigger}
         variant='ghost'
-        sx={[t => ({ minHeight: 0, padding: `${t.space.$1} ${t.space.$2}`, position: 'relative' }), sx]}
+        sx={[
+          t => ({
+            minHeight: 0,
+            padding: `${t.space.$1} ${t.space.$2}`,
+            position: 'relative',
+            color: t.colors.$colorText,
+          }),
+          sx,
+        ]}
         ref={ref}
         aria-label={`${props.isOpen ? 'Close' : 'Open'} organization switcher`}
         aria-expanded={props.isOpen}
