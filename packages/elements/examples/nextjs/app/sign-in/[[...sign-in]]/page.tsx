@@ -4,13 +4,13 @@ export default function SignInPage() {
   return (
     <SignIn>
       <SignInStart>
-        Start child
+        <p>Start child</p>
       </SignInStart>
       <SignInFactorOne>
-        Factor one child
-        </SignInFactorOne>
+        <p>Factor one child</p>
+      </SignInFactorOne>
       <SignInFactorTwo>
-        Factor two child
+        <p>Factor two child</p>
       </SignInFactorTwo>
       <SignInSSOCallback />
     </SignIn>
