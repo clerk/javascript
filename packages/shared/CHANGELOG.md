@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.0
+
+### Minor Changes
+
+- Support reading from `__clerk_db_jwt` and `__dev_session` the dev browser jwt in development ([#2428](https://github.com/clerk/javascript/pull/2428)) by [@dimkl](https://github.com/dimkl)
+
 ## 1.1.1
 
 ### Patch Changes

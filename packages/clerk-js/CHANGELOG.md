@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.68.0
+
+### Minor Changes
+
+- Support reading from `__clerk_db_jwt` and `__dev_session` the dev browser jwt in development ([#2428](https://github.com/clerk/javascript/pull/2428)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Bug fix: Clear feedback of input field if `setError` is called with undefined. ([#2409](https://github.com/clerk/javascript/pull/2409)) by [@panteliselef](https://github.com/panteliselef)
+
+- Prevent submitting on enter in Organization Profile form when submit button is disabled. ([#2401](https://github.com/clerk/javascript/pull/2401)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`df40705d3`](https://github.com/clerk/javascript/commit/df40705d3fbb22b8b4d6fd8ee0a52b100146d88a)]:
+  - @clerk/shared@1.2.0
+
 ## 4.67.0
 
 ### Minor Changes
