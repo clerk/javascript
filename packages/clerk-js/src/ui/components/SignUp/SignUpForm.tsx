@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useAppearance } from '../../customizables';
+import { localizationKeys, useAppearance } from '../../customizables';
 import { Form } from '../../elements';
 import { mqu } from '../../styledSystem';
 import type { FormControlState } from '../../utils';
@@ -95,7 +95,10 @@ export const SignUpForm = (props: SignUpFormProps) => {
           />
         </Form.ControlRow>
       )}
-      <Form.SubmitButton>Continue</Form.SubmitButton>
+      <Form.SubmitButton
+        hasArrow
+        localizationKey={localizationKeys('formButtonPrimary')}
+      />
     </Form.Root>
   );
 };

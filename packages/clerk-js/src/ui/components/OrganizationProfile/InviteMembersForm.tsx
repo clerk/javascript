@@ -134,8 +134,8 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
         <FormButtonContainer sx={t => ({ margin: t.space.$none, flexWrap: 'wrap', justifyContent: 'center' })}>
           <Form.SubmitButton
             block={false}
-            hasArrow={false}
             isDisabled={!canSubmit}
+            hasArrow
             localizationKey={localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')}
           />
           <Form.ResetButton
