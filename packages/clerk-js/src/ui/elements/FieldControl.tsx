@@ -77,6 +77,7 @@ const FieldOptionalLabel = () => {
       elementDescriptor={descriptors.formFieldHintText}
       elementId={descriptors.formFieldHintText.setId(fieldId)}
       as='span'
+      variant='caption'
       colorScheme='neutral'
       isDisabled={isDisabled}
     />
@@ -125,10 +126,11 @@ const FieldLabel = (props: PropsWithChildren<{ localizationKey?: LocalizationKey
       hasError={!!hasError}
       isDisabled={isDisabled}
       isRequired={isRequired}
-      sx={{
+      sx={t => ({
         display: 'flex',
         alignItems: 'center',
-      }}
+        color: t.colors.$blackAlpha700,
+      })}
     >
       {props.children}
     </FormLabel>
