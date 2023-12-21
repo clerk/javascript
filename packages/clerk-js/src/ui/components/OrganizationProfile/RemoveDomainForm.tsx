@@ -19,7 +19,7 @@ export const RemoveDomainForm = (props: RemoveDomainFormProps) => {
   const { domainId: id, onSuccess, onReset } = props;
 
   const ref = React.useRef<OrganizationDomainResource>();
-  const { data: domain, status: domainStatus } = useFetch(
+  const { data: domain, isLoading: domainIsLoading } = useFetch(
     organization?.getDomain,
     {
       domainId: id,
@@ -41,7 +41,7 @@ export const RemoveDomainForm = (props: RemoveDomainFormProps) => {
     return null;
   }
 
-  if (domainStatus.isLoading || !domain) {
+  if (domainIsLoading || !domain) {
     return (
       <Flex
         direction={'row'}

@@ -13,10 +13,10 @@ const getRolesParams = {
 };
 export const useFetchRoles = () => {
   const { organization } = useOrganization();
-  const { data, status } = useFetch(organization?.getRoles, getRolesParams);
+  const { data, isLoading } = useFetch(organization?.getRoles, getRolesParams);
 
   return {
-    isLoading: status.isLoading,
+    isLoading,
     options: data?.data?.map(role => ({ value: role.key, label: role.name })),
   };
 };
