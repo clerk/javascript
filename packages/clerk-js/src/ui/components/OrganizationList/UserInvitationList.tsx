@@ -28,6 +28,7 @@ export const InvitationPreview = withCardStateProvider((props: UserOrganizationI
   const [acceptedOrganization, setAcceptedOrganization] = useState<OrganizationResource | null>(null);
   const { userInvitations } = useOrganizationList({
     userInvitations: organizationListParams.userInvitations,
+    userMemberships: organizationListParams.userMemberships,
   });
 
   const handleAccept = () => {
@@ -39,6 +40,7 @@ export const InvitationPreview = withCardStateProvider((props: UserOrganizationI
       })
       .then(([updatedItem, organization]) => {
         // Update cache in case another listener depends on it
+        userInvitations?.revalidate();
         void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
         setAcceptedOrganization(organization);
       })

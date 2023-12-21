@@ -109,7 +109,7 @@ const NotificationCountBadgeSwitcherTrigger = () => {
       containerSx={t => ({
         position: 'absolute',
         top: `-${t.space.$2}`,
-        right: 0,
+        right: `-${t.space.$2}`,
       })}
       notificationCount={notificationCount}
     />

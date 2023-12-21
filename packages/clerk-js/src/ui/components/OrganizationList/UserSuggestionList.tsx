@@ -10,14 +10,18 @@ import { organizationListParams } from './utils';
 
 export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResource) => {
   const card = useCardState();
-  const { userSuggestions } = useOrganizationList({
+  const { userSuggestions, userMemberships } = useOrganizationList({
     userSuggestions: organizationListParams.userSuggestions,
+    userMemberships: organizationListParams.userMemberships,
   });
 
   const handleAccept = () => {
     return card
       .runAsync(props.accept)
-      .then(updatedItem => userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages)))
+      .then(updatedItem => {
+        userMemberships?.revalidate();
+        userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages));
+      })
       .catch(err => handleError(err, [], card.setError));
   };
 

@@ -188,7 +188,10 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
           icon={Add}
           label={localizationKeys('organizationList.action__createOrganization')}
           onClick={handleCreateOrganizationClicked}
-          sx={{ borderBottom: 'none' }}
+          sx={t => ({
+            borderBottom: 'none',
+            padding: `${t.space.$5} ${t.space.$5}`,
+          })}
           iconSx={t => ({
             width: t.sizes.$9,
             height: t.sizes.$6,
