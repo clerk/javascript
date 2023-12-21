@@ -287,6 +287,7 @@ export interface UserJSON extends ClerkResourceJSON {
   unsafe_metadata: UserUnsafeMetadata;
   created_at: number;
   updated_at: number;
+  create_organization_enabled: boolean;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
