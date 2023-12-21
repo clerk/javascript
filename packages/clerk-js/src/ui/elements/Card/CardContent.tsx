@@ -25,10 +25,8 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
       sx={[
         t => ({
           backgroundColor: t.colors.$colorBackground,
-          willChange: 'transform, opacity, height',
           transitionProperty: t.transitionProperty.$common,
           transitionDuration: '200ms',
-          backdropFilter: 'blur(10px)',
           textAlign: 'center',
           zIndex: t.zIndices.$card,
           boxShadow: shadows.cardContentShadow,

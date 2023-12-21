@@ -8,7 +8,6 @@ export const CardAlert = React.memo((props: PropsOfComponent<typeof Alert>) => {
     <Alert
       variant='danger'
       sx={theme => ({
-        willChange: 'transform, opacity, height',
         animation: `${animations.textInBig} ${theme.transitionDuration.$slow}`,
       })}
       {...props}
