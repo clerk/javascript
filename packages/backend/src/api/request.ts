@@ -51,18 +51,22 @@ type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) 
  * TODO: Simply remove this wrapper and the ClerkAPIResponseError before the v5 release.
  */
 const withLegacyReturn =
-  (cb: any): LegacyRequestFunction =>
+  (cb: (...args: any) => Promise<ClerkBackendApiResponse<any>>): LegacyRequestFunction =>
   async (...args) => {
-    // @ts-ignore
-    const { data, errors, status, statusText, clerkTraceId } = await cb<T>(...args);
-    if (errors === null) {
-      return data;
+    const response = await cb(...args);
+    if (response.errors === null) {
+      return response.data;
     } else {
-      throw new ClerkAPIResponseError(statusText || '', {
-        data: errors,
+      const { errors, clerkTraceId } = response;
+      // TODO: To be removed with withLegacyReturn
+      const { status, statusText } = response as any;
+      const error = new ClerkAPIResponseError(statusText || '', {
+        data: [],
         status: status || '',
         clerkTraceId,
       });
+      error.errors = errors;
+      throw error;
     }
   };
 
