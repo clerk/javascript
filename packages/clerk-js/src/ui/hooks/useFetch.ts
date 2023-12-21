@@ -8,8 +8,6 @@ export type State<Data = any, Error = any> = {
 };
 
 export interface Cache<Data = any> {
-  keys(): IterableIterator<string>;
-
   get(key: string): State<Data> | undefined;
 
   set(key: string, value: State<Data>): void;
@@ -19,7 +17,14 @@ export interface Cache<Data = any> {
   clear(): void;
 }
 
+/**
+ * Global cache for storing status of fetched resources
+ */
 let requestCache = new WeakMap<Cache, State>();
+
+/**
+ * A set to store subscribers in order to notify when the value of a key of `requestCache` changes
+ */
 const subscribers = new Set<() => void>();
 
 /**
@@ -76,17 +81,11 @@ export const useFetch = <T>(
   }, [cache.subscribe]);
 
   useEffect(() => {
-    if (!fetcherRef.current) {
-      return;
-    }
+    const fetcherMissing = !fetcherRef.current;
+    const isCacheStale = Date.now() - (cache.get()?.cachedAt || 0) < 20000;
+    const isRequestOnGoing = cache.get()?.isLoading;
 
-    // Only fetch stale data
-    if (Date.now() - (cache.get()?.cachedAt || 0) < 20000) {
-      return;
-    }
-
-    // No parallel requests for the same resource
-    if (cache.get()?.isLoading) {
+    if (fetcherMissing || isCacheStale || isRequestOnGoing) {
       return;
     }
 
@@ -95,8 +94,7 @@ export const useFetch = <T>(
       isLoading: true,
       error: null,
     });
-    fetcherRef
-      .current(params)
+    fetcherRef.current!(params)
       .then(result => {
         if (typeof result !== 'undefined') {
           const data = typeof result === 'object' ? { ...result } : result;

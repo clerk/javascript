@@ -38,9 +38,9 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
   } = props;
 
   const { localizeCustomRole } = useLocalizeCustomRoles();
-  const membership = user?.organizationMemberships.find(membership => membership.organization.id === organization.id);
-
   const { options } = useFetchRoles(fetchRoles);
+
+  const membership = user?.organizationMemberships.find(membership => membership.organization.id === organization.id);
   const unlocalizedRoleLabel = options?.find(a => a.value === membership?.role)?.label;
 
   const mainTextSize =

@@ -182,7 +182,6 @@ describe('OrganizationMembers', () => {
       }),
     );
 
-    // fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockResolvedValue({
       total_count: 2,
       data: [
