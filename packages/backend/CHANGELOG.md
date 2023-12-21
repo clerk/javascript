@@ -1,5 +1,26 @@
 # Change Log
 
+## 1.0.0-alpha-v5.11
+
+### Minor Changes
+
+- Add `createOrganizationEnabled` param in `@clerk/backend` method `User.updateUser()` ([#2415](https://github.com/clerk/javascript/pull/2415)) by [@dimkl](https://github.com/dimkl)
+
+  Example:
+
+  ```typescript
+      import { createClerkClient }  from '@clerk/backend';
+
+      const clerkClient = createClerkClient({...});
+      await clerkClient.users.updateUser('user_...', { createOrganizationEnabled: true })
+  ```
+
+### Patch Changes
+
+- `OrganizationMembershipRole` should respect authorization types provided by the developer if those exist. ([#2408](https://github.com/clerk/javascript/pull/2408)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fixed an issue where errors returned from backend api requests are not converted to camelCase. ([#2423](https://github.com/clerk/javascript/pull/2423)) by [@Nikpolik](https://github.com/Nikpolik)
+
 ## 1.0.0-alpha-v5.10
 
 ### Major Changes

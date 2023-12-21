@@ -1,5 +1,36 @@
 # Change Log
 
+## 4.0.0-alpha-v5.12
+
+### Minor Changes
+
+- Remove MemberRole Type`MemberRole` would always include the old role keys `admin`, `member`, `guest_member`. ([#2388](https://github.com/clerk/javascript/pull/2388)) by [@panteliselef](https://github.com/panteliselef)
+
+  If developers still depend on them after the introduction of custom roles, the can provide them as their custom types for authorization.
+
+  ```ts
+  // clerk.d.ts
+  export {};
+
+  interface ClerkAuthorization {
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
+  }
+  ```
+
+- Update `@clerk/clerk-js` and `@clerk/clerk-react` to support the following examples: ([#2412](https://github.com/clerk/javascript/pull/2412)) by [@dimkl](https://github.com/dimkl)
+
+  ```typescript
+  Clerk.signOut({ redirectUrl: '/' })
+
+  <SignOutButton redirectUrl='/' />
+  // uses Clerk.signOut({ redirectUrl: '/' })
+  <UserButton afterSignOutUrl='/after' />
+  // uses Clerk.signOut({ redirectUrl: '/after' })
+  <ClerkProvider afterSignOutUrl='/after' />
+  // uses Clerk.signOut({ redirectUrl: '/after' })
+  ```
+
 ## 4.0.0-alpha-v5.11
 
 ### Major Changes

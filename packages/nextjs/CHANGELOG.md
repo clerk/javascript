@@ -1,5 +1,41 @@
 # Change Log
 
+## 5.0.0-alpha-v5.13
+
+### Major Changes
+
+- Path-based routing is now the default routing strategy if the `path` prop is filled. Additionally, if the `path` and `routing` props are not filled, an error will be thrown. ([#2338](https://github.com/clerk/javascript/pull/2338)) by [@octoper](https://github.com/octoper)
+
+  ```jsx
+
+  // Without path or routing props, an error with be thrown
+  <UserProfile />
+  <CreateOrganization />
+  <OrganizationProfile />
+  <SignIn />
+  <SignUp />
+
+  // Alternative #1
+  <UserProfile path="/whatever"/>
+  <CreateOrganization path="/whatever"/>
+  <OrganizationProfile path="/whatever"/>
+  <SignIn path="/whatever"/>
+  <SignUp path="/whatever"/>
+
+  // Alternative #2
+  <UserProfile routing="hash_or_virtual"/>
+  <CreateOrganization routing="hash_or_virtual"/>
+  <OrganizationProfile routing="hash_or_virtual"/>
+  <SignIn routing="hash_or_virtual"/>
+  <SignUp routing="hash_or_virtual"/>
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`f4f99f18d`](https://github.com/clerk/javascript/commit/f4f99f18de0be8afaae9f52599deb2814ab235e7), [`cfea3d9c0`](https://github.com/clerk/javascript/commit/cfea3d9c00950eee8d7e942d88bee1a56a5f842b), [`fe2607b6f`](https://github.com/clerk/javascript/commit/fe2607b6fdeed83002db7e4a0c040ac0280e5ff7), [`bad4de1a2`](https://github.com/clerk/javascript/commit/bad4de1a2fd8a3e2643fe26677801166a8305c29), [`2e4a43017`](https://github.com/clerk/javascript/commit/2e4a43017ef33b541949ba90e16bf5311ce8bc60), [`f5fb63cf1`](https://github.com/clerk/javascript/commit/f5fb63cf1dd51cd6cd0dba4d9eef871695ef06c3), [`e7e2a1eae`](https://github.com/clerk/javascript/commit/e7e2a1eae2ed726ab49894dd195185c8f4e70acd)]:
+  - @clerk/backend@1.0.0-alpha-v5.11
+  - @clerk/clerk-react@5.0.0-alpha-v5.12
+
 ## 5.0.0-alpha-v5.12
 
 ### Major Changes
