@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 
 export type State<Data = any, Error = any> = {
   data: Data | null;
@@ -69,20 +69,13 @@ export const useFetch = <K, T>(
   },
 ) => {
   const { subscribeCache, getCache, setCache } = useCache<K, T>(params);
-
-  const [state, setState] = useState(getCache());
   const fetcherRef = useRef(fetcher);
 
-  useEffect(() => {
-    const unsub = subscribeCache(() => {
-      setState(getCache());
-    });
-    return () => unsub();
-  }, [getCache, subscribeCache]);
+  const cached = useSyncExternalStore(subscribeCache, getCache);
 
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;
-    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) < 3000; //20000;
+    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) < 1000 * 60 * 2; //cache for 2 minutes;
     const isRequestOnGoing = getCache()?.isValidating;
 
     if (fetcherMissing || isCacheStale || isRequestOnGoing) {
@@ -121,6 +114,6 @@ export const useFetch = <K, T>(
   }, [serialize(params), setCache, getCache]);
 
   return {
-    ...state,
+    ...cached,
   };
 };
