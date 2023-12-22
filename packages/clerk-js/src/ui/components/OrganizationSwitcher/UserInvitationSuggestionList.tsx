@@ -148,7 +148,7 @@ const InvitationPreview = withCardStateProvider(
         })
         .then(([updatedItem, organization]) => {
           // Update cache in case another listener depends on it
-          void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
+          void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages, 'negative'));
           setAcceptedInvitations(old => [
             ...old,
             {
@@ -161,7 +161,7 @@ const InvitationPreview = withCardStateProvider(
     };
 
     if (status === 'accepted') {
-      if (activeOrganization?.id === acceptedOrganization?.id) {
+      if (acceptedOrganization?.id && activeOrganization?.id === acceptedOrganization.id) {
         // Hide the Accepted invitation that looks like a membership when the organization is already active
         return null;
       }
@@ -221,6 +221,10 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
   const isLoading = userInvitations.isLoading || userSuggestions.isLoading;
   const hasNextPage = userInvitations.hasNextPage || userSuggestions.hasNextPage;
   const hasAnyData = !!(userInvitations.count || userSuggestions.count);
+
+  // Solve weird bug with swr while running unit tests
+  const userInvitationsData = userInvitations.data?.filter(a => !!a);
+  const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
   return (
     <SwitcherInvitationActions
       showBorder={hasAnyData || isLoading}
@@ -233,20 +237,18 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
           ...common.unstyledScrollbar(t),
         })}
       >
-        {(userInvitations.count || 0) > 0 &&
-          userInvitations.data?.map(inv => {
-            return (
-              <InvitationPreview
-                key={inv.id}
-                invitation={inv}
-                onOrganizationClick={onOrganizationClick}
-              />
-            );
-          })}
+        {userInvitationsData?.map(inv => {
+          return (
+            <InvitationPreview
+              key={inv.id}
+              invitation={inv}
+              onOrganizationClick={onOrganizationClick}
+            />
+          );
+        })}
 
-        {(userSuggestions.count || 0) > 0 &&
-          !userInvitations.hasNextPage &&
-          userSuggestions.data?.map(suggestion => {
+        {!userInvitations.hasNextPage &&
+          userSuggestionsData?.map(suggestion => {
             return (
               <SuggestionPreview
                 key={suggestion.id}
