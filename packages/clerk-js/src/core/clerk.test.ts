@@ -2113,7 +2113,7 @@ describe('Clerk singleton', () => {
       await sut.load();
 
       const url = sut.buildUrlWithAuth('https://example.com/some-path', { useQueryParam: true });
-      expect(url).toBe('https://example.com/some-path?__dev_session=deadbeef');
+      expect(url).toBe('https://example.com/some-path?__dev_session=deadbeef&__clerk_db_jwt=deadbeef');
     });
 
     it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - non-kima', async () => {
@@ -2122,7 +2122,7 @@ describe('Clerk singleton', () => {
       await sut.load();
 
       const url = sut.buildUrlWithAuth('https://accounts.abcef.12345.dev.lclclerk.com');
-      expect(url).toBe('https://accounts.abcef.12345.dev.lclclerk.com/?__dev_session=deadbeef');
+      expect(url).toBe('https://accounts.abcef.12345.dev.lclclerk.com/?__dev_session=deadbeef&__clerk_db_jwt=deadbeef');
     });
 
     it('uses the query param to propagate the dev_browser JWT to Account Portal pages on dev - kima', async () => {
@@ -2131,7 +2131,7 @@ describe('Clerk singleton', () => {
       await sut.load();
 
       const url = sut.buildUrlWithAuth('https://rested-anemone-14.accounts.dev');
-      expect(url).toBe('https://rested-anemone-14.accounts.dev/?__dev_session=deadbeef');
+      expect(url).toBe('https://rested-anemone-14.accounts.dev/?__dev_session=deadbeef&__clerk_db_jwt=deadbeef');
     });
   });
 
