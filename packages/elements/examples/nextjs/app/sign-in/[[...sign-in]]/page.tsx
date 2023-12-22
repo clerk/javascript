@@ -11,8 +11,6 @@ import {
   Submit,
 } from '@clerk/elements';
 
-import { Debug } from '@/components/debug';
-
 export default function SignInPage() {
   return (
     <SignIn>
@@ -59,8 +57,6 @@ export default function SignInPage() {
         </SignInFactorTwo>
         <SignInSSOCallback />
       </div>
-
-      <Debug />
     </SignIn>
   );
 }
