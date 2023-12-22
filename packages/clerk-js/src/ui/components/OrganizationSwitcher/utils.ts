@@ -39,7 +39,10 @@ export const populateCacheUpdateItem = <T extends { id: string }>(
 
       return obj;
     });
-    return { ...item, data: newData };
+    return {
+      ...item,
+      data: newData,
+    };
   });
 };
 

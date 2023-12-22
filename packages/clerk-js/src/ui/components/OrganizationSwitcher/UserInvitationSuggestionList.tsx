@@ -128,7 +128,7 @@ const Preview = (
 const InvitationPreview = withCardStateProvider(
   (props: { invitation: UserOrganizationInvitationResource } & UserInvitationSuggestionListProps) => {
     const { invitation, onOrganizationClick } = props;
-    const { accept, publicOrganizationData } = invitation;
+    const { accept, publicOrganizationData, status } = invitation;
     const card = useCardState();
     const { getOrganization } = useClerk();
     const [acceptedOrganization, setAcceptedOrganization] = useState<OrganizationResource | null>(null);
@@ -152,12 +152,12 @@ const InvitationPreview = withCardStateProvider(
         .catch(err => handleError(err, [], card.setError));
     };
 
-    if (acceptedOrganization) {
+    if (status === 'accepted') {
       return (
         <PreviewButton
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
           icon={SwitchArrowRight}
-          onClick={() => onOrganizationClick(acceptedOrganization)}
+          onClick={acceptedOrganization ? () => onOrganizationClick(acceptedOrganization) : undefined}
           role='menuitem'
         >
           <OrganizationPreview
