@@ -51,6 +51,7 @@ export const EmailsSection = () => {
                 <ProfileSection.Item id='emailAddresses'>
                   <Text sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                     <Flex
+                      as={'span'}
                       gap={2}
                       center
                     >

@@ -11,7 +11,6 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     alignItems: 'center',
     margin: 0,
     cursor: 'pointer',
-    ...common.focusRing(theme),
     ...common.disabled(theme),
     textDecoration: 'none',
     '&:hover': { textDecoration: 'underline' },

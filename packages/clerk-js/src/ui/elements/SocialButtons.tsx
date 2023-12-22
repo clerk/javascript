@@ -17,7 +17,7 @@ import {
   useAppearance,
 } from '../customizables';
 import { useEnabledThirdPartyProviders, useResizeObserver } from '../hooks';
-import type { PropsOfComponent } from '../styledSystem';
+import { mqu, type PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { useCardState } from './contexts';
 import { distributeStrategiesIntoRows } from './utils';
@@ -94,11 +94,13 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           elementDescriptor={descriptors.socialButtons}
           gap={2}
           sx={{
-            // Allow the first row items to use the entire row's width, but the rest should have a fixed width based on the first row's items
+            justifyContent: 'center',
+            [mqu.xs]: {
+              gridTemplateColumns: 'repeat(1, 1fr)',
+            },
             gridTemplateColumns: preferBlockButtons
               ? `repeat(1, 1fr)`
               : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
-            justifyContent: 'center',
           }}
         >
           {row.map((strategy, strategyIndex) => {

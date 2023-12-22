@@ -99,7 +99,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
             boxShadow: [
               defaultBoxShadow,
               hoverBoxShadow,
-              t.shadows.$focusRing.replace('{{color}}', props?.hasError ? t.colors.$danger300 : t.colors.$primary300),
+              t.shadows.$focusRing.replace('{{color}}', props?.hasError ? t.colors.$danger50 : t.colors.$primary50),
             ].toString(),
           },
         };

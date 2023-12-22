@@ -27,7 +27,7 @@ export type PageButtonProps = PropsOfComponent<typeof Button> & {
 };
 
 const PageButton = (props: PageButtonProps) => {
-  const { sx, isActive, children, ...rest } = props;
+  const { sx, isActive, icon, children, ...rest } = props;
 
   return (
     <Button
@@ -44,7 +44,7 @@ const PageButton = (props: PageButtonProps) => {
       elementDescriptor={descriptors.paginationButton}
       {...rest}
     >
-      {props.icon && (
+      {icon && (
         <Icon
           elementDescriptor={descriptors.paginationButtonIcon}
           icon={props.icon as React.ComponentType}
