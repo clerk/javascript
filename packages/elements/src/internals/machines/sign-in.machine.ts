@@ -11,7 +11,36 @@ import {
   prepareFirstFactor,
   prepareSecondFactor,
 } from './sign-in.actors';
-import type { SignInClient } from './sign-in.types';
+import type { FieldDetails, SignInClient } from './sign-in.types';
+
+export interface SignInMachineContext {
+  client: SignInClient;
+  router: ClerkHostRouter;
+  error?: Error | ClerkAPIResponseError;
+  resource?: SignInResource;
+  fields: Map<string, FieldDetails>;
+}
+
+export interface SignInMachineInput {
+  client: SignInClient;
+  router: ClerkHostRouter;
+}
+
+export type SignInMachineEvents =
+  | { type: 'START' }
+  | { type: 'SUBMIT' }
+  | { type: 'NEXT' }
+  | { type: 'RETRY' }
+  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'type' | 'value'> }
+  | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'type'> }
+  | {
+      type: 'FIELD.UPDATE';
+      field: Pick<FieldDetails, 'type' | 'value'>;
+    }
+  | {
+      type: 'FIELD.ERROR';
+      field: Pick<FieldDetails, 'type' | 'error'>;
+    };
 
 export const STATES = {
   Init: 'Init',
@@ -58,7 +87,7 @@ export const SignInMachine = setup({
     navigateTo: ({ context }, { path }: { path: string }) => context.router.replace(path),
 
     clearFields: assign({
-      fields: {},
+      fields: new Map(),
     }),
   },
   guards: {
@@ -71,27 +100,68 @@ export const SignInMachine = setup({
         : false,
   },
   types: {
-    context: {} as {
-      client: SignInClient;
-      router: ClerkHostRouter;
-      error?: Error | ClerkAPIResponseError;
-      resource?: SignInResource;
-      fields: Record<string, { error: string }>;
-    },
-    input: {} as {
-      client: SignInClient;
-      router: ClerkHostRouter;
-    },
-    events: {} as { type: 'START' } | { type: 'SUBMIT' } | { type: 'NEXT' } | { type: 'RETRY' } | { type: 'ASSIGN' },
+    context: {} as SignInMachineContext,
+    input: {} as SignInMachineInput,
+    events: {} as SignInMachineEvents,
   },
 }).createMachine({
   context: ({ input }) => ({
     client: input.client,
     router: input.router,
     currentFactor: null,
-    fields: {},
+    fields: new Map(),
   }),
   initial: STATES.Init,
+  on: {
+    'FIELD.ADD': {
+      actions: assign({
+        fields: ({ context, event }) => {
+          if (!event.field.type) throw new Error('Field type is required');
+
+          context.fields.set(event.field.type, event.field);
+          return context.fields;
+        },
+      }),
+    },
+    'FIELD.UPDATE': {
+      actions: assign({
+        fields: ({ context, event }) => {
+          if (!event.field.type) throw new Error('Field type is required');
+
+          if (context.fields.has(event.field.type)) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            context.fields.get(event.field.type)!.value = event.field.value;
+          }
+
+          return context.fields;
+        },
+      }),
+    },
+    'FIELD.REMOVE': {
+      actions: assign({
+        fields: ({ context, event }) => {
+          if (!event.field.type) throw new Error('Field type is required');
+
+          context.fields.delete(event.field.type);
+          return context.fields;
+        },
+      }),
+    },
+    'FIELD.ERROR': {
+      actions: assign({
+        fields: ({ context, event }) => {
+          if (!event.field.type) throw new Error('Field type is required');
+
+          if (context.fields.has(event.field.type)) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            context.fields.get(event.field.type)!.error = event.field.error;
+          }
+
+          return context.fields;
+        },
+      }),
+    },
+  },
   states: {
     [STATES.Init]: {
       always: 'Start',
@@ -110,8 +180,8 @@ export const SignInMachine = setup({
         input: ({ context }) => ({
           client: context.client,
           params: {
-            identifier: 'tom@clerk.dev',
-            password: 'tom@clerk.dev',
+            identifier: context.fields.get('identifier')?.value as string,
+            password: context.fields.get('identifier')?.value as string,
             strategy: 'password',
           },
         }),

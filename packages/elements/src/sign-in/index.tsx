@@ -3,7 +3,7 @@
 import { useClerk } from '@clerk/nextjs';
 import { useEffect } from 'react';
 
-import { SignInActor } from '../internals/machines/sign-in.context';
+import { SignInFlowProvider, useSignInFlow } from '../internals/machines/sign-in.context';
 import { useNextRouter } from '../internals/router';
 import { Route, Router } from '../internals/router-react';
 
@@ -25,43 +25,23 @@ export function SignIn({ children }: { children: React.ReactNode }): JSX.Element
       router={router}
       basePath='/sign-in'
     >
-      <SignInActor.Provider options={{ input: { client, router } }}>{children}</SignInActor.Provider>
+      <SignInFlowProvider options={{ input: { client, router } }}>{children}</SignInFlowProvider>
     </Router>
   );
 }
 
-export function SubmitButton() {
-  const ref = SignInActor.useActorRef();
-  // const fields = SignInRootMachine.useSelector((state) => state.context.fields['identifier']);
-  // console.log(ref.getSnapshot());
-
-  return (
-    <button
-      style={{ fontWeight: 'bold', backgroundColor: '#eee', padding: '0.5rem 1rem', borderRadius: '0.25rem' }}
-      onClick={() => ref.send({ type: 'SUBMIT' })}
-      type='button'
-    >
-      Submit
-    </button>
-  );
-}
-
 export function SignInStartInner({ children }: { children: React.ReactNode }) {
-  const ref = SignInActor.useActorRef();
+  const ref = useSignInFlow();
 
   useEffect(() => ref.send({ type: 'START' }), [ref]);
 
-  return <>{children}</>;
+  return children;
 }
 
 export function SignInStart({ children }: { children: React.ReactNode }) {
   return (
     <Route index>
-      <SignInStartInner>
-        <h1>Start</h1>
-        {children}
-        <SubmitButton />
-      </SignInStartInner>
+      <SignInStartInner>{children}</SignInStartInner>
     </Route>
   );
 }
