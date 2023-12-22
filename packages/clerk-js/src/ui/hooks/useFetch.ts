@@ -7,20 +7,10 @@ export type State<Data = any, Error = any> = {
   cachedAt?: number;
 };
 
-export interface Cache<Data = any> {
-  get(key: string): State<Data> | undefined;
-
-  set(key: string, value: State<Data>): void;
-
-  delete(key: string): void;
-
-  clear(): void;
-}
-
 /**
  * Global cache for storing status of fetched resources
  */
-let requestCache = new WeakMap<Cache, State>();
+let requestCache = new Map<string, State>();
 
 /**
  * A set to store subscribers in order to notify when the value of a key of `requestCache` changes
@@ -31,23 +21,26 @@ const subscribers = new Set<() => void>();
  * This utility should only be used in tests to clear previously fetched data
  */
 export const clearFetchCache = () => {
-  requestCache = new WeakMap<Cache, State>();
+  requestCache = new Map<string, State>();
 };
 
-const useCache = (
-  param: any,
+const serialize = (obj: unknown) => JSON.stringify(obj);
+
+const useCache = <K = any, V = any>(
+  key: K,
 ): {
-  get: <T>() => State<T> | undefined;
-  set: (state: State) => void;
-  subscribe: (callback: () => void) => () => void;
+  getCache: () => State<V> | undefined;
+  setCache: (state: State) => void;
+  subscribeCache: (callback: () => void) => () => void;
 } => {
-  const get = useCallback(() => requestCache.get(param), [param]);
+  const serializedKey = serialize(key);
+  const get = useCallback(() => requestCache.get(serializedKey), [serializedKey]);
   const set = useCallback(
     (data: State) => {
-      requestCache.set(param, data);
+      requestCache.set(serializedKey, data);
       subscribers.forEach(callback => callback());
     },
-    [param],
+    [serializedKey],
   );
   const subscribe = useCallback((callback: () => void) => {
     subscribers.add(callback);
@@ -55,41 +48,41 @@ const useCache = (
   }, []);
 
   return {
-    get,
-    set,
-    subscribe,
+    getCache: get,
+    setCache: set,
+    subscribeCache: subscribe,
   };
 };
 
-export const useFetch = <T>(
+export const useFetch = <K, T>(
   fetcher: ((...args: any) => Promise<T>) | undefined,
-  params: any,
+  params: K,
   callbacks?: {
     onSuccess?: (data: T) => void;
   },
 ) => {
-  const cache = useCache(params);
+  const { subscribeCache, getCache, setCache } = useCache<K, T>(params);
 
-  const [state, setState] = useState(cache.get<T>());
+  const [state, setState] = useState(getCache());
   const fetcherRef = useRef(fetcher);
 
   useEffect(() => {
-    const unsub = cache.subscribe(() => {
-      setState(cache.get<T>());
+    const unsub = subscribeCache(() => {
+      setState(getCache());
     });
     return () => unsub();
-  }, [cache.subscribe]);
+  }, [getCache, subscribeCache]);
 
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;
-    const isCacheStale = Date.now() - (cache.get()?.cachedAt || 0) < 20000;
-    const isRequestOnGoing = cache.get()?.isLoading;
+    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) < 20000;
+    const isRequestOnGoing = getCache()?.isLoading;
 
     if (fetcherMissing || isCacheStale || isRequestOnGoing) {
       return;
     }
 
-    cache.set({
+    setCache({
       data: null,
       isLoading: true,
       error: null,
@@ -98,7 +91,7 @@ export const useFetch = <T>(
       .then(result => {
         if (typeof result !== 'undefined') {
           const data = typeof result === 'object' ? { ...result } : result;
-          cache.set({
+          setCache({
             data,
             isLoading: false,
             error: null,
@@ -108,14 +101,14 @@ export const useFetch = <T>(
         }
       })
       .catch(() => {
-        cache.set({
+        setCache({
           data: null,
           isLoading: false,
           error: true,
           cachedAt: Date.now(),
         });
       });
-  }, [JSON.stringify(params), cache.set, cache.get]);
+  }, [serialize(params), setCache, getCache]);
 
   return {
     ...state,
