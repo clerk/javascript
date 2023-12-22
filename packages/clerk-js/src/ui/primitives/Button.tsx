@@ -192,7 +192,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       textVariant: 'buttonLarge',
       variant: 'primary',
       size: 'sm',
-      focusRing: true,
+      focusRing: false,
     },
   };
 });

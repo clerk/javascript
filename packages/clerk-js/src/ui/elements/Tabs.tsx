@@ -120,7 +120,6 @@ export const Tab = (props: TabProps) => {
     <Button
       elementDescriptor={descriptors.tabButton}
       onClick={onClick}
-      focusRing={isActive}
       isDisabled={isDisabled}
       tabIndex={isActive ? 0 : -1}
       variant='ghost'

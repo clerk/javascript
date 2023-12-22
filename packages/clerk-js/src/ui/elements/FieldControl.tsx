@@ -155,11 +155,12 @@ const FieldLabelRow = (props: PropsWithChildren) => {
   );
 };
 
-const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors'>) => {
+const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors' | 'center'>) => {
   const { fieldId, debouncedFeedback } = useFormField();
 
   return (
     <FormFeedback
+      center={props.center}
       {...{
         ...debouncedFeedback,
         elementDescriptors: props.elementDescriptors,

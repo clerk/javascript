@@ -85,7 +85,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     children,
     ...rest
   } = props;
-  const popoverCtx = usePopover({ autoUpdate: false, bubbles: false });
+  const popoverCtx = usePopover({ autoUpdate: true, bubbles: false });
   const togglePopover = popoverCtx.toggle;
   const focusedItemRef = React.useRef<HTMLDivElement>(null);
   const searchInputCtx = useSearchInput({
@@ -245,9 +245,16 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   };
 
   React.useEffect(scrollToItemOnSelectedIndexChange, [focusedIndex, isOpen]);
+  React.useEffect(() => setFocusedIndex(0), [options.length]);
   React.useEffect(() => {
     if (!comparator) {
       containerRef?.current?.focus();
+    }
+
+    if (isOpen) {
+      setFocusedIndex(options.findIndex(o => o.value === value));
+      focusedItemRef.current?.scrollIntoView({ block: 'nearest' });
+      return;
     }
   }, [isOpen]);
 
@@ -255,7 +262,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (isOpen) {
-        return setFocusedIndex((i = 0) => Math.max(i - 1, 0));
+        return setFocusedIndex((i = 0) => (i === 0 ? options.length - 1 : i - 1));
       }
       return onTriggerClick();
     }
@@ -263,7 +270,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (isOpen) {
-        return setFocusedIndex((i = 0) => Math.min(i + 1, options.length - 1));
+        return setFocusedIndex((i = 0) => (i === options.length - 1 ? 0 : i + 1));
       }
       return onTriggerClick();
     }

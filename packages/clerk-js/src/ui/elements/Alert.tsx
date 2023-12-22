@@ -21,6 +21,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     <AlertCust
       elementDescriptor={descriptors.alert}
       elementId={descriptors.alert.setId(variant)}
+      colorScheme={variant}
       {...rest}
     >
       <AlertIcon
@@ -38,7 +39,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
         <Text
           elementDescriptor={descriptors.alertText}
           elementId={descriptors.alert.setId(variant)}
-          colorScheme='neutral'
+          colorScheme={variant === 'danger' ? 'danger' : 'neutral'}
           variant='body'
           localizationKey={title}
         >
@@ -48,7 +49,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           <Text
             elementDescriptor={descriptors.alertText}
             elementId={descriptors.alert.setId(variant)}
-            colorScheme='neutral'
+            colorScheme={variant === 'danger' ? 'danger' : 'neutral'}
             variant='body'
             localizationKey={subtitle}
           />

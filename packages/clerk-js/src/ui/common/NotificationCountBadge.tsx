@@ -20,6 +20,10 @@ export const NotificationCountBadge = ({ notificationCount, containerSx }: Notif
         } ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`,
   });
 
+  if (!showNotification) {
+    return null;
+  }
+
   return (
     <Flex
       justify='center'
@@ -31,7 +35,7 @@ export const NotificationCountBadge = ({ notificationCount, containerSx }: Notif
         containerSx,
       ]}
     >
-      {showNotification && <NotificationBadge sx={enterExitAnimation}>{notificationCount}</NotificationBadge>}
+      <NotificationBadge sx={enterExitAnimation}>{notificationCount}</NotificationBadge>
     </Flex>
   );
 };

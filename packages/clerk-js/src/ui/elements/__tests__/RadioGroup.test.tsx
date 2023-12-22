@@ -152,7 +152,7 @@ describe('RadioGroup', () => {
     );
 
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    expect(await findByText('some error')).toBeInTheDocument();
+    expect(await findByText(/some error/i)).toBeInTheDocument();
 
     const radios = getAllByRole('radio');
     radios.forEach(radio => {
@@ -174,7 +174,7 @@ describe('RadioGroup', () => {
 
     const { findByLabelText, findByText } = render(<Field />, { wrapper });
 
-    fireEvent.focus(await findByLabelText('One'));
-    expect(await findByText('some info')).toBeInTheDocument();
+    fireEvent.focus(await findByLabelText(/One/i));
+    expect(await findByText(/some info/i)).toBeInTheDocument();
   });
 });

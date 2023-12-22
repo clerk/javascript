@@ -171,7 +171,6 @@ export const MenuItem = (props: MenuItemProps) => {
       ref={buttonRef}
       elementDescriptor={descriptors.menuItem}
       elementId={descriptors.menuItem.setId(elementId)}
-      focusRing={false}
       hoverAsFocus
       variant={destructive ? 'secondaryDanger' : 'secondary'}
       role='menuitem'

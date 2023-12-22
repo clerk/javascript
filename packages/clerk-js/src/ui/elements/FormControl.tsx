@@ -1,7 +1,8 @@
+import { titleize } from '@clerk/shared';
 import type { FieldId } from '@clerk/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { Box, descriptors, FormErrorText, FormInfoText, FormSuccessText, FormWarningText } from '../customizables';
+import { descriptors, Flex, FormErrorText, FormInfoText, FormSuccessText, FormWarningText } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
@@ -42,8 +43,7 @@ export const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) 
   const calculateHeight = useCallback(
     (element: HTMLElement | null) => {
       if (element) {
-        const computedStyles = getComputedStyle(element);
-        setHeight(element.scrollHeight + parseInt(computedStyles.marginTop.replace('px', '')));
+        setHeight(element.scrollHeight + element.offsetTop * 2);
       }
     },
     [feedback],
@@ -61,10 +61,11 @@ type Feedback = { feedback?: string; feedbackType?: FeedbackType; shouldEnter: b
 
 export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
+  center?: boolean;
 };
 
 export const FormFeedback = (props: FormFeedbackProps) => {
-  const { id, elementDescriptors, feedback, feedbackType = 'info' } = props;
+  const { id, elementDescriptors, feedback, feedbackType = 'info', center = false } = props;
   const feedbacksRef = useRef<{
     a?: Feedback;
     b?: Feedback;
@@ -146,11 +147,12 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const InfoComponentB = FormInfoComponent[feedbacks.b?.feedbackType || 'info'];
 
   return (
-    <Box
+    <Flex
       style={{
         height: feedback ? maxHeight : 0, // dynamic height
         position: 'relative',
       }}
+      center={center}
       sx={[getFormTextAnimation(!!feedback)]}
     >
       <InfoComponentA
@@ -162,7 +164,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           }),
           getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
         ]}
-        localizationKey={feedbacks.a?.feedback}
+        localizationKey={titleize(feedbacks.a?.feedback)}
       />
       <InfoComponentB
         {...getElementProps(feedbacks.b?.feedbackType)}
@@ -173,8 +175,8 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           }),
           getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
         ]}
-        localizationKey={feedbacks.b?.feedback}
+        localizationKey={titleize(feedbacks.b?.feedback)}
       />
-    </Box>
+    </Flex>
   );
 };

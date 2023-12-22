@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Badge, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { useSaml } from '../../hooks';
 
@@ -32,7 +32,7 @@ export const EnterpriseAccountsSection = () => {
                 src={providerLogoUrl}
                 sx={theme => ({ width: theme.sizes.$4 })}
               />
-              <Text sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                 <Flex
                   gap={2}
                   center
@@ -45,7 +45,7 @@ export const EnterpriseAccountsSection = () => {
                     />
                   )}
                 </Flex>
-              </Text>
+              </Box>
             </Flex>
           );
         })}

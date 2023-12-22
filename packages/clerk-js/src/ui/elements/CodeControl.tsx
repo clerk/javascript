@@ -7,7 +7,7 @@ import { descriptors, Flex, Input } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
-import { common } from '../styledSystem';
+import { common, mqu } from '../styledSystem';
 import type { FormControlState } from '../utils';
 import { handleError, sleep, useFormControl } from '../utils';
 import { TimerButton } from './TimerButton';
@@ -276,8 +276,8 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
       hasError={feedbackType === 'error'}
       elementDescriptor={descriptors.otpCodeFieldInputs}
       gap={2}
-      align='center'
-      sx={{ direction: 'ltr', width: 'max-content' }}
+      center
+      sx={t => ({ direction: 'ltr', padding: t.space.$1 })}
     >
       {values.map((value, index: number) => (
         <SingleCharInput
@@ -326,6 +326,10 @@ const SingleCharInput = React.forwardRef<
         ...(isSuccessfullyFilled ? { borderColor: theme.colors.$success500 } : common.borderColor(theme, props)),
         backgroundColor: 'unset',
         '&:focus': {},
+        [mqu.xs]: {
+          height: theme.space.$8,
+          width: theme.space.$8,
+        },
       })}
       {...rest}
     />

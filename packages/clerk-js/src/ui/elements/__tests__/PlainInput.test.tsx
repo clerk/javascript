@@ -75,9 +75,9 @@ describe('PlainInput', () => {
     });
 
     const { getByLabelText, queryByText } = render(<Field isRequired />, { wrapper });
-    expect(getByLabelText('some label')).toHaveValue('init value');
-    expect(getByLabelText('some label')).toHaveAttribute('required');
-    expect(getByLabelText('some label')).toHaveAttribute('aria-required', 'true');
+    expect(getByLabelText(/some label/i)).toHaveValue('init value');
+    expect(getByLabelText(/some label/i)).toHaveAttribute('required');
+    expect(getByLabelText(/some label/i)).toHaveAttribute('aria-required', 'true');
     expect(queryByText(/optional/i)).not.toBeInTheDocument();
   });
 
@@ -90,8 +90,8 @@ describe('PlainInput', () => {
     });
 
     const { getByLabelText, getByText } = render(<Field isOptional />, { wrapper });
-    expect(getByLabelText('some label')).not.toHaveAttribute('required');
-    expect(getByLabelText('some label')).toHaveAttribute('aria-required', 'false');
+    expect(getByLabelText(/some label/i)).not.toHaveAttribute('required');
+    expect(getByLabelText(/some label/i)).toHaveAttribute('aria-required', 'false');
     expect(getByText(/optional/i)).toBeInTheDocument();
   });
 
@@ -136,9 +136,9 @@ describe('PlainInput', () => {
 
     await userEvent.click(getByRole('button', { name: /set error/i }));
 
-    expect(await findByText('some error')).toBeInTheDocument();
+    expect(await findByText(/some error/i)).toBeInTheDocument();
 
-    const label = getByLabelText('some label');
+    const label = getByLabelText(/some label/i);
     expect(label).toHaveAttribute('aria-invalid', 'true');
     expect(label).toHaveAttribute('aria-describedby', 'error-firstname');
   });
@@ -154,7 +154,7 @@ describe('PlainInput', () => {
 
     const { findByLabelText, findByText } = render(<Field actionLabel={'take action'} />, { wrapper });
 
-    fireEvent.focus(await findByLabelText('some label'));
-    expect(await findByText('some info')).toBeInTheDocument();
+    fireEvent.focus(await findByLabelText(/some label/i));
+    expect(await findByText(/some info/i)).toBeInTheDocument();
   });
 });

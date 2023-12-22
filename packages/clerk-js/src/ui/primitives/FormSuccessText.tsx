@@ -8,12 +8,13 @@ import { Text } from './Text';
 
 export const { applyVariants } = createVariants(theme => ({
   base: {
-    marginTop: theme.sizes.$2,
+    marginTop: theme.sizes.$1x5,
     animation: `${animations.textInSmall} ${theme.transitionDuration.$fast}`,
     display: 'flex',
     gap: theme.sizes.$1,
     position: 'absolute',
     top: '0',
+    textAlign: 'left',
   },
   variants: {},
 }));

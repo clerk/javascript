@@ -3,7 +3,7 @@ import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy 
 
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
-import { Badge, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -77,12 +77,13 @@ export const ConnectedAccountsSection = () => {
                         src={providerToDisplayData[account.provider].iconUrl}
                         sx={theme => ({ width: theme.sizes.$4 })}
                       />
-                      <Text sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                      <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                         <Flex
+                          as={'span'}
                           gap={2}
                           center
                         >
-                          {`${providerToDisplayData[account.provider].name}`}
+                          <Text>{`${providerToDisplayData[account.provider].name}`}</Text>
                           <Text
                             as='span'
                             sx={t => ({ color: t.colors.$blackAlpha400 })}
@@ -96,7 +97,7 @@ export const ConnectedAccountsSection = () => {
                             />
                           )}
                         </Flex>
-                      </Text>
+                      </Box>
                     </Flex>
 
                     <ConnectedAccountMenu account={account} />

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import type { LocalizationKey } from '../../customizables';
 import {
@@ -164,6 +164,17 @@ export const RoleSelect = (props: {
       options={localizedOptions}
       value={value}
       onChange={role => onChange(role.value)}
+      renderOption={(option, _index, isSelected) => (
+        <RolesListItem
+          isSelected={isSelected}
+          option={option}
+          sx={theme => ({
+            '&:hover, &[data-focused="true"]': {
+              backgroundColor: theme.colors.$blackAlpha200,
+            },
+          })}
+        />
+      )}
     >
       {/*Store value inside an input in order to be accessible as form data*/}
       <input
@@ -202,7 +213,40 @@ export const RoleSelect = (props: {
           </Flex>
         )}
       </SelectButton>
-      <SelectOptionList sx={optionListSx} />
+      <SelectOptionList
+        sx={optionListSx}
+        containerSx={{
+          gap: 0,
+        }}
+      />
     </Select>
   );
 };
+
+type RolesListItemProps = PropsOfComponent<typeof Flex> & {
+  isSelected?: boolean;
+  option?: {
+    label: string;
+    value: string;
+  };
+};
+
+const RolesListItem = memo((props: RolesListItemProps) => {
+  const { option, isSelected, sx, ...rest } = props;
+  return (
+    <Flex
+      center
+      sx={[
+        theme => ({
+          width: '100%',
+          gap: theme.space.$1,
+          padding: `${theme.space.$2} ${theme.space.$4}`,
+        }),
+        sx,
+      ]}
+      {...rest}
+    >
+      <Text colorScheme='neutral'>{option?.label}</Text>
+    </Flex>
+  );
+});
