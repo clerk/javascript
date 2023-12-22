@@ -1,11 +1,10 @@
-import { useClerk, useOrganizationList } from '@clerk/shared/react';
+import { useClerk, useOrganization, useOrganizationList } from '@clerk/shared/react';
 import type {
   OrganizationResource,
   OrganizationSuggestionResource,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import { useState } from 'react';
 
 import { InfiniteListSpinner } from '../../common';
 import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
@@ -15,6 +14,7 @@ import { SwitchArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { handleError } from '../../utils';
+import { useInPlaceAcceptedInvitations } from './InPlaceAcceptedInvitations';
 import { organizationListParams, populateCacheUpdateItem } from './utils';
 
 const useFetchInvitations = () => {
@@ -131,11 +131,13 @@ const InvitationPreview = withCardStateProvider(
     const { accept, publicOrganizationData, status } = invitation;
     const card = useCardState();
     const { getOrganization } = useClerk();
-    const [acceptedOrganization, setAcceptedOrganization] = useState<OrganizationResource | null>(null);
+    const { organization: activeOrganization } = useOrganization();
     const { userInvitations } = useOrganizationList({
       userInvitations: organizationListParams.userInvitations,
       userMemberships: organizationListParams.userMemberships,
     });
+    const { acceptedInvitations, setAcceptedInvitations } = useInPlaceAcceptedInvitations();
+    const acceptedOrganization = acceptedInvitations.find(item => item.invitation.id === invitation.id)?.organization;
 
     const handleAccept = () => {
       return card
@@ -147,12 +149,22 @@ const InvitationPreview = withCardStateProvider(
         .then(([updatedItem, organization]) => {
           // Update cache in case another listener depends on it
           void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
-          setAcceptedOrganization(organization);
+          setAcceptedInvitations(old => [
+            ...old,
+            {
+              organization,
+              invitation: updatedItem,
+            },
+          ]);
         })
         .catch(err => handleError(err, [], card.setError));
     };
 
     if (status === 'accepted') {
+      if (activeOrganization?.id === acceptedOrganization?.id) {
+        // Hide the Accepted invitation that looks like a membership when the organization is already active
+        return null;
+      }
       return (
         <PreviewButton
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
