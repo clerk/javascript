@@ -91,6 +91,13 @@ export class TelemetryCollector {
       return false;
     }
 
+    // navigator.webdriver is a property generally set by headless browsers that are running in an automated testing environment.
+    // Data from these environments is not meaningful for us and has the potential to produce a large volume of events, so we disable
+    // collection in this case. (ref: https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver)
+    if (typeof window !== 'undefined' && !!window?.navigator?.webdriver) {
+      return false;
+    }
+
     return true;
   }
 
