@@ -25,6 +25,7 @@ describe('ClerkExpressWithAuth', () => {
     const clerkClient = mockClerkClient() as any;
     clerkClient.authenticateRequest.mockReturnValue({
       toAuth: () => ({ sessionId: null }),
+      headers: new Headers(),
     } as RequestState);
 
     await createClerkExpressWithAuth({ clerkClient })()(req, res, mockNext as NextFunction);
@@ -40,11 +41,34 @@ describe('ClerkExpressWithAuth', () => {
     const clerkClient = mockClerkClient() as any;
     clerkClient.authenticateRequest.mockReturnValue({
       toAuth: () => ({ sessionId: '1' }),
+      headers: new Headers(),
     } as RequestState);
 
     await createClerkExpressWithAuth({ clerkClient })()(req, res, mockNext as NextFunction);
     expect((req as WithAuthProp<Request>).auth.sessionId).toEqual('1');
     expect(mockNext).toHaveBeenCalledWith();
+  });
+
+  it('should redirect if a Location header is returned', async () => {
+    const req = createRequest();
+    const res = {
+      status: jest.fn(() => res),
+      set: jest.fn(() => res),
+      end: jest.fn(),
+      getHeader: jest.fn(),
+    } as unknown as Response;
+
+    const headers = new Headers({ Location: 'https://clerk.example.com/v1/handshake' });
+
+    const clerkClient = mockClerkClient() as any;
+    clerkClient.authenticateRequest.mockReturnValue({
+      toAuth: () => ({ sessionId: '1' }),
+      headers: new Headers({ Location: 'https://clerk.example.com/v1/handshake' }),
+    } as RequestState);
+
+    await createClerkExpressWithAuth({ clerkClient })()(req, res, mockNext as NextFunction);
+    expect(res.status).toHaveBeenCalledWith(307);
+    expect(res.set).toHaveBeenCalledWith(headers);
   });
 });
 
@@ -56,6 +80,7 @@ describe('ClerkExpressRequireAuth', () => {
     const clerkClient = mockClerkClient() as any;
     clerkClient.authenticateRequest.mockReturnValue({
       toAuth: () => ({ sessionId: null }),
+      headers: new Headers(),
     } as RequestState);
 
     await createClerkExpressRequireAuth({ clerkClient })()(req, res, mockNext as NextFunction);
@@ -72,10 +97,33 @@ describe('ClerkExpressRequireAuth', () => {
     clerkClient.authenticateRequest.mockReturnValue({
       isSignedIn: true,
       toAuth: () => ({ sessionId: '1' }),
+      headers: new Headers(),
     } as RequestState);
 
     await createClerkExpressRequireAuth({ clerkClient })()(req, res, mockNext as NextFunction);
     expect((req as WithAuthProp<Request>).auth.sessionId).toEqual('1');
     expect(mockNext).toHaveBeenCalledWith();
+  });
+
+  it('should redirect if a Location header is returned', async () => {
+    const req = createRequest();
+    const res = {
+      status: jest.fn(() => res),
+      set: jest.fn(() => res),
+      end: jest.fn(),
+      getHeader: jest.fn(),
+    } as unknown as Response;
+
+    const headers = new Headers({ Location: 'https://clerk.example.com/v1/handshake' });
+
+    const clerkClient = mockClerkClient() as any;
+    clerkClient.authenticateRequest.mockReturnValue({
+      toAuth: () => ({ sessionId: '1' }),
+      headers: new Headers({ Location: 'https://clerk.example.com/v1/handshake' }),
+    } as RequestState);
+
+    await createClerkExpressRequireAuth({ clerkClient })()(req, res, mockNext as NextFunction);
+    expect(res.status).toHaveBeenCalledWith(307);
+    expect(res.set).toHaveBeenCalledWith(headers);
   });
 });

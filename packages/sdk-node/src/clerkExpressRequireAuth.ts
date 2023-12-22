@@ -25,10 +25,15 @@ export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMidd
       });
       decorateResponseWithObservabilityHeaders(res, requestState);
 
-      if (requestState.status === AuthStatus.Handshake) {
-        // TODO: Handle handshake
-        // This needs to be refactored and reused by clerkExpressWithAuth as well
+      const hasLocationHeader = requestState.headers.get('location');
+      if (hasLocationHeader) {
+        // triggering a handshake redirect
+        res.status(307).set(requestState.headers).end();
         return;
+      }
+
+      if (requestState.status === AuthStatus.Handshake) {
+        next(new Error('Clerk: unexpected handshake without redirect'));
       }
 
       if (requestState.isSignedIn) {
