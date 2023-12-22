@@ -79,11 +79,11 @@ const textVariants = (t: InternalTheme) => {
 
 const borderVariants = (t: InternalTheme, props?: any) => {
   const defaultBoxShadow = t.shadows.$input
-    .replace('{{color1}}', t.colors.$blackAlpha200)
-    .replace('{{color2}}', t.colors.$blackAlpha300);
+    .replace('{{color1}}', !props?.hasError ? t.colors.$blackAlpha200 : t.colors.$danger200)
+    .replace('{{color2}}', !props?.hasError ? t.colors.$blackAlpha300 : t.colors.$danger300);
   const hoverBoxShadow = t.shadows.$inputHover
-    .replace('{{color1}}', t.colors.$blackAlpha300)
-    .replace('{{color2}}', t.colors.$blackAlpha400);
+    .replace('{{color1}}', !props?.hasError ? t.colors.$blackAlpha300 : t.colors.$danger300)
+    .replace('{{color2}}', !props?.hasError ? t.colors.$blackAlpha400 : t.colors.$danger400);
   const hoverStyles = {
     '&:hover': {
       WebkitTapHighlightColor: 'transparent',
@@ -99,7 +99,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
             boxShadow: [
               defaultBoxShadow,
               hoverBoxShadow,
-              t.shadows.$focusRing.replace('{{color}}', props?.hasError ? t.colors.$danger50 : t.colors.$primary50),
+              t.shadows.$focusRing.replace('{{color}}', props?.hasError ? t.colors.$primary200 : t.colors.$primary50),
             ].toString(),
           },
         };

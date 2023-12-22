@@ -32,6 +32,7 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
         sx={t => ({
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           backgroundColor: t.colors.$white,
+          padding: `${t.space.$4} ${t.space.$5}`,
         })}
       />
       <Action
@@ -49,6 +50,7 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
             borderBottomLeftRadius: t.radii.$lg,
             borderBottomRightRadius: t.radii.$lg,
             borderBottom: 'none',
+            padding: `${t.space.$4} ${t.space.$5}`,
             ':hover': {
               backgroundColor: t.colors.$danger50,
               color: t.colors.$danger400,

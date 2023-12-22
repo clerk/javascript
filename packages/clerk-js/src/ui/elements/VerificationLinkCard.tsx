@@ -91,6 +91,9 @@ export const VerificationLink = (props: VerificationLinkProps) => {
         <Text
           localizationKey={props.formSubtitle}
           elementDescriptor={descriptors.formHeaderSubtitle}
+          sx={t => ({
+            lineHeight: t.lineHeights.$normal,
+          })}
           colorScheme='neutral'
         />
         {props.children}
