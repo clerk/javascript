@@ -4,6 +4,7 @@
 .idea
 .next
 .temp_integration
+.tsup
 .turbo
 .vscode
 .yalc
@@ -12,6 +13,8 @@ build
 coverage
 coverage
 dist
+/packages/nextjs/examples
+/packages/sdk-node/examples
 node_modules
 package-lock.json
 playground

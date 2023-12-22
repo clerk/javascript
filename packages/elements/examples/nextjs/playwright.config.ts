@@ -1,8 +1,9 @@
-import { defineConfig, devices } from '@playwright/test'
-import path from 'path'
+import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
 
-const PORT = process.env.PORT || 3000
-const baseURL = `http://localhost:${PORT}`
+// eslint-disable-next-line turbo/no-undeclared-env-vars
+const PORT = process.env.PORT || 3000;
+const baseURL = `http://localhost:${PORT}`;
 
 // Reference: https://playwright.dev/docs/test-configuration
 export default defineConfig({
@@ -14,7 +15,7 @@ export default defineConfig({
     command: 'npm run dev',
     url: baseURL,
     timeout: 120 * 1000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env.CI, // eslint-disable-line turbo/no-undeclared-env-vars
   },
   use: {
     baseURL,
@@ -55,4 +56,4 @@ export default defineConfig({
       use: devices['iPhone 12'],
     },
   ],
-})
+});
