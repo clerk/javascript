@@ -12,7 +12,6 @@ build
 coverage
 coverage
 dist
-examples
 node_modules
 package-lock.json
 playground
