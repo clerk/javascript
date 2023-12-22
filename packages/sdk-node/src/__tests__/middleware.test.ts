@@ -53,7 +53,7 @@ describe('ClerkExpressWithAuth', () => {
     const req = createRequest();
     const res = {
       status: jest.fn(() => res),
-      set: jest.fn(() => res),
+      appendHeader: jest.fn(),
       end: jest.fn(),
       getHeader: jest.fn(),
     } as unknown as Response;
@@ -68,7 +68,10 @@ describe('ClerkExpressWithAuth', () => {
 
     await createClerkExpressWithAuth({ clerkClient })()(req, res, mockNext as NextFunction);
     expect(res.status).toHaveBeenCalledWith(307);
-    expect(res.set).toHaveBeenCalledWith(headers);
+
+    for (const [key, value] of headers.entries()) {
+      expect(res.appendHeader).toHaveBeenCalledWith(key, value);
+    }
   });
 });
 
@@ -109,7 +112,7 @@ describe('ClerkExpressRequireAuth', () => {
     const req = createRequest();
     const res = {
       status: jest.fn(() => res),
-      set: jest.fn(() => res),
+      appendHeader: jest.fn(),
       end: jest.fn(),
       getHeader: jest.fn(),
     } as unknown as Response;
@@ -124,6 +127,9 @@ describe('ClerkExpressRequireAuth', () => {
 
     await createClerkExpressRequireAuth({ clerkClient })()(req, res, mockNext as NextFunction);
     expect(res.status).toHaveBeenCalledWith(307);
-    expect(res.set).toHaveBeenCalledWith(headers);
+
+    for (const [key, value] of headers.entries()) {
+      expect(res.appendHeader).toHaveBeenCalledWith(key, value);
+    }
   });
 });

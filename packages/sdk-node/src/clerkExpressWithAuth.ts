@@ -1,6 +1,8 @@
-import { AuthStatus } from '@clerk/backend/internal';
-
-import { authenticateRequest, decorateResponseWithObservabilityHeaders } from './authenticateRequest';
+import {
+  authenticateRequest,
+  decorateResponseWithObservabilityHeaders,
+  setResponseForHandshake,
+} from './authenticateRequest';
 import type { CreateClerkExpressMiddlewareOptions } from './clerkExpressRequireAuth';
 import type { ClerkMiddlewareOptions, MiddlewareWithAuthProp, WithAuthProp } from './types';
 
@@ -17,21 +19,17 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
       });
       decorateResponseWithObservabilityHeaders(res, requestState);
 
-      const hasLocationHeader = requestState.headers.get('location');
-      if (hasLocationHeader) {
-        // triggering a handshake redirect
-        res.status(307).set(requestState.headers).end();
-        return;
-      }
-
-      if (requestState.status === AuthStatus.Handshake) {
-        next(new Error('Clerk: unexpected handshake without redirect'));
+      const err = setResponseForHandshake(requestState, res);
+      if (err || res.writableEnded) {
+        if (err) {
+          next(err);
+        }
         return;
       }
 
       (req as WithAuthProp<any>).auth = {
         ...requestState.toAuth(),
-        claims: requestState.toAuth().sessionClaims,
+        claims: requestState.toAuth()?.sessionClaims,
       };
       next();
     };

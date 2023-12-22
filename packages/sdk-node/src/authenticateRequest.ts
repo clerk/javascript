@@ -1,8 +1,9 @@
 import type { RequestState } from '@clerk/backend/internal';
-import { constants, createClerkRequest } from '@clerk/backend/internal';
+import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
+import type { Response } from 'express';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 import type { AuthenticateRequestParams } from './types';
@@ -54,6 +55,31 @@ const incomingMessageToRequest = (req: IncomingMessage): Request => {
     method: req.method,
     headers: new Headers(headers),
   });
+};
+
+/**
+ * Depending on the auth state of the request, handles applying redirects and validating that a handshake state was properly handled.
+ *
+ * Returns an error if state is handshake without a redirect, otherwise returns undefined. res.writableEnded should be checked after this method is called.
+ */
+export const setResponseForHandshake = (requestState: RequestState, res: Response) => {
+  const hasLocationHeader = requestState.headers.get('location');
+  if (hasLocationHeader) {
+    requestState.headers.forEach((value, key) => {
+      res.appendHeader(key, value);
+    });
+
+    // triggering a handshake redirect
+    res.status(307).end();
+
+    return;
+  }
+
+  if (requestState.status === AuthStatus.Handshake) {
+    return new Error('Clerk: unexpected handshake without redirect');
+  }
+
+  return;
 };
 
 // TODO: Move to backend
