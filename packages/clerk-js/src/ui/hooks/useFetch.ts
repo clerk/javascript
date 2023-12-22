@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type State<Data = any, Error = any> = {
-  data?: Data;
-  error?: Error;
-  isLoading?: boolean;
+  data: Data | null;
+  error: Error | null;
+  /**
+   * if there's an ongoing request and no "loaded data"
+   */
+  isLoading: boolean;
+  /**
+   * if there's a request or revalidation loading
+   */
+  isValidating: boolean;
   cachedAt?: number;
 };
 
@@ -75,8 +82,8 @@ export const useFetch = <K, T>(
 
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;
-    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) < 20000;
-    const isRequestOnGoing = getCache()?.isLoading;
+    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) < 3000; //20000;
+    const isRequestOnGoing = getCache()?.isValidating;
 
     if (fetcherMissing || isCacheStale || isRequestOnGoing) {
       return;
@@ -84,7 +91,8 @@ export const useFetch = <K, T>(
 
     setCache({
       data: null,
-      isLoading: true,
+      isLoading: !getCache(),
+      isValidating: true,
       error: null,
     });
     fetcherRef.current!(params)
@@ -94,6 +102,7 @@ export const useFetch = <K, T>(
           setCache({
             data,
             isLoading: false,
+            isValidating: false,
             error: null,
             cachedAt: Date.now(),
           });
@@ -104,6 +113,7 @@ export const useFetch = <K, T>(
         setCache({
           data: null,
           isLoading: false,
+          isValidating: false,
           error: true,
           cachedAt: Date.now(),
         });
