@@ -5,3 +5,4 @@ export * from './OptionsContext';
 export * from './CoreSessionContext';
 export * from './CoreClientContext';
 export * from './CoreClerkContextWrapper';
+export * from './AcceptedUserInvitations';

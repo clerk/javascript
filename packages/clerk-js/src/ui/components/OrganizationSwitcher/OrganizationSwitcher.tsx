@@ -1,11 +1,10 @@
 import { useId } from 'react';
 
 import { withOrganizationsEnabledGuard } from '../../common';
-import { withCoreUserGuard } from '../../contexts';
+import { AcceptedInvitationsProvider, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
-import { InPlaceAcceptedInvitationsProvider } from './InPlaceAcceptedInvitations';
 import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
 import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
 
@@ -19,7 +18,7 @@ const _OrganizationSwitcher = withFloatingTree(() => {
 
   return (
     <Flow.Root flow='organizationSwitcher'>
-      <InPlaceAcceptedInvitationsProvider>
+      <AcceptedInvitationsProvider>
         <OrganizationSwitcherTrigger
           ref={reference}
           onClick={toggle}
@@ -38,7 +37,7 @@ const _OrganizationSwitcher = withFloatingTree(() => {
             style={{ ...styles }}
           />
         </Popover>
-      </InPlaceAcceptedInvitationsProvider>
+      </AcceptedInvitationsProvider>
     </Flow.Root>
   );
 });

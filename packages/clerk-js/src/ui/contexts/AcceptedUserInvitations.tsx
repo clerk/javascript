@@ -11,7 +11,7 @@ type Value = {
     SetStateAction<{ invitation: UserOrganizationInvitationResource; organization: OrganizationResource }[]>
   >;
 };
-const InPlaceAcceptedInvitations = createContext<Value>({
+const AcceptedInvitations = createContext<Value>({
   acceptedInvitations: [],
   setAcceptedInvitations: () => {},
 });
@@ -20,7 +20,7 @@ interface InPlaceAcceptedInvitationsProps {
   children: ReactNode;
 }
 
-function InPlaceAcceptedInvitationsProvider({ children }: InPlaceAcceptedInvitationsProps): JSX.Element {
+function AcceptedInvitationsProvider({ children }: InPlaceAcceptedInvitationsProps): JSX.Element {
   const [acceptedInvitations, setAcceptedInvitations] = useState<
     {
       invitation: UserOrganizationInvitationResource;
@@ -28,20 +28,19 @@ function InPlaceAcceptedInvitationsProvider({ children }: InPlaceAcceptedInvitat
     }[]
   >([]);
   return (
-    <InPlaceAcceptedInvitations.Provider
+    <AcceptedInvitations.Provider
       value={{
         acceptedInvitations,
         setAcceptedInvitations,
       }}
     >
       {children}
-    </InPlaceAcceptedInvitations.Provider>
+    </AcceptedInvitations.Provider>
   );
 }
 
-function useInPlaceAcceptedInvitations(): Value {
-  const context = useContext(InPlaceAcceptedInvitations);
-  return context;
+function useAcceptedInvitations(): Value {
+  return useContext(AcceptedInvitations);
 }
 
-export { InPlaceAcceptedInvitationsProvider, useInPlaceAcceptedInvitations };
+export { AcceptedInvitationsProvider, useAcceptedInvitations };

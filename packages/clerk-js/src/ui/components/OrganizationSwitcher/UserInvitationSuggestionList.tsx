@@ -7,6 +7,7 @@ import type {
 import type { PropsWithChildren } from 'react';
 
 import { InfiniteListSpinner } from '../../common';
+import { useAcceptedInvitations } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Actions, OrganizationPreview, PreviewButton, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
@@ -14,7 +15,6 @@ import { SwitchArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { useInPlaceAcceptedInvitations } from './InPlaceAcceptedInvitations';
 import { organizationListParams, populateCacheUpdateItem } from './utils';
 
 const useFetchInvitations = () => {
@@ -136,7 +136,7 @@ const InvitationPreview = withCardStateProvider(
       userInvitations: organizationListParams.userInvitations,
       userMemberships: organizationListParams.userMemberships,
     });
-    const { acceptedInvitations, setAcceptedInvitations } = useInPlaceAcceptedInvitations();
+    const { acceptedInvitations, setAcceptedInvitations } = useAcceptedInvitations();
     const acceptedOrganization = acceptedInvitations.find(item => item.invitation.id === invitation.id)?.organization;
 
     const handleAccept = () => {
