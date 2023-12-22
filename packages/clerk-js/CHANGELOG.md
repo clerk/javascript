@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.68.1
+
+### Patch Changes
+
+- Fix support of Clerk@v3 instance from `<ClerkProvider />` ([#2441](https://github.com/clerk/javascript/pull/2441)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`0bf0bdd56`](https://github.com/clerk/javascript/commit/0bf0bdd56268f53aa8b27f5d136c288afb10944b)]:
+  - @clerk/shared@1.3.0
+
 ## 4.68.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.3.0
+
+### Minor Changes
+
+- Use both `__clerk_db_jwt` and `__dev_browser` search params to sync dev browser between application and Account Portal in development instances. ([#2431](https://github.com/clerk/javascript/pull/2431)) by [@dimkl](https://github.com/dimkl)
+
+  This change is required to support the next major version of the ClerkJS.
+
 ## 1.2.0
 
 ### Minor Changes
