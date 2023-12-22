@@ -10,10 +10,6 @@ inputs:
     description: 'Enable Playwright?'
     required: false
     default: 'false'
-  cache-suffix:
-    description: 'The cache suffix to use'
-    required: false
-    default: ''
   turbo-summarize:
     description: 'The token to use for Turbo task summaries'
     required: false
@@ -100,26 +96,9 @@ runs:
         cache: 'npm'
         node-version: ${{ inputs.node-version }}
         registry-url: ${{ inputs.registry-url }}
-        cache-dependency-path: package-lock.json
-
-    # - name: Cache node_modules
-    #   uses: actions/cache@v3
-    #   id: npm-cache
-    #   with:
-    #     path: ./node_modules
-    #     key: ${{ runner.os }}-node-${{ inputs.node-version }}-${{ hashFiles('.github/.cache-version') }}-node-modules-${{ hashFiles('package-lock.json') }}${{ inputs.cache-suffix }}
 
     - name: Install NPM Dependencies
-      # if: steps.npm-cache.outputs.cache-hit != 'true'
-      run: npm ci --audit=false --fund=false
-      shell: bash
-
-    - name: List node_modules
-      run: npm ls
-      shell: bash
-
-    - name: Lint GitHub Actions Workflows
-      run: npx eslint .github
+      run: npm ci --audit=false --fund=false --prefer-offline
       shell: bash
 
     - name: Get Playwright Version
@@ -134,7 +113,7 @@ runs:
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('.github/.cache-version') }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
+        key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
 
     - name: Install Playwright Browsers
       if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
