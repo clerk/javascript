@@ -1,20 +1,39 @@
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
+  LoadedClerk,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
-  SignInCreateParams,
   SignInResource,
 } from '@clerk/types';
 import { fromPromise } from 'xstate';
 
+import type { SignInMachineContext } from './sign-in.machine';
 import type { SignInResourceParams } from './sign-in.types';
 
-export const createSignIn = fromPromise<SignInResource, SignInResourceParams<SignInCreateParams>>(
-  async ({ input: { client, params } }) => {
-    return client.signIn.create(params);
-  },
-);
+export const createSignIn = fromPromise<
+  SignInResource,
+  { client: LoadedClerk['client']; fields: SignInMachineContext['fields'] }
+>(({ input: { client, fields } }) => {
+  const password = fields.get('password');
+  const identifier = fields.get('identifier');
+
+  if (!identifier) {
+    throw new Error('Identifier field not present'); // TODO: better error
+  }
+
+  const passwordParams = password
+    ? {
+        password: password.value,
+        strategy: 'password',
+      }
+    : {};
+
+  return client.signIn.create({
+    identifier: identifier.value as string,
+    ...passwordParams,
+  });
+});
 
 export const prepareFirstFactor = fromPromise<SignInResource, SignInResourceParams<PrepareFirstFactorParams>>(
   async ({ input: { client, params } }) => {

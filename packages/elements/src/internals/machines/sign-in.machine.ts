@@ -195,13 +195,9 @@ export const SignInMachine = setup({
         src: 'createSignIn',
         input: ({ context }) => ({
           client: context.clerk.client,
-          params: {
-            identifier: context.fields.get('identifier')?.value as string,
-            password: context.fields.get('identifier')?.value as string,
-            strategy: 'password',
-          },
+          fields: context.fields,
         }),
-        onDone: [{ actions: 'assignResourceToContext' }],
+        onDone: { actions: 'assignResourceToContext' },
         onError: {
           target: STATES.StartFailure,
           actions: 'assignErrorMessageToContext',
