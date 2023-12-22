@@ -61,7 +61,6 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
     <SimpleButton
       size='xs'
       variant='secondary'
-      focusRing={false}
       hoverAsFocus
       sx={[
         t => ({
@@ -175,7 +174,6 @@ export const Action = (props: ActionProps) => {
       size='md'
       variant='ghostAction'
       textVariant='buttonLarge'
-      focusRing={false}
       hoverAsFocus
       sx={[
         t => ({

@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Flex, Image, localizationKeys } from '../../customizables';
+import { Box, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -54,17 +54,22 @@ export const Web3Section = () => {
                     key={wallet.id}
                     id='web3Wallets'
                   >
-                    <Flex
-                      align='center'
-                      gap={2}
-                    >
-                      <Image
-                        src={strategyToDisplayData[strategy].iconUrl}
-                        alt={strategyToDisplayData[strategy].name}
-                        sx={theme => ({ width: theme.sizes.$4 })}
-                      />
-                      {strategyToDisplayData[strategy].name} ({wallet.web3Wallet})
-                    </Flex>
+                    <Image
+                      src={strategyToDisplayData[strategy].iconUrl}
+                      alt={strategyToDisplayData[strategy].name}
+                      sx={theme => ({ width: theme.sizes.$4 })}
+                    />
+                    <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                      <Flex
+                        as={'span'}
+                        gap={2}
+                        center
+                      >
+                        <Text>
+                          {strategyToDisplayData[strategy].name} ({wallet.web3Wallet})
+                        </Text>
+                      </Flex>
+                    </Box>
 
                     <Web3WalletMenu />
                   </ProfileSection.Item>
@@ -98,11 +103,13 @@ export const Web3Section = () => {
 };
 
 const Web3WalletMenu = () => {
+  const { open } = useActionContext();
+
   const actions = (
     [
       {
         label: localizationKeys('userProfile.start.web3WalletsSection.destructiveAction'),
-        onClick: () => open('verify'),
+        onClick: () => open('remove'),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];

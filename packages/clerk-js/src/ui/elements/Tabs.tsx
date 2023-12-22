@@ -120,7 +120,6 @@ export const Tab = (props: TabProps) => {
     <Button
       elementDescriptor={descriptors.tabButton}
       onClick={onClick}
-      focusRing={isActive}
       isDisabled={isDisabled}
       tabIndex={isActive ? 0 : -1}
       variant='ghost'
@@ -140,7 +139,7 @@ export const Tab = (props: TabProps) => {
           borderColor: isActive ? t.colors.$blackAlpha800 : t.colors.$transparent,
           borderRadius: 0,
           width: 'fit-content',
-          '&:hover, :focus': { backgroundColor: t.colors.$transparent, boxShadow: 'none' },
+          '&:hover, :focus': { backgroundColor: t.colors.$transparent },
         }),
         sx,
       ]}

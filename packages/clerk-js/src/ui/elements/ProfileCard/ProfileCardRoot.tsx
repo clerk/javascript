@@ -36,11 +36,13 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
           sx={t => ({
             [mqu.md]: {
               padding: `${t.space.$1x5} ${t.space.$2}`,
+              top: t.space.$none,
+              right: t.space.$none,
             },
             zIndex: t.zIndices.$modal,
             position: 'absolute',
-            top: t.space.$none,
-            right: t.space.$none,
+            top: t.space.$0x5,
+            right: t.space.$2,
           })}
         >
           <IconButton
