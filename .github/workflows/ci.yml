@@ -39,10 +39,18 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: List node_modules
+        run: npm ls
+        shell: bash
+
       - name: Require Changeset
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         if: ${{ !(github.event_name == 'merge_group') }}
         run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
+
+      - name: Lint GitHub Actions Workflows
+        run: npx eslint .github
+        shell: bash
 
       - name: Check Formatting
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
