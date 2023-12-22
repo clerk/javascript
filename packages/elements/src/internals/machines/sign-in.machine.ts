@@ -1,9 +1,9 @@
-import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { SignInResource } from '@clerk/types';
+import { type ClerkAPIResponseError, isClerkAPIResponseError } from '@clerk/shared/error';
+import type { LoadedClerk, SignInResource } from '@clerk/types';
 import { assign, setup } from 'xstate';
 
 import type { ClerkHostRouter } from '../router';
+import { waitForClerk } from './shared.actors';
 import {
   attemptFirstFactor,
   attemptSecondFactor,
@@ -11,10 +11,10 @@ import {
   prepareFirstFactor,
   prepareSecondFactor,
 } from './sign-in.actors';
-import type { FieldDetails, SignInClient } from './sign-in.types';
+import type { FieldDetails } from './sign-in.types';
 
 export interface SignInMachineContext {
-  client: SignInClient;
+  clerk: LoadedClerk;
   router: ClerkHostRouter;
   error?: Error | ClerkAPIResponseError;
   resource?: SignInResource;
@@ -22,7 +22,7 @@ export interface SignInMachineContext {
 }
 
 export interface SignInMachineInput {
-  client: SignInClient;
+  clerk: LoadedClerk;
   router: ClerkHostRouter;
 }
 
@@ -44,19 +44,23 @@ export type SignInMachineEvents =
 
 export const STATES = {
   Init: 'Init',
+
   Start: 'Start',
   StartAttempting: 'StartAttempting',
   StartFailure: 'StartFailure',
+
   FirstFactor: 'FirstFactor',
   FirstFactorPreparing: 'FirstFactorPreparing',
   FirstFactorIdle: 'FirstFactorIdle',
   FirstFactorAttempting: 'FirstFactorAttempting',
   FirstFactorFailure: 'FirstFactorFailure',
+
   SecondFactor: 'SecondFactor',
   SecondFactorPreparing: 'SecondFactorPreparing',
   SecondFactorIdle: 'SecondFactorIdle',
   SecondFactorAttempting: 'SecondFactorAttempting',
   SecondFactorFailure: 'SecondFactorFailure',
+
   Complete: 'Complete',
 } as const;
 
@@ -67,6 +71,7 @@ function eventHasError<T = any>(value: T): value is T & { error: Error } {
 
 export const SignInMachine = setup({
   actors: {
+    waitForClerk,
     createSignIn,
     prepareFirstFactor,
     attemptFirstFactor,
@@ -106,7 +111,7 @@ export const SignInMachine = setup({
   },
 }).createMachine({
   context: ({ input }) => ({
-    client: input.client,
+    clerk: input.clerk,
     router: input.router,
     currentFactor: null,
     fields: new Map(),
@@ -164,33 +169,50 @@ export const SignInMachine = setup({
   },
   states: {
     [STATES.Init]: {
-      always: 'Start',
+      invoke: {
+        src: 'waitForClerk',
+        input: ({ context }) => context.clerk,
+        onDone: {
+          target: STATES.Start,
+          actions: assign({
+            // @ts-expect-error -- this is really IsomorphicClerk up to this point
+            clerk: ({ context }) => context.clerk.clerkjs,
+          }),
+        },
+      },
     },
     [STATES.Start]: {
       entry: ({ context }) => console.log('Start entry: ', context),
       on: {
-        SUBMIT: STATES.StartAttempting,
+        SUBMIT: {
+          target: STATES.StartAttempting,
+        },
       },
     },
     [STATES.StartAttempting]: {
       entry: ({ context }) => console.log('StartAttempting entry: ', context),
       invoke: {
-        id: 'createSignIn',
         src: 'createSignIn',
         input: ({ context }) => ({
-          client: context.client,
-          params: {
-            identifier: context.fields.get('identifier')?.value as string,
-            password: context.fields.get('identifier')?.value as string,
-            strategy: 'password',
-          },
+          client: context.clerk.client,
+          fields: context.fields,
         }),
-        onDone: [{ actions: 'assignResourceToContext' }],
+        onDone: { actions: 'assignResourceToContext' },
         onError: {
           target: STATES.StartFailure,
           actions: 'assignErrorMessageToContext',
         },
       },
+      always: [
+        {
+          guard: ({ context }) => context?.resource?.status === 'complete',
+          target: STATES.Complete,
+        },
+        {
+          guard: ({ context }) => context?.resource?.status === 'needs_first_factor',
+          target: STATES.FirstFactor,
+        },
+      ],
     },
     [STATES.StartFailure]: {
       entry: ({ context }) => console.log('StartFailure entry: ', context),
@@ -210,14 +232,6 @@ export const SignInMachine = setup({
           guard: 'hasClerkAPIError',
           target: STATES.Start,
         },
-        {
-          actions: {
-            type: 'navigateTo',
-            params: {
-              path: '/sign-in/factor-one',
-            },
-          },
-        },
       ],
     },
     [STATES.FirstFactor]: {
@@ -229,7 +243,7 @@ export const SignInMachine = setup({
         src: 'prepareFirstFactor',
         // @ts-expect-error - TODO: Implement
         input: ({ context }) => ({
-          client: context.client,
+          client: context.clerk.client,
           params: {},
         }),
         onDone: {
@@ -264,7 +278,7 @@ export const SignInMachine = setup({
         src: 'prepareFirstFactor',
         // @ts-expect-error - TODO: Implement
         input: ({ context }) => ({
-          client: context.client,
+          client: context.clerk.client,
           params: {},
         }),
         onDone: {
@@ -310,7 +324,7 @@ export const SignInMachine = setup({
         src: 'prepareSecondFactor',
         // @ts-expect-error - TODO: Implement
         input: ({ context }) => ({
-          client: context.client,
+          client: context.clerk.client,
           params: {},
         }),
         onDone: {
@@ -338,7 +352,7 @@ export const SignInMachine = setup({
         src: 'prepareFirstFactor',
         // @ts-expect-error - TODO: Implement
         input: ({ context }) => ({
-          client: context.client,
+          client: context.clerk.client,
           params: {},
         }),
         onDone: {
@@ -370,6 +384,10 @@ export const SignInMachine = setup({
     },
     [STATES.Complete]: {
       type: 'final',
+      entry: ({ context }) => {
+        const beforeEmit = () => context.router.push(context.clerk.buildAfterSignInUrl());
+        void context.clerk.setActive({ session: context.resource?.createdSessionId, beforeEmit });
+      },
     },
   },
 });

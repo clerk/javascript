@@ -1,4 +1,4 @@
-import type { ClientResource } from '@clerk/types';
+import type { LoadedClerk } from '@clerk/types';
 
 export type FieldDetails = {
   type?: string;
@@ -6,9 +6,7 @@ export type FieldDetails = {
   error?: Error;
 };
 
-export type SignInClient = ClientResource;
-
 export type SignInResourceParams<T> = {
-  client: SignInClient;
+  client: LoadedClerk['client'];
   params: T;
 };

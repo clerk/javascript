@@ -1,6 +1,6 @@
 'use client';
 
-import { useClerk } from '@clerk/nextjs';
+import { useClerk } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 
 import { SignInFlowProvider, useSignInFlow } from '../internals/machines/sign-in.context';
@@ -12,20 +12,12 @@ export function SignIn({ children }: { children: React.ReactNode }): JSX.Element
   const router = useNextRouter();
   const clerk = useClerk();
 
-  // @ts-expect-error - clerk.clerkjs isn't typed
-  if (!router || !clerk?.clerkjs) {
-    return null;
-  }
-
-  // @ts-expect-error - clerk.clerkjs isn't typed
-  const client = clerk.clerkjs.client;
-
   return (
     <Router
       router={router}
       basePath='/sign-in'
     >
-      <SignInFlowProvider options={{ input: { client, router } }}>{children}</SignInFlowProvider>
+      <SignInFlowProvider options={{ input: { clerk, router } }}>{children}</SignInFlowProvider>
     </Router>
   );
 }
@@ -36,6 +28,22 @@ export function SignInStartInner({ children }: { children: React.ReactNode }) {
   useEffect(() => ref.send({ type: 'START' }), [ref]);
 
   return children;
+  // return (
+  //   <form
+  //     onSubmit={(event: any) => {
+  //       event.preventDefault();
+
+  //       const fields = {
+  //         identifier: { value: event.target.elements.identifier?.value },
+  //         password: { value: event.target.elements.password?.value },
+  //       };
+
+  //       ref.send({ type: 'SUBMIT', fields });
+  //     }}
+  //   >
+  //     {children}
+  //   </form>
+  // );
 }
 
 export function SignInStart({ children }: { children: React.ReactNode }) {
