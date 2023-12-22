@@ -173,7 +173,7 @@ export default class Clerk implements ClerkInterface {
   #environment?: EnvironmentResource | null;
   #fapiClient: FapiClient;
   #instanceType: InstanceType;
-  #loaded = false;
+  #isReady = false;
 
   /**
    * @deprecated Although this being a private field, this is a reminder to drop it with the next major release
@@ -200,7 +200,7 @@ export default class Clerk implements ClerkInterface {
   }
 
   get loaded(): boolean {
-    return this.#loaded;
+    return this.#isReady;
   }
 
   get isSatellite(): boolean {
@@ -319,13 +319,10 @@ export default class Clerk implements ClerkInterface {
 
   public getFapiClient = (): FapiClient => this.#fapiClient;
 
-  public isReady = (): boolean => {
-    deprecated('Clerk.isReady()', 'Use `Clerk.loaded` instead.');
-    return this.#loaded;
-  };
+  public isReady = (): boolean => this.#isReady;
 
   public load = async (options?: ClerkOptions): Promise<void> => {
-    if (this.#loaded) {
+    if (this.#isReady) {
       return;
     }
 
@@ -335,9 +332,9 @@ export default class Clerk implements ClerkInterface {
     };
 
     if (this.#options.standardBrowser) {
-      this.#loaded = await this.#loadInStandardBrowser();
+      this.#isReady = await this.#loadInStandardBrowser();
     } else {
-      this.#loaded = await this.#loadInNonStandardBrowser();
+      this.#isReady = await this.#loadInNonStandardBrowser();
     }
   };
 
@@ -952,7 +949,7 @@ export default class Clerk implements ClerkInterface {
     params: HandleOAuthCallbackParams = {},
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
-    if (!this.loaded || !this.#environment || !this.client) {
+    if (!this.#isReady || !this.#environment || !this.client) {
       return;
     }
     const { signIn, signUp } = this.client;
@@ -1622,7 +1619,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   #buildUrl = (key: 'signInUrl' | 'signUpUrl', options?: SignInRedirectOptions | SignUpRedirectOptions): string => {
-    if (!this.loaded || !this.#environment || !this.#environment.displayConfig) {
+    if (!this.#isReady || !this.#environment || !this.#environment.displayConfig) {
       return '';
     }
 
