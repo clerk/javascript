@@ -34,7 +34,12 @@ const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element 
       elementDescriptor={descriptors.headerSubtitle}
       variant='body'
       colorScheme='neutral'
-      sx={sx}
+      sx={[
+        t => ({
+          lineHeight: t.lineHeights.$normal,
+        }),
+        sx,
+      ]}
       {...rest}
     />
   );

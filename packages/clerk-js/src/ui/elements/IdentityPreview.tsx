@@ -85,9 +85,9 @@ const Container = (props: React.PropsWithChildren) => {
       elementDescriptor={descriptors.identityPreview}
       align='center'
       gap={2}
-      sx={t => ({
-        margin: `${t.space.$none} auto`,
-      })}
+      sx={{
+        justifyContent: 'center',
+      }}
       {...props}
     />
   );

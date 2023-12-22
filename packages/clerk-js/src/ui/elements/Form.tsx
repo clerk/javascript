@@ -253,7 +253,7 @@ const OTPInput = (props: OTPInputProps) => {
         {/*TODO: Create a descriptor for OTP wrapper*/}
         <Col
           elementDescriptor={descriptors.form}
-          gap={3}
+          gap={2}
           align='center'
         >
           <Flex
@@ -264,6 +264,7 @@ const OTPInput = (props: OTPInputProps) => {
           >
             <Field.OTPCodeControl ref={ref} />
             <Field.Feedback
+              center
               elementDescriptors={{
                 error: descriptors.otpCodeFieldErrorText,
               }}

@@ -9,7 +9,18 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     backgroundColor: theme.colors.$blackAlpha50,
     ...common.borderVariants(theme).normal,
   },
-  variants: {},
+  variants: {
+    colorScheme: {
+      danger: {
+        color: theme.colors.$danger500,
+        backgroundColor: theme.colors.$danger50,
+        ...common.borderVariants(theme, {
+          hasError: true,
+        }).normal,
+      },
+      warning: {},
+    },
+  },
 }));
 
 export type AlertProps = FlexProps & StyleVariants<typeof applyVariants>;
