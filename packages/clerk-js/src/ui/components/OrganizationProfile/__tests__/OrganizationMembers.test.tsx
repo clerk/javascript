@@ -4,6 +4,7 @@ import { screen, waitFor, waitForElementToBeRemoved } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 
 import { render } from '../../../../testUtils';
+import { clearFetchCache } from '../../../hooks/useFetch';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationMembers } from '../OrganizationMembers';
 import { createFakeMember, createFakeOrganizationInvitation, createFakeOrganizationMembershipRequest } from './utils';
@@ -15,6 +16,13 @@ async function waitForLoadingCompleted(container: HTMLElement) {
 }
 
 describe('OrganizationMembers', () => {
+  /**
+   * `<OrganizationMembers/>` internally uses useFetch which caches the results, be sure to clear the cache before each test
+   */
+  beforeEach(() => {
+    clearFetchCache();
+  });
+
   it('renders the Organization Members page', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();

@@ -146,6 +146,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             elementId={'organizationSwitcherActiveOrganization'}
             organization={currentOrg}
             user={user}
+            fetchRoles
             mainIdentifierVariant='buttonLarge'
             sx={t => ({
               padding: `${t.space.$4} ${t.space.$5}`,
@@ -178,6 +179,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             elementId={'organizationSwitcherActiveOrganization'}
             organization={currentOrg}
             user={user}
+            fetchRoles
             mainIdentifierVariant='buttonLarge'
             sx={t => ({
               padding: `${t.space.$4} ${t.space.$5}`,

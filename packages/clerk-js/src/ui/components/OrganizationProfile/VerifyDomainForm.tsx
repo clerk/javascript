@@ -29,7 +29,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
   const { organizationSettings } = useEnvironment();
   const { organization } = useOrganization();
 
-  const { data: domain, status: domainStatus } = useFetch(organization?.getDomain, {
+  const { data: domain, isLoading: domainIsLoading } = useFetch(organization?.getDomain, {
     domainId: id,
   });
   const title = localizationKeys('organizationProfile.verifyDomainPage.title');
@@ -108,7 +108,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
       });
   };
 
-  if (domainStatus.isLoading || !domain) {
+  if (domainIsLoading || !domain) {
     return (
       <Flex
         direction={'row'}

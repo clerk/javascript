@@ -17,7 +17,7 @@ import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 const useCalloutLabel = (
-  domain: OrganizationDomainResource | null,
+  domain: OrganizationDomainResource | undefined | null,
   {
     infoLabel: infoLabelKey,
   }: {
@@ -114,7 +114,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
     type: 'checkbox',
   });
 
-  const { data: domain, status: domainStatus } = useFetch(
+  const { data: domain, isLoading: domainIsLoading } = useFetch(
     organization?.getDomain,
     {
       domainId: id,
@@ -161,7 +161,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
     return null;
   }
 
-  if (domainStatus.isLoading || !domain) {
+  if (domainIsLoading || !domain) {
     return (
       <Flex
         direction={'row'}
@@ -229,7 +229,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
 
           <FormButtons
             localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save')}
-            isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
+            isDisabled={domainIsLoading || !domain || !isFormDirty}
             onReset={onReset}
           />
         </Form.Root>
