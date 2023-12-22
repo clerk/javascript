@@ -14,10 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
-      <ClerkProvider
-        clerkJSVariant='headless'
-        publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
-      >
+      <ClerkProvider clerkJSVariant='headless'>
         <body className={`${inter.variable} font-sans`}>{children}</body>
       </ClerkProvider>
     </html>

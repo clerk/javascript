@@ -11,8 +11,6 @@ import {
   Submit,
 } from '@clerk/elements';
 
-import { Debug } from '@/components/debug';
-
 export default function SignInPage() {
   return (
     <SignIn>
@@ -30,6 +28,9 @@ export default function SignInPage() {
                 type='identifier'
                 className='bg-tertiary rounded-sm px-2 py-1 border border-foreground'
               />
+
+              {/* <input type="text" name="identifier" placeholder="identifier" /> */}
+              {/* <button type="submit">Continue</button> */}
             </Field>
 
             <Field
@@ -56,8 +57,6 @@ export default function SignInPage() {
         </SignInFactorTwo>
         <SignInSSOCallback />
       </div>
-
-      <Debug />
     </SignIn>
   );
 }

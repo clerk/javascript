@@ -58,7 +58,9 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.0.0-alpha-v5.12",
+    "@clerk/clerk-react": "*",
+    "@clerk/nextjs": "*",
+    "@clerk/shared": "*",
     "@radix-ui/react-form": "^0.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@xstate/react": "^4.0.1",

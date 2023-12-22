@@ -12,10 +12,6 @@ import type { SignInResourceParams } from './sign-in.types';
 
 export const createSignIn = fromPromise<SignInResource, SignInResourceParams<SignInCreateParams>>(
   async ({ input: { client, params } }) => {
-    if (!client.signIn) {
-      throw new Error('signIn not available'); // TODO: better error
-    }
-
     return client.signIn.create(params);
   },
 );
