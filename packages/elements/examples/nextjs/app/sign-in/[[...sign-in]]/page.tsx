@@ -1,4 +1,4 @@
-import { SignIn, SignInFactorOne, SignInFactorTwo, SignInSSOCallback, SignInStart } from '@clerk/elements'
+import { SignIn, SignInFactorOne, SignInFactorTwo, SignInSSOCallback, SignInStart } from '@clerk/elements';
 
 export default function SignInPage() {
   return (
@@ -14,5 +14,5 @@ export default function SignInPage() {
       </SignInFactorTwo>
       <SignInSSOCallback />
     </SignIn>
-  )
+  );
 }
