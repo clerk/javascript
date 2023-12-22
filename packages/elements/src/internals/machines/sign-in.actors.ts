@@ -22,7 +22,7 @@ export const createSignIn = fromPromise<
     throw new Error('Identifier field not present'); // TODO: better error
   }
 
-  const passwordParams = password
+  const passwordParams = password?.value
     ? {
         password: password.value,
         strategy: 'password',
@@ -35,10 +35,10 @@ export const createSignIn = fromPromise<
   });
 });
 
-export const prepareFirstFactor = fromPromise<SignInResource, SignInResourceParams<PrepareFirstFactorParams>>(
+export const prepareFirstFactor = fromPromise<SignInResource, SignInResourceParams<PrepareFirstFactorParams | null>>(
   async ({ input: { client, params } }) => {
-    if (!client.signIn) {
-      throw new Error('signIn not available'); // TODO: better error
+    if (!params) {
+      throw new Error('Unable to prepare first factor: no factor provided'); // TODO: better error
     }
 
     return client.signIn.prepareFirstFactor(params);

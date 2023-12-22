@@ -1,7 +1,8 @@
 import { type ClerkAPIResponseError, isClerkAPIResponseError } from '@clerk/shared/error';
-import type { LoadedClerk, SignInResource } from '@clerk/types';
+import type { LoadedClerk, SignInFactor, SignInResource } from '@clerk/types';
 import { assign, setup } from 'xstate';
 
+import { determineStartingSignInFactor } from '../../sign-in/utils';
 import type { ClerkHostRouter } from '../router';
 import { waitForClerk } from './shared.actors';
 import {
@@ -19,6 +20,7 @@ export interface SignInMachineContext {
   error?: Error | ClerkAPIResponseError;
   resource?: SignInResource;
   fields: Map<string, FieldDetails>;
+  currentFactor: SignInFactor | null;
 }
 
 export interface SignInMachineInput {
@@ -235,28 +237,46 @@ export const SignInMachine = setup({
       ],
     },
     [STATES.FirstFactor]: {
-      always: 'FirstFactorPreparing',
+      entry: [
+        assign({
+          currentFactor: ({ context: { clerk } }) => {
+            // @ts-expect-error -- __unstable__environment is not on the type
+            const { preferredSignInStrategy } = clerk.__unstable__environment.displayConfig;
+
+            const factor = determineStartingSignInFactor(
+              clerk.client.signIn.supportedFirstFactors,
+              clerk.client.signIn.identifier,
+              preferredSignInStrategy,
+            );
+
+            return factor;
+          },
+        }),
+        {
+          type: 'navigateTo',
+          params: {
+            path: '/sign-in/factor-one',
+          },
+        },
+      ],
+      always: [
+        {
+          guard: ({ context }) => !!context.currentFactor,
+          target: 'FirstFactorPreparing',
+        },
+      ],
     },
     [STATES.FirstFactorPreparing]: {
       invoke: {
         id: 'prepareFirstFactor',
         src: 'prepareFirstFactor',
-        // @ts-expect-error - TODO: Implement
         input: ({ context }) => ({
           client: context.clerk.client,
-          params: {},
+          params: context.currentFactor,
         }),
         onDone: {
-          target: STATES.FirstFactor,
-          actions: [
-            'assignResourceToContext',
-            {
-              type: 'navigateTo',
-              params: {
-                path: '/sign-in/factor-one',
-              },
-            },
-          ],
+          target: STATES.FirstFactorIdle,
+          actions: ['assignResourceToContext'],
         },
         onError: {
           target: STATES.Start,
@@ -274,8 +294,8 @@ export const SignInMachine = setup({
     },
     [STATES.FirstFactorAttempting]: {
       invoke: {
-        id: 'prepareFirstFactor',
-        src: 'prepareFirstFactor',
+        id: 'attemptFirstFactor',
+        src: 'attemptFirstFactor',
         // @ts-expect-error - TODO: Implement
         input: ({ context }) => ({
           client: context.clerk.client,

@@ -30,9 +30,6 @@ export default function SignInPage() {
                 type='identifier'
                 className='bg-tertiary rounded-sm px-2 py-1 border border-foreground'
               />
-
-              {/* <input type="text" name="identifier" placeholder="identifier" /> */}
-              {/* <button type="submit">Continue</button> */}
             </Field>
 
             <Field
