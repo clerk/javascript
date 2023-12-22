@@ -32,19 +32,21 @@ export const InvitationPreview = withCardStateProvider((props: UserOrganizationI
   });
 
   const handleAccept = () => {
-    return card
-      .runAsync(async () => {
-        const updatedItem = await props.accept();
-        await userInvitations?.revalidate?.();
-        const organization = await getOrganization(props.publicOrganizationData.id);
-        return [updatedItem, organization] as const;
-      })
-      .then(([updatedItem, organization]) => {
-        // Update cache in case another listener depends on it
-        void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
-        setAcceptedOrganization(organization);
-      })
-      .catch(err => handleError(err, [], card.setError));
+    return (
+      card
+        // When accepting an invitation we don't want to trigger a revalidation as this will cause a layout shift, prefer updating in place
+        .runAsync(async () => {
+          const updatedItem = await props.accept();
+          const organization = await getOrganization(props.publicOrganizationData.id);
+          return [updatedItem, organization] as const;
+        })
+        .then(([updatedItem, organization]) => {
+          // Update cache in case another listener depends on it
+          void userInvitations?.setData?.(cachedPages => populateCacheUpdateItem(updatedItem, cachedPages));
+          setAcceptedOrganization(organization);
+        })
+        .catch(err => handleError(err, [], card.setError))
+    );
   };
 
   if (acceptedOrganization) {

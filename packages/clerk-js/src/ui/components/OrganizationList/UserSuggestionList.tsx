@@ -10,20 +10,18 @@ import { organizationListParams } from './utils';
 
 export const AcceptRejectInvitationButtons = (props: OrganizationSuggestionResource) => {
   const card = useCardState();
-  const { userSuggestions, userMemberships } = useOrganizationList({
+  const { userSuggestions } = useOrganizationList({
     userSuggestions: organizationListParams.userSuggestions,
-    userMemberships: organizationListParams.userMemberships,
   });
 
   const handleAccept = () => {
-    return card
-      .runAsync(async () => {
-        const updatedItem = await props.accept();
-        await userMemberships.revalidate?.();
-        return updatedItem;
-      })
-      .then(updatedItem => userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages)))
-      .catch(err => handleError(err, [], card.setError));
+    return (
+      card
+        // When accepting a suggestion, a membership is not getting generated, so we don't need to revalidate memberships, only update suggestions in place
+        .runAsync(props.accept)
+        .then(updatedItem => userSuggestions?.setData?.(pages => populateCacheUpdateItem(updatedItem, pages)))
+        .catch(err => handleError(err, [], card.setError))
+    );
   };
 
   if (props.status === 'accepted') {

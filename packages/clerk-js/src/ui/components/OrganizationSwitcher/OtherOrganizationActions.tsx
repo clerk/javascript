@@ -58,7 +58,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
 
   return (
     <>
-      <UserInvitationSuggestionList />
+      <UserInvitationSuggestionList onOrganizationClick={onOrganizationClick} />
       <SecondaryActions
         elementDescriptor={descriptors.organizationSwitcherPopoverActions}
         role='menu'
