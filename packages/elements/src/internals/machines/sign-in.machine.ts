@@ -207,6 +207,16 @@ export const SignInMachine = setup({
           actions: 'assignErrorMessageToContext',
         },
       },
+      always: [
+        {
+          guard: ({ context }) => context?.resource?.status === 'complete',
+          target: STATES.Complete,
+        },
+        {
+          guard: ({ context }) => context?.resource?.status === 'needs_first_factor',
+          target: STATES.FirstFactor,
+        },
+      ],
     },
     [STATES.CreateFailure]: {
       entry: ({ context }) => console.log('CreateFailure entry: ', context),
@@ -225,14 +235,6 @@ export const SignInMachine = setup({
         {
           guard: 'hasClerkAPIError',
           target: STATES.Start,
-        },
-        {
-          actions: {
-            type: 'navigateTo',
-            params: {
-              path: '/sign-in/factor-one',
-            },
-          },
         },
       ],
     },
@@ -386,6 +388,10 @@ export const SignInMachine = setup({
     },
     [STATES.Complete]: {
       type: 'final',
+      entry: ({ context }) => {
+        const beforeEmit = () => context.router.push(context.clerk.buildAfterSignInUrl());
+        void context.clerk.setActive({ session: context.resource?.createdSessionId, beforeEmit });
+      },
     },
   },
 });
