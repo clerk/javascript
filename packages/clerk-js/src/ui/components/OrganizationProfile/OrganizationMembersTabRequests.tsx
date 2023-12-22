@@ -2,6 +2,7 @@ import { BlockButton, Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
+import { Plus } from '../../icons';
 import { useRouter } from '../../router';
 import { DomainList } from './DomainList';
 import { MembershipWidget } from './MembershipWidget';
@@ -37,7 +38,7 @@ export const OrganizationMembersTabRequests = () => {
                 localizationKey={localizationKeys(
                   'organizationProfile.membersPage.requestsTab.autoSuggestions.headerTitle',
                 )}
-                textVariant='h2'
+                textVariant='h3'
               />
               <Header.Subtitle
                 localizationKey={localizationKeys(
@@ -52,6 +53,9 @@ export const OrganizationMembersTabRequests = () => {
                   textLocalizationKey={localizationKeys(
                     'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
                   )}
+                  leftIcon={Plus}
+                  sx={t => ({ gap: t.space.$2 })}
+                  leftIconSx={t => ({ width: t.sizes.$2x5, height: t.sizes.$2x5 })}
                   id='manageVerifiedDomains'
                   onClick={() => navigate('../')}
                 />
@@ -77,7 +81,7 @@ export const OrganizationMembersTabRequests = () => {
           <Header.Root>
             <Header.Title
               localizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.requests.headerTitle')}
-              textVariant='h2'
+              textVariant='h3'
             />
             <Header.Subtitle
               localizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.requests.headerSubtitle')}

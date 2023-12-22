@@ -65,7 +65,7 @@ export const OrganizationGeneralPage = () => {
           <Header.Title
             localizationKey={localizationKeys('organizationProfile.general.title')}
             sx={t => ({ marginBottom: t.space.$4 })}
-            textVariant='h1'
+            textVariant='h2'
           />
         </Header.Root>
         <OrganizationProfileSection />

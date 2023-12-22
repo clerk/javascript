@@ -157,7 +157,6 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
           <Form.ControlRow elementId={nameField.id}>
             <Form.PlainInput
               {...nameField.props}
-              sx={{ flexBasis: '80%' }}
               onChange={onChangeName}
               isRequired
               autoFocus
@@ -166,9 +165,9 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
           <Form.ControlRow elementId={slugField.id}>
             <Form.PlainInput
               {...slugField.props}
-              sx={{ flexBasis: '80%' }}
               onChange={onChangeSlug}
               isRequired
+              pattern='^[a-z0-9\-]+$'
             />
           </Form.ControlRow>
           <FormButtonContainer>

@@ -649,7 +649,8 @@ export const enUS: LocalizationResource = {
       headerTitle__settings: 'Settings',
     },
     profilePage: {
-      title: 'Organization Profile',
+      title: 'Update Profile',
+      //TODO-RETHEME remove
       subtitle: 'Manage organization profile',
       successMessage: 'The organization has been updated.',
       dangerSection: {

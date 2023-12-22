@@ -1,6 +1,6 @@
 import type { OrganizationResource } from '@clerk/types';
 
-import { Text } from '../../customizables';
+import { Col, Text } from '../../customizables';
 import type { AvatarUploaderProps } from '../../elements';
 import { AvatarUploader, OrganizationAvatar } from '../../elements';
 import { localizationKeys } from '../../localization';
@@ -11,7 +11,7 @@ export const OrganizationProfileAvatarUploader = (
   const { organization, ...rest } = props;
 
   return (
-    <>
+    <Col>
       <Text
         variant='subtitle'
         sx={t => ({
@@ -31,6 +31,6 @@ export const OrganizationProfileAvatarUploader = (
           />
         }
       />
-    </>
+    </Col>
   );
 };
