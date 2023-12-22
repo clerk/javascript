@@ -44,10 +44,10 @@ export type SignInMachineEvents =
 
 export const STATES = {
   Init: 'Init',
-  Start: 'Start',
 
-  Create: 'Create',
-  CreateFailure: 'CreateFailure',
+  Start: 'Start',
+  StartAttempting: 'StartAttempting',
+  StartFailure: 'StartFailure',
 
   FirstFactor: 'FirstFactor',
   FirstFactorPreparing: 'FirstFactorPreparing',
@@ -185,12 +185,12 @@ export const SignInMachine = setup({
       entry: ({ context }) => console.log('Start entry: ', context),
       on: {
         SUBMIT: {
-          target: STATES.Create,
+          target: STATES.StartAttempting,
         },
       },
     },
-    [STATES.Create]: {
-      entry: ({ context }) => console.log('Create entry: ', context),
+    [STATES.StartAttempting]: {
+      entry: ({ context }) => console.log('StartAttempting entry: ', context),
       invoke: {
         src: 'createSignIn',
         input: ({ context }) => ({
@@ -203,7 +203,7 @@ export const SignInMachine = setup({
         }),
         onDone: [{ actions: 'assignResourceToContext' }],
         onError: {
-          target: STATES.CreateFailure,
+          target: STATES.StartFailure,
           actions: 'assignErrorMessageToContext',
         },
       },
@@ -218,8 +218,8 @@ export const SignInMachine = setup({
         },
       ],
     },
-    [STATES.CreateFailure]: {
-      entry: ({ context }) => console.log('CreateFailure entry: ', context),
+    [STATES.StartFailure]: {
+      entry: ({ context }) => console.log('StartFailure entry: ', context),
       always: [
         {
           guard: { type: 'hasClerkAPIErrorCode', params: { code: 'session_exists' } },
