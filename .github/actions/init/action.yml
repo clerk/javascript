@@ -97,18 +97,20 @@ runs:
     - name: Setup NodeJS ${{ inputs.node-version }}
       uses: actions/setup-node@v4
       with:
+        cache: 'npm'
         node-version: ${{ inputs.node-version }}
         registry-url: ${{ inputs.registry-url }}
+        cache-dependency-path: package-lock.json
 
-    - name: Cache node_modules
-      uses: actions/cache@v3
-      id: npm-cache
-      with:
-        path: ./node_modules
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-${{ hashFiles('.github/.cache-version') }}-node-modules-${{ hashFiles('package-lock.json') }}${{ inputs.cache-suffix }}
+    # - name: Cache node_modules
+    #   uses: actions/cache@v3
+    #   id: npm-cache
+    #   with:
+    #     path: ./node_modules
+    #     key: ${{ runner.os }}-node-${{ inputs.node-version }}-${{ hashFiles('.github/.cache-version') }}-node-modules-${{ hashFiles('package-lock.json') }}${{ inputs.cache-suffix }}
 
     - name: Install NPM Dependencies
-      if: steps.npm-cache.outputs.cache-hit != 'true'
+      # if: steps.npm-cache.outputs.cache-hit != 'true'
       run: npm ci --audit=false --fund=false
       shell: bash
 
