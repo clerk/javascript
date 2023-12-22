@@ -25,7 +25,7 @@ import { LinkButtonWithDescription } from '../UserProfile/LinkButtonWithDescript
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 const useCalloutLabel = (
-  domain: OrganizationDomainResource | null,
+  domain: OrganizationDomainResource | undefined | null,
   {
     infoLabel: infoLabelKey,
   }: {
@@ -120,7 +120,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     type: 'checkbox',
   });
 
-  const { data: domain, status: domainStatus } = useFetch(
+  const { data: domain, isLoading: domainIsLoading } = useFetch(
     organization?.getDomain,
     {
       domainId: params.id,
@@ -168,7 +168,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
     return null;
   }
 
-  if (domainStatus.isLoading || !domain) {
+  if (domainIsLoading || !domain) {
     return (
       <Flex
         direction={'row'}
@@ -264,7 +264,7 @@ export const VerifiedDomainPage = withCardStateProvider(() => {
                     localizationKey={localizationKeys(
                       'organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save',
                     )}
-                    isDisabled={domainStatus.isLoading || !domain || !isFormDirty}
+                    isDisabled={domainIsLoading || !domain || !isFormDirty}
                   />
                 </Form.Root>
               </TabPanel>

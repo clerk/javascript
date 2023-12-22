@@ -27,7 +27,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
 
   const [success, setSuccess] = React.useState(false);
 
-  const { data: domain, status: domainStatus } = useFetch(organization?.getDomain, {
+  const { data: domain, isLoading: domainIsLoading } = useFetch(organization?.getDomain, {
     domainId: params.id,
   });
   const title = localizationKeys('organizationProfile.verifyDomainPage.title');
@@ -122,7 +122,7 @@ export const VerifyDomainPage = withCardStateProvider(() => {
       });
   };
 
-  if (domainStatus.isLoading || !domain) {
+  if (domainIsLoading || !domain) {
     return (
       <Flex
         direction={'row'}

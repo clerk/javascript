@@ -6,12 +6,16 @@ import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { render } from '../../../../testUtils';
+import { clearFetchCache } from '../../../hooks';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { InviteMembersPage } from '../InviteMembersPage';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('InviteMembersPage', () => {
+  beforeEach(() => {
+    clearFetchCache();
+  });
   it('renders the component', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();

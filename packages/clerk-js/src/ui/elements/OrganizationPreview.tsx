@@ -2,8 +2,8 @@ import type { OrganizationPreviewId, UserOrganizationInvitationResource, UserRes
 import React from 'react';
 
 import { descriptors, Flex, Text } from '../customizables';
+import { useFetchRoles, useLocalizeCustomRoles } from '../hooks/useFetchRoles';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { roleLocalizationKey } from '../utils';
 import { OrganizationAvatar } from './OrganizationAvatar';
 
 export type OrganizationPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'elementId'> & {
@@ -16,6 +16,7 @@ export type OrganizationPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'elem
   badge?: React.ReactNode;
   rounded?: boolean;
   elementId?: OrganizationPreviewId;
+  fetchRoles?: boolean;
 };
 
 export const OrganizationPreview = (props: OrganizationPreviewProps) => {
@@ -24,6 +25,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
     size = 'md',
     icon,
     rounded = false,
+    fetchRoles = false,
     badge,
     sx,
     user,
@@ -32,7 +34,12 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
     elementId,
     ...rest
   } = props;
-  const role = user?.organizationMemberships.find(membership => membership.organization.id === organization.id)?.role;
+
+  const { localizeCustomRole } = useLocalizeCustomRoles();
+  const { options } = useFetchRoles(fetchRoles);
+
+  const membership = user?.organizationMemberships.find(membership => membership.organization.id === organization.id);
+  const unlocalizedRoleLabel = options?.find(a => a.value === membership?.role)?.label;
 
   return (
     <Flex
@@ -80,7 +87,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           <Text
             elementDescriptor={descriptors.organizationPreviewSecondaryIdentifier}
             elementId={descriptors.organizationPreviewSecondaryIdentifier.setId(elementId)}
-            localizationKey={role && roleLocalizationKey(role)}
+            localizationKey={localizeCustomRole(membership?.role) || unlocalizedRoleLabel}
             variant='smallRegular'
             colorScheme='neutral'
             truncate

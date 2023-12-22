@@ -10,12 +10,12 @@ const getRolesParams = {
    */
   pageSize: 20,
 };
-export const useFetchRoles = () => {
+export const useFetchRoles = (enabled = true) => {
   const { organization } = useCoreOrganization();
-  const { data, status } = useFetch(organization?.getRoles, getRolesParams);
+  const { data, isLoading } = useFetch(enabled ? organization?.getRoles : undefined, getRolesParams);
 
   return {
-    isLoading: status.isLoading,
+    isLoading,
     options: data?.data?.map(role => ({ value: role.key, label: role.name })),
   };
 };
