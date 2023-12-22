@@ -112,6 +112,10 @@ runs:
       run: npm ci --audit=false --fund=false
       shell: bash
 
+    - name: List node_modules
+      run: npm ls
+      shell: bash
+
     - name: Lint GitHub Actions Workflows
       run: npx eslint .github
       shell: bash
