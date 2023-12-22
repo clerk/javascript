@@ -2,6 +2,7 @@ import { BlockButton, Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
+import { Plus } from '../../icons';
 import { useRouter } from '../../router';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';
@@ -37,7 +38,7 @@ export const OrganizationMembersTabInvitations = () => {
                 localizationKey={localizationKeys(
                   'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
                 )}
-                textVariant='h2'
+                textVariant='h3'
               />
               <Header.Subtitle
                 localizationKey={localizationKeys(
@@ -53,6 +54,9 @@ export const OrganizationMembersTabInvitations = () => {
                     'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
                   )}
                   id='manageVerifiedDomains'
+                  sx={t => ({ gap: t.space.$2 })}
+                  leftIcon={Plus}
+                  leftIconSx={t => ({ width: t.sizes.$2x5, height: t.sizes.$2x5 })}
                   onClick={() => navigate('../')}
                 />
               }
@@ -79,7 +83,7 @@ export const OrganizationMembersTabInvitations = () => {
               localizationKey={localizationKeys(
                 'organizationProfile.membersPage.invitationsTab.manualInvitations.headerTitle',
               )}
-              textVariant='h2'
+              textVariant='h3'
             />
             <Header.Subtitle
               localizationKey={localizationKeys(

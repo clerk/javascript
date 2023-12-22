@@ -55,7 +55,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
           <Header.Root sx={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
             <Header.Title
               localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
-              textVariant='h1'
+              textVariant='h2'
             />
             <Action.Trigger value='invite'>
               <IconButton
@@ -68,6 +68,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                     sx={t => ({ marginRight: t.space.$2 })}
                   />
                 }
+                sx={t => ({ height: t.space.$8 })}
                 textVariant='buttonSmall'
                 localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
               />

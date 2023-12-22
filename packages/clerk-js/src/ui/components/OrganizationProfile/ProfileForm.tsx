@@ -13,7 +13,6 @@ type ProfileFormProps = FormProps;
 export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const { onSuccess, onReset } = props;
   const title = localizationKeys('organizationProfile.profilePage.title');
-  const subtitle = localizationKeys('organizationProfile.profilePage.subtitle');
   const card = useCardState();
   const [avatarChanged, setAvatarChanged] = React.useState(false);
   const { organization } = useOrganization();
@@ -76,10 +75,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   };
 
   return (
-    <FormContent
-      headerTitle={title}
-      headerSubtitle={subtitle}
-    >
+    <FormContent headerTitle={title}>
       <Form.Root onSubmit={onSubmit}>
         <OrganizationProfileAvatarUploader
           organization={organization}
@@ -102,6 +98,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
         <FormButtons
           isDisabled={!canSubmit}
           onReset={onReset}
+          sx={t => ({ marginTop: t.space.$1 })}
         />
       </Form.Root>
     </FormContent>
