@@ -74,7 +74,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     const authObject = requestState.toAuth();
 
     const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
-      protect: createMiddlewareProtect(authObject),
+      protect: createMiddlewareProtect(clerkRequest, authObject),
       redirectToSignIn: createMiddlewareRedirectToSignIn(clerkRequest, requestState),
     });
 
@@ -165,7 +165,10 @@ const createMiddlewareRedirectToSignIn = (
   };
 };
 
-const createMiddlewareProtect = (authObject: AuthObject): ClerkMiddlewareAuthObject['protect'] => {
+const createMiddlewareProtect = (
+  clerkRequest: ClerkRequest,
+  authObject: AuthObject,
+): ClerkMiddlewareAuthObject['protect'] => {
   return ((params, options) => {
     const notFound = () => {
       throw new Error(PROTECT_REWRITE) as any;
@@ -177,11 +180,11 @@ const createMiddlewareProtect = (authObject: AuthObject): ClerkMiddlewareAuthObj
       throw err;
     };
 
-    const handleUnauthenticated = () => {
+    const redirectToSignIn = () => {
       throw new Error(PROTECT_REDIRECT_TO_SIGN_IN) as any;
     };
 
     // @ts-expect-error TS is not happy even though the types are correct
-    return createProtect({ redirect, notFound, authObject, handleUnauthenticated })(params, options);
+    return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
   }) as AuthProtect;
 };

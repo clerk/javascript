@@ -1,8 +1,12 @@
 import type { AuthObject, SignedInAuthObject } from '@clerk/backend/internal';
+import { constants } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
 } from '@clerk/types';
+
+import { constants as nextConstants } from '../constants';
+import { SIGN_IN_URL } from './constants';
 
 type AuthProtectOptions = { redirectUrl?: string };
 
@@ -21,6 +25,7 @@ export interface AuthProtect {
 }
 
 export const createProtect = (opts: {
+  request: Request;
   authObject: AuthObject;
   /**
    * middleware and pages throw a notFound error if signed out
@@ -37,9 +42,9 @@ export const createProtect = (opts: {
    * protect() in pages throws a notFound error if signed out
    * use this callback to customise the behavior
    */
-  handleUnauthenticated?: () => void;
+  redirectToSignIn?: () => void;
 }): AuthProtect => {
-  const { handleUnauthenticated, authObject, redirect, notFound } = opts;
+  const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
 
   return ((...args: any[]) => {
     const paramsOrFunction = args[0]?.redirectUrl
@@ -49,18 +54,29 @@ export const createProtect = (opts: {
           | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
     const redirectUrl = (args[0]?.redirectUrl || args[1]?.redirectUrl) as string | undefined;
 
+    const handleUnauthenticated = () => {
+      if (redirectUrl) {
+        return redirect(redirectUrl);
+      }
+      if (isPageRequest(request)) {
+        // TODO: Handle runtime values. What happens if runtime values are set in middleware and in ClerkProvider as well?
+        return redirectToSignIn ? redirectToSignIn() : redirect(SIGN_IN_URL);
+      }
+      return notFound();
+    };
+
     const handleUnauthorized = () => {
       if (redirectUrl) {
-        redirect(redirectUrl);
+        return redirect(redirectUrl);
       }
-      notFound();
+      return notFound();
     };
 
     /**
      * User is not authenticated
      */
     if (!authObject.userId) {
-      return handleUnauthenticated ? handleUnauthenticated() : handleUnauthorized();
+      return handleUnauthenticated();
     }
 
     /**
@@ -90,3 +106,25 @@ export const createProtect = (opts: {
     return handleUnauthorized();
   }) as AuthProtect;
 };
+
+const isServerActionRequest = (req: Request) => {
+  return (
+    !!req.headers.get(nextConstants.Headers.NextUrl) &&
+    (req.headers.get(constants.Headers.Accept)?.includes('text/x-component') ||
+      req.headers.get(constants.Headers.ContentType)?.includes('multipart/form-data') ||
+      !!req.headers.get(nextConstants.Headers.NextAction))
+  );
+};
+
+const isPageRequest = (req: Request): boolean => {
+  return (
+    req.headers.get(constants.Headers.SecFetchDest) === 'document' ||
+    req.headers.get(constants.Headers.Accept)?.includes('text/html') ||
+    (!!req.headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(req))
+  );
+};
+
+// In case we want to handle router handlers and server actions differently in the future
+// const isRouteHandler = (req: Request) => {
+//   return !isPageRequest(req) && !isServerAction(req);
+// };

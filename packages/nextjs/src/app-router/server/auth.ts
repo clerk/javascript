@@ -8,12 +8,13 @@ import { createProtect } from '../../server/protect';
 import { buildRequestLike } from './utils';
 
 export const auth = (): AuthObject & { protect: AuthProtect } => {
+  const request = buildRequestLike();
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing(),
-  })(buildRequestLike());
+  })(request);
 
-  return Object.assign(authObject, { protect: createProtect({ notFound, redirect, authObject }) });
+  return Object.assign(authObject, { protect: createProtect({ request, authObject, notFound, redirect }) });
 };
 
 export const initialState = () => {

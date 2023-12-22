@@ -17,7 +17,6 @@ const domain =
 
 window.Clerk = new Clerk(publishableKey, {
   proxyUrl,
-  // @ts-expect-error
   domain,
 });
 
