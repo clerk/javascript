@@ -9,7 +9,6 @@ import { Text } from './Text';
 
 const { applyVariants } = createVariants(theme => ({
   base: {
-    willChange: 'transform, opacity, height',
     marginTop: theme.sizes.$2,
     animation: `${animations.textInSmall} ${theme.transitionDuration.$fast}`,
     display: 'flex',
