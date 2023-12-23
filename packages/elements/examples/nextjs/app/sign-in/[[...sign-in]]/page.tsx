@@ -29,8 +29,6 @@ const BUTTON_BGS_HOVER: Record<string, string> = {
   google: 'rgb(51 63 97 / 0.8)',
 };
 
-import { Debug } from '@/components/debug';
-
 export default function SignInPage() {
   return (
     <SignIn>
