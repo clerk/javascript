@@ -19,20 +19,10 @@ export function Debug() {
 
   return (
     <div className='absolute text-xs flex p-4 gap-4 bottom-0 w-screen justify-center bg-secondary border-tertiary border-t'>
-      <Button
-        onClick={() => {
-          console.dir(ref.getSnapshot().context.fields);
-        }}
-      >
-        Log Fields
-      </Button>
-
-      <Button
-        onClick={() => {
-          console.dir(ref.getSnapshot().context);
-        }}
-      >
-        Log Context
+      <Button onClick={() => console.dir(ref.getSnapshot().context.fields)}>Log Fields</Button>
+      <Button onClick={() => console.dir(ref.getSnapshot().context)}>Log Context</Button>
+      <Button onClick={() => console.dir(ref.getSnapshot().context.clerk.__unstable__environment)}>
+        Log Environment
       </Button>
 
       <SignedIn>
