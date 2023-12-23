@@ -121,6 +121,11 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
   const handleCreateOrganizationClicked = () => {
     props.onCreateOrganizationClick();
   };
+
+  // Solve weird bug with swr while running unit tests
+  const userInvitationsData = userInvitations.data?.filter(a => !!a);
+  const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+
   return (
     <>
       <Header.Root
@@ -157,8 +162,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
               })}
 
             {!userMemberships.hasNextPage &&
-              (userInvitations.count || 0) > 0 &&
-              userInvitations.data?.map(inv => {
+              userInvitationsData?.map(inv => {
                 return (
                   <InvitationPreview
                     key={inv.id}
@@ -169,8 +173,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
 
             {!userMemberships.hasNextPage &&
               !userInvitations.hasNextPage &&
-              (userSuggestions.count || 0) > 0 &&
-              userSuggestions.data?.map(inv => {
+              userSuggestionsData?.map(inv => {
                 return (
                   <SuggestionPreview
                     key={inv.id}
@@ -188,7 +191,10 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
           icon={Add}
           label={localizationKeys('organizationList.action__createOrganization')}
           onClick={handleCreateOrganizationClicked}
-          sx={{ borderBottom: 'none' }}
+          sx={t => ({
+            borderBottom: 'none',
+            padding: `${t.space.$5} ${t.space.$5}`,
+          })}
           iconSx={t => ({
             width: t.sizes.$9,
             height: t.sizes.$6,

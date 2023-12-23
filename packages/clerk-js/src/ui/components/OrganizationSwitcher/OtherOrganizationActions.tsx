@@ -35,6 +35,7 @@ const CreateOrganizationButton = ({
       sx={t => ({
         borderBottom: 'none',
         color: t.colors.$blackAlpha600,
+        padding: `${t.space.$5} ${t.space.$5}`,
         ':hover': {
           color: t.colors.$blackAlpha600,
         },
@@ -57,7 +58,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
 
   return (
     <>
-      <UserInvitationSuggestionList />
+      <UserInvitationSuggestionList onOrganizationClick={onOrganizationClick} />
       <SecondaryActions
         elementDescriptor={descriptors.organizationSwitcherPopoverActions}
         role='menu'

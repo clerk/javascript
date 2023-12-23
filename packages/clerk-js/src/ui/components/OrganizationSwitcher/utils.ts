@@ -17,10 +17,13 @@ export const organizationListParams = {
 export const populateCacheUpdateItem = <T extends { id: string }>(
   updatedItem: T,
   itemsInfinitePages: (ClerkPaginatedResponse<T> | undefined)[] | undefined,
+  affectTotalCount?: 'negative',
 ) => {
   if (typeof itemsInfinitePages === 'undefined') {
     return [{ data: [updatedItem], total_count: 1 }];
   }
+
+  const prevTotalCount = itemsInfinitePages?.[itemsInfinitePages.length - 1]?.total_count || 1;
 
   /**
    * We should "preserve" an undefined page if one is found. For example if swr triggers 2 requests, page 1 & page2, and the request for page2 resolves first, at that point in memory itemsInfinitePages would look like this [undefined, {....}]
@@ -39,7 +42,11 @@ export const populateCacheUpdateItem = <T extends { id: string }>(
 
       return obj;
     });
-    return { ...item, data: newData };
+    return {
+      ...item,
+      data: newData,
+      total_count: affectTotalCount === 'negative' ? prevTotalCount - 1 : prevTotalCount,
+    };
   });
 };
 

@@ -1,7 +1,7 @@
 import { useId } from 'react';
 
 import { withOrganizationsEnabledGuard } from '../../common';
-import { withCoreUserGuard } from '../../contexts';
+import { AcceptedInvitationsProvider, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
@@ -18,24 +18,26 @@ const _OrganizationSwitcher = withFloatingTree(() => {
 
   return (
     <Flow.Root flow='organizationSwitcher'>
-      <OrganizationSwitcherTrigger
-        ref={reference}
-        onClick={toggle}
-        isOpen={isOpen}
-        aria-controls={switcherButtonMenuId}
-      />
-      <Popover
-        nodeId={nodeId}
-        context={context}
-        isOpen={isOpen}
-      >
-        <OrganizationSwitcherPopover
-          id={switcherButtonMenuId}
-          close={toggle}
-          ref={floating}
-          style={{ ...styles }}
+      <AcceptedInvitationsProvider>
+        <OrganizationSwitcherTrigger
+          ref={reference}
+          onClick={toggle}
+          isOpen={isOpen}
+          aria-controls={switcherButtonMenuId}
         />
-      </Popover>
+        <Popover
+          nodeId={nodeId}
+          context={context}
+          isOpen={isOpen}
+        >
+          <OrganizationSwitcherPopover
+            id={switcherButtonMenuId}
+            close={toggle}
+            ref={floating}
+            style={{ ...styles }}
+          />
+        </Popover>
+      </AcceptedInvitationsProvider>
     </Flow.Root>
   );
 });
