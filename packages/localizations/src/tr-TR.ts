@@ -565,7 +565,7 @@ export const trTR: LocalizationResource = {
     form_param_format_invalid: '',
     form_password_length_too_short: '',
     form_param_nil: '',
-    form_code_incorrect: '',
+    form_code_incorrect: 'Hatalı kod',
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
