@@ -48,16 +48,6 @@ type StateProps = Partial<Record<'isDisabled' | 'hasError' | 'isLoading' | 'isOp
 type RequiredProp = Partial<Record<'isRequired', boolean>>;
 
 type PrimitiveProps<HtmlT extends keyof ElementProps> = ElementProps[HtmlT] & CssProp;
-type PickSiblingProps<C extends React.FunctionComponent, T extends keyof Parameters<C>[0]> = Pick<Parameters<C>[0], T>;
 type PropsOfComponent<C extends (...args: any[]) => any> = Parameters<C>[0];
 
-export type {
-  InternalTheme,
-  PrimitiveProps,
-  PickSiblingProps,
-  PropsOfComponent,
-  StyleRule,
-  ThemableCssProp,
-  StateProps,
-  RequiredProp,
-};
+export type { InternalTheme, PrimitiveProps, PropsOfComponent, StyleRule, ThemableCssProp, StateProps, RequiredProp };
