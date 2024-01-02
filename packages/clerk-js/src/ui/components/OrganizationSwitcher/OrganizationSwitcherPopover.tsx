@@ -145,6 +145,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                   gap={4}
                   organization={currentOrg}
                   user={user}
+                  fetchRoles
                   sx={theme => t => ({ padding: `0 ${theme.space.$6}`, marginBottom: t.space.$2 })}
                 />
                 <Actions role='menu'>

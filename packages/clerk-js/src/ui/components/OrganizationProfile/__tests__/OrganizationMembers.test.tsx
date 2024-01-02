@@ -4,6 +4,7 @@ import { act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { render } from '../../../../testUtils';
+import { clearFetchCache } from '../../../hooks/useFetch';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { OrganizationMembers } from '../OrganizationMembers';
@@ -12,6 +13,13 @@ import { createFakeMember, createFakeOrganizationInvitation, createFakeOrganizat
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('OrganizationMembers', () => {
+  /**
+   * `<OrganizationMembers/>` internally uses useFetch which caches the results, be sure to clear the cache before each test
+   */
+  beforeEach(() => {
+    clearFetchCache();
+  });
+
   it('renders the Organization Members page', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
