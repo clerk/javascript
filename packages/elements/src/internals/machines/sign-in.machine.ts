@@ -48,33 +48,6 @@ export type SignInMachineEvents =
   | { type: 'START' }
   | { type: 'SUBMIT' };
 
-export const STATES = {
-  Init: 'Init',
-
-  Start: 'Start',
-  StartAttempting: 'StartAttempting',
-  StartFailure: 'StartFailure',
-
-  InitiatingOAuthAuthentication: 'InitiatingOAuthAuthentication',
-  InitiatingWeb3Authentication: 'InitiatingWeb3Authentication',
-
-  FirstFactor: 'FirstFactor',
-  FirstFactorPreparing: 'FirstFactorPreparing',
-  FirstFactorIdle: 'FirstFactorIdle',
-  FirstFactorAttempting: 'FirstFactorAttempting',
-  FirstFactorFailure: 'FirstFactorFailure',
-
-  SecondFactor: 'SecondFactor',
-  SecondFactorPreparing: 'SecondFactorPreparing',
-  SecondFactorIdle: 'SecondFactorIdle',
-  SecondFactorAttempting: 'SecondFactorAttempting',
-  SecondFactorFailure: 'SecondFactorFailure',
-
-  SSOCallbackRunning: 'SSOCallbackRunning',
-
-  Complete: 'Complete',
-} as const;
-
 export const SignInMachine = setup({
   actors: {
     ...signInActors,
@@ -122,7 +95,7 @@ export const SignInMachine = setup({
     currentFactor: null,
     fields: new Map(),
   }),
-  initial: STATES.Init,
+  initial: 'Init',
   on: {
     'FIELD.ADD': {
       actions: assign({
@@ -172,15 +145,15 @@ export const SignInMachine = setup({
         },
       }),
     },
-    'OAUTH.CALLBACK': goToChildState(STATES.SSOCallbackRunning),
+    'OAUTH.CALLBACK': goToChildState('SSOCallbackRunning'),
   },
   states: {
-    [STATES.Init]: {
+    Init: {
       invoke: {
         src: 'waitForClerk',
         input: ({ context }) => context.clerk,
         onDone: {
-          target: STATES.Start,
+          target: 'Start',
           actions: assign({
             // @ts-expect-error -- this is really IsomorphicClerk up to this point
             clerk: ({ context }) => context.clerk.clerkjs,
@@ -190,15 +163,15 @@ export const SignInMachine = setup({
         },
       },
     },
-    [STATES.Start]: {
+    Start: {
       entry: ({ context }) => console.log('Start entry: ', context),
       on: {
-        'AUTHENTICATE.OAUTH': STATES.InitiatingOAuthAuthentication,
-        // 'AUTHENTICATE.WEB3': STATES.InitiatingWeb3Authentication,
-        SUBMIT: STATES.StartAttempting,
+        'AUTHENTICATE.OAUTH': 'InitiatingOAuthAuthentication',
+        // 'AUTHENTICATE.WEB3': 'InitiatingWeb3Authentication',
+        SUBMIT: 'StartAttempting',
       },
     },
-    [STATES.StartAttempting]: {
+    StartAttempting: {
       entry: () => console.log('StartAttempting'),
       invoke: {
         src: 'createSignIn',
@@ -208,22 +181,22 @@ export const SignInMachine = setup({
         }),
         onDone: { actions: 'assignResourceToContext' },
         onError: {
-          target: STATES.StartFailure,
+          target: 'StartFailure',
           actions: 'assignErrorMessageToContext',
         },
       },
       always: [
         {
           guard: ({ context }) => context?.resource?.status === 'complete',
-          target: STATES.Complete,
+          target: 'Complete',
         },
         {
           guard: ({ context }) => context?.resource?.status === 'needs_first_factor',
-          target: STATES.FirstFactor,
+          target: 'FirstFactor',
         },
       ],
     },
-    [STATES.StartFailure]: {
+    StartFailure: {
       entry: ({ context }) => console.log('StartFailure entry: ', context),
       always: [
         {
@@ -239,14 +212,14 @@ export const SignInMachine = setup({
         },
         {
           guard: 'hasClerkAPIError',
-          target: STATES.Start,
+          target: 'Start',
         },
       ],
     },
-    [STATES.FirstFactor]: {
+    FirstFactor: {
       always: 'FirstFactorPreparing',
     },
-    [STATES.FirstFactorPreparing]: {
+    FirstFactorPreparing: {
       invoke: {
         id: 'prepareFirstFactor',
         src: 'prepareFirstFactor',
@@ -256,7 +229,7 @@ export const SignInMachine = setup({
           params: {},
         }),
         onDone: {
-          target: STATES.FirstFactor,
+          target: 'FirstFactor',
           actions: [
             'assignResourceToContext',
             {
@@ -268,20 +241,20 @@ export const SignInMachine = setup({
           ],
         },
         onError: {
-          target: STATES.Start,
+          target: 'Start',
           actions: ['assignErrorMessageToContext'],
         },
       },
     },
-    [STATES.FirstFactorIdle]: {
+    FirstFactorIdle: {
       on: {
         SUBMIT: {
           // guard: ({ context }) => !!context.resource,
-          target: STATES.FirstFactorAttempting,
+          target: 'FirstFactorAttempting',
         },
       },
     },
-    [STATES.FirstFactorAttempting]: {
+    FirstFactorAttempting: {
       invoke: {
         id: 'prepareFirstFactor',
         src: 'prepareFirstFactor',
@@ -291,7 +264,7 @@ export const SignInMachine = setup({
           params: {},
         }),
         onDone: {
-          target: STATES.FirstFactor,
+          target: 'FirstFactor',
           actions: [
             'assignResourceToContext',
             {
@@ -303,16 +276,16 @@ export const SignInMachine = setup({
           ],
         },
         onError: {
-          target: STATES.FirstFactorIdle,
+          target: 'FirstFactorIdle',
           actions: 'assignErrorMessageToContext',
         },
       },
     },
-    [STATES.FirstFactorFailure]: {
+    FirstFactorFailure: {
       always: [
         {
           guard: 'hasClerkAPIError',
-          target: STATES.FirstFactorIdle,
+          target: 'FirstFactorIdle',
         },
         {
           actions: {
@@ -324,10 +297,10 @@ export const SignInMachine = setup({
         },
       ],
     },
-    [STATES.SecondFactor]: {
-      always: STATES.SecondFactorPreparing,
+    SecondFactor: {
+      always: 'SecondFactorPreparing',
     },
-    [STATES.SecondFactorPreparing]: {
+    SecondFactorPreparing: {
       invoke: {
         id: 'prepareSecondFactor',
         src: 'prepareSecondFactor',
@@ -337,25 +310,25 @@ export const SignInMachine = setup({
           params: {},
         }),
         onDone: {
-          target: STATES.SecondFactorIdle,
+          target: 'SecondFactorIdle',
           actions: ['assignResourceToContext'],
         },
         onError: {
-          target: STATES.SecondFactorIdle,
+          target: 'SecondFactorIdle',
           actions: ['assignErrorMessageToContext'],
         },
       },
     },
-    [STATES.SecondFactorIdle]: {
+    SecondFactorIdle: {
       on: {
         RETRY: 'SecondFactorPreparing',
         SUBMIT: {
           // guard: ({ context }) => !!context.resource,
-          target: STATES.SecondFactorAttempting,
+          target: 'SecondFactorAttempting',
         },
       },
     },
-    [STATES.SecondFactorAttempting]: {
+    SecondFactorAttempting: {
       invoke: {
         id: 'prepareFirstFactor',
         src: 'prepareFirstFactor',
@@ -365,7 +338,7 @@ export const SignInMachine = setup({
           params: {},
         }),
         onDone: {
-          target: STATES.SecondFactorIdle,
+          target: 'SecondFactorIdle',
           actions: [
             'assignResourceToContext',
             {
@@ -377,21 +350,21 @@ export const SignInMachine = setup({
           ],
         },
         onError: {
-          target: STATES.SecondFactorIdle,
+          target: 'SecondFactorIdle',
           actions: ['assignErrorMessageToContext'],
         },
       },
-      [STATES.SecondFactorFailure]: {
+      SecondFactorFailure: {
         always: [
           {
             guard: 'hasClerkAPIError',
-            target: STATES.SecondFactorIdle,
+            target: 'SecondFactorIdle',
           },
-          { target: STATES.Complete },
+          { target: 'Complete' },
         ],
       },
     },
-    [STATES.SSOCallbackRunning]: {
+    SSOCallbackRunning: {
       entry: () => console.log('StartAttempting'),
       invoke: {
         src: 'handleSSOCallback',
@@ -405,22 +378,22 @@ export const SignInMachine = setup({
         }),
         onDone: { actions: 'assignResourceToContext' },
         onError: {
-          target: STATES.StartFailure,
+          target: 'StartFailure',
           actions: 'assignErrorMessageToContext',
         },
       },
       always: [
         {
           guard: ({ context }) => context?.resource?.status === 'complete',
-          target: STATES.Complete,
+          target: 'Complete',
         },
         {
           guard: ({ context }) => context?.resource?.status === 'needs_first_factor',
-          target: STATES.FirstFactor,
+          target: 'FirstFactor',
         },
       ],
     },
-    [STATES.InitiatingOAuthAuthentication]: {
+    InitiatingOAuthAuthentication: {
       entry: () => console.log('InitiatingOAuthAuthentication'),
       invoke: {
         src: 'authenticateWithRedirect',
@@ -433,22 +406,22 @@ export const SignInMachine = setup({
           };
         },
         onError: {
-          target: STATES.StartFailure,
+          target: 'StartFailure',
           actions: 'assignErrorMessageToContext',
         },
       },
     },
-    // [STATES.InitiatingWeb3Authentication]: {
+    // InitiatingWeb3Authentication: {
     //   entry: () => console.log('InitiatingWeb3Authentication'),
     //   invoke: {
     //     src: 'authenticateWithMetamask',
     //     onError: {
-    //       target: STATES.StartFailure,
+    //       target: 'StartFailure',
     //       actions: 'assignErrorMessageToContext',
     //     },
     //   },
     // },
-    [STATES.Complete]: {
+    Complete: {
       type: 'final',
       entry: ({ context }) => {
         const beforeEmit = () => context.router.push(context.clerk.buildAfterSignInUrl());
