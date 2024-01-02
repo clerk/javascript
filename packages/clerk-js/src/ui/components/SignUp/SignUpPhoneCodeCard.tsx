@@ -7,9 +7,10 @@ import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const signUp = useCoreSignUp();
 
+  const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
+  const shouldAvoidPrepare = !signUp.status || phoneVerificationStatus === 'verified';
   const prepare = () => {
-    const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
-    if (!signUp.status || phoneVerificationStatus === 'verified') {
+    if (shouldAvoidPrepare) {
       return;
     }
     return signUp.preparePhoneNumberVerification({ strategy: 'phone_code' });
@@ -17,10 +18,9 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
 
   // TODO: Introduce a useMutation to handle mutating requests
   useFetch(
-    // @ts-ignore Typescript complains because prepare may return undefined
-    prepare,
+    shouldAvoidPrepare ? undefined : () => signUp.preparePhoneNumberVerification({ strategy: 'phone_code' }),
     {
-      name: 'prepare',
+      name: 'signUp.preparePhoneNumberVerification',
       strategy: 'phone_code',
       number: signUp.phoneNumber,
     },
