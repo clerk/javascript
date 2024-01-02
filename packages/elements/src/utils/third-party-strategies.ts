@@ -1,9 +1,10 @@
+// c.f. vendor/clerk-js/src/ui/hooks/useEnabledThirdPartyProviders.tsx [Modified]
+
 import type { EnvironmentResource, OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import { OAUTH_PROVIDERS, WEB3_PROVIDERS } from '@clerk/types'; // TODO: This import shouldn't be part of @clerk/types
 
 import { fromEntries, iconImageUrl } from './clerk-js';
 
-// c.f. vendor/clerk-js/src/ui/hooks/useEnabledThirdPartyProviders.tsx [Modified]
 export interface ThirdPartyStrategy {
   id: Web3Provider | OAuthProvider;
   iconUrl: string;
