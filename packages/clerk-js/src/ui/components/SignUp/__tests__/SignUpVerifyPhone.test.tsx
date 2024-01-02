@@ -1,3 +1,4 @@
+import { waitFor } from '@testing-library/dom';
 import React from 'react';
 
 import { render, screen } from '../../../../testUtils';
@@ -19,8 +20,8 @@ describe('SignUpVerifyPhone', () => {
       f.startSignUpWithPhoneNumber({ phoneNumber: '+306911111111' });
     });
     fixtures.signUp.preparePhoneNumberVerification.mockRejectedValue(null);
-    render(<SignUpVerifyPhone />, { wrapper });
-    screen.getByText('+30 691 1111111');
+    const { findByText } = render(<SignUpVerifyPhone />, { wrapper });
+    await waitFor(async () => expect(await findByText('+30 691 1111111')).toBeInTheDocument());
   });
 
   it('shows the verify with code message', async () => {
@@ -29,9 +30,11 @@ describe('SignUpVerifyPhone', () => {
       f.startSignUpWithPhoneNumber();
     });
     fixtures.signUp.preparePhoneNumberVerification.mockRejectedValue(null);
-    render(<SignUpVerifyPhone />, { wrapper });
-    screen.getByText(/Verify your phone/i);
-    screen.getByText(/Enter the verification code sent to your phone/i);
+    const { findByText } = render(<SignUpVerifyPhone />, { wrapper });
+    await waitFor(async () => expect(await findByText(/Verify your phone/i)).toBeInTheDocument());
+    await waitFor(async () =>
+      expect(await findByText(/Enter the verification code sent to your phone/i)).toBeInTheDocument(),
+    );
   });
 
   it('clicking on the edit icon navigates to the previous route', async () => {
@@ -55,9 +58,8 @@ describe('SignUpVerifyPhone', () => {
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
     fixtures.signUp.preparePhoneNumberVerification.mockRejectedValue(null);
-    render(<SignUpVerifyPhone />, { wrapper });
-    const resendButton = screen.getByText(/Resend/i);
-    expect(resendButton.tagName.toUpperCase()).toBe('BUTTON');
+    const { findByText } = render(<SignUpVerifyPhone />, { wrapper });
+    await waitFor(async () => expect((await findByText(/Resend/i)).tagName.toUpperCase()).toBe('BUTTON'));
   });
 
   it.todo('Resend code button is pressable after 30 seconds');
