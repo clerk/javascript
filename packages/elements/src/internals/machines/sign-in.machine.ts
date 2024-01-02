@@ -1,36 +1,37 @@
 import { type ClerkAPIResponseError, isClerkAPIResponseError } from '@clerk/shared/error';
-import type { LoadedClerk, SignInResource } from '@clerk/types';
-import { assign, setup } from 'xstate';
+import type { OAuthStrategy, SignInResource, Web3Strategy } from '@clerk/types';
+import type { DoneActorEvent, DoneStateEvent, ErrorActorEvent } from 'xstate';
+import { assertEvent, assign, setup } from 'xstate';
 
+import type { EnabledThirdPartyProviders } from '../../utils/third-party-strategies';
+import { getEnabledThirdPartyProviders } from '../../utils/third-party-strategies';
 import type { ClerkHostRouter } from '../router';
 import { waitForClerk } from './shared.actors';
-import {
-  attemptFirstFactor,
-  attemptSecondFactor,
-  createSignIn,
-  prepareFirstFactor,
-  prepareSecondFactor,
-} from './sign-in.actors';
-import type { FieldDetails } from './sign-in.types';
+import * as signInActors from './sign-in.actors';
+import type { FieldDetails, LoadedClerkWithEnv } from './sign-in.types';
+import { assertActorEventDone, assertActorEventError } from './utils/assert';
+import { goToChildState } from './utils/states';
 
 export interface SignInMachineContext {
-  clerk: LoadedClerk;
-  router: ClerkHostRouter;
+  clerk: LoadedClerkWithEnv;
+  enabledThirdPartyProviders?: EnabledThirdPartyProviders;
   error?: Error | ClerkAPIResponseError;
-  resource?: SignInResource;
   fields: Map<string, FieldDetails>;
+  resource?: SignInResource;
+  router: ClerkHostRouter;
 }
 
 export interface SignInMachineInput {
-  clerk: LoadedClerk;
+  clerk: LoadedClerkWithEnv;
   router: ClerkHostRouter;
 }
 
 export type SignInMachineEvents =
-  | { type: 'START' }
-  | { type: 'SUBMIT' }
-  | { type: 'NEXT' }
-  | { type: 'RETRY' }
+  | DoneActorEvent
+  | ErrorActorEvent
+  | DoneStateEvent
+  | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
+  | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
   | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'type' | 'value'> }
   | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'type'> }
   | {
@@ -40,7 +41,12 @@ export type SignInMachineEvents =
   | {
       type: 'FIELD.ERROR';
       field: Pick<FieldDetails, 'type' | 'error'>;
-    };
+    }
+  | { type: 'NEXT' }
+  | { type: 'OAUTH.CALLBACK' }
+  | { type: 'RETRY' }
+  | { type: 'START' }
+  | { type: 'SUBMIT' };
 
 export const STATES = {
   Init: 'Init',
@@ -48,6 +54,9 @@ export const STATES = {
   Start: 'Start',
   StartAttempting: 'StartAttempting',
   StartFailure: 'StartFailure',
+
+  InitiatingOAuthAuthentication: 'InitiatingOAuthAuthentication',
+  InitiatingWeb3Authentication: 'InitiatingWeb3Authentication',
 
   FirstFactor: 'FirstFactor',
   FirstFactorPreparing: 'FirstFactorPreparing',
@@ -61,32 +70,29 @@ export const STATES = {
   SecondFactorAttempting: 'SecondFactorAttempting',
   SecondFactorFailure: 'SecondFactorFailure',
 
+  SSOCallbackRunning: 'SSOCallbackRunning',
+
   Complete: 'Complete',
 } as const;
 
-function eventHasError<T = any>(value: T): value is T & { error: Error } {
-  // @ts-expect-error - TODO: fix
-  return value.error instanceof Error;
-}
-
 export const SignInMachine = setup({
   actors: {
+    ...signInActors,
     waitForClerk,
-    createSignIn,
-    prepareFirstFactor,
-    attemptFirstFactor,
-    prepareSecondFactor,
-    attemptSecondFactor,
-    // authenticateWithRedirect,
   },
   actions: {
     assignResourceToContext: assign({
-      // @ts-expect-error - TODO: fix types
-      resource: ({ event }) => event.output,
+      resource: ({ event }) => {
+        assertActorEventDone<SignInResource>(event);
+        return event.output;
+      },
     }),
 
     assignErrorMessageToContext: assign({
-      error: ({ context, event }) => (eventHasError(event) ? event.error : context.error),
+      error: ({ event }) => {
+        assertActorEventError(event);
+        return event.error;
+      },
     }),
 
     navigateTo: ({ context }, { path }: { path: string }) => context.router.replace(path),
@@ -166,6 +172,7 @@ export const SignInMachine = setup({
         },
       }),
     },
+    'OAUTH.CALLBACK': goToChildState(STATES.SSOCallbackRunning),
   },
   states: {
     [STATES.Init]: {
@@ -177,6 +184,8 @@ export const SignInMachine = setup({
           actions: assign({
             // @ts-expect-error -- this is really IsomorphicClerk up to this point
             clerk: ({ context }) => context.clerk.clerkjs,
+            enabledThirdPartyProviders: ({ context }) =>
+              getEnabledThirdPartyProviders(context.clerk.__unstable__environment),
           }),
         },
       },
@@ -184,13 +193,13 @@ export const SignInMachine = setup({
     [STATES.Start]: {
       entry: ({ context }) => console.log('Start entry: ', context),
       on: {
-        SUBMIT: {
-          target: STATES.StartAttempting,
-        },
+        'AUTHENTICATE.OAUTH': STATES.InitiatingOAuthAuthentication,
+        // 'AUTHENTICATE.WEB3': STATES.InitiatingWeb3Authentication,
+        SUBMIT: STATES.StartAttempting,
       },
     },
     [STATES.StartAttempting]: {
-      entry: ({ context }) => console.log('StartAttempting entry: ', context),
+      entry: () => console.log('StartAttempting'),
       invoke: {
         src: 'createSignIn',
         input: ({ context }) => ({
@@ -382,6 +391,63 @@ export const SignInMachine = setup({
         ],
       },
     },
+    [STATES.SSOCallbackRunning]: {
+      entry: () => console.log('StartAttempting'),
+      invoke: {
+        src: 'handleSSOCallback',
+        input: ({ context }) => ({
+          clerk: context.clerk,
+          params: {
+            firstFactorUrl: '../factor-one',
+            secondFactorUrl: '../factor-two',
+          },
+          router: context.router,
+        }),
+        onDone: { actions: 'assignResourceToContext' },
+        onError: {
+          target: STATES.StartFailure,
+          actions: 'assignErrorMessageToContext',
+        },
+      },
+      always: [
+        {
+          guard: ({ context }) => context?.resource?.status === 'complete',
+          target: STATES.Complete,
+        },
+        {
+          guard: ({ context }) => context?.resource?.status === 'needs_first_factor',
+          target: STATES.FirstFactor,
+        },
+      ],
+    },
+    [STATES.InitiatingOAuthAuthentication]: {
+      entry: () => console.log('InitiatingOAuthAuthentication'),
+      invoke: {
+        src: 'authenticateWithRedirect',
+        input: ({ context, event }) => {
+          assertEvent(event, 'AUTHENTICATE.OAUTH');
+
+          return {
+            clerk: context.clerk,
+            strategy: event.strategy,
+          };
+        },
+        onError: {
+          target: STATES.StartFailure,
+          actions: 'assignErrorMessageToContext',
+        },
+      },
+    },
+    // [STATES.InitiatingWeb3Authentication]: {
+    //   entry: () => console.log('InitiatingWeb3Authentication'),
+    //   invoke: {
+    //     src: 'authenticateWithMetamask',
+    //     onError: {
+    //       target: STATES.StartFailure,
+    //       actions: 'assignErrorMessageToContext',
+    //     },
+    //   },
+    // },
     [STATES.Complete]: {
       type: 'final',
       entry: ({ context }) => {

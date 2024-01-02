@@ -1,9 +1,13 @@
 'use client';
 import { useNextRouter } from './internals/router';
 
-export * from './common/form';
+/** Common Components */
+export { Form, Input, Field, Label, Submit } from './common/form';
+export { SocialProviders } from './common/social-providers';
 
-export { useSignInFlow, useSignInFlowSelector } from './internals/machines/sign-in.context';
+/** Sign In Components */
 export { SignIn, SignInStart, SignInFactorOne, SignInFactorTwo, SignInSSOCallback } from './sign-in';
 
+/** Hooks */
+export { useSignInFlow, useSignInFlowSelector } from './internals/machines/sign-in.context';
 export { useNextRouter };
