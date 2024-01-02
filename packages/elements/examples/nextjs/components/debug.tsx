@@ -26,7 +26,7 @@ export function Debug() {
       </Button>
 
       <SignedIn>
-        <SignOutButton>
+        <SignOutButton redirectUrl='/sign-in'>
           <Button>Sign Out</Button>
         </SignOutButton>
       </SignedIn>
