@@ -14,10 +14,11 @@ describe('SignUpVerifyEmail', () => {
   });
 
   it('shows the email associated with the sign up', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
+    fixtures.signUp.prepareEmailAddressVerification.mockRejectedValue(null);
     render(<SignUpVerifyEmail />, { wrapper });
     screen.getByText('test@clerk.com');
   });
@@ -44,13 +45,8 @@ describe('SignUpVerifyEmail', () => {
       f.withEmailAddress({ required: true, verifications: ['email_code'] });
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
-    fixtures.signUp.createEmailLinkFlow.mockImplementation(
-      () =>
-        ({
-          startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-          cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-        } as any),
-    );
+
+    fixtures.signUp.prepareEmailAddressVerification.mockRejectedValue(null);
 
     render(<SignUpVerifyEmail />, { wrapper });
     screen.getByText(/Verify your email/i);
@@ -62,6 +58,8 @@ describe('SignUpVerifyEmail', () => {
       f.withEmailAddress({ required: true });
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
+    fixtures.signUp.prepareEmailAddressVerification.mockRejectedValue(null);
+
     const { userEvent } = render(<SignUpVerifyEmail />, { wrapper });
     await userEvent.click(
       screen.getByRole('button', {
@@ -94,13 +92,8 @@ describe('SignUpVerifyEmail', () => {
       f.withEmailAddress({ required: true, verifications: ['email_code'] });
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
-    fixtures.signUp.createEmailLinkFlow.mockImplementation(
-      () =>
-        ({
-          startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-          cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-        } as any),
-    );
+
+    fixtures.signUp.prepareEmailAddressVerification.mockRejectedValue(null);
 
     render(<SignUpVerifyEmail />, { wrapper });
     const resendButton = screen.getByText(/Resend/i);
