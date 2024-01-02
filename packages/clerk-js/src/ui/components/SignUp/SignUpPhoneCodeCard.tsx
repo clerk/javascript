@@ -1,26 +1,33 @@
-import React from 'react';
-
 import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { withCardStateProvider } from '../../elements';
+import { useFetch } from '../../hooks';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
 export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const signUp = useCoreSignUp();
 
-  React.useEffect(() => {
-    // TODO: This prepare method is not idempotent.
-    // We need to make sure that R18 won't trigger this twice
-    void prepare();
-  }, []);
-
+  const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
+  const shouldAvoidPrepare = !signUp.status || phoneVerificationStatus === 'verified';
   const prepare = () => {
-    const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
-    if (!signUp.status || phoneVerificationStatus === 'verified') {
+    if (shouldAvoidPrepare) {
       return;
     }
     return signUp.preparePhoneNumberVerification({ strategy: 'phone_code' });
   };
+
+  // TODO: Introduce a useMutation to handle mutating requests
+  useFetch(
+    shouldAvoidPrepare ? undefined : () => signUp.preparePhoneNumberVerification({ strategy: 'phone_code' }),
+    {
+      name: 'signUp.preparePhoneNumberVerification',
+      strategy: 'phone_code',
+      number: signUp.phoneNumber,
+    },
+    {
+      staleTime: 100,
+    },
+  );
 
   const attempt = (code: string) => signUp.attemptPhoneNumberVerification({ code });
 
