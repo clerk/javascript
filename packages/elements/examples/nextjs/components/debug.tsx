@@ -35,6 +35,14 @@ export function Debug() {
         Log Context
       </Button>
 
+      <Button
+        onClick={() => {
+          console.dir(ref.getSnapshot());
+        }}
+      >
+        Log Everything
+      </Button>
+
       <SignedIn>
         <SignOutButton>
           <Button>Sign Out</Button>

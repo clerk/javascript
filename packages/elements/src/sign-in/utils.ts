@@ -73,3 +73,22 @@ function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier
 
   return null;
 }
+
+// The priority of second factors is: TOTP -> Phone code -> any other factor
+export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[]): SignInFactor | null {
+  if (!secondFactors || secondFactors.length === 0) {
+    return null;
+  }
+
+  const totpFactor = secondFactors.find(f => f.strategy === 'totp');
+  if (totpFactor) {
+    return totpFactor;
+  }
+
+  const phoneCodeFactor = secondFactors.find(f => f.strategy === 'phone_code');
+  if (phoneCodeFactor) {
+    return phoneCodeFactor;
+  }
+
+  return secondFactors[0];
+}

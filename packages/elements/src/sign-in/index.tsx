@@ -28,22 +28,6 @@ export function SignInStartInner({ children }: { children: React.ReactNode }) {
   useEffect(() => ref.send({ type: 'START' }), [ref]);
 
   return children;
-  // return (
-  //   <form
-  //     onSubmit={(event: any) => {
-  //       event.preventDefault();
-
-  //       const fields = {
-  //         identifier: { value: event.target.elements.identifier?.value },
-  //         password: { value: event.target.elements.password?.value },
-  //       };
-
-  //       ref.send({ type: 'SUBMIT', fields });
-  //     }}
-  //   >
-  //     {children}
-  //   </form>
-  // );
 }
 
 export function SignInStart({ children }: { children: React.ReactNode }) {

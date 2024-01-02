@@ -4,12 +4,13 @@ import type {
   LoadedClerk,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
+  SignInFirstFactor,
   SignInResource,
 } from '@clerk/types';
 import { fromPromise } from 'xstate';
 
 import type { SignInMachineContext } from './sign-in.machine';
-import type { SignInResourceParams } from './sign-in.types';
+import type { SignInResourceParams, FieldDetails } from './sign-in.types';
 
 export const createSignIn = fromPromise<
   SignInResource,
@@ -45,13 +46,35 @@ export const prepareFirstFactor = fromPromise<SignInResource, SignInResourcePara
   },
 );
 
-export const attemptFirstFactor = fromPromise<SignInResource, SignInResourceParams<AttemptFirstFactorParams>>(
-  async ({ input: { client, params } }) => {
+export const attemptFirstFactor = fromPromise<
+  SignInResource,
+  SignInResourceParams<{ fields: Map<string, FieldDetails>; currentFactor: SignInFirstFactor }>
+>(
+  async ({
+    input: {
+      client,
+      params: { fields, currentFactor },
+    },
+  }) => {
     if (!client.signIn) {
       throw new Error('signIn not available'); // TODO: better error
     }
 
-    return client.signIn.attemptFirstFactor(params);
+    let params;
+
+    if (currentFactor.strategy === 'password') {
+      params = {
+        strategy: 'password',
+        password: fields.get('password')?.value as string,
+      };
+    } else {
+      params = {
+        strategy: currentFactor.strategy,
+        code: fields.get('code')?.value as string,
+      };
+    }
+
+    return client.signIn.attemptFirstFactor(params as AttemptFirstFactorParams);
   },
 );
 
