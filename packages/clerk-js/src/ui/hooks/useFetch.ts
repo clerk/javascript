@@ -37,7 +37,7 @@ const useCache = <K = any, V = any>(
   key: K,
 ): {
   getCache: () => State<V> | undefined;
-  setCache: (state: State) => void;
+  setCache: (state: State<V>) => void;
   subscribeCache: (callback: () => void) => () => void;
 } => {
   const serializedKey = serialize(key);
@@ -64,18 +64,21 @@ const useCache = <K = any, V = any>(
 export const useFetch = <K, T>(
   fetcher: ((...args: any) => Promise<T>) | undefined,
   params: K,
-  callbacks?: {
+  options?: {
     onSuccess?: (data: T) => void;
+    staleTime?: number;
   },
 ) => {
   const { subscribeCache, getCache, setCache } = useCache<K, T>(params);
+
+  const staleTime = options?.staleTime || 1000 * 60 * 2; //cache for 2 minutes by default
   const fetcherRef = useRef(fetcher);
 
   const cached = useSyncExternalStore(subscribeCache, getCache);
 
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;
-    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) < 1000 * 60 * 2; //cache for 2 minutes;
+    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) < staleTime;
     const isRequestOnGoing = getCache()?.isValidating;
 
     if (fetcherMissing || isCacheStale || isRequestOnGoing) {
@@ -99,7 +102,7 @@ export const useFetch = <K, T>(
             error: null,
             cachedAt: Date.now(),
           });
-          callbacks?.onSuccess?.(data);
+          options?.onSuccess?.(data);
         }
       })
       .catch(() => {

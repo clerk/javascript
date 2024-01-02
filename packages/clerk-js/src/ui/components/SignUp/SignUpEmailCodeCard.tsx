@@ -1,17 +1,10 @@
-import React from 'react';
-
 import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
+import { useFetch } from '../../hooks';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
 export const SignUpEmailCodeCard = () => {
   const signUp = useCoreSignUp();
-
-  React.useEffect(() => {
-    // TODO: This prepare method is not idempotent.
-    // We need to make sure that R18 won't trigger this twice
-    void prepare();
-  }, []);
 
   const prepare = () => {
     const emailVerificationStatus = signUp.verifications.emailAddress.status;
@@ -20,6 +13,20 @@ export const SignUpEmailCodeCard = () => {
     }
     return signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
   };
+
+  // TODO: Introduce a useMutation to handle mutating requests
+  useFetch(
+    // @ts-ignore Typescript complains because prepare may return undefined
+    prepare,
+    {
+      name: 'prepare',
+      strategy: 'email_code',
+      number: signUp.emailAddress,
+    },
+    {
+      staleTime: 100,
+    },
+  );
 
   const attempt = (code: string) => signUp.attemptEmailAddressVerification({ code });
 
