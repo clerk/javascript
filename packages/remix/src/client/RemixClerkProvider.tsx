@@ -1,10 +1,9 @@
-import type { ClerkProviderOptionsWrapper } from '@clerk/clerk-react';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import { assertValidClerkState, warnForSsr } from '../utils';
 import { ClerkRemixOptionsProvider } from './RemixOptionsContext';
-import type { ClerkState } from './types';
+import type { ClerkState, RemixClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
@@ -13,10 +12,6 @@ const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
 };
-
-export type RemixClerkProviderProps = {
-  clerkState: ClerkState;
-} & ClerkProviderOptionsWrapper;
 
 /**
  * Remix hydration errors should not stop Clerk navigation from working, as the components mount only after
@@ -31,7 +26,16 @@ export type RemixClerkProviderProps = {
  */
 const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 
-export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): JSX.Element {
+/**
+ * Internal type that includes the initial state prop that is passed to the ClerkProvider
+ * during SSR.
+ * This is a value that we pass automatically so it does not need to pollute the public API.
+ */
+type ClerkProviderPropsWithState = RemixClerkProviderProps & {
+  clerkState: ClerkState;
+};
+
+export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
 
   React.useEffect(() => {

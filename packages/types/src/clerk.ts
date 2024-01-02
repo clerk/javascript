@@ -503,19 +503,17 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
  * Navigation options used to replace or push history changes.
  * Both `routerPush` & `routerReplace` OR none options should be passed.
  */
-type ClerkOptionsNavigationFn =
+type ClerkOptionsNavigation =
   | {
       routerPush?: never;
+      routerDebug?: boolean;
       routerReplace?: never;
     }
   | {
       routerPush: (to: string) => Promise<unknown> | unknown;
       routerReplace: (to: string) => Promise<unknown> | unknown;
+      routerDebug?: boolean;
     };
-
-type ClerkOptionsNavigation = ClerkOptionsNavigationFn & {
-  routerDebug?: boolean;
-};
 
 export type ClerkOptions = ClerkOptionsNavigation &
   AfterActionURLs & {

@@ -1,5 +1,6 @@
-import type { ClerkProviderOptionsWrapper } from '@clerk/clerk-react';
-import type { InitialState } from '@clerk/types';
+import type { ClerkProviderProps } from '@clerk/clerk-react';
+import type { InitialState, Without } from '@clerk/types';
+import type React from 'react';
 
 export type ClerkState = {
   __type: 'clerkState';
@@ -26,4 +27,11 @@ export type WithClerkState<U = any> = {
   clerkState: { __type: 'clerkState' };
 };
 
-export type RemixClerkProviderProps = ClerkProviderOptionsWrapper;
+export type RemixClerkProviderProps = Without<ClerkProviderProps, 'publishableKey' | 'initialState'> & {
+  /**
+   * Used to override the default CLERK_PUBLISHABLE_KEY env variable if needed.
+   * This is optional for Remix as the ClerkProvider will automatically use the CLERK_PUBLISHABLE_KEY env variable if it exists.
+   */
+  publishableKey?: string;
+  children: React.ReactNode;
+};
