@@ -4,7 +4,7 @@ import type { EnvironmentResource, OAuthStrategy, SignInResource, Web3Strategy }
 import type { MachineContext } from 'xstate';
 import { and, assertEvent, assign, enqueueActions, log, not, raise, setup } from 'xstate';
 
-import type { ClerkHostRouter } from '../router';
+import type { ClerkRouter } from '../router';
 import { waitForClerk } from './shared.actors';
 import * as signInActors from './sign-in.actors';
 import type { FieldDetails, LoadedClerkWithEnv } from './sign-in.types';
@@ -17,12 +17,12 @@ export interface SignInMachineContext extends MachineContext {
   loaded: boolean;
   mode: 'browser' | 'server';
   resource: SignInResource | null;
-  router: ClerkHostRouter;
+  router: ClerkRouter;
 }
 
 export interface SignInMachineInput {
   clerk: LoadedClerkWithEnv;
-  router: ClerkHostRouter;
+  router: ClerkRouter;
 }
 
 export type SignInMachineEvents =
