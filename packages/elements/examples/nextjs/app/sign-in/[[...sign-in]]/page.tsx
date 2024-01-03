@@ -74,22 +74,16 @@ export default function SignInPage() {
                 name='identifier'
                 className='flex gap-4 justify-between items-center'
               >
-                <Label htmlFor='password'>Email</Label>
-                <Input
-                  type='identifier'
-                  className='bg-tertiary rounded-sm px-2 py-1 border border-foreground'
-                />
+                <Label>Email</Label>
+                <Input className='bg-tertiary rounded-sm px-2 py-1 border border-foreground' />
               </Field>
 
               <Field
                 name='password'
                 className='flex gap-4 justify-between items-center'
               >
-                <Label htmlFor='password'>Password</Label>
-                <Input
-                  type='password'
-                  className='bg-tertiary rounded-sm px-2 py-1 border border-foreground'
-                />
+                <Label>Password</Label>
+                <Input className='bg-tertiary rounded-sm px-2 py-1 border border-foreground' />
               </Field>
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>

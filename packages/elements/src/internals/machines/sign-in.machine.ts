@@ -90,19 +90,15 @@ export const SignInMachine = setup({
   types: {} as SignInMachineTypes,
 }).createMachine({
   id: 'SignIn',
-  context: ({ input }) => {
-    console.debug({ mode: input.clerk.mode, loaded: input.clerk.loaded });
-
-    return {
-      clerk: input.clerk,
-      environment: input.clerk.__unstable__environment,
-      mode: input.clerk.mode,
-      loaded: input.clerk.loaded,
-      router: input.router,
-      resource: null,
-      fields: new Map(),
-    };
-  },
+  context: ({ input }) => ({
+    clerk: input.clerk,
+    environment: input.clerk.__unstable__environment,
+    mode: input.clerk.mode,
+    loaded: input.clerk.loaded,
+    router: input.router,
+    resource: null,
+    fields: new Map(),
+  }),
   on: {
     'FIELD.ADD': {
       actions: assign({
