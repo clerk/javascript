@@ -107,6 +107,7 @@ const Preview = (
       sx={t => ({
         justifyContent: 'space-between',
         padding: `${t.space.$4} ${t.space.$5}`,
+        borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
       })}
     >
       <OrganizationPreview
@@ -197,9 +198,6 @@ const SwitcherInvitationActions = (props: PropsOfComponent<typeof Flex> & { show
   const { showBorder, ...restProps } = props;
   return (
     <Actions
-      sx={t => ({
-        borderBottom: showBorder ? `${t.borders.$normal} ${t.colors.$blackAlpha100}` : 'none',
-      })}
       role='menu'
       {...restProps}
     />
