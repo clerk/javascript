@@ -3,7 +3,7 @@ import { AuthStatus, constants, createClerkRequest, redirect } from '@clerk/back
 import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { appendDevBrowserOnCrossOrigin, isRedirect, setHeader } from '../utils';
+import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 import type { AuthProtect } from './protect';
@@ -101,7 +101,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     if (isRedirect(handlerResult)) {
       const res = setHeader(handlerResult, constants.Headers.AuthReason, 'redirect');
-      return appendDevBrowserOnCrossOrigin(clerkRequest, res, options);
+      return serverRedirectWithAuth(clerkRequest, res, options);
     }
 
     if (options.debug) {

@@ -9,11 +9,7 @@ import { SECRET_KEY } from '../server/constants';
 /**
  * Grabs the dev browser JWT from cookies and appends it to the redirect URL when redirecting to cross-origin.
  */
-export const appendDevBrowserOnCrossOrigin = (
-  clerkRequest: ClerkRequest,
-  res: Response,
-  opts: AuthenticateRequestOptions,
-) => {
+export const serverRedirectWithAuth = (clerkRequest: ClerkRequest, res: Response, opts: AuthenticateRequestOptions) => {
   const location = res.headers.get('location');
   const shouldAppendDevBrowser = res.headers.get(constants.Headers.ClerkRedirectTo) === 'true';
 

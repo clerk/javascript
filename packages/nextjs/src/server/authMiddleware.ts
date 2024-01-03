@@ -5,7 +5,7 @@ import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { appendDevBrowserOnCrossOrigin, isRedirect, mergeResponses, setHeader, stringifyHeaders } from '../utils';
+import { isRedirect, mergeResponses, serverRedirectWithAuth, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
 import { createAuthenticateRequestOptions } from './clerkMiddleware';
@@ -206,7 +206,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
       const res = setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
-      return appendDevBrowserOnCrossOrigin(clerkRequest, res, options);
+      return serverRedirectWithAuth(clerkRequest, res, options);
     }
 
     if (options.debug) {
