@@ -246,8 +246,8 @@ export const useOrganization: UseOrganization = params => {
     },
     organization?.getInvitations,
     {
-      keepPreviousData: membersSafeValues.keepPreviousData,
-      infinite: membersSafeValues.infinite,
+      keepPreviousData: invitationsSafeValues.keepPreviousData,
+      infinite: invitationsSafeValues.infinite,
       enabled: !!invitationsParams,
     },
     {
