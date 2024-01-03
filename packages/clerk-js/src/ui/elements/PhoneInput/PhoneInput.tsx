@@ -3,7 +3,7 @@ import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
-import { Check } from '../../icons';
+import { ArrowUpDown, Check } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
 import { mergeRefs } from '../../utils';
 import type { CountryEntry, CountryIso } from './countryCodeData';
@@ -112,6 +112,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
             },
           })}
           isDisabled={rest.isDisabled}
+          icon={ArrowUpDown}
         >
           <Text
             sx={{

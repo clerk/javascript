@@ -357,8 +357,12 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   );
 };
 
-export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
-  const { sx, children, ...rest } = props;
+export const SelectButton = (
+  props: PropsOfComponent<typeof Button> & {
+    icon?: React.ReactElement | React.ComponentType;
+  },
+) => {
+  const { sx, children, icon, ...rest } = props;
   const { popoverCtx, onTriggerClick, buttonRenderOption, selectedOption, placeholder, elementId } = useSelectState();
   const { reference } = popoverCtx;
 
@@ -401,7 +405,7 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
         elementDescriptor={descriptors.selectButtonIcon}
         elementId={descriptors.selectButtonIcon.setId(elementId)}
         size='md'
-        icon={ChevronDown}
+        icon={icon || ChevronDown}
       />
     </Button>
   );
