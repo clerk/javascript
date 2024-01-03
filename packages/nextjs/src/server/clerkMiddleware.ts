@@ -33,6 +33,10 @@ type ClerkMiddlewareHandler = (
 
 type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
 
+/**
+ * Middleware for Next.js that handles authentication and authorization with Clerk.
+ * For more details, please refer to the docs: https://clerk.com/docs/references/nextjs/clerkMiddleware
+ */
 interface ClerkMiddleware {
   /**
    * @example
