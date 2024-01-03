@@ -1,11 +1,9 @@
 'use client';
 
 import { useClerk } from '@clerk/clerk-react';
-import { useEffect } from 'react';
 
 import {
   SignInFlowProvider as SignInFlowContextProvider,
-  useSignInFlow,
   useSSOCallbackHandler,
 } from '../internals/machines/sign-in.context';
 import type { LoadedClerkWithEnv } from '../internals/machines/sign-in.types';
@@ -51,20 +49,8 @@ export function SignIn({ children }: { children: React.ReactNode }): JSX.Element
   );
 }
 
-export function SignInStartInner({ children }: WithChildren) {
-  const ref = useSignInFlow();
-
-  useEffect(() => ref.send({ type: 'START' }), [ref]);
-
-  return children;
-}
-
 export function SignInStart({ children }: WithChildren) {
-  return (
-    <Route index>
-      <SignInStartInner>{children}</SignInStartInner>
-    </Route>
-  );
+  return <Route index>{children}</Route>;
 }
 
 export function SignInFactorOne({ children }: WithChildren) {
