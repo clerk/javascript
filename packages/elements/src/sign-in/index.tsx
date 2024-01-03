@@ -3,34 +3,50 @@
 import { useClerk } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 
-import { SignInFlowProvider, useSignInFlow, useSSOCallbackHandler } from '../internals/machines/sign-in.context';
+import {
+  SignInFlowProvider as SignInFlowContextProvider,
+  useSignInFlow,
+  useSSOCallbackHandler,
+} from '../internals/machines/sign-in.context';
 import type { LoadedClerkWithEnv } from '../internals/machines/sign-in.types';
 import { useNextRouter } from '../internals/router';
-import { Route, Router } from '../internals/router-react';
+import { Route, Router, useClerkRouter } from '../internals/router-react';
 
 type WithChildren<T = unknown> = T & { children?: React.ReactNode };
+
+function SignInFlowProvider({ children }: WithChildren) {
+  const clerk = useClerk() as unknown as LoadedClerkWithEnv;
+  const router = useClerkRouter();
+
+  if (!router) {
+    throw new Error('clerk: Unable to locate ClerkRouter, make sure this is rendered within `<Router>`.');
+  }
+
+  return (
+    <SignInFlowContextProvider
+      options={{
+        input: {
+          clerk,
+          router,
+        },
+      }}
+    >
+      {children}
+    </SignInFlowContextProvider>
+  );
+}
 
 export function SignIn({ children }: { children: React.ReactNode }): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   // TODO: Do something about `__unstable__environment` typing
   const router = useNextRouter();
-  const clerk = useClerk() as unknown as LoadedClerkWithEnv;
 
   return (
     <Router
       router={router}
       basePath='/sign-in'
     >
-      <SignInFlowProvider
-        options={{
-          input: {
-            clerk,
-            router,
-          },
-        }}
-      >
-        {children}
-      </SignInFlowProvider>
+      <SignInFlowProvider>{children}</SignInFlowProvider>
     </Router>
   );
 }

@@ -1,5 +1,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
+export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up_url', 'redirect_url'];
+
 /**
  * This type represents a generic router interface that Clerk relies on to interact with the host router.
  */
@@ -58,6 +60,23 @@ function normalizePath(path: string) {
 export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/'): ClerkRouter {
   const normalizedBasePath = normalizePath(basePath);
 
+  /**
+   * Certain query parameters need to be preserved when navigating internally. These query parameters are ultimately used by Clerk to dictate behavior, so we keep them around.
+   */
+  function makeDestinationUrlWithPreservedQueryParameters(path: string) {
+    const destinationUrl = new URL(path, window.location.origin);
+    const currentSearchParams = router.searchParams();
+
+    PRESERVED_QUERYSTRING_PARAMS.forEach(key => {
+      const maybeValue = currentSearchParams.get(key);
+      if (maybeValue) {
+        destinationUrl.searchParams.set(key, maybeValue);
+      }
+    });
+
+    return `${destinationUrl.pathname}${destinationUrl.search}`;
+  }
+
   function match(path?: string, index?: boolean) {
     const pathToMatch = path ?? (index && '/');
 
@@ -74,11 +93,21 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
     return createClerkRouter(router, `${normalizedBasePath}/${normalizePath(childBasePath)}`);
   }
 
+  function push(path: string) {
+    const destinationUrl = makeDestinationUrlWithPreservedQueryParameters(path);
+    return router.push(destinationUrl);
+  }
+
+  function replace(path: string) {
+    const destinationUrl = makeDestinationUrlWithPreservedQueryParameters(path);
+    return router.replace(destinationUrl);
+  }
+
   return {
     child,
     match,
-    push: router.push,
-    replace: router.replace,
+    push,
+    replace,
     pathname: router.pathname,
     searchParams: router.searchParams,
   };

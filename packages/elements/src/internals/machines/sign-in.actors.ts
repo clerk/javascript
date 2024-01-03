@@ -23,7 +23,7 @@ export const createSignIn = fromPromise<SignInResource, WithClient<{ fields: Sig
       throw new Error('Identifier field not present'); // TODO: better error
     }
 
-    const passwordParams = password
+    const passwordParams = password?.value
       ? {
           password: password.value,
           strategy: 'password',

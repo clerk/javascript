@@ -6,7 +6,7 @@ import { createClerkRouter } from './router';
 
 export const ClerkRouterContext = createContext<ClerkRouter | null>(null);
 
-function useClerkRouter() {
+export function useClerkRouter() {
   return useContext(ClerkRouterContext);
 }
 

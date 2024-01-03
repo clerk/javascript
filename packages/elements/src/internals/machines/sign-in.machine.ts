@@ -5,7 +5,7 @@ import { assertEvent, assign, setup } from 'xstate';
 
 import type { EnabledThirdPartyProviders } from '../../utils/third-party-strategies';
 import { getEnabledThirdPartyProviders } from '../../utils/third-party-strategies';
-import type { ClerkHostRouter } from '../router';
+import type { ClerkRouter } from '../router';
 import { waitForClerk } from './shared.actors';
 import * as signInActors from './sign-in.actors';
 import type { FieldDetails, LoadedClerkWithEnv } from './sign-in.types';
@@ -18,12 +18,12 @@ export interface SignInMachineContext {
   error?: Error | ClerkAPIResponseError;
   fields: Map<string, FieldDetails>;
   resource?: SignInResource;
-  router: ClerkHostRouter;
+  router: ClerkRouter;
 }
 
 export interface SignInMachineInput {
   clerk: LoadedClerkWithEnv;
-  router: ClerkHostRouter;
+  router: ClerkRouter;
 }
 
 export type SignInMachineEvents =
