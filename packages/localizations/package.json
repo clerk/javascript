@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "2.0.0-alpha-v5.7",
+  "version": "2.0.0-alpha-v5.8",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",

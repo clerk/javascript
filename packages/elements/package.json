@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.0.2-alpha-v5.1",
+  "version": "0.0.2-alpha-v5.2",
   "private": true,
   "description": "Clerk Elements",
   "keywords": [
@@ -58,9 +58,9 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/clerk-react": "5.0.0-alpha-v5.12",
-    "@clerk/nextjs": "5.0.0-alpha-v5.13",
-    "@clerk/shared": "2.0.0-alpha-v5.7",
+    "@clerk/clerk-react": "5.0.0-alpha-v5.13",
+    "@clerk/nextjs": "5.0.0-alpha-v5.14",
+    "@clerk/shared": "2.0.0-alpha-v5.8",
     "@radix-ui/react-form": "^0.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@xstate/react": "^4.0.1",

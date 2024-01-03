@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.8
+
+### Patch Changes
+
+- Disable telemetry collection when window.navigator.webdriver is defined, indicating traffic from an automation tool. ([#2448](https://github.com/clerk/javascript/pull/2448)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 2.0.0-alpha-v5.7
 
 ### Major Changes
