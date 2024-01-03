@@ -1,3 +1,4 @@
+import { waitFor } from '@testing-library/dom';
 import React from 'react';
 
 import { render, screen } from '../../../../testUtils';
@@ -19,8 +20,8 @@ describe('SignUpVerifyEmail', () => {
       f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.com' });
     });
     fixtures.signUp.prepareEmailAddressVerification.mockRejectedValue(null);
-    render(<SignUpVerifyEmail />, { wrapper });
-    screen.getByText('test@clerk.com');
+    const { findByText } = render(<SignUpVerifyEmail />, { wrapper });
+    await waitFor(async () => expect(await findByText('test@clerk.com')).toBeInTheDocument());
   });
 
   it('shows the verify with link message', async () => {
@@ -36,8 +37,8 @@ describe('SignUpVerifyEmail', () => {
         } as any),
     );
 
-    render(<SignUpVerifyEmail />, { wrapper });
-    screen.getAllByText(/Verification Link/i);
+    const { findByText } = render(<SignUpVerifyEmail />, { wrapper });
+    await waitFor(async () => expect(await findByText(/Verification Link/i)).toBeInTheDocument());
   });
 
   it('shows the verify with code message', async () => {
@@ -48,9 +49,11 @@ describe('SignUpVerifyEmail', () => {
 
     fixtures.signUp.prepareEmailAddressVerification.mockRejectedValue(null);
 
-    render(<SignUpVerifyEmail />, { wrapper });
-    screen.getByText(/Verify your email/i);
-    screen.getByText(/Enter the verification code sent to your email/i);
+    const { findByText } = render(<SignUpVerifyEmail />, { wrapper });
+    await waitFor(async () => expect(await findByText(/Verify your email/i)).toBeInTheDocument());
+    await waitFor(async () =>
+      expect(await findByText(/Enter the verification code sent to your email/i)).toBeInTheDocument(),
+    );
   });
 
   it('clicking on the edit icon navigates to the previous route', async () => {
@@ -81,10 +84,8 @@ describe('SignUpVerifyEmail', () => {
           cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
         } as any),
     );
-
-    render(<SignUpVerifyEmail />, { wrapper });
-    const resendButton = screen.getByText(/Resend/i);
-    expect(resendButton.tagName.toUpperCase()).toBe('BUTTON');
+    const { findByText } = render(<SignUpVerifyEmail />, { wrapper });
+    await waitFor(async () => expect((await findByText(/Resend/i)).tagName.toUpperCase()).toBe('BUTTON'));
   });
 
   it('Resend code button exists', async () => {
@@ -95,9 +96,8 @@ describe('SignUpVerifyEmail', () => {
 
     fixtures.signUp.prepareEmailAddressVerification.mockRejectedValue(null);
 
-    render(<SignUpVerifyEmail />, { wrapper });
-    const resendButton = screen.getByText(/Resend/i);
-    expect(resendButton.tagName.toUpperCase()).toBe('BUTTON');
+    const { findByText } = render(<SignUpVerifyEmail />, { wrapper });
+    await waitFor(async () => expect((await findByText(/Resend/i)).tagName.toUpperCase()).toBe('BUTTON'));
   });
 
   it.todo('Resend link button is pressable after 60 seconds');
