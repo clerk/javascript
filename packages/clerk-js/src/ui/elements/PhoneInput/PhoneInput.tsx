@@ -99,11 +99,11 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         comparator={(term, option) => option.searchTerm.toLowerCase().includes(term.toLowerCase())}
       >
         <SelectButton
+          focusRing={false}
           sx={t => ({
             borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
             borderBottomRightRadius: '0',
             borderTopRightRadius: '0',
-            boxShadow: 'none',
             ':focus': {
               zIndex: 2,
             },

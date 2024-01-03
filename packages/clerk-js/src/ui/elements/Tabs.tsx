@@ -128,6 +128,7 @@ export const Tab = (props: TabProps) => {
       aria-controls={`cl-tabpanel-${tabIndex}`}
       role='tab'
       ref={buttonRef}
+      focusRing={false}
       sx={[
         t => ({
           background: t.colors.$transparent,
@@ -141,7 +142,6 @@ export const Tab = (props: TabProps) => {
           padding: `${t.space.$2x5} ${t.space.$3x5}`,
           width: 'fit-content',
           '&:hover, :focus': { backgroundColor: t.colors.$transparent },
-          '&:focus': { boxShadow: 'none' },
         }),
         sx,
       ]}
