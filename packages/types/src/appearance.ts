@@ -24,7 +24,22 @@ interface CSSObject extends CSSPropertiesWithMultiValues, CSSPseudos {}
 
 type UserDefinedStyle = string | CSSObject;
 
-type Shade = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
+type Shade =
+  | '25'
+  | '50'
+  | '100'
+  | '150'
+  | '200'
+  | '300'
+  | '400'
+  | '500'
+  | '600'
+  | '700'
+  | '750'
+  | '800'
+  | '850'
+  | '900'
+  | '950';
 export type ColorScale<T = string> = Record<Shade, T>;
 export type AlphaColorScale<T = string> = Record<'20' | Shade, T>;
 

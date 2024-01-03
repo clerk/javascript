@@ -4,24 +4,29 @@ import { colors, fromEntries } from '../utils';
 
 type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;
 
-const LIGHT_SHADES = ['50', '100', '200', '300', '400'].reverse();
-const DARK_SHADES = ['600', '700', '800', '900'];
+const LIGHT_SHADES = ['25', '50', '100', '150', '200', '300', '400'].reverse();
+const DARK_SHADES = ['600', '700', '750', '800', '850', '900', '950'];
 
 const TARGET_L_50_SHADE = 97;
 const TARGET_L_900_SHADE = 12;
 
 function createEmptyColorScale<T = undefined>(): InternalColorScale<T | undefined> {
   return {
+    '25': undefined,
     '50': undefined,
     '100': undefined,
+    '150': undefined,
     '200': undefined,
     '300': undefined,
     '400': undefined,
     '500': undefined,
     '600': undefined,
     '700': undefined,
+    '750': undefined,
     '800': undefined,
+    '850': undefined,
     '900': undefined,
+    '950': undefined,
   };
 }
 
