@@ -1,10 +1,13 @@
 import type { OAuthStrategy, Web3Strategy } from '@clerk/types';
 import { createActorContext } from '@xstate/react';
 import { useCallback, useEffect } from 'react';
+import type { SnapshotFrom } from 'xstate';
 
 import { isAuthenticatableOauthStrategy, isWeb3Strategy } from '../../utils/third-party-strategies';
 import { SignInMachine } from './sign-in.machine';
-import type { FieldDetails, SnapshotState } from './sign-in.types';
+import type { FieldDetails } from './sign-in.types';
+
+export type SnapshotState = SnapshotFrom<typeof SignInMachine>;
 
 // ================= MACHINE CONTEXT/HOOKS ================= //
 
