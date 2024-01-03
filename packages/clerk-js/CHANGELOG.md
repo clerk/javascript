@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.0.0-alpha-v5.13
+
+### Patch Changes
+
+- Bug fix: Avoid triggering prepare verification twice. (Affects only dev mode) ([#2459](https://github.com/clerk/javascript/pull/2459)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: fetch custom roles in OrganizationSwitcher ([#2430](https://github.com/clerk/javascript/pull/2430)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`7ecd6f6ab`](https://github.com/clerk/javascript/commit/7ecd6f6abb0e5bfb1a57c99cc11860de311c3e82), [`390a70732`](https://github.com/clerk/javascript/commit/390a707323fe35cecb55f7c4592ee9d18e7c56be)]:
+  - @clerk/shared@2.0.0-alpha-v5.8
+  - @clerk/localizations@2.0.0-alpha-v5.8
+
 ## 5.0.0-alpha-v5.12
 
 ### Major Changes

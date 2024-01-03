@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.8
+
+### Patch Changes
+
+- Fix typo in ko-KR.ts ([#2464](https://github.com/clerk/javascript/pull/2464)) by [@FitCoderOfficial](https://github.com/FitCoderOfficial)
+
 ## 2.0.0-alpha-v5.7
 
 ### Patch Changes
