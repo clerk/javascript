@@ -26,6 +26,13 @@ export type WithParams<T> = { params: T };
 
 // ====================== CLERKJS MODIFICATIONS ======================
 
+/**
+ * Notes:
+ * The following interfaces were modified from the original clerkjs types as the originals weren't able to be appropriately narrowed.
+ *   - `SignInCreateIdentifierOnlyParams` and `SignInCreateTransferOnlyParams`: `never` was added to `strategy`.
+ *   - `SignInCreateOAuthParams` and `SignInCreateSamlParams` where identifier is required in one but not in the other.
+ */
+
 export interface LoadedClerkWithEnv extends LoadedClerk {
   mode: 'browser' | 'server';
   __unstable__environment: EnvironmentResource;
