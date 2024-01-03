@@ -90,6 +90,7 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
       sx={t => ({
         justifyContent: 'space-between',
         width: '100%',
+        alignItems: 'center',
         padding: `${t.space.$2} ${t.space.$4}`,
       })}
       {...rest}
