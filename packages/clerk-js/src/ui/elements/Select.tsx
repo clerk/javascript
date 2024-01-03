@@ -376,7 +376,7 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
       ref={reference}
-      variant='ghost'
+      variant='unstyled'
       textVariant='buttonLarge'
       onClick={onTriggerClick}
       sx={[

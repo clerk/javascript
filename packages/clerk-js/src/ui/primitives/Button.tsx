@@ -179,6 +179,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           '&:hover': { textDecoration: 'underline' },
           '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
         },
+        unstyled: {},
         roundWrapper: { padding: 0, margin: 0, height: 'unset', width: 'unset', minHeight: 'unset' },
       },
       block: {
@@ -192,7 +193,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       textVariant: 'buttonLarge',
       variant: 'primary',
       size: 'sm',
-      focusRing: false,
+      focusRing: true,
     },
   };
 });

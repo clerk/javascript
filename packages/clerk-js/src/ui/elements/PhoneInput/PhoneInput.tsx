@@ -4,7 +4,7 @@ import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import { Check } from '../../icons';
-import type { PropsOfComponent } from '../../styledSystem';
+import { common, type PropsOfComponent } from '../../styledSystem';
 import { mergeRefs } from '../../utils';
 import type { CountryEntry, CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
@@ -69,6 +69,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
       direction='row'
       hasError={rest.hasError}
       sx={theme => ({
+        ...common.borderVariants(theme).normal,
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
@@ -99,14 +100,14 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
       >
         <SelectButton
           sx={t => ({
-            border: 'none',
             borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
             borderBottomRightRadius: '0',
             borderTopRightRadius: '0',
-            ':hover': {
+            boxShadow: 'none',
+            ':focus': {
               zIndex: 2,
             },
-            ':focus': {
+            ':active': {
               zIndex: 2,
             },
           })}
@@ -145,7 +146,10 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
           type='tel'
           sx={[
             {
-              border: 'none',
+              boxShadow: 'none',
+              ':hover:not(:focus)': {
+                boxShadow: 'none',
+              },
               height: '100%',
               borderTopLeftRadius: '0',
               borderBottomLeftRadius: '0',
