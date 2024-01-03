@@ -56,7 +56,7 @@ export const OrganizationMembersTabInvitations = () => {
                   id='manageVerifiedDomains'
                   sx={t => ({ gap: t.space.$2 })}
                   leftIcon={Plus}
-                  leftIconSx={t => ({ width: t.sizes.$2x5, height: t.sizes.$2x5 })}
+                  leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
                   onClick={() => navigate('../')}
                 />
               }

@@ -114,7 +114,7 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
       sx={[t => ({ justifyContent: 'start', gap: t.space.$2, padding: `${t.space.$2} ${t.space.$4}` }), sx]}
       textLocalizationKey={localizationKey}
       leftIcon={Plus}
-      leftIconSx={t => ({ width: t.sizes.$2x5, height: t.sizes.$2x5 })}
+      leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
       {...rest}
     >
       {children}

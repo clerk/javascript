@@ -70,7 +70,6 @@ export const TabsList = (props: TabsListProps) => {
     <Flex
       elementDescriptor={descriptors.tabListContainer}
       onKeyDown={onKeyDown}
-      justify='center'
       sx={[
         theme => ({
           borderBottom: theme.borders.$normal,
@@ -142,6 +141,7 @@ export const Tab = (props: TabProps) => {
           padding: `${t.space.$2x5} ${t.space.$3x5}`,
           width: 'fit-content',
           '&:hover, :focus': { backgroundColor: t.colors.$transparent },
+          '&:focus': { boxShadow: 'none' },
         }),
         sx,
       ]}

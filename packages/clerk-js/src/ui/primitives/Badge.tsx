@@ -12,6 +12,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     borderRadius: theme.radii.$sm,
     padding: `${theme.space.$none} ${theme.space.$1x5}`,
     display: 'inline-flex',
+    marginRight: '1px',
   },
   variants: {
     textVariant: { ...common.textVariants(theme) },
