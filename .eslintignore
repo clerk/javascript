@@ -2,6 +2,7 @@
 **/node_modules/**
 packages/*/dist/**
 packages/eslint-config-custom/**
+packages/upgrade
 **/dist/*
 **/build/*
 **/.turbo/*
