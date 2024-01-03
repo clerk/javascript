@@ -77,7 +77,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
     await u.page.goToRelative('/settings/auth-has');
     await expect(u.page.getByText(/User is missing permissions/i)).toBeVisible();
     await u.page.goToRelative('/settings/auth-protect');
-    await expect(u.page.getByText(/this page could not be found/i)).toBeVisible();
+    await u.po.signIn.waitForMounted();
   });
 
   test('Protect in RSCs and RCCs as `viewer`', async ({ page, context }) => {

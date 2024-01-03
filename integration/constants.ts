@@ -38,6 +38,7 @@ export const constants = {
    */
   E2E_APP_SK: process.env.E2E_APP_SK,
   E2E_APP_PK: process.env.E2E_APP_PK,
+  E2E_CLERK_API_URL: process.env.E2E_CLERK_API_URL,
   /**
    * The version of the dependency to use, controlled programmatically.
    */
