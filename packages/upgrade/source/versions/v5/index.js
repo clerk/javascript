@@ -135,6 +135,15 @@ export const matchers = {
 		'appearance-organizationpreview-organizationswitcher', // shared w/ all
 		'redirecttohome',
 	]),
+	shared: load('shared', [
+		'magiclinkerror',
+		'ismagiclinkerror',
+		'magiclinkerrorcode',
+		'usemagiclink',
+		'buildrequesturl',
+		'organizationcontext',
+		'useorganizationlist-organizationlist', // shared outside this pkg?
+	]),
 };
 
 function dedupeMerge(arr1, arr2) {

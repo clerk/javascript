@@ -11,7 +11,7 @@ export default function createLoader({ version, baseUrl }) {
 		// make the code a decent amount more complex.
 		return slugs.map(slug => {
 			const sdkPath = path.join(__dirname, '../versions', `v${version}`, sdk, `${slug}.md`);
-			const sharedPath = path.join(__dirname, '../versions', `v${version}`, 'shared', `${slug}.md`);
+			const sharedPath = path.join(__dirname, '../versions', `v${version}`, 'common', `${slug}.md`);
 
 			const loadPath = fs.existsSync(sdkPath) ? sdkPath : sharedPath;
 			const content = fs.readFileSync(loadPath, 'utf8');
