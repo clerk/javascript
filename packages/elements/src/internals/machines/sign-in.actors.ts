@@ -10,18 +10,15 @@ import type {
 } from '@clerk/types';
 import { fromPromise } from 'xstate';
 
-import type { ClerkHostRouter } from '../router';
+import type { ClerkRouter } from '../router';
 import type { SignInMachineContext } from './sign-in.machine';
 import type { WithClerk, WithClient, WithParams } from './sign-in.types';
+import { assertIsDefined } from './utils/assert';
 
 export const createSignIn = fromPromise<SignInResource, WithClient<{ fields: SignInMachineContext['fields'] }>>(
   ({ input: { client, fields } }) => {
     const password = fields.get('password');
     const identifier = fields.get('identifier');
-
-    if (!identifier) {
-      throw new Error('Identifier field not present'); // TODO: better error
-    }
 
     const passwordParams = password?.value
       ? {
@@ -31,7 +28,7 @@ export const createSignIn = fromPromise<SignInResource, WithClient<{ fields: Sig
       : {};
 
     return client.signIn.create({
-      identifier: identifier.value as string,
+      identifier: identifier?.value as string,
       ...passwordParams,
     });
   },
@@ -39,11 +36,11 @@ export const createSignIn = fromPromise<SignInResource, WithClient<{ fields: Sig
 
 export const authenticateWithRedirect = fromPromise<
   void,
-  WithClerk<{ strategy: AuthenticateWithRedirectParams['strategy'] | undefined }>
+  WithClerk<{
+    strategy: AuthenticateWithRedirectParams['strategy'] | undefined;
+  }>
 >(async ({ input: { clerk, strategy } }) => {
-  if (!strategy) {
-    throw new Error('Expected `strategy to be defined');
-  }
+  assertIsDefined(strategy);
 
   return clerk.client.signIn.authenticateWithRedirect({
     strategy,
@@ -70,7 +67,7 @@ export const attemptSecondFactor = fromPromise<SignInResource, WithClient<WithPa
 
 export const handleSSOCallback = fromPromise<
   unknown,
-  WithClerk<WithParams<HandleOAuthCallbackParams | HandleSamlCallbackParams> & { router: ClerkHostRouter }>
+  WithClerk<WithParams<HandleOAuthCallbackParams | HandleSamlCallbackParams> & { router: ClerkRouter }>
 >(async ({ input }) => {
   return input.clerk.handleRedirectCallback(
     {

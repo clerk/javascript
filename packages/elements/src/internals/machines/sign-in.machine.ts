@@ -10,7 +10,6 @@ import { waitForClerk } from './shared.actors';
 import * as signInActors from './sign-in.actors';
 import type { FieldDetails, LoadedClerkWithEnv } from './sign-in.types';
 import { assertActorEventDone, assertActorEventError } from './utils/assert';
-import { goToChildState } from './utils/states';
 
 export interface SignInMachineContext {
   clerk: LoadedClerkWithEnv;
@@ -145,7 +144,7 @@ export const SignInMachine = setup({
         },
       }),
     },
-    'OAUTH.CALLBACK': goToChildState('SSOCallbackRunning'),
+    'OAUTH.CALLBACK': '.SSOCallbackRunning',
   },
   states: {
     Init: {
