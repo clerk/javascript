@@ -14,7 +14,6 @@ import { Form, FormButtons, FormContent, Header, useCardState, withCardStateProv
 import { useFetch } from '../../hooks';
 import { InformationCircle } from '../../icons';
 import { handleError, useFormControl } from '../../utils';
-import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 const useCalloutLabel = (
   domain: OrganizationDomainResource | undefined | null,
@@ -99,7 +98,6 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
     },
   });
 
-  const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const allowsEdit = mode === 'edit';
 
   const enrollmentOptions = useEnrollmentOptions();
@@ -188,9 +186,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
     <FormContent
       headerTitle={title}
       headerSubtitle={allowsEdit ? undefined : subtitle}
-      breadcrumbTitle={breadcrumbTitle}
       gap={4}
-      Breadcrumbs={OrganizationProfileBreadcrumbs}
     >
       <Col gap={6}>
         {calloutLabel.length > 0 && (

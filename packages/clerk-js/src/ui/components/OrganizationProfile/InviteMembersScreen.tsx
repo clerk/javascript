@@ -9,7 +9,6 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 import { Email } from '../../icons';
 import { BillingWidget } from './BillingWidget';
 import { InviteMembersForm } from './InviteMembersForm';
-import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 type InviteMembersScreenProps = {
   onReset?: () => void;
@@ -40,7 +39,6 @@ export const InviteMembersScreen = withCardStateProvider((props: InviteMembersSc
       <FormContent
         headerTitle={title}
         headerSubtitle={subtitle}
-        Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         {reachedOrganizationMemberLimit && __unstable_manageBillingUrl && (
           <BillingWidget

@@ -110,7 +110,6 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
   return (
     <Wizard {...wizard.props}>
       <FormContent
-        Breadcrumbs={null}
         headerTitle={props?.startPage?.headerTitle}
         headerSubtitle={props?.startPage?.headerSubtitle}
         headerTitleTextVariant={headerTitleTextVariant}
@@ -189,7 +188,6 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
       </FormContent>
 
       <FormContent
-        Breadcrumbs={null}
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
@@ -203,6 +201,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
           />
         )}
       </FormContent>
+
       <Col>
         <Header.Root>
           <Header.Title

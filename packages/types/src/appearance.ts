@@ -182,6 +182,7 @@ export type ElementsConfig = {
   verificationLinkStatusText: WithOptions;
 
   form: WithOptions<never, ErrorState>;
+  formContainer: WithOptions<never, ErrorState>;
   formFieldRow: WithOptions<FieldId>;
   formField: WithOptions<FieldId, ControlState>;
   formFieldLabelRow: WithOptions<FieldId, ControlState>;

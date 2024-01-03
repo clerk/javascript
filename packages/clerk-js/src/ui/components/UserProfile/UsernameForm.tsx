@@ -5,7 +5,6 @@ import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type UsernameFormProps = FormProps;
 
@@ -40,10 +39,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
   };
 
   return (
-    <FormContent
-      headerTitle={localizationKeys('userProfile.usernamePage.title')}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={localizationKeys('userProfile.usernamePage.title')}>
       <Form.Root onSubmit={updatePassword}>
         <Form.ControlRow elementId={usernameField.id}>
           <Form.PlainInput

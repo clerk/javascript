@@ -14,7 +14,6 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 type LeaveOrganizationFormProps = FormProps;
 export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
@@ -138,11 +137,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
-        headerTitle={title}
-        breadcrumbTitle={localizationKeys('organizationProfile.profilePage.dangerSection.title')}
-        Breadcrumbs={OrganizationProfileBreadcrumbs}
-      >
+      <FormContent headerTitle={title}>
         <Form.Root onSubmit={handleSubmit}>
           <Col gap={1}>
             <Text

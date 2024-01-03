@@ -8,7 +8,6 @@ import { Button, Col, descriptors, localizationKeys, Text } from '../../customiz
 import type { FormProps } from '../../elements';
 import { ClipboardInput, FormButtonContainer, FormContent, FullHeightLoader, useCardState } from '../../elements';
 import { handleError } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type AddAuthenticatorAppProps = FormProps & {
   title: LocalizationKey;
@@ -37,10 +36,7 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
   }
 
   return (
-    <FormContent
-      headerTitle={title}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={title}>
       {!totp && <FullHeightLoader />}
 
       {totp && (

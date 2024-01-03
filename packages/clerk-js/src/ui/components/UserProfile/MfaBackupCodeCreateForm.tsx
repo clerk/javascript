@@ -13,7 +13,6 @@ import {
 } from '../../elements';
 import { handleError } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type MfaBackupCodeCreateFormProps = FormProps;
 export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCodeCreateFormProps) => {
@@ -34,19 +33,11 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
   }, []);
 
   if (card.error) {
-    return (
-      <FormContent
-        headerTitle={localizationKeys('userProfile.backupCodePage.title')}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      />
-    );
+    return <FormContent headerTitle={localizationKeys('userProfile.backupCodePage.title')} />;
   }
 
   return (
-    <FormContent
-      headerTitle={localizationKeys('userProfile.backupCodePage.title')}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
       {!backupCode ? (
         <FullHeightLoader />
       ) : (

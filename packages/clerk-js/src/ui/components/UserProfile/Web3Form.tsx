@@ -7,7 +7,6 @@ import type { FormProps } from '../../elements';
 import { ArrowBlockButton, FormButtonContainer, FormContent, useCardState } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { getFieldError, handleError } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type AddWeb3WalletProps = FormProps;
 export const AddWeb3Wallet = (props: AddWeb3WalletProps) => {
@@ -52,10 +51,7 @@ export const AddWeb3Wallet = (props: AddWeb3WalletProps) => {
   };
 
   return (
-    <FormContent
-      headerTitle={localizationKeys('userProfile.web3WalletPage.title')}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={localizationKeys('userProfile.web3WalletPage.title')}>
       <Text
         localizationKey={localizationKeys(
           unconnectedStrategies.length
