@@ -34,30 +34,16 @@ export class OrganizationMembership extends BaseResource implements Organization
       // `paginated` is used in some legacy endpoints to support clerk paginated responses
       // The parameter will be dropped in FAPI v2
       search: convertPageToOffset({ ...retrieveMembershipsParams, paginated: true }),
-    })
-      .then(res => {
-        if (!res?.response) {
-          return {
-            total_count: 0,
-            data: [],
-          };
-        }
+    }).then(res => {
+      // TODO: Fix typing
+      const { data: suggestions, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
 
-        // TODO: Fix typing
-        const { data: suggestions, total_count } =
-          res.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
-
-        return {
-          total_count,
-          data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
-        };
-      })
-      .catch(() => {
-        return {
-          total_count: 0,
-          data: [],
-        };
-      });
+      return {
+        total_count,
+        data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
+      };
+    });
   };
 
   destroy = async (): Promise<OrganizationMembership> => {
