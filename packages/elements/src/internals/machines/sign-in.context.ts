@@ -26,14 +26,14 @@ export const {
 /**
  * Selects if a specific field has a value
  */
-const fieldHasValueSelector = (type: string | undefined) => (state: SnapshotState) =>
-  type ? Boolean(state.context.fields.get(type)?.value) : false;
+const fieldHasValueSelector = (name: string | undefined) => (state: SnapshotState) =>
+  name ? Boolean(state.context.fields.get(name)?.value) : false;
 
 /**
  * Selects a field-specific error, if it exists
  */
-const fieldErrorSelector = (type: string | undefined) => (state: SnapshotState) =>
-  type ? state.context.fields.get(type)?.error : undefined;
+const fieldErrorSelector = (name: string | undefined) => (state: SnapshotState) =>
+  name ? state.context.fields.get(name)?.error : undefined;
 
 /**
  * Selects a global error, if it exists
@@ -114,11 +114,11 @@ export const useThirdPartyProviders = () => {
 };
 
 /**
- * Provides field-specfic props based on the field's type/state
+ * Provides field-specific props based on the field's type/state
  */
-export const useField = ({ type }: Partial<Pick<FieldDetails, 'type'>>) => {
-  const hasValue = useSignInFlowSelector(fieldHasValueSelector(type));
-  const error = useSignInFlowSelector(fieldErrorSelector(type));
+export const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const hasValue = useSignInFlowSelector(fieldHasValueSelector(name));
+  const error = useSignInFlowSelector(fieldErrorSelector(name));
 
   const shouldBeHidden = false; // TODO: Implement clerk-js utils
   const hasError = Boolean(error);
@@ -136,28 +136,28 @@ export const useField = ({ type }: Partial<Pick<FieldDetails, 'type'>>) => {
 };
 
 /**
- * Provides control (input)-specfic props based on the field/input's type/state
+ * Provides control (input)-specific props based on the field/input's type/state
  */
-export const useInput = ({ type, value: initialValue }: Partial<Pick<FieldDetails, 'type' | 'value'>>) => {
+export const useInput = ({ name, value: initialValue }: Partial<Pick<FieldDetails, 'name' | 'value'>>) => {
   const ref = useSignInFlow();
-  const hasValue = useSignInFlowSelector(fieldHasValueSelector(type));
+  const hasValue = useSignInFlowSelector(fieldHasValueSelector(name));
 
-  // Add the field to the machine context, esuring it's only added once
+  // Add the field to the machine context, ensuring it's only added once
   useEffect(() => {
-    if (!type || ref.getSnapshot().context.fields.get(type)) return;
+    if (!name || ref.getSnapshot().context.fields.get(name)) return;
 
-    ref.send({ type: 'FIELD.ADD', field: { type, value: initialValue } });
+    ref.send({ type: 'FIELD.ADD', field: { name, value: initialValue } });
 
-    return () => ref.send({ type: 'FIELD.REMOVE', field: { type } });
+    return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Register the onChange handler for field updates to persist to the machine context
   const onChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!type) return;
-      ref.send({ type: 'FIELD.UPDATE', field: { type, value: event.target.value } });
+      if (!name) return;
+      ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
     },
-    [ref, type],
+    [ref, name],
   );
 
   // TODO: Implement clerk-js utils

@@ -28,15 +28,15 @@ export interface SignInMachineInput {
 export type SignInMachineEvents =
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
   | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
-  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'type' | 'value'> }
-  | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'type'> }
+  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'name' | 'value'> }
+  | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'name'> }
   | {
       type: 'FIELD.UPDATE';
-      field: Pick<FieldDetails, 'type' | 'value'>;
+      field: Pick<FieldDetails, 'name' | 'value'>;
     }
   | {
       type: 'FIELD.ERROR';
-      field: Pick<FieldDetails, 'type' | 'error'>;
+      field: Pick<FieldDetails, 'name' | 'error'>;
     }
   | { type: 'NEXT' }
   | { type: 'OAUTH.CALLBACK' }
@@ -107,9 +107,9 @@ export const SignInMachine = setup({
     'FIELD.ADD': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.type) throw new Error('Field type is required');
+          if (!event.field.name) throw new Error('Field name is required');
 
-          context.fields.set(event.field.type, event.field);
+          context.fields.set(event.field.name, event.field);
           return context.fields;
         },
       }),
@@ -117,11 +117,11 @@ export const SignInMachine = setup({
     'FIELD.UPDATE': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.type) throw new Error('Field type is required');
+          if (!event.field.name) throw new Error('Field type is required');
 
-          if (context.fields.has(event.field.type)) {
+          if (context.fields.has(event.field.name)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            context.fields.get(event.field.type)!.value = event.field.value;
+            context.fields.get(event.field.name)!.value = event.field.value;
           }
 
           return context.fields;
@@ -131,9 +131,9 @@ export const SignInMachine = setup({
     'FIELD.REMOVE': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.type) throw new Error('Field type is required');
+          if (!event.field.name) throw new Error('Field type is required');
 
-          context.fields.delete(event.field.type);
+          context.fields.delete(event.field.name);
           return context.fields;
         },
       }),
@@ -141,10 +141,10 @@ export const SignInMachine = setup({
     'FIELD.ERROR': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.type) throw new Error('Field type is required');
-          if (context.fields.has(event.field.type)) {
+          if (!event.field.name) throw new Error('Field type is required');
+          if (context.fields.has(event.field.name)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            context.fields.get(event.field.type)!.error = event.field.error;
+            context.fields.get(event.field.name)!.error = event.field.error;
           }
 
           return context.fields;
@@ -264,7 +264,7 @@ export const SignInMachine = setup({
                         raise({
                           type: 'FIELD.ERROR',
                           field: {
-                            type: error.meta.paramName,
+                            name: error.meta.paramName,
                             error: error,
                           },
                         }),

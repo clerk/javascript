@@ -15,7 +15,7 @@ import type {
 } from '@clerk/types';
 
 export type FieldDetails = {
-  type?: string;
+  name?: string;
   value?: string | readonly string[] | number;
   error?: ClerkAPIError;
 };
