@@ -5,7 +5,6 @@ import { Col, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type DeleteUserFormProps = FormProps;
 export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps) => {
@@ -37,10 +36,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const canSubmit = confirmationField.value === 'Delete account';
 
   return (
-    <FormContent
-      headerTitle={localizationKeys('userProfile.deletePage.title')}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={localizationKeys('userProfile.deletePage.title')}>
       <Form.Root onSubmit={deleteUser}>
         <Col gap={1}>
           <Text

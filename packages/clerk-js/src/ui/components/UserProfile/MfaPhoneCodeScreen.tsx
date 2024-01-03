@@ -10,7 +10,6 @@ import { FormButtonContainer, FormContent, SuccessPage, useCardState, withCardSt
 import { handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { AddPhone, VerifyPhone } from './PhoneForm';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type MfaPhoneCodeScreenProps = FormProps;
 export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScreenProps) => {
@@ -95,10 +94,7 @@ const AddMfa = (props: AddMfaProps) => {
   };
 
   return (
-    <FormContent
-      headerTitle={title}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={title}>
       <Text
         localizationKey={localizationKeys(
           availableMethods.length

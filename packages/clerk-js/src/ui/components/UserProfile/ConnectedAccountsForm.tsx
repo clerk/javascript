@@ -15,7 +15,6 @@ import {
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type ConnectedAccountsFormProps = FormProps;
 
@@ -74,10 +73,7 @@ const AddConnectedAccount = (props: AddConnectedAccountProps) => {
   };
 
   return (
-    <FormContent
-      headerTitle={localizationKeys('userProfile.connectedAccountPage.title')}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={localizationKeys('userProfile.connectedAccountPage.title')}>
       <Text
         localizationKey={
           unconnectedStrategies.length

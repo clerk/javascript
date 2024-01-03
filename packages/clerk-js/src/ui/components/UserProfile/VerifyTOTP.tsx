@@ -5,7 +5,6 @@ import React from 'react';
 import { Button, Col, descriptors, localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtonContainer, FormContent, useFieldOTP } from '../../elements';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type VerifyTOTPProps = FormProps & {
   resourceRef: React.MutableRefObject<TOTPResource | undefined>;
@@ -29,10 +28,7 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
   });
 
   return (
-    <FormContent
-      headerTitle={localizationKeys('userProfile.mfaTOTPPage.title')}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={localizationKeys('userProfile.mfaTOTPPage.title')}>
       <Col>
         <Form.OTPInput
           {...otp}

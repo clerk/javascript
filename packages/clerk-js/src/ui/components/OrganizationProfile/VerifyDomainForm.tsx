@@ -16,7 +16,6 @@ import {
 } from '../../elements';
 import { useFetch } from '../../hooks';
 import { handleError, useFormControl } from '../../utils';
-import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 import { VerifiedDomainForm } from './VerifiedDomainForm';
 
 type VerifyDomainFormProps = FormProps & {
@@ -37,7 +36,6 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
     domainName: domain?.name ?? '',
   });
 
-  const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const emailField = useFormControl('affiliationEmailAddress', '', {
@@ -128,9 +126,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
     <Wizard {...wizard.props}>
       <FormContent
         headerTitle={title}
-        breadcrumbTitle={breadcrumbTitle}
         headerSubtitle={subtitle}
-        Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <Form.Root onSubmit={onSubmitPrepare}>
           <Form.ControlRow elementId={emailField.id}>
@@ -149,9 +145,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
 
       <FormContent
         headerTitle={title}
-        breadcrumbTitle={breadcrumbTitle}
         headerSubtitle={subtitleVerificationCodeScreen}
-        Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <Form.OTPInput
           {...otp}

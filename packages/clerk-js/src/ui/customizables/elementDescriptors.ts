@@ -76,6 +76,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'verificationLinkStatusText',
 
   'form',
+  'formContainer',
   'formFieldRow',
   'formField',
   'formFieldLabelRow',

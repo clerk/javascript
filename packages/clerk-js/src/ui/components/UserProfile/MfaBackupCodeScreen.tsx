@@ -4,7 +4,6 @@ import type { FormProps } from '../../elements';
 import { FormButtonContainer, FormContent, withCardStateProvider } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type MfaBackupCodeScreenProps = FormProps;
 export const MfaBackupCodeScreen = withCardStateProvider((props: MfaBackupCodeScreenProps) => {
@@ -32,10 +31,7 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
   const { close } = useActionContext();
 
   return (
-    <FormContent
-      headerTitle={localizationKeys('userProfile.backupCodePage.title')}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
       <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText1')} />
       <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText2')} />
 

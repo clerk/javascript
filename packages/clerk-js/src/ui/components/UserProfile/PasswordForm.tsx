@@ -15,7 +15,6 @@ import {
 } from '../../elements';
 import { useConfirmPassword } from '../../hooks';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
   const localizedTexts = [];
@@ -126,10 +125,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   };
 
   return (
-    <FormContent
-      headerTitle={title}
-      Breadcrumbs={UserProfileBreadcrumbs}
-    >
+    <FormContent headerTitle={title}>
       {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
 
       <Form.Root

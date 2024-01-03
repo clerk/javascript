@@ -7,7 +7,6 @@ import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 import { VerifyDomainForm } from './VerifyDomainForm';
 
 type AddDomainFormProps = FormProps;
@@ -24,7 +23,6 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
   const [domainId, setDomainId] = useState('');
   const title = localizationKeys('organizationProfile.createDomainPage.title');
   const subtitle = localizationKeys('organizationProfile.createDomainPage.subtitle');
-  const breadcrumbTitle = localizationKeys('organizationProfile.profilePage.domainSection.title');
   const card = useCardState();
   const { organization } = useOrganization();
 
@@ -64,8 +62,6 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
       <FormContent
         headerTitle={title}
         headerSubtitle={subtitle}
-        breadcrumbTitle={breadcrumbTitle}
-        Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <Form.Root onSubmit={onSubmit}>
           <Form.ControlRow elementId={nameField.id}>

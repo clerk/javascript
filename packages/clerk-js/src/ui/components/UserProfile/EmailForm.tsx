@@ -8,7 +8,6 @@ import { localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithLink } from './VerifyWithLink';
@@ -52,10 +51,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
-        headerTitle={title}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      >
+      <FormContent headerTitle={title}>
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>
             <Form.PlainInput
@@ -77,10 +73,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
         </Form.Root>
       </FormContent>
 
-      <FormContent
-        headerTitle={title}
-        Breadcrumbs={UserProfileBreadcrumbs}
-      >
+      <FormContent headerTitle={title}>
         {preferEmailLinks ? (
           <VerifyWithLink
             nextStep={onSuccess}
