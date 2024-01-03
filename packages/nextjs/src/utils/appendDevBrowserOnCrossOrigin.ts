@@ -15,7 +15,6 @@ export const appendDevBrowserOnCrossOrigin = (
   opts: AuthenticateRequestOptions,
 ) => {
   const location = res.headers.get('location');
-
   const shouldAppendDevBrowser = res.headers.get(constants.Headers.ClerkRedirectTo) === 'true';
 
   if (

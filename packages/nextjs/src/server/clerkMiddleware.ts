@@ -84,12 +84,16 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     } catch (e: any) {
       switch (e.message) {
         case PROTECT_REWRITE:
-          // Rewrite to bonus URL to force not found error
-          return NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`);
+          // Rewrite to a bogus URL to force not found error
+          handlerResult = NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`);
+          setHeader(handlerResult, constants.Headers.AuthReason, 'protect-rewrite');
+          break;
         case PROTECT_REDIRECT_TO_URL:
-          return NextResponse.redirect(e.redirectUrl);
+          handlerResult = redirectAdapter(e.redirectUrl);
+          break;
         case PROTECT_REDIRECT_TO_SIGN_IN:
-          return authObjWithMethods.redirectToSignIn();
+          handlerResult = authObjWithMethods.redirectToSignIn();
+          break;
         default:
           throw e;
       }
@@ -135,7 +139,7 @@ const parseRequestAndEvent = (args: unknown[]) => {
 const parseHandlerAndOptions = (args: unknown[]) => {
   return [
     typeof args[0] === 'function' ? args[0] : undefined,
-    args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0],
+    (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
   ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions];
 };
 
@@ -148,16 +152,18 @@ export const createAuthenticateRequestOptions = (clerkRequest: ClerkRequest, opt
   };
 };
 
+const redirectAdapter = (url: string | URL) => {
+  const res = NextResponse.redirect(url);
+  return setHeader(res, constants.Headers.ClerkRedirectTo, 'true');
+};
+
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
   requestState: RequestState,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
     return redirect({
-      redirectAdapter: url => {
-        const res = NextResponse.redirect(url);
-        return setHeader(res, constants.Headers.ClerkRedirectTo, 'true');
-      },
+      redirectAdapter,
       signInUrl: requestState.signInUrl,
       signUpUrl: requestState.signUpUrl,
       publishableKey: PUBLISHABLE_KEY,
