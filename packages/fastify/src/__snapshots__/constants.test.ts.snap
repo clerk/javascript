@@ -24,6 +24,7 @@ exports[`constants from environment variables 1`] = `
     "ForwardedPort": "x-forwarded-port",
     "ForwardedProto": "x-forwarded-proto",
     "Host": "host",
+    "Location": "location",
     "Origin": "origin",
     "Referrer": "referer",
     "SecFetchDest": "sec-fetch-dest",

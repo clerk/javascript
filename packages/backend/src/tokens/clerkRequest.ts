@@ -1,25 +1,14 @@
 import { parse as parseCookies } from 'cookie';
 
 import { constants } from '../constants';
-
-export type WithClerkUrl<T> = T & {
-  /**
-   * When a NextJs app is hosted on a platform different from Vercel
-   * or inside a container (Netlify, Fly.io, AWS Amplify, docker etc),
-   * req.url is always set to `localhost:3000` instead of the actual host of the app.
-   *
-   * The `authMiddleware` uses the value of the available req.headers in order to construct
-   * and use the correct url internally. This url is then exposed as `experimental_clerkUrl`,
-   * intended to be used within `beforeAuth` and `afterAuth` if needed.
-   */
-  clerkUrl: URL;
-};
+import type { ClerkUrl, WithClerkUrl } from './clerkUrl';
+import { createClerkUrl } from './clerkUrl';
 
 class ClerkRequest extends Request {
-  readonly clerkUrl: URL;
+  readonly clerkUrl: ClerkUrl;
   readonly cookies: Map<string, string>;
 
-  public constructor(req: Request) {
+  public constructor(req: ClerkRequest | Request) {
     super(req, req);
     this.clerkUrl = this.deriveUrlFromHeaders(req);
     this.cookies = this.parseCookies(req);
@@ -44,7 +33,7 @@ class ClerkRequest extends Request {
     const resolvedProtocol = this.getFirstValueFromHeader(forwardedProto) ?? protocol?.replace(/[:/]/, '');
     const origin = resolvedHost && resolvedProtocol ? `${resolvedProtocol}://${resolvedHost}` : initialUrl.origin;
 
-    return new URL(initialUrl.pathname + initialUrl.search, origin);
+    return createClerkUrl(initialUrl.pathname + initialUrl.search, origin);
   }
 
   private getFirstValueFromHeader(value?: string | null) {
@@ -62,7 +51,7 @@ class ClerkRequest extends Request {
 }
 
 export const createClerkRequest = (...args: ConstructorParameters<typeof ClerkRequest>): ClerkRequest => {
-  return new ClerkRequest(...args);
+  return args[0] instanceof ClerkRequest ? args[0] : new ClerkRequest(...args);
 };
 
 export type { ClerkRequest };

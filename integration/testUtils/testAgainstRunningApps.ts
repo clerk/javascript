@@ -20,7 +20,7 @@ type RunningAppsParams = {
  */
 const runningApps = (params: RunningAppsParams = {}) => {
   const withEnv = [params.withEnv].flat().filter(Boolean);
-  const { appIds, appUrl, appPk, appSk } = parseEnvOptions();
+  const { appIds, appUrl, appPk, appSk, clerkApiUrl } = parseEnvOptions();
   if (appIds.length) {
     // if appIds are provided, we only return the apps with the given ids
     const filter = app => (withEnv.length ? withEnv.includes(app.env) : true);
@@ -31,6 +31,7 @@ const runningApps = (params: RunningAppsParams = {}) => {
   const env = environmentConfig()
     .setId('tempEnv')
     .setEnvVariable('private', 'CLERK_SECRET_KEY', appSk)
+    .setEnvVariable('private', 'CLERK_API_URL', clerkApiUrl)
     .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', appPk);
   return [longRunningApplication({ id: 'standalone', env, serverUrl: appUrl, config: applicationConfig() })];
 };

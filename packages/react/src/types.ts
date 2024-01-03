@@ -36,11 +36,6 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
   initialState?: InitialState;
 };
 
-export type ClerkProviderOptionsWrapper = Without<IsomorphicClerkOptions, 'publishableKey'> & {
-  publishableKey?: string;
-  children: React.ReactNode;
-};
-
 export interface BrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
 }
