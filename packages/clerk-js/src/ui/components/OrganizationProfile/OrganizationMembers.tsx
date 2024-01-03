@@ -106,6 +106,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 </Tab>
               )}
               <Col
+                justify='center'
                 sx={{
                   marginLeft: 'auto',
                   [mqu.md]: {
