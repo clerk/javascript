@@ -10,7 +10,7 @@ import type {
 } from '@clerk/types';
 import { fromPromise } from 'xstate';
 
-import type { ClerkHostRouter } from '../router';
+import type { ClerkRouter } from '../router';
 import type { SignInMachineContext } from './sign-in.machine';
 import type { WithClerk, WithClient, WithParams } from './sign-in.types';
 import { assertIsDefined } from './utils/assert';
@@ -67,7 +67,7 @@ export const attemptSecondFactor = fromPromise<SignInResource, WithClient<WithPa
 
 export const handleSSOCallback = fromPromise<
   unknown,
-  WithClerk<WithParams<HandleOAuthCallbackParams | HandleSamlCallbackParams> & { router: ClerkHostRouter }>
+  WithClerk<WithParams<HandleOAuthCallbackParams | HandleSamlCallbackParams> & { router: ClerkRouter }>
 >(async ({ input }) => {
   return input.clerk.handleRedirectCallback(
     {
