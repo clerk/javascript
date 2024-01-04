@@ -1,8 +1,7 @@
-import { BlockButton, Protect } from '../../common';
+import { Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys } from '../../customizables';
-import { Header } from '../../elements';
-import { Plus } from '../../icons';
+import { Header, ProfileSection } from '../../elements';
 import { useRouter } from '../../router';
 import { DomainList } from './DomainList';
 import { MembershipWidget } from './MembershipWidget';
@@ -49,13 +48,11 @@ export const OrganizationMembersTabRequests = () => {
             </Header.Root>
             <DomainList
               fallback={
-                <BlockButton
-                  textLocalizationKey={localizationKeys(
+                <ProfileSection.Button
+                  localizationKey={localizationKeys(
                     'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
                   )}
-                  leftIcon={Plus}
                   sx={t => ({ gap: t.space.$2 })}
-                  leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
                   id='manageVerifiedDomains'
                   onClick={() => navigate('../')}
                 />
