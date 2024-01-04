@@ -1,11 +1,12 @@
-import type { ProfileSectionId } from '@clerk/types';
+import type { MenuId, ProfileSectionId } from '@clerk/types';
+import { isValidElement } from 'react';
 
 import type { Button, LocalizationKey } from '../customizables';
-import { Col, descriptors, Flex, Text } from '../customizables';
+import { Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { Plus } from '../icons';
-import type { PropsOfComponent } from '../styledSystem';
-import { ArrowBlockButton } from '.';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import { ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
@@ -122,11 +123,113 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
   );
 };
 
+type ProfileSectionActionMenuItemProps = PropsOfComponent<typeof MenuItem> & {
+  destructive?: boolean;
+  leftIcon?: React.ComponentType | React.ReactElement;
+  leftIconSx?: ThemableCssProp;
+};
+
+export const ProfileSectionActionMenuItem = (props: ProfileSectionActionMenuItemProps) => {
+  const { children, isLoading, localizationKey, sx, leftIcon, leftIconSx, ...rest } = props;
+
+  const isIconElement = isValidElement(leftIcon);
+
+  return (
+    <MenuItem
+      sx={[
+        theme => ({
+          borderRadius: theme.radii.$sm,
+        }),
+        sx,
+      ]}
+      isLoading={isLoading}
+      {...rest}
+    >
+      {(isLoading || leftIcon) && (
+        <Flex
+          as='span'
+          sx={theme => ({ flex: `0 0 ${theme.space.$4}` })}
+        >
+          {isLoading ? (
+            <Spinner
+              elementDescriptor={descriptors.spinner}
+              size={'sm'}
+            />
+          ) : !isIconElement && leftIcon ? (
+            <Icon
+              icon={leftIcon as React.ComponentType}
+              sx={[
+                theme => ({
+                  color: theme.colors.$blackAlpha600,
+                  width: theme.sizes.$5,
+                }),
+                leftIconSx,
+              ]}
+            />
+          ) : (
+            leftIcon
+          )}
+        </Flex>
+      )}
+      <Text localizationKey={localizationKey} />
+    </MenuItem>
+  );
+};
+
+type ProfileSectionActionMenuProps = {
+  children: React.ReactNode;
+  destructive?: boolean;
+  triggerLocalizationKey?: LocalizationKey;
+  triggerSx?: ThemableCssProp;
+  elementId?: MenuId;
+};
+
+export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) => {
+  const { children, triggerLocalizationKey, elementId, triggerSx } = props;
+  return (
+    <Flex
+      sx={{
+        position: 'relative',
+      }}
+    >
+      <Menu
+        popoverPlacement='bottom'
+        elementId={elementId}
+      >
+        <MenuTrigger>
+          <ArrowBlockButton
+            variant='ghost'
+            sx={[
+              t => ({ justifyContent: 'start', gap: t.space.$2, padding: `${t.space.$2} ${t.space.$4}` }),
+              triggerSx,
+            ]}
+            textLocalizationKey={triggerLocalizationKey}
+            leftIcon={Plus}
+            leftIconSx={t => ({ width: t.sizes.$2x5, height: t.sizes.$2x5 })}
+          />
+        </MenuTrigger>
+        <MenuList
+          sx={t => ({
+            width: '100%',
+            gap: 2,
+            paddingLeft: t.space.$1,
+            paddingRight: t.space.$1,
+          })}
+        >
+          {children}
+        </MenuList>
+      </Menu>
+    </Flex>
+  );
+};
+
 export const ProfileSection = {
   Root: ProfileSectionRoot,
   ItemList: ProfileSectionItemList,
   Item: ProfileSectionItem,
   Button: ProfileSectionButton,
+  ActionMenu: ProfileSectionActionMenu,
+  ActionMenuItem: ProfileSectionActionMenuItem,
 };
 
 type SectionHeaderProps = PropsOfComponent<typeof Flex> & {

@@ -3,10 +3,9 @@ import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
 
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
-import { Col, Flex, Image, localizationKeys, SimpleButton, Text } from '../../customizables';
-import { ArrowBlockButton, Menu, MenuList, MenuTrigger, useCardState, withCardStateProvider } from '../../elements';
+import { Image, localizationKeys } from '../../customizables';
+import { ProfileSection, useCardState, withCardStateProvider } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
-import { Plus } from '../../icons';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
 
@@ -41,7 +40,7 @@ const AddConnectedAccount = () => {
     card.setLoading(strategy);
     user
       ?.createExternalAccount({
-        strategy: strategy,
+        strategy,
         redirectUrl,
         additionalScopes,
       })
@@ -52,7 +51,7 @@ const AddConnectedAccount = () => {
       })
       .catch(err => handleError(err, [], card.setError))
       .finally(() => {
-        void sleep(2000).then(() => card.setIdle);
+        void sleep(2000).then(() => card.setIdle(strategy));
       });
   };
 
@@ -61,63 +60,38 @@ const AddConnectedAccount = () => {
   }
 
   return (
-    <Flex
-      sx={{
-        position: 'relative',
-      }}
+    <ProfileSection.ActionMenu
+      triggerLocalizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
+      elementId='connected-accounts-menu'
     >
-      <Menu popoverPlacement='bottom'>
-        <MenuTrigger>
-          <ArrowBlockButton
-            variant='ghost'
-            sx={[t => ({ justifyContent: 'start', gap: t.space.$2, padding: `${t.space.$2} ${t.space.$4}` })]}
-            textLocalizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
-            leftIcon={Plus}
-            leftIconSx={t => ({ width: t.sizes.$2x5, height: t.sizes.$2x5 })}
-          />
-        </MenuTrigger>
-        <MenuList
-          sx={{
-            width: '100%',
-          }}
-        >
-          <Col
-            gap={2}
-            sx={t => ({
-              paddingLeft: t.space.$1,
-              paddingRight: t.space.$1,
-            })}
-          >
-            {unconnectedStrategies.map(strategy => (
-              <SimpleButton
-                key={strategy}
-                id={strategyToDisplayData[strategy].id}
-                onClick={() => connect(strategy)}
-                isDisabled={card.isLoading}
-                variant='ghost'
-                sx={t => ({
-                  justifyContent: 'start',
-                  gap: t.space.$2,
-                })}
-                focusRing={false}
-              >
-                <Image
-                  isLoading={card.loadingMetadata === strategy}
-                  isDisabled={card.isLoading}
-                  src={strategyToDisplayData[strategy].iconUrl}
-                  alt={`Connect ${strategyToDisplayData[strategy].name} account`}
-                  sx={theme => ({ width: theme.sizes.$4 })}
-                />
-                <Text
-                  localizationKey={localizationKeys('userProfile.connectedAccountPage.socialButtonsBlockButton', {
-                    provider: strategyToDisplayData[strategy].name,
-                  })}
-                />
-              </SimpleButton>
-            ))}
-          </Col>
-        </MenuList>
-      </Menu>
-    </Flex>
+      {unconnectedStrategies.map(strategy => (
+        <ProfileSection.ActionMenuItem
+          key={strategy}
+          id={strategyToDisplayData[strategy].id}
+          onClick={() => connect(strategy)}
+          isDisabled={card.isLoading}
+          variant='ghost'
+          isLoading={card.loadingMetadata === strategy}
+          focusRing={false}
+          closeAfterClick={false}
+          localizationKey={localizationKeys('userProfile.connectedAccountPage.socialButtonsBlockButton', {
+            provider: strategyToDisplayData[strategy].name,
+          })}
+          sx={t => ({
+            justifyContent: 'start',
+            gap: t.space.$2,
+          })}
+          leftIcon={
+            <Image
+              isLoading={card.loadingMetadata === strategy}
+              isDisabled={card.isLoading}
+              src={strategyToDisplayData[strategy].iconUrl}
+              alt={`Connect ${strategyToDisplayData[strategy].name} account`}
+              sx={theme => ({ width: theme.sizes.$4 })}
+            />
+          }
+        />
+      ))}
+    </ProfileSection.ActionMenu>
   );
 };

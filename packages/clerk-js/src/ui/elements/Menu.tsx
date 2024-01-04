@@ -4,7 +4,8 @@ import type { Placement } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
 
-import { Button, Col, descriptors } from '../customizables';
+import type { Button } from '../customizables';
+import { Col, descriptors, SimpleButton } from '../customizables';
 import type { UsePopoverReturn } from '../hooks';
 import { usePopover } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -31,6 +32,7 @@ export const Menu = withFloatingTree((props: MenuProps) => {
     placement: popoverPlacement,
     offset: 8,
     bubbles: false,
+    shoudFlip: false,
   });
 
   const value = React.useMemo(() => ({ value: { popoverCtx, elementId } }), [{ ...popoverCtx }, elementId]);
@@ -147,10 +149,11 @@ export const MenuList = (props: MenuListProps) => {
 
 type MenuItemProps = PropsOfComponent<typeof Button> & {
   destructive?: boolean;
+  closeAfterClick?: boolean;
 };
 
 export const MenuItem = (props: MenuItemProps) => {
-  const { sx, onClick, destructive, ...rest } = props;
+  const { sx, onClick, destructive, closeAfterClick = true, ...rest } = props;
   const { popoverCtx, elementId } = useMenuState();
   const { toggle } = popoverCtx;
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -172,7 +175,7 @@ export const MenuItem = (props: MenuItemProps) => {
   };
 
   return (
-    <Button
+    <SimpleButton
       ref={buttonRef}
       elementDescriptor={descriptors.menuItem}
       elementId={descriptors.menuItem.setId(elementId)}
@@ -182,7 +185,7 @@ export const MenuItem = (props: MenuItemProps) => {
       onKeyDown={onKeyDown}
       onClick={e => {
         onClick?.(e);
-        toggle();
+        closeAfterClick && toggle();
       }}
       sx={[
         theme => ({

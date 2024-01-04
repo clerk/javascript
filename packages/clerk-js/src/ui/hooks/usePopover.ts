@@ -6,6 +6,7 @@ type UsePopoverProps = {
   defaultOpen?: boolean;
   placement?: UseFloatingOptions['placement'];
   offset?: Parameters<typeof offset>[0];
+  shoudFlip?: boolean;
   autoUpdate?: boolean;
   outsidePress?: boolean | ((event: MouseEvent) => boolean);
   bubbles?:
@@ -19,7 +20,7 @@ type UsePopoverProps = {
 export type UsePopoverReturn = ReturnType<typeof usePopover>;
 
 export const usePopover = (props: UsePopoverProps = {}) => {
-  const { bubbles = true, outsidePress } = props;
+  const { bubbles = true, shoudFlip = true, outsidePress } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const nodeId = useFloatingNodeId();
   const { update, refs, strategy, x, y, context } = useFloating({
@@ -28,7 +29,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
     nodeId,
     whileElementsMounted: props.autoUpdate === false ? undefined : autoUpdate,
     placement: props.placement || 'bottom-start',
-    middleware: [offset(props.offset || 6), flip(), shift()],
+    middleware: [offset(props.offset || 6), shoudFlip && flip(), shift()],
   });
   // Names are aliased because in @floating-ui/react-dom@2.0.0 the top-level elements were removed
   // This keeps the API shape for consumers of usePopover
