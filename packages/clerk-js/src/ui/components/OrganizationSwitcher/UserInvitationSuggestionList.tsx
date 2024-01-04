@@ -230,7 +230,8 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
     >
       <Box
         sx={t => ({
-          maxHeight: `calc(4 * ${t.sizes.$12})`,
+          // 4 items + 4px border (four 1px borders)
+          maxHeight: `calc(4 * ${t.sizes.$17} + 4px)`,
           overflowY: 'auto',
           ...common.unstyledScrollbar(t),
         })}
