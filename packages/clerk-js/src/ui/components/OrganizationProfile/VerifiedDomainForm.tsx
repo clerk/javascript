@@ -131,7 +131,6 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
   const subtitle = localizationKeys('organizationProfile.verifiedDomainPage.subtitle', {
     domain: domain?.name,
   });
-  console.log(title, subtitle);
 
   const calloutLabel = useCalloutLabel(domain, {
     infoLabel: localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutInfoLabel`),
