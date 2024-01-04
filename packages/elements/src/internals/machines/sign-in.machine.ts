@@ -4,6 +4,7 @@ import type { EnvironmentResource, OAuthStrategy, SignInResource, Web3Strategy }
 import type { MachineContext } from 'xstate';
 import { and, assertEvent, assign, enqueueActions, log, not, raise, setup } from 'xstate';
 
+import { ClerkElementsFieldError } from '../errors/error';
 import type { ClerkRouter } from '../router';
 import { waitForClerk } from './shared.actors';
 import * as signInActors from './sign-in.actors';
@@ -35,8 +36,12 @@ export type SignInMachineEvents =
       field: Pick<FieldDetails, 'type' | 'value'>;
     }
   | {
-      type: 'FIELD.ERROR';
-      field: Pick<FieldDetails, 'type' | 'error'>;
+      type: 'FIELD.ERRORS.SET';
+      field: Pick<FieldDetails, 'type' | 'errors'>;
+    }
+  | {
+      type: 'FIELD.ERRORS.CLEAR';
+      field: Pick<FieldDetails, 'type'>;
     }
   | { type: 'NEXT' }
   | { type: 'OAUTH.CALLBACK' }
@@ -76,33 +81,33 @@ export const SignInMachine = setup({
     isSignInComplete: ({ context }) => context?.resource?.status === 'complete',
     isLoggedIn: ({ context }) => Boolean(context.clerk.user),
     isSingleSessionMode: ({ context }) => Boolean(context.clerk.__unstable__environment?.authConfig.singleSessionMode),
+    needsIdentifier: ({ context }) => context.resource?.status === 'needs_identifier',
     needsFirstFactor: ({ context }) => context.resource?.status === 'needs_first_factor',
     needsSecondFactor: ({ context }) => context.resource?.status === 'needs_second_factor',
+    needsNewPassword: ({ context }) => context.resource?.status === 'needs_new_password',
     hasSignInResource: ({ context }) => Boolean(context.resource),
     hasClerkAPIError: ({ context }) => isClerkAPIResponseError(context.error),
-    hasClerkAPIErrorCode: ({ context }, params?: { code?: string }) =>
-      params?.code
-        ? isClerkAPIResponseError(context.error)
-          ? Boolean(context.error.errors.find(e => e.code === params.code))
+    hasClerkAPIErrorCode: ({ context }, params?: { code?: string; error?: Error | ClerkAPIResponseError }) => {
+      const err = params?.error && context.error;
+      return params?.code && err
+        ? isClerkAPIResponseError(err)
+          ? Boolean(err.errors.find(e => e.code === params.code))
           : false
-        : false,
+        : false;
+    },
   },
   types: {} as SignInMachineTypes,
 }).createMachine({
   id: 'SignIn',
-  context: ({ input }) => {
-    console.debug({ mode: input.clerk.mode, loaded: input.clerk.loaded });
-
-    return {
-      clerk: input.clerk,
-      environment: input.clerk.__unstable__environment,
-      mode: input.clerk.mode,
-      loaded: input.clerk.loaded,
-      router: input.router,
-      resource: null,
-      fields: new Map(),
-    };
-  },
+  context: ({ input }) => ({
+    clerk: input.clerk,
+    environment: input.clerk.__unstable__environment,
+    mode: input.clerk.mode,
+    loaded: input.clerk.loaded,
+    router: input.router,
+    resource: null,
+    fields: new Map(),
+  }),
   on: {
     'FIELD.ADD': {
       actions: assign({
@@ -138,14 +143,25 @@ export const SignInMachine = setup({
         },
       }),
     },
-    'FIELD.ERROR': {
+    'FIELD.ERRORS.SET': {
       actions: assign({
         fields: ({ context, event }) => {
           if (!event.field.type) throw new Error('Field type is required');
           if (context.fields.has(event.field.type)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            context.fields.get(event.field.type)!.error = event.field.error;
+            context.fields.get(event.field.type)!.errors = event.field.errors;
           }
+
+          return context.fields;
+        },
+      }),
+    },
+    'FIELD.ERRORS.CLEAR': {
+      actions: assign({
+        fields: ({ context }) => {
+          context.fields.forEach(field => {
+            field.errors = undefined;
+          });
 
           return context.fields;
         },
@@ -207,6 +223,19 @@ export const SignInMachine = setup({
               guard: 'needsSecondFactor',
               target: '#SignIn.SecondFactor',
             },
+            {
+              guard: 'needsNewPassword',
+              actions: assign({ error: () => new Error('needs_new_password') }),
+              target: '#SignIn.Start', // TOOD: Update target
+            },
+            {
+              guard: 'needsIdentifier',
+              actions: assign({ error: () => new Error('needs_identifier') }),
+              target: '#SignIn.Start',
+            },
+            {
+              target: '#SignIn.Start',
+            },
           ],
           exit: 'debug',
         },
@@ -256,19 +285,31 @@ export const SignInMachine = setup({
             onError: {
               actions: enqueueActions(({ enqueue, event }) => {
                 if (isClerkAPIResponseError(event.error)) {
-                  for (const error of event.error.errors) {
-                    enqueue(() => console.debug(error));
+                  // TODO: Move to Event/Action for Re-use
+                  const fields: Record<string, ClerkElementsFieldError[]> = {};
 
-                    if (error.meta?.paramName)
-                      enqueue(
-                        raise({
-                          type: 'FIELD.ERROR',
-                          field: {
-                            type: error.meta.paramName,
-                            error: error,
-                          },
-                        }),
-                      );
+                  for (const error of event.error.errors) {
+                    const name = error.meta?.paramName;
+
+                    if (!name) {
+                      continue;
+                    } else if (!fields[name]) {
+                      fields[name] = [];
+                    }
+
+                    fields[name]?.push(ClerkElementsFieldError.fromAPIError(error));
+                  }
+
+                  for (const field in fields) {
+                    enqueue(
+                      raise({
+                        type: 'FIELD.ERRORS.SET',
+                        field: {
+                          type: field,
+                          errors: fields[field],
+                        },
+                      }),
+                    );
                   }
                 }
               }),

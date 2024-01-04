@@ -2,6 +2,7 @@
 
 import {
   Field,
+  FieldErrors,
   Form,
   Input,
   Label,
@@ -28,6 +29,14 @@ const BUTTON_BGS_HOVER: Record<string, string> = {
   github: 'rgba(23 23 23 / 0.8)',
   google: 'rgb(51 63 97 / 0.8)',
 };
+
+function CustomError({ code, message }: { code: string; message: string }) {
+  return (
+    <p className='text-red-400 font-mono'>
+      <span className='block '>{code}:</span> {message}
+    </p>
+  );
+}
 
 export default function SignInPage() {
   return (
@@ -72,23 +81,46 @@ export default function SignInPage() {
             <Form className='flex gap-6 flex-col'>
               <Field
                 name='identifier'
-                className='flex gap-4 justify-between items-center'
+                className='flex flex-col gap-4'
               >
-                <Label htmlFor='password'>Email</Label>
-                <Input
-                  type='identifier'
-                  className='bg-tertiary rounded-sm px-2 py-1 border border-foreground'
+                <div className='flex gap-4 justify-between items-center'>
+                  <Label>Email</Label>
+                  <Input
+                    type='identifier'
+                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500'
+                  />
+                </div>
+
+                <FieldErrors
+                  render={({ code, message }) => (
+                    <CustomError
+                      code={code}
+                      message={message}
+                    />
+                  )}
                 />
+                {/* <FieldErrors render={error => <pre>{error)}</pre>} /> */}
               </Field>
 
               <Field
                 name='password'
-                className='flex gap-4 justify-between items-center'
+                className='flex flex-col gap-4'
               >
-                <Label htmlFor='password'>Password</Label>
-                <Input
-                  type='password'
-                  className='bg-tertiary rounded-sm px-2 py-1 border border-foreground'
+                <div className='flex gap-4 justify-between items-center'>
+                  <Label>Password</Label>
+                  <Input
+                    type='password'
+                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                  />
+                </div>
+
+                <FieldErrors
+                  render={({ code, message }) => (
+                    <CustomError
+                      code={code}
+                      message={message}
+                    />
+                  )}
                 />
               </Field>
 
