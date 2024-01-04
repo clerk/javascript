@@ -32,7 +32,7 @@ export const OrganizationProfileNavbar = (
         description={localizationKeys('organizationProfile.navbar.description')}
         header={
           <OrganizationPreview
-            size='sm'
+            size='md'
             organization={organization}
             sx={t => ({ margin: `0 0 ${t.space.$4} ${t.space.$2}` })}
           />
