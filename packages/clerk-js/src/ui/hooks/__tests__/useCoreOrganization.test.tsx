@@ -553,7 +553,7 @@ describe('useOrganization', () => {
       );
       const { result } = renderHook(
         () =>
-          useOrganization({
+          useCoreOrganization({
             invitations: {
               pageSize: 2,
               infinite: true,
