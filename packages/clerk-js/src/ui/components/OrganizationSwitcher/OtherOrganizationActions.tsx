@@ -34,7 +34,7 @@ const CreateOrganizationButton = ({
       onClick={onCreateOrganizationClick}
       sx={t => ({
         borderBottom: 'none',
-        color: t.colors.$blackAlpha600,
+        color: t.colors.$blackAlpha500,
         padding: `${t.space.$5} ${t.space.$5}`,
         ':hover': {
           color: t.colors.$blackAlpha600,
