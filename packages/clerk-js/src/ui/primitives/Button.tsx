@@ -113,7 +113,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
             ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$colorBackground },
-          boxShadow: theme.shadows.$secondaryButtonShadow,
+          boxShadow: common.shadows(theme).secondaryButtonShadow,
         },
         secondaryDanger: {
           backgroundColor: theme.colors.$colorBackground,
@@ -126,7 +126,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
             ? { backgroundColor: theme.colors.$danger50, color: theme.colors.$danger500 }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$colorBackground },
-          boxShadow: theme.shadows.$secondaryButtonShadow,
+          boxShadow: common.shadows(theme).secondaryButtonShadow,
         },
         ghost: {
           color: theme.colors.$blackAlpha700,

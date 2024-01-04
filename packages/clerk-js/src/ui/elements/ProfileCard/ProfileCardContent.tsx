@@ -37,7 +37,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         width: '100%',
         height: '100%',
         overflowY: 'auto',
-        boxShadow: t.shadows.$cardContentShadow,
+        boxShadow: common.shadows(t).cardContentShadow,
       })}
     >
       <Col

@@ -20,22 +20,22 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       primary: {
         [vars.accent]: theme.colors.$blackAlpha500,
         [vars.bg]: theme.colors.$blackAlpha50,
-        [vars.shadow]: theme.shadows.$badge.replace('{{color}}', theme.colors.$blackAlpha100),
+        [vars.shadow]: common.shadows(theme).badge.replace('{{color}}', theme.colors.$blackAlpha100),
       },
       danger: {
         [vars.accent]: theme.colors.$danger500,
         [vars.bg]: theme.colors.$danger50,
-        [vars.shadow]: theme.shadows.$badge.replace('{{color}}', theme.colors.$danger200),
+        [vars.shadow]: common.shadows(theme).badge.replace('{{color}}', theme.colors.$danger200),
       },
       success: {
         [vars.accent]: theme.colors.$success500,
         [vars.bg]: theme.colors.$success50,
-        [vars.shadow]: theme.shadows.$badge.replace('{{color}}', theme.colors.$success200),
+        [vars.shadow]: common.shadows(theme).badge.replace('{{color}}', theme.colors.$success200),
       },
       warning: {
         [vars.accent]: theme.colors.$warning500,
         [vars.bg]: theme.colors.$warning50,
-        [vars.shadow]: theme.shadows.$badge.replace('{{color}}', theme.colors.$warning200),
+        [vars.shadow]: common.shadows(theme).badge.replace('{{color}}', theme.colors.$warning200),
       },
     },
   },

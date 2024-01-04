@@ -19,7 +19,7 @@ import {
 import { Portal } from '../../elements/Portal';
 import { Eye } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
-import { InternalThemeProvider, mqu } from '../../styledSystem';
+import { common, InternalThemeProvider, mqu } from '../../styledSystem';
 
 type EyeCircleProps = PropsOfComponent<typeof Col> & {
   width: string;
@@ -90,7 +90,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
         localizationKey={signOutText}
         onClick={async () => {
           // clerk-js has been loaded at this point so we can safely access session
-          await signOut({ sessionId: session!.id });
+          await signOut({ sessionId: session.id });
         }}
       />
     </Col>
@@ -188,7 +188,7 @@ const _ImpersonationFab = () => {
           top: `var(${topProperty}, ${defaultTop}px)`,
           right: `var(${rightProperty}, ${defaultRight}px)`,
           zIndex: t.zIndices.$fab,
-          boxShadow: t.shadows.$fabShadow,
+          boxShadow: common.shadows(t).fabShadow,
           borderRadius: t.radii.$halfHeight, //to match the circular eye perfectly
           backgroundColor: t.colors.$white,
           fontFamily: t.fonts.$main,

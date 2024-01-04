@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createVariants, type PrimitiveProps } from '../styledSystem';
+import { common, createVariants, type PrimitiveProps } from '../styledSystem';
 import type { BoxProps } from './Box';
 import { Box } from './Box';
 
@@ -11,7 +11,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
     base: {
       width: '100%',
       borderRadius: theme.radii.$lg,
-      boxShadow: theme.shadows.$tableBodyShadow,
+      boxShadow: common.shadows(theme).tableBodyShadow,
     },
     variants: {},
   };

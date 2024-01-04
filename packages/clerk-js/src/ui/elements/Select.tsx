@@ -7,7 +7,7 @@ import { Button, descriptors, Flex, Icon, Input, Text } from '../customizables';
 import { usePopover, useSearchInput } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { animations } from '../styledSystem';
+import { animations, common } from '../styledSystem';
 import { colors } from '../utils';
 import { withFloatingTree } from './contexts';
 import type { InputWithIcon } from './InputWithIcon';
@@ -303,7 +303,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
             overflow: 'hidden',
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: theme.shadows.$menuShadow,
+            boxShadow: common.shadows(theme).menuShadow,
             zIndex: theme.zIndices.$dropdown,
           }),
           sx,
@@ -390,7 +390,7 @@ export const SelectButton = (
           color: theme.colors.$colorInputText,
           backgroundColor: theme.colors.$colorInputBackground,
           borderRadius: theme.radii.$md,
-          boxShadow: theme.shadows.$selectButtonShadow,
+          boxShadow: common.shadows(theme).selectButtonShadow,
           paddingLeft: theme.space.$3x5,
           paddingRight: theme.space.$3x5,
           alignItems: 'center',

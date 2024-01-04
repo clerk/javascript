@@ -3,7 +3,7 @@ import React from 'react';
 import { useEnvironment } from '../contexts';
 import { Col, descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations } from '../styledSystem';
+import { animations, common } from '../styledSystem';
 import { Card } from '.';
 import { PoweredByClerkTag } from './PoweredByClerk';
 
@@ -37,7 +37,7 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
           backgroundColor: t.colors.$colorBackground,
           overflow: 'hidden',
           borderRadius: t.radii.$lg,
-          boxShadow: t.shadows.$cardContentShadow,
+          boxShadow: common.shadows(t).cardContentShadow,
         }),
         sx,
       ]}
