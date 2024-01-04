@@ -3,6 +3,7 @@ import { describe } from '@jest/globals';
 import { act, bindCreateFixtures, renderHook, waitFor } from '../../../testUtils';
 import {
   createFakeDomain,
+  createFakeOrganizationInvitation,
   createFakeOrganizationMembershipRequest,
 } from '../../components/OrganizationProfile/__tests__/utils';
 import { createFakeUserOrganizationMembership } from '../../components/OrganizationSwitcher/__tests__/utlis';
@@ -13,6 +14,9 @@ const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 const defaultRenderer = () =>
   useCoreOrganization({
     domains: {
+      pageSize: 2,
+    },
+    invitations: {
       pageSize: 2,
     },
     membershipRequests: {
@@ -425,6 +429,206 @@ describe('useOrganization', () => {
           ]),
         );
       });
+    });
+  });
+
+  describe('invitations', () => {
+    it('fetch with pages', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getInvitations.mockReturnValue(
+        Promise.resolve({
+          data: [
+            createFakeOrganizationInvitation({
+              id: '1',
+              emailAddress: 'admin1@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+            createFakeOrganizationInvitation({
+              id: '2',
+              emailAddress: 'member2@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+          ],
+          total_count: 4,
+        }),
+      );
+      const { result } = renderHook(defaultRenderer, { wrapper });
+      expect(result.current.invitations?.isLoading).toBe(true);
+      expect(result.current.invitations?.isFetching).toBe(true);
+      expect(result.current.invitations?.count).toBe(0);
+
+      await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
+
+      expect(result.current.invitations?.isFetching).toBe(false);
+      expect(result.current.invitations?.count).toBe(4);
+      expect(result.current.invitations?.page).toBe(1);
+      expect(result.current.invitations?.pageCount).toBe(2);
+      expect(result.current.invitations?.hasNextPage).toBe(true);
+
+      fixtures.clerk.organization?.getInvitations.mockReturnValue(
+        Promise.resolve({
+          data: [
+            createFakeOrganizationInvitation({
+              id: '3',
+              emailAddress: 'admin3@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+            createFakeOrganizationInvitation({
+              id: '4',
+              emailAddress: 'member4@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+          ],
+          total_count: 4,
+        }),
+      );
+
+      act(() => result.current.invitations?.fetchNext?.());
+
+      await waitFor(() => expect(result.current.invitations?.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
+
+      expect(result.current.invitations?.page).toBe(2);
+      expect(result.current.invitations?.hasNextPage).toBe(false);
+      expect(result.current.invitations?.data).toEqual(
+        expect.arrayContaining([
+          expect.not.objectContaining({
+            id: '1',
+          }),
+          expect.not.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            organizationId: '1',
+            id: '3',
+            emailAddress: 'admin3@clerk.com',
+          }),
+          expect.objectContaining({
+            organizationId: '1',
+            id: '4',
+            emailAddress: 'member4@clerk.com',
+          }),
+        ]),
+      );
+    });
+
+    it('infinite fetch', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeOrganizationInvitation({
+              id: '1',
+              emailAddress: 'admin1@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+            createFakeOrganizationInvitation({
+              id: '2',
+              emailAddress: 'member2@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+          ],
+          total_count: 4,
+        }),
+      );
+      const { result } = renderHook(
+        () =>
+          useCoreOrganization({
+            invitations: {
+              pageSize: 2,
+              infinite: true,
+            },
+          }),
+        { wrapper },
+      );
+      expect(result.current.invitations?.isLoading).toBe(true);
+      expect(result.current.invitations?.isFetching).toBe(true);
+
+      await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
+      expect(result.current.invitations?.isFetching).toBe(false);
+
+      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeOrganizationInvitation({
+              id: '1',
+              emailAddress: 'admin1@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+            createFakeOrganizationInvitation({
+              id: '2',
+              emailAddress: 'member2@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+          ],
+          total_count: 4,
+        }),
+      );
+
+      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(
+        Promise.resolve({
+          data: [
+            createFakeOrganizationInvitation({
+              id: '3',
+              emailAddress: 'admin3@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+            createFakeOrganizationInvitation({
+              id: '4',
+              emailAddress: 'member4@clerk.com',
+              organizationId: '1',
+              createdAt: new Date('2022-01-01'),
+            }),
+          ],
+          total_count: 4,
+        }),
+      );
+
+      act(() => result.current.invitations?.fetchNext?.());
+
+      await waitFor(() => expect(result.current.invitations?.isFetching).toBe(true));
+      expect(result.current.invitations?.isLoading).toBe(false);
+
+      await waitFor(() => expect(result.current.invitations?.isFetching).toBe(false));
+      expect(result.current.invitations?.data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: '1',
+          }),
+          expect.objectContaining({
+            id: '2',
+          }),
+          expect.objectContaining({
+            id: '3',
+          }),
+          expect.objectContaining({
+            id: '4',
+          }),
+        ]),
+      );
     });
   });
 });
