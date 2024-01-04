@@ -61,6 +61,8 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   return (
     <Box
       sx={t => ({
+        // 4 items + 4px border (four 1px borders)
+        maxHeight: `calc((4 * ${t.sizes.$17}) + 4px)`,
         overflowY: 'auto',
         ...common.unstyledScrollbar(t),
       })}
