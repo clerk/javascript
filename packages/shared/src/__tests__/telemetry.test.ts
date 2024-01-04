@@ -152,4 +152,22 @@ describe('TelemetryCollector', () => {
 
     fetchSpy.mockRestore();
   });
+
+  test('does not send events if the random seed does not exceed the event-specific sampling rate', async () => {
+    const fetchSpy = jest.spyOn(global, 'fetch');
+    const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.1);
+
+    const collector = new TelemetryCollector({
+      publishableKey: TEST_PK,
+    });
+
+    collector.record({ event: 'TEST_EVENT', eventSamplingRate: 0.01, payload: {} });
+
+    jest.runAllTimers();
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    fetchSpy.mockRestore();
+    randomSpy.mockRestore;
+  });
 });
