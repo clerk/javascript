@@ -260,18 +260,12 @@ export type ElementsConfig = {
   organizationSwitcherPopoverActions: WithOptions;
   organizationSwitcherPopoverInvitationActions: WithOptions;
   organizationSwitcherPopoverActionButton: WithOptions<
-    'manageOrganization' | 'createOrganization' | 'switchOrganization',
-    never,
-    never
+    'manageOrganization' | 'createOrganization' | 'switchOrganization'
   >;
   organizationSwitcherPreviewButton: WithOptions;
   organizationSwitcherInvitationAcceptButton: WithOptions;
   organizationSwitcherInvitationRejectButton: WithOptions;
-  organizationSwitcherPopoverActionButtonIconBox: WithOptions<
-    'manageOrganization' | 'createOrganization',
-    never,
-    never
-  >;
+  organizationSwitcherPopoverActionButtonIconBox: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverActionButtonText: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverFooter: WithOptions;

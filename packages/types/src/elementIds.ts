@@ -36,7 +36,7 @@ export type ProfileSectionId =
   | 'organizationDanger'
   | 'organizationDomains'
   | 'manageVerifiedDomains';
-export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'organizationMembers';
+export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId =
