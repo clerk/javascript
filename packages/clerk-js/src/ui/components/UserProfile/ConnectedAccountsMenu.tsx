@@ -4,16 +4,12 @@ import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
 import { Image, localizationKeys } from '../../customizables';
-import { ProfileSection, useCardState, withCardStateProvider } from '../../elements';
+import { ProfileSection, useCardState } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
 
-export const ConnectedAccountsMenu = withCardStateProvider(() => {
-  return <AddConnectedAccount />;
-});
-
-const AddConnectedAccount = () => {
+export const AddConnectedAccount = () => {
   const card = useCardState();
   const { user } = useUser();
   const { navigate } = useRouter();
@@ -46,12 +42,13 @@ const AddConnectedAccount = () => {
       })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {
+          void sleep(2000).then(() => card.setIdle(strategy));
           void navigate(res.verification.externalVerificationRedirectURL.href);
         }
       })
-      .catch(err => handleError(err, [], card.setError))
-      .finally(() => {
-        void sleep(2000).then(() => card.setIdle(strategy));
+      .catch(err => {
+        handleError(err, [], card.setError);
+        card.setIdle(strategy);
       });
   };
 

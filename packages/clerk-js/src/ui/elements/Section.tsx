@@ -123,7 +123,7 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
   );
 };
 
-type ProfileSectionActionMenuItemProps = PropsOfComponent<typeof MenuItem> & {
+export type ProfileSectionActionMenuItemProps = PropsOfComponent<typeof MenuItem> & {
   destructive?: boolean;
   leftIcon?: React.ComponentType | React.ReactElement;
   leftIconSx?: ThemableCssProp;
@@ -192,10 +192,7 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
         position: 'relative',
       }}
     >
-      <Menu
-        popoverPlacement='bottom'
-        elementId={elementId}
-      >
+      <Menu elementId={elementId}>
         <MenuTrigger>
           <ArrowBlockButton
             variant='ghost'
@@ -205,10 +202,11 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
             ]}
             textLocalizationKey={triggerLocalizationKey}
             leftIcon={Plus}
-            leftIconSx={t => ({ width: t.sizes.$2x5, height: t.sizes.$2x5 })}
+            leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
           />
         </MenuTrigger>
         <MenuList
+          isPortal={false}
           sx={t => ({
             width: '100%',
             gap: 2,

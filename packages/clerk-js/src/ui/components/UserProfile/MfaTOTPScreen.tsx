@@ -32,6 +32,7 @@ export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => 
       <SuccessPage
         title={localizationKeys('userProfile.mfaTOTPPage.title')}
         text={localizationKeys('userProfile.mfaTOTPPage.successMessage')}
+        onFinish={onReset}
         contents={
           <MfaBackupCodeList
             subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
