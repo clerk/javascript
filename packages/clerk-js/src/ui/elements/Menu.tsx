@@ -27,7 +27,7 @@ type MenuProps = PropsWithChildren<Record<never, never>> & {
 };
 
 export const Menu = withFloatingTree((props: MenuProps) => {
-  const { elementId, popoverPlacement = 'bottom-end' } = props;
+  const { popoverPlacement = 'bottom-end', ...rest } = props;
   const popoverCtx = usePopover({
     placement: popoverPlacement,
     offset: 8,
@@ -35,12 +35,15 @@ export const Menu = withFloatingTree((props: MenuProps) => {
     shoudFlip: false,
   });
 
-  const value = React.useMemo(() => ({ value: { popoverCtx, elementId } }), [{ ...popoverCtx }, elementId]);
+  const value = React.useMemo(
+    () => ({ value: { popoverCtx, elementId: rest.elementId } }),
+    [{ ...popoverCtx }, rest.elementId],
+  );
 
   return (
     <MenuStateCtx.Provider
       value={value}
-      {...props}
+      {...rest}
     />
   );
 });

@@ -206,20 +206,20 @@ const MfaAddMenu = (props: MfaAddMenuProps) => {
             return {
               icon: Mobile,
               text: 'SMS code',
-              key: key,
-            };
+              key: 'phone_code',
+            } as const;
           } else if (key === 'totp') {
             return {
               icon: AuthApp,
               text: 'Authenticator application',
-              key: key,
-            };
+              key: 'totp',
+            } as const;
           } else if (key === 'backup_code') {
             return {
               icon: DotCircle,
               text: 'Backup code',
-              key: key,
-            };
+              key: 'backup_code',
+            } as const;
           }
 
           return null;
@@ -251,9 +251,7 @@ const MfaAddMenu = (props: MfaAddMenuProps) => {
         )}
       </ProfileSection.ActionMenu>
       <Action.Open value='multi-factor'>
-        <Action.Card>
-          <MfaScreen selectedStrategy={selectedStrategy} />
-        </Action.Card>
+        <Action.Card>{selectedStrategy && <MfaScreen selectedStrategy={selectedStrategy} />}</Action.Card>
       </Action.Open>
     </>
   );
