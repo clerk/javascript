@@ -4,13 +4,13 @@ import React from 'react';
 
 import { Button, Col, descriptors, localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtonContainer, FormContent, useFieldOTP } from '../../elements';
+import { Form, FormButtonContainer, FormContainer, useFieldOTP, withCardStateProvider } from '../../elements';
 
 type VerifyTOTPProps = FormProps & {
   resourceRef: React.MutableRefObject<TOTPResource | undefined>;
 };
 
-export const VerifyTOTP = (props: VerifyTOTPProps) => {
+export const VerifyTOTP = withCardStateProvider((props: VerifyTOTPProps) => {
   const { onSuccess, onReset, resourceRef } = props;
   const { user } = useUser();
 
@@ -28,7 +28,7 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
   });
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.mfaTOTPPage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.mfaTOTPPage.title')}>
       <Col>
         <Form.OTPInput
           {...otp}
@@ -46,6 +46,6 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
           elementDescriptor={descriptors.formButtonReset}
         />
       </FormButtonContainer>
-    </FormContent>
+    </FormContainer>
   );
-};
+});

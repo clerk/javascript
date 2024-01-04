@@ -4,7 +4,16 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { Col, Icon } from '../../customizables';
-import { Form, FormButtonContainer, FormContent, Header, IconButton, SuccessPage, useCardState } from '../../elements';
+import {
+  Form,
+  FormButtonContainer,
+  FormContainer,
+  Header,
+  IconButton,
+  SuccessPage,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
@@ -26,7 +35,7 @@ type CreateOrganizationFormProps = {
   };
 };
 
-export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
+export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
@@ -114,7 +123,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
+      <FormContainer
         headerTitle={props?.startPage?.headerTitle}
         headerSubtitle={props?.startPage?.headerSubtitle}
         headerTitleTextVariant={headerTitleTextVariant}
@@ -190,9 +199,9 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             )}
           </FormButtonContainer>
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
-      <FormContent
+      <FormContainer
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
@@ -205,7 +214,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             onReset={completeFlow}
           />
         )}
-      </FormContent>
+      </FormContainer>
 
       <Col>
         <Header.Root>
@@ -222,4 +231,4 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
       </Col>
     </Wizard>
   );
-};
+});

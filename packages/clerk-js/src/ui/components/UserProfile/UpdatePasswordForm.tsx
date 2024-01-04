@@ -9,7 +9,7 @@ import {
   Form,
   FormButtonContainer,
   FormButtons,
-  FormContent,
+  FormContainer,
   InformationBox,
   SuccessPage,
   useCardState,
@@ -125,7 +125,7 @@ export const UpdatePasswordForm = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent>
+      <FormContainer>
         {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
 
         <Form.Root
@@ -193,7 +193,7 @@ export const UpdatePasswordForm = withCardStateProvider(() => {
             <FormButtons isDisabled={!canSubmit} />
           )}
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
       <SuccessPage {...successPagePropsRef.current} />
     </Wizard>

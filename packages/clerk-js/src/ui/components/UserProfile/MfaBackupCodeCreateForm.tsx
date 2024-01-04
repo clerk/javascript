@@ -6,7 +6,7 @@ import { Button, descriptors, localizationKeys, Text } from '../../customizables
 import type { FormProps } from '../../elements';
 import {
   FormButtonContainer,
-  FormContent,
+  FormContainer,
   FullHeightLoader,
   useCardState,
   withCardStateProvider,
@@ -33,11 +33,11 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
   }, []);
 
   if (card.error) {
-    return <FormContent headerTitle={localizationKeys('userProfile.backupCodePage.title')} />;
+    return <FormContainer headerTitle={localizationKeys('userProfile.backupCodePage.title')} />;
   }
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
       {!backupCode ? (
         <FullHeightLoader />
       ) : (
@@ -59,6 +59,6 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
           </FormButtonContainer>
         </>
       )}
-    </FormContent>
+    </FormContainer>
   );
 });

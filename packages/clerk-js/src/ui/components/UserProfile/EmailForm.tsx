@@ -6,7 +6,7 @@ import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
@@ -51,7 +51,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent headerTitle={title}>
+      <FormContainer headerTitle={title}>
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>
             <Form.PlainInput
@@ -71,9 +71,9 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
             onReset={onReset}
           />
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
-      <FormContent headerTitle={title}>
+      <FormContainer headerTitle={title}>
         {preferEmailLinks ? (
           <VerifyWithLink
             nextStep={onSuccess}
@@ -89,7 +89,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
             onReset={wizard.prevStep}
           />
         )}
-      </FormContent>
+      </FormContainer>
     </Wizard>
   );
 });

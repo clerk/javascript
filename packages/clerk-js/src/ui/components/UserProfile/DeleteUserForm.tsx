@@ -3,7 +3,7 @@ import { useUser } from '@clerk/shared/react';
 import { useSignOutContext } from '../../contexts';
 import { Col, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 
 type DeleteUserFormProps = FormProps;
@@ -36,7 +36,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const canSubmit = confirmationField.value === 'Delete account';
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.deletePage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.deletePage.title')}>
       <Form.Root onSubmit={deleteUser}>
         <Col gap={1}>
           <Text
@@ -59,6 +59,6 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
           onReset={onReset}
         />
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });

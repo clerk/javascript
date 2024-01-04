@@ -8,7 +8,7 @@ import type { FormProps } from '../../elements';
 import {
   Form,
   FormButtonContainer,
-  FormContent,
+  FormContainer,
   SuccessPage,
   useCardState,
   withCardStateProvider,
@@ -151,7 +151,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent headerTitle={title}>
+      <FormContainer headerTitle={title}>
         <Form.Root onSubmit={handleSubmit}>
           <Col gap={1}>
             <Text
@@ -182,7 +182,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
             />
           </FormButtonContainer>
         </Form.Root>
-      </FormContent>
+      </FormContainer>
       <SuccessPage
         title={title}
         text={successMessage}

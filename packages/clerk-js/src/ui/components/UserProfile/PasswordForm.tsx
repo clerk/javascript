@@ -8,7 +8,7 @@ import {
   Form,
   FormButtonContainer,
   FormButtons,
-  FormContent,
+  FormContainer,
   InformationBox,
   useCardState,
   withCardStateProvider,
@@ -125,7 +125,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   };
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer headerTitle={title}>
       {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
 
       <Form.Root
@@ -196,6 +196,6 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
           />
         )}
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });

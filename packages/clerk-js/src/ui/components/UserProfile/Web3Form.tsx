@@ -4,12 +4,18 @@ import type { Web3Strategy } from '@clerk/types';
 import { generateSignatureWithMetamask, getMetamaskIdentifier } from '../../../utils/web3';
 import { Button, Col, descriptors, Image, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { ArrowBlockButton, FormButtonContainer, FormContent, useCardState } from '../../elements';
+import {
+  ArrowBlockButton,
+  FormButtonContainer,
+  FormContainer,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { getFieldError, handleError } from '../../utils';
 
 type AddWeb3WalletProps = FormProps;
-export const AddWeb3Wallet = (props: AddWeb3WalletProps) => {
+export const AddWeb3Wallet = withCardStateProvider((props: AddWeb3WalletProps) => {
   const { onSuccess, onReset } = props;
   const card = useCardState();
   const { user } = useUser();
@@ -51,7 +57,7 @@ export const AddWeb3Wallet = (props: AddWeb3WalletProps) => {
   };
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.web3WalletPage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.web3WalletPage.title')}>
       <Text
         localizationKey={localizationKeys(
           unconnectedStrategies.length
@@ -96,6 +102,6 @@ export const AddWeb3Wallet = (props: AddWeb3WalletProps) => {
           localizationKey={localizationKeys('userProfile.formButtonReset')}
         />
       </FormButtonContainer>
-    </FormContent>
+    </FormContainer>
   );
-};
+});

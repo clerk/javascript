@@ -5,7 +5,7 @@ import React from 'react';
 import { useEnvironment } from '../../contexts';
 import { Button, Col, Grid, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { FormButtonContainer, FormContent, TileButton, useCardState, withCardStateProvider } from '../../elements';
+import { FormButtonContainer, FormContainer, TileButton, useCardState, withCardStateProvider } from '../../elements';
 import { AuthApp, DotCircle, Mobile } from '../../icons';
 import { mqu } from '../../styledSystem';
 import { MfaBackupCodeScreen } from './MfaBackupCodeScreen';
@@ -39,7 +39,7 @@ export const MfaForm = withCardStateProvider((props: MfaFormProps) => {
   }, []);
 
   if (card.error) {
-    return <FormContent headerTitle={title} />;
+    return <FormContainer headerTitle={title} />;
   }
 
   // If there is only an available method or one has been selected, render the dedicated page instead
@@ -54,7 +54,7 @@ export const MfaForm = withCardStateProvider((props: MfaFormProps) => {
   }
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer headerTitle={title}>
       <Col gap={4}>
         <Text localizationKey={localizationKeys('userProfile.mfaPage.formHint')} />
         <Grid
@@ -84,7 +84,7 @@ export const MfaForm = withCardStateProvider((props: MfaFormProps) => {
           onClick={onReset}
         />
       </FormButtonContainer>
-    </FormContent>
+    </FormContainer>
   );
 });
 
