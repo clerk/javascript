@@ -39,7 +39,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
   };
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.usernamePage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.profile.usernameSection.usernameScreen.title')}>
       <Form.Root onSubmit={updatePassword}>
         <Form.ControlRow elementId={usernameField.id}>
           <Form.PlainInput

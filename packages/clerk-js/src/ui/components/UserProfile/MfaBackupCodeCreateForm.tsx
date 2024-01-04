@@ -33,19 +33,19 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
   }, []);
 
   if (card.error) {
-    return <FormContainer headerTitle={localizationKeys('userProfile.backupCodePage.title')} />;
+    return <FormContainer headerTitle={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.title')} />;
   }
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.title')}>
       {!backupCode ? (
         <FullHeightLoader />
       ) : (
         <>
-          <Text localizationKey={localizationKeys('userProfile.backupCodePage.successMessage')} />
+          <Text localizationKey={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.successMessage')} />
 
           <MfaBackupCodeList
-            subtitle={localizationKeys('userProfile.backupCodePage.subtitle__codelist')}
+            subtitle={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.subtitle__codelist')}
             backupCodes={backupCode.codes}
           />
 

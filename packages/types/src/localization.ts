@@ -159,22 +159,11 @@ type _LocalizationResource = {
     };
     forgotPassword: {
       title: LocalizationValue;
+      subtitle: LocalizationValue;
       subtitle_email: LocalizationValue;
       subtitle_phone: LocalizationValue;
       inputLabel: LocalizationValue;
       resendButton: LocalizationValue;
-      // TODO-RETHEME remove
-      title_email: LocalizationValue;
-      // TODO-RETHEME remove
-      title_phone: LocalizationValue;
-      // TODO-RETHEME remove
-      subtitle: LocalizationValue;
-      // TODO-RETHEME remove
-      formTitle: LocalizationValue;
-      // TODO-RETHEME remove
-      formSubtitle_email: LocalizationValue;
-      // TODO-RETHEME remove
-      formSubtitle_phone: LocalizationValue;
     };
     resetPassword: {
       title: LocalizationValue;
@@ -190,10 +179,6 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       inputLabel: LocalizationValue;
       resendButton: LocalizationValue;
-      // TODO-RETHEME remove
-      formTitle: LocalizationValue;
-      // TODO-RETHEME remove
-      formSubtitle: LocalizationValue;
     };
     emailLink: {
       title: LocalizationValue;
@@ -236,10 +221,6 @@ type _LocalizationResource = {
     };
     phoneCodeMfa: {
       title: LocalizationValue;
-      // TODO-RETHEME remove
-      formTitle: LocalizationValue;
-      // TODO-RETHEME remove
-      formSubtitle: LocalizationValue;
       subtitle: LocalizationValue;
       inputLabel: LocalizationValue;
       resendButton: LocalizationValue;
@@ -248,8 +229,6 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       inputLabel: LocalizationValue;
-      formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue;
     };
     backupCodeMfa: {
       title: LocalizationValue;
@@ -281,9 +260,10 @@ type _LocalizationResource = {
     };
   };
   userProfile: {
+    headerTitle__profile: LocalizationValue;
+    headerTitle__security: LocalizationValue;
     mobileButton__menu: LocalizationValue;
     formButtonPrimary__save: LocalizationValue;
-    // TODO-RETHEME remove
     formButtonPrimary__continue: LocalizationValue;
     formButtonPrimary__finish: LocalizationValue;
     formButtonReset: LocalizationValue;
@@ -291,96 +271,200 @@ type _LocalizationResource = {
       title: LocalizationValue;
       description: LocalizationValue;
     };
-    start: {
-      headerTitle__account: LocalizationValue;
-      headerTitle__security: LocalizationValue;
+    profile: {
       profileSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
+        profileScreen: {
+          title: LocalizationValue;
+          imageFormTitle: LocalizationValue;
+          imageFormSubtitle: LocalizationValue;
+          imageFormDestructiveActionSubtitle: LocalizationValue;
+          fileDropAreaTitle: LocalizationValue;
+          fileDropAreaAction: LocalizationValue;
+          fileDropAreaHint: LocalizationValue;
+          readonly: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
       };
       usernameSection: {
         title: LocalizationValue;
         primaryButton__changeUsername: LocalizationValue;
         primaryButton__setUsername: LocalizationValue;
+        usernameScreen: {
+          title: LocalizationValue;
+        };
       };
       emailAddressesSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        detailsTitle__primary: LocalizationValue;
-        detailsSubtitle__primary: LocalizationValue;
         detailsAction__primary: LocalizationValue;
-        detailsTitle__nonPrimary: LocalizationValue;
-        detailsSubtitle__nonPrimary: LocalizationValue;
         detailsAction__nonPrimary: LocalizationValue;
-        detailsTitle__unverified: LocalizationValue;
-        detailsSubtitle__unverified: LocalizationValue;
         detailsAction__unverified: LocalizationValue;
-        destructiveActionTitle: LocalizationValue;
-        destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
+        emailAddressScreen: {
+          title: LocalizationValue;
+          emailCode: {
+            formHint: LocalizationValue;
+            formTitle: LocalizationValue;
+            formSubtitle: LocalizationValue;
+            resendButton: LocalizationValue;
+            successMessage: LocalizationValue;
+          };
+          emailLink: {
+            formHint: LocalizationValue;
+            formTitle: LocalizationValue;
+            formSubtitle: LocalizationValue;
+            resendButton: LocalizationValue;
+            successMessage: LocalizationValue;
+          };
+          removeResource: {
+            title: LocalizationValue;
+            messageLine1: LocalizationValue;
+            messageLine2: LocalizationValue;
+            successMessage: LocalizationValue;
+          };
+        };
       };
       phoneNumbersSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        detailsTitle__primary: LocalizationValue;
-        detailsSubtitle__primary: LocalizationValue;
         detailsAction__primary: LocalizationValue;
-        detailsTitle__nonPrimary: LocalizationValue;
-        detailsSubtitle__nonPrimary: LocalizationValue;
         detailsAction__nonPrimary: LocalizationValue;
-        detailsTitle__unverified: LocalizationValue;
-        detailsSubtitle__unverified: LocalizationValue;
         detailsAction__unverified: LocalizationValue;
-        destructiveActionTitle: LocalizationValue;
-        destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
+        phoneNumberScreen: {
+          title: LocalizationValue;
+          successMessage: LocalizationValue;
+          infoText: LocalizationValue;
+          infoText__secondary: LocalizationValue;
+          removeResource: {
+            title: LocalizationValue;
+            messageLine1: LocalizationValue;
+            messageLine2: LocalizationValue;
+            successMessage: LocalizationValue;
+          };
+        };
       };
       connectedAccountsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        title__connectionFailed: LocalizationValue;
-        title__reauthorize: LocalizationValue;
-        subtitle__reauthorize: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
         actionLabel__reauthorize: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
-        destructiveActionSubtitle: LocalizationValue;
-        destructiveActionAccordionSubtitle: LocalizationValue;
+        connectedAccountScreen: {
+          title: LocalizationValue;
+          formHint: LocalizationValue;
+          formHint__noAccounts: LocalizationValue;
+          socialButtonsBlockButton: LocalizationValue;
+          successMessage: LocalizationValue;
+          removeResource: {
+            title: LocalizationValue;
+            messageLine1: LocalizationValue;
+            messageLine2: LocalizationValue;
+            successMessage: LocalizationValue;
+          };
+        };
       };
       enterpriseAccountsSection: {
         title: LocalizationValue;
       };
+      web3WalletsSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+        destructiveAction: LocalizationValue;
+        web3WalletScreen: {
+          title: LocalizationValue;
+          subtitle__availableWallets: LocalizationValue;
+          subtitle__unavailableWallets: LocalizationValue;
+          successMessage: LocalizationValue;
+          removeResource: {
+            title: LocalizationValue;
+            messageLine1: LocalizationValue;
+            messageLine2: LocalizationValue;
+            successMessage: LocalizationValue;
+          };
+        };
+      };
+    };
+    security: {
       passwordSection: {
         title: LocalizationValue;
         primaryButton__changePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
+        passwordScreen: {
+          title: LocalizationValue;
+          readonly: LocalizationValue;
+          successMessage: LocalizationValue;
+          changePasswordTitle: LocalizationValue;
+          changePasswordSuccessMessage: LocalizationValue;
+          sessionsSignedOutSuccessMessage: LocalizationValue;
+        };
       };
       mfaSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         phoneCode: {
-          destructiveActionTitle: LocalizationValue;
-          destructiveActionSubtitle: LocalizationValue;
           destructiveActionLabel: LocalizationValue;
-          title__default: LocalizationValue;
-          title__setDefault: LocalizationValue;
-          subtitle__default: LocalizationValue;
-          subtitle__setDefault: LocalizationValue;
           actionLabel__setDefault: LocalizationValue;
         };
         backupCodes: {
           headerTitle: LocalizationValue;
-          title__regenerate: LocalizationValue;
-          subtitle__regenerate: LocalizationValue;
           actionLabel__regenerate: LocalizationValue;
         };
         totp: {
           headerTitle: LocalizationValue;
-          title: LocalizationValue;
-          subtitle: LocalizationValue;
           destructiveActionTitle: LocalizationValue;
-          destructiveActionSubtitle: LocalizationValue;
-          destructiveActionLabel: LocalizationValue;
+        };
+        mfaScreen: {
+          title: LocalizationValue;
+          formHint: LocalizationValue;
+        };
+        mfaTOTPScreen: {
+          title: LocalizationValue;
+          verifyTitle: LocalizationValue;
+          verifySubtitle: LocalizationValue;
+          successMessage: LocalizationValue;
+          authenticatorApp: {
+            infoText__ableToScan: LocalizationValue;
+            infoText__unableToScan: LocalizationValue;
+            inputLabel__unableToScan1: LocalizationValue;
+            inputLabel__unableToScan2: LocalizationValue;
+            buttonAbleToScan__nonPrimary: LocalizationValue;
+            buttonUnableToScan__nonPrimary: LocalizationValue;
+          };
+          removeResource: {
+            title: LocalizationValue;
+            messageLine1: LocalizationValue;
+            messageLine2: LocalizationValue;
+            successMessage: LocalizationValue;
+          };
+        };
+        mfaPhoneCodeScreen: {
+          title: LocalizationValue;
+          primaryButton__addPhoneNumber: LocalizationValue;
+          subtitle__availablePhoneNumbers: LocalizationValue;
+          subtitle__unavailablePhoneNumbers: LocalizationValue;
+          successMessage: LocalizationValue;
+          removeResource: {
+            title: LocalizationValue;
+            messageLine1: LocalizationValue;
+            messageLine2: LocalizationValue;
+            successMessage: LocalizationValue;
+          };
+        };
+        backupCodeScreen: {
+          title: LocalizationValue;
+          title__codelist: LocalizationValue;
+          subtitle__codelist: LocalizationValue;
+          infoText1: LocalizationValue;
+          infoText2: LocalizationValue;
+          successSubtitle: LocalizationValue;
+          successMessage: LocalizationValue;
+          actionLabel__copy: LocalizationValue;
+          actionLabel__copied: LocalizationValue;
+          actionLabel__download: LocalizationValue;
+          actionLabel__print: LocalizationValue;
         };
       };
       activeDevicesSection: {
@@ -392,159 +476,17 @@ type _LocalizationResource = {
         destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
       };
-      web3WalletsSection: {
-        title: LocalizationValue;
-        primaryButton: LocalizationValue;
-        destructiveActionTitle: LocalizationValue;
-        destructiveActionSubtitle: LocalizationValue;
-        destructiveAction: LocalizationValue;
-      };
       dangerSection: {
         title: LocalizationValue;
         deleteAccountButton: LocalizationValue;
-        deleteAccountTitle: LocalizationValue;
-        deleteAccountDescription: LocalizationValue;
+        deleteScreen: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          actionDescription: LocalizationValue;
+          confirm: LocalizationValue;
+        };
       };
-    };
-    profilePage: {
-      title: LocalizationValue;
-      imageFormTitle: LocalizationValue;
-      imageFormSubtitle: LocalizationValue;
-      imageFormDestructiveActionSubtitle: LocalizationValue;
-      fileDropAreaTitle: LocalizationValue;
-      fileDropAreaAction: LocalizationValue;
-      fileDropAreaHint: LocalizationValue;
-      readonly: LocalizationValue;
-      successMessage: LocalizationValue;
-    };
-    usernamePage: {
-      title: LocalizationValue;
-      successMessage: LocalizationValue;
-    };
-    emailAddressPage: {
-      title: LocalizationValue;
-      emailCode: {
-        formHint: LocalizationValue;
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue;
-        resendButton: LocalizationValue;
-        successMessage: LocalizationValue;
-      };
-      emailLink: {
-        formHint: LocalizationValue;
-        formTitle: LocalizationValue;
-        formSubtitle: LocalizationValue;
-        resendButton: LocalizationValue;
-        successMessage: LocalizationValue;
-      };
-      removeResource: {
-        title: LocalizationValue;
-        messageLine1: LocalizationValue;
-        messageLine2: LocalizationValue;
-        successMessage: LocalizationValue;
-      };
-    };
-    phoneNumberPage: {
-      title: LocalizationValue;
-      successMessage: LocalizationValue;
-      infoText: LocalizationValue;
-      infoText__secondary: LocalizationValue;
-      removeResource: {
-        title: LocalizationValue;
-        messageLine1: LocalizationValue;
-        messageLine2: LocalizationValue;
-        successMessage: LocalizationValue;
-      };
-    };
-    connectedAccountPage: {
-      title: LocalizationValue;
-      formHint: LocalizationValue;
-      formHint__noAccounts: LocalizationValue;
-      socialButtonsBlockButton: LocalizationValue;
-      successMessage: LocalizationValue;
-      removeResource: {
-        title: LocalizationValue;
-        messageLine1: LocalizationValue;
-        messageLine2: LocalizationValue;
-        successMessage: LocalizationValue;
-      };
-    };
-    web3WalletPage: {
-      title: LocalizationValue;
-      subtitle__availableWallets: LocalizationValue;
-      subtitle__unavailableWallets: LocalizationValue;
-      successMessage: LocalizationValue;
-      removeResource: {
-        title: LocalizationValue;
-        messageLine1: LocalizationValue;
-        messageLine2: LocalizationValue;
-        successMessage: LocalizationValue;
-      };
-    };
-    passwordPage: {
-      title: LocalizationValue;
-      readonly: LocalizationValue;
-      successMessage: LocalizationValue;
-      changePasswordTitle: LocalizationValue;
-      changePasswordSuccessMessage: LocalizationValue;
-      sessionsSignedOutSuccessMessage: LocalizationValue;
-    };
-    mfaPage: {
-      title: LocalizationValue;
-      formHint: LocalizationValue;
-    };
-    mfaTOTPPage: {
-      title: LocalizationValue;
-      verifyTitle: LocalizationValue;
-      verifySubtitle: LocalizationValue;
-      successMessage: LocalizationValue;
-      authenticatorApp: {
-        infoText__ableToScan: LocalizationValue;
-        infoText__unableToScan: LocalizationValue;
-        inputLabel__unableToScan1: LocalizationValue;
-        inputLabel__unableToScan2: LocalizationValue;
-        buttonAbleToScan__nonPrimary: LocalizationValue;
-        buttonUnableToScan__nonPrimary: LocalizationValue;
-      };
-      removeResource: {
-        title: LocalizationValue;
-        messageLine1: LocalizationValue;
-        messageLine2: LocalizationValue;
-        successMessage: LocalizationValue;
-      };
-    };
-    mfaPhoneCodePage: {
-      title: LocalizationValue;
-      primaryButton__addPhoneNumber: LocalizationValue;
-      subtitle__availablePhoneNumbers: LocalizationValue;
-      subtitle__unavailablePhoneNumbers: LocalizationValue;
-      successMessage: LocalizationValue;
-      removeResource: {
-        title: LocalizationValue;
-        messageLine1: LocalizationValue;
-        messageLine2: LocalizationValue;
-        successMessage: LocalizationValue;
-      };
-    };
-    backupCodePage: {
-      title: LocalizationValue;
-      title__codelist: LocalizationValue;
-      subtitle__codelist: LocalizationValue;
-      infoText1: LocalizationValue;
-      infoText2: LocalizationValue;
-      successSubtitle: LocalizationValue;
-      successMessage: LocalizationValue;
-      actionLabel__copy: LocalizationValue;
-      actionLabel__copied: LocalizationValue;
-      actionLabel__download: LocalizationValue;
-      actionLabel__print: LocalizationValue;
-    };
-    deletePage: {
-      title: LocalizationValue;
-      messageLine1: LocalizationValue;
-      messageLine2: LocalizationValue;
-      actionDescription: LocalizationValue;
-      confirm: LocalizationValue;
     };
   };
   userButton: {
@@ -567,6 +509,12 @@ type _LocalizationResource = {
     action__signOut: LocalizationValue;
   };
   organizationProfile: {
+    headerTitle__general: LocalizationValue;
+    headerTitle__members: LocalizationValue;
+    badge__unverified: LocalizationValue;
+    badge__automaticInvitation: LocalizationValue;
+    badge__automaticSuggestion: LocalizationValue;
+    badge__manualInvitation: LocalizationValue;
     navbar: {
       title: LocalizationValue;
       description: LocalizationValue;
@@ -579,6 +527,27 @@ type _LocalizationResource = {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         uploadAction__title: LocalizationValue;
+        profileScreen: {
+          title: LocalizationValue;
+          successMessage: LocalizationValue;
+          dangerSection: {
+            title: LocalizationValue;
+            leaveOrganization: {
+              title: LocalizationValue;
+              messageLine1: LocalizationValue;
+              messageLine2: LocalizationValue;
+              actionDescription: LocalizationValue;
+              successMessage: LocalizationValue;
+            };
+            deleteOrganization: {
+              title: LocalizationValue;
+              messageLine1: LocalizationValue;
+              messageLine2: LocalizationValue;
+              actionDescription: LocalizationValue;
+              successMessage: LocalizationValue;
+            };
+          };
+        };
       };
       domainSection: {
         title: LocalizationValue;
@@ -587,110 +556,59 @@ type _LocalizationResource = {
         menuAction__verify: LocalizationValue;
         menuAction__remove: LocalizationValue;
         menuAction__manage: LocalizationValue;
-        unverifiedDomain_menuAction__verify: LocalizationValue;
-        unverifiedDomain_menuAction__remove: LocalizationValue;
+        createDomainScreen: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
+        verifyDomainScreen: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          subtitleVerificationCodeScreen: LocalizationValue;
+          formTitle: LocalizationValue;
+          formSubtitle: LocalizationValue;
+          resendButton: LocalizationValue;
+        };
+        verifiedDomainScreen: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          start: {
+            headerTitle__enrollment: LocalizationValue;
+            headerTitle__danger: LocalizationValue;
+          };
+          enrollmentTab: {
+            subtitle: LocalizationValue;
+            manualInvitationOption__label: LocalizationValue;
+            manualInvitationOption__description: LocalizationValue;
+            automaticInvitationOption__label: LocalizationValue;
+            automaticInvitationOption__description: LocalizationValue;
+            automaticSuggestionOption__label: LocalizationValue;
+            automaticSuggestionOption__description: LocalizationValue;
+            formButton__save: LocalizationValue;
+            calloutInfoLabel: LocalizationValue;
+            calloutInvitationCountLabel: LocalizationValue;
+            calloutSuggestionCountLabel: LocalizationValue;
+          };
+          dangerTab: {
+            removeDomainTitle: LocalizationValue;
+            removeDomainSubtitle: LocalizationValue;
+            removeDomainActionLabel__remove: LocalizationValue;
+            calloutInfoLabel: LocalizationValue;
+          };
+        };
+        removeDomainScreen: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
       };
     };
     members: {
-      title: LocalizationValue;
-    };
-    badge__unverified: LocalizationValue;
-    badge__automaticInvitation: LocalizationValue;
-    badge__automaticSuggestion: LocalizationValue;
-    badge__manualInvitation: LocalizationValue;
-    start: {
       headerTitle__members: LocalizationValue;
-      headerTitle__settings: LocalizationValue;
-    };
-    profilePage: {
-      title: LocalizationValue;
-      subtitle: LocalizationValue;
-      successMessage: LocalizationValue;
-      dangerSection: {
-        title: LocalizationValue;
-        leaveOrganization: {
-          title: LocalizationValue;
-          messageLine1: LocalizationValue;
-          messageLine2: LocalizationValue;
-          actionDescription: LocalizationValue;
-          successMessage: LocalizationValue;
-        };
-        deleteOrganization: {
-          title: LocalizationValue;
-          messageLine1: LocalizationValue;
-          messageLine2: LocalizationValue;
-          actionDescription: LocalizationValue;
-          successMessage: LocalizationValue;
-        };
-      };
-      domainSection: {
-        title: LocalizationValue;
-        subtitle: LocalizationValue;
-        primaryButton: LocalizationValue;
-        unverifiedDomain_menuAction__verify: LocalizationValue;
-        unverifiedDomain_menuAction__remove: LocalizationValue;
-      };
-    };
-    createDomainPage: {
-      title: LocalizationValue;
-      subtitle: LocalizationValue;
-    };
-    verifyDomainPage: {
-      title: LocalizationValue;
-      subtitle: LocalizationValue;
-      subtitleVerificationCodeScreen: LocalizationValue;
-      formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue;
-      resendButton: LocalizationValue;
-    };
-    verifiedDomainPage: {
-      title: LocalizationValue;
-      subtitle: LocalizationValue;
-      start: {
-        headerTitle__enrollment: LocalizationValue;
-        headerTitle__danger: LocalizationValue;
-      };
-      enrollmentTab: {
-        subtitle: LocalizationValue;
-        manualInvitationOption__label: LocalizationValue;
-        manualInvitationOption__description: LocalizationValue;
-        automaticInvitationOption__label: LocalizationValue;
-        automaticInvitationOption__description: LocalizationValue;
-        automaticSuggestionOption__label: LocalizationValue;
-        automaticSuggestionOption__description: LocalizationValue;
-        formButton__save: LocalizationValue;
-        calloutInfoLabel: LocalizationValue;
-        calloutInvitationCountLabel: LocalizationValue;
-        calloutSuggestionCountLabel: LocalizationValue;
-      };
-      dangerTab: {
-        removeDomainTitle: LocalizationValue;
-        removeDomainSubtitle: LocalizationValue;
-        removeDomainActionLabel__remove: LocalizationValue;
-        calloutInfoLabel: LocalizationValue;
-      };
-    };
-    removeDomainPage: {
-      title: LocalizationValue;
-      messageLine1: LocalizationValue;
-      messageLine2: LocalizationValue;
-      successMessage: LocalizationValue;
-    };
-    invitePage: {
-      title: LocalizationValue;
-      subtitle: LocalizationValue;
-      successMessage: LocalizationValue;
-      detailsTitle__inviteFailed: LocalizationValue;
-      formButtonPrimary__continue: LocalizationValue;
-    };
-    membersPage: {
+      headerTitle__invitations: LocalizationValue;
+      headerTitle__requests: LocalizationValue;
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
-      start: {
-        headerTitle__members: LocalizationValue;
-        headerTitle__invitations: LocalizationValue;
-        headerTitle__requests: LocalizationValue;
-      };
       activeMembersTab: {
         tableHeader__user: LocalizationValue;
         tableHeader__joined: LocalizationValue;
@@ -728,6 +646,13 @@ type _LocalizationResource = {
           headerSubtitle: LocalizationValue;
           primaryButton: LocalizationValue;
         };
+      };
+      inviteScreen: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        successMessage: LocalizationValue;
+        detailsTitle__inviteFailed: LocalizationValue;
+        formButtonPrimary__continue: LocalizationValue;
       };
     };
   };

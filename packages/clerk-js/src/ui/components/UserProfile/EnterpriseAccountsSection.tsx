@@ -10,7 +10,7 @@ export const EnterpriseAccountsSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.enterpriseAccountsSection.title')}
+      title={localizationKeys('userProfile.profile.enterpriseAccountsSection.title')}
       id='enterpriseAccounts'
     >
       <ProfileSection.Item id='enterpriseAccounts'>

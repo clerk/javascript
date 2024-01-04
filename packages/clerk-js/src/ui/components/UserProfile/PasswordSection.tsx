@@ -27,7 +27,7 @@ export const PasswordSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.passwordSection.title')}
+      title={localizationKeys('userProfile.security.passwordSection.title')}
       id='password'
     >
       <Action.Root>
@@ -40,8 +40,8 @@ export const PasswordSection = () => {
                 id='password'
                 localizationKey={
                   passwordEnabled
-                    ? localizationKeys('userProfile.start.passwordSection.primaryButton__changePassword')
-                    : localizationKeys('userProfile.start.passwordSection.primaryButton__setPassword')
+                    ? localizationKeys('userProfile.security.passwordSection.primaryButton__changePassword')
+                    : localizationKeys('userProfile.security.passwordSection.primaryButton__setPassword')
                 }
               />
             </Action.Trigger>

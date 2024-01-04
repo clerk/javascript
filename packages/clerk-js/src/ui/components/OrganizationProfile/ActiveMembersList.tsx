@@ -46,12 +46,12 @@ export const ActiveMembersList = () => {
       pageCount={memberships?.pageCount || 0}
       itemsPerPage={membershipsParams.memberships.pageSize}
       isLoading={memberships?.isLoading || loadingRoles}
-      emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
+      emptyStateLocalizationKey={localizationKeys('organizationProfile.members.detailsTitle__emptyRow')}
       headers={[
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__joined'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+        localizationKeys('organizationProfile.members.activeMembersTab.tableHeader__user'),
+        localizationKeys('organizationProfile.members.activeMembersTab.tableHeader__joined'),
+        localizationKeys('organizationProfile.members.activeMembersTab.tableHeader__role'),
+        localizationKeys('organizationProfile.members.activeMembersTab.tableHeader__actions'),
       ]}
       rows={(memberships?.data || []).map(m => (
         <MemberRow
@@ -114,7 +114,7 @@ const MemberRow = (props: {
           <ThreeDotsMenu
             actions={[
               {
-                label: localizationKeys('organizationProfile.membersPage.activeMembersTab.menuAction__remove'),
+                label: localizationKeys('organizationProfile.members.activeMembersTab.menuAction__remove'),
                 isDestructive: true,
                 onClick: onRemove,
                 isDisabled: isCurrentUser,

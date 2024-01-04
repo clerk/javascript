@@ -23,14 +23,22 @@ export const RemoveEmailForm = (props: RemoveEmailFormProps) => {
 
   return (
     <RemoveResourceForm
-      title={localizationKeys('userProfile.emailAddressPage.removeResource.title')}
-      messageLine1={localizationKeys('userProfile.emailAddressPage.removeResource.messageLine1', {
-        identifier: ref.current,
-      })}
-      messageLine2={localizationKeys('userProfile.emailAddressPage.removeResource.messageLine2')}
-      successMessage={localizationKeys('userProfile.emailAddressPage.removeResource.successMessage', {
-        emailAddress: ref.current,
-      })}
+      title={localizationKeys('userProfile.profile.emailAddressesSection.emailAddressScreen.removeResource.title')}
+      messageLine1={localizationKeys(
+        'userProfile.profile.emailAddressesSection.emailAddressScreen.removeResource.messageLine1',
+        {
+          identifier: ref.current,
+        },
+      )}
+      messageLine2={localizationKeys(
+        'userProfile.profile.emailAddressesSection.emailAddressScreen.removeResource.messageLine2',
+      )}
+      successMessage={localizationKeys(
+        'userProfile.profile.emailAddressesSection.emailAddressScreen.removeResource.successMessage',
+        {
+          emailAddress: ref.current,
+        },
+      )}
       deleteResource={() => Promise.resolve(resource?.destroy())}
       onSuccess={onSuccess}
       onReset={onReset}
@@ -54,14 +62,22 @@ export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
 
   return (
     <RemoveResourceForm
-      title={localizationKeys('userProfile.phoneNumberPage.removeResource.title')}
-      messageLine1={localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine1', {
-        identifier: ref.current,
-      })}
-      messageLine2={localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine2')}
-      successMessage={localizationKeys('userProfile.phoneNumberPage.removeResource.successMessage', {
-        phoneNumber: ref.current,
-      })}
+      title={localizationKeys('userProfile.profile.phoneNumbersSection.phoneNumberScreen.removeResource.title')}
+      messageLine1={localizationKeys(
+        'userProfile.profile.phoneNumbersSection.phoneNumberScreen.removeResource.messageLine1',
+        {
+          identifier: ref.current,
+        },
+      )}
+      messageLine2={localizationKeys(
+        'userProfile.profile.phoneNumbersSection.phoneNumberScreen.removeResource.messageLine2',
+      )}
+      successMessage={localizationKeys(
+        'userProfile.profile.phoneNumbersSection.phoneNumberScreen.removeResource.successMessage',
+        {
+          phoneNumber: ref.current,
+        },
+      )}
       deleteResource={() => Promise.resolve(resource?.destroy())}
       onSuccess={onSuccess}
       onReset={onReset}
@@ -86,14 +102,24 @@ export const RemoveConnectedAccountForm = (props: ConnectedAccountFormProps) => 
 
   return (
     <RemoveResourceForm
-      title={localizationKeys('userProfile.connectedAccountPage.removeResource.title')}
-      messageLine1={localizationKeys('userProfile.connectedAccountPage.removeResource.messageLine1', {
-        identifier: providerToDisplayData[ref.current]?.name,
-      })}
-      messageLine2={localizationKeys('userProfile.connectedAccountPage.removeResource.messageLine2')}
-      successMessage={localizationKeys('userProfile.connectedAccountPage.removeResource.successMessage', {
-        connectedAccount: providerToDisplayData[ref.current]?.name,
-      })}
+      title={localizationKeys(
+        'userProfile.profile.connectedAccountsSection.connectedAccountScreen.removeResource.title',
+      )}
+      messageLine1={localizationKeys(
+        'userProfile.profile.connectedAccountsSection.connectedAccountScreen.removeResource.messageLine1',
+        {
+          identifier: providerToDisplayData[ref.current]?.name,
+        },
+      )}
+      messageLine2={localizationKeys(
+        'userProfile.profile.connectedAccountsSection.connectedAccountScreen.removeResource.messageLine2',
+      )}
+      successMessage={localizationKeys(
+        'userProfile.profile.connectedAccountsSection.connectedAccountScreen.removeResource.successMessage',
+        {
+          connectedAccount: providerToDisplayData[ref.current]?.name,
+        },
+      )}
       deleteResource={() => Promise.resolve(resource?.destroy())}
       onSuccess={onSuccess}
       onReset={onReset}
@@ -117,14 +143,22 @@ export const RemoveWeb3WalletForm = (props: RemoveWeb3WalletFormProps) => {
 
   return (
     <RemoveResourceForm
-      title={localizationKeys('userProfile.web3WalletPage.removeResource.title')}
-      messageLine1={localizationKeys('userProfile.web3WalletPage.removeResource.messageLine1', {
-        identifier: ref.current,
-      })}
-      messageLine2={localizationKeys('userProfile.web3WalletPage.removeResource.messageLine2')}
-      successMessage={localizationKeys('userProfile.web3WalletPage.removeResource.successMessage', {
-        web3Wallet: ref.current,
-      })}
+      title={localizationKeys('userProfile.profile.web3WalletsSection.web3WalletScreen.removeResource.title')}
+      messageLine1={localizationKeys(
+        'userProfile.profile.web3WalletsSection.web3WalletScreen.removeResource.messageLine1',
+        {
+          identifier: ref.current,
+        },
+      )}
+      messageLine2={localizationKeys(
+        'userProfile.profile.web3WalletsSection.web3WalletScreen.removeResource.messageLine2',
+      )}
+      successMessage={localizationKeys(
+        'userProfile.profile.web3WalletsSection.web3WalletScreen.removeResource.successMessage',
+        {
+          web3Wallet: ref.current,
+        },
+      )}
       deleteResource={() => Promise.resolve(resource?.destroy())}
       onSuccess={onSuccess}
       onReset={onReset}
@@ -149,14 +183,17 @@ export const RemoveMfaPhoneCodeForm = (props: RemoveMfaPhoneCodeFormProps) => {
 
   return (
     <RemoveResourceForm
-      title={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.title')}
-      messageLine1={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.messageLine1', {
+      title={localizationKeys('userProfile.security.mfaSection.mfaPhoneCodeScreen.removeResource.title')}
+      messageLine1={localizationKeys('userProfile.security.mfaSection.mfaPhoneCodeScreen.removeResource.messageLine1', {
         identifier: ref.current,
       })}
-      messageLine2={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.messageLine2')}
-      successMessage={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.successMessage', {
-        mfaPhoneCode: ref.current,
-      })}
+      messageLine2={localizationKeys('userProfile.security.mfaSection.mfaPhoneCodeScreen.removeResource.messageLine2')}
+      successMessage={localizationKeys(
+        'userProfile.security.mfaSection.mfaPhoneCodeScreen.removeResource.successMessage',
+        {
+          mfaPhoneCode: ref.current,
+        },
+      )}
       deleteResource={() => Promise.resolve(resource?.setReservedForSecondFactor({ reserved: false }))}
       onSuccess={onSuccess}
       onReset={onReset}
@@ -175,10 +212,10 @@ export const RemoveMfaTOTPForm = (props: RemoveMfaTOTPFormProps) => {
 
   return (
     <RemoveResourceForm
-      title={localizationKeys('userProfile.mfaTOTPPage.removeResource.title')}
-      messageLine1={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine1')}
-      messageLine2={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine2')}
-      successMessage={localizationKeys('userProfile.mfaTOTPPage.removeResource.successMessage')}
+      title={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.removeResource.title')}
+      messageLine1={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.removeResource.messageLine1')}
+      messageLine2={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.removeResource.messageLine2')}
+      successMessage={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.removeResource.successMessage')}
       deleteResource={user.disableTOTP}
       onSuccess={onSuccess}
       onReset={onReset}

@@ -93,13 +93,13 @@ export const FileDropArea = (props: FileDropAreaProps) => {
         ) : (
           <>
             <Text
-              localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaTitle')}
+              localizationKey={localizationKeys('userProfile.profile.profileSection.profileScreen.fileDropAreaTitle')}
               elementDescriptor={descriptors.fileDropAreaHint}
               sx={{ [mqu.sm]: { display: 'none' } }}
               colorScheme='neutral'
             />
             <Button
-              localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaAction')}
+              localizationKey={localizationKeys('userProfile.profile.profileSection.profileScreen.fileDropAreaAction')}
               elementDescriptor={descriptors.fileDropAreaButtonPrimary}
               variant='ghost'
               onClick={openDialog}
@@ -108,7 +108,7 @@ export const FileDropArea = (props: FileDropAreaProps) => {
         )}
       </Col>
       <Text
-        localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaHint')}
+        localizationKey={localizationKeys('userProfile.profile.profileSection.profileScreen.fileDropAreaHint')}
         elementDescriptor={descriptors.fileDropAreaFooterHint}
         colorScheme='neutral'
       />

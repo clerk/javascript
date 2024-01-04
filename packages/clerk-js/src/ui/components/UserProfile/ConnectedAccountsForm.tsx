@@ -73,12 +73,16 @@ const AddConnectedAccount = (props: AddConnectedAccountProps) => {
   };
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.connectedAccountPage.title')}>
+    <FormContainer
+      headerTitle={localizationKeys('userProfile.profile.connectedAccountsSection.connectedAccountScreen.title')}
+    >
       <Text
         localizationKey={
           unconnectedStrategies.length
-            ? localizationKeys('userProfile.connectedAccountPage.formHint')
-            : localizationKeys('userProfile.connectedAccountPage.formHint__noAccounts')
+            ? localizationKeys('userProfile.profile.connectedAccountsSection.connectedAccountScreen.formHint')
+            : localizationKeys(
+                'userProfile.profile.connectedAccountsSection.connectedAccountScreen.formHint__noAccounts',
+              )
         }
       />
       <Col gap={2}>
@@ -98,9 +102,12 @@ const AddConnectedAccount = (props: AddConnectedAccountProps) => {
                 sx={theme => ({ width: theme.sizes.$5 })}
               />
             }
-            textLocalizationKey={localizationKeys('userProfile.connectedAccountPage.socialButtonsBlockButton', {
-              provider: strategyToDisplayData[strategy].name,
-            })}
+            textLocalizationKey={localizationKeys(
+              'userProfile.profile.connectedAccountsSection.connectedAccountScreen.socialButtonsBlockButton',
+              {
+                provider: strategyToDisplayData[strategy].name,
+              },
+            )}
           />
         ))}
       </Col>

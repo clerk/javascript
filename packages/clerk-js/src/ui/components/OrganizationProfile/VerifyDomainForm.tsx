@@ -31,8 +31,8 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
   const { data: domain, isLoading: domainIsLoading } = useFetch(organization?.getDomain, {
     domainId: id,
   });
-  const title = localizationKeys('organizationProfile.verifyDomainPage.title');
-  const subtitle = localizationKeys('organizationProfile.verifyDomainPage.subtitle', {
+  const title = localizationKeys('organizationProfile.general.domainSection.verifyDomainScreen.title');
+  const subtitle = localizationKeys('organizationProfile.general.domainSection.verifyDomainScreen.subtitle', {
     domainName: domain?.name ?? '',
   });
 
@@ -49,7 +49,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
   const affiliationEmailAddressRef = useRef<string>();
 
   const subtitleVerificationCodeScreen = localizationKeys(
-    'organizationProfile.verifyDomainPage.subtitleVerificationCodeScreen',
+    'organizationProfile.general.domainSection.verifyDomainScreen.subtitleVerificationCodeScreen',
     {
       emailAddress: affiliationEmailAddressRef.current,
     },
@@ -149,9 +149,9 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
       >
         <Form.OTPInput
           {...otp}
-          label={localizationKeys('organizationProfile.verifyDomainPage.formTitle')}
-          description={localizationKeys('organizationProfile.verifyDomainPage.formSubtitle')}
-          resendButton={localizationKeys('organizationProfile.verifyDomainPage.resendButton')}
+          label={localizationKeys('organizationProfile.general.domainSection.verifyDomainScreen.formTitle')}
+          description={localizationKeys('organizationProfile.general.domainSection.verifyDomainScreen.formSubtitle')}
+          resendButton={localizationKeys('organizationProfile.general.domainSection.verifyDomainScreen.resendButton')}
         />
 
         <FormButtonContainer>

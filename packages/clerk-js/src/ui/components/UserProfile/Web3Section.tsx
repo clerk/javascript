@@ -39,7 +39,7 @@ export const Web3Section = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.web3WalletsSection.title')}
+      title={localizationKeys('userProfile.profile.web3WalletsSection.title')}
       id='web3Wallets'
     >
       <Action.Root>
@@ -87,7 +87,7 @@ export const Web3Section = () => {
           <Action.Trigger value='add'>
             <ProfileSection.Button
               id='web3Wallets'
-              localizationKey={localizationKeys('userProfile.start.web3WalletsSection.primaryButton')}
+              localizationKey={localizationKeys('userProfile.profile.web3WalletsSection.primaryButton')}
             />
           </Action.Trigger>
         </ProfileSection.ItemList>
@@ -108,7 +108,7 @@ const Web3WalletMenu = () => {
   const actions = (
     [
       {
-        label: localizationKeys('userProfile.start.web3WalletsSection.destructiveAction'),
+        label: localizationKeys('userProfile.profile.web3WalletsSection.destructiveAction'),
         onClick: () => open('remove'),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]

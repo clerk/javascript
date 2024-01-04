@@ -52,7 +52,9 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
             {displayFormat == 'qr' && (
               <>
                 <Text
-                  localizationKey={localizationKeys('userProfile.mfaTOTPPage.authenticatorApp.infoText__ableToScan')}
+                  localizationKey={localizationKeys(
+                    'userProfile.security.mfaSection.mfaTOTPScreen.authenticatorApp.infoText__ableToScan',
+                  )}
                 />
 
                 <QRCode url={totp.uri || ''} />
@@ -61,7 +63,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
                   variant='link'
                   onClick={() => setDisplayFormat('uri')}
                   localizationKey={localizationKeys(
-                    'userProfile.mfaTOTPPage.authenticatorApp.buttonUnableToScan__nonPrimary',
+                    'userProfile.security.mfaSection.mfaTOTPScreen.authenticatorApp.buttonUnableToScan__nonPrimary',
                   )}
                 />
               </>
@@ -70,12 +72,14 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
             {displayFormat == 'uri' && (
               <>
                 <Text
-                  localizationKey={localizationKeys('userProfile.mfaTOTPPage.authenticatorApp.infoText__unableToScan')}
+                  localizationKey={localizationKeys(
+                    'userProfile.security.mfaSection.mfaTOTPScreen.authenticatorApp.infoText__unableToScan',
+                  )}
                 />
 
                 <Text
                   localizationKey={localizationKeys(
-                    'userProfile.mfaTOTPPage.authenticatorApp.inputLabel__unableToScan1',
+                    'userProfile.security.mfaSection.mfaTOTPScreen.authenticatorApp.inputLabel__unableToScan1',
                   )}
                 />
 
@@ -83,7 +87,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
 
                 <Text
                   localizationKey={localizationKeys(
-                    'userProfile.mfaTOTPPage.authenticatorApp.inputLabel__unableToScan2',
+                    'userProfile.security.mfaSection.mfaTOTPScreen.authenticatorApp.inputLabel__unableToScan2',
                   )}
                 />
 
@@ -93,7 +97,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
                   variant='link'
                   onClick={() => setDisplayFormat('qr')}
                   localizationKey={localizationKeys(
-                    'userProfile.mfaTOTPPage.authenticatorApp.buttonAbleToScan__nonPrimary',
+                    'userProfile.security.mfaSection.mfaTOTPScreen.authenticatorApp.buttonAbleToScan__nonPrimary',
                   )}
                 />
               </>

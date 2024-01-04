@@ -54,7 +54,7 @@ export const ConnectedAccountsSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.connectedAccountsSection.title')}
+      title={localizationKeys('userProfile.profile.connectedAccountsSection.title')}
       id='connectedAccounts'
     >
       <Action.Root>
@@ -116,7 +116,7 @@ export const ConnectedAccountsSection = () => {
           <Action.Trigger value='add'>
             <ProfileSection.Button
               id='connectedAccounts'
-              localizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
+              localizationKey={localizationKeys('userProfile.profile.connectedAccountsSection.primaryButton')}
             />
           </Action.Trigger>
         </ProfileSection.ItemList>
@@ -142,8 +142,8 @@ const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource })
   const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
   const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
   const actionLabel = !reauthorizationRequired
-    ? localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__connectionFailed')
-    : localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__reauthorize');
+    ? localizationKeys('userProfile.profile.connectedAccountsSection.actionLabel__connectionFailed')
+    : localizationKeys('userProfile.profile.connectedAccountsSection.actionLabel__reauthorize');
 
   const handleOnClick = async () => {
     const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
@@ -179,7 +179,7 @@ const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource })
           }
         : null,
       {
-        label: localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionTitle'),
+        label: localizationKeys('userProfile.profile.connectedAccountsSection.destructiveActionTitle'),
         isDestructive: true,
         onClick: () => open('remove'),
       },

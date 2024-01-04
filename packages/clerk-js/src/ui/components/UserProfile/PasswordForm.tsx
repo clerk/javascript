@@ -20,13 +20,17 @@ const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boole
   const localizedTexts = [];
 
   if (userHasPassword) {
-    localizedTexts.push(localizationKeys('userProfile.passwordPage.changePasswordSuccessMessage'));
+    localizedTexts.push(
+      localizationKeys('userProfile.security.passwordSection.passwordScreen.changePasswordSuccessMessage'),
+    );
   } else {
-    localizedTexts.push(localizationKeys('userProfile.passwordPage.successMessage'));
+    localizedTexts.push(localizationKeys('userProfile.security.passwordSection.passwordScreen.successMessage'));
   }
 
   if (sessionSignOut) {
-    localizedTexts.push(localizationKeys('userProfile.passwordPage.sessionsSignedOutSuccessMessage'));
+    localizedTexts.push(
+      localizationKeys('userProfile.security.passwordSection.passwordScreen.sessionsSignedOutSuccessMessage'),
+    );
   }
 
   return localizedTexts;
@@ -43,15 +47,15 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
 
   const { session } = useSession();
   const title = user.passwordEnabled
-    ? localizationKeys('userProfile.passwordPage.changePasswordTitle')
-    : localizationKeys('userProfile.passwordPage.title');
+    ? localizationKeys('userProfile.security.passwordSection.passwordScreen.changePasswordTitle')
+    : localizationKeys('userProfile.security.passwordSection.passwordScreen.title');
   const card = useCardState();
 
   const passwordEditDisabled = user.samlAccounts.some(sa => sa.active);
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
-    title: localizationKeys('userProfile.passwordPage.title'),
+    title: localizationKeys('userProfile.security.passwordSection.passwordScreen.title'),
   });
 
   const currentPasswordField = useFormControl('currentPassword', '', {
@@ -112,8 +116,8 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
     try {
       successPagePropsRef.current = {
         title: user.passwordEnabled
-          ? localizationKeys('userProfile.passwordPage.changePasswordTitle')
-          : localizationKeys('userProfile.passwordPage.title'),
+          ? localizationKeys('userProfile.security.passwordSection.passwordScreen.changePasswordTitle')
+          : localizationKeys('userProfile.security.passwordSection.passwordScreen.title'),
         text: generateSuccessPageText(user.passwordEnabled, !!sessionsField.checked),
       };
 
@@ -126,7 +130,9 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
 
   return (
     <FormContainer headerTitle={title}>
-      {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
+      {passwordEditDisabled && (
+        <InformationBox message={localizationKeys('userProfile.security.passwordSection.passwordScreen.readonly')} />
+      )}
 
       <Form.Root
         onSubmit={updatePassword}

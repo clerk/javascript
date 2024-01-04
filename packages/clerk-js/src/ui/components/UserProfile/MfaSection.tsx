@@ -35,7 +35,7 @@ export const MfaSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.mfaSection.title')}
+      title={localizationKeys('userProfile.security.mfaSection.title')}
       id='mfa'
     >
       <Action.Root>
@@ -49,7 +49,7 @@ export const MfaSection = () => {
                     sx={theme => ({ color: theme.colors.$blackAlpha700 })}
                   />
 
-                  <Text localizationKey={localizationKeys('userProfile.start.mfaSection.totp.headerTitle')} />
+                  <Text localizationKey={localizationKeys('userProfile.security.mfaSection.totp.headerTitle')} />
 
                   <Badge localizationKey={localizationKeys('badge__default')} />
                 </Flex>
@@ -106,7 +106,7 @@ export const MfaSection = () => {
                     sx={theme => ({ color: theme.colors.$blackAlpha700 })}
                   />
 
-                  <Text localizationKey={localizationKeys('userProfile.start.mfaSection.backupCodes.headerTitle')} />
+                  <Text localizationKey={localizationKeys('userProfile.security.mfaSection.backupCodes.headerTitle')} />
                 </Flex>
 
                 <MfaBackupCodeMenu />
@@ -125,7 +125,7 @@ export const MfaSection = () => {
               <Action.Trigger value='multi-factor'>
                 <ProfileSection.Button
                   id='mfa'
-                  localizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
+                  localizationKey={localizationKeys('userProfile.security.mfaSection.primaryButton')}
                 />
               </Action.Trigger>
 
@@ -155,12 +155,12 @@ const MfaPhoneCodeMenu = ({ phone, showTOTP }: MfaPhoneCodeMenuProps) => {
     [
       showTOTP
         ? {
-            label: localizationKeys('userProfile.start.mfaSection.phoneCode.actionLabel__setDefault'),
+            label: localizationKeys('userProfile.security.mfaSection.phoneCode.actionLabel__setDefault'),
             onClick: () => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError)),
           }
         : null,
       {
-        label: localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionLabel'),
+        label: localizationKeys('userProfile.security.mfaSection.phoneCode.destructiveActionLabel'),
         isDestructive: true,
         onClick: () => open('remove'),
       },
@@ -176,7 +176,7 @@ const MfaBackupCodeMenu = () => {
   const actions = (
     [
       {
-        label: localizationKeys('userProfile.start.mfaSection.backupCodes.actionLabel__regenerate'),
+        label: localizationKeys('userProfile.security.mfaSection.backupCodes.actionLabel__regenerate'),
         onClick: () => open('regenerate'),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
@@ -191,7 +191,7 @@ const MfaTOTPMenu = () => {
   const actions = (
     [
       {
-        label: localizationKeys('userProfile.start.mfaSection.totp.destructiveActionTitle'),
+        label: localizationKeys('userProfile.security.mfaSection.totp.destructiveActionTitle'),
         onClick: () => open('remove'),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]

@@ -51,16 +51,24 @@ export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
   return (
     <ActionConfirmationPage
       organizationName={organization?.name}
-      title={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
-      messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine1')}
-      messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine2')}
+      title={localizationKeys(
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.leaveOrganization.title',
+      )}
+      messageLine1={localizationKeys(
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.leaveOrganization.messageLine1',
+      )}
+      messageLine2={localizationKeys(
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.leaveOrganization.messageLine2',
+      )}
       actionDescription={localizationKeys(
-        'organizationProfile.profilePage.dangerSection.leaveOrganization.actionDescription',
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.leaveOrganization.actionDescription',
         { organizationName: organization?.name },
       )}
-      submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
+      submitLabel={localizationKeys(
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.leaveOrganization.title',
+      )}
       successMessage={localizationKeys(
-        'organizationProfile.profilePage.dangerSection.leaveOrganization.successMessage',
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.leaveOrganization.successMessage',
       )}
       onConfirmation={leaveOrg}
       {...props}
@@ -81,16 +89,24 @@ export const DeleteOrganizationForm = (props: DeleteOrganizationFormProps) => {
   return (
     <ActionConfirmationPage
       organizationName={organization?.name}
-      title={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
-      messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine1')}
-      messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.messageLine2')}
+      title={localizationKeys(
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.deleteOrganization.title',
+      )}
+      messageLine1={localizationKeys(
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.deleteOrganization.messageLine1',
+      )}
+      messageLine2={localizationKeys(
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.deleteOrganization.messageLine2',
+      )}
       actionDescription={localizationKeys(
-        'organizationProfile.profilePage.dangerSection.deleteOrganization.actionDescription',
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.deleteOrganization.actionDescription',
         { organizationName: organization?.name },
       )}
-      submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
+      submitLabel={localizationKeys(
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.deleteOrganization.title',
+      )}
       successMessage={localizationKeys(
-        'organizationProfile.profilePage.dangerSection.deleteOrganization.successMessage',
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.deleteOrganization.successMessage',
       )}
       onConfirmation={deleteOrg}
       {...props}
@@ -131,7 +147,9 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     type: 'text',
     label:
       actionDescription ||
-      localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.actionDescription'),
+      localizationKeys(
+        'organizationProfile.general.profileSection.profileScreen.dangerSection.leaveOrganization.actionDescription',
+      ),
     isRequired: true,
     placeholder: organizationName,
   });

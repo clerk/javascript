@@ -202,7 +202,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       </FormContainer>
 
       <FormContainer
-        headerTitle={localizationKeys('organizationProfile.invitePage.title')}
+        headerTitle={localizationKeys('organizationProfile.members.inviteScreen.title')}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
         sx={t => ({ minHeight: t.sizes.$60, textAlign: 'left' })}
@@ -219,7 +219,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       <Col>
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('organizationProfile.invitePage.title')}
+            localizationKey={localizationKeys('organizationProfile.members.inviteScreen.title')}
             sx={{ textAlign: 'left' }}
           />
         </Header.Root>

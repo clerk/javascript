@@ -20,13 +20,13 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
   return (
     <Wizard {...wizard.props}>
       <AddPhone
-        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
+        title={localizationKeys('userProfile.security.mfaSection.mfaPhoneCodeScreen.title')}
         resourceRef={ref}
         onSuccess={wizard.nextStep}
         onReset={onReset}
       />
       <VerifyPhone
-        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
+        title={localizationKeys('userProfile.security.mfaSection.mfaPhoneCodeScreen.title')}
         resourceRef={ref}
         onSuccess={wizard.nextStep}
         onReset={wizard.prevStep}
@@ -39,16 +39,16 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
           ref.current = phone;
           wizard.goToStep(1);
         }}
-        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
+        title={localizationKeys('userProfile.security.mfaSection.mfaPhoneCodeScreen.title')}
         resourceRef={ref}
       />
       <SuccessPage
-        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
-        text={localizationKeys('userProfile.mfaPhoneCodePage.successMessage')}
+        title={localizationKeys('userProfile.security.mfaSection.mfaPhoneCodeScreen.title')}
+        text={localizationKeys('userProfile.security.mfaSection.mfaPhoneCodeScreen.successMessage')}
         onFinish={onReset}
         contents={
           <MfaBackupCodeList
-            subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
+            subtitle={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.successSubtitle')}
             backupCodes={ref.current?.backupCodes}
           />
         }
@@ -98,8 +98,8 @@ const AddMfa = (props: AddMfaProps) => {
       <Text
         localizationKey={localizationKeys(
           availableMethods.length
-            ? 'userProfile.mfaPhoneCodePage.subtitle__availablePhoneNumbers'
-            : 'userProfile.mfaPhoneCodePage.subtitle__unavailablePhoneNumbers',
+            ? 'userProfile.security.mfaSection.mfaPhoneCodeScreen.subtitle__availablePhoneNumbers'
+            : 'userProfile.security.mfaSection.mfaPhoneCodeScreen.subtitle__unavailablePhoneNumbers',
         )}
       />
       <Col gap={2}>
@@ -123,7 +123,9 @@ const AddMfa = (props: AddMfaProps) => {
           variant='ghost'
           sx={{ justifyContent: 'start' }}
           onClick={onAddPhoneClick}
-          localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}
+          localizationKey={localizationKeys(
+            'userProfile.security.mfaSection.mfaPhoneCodeScreen.primaryButton__addPhoneNumber',
+          )}
         />
       </Col>
       <FormButtonContainer sx={{ marginTop: 0 }}>

@@ -78,7 +78,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
               elementDescriptor={descriptors.avatarImageActionsUpload}
               localizationKey={
                 !showUpload
-                  ? localizationKeys('userProfile.profilePage.imageFormSubtitle')
+                  ? localizationKeys('userProfile.profile.profileSection.profileScreen.imageFormSubtitle')
                   : localizationKeys('userProfile.formButtonReset')
               }
               isDisabled={card.isLoading}
@@ -92,7 +92,9 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
             {!!onAvatarRemove && !showUpload && (
               <Button
                 elementDescriptor={descriptors.avatarImageActionsRemove}
-                localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}
+                localizationKey={localizationKeys(
+                  'userProfile.profile.profileSection.profileScreen.imageFormDestructiveActionSubtitle',
+                )}
                 isDisabled={card.isLoading}
                 sx={t => ({ color: t.colors.$danger500 })}
                 variant='ghostDanger'

@@ -40,7 +40,7 @@ export const EmailsSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.emailAddressesSection.title')}
+      title={localizationKeys('userProfile.profile.emailAddressesSection.title')}
       id='emailAddresses'
     >
       <Action.Root>
@@ -86,7 +86,7 @@ export const EmailsSection = () => {
           <Action.Trigger value='add'>
             <ProfileSection.Button
               id='emailAddresses'
-              localizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
+              localizationKey={localizationKeys('userProfile.profile.emailAddressesSection.primaryButton')}
             />
           </Action.Trigger>
         </ProfileSection.ItemList>
@@ -115,24 +115,24 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
     [
       isPrimary && !isVerified
         ? {
-            label: localizationKeys('userProfile.start.emailAddressesSection.detailsAction__primary'),
+            label: localizationKeys('userProfile.profile.emailAddressesSection.detailsAction__primary'),
             onClick: () => open('verify'),
           }
         : null,
       !isPrimary && isVerified
         ? {
-            label: localizationKeys('userProfile.start.emailAddressesSection.detailsAction__nonPrimary'),
+            label: localizationKeys('userProfile.profile.emailAddressesSection.detailsAction__nonPrimary'),
             onClick: setPrimary,
           }
         : null,
       !isPrimary && !isVerified
         ? {
-            label: localizationKeys('userProfile.start.emailAddressesSection.detailsAction__unverified'),
+            label: localizationKeys('userProfile.profile.emailAddressesSection.detailsAction__unverified'),
             onClick: () => open('verify'),
           }
         : null,
       {
-        label: localizationKeys('userProfile.start.emailAddressesSection.destructiveAction'),
+        label: localizationKeys('userProfile.profile.emailAddressesSection.destructiveAction'),
         isDestructive: true,
         onClick: () => open('remove'),
       },

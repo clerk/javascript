@@ -40,7 +40,7 @@ export const PhoneSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.phoneNumbersSection.title')}
+      title={localizationKeys('userProfile.profile.phoneNumbersSection.title')}
       id='phoneNumbers'
     >
       <Action.Root>
@@ -85,7 +85,7 @@ export const PhoneSection = () => {
           <Action.Trigger value='add'>
             <ProfileSection.Button
               id='phoneNumbers'
-              localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
+              localizationKey={localizationKeys('userProfile.profile.phoneNumbersSection.primaryButton')}
             />
           </Action.Trigger>
         </ProfileSection.ItemList>
@@ -119,24 +119,24 @@ const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
     [
       isPrimary && !isVerified
         ? {
-            label: localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__primary'),
+            label: localizationKeys('userProfile.profile.phoneNumbersSection.detailsAction__primary'),
             onClick: () => open('verify'),
           }
         : null,
       !isPrimary && isVerified
         ? {
-            label: localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__nonPrimary'),
+            label: localizationKeys('userProfile.profile.phoneNumbersSection.detailsAction__nonPrimary'),
             onClick: setPrimary,
           }
         : null,
       !isPrimary && !isVerified
         ? {
-            label: localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__unverified'),
+            label: localizationKeys('userProfile.profile.phoneNumbersSection.detailsAction__unverified'),
             onClick: () => open('verify'),
           }
         : null,
       {
-        label: localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction'),
+        label: localizationKeys('userProfile.profile.phoneNumbersSection.destructiveAction'),
         isDestructive: true,
         onClick: () => open('remove'),
       },

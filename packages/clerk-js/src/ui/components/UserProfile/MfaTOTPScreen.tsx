@@ -18,7 +18,7 @@ export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => 
   return (
     <Wizard {...wizard.props}>
       <AddAuthenticatorApp
-        title={localizationKeys('userProfile.mfaTOTPPage.title')}
+        title={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.title')}
         onSuccess={wizard.nextStep}
         onReset={onReset}
       />
@@ -30,11 +30,11 @@ export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => 
       />
 
       <SuccessPage
-        title={localizationKeys('userProfile.mfaTOTPPage.title')}
-        text={localizationKeys('userProfile.mfaTOTPPage.successMessage')}
+        title={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.title')}
+        text={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.successMessage')}
         contents={
           <MfaBackupCodeList
-            subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
+            subtitle={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.successSubtitle')}
             backupCodes={ref.current?.backupCodes}
           />
         }

@@ -63,7 +63,7 @@ export const OrganizationGeneralPage = () => {
       >
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('organizationProfile.general.title')}
+            localizationKey={localizationKeys('organizationProfile.headerTitle__general')}
             sx={t => ({ marginBottom: t.space.$4 })}
             textVariant='h2'
           />
@@ -175,7 +175,7 @@ const OrganizationDangerSection = () => {
   return (
     <ProfileSection.Root
       id='organizationDanger'
-      title={localizationKeys('organizationProfile.profilePage.dangerSection.title')}
+      title={localizationKeys('organizationProfile.general.profileSection.profileScreen.dangerSection.title')}
       sx={t => ({ marginBottom: t.space.$4 })}
     >
       <Action.Root>
@@ -189,7 +189,7 @@ const OrganizationDangerSection = () => {
                 <Button
                   variant='ghostDanger'
                   localizationKey={localizationKeys(
-                    'organizationProfile.profilePage.dangerSection.leaveOrganization.title',
+                    'organizationProfile.general.profileSection.profileScreen.dangerSection.leaveOrganization.title',
                   )}
                 />
               </Action.Trigger>
@@ -201,7 +201,7 @@ const OrganizationDangerSection = () => {
                   <Button
                     variant='ghostDanger'
                     localizationKey={localizationKeys(
-                      'organizationProfile.profilePage.dangerSection.deleteOrganization.title',
+                      'organizationProfile.general.profileSection.profileScreen.dangerSection.deleteOrganization.title',
                     )}
                   />
                 </Action.Trigger>

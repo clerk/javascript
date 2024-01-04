@@ -59,11 +59,11 @@ export const RemoveDomainForm = (props: RemoveDomainFormProps) => {
 
   return (
     <RemoveResourceForm
-      title={localizationKeys('organizationProfile.removeDomainPage.title')}
-      messageLine1={localizationKeys('organizationProfile.removeDomainPage.messageLine1', {
+      title={localizationKeys('organizationProfile.general.domainSection.removeDomainScreen.title')}
+      messageLine1={localizationKeys('organizationProfile.general.domainSection.removeDomainScreen.messageLine1', {
         domain: ref.current?.name,
       })}
-      messageLine2={localizationKeys('organizationProfile.removeDomainPage.messageLine2')}
+      messageLine2={localizationKeys('organizationProfile.general.domainSection.removeDomainScreen.messageLine2')}
       deleteResource={() =>
         domain?.delete().then(async () => {
           await domains?.revalidate?.();

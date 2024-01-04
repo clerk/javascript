@@ -17,7 +17,7 @@ const DeleteUserScreen = () => {
 export const DeleteSection = () => {
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.dangerSection.title')}
+      title={localizationKeys('userProfile.security.dangerSection.title')}
       id='danger'
     >
       <Action.Root>
@@ -27,7 +27,7 @@ export const DeleteSection = () => {
               id='danger'
               variant='ghostDanger'
               sx={{ alignSelf: 'start' }}
-              localizationKey={localizationKeys('userProfile.start.dangerSection.deleteAccountButton')}
+              localizationKey={localizationKeys('userProfile.security.dangerSection.deleteAccountButton')}
             />
           </Action.Trigger>
         </Action.Closed>

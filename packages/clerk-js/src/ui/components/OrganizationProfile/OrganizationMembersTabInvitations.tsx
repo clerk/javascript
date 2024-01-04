@@ -35,13 +35,13 @@ export const OrganizationMembersTabInvitations = () => {
             <Header.Root>
               <Header.Title
                 localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
+                  'organizationProfile.members.invitationsTab.autoInvitations.headerTitle',
                 )}
                 textVariant='h3'
               />
               <Header.Subtitle
                 localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
+                  'organizationProfile.members.invitationsTab.autoInvitations.headerSubtitle',
                 )}
                 variant='subtitle'
               />
@@ -50,7 +50,7 @@ export const OrganizationMembersTabInvitations = () => {
               fallback={
                 <ProfileSection.Button
                   localizationKey={localizationKeys(
-                    'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
+                    'organizationProfile.members.invitationsTab.autoInvitations.primaryButton',
                   )}
                   id='manageVerifiedDomains'
                   sx={t => ({ gap: t.space.$2 })}
@@ -78,13 +78,13 @@ export const OrganizationMembersTabInvitations = () => {
           <Header.Root>
             <Header.Title
               localizationKey={localizationKeys(
-                'organizationProfile.membersPage.invitationsTab.manualInvitations.headerTitle',
+                'organizationProfile.members.invitationsTab.manualInvitations.headerTitle',
               )}
               textVariant='h3'
             />
             <Header.Subtitle
               localizationKey={localizationKeys(
-                'organizationProfile.membersPage.invitationsTab.manualInvitations.headerSubtitle',
+                'organizationProfile.members.invitationsTab.manualInvitations.headerSubtitle',
               )}
               variant='subtitle'
             />

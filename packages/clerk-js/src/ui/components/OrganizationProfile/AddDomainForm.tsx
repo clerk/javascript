@@ -21,8 +21,8 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
   });
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const [domainId, setDomainId] = useState('');
-  const title = localizationKeys('organizationProfile.createDomainPage.title');
-  const subtitle = localizationKeys('organizationProfile.createDomainPage.subtitle');
+  const title = localizationKeys('organizationProfile.general.domainSection.createDomainScreen.title');
+  const subtitle = localizationKeys('organizationProfile.general.domainSection.createDomainScreen.subtitle');
   const card = useCardState();
   const { organization } = useOrganization();
 

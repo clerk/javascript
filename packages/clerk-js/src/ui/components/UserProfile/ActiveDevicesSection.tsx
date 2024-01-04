@@ -22,7 +22,7 @@ export const ActiveDevicesSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.activeDevicesSection.title')}
+      title={localizationKeys('userProfile.security.activeDevicesSection.title')}
       id='activeDevices'
     >
       <ProfileSection.ItemList id='activeDevices'>
@@ -158,7 +158,7 @@ const ActiveDeviceMenu = ({ revoke }: { revoke: () => Promise<any> }) => {
   const actions = (
     [
       {
-        label: localizationKeys('userProfile.start.activeDevicesSection.destructiveAction'),
+        label: localizationKeys('userProfile.security.activeDevicesSection.destructiveAction'),
         isDestructive: true,
         onClick: revoke,
       },

@@ -17,7 +17,7 @@ type EmailFormProps = FormProps & {
 };
 export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const { emailId: id, onSuccess, onReset } = props;
-  const title = localizationKeys('userProfile.emailAddressPage.title');
+  const title = localizationKeys('userProfile.profile.emailAddressesSection.emailAddressScreen.title');
   const card = useCardState();
   const { user } = useUser();
   const environment = useEnvironment();
@@ -62,8 +62,8 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
           <Text
             localizationKey={
               preferEmailLinks
-                ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
-                : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
+                ? localizationKeys('userProfile.profile.emailAddressesSection.emailAddressScreen.emailLink.formHint')
+                : localizationKeys('userProfile.profile.emailAddressesSection.emailAddressScreen.emailCode.formHint')
             }
           />
           <FormButtons

@@ -29,11 +29,11 @@ export const RequestToJoinList = () => {
       pageCount={membershipRequests?.pageCount || 0}
       itemsPerPage={membershipRequestsParams.membershipRequests.pageSize}
       isLoading={membershipRequests?.isLoading}
-      emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.table__emptyRow')}
+      emptyStateLocalizationKey={localizationKeys('organizationProfile.members.requestsTab.table__emptyRow')}
       headers={[
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
-        localizationKeys('organizationProfile.membersPage.requestsTab.tableHeader__requested'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+        localizationKeys('organizationProfile.members.activeMembersTab.tableHeader__user'),
+        localizationKeys('organizationProfile.members.requestsTab.tableHeader__requested'),
+        localizationKeys('organizationProfile.members.activeMembersTab.tableHeader__actions'),
       ]}
       rows={(membershipRequests?.data || []).map(request => (
         <RequestRow
@@ -104,7 +104,7 @@ const AcceptRejectRequestButtons = (props: { onAccept: () => unknown; onReject: 
         isLoading={card.isLoading && card.loadingMetadata === 'reject'}
         isDisabled={card.isLoading && card.loadingMetadata !== 'reject'}
         onClick={props.onReject}
-        localizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.menuAction__reject')}
+        localizationKey={localizationKeys('organizationProfile.members.requestsTab.menuAction__reject')}
       />
 
       <Button
@@ -113,7 +113,7 @@ const AcceptRejectRequestButtons = (props: { onAccept: () => unknown; onReject: 
         isLoading={card.isLoading && card.loadingMetadata === 'accept'}
         isDisabled={card.isLoading && card.loadingMetadata !== 'accept'}
         onClick={props.onAccept}
-        localizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.menuAction__approve')}
+        localizationKey={localizationKeys('organizationProfile.members.requestsTab.menuAction__approve')}
       />
     </Flex>
   );

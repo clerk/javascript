@@ -46,11 +46,16 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
   return (
     <>
       <VerificationLink
-        formTitle={localizationKeys('userProfile.emailAddressPage.emailLink.formTitle')}
-        formSubtitle={localizationKeys('userProfile.emailAddressPage.emailLink.formSubtitle', {
-          identifier: email.emailAddress,
-        })}
-        resendButton={localizationKeys('userProfile.emailAddressPage.emailLink.resendButton')}
+        formTitle={localizationKeys('userProfile.profile.emailAddressesSection.emailAddressScreen.emailLink.formTitle')}
+        formSubtitle={localizationKeys(
+          'userProfile.profile.emailAddressesSection.emailAddressScreen.emailLink.formSubtitle',
+          {
+            identifier: email.emailAddress,
+          },
+        )}
+        resendButton={localizationKeys(
+          'userProfile.profile.emailAddressesSection.emailAddressScreen.emailLink.resendButton',
+        )}
         onResendCodeClicked={startVerification}
       />
       <FormButtonContainer>

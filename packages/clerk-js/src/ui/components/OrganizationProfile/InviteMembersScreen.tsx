@@ -17,8 +17,8 @@ type InviteMembersScreenProps = {
 export const InviteMembersScreen = withCardStateProvider((props: InviteMembersScreenProps) => {
   const { close } = useActionContext();
   const { onReset = close } = props;
-  const title = localizationKeys('organizationProfile.invitePage.title');
-  const subtitle = localizationKeys('organizationProfile.invitePage.subtitle');
+  const title = localizationKeys('organizationProfile.members.inviteScreen.title');
+  const subtitle = localizationKeys('organizationProfile.members.inviteScreen.subtitle');
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const { organization } = useOrganization();
@@ -72,7 +72,7 @@ export const InvitationsSentMessage = () => {
         iconElementDescriptor={descriptors.invitationsSentIcon}
         icon={Email}
       />
-      <Text localizationKey={localizationKeys('organizationProfile.invitePage.successMessage')} />
+      <Text localizationKey={localizationKeys('organizationProfile.members.inviteScreen.successMessage')} />
     </Flex>
   );
 };

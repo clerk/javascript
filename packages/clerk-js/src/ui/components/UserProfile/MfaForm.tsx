@@ -26,7 +26,7 @@ export const MfaForm = withCardStateProvider((props: MfaFormProps) => {
     return null;
   }
 
-  const title = localizationKeys('userProfile.mfaPage.title');
+  const title = localizationKeys('userProfile.security.mfaSection.mfaScreen.title');
   const [selectedMethod, setSelectedMethod] = React.useState<VerificationStrategy>();
 
   // Calculate second factors available to add on first use only
@@ -56,7 +56,7 @@ export const MfaForm = withCardStateProvider((props: MfaFormProps) => {
   return (
     <FormContainer headerTitle={title}>
       <Col gap={4}>
-        <Text localizationKey={localizationKeys('userProfile.mfaPage.formHint')} />
+        <Text localizationKey={localizationKeys('userProfile.security.mfaSection.mfaScreen.formHint')} />
         <Grid
           gap={2}
           sx={t => ({

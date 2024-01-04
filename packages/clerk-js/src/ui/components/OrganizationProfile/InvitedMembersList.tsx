@@ -42,12 +42,12 @@ export const InvitedMembersList = () => {
       pageCount={invitations?.pageCount || 0}
       itemsPerPage={invitationsParams.invitations.pageSize}
       isLoading={invitations?.isLoading || loadingRoles}
-      emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.invitationsTab.table__emptyRow')}
+      emptyStateLocalizationKey={localizationKeys('organizationProfile.members.invitationsTab.table__emptyRow')}
       headers={[
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
-        localizationKeys('organizationProfile.membersPage.invitedMembersTab.tableHeader__invited'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
+        localizationKeys('organizationProfile.members.activeMembersTab.tableHeader__user'),
+        localizationKeys('organizationProfile.members.invitedMembersTab.tableHeader__invited'),
+        localizationKeys('organizationProfile.members.activeMembersTab.tableHeader__role'),
+        localizationKeys('organizationProfile.members.activeMembersTab.tableHeader__actions'),
       ]}
       rows={(invitations?.data || []).map(i => (
         <InvitationRow
@@ -90,7 +90,7 @@ const InvitationRow = (props: {
         <ThreeDotsMenu
           actions={[
             {
-              label: localizationKeys('organizationProfile.membersPage.invitedMembersTab.menuAction__revoke'),
+              label: localizationKeys('organizationProfile.members.invitedMembersTab.menuAction__revoke'),
               isDestructive: true,
               onClick: onRevoke,
             },

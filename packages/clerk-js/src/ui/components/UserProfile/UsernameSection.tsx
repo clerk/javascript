@@ -25,7 +25,7 @@ export const UsernameSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.usernameSection.title')}
+      title={localizationKeys('userProfile.profile.usernameSection.title')}
       id='username'
     >
       <Action.Root>
@@ -39,8 +39,8 @@ export const UsernameSection = () => {
                 variant='ghost'
                 localizationKey={
                   user.username
-                    ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')
-                    : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
+                    ? localizationKeys('userProfile.profile.usernameSection.primaryButton__changeUsername')
+                    : localizationKeys('userProfile.profile.usernameSection.primaryButton__setUsername')
                 }
               />
             </Action.Trigger>

@@ -25,13 +25,13 @@ export const PhoneForm = withCardStateProvider((props: PhoneFormProps) => {
     <Wizard {...wizard.props}>
       <AddPhone
         resourceRef={phoneNumberRef}
-        title={localizationKeys('userProfile.phoneNumberPage.title')}
+        title={localizationKeys('userProfile.profile.phoneNumbersSection.phoneNumberScreen.title')}
         onSuccess={wizard.nextStep}
         onReset={onReset}
       />
       <VerifyPhone
         resourceRef={phoneNumberRef}
-        title={localizationKeys('userProfile.phoneNumberPage.title')}
+        title={localizationKeys('userProfile.profile.phoneNumbersSection.phoneNumberScreen.title')}
         onSuccess={onSuccess}
         onReset={wizard.prevStep}
       />
@@ -77,10 +77,14 @@ export const AddPhone = (props: AddPhoneProps) => {
             autoFocus
           />
         </Form.ControlRow>
-        <Text localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')} />
+        <Text
+          localizationKey={localizationKeys('userProfile.profile.phoneNumbersSection.phoneNumberScreen.infoText')}
+        />
         <Text
           colorScheme='neutral'
-          localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText__secondary')}
+          localizationKey={localizationKeys(
+            'userProfile.profile.phoneNumbersSection.phoneNumberScreen.infoText__secondary',
+          )}
         />
         <FormButtons
           isDisabled={!canSubmit}

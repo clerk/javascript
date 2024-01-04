@@ -31,9 +31,9 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
   const { close } = useActionContext();
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
-      <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText1')} />
-      <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText2')} />
+    <FormContainer headerTitle={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.title')}>
+      <Text localizationKey={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.infoText1')} />
+      <Text localizationKey={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.infoText2')} />
 
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <Button

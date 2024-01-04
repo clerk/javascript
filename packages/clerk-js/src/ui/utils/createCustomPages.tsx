@@ -236,13 +236,13 @@ const assertExternalLinkAsRoot = (routes: NavbarRoute[]) => {
 const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
-      name: localizationKeys('userProfile.start.headerTitle__account'),
+      name: localizationKeys('userProfile.headerTitle__profile'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT,
       icon: User,
       path: 'account',
     },
     {
-      name: localizationKeys('userProfile.start.headerTitle__security'),
+      name: localizationKeys('userProfile.headerTitle__security'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
       icon: TickShield,
       path: 'security',

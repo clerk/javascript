@@ -28,12 +28,12 @@ export const VerifyTOTP = withCardStateProvider((props: VerifyTOTPProps) => {
   });
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.mfaTOTPPage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.title')}>
       <Col>
         <Form.OTPInput
           {...otp}
-          label={localizationKeys('userProfile.mfaTOTPPage.verifyTitle')}
-          description={localizationKeys('userProfile.mfaTOTPPage.verifySubtitle')}
+          label={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.verifyTitle')}
+          description={localizationKeys('userProfile.security.mfaSection.mfaTOTPScreen.verifySubtitle')}
         />
       </Col>
 

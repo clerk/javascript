@@ -33,12 +33,18 @@ const useCalloutLabel = (
 
   return [
     infoLabelKey,
-    localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutInvitationCountLabel`, {
-      count: totalInvitations,
-    }),
-    localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutSuggestionCountLabel`, {
-      count: totalInvitations,
-    }),
+    localizationKeys(
+      `organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.calloutInvitationCountLabel`,
+      {
+        count: totalInvitations,
+      },
+    ),
+    localizationKeys(
+      `organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.calloutSuggestionCountLabel`,
+      {
+        count: totalInvitations,
+      },
+    ),
   ];
 };
 
@@ -47,9 +53,11 @@ const buildEnrollmentOptions = (settings: OrganizationSettingsResource) => {
   if (settings.domains.enrollmentModes.includes('manual_invitation')) {
     _options.push({
       value: 'manual_invitation',
-      label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__label'),
+      label: localizationKeys(
+        'organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.manualInvitationOption__label',
+      ),
       description: localizationKeys(
-        'organizationProfile.verifiedDomainPage.enrollmentTab.manualInvitationOption__description',
+        'organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.manualInvitationOption__description',
       ),
     });
   }
@@ -57,9 +65,11 @@ const buildEnrollmentOptions = (settings: OrganizationSettingsResource) => {
   if (settings.domains.enrollmentModes.includes('automatic_invitation')) {
     _options.push({
       value: 'automatic_invitation',
-      label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__label'),
+      label: localizationKeys(
+        'organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.automaticInvitationOption__label',
+      ),
       description: localizationKeys(
-        'organizationProfile.verifiedDomainPage.enrollmentTab.automaticInvitationOption__description',
+        'organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.automaticInvitationOption__description',
       ),
     });
   }
@@ -67,9 +77,11 @@ const buildEnrollmentOptions = (settings: OrganizationSettingsResource) => {
   if (settings.domains.enrollmentModes.includes('automatic_suggestion')) {
     _options.push({
       value: 'automatic_suggestion',
-      label: localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__label'),
+      label: localizationKeys(
+        'organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.automaticSuggestionOption__label',
+      ),
       description: localizationKeys(
-        'organizationProfile.verifiedDomainPage.enrollmentTab.automaticSuggestionOption__description',
+        'organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.automaticSuggestionOption__description',
       ),
     });
   }
@@ -125,15 +137,17 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
   );
 
   const isFormDirty = deletePending.checked || domain?.enrollmentMode !== enrollmentMode.value;
-  const title = localizationKeys('organizationProfile.verifiedDomainPage.title', {
+  const title = localizationKeys('organizationProfile.general.domainSection.verifiedDomainScreen.title', {
     domain: domain?.name,
   });
-  const subtitle = localizationKeys('organizationProfile.verifiedDomainPage.subtitle', {
+  const subtitle = localizationKeys('organizationProfile.general.domainSection.verifiedDomainScreen.subtitle', {
     domain: domain?.name,
   });
 
   const calloutLabel = useCalloutLabel(domain, {
-    infoLabel: localizationKeys(`organizationProfile.verifiedDomainPage.enrollmentTab.calloutInfoLabel`),
+    infoLabel: localizationKeys(
+      `organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.calloutInfoLabel`,
+    ),
   });
 
   const updateEnrollmentMode = async () => {
@@ -205,7 +219,9 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
         )}
         <Header.Root>
           <Header.Subtitle
-            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.subtitle')}
+            localizationKey={localizationKeys(
+              'organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.subtitle',
+            )}
             variant='subtitle'
           />
         </Header.Root>
@@ -224,7 +240,9 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
           )}
 
           <FormButtons
-            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save')}
+            localizationKey={localizationKeys(
+              'organizationProfile.general.domainSection.verifiedDomainScreen.enrollmentTab.formButton__save',
+            )}
             isDisabled={domainIsLoading || !domain || !isFormDirty}
             onReset={onReset}
           />

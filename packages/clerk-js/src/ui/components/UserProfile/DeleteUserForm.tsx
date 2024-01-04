@@ -28,7 +28,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
-    label: localizationKeys('userProfile.deletePage.actionDescription'),
+    label: localizationKeys('userProfile.security.dangerSection.deleteScreen.actionDescription'),
     isRequired: true,
     placeholder: localizationKeys('formFieldInputPlaceholder__confirmDeletionUserAccount'),
   });
@@ -36,16 +36,16 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const canSubmit = confirmationField.value === 'Delete account';
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.deletePage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.security.dangerSection.deleteScreen.title')}>
       <Form.Root onSubmit={deleteUser}>
         <Col gap={1}>
           <Text
             colorScheme='neutral'
-            localizationKey={localizationKeys('userProfile.deletePage.messageLine1')}
+            localizationKey={localizationKeys('userProfile.security.dangerSection.deleteScreen.messageLine1')}
           />
           <Text
             colorScheme='danger'
-            localizationKey={localizationKeys('userProfile.deletePage.messageLine2')}
+            localizationKey={localizationKeys('userProfile.security.dangerSection.deleteScreen.messageLine2')}
           />
         </Col>
 
@@ -53,7 +53,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
           <Form.PlainInput {...confirmationField.props} />
         </Form.ControlRow>
         <FormButtons
-          submitLabel={localizationKeys('userProfile.deletePage.confirm')}
+          submitLabel={localizationKeys('userProfile.security.dangerSection.deleteScreen.confirm')}
           variant='primaryDanger'
           isDisabled={!canSubmit}
           onReset={onReset}

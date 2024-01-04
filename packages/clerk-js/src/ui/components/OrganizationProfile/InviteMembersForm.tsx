@@ -90,7 +90,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
           card.setError(
             t(
-              localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
+              localizationKeys('organizationProfile.members.inviteScreen.detailsTitle__inviteFailed', {
                 // Create a localized list of email addresses
                 email_addresses: createListFormat(unlocalizedEmailsList, locale),
               }),
@@ -136,7 +136,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             block={false}
             isDisabled={!canSubmit}
             hasArrow
-            localizationKey={localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')}
+            localizationKey={localizationKeys('organizationProfile.members.inviteScreen.formButtonPrimary__continue')}
           />
           <Form.ResetButton
             localizationKey={resetButtonLabel || localizationKeys('userProfile.formButtonReset')}

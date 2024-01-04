@@ -38,7 +38,7 @@ export const InviteMembersButton = (props: { sx?: ThemableCssProp }) => {
         />
       }
       textVariant='buttonSmall'
-      localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
+      localizationKey={localizationKeys('organizationProfile.members.action__invite')}
     />
   );
 };
@@ -74,7 +74,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
         <Action.Root>
           <Header.Root sx={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
             <Header.Title
-              localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
+              localizationKey={localizationKeys('organizationProfile.headerTitle__members')}
               textVariant='h2'
             />
             {canManageMemberships && (
@@ -93,15 +93,13 @@ export const OrganizationMembers = withCardStateProvider(() => {
           <Tabs>
             <TabsList>
               {canReadMemberships && (
-                <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
+                <Tab localizationKey={localizationKeys('organizationProfile.members.headerTitle__members')} />
               )}
               {canManageMemberships && (
-                <Tab
-                  localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
-                />
+                <Tab localizationKey={localizationKeys('organizationProfile.members.headerTitle__invitations')} />
               )}
               {canManageMemberships && isDomainsEnabled && (
-                <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
+                <Tab localizationKey={localizationKeys('organizationProfile.members.headerTitle__requests')}>
                   <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />
                 </Tab>
               )}

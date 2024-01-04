@@ -57,12 +57,12 @@ export const AddWeb3Wallet = withCardStateProvider((props: AddWeb3WalletProps) =
   };
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.web3WalletPage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.profile.web3WalletsSection.web3WalletScreen.title')}>
       <Text
         localizationKey={localizationKeys(
           unconnectedStrategies.length
-            ? 'userProfile.web3WalletPage.subtitle__availableWallets'
-            : 'userProfile.web3WalletPage.subtitle__unavailableWallets',
+            ? 'userProfile.profile.web3WalletsSection.web3WalletScreen.subtitle__availableWallets'
+            : 'userProfile.profile.web3WalletsSection.web3WalletScreen.subtitle__unavailableWallets',
         )}
       />
       <Col gap={2}>

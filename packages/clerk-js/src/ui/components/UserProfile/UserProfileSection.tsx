@@ -27,7 +27,7 @@ export const UserProfileSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.profileSection.title')}
+      title={localizationKeys('userProfile.profile.profileSection.title')}
       id='profile'
     >
       <Action.Root>
@@ -39,7 +39,7 @@ export const UserProfileSection = () => {
               <Button
                 id='profile'
                 variant='ghost'
-                localizationKey={localizationKeys('userProfile.start.profileSection.primaryButton')}
+                localizationKey={localizationKeys('userProfile.profile.profileSection.primaryButton')}
               />
             </Action.Trigger>
           </ProfileSection.Item>

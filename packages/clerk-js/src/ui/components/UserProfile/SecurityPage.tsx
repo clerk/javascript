@@ -29,7 +29,7 @@ export const SecurityPage = withCardStateProvider(() => {
       >
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('userProfile.start.headerTitle__security')}
+            localizationKey={localizationKeys('userProfile.headerTitle__security')}
             sx={t => ({ marginBottom: t.space.$4 })}
             textVariant='h2'
           />

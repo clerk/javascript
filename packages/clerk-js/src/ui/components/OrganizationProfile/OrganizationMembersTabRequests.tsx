@@ -35,13 +35,13 @@ export const OrganizationMembersTabRequests = () => {
             <Header.Root>
               <Header.Title
                 localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.requestsTab.autoSuggestions.headerTitle',
+                  'organizationProfile.members.requestsTab.autoSuggestions.headerTitle',
                 )}
                 textVariant='h3'
               />
               <Header.Subtitle
                 localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.requestsTab.autoSuggestions.headerSubtitle',
+                  'organizationProfile.members.requestsTab.autoSuggestions.headerSubtitle',
                 )}
                 variant='subtitle'
               />
@@ -50,7 +50,7 @@ export const OrganizationMembersTabRequests = () => {
               fallback={
                 <ProfileSection.Button
                   localizationKey={localizationKeys(
-                    'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
+                    'organizationProfile.members.requestsTab.autoSuggestions.primaryButton',
                   )}
                   sx={t => ({ gap: t.space.$2 })}
                   id='manageVerifiedDomains'
@@ -77,11 +77,11 @@ export const OrganizationMembersTabRequests = () => {
         >
           <Header.Root>
             <Header.Title
-              localizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.requests.headerTitle')}
+              localizationKey={localizationKeys('organizationProfile.members.requestsTab.requests.headerTitle')}
               textVariant='h3'
             />
             <Header.Subtitle
-              localizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.requests.headerSubtitle')}
+              localizationKey={localizationKeys('organizationProfile.members.requestsTab.requests.headerSubtitle')}
               variant='subtitle'
             />
           </Header.Root>

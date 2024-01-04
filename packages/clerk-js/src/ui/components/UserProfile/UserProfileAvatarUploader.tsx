@@ -11,7 +11,7 @@ export const UserProfileAvatarUploader = (
   return (
     <AvatarUploader
       {...rest}
-      title={localizationKeys('userProfile.profilePage.imageFormTitle')}
+      title={localizationKeys('userProfile.profile.profileSection.profileScreen.imageFormTitle')}
       avatarPreview={
         <UserAvatar
           size={theme => theme.sizes.$12}

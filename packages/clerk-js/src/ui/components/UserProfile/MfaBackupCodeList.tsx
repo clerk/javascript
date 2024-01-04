@@ -46,7 +46,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
     <>
       <Col gap={1}>
         <Text
-          localizationKey={localizationKeys('userProfile.backupCodePage.title__codelist')}
+          localizationKey={localizationKeys('userProfile.security.mfaSection.backupCodeScreen.title__codelist')}
           variant='subtitle'
         />
         <Text

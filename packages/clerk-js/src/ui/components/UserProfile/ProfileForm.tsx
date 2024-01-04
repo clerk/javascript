@@ -85,8 +85,10 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   };
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.profilePage.title')}>
-      {nameEditDisabled && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
+    <FormContainer headerTitle={localizationKeys('userProfile.profile.profileSection.profileScreen.title')}>
+      {nameEditDisabled && (
+        <InformationBox message={localizationKeys('userProfile.profile.profileSection.profileScreen.readonly')} />
+      )}
 
       <Form.Root onSubmit={onSubmit}>
         <UserProfileAvatarUploader

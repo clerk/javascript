@@ -12,7 +12,7 @@ type ProfileFormProps = FormProps;
 
 export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const { onSuccess, onReset } = props;
-  const title = localizationKeys('organizationProfile.profilePage.title');
+  const title = localizationKeys('organizationProfile.general.profileSection.profileScreen.title');
   const card = useCardState();
   const [avatarChanged, setAvatarChanged] = React.useState(false);
   const { organization } = useOrganization();
