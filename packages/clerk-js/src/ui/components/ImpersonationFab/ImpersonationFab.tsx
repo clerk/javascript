@@ -90,7 +90,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
         localizationKey={signOutText}
         onClick={async () => {
           // clerk-js has been loaded at this point so we can safely access session
-          await signOut({ sessionId: session.id });
+          await signOut({ sessionId: session!.id });
         }}
       />
     </Col>
