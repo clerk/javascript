@@ -1,5 +1,4 @@
 import type {
-  ClerkAPIError,
   EmailCodeStrategy,
   EmailLinkStrategy,
   EnvironmentResource,
@@ -14,10 +13,12 @@ import type {
   Web3Strategy,
 } from '@clerk/types';
 
+import type { ClerkElementsFieldError } from '../errors/error';
+
 export type FieldDetails = {
   type?: string;
   value?: string | readonly string[] | number;
-  error?: ClerkAPIError;
+  errors?: ClerkElementsFieldError[];
 };
 
 export type WithClerk<T> = { clerk: LoadedClerkWithEnv } & T;

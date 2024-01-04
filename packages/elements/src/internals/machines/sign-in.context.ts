@@ -1,6 +1,6 @@
 import type { OAuthStrategy, Web3Strategy } from '@clerk/types';
 import { createActorContext } from '@xstate/react';
-import { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import type { SnapshotFrom } from 'xstate';
 
 import {
@@ -32,13 +32,13 @@ const fieldHasValueSelector = (type: string | undefined) => (state: SnapshotStat
 /**
  * Selects a field-specific error, if it exists
  */
-const fieldErrorSelector = (type: string | undefined) => (state: SnapshotState) =>
-  type ? state.context.fields.get(type)?.error : undefined;
+const fieldErrorsSelector = (type: string | undefined) => (state: SnapshotState) =>
+  type ? state.context.fields.get(type)?.errors : undefined;
 
 /**
  * Selects a global error, if it exists
  */
-const globalErrorSelector = (state: SnapshotState) => state.context.error;
+const globalErrorsSelector = (state: SnapshotState) => state.context.errors;
 
 /**
  * Selects the clerk environment
@@ -52,7 +52,7 @@ const clerkEnvironmentSelector = (state: SnapshotState) => state.context.environ
  */
 export const useForm = () => {
   const ref = useSignInFlow();
-  const error = useSignInFlowSelector(globalErrorSelector);
+  const error = useSignInFlowSelector(globalErrorsSelector);
 
   const validity = error ? 'invalid' : 'valid';
 
@@ -113,12 +113,27 @@ export const useThirdPartyProviders = () => {
   };
 };
 
+export type FieldContextValue = {
+  name: string;
+};
+export const FieldContext = React.createContext<FieldContextValue>({ name: '' });
+
+export function useFieldDetails() {
+  const ctx = useContext(FieldContext);
+
+  if (!ctx.name) {
+    throw new Error('useFieldDetails must be used within a FieldContextProvider');
+  }
+
+  return ctx;
+}
+
 /**
  * Provides field-specfic props based on the field's type/state
  */
 export const useField = ({ type }: Partial<Pick<FieldDetails, 'type'>>) => {
   const hasValue = useSignInFlowSelector(fieldHasValueSelector(type));
-  const error = useSignInFlowSelector(fieldErrorSelector(type));
+  const error = useSignInFlowSelector(fieldErrorsSelector(type));
 
   const shouldBeHidden = false; // TODO: Implement clerk-js utils
   const hasError = Boolean(error);
@@ -136,9 +151,37 @@ export const useField = ({ type }: Partial<Pick<FieldDetails, 'type'>>) => {
 };
 
 /**
+ * Provides field-error/message-specfic props based on the field's type/state
+ */
+export const useFieldErrors = ({ type }: Partial<Pick<FieldDetails, 'type'>>) => {
+  const errors = useSignInFlowSelector(fieldErrorsSelector(type));
+
+  return {
+    errors,
+  };
+};
+
+/**
+ * Provides global errors
+ */
+export const useGlobalErrors = () => {
+  const error = useSignInFlowSelector(globalErrorsSelector);
+  const validity = error ? 'invalid' : 'valid';
+
+  return {
+    message: error?.message,
+    props: {
+      // TODO: Handle accessibility
+      [`data-${validity}`]: true,
+    },
+  };
+};
+
+/**
  * Provides control (input)-specfic props based on the field/input's type/state
  */
 export const useInput = ({ type, value: initialValue }: Partial<Pick<FieldDetails, 'type' | 'value'>>) => {
+  const { name } = useFieldDetails();
   const ref = useSignInFlow();
   const hasValue = useSignInFlowSelector(fieldHasValueSelector(type));
 
@@ -167,6 +210,7 @@ export const useInput = ({ type, value: initialValue }: Partial<Pick<FieldDetail
   return {
     hasValue,
     props: {
+      name,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
       onChange,
