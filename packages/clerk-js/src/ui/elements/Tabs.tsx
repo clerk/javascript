@@ -70,7 +70,6 @@ export const TabsList = (props: TabsListProps) => {
     <Flex
       elementDescriptor={descriptors.tabListContainer}
       onKeyDown={onKeyDown}
-      justify='center'
       sx={[
         theme => ({
           borderBottom: theme.borders.$normal,
@@ -129,6 +128,7 @@ export const Tab = (props: TabProps) => {
       aria-controls={`cl-tabpanel-${tabIndex}`}
       role='tab'
       ref={buttonRef}
+      focusRing={false}
       sx={[
         t => ({
           background: t.colors.$transparent,

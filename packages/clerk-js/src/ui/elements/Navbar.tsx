@@ -258,6 +258,9 @@ const NavButton = (props: NavButtonProps) => {
           justifyContent: 'flex-start',
           backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
           opacity: isActive ? 1 : 0.6,
+          ':focus': {
+            boxShadow: 'none',
+          },
         }),
         sx,
       ]}
@@ -315,7 +318,7 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
         <Icon
           elementDescriptor={descriptors.navbarMobileMenuButtonIcon}
           icon={Menu}
-          size='sm'
+          size='md'
         />
         {t(navbarTitleLocalizationKey)}
       </Button>

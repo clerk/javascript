@@ -18,10 +18,6 @@ const RadioIndicator = forwardRef<HTMLInputElement, { value: string; id: string 
       sx={t => ({
         width: 'fit-content',
         marginTop: t.space.$0x5,
-        boxShadow: 'none',
-        ':hover': {
-          boxShadow: 'none',
-        },
       })}
       type='radio'
       value={props.value}

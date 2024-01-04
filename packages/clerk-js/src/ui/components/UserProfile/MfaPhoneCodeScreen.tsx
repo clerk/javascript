@@ -6,7 +6,7 @@ import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { FormButtonContainer, FormContent, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { FormButtonContainer, FormContainer, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { AddPhone, VerifyPhone } from './PhoneForm';
@@ -94,7 +94,7 @@ const AddMfa = (props: AddMfaProps) => {
   };
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer headerTitle={title}>
       <Text
         localizationKey={localizationKeys(
           availableMethods.length
@@ -133,6 +133,6 @@ const AddMfa = (props: AddMfaProps) => {
           onClick={onReset}
         />
       </FormButtonContainer>
-    </FormContent>
+    </FormContainer>
   );
 };

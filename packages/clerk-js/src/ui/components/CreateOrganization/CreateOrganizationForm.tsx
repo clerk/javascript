@@ -4,7 +4,16 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { Col, Icon } from '../../customizables';
-import { Form, FormButtonContainer, FormContent, Header, IconButton, SuccessPage, useCardState } from '../../elements';
+import {
+  Form,
+  FormButtonContainer,
+  FormContainer,
+  Header,
+  IconButton,
+  SuccessPage,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
@@ -12,6 +21,7 @@ import { createSlug, handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersScreen';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
+import { organizationListParams } from '../OrganizationSwitcher/utils';
 
 type CreateOrganizationFormProps = {
   skipInvitationScreen: boolean;
@@ -25,12 +35,14 @@ type CreateOrganizationFormProps = {
   };
 };
 
-export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
+export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
-  const { createOrganization, isLoaded, setActive } = useOrganizationList();
+  const { createOrganization, isLoaded, setActive, userMemberships } = useOrganizationList({
+    userMemberships: organizationListParams.userMemberships,
+  });
   const { organization } = useOrganization();
   const [file, setFile] = React.useState<File | null>();
 
@@ -67,6 +79,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
 
       lastCreatedOrganizationRef.current = organization;
       await setActive({ organization });
+
+      void userMemberships.revalidate?.();
 
       if (props.skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
         return completeFlow();
@@ -109,7 +123,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
+      <FormContainer
         headerTitle={props?.startPage?.headerTitle}
         headerSubtitle={props?.startPage?.headerSubtitle}
         headerTitleTextVariant={headerTitleTextVariant}
@@ -185,9 +199,9 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             )}
           </FormButtonContainer>
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
-      <FormContent
+      <FormContainer
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
@@ -200,7 +214,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             onReset={completeFlow}
           />
         )}
-      </FormContent>
+      </FormContainer>
 
       <Col>
         <Header.Root>
@@ -217,4 +231,4 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
       </Col>
     </Wizard>
   );
-};
+});

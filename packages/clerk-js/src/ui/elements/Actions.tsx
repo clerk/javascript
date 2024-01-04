@@ -175,6 +175,7 @@ export const Action = (props: ActionProps) => {
       variant='ghostAction'
       textVariant='buttonLarge'
       hoverAsFocus
+      focusRing={false}
       sx={[
         t => ({
           flex: '1',

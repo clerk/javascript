@@ -1,11 +1,20 @@
-import type { FormControlProps, FormFieldProps, FormProps } from '@radix-ui/react-form';
-import { Control, Field as RadixField, Form as RadixForm, Label, Submit } from '@radix-ui/react-form';
-import { createContext, useCallback, useContext, useEffect } from 'react';
+import type { FormControlProps, FormFieldProps, FormLabelProps, FormProps } from '@radix-ui/react-form';
+import {
+  Control as RadixControl,
+  Field as RadixField,
+  Form as RadixForm,
+  Label as RadixLabel,
+  Message as RadixMessage,
+  Submit,
+} from '@radix-ui/react-form';
+import React, { createContext, useCallback, useContext, useEffect } from 'react';
 import type { FieldDetails } from 'src/internals/machines/sign-in.types';
 
+import type { ClerkElementsError } from '../internals/errors/error';
 import {
+  fieldErrorsSelector,
   fieldHasValueSelector,
-  globalErrorSelector,
+  globalErrorsSelector,
   useSignInFlow,
   useSignInFlowSelector,
 } from '../internals/machines/sign-in.context';
@@ -18,7 +27,7 @@ const useFieldContext = () => useContext(FieldContext);
  */
 const useForm = () => {
   const ref = useSignInFlow();
-  const error = useSignInFlowSelector(globalErrorSelector);
+  const error = useSignInFlowSelector(globalErrorsSelector);
 
   const validity = error ? 'invalid' : 'valid';
 
@@ -36,6 +45,36 @@ const useForm = () => {
       [`data-${validity}`]: true,
       onSubmit,
     },
+  };
+};
+
+const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const hasValue = useSignInFlowSelector(fieldHasValueSelector(name));
+  const error = useSignInFlowSelector(fieldErrorsSelector(name));
+
+  const shouldBeHidden = false; // TODO: Implement clerk-js utils
+  const hasError = Boolean(error);
+  const validity = hasError ? 'invalid' : 'valid';
+
+  return {
+    hasValue,
+    props: {
+      [`data-${validity}`]: true,
+      'data-hidden': shouldBeHidden ? true : undefined,
+      serverInvalid: hasError,
+      tabIndex: shouldBeHidden ? -1 : 0,
+    },
+  };
+};
+
+/**
+ * Provides field-error/message-specific props based on the field's type/state
+ */
+const useFieldErrors = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const errors = useSignInFlowSelector(fieldErrorsSelector(name));
+
+  return {
+    errors,
   };
 };
 
@@ -103,14 +142,22 @@ function Form({ asChild, ...rest }: FormProps) {
   );
 }
 
-function Field({ name, ...rest }: FormFieldProps) {
+function Field(props: FormFieldProps) {
   return (
-    <FieldContext.Provider value={{ name }}>
-      <RadixField
-        name={name}
-        {...rest}
-      />
+    <FieldContext.Provider value={{ name: props.name }}>
+      <InnerField {...props} />
     </FieldContext.Provider>
+  );
+}
+
+function InnerField(props: FormFieldProps) {
+  const field = useField({ name: props.name });
+
+  return (
+    <RadixField
+      {...field.props}
+      {...props}
+    />
   );
 }
 
@@ -119,7 +166,7 @@ function Input(props: FormControlProps) {
   const field = useInput({ name, value });
 
   return (
-    <Control
+    <RadixControl
       type={field.type}
       {...field.props}
       {...props}
@@ -127,4 +174,39 @@ function Input(props: FormControlProps) {
   );
 }
 
-export { Form, Input, Field, Label, Submit };
+function Label(props: FormLabelProps) {
+  return <RadixLabel {...props} />;
+}
+
+// ================= ERRORS ================= //
+type ClerkElementsErrorsRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
+interface ErrorsProps {
+  render(error: ClerkElementsErrorsRenderProps): React.ReactNode;
+}
+
+function Errors({ render }: ErrorsProps) {
+  const fieldContext = useFieldContext();
+  const { errors } = useFieldErrors({ name: fieldContext?.name });
+
+  if (!errors) {
+    return null;
+  }
+
+  return (
+    <>
+      {errors.map(error => (
+        <RadixMessage
+          asChild
+          match={error.matchFn}
+          forceMatch={error.forceMatch}
+          key={`${error.name}-${name}-${error.code}`}
+        >
+          {render(error)}
+        </RadixMessage>
+      ))}
+    </>
+  );
+}
+
+export { Field, Form, Input, Errors, Label, Submit };
+export type { FormControlProps, FormFieldProps, FormProps, ErrorsProps };

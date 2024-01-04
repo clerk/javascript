@@ -162,10 +162,6 @@ export const TagInput = (props: TagInputProps) => {
           padding: 0,
           lineHeight: t.space.$6,
           paddingLeft: t.space.$1,
-          boxShadow: 'none',
-          ':hover': {
-            boxShadow: 'none',
-          },
           '::placeholder': {
             color: t.colors.$colorTextTertiary,
           },

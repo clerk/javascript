@@ -1,7 +1,7 @@
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { Header } from './index';
+import { Card, Header, useCardState } from './index';
 
 export type FormProps = {
   onSuccess: () => void;
@@ -15,7 +15,7 @@ type PageProps = PropsOfComponent<typeof Col> & {
   headerSubtitleTextVariant?: PropsOfComponent<typeof Header.Subtitle>['variant'];
 };
 
-export const FormContent = (props: PageProps) => {
+export const FormContainer = (props: PageProps) => {
   const {
     headerTitle,
     headerTitleTextVariant = 'h3',
@@ -25,6 +25,7 @@ export const FormContent = (props: PageProps) => {
     sx,
     ...rest
   } = props;
+  const card = useCardState();
 
   return (
     <Col
@@ -33,6 +34,7 @@ export const FormContent = (props: PageProps) => {
       {...rest}
       sx={[sx]}
     >
+      <Card.Alert>{card.error}</Card.Alert>
       {(headerTitle || headerSubtitle) && (
         <Header.Root>
           {headerTitle && (

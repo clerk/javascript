@@ -34,7 +34,8 @@ export type ProfileSectionId =
   | 'activeDevices'
   | 'organizationProfile'
   | 'organizationDanger'
-  | 'organizationDomains';
+  | 'organizationDomains'
+  | 'manageVerifiedDomains';
 export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'organizationMembers';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';

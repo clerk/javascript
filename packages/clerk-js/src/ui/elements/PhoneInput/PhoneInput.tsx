@@ -3,7 +3,7 @@ import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
-import { Check } from '../../icons';
+import { ArrowUpDown, Check } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
 import { mergeRefs } from '../../utils';
 import type { CountryEntry, CountryIso } from './countryCodeData';
@@ -99,11 +99,11 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         comparator={(term, option) => option.searchTerm.toLowerCase().includes(term.toLowerCase())}
       >
         <SelectButton
+          focusRing={false}
           sx={t => ({
             borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
             borderBottomRightRadius: '0',
             borderTopRightRadius: '0',
-            boxShadow: 'none',
             ':focus': {
               zIndex: 2,
             },
@@ -112,6 +112,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
             },
           })}
           isDisabled={rest.isDisabled}
+          icon={ArrowUpDown}
         >
           <Text
             sx={{

@@ -10,7 +10,7 @@ import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, Header, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { InformationCircle } from '../../icons';
 import { handleError, useFormControl } from '../../utils';
@@ -183,7 +183,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
   }
 
   return (
-    <FormContent
+    <FormContainer
       headerTitle={title}
       headerSubtitle={allowsEdit ? undefined : subtitle}
       gap={4}
@@ -230,6 +230,6 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
           />
         </Form.Root>
       </Col>
-    </FormContent>
+    </FormContainer>
   );
 });

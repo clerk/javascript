@@ -6,7 +6,14 @@ import { QRCode } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { ClipboardInput, FormButtonContainer, FormContent, FullHeightLoader, useCardState } from '../../elements';
+import {
+  ClipboardInput,
+  FormButtonContainer,
+  FormContainer,
+  FullHeightLoader,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { handleError } from '../../utils';
 
 type AddAuthenticatorAppProps = FormProps & {
@@ -15,7 +22,7 @@ type AddAuthenticatorAppProps = FormProps & {
 
 type DisplayFormat = 'qr' | 'uri';
 
-export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
+export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticatorAppProps) => {
   const { title, onSuccess, onReset } = props;
   const { user } = useUser();
   const card = useCardState();
@@ -32,11 +39,11 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
   }, []);
 
   if (card.error) {
-    return <FormContent headerTitle={title} />;
+    return <FormContainer headerTitle={title} />;
   }
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer headerTitle={title}>
       {!totp && <FullHeightLoader />}
 
       {totp && (
@@ -110,6 +117,6 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
           </FormButtonContainer>
         </>
       )}
-    </FormContent>
+    </FormContainer>
   );
-};
+});

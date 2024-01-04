@@ -1,5 +1,6 @@
 import type { OAuthStrategy, Web3Strategy } from '@clerk/types';
 import { createActorContext } from '@xstate/react';
+import type React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import type { SnapshotFrom } from 'xstate';
 
@@ -31,13 +32,13 @@ export const fieldHasValueSelector = (name: string | undefined) => (state: Snaps
 /**
  * Selects a field-specific error, if it exists
  */
-export const fieldErrorSelector = (name: string | undefined) => (state: SnapshotState) =>
-  name ? state.context.fields.get(name)?.error : undefined;
+export const fieldErrorsSelector = (name: string | undefined) => (state: SnapshotState) =>
+  name ? state.context.fields.get(name)?.errors : undefined;
 
 /**
  * Selects a global error, if it exists
  */
-export const globalErrorSelector = (state: SnapshotState) => state.context.error;
+export const globalErrorsSelector = (state: SnapshotState) => state.context.errors;
 
 /**
  * Selects the clerk environment
@@ -83,6 +84,22 @@ export const useThirdPartyProviders = () => {
   return {
     ...providers,
     createOnClick,
+  };
+};
+
+/**
+ * Provides global errors
+ */
+export const useGlobalErrors = () => {
+  const error = useSignInFlowSelector(globalErrorsSelector);
+  const validity = error ? 'invalid' : 'valid';
+
+  return {
+    message: error?.message,
+    props: {
+      // TODO: Handle accessibility
+      [`data-${validity}`]: true,
+    },
   };
 };
 

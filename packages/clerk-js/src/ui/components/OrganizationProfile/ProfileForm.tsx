@@ -4,7 +4,7 @@ import React from 'react';
 import { isDefaultImage } from '../../../utils';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 
@@ -75,7 +75,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   };
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer headerTitle={title}>
       <Form.Root onSubmit={onSubmit}>
         <OrganizationProfileAvatarUploader
           organization={organization}
@@ -101,6 +101,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
           sx={t => ({ marginTop: t.space.$1 })}
         />
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });

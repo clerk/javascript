@@ -5,7 +5,7 @@ import { isDefaultImage } from '../../../utils';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, InformationBox, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, InformationBox, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 
@@ -85,7 +85,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   };
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.profilePage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.profilePage.title')}>
       {nameEditDisabled && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
 
       <Form.Root onSubmit={onSubmit}>
@@ -118,6 +118,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
           onReset={onReset}
         />
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });
