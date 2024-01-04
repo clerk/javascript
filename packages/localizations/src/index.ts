@@ -23,3 +23,4 @@ export { elGR } from './el-GR';
 export { skSK } from './sk-SK';
 export { ukUA } from './uk-UA';
 export { roRO } from './ro-RO';
+export { esMX } from './es-MX';

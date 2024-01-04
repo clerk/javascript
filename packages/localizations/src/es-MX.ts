@@ -194,8 +194,6 @@ export const esMX: LocalizationResource = {
     start: {
       headerTitle__account: 'Cuenta',
       headerTitle__security: 'Seguridad',
-      headerSubtitle__account: 'Administra la información de tu cuenta',
-      headerSubtitle__security: 'Administra tus preferencias de seguridad',
       profileSection: {
         title: 'Perfil',
       },
@@ -484,9 +482,7 @@ export const esMX: LocalizationResource = {
   organizationProfile: {
     start: {
       headerTitle__members: 'Miembros',
-      headerSubtitle__members: 'Ver y administrar miembros de la organización',
       headerTitle__settings: 'Configuración',
-      headerSubtitle__settings: 'Administrar la configuración de la organización'
     },
     profilePage: {
       title: 'Perfil de la organización',
@@ -507,12 +503,11 @@ export const esMX: LocalizationResource = {
           messageLine1: '¿Estas seguro que quieres eliminar esta organización?',
           messageLine2: 'Esta acción es permanente e irreversible.',
           actionDescription: 'Escribe "{{organizationName}}" a continuación para continuar.',
-          successMessage: 'Haz eliminado la organización.'
-        }
+          successMessage: 'Haz eliminado la organización.',
+        },
       },
     },
     invitePage: {
-
       title: 'Invitar miembros',
       subtitle: 'Invitar nuevos miembros a esta organización',
       successMessage: 'Invitaciones enviadas con éxito',
@@ -523,7 +518,7 @@ export const esMX: LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: 'No hay miembros para mostrar',
       action__invite: 'Invitar',
-      start: { 
+      start: {
         headerTitle__members: 'Miembros',
         headerTitle__invitations: 'Invitaciones',
         headerTitle__requests: 'Solicitudes',
@@ -540,11 +535,11 @@ export const esMX: LocalizationResource = {
       },
       invitationsTab: {
         manualInvitations: {
-        headerTitle: 'Invitación individual',
-        headerSubtitle: 'Invita manualmente a miembros y gestiona invitaciones existentes.'
+          headerTitle: 'Invitación individual',
+          headerSubtitle: 'Invita manualmente a miembros y gestiona invitaciones existentes.',
         },
-        table__emptyRow: 'No hay invitaciones para mostrar'
-      }
+        table__emptyRow: 'No hay invitaciones para mostrar',
+      },
     },
   },
   createOrganization: {
@@ -568,9 +563,10 @@ export const esMX: LocalizationResource = {
   unstable__errors: {
     form_identifier_not_found: 'No encontrado, puede estar mal escrito.',
     form_identifier_exists__email_address: 'Ya existe esta dirección de correo electronico',
-    
-    form_password_pwned: 'Esta contraseña se encontró como parte de una infracción y no se puede usar; pruebe con otra contraseña.',
-    
+
+    form_password_pwned:
+      'Esta contraseña se encontró como parte de una infracción y no se puede usar; pruebe con otra contraseña.',
+
     form_username_invalid_length: 'Longitud de usuario muy corta.',
     form_username_invalid_character: 'Caracter invalido.',
 
@@ -583,7 +579,7 @@ export const esMX: LocalizationResource = {
       requireNumbers: 'almenos un numero',
       requireLowercase: 'al menos una letra minuscula',
       requireUppercase: 'al menos una letra mayuscula',
-      requireSpecialCharacter: 'al menos un caracter especial'
+      requireSpecialCharacter: 'al menos un caracter especial',
     },
     zxcvbn: {
       notEnough: 'Tu contraseña no es lo suficientemente segura.',
