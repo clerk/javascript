@@ -2,4 +2,4 @@
 '@clerk/shared': patch
 ---
 
-Bug fix: Invitations from useOrganization depends on options of membership.}
+Fixes a bug where Invitations from `useOrganization` incorrectly depended on options for memberships.
