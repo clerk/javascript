@@ -179,7 +179,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       center
       sx={[
         theme => ({
-          width: '100%',
+          // width: '100%',
           gap: theme.space.$2,
           padding: `${theme.space.$0x5} ${theme.space.$4}`,
         }),

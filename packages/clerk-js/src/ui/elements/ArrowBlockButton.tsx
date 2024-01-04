@@ -24,7 +24,7 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   textLocalizationKey?: LocalizationKey | string;
 };
 
-export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
+export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockButtonProps>((props, ref) => {
   const {
     rightIcon = ArrowRightIcon,
     rightIconSx,
@@ -54,6 +54,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
       block
       isLoading={isLoading}
       {...rest}
+      ref={ref}
       sx={theme => [
         {
           gap: theme.space.$4,
@@ -140,4 +141,4 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
       />
     </SimpleButton>
   );
-};
+});

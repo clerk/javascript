@@ -11,7 +11,7 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { ConnectedAccountsForm } from './ConnectedAccountsForm';
+import { ConnectedAccountsMenu } from './ConnectedAccountsMenu';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 
 type RemoveConnectedAccountScreenProps = { accountId: string };
@@ -26,17 +26,16 @@ const RemoveConnectedAccountScreen = (props: RemoveConnectedAccountScreenProps) 
   );
 };
 
-type ConnectedAccountsScreenProps = { accountId?: string };
-const ConnectedAccountsScreen = (props: ConnectedAccountsScreenProps) => {
-  const { close } = useActionContext();
-  return (
-    <ConnectedAccountsForm
-      onSuccess={close}
-      onReset={close}
-      {...props}
-    />
-  );
-};
+// type ConnectedAccountsScreenProps = { accountId?: string };
+// const ConnectedAccountsMenu = (props: ConnectedAccountsScreenProps) => {
+//   return (
+//     <ConnectedAccountsForm
+//       onSuccess={close}
+//       onReset={close}
+//       {...props}
+//     />
+//   );
+// };
 
 export const ConnectedAccountsSection = () => {
   const { user } = useUser();
@@ -113,19 +112,8 @@ export const ConnectedAccountsSection = () => {
             );
           })}
 
-          <Action.Trigger value='add'>
-            <ProfileSection.Button
-              id='connectedAccounts'
-              localizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
-            />
-          </Action.Trigger>
+          <ConnectedAccountsMenu />
         </ProfileSection.ItemList>
-
-        <Action.Open value='add'>
-          <Action.Card>
-            <ConnectedAccountsScreen />
-          </Action.Card>
-        </Action.Open>
       </Action.Root>
     </ProfileSection.Root>
   );

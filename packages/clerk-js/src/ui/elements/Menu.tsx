@@ -1,5 +1,6 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { MenuId } from '@clerk/types';
+import type { Placement } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
 
@@ -19,12 +20,15 @@ type MenuState = {
 
 const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState');
 
-type MenuProps = PropsWithChildren<Record<never, never>> & { elementId?: MenuId };
+type MenuProps = PropsWithChildren<Record<never, never>> & {
+  elementId?: MenuId;
+  popoverPlacement?: Placement;
+};
 
 export const Menu = withFloatingTree((props: MenuProps) => {
-  const { elementId } = props;
+  const { elementId, popoverPlacement = 'bottom-end' } = props;
   const popoverCtx = usePopover({
-    placement: 'right-start',
+    placement: popoverPlacement,
     offset: 8,
     bubbles: false,
   });
@@ -107,6 +111,7 @@ export const MenuList = (props: MenuListProps) => {
       nodeId={nodeId}
       isOpen={isOpen}
       order={['floating', 'content']}
+      portal={false}
     >
       <Col
         elementDescriptor={descriptors.menuList}
