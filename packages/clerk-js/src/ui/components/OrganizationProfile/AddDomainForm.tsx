@@ -5,7 +5,7 @@ import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { VerifyDomainForm } from './VerifyDomainForm';
 
@@ -59,7 +59,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
+      <FormContainer
         headerTitle={title}
         headerSubtitle={subtitle}
       >
@@ -76,7 +76,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
             onReset={onReset}
           />
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
       <VerifyDomainForm
         domainId={domainId}

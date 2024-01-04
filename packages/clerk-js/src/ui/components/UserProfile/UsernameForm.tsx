@@ -3,7 +3,7 @@ import { useUser } from '@clerk/shared/react';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 
 type UsernameFormProps = FormProps;
@@ -39,7 +39,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
   };
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.usernamePage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.usernamePage.title')}>
       <Form.Root onSubmit={updatePassword}>
         <Form.ControlRow elementId={usernameField.id}>
           <Form.PlainInput
@@ -53,6 +53,6 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
           onReset={onReset}
         />
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });

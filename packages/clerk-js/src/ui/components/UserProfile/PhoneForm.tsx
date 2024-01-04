@@ -6,7 +6,7 @@ import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { VerifyWithCode } from './VerifyWithCode';
 
@@ -69,7 +69,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   };
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer headerTitle={title}>
       <Form.Root onSubmit={addPhone}>
         <Form.ControlRow elementId={phoneField.id}>
           <Form.PhoneInput
@@ -87,7 +87,7 @@ export const AddPhone = (props: AddPhoneProps) => {
           onReset={onReset}
         />
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 };
 
@@ -95,7 +95,7 @@ export const VerifyPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, resourceRef, onReset } = props;
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer headerTitle={title}>
       <VerifyWithCode
         nextStep={onSuccess}
         identification={resourceRef.current}
@@ -103,6 +103,6 @@ export const VerifyPhone = (props: AddPhoneProps) => {
         prepareVerification={resourceRef.current?.prepareVerification}
         onReset={onReset}
       />
-    </FormContent>
+    </FormContainer>
   );
 };

@@ -9,7 +9,7 @@ import {
   Form,
   FormButtonContainer,
   FormButtons,
-  FormContent,
+  FormContainer,
   useCardState,
   useFieldOTP,
   withCardStateProvider,
@@ -124,7 +124,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
+      <FormContainer
         headerTitle={title}
         headerSubtitle={subtitle}
       >
@@ -141,9 +141,9 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
             onReset={onReset}
           />
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
-      <FormContent
+      <FormContainer
         headerTitle={title}
         headerSubtitle={subtitleVerificationCodeScreen}
       >
@@ -170,7 +170,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
             localizationKey={localizationKeys('userProfile.formButtonReset')}
           />
         </FormButtonContainer>
-      </FormContent>
+      </FormContainer>
 
       <VerifiedDomainForm
         domainId={id}

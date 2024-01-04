@@ -8,7 +8,7 @@ import type { FormProps } from '../../elements';
 import {
   ArrowBlockButton,
   FormButtonContainer,
-  FormContent,
+  FormContainer,
   useCardState,
   withCardStateProvider,
 } from '../../elements';
@@ -73,7 +73,7 @@ const AddConnectedAccount = (props: AddConnectedAccountProps) => {
   };
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.connectedAccountPage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.connectedAccountPage.title')}>
       <Text
         localizationKey={
           unconnectedStrategies.length
@@ -111,6 +111,6 @@ const AddConnectedAccount = (props: AddConnectedAccountProps) => {
           onClick={onReset}
         />
       </FormButtonContainer>
-    </FormContent>
+    </FormContainer>
   );
 };
