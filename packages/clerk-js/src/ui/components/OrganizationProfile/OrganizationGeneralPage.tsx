@@ -59,7 +59,7 @@ export const OrganizationGeneralPage = () => {
     >
       <Col
         elementDescriptor={descriptors.profilePage}
-        elementId={descriptors.profilePage.setId('organizationSettings')}
+        elementId={descriptors.profilePage.setId('organizationGeneral')}
       >
         <Header.Root>
           <Header.Title
