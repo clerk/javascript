@@ -22,7 +22,7 @@ type MenuState = {
 export const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState');
 
 type MenuProps = PropsWithChildren<Record<never, never>> & {
-  elementId?: MenuId;
+  elementId?: any;
   popoverPlacement?: Placement;
 };
 

@@ -1,4 +1,4 @@
-import type { MenuId, ProfileSectionId } from '@clerk/types';
+import type { ProfileSectionId } from '@clerk/types';
 import { isValidElement } from 'react';
 
 import type { Button, LocalizationKey } from '../customizables';
@@ -181,7 +181,7 @@ type ProfileSectionActionMenuProps = {
   destructive?: boolean;
   triggerLocalizationKey?: LocalizationKey;
   triggerSx?: ThemableCssProp;
-  elementId?: MenuId;
+  elementId?: ProfileSectionId;
 };
 
 export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) => {
