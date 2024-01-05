@@ -1,7 +1,7 @@
 import type { OAuthStrategy, SignInStrategy, Web3Strategy } from '@clerk/types';
 import { createActorContext } from '@xstate/react';
 import type React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import type { SnapshotFrom } from 'xstate';
 
 import {
@@ -9,7 +9,9 @@ import {
   isAuthenticatableOauthStrategy,
   isWeb3Strategy,
 } from '../../utils/third-party-strategies';
+import { ClerkElementsRuntimeError } from '../errors/error';
 import { SignInMachine } from './sign-in.machine';
+import type { SignInStrategyName } from './sign-in.types';
 import { matchStrategy } from './utils/strategies';
 
 export type SnapshotState = SnapshotFrom<typeof SignInMachine>;
@@ -21,6 +23,20 @@ export const {
   useActorRef: useSignInFlow,
   useSelector: useSignInFlowSelector,
 } = createActorContext(SignInMachine);
+
+// ================= CONTEXTS ================= //
+
+export type StrategiesContextValue = {
+  current: SignInStrategy | undefined;
+  isActive: (name: string) => boolean;
+  preferred: SignInStrategy | undefined;
+};
+
+export const StrategiesContext = createContext<StrategiesContextValue>({
+  current: undefined,
+  isActive: _name => false,
+  preferred: undefined,
+});
 
 // ================= SELECTORS ================= //
 
@@ -35,6 +51,24 @@ const clerkEnvironmentSelector = (state: SnapshotState) => state.context.environ
 const clerkCurrentStrategy = (state: SnapshotState) => state.context.currentFactor?.strategy;
 
 // ================= HOOKS ================= //
+
+export function useStrategy(name: SignInStrategyName) {
+  const ctx = useContext(StrategiesContext);
+
+  if (!ctx) {
+    throw new ClerkElementsRuntimeError('useSignInStrategy must be used within a <SignInStrategies> component.');
+  }
+
+  const { current, preferred, isActive } = ctx;
+
+  return {
+    current,
+    preferred,
+    get shouldRender() {
+      return isActive(name);
+    },
+  };
+}
 
 export const useSignInState = () => {
   return useSignInFlowSelector(

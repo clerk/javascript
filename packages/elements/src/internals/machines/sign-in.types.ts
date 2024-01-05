@@ -9,6 +9,7 @@ import type {
   ResetPasswordEmailCodeStrategy,
   ResetPasswordPhoneCodeStrategy,
   SamlStrategy,
+  SignInStrategy,
   TicketStrategy,
   Web3Strategy,
 } from '@clerk/types';
@@ -16,6 +17,8 @@ import type {
 export type WithClerk<T> = { clerk: LoadedClerkWithEnv } & T;
 export type WithClient<T> = { client: LoadedClerkWithEnv['client'] } & T;
 export type WithParams<T> = { params: T };
+
+export type SignInStrategyName = SignInStrategy | 'oauth' | 'web3';
 
 // ====================== CLERKJS MODIFICATIONS ======================
 

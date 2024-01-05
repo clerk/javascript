@@ -21,6 +21,7 @@ import type { CSSProperties } from 'react';
 import { forwardRef } from 'react';
 
 import { Debug } from '@/components/debug';
+import { H1, H2, H3, HR, P } from '@/components/design';
 
 const BUTTON_BGS: Record<string, string> = {
   github: 'rgba(23 23 23)',
@@ -52,7 +53,7 @@ export default function SignInPage() {
       <div className='m-auto w-max text-sm'>
         <SignInStart>
           <div className='flex flex-col items-center justify-center gap-12'>
-            <h1 className='text-xl mb-6 font-mono'>START</h1>
+            <H1>START</H1>
             <div className='flex flex-col gap-3'>
               <SocialProviders
                 render={provider => {
@@ -84,10 +85,9 @@ export default function SignInPage() {
               />
             </div>
 
-            <hr className='w-full border-foreground opacity-10' />
+            <HR />
 
             <div className='flex gap-6 flex-col'>
-              {/*
               <Field
                 name='identifier'
                 className='flex flex-col gap-4'
@@ -111,9 +111,11 @@ export default function SignInPage() {
               </Field>
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In
+                Sign In with Email/Password
               </Submit>
-              */}
+
+              <HR />
+
               <Field
                 name='identifier'
                 className='flex flex-col gap-4'
@@ -148,12 +150,12 @@ export default function SignInPage() {
 
         <SignInStrategies>
           <div className='flex gap-6 flex-col'>
-            <h1 className='text-xl mb-6 font-mono'>STRATEGIES (FIRST/SECOND FACTOR)</h1>
+            <H1>STRATEGIES (FIRST/SECOND FACTOR)</H1>
 
-            <h2 className='text-l mb-6 font-mono'>
+            <H2>
               <SignInFactorOne>First Factor</SignInFactorOne>
               <SignInFactorTwo>Second Factor</SignInFactorTwo>
-            </h2>
+            </H2>
 
             <SignInStrategy name='password'>
               <Field
@@ -210,22 +212,20 @@ export default function SignInPage() {
                 Sign In
               </Submit>
             </SignInStrategy>
-          </div>
-        </SignInStrategies>
 
-        {/*
-          <SignInFactorOne>
-            <div className='flex flex-col items-center justify-center gap-12'>
-              <h1 className='text-xl mb-6 font-mono'>FIRST FACTOR</h1>
+            <SignInStrategy name='reset_password_email_code'>
+              <H3>Verify your email</H3>
+
+              <P>Please check your email for a verification code...</P>
 
               <Field
-                name='password'
+                name='code'
                 className='flex flex-col gap-4'
               >
                 <div className='flex gap-4 justify-between items-center'>
-                  <Label>Password</Label>
+                  <Label>Phone Code</Label>
                   <Input
-                    type='password'
+                    type='code'
                     className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
                   />
                 </div>
@@ -241,11 +241,11 @@ export default function SignInPage() {
               </Field>
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In
+                Verify
               </Submit>
-            </div>
-          </SignInFactorOne>
-        */}
+            </SignInStrategy>
+          </div>
+        </SignInStrategies>
 
         <SignInSSOCallback />
       </div>

@@ -111,7 +111,6 @@ export const SignInMachine = setup({
     isSignInComplete: ({ context }) => context?.resource?.status === 'complete',
     isLoggedIn: ({ context }) => Boolean(context.clerk.user),
     isSingleSessionMode: ({ context }) => Boolean(context.clerk.__unstable__environment?.authConfig.singleSessionMode),
-    // isInitialRoute: ({ context }) => context.router.pathname() === '/sign-in',
     needsIdentifier: ({ context }) =>
       context.clerk.client.signIn.status === 'needs_identifier' || context.resource?.status === 'needs_identifier',
     needsFirstFactor: ({ context }) =>
@@ -191,10 +190,10 @@ export const SignInMachine = setup({
               guard: not('hasSignInResource'),
               target: '#SignIn.Start',
             },
-            {
-              guard: or(['needsNewPassword', 'needsIdentifier']),
-              actions: 'debug',
-            },
+            // {
+            //   guard: or(['needsNewPassword', 'needsIdentifier']),
+            //   actions: 'debug',
+            // },
             {
               description: 'Default to the initial sign-in flow state',
               target: '#SignIn.Start',
