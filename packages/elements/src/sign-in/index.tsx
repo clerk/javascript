@@ -1,12 +1,14 @@
 'use client';
 
 import { useClerk } from '@clerk/clerk-react';
+import type { createBrowserInspector } from '@statelyai/inspect';
 
 import { Form } from '../common/form';
 import { FormStoreProvider, useFormStore } from '../internals/machines/form.context';
 import {
   SignInFlowProvider as SignInFlowContextProvider,
   useSignInFlow,
+  useSignInState,
   useSSOCallbackHandler,
 } from '../internals/machines/sign-in.context';
 import type { LoadedClerkWithEnv } from '../internals/machines/sign-in.types';
@@ -14,6 +16,20 @@ import { useNextRouter } from '../internals/router';
 import { Route, Router, useClerkRouter } from '../internals/router-react';
 
 type WithChildren<T = unknown> = T & { children?: React.ReactNode };
+
+const DEBUG = process.env.NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG === 'true';
+let inspector: ReturnType<typeof createBrowserInspector>;
+
+if (DEBUG && typeof window !== 'undefined') {
+  const getInspector = async () => {
+    const { createBrowserInspector } = (await import('@statelyai/inspect')).default;
+    return createBrowserInspector();
+  };
+
+  getInspector()
+    .then(mod => (inspector = mod))
+    .catch(console.error);
+}
 
 function SignInFlowProvider({ children }: WithChildren) {
   const clerk = useClerk() as unknown as LoadedClerkWithEnv;
@@ -24,6 +40,10 @@ function SignInFlowProvider({ children }: WithChildren) {
     throw new Error('clerk: Unable to locate ClerkRouter, make sure this is rendered within `<Router>`.');
   }
 
+  if (DEBUG && !inspector) {
+    return null;
+  }
+
   return (
     <SignInFlowContextProvider
       options={{
@@ -32,6 +52,7 @@ function SignInFlowProvider({ children }: WithChildren) {
           router,
           form,
         },
+        inspect: inspector?.inspect,
       }}
     >
       {children}
@@ -39,7 +60,7 @@ function SignInFlowProvider({ children }: WithChildren) {
   );
 }
 
-export function SignIn({ children }: { children: React.ReactNode }): JSX.Element | null {
+export function SignIn({ children }: WithChildren): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   // TODO: Do something about `__unstable__environment` typing
   const router = useNextRouter();
@@ -57,31 +78,20 @@ export function SignIn({ children }: { children: React.ReactNode }): JSX.Element
 }
 
 export function SignInStart({ children }: WithChildren) {
+  const state = useSignInState();
   const actorRef = useSignInFlow();
 
-  return (
-    <Route index>
-      <Form flowActor={actorRef}>{children}</Form>
-    </Route>
-  );
+  return state.matches('Start') ? <Form flowActor={actorRef}>{children}</Form> : null;
 }
 
 export function SignInFactorOne({ children }: WithChildren) {
-  return (
-    <Route path='factor-one'>
-      <h1>Factor One</h1>
-      {children}
-    </Route>
-  );
+  const state = useSignInState();
+  return state.matches('FirstFactor') ? children : null;
 }
 
 export function SignInFactorTwo({ children }: WithChildren) {
-  return (
-    <Route path='factor-two'>
-      <h1>Factor Two</h1>
-      {children}
-    </Route>
-  );
+  const state = useSignInState();
+  return state.matches('SecondFactor') ? children : null;
 }
 
 export function SignInSSOCallbackInner() {

@@ -106,6 +106,18 @@ export default function SignInPage() {
                 />
               </Field>
 
+              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+                Sign In
+              </Submit>
+            </Form>
+          </div>
+        </SignInStart>
+
+        <SignInFactorOne>
+          <div className='flex flex-col items-center justify-center gap-12'>
+            <h1 className='text-xl mb-6 font-mono'>FIRST FACTOR</h1>
+
+            <Form className='flex gap-6 flex-col'>
               <Field
                 name='password'
                 className='flex flex-col gap-4'
@@ -133,10 +145,6 @@ export default function SignInPage() {
               Sign In
             </Submit>
           </div>
-        </SignInStart>
-
-        <SignInFactorOne>
-          <p>Factor one child</p>
         </SignInFactorOne>
 
         <SignInFactorTwo>

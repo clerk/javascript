@@ -30,6 +30,13 @@ const clerkEnvironmentSelector = (state: SnapshotState) => state.context.environ
 
 // ================= HOOKS ================= //
 
+export const useSignInState = () => {
+  return useSignInFlowSelector(
+    state => state,
+    // (prev, next) => prev.value === next.value && prev.tags === next.tags,
+  );
+};
+
 /**
  * Provides the onClick handler for oauth
  */
