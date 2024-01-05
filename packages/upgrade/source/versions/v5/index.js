@@ -144,6 +144,19 @@ export const matchers = {
 		'organizationcontext',
 		'useorganizationlist-organizationlist', // shared outside this pkg?
 	]),
+	backend: load('backend', [
+		'createclerkclient-frontendapi',
+		'clerk-import',
+		'externalaccount-picture',
+		'externalaccountjson-avatarurl',
+		'organization-logourl',
+		'organizationjson-logourl',
+		'user-profileimageurl',
+		'userjson-profileimageurl',
+		'organizationmembershippublicuserdata-profileimageurl',
+		'organizationmembershippublicuserdatajson-profileimageurl',
+		'clockskewinseconds',
+	]),
 };
 
 function dedupeMerge(arr1, arr2) {

@@ -12,6 +12,6 @@ import { authMiddleware } from '@clerk/nextjs';
 // before
 authMiddleware({ apiKey: '...' });
 
-// before
+// after
 authMiddleware({ secretKey: '...' });
 ```
