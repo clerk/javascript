@@ -15,7 +15,8 @@ import {
 } from '@clerk/elements';
 import clsx from 'clsx';
 import Image from 'next/image';
-import { type CSSProperties, forwardRef } from 'react';
+import type { CSSProperties } from 'react';
+import { forwardRef } from 'react';
 
 import { Debug } from '@/components/debug';
 
@@ -106,37 +107,43 @@ export default function SignInPage() {
                 />
               </Field>
 
-              <Field
-                name='password'
-                className='flex flex-col gap-4'
-              >
-                <div className='flex gap-4 justify-between items-center'>
-                  <Label>Password</Label>
-                  <Input
-                    type='password'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
-                  />
-                </div>
-
-                <Errors
-                  render={({ code, message }) => (
-                    <CustomError
-                      code={code}
-                      message={message}
-                    />
-                  )}
-                />
-              </Field>
+              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+                Sign In
+              </Submit>
             </div>
+          </div>
+        </SignInStart>
+
+        <SignInFactorOne>
+          <div className='flex flex-col items-center justify-center gap-12'>
+            <h1 className='text-xl mb-6 font-mono'>FIRST FACTOR</h1>
+
+            <Field
+              name='password'
+              className='flex flex-col gap-4'
+            >
+              <div className='flex gap-4 justify-between items-center'>
+                <Label>Password</Label>
+                <Input
+                  type='password'
+                  className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                />
+              </div>
+
+              <Errors
+                render={({ code, message }) => (
+                  <CustomError
+                    code={code}
+                    message={message}
+                  />
+                )}
+              />
+            </Field>
 
             <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
               Sign In
             </Submit>
           </div>
-        </SignInStart>
-
-        <SignInFactorOne>
-          <p>Factor one child</p>
         </SignInFactorOne>
 
         <SignInFactorTwo>
