@@ -9,8 +9,8 @@ import type {
   SignInResource,
   Web3Strategy,
 } from '@clerk/types';
-import type { ActorRefFrom, MachineContext } from 'xstate';
-import { and, assertEvent, assign, enqueueActions, log, not, raise, setup } from 'xstate';
+import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
+import { and, assertEvent, assign, log, not, sendTo, setup } from 'xstate';
 
 import type { ClerkRouter } from '../router';
 import type { FormMachine } from './form.machine';
@@ -24,33 +24,34 @@ import {
   prepareFirstFactor,
 } from './sign-in.actors';
 import type { LoadedClerkWithEnv } from './sign-in.types';
+import { assertActorEventError } from './utils/assert';
 
 export interface SignInMachineContext extends MachineContext {
   clerk: LoadedClerkWithEnv;
   currentFactor: SignInFactor | null;
   environment?: EnvironmentResource;
   error?: Error | ClerkAPIResponseError;
+  formRef: ActorRefFrom<typeof FormMachine>;
   loaded: boolean;
   mode: 'browser' | 'server';
   resource: SignInResource | null;
   router: ClerkRouter;
-  form: ActorRefFrom<typeof FormMachine>;
 }
 
 export interface SignInMachineInput {
   clerk: LoadedClerkWithEnv;
-  router: ClerkRouter;
   form: ActorRefFrom<typeof FormMachine>;
+  router: ClerkRouter;
 }
 
 export type SignInMachineEvents =
+  | ErrorActorEvent
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
   | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
   | { type: 'NEXT' }
   | { type: 'OAUTH.CALLBACK' }
   | { type: 'RETRY' }
-  | { type: 'SUBMIT' }
-  | { type: 'NAVIGATE'; path: string };
+  | { type: 'SUBMIT' };
 
 export type SignInTags = 'start' | 'first-factor' | 'second-factor' | 'complete';
 export interface SignInMachineTypes {
@@ -79,11 +80,6 @@ export const SignInMachine = setup({
   },
   actions: {
     debug: ({ context, event }, params?: Record<string, unknown>) => console.dir({ context, event, params }),
-    ensureSynchronizedRouterPath({ context }, { requiredPath }: { requiredPath: string }) {
-      if (context.router.pathname() !== requiredPath) {
-        context.router.replace(requiredPath);
-      }
-    },
     navigateTo({ context }, { path }: { path: string }) {
       context.router.replace(path);
     },
@@ -93,6 +89,16 @@ export const SignInMachine = setup({
       };
       void context.clerk.setActive({ session: context.resource?.createdSessionId, beforeEmit });
     },
+    setFormErrors: sendTo(
+      ({ context }) => context.formRef,
+      ({ event }) => {
+        assertActorEventError(event);
+        return {
+          type: 'ERRORS.SET',
+          error: event.error,
+        };
+      },
+    ),
   },
   guards: {
     hasCurrentFactor: ({ context }) => Boolean(context.currentFactor),
@@ -131,7 +137,7 @@ export const SignInMachine = setup({
     clerk: input.clerk,
     currentFactor: null,
     environment: input.clerk.__unstable__environment,
-    form: input.form,
+    formRef: input.form,
     loaded: input.clerk.loaded,
     mode: input.clerk.mode,
     resource: null,
@@ -188,23 +194,6 @@ export const SignInMachine = setup({
               target: '#SignIn.Complete',
             },
             {
-              guard: 'needsFirstFactor',
-              target: '#SignIn.FirstFactor',
-            },
-            {
-              guard: 'needsSecondFactor',
-              target: '#SignIn.SecondFactor',
-            },
-            {
-              guard: 'needsNewPassword',
-              actions: [log('needsNewPassword'), 'debug'],
-            },
-            {
-              guard: 'needsIdentifier',
-              actions: [log('needsIdentifier'), 'debug'],
-            },
-            {
-              actions: log('Unknown state'),
               target: '#SignIn.Start',
             },
           ],
@@ -232,12 +221,6 @@ export const SignInMachine = setup({
     Start: {
       description: 'The intial state of the sign-in flow.',
       initial: 'AwaitingInput',
-      entry: {
-        type: 'ensureSynchronizedRouterPath',
-        params: {
-          requiredPath: '/sign-in',
-        },
-      },
       on: {
         'AUTHENTICATE.OAUTH': '#SignIn.InitiatingOAuthAuthentication',
       },
@@ -245,7 +228,10 @@ export const SignInMachine = setup({
         AwaitingInput: {
           description: 'Waiting for user input',
           on: {
-            SUBMIT: 'Attempting',
+            SUBMIT: {
+              target: 'Attempting',
+              reenter: true,
+            },
           },
         },
         Attempting: {
@@ -254,7 +240,7 @@ export const SignInMachine = setup({
             src: 'createSignIn',
             input: ({ context }) => ({
               client: context.clerk.client,
-              fields: context.form.getSnapshot().context.fields,
+              fields: context.formRef.getSnapshot().context.fields,
             }),
             onDone: {
               actions: [
@@ -265,36 +251,7 @@ export const SignInMachine = setup({
               target: 'Success',
             },
             onError: {
-              actions: enqueueActions(({ enqueue, event }) => {
-                if (isClerkAPIResponseError(event.error)) {
-                  // TODO: Move to Event/Action for Re-use
-                  const fields: Record<string, ClerkElementsFieldError[]> = {};
-
-                  for (const error of event.error.errors) {
-                    const name = error.meta?.paramName;
-
-                    if (!name) {
-                      continue;
-                    } else if (!fields[name]) {
-                      fields[name] = [];
-                    }
-
-                    fields[name]?.push(ClerkElementsFieldError.fromAPIError(error));
-                  }
-
-                  for (const field in fields) {
-                    enqueue(
-                      raise({
-                        type: 'FIELD.ERRORS.SET',
-                        field: {
-                          type: field,
-                          errors: fields[field],
-                        },
-                      }),
-                    );
-                  }
-                }
-              }),
+              actions: 'setFormErrors',
               target: 'AwaitingInput',
             },
           },
@@ -329,14 +286,6 @@ export const SignInMachine = setup({
     },
     FirstFactor: {
       initial: 'DeterminingState',
-      always: {
-        actions: {
-          type: 'ensureSynchronizedRouterPath',
-          params: {
-            requiredPath: '/sign-in/factor-one',
-          },
-        },
-      },
       states: {
         DeterminingState: {
           always: [
@@ -371,8 +320,8 @@ export const SignInMachine = setup({
               reenter: true,
             },
             onError: {
+              actions: 'setFormErrors',
               target: 'Failure',
-              actions: assign({ error: ({ event }) => event.error as Error }),
             },
           },
         },
@@ -400,15 +349,18 @@ export const SignInMachine = setup({
               ],
             },
             onError: {
+              actions: 'setFormErrors',
               target: 'Failure',
-              actions: assign({ error: ({ event }) => event.error as Error }),
             },
           },
         },
         AwaitingInput: {
           description: 'Waiting for user input',
           on: {
-            SUBMIT: 'Attempting',
+            SUBMIT: {
+              target: 'Attempting',
+              reenter: true,
+            },
           },
         },
         Attempting: {
@@ -418,8 +370,8 @@ export const SignInMachine = setup({
             input: ({ context }) => ({
               client: context.clerk.client,
               params: {
-                fields: context.fields,
                 currentFactor: context.currentFactor as SignInFirstFactor,
+                fields: context.formRef.getSnapshot().context.fields,
               },
             }),
             onDone: {
@@ -428,13 +380,9 @@ export const SignInMachine = setup({
               }),
               target: 'Success',
             },
+
             onError: {
-              actions: enqueueActions(({ context, enqueue, event }) => {
-                enqueue.sendTo(context.form, {
-                  type: 'ERRORS.SET',
-                  error: event.error,
-                });
-              }),
+              actions: 'setFormErrors',
               target: 'AwaitingInput',
             },
           },
@@ -481,7 +429,7 @@ export const SignInMachine = setup({
           actions: assign({ resource: ({ event }) => event.output as SignInResource }),
         },
         onError: {
-          actions: assign({ error: ({ event }) => event.error as Error }),
+          actions: 'setFormErrors',
         },
       },
       always: [
@@ -508,7 +456,7 @@ export const SignInMachine = setup({
           };
         },
         onError: {
-          actions: assign({ error: ({ event }) => event.error as Error }),
+          actions: 'setFormErrors',
         },
       },
     },

@@ -86,12 +86,16 @@ export function SignInStart({ children }: WithChildren) {
 
 export function SignInFactorOne({ children }: WithChildren) {
   const state = useSignInState();
-  return state.matches('FirstFactor') ? children : null;
+  const actorRef = useSignInFlow();
+
+  return state.matches('FirstFactor') ? <Form flowActor={actorRef}>{children}</Form> : null;
 }
 
 export function SignInFactorTwo({ children }: WithChildren) {
   const state = useSignInState();
-  return state.matches('SecondFactor') ? children : null;
+  const actorRef = useSignInFlow();
+
+  return state.matches('SecondFactor') ? <Form flowActor={actorRef}>{children}</Form> : null;
 }
 
 export function SignInSSOCallbackInner() {

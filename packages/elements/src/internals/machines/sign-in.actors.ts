@@ -17,7 +17,7 @@ import { fromPromise } from 'xstate';
 import { ClerkElementsRuntimeError } from '../errors/error';
 import type { ClerkRouter } from '../router';
 import type { SignInMachineContext } from './sign-in.machine';
-import type { FieldDetails, WithClerk, WithClient, WithParams } from './sign-in.types';
+import type { WithClerk, WithClient, WithParams } from './sign-in.types';
 import { determineStartingSignInFactor } from './sign-in.utils';
 import { assertIsDefined } from './utils/assert';
 
@@ -97,7 +97,7 @@ export const prepareFirstFactor = fromPromise<SignInResource, PrepareFirstFactor
 // ================= attemptFirstFactor ================= //
 
 export type AttemptFirstFactorInput = WithClient<
-  WithParams<{ fields: Map<string, FieldDetails>; currentFactor: SignInFirstFactor | null }>
+  WithParams<{ fields: SignInMachineContext['fields']; currentFactor: SignInFirstFactor | null }>
 >;
 
 export const attemptFirstFactor = fromPromise<SignInResource, AttemptFirstFactorInput>(
