@@ -163,7 +163,6 @@ export type ElementsConfig = {
   socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
-  socialButtonsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
 
   enterpriseButtonsProviderIcon: WithOptions<SamlIdpSlug, LoadingState>;
@@ -173,10 +172,6 @@ export type ElementsConfig = {
   alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
 
-  otpCodeBox: WithOptions;
-  otpCodeHeader: WithOptions;
-  otpCodeHeaderTitle: WithOptions;
-  otpCodeHeaderSubtitle: WithOptions;
   otpCodeField: WithOptions;
   otpCodeFieldInputs: WithOptions;
   otpCodeFieldInput: WithOptions;
@@ -214,9 +209,7 @@ export type ElementsConfig = {
   formFieldWarningText: WithOptions<FieldId, ControlState>;
   formFieldSuccessText: WithOptions<FieldId, ControlState>;
   formFieldInfoText: WithOptions<FieldId, ControlState>;
-  formFieldDirectionsText: WithOptions<FieldId, ControlState>;
   formFieldHintText: WithOptions<FieldId, ControlState>;
-  formButtonRow: WithOptions<never, ControlState | LoadingState>;
   formButtonPrimary: WithOptions<never, ControlState | LoadingState>;
   formButtonReset: WithOptions<never, ControlState | LoadingState>;
   formFieldInputGroup: WithOptions;
@@ -243,13 +236,11 @@ export type ElementsConfig = {
   userButtonPopoverRootBox: WithOptions;
   userButtonPopoverCard: WithOptions;
   userButtonPopoverMain: WithOptions;
-  userButtonPopoverUserPreview: WithOptions;
   userButtonPopoverActions: WithOptions<'singleSession' | 'multiSession'>;
   userButtonPopoverActionButton: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverFooter: WithOptions;
-  userButtonPopoverFooterPages: WithOptions;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
 
   organizationSwitcherTrigger: WithOptions<never, 'open'>;
@@ -264,13 +255,9 @@ export type ElementsConfig = {
   >;
   organizationSwitcherPreviewButton: WithOptions;
   organizationSwitcherInvitationAcceptButton: WithOptions;
-  organizationSwitcherInvitationRejectButton: WithOptions;
   organizationSwitcherPopoverActionButtonIconBox: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization'>;
-  organizationSwitcherPopoverActionButtonText: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverFooter: WithOptions;
-  organizationSwitcherPopoverFooterPages: WithOptions;
-  organizationSwitcherPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
 
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;
@@ -298,11 +285,8 @@ export type ElementsConfig = {
   organizationPreviewSecondaryIdentifier: WithOptions<OrganizationPreviewId>;
 
   membersPageInviteButton: WithOptions;
-  organizationProfilePage: WithOptions;
 
   identityPreview: WithOptions;
-  identityPreviewAvatarBox: WithOptions;
-  identityPreviewAvatarImage: WithOptions;
   identityPreviewText: WithOptions;
   identityPreviewEditButton: WithOptions;
   identityPreviewEditButtonIcon: WithOptions;
@@ -335,9 +319,6 @@ export type ElementsConfig = {
   menuButton: WithOptions<MenuId>;
   menuList: WithOptions<MenuId>;
   menuItem: WithOptions<MenuId>;
-
-  loader: WithOptions;
-  loaderIcon: WithOptions<never, ErrorState>;
 
   modalBackdrop: WithOptions;
   modalContent: WithOptions;
@@ -379,7 +360,6 @@ export type ElementsConfig = {
 
   pageScrollBox: WithOptions;
   page: WithOptions;
-  pageHeader: WithOptions;
 
   activeDevice: WithOptions<'current'>;
   activeDeviceListItem: WithOptions<'current'>;
@@ -411,7 +391,6 @@ export type ElementsConfig = {
   // default descriptors
   badge: WithOptions<'primary' | 'actionRequired'>;
   notificationBadge: WithOptions;
-  button: WithOptions<never, LoadingState>;
   buttonArrowIcon: WithOptions;
   providerIcon: WithOptions<OAuthProvider | Web3Provider>;
   spinner: WithOptions;
