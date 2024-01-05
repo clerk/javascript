@@ -195,12 +195,14 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
       <Menu elementId={elementId}>
         <MenuTrigger>
           <ArrowBlockButton
+            elementDescriptor={descriptors.profileSectionPrimaryButton}
+            elementId={descriptors.profileSectionPrimaryButton.setId(elementId)}
+            textLocalizationKey={triggerLocalizationKey}
             variant='ghost'
             sx={[
               t => ({ justifyContent: 'start', gap: t.space.$2, padding: `${t.space.$2} ${t.space.$4}` }),
               triggerSx,
             ]}
-            textLocalizationKey={triggerLocalizationKey}
             leftIcon={Plus}
             leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
           />
