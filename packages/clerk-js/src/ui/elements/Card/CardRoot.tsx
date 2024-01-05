@@ -18,6 +18,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
       {appearance.parsedLayout.logoPlacement === 'outside' && (
         <ApplicationLogo
           sx={t => ({
+            position: 'relative',
             [mqu.sm]: {
               margin: `0 0 ${t.space.$7} 0`,
             },
@@ -36,6 +37,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
             boxShadow: common.shadows(t).cardRootShadow,
             borderRadius: t.radii.$xl,
             color: t.colors.$colorText,
+            position: 'relative',
           }),
           sx,
         ]}
