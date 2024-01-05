@@ -153,8 +153,8 @@ export const handleSSOCallback = fromPromise<unknown, HandleSSOCallbackInput>(as
   return input.clerk.handleRedirectCallback(
     {
       afterSignInUrl: input.clerk.buildAfterSignInUrl(),
-      firstFactorUrl: '../factor-one',
-      secondFactorUrl: '../factor-two',
+      firstFactorUrl: '../',
+      secondFactorUrl: '../',
       ...input.params,
     },
     // @ts-expect-error - Align on return typing. `void` vs `Promise<unknown>`

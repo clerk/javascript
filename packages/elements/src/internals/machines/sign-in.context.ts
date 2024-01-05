@@ -1,4 +1,4 @@
-import type { OAuthStrategy, Web3Strategy } from '@clerk/types';
+import type { OAuthStrategy, SignInStrategy, Web3Strategy } from '@clerk/types';
 import { createActorContext } from '@xstate/react';
 import type React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -10,6 +10,7 @@ import {
   isWeb3Strategy,
 } from '../../utils/third-party-strategies';
 import { SignInMachine } from './sign-in.machine';
+import { matchStrategy } from './utils/strategies';
 
 export type SnapshotState = SnapshotFrom<typeof SignInMachine>;
 
@@ -28,6 +29,11 @@ export const {
  */
 const clerkEnvironmentSelector = (state: SnapshotState) => state.context.environment;
 
+/**
+ * Selects the clerk environment
+ */
+const clerkCurrentStrategy = (state: SnapshotState) => state.context.currentFactor?.strategy;
+
 // ================= HOOKS ================= //
 
 export const useSignInState = () => {
@@ -36,6 +42,21 @@ export const useSignInState = () => {
     // (prev, next) => prev.value === next.value && prev.tags === next.tags,
   );
 };
+
+export function useSignInStrategies(_preferred?: SignInStrategy) {
+  const state = useSignInState();
+  const current = useSignInFlowSelector(clerkCurrentStrategy);
+
+  const shouldRender = state.matches('FirstFactor') || state.matches('SecondFactor');
+
+  const isActive = useCallback((name: string) => (current ? matchStrategy(current, name) : false), [current]);
+
+  return {
+    current,
+    isActive,
+    shouldRender,
+  };
+}
 
 /**
  * Provides the onClick handler for oauth

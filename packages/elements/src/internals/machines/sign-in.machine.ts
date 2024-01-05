@@ -10,7 +10,7 @@ import type {
   Web3Strategy,
 } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
-import { and, assertEvent, assign, log, not, sendTo, setup } from 'xstate';
+import { and, assertEvent, assign, log, not, or, sendTo, setup } from 'xstate';
 
 import type { ClerkRouter } from '../router';
 import type { FormMachine } from './form.machine';
@@ -81,11 +81,6 @@ export const SignInMachine = setup({
   },
   actions: {
     debug: ({ context, event }, params?: Record<string, unknown>) => console.dir({ context, event, params }),
-    ensureSynchronizedRouterPath({ context }, { requiredPath }: { requiredPath: string }) {
-      if (context.router.pathname() !== requiredPath) {
-        context.router.replace(requiredPath);
-      }
-    },
     navigateTo({ context }, { path }: { path: string }) {
       context.router.replace(path);
     },
@@ -116,6 +111,7 @@ export const SignInMachine = setup({
     isSignInComplete: ({ context }) => context?.resource?.status === 'complete',
     isLoggedIn: ({ context }) => Boolean(context.clerk.user),
     isSingleSessionMode: ({ context }) => Boolean(context.clerk.__unstable__environment?.authConfig.singleSessionMode),
+    // isInitialRoute: ({ context }) => context.router.pathname() === '/sign-in',
     needsIdentifier: ({ context }) =>
       context.clerk.client.signIn.status === 'needs_identifier' || context.resource?.status === 'needs_identifier',
     needsFirstFactor: ({ context }) =>
@@ -160,12 +156,12 @@ export const SignInMachine = setup({
         Init: {
           always: [
             {
-              description: 'If the SignIn resource is empty, invoke the sign-in start flow.',
+              description: 'Determine if running on the server',
               guard: 'isServer',
               target: 'Server',
             },
             {
-              description: 'Wait for the Clerk instance to be ready.',
+              description: 'Determine if running on the browser',
               guard: 'isBrowser',
               target: 'Browser',
             },
@@ -173,33 +169,34 @@ export const SignInMachine = setup({
         },
         Server: {
           type: 'final',
-          description: 'Determines the state of the sign-in flow on the server. This is a no-op for now.', // TODO: Implement
-          entry: ['debug', log('Server no-op')],
+          description: 'Determines the state of the sign-in flow on the server [NOOP]',
+          entry: 'debug',
         },
         Browser: {
           type: 'final',
-          description: 'Determines the state of the sign-in flow on the browser.',
+          description: 'Determines the state of the sign-in flow on the browser',
           always: [
             {
-              description: 'Wait for the Clerk instance to be ready.',
+              description: 'Wait for the Clerk instance to be ready',
               guard: not('isClerkLoaded'),
               target: '#SignIn.WaitingForClerk',
             },
             {
-              description: 'If loggedin and single-session, invoke the sign-in start flow with error.',
-              guard: and(['isLoggedIn', 'isSingleSessionMode']),
+              description: 'If sign-in complete or loggedin and single-session, skip to complete',
+              guard: or(['isSignInComplete', and(['isLoggedIn', 'isSingleSessionMode'])]),
               target: '#SignIn.Complete',
             },
             {
-              description: 'If the SignIn resource is empty, invoke the sign-in start flow.',
+              description: 'If the SignIn resource is empty, invoke the sign-in start flow',
               guard: not('hasSignInResource'),
               target: '#SignIn.Start',
             },
             {
-              guard: 'isSignInComplete',
-              target: '#SignIn.Complete',
+              guard: or(['needsNewPassword', 'needsIdentifier']),
+              actions: 'debug',
             },
             {
+              description: 'Default to the initial sign-in flow state',
               target: '#SignIn.Start',
             },
           ],
@@ -223,7 +220,6 @@ export const SignInMachine = setup({
         },
       },
     },
-
     Start: {
       description: 'The intial state of the sign-in flow.',
       initial: 'AwaitingInput',
@@ -275,7 +271,7 @@ export const SignInMachine = setup({
             },
             {
               guard: 'needsSecondFactor',
-              target: '#SignIn.FirstFactor',
+              target: '#SignIn.SecondFactor',
             },
             {
               target: '#SignIn.DeterminingState',
@@ -286,7 +282,7 @@ export const SignInMachine = setup({
         Failure: {
           type: 'final',
           target: '#SignIn.DeterminingState',
-          reenter: true,
+          // reenter: true,
         },
       },
     },
@@ -296,16 +292,19 @@ export const SignInMachine = setup({
         DeterminingState: {
           always: [
             {
+              description: 'If the current factor is not set, determine the starting factor details',
               guard: not('hasCurrentFactor'),
               target: 'DetermineStartingFactor',
               reenter: true,
             },
             {
+              description: 'If the current factor is not password, prepare the factor',
               guard: not('isCurrentFactorPassword'),
               target: 'Preparing',
               reenter: true,
             },
             {
+              description: 'Else, skip to awaiting input',
               target: 'AwaitingInput',
               reenter: true,
             },
@@ -470,6 +469,12 @@ export const SignInMachine = setup({
         onError: {
           actions: 'setFormErrors',
         },
+      },
+    },
+    HavingTrouble: {
+      type: 'final',
+      on: {
+        // RESTART: '#SignIn.Start',
       },
     },
     Complete: {
