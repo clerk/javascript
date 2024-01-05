@@ -9,10 +9,10 @@ import { Box } from './Box';
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     textAlign: 'left',
-    fontSize: theme.fontSizes.$xs,
+    fontSize: theme.fontSizes.$sm,
     fontWeight: theme.fontWeights.$normal,
     color: colors.setAlpha(theme.colors.$colorText, 0.62),
-    paddingBottom: theme.space.$2,
+    padding: `${theme.space.$3} ${theme.space.$4}`,
   },
   variants: {},
 }));

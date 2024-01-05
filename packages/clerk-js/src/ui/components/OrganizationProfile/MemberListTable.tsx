@@ -54,7 +54,7 @@ export const DataTable = (props: MembersListTableProps) => {
       sx={{ width: '100%' }}
     >
       <Flex sx={t => ({ overflowX: 'auto', padding: t.space.$1 })}>
-        <Table sx={{ width: '100%' }}>
+        <Table>
           <Thead>
             <Tr>
               {headers.map((h, index) => (
@@ -235,7 +235,6 @@ const RolesListItem = memo((props: RolesListItemProps) => {
   const { option, isSelected, sx, ...rest } = props;
   return (
     <Flex
-      center
       sx={[
         theme => ({
           width: '100%',
