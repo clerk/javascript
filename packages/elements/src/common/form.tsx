@@ -8,16 +8,17 @@ import {
   Submit,
 } from '@radix-ui/react-form';
 import React, { createContext, useCallback, useContext, useEffect } from 'react';
-import type { FieldDetails } from 'src/internals/machines/sign-in.types';
+import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '../internals/errors/error';
 import {
   fieldErrorsSelector,
   fieldHasValueSelector,
   globalErrorsSelector,
-  useSignInFlow,
-  useSignInFlowSelector,
-} from '../internals/machines/sign-in.context';
+  useFormSelector,
+  useFormStore,
+} from '../internals/machines/form.context';
+import type { FieldDetails } from '../internals/machines/form.types';
 
 const FieldContext = createContext<Pick<FieldDetails, 'name'> | null>(null);
 const useFieldContext = () => useContext(FieldContext);
@@ -25,19 +26,21 @@ const useFieldContext = () => useContext(FieldContext);
 /**
  * Provides the form submission handler along with the form's validity via a data attribute
  */
-const useForm = () => {
-  const ref = useSignInFlow();
-  const error = useSignInFlowSelector(globalErrorsSelector);
+const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
+  const error = useFormSelector(globalErrorsSelector);
 
   const validity = error ? 'invalid' : 'valid';
 
   // Register the onSubmit handler for form submission
+  // TODO: merge user-provided submit handler
   const onSubmit = useCallback(
     (event: React.FormEvent<Element>) => {
       event.preventDefault();
-      ref.send({ type: 'SUBMIT' });
+      if (flowActor) {
+        flowActor.send({ type: 'SUBMIT' });
+      }
     },
-    [ref],
+    [flowActor],
   );
 
   return {
@@ -49,8 +52,8 @@ const useForm = () => {
 };
 
 const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
-  const hasValue = useSignInFlowSelector(fieldHasValueSelector(name));
-  const error = useSignInFlowSelector(fieldErrorsSelector(name));
+  const hasValue = useFormSelector(fieldHasValueSelector(name));
+  const error = useFormSelector(fieldErrorsSelector(name));
 
   const shouldBeHidden = false; // TODO: Implement clerk-js utils
   const hasError = Boolean(error);
@@ -71,7 +74,7 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
  * Provides field-error/message-specific props based on the field's type/state
  */
 const useFieldErrors = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
-  const errors = useSignInFlowSelector(fieldErrorsSelector(name));
+  const errors = useFormSelector(fieldErrorsSelector(name));
 
   return {
     errors,
@@ -91,8 +94,8 @@ const useInput = ({ name: inputName, value: initialValue }: Partial<Pick<FieldDe
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
 
-  const ref = useSignInFlow();
-  const hasValue = useSignInFlowSelector(fieldHasValueSelector(name));
+  const ref = useFormStore();
+  const hasValue = useFormSelector(fieldHasValueSelector(name));
 
   // Register the field in the machine context
   useEffect(() => {
@@ -131,13 +134,13 @@ const useInput = ({ name: inputName, value: initialValue }: Partial<Pick<FieldDe
   };
 };
 
-function Form({ asChild, ...rest }: FormProps) {
-  const form = useForm();
+function Form({ flowActor, ...props }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> } & FormProps) {
+  const form = useForm({ flowActor: flowActor });
 
   return (
     <RadixForm
       {...form.props}
-      {...rest}
+      {...props}
     />
   );
 }

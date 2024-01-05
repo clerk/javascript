@@ -3,7 +3,6 @@
 import {
   Errors,
   Field,
-  Form,
   Input,
   Label,
   SignIn,
@@ -16,7 +15,7 @@ import {
 } from '@clerk/elements';
 import clsx from 'clsx';
 import Image from 'next/image';
-import type { CSSProperties } from 'react';
+import { type CSSProperties, forwardRef } from 'react';
 
 import { Debug } from '@/components/debug';
 
@@ -30,13 +29,19 @@ const BUTTON_BGS_HOVER: Record<string, string> = {
   google: 'rgb(51 63 97 / 0.8)',
 };
 
-function CustomError({ code, message }: { code: string; message: string }) {
+const CustomError = forwardRef<HTMLParagraphElement, { code: string; message: string }>(function CustomError(
+  { code, message },
+  ref,
+) {
   return (
-    <p className='text-red-400 font-mono'>
+    <p
+      className='text-red-400 font-mono'
+      ref={ref}
+    >
       <span className='block '>{code}:</span> {message}
     </p>
   );
-}
+});
 
 export default function SignInPage() {
   return (
@@ -78,7 +83,7 @@ export default function SignInPage() {
 
             <hr className='w-full border-foreground opacity-10' />
 
-            <Form className='flex gap-6 flex-col'>
+            <div className='flex gap-6 flex-col'>
               <Field
                 name='identifier'
                 className='flex flex-col gap-4'
@@ -122,11 +127,11 @@ export default function SignInPage() {
                   )}
                 />
               </Field>
+            </div>
 
-              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In
-              </Submit>
-            </Form>
+            <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+              Sign In
+            </Submit>
           </div>
         </SignInStart>
 

@@ -24,23 +24,6 @@ export const {
 // ================= SELECTORS ================= //
 
 /**
- * Selects if a specific field has a value
- */
-export const fieldHasValueSelector = (name: string | undefined) => (state: SnapshotState) =>
-  name ? Boolean(state.context.fields.get(name)?.value) : false;
-
-/**
- * Selects a field-specific error, if it exists
- */
-export const fieldErrorsSelector = (name: string | undefined) => (state: SnapshotState) =>
-  name ? state.context.fields.get(name)?.errors : undefined;
-
-/**
- * Selects a global error, if it exists
- */
-export const globalErrorsSelector = (state: SnapshotState) => state.context.errors;
-
-/**
  * Selects the clerk environment
  */
 const clerkEnvironmentSelector = (state: SnapshotState) => state.context.environment;
@@ -84,22 +67,6 @@ export const useThirdPartyProviders = () => {
   return {
     ...providers,
     createOnClick,
-  };
-};
-
-/**
- * Provides global errors
- */
-export const useGlobalErrors = () => {
-  const error = useSignInFlowSelector(globalErrorsSelector);
-  const validity = error ? 'invalid' : 'valid';
-
-  return {
-    message: error?.message,
-    props: {
-      // TODO: Handle accessibility
-      [`data-${validity}`]: true,
-    },
   };
 };
 
