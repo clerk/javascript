@@ -30,13 +30,14 @@ const BUTTON_BGS_HOVER: Record<string, string> = {
 };
 
 const CustomError = forwardRef<HTMLParagraphElement, { code: string; message: string }>(function CustomError(
-  { code, message },
+  { code, message, ...rest },
   ref,
 ) {
   return (
     <p
       className='text-red-400 font-mono'
       ref={ref}
+      {...rest}
     >
       <span className='block '>{code}:</span> {message}
     </p>

@@ -7,6 +7,8 @@ import {
   Message as RadixMessage,
   Submit,
 } from '@radix-ui/react-form';
+import { Slot } from '@radix-ui/react-slot';
+import type { HTMLProps, ReactNode } from 'react';
 import React, { createContext, useCallback, useContext, useEffect } from 'react';
 import type { BaseActorRef } from 'xstate';
 
@@ -67,6 +69,14 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
       serverInvalid: hasError,
       tabIndex: shouldBeHidden ? -1 : 0,
     },
+  };
+};
+
+const useGlobalErrors = () => {
+  const errors = useFormSelector(globalErrorsSelector);
+
+  return {
+    errors,
   };
 };
 
@@ -164,6 +174,20 @@ function InnerField(props: FormFieldProps) {
   );
 }
 
+/**
+ * A helper to access the state of the field programmatically. This can be useful if you need to trigger
+ * animations or certain behavior based on the field's state independent of the existing components.
+ */
+function FieldState({ children }: { children: (state: { state: 'valid' | 'invalid' }) => ReactNode }) {
+  const field = useFieldContext();
+  const error = useFormSelector(fieldErrorsSelector(field?.name));
+  const state = error ? ('invalid' as const) : ('valid' as const);
+
+  const fieldState = { state };
+
+  return children(fieldState);
+}
+
 function Input(props: FormControlProps) {
   const { name, value } = props;
   const field = useInput({ name, value });
@@ -183,13 +207,54 @@ function Label(props: FormLabelProps) {
 
 // ================= ERRORS ================= //
 type ClerkElementsErrorsRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
-interface ErrorsProps {
+type ErrorsProps = {
+  name?: string;
   render(error: ClerkElementsErrorsRenderProps): React.ReactNode;
+} & HTMLProps<HTMLDivElement>;
+
+/**
+ * Component used to render:
+ *  1. field-level errors when render within a <Field> or with a `name` prop
+ *  2. global errors when rendered outside of a <Field> and without a `name` prop
+ */
+function Errors({ name, ...props }: ErrorsProps) {
+  const fieldContext = useFieldContext();
+
+  if (!fieldContext && !name) {
+    return <GlobalErrors {...props} />;
+  }
+
+  return (
+    <FieldErrors
+      name={name}
+      {...props}
+    />
+  );
 }
 
-function Errors({ render }: ErrorsProps) {
+function GlobalErrors({ render, ...rest }: Exclude<ErrorsProps, 'name'>) {
+  const { errors } = useGlobalErrors();
+
+  if (!errors) {
+    return null;
+  }
+
+  return (
+    <div
+      role='alert'
+      {...rest}
+    >
+      {errors.map(error => (
+        <Slot key={`${error.name}-${error.code}`}>{render(error)}</Slot>
+      ))}
+    </div>
+  );
+}
+
+function FieldErrors({ name, render }: ErrorsProps) {
   const fieldContext = useFieldContext();
-  const { errors } = useFieldErrors({ name: fieldContext?.name });
+  const fieldName = fieldContext?.name || name;
+  const { errors } = useFieldErrors({ name: fieldName });
 
   if (!errors) {
     return null;
@@ -202,7 +267,7 @@ function Errors({ render }: ErrorsProps) {
           asChild
           match={error.matchFn}
           forceMatch={error.forceMatch}
-          key={`${error.name}-${name}-${error.code}`}
+          key={`${error.name}-${error.code}`}
         >
           {render(error)}
         </RadixMessage>
@@ -211,5 +276,5 @@ function Errors({ render }: ErrorsProps) {
   );
 }
 
-export { Field, Form, Input, Errors, Label, Submit };
+export { Field, FieldState, Form, Input, Errors, Label, Submit };
 export type { FormControlProps, FormFieldProps, FormProps, ErrorsProps };
