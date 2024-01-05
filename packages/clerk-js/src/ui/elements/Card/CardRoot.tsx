@@ -3,7 +3,7 @@ import React from 'react';
 import { Col, descriptors, generateFlowPartClassname, useAppearance } from '../../customizables';
 import type { ElementDescriptor } from '../../customizables/elementDescriptors';
 import type { PropsOfComponent } from '../../styledSystem';
-import { mqu } from '../../styledSystem';
+import { common, mqu } from '../../styledSystem';
 import { ApplicationLogo } from '../ApplicationLogo';
 import { useFlowMetadata } from '../contexts';
 
@@ -33,7 +33,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
             background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
             maxWidth: `calc(100vw - ${t.sizes.$20})`,
             width: t.sizes.$100,
-            boxShadow: t.shadows.$cardRootShadow,
+            boxShadow: common.shadows(t).cardRootShadow,
             borderRadius: t.radii.$xl,
             color: t.colors.$colorText,
           }),

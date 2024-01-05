@@ -78,11 +78,11 @@ const textVariants = (t: InternalTheme) => {
 };
 
 const borderVariants = (t: InternalTheme, props?: any) => {
-  const defaultBoxShadow = t.shadows.$input
-    .replace('{{color1}}', !props?.hasError ? t.colors.$blackAlpha200 : t.colors.$danger200)
+  const defaultBoxShadow = shadows(t)
+    .input.replace('{{color1}}', !props?.hasError ? t.colors.$blackAlpha200 : t.colors.$danger200)
     .replace('{{color2}}', !props?.hasError ? t.colors.$blackAlpha300 : t.colors.$danger300);
-  const hoverBoxShadow = t.shadows.$inputHover
-    .replace('{{color1}}', !props?.hasError ? t.colors.$blackAlpha300 : t.colors.$danger300)
+  const hoverBoxShadow = shadows(t)
+    .inputHover.replace('{{color1}}', !props?.hasError ? t.colors.$blackAlpha300 : t.colors.$danger300)
     .replace('{{color2}}', !props?.hasError ? t.colors.$blackAlpha400 : t.colors.$danger400);
   const hoverStyles = {
     '&:hover': {
@@ -99,7 +99,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
             boxShadow: [
               defaultBoxShadow,
               hoverBoxShadow,
-              t.shadows.$focusRing.replace('{{color}}', props?.hasError ? t.colors.$danger200 : t.colors.$primary50),
+              shadows(t).focusRing.replace('{{color}}', props?.hasError ? t.colors.$danger200 : t.colors.$primary50),
             ].toString(),
           },
         };
@@ -128,7 +128,7 @@ const focusRing = (t: InternalTheme) => {
     '&:focus': {
       '&::-moz-focus-inner': { border: '0' },
       WebkitTapHighlightColor: 'transparent',
-      boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$primary50),
+      boxShadow: shadows(t).focusRing.replace('{{color}}', t.colors.$primary50),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
@@ -140,7 +140,7 @@ const focusRingInput = (t: InternalTheme, props?: any) => {
   return {
     '&:focus': {
       WebkitTapHighlightColor: 'transparent',
-      boxShadow: t.shadows.$focusRing.replace(
+      boxShadow: shadows(t).focusRing.replace(
         '{{color}}',
         props?.hasError ? t.colors.$danger400 : t.colors.$primary400,
       ),
@@ -152,7 +152,7 @@ const focusRingInput = (t: InternalTheme, props?: any) => {
 };
 
 const buttonShadow = (t: InternalTheme) => {
-  return { boxShadow: t.shadows.$buttonShadow.replace('{{color}}', t.colors.$primary800) };
+  return { boxShadow: shadows(t).buttonShadow.replace('{{color}}', t.colors.$primary800) };
 };
 
 const disabled = (t: InternalTheme) => {
@@ -192,6 +192,35 @@ const maxHeightScroller = (t: InternalTheme) =>
     ...unstyledScrollbar(t),
   } as const);
 
+const shadows = (t: InternalTheme) => {
+  return {
+    menuShadow: t.shadows.$menuShadow.replace('{{blackAlpha100}}', t.colors.$blackAlpha100),
+    fabShadow: t.shadows.$fabShadow.replace('{{blackAlpha300}}', t.colors.$blackAlpha300),
+    buttonShadow: t.shadows.$buttonShadow
+      .replace('{{blackAlpha100}}', t.colors.$blackAlpha100)
+      .replace('{{blackAlpha300}}', t.colors.$blackAlpha300),
+    cardRootShadow: t.shadows.$cardRootShadow.replace('{{blackAlpha100}}', t.colors.$blackAlpha100),
+    cardContentShadow: t.shadows.$cardContentShadow.replace('{{blackAlpha100}}', t.colors.$blackAlpha100),
+    actionCardShadow: t.shadows.$actionCardShadow.replace('{{blackAlpha150}}', t.colors.$blackAlpha150),
+    actionCardDestructiveShadow: t.shadows.$actionCardDestructiveShadow.replace(
+      '{{blackAlpha100}}',
+      t.colors.$blackAlpha100,
+    ),
+    secondaryButtonShadow: t.shadows.$secondaryButtonShadow
+      .replace('{{blackAlpha100}}', t.colors.$blackAlpha100)
+      .replace('{{blackAlpha25}}', t.colors.$blackAlpha25)
+      .replace('{{blackAlpha100}}', t.colors.$blackAlpha100),
+    shadowShimmer: t.shadows.$shadowShimmer.replace('{{blackAlpha400}}', t.colors.$blackAlpha400),
+    badge: t.shadows.$badge.replace('{{blackAlpha50}}', t.colors.$blackAlpha50),
+    tableBodyShadow: t.shadows.$tableBodyShadow.replace('{{blackAlpha100}}', t.colors.$blackAlpha100),
+    selectButtonShadow: t.shadows.$selectButtonShadow.replace('{{blackAlpha100}}', t.colors.$blackAlpha100),
+    sm: t.shadows.$sm,
+    input: t.shadows.$input,
+    inputHover: t.shadows.$inputHover,
+    focusRing: t.shadows.$focusRing,
+  } as const;
+};
+
 export const common = {
   textVariants,
   borderVariants,
@@ -203,4 +232,5 @@ export const common = {
   centeredFlex,
   maxHeightScroller,
   unstyledScrollbar,
+  shadows,
 };

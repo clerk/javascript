@@ -59,12 +59,8 @@ const FooterActionLink = (props: PropsOfComponent<typeof RouterLink>): JSX.Eleme
     <RouterLink
       elementDescriptor={descriptors.footerActionLink}
       {...props}
-      // colorScheme='primary'
-      sx={t => ({
-        // TODO: Make the color theme-aware once we have dark mode colors
-        color: t.colors.$primary700,
-        fontWeight: t.fontWeights.$medium,
-      })}
+      colorScheme='primary'
+      variant='buttonLarge'
     />
   );
 };

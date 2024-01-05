@@ -7,7 +7,7 @@ import { Button, Col, descriptors } from '../customizables';
 import type { UsePopoverReturn } from '../hooks';
 import { usePopover } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations } from '../styledSystem';
+import { animations, common } from '../styledSystem';
 import { colors } from '../utils/colors';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
@@ -128,7 +128,7 @@ export const MenuList = (props: MenuListProps) => {
             top: `calc(100% + ${theme.space.$2})`,
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: theme.shadows.$menuShadow,
+            boxShadow: common.shadows(theme).menuShadow,
             zIndex: theme.zIndices.$dropdown,
           }),
           sx,
