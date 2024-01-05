@@ -29,7 +29,9 @@ function LogButtons() {
 
   return (
     <>
-      <Button onClick={() => console.dir(ref.getSnapshot().context.fields)}>Log Fields</Button>
+      <Button onClick={() => console.dir(ref.getSnapshot().context.form.getSnapshot().context.fields)}>
+        Log Fields
+      </Button>
       <Button onClick={() => console.dir(ref.getSnapshot().context)}>Log Context</Button>
       <Button onClick={() => console.dir(ref.getSnapshot().context.clerk.__unstable__environment)}>
         Log Environment

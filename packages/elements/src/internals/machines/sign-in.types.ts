@@ -13,14 +13,6 @@ import type {
   Web3Strategy,
 } from '@clerk/types';
 
-import type { ClerkElementsFieldError } from '../errors/error';
-
-export type FieldDetails = {
-  type?: string;
-  value?: string | readonly string[] | number;
-  errors?: ClerkElementsFieldError[];
-};
-
 export type WithClerk<T> = { clerk: LoadedClerkWithEnv } & T;
 export type WithClient<T> = { client: LoadedClerkWithEnv['client'] } & T;
 export type WithParams<T> = { params: T };

@@ -1,48 +1,35 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { EnvironmentResource, OAuthStrategy, SignInResource, Web3Strategy } from '@clerk/types';
-import type { MachineContext } from 'xstate';
-import { and, assertEvent, assign, enqueueActions, log, not, raise, setup } from 'xstate';
+import type { ActorRefFrom, MachineContext } from 'xstate';
+import { and, assertEvent, assign, enqueueActions, log, not, setup } from 'xstate';
 
-import { ClerkElementsFieldError } from '../errors/error';
 import type { ClerkRouter } from '../router';
+import type { FormMachine } from './form.machine';
 import { waitForClerk } from './shared.actors';
 import * as signInActors from './sign-in.actors';
-import type { FieldDetails, LoadedClerkWithEnv } from './sign-in.types';
+import type { LoadedClerkWithEnv } from './sign-in.types';
 
 export interface SignInMachineContext extends MachineContext {
   clerk: LoadedClerkWithEnv;
   environment?: EnvironmentResource;
   error?: Error | ClerkAPIResponseError;
-  fields: Map<string, FieldDetails>;
   loaded: boolean;
   mode: 'browser' | 'server';
   resource: SignInResource | null;
   router: ClerkRouter;
+  form: ActorRefFrom<typeof FormMachine>;
 }
 
 export interface SignInMachineInput {
   clerk: LoadedClerkWithEnv;
   router: ClerkRouter;
+  form: ActorRefFrom<typeof FormMachine>;
 }
 
 export type SignInMachineEvents =
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
   | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
-  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'type' | 'value'> }
-  | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'type'> }
-  | {
-      type: 'FIELD.UPDATE';
-      field: Pick<FieldDetails, 'type' | 'value'>;
-    }
-  | {
-      type: 'FIELD.ERRORS.SET';
-      field: Pick<FieldDetails, 'type' | 'errors'>;
-    }
-  | {
-      type: 'FIELD.ERRORS.CLEAR';
-      field: Pick<FieldDetails, 'type'>;
-    }
   | { type: 'NEXT' }
   | { type: 'OAUTH.CALLBACK' }
   | { type: 'RETRY' }
@@ -102,71 +89,13 @@ export const SignInMachine = setup({
   context: ({ input }) => ({
     clerk: input.clerk,
     environment: input.clerk.__unstable__environment,
-    mode: input.clerk.mode,
+    form: input.form,
     loaded: input.clerk.loaded,
-    router: input.router,
+    mode: input.clerk.mode,
     resource: null,
-    fields: new Map(),
+    router: input.router,
   }),
   on: {
-    'FIELD.ADD': {
-      actions: assign({
-        fields: ({ context, event }) => {
-          if (!event.field.type) throw new Error('Field type is required');
-
-          context.fields.set(event.field.type, event.field);
-          return context.fields;
-        },
-      }),
-    },
-    'FIELD.UPDATE': {
-      actions: assign({
-        fields: ({ context, event }) => {
-          if (!event.field.type) throw new Error('Field type is required');
-
-          if (context.fields.has(event.field.type)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            context.fields.get(event.field.type)!.value = event.field.value;
-          }
-
-          return context.fields;
-        },
-      }),
-    },
-    'FIELD.REMOVE': {
-      actions: assign({
-        fields: ({ context, event }) => {
-          if (!event.field.type) throw new Error('Field type is required');
-
-          context.fields.delete(event.field.type);
-          return context.fields;
-        },
-      }),
-    },
-    'FIELD.ERRORS.SET': {
-      actions: assign({
-        fields: ({ context, event }) => {
-          if (!event.field.type) throw new Error('Field type is required');
-          if (context.fields.has(event.field.type)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            context.fields.get(event.field.type)!.errors = event.field.errors;
-          }
-
-          return context.fields;
-        },
-      }),
-    },
-    'FIELD.ERRORS.CLEAR': {
-      actions: assign({
-        fields: ({ context }) => {
-          context.fields.forEach(field => {
-            field.errors = undefined;
-          });
-
-          return context.fields;
-        },
-      }),
-    },
     'OAUTH.CALLBACK': '#SignIn.SSOCallbackRunning',
   },
   initial: 'DeterminingState',
@@ -274,7 +203,7 @@ export const SignInMachine = setup({
             src: 'createSignIn',
             input: ({ context }) => ({
               client: context.clerk.client,
-              fields: context.fields,
+              fields: context.form.getSnapshot().context.fields,
             }),
             onDone: {
               actions: assign({
@@ -283,35 +212,11 @@ export const SignInMachine = setup({
               target: 'Success',
             },
             onError: {
-              actions: enqueueActions(({ enqueue, event }) => {
-                if (isClerkAPIResponseError(event.error)) {
-                  // TODO: Move to Event/Action for Re-use
-                  const fields: Record<string, ClerkElementsFieldError[]> = {};
-
-                  for (const error of event.error.errors) {
-                    const name = error.meta?.paramName;
-
-                    if (!name) {
-                      continue;
-                    } else if (!fields[name]) {
-                      fields[name] = [];
-                    }
-
-                    fields[name]?.push(ClerkElementsFieldError.fromAPIError(error));
-                  }
-
-                  for (const field in fields) {
-                    enqueue(
-                      raise({
-                        type: 'FIELD.ERRORS.SET',
-                        field: {
-                          type: field,
-                          errors: fields[field],
-                        },
-                      }),
-                    );
-                  }
-                }
+              actions: enqueueActions(({ context, enqueue, event }) => {
+                enqueue.sendTo(context.form, {
+                  type: 'ERRORS.SET',
+                  error: event.error,
+                });
               }),
               target: 'AwaitingInput',
             },

@@ -7,34 +7,143 @@ import {
   Message as RadixMessage,
   Submit,
 } from '@radix-ui/react-form';
-import type { SlotProps } from '@radix-ui/react-slot';
-import { Slot } from '@radix-ui/react-slot';
-import React from 'react';
+import React, { createContext, useCallback, useContext, useEffect } from 'react';
+import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '../internals/errors/error';
 import {
-  FieldContext,
-  useField,
-  useFieldDetails,
-  useFieldErrors,
-  useForm,
-  useInput,
-} from '../internals/machines/sign-in.context';
+  fieldErrorsSelector,
+  fieldHasValueSelector,
+  globalErrorsSelector,
+  useFormSelector,
+  useFormStore,
+} from '../internals/machines/form.context';
+import type { FieldDetails } from '../internals/machines/form.types';
 
-// ================= FORM ================= //
+const FieldContext = createContext<Pick<FieldDetails, 'name'> | null>(null);
+const useFieldContext = () => useContext(FieldContext);
 
-function Form({ asChild, ...rest }: FormProps) {
-  const form = useForm();
+/**
+ * Provides the form submission handler along with the form's validity via a data attribute
+ */
+const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
+  const error = useFormSelector(globalErrorsSelector);
+
+  const validity = error ? 'invalid' : 'valid';
+
+  // Register the onSubmit handler for form submission
+  // TODO: merge user-provided submit handler
+  const onSubmit = useCallback(
+    (event: React.FormEvent<Element>) => {
+      event.preventDefault();
+      if (flowActor) {
+        flowActor.send({ type: 'SUBMIT' });
+      }
+    },
+    [flowActor],
+  );
+
+  return {
+    props: {
+      [`data-${validity}`]: true,
+      onSubmit,
+    },
+  };
+};
+
+const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const hasValue = useFormSelector(fieldHasValueSelector(name));
+  const error = useFormSelector(fieldErrorsSelector(name));
+
+  const shouldBeHidden = false; // TODO: Implement clerk-js utils
+  const hasError = Boolean(error);
+  const validity = hasError ? 'invalid' : 'valid';
+
+  return {
+    hasValue,
+    props: {
+      [`data-${validity}`]: true,
+      'data-hidden': shouldBeHidden ? true : undefined,
+      serverInvalid: hasError,
+      tabIndex: shouldBeHidden ? -1 : 0,
+    },
+  };
+};
+
+/**
+ * Provides field-error/message-specific props based on the field's type/state
+ */
+const useFieldErrors = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const errors = useFormSelector(fieldErrorsSelector(name));
+
+  return {
+    errors,
+  };
+};
+
+const determineInputTypeFromName = (name: string) => {
+  if (name === 'password') return 'password' as const;
+  if (name === 'email') return 'email' as const;
+  if (name === 'phone') return 'tel' as const;
+
+  return 'text' as const;
+};
+
+const useInput = ({ name: inputName, value: initialValue }: Partial<Pick<FieldDetails, 'name' | 'value'>>) => {
+  // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
+  const fieldContext = useFieldContext();
+  const name = inputName || fieldContext?.name;
+
+  const ref = useFormStore();
+  const hasValue = useFormSelector(fieldHasValueSelector(name));
+
+  // Register the field in the machine context
+  useEffect(() => {
+    if (!name || ref.getSnapshot().context.fields.get(name)) return;
+
+    ref.send({ type: 'FIELD.ADD', field: { name, value: initialValue } });
+
+    return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
+  }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Register the onChange handler for field updates to persist to the machine context
+  const onChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (!name) return;
+      ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
+    },
+    [ref, name],
+  );
+
+  if (!name) {
+    throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
+  }
+
+  // TODO: Implement clerk-js utils
+  const shouldBeHidden = false;
+  const type = determineInputTypeFromName(name);
+
+  return {
+    type,
+    props: {
+      onChange,
+      'data-hidden': shouldBeHidden ? true : undefined,
+      'data-has-value': hasValue ? true : undefined,
+      tabIndex: shouldBeHidden ? -1 : 0,
+    },
+  };
+};
+
+function Form({ flowActor, ...props }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> } & FormProps) {
+  const form = useForm({ flowActor: flowActor });
 
   return (
     <RadixForm
       {...form.props}
-      {...rest}
+      {...props}
     />
   );
 }
-
-// ================= FIELD ================= //
 
 function Field(props: FormFieldProps) {
   return (
@@ -45,7 +154,7 @@ function Field(props: FormFieldProps) {
 }
 
 function InnerField(props: FormFieldProps) {
-  const field = useField({ type: props.name });
+  const field = useField({ name: props.name });
 
   return (
     <RadixField
@@ -55,54 +164,32 @@ function InnerField(props: FormFieldProps) {
   );
 }
 
-// ================= LABEL ================= //
-
-function Label(props: FormLabelProps) {
-  const { name } = useFieldDetails();
-
-  return (
-    <RadixLabel
-      htmlFor={name}
-      {...props}
-    />
-  );
-}
-
-// ================= INPUT ================= //
-
 function Input(props: FormControlProps) {
-  const { type, value } = props;
-  const field = useInput({ type, value });
+  const { name, value } = props;
+  const field = useInput({ name, value });
 
   return (
     <RadixControl
+      type={field.type}
       {...field.props}
       {...props}
     />
   );
 }
 
-// ================= ERRORS ================= //
+function Label(props: FormLabelProps) {
+  return <RadixLabel {...props} />;
+}
 
-type ClerkElementsErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
-interface ErrorsProps extends SlotProps {
-  render(error: ClerkElementsErrorRenderProps): React.ReactNode;
+// ================= ERRORS ================= //
+type ClerkElementsErrorsRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
+interface ErrorsProps {
+  render(error: ClerkElementsErrorsRenderProps): React.ReactNode;
 }
 
 function Errors({ render }: ErrorsProps) {
-  const errors = [] as ClerkElementsError[];
-
-  return errors.map(error => <Slot key={`${error.name}-global-${error.code}`}>{render(error)}</Slot>);
-}
-
-type ClerkElementsFieldErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
-interface FieldErrorsProps {
-  render(error: ClerkElementsFieldErrorRenderProps): React.ReactNode;
-}
-
-function FieldErrors({ render }: FieldErrorsProps) {
-  const { name } = useFieldDetails();
-  const { errors } = useFieldErrors({ type: name });
+  const fieldContext = useFieldContext();
+  const { errors } = useFieldErrors({ name: fieldContext?.name });
 
   if (!errors) {
     return null;
@@ -124,5 +211,5 @@ function FieldErrors({ render }: FieldErrorsProps) {
   );
 }
 
-export { Errors, Field, Form, Input, FieldErrors, Label, Submit };
-export type { FormControlProps, FormFieldProps, FormProps, FieldErrorsProps, ErrorsProps };
+export { Field, Form, Input, Errors, Label, Submit };
+export type { FormControlProps, FormFieldProps, FormProps, ErrorsProps };
