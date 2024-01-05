@@ -1,5 +1,5 @@
 import { UserProfile } from '@clerk/nextjs';
 
 export default function Page() {
-  return <UserProfile />;
+  return <UserProfile path='/app-dir/user' />;
 }
