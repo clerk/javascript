@@ -29,7 +29,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 		import(`./versions/v${toVersion}/index.js`).then(version => {
 			setMatchers(
 				sdks.reduce((m, sdk) => {
-					m[sdk] = version.matchers[sdk];
+					m[sdk] = version[sdk];
 					return m;
 				}, {}),
 			);

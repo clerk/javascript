@@ -16,7 +16,7 @@ const reactChangesList = [
 	'navigate-to-routerpush-routerreplace',
 ];
 
-export const matchers = {
+export default {
 	nextjs: load('next', [
 		'api-key-to-secret-key',
 		'frontend-api-to-publishable-key',
