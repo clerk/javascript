@@ -3,7 +3,6 @@ import Link from 'ink-link';
 import { Text, Newline, Box } from 'ink';
 import { globby } from 'globby';
 import fs from 'fs/promises';
-import path from 'path';
 import Spinner from 'ink-spinner';
 import indexToPosition from 'index-to-position';
 
@@ -57,7 +56,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 			// first we read all the files
 			files.map(async file => {
 				setStatus(`Scanning ${file}`);
-				const content = await fs.readFile(path.join(process.cwd(), file), 'utf8');
+				const content = await fs.readFile(file, 'utf8');
 
 				// then we run each of the matchers against the file contents
 				// TODO: combine results on the same match, add multiple file/positions

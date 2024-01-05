@@ -1,6 +1,6 @@
 ---
 title: "`Organization.create('x')` -> `Organization.create({ name: 'x' })`"
-matcher: "Organization\\.create\\(\\s*[\"'])"
+matcher: "Organization\\.create\\(\\s*[\"']"
 matcherFlags: 'm'
 ---
 

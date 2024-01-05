@@ -178,8 +178,12 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = '', _ignore
 					<Text>
 						Looking in the directory
 						<Text color='green'> {dir} </Text>
-						and ignoring
-						<Text color='green'> {ignore.join(', ')}</Text>
+						{ignore.length > 0 && (
+							<>
+								and ignoring
+								<Text color='green'> {ignore.join(', ')}</Text>
+							</>
+						)}
 					</Text>
 					<Newline />
 					<Text>Does this look right?</Text>
