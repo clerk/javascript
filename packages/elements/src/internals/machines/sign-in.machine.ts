@@ -51,7 +51,8 @@ export type SignInMachineEvents =
   | { type: 'NEXT' }
   | { type: 'OAUTH.CALLBACK' }
   | { type: 'RETRY' }
-  | { type: 'SUBMIT' };
+  | { type: 'SUBMIT' }
+  | { type: 'NAVIGATE'; path: string };
 
 export type SignInTags = 'start' | 'first-factor' | 'second-factor' | 'complete';
 export interface SignInMachineTypes {
@@ -80,6 +81,11 @@ export const SignInMachine = setup({
   },
   actions: {
     debug: ({ context, event }, params?: Record<string, unknown>) => console.dir({ context, event, params }),
+    ensureSynchronizedRouterPath({ context }, { requiredPath }: { requiredPath: string }) {
+      if (context.router.pathname() !== requiredPath) {
+        context.router.replace(requiredPath);
+      }
+    },
     navigateTo({ context }, { path }: { path: string }) {
       context.router.replace(path);
     },
@@ -375,12 +381,13 @@ export const SignInMachine = setup({
               },
             }),
             onDone: {
-              actions: assign({
-                resource: ({ event }) => event.output,
-              }),
+              actions: [
+                assign({
+                  resource: ({ event }) => event.output,
+                }),
+              ],
               target: 'Success',
             },
-
             onError: {
               actions: 'setFormErrors',
               target: 'AwaitingInput',
@@ -388,14 +395,19 @@ export const SignInMachine = setup({
           },
         },
         Success: {
+          type: 'final',
           always: [
             {
               guard: 'isSignInComplete',
-              actions: 'setAsActive',
+              target: '#SignIn.Complete',
+            },
+            {
+              guard: 'needsFirstFactor',
+              target: '#SignIn.FirstFactor',
             },
             {
               guard: 'needsSecondFactor',
-              target: '#SignIn.SecondFactor',
+              target: '#SignIn.FirstFactor',
             },
             {
               target: '#SignIn.DeterminingState',
