@@ -57,11 +57,11 @@ export function SignIn({ children }: { children: React.ReactNode }): JSX.Element
 }
 
 export function SignInStart({ children }: WithChildren) {
-  const actor = useSignInFlow();
+  const actorRef = useSignInFlow();
 
   return (
     <Route index>
-      <Form flowActor={actor}>{children}</Form>
+      <Form flowActor={actorRef}>{children}</Form>
     </Route>
   );
 }

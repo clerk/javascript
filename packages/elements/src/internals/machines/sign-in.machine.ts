@@ -4,7 +4,6 @@ import type { EnvironmentResource, OAuthStrategy, SignInResource, Web3Strategy }
 import type { ActorRefFrom, MachineContext } from 'xstate';
 import { and, assertEvent, assign, enqueueActions, log, not, setup } from 'xstate';
 
-import { ClerkElementsFieldError } from '../errors/error';
 import type { ClerkRouter } from '../router';
 import type { FormMachine } from './form.machine';
 import { waitForClerk } from './shared.actors';
@@ -214,32 +213,10 @@ export const SignInMachine = setup({
             },
             onError: {
               actions: enqueueActions(({ context, enqueue, event }) => {
-                if (isClerkAPIResponseError(event.error)) {
-                  // TODO: Move to Event/Action for Re-use
-                  const fields: Record<string, ClerkElementsFieldError[]> = {};
-
-                  for (const error of event.error.errors) {
-                    const name = error.meta?.paramName;
-
-                    if (!name) {
-                      continue;
-                    } else if (!fields[name]) {
-                      fields[name] = [];
-                    }
-
-                    fields[name]?.push(ClerkElementsFieldError.fromAPIError(error));
-                  }
-
-                  for (const field in fields) {
-                    enqueue.sendTo(context.form, {
-                      type: 'FIELD.ERRORS.SET',
-                      field: {
-                        name: field,
-                        errors: fields[field],
-                      },
-                    });
-                  }
-                }
+                enqueue.sendTo(context.form, {
+                  type: 'ERRORS.SET',
+                  error: event.error,
+                });
               }),
               target: 'AwaitingInput',
             },
