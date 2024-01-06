@@ -10,6 +10,8 @@ import {
   SignInFactorTwo,
   SignInSSOCallback,
   SignInStart,
+  SignInStrategies,
+  SignInStrategy,
   SocialProviders,
   Submit,
 } from '@clerk/elements';
@@ -19,6 +21,7 @@ import type { CSSProperties } from 'react';
 import { forwardRef } from 'react';
 
 import { Debug } from '@/components/debug';
+import { H1, H2, H3, HR, P } from '@/components/design';
 
 const BUTTON_BGS: Record<string, string> = {
   github: 'rgba(23 23 23)',
@@ -50,7 +53,7 @@ export default function SignInPage() {
       <div className='m-auto w-max text-sm'>
         <SignInStart>
           <div className='flex flex-col items-center justify-center gap-12'>
-            <h1 className='text-xl mb-6 font-mono'>START</h1>
+            <H1>START</H1>
             <div className='flex flex-col gap-3'>
               <SocialProviders
                 render={provider => {
@@ -82,7 +85,7 @@ export default function SignInPage() {
               />
             </div>
 
-            <hr className='w-full border-foreground opacity-10' />
+            <HR />
 
             <div className='flex gap-6 flex-col'>
               <Field
@@ -108,47 +111,141 @@ export default function SignInPage() {
               </Field>
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In
+                Sign In with Email/Password
+              </Submit>
+
+              <HR />
+
+              <Field
+                name='identifier'
+                className='flex flex-col gap-4'
+              >
+                <div className='flex gap-4 justify-between items-center'>
+                  <Label>Phone</Label>
+                  <Input
+                    type='identifier'
+                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500'
+                    asChild
+                  >
+                    <input type='tel' />
+                  </Input>
+                </div>
+
+                <Errors
+                  render={({ code, message }) => (
+                    <CustomError
+                      code={code}
+                      message={message}
+                    />
+                  )}
+                />
+              </Field>
+
+              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+                Sign In with Phone Number
               </Submit>
             </div>
           </div>
         </SignInStart>
 
-        <SignInFactorOne>
-          <div className='flex flex-col items-center justify-center gap-12'>
-            <h1 className='text-xl mb-6 font-mono'>FIRST FACTOR</h1>
+        <SignInStrategies>
+          <div className='flex gap-6 flex-col'>
+            <H1>STRATEGIES (FIRST/SECOND FACTOR)</H1>
 
-            <Field
-              name='password'
-              className='flex flex-col gap-4'
-            >
-              <div className='flex gap-4 justify-between items-center'>
-                <Label>Password</Label>
-                <Input
-                  type='password'
-                  className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
-                />
-              </div>
+            <H2>
+              <SignInFactorOne>First Factor</SignInFactorOne>
+              <SignInFactorTwo>Second Factor</SignInFactorTwo>
+            </H2>
 
-              <Errors
-                render={({ code, message }) => (
-                  <CustomError
-                    code={code}
-                    message={message}
+            <SignInStrategy name='password'>
+              <Field
+                name='password'
+                className='flex flex-col gap-4'
+              >
+                <div className='flex gap-4 justify-between items-center'>
+                  <Label>Password</Label>
+                  <Input
+                    type='password'
+                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
                   />
-                )}
-              />
-            </Field>
+                </div>
 
-            <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-              Sign In
-            </Submit>
+                <Errors
+                  render={({ code, message }) => (
+                    <CustomError
+                      code={code}
+                      message={message}
+                    />
+                  )}
+                />
+              </Field>
+
+              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+                Sign In
+              </Submit>
+            </SignInStrategy>
+
+            <SignInStrategy name='phone_code'>
+              <Field
+                name='code'
+                className='flex flex-col gap-4'
+              >
+                <div className='flex gap-4 justify-between items-center'>
+                  <Label>Phone Code</Label>
+                  <Input
+                    type='code'
+                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                  />
+                </div>
+
+                <Errors
+                  render={({ code, message }) => (
+                    <CustomError
+                      code={code}
+                      message={message}
+                    />
+                  )}
+                />
+              </Field>
+
+              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+                Sign In
+              </Submit>
+            </SignInStrategy>
+
+            <SignInStrategy name='reset_password_email_code'>
+              <H3>Verify your email</H3>
+
+              <P>Please check your email for a verification code...</P>
+
+              <Field
+                name='code'
+                className='flex flex-col gap-4'
+              >
+                <div className='flex gap-4 justify-between items-center'>
+                  <Label>Phone Code</Label>
+                  <Input
+                    type='code'
+                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                  />
+                </div>
+
+                <Errors
+                  render={({ code, message }) => (
+                    <CustomError
+                      code={code}
+                      message={message}
+                    />
+                  )}
+                />
+              </Field>
+
+              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+                Verify
+              </Submit>
+            </SignInStrategy>
           </div>
-        </SignInFactorOne>
-
-        <SignInFactorTwo>
-          <p>Factor two child</p>
-        </SignInFactorTwo>
+        </SignInStrategies>
 
         <SignInSSOCallback />
       </div>

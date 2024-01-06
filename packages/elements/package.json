@@ -54,7 +54,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {

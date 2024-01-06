@@ -33,16 +33,16 @@ function LogButtons() {
         Log Fields
       </Button>
       <Button onClick={() => console.dir(ref.getSnapshot().context)}>Log Context</Button>
-      <Button onClick={() => console.dir(ref.getSnapshot().context.clerk.__unstable__environment)}>
-        Log Environment
-      </Button>
+      <Button onClick={() => console.dir(ref.getSnapshot().context.currentFactor)}>Log Current Factor</Button>
+      <Button onClick={() => console.dir(ref.getSnapshot().context.environment)}>Log Environment</Button>
+      <Button onClick={() => console.dir(ref.getSnapshot().context.resource)}>Log Resource</Button>
     </>
   );
 }
 
 export function Debug() {
   return (
-    <div className='absolute text-xs flex flex-col p-4 gap-4 bottom-0 w-screen justify-center bg-secondary border-tertiary border-t max-w-full overflow-clip'>
+    <div className='absolute text-xs flex flex-col p-4 gap-4 bottom-0 w-screen justify-center bg-secondary border-tertiary border-t'>
       <ActiveState />
 
       <div className='flex gap-4 bottom-0 w-screen justify-center'>
