@@ -190,10 +190,6 @@ export const SignInMachine = setup({
               guard: not('hasSignInResource'),
               target: '#SignIn.Start',
             },
-            // {
-            //   guard: or(['needsNewPassword', 'needsIdentifier']),
-            //   actions: 'debug',
-            // },
             {
               description: 'Default to the initial sign-in flow state',
               target: '#SignIn.Start',
@@ -281,7 +277,6 @@ export const SignInMachine = setup({
         Failure: {
           type: 'final',
           target: '#SignIn.DeterminingState',
-          // reenter: true,
         },
       },
     },

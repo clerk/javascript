@@ -134,7 +134,6 @@ export type SignInStrategyProps = PropsWithChildren<{ name: SignInStrategyName }
 
 export function SignInStrategy({ children, name }: SignInStrategyProps) {
   const { shouldRender } = useStrategy(name);
-  // const currentStrategy = useSignInFlowSelector(state => state.context.currentFactor?.strategy);
   return shouldRender ? children : null;
 }
 
