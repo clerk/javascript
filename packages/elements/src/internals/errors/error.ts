@@ -1,16 +1,15 @@
 import type { ClerkAPIError } from '@clerk/types';
 
-export class ClerkElementsError extends Error {
+export abstract class ClerkElementsErrorBase extends Error {
   clerkError = true;
   clerkElementsError = true;
-
-  static fromAPIError(error: ClerkAPIError) {
-    return new ClerkElementsError(error.code, error.longMessage || error.message);
-  }
+  rawMessage: string;
 
   constructor(readonly code: string, message: string) {
     super(message);
+
     this.name = 'ClerkElementsError';
+    this.rawMessage = message;
   }
 
   toString() {
@@ -18,12 +17,30 @@ export class ClerkElementsError extends Error {
   }
 }
 
-export class ClerkElementsFieldError extends ClerkElementsError {
+export class ClerkElementsError extends ClerkElementsErrorBase {
+  static fromAPIError(error: ClerkAPIError) {
+    return new ClerkElementsError(error.code, error.longMessage || error.message);
+  }
+
+  constructor(code: string, message: string) {
+    super(code, message);
+    this.name = 'ClerkElementsError';
+  }
+}
+
+export class ClerkElementsRuntimeError extends ClerkElementsErrorBase {
+  constructor(message: string) {
+    super('elements_runtime_error', message);
+    this.name = 'ClerkElementsRuntimeError';
+  }
+}
+
+export class ClerkElementsFieldError extends ClerkElementsErrorBase {
   static fromAPIError(error: ClerkAPIError) {
     return new ClerkElementsFieldError(error.code, error.longMessage || error.message);
   }
 
-  constructor(readonly code: string, message: string) {
+  constructor(code: string, message: string) {
     super(code, message);
     this.name = 'ClerkElementsFieldError';
   }

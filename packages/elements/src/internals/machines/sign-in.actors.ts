@@ -5,73 +5,151 @@ import type {
   EnvironmentResource,
   HandleOAuthCallbackParams,
   HandleSamlCallbackParams,
+  PreferredSignInStrategy,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
+  SignInFactor,
+  SignInFirstFactor,
   SignInResource,
 } from '@clerk/types';
 import { fromPromise } from 'xstate';
 
+import { ClerkElementsRuntimeError } from '../errors/error';
 import type { ClerkRouter } from '../router';
 import type { SignInMachineContext } from './sign-in.machine';
 import type { WithClerk, WithClient, WithParams } from './sign-in.types';
+import { determineStartingSignInFactor } from './sign-in.utils';
 import { assertIsDefined } from './utils/assert';
 
-export const createSignIn = fromPromise<SignInResource, WithClient<{ fields: SignInMachineContext['fields'] }>>(
-  ({ input: { client, fields } }) => {
-    const password = fields.get('password');
-    const identifier = fields.get('identifier');
+// ================= createSignIn ================= //
 
-    const passwordParams = password?.value
-      ? {
-          password: password.value,
-          strategy: 'password',
-        }
-      : {};
+export type CreateSignInInput = WithClient<{ fields: SignInMachineContext['fields'] }>;
 
-    return client.signIn.create({
-      identifier: identifier?.value as string,
-      ...passwordParams,
+export const createSignIn = fromPromise<SignInResource, CreateSignInInput>(({ input: { client, fields } }) => {
+  const password = fields.get('password');
+  const identifier = fields.get('identifier');
+
+  const passwordParams = password?.value
+    ? {
+        password: password.value,
+        strategy: 'password',
+      }
+    : {};
+
+  return client.signIn.create({
+    identifier: identifier?.value as string,
+    ...passwordParams,
+  });
+});
+
+// ================= authenticateWithRedirect ================= //
+
+export type AuthenticateWithRedirectInput = WithClerk<{
+  environment: EnvironmentResource | undefined;
+  strategy: AuthenticateWithRedirectParams['strategy'] | undefined;
+}>;
+
+export const authenticateWithRedirect = fromPromise<void, AuthenticateWithRedirectInput>(
+  async ({ input: { clerk, environment, strategy } }) => {
+    assertIsDefined(environment);
+    assertIsDefined(strategy);
+
+    return clerk.client.signIn.authenticateWithRedirect({
+      strategy,
+      redirectUrl: `${environment.displayConfig.signInUrl}/sso-callback`,
+      redirectUrlComplete: clerk.buildAfterSignInUrl(),
     });
   },
 );
 
-export const authenticateWithRedirect = fromPromise<
-  void,
-  WithClerk<{
-    environment: EnvironmentResource | undefined;
-    strategy: AuthenticateWithRedirectParams['strategy'] | undefined;
-  }>
->(async ({ input: { clerk, environment, strategy } }) => {
-  assertIsDefined(environment);
-  assertIsDefined(strategy);
+// ================= determineStartingFirstFactor ================= //
 
-  return clerk.client.signIn.authenticateWithRedirect({
-    strategy,
-    redirectUrl: `${environment.displayConfig.signInUrl}/sso-callback`,
-    redirectUrlComplete: clerk.buildAfterSignInUrl(),
-  });
-});
+export type DetermineStartingFirstFactorInput = {
+  supportedFactors: SignInFirstFactor[];
+  identifier: string | null;
+  preferredStrategy: PreferredSignInStrategy | undefined;
+};
 
-export const prepareFirstFactor = fromPromise<SignInResource, WithClient<WithParams<PrepareFirstFactorParams>>>(
-  ({ input }) => input.client.signIn.prepareFirstFactor(input.params),
+export const determineStartingFirstFactor = fromPromise<SignInFactor | null, DetermineStartingFirstFactorInput>(
+  async ({ input: { supportedFactors, identifier, preferredStrategy = 'password' } }) => {
+    try {
+      return Promise.resolve(determineStartingSignInFactor(supportedFactors, identifier, preferredStrategy));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  },
 );
 
-export const attemptFirstFactor = fromPromise<SignInResource, WithClient<WithParams<AttemptFirstFactorParams>>>(
-  ({ input }) => input.client.signIn.attemptFirstFactor(input.params),
+// ================= prepareFirstFactor ================= //
+
+export type PrepareFirstFactorInput = WithClient<WithParams<PrepareFirstFactorParams | null>>;
+
+export const prepareFirstFactor = fromPromise<SignInResource, PrepareFirstFactorInput>(
+  async ({ input: { client, params } }) => {
+    if (!params) {
+      throw new ClerkElementsRuntimeError('prepareFirstFactor parameters were undefined');
+    }
+
+    return client.signIn.prepareFirstFactor(params);
+  },
 );
 
-export const prepareSecondFactor = fromPromise<SignInResource, WithClient<WithParams<PrepareSecondFactorParams>>>(
-  ({ input }) => input.client.signIn.prepareSecondFactor(input.params),
+// ================= attemptFirstFactor ================= //
+
+export type AttemptFirstFactorInput = WithClient<
+  WithParams<{ fields: SignInMachineContext['fields']; currentFactor: SignInFirstFactor | null }>
+>;
+
+export const attemptFirstFactor = fromPromise<SignInResource, AttemptFirstFactorInput>(
+  async ({
+    input: {
+      client,
+      params: { fields, currentFactor },
+    },
+  }) => {
+    assertIsDefined(currentFactor);
+
+    let params;
+
+    if (currentFactor.strategy === 'password') {
+      params = {
+        strategy: 'password',
+        password: fields.get('password')?.value as string,
+      };
+    } else {
+      params = {
+        strategy: currentFactor.strategy,
+        code: fields.get('code')?.value as string,
+      };
+    }
+
+    return client.signIn.attemptFirstFactor(params as AttemptFirstFactorParams);
+  },
 );
 
-export const attemptSecondFactor = fromPromise<SignInResource, WithClient<WithParams<AttemptSecondFactorParams>>>(
-  ({ input }) => input.client.signIn.attemptSecondFactor(input.params),
+// ================= prepareSecondFactor ================= //
+
+export type PrepareSecondFactorInput = WithClient<WithParams<PrepareSecondFactorParams>>;
+
+export const prepareSecondFactor = fromPromise<SignInResource, PrepareSecondFactorInput>(({ input }) =>
+  input.client.signIn.prepareSecondFactor(input.params),
 );
 
-export const handleSSOCallback = fromPromise<
-  unknown,
-  WithClerk<WithParams<HandleOAuthCallbackParams | HandleSamlCallbackParams> & { router: ClerkRouter }>
->(async ({ input }) => {
+// ================= attemptSecondFactor ================= //
+
+export type AttemptSecondFactorInput = WithClient<WithParams<AttemptSecondFactorParams>>;
+
+export const attemptSecondFactor = fromPromise<SignInResource, AttemptSecondFactorInput>(({ input }) =>
+  input.client.signIn.attemptSecondFactor(input.params),
+);
+
+// ================= handleSSOCallback ================= //
+
+export type HandleSSOCallbackInput = WithClerk<
+  WithParams<HandleOAuthCallbackParams | HandleSamlCallbackParams> & { router: ClerkRouter }
+>;
+
+export const handleSSOCallback = fromPromise<unknown, HandleSSOCallbackInput>(async ({ input }) => {
   return input.clerk.handleRedirectCallback(
     {
       afterSignInUrl: input.clerk.buildAfterSignInUrl(),

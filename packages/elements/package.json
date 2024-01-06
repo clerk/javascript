@@ -63,6 +63,7 @@
     "@clerk/shared": "2.0.0-alpha-v5.8",
     "@radix-ui/react-form": "^0.0.3",
     "@radix-ui/react-slot": "^1.0.2",
+    "@statelyai/inspect": "^0.1.0",
     "@xstate/react": "^4.0.1",
     "clsx": "^2.0.0",
     "react-children-utilities": "^2.9.0",

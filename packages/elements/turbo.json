@@ -3,6 +3,7 @@
   "pipeline": {
     "dev": {
       "dependsOn": ["^build"],
+      "inputs": ["src/**", "!examples/**"],
       "cache": false,
       "persistent": true
     }

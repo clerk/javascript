@@ -2,9 +2,6 @@
   "name": "elements-nextjs",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "../.."
-  ],
   "scripts": {
     "build": "next build",
     "dev": "next dev",
@@ -13,7 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@clerk/elements": "*",
+    "@clerk/elements": "file:../../elements",
     "@clerk/nextjs": "file:../../nextjs",
     "@radix-ui/react-form": "^0.0.3",
     "clsx": "^2.0.0",
