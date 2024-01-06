@@ -3,6 +3,7 @@
 import {
   Errors,
   Field,
+  FieldState,
   Input,
   Label,
   SignIn,
@@ -84,6 +85,15 @@ export default function SignInPage() {
 
             <hr className='w-full border-foreground opacity-10' />
 
+            <Errors
+              render={({ code, message }) => (
+                <CustomError
+                  code={code}
+                  message={message}
+                />
+              )}
+            />
+
             <div className='flex gap-6 flex-col'>
               <Field
                 name='identifier'
@@ -105,6 +115,7 @@ export default function SignInPage() {
                     />
                   )}
                 />
+                <FieldState>{({ state }) => <span>Field state: {state}</span>}</FieldState>
               </Field>
 
               <Field
@@ -127,6 +138,7 @@ export default function SignInPage() {
                     />
                   )}
                 />
+                <FieldState>{({ state }) => <span>Field state: {state}</span>}</FieldState>
               </Field>
             </div>
 

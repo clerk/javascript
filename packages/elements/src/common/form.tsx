@@ -240,14 +240,14 @@ function GlobalErrors({ render, ...rest }: Exclude<ErrorsProps, 'name'>) {
   }
 
   return (
-    <div
+    <span
       role='alert'
       {...rest}
     >
       {errors.map(error => (
         <Slot key={`${error.name}-${error.code}`}>{render(error)}</Slot>
       ))}
-    </div>
+    </span>
   );
 }
 
