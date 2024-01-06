@@ -19,11 +19,11 @@ import {
   attemptFirstFactor,
   authenticateWithRedirect,
   createSignIn,
-  determineStartingFirstFactor,
   handleSSOCallback,
   prepareFirstFactor,
 } from './sign-in.actors';
 import type { LoadedClerkWithEnv } from './sign-in.types';
+import { determineStartingSignInFactor } from './sign-in.utils';
 import { assertActorEventError } from './utils/assert';
 
 export interface SignInMachineContext extends MachineContext {
@@ -72,7 +72,6 @@ export const SignInMachine = setup({
     createSignIn,
 
     // First Factor
-    determineStartingFirstFactor,
     attemptFirstFactor,
     prepareFirstFactor,
 
@@ -282,6 +281,14 @@ export const SignInMachine = setup({
     },
     FirstFactor: {
       initial: 'DeterminingState',
+      entry: assign({
+        currentFactor: ({ context }) =>
+          determineStartingSignInFactor(
+            context.clerk.client.signIn.supportedFirstFactors,
+            context.clerk.client.signIn.identifier,
+            context.environment?.displayConfig.preferredSignInStrategy,
+          ),
+      }),
       states: {
         DeterminingState: {
           always: [
@@ -303,26 +310,6 @@ export const SignInMachine = setup({
               reenter: true,
             },
           ],
-        },
-        DetermineStartingFactor: {
-          invoke: {
-            id: 'determineStartingFirstFactor',
-            src: 'determineStartingFirstFactor',
-            input: ({ context }) => ({
-              supportedFactors: context.clerk.client.signIn.supportedFirstFactors,
-              identifier: context.clerk.client.signIn.identifier,
-              preferredStrategy: context.environment?.displayConfig.preferredSignInStrategy,
-            }),
-            onDone: {
-              actions: assign({ currentFactor: ({ event }) => event.output }),
-              target: 'DeterminingState',
-              reenter: true,
-            },
-            onError: {
-              actions: 'setFormErrors',
-              target: 'Failure',
-            },
-          },
         },
         Preparing: {
           invoke: {

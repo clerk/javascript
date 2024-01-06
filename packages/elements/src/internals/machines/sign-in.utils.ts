@@ -15,7 +15,7 @@ const findFactorForIdentifier = (i: string | null) => (f: SignInFactor) => {
 export function determineStartingSignInFactor(
   firstFactors: SignInFactor[],
   identifier: string | null,
-  preferredSignInStrategy: PreferredSignInStrategy,
+  preferredSignInStrategy?: PreferredSignInStrategy,
 ): SignInFactor | null {
   if (!firstFactors || firstFactors.length === 0) {
     return null;
