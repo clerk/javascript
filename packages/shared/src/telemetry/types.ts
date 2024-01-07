@@ -70,5 +70,6 @@ export type TelemetryEvent = {
 
 export type TelemetryEventRaw<Payload = TelemetryEvent['payload']> = {
   event: TelemetryEvent['event'];
+  eventSamplingRate?: number;
   payload: Payload;
 };
