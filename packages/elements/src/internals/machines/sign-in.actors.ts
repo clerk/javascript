@@ -5,10 +5,8 @@ import type {
   EnvironmentResource,
   HandleOAuthCallbackParams,
   HandleSamlCallbackParams,
-  PreferredSignInStrategy,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
-  SignInFactor,
   SignInFirstFactor,
   SignInResource,
 } from '@clerk/types';
@@ -18,7 +16,6 @@ import { ClerkElementsRuntimeError } from '../errors/error';
 import type { ClerkRouter } from '../router';
 import type { SignInMachineContext } from './sign-in.machine';
 import type { WithClerk, WithClient, WithParams } from './sign-in.types';
-import { determineStartingSignInFactor } from './sign-in.utils';
 import { assertIsDefined } from './utils/assert';
 
 // ================= createSignIn ================= //
@@ -59,24 +56,6 @@ export const authenticateWithRedirect = fromPromise<void, AuthenticateWithRedire
       redirectUrl: `${environment.displayConfig.signInUrl}/sso-callback`,
       redirectUrlComplete: clerk.buildAfterSignInUrl(),
     });
-  },
-);
-
-// ================= determineStartingFirstFactor ================= //
-
-export type DetermineStartingFirstFactorInput = {
-  supportedFactors: SignInFirstFactor[];
-  identifier: string | null;
-  preferredStrategy: PreferredSignInStrategy | undefined;
-};
-
-export const determineStartingFirstFactor = fromPromise<SignInFactor | null, DetermineStartingFirstFactorInput>(
-  async ({ input: { supportedFactors, identifier, preferredStrategy = 'password' } }) => {
-    try {
-      return Promise.resolve(determineStartingSignInFactor(supportedFactors, identifier, preferredStrategy));
-    } catch (e) {
-      return Promise.reject(e);
-    }
   },
 );
 
@@ -153,8 +132,8 @@ export const handleSSOCallback = fromPromise<unknown, HandleSSOCallbackInput>(as
   return input.clerk.handleRedirectCallback(
     {
       afterSignInUrl: input.clerk.buildAfterSignInUrl(),
-      firstFactorUrl: '../factor-one',
-      secondFactorUrl: '../factor-two',
+      firstFactorUrl: '../',
+      secondFactorUrl: '../',
       ...input.params,
     },
     // @ts-expect-error - Align on return typing. `void` vs `Promise<unknown>`

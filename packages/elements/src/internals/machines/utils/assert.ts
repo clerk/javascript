@@ -14,6 +14,6 @@ export function assertActorEventDone<T>(event: EventObject): asserts event is Do
 
 export function assertActorEventError<T = Error>(event: EventObject): asserts event is ErrorActorEvent<T> {
   if ('error' in event === false) {
-    throw new Error(`Expected a error event, got "${event.type}"`);
+    throw new Error(`Expected an error event, got "${event.type}"`);
   }
 }
