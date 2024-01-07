@@ -4,26 +4,30 @@ import type {
   EnvironmentResource,
   OAuthStrategy,
   PrepareFirstFactorParams,
+  PrepareSecondFactorParams,
   SignInFactor,
   SignInFirstFactor,
   SignInResource,
+  SignInSecondFactor,
   Web3Strategy,
 } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
-import { and, assertEvent, assign, log, not, or, sendTo, setup } from 'xstate';
+import { and, assertEvent, assign, not, or, sendTo, setup } from 'xstate';
 
 import type { ClerkRouter } from '../router';
 import type { FormMachine } from './form.machine';
 import { waitForClerk } from './shared.actors';
 import {
   attemptFirstFactor,
+  attemptSecondFactor,
   authenticateWithRedirect,
   createSignIn,
   handleSSOCallback,
   prepareFirstFactor,
+  prepareSecondFactor,
 } from './sign-in.actors';
 import type { LoadedClerkWithEnv } from './sign-in.types';
-import { determineStartingSignInFactor } from './sign-in.utils';
+import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from './sign-in.utils';
 import { assertActorEventError } from './utils/assert';
 
 export interface SignInMachineContext extends MachineContext {
@@ -72,8 +76,12 @@ export const SignInMachine = setup({
     createSignIn,
 
     // First Factor
-    attemptFirstFactor,
     prepareFirstFactor,
+    attemptFirstFactor,
+
+    // Second Factor
+    prepareSecondFactor,
+    attemptSecondFactor,
 
     // SSO
     handleSSOCallback,
@@ -105,6 +113,7 @@ export const SignInMachine = setup({
     isServer: ({ context }) => context.mode === 'server',
     isBrowser: ({ context }) => context.mode === 'browser',
     isCurrentFactorPassword: ({ context }) => context.currentFactor?.strategy === 'password',
+    isCurrentFactorTOTP: ({ context }) => context.currentFactor?.strategy === 'totp',
     isClerkLoaded: ({ context }) => context.clerk.loaded,
     isClerkEnvironmentLoaded: ({ context }) => Boolean(context.clerk.__unstable__environment),
     isSignInComplete: ({ context }) => context?.resource?.status === 'complete',
@@ -293,12 +302,6 @@ export const SignInMachine = setup({
         DeterminingState: {
           always: [
             {
-              description: 'If the current factor is not set, determine the starting factor details',
-              guard: not('hasCurrentFactor'),
-              target: 'DetermineStartingFactor',
-              reenter: true,
-            },
-            {
               description: 'If the current factor is not password, prepare the factor',
               guard: not('isCurrentFactorPassword'),
               target: 'Preparing',
@@ -387,7 +390,7 @@ export const SignInMachine = setup({
             },
             {
               guard: 'needsSecondFactor',
-              target: '#SignIn.FirstFactor',
+              target: '#SignIn.SecondFactor',
             },
             {
               target: '#SignIn.DeterminingState',
@@ -403,8 +406,104 @@ export const SignInMachine = setup({
       },
     },
     SecondFactor: {
-      type: 'final',
-      actions: [log('SecondFactor'), 'debug'],
+      initial: 'DeterminingState',
+      entry: assign({
+        currentFactor: ({ context }) =>
+          determineStartingSignInSecondFactor(context.clerk.client.signIn.supportedSecondFactors),
+      }),
+      states: {
+        DeterminingState: {
+          always: [
+            {
+              description: 'If the current factor is not TOTP, prepare the factor',
+              guard: not('isCurrentFactorTOTP'),
+              target: 'Preparing',
+              reenter: true,
+            },
+            {
+              description: 'Else, skip to awaiting input',
+              target: 'AwaitingInput',
+              reenter: true,
+            },
+          ],
+        },
+        Preparing: {
+          invoke: {
+            id: 'prepareSecondFactor',
+            src: 'prepareSecondFactor',
+            input: ({ context }) => {
+              return {
+                client: context.clerk.client,
+                params: !context.currentFactor ? null : (context.currentFactor as PrepareSecondFactorParams),
+              };
+            },
+            onDone: {
+              target: 'AwaitingInput',
+              actions: [
+                assign({
+                  resource: ({ event }) => event.output,
+                }),
+              ],
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Failure',
+            },
+          },
+        },
+        AwaitingInput: {
+          description: 'Waiting for user input',
+          on: {
+            SUBMIT: {
+              target: 'Attempting',
+              reenter: true,
+            },
+          },
+        },
+        Attempting: {
+          invoke: {
+            id: 'attemptSecondFactor',
+            src: 'attemptSecondFactor',
+            input: ({ context }) => ({
+              client: context.clerk.client,
+              params: {
+                currentFactor: context.currentFactor as SignInSecondFactor,
+                fields: context.formRef.getSnapshot().context.fields,
+              },
+            }),
+            onDone: {
+              actions: [
+                assign({
+                  resource: ({ event }) => event.output,
+                }),
+              ],
+              target: 'Success',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'AwaitingInput',
+            },
+          },
+        },
+        Success: {
+          type: 'final',
+          always: [
+            {
+              guard: 'isSignInComplete',
+              target: '#SignIn.Complete',
+            },
+            {
+              target: '#SignIn.DeterminingState',
+              reenter: true,
+            },
+          ],
+        },
+        Failure: {
+          type: 'final',
+          target: '#SignIn.DeterminingState',
+          reenter: true,
+        },
+      },
     },
     SSOCallbackRunning: {
       invoke: {

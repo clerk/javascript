@@ -185,6 +185,34 @@ export default function SignInPage() {
               </Submit>
             </SignInStrategy>
 
+            <SignInStrategy name='email_code'>
+              <Field
+                name='code'
+                className='flex flex-col gap-4'
+              >
+                <div className='flex gap-4 justify-between items-center'>
+                  <Label>Email Code</Label>
+                  <Input
+                    type='code'
+                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                  />
+                </div>
+
+                <Errors
+                  render={({ code, message }) => (
+                    <CustomError
+                      code={code}
+                      message={message}
+                    />
+                  )}
+                />
+              </Field>
+
+              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+                Sign In
+              </Submit>
+            </SignInStrategy>
+
             <SignInStrategy name='phone_code'>
               <Field
                 name='code'
