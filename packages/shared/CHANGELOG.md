@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.1
+
+### Patch Changes
+
+- Fixes a bug where Invitations from `useOrganization` incorrectly depended on options for memberships. ([#2481](https://github.com/clerk/javascript/pull/2481)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
 ## 1.3.0
 
 ### Minor Changes

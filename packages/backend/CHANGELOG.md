@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.37.1
+
+### Patch Changes
+
+- Fixed a bug where backend API responses where missing error details. This was caused by parsing the errors twice once in the response error handling code and again when initializing the ClerkAPIResponseError. ([#2421](https://github.com/clerk/javascript/pull/2421)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Updated dependencies [[`65332d744`](https://github.com/clerk/javascript/commit/65332d7440419e275e76ffde104b7d0fe98ceeda)]:
+  - @clerk/shared@1.3.1
+
 ## 0.37.0
 
 ### Minor Changes
