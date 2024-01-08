@@ -47,5 +47,5 @@ export type OrganizationPreviewId =
 
 export type FooterActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn';
 
-export type MenuId = 'invitation' | 'member';
+export type MenuId = 'invitation' | 'member' | ProfileSectionId;
 export type SelectId = 'countryCode' | 'role';

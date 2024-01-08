@@ -1,9 +1,11 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { MenuId } from '@clerk/types';
+import type { Placement } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
 
-import { Button, Col, descriptors } from '../customizables';
+import type { Button } from '../customizables';
+import { Col, descriptors, SimpleButton } from '../customizables';
 import type { UsePopoverReturn } from '../hooks';
 import { usePopover } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -17,16 +19,20 @@ type MenuState = {
   elementId?: MenuId;
 };
 
-const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState');
+export const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState');
 
-type MenuProps = PropsWithChildren<Record<never, never>> & { elementId?: MenuId };
+type MenuProps = PropsWithChildren<Record<never, never>> & {
+  elementId?: MenuId;
+  popoverPlacement?: Placement;
+};
 
 export const Menu = withFloatingTree((props: MenuProps) => {
-  const { elementId } = props;
+  const { popoverPlacement = 'bottom-end', elementId, ...rest } = props;
   const popoverCtx = usePopover({
-    placement: 'right-start',
+    placement: popoverPlacement,
     offset: 8,
     bubbles: false,
+    shoudFlip: false,
   });
 
   const value = React.useMemo(() => ({ value: { popoverCtx, elementId } }), [{ ...popoverCtx }, elementId]);
@@ -34,7 +40,7 @@ export const Menu = withFloatingTree((props: MenuProps) => {
   return (
     <MenuStateCtx.Provider
       value={value}
-      {...props}
+      {...rest}
     />
   );
 });
@@ -53,8 +59,8 @@ export const MenuTrigger = (props: MenuTriggerProps) => {
   return cloneElement(children, {
     // @ts-expect-error
     ref: reference,
-    elementDescriptor: descriptors.menuButton,
-    elementId: descriptors.menuButton.setId(elementId),
+    elementDescriptor: children.props.elementDescriptor || descriptors.menuButton,
+    elementId: children.props.elementId || descriptors.menuButton.setId(elementId),
     onClick: (e: React.MouseEvent) => {
       children.props?.onClick?.(e);
       toggle();
@@ -72,10 +78,12 @@ const findMenuItem = (el: Element, siblingType: 'prev' | 'next', options?: { cou
   return sibling;
 };
 
-type MenuListProps = PropsOfComponent<typeof Col>;
+type MenuListProps = PropsOfComponent<typeof Col> & {
+  asPortal?: boolean;
+};
 
 export const MenuList = (props: MenuListProps) => {
-  const { sx, ...rest } = props;
+  const { sx, asPortal, ...rest } = props;
   const { popoverCtx, elementId } = useMenuState();
   const { floating, styles, isOpen, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -107,6 +115,7 @@ export const MenuList = (props: MenuListProps) => {
       nodeId={nodeId}
       isOpen={isOpen}
       order={['floating', 'content']}
+      portal={asPortal}
     >
       <Col
         elementDescriptor={descriptors.menuList}
@@ -142,10 +151,11 @@ export const MenuList = (props: MenuListProps) => {
 
 type MenuItemProps = PropsOfComponent<typeof Button> & {
   destructive?: boolean;
+  closeAfterClick?: boolean;
 };
 
 export const MenuItem = (props: MenuItemProps) => {
-  const { sx, onClick, destructive, ...rest } = props;
+  const { sx, onClick, destructive, closeAfterClick = true, ...rest } = props;
   const { popoverCtx, elementId } = useMenuState();
   const { toggle } = popoverCtx;
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -167,7 +177,7 @@ export const MenuItem = (props: MenuItemProps) => {
   };
 
   return (
-    <Button
+    <SimpleButton
       ref={buttonRef}
       elementDescriptor={descriptors.menuItem}
       elementId={descriptors.menuItem.setId(elementId)}
@@ -177,7 +187,7 @@ export const MenuItem = (props: MenuItemProps) => {
       onKeyDown={onKeyDown}
       onClick={e => {
         onClick?.(e);
-        toggle();
+        closeAfterClick && toggle();
       }}
       sx={[
         theme => ({

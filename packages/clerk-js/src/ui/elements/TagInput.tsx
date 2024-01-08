@@ -165,6 +165,10 @@ export const TagInput = (props: TagInputProps) => {
           '::placeholder': {
             color: t.colors.$colorTextTertiary,
           },
+          boxShadow: 'none',
+          ':hover': {
+            boxShadow: 'none',
+          },
         })}
       />
     </Flex>

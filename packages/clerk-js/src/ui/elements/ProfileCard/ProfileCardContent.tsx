@@ -36,7 +36,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         borderRadius: t.radii.$lg,
         width: '100%',
         height: '100%',
-        overflowY: 'auto',
+        overflow: 'hidden',
         boxShadow: common.shadows(t).cardContentShadow,
       })}
     >

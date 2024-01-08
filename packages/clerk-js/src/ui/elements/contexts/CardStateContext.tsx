@@ -54,6 +54,7 @@ const useCardState = () => {
     error: state.error ? state.error : undefined,
     isLoading: state.status === 'loading',
     isIdle: state.status === 'idle',
+    state,
   };
 };
 
