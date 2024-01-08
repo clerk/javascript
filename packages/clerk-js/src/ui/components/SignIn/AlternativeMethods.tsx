@@ -68,7 +68,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
               <>
                 {asForgotPassword && (
                   <Divider
-                    deviderText={localizationKeys('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}
+                    dividerText={localizationKeys('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}
                   />
                 )}
                 <Flex
