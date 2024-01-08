@@ -16,7 +16,7 @@ export default defineConfig(overrideOptions => {
     },
     dts: true,
     entry: {
-      index: 'src/index.tsx',
+      index: 'src/index.ts',
     },
     external: ['react', 'react-dom'],
     format: ['cjs', 'esm'],

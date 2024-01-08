@@ -1,7 +1,7 @@
 import { createActorContext } from '@xstate/react';
 import type { SnapshotFrom } from 'xstate';
 
-import { FormMachine } from './form.machine';
+import { FormMachine } from '~/internals/machines/form.machine';
 
 export type SnapshotState = SnapshotFrom<typeof FormMachine>;
 

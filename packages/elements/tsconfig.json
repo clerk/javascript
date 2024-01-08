@@ -19,7 +19,10 @@
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ES2020"
+    "target": "ES2020",
+    "paths": {
+      "~*": ["./src/*"]
+    }
   },
   "include": ["src"]
 }

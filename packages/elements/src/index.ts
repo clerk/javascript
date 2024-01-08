@@ -1,9 +1,10 @@
 'use client';
-import { useNextRouter } from './internals/router';
+
+import { useNextRouter } from './react/router/next';
 
 /** Common Components */
-export { Errors, Field, FieldState, Form, Input, Label, Submit } from './common/form';
-export { SocialProviders } from './common/social-providers';
+export { Errors, Field, FieldState, Form, Input, Label, Submit } from './react/common/form';
+export { SocialProviders } from './react/common/social-providers';
 
 /** Sign In Components */
 export {
@@ -14,7 +15,7 @@ export {
   SignInSSOCallback,
   SignInStrategies,
   SignInStrategy,
-} from './sign-in';
+} from './react/sign-in';
 
 /** Hooks */
 export { useSignInFlow, useSignInFlowSelector } from './internals/machines/sign-in.context';

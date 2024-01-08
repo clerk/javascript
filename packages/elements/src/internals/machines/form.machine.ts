@@ -2,7 +2,8 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
 
-import { ClerkElementsError, ClerkElementsFieldError } from '../errors/error';
+import { ClerkElementsError, ClerkElementsFieldError } from '~/internals/errors/error';
+
 import type { FieldDetails } from './form.types';
 
 export interface FormMachineContext extends MachineContext {

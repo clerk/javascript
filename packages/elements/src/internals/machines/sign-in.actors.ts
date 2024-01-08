@@ -12,8 +12,9 @@ import type {
 } from '@clerk/types';
 import { fromPromise } from 'xstate';
 
-import { ClerkElementsRuntimeError } from '../errors/error';
-import type { ClerkRouter } from '../router';
+import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import type { ClerkRouter } from '~react/router';
+
 import type { SignInMachineContext } from './sign-in.machine';
 import type { WithClerk, WithClient, WithParams } from './sign-in.types';
 import { assertIsDefined } from './utils/assert';

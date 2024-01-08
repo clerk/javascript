@@ -1,4 +1,4 @@
-import type { ClerkElementsFieldError } from '../errors/error';
+import type { ClerkElementsFieldError } from '~internals/errors/error';
 
 export type FieldDetails = {
   name?: string;

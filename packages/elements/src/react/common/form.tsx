@@ -12,15 +12,15 @@ import type { HTMLProps, ReactNode } from 'react';
 import React, { createContext, useCallback, useContext, useEffect } from 'react';
 import type { BaseActorRef } from 'xstate';
 
-import type { ClerkElementsError } from '../internals/errors/error';
+import type { ClerkElementsError } from '~/internals/errors/error';
 import {
   fieldErrorsSelector,
   fieldHasValueSelector,
   globalErrorsSelector,
   useFormSelector,
   useFormStore,
-} from '../internals/machines/form.context';
-import type { FieldDetails } from '../internals/machines/form.types';
+} from '~/internals/machines/form.context';
+import type { FieldDetails } from '~/internals/machines/form.types';
 
 const FieldContext = createContext<Pick<FieldDetails, 'name'> | null>(null);
 const useFieldContext = () => useContext(FieldContext);
