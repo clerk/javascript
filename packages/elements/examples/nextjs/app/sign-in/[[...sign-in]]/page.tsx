@@ -3,6 +3,7 @@
 import {
   Errors,
   Field,
+  FieldState,
   Input,
   Label,
   SignIn,
@@ -34,13 +35,14 @@ const BUTTON_BGS_HOVER: Record<string, string> = {
 };
 
 const CustomError = forwardRef<HTMLParagraphElement, { code: string; message: string }>(function CustomError(
-  { code, message },
+  { code, message, ...rest },
   ref,
 ) {
   return (
     <p
       className='text-red-400 font-mono'
       ref={ref}
+      {...rest}
     >
       <span className='block '>{code}:</span> {message}
     </p>
@@ -87,6 +89,15 @@ export default function SignInPage() {
 
             <HR />
 
+            <Errors
+              render={({ code, message }) => (
+                <CustomError
+                  code={code}
+                  message={message}
+                />
+              )}
+            />
+
             <div className='flex gap-6 flex-col'>
               <Field
                 name='identifier'
@@ -108,6 +119,7 @@ export default function SignInPage() {
                     />
                   )}
                 />
+                <FieldState>{({ state }) => <span>Field state: {state}</span>}</FieldState>
               </Field>
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
@@ -178,6 +190,7 @@ export default function SignInPage() {
                     />
                   )}
                 />
+                <FieldState>{({ state }) => <span>Field state: {state}</span>}</FieldState>
               </Field>
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
