@@ -2,6 +2,8 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
+import { isCI } from 'std-env';
+
 // If we make significant changes to how telemetry is collected in the future, bump this version.
 const TELEMETRY_NOTICE_VERSION = '1';
 
@@ -57,7 +59,9 @@ async function notifyAboutTelemetry() {
 
   config.telemetryNoticeVersion = TELEMETRY_NOTICE_VERSION;
 
-  telemetryNotice();
+  if (!isCI) {
+    telemetryNotice();
+  }
 
   await fs.writeFile(configFile, JSON.stringify(config, null, '\t'));
 }
