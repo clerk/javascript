@@ -150,7 +150,14 @@ export default (QUnit: QUnit) => {
     });
 
     test('executes a failed backend API request and parses the error response', async assert => {
-      const mockErrorPayload = { code: 'whatever_error', message: 'whatever error', meta: {} };
+      const mockErrorPayload = {
+        code: 'whatever_error',
+        message: 'whatever error',
+        long_message: 'some long message',
+        meta: {
+          param_name: 'whatever_param',
+        },
+      };
       const traceId = 'trace_id_123';
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonNotOk({ errors: [mockErrorPayload], clerk_trace_id: traceId }));
@@ -162,6 +169,9 @@ export default (QUnit: QUnit) => {
         assert.equal(e.clerkError, true);
         assert.equal(e.status, 422);
         assert.equal(e.errors[0].code, 'whatever_error');
+        assert.equal(e.errors[0].message, 'whatever error');
+        assert.equal(e.errors[0].longMessage, 'some long message');
+        assert.equal(e.errors[0].meta.paramName, 'whatever_param');
       }
 
       assert.ok(
