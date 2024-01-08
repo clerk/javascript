@@ -1,5 +1,10 @@
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization, useCoreUser, useCoreOrganizationList, useOrganizationProfileContext } from '../../contexts';
+import {
+  useCoreOrganization,
+  useCoreOrganizationList,
+  useCoreUser,
+  useOrganizationProfileContext,
+} from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
 import {
@@ -12,8 +17,8 @@ import {
 } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
-import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 import { organizationListParams } from '../OrganizationSwitcher/utils';
+import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 const useLeaveWithRevalidations = (leavePromise: (() => Promise<any>) | undefined) => {
   const card = useCardState();
@@ -35,11 +40,11 @@ const useLeaveWithRevalidations = (leavePromise: (() => Promise<any>) | undefine
       });
 };
 
-export const LeaveOrganizationForm = () => {
+export const LeaveOrganizationPage = () => {
   const { organization } = useCoreOrganization();
-  const { user } = useCoreUser();
+  const user = useCoreUser();
 
-  const leaveOrg = useLeaveWithRevalidations(() => user!.leaveOrganization(organization!.id));
+  const leaveOrg = useLeaveWithRevalidations(organization ? () => user.leaveOrganization(organization.id) : undefined);
 
   if (!organization || !user) {
     return null;
@@ -72,10 +77,6 @@ export const DeleteOrganizationPage = () => {
   if (!organization || !membership) {
     return null;
   }
-
-  const deleteOrg = () => {
-    return card.runAsync(organization.destroy()).then(navigateAfterLeaveOrganization);
-  };
 
   return (
     <ActionConfirmationPage
