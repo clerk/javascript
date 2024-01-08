@@ -4,7 +4,7 @@ export default function Page() {
   return (
     <div>
       <OrganizationSwitcher />
-      <OrganizationProfile />
+      <OrganizationProfile path='/app-dir/organization' />
     </div>
   );
 }
