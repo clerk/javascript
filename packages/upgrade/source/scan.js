@@ -41,7 +41,15 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 	// result = `files` set to format: ['/filename', '/other/filename']
 	useEffect(() => {
 		setStatus('Collecting files to scan');
-		ignore.push('node_modules/**', '.git/**', 'package.json', 'package-lock.json');
+		ignore.push(
+			'node_modules/**',
+			'**/node_modules/**',
+			'.git/**',
+			'package.json',
+			'package-lock.json',
+			'yarn.lock',
+			'pnpm-lock.yaml',
+		);
 		globby(dir, { ignore: [...ignore.filter(x => x)] }).then(files => setFiles(files));
 	}, [dir, ignore]);
 
@@ -51,6 +59,8 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 	//
 	useEffect(() => {
 		if (!matchers || !files) return;
+
+		console.log(files);
 
 		Promise.all(
 			// first we read all the files
