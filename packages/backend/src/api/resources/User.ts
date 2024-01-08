@@ -3,8 +3,6 @@ import { ExternalAccount } from './ExternalAccount';
 import type { ExternalAccountJSON, UserJSON } from './JSON';
 import { PhoneNumber } from './PhoneNumber';
 import { Web3Wallet } from './Web3Wallet';
-export const getFullName = ({ firstName, lastName }: { firstName?: string | null; lastName?: string | null }) =>
-  [firstName, lastName].join(' ').trim() || null;
 
 export class User {
   constructor(
@@ -21,17 +19,13 @@ export class User {
     readonly gender: string,
     readonly birthday: string,
     readonly primaryEmailAddressId: string | null,
-    readonly primaryEmailAddress: EmailAddress | null,
     readonly primaryPhoneNumberId: string | null,
-    readonly primaryPhoneNumber: PhoneNumber | null,
     readonly primaryWeb3WalletId: string | null,
-    readonly primaryWeb3Wallet: Web3Wallet | null,
     readonly lastSignInAt: number | null,
     readonly externalId: string | null,
     readonly username: string | null,
     readonly firstName: string | null,
     readonly lastName: string | null,
-    readonly fullName: string | null,
     readonly publicMetadata: UserPublicMetadata = {},
     readonly privateMetadata: UserPrivateMetadata = {},
     readonly unsafeMetadata: UserUnsafeMetadata = {},
@@ -61,17 +55,13 @@ export class User {
       data.gender,
       data.birthday,
       data.primary_email_address_id,
-      emailAddresses.find(({ id }) => id === data.primary_email_address_id) ?? null,
       data.primary_phone_number_id,
-      phoneNumbers.find(({ id }) => id === data.primary_phone_number_id) ?? null,
       data.primary_web3_wallet_id,
-      wallets.find(({ id }) => id === data.primary_web3_wallet_id) ?? null,
       data.last_sign_in_at,
       data.external_id,
       data.username,
       data.first_name,
       data.last_name,
-      getFullName({ firstName: data.first_name, lastName: data.last_name }),
       data.public_metadata,
       data.private_metadata,
       data.unsafe_metadata,
@@ -82,5 +72,21 @@ export class User {
       data.last_active_at,
       data.create_organization_enabled,
     );
+  }
+
+  get primaryEmailAddress() {
+    return this.emailAddresses.find(({ id }) => id === this.primaryEmailAddressId) ?? null;
+  }
+
+  get primaryPhoneNumber() {
+    return this.phoneNumbers.find(({ id }) => id === this.primaryPhoneNumberId) ?? null;
+  }
+
+  get primaryWeb3Wallet() {
+    return this.web3Wallets.find(({ id }) => id === this.primaryWeb3WalletId) ?? null;
+  }
+
+  get fullName() {
+    return [this.firstName, this.lastName].join(' ').trim() || null;
   }
 }
