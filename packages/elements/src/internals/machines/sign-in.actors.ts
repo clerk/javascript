@@ -1,6 +1,5 @@
 import type {
   AttemptFirstFactorParams,
-  AttemptSecondFactorParams,
   AuthenticateWithRedirectParams,
   EnvironmentResource,
   HandleOAuthCallbackParams,
@@ -9,6 +8,7 @@ import type {
   PrepareSecondFactorParams,
   SignInFirstFactor,
   SignInResource,
+  SignInSecondFactor,
 } from '@clerk/types';
 import { fromPromise } from 'xstate';
 
@@ -108,19 +108,32 @@ export const attemptFirstFactor = fromPromise<SignInResource, AttemptFirstFactor
 
 // ================= prepareSecondFactor ================= //
 
-export type PrepareSecondFactorInput = WithClient<WithParams<PrepareSecondFactorParams>>;
+export type PrepareSecondFactorInput = WithClient<WithParams<PrepareSecondFactorParams | null>>;
 
-export const prepareSecondFactor = fromPromise<SignInResource, PrepareSecondFactorInput>(({ input }) =>
-  input.client.signIn.prepareSecondFactor(input.params),
-);
+export const prepareSecondFactor = fromPromise<SignInResource, PrepareSecondFactorInput>(({ input }) => {
+  const currentFactor = input.params;
+  assertIsDefined(currentFactor);
+
+  return input.client.signIn.prepareSecondFactor({
+    strategy: currentFactor.strategy,
+    phoneNumberId: currentFactor.phoneNumberId,
+  });
+});
 
 // ================= attemptSecondFactor ================= //
 
-export type AttemptSecondFactorInput = WithClient<WithParams<AttemptSecondFactorParams>>;
+export type AttemptSecondFactorInput = WithClient<
+  WithParams<{ fields: SignInMachineContext['fields']; currentFactor: SignInSecondFactor | null }>
+>;
 
-export const attemptSecondFactor = fromPromise<SignInResource, AttemptSecondFactorInput>(({ input }) =>
-  input.client.signIn.attemptSecondFactor(input.params),
-);
+export const attemptSecondFactor = fromPromise<SignInResource, AttemptSecondFactorInput>(({ input }) => {
+  assertIsDefined(input.params.currentFactor);
+
+  return input.client.signIn.attemptSecondFactor({
+    strategy: input.params.currentFactor.strategy,
+    code: input.params.fields.get('code').value,
+  });
+});
 
 // ================= handleSSOCallback ================= //
 
