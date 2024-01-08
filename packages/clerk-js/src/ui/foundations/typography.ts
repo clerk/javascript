@@ -20,8 +20,8 @@ const letterSpacings = Object.freeze({
 // This is directly related to the createFontSizeScale function in the theme
 // ref: src/ui/customizables/parseVariables.ts
 const fontSizes = Object.freeze({
-  xs: '0.65rem',
-  sm: '0.73125rem',
+  xs: '0.6875rem',
+  sm: '0.75rem',
   md: '0.8125rem',
   lg: '1.05625rem',
   xl: '1.503125rem',

@@ -79,7 +79,7 @@ const FieldOptionalLabel = () => {
       elementId={descriptors.formFieldHintText.setId(fieldId)}
       as='span'
       variant='caption'
-      colorScheme='neutral'
+      colorScheme='tertiary'
       isDisabled={isDisabled}
     />
   );
