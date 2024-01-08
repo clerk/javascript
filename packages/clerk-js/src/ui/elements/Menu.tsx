@@ -22,7 +22,7 @@ type MenuState = {
 export const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState');
 
 type MenuProps = PropsWithChildren<Record<never, never>> & {
-  elementId?: any;
+  elementId?: MenuId;
   popoverPlacement?: Placement;
 };
 
@@ -79,11 +79,11 @@ const findMenuItem = (el: Element, siblingType: 'prev' | 'next', options?: { cou
 };
 
 type MenuListProps = PropsOfComponent<typeof Col> & {
-  isPortal?: boolean;
+  asPortal?: boolean;
 };
 
 export const MenuList = (props: MenuListProps) => {
-  const { sx, isPortal, ...rest } = props;
+  const { sx, asPortal, ...rest } = props;
   const { popoverCtx, elementId } = useMenuState();
   const { floating, styles, isOpen, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -115,7 +115,7 @@ export const MenuList = (props: MenuListProps) => {
       nodeId={nodeId}
       isOpen={isOpen}
       order={['floating', 'content']}
-      portal={isPortal}
+      portal={asPortal}
     >
       <Col
         elementDescriptor={descriptors.menuList}

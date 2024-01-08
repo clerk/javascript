@@ -208,7 +208,7 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
           />
         </MenuTrigger>
         <MenuList
-          isPortal={false}
+          asPortal={false}
           sx={t => ({
             width: '100%',
             gap: 2,
