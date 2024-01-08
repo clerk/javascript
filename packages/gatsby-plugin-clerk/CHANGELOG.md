@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.0-alpha-v5.15
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/backend@1.0.0-alpha-v5.13
+  - @clerk/clerk-react@5.0.0-alpha-v5.14
+  - @clerk/clerk-sdk-node@5.0.0-alpha-v5.13
+
 ## 5.0.0-alpha-v5.14
 
 ### Patch Changes
