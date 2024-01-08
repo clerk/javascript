@@ -7,7 +7,7 @@ import Scan from './scan.js';
 import guessFrameworks from './util/guess-framework.js';
 import getClerkMajorVersion from './util/get-clerk-version.js';
 
-export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ignore = '' }) {
+export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ignore = [] }) {
 	const [sdks, setSdks] = useState(_sdk ? [_sdk] : []);
 	const [sdkGuessAttempted, setSdkGuessAttempted] = useState(false);
 	const [fromVersion, setFromVersion] = useState(_fromVersion);
@@ -157,7 +157,7 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 					/>
 				</>
 			)}
-			{!isEmpty(sdks) && fromVersion && toVersion && dir && !ignore && (
+			{!isEmpty(sdks) && fromVersion && toVersion && dir && isEmpty(ignore) && !configComplete && (
 				<>
 					<Text>
 						Are there any files or directories you'd like to ignore? If so, you can add them below, separated by commas.
@@ -168,7 +168,7 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 						placeholder='docs/**, images/**'
 						defaultValue={ignore}
 						onSubmit={val => {
-							setIgnore(val.split(','));
+							setIgnore(val);
 							setConfigComplete(true);
 						}}
 					/>
