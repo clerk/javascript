@@ -3,7 +3,7 @@ import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
 import { Button, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
-import { ArrowBlockButton, BackLink, Card, Divider, Footer, Header } from '../../elements';
+import { ArrowBlockButton, BackLink, Card, Divider, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { ChatAltIcon, Email, LinkIcon, LockClosedIcon, RequestAuthIcon } from '../../icons';
@@ -103,22 +103,18 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
               />
             )}
           </Flex>
+
+          <Card.Action elementId='havingTrouble'>
+            <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
+            <Card.ActionLink
+              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+              onClick={onHavingTroubleClick}
+            />
+          </Card.Action>
         </Card.Content>
 
-        <Footer.Root>
-          <Footer.Links />
-        </Footer.Root>
         <Card.Footer>
-          <Footer.Root key='signIn.alternativeMethods.actionLink'>
-            <Footer.Action elementId='havingTrouble'>
-              <Footer.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
-              <Footer.ActionLink
-                localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
-                onClick={onHavingTroubleClick}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+          <Card.FooterLinks />
         </Card.Footer>
       </Card.Root>
     </Flow.Part>

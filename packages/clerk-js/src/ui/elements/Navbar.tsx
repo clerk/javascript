@@ -85,7 +85,9 @@ export const NavBar = (props: NavBarProps) => {
   const items = (
     <Col
       elementDescriptor={descriptors.navbarButtons}
-      sx={t => ({ gap: t.space.$0x5 })}
+      sx={t => ({
+        gap: t.space.$0x5,
+      })}
     >
       {routes.map(r => (
         <NavButton
@@ -138,7 +140,9 @@ const NavbarContainer = (
         flex: `0 0 ${t.space.$60}`,
         width: t.sizes.$60,
         maxWidth: t.space.$60,
-        padding: `${t.space.$6} ${t.space.$3} ${t.space.$3}`,
+        background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+        padding: `${t.space.$6} ${t.space.$5} ${t.space.$3} ${t.space.$3}`,
+        marginRight: `-${t.space.$2}`,
         color: t.colors.$colorText,
         justifyContent: 'space-between',
       })}
@@ -290,7 +294,9 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
       elementDescriptor={descriptors.navbarMobileMenuRow}
       sx={t => ({
         display: 'none',
-        padding: `${t.space.$2} ${t.space.$3}`,
+        background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+        padding: `${t.space.$2} ${t.space.$3} ${t.space.$4} ${t.space.$3}`,
+        marginBottom: `-${t.space.$2}`,
         [mqu.md]: {
           display: 'flex',
         },
