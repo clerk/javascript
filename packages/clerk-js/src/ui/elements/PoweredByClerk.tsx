@@ -10,6 +10,10 @@ export const PoweredByClerkTag = React.memo(
     const { sx, ...rest } = props;
     const { branded } = useEnvironment().displayConfig;
 
+    if (!branded) {
+      return null;
+    }
+
     return (
       <Flex
         gap={1}
@@ -19,12 +23,8 @@ export const PoweredByClerkTag = React.memo(
         {...rest}
         ref={ref}
       >
-        {branded ? (
-          <>
-            <Text variant='buttonSmall'>Secured by</Text>
-            <LogoMarkIconLink />
-          </>
-        ) : null}
+        <Text variant='buttonSmall'>Secured by</Text>
+        <LogoMarkIconLink />
       </Flex>
     );
   }),

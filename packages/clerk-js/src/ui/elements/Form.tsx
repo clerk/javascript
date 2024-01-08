@@ -95,7 +95,7 @@ const FormReset = (props: PropsOfComponent<typeof Button>) => {
     <Button
       elementDescriptor={descriptors.formButtonReset}
       block
-      variant='ghost'
+      variant='ghostPrimary'
       textVariant='buttonSmall'
       type='reset'
       isDisabled={isLoading || isDisabled}

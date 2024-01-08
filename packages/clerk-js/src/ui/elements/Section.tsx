@@ -111,7 +111,7 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
     <ArrowBlockButton
       elementDescriptor={descriptors.profileSectionPrimaryButton}
       elementId={descriptors.profileSectionPrimaryButton.setId(id)}
-      variant='ghost'
+      variant='ghostPrimary'
       sx={[t => ({ justifyContent: 'start', gap: t.space.$2, padding: `${t.space.$2} ${t.space.$4}` }), sx]}
       textLocalizationKey={localizationKey}
       leftIcon={Plus}

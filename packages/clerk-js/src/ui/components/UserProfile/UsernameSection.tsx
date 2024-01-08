@@ -36,7 +36,7 @@ export const UsernameSection = () => {
             <Action.Trigger value='edit'>
               <Button
                 id='username'
-                variant='ghost'
+                variant='ghostPrimary'
                 localizationKey={
                   user.username
                     ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')
