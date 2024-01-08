@@ -250,7 +250,7 @@ const NavButton = (props: NavButtonProps) => {
   const { icon, children, isActive, iconElementDescriptor, iconElementId, sx, ...rest } = props;
   return (
     <Button
-      variant='ghostPrimary'
+      variant='ghost'
       textVariant='buttonLarge'
       size='md'
       isActive={isActive}
