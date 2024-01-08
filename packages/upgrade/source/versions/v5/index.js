@@ -145,6 +145,9 @@ export default {
 		'useorganizationlist-organizationlist', // shared outside this pkg?
 	]),
 	chromeExtension: load('chromeExtension', ['clerkprovider-tokencache']),
+	localization: [],
+	types: [],
+	backend: [],
 	// backend: load('backend', [
 	// 	'createclerkclient-frontendapi',
 	// 	'clerk-import',

@@ -60,8 +60,6 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 	useEffect(() => {
 		if (!matchers || !files) return;
 
-		console.log(files);
-
 		Promise.all(
 			// first we read all the files
 			files.map(async file => {

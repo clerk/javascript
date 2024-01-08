@@ -7,7 +7,7 @@ import Scan from './scan.js';
 import guessFrameworks from './util/guess-framework.js';
 import getClerkMajorVersion from './util/get-clerk-version.js';
 
-export default function App({ _fromVersion, _toVersion, _sdk, _dir = '', _ignore = '' }) {
+export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ignore = '' }) {
 	const [sdks, setSdks] = useState(_sdk ? [_sdk] : []);
 	const [sdkGuessAttempted, setSdkGuessAttempted] = useState(false);
 	const [fromVersion, setFromVersion] = useState(_fromVersion);
@@ -17,13 +17,13 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = '', _ignore
 	const [ignore, setIgnore] = useState(_ignore);
 	const [configComplete, setConfigComplete] = useState(false);
 	const [configVerified, setConfigVerified] = useState(false);
-	let sdkGuesses = [];
+	const [sdkGuesses, setSdkGuesses] = useState([]);
 	let fromVersionGuess = false;
 
 	// We try to guess which SDK they are using
 	if (isEmpty(sdks) && isEmpty(sdkGuesses) && !sdkGuessAttempted) {
-		sdkGuesses = guessFrameworks();
-		setSdkGuessAttempted(true);
+		if (!dir) return setDir(process.cwd());
+		setSdkGuesses(guessFrameworks(dir));
 	}
 
 	// We try to guess which version of Clerk they are using
@@ -59,16 +59,29 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = '', _ignore
 			{/* Verify our guess at what their SDK is, if we have one */}
 			{isEmpty(sdks) && !isEmpty(sdkGuesses) && !sdkGuessAttempted && (
 				<>
-					<Text>It looks like you are using {sdkGuesses.toString()}. Is that right?</Text>
+					{sdkGuesses.length > 1 ? (
+						<>
+							<Text>It looks like you are using the following Clerk SDKs in your project:</Text>
+							{sdkGuesses.map(guess => (
+								<Text key={guess.value}>
+									{'  '}- {guess.label}
+								</Text>
+							))}
+							<Text>Is that right?</Text>
+						</>
+					) : (
+						<></>
+					)}
+
 					<Select
 						options={[
-							{ label: 'yes', value: true },
-							{ label: 'no', value: false },
+							{ label: 'yes', value: 'yes' },
+							{ label: 'no', value: 'no' },
 						]}
 						onChange={item => {
 							setSdkGuessAttempted(true);
 							// if true, we were right so we set the sdk
-							if (item.value) setSdk(sdkGuesses);
+							if (item === 'yes') setSdks(sdkGuesses.map(guess => guess.value));
 						}}
 					/>
 				</>
