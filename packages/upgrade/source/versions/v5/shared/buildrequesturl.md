@@ -1,6 +1,6 @@
 ---
 title: '`getRequestUrl` -> `buildRequestUrl` from `@clerk/backend`'
-matcher:
+matcher: "getRequestUrl\\("
 ---
 
 ```js

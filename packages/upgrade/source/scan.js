@@ -118,6 +118,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 						flexDirection='column'
 						paddingX={2}
 						paddingY={1}
+						key={result.position}
 					>
 						<Text color='blue'>{result.title}</Text>
 						<Text>
