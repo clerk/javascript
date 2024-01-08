@@ -247,6 +247,10 @@ export const SectionHeader = (props: SectionHeaderProps) => {
         variant='h3'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
+        sx={t => ({
+          fontWeight: t.fontWeights.$medium,
+          color: t.colors.$blackAlpha950,
+        })}
       />
     </Flex>
   );
