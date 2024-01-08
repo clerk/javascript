@@ -12,6 +12,7 @@ import { colors, createSlug, handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
+import { organizationListParams } from '../OrganizationSwitcher/utils';
 
 type CreateOrganizationFormProps = {
   skipInvitationScreen: boolean;
@@ -30,7 +31,9 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
-  const { createOrganization, isLoaded, setActive } = useCoreOrganizationList();
+  const { createOrganization, isLoaded, setActive, userMemberships } = useCoreOrganizationList({
+    userMemberships: organizationListParams.userMemberships,
+  });
   const { organization } = useCoreOrganization();
   const [file, setFile] = React.useState<File | null>();
 
@@ -67,6 +70,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
 
       lastCreatedOrganizationRef.current = organization;
       await setActive({ organization });
+
+      void userMemberships.revalidate?.();
 
       if (props.skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
         return completeFlow();
