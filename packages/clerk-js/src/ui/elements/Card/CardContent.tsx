@@ -33,7 +33,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           borderRadius: `${t.radii.$card} ${t.radii.$card} ${t.radii.$lg} ${t.radii.$lg}`,
           position: 'relative',
           padding: t.space.$8,
-          gap: t.space.$4,
+          gap: t.space.$8,
           justifyContent: 'center',
           alignContent: 'center',
         }),
