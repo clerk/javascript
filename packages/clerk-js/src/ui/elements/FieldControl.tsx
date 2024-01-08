@@ -59,6 +59,7 @@ const FieldAction = (
       elementId={descriptors.formFieldLabel.setId(fieldId)}
       isDisabled={isDisabled}
       colorScheme='primary'
+      variant='buttonSmall'
       onClick={e => {
         e.preventDefault();
         props.onClick?.(e);
