@@ -11,10 +11,10 @@ export default async function Page() {
     <main>
       <ul>
         <li>
-          <Link href={'/sign-in'}>Sign in page</Link>
+          <Link href={'/app-dir/sign-in'}>Sign in page</Link>
         </li>
         <li>
-          <Link href={'/sign-up'}>Sign up page</Link>
+          <Link href={'/app-dir/sign-up'}>Sign up page</Link>
         </li>
         <li>
           <Link href={'/user'}>User profile page</Link>
@@ -41,7 +41,7 @@ export default async function Page() {
           <div>{JSON.stringify(currentUser_)}</div>
         </SignedIn>
         <SignedOut>
-          <SignIn />
+          <SignIn routing='hash' />
         </SignedOut>
       </div>
     </main>
