@@ -1,5 +1,5 @@
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization, useCoreUser, useOrganizationProfileContext } from '../../contexts';
+import { useCoreOrganization, useCoreUser, useCoreOrganizationList, useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
 import {
@@ -13,20 +13,37 @@ import {
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
+import { organizationListParams } from '../OrganizationSwitcher/utils';
 
-export const LeaveOrganizationPage = () => {
+const useLeaveWithRevalidations = (leavePromise: (() => Promise<any>) | undefined) => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
-  const { organization } = useCoreOrganization();
-  const user = useCoreUser();
+  const { userMemberships, userInvitations } = useCoreOrganizationList({
+    userMemberships: organizationListParams.userMemberships,
+    userInvitations: organizationListParams.userInvitations,
+  });
 
-  if (!organization) {
+  return () =>
+    card
+      .runAsync(async () => {
+        await leavePromise?.();
+      })
+      .then(() => {
+        void userMemberships.revalidate?.();
+        void userInvitations.revalidate?.();
+        void navigateAfterLeaveOrganization();
+      });
+};
+
+export const LeaveOrganizationForm = () => {
+  const { organization } = useCoreOrganization();
+  const { user } = useCoreUser();
+
+  const leaveOrg = useLeaveWithRevalidations(() => user!.leaveOrganization(organization!.id));
+
+  if (!organization || !user) {
     return null;
   }
-
-  const leave = () => {
-    return card.runAsync(user.leaveOrganization(organization.id)).then(navigateAfterLeaveOrganization);
-  };
 
   return (
     <ActionConfirmationPage
@@ -42,17 +59,17 @@ export const LeaveOrganizationPage = () => {
       successMessage={localizationKeys(
         'organizationProfile.profilePage.dangerSection.leaveOrganization.successMessage',
       )}
-      onConfirmation={leave}
+      onConfirmation={leaveOrg}
     />
   );
 };
 
 export const DeleteOrganizationPage = () => {
-  const card = useCardState();
-  const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
-  const { organization } = useCoreOrganization();
+  const { organization, membership } = useCoreOrganization();
 
-  if (!organization) {
+  const deleteOrg = useLeaveWithRevalidations(organization?.destroy);
+
+  if (!organization || !membership) {
     return null;
   }
 
