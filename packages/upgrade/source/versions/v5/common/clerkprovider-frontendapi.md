@@ -1,6 +1,6 @@
 ---
 title: '`frontendApi` -> `publishableKey` as prop to `ClerkProvider`'
-matcher: '<ClerkProvider.*?frontendApi=.*?>'
+matcher: "<ClerkProvider[\\s\\S]*?frontendApi=[\\s\\S]*?>"
 matcherFlags: 'm'
 ---
 
