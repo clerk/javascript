@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.68.2
+
+### Patch Changes
+
+- Bug fix: Avoid triggering prepare verification twice. (Affects only dev mode) ([#2458](https://github.com/clerk/javascript/pull/2458)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update user memberships when user creates, leaves or deletes an organization. ([#2504](https://github.com/clerk/javascript/pull/2504)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: fetch custom roles in OrganizationSwitcher ([#2450](https://github.com/clerk/javascript/pull/2450)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`65332d744`](https://github.com/clerk/javascript/commit/65332d7440419e275e76ffde104b7d0fe98ceeda)]:
+  - @clerk/shared@1.3.1
+
 ## 4.68.1
 
 ### Patch Changes
