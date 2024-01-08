@@ -17,7 +17,7 @@ export const BackLink = (props: BackLinkProps) => {
     >
       <RouterLink {...rest}>
         <Text
-          localizationKey={localizationKeys('backButton')}
+          localizationKey={localizationKeys('signIn.alternativeMethods.backLink')}
           elementDescriptor={linkElementDescriptor}
           variant='body'
         />
