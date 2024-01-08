@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.0.0-alpha-v5.9
+
+### Patch Changes
+
+- Do not display telemetry notice in CI ([#2503](https://github.com/clerk/javascript/pull/2503)) by [@LekoArts](https://github.com/LekoArts)
+
+- Update TelemetryCollector to consider event-specific sampling rates. ([#2487](https://github.com/clerk/javascript/pull/2487)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fixes a bug where Invitations from `useOrganization` incorrectly depended on options for memberships. ([#2472](https://github.com/clerk/javascript/pull/2472)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 2.0.0-alpha-v5.8
 
 ### Patch Changes

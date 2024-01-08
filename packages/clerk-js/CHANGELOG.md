@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.0.0-alpha-v5.14
+
+### Patch Changes
+
+- Update user memberships when user creates, leaves or deletes an organization. ([#2473](https://github.com/clerk/javascript/pull/2473)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`1dc28ab46`](https://github.com/clerk/javascript/commit/1dc28ab46f6930074334be183c637ce7a81bebf7), [`ea4933655`](https://github.com/clerk/javascript/commit/ea4933655863ce315324aa2a3be7d5f263c2b61f), [`eb796dd9e`](https://github.com/clerk/javascript/commit/eb796dd9e5329e066ab5f0040a15c1f939d66888), [`38d8b3e8a`](https://github.com/clerk/javascript/commit/38d8b3e8a0387bcf0b9c8d16e3bbfcfe9b643ca2)]:
+  - @clerk/shared@2.0.0-alpha-v5.9
+  - @clerk/localizations@2.0.0-alpha-v5.9
+
 ## 5.0.0-alpha-v5.13
 
 ### Patch Changes

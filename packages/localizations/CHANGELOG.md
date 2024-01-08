@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.9
+
+### Patch Changes
+
+- Introduce es-MX localization by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 2.0.0-alpha-v5.8
 
 ### Patch Changes
