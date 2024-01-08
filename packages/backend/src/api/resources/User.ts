@@ -38,9 +38,6 @@ export class User {
   ) {}
 
   static fromJSON(data: UserJSON): User {
-    const emailAddresses = (data.email_addresses || []).map(x => EmailAddress.fromJSON(x));
-    const phoneNumbers = (data.phone_numbers || []).map(x => PhoneNumber.fromJSON(x));
-    const wallets = (data.web3_wallets || []).map(x => Web3Wallet.fromJSON(x));
     return new User(
       data.id,
       data.password_enabled,
@@ -65,9 +62,9 @@ export class User {
       data.public_metadata,
       data.private_metadata,
       data.unsafe_metadata,
-      emailAddresses,
-      phoneNumbers,
-      wallets,
+      (data.email_addresses || []).map(x => EmailAddress.fromJSON(x)),
+      (data.phone_numbers || []).map(x => PhoneNumber.fromJSON(x)),
+      (data.web3_wallets || []).map(x => Web3Wallet.fromJSON(x)),
       (data.external_accounts || []).map((x: ExternalAccountJSON) => ExternalAccount.fromJSON(x)),
       data.last_active_at,
       data.create_organization_enabled,
