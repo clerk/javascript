@@ -6,7 +6,8 @@ import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPM
 import type { Clerk } from './internal';
 import { ClerkAPIResponseError, Client } from './internal';
 
-export type BaseFetchOptions = ClerkResourceReloadParams & { forceUpdateClient?: boolean };
+export type BaseFetchOptions = Pick<FapiRequestInit, 'search'> &
+  ClerkResourceReloadParams & { forceUpdateClient?: boolean };
 
 export type BaseMutateParams = {
   action?: string;
@@ -116,6 +117,7 @@ export abstract class BaseResource {
         method: 'GET',
         path: this.path(),
         rotatingTokenNonce: opts.rotatingTokenNonce,
+        search: opts.search,
       },
       opts,
     );

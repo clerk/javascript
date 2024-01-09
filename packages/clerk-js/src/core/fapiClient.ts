@@ -20,6 +20,8 @@ type FapiQueryStringParameters = {
   _method?: string;
   _clerk_session_id?: string;
   _clerk_js_version?: string;
+  __clerk_framework_hint?: string;
+  __clerk_framework_version?: string;
   rotating_token_nonce?: string;
 };
 
@@ -98,16 +100,6 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
 
     if (clerkInstance.version) {
       searchParams.append('_clerk_js_version', clerkInstance.version);
-    }
-
-    // @ts-ignore Internal util on clerk-js
-    if (clerkInstance.__internal_getFrameworkHint) {
-      // @ts-ignore Internal util on clerk-js
-      const { framework, version } = clerkInstance.__internal_getFrameworkHint();
-      if (framework) {
-        searchParams.append('__clerk_framework_hint', framework);
-        version && searchParams.append('__clerk_framework_version', version);
-      }
     }
 
     if (rotatingTokenNonce) {

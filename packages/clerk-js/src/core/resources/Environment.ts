@@ -36,7 +36,17 @@ export class Environment extends BaseResource implements EnvironmentResource {
     if (touch) {
       return this._basePatch({});
     }
-    return this._baseGet();
+
+    const search = new URLSearchParams();
+    if (typeof BaseResource.clerk.__internal_getFrameworkHint === 'function') {
+      const { framework, version } = BaseResource.clerk.__internal_getFrameworkHint();
+      if (framework) {
+        search.append('__clerk_framework_hint', framework);
+        version && search.append('__clerk_framework_version', version);
+      }
+    }
+
+    return this._baseGet({ search });
   }
 
   isSingleSession = (): boolean => {
