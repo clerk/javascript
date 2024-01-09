@@ -1,4 +1,5 @@
 import { logErrorInDevMode } from '@clerk/shared';
+import { isDeeplyEqual } from '@clerk/shared/react';
 import type {
   CreateOrganizationProps,
   OrganizationListProps,
@@ -90,10 +91,7 @@ class Portal extends React.PureComponent<MountProps> {
   private portalRef = React.createRef<HTMLDivElement>();
 
   componentDidUpdate(prevProps: Readonly<MountProps>) {
-    if (
-      prevProps.props.appearance !== this.props.props.appearance ||
-      prevProps.props?.customPages?.length !== this.props.props?.customPages?.length
-    ) {
+    if (!isDeeplyEqual(prevProps.props, this.props.props)) {
       this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
     }
   }
