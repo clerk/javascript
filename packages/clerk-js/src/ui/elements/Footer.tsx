@@ -59,7 +59,7 @@ const FooterActionLink = (props: PropsOfComponent<typeof RouterLink>): JSX.Eleme
     <RouterLink
       elementDescriptor={descriptors.footerActionLink}
       {...props}
-      colorScheme='neutral'
+      colorScheme='primary'
       variant='buttonLarge'
     />
   );
