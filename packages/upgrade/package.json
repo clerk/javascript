@@ -31,6 +31,8 @@
 		"gray-matter": "^4.0.3",
 		"index-to-position": "^0.1.2",
 		"ink": "^4.4.1",
+		"ink-big-text": "^2.0.0",
+		"ink-gradient": "^3.0.0",
 		"ink-link": "^3.0.0",
 		"ink-markdown": "jescalan/ink-markdown#release",
 		"marked": "^11.1.1",

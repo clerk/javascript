@@ -40,6 +40,13 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 	// and here's the actual markup we render for each list item!
 	return (
 		<>
+			<Text color='blue'>Navigation Instructions:</Text>
+			<Text>
+				Navigate through items with ↑ and ↓ arrow keys. Expand the details of any item with space bar. ↓ key on the last
+				item goes to the next page, ↑ on the first item goes to the previous page
+			</Text>
+			<Newline />
+
 			{state.all.reduce((memo, item, idx) => {
 				if (idx < state.visible[0] || idx >= state.visible[1]) return memo;
 

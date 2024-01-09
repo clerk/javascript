@@ -6,6 +6,8 @@ import VERSIONS from './constants/versions.js';
 import Scan from './scan.js';
 import guessFrameworks from './util/guess-framework.js';
 import getClerkMajorVersion from './util/get-clerk-version.js';
+import Gradient from 'ink-gradient';
+import BigText from 'ink-big-text';
 
 export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ignore = [] }) {
 	const [sdks, setSdks] = useState(_sdk ? [_sdk] : []);
@@ -46,6 +48,12 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 
 	return (
 		<>
+			<Gradient name='vice'>
+				<BigText
+					text='Clerk Upgrade'
+					font='tiny'
+				/>
+			</Gradient>
 			{/* Welcome to the upgrade script! */}
 			{!configComplete && (
 				<>
