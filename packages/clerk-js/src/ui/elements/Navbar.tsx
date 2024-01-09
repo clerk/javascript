@@ -138,6 +138,9 @@ const NavbarContainer = (
         [mqu.md]: {
           display: 'none',
         },
+        flex: `0 0 ${t.space.$60}`,
+        width: t.sizes.$60,
+        maxWidth: t.space.$60,
         padding: `${t.space.$6} ${t.space.$3} ${t.space.$3}`,
         color: t.colors.$colorText,
         justifyContent: 'space-between',
@@ -256,11 +259,7 @@ const NavButton = (props: NavButtonProps) => {
         t => ({
           gap: t.space.$4,
           justifyContent: 'flex-start',
-          backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
           opacity: isActive ? 1 : 0.6,
-          ':focus': {
-            boxShadow: 'none',
-          },
         }),
         sx,
       ]}

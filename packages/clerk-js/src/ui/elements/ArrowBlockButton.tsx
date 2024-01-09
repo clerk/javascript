@@ -90,7 +90,6 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
               icon={leftIcon as React.ComponentType}
               sx={[
                 theme => ({
-                  color: theme.colors.$blackAlpha600,
                   width: theme.sizes.$5,
                 }),
                 leftIconSx,
