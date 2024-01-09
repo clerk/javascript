@@ -8,12 +8,20 @@ export function useRoutingProps<T extends RoutingOptions>(
   props: T,
   routingOptions?: RoutingOptions,
 ): T {
-  const path = routingOptions?.path || props.path;
+  const path = props.path || routingOptions?.path;
   if (!path && !props.routing) {
     errorThrower.throw(noPathProvidedError(componentName));
   }
 
-  if (props.path) {
+  if (props.routing && props.routing !== 'path' && routingOptions?.path && !props.path) {
+    return {
+      ...routingOptions,
+      ...props,
+      path: undefined,
+    };
+  }
+
+  if (path && !props.routing) {
     return {
       ...routingOptions,
       ...props,

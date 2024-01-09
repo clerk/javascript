@@ -71,4 +71,20 @@ describe('useRoutingProps()', () => {
     );
     expect(baseElement).toMatchSnapshot();
   });
+
+  it('returns passed props but omits path prop if path is passed from routing options and a routing strategy other than path is specified', () => {
+    const TestingComponent = props => {
+      const options = useRoutingProps('TestingComponent', props, { path: '/aloha' });
+      return <div>{JSON.stringify(options)}</div>;
+    };
+
+    const { baseElement } = render(
+      <TestingComponent
+        prop1='1'
+        prop2='2'
+        routing='virtual'
+      />,
+    );
+    expect(baseElement).toMatchSnapshot();
+  });
 });
