@@ -383,6 +383,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       successMessage: LocalizationValue;
       infoText: LocalizationValue;
+      infoText__secondary: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;
