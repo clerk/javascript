@@ -8,7 +8,6 @@ import { useRouter } from '../router';
 import { ArrowBlockButton } from './ArrowBlockButton';
 import { Card } from './Card';
 import { useCardState } from './contexts';
-import { Footer } from './Footer';
 import { Header } from './Header';
 
 type ErrorCardProps = {
@@ -68,17 +67,18 @@ export const ErrorCard = (props: ErrorCardProps) => {
               }
             />
           </Flex>
-          <Footer.Root>
-            <Footer.Action elementId='alternativeMethods'>
-              <Footer.ActionLink
-                localizationKey={localizationKeys('backButton')}
-                onClick={goBack}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+
+          <Card.Action elementId='alternativeMethods'>
+            <Card.ActionLink
+              localizationKey={localizationKeys('backButton')}
+              onClick={goBack}
+            />
+          </Card.Action>
         </Card.Content>
-        <Card.Footer />
+
+        <Card.Footer>
+          <Card.FooterLinks />
+        </Card.Footer>
       </Card.Root>
     </Flow.Part>
   );

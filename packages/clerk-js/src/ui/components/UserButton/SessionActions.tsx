@@ -31,7 +31,7 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
         onClick={handleManageAccountClicked}
         sx={t => ({
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-          backgroundColor: t.colors.$white,
+          backgroundColor: t.colors.$colorBackground,
           padding: `${t.space.$4} ${t.space.$5}`,
         })}
       />

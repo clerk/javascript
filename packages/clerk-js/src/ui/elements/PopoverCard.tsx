@@ -37,6 +37,7 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
           backgroundColor: t.colors.$colorBackground,
           overflow: 'hidden',
           borderRadius: t.radii.$lg,
+          zIndex: t.zIndices.$card,
           boxShadow: common.shadows(t).cardContentShadow,
         }),
         sx,
@@ -62,13 +63,16 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
     <Col
       justify='between'
       sx={[
-        {
+        t => ({
+          background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+          marginTop: `-${t.space.$2}`,
+          paddingTop: t.space.$2,
           borderBottomLeftRadius: 'inherit',
           borderBottomRightRadius: 'inherit',
           '&:empty': {
             padding: '0',
           },
-        },
+        }),
         sx,
       ]}
       {...rest}

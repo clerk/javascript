@@ -1,9 +1,8 @@
 import React from 'react';
 
 import { descriptors, Flex, generateFlowPartClassname, Icon, useAppearance } from '../../customizables';
-import { shadows } from '../../foundations/shadows';
 import { Close } from '../../icons';
-import type { PropsOfComponent } from '../../styledSystem';
+import { common, type PropsOfComponent } from '../../styledSystem';
 import { ApplicationLogo } from '..';
 import { useFlowMetadata } from '../contexts';
 import { IconButton } from '../IconButton';
@@ -21,7 +20,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
       direction='col'
       className={generateFlowPartClassname(flowMetadata)}
       {...rest}
-      elementDescriptor={descriptors.cardContent}
+      elementDescriptor={descriptors.card}
       sx={[
         t => ({
           backgroundColor: t.colors.$colorBackground,
@@ -29,7 +28,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           transitionDuration: '200ms',
           textAlign: 'center',
           zIndex: t.zIndices.$card,
-          boxShadow: shadows.cardContentShadow,
+          boxShadow: common.shadows(t).cardContentShadow,
           borderRadius: `${t.radii.$card} ${t.radii.$card} ${t.radii.$lg} ${t.radii.$lg}`,
           position: 'relative',
           padding: t.space.$8,

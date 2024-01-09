@@ -26,16 +26,16 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
         />
       )}
       <Col
-        elementDescriptor={[descriptors.card, props.elementDescriptor as ElementDescriptor]}
+        elementDescriptor={[descriptors.cardBox, props.elementDescriptor as ElementDescriptor]}
         className={generateFlowPartClassname(flowMetadata)}
         ref={ref}
         sx={[
           t => ({
-            background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
             maxWidth: `calc(100vw - ${t.sizes.$20})`,
             width: t.sizes.$100,
             boxShadow: common.shadows(t).cardRootShadow,
             borderRadius: t.radii.$xl,
+            overflow: 'hidden',
             color: t.colors.$colorText,
             position: 'relative',
           }),

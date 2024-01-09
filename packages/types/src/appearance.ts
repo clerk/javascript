@@ -2,8 +2,8 @@ import type * as CSS from 'csstype';
 
 import type {
   AlertId,
+  CardActionId,
   FieldId,
-  FooterActionId,
   MenuId,
   OrganizationPreviewId,
   ProfilePageId,
@@ -133,10 +133,8 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
  */
 export type ElementsConfig = {
   rootBox: WithOptions;
+  cardBox: WithOptions;
   card: WithOptions;
-  cardContent: WithOptions;
-  cardFooter: WithOptions;
-  cardFooterItem: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
@@ -153,7 +151,8 @@ export type ElementsConfig = {
   main: WithOptions;
 
   footer: WithOptions;
-  footerAction: WithOptions<FooterActionId>;
+  footerItem: WithOptions;
+  footerAction: WithOptions<CardActionId>;
   footerActionText: WithOptions;
   footerActionLink: WithOptions;
   footerPages: WithOptions;
