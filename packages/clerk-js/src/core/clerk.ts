@@ -1297,6 +1297,23 @@ export default class Clerk implements ClerkInterface {
     return this.navigate(to);
   }
 
+  public __internal_getFrameworkHint(): { framework: string | undefined; version: string | undefined } {
+    try {
+      if (typeof window === 'undefined' || typeof document === 'undefined') {
+        return { framework: undefined, version: undefined };
+      }
+      const win = window as any;
+      const isNextJsApp = !!(win.__NEXT_DATA__ || !!win.document.querySelector('#__next') || win.next?.version);
+      if (isNextJsApp) {
+        return { framework: 'nextjs', version: win.next?.version };
+      }
+      return { framework: undefined, version: undefined };
+    } catch (e: unknown) {
+      // Make sure to result in an no-op if anything goes terribly wrong
+      return { framework: undefined, version: undefined };
+    }
+  }
+
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
   #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
 
