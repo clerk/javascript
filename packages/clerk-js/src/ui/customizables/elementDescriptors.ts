@@ -43,7 +43,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsIconButton',
   'socialButtonsBlockButton',
   'socialButtonsBlockButtonText',
-  'socialButtonsBlockButtonArrow',
   'socialButtonsProviderIcon',
 
   'enterpriseButtonsProviderIcon',
@@ -52,10 +51,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'alternativeMethodsBlockButtonText',
   'alternativeMethodsBlockButtonArrow',
 
-  'otpCodeBox',
-  'otpCodeHeader',
-  'otpCodeHeaderTitle',
-  'otpCodeHeaderSubtitle',
   'otpCodeField',
   'otpCodeFieldInputs',
   'otpCodeFieldInput',
@@ -93,9 +88,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldWarningText',
   'formFieldSuccessText',
   'formFieldInfoText',
-  'formFieldDirectionsText',
   'formFieldHintText',
-  'formButtonRow',
   'formButtonPrimary',
   'formButtonReset',
   'formFieldInputGroup',
@@ -121,13 +114,11 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userButtonPopoverRootBox',
   'userButtonPopoverCard',
   'userButtonPopoverMain',
-  'userButtonPopoverUserPreview',
   'userButtonPopoverActions',
   'userButtonPopoverActionButton',
   'userButtonPopoverActionButtonIconBox',
   'userButtonPopoverActionButtonIcon',
   'userButtonPopoverFooter',
-  'userButtonPopoverFooterPages',
   'userButtonPopoverFooterPagesLink',
 
   'organizationSwitcherTrigger',
@@ -140,13 +131,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationSwitcherPopoverActionButton',
   'organizationSwitcherPreviewButton',
   'organizationSwitcherInvitationAcceptButton',
-  'organizationSwitcherInvitationRejectButton',
   'organizationSwitcherPopoverActionButtonIconBox',
   'organizationSwitcherPopoverActionButtonIcon',
-  'organizationSwitcherPopoverActionButtonText',
   'organizationSwitcherPopoverFooter',
-  'organizationSwitcherPopoverFooterPages',
-  'organizationSwitcherPopoverFooterPagesLink',
 
   'organizationListPreviewItems',
   'organizationListPreviewItem',
@@ -172,11 +159,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationPreviewSecondaryIdentifier',
 
   'membersPageInviteButton',
-  'organizationProfilePage',
 
   'identityPreview',
-  'identityPreviewAvatarBox',
-  'identityPreviewAvatarImage',
   'identityPreviewText',
   'identityPreviewEditButton',
   'identityPreviewEditButtonIcon',
@@ -209,9 +193,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'menuButton',
   'menuList',
   'menuItem',
-
-  'loader',
-  'loaderIcon',
 
   'modalBackdrop',
   'modalContent',
@@ -252,7 +233,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'pageScrollBox',
   'page',
-  'pageHeader',
 
   'activeDevice',
   'activeDeviceListItem',
@@ -283,7 +263,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'badge',
   'notificationBadge',
-  'button',
   'buttonArrowIcon',
   'providerIcon',
   'spinner',
