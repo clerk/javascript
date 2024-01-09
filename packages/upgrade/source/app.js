@@ -93,7 +93,7 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 			{isEmpty(sdks) && isEmpty(sdkGuesses) && (
 				<>
 					<Text>Please select which Clerk SDK(s) you're using for your app:</Text>
-					<Text color='gray'>(multiple can be selected using the space bar, press enter when finished)</Text>
+					<Text color='gray'>(select with space bar, multiple can be selected, press enter when finished)</Text>
 					<MultiSelect
 						options={SDKS}
 						onSubmit={value => setSdks(value)}
@@ -205,7 +205,7 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 					<Select
 						options={[
 							{ label: 'yes', value: true },
-							{ label: 'no - exit and try again', value: false },
+							{ label: 'no - exit, and i will try again', value: false },
 						]}
 						onChange={value => {
 							if (!value) {

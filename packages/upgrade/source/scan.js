@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Link from 'ink-link';
 import { Text, Newline, Box } from 'ink';
 import { globby } from 'globby';
 import fs from 'fs/promises';
-import Spinner from 'ink-spinner';
+import { ProgressBar } from '@inkjs/ui';
 import indexToPosition from 'index-to-position';
 import ExpandableList from './util/expandable-list.js';
 
@@ -16,7 +15,8 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 	// This is not yet implemented though since the current state of the script
 	// only handles a single version.
 	const [status, setStatus] = useState('Initializing');
-	const [spinnerActive, setSpinnerActive] = useState(true);
+	const [progress, setProgress] = useState(0);
+	const [complete, setComplete] = useState(false);
 	const [matchers, setMatchers] = useState();
 	const [files, setFiles] = useState();
 	const [results, setResults] = useState([]);
@@ -63,8 +63,9 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 
 		Promise.all(
 			// first we read all the files
-			files.map(async file => {
+			files.map(async (file, idx) => {
 				setStatus(`Scanning ${file}`);
+				setProgress(Math.ceil((idx / files.length) * 100));
 				const content = await fs.readFile(file, 'utf8');
 
 				// then we run each of the matchers against the file contents
@@ -89,7 +90,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 			}),
 		)
 			.then(() => {
-				setSpinnerActive(false);
+				setComplete(true);
 				setStatus('File scan complete. See results below!');
 			})
 			.catch(err => {
@@ -97,19 +98,16 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 			});
 	}, [matchers, files]);
 
-	// TODO: add progress bar here
 	return (
 		<>
-			<Text>
-				{spinnerActive ? (
-					<Text color='green'>
-						<Spinner type='dots' />
-					</Text>
-				) : (
-					<Text color='green'>✓</Text>
-				)}
-				{' ' + status}
-			</Text>
+			{complete ? (
+				<Text color='green'>✓ {status}</Text>
+			) : (
+				<>
+					<ProgressBar value={progress} />
+					<Text>{status}</Text>
+				</>
+			)}
 			<Newline />
 			{!!results.length && <ExpandableList items={results} />}
 		</>

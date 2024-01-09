@@ -38,7 +38,6 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 	});
 
 	// and here's the actual markup we render for each list item!
-	// make sure to render an indicator like "showing items 1-5 of 20" at bottom
 	return (
 		<>
 			{state.all.reduce((memo, item, idx) => {
@@ -47,12 +46,13 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 				const loc = `${item.file}:${item.position.line}:${item.position.column}`;
 				memo.push(
 					<Box
-						borderStyle='round'
+						borderStyle={item.focused ? 'double' : 'single'}
 						flexDirection='column'
 						borderColor={item.focused ? 'blue' : 'white'}
+						paddingX={1}
 						key={loc}
 					>
-						<Text bold>{item.title}</Text>
+						<Markdown>{item.title}</Markdown>
 						<Text>Location: {loc}</Text>
 						{item.expanded && (
 							<>
@@ -68,6 +68,7 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 				);
 				return memo;
 			}, [])}
+
 			{state.all.length > state.numberVisible && (
 				<Text>
 					Showing {state.visible[0] + 1} - {Math.min(state.visible[1], state.all.length)} of {state.all.length}
@@ -79,11 +80,11 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 
 // I'd like to recognize that this logic is kinda crazy, but it works 💖
 function reducer(state, action) {
-	// if the current item is focused and a next item exists
-	// un-focus it and tee up the next one to be focused
-	// also shift the visible window if needed
 	if (action.type === 'focus-next-option') {
 		let nextIdx;
+
+		// if the current item is focused and a next item exists
+		// un-focus it and tee up the next one to be focused
 		const all = state.all.map((item, idx) => {
 			if (item.focused && state.all[idx + 1]) {
 				nextIdx = idx + 1;
@@ -108,9 +109,10 @@ function reducer(state, action) {
 		return { all, visible, numberVisible: state.numberVisible };
 	}
 
-	// if the next item is focused, focus this one and tee up the next one to be un-focused
 	if (action.type === 'focus-previous-option') {
 		let nextIdx;
+
+		// if the next item is focused, focus this one and tee up the next one to be un-focused
 		const all = state.all.map((item, idx) => {
 			if (state.all[idx + 1]?.focused) {
 				item.focused = true;
@@ -144,9 +146,5 @@ function reducer(state, action) {
 			return item;
 		});
 		return { all, visible: state.visible, numberVisible: state.numberVisible };
-	}
-
-	if (action.type === 'update-visible') {
-		// update which items are currently visible
 	}
 }
