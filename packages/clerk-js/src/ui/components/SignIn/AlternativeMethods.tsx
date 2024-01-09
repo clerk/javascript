@@ -103,7 +103,9 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
               />
             )}
           </Flex>
+        </Card.Content>
 
+        <Card.Footer>
           <Card.Action elementId='havingTrouble'>
             <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
             <Card.ActionLink
@@ -111,10 +113,6 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
               onClick={onHavingTroubleClick}
             />
           </Card.Action>
-        </Card.Content>
-
-        <Card.Footer>
-          <Card.FooterLinks />
         </Card.Footer>
       </Card.Root>
     </Flow.Part>

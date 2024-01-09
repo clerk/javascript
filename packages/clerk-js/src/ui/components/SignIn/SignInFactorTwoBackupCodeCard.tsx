@@ -91,7 +91,6 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
             <Form.SubmitButton hasArrow />
           </Form.Root>
         </Col>
-
         <Card.Action elementId='alternativeMethods'>
           {onShowAlternativeMethodsClicked && (
             <Card.ActionLink
@@ -102,9 +101,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
         </Card.Action>
       </Card.Content>
 
-      <Card.Footer>
-        <Card.FooterLinks />
-      </Card.Footer>
+      <Card.Footer />
     </Card.Root>
   );
 };

@@ -87,9 +87,7 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
         )}
       </Card.Content>
 
-      <Card.Footer>
-        <Card.FooterLinks />
-      </Card.Footer>
+      <Card.Footer />
     </Card.Root>
   );
 };

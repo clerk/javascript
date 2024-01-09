@@ -50,7 +50,6 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
               />
             </VerificationLink>
           </Header.Root>
-
           <Card.Action elementId='alternativeMethods'>
             {props.onShowAlternativeMethodsClicked && (
               <Card.ActionLink
@@ -61,9 +60,7 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
           </Card.Action>
         </Card.Content>
 
-        <Card.Footer>
-          <Card.FooterLinks />
-        </Card.Footer>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );
