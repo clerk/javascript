@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Heading, Icon, Text, useLocalizations } from '../customizables';
@@ -33,7 +33,6 @@ export type NavbarRoute = {
   path: string;
   external?: boolean;
 };
-type RouteId = NavbarRoute['id'];
 type NavBarProps = {
   title: LocalizationKey;
   description: LocalizationKey;
@@ -44,7 +43,6 @@ type NavBarProps = {
 
 export const NavBar = (props: NavBarProps) => {
   const { contentRef, title, description, routes, header } = props;
-  const [activeId, setActiveId] = React.useState<RouteId>('');
   const { close } = useNavbarContext();
   const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
@@ -61,7 +59,6 @@ export const NavBar = (props: NavBarProps) => {
 
   const navigateToInternalRoute = async (route: NavbarRoute) => {
     if (contentRef.current) {
-      setActiveId(route.id);
       close();
       if (route.path === '/') {
         // TODO: this is needed to correctly handle navigations
@@ -73,17 +70,17 @@ export const NavBar = (props: NavBarProps) => {
     }
   };
 
-  useEffect(() => {
-    routes.every(route => {
-      const isRoot = router.currentPath === router.fullPath && route.path === '/';
-      const matchesPath = router.matches(route.path);
-      if (isRoot || matchesPath) {
-        setActiveId(route.id);
+  const checkIfActive = useCallback(
+    (a: NavbarRoute) => {
+      if (a.external) {
         return false;
       }
-      return true;
-    });
-  }, [router.currentPath]);
+      const isRoot = router.currentPath === router.fullPath && a.path === '/';
+      const matchesPath = router.matches(a.path);
+      return isRoot || matchesPath;
+    },
+    [router.currentPath],
+  );
 
   const items = (
     <Col
@@ -99,7 +96,7 @@ export const NavBar = (props: NavBarProps) => {
           iconElementId={descriptors.navbarButtonIcon.setId(r.id) as any}
           onClick={handleNavigate(r)}
           icon={r.icon}
-          isActive={activeId === r.id}
+          isActive={checkIfActive(r)}
           sx={t => ({
             padding: `${t.space.$1x5} ${t.space.$3}`,
           })}
