@@ -5,14 +5,16 @@ import type { AuthenticateContext } from './authenticateContext';
 import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';
 
-export enum AuthStatus {
-  SignedIn = 'signed-in',
-  SignedOut = 'signed-out',
-  Handshake = 'handshake',
-}
+export const AuthStatus = {
+  SignedIn: 'signed-in',
+  SignedOut: 'signed-out',
+  Handshake: 'handshake',
+} as const;
+
+export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
 export type SignedInState = {
-  status: AuthStatus.SignedIn;
+  status: typeof AuthStatus.SignedIn;
   reason: null;
   message: null;
   proxyUrl?: string;
@@ -29,7 +31,7 @@ export type SignedInState = {
 };
 
 export type SignedOutState = {
-  status: AuthStatus.SignedOut;
+  status: typeof AuthStatus.SignedOut;
   message: string;
   reason: AuthReason;
   proxyUrl?: string;
@@ -46,22 +48,24 @@ export type SignedOutState = {
 };
 
 export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
-  status: AuthStatus.Handshake;
+  status: typeof AuthStatus.Handshake;
   headers: Headers;
   toAuth: () => null;
 };
 
-export enum AuthErrorReason {
-  ClientUATWithoutSessionToken = 'client-uat-but-no-session-token',
-  DevBrowserSync = 'dev-browser-sync',
-  PrimaryRespondsToSyncing = 'primary-responds-to-syncing',
-  SatelliteCookieNeedsSyncing = 'satellite-needs-syncing',
-  SessionTokenAndUATMissing = 'session-token-and-uat-missing',
-  SessionTokenMissing = 'session-token-missing',
-  SessionTokenOutdated = 'session-token-outdated',
-  SessionTokenWithoutClientUAT = 'session-token-but-no-client-uat',
-  UnexpectedError = 'unexpected-error',
-}
+export const AuthErrorReason = {
+  ClientUATWithoutSessionToken: 'client-uat-but-no-session-token',
+  DevBrowserSync: 'dev-browser-sync',
+  PrimaryRespondsToSyncing: 'primary-responds-to-syncing',
+  SatelliteCookieNeedsSyncing: 'satellite-needs-syncing',
+  SessionTokenAndUATMissing: 'session-token-and-uat-missing',
+  SessionTokenMissing: 'session-token-missing',
+  SessionTokenOutdated: 'session-token-outdated',
+  SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
+  UnexpectedError: 'unexpected-error',
+} as const;
+
+export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorReason];
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
