@@ -100,6 +100,16 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
       searchParams.append('_clerk_js_version', clerkInstance.version);
     }
 
+    // @ts-ignore Internal util on clerk-js
+    if (clerkInstance.__internal_getFrameworkHint) {
+      // @ts-ignore Internal util on clerk-js
+      const { framework, version } = clerkInstance.__internal_getFrameworkHint();
+      if (framework) {
+        searchParams.append('__clerk_framework_hint', framework);
+        version && searchParams.append('__clerk_framework_version', version);
+      }
+    }
+
     if (rotatingTokenNonce) {
       searchParams.append('rotating_token_nonce', rotatingTokenNonce);
     }
