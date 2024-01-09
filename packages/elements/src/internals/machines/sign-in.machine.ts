@@ -14,7 +14,8 @@ import type {
 import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
 import { and, assertEvent, assign, not, or, sendTo, setup } from 'xstate';
 
-import type { ClerkRouter } from '../router';
+import type { ClerkRouter } from '~/react/router';
+
 import type { FormMachine } from './form.machine';
 import { waitForClerk } from './shared.actors';
 import {
@@ -401,7 +402,6 @@ export const SignInMachine = setup({
         Failure: {
           type: 'final',
           target: '#SignIn.DeterminingState',
-          reenter: true,
         },
       },
     },
@@ -501,7 +501,6 @@ export const SignInMachine = setup({
         Failure: {
           type: 'final',
           target: '#SignIn.DeterminingState',
-          reenter: true,
         },
       },
     },

@@ -1,7 +1,7 @@
 import { Slot } from '@radix-ui/react-slot';
 
-import { useThirdPartyProviders } from '../internals/machines/sign-in.context';
-import { type ThirdPartyStrategy } from '../utils/third-party-strategies';
+import { useThirdPartyProviders } from '~/internals/machines/sign-in.context';
+import { type ThirdPartyStrategy } from '~/utils/third-party-strategies';
 
 export function SocialProviders({ render: provider }: { render(provider: ThirdPartyStrategy): React.ReactNode }) {
   const thirdPartyProviders = useThirdPartyProviders();

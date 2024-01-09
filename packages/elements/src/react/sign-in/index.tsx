@@ -5,20 +5,19 @@ import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
 import type { createBrowserInspector } from '@statelyai/inspect';
 import type { PropsWithChildren } from 'react';
 
-import { Form } from '../common/form';
-import { FormStoreProvider, useFormStore } from '../internals/machines/form.context';
+import { FormStoreProvider, useFormStore } from '~/internals/machines/form.context';
 import {
   SignInFlowProvider as SignInFlowContextProvider,
   StrategiesContext,
   useSignInFlow,
-  useSignInState,
+  useSignInStateMatcher,
   useSignInStrategies,
   useSSOCallbackHandler,
   useStrategy,
-} from '../internals/machines/sign-in.context';
-import type { LoadedClerkWithEnv, SignInStrategyName } from '../internals/machines/sign-in.types';
-import { useNextRouter } from '../internals/router';
-import { Route, Router, useClerkRouter } from '../internals/router-react';
+} from '~/internals/machines/sign-in.context';
+import type { LoadedClerkWithEnv, SignInStrategyName } from '~/internals/machines/sign-in.types';
+import { Form } from '~/react/common/form';
+import { Route, Router, useClerkRouter, useNextRouter } from '~/react/router';
 
 // ================= XState Inspector ================= //
 
@@ -89,7 +88,7 @@ export function SignIn({ children }: PropsWithChildren): JSX.Element | null {
 // ================= SignInStart ================= //
 
 export function SignInStart({ children }: PropsWithChildren) {
-  const state = useSignInState();
+  const state = useSignInStateMatcher();
   const actorRef = useSignInFlow();
 
   return state.matches('Start') ? <Form flowActor={actorRef}>{children}</Form> : null;
@@ -98,7 +97,7 @@ export function SignInStart({ children }: PropsWithChildren) {
 // ================= SignInFactorOne ================= //
 
 export function SignInFactorOne({ children }: PropsWithChildren) {
-  const state = useSignInState();
+  const state = useSignInStateMatcher();
   const actorRef = useSignInFlow();
 
   return state.matches('FirstFactor') ? <Form flowActor={actorRef}>{children}</Form> : null;
@@ -107,7 +106,7 @@ export function SignInFactorOne({ children }: PropsWithChildren) {
 // ================= SignInFactorTwo ================= //
 
 export function SignInFactorTwo({ children }: PropsWithChildren) {
-  const state = useSignInState();
+  const state = useSignInStateMatcher();
   const actorRef = useSignInFlow();
 
   return state.matches('SecondFactor') ? <Form flowActor={actorRef}>{children}</Form> : null;
