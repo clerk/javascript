@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.68.4
+
+### Patch Changes
+
+- Telemetry: Append \_\_clerk_framework_hint for Environment requests only by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.68.3
 
 ### Patch Changes
