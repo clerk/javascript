@@ -366,6 +366,8 @@ export const enUS: LocalizationResource = {
       successMessage: '{{identifier}} has been added to your account.',
       infoText:
         'A text message containing a verification link will be sent to this phone number. Message and data rates may apply.',
+      //TODO-RETHEME remove
+      infoText__secondary: 'Message and data rates may apply.',
       removeResource: {
         title: 'Remove phone number',
         messageLine1: '{{identifier}} will be removed from this account.',
@@ -443,8 +445,14 @@ export const enUS: LocalizationResource = {
         'Select an existing phone number to register for SMS code two-step verification or add a new one.',
       subtitle__unavailablePhoneNumbers:
         'There are no available phone numbers to register for SMS code two-step verification, please add a new one.',
+      //TODO-RETHEME remove
       successMessage:
         'SMS code two-step verification is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successTitle: 'SMS code verification enabled',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
       removeResource: {
         title: 'Remove two-step verification',
         messageLine1: '{{identifier}} will be no longer receiving verification codes when signing in.',
