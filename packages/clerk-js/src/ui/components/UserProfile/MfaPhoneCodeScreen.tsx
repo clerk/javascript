@@ -4,10 +4,11 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
-import { Button, Col, localizationKeys, Text } from '../../customizables';
+import { Button, Col, Flex, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { FormButtonContainer, FormContainer, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { handleError, stringToFormattedPhoneString } from '../../utils';
+import { FormContainer, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { Plus } from '../../icons';
+import { getCountryFromPhoneString, handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { AddPhone, VerifyPhone } from './PhoneForm';
 
@@ -20,9 +21,10 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
   return (
     <Wizard {...wizard.props}>
       <AddPhone
-        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
+        title={localizationKeys('userProfile.phoneNumberPage.title')}
         resourceRef={ref}
         onSuccess={wizard.nextStep}
+        onUseExistingNumberClick={() => wizard.goToStep(2)}
         onReset={onReset}
       />
       <VerifyPhone
@@ -94,45 +96,57 @@ const AddMfa = (props: AddMfaProps) => {
   };
 
   return (
-    <FormContainer headerTitle={title}>
+    <FormContainer
+      headerTitle={title}
+      gap={1}
+    >
       <Text
         localizationKey={localizationKeys(
           availableMethods.length
             ? 'userProfile.mfaPhoneCodePage.subtitle__availablePhoneNumbers'
             : 'userProfile.mfaPhoneCodePage.subtitle__unavailablePhoneNumbers',
         )}
+        sx={t => ({ color: t.colors.$blackAlpha500 })}
       />
       <Col gap={2}>
         {availableMethods.map(phone => {
+          const { country } = getCountryFromPhoneString(phone.phoneNumber);
+
           const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
 
           return (
             <Button
               key={phone.id}
-              variant='ghost'
-              sx={{ justifyContent: 'start' }}
+              variant='secondary'
               onClick={() => enableMfa(phone)}
               isLoading={card.loadingMetadata === phone.id}
               isDisabled={card.isLoading}
+              sx={t => ({
+                columnGap: t.space.$2x5,
+                justifyContent: 'start',
+              })}
             >
-              {formattedPhone}
+              <span>{country.iso.toUpperCase()}</span> <span>{formattedPhone}</span>
             </Button>
           );
         })}
-        <Button
-          variant='ghost'
-          sx={{ justifyContent: 'start' }}
-          onClick={onAddPhoneClick}
-          localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}
-        />
+
+        <Flex sx={{ justifyContent: 'space-between' }}>
+          <Button
+            variant='ghost'
+            sx={{ justifyContent: 'start' }}
+            onClick={onAddPhoneClick}
+            localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}
+            icon={Plus}
+          />
+
+          <Button
+            variant='ghost'
+            localizationKey={localizationKeys('userProfile.formButtonReset')}
+            onClick={onReset}
+          />
+        </Flex>
       </Col>
-      <FormButtonContainer sx={{ marginTop: 0 }}>
-        <Button
-          variant='ghost'
-          localizationKey={localizationKeys('userProfile.formButtonReset')}
-          onClick={onReset}
-        />
-      </FormButtonContainer>
     </FormContainer>
   );
 };

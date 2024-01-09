@@ -362,10 +362,10 @@ export const enUS: LocalizationResource = {
       },
     },
     phoneNumberPage: {
-      title: 'Add phone number',
+      title: 'Add a phone number',
       successMessage: '{{identifier}} has been added to your account.',
-      infoText: 'A text message containing a verification link will be sent to this phone number.',
-      infoText__secondary: 'Message and data rates may apply.',
+      infoText:
+        'A text message containing a verification link will be sent to this phone number. Message and data rates may apply.',
       removeResource: {
         title: 'Remove phone number',
         messageLine1: '{{identifier}} will be removed from this account.',
@@ -438,9 +438,11 @@ export const enUS: LocalizationResource = {
     mfaPhoneCodePage: {
       title: 'Add SMS code verification',
       primaryButton__addPhoneNumber: 'Add a phone number',
-      subtitle__availablePhoneNumbers: 'Select a phone number to register for SMS code two-step verification.',
+      backButton: 'Use existing number',
+      subtitle__availablePhoneNumbers:
+        'Select an existing phone number to register for SMS code two-step verification or add a new one.',
       subtitle__unavailablePhoneNumbers:
-        'There are no available phone numbers to register for SMS code two-step verification.',
+        'There are no available phone numbers to register for SMS code two-step verification, please add a new one.',
       successMessage:
         'SMS code two-step verification is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
       removeResource: {

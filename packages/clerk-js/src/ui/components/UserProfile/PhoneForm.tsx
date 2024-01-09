@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
-import { localizationKeys, Text } from '../../customizables';
+import { Button, Col, Flex, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -42,10 +42,11 @@ export const PhoneForm = withCardStateProvider((props: PhoneFormProps) => {
 type AddPhoneProps = FormProps & {
   title: LocalizationKey;
   resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
+  onUseExistingNumberClick?: React.MouseEventHandler;
 };
 
 export const AddPhone = (props: AddPhoneProps) => {
-  const { title, onSuccess, onReset, resourceRef } = props;
+  const { title, onSuccess, onReset, onUseExistingNumberClick, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
 
@@ -69,29 +70,53 @@ export const AddPhone = (props: AddPhoneProps) => {
   };
 
   return (
-    <FormContainer headerTitle={title}>
-      <Form.Root onSubmit={addPhone}>
-        <Form.ControlRow elementId={phoneField.id}>
-          <Form.PhoneInput
-            {...phoneField.props}
-            autoFocus
-          />
-        </Form.ControlRow>
-        <Text localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')} />
+    <FormContainer
+      headerTitle={title}
+      gap={1}
+    >
+      <Form.Root
+        gap={6}
+        onSubmit={addPhone}
+      >
         <Text
-          colorScheme='neutral'
-          localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText__secondary')}
+          localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')}
+          sx={t => ({ color: t.colors.$blackAlpha500 })}
         />
-        <FormButtons
-          isDisabled={!canSubmit}
-          onReset={onReset}
-        />
+
+        <Col gap={1}>
+          <Form.ControlRow elementId={phoneField.id}>
+            <Form.PhoneInput
+              {...phoneField.props}
+              autoFocus
+            />
+          </Form.ControlRow>
+
+          <Flex justify={onUseExistingNumberClick ? 'between' : 'end'}>
+            {onUseExistingNumberClick && (
+              <Button
+                variant='ghost'
+                localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.backButton')}
+                onClick={onUseExistingNumberClick}
+              />
+            )}
+
+            <FormButtons
+              isDisabled={!canSubmit}
+              onReset={onReset}
+            />
+          </Flex>
+        </Col>
       </Form.Root>
     </FormContainer>
   );
 };
 
-export const VerifyPhone = (props: AddPhoneProps) => {
+type VerifyPhoneProps = FormProps & {
+  title: LocalizationKey;
+  resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
+};
+
+export const VerifyPhone = (props: VerifyPhoneProps) => {
   const { title, onSuccess, resourceRef, onReset } = props;
 
   return (
