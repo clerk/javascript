@@ -44,8 +44,6 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 		return <Text color='red'>You are already on version {toVersion}, so there's no need to migrate!</Text>;
 	}
 
-	console.log(ignore);
-
 	return (
 		<>
 			{/* Welcome to the upgrade script! */}
