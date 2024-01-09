@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.68.3
+
+### Patch Changes
+
+- Telemetry: Append `__clerk_framework_hint` if a known framework is detected ([#2522](https://github.com/clerk/javascript/pull/2522)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.68.2
 
 ### Patch Changes
