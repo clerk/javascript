@@ -5,6 +5,7 @@ import { globby } from 'globby';
 import fs from 'fs/promises';
 import Spinner from 'ink-spinner';
 import indexToPosition from 'index-to-position';
+import ExpandableList from './util/expandable-list.js';
 
 export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 	// NOTE: if the difference between fromVersion and toVersion is greater than 1
@@ -110,28 +111,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 				{' ' + status}
 			</Text>
 			<Newline />
-			{results.map(result => {
-				return (
-					<Box
-						borderStyle='round'
-						borderColor='blue'
-						flexDirection='column'
-						paddingX={2}
-						paddingY={1}
-						key={result.position}
-					>
-						<Text color='blue'>{result.title}</Text>
-						<Text>
-							Location: {result.file}:{result.position.line}:{result.position.column}
-						</Text>
-						<Text color='gray'>changed in {result.sdk} SDK</Text>
-						<Link url={result.link}>
-							<Text>Migration guide entry &raquo;</Text>
-						</Link>
-						<Text>{result.content}</Text>
-					</Box>
-				);
-			})}
+			{!!results.length && <ExpandableList items={results} />}
 		</>
 	);
 }

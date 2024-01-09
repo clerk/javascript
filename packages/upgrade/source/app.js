@@ -9,6 +9,8 @@ import getClerkMajorVersion from './util/get-clerk-version.js';
 
 export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ignore = [] }) {
 	const [sdks, setSdks] = useState(_sdk ? [_sdk] : []);
+	const [sdkGuesses, setSdkGuesses] = useState([]);
+	const [sdkGuessConfirmed, setSdkGuessConfirmed] = useState(false);
 	const [sdkGuessAttempted, setSdkGuessAttempted] = useState(false);
 	const [fromVersion, setFromVersion] = useState(_fromVersion);
 	const [fromVersionGuessAttempted, fromVersionSdkGuessAttempted] = useState(false);
@@ -17,13 +19,13 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 	const [ignore, setIgnore] = useState(_ignore);
 	const [configComplete, setConfigComplete] = useState(false);
 	const [configVerified, setConfigVerified] = useState(false);
-	const [sdkGuesses, setSdkGuesses] = useState([]);
 	let fromVersionGuess = false;
 
 	// We try to guess which SDK they are using
 	if (isEmpty(sdks) && isEmpty(sdkGuesses) && !sdkGuessAttempted) {
 		if (!dir) return setDir(process.cwd());
-		setSdkGuesses(guessFrameworks(dir));
+		setSdkGuesses(guessFrameworks(dir)); // this is the suspect line
+		setSdkGuessAttempted(true);
 	}
 
 	// We try to guess which version of Clerk they are using
@@ -42,6 +44,8 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 		return <Text color='red'>You are already on version {toVersion}, so there's no need to migrate!</Text>;
 	}
 
+	console.log(ignore);
+
 	return (
 		<>
 			{/* Welcome to the upgrade script! */}
@@ -57,7 +61,7 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 			)}
 
 			{/* Verify our guess at what their SDK is, if we have one */}
-			{isEmpty(sdks) && !isEmpty(sdkGuesses) && !sdkGuessAttempted && (
+			{isEmpty(sdks) && !isEmpty(sdkGuesses) && !sdkGuessConfirmed && (
 				<>
 					{sdkGuesses.length > 1 ? (
 						<>
@@ -79,7 +83,7 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 							{ label: 'no', value: 'no' },
 						]}
 						onChange={item => {
-							setSdkGuessAttempted(true);
+							setSdkGuessConfirmed(true);
 							// if true, we were right so we set the sdk
 							if (item === 'yes') setSdks(sdkGuesses.map(guess => guess.value));
 						}}
@@ -88,7 +92,7 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 			)}
 
 			{/* If we tried to guess and failed, user must manually select */}
-			{isEmpty(sdks) && sdkGuessAttempted && (
+			{isEmpty(sdks) && isEmpty(sdkGuesses) && (
 				<>
 					<Text>Please select which Clerk SDK(s) you're using for your app:</Text>
 					<Text color='gray'>(multiple can be selected using the space bar, press enter when finished)</Text>
@@ -168,7 +172,7 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 						placeholder='docs/**, images/**'
 						defaultValue={ignore}
 						onSubmit={val => {
-							setIgnore(val);
+							setIgnore(val.includes(',') ? val.split(/\s*,\s*/) : [].concat(val));
 							setConfigComplete(true);
 						}}
 					/>
