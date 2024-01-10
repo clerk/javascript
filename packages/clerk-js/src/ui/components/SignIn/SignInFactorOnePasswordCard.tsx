@@ -138,9 +138,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           </Card.Action>
         </Card.Content>
 
-        <Card.Footer>
-          <Card.FooterLinks />
-        </Card.Footer>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );

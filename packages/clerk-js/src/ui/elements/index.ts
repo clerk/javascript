@@ -12,7 +12,6 @@ export * from './VerificationCodeCard';
 export * from './LoadingCard';
 export * from './ErrorCard';
 export * from './VerificationLinkCard';
-export * from './PoweredByClerk';
 export * from './ApplicationLogo';
 export * from './Card';
 export * from './ArrowBlockButton';
