@@ -1,7 +1,7 @@
 import React, { useReducer, useMemo } from 'react';
 import { Text, Newline, useInput, Box } from 'ink';
 import Link from 'ink-link';
-import Markdown from 'ink-markdown';
+import Markdown from '@jescalan/ink-markdown';
 
 // A listing of items which can be navigated with arrow keys and expanded/contracted
 // with space bar. Limits the number visible at a time to prevent rendering issues with
