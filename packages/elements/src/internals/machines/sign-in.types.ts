@@ -1,7 +1,6 @@
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
-  EnvironmentResource,
   LoadedClerk,
   OAuthStrategy,
   PasswordStrategy,
@@ -14,8 +13,8 @@ import type {
   Web3Strategy,
 } from '@clerk/types';
 
-export type WithClerk<T> = { clerk: LoadedClerkWithEnv } & T;
-export type WithClient<T> = { client: LoadedClerkWithEnv['client'] } & T;
+export type WithClerk<T> = { clerk: LoadedClerk } & T;
+export type WithClient<T> = { client: LoadedClerk['client'] } & T;
 export type WithParams<T> = { params: T };
 
 export type SignInStrategyName = SignInStrategy | 'oauth' | 'web3';
@@ -28,11 +27,6 @@ export type SignInStrategyName = SignInStrategy | 'oauth' | 'web3';
  *   - `SignInCreateIdentifierOnlyParams` and `SignInCreateTransferOnlyParams`: `never` was added to `strategy`.
  *   - `SignInCreateOAuthParams` and `SignInCreateSamlParams` where identifier is required in one but not in the other.
  */
-
-export interface LoadedClerkWithEnv extends LoadedClerk {
-  mode: 'browser' | 'server';
-  __unstable__environment: EnvironmentResource;
-}
 
 export interface SignInCreateOAuthParams {
   strategy: OAuthStrategy;

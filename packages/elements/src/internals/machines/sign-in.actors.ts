@@ -15,8 +15,8 @@ import { fromPromise } from 'xstate';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import type { ClerkRouter } from '~/react/router';
 
+import type { WithClerk, WithClient, WithParams } from './shared.types';
 import type { SignInMachineContext } from './sign-in.machine';
-import type { WithClerk, WithClient, WithParams } from './sign-in.types';
 import { assertIsDefined } from './utils/assert';
 
 // ================= createSignIn ================= //

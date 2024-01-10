@@ -2,6 +2,7 @@ import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   EnvironmentResource,
+  LoadedClerk,
   OAuthStrategy,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
@@ -27,12 +28,11 @@ import {
   prepareFirstFactor,
   prepareSecondFactor,
 } from './sign-in.actors';
-import type { LoadedClerkWithEnv } from './sign-in.types';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from './sign-in.utils';
 import { assertActorEventError } from './utils/assert';
 
 export interface SignInMachineContext extends MachineContext {
-  clerk: LoadedClerkWithEnv;
+  clerk: LoadedClerk;
   currentFactor: SignInFactor | null;
   environment?: EnvironmentResource;
   error?: Error | ClerkAPIResponseError;
@@ -44,7 +44,7 @@ export interface SignInMachineContext extends MachineContext {
 }
 
 export interface SignInMachineInput {
-  clerk: LoadedClerkWithEnv;
+  clerk: LoadedClerk;
   form: ActorRefFrom<typeof FormMachine>;
   router: ClerkRouter;
 }

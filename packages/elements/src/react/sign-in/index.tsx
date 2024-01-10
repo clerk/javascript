@@ -1,6 +1,6 @@
 'use client';
 
-import { useClerk } from '@clerk/clerk-react';
+import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
 import type { createBrowserInspector } from '@statelyai/inspect';
 import type { PropsWithChildren } from 'react';
@@ -15,7 +15,7 @@ import {
   useSSOCallbackHandler,
   useStrategy,
 } from '~/internals/machines/sign-in.context';
-import type { LoadedClerkWithEnv, SignInStrategyName } from '~/internals/machines/sign-in.types';
+import type { SignInStrategyName } from '~/internals/machines/sign-in.types';
 import { Form } from '~/react/common/form';
 import { Route, Router, useClerkRouter, useNextRouter } from '~/react/router';
 
@@ -38,8 +38,7 @@ if (DEBUG && typeof window !== 'undefined') {
 // ================= SignInFlowProvider ================= //
 
 function SignInFlowProvider({ children }: PropsWithChildren) {
-  // TODO: Do something about `__unstable__environment` typing
-  const clerk = useClerk() as unknown as LoadedClerkWithEnv;
+  const clerk = useClerk();
   const router = useClerkRouter();
   const form = useFormStore();
 
@@ -78,9 +77,12 @@ export function SignIn({ children }: PropsWithChildren): JSX.Element | null {
       router={router}
       basePath='/sign-in'
     >
-      <FormStoreProvider>
-        <SignInFlowProvider>{children}</SignInFlowProvider>
-      </FormStoreProvider>
+      {/* TODO: Temporary hydration fix */}
+      <ClerkLoaded>
+        <FormStoreProvider>
+          <SignInFlowProvider>{children}</SignInFlowProvider>
+        </FormStoreProvider>
+      </ClerkLoaded>
     </Router>
   );
 }
