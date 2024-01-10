@@ -2,13 +2,9 @@ import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/c
 import { Clerk } from '@clerk/clerk-js/headless';
 import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 import * as Application from 'expo-application';
-import Constants, { ExecutionEnvironment } from 'expo-constants';
-import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 
 import type { TokenCache } from './cache';
-
-// `true` when running in Expo Go.
-const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 Clerk.sdkMetadata = {
   name: PACKAGE_NAME,
@@ -16,8 +12,6 @@ Clerk.sdkMetadata = {
 };
 
 const KEY = '__clerk_client_jwt';
-
-const NULL_VALUE = 'NULL';
 
 export let clerk: HeadlessBrowserClerk;
 
@@ -50,23 +44,12 @@ export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrow
       const jwt = await getToken(KEY);
       (requestInit.headers as Headers).set('authorization', jwt || '');
 
-      // indicate the device; non-identifying information
-      (requestInit.headers as Headers).set('x-expo-device-brand', Device.brand ?? NULL_VALUE);
-
-      // [isDevice]: true if the app is running on a real device and false if running in a simulator or emulator. On web, this is always set to true.
-      (requestInit.headers as Headers).set('x-expo-device-is-device', Device.isDevice ? 'true' : 'false');
-      (requestInit.headers as Headers).set('x-expo-device-brand', Device.brand ?? NULL_VALUE);
-      (requestInit.headers as Headers).set('x-expo-device-model-id', Device.modelId ?? NULL_VALUE);
-      (requestInit.headers as Headers).set('x-expo-application-id', Application.applicationId ?? NULL_VALUE);
-      (requestInit.headers as Headers).set('x-expo-application-name', Application.applicationName ?? NULL_VALUE);
+      // Send some non-identifying headers that are useful for logging
+      (requestInit.headers as Headers).set('x-expo-execution-environment', Constants.executionEnvironment);
       (requestInit.headers as Headers).set(
         'x-expo-native-application-version',
-        Application.nativeApplicationVersion ?? NULL_VALUE,
+        Application.nativeApplicationVersion || 'NULL',
       );
-      (requestInit.headers as Headers).set('x-expo-native-build-version', Application.nativeBuildVersion ?? NULL_VALUE);
-
-      // indicate "environment"; non-identifying information
-      (requestInit.headers as Headers).set('x-expo-is-expo-go', isExpoGo ? 'true' : 'false');
     });
 
     // @ts-expect-error
