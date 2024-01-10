@@ -9,11 +9,11 @@ import {
   SignIn,
   SignInFactorOne,
   SignInFactorTwo,
+  SignInSocialProviders,
   SignInSSOCallback,
   SignInStart,
   SignInStrategies,
   SignInStrategy,
-  SocialProviders,
   Submit,
 } from '@clerk/elements';
 import clsx from 'clsx';
@@ -21,8 +21,8 @@ import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import { forwardRef } from 'react';
 
-import { Debug } from '@/components/debug';
 import { H1, H2, H3, HR, P } from '@/components/design';
+import { SignInDebug } from '@/components/sign-in-debug';
 
 const BUTTON_BGS: Record<string, string> = {
   github: 'rgba(23 23 23)',
@@ -57,7 +57,7 @@ export default function SignInPage() {
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>START</H1>
             <div className='flex flex-col gap-3'>
-              <SocialProviders
+              <SignInSocialProviders
                 render={provider => {
                   return (
                     <button
@@ -291,7 +291,7 @@ export default function SignInPage() {
         <SignInSSOCallback />
       </div>
 
-      <Debug />
+      <SignInDebug />
     </SignIn>
   );
 }
