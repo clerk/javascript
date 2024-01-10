@@ -80,7 +80,9 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 							<Text>Is that right?</Text>
 						</>
 					) : (
-						<></>
+						<Text>
+							It looks like you are using the "{sdkGuesses[0].label}" Clerk SDK in your project. Is that right?
+						</Text>
 					)}
 
 					<Select
