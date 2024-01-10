@@ -2,7 +2,6 @@ import type { ComponentProps } from 'react';
 
 import { Col } from '../../customizables';
 import type { InternalTheme } from '../../styledSystem';
-import { common } from '../../styledSystem';
 
 type ActionCardProps = ComponentProps<typeof Col> & {
   variant?: 'neutral' | 'destructive';
@@ -10,12 +9,10 @@ type ActionCardProps = ComponentProps<typeof Col> & {
 
 const styles = (t: InternalTheme) => ({
   neutral: {
-    background: t.colors.$colorBackground,
-    boxShadow: common.shadows(t).actionCardShadow,
+    backgroundColor: t.colors.$colorBackground,
   },
   destructive: {
-    background: t.colors.$blackAlpha50,
-    boxShadow: common.shadows(t).actionCardDestructiveShadow,
+    backgroundColor: t.colors.$blackAlpha50,
   },
 });
 
@@ -26,11 +23,13 @@ export const ActionCard = (props: ActionCardProps) => {
     <Col
       sx={[
         t => ({
+          boxShadow: t.shadows.$actionCardShadow,
           gap: t.space.$4,
           borderRadius: t.radii.$lg,
           padding: t.space.$6,
-          backgroundColor: styles(t)[variant].background,
-          boxShadow: styles(t)[variant].boxShadow,
+          border: t.borders.$normal,
+          borderColor: t.colors.$blackAlpha150,
+          ...styles(t)[variant],
         }),
         sx,
       ]}

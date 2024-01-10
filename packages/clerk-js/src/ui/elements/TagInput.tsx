@@ -191,7 +191,7 @@ const TagPill = (props: TagPillProps) => {
         backgroundColor: t.colors.$blackAlpha50,
         color: t.colors.$blackAlpha700,
         borderRadius: t.radii.$sm,
-        boxShadow: common.shadows(t).badge.replace('{{color}}', t.colors.$blackAlpha100),
+        boxShadow: t.shadows.$badge,
         cursor: 'pointer',
         ':hover svg': {
           color: t.colors.$danger500,

@@ -3,7 +3,7 @@ import React from 'react';
 import { useEnvironment } from '../contexts';
 import { Col, Flex, Flow, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations, common } from '../styledSystem';
+import { animations } from '../styledSystem';
 import { Card } from '.';
 
 const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card.Content>>((props, ref) => {
@@ -37,7 +37,7 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
           overflow: 'hidden',
           borderRadius: t.radii.$lg,
           zIndex: t.zIndices.$card,
-          boxShadow: common.shadows(t).cardContentShadow,
+          boxShadow: t.shadows.$cardContentShadow,
         }),
         sx,
       ]}

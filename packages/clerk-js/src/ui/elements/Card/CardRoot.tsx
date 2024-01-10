@@ -3,7 +3,7 @@ import React from 'react';
 import { Col, descriptors, generateFlowPartClassname, useAppearance } from '../../customizables';
 import type { ElementDescriptor } from '../../customizables/elementDescriptors';
 import type { PropsOfComponent } from '../../styledSystem';
-import { common, mqu } from '../../styledSystem';
+import { mqu } from '../../styledSystem';
 import { ApplicationLogo } from '../ApplicationLogo';
 import { useFlowMetadata } from '../contexts';
 
@@ -33,7 +33,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
           t => ({
             maxWidth: `calc(100vw - ${t.sizes.$20})`,
             width: t.sizes.$100,
-            boxShadow: common.shadows(t).cardRootShadow,
+            boxShadow: t.shadows.$cardBoxShadow,
             borderRadius: t.radii.$xl,
             overflow: 'hidden',
             color: t.colors.$colorText,

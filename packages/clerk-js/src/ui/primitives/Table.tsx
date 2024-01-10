@@ -1,18 +1,19 @@
 import React from 'react';
 
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
-import { common, createVariants } from '../styledSystem';
+import { createVariants } from '../styledSystem';
 import type { BoxProps } from './Box';
 import { Box } from './Box';
 
 const { applyVariants, filterProps } = createVariants(theme => {
   return {
     base: {
-      borderCollapse: 'collapse',
       borderSpacing: '0',
+      borderCollapse: 'separate',
+      border: theme.borders.$normal,
+      borderColor: theme.colors.$blackAlpha100,
       borderRadius: theme.radii.$lg,
-      boxShadow: common.shadows(theme).tableBodyShadow,
-      padding: `${theme.space.$4} ${theme.space.$5}`,
+      boxShadow: theme.shadows.$tableBodyShadow,
       width: '100%',
       '>:not([hidden])~:not([hidden])': {
         borderBottomWidth: '0px',
@@ -29,6 +30,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
         paddingLeft: theme.space.$2,
       },
       'tr > td': {
+        borderTop: theme.borders.$normal,
+        borderColor: theme.colors.$blackAlpha100,
         paddingBottom: theme.space.$2,
         paddingTop: theme.space.$2,
         paddingLeft: theme.space.$4,

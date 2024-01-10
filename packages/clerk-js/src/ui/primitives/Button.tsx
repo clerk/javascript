@@ -45,7 +45,9 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         primary: {
           backgroundColor: theme.colors.$primary500,
           color: theme.colors.$colorTextOnPrimaryBackground,
-          ...common.buttonShadow,
+          boxShadow: theme.shadows.$buttonShadow,
+          border: theme.borders.$normal,
+          borderColor: theme.colors.$primary800,
           ':before': {
             position: 'absolute',
             content: '""',
@@ -75,7 +77,9 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         primaryDanger: {
           backgroundColor: theme.colors.$danger500,
           color: theme.colors.$colorTextOnPrimaryBackground,
-          ...common.buttonShadow,
+          boxShadow: theme.shadows.$buttonShadow,
+          border: theme.borders.$normal,
+          borderColor: theme.colors.$danger800,
           ':before': {
             position: 'absolute',
             content: '""',
@@ -113,7 +117,9 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
             ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$colorBackground },
-          boxShadow: common.shadows(theme).secondaryButtonShadow,
+          boxShadow: theme.shadows.$secondaryButtonShadow,
+          border: theme.borders.$normal,
+          borderColor: theme.colors.$blackAlpha100,
         },
         secondaryDanger: {
           backgroundColor: theme.colors.$colorBackground,
@@ -126,21 +132,15 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
             ? { backgroundColor: theme.colors.$danger50, color: theme.colors.$danger500 }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$colorBackground },
-          boxShadow: common.shadows(theme).secondaryButtonShadow,
+          boxShadow: theme.shadows.$secondaryButtonShadow,
+          border: theme.borders.$normal,
+          borderColor: theme.colors.$blackAlpha100,
         },
         ghost: {
           color: theme.colors.$blackAlpha700,
           '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 },
           '&:focus': props.hoverAsFocus
             ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
-            : undefined,
-          '&:active': { backgroundColor: theme.colors.$transparent },
-        },
-        ghostAction: {
-          color: theme.colors.$blackAlpha600,
-          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha600 },
-          '&:focus': props.hoverAsFocus
-            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha600 }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$transparent },
         },

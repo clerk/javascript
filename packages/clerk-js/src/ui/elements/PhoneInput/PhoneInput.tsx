@@ -82,8 +82,11 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         renderOption={(option, _index, isSelected) => (
           <CountryCodeListItem
             sx={theme => ({
-              '&:hover, &[data-focused="true"]': {
-                backgroundColor: theme.colors.$blackAlpha200,
+              '&:hover': {
+                backgroundColor: theme.colors.$blackAlpha100,
+              },
+              '&[data-focused="true"]': {
+                backgroundColor: theme.colors.$blackAlpha150,
               },
             })}
             isSelected={isSelected}
@@ -99,8 +102,9 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         comparator={(term, option) => option.searchTerm.toLowerCase().includes(term.toLowerCase())}
       >
         <SelectButton
-          focusRing={false}
+          variant='ghost'
           sx={t => ({
+            border: 'none',
             borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
             borderBottomRightRadius: '0',
             borderTopRightRadius: '0',
@@ -148,7 +152,9 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
           sx={[
             {
               boxShadow: 'none',
+              border: 'none',
               ':hover:not(:focus)': {
+                border: 'none',
                 boxShadow: 'none',
               },
               height: '100%',

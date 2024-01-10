@@ -7,7 +7,7 @@ import { Button, descriptors, Flex, Icon, Input, Text } from '../customizables';
 import { usePopover, useSearchInput } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { animations, common } from '../styledSystem';
+import { animations } from '../styledSystem';
 import { colors } from '../utils';
 import { withFloatingTree } from './contexts';
 import type { InputWithIcon } from './InputWithIcon';
@@ -56,9 +56,9 @@ const defaultRenderOption = <O extends Option>(option: O, _index?: number, isFoc
         padding: `${theme.space.$2} ${theme.space.$4}`,
         margin: `0 ${theme.space.$1}`,
         borderRadius: theme.radii.$md,
-        ...(isFocused && { backgroundColor: theme.colors.$blackAlpha200 }),
+        ...(isFocused && { backgroundColor: theme.colors.$blackAlpha100 }),
         '&:hover': {
-          backgroundColor: theme.colors.$blackAlpha200,
+          backgroundColor: theme.colors.$blackAlpha100,
         },
       })}
     >
@@ -181,14 +181,13 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
   const { elementId } = useSelectState();
 
   return (
-    <Flex sx={t => ({ padding: t.space.$1 })}>
+    <Flex sx={t => ({ padding: `${t.space.$1} ${t.space.$1} 0 ${t.space.$1}` })}>
       <Input
         elementDescriptor={descriptors.selectSearchInput}
         elementId={descriptors.selectSearchInput.setId(elementId)}
         focusRing={false}
         sx={[
           t => ({
-            border: 'none',
             borderRadius: t.radii.$md,
             backgroundColor: t.colors.$blackAlpha50,
             padding: t.space.$2,
@@ -303,7 +302,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
             overflow: 'hidden',
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: common.shadows(theme).menuShadow,
+            boxShadow: theme.shadows.$menuShadow,
             zIndex: theme.zIndices.$dropdown,
           }),
           sx,
@@ -380,17 +379,12 @@ export const SelectButton = (
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
       ref={reference}
-      variant='unstyled'
+      variant='secondary'
       textVariant='buttonLarge'
       onClick={onTriggerClick}
       sx={[
         theme => ({
           gap: theme.space.$2,
-          fontWeight: theme.fontWeights.$normal,
-          color: theme.colors.$colorInputText,
-          backgroundColor: theme.colors.$colorInputBackground,
-          borderRadius: theme.radii.$md,
-          boxShadow: common.shadows(theme).selectButtonShadow,
           paddingLeft: theme.space.$3x5,
           paddingRight: theme.space.$3x5,
           alignItems: 'center',
