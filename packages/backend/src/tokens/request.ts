@@ -124,8 +124,8 @@ export async function authenticateRequest(
 
     if (
       instanceType === 'development' &&
-      (error.reason === TokenVerificationErrorReason.TokenExpired ||
-        error.reason === TokenVerificationErrorReason.TokenNotActiveYet)
+      (error?.reason === TokenVerificationErrorReason.TokenExpired ||
+        error?.reason === TokenVerificationErrorReason.TokenNotActiveYet)
     ) {
       error.tokenCarrier = 'cookie';
       // This probably means we're dealing with clock skew
@@ -204,7 +204,21 @@ ${error.getFullMessage()}`,
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
      */
     if (authenticateContext.handshakeToken) {
-      return resolveHandshake();
+      try {
+        return await resolveHandshake();
+      } catch (error) {
+        // If for some reason the handshake token is invalid or stale, we ignore it and continue trying to authenticate the request.
+        // Worst case, the handshake will trigger again and return a refreshed token.
+        if (error instanceof TokenVerificationError && instanceType === 'development') {
+          if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
+            throw new Error(
+              `Clerk: Handshake token verification failed due to an invalid signature. If you have switched Clerk keys locally, clear your cookies and try again.`,
+            );
+          }
+
+          throw new Error(`Clerk: Handshake token verification failed: ${error.getFullMessage()}.`);
+        }
+      }
     }
 
     /**

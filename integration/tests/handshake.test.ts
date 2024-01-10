@@ -827,13 +827,14 @@ test.describe('Client handshake @generic', () => {
       }),
       redirect: 'manual',
     });
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(200);
   });
 
-  test('Handshake result - prod - skew - clock ahead', async () => {
+  test('Handshake result - prod - session token expired and handshake stale', async () => {
     const config = generateConfig({
       mode: 'live',
     });
+    const { token: currentSessionToken, claims } = config.generateToken({ state: 'expired' });
     const { token } = config.generateToken({ state: 'expired' });
     const cookiesToSet = [`__session=${token};path=/`, 'foo=bar;path=/;domain=example.com'];
     const handshake = await config.generateHandshakeToken(cookiesToSet);
@@ -841,12 +842,12 @@ test.describe('Client handshake @generic', () => {
       headers: new Headers({
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
-        Cookie: `__clerk_handshake=${handshake}`,
+        Cookie: `__clerk_handshake=${handshake};__session=${currentSessionToken};__client_uat=${claims.iat}`,
         'Sec-Fetch-Dest': 'document',
       }),
       redirect: 'manual',
     });
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(307);
   });
 
   test('Handshake result - prod - mismatched keys', async () => {
@@ -866,6 +867,6 @@ test.describe('Client handshake @generic', () => {
       }),
       redirect: 'manual',
     });
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(200);
   });
 });
