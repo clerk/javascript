@@ -63,7 +63,7 @@ export const OrganizationGeneralPage = () => {
       >
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('organizationProfile.general.title')}
+            localizationKey={localizationKeys('organizationProfile.start.headerTitle__general')}
             sx={t => ({ marginBottom: t.space.$4 })}
             textVariant='h2'
           />
@@ -89,7 +89,7 @@ const OrganizationProfileSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('organizationProfile.general.profileSection.title')}
+      title={localizationKeys('organizationProfile.start.profileSection.title')}
       id='organizationProfile'
     >
       <Action.Root>
@@ -105,7 +105,7 @@ const OrganizationProfileSection = () => {
                 <Button
                   id='organizationProfile'
                   variant='ghost'
-                  localizationKey={localizationKeys('organizationProfile.general.profileSection.primaryButton')}
+                  localizationKey={localizationKeys('organizationProfile.start.profileSection.primaryButton')}
                 />
               </Action.Trigger>
             </ProfileSection.Item>
@@ -136,8 +136,8 @@ const OrganizationDomainsSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('organizationProfile.general.domainSection.title')}
-      subtitle={localizationKeys('organizationProfile.general.domainSection.subtitle')}
+      title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
+      subtitle={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
       id='organizationDomains'
     >
       <Action.Root>
@@ -146,7 +146,7 @@ const OrganizationDomainsSection = () => {
         <Protect permission='org:sys_domains:manage'>
           <Action.Trigger value='add'>
             <ProfileSection.Button
-              localizationKey={localizationKeys('organizationProfile.general.domainSection.primaryButton')}
+              localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
               id='organizationDomains'
             />
           </Action.Trigger>
