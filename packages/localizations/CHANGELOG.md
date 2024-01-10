@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.10
+
+### Minor Changes
+
+- Correct ko-KR strings naturally ([#2533](https://github.com/clerk/javascript/pull/2533)) by [@sunghyunzz](https://github.com/sunghyunzz)
+
 ## 2.0.0-alpha-v5.9
 
 ### Patch Changes

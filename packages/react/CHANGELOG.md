@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.0.0-alpha-v5.15
+
+### Patch Changes
+
+- Fixes error thrown for missing path & routing props when path was passed from context. ([#2514](https://github.com/clerk/javascript/pull/2514)) by [@dimkl](https://github.com/dimkl)
+
+  This change affects components `<SignIn />`, `<SignUp />` from `@clerk/nextjs` and `@clerk/remix`.
+
+- Fixes error when path is passed from context and a routing strategy other than `path` is passed as a prop. ([#2530](https://github.com/clerk/javascript/pull/2530)) by [@octoper](https://github.com/octoper)
+
+  This change affects components `<SignIn />`, `<SignUp />` from `@clerk/nextjs` and `@clerk/remix`.
+
 ## 5.0.0-alpha-v5.14
 
 ### Patch Changes

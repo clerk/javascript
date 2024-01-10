@@ -1,5 +1,28 @@
 # Change Log
 
+## 5.0.0-alpha-v5.15
+
+### Minor Changes
+
+- Remove fallback data and allow promise to throw for paginated endpoint methods. ([#2491](https://github.com/clerk/javascript/pull/2491)) by [@panteliselef](https://github.com/panteliselef)
+
+  Affected methods:
+
+  - Organization.getDomains
+  - Organization.getInvitations
+  - Organization.getMembershipRequests
+  - Organization.getMemberships
+  - User.getOrganizationInvitations
+  - User.getOrganizationSuggestions
+  - User.getOrganizationMemberships
+
+### Patch Changes
+
+- Exclude external custom links from route matching. Previously adding external links to custom pages would cause all pages that are defined below it to throw an error. ([#2519](https://github.com/clerk/javascript/pull/2519)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`6b316611f`](https://github.com/clerk/javascript/commit/6b316611fb9d647bd75e9ead1858492255339449)]:
+  - @clerk/localizations@2.0.0-alpha-v5.10
+
 ## 5.0.0-alpha-v5.14
 
 ### Patch Changes

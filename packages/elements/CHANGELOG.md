@@ -1,5 +1,13 @@
 # @clerk/elements
 
+## 0.0.2-alpha-v5.4
+
+### Patch Changes
+
+- Updated dependencies [[`e9841dd91`](https://github.com/clerk/javascript/commit/e9841dd91897a7ebb468b14e272ce06154795389), [`59f9a7296`](https://github.com/clerk/javascript/commit/59f9a72968fb49add6d9031158c791ac60a161b9)]:
+  - @clerk/clerk-react@5.0.0-alpha-v5.15
+  - @clerk/nextjs@5.0.0-alpha-v5.16
+
 ## 0.0.2-alpha-v5.3
 
 ### Patch Changes
