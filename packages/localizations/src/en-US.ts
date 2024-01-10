@@ -446,7 +446,7 @@ export const enUS: LocalizationResource = {
       imageFormDestructiveActionSubtitle: 'Remove',
       fileDropAreaTitle: 'Drag file here, or...',
       fileDropAreaAction: 'Select file',
-      fileDropAreaHint: 'Upload a JPG, PNG, GIF, or WEBP image smaller than 10 MB',
+      fileDropAreaHint: 'Recommend size 1:1, upto 10MB.',
       readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
       successMessage: 'Your profile has been updated.',
     },
