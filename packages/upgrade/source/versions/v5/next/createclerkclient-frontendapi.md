@@ -1,6 +1,6 @@
 ---
 title: '`frontendApi` -> `publishableKey` as param to createClerkClient'
-matcher: "createClerkClient\\({.*?frontendApi:.*?}\\)"
+matcher: "createClerkClient\\({[\\s\\S]*?frontendApi:[\\s\\S]*?}\\)"
 matcherFlags: 'm'
 ---
 

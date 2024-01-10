@@ -1,6 +1,6 @@
 ---
 title: '`frontendApi` -> `publishableKey` as param to authMiddleware'
-matcher: "authMiddleware\\({.*?frontendApi:.*?}\\)"
+matcher: "authMiddleware\\({[\\s\\S]*?frontendApi:[\\s\\S]*?}\\)"
 matcherFlags: 'm'
 ---
 

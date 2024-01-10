@@ -1,6 +1,6 @@
 ---
 title: '`apiKey` -> `secretKey` as param to authMiddleware'
-matcher: "authMiddleware\\({.*?apiKey:.*?}\\)"
+matcher: "authMiddleware\\({[\\s\\S]*?apiKey:[\\s\\S]*?}\\)"
 matcherFlags: 'm'
 ---
 

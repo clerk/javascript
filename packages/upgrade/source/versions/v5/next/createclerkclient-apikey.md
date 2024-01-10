@@ -1,6 +1,6 @@
 ---
 title: '`apiKey` -> `secretKey` as param to createClerkClient'
-matcher: "createClerkClient\\({.*?apiKey:.*?}\\)"
+matcher: "createClerkClient\\({[\\s\\S]*?apiKey:[\\s\\S]*?}\\)"
 matcherFlags: 'm'
 ---
 

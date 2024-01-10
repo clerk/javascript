@@ -1,6 +1,6 @@
 ---
 title: '`apiKey` -> `secretKey` as param to getAuth'
-matcher: "getAuth\\({.*?apiKey:.*?}\\)"
+matcher: "getAuth\\({[\\s\\S]*?apiKey:[\\s\\S]*?}\\)"
 matcherFlags: 'm'
 ---
 
