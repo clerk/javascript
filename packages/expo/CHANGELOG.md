@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.20.0
+
+### Minor Changes
+
+- Include new headers in requests; ([#2544](https://github.com/clerk/javascript/pull/2544)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  Added `expo-application >=5` & `expo-constants >=14` peer deps
+
 ## 0.19.30
 
 ### Patch Changes
