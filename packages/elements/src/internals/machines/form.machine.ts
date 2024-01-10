@@ -4,10 +4,10 @@ import { assign, enqueueActions, setup } from 'xstate';
 
 import { ClerkElementsError, ClerkElementsFieldError } from '~/internals/errors/error';
 
-import type { FieldDetails } from './form.types';
+import type { FieldDetails, FormFields } from './form.types';
 
 export interface FormMachineContext extends MachineContext {
-  fields: Map<string, FieldDetails>;
+  fields: FormFields;
   errors: ClerkElementsError[];
 }
 

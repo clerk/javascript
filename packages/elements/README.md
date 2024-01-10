@@ -51,7 +51,10 @@ cd examples/nextjs && npm i
 Changes in the `packages/elements` directory will be hotloaded in the example app.
 
 ```sh
-cd examples/nextjs && npm run dev
+npm run app:dev
+
+# With the XState Inspector
+NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true npm run app:dev
 ```
 
 #### E2E Testing

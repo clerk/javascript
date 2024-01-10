@@ -1,7 +1,12 @@
-import type { Clerk } from '@clerk/types';
+import type { Clerk, LoadedClerk } from '@clerk/types';
 import { fromPromise } from 'xstate';
 
-export const waitForClerk = fromPromise(
-  // @ts-expect-error -- not specified on the type
-  ({ input: clerk }: { input: Clerk }) => new Promise(resolve => clerk.addOnLoaded(resolve)),
-);
+export const waitForClerk = fromPromise<LoadedClerk, Clerk | LoadedClerk>(({ input: clerk }) => {
+  return new Promise(resolve => {
+    if (clerk.loaded) {
+      resolve(clerk as LoadedClerk);
+    } else {
+      clerk.addOnLoaded(() => resolve(clerk as LoadedClerk));
+    }
+  });
+});

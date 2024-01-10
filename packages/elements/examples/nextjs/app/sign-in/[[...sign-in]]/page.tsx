@@ -264,7 +264,7 @@ export default function SignInPage() {
                 className='flex flex-col gap-4'
               >
                 <div className='flex gap-4 justify-between items-center'>
-                  <Label>Phone Code</Label>
+                  <Label>Email Code</Label>
                   <Input
                     type='code'
                     className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
