@@ -4,7 +4,7 @@ run-name: Canary release from ${{ github.ref_name }}
 on:
   push:
     branches:
-      - release/v4
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,6 +34,7 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
+          registry-url: "https://registry.npmjs.org"
 
       - name: Version packages for canary
         id: version-packages

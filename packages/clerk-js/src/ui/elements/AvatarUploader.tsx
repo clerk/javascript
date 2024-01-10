@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, localizationKeys, SimpleButton } from '../customizables';
+import { Button, Col, descriptors, Flex, localizationKeys, SimpleButton, Text } from '../customizables';
 import { handleError } from '../utils';
 import { useCardState } from './contexts';
 import { FileDropArea } from './FileDropArea';
@@ -100,6 +100,10 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
               />
             )}
           </Flex>
+          <Text
+            sx={t => ({ color: t.colors.$blackAlpha400 })}
+            localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaHint')}
+          />
         </Col>
       </Flex>
 

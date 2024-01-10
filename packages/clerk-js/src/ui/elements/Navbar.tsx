@@ -10,9 +10,9 @@ import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, common, mqu } from '../styledSystem';
 import { colors } from '../utils';
+import { Card } from './Card';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
-import { PoweredByClerkTag } from './PoweredByClerk';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
 export const [NavbarContext, useNavbarContext, useUnsafeNavbarContext] =
@@ -166,9 +166,10 @@ const NavbarContainer = (
         </Col>
         {props.children}
       </Col>
-      <PoweredByClerkTag
+
+      <Card.ClerkAndPagesTag
         sx={theme => ({
-          justifyContent: 'start',
+          width: 'fit-content',
           paddingLeft: theme.space.$3,
         })}
       />

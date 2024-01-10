@@ -70,4 +70,20 @@ export class User {
       data.create_organization_enabled,
     );
   }
+
+  get primaryEmailAddress() {
+    return this.emailAddresses.find(({ id }) => id === this.primaryEmailAddressId) ?? null;
+  }
+
+  get primaryPhoneNumber() {
+    return this.phoneNumbers.find(({ id }) => id === this.primaryPhoneNumberId) ?? null;
+  }
+
+  get primaryWeb3Wallet() {
+    return this.web3Wallets.find(({ id }) => id === this.primaryWeb3WalletId) ?? null;
+  }
+
+  get fullName() {
+    return [this.firstName, this.lastName].join(' ').trim() || null;
+  }
 }

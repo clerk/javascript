@@ -74,9 +74,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           </Card.Action>
         </Card.Content>
 
-        <Card.Footer>
-          <Card.FooterLinks />
-        </Card.Footer>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );

@@ -330,7 +330,6 @@ export function _SignInStart(): JSX.Element {
               to={clerk.buildUrlWithAuth(signUpUrl)}
             />
           </Card.Action>
-          <Card.FooterLinks />
         </Card.Footer>
       </Card.Root>
     </Flow.Part>

@@ -67,7 +67,6 @@ export const ErrorCard = (props: ErrorCardProps) => {
               }
             />
           </Flex>
-
           <Card.Action elementId='alternativeMethods'>
             <Card.ActionLink
               localizationKey={localizationKeys('backButton')}
@@ -76,9 +75,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
           </Card.Action>
         </Card.Content>
 
-        <Card.Footer>
-          <Card.FooterLinks />
-        </Card.Footer>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );

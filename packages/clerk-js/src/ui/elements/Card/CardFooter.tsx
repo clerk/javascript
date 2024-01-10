@@ -3,12 +3,14 @@ import React from 'react';
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../customizables';
 import { mqu, type PropsOfComponent } from '../../styledSystem';
-import { PoweredByClerkTag } from '..';
-
+import { Card } from '.';
 type CardFooterProps = PropsOfComponent<typeof Flex>;
 export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((props, ref) => {
   const { children, sx, ...rest } = props;
   const { branded } = useEnvironment().displayConfig;
+  const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+  const showSponsor = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
+
   return (
     <Flex
       direction='col'
@@ -21,10 +23,10 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
           paddingTop: t.space.$2,
           background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
           '>:first-of-type': {
-            padding: `${t.space.$4} ${t.space.$2} ${t.space.$4} ${t.space.$2}`,
+            padding: `${t.space.$4} ${t.space.$8} ${t.space.$4} ${t.space.$8}`,
           },
           '>:not(:first-of-type)': {
-            padding: `${t.space.$4} ${t.space.$2}`,
+            padding: `${t.space.$4} ${t.space.$8}`,
             borderTop: t.borders.$normal,
             borderColor: t.colors.$blackAlpha100,
           },
@@ -35,7 +37,8 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       ref={ref}
     >
       {children}
-      {branded && <PoweredByClerkTag />}
+
+      {showSponsor && <Card.ClerkAndPagesTag withFooterPages />}
     </Flex>
   );
 });
