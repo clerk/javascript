@@ -1,6 +1,7 @@
 ---
 title: '`tokenCache` -> `storageCache` as `<ClerkProvider>` props'
 matcher: "<ClerkProvider[\\s\\S]*?tokenCache=[\\s\\S]*?>"
+matcherFlags: 'm'
 ---
 
 The `tokenCache` prop has been renamed to `storageCache` in order to accomodate the new [WebSSO feature](https://github.com/clerk/javascript/pull/2277). With the prop change from `tokenCache` to `storageCache`, the interface has been expanded to allow for more flexibility. The new interface is as follows:

@@ -1,6 +1,6 @@
 ---
 title: '`navigate` prop replaced by `routerPush` and `routerReplace`'
-matcher: '<ClerkProvider.*?navigate=.*?>'
+matcher: "<ClerkProvider[\\s\\S]*?navigate=[\\s\\S]*?>"
 matcherFlags: 'm'
 ---
 
