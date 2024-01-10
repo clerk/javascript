@@ -21,26 +21,35 @@ export const SuccessPage = (props: SuccessPageProps) => {
   const { navigateToFlowStart } = useNavigateToFlowStart();
 
   return (
-    <Col {...rest}>
+    <Col
+      {...rest}
+      gap={4}
+    >
       <Header.Root>
         <Header.Title localizationKey={title} />
       </Header.Root>
       <Box>
         {Array.isArray(text) ? (
-          text.map(t => (
-            <Text
-              key={t.key}
-              localizationKey={t}
-              sx={t => ({
-                display: 'inline',
-                ':not(:last-of-type)': {
-                  marginRight: t.sizes.$1,
-                },
-              })}
-            />
-          ))
+          <Col gap={4}>
+            {text.map(t => (
+              <Text
+                key={t.key}
+                localizationKey={t}
+                colorScheme='neutral'
+                sx={t => ({
+                  display: 'inline',
+                  ':not(:last-of-type)': {
+                    marginRight: t.sizes.$1,
+                  },
+                })}
+              />
+            ))}
+          </Col>
         ) : (
-          <Text localizationKey={text} />
+          <Text
+            localizationKey={text}
+            colorScheme='neutral'
+          />
         )}
       </Box>
       {contents}

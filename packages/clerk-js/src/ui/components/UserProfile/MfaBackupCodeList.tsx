@@ -4,13 +4,13 @@ import { getIdentifier } from '../../../utils/user';
 import { PrintableComponent, usePrintable } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Box, Button, Col, Grid, Heading, Icon, localizationKeys, Text } from '../../customizables';
+import { Box, Button, Col, Grid, Heading, Icon, Text } from '../../customizables';
 import { useClipboard } from '../../hooks';
 import { Check, Copy, Download, Print } from '../../icons';
 import { MfaBackupCodeTile } from './MfaBackupCodeTile';
 
 type MfaBackupCodeListProps = {
-  subtitle: LocalizationKey;
+  subtitle?: LocalizationKey;
   backupCodes?: string[];
 };
 
@@ -45,15 +45,13 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
   return (
     <>
       <Col gap={1}>
-        <Text
-          localizationKey={localizationKeys('userProfile.backupCodePage.title__codelist')}
-          variant='subtitle'
-        />
-        <Text
-          localizationKey={subtitle}
-          variant='caption'
-          colorScheme='neutral'
-        />
+        {subtitle && (
+          <Text
+            localizationKey={subtitle}
+            variant='caption'
+            colorScheme='neutral'
+          />
+        )}
       </Col>
       <Box
         sx={t => ({

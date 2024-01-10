@@ -80,7 +80,7 @@ export const AddPhone = (props: AddPhoneProps) => {
       >
         <Text
           localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')}
-          sx={t => ({ color: t.colors.$blackAlpha500 })}
+          colorScheme='neutral'
         />
 
         <Col gap={1}>

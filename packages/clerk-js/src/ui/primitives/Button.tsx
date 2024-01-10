@@ -3,7 +3,7 @@ import React from 'react';
 
 import { descriptors, Icon, Spinner } from '../customizables';
 import { ArrowRightButtonIcon } from '../icons';
-import type { PrimitiveProps, StyleVariants, ThemableCssProp } from '../styledSystem';
+import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { common, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
@@ -203,8 +203,6 @@ type OwnProps = PrimitiveProps<'button'> & {
   isActive?: boolean;
   hoverAsFocus?: boolean;
   hasArrow?: boolean;
-  icon?: React.ComponentType;
-  iconSx?: ThemableCssProp;
 };
 
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
@@ -239,8 +237,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
     loadingText,
     children,
     hasArrow,
-    icon,
-    iconSx,
     onClick: onClickProp,
     ...rest
   } = filterProps(parsedProps);
@@ -284,18 +280,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
         </Flex>
       )}
 
-      {icon && (
-        <Icon
-          elementDescriptor={descriptors.buttonIcon}
-          icon={icon}
-          sx={[
-            t => ({
-              marginRight: t.space.$2,
-            }),
-            iconSx,
-          ]}
-        />
-      )}
       {!isLoading && (hasArrow ? <ButtonChildrenWithArrow>{children}</ButtonChildrenWithArrow> : children)}
     </button>
   );

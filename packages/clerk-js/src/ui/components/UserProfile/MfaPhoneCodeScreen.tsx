@@ -4,9 +4,9 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
-import { Button, Col, Flex, localizationKeys, Text } from '../../customizables';
+import { Button, Col, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { FormContainer, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { FormContainer, IconButton, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { Plus } from '../../icons';
 import { getCountryFromPhoneString, handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
@@ -45,15 +45,13 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
         resourceRef={ref}
       />
       <SuccessPage
-        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
-        text={localizationKeys('userProfile.mfaPhoneCodePage.successMessage')}
+        title={localizationKeys('userProfile.mfaPhoneCodePage.successTitle')}
+        text={[
+          localizationKeys('userProfile.mfaPhoneCodePage.successMessage1'),
+          localizationKeys('userProfile.mfaPhoneCodePage.successMessage2'),
+        ]}
         onFinish={onReset}
-        contents={
-          <MfaBackupCodeList
-            subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
-            backupCodes={ref.current?.backupCodes}
-          />
-        }
+        contents={<MfaBackupCodeList backupCodes={ref.current?.backupCodes} />}
       />
     </Wizard>
   );
@@ -106,7 +104,7 @@ const AddMfa = (props: AddMfaProps) => {
             ? 'userProfile.mfaPhoneCodePage.subtitle__availablePhoneNumbers'
             : 'userProfile.mfaPhoneCodePage.subtitle__unavailablePhoneNumbers',
         )}
-        sx={t => ({ color: t.colors.$blackAlpha500 })}
+        colorScheme='neutral'
       />
       <Col gap={2}>
         {availableMethods.map(phone => {
@@ -132,12 +130,17 @@ const AddMfa = (props: AddMfaProps) => {
         })}
 
         <Flex sx={{ justifyContent: 'space-between' }}>
-          <Button
+          <IconButton
             variant='ghost'
-            sx={{ justifyContent: 'start' }}
-            onClick={onAddPhoneClick}
+            aria-label='Add phone number'
+            icon={
+              <Icon
+                icon={Plus}
+                sx={t => ({ marginRight: t.space.$2 })}
+              />
+            }
             localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}
-            icon={Plus}
+            onClick={onAddPhoneClick}
           />
 
           <Button
