@@ -202,8 +202,8 @@ export const koKR: LocalizationResource = {
       },
     },
     phoneCode: { ...commonTexts.signIn.phoneCode },
-    phoneCodeMfa: { 
-      ...commonTexts.signIn.phoneCode, 
+    phoneCodeMfa: {
+      ...commonTexts.signIn.phoneCode,
       subtitle: '계속하려면 휴대폰으로 전송된 인증 코드를 입력하세요',
     },
     totpMfa: {
