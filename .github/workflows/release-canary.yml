@@ -4,7 +4,7 @@ run-name: Canary release from ${{ github.ref_name }}
 on:
   push:
     branches:
-      - release/v4
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
