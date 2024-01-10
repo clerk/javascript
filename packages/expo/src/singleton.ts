@@ -1,6 +1,8 @@
 import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/core/fapiClient';
 import Clerk from '@clerk/clerk-js/headless';
 import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
+import * as Application from 'expo-application';
+import Constants from 'expo-constants';
 
 import type { TokenCache } from './cache';
 
@@ -41,6 +43,13 @@ export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrow
 
       const jwt = await getToken(KEY);
       (requestInit.headers as Headers).set('authorization', jwt || '');
+
+      // Send some non-identifying headers that are useful for logging
+      (requestInit.headers as Headers).set('x-expo-execution-environment', Constants.executionEnvironment);
+      (requestInit.headers as Headers).set(
+        'x-expo-native-application-version',
+        Application.nativeApplicationVersion || 'NULL',
+      );
     });
 
     // @ts-expect-error
