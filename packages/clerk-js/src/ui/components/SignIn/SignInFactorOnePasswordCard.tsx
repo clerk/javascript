@@ -6,7 +6,7 @@ import React from 'react';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
-import { Card, Footer, Form, Header, IdentityPreview, useCardState } from '../../elements';
+import { Card, Form, Header, IdentityPreview, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
 import { handleError, useFormControl } from '../../utils';
@@ -128,18 +128,16 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             </Form.Root>
           </Flex>
 
-          <Footer.Root>
-            <Footer.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
-              <Footer.ActionLink
-                localizationKey={localizationKeys(
-                  onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
-                )}
-                onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+          <Card.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
+            <Card.ActionLink
+              localizationKey={localizationKeys(
+                onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
+              )}
+              onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
+            />
+          </Card.Action>
         </Card.Content>
+
         <Card.Footer />
       </Card.Root>
     </Flow.Part>

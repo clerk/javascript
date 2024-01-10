@@ -17,12 +17,13 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
       sx={[
         t => ({
           width: t.sizes.$220,
-          maxWidth: `calc(100vw - ${t.sizes.$20})`,
-          display: 'grid',
+          maxWidth: `calc(100vw - ${t.sizes.$16})`,
+          display: 'flex',
+          flexDirection: 'row',
           [mqu.md]: {
             display: 'flex',
+            flexDirection: 'column',
           },
-          gridTemplateColumns: '1fr 2.5fr',
           overflow: 'hidden',
           height: t.sizes.$176,
           position: 'relative',

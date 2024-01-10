@@ -8,7 +8,6 @@ import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts'
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
-  Footer,
   Header,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
@@ -275,17 +274,15 @@ function _SignUpStart(): JSX.Element {
             </SocialButtonsReversibleContainerWithDivider>
           </Flex>
         </Card.Content>
+
         <Card.Footer>
-          <Footer.Root>
-            <Footer.Action elementId='signUp'>
-              <Footer.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
-              <Footer.ActionLink
-                localizationKey={localizationKeys('signUp.start.actionLink')}
-                to={clerk.buildUrlWithAuth(signInUrl)}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+          <Card.Action elementId='signUp'>
+            <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
+            <Card.ActionLink
+              localizationKey={localizationKeys('signUp.start.actionLink')}
+              to={clerk.buildUrlWithAuth(signInUrl)}
+            />
+          </Card.Action>
         </Card.Footer>
       </Card.Root>
     </Flow.Part>

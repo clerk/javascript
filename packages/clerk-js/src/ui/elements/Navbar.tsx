@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Heading, Icon, Text, useLocalizations } from '../customizables';
@@ -10,9 +10,9 @@ import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, common, mqu } from '../styledSystem';
 import { colors } from '../utils';
+import { Card } from './Card';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
-import { PoweredByClerkTag } from './PoweredByClerk';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
 export const [NavbarContext, useNavbarContext, useUnsafeNavbarContext] =
@@ -33,7 +33,6 @@ export type NavbarRoute = {
   path: string;
   external?: boolean;
 };
-type RouteId = NavbarRoute['id'];
 type NavBarProps = {
   title: LocalizationKey;
   description: LocalizationKey;
@@ -44,7 +43,6 @@ type NavBarProps = {
 
 export const NavBar = (props: NavBarProps) => {
   const { contentRef, title, description, routes, header } = props;
-  const [activeId, setActiveId] = React.useState<RouteId>('');
   const { close } = useNavbarContext();
   const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
@@ -61,7 +59,6 @@ export const NavBar = (props: NavBarProps) => {
 
   const navigateToInternalRoute = async (route: NavbarRoute) => {
     if (contentRef.current) {
-      setActiveId(route.id);
       close();
       if (route.path === '/') {
         // TODO: this is needed to correctly handle navigations
@@ -73,22 +70,24 @@ export const NavBar = (props: NavBarProps) => {
     }
   };
 
-  useEffect(() => {
-    routes.every(route => {
-      const isRoot = router.currentPath === router.fullPath && route.path === '/';
-      const matchesPath = router.matches(route.path);
-      if (isRoot || matchesPath) {
-        setActiveId(route.id);
+  const checkIfActive = useCallback(
+    (a: NavbarRoute) => {
+      if (a.external) {
         return false;
       }
-      return true;
-    });
-  }, [router.currentPath]);
+      const isRoot = router.currentPath === router.fullPath && a.path === '/';
+      const matchesPath = router.matches(a.path);
+      return isRoot || matchesPath;
+    },
+    [router.currentPath],
+  );
 
   const items = (
     <Col
       elementDescriptor={descriptors.navbarButtons}
-      sx={t => ({ gap: t.space.$0x5 })}
+      sx={t => ({
+        gap: t.space.$0x5,
+      })}
     >
       {routes.map(r => (
         <NavButton
@@ -99,7 +98,7 @@ export const NavBar = (props: NavBarProps) => {
           iconElementId={descriptors.navbarButtonIcon.setId(r.id) as any}
           onClick={handleNavigate(r)}
           icon={r.icon}
-          isActive={activeId === r.id}
+          isActive={checkIfActive(r)}
           sx={t => ({
             padding: `${t.space.$1x5} ${t.space.$3}`,
           })}
@@ -138,7 +137,12 @@ const NavbarContainer = (
         [mqu.md]: {
           display: 'none',
         },
-        padding: `${t.space.$6} ${t.space.$3} ${t.space.$3}`,
+        flex: `0 0 ${t.space.$60}`,
+        width: t.sizes.$60,
+        maxWidth: t.space.$60,
+        background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+        padding: `${t.space.$6} ${t.space.$5} ${t.space.$3} ${t.space.$3}`,
+        marginRight: `-${t.space.$2}`,
         color: t.colors.$colorText,
         justifyContent: 'space-between',
       })}
@@ -162,9 +166,10 @@ const NavbarContainer = (
         </Col>
         {props.children}
       </Col>
-      <PoweredByClerkTag
+
+      <Card.ClerkAndPagesTag
         sx={theme => ({
-          justifyContent: 'start',
+          width: 'fit-content',
           paddingLeft: theme.space.$3,
         })}
       />
@@ -256,11 +261,7 @@ const NavButton = (props: NavButtonProps) => {
         t => ({
           gap: t.space.$4,
           justifyContent: 'flex-start',
-          backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
           opacity: isActive ? 1 : 0.6,
-          ':focus': {
-            boxShadow: 'none',
-          },
         }),
         sx,
       ]}
@@ -294,7 +295,9 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
       elementDescriptor={descriptors.navbarMobileMenuRow}
       sx={t => ({
         display: 'none',
-        padding: `${t.space.$2} ${t.space.$3}`,
+        background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+        padding: `${t.space.$2} ${t.space.$3} ${t.space.$4} ${t.space.$3}`,
+        marginBottom: `-${t.space.$2}`,
         [mqu.md]: {
           display: 'flex',
         },

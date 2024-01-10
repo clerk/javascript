@@ -6,7 +6,7 @@ import React from 'react';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { Card, Footer, Form, Header, useCardState } from '../../elements';
+import { Card, Form, Header, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
@@ -91,18 +91,16 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
             <Form.SubmitButton hasArrow />
           </Form.Root>
         </Col>
-        <Footer.Root>
-          <Footer.Action elementId='alternativeMethods'>
-            {onShowAlternativeMethodsClicked && (
-              <Footer.ActionLink
-                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-                onClick={onShowAlternativeMethodsClicked}
-              />
-            )}
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
+        <Card.Action elementId='alternativeMethods'>
+          {onShowAlternativeMethodsClicked && (
+            <Card.ActionLink
+              localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+              onClick={onShowAlternativeMethodsClicked}
+            />
+          )}
+        </Card.Action>
       </Card.Content>
+
       <Card.Footer />
     </Card.Root>
   );

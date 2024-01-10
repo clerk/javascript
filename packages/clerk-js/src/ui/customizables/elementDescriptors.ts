@@ -15,10 +15,9 @@ const camelize = (s: string) => s.replace(/-./g, x => x[1].toUpperCase());
  */
 export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'rootBox',
+  'cardBox',
   'card',
-  'cardContent',
-  'cardFooter',
-  'cardFooterItem',
+  'footerItem',
 
   'logoBox',
   'logoImage',

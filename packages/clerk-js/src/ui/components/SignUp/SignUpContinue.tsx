@@ -5,7 +5,6 @@ import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts'
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
-  Footer,
   Header,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
@@ -187,19 +186,17 @@ function _SignUpContinue() {
               />
             </SocialButtonsReversibleContainerWithDivider>
           </Flex>
+
+          <Card.Action elementId='signUp'>
+            <Card.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
+            <Card.ActionLink
+              localizationKey={localizationKeys('signUp.continue.actionLink')}
+              to={clerk.buildUrlWithAuth(signInUrl)}
+            />
+          </Card.Action>
         </Card.Content>
-        <Card.Footer>
-          <Footer.Root>
-            <Footer.Action elementId='signUp'>
-              <Footer.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
-              <Footer.ActionLink
-                localizationKey={localizationKeys('signUp.continue.actionLink')}
-                to={clerk.buildUrlWithAuth(signInUrl)}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
-        </Card.Footer>
+
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );

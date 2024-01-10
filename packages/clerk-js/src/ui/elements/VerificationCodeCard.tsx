@@ -6,7 +6,6 @@ import type { LocalizationKey } from '../localization';
 import { Card } from './Card';
 import { useFieldOTP } from './CodeControl';
 import { useCardState } from './contexts';
-import { Footer } from './Footer';
 import { Form } from './Form';
 import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';
@@ -79,17 +78,15 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
         </Col>
 
         {showAlternativeMethods && props.onShowAlternativeMethodsClicked && (
-          <Footer.Root>
-            <Footer.Action elementId='alternativeMethods'>
-              <Footer.ActionLink
-                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-                onClick={props.onShowAlternativeMethodsClicked}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+          <Card.Action elementId='alternativeMethods'>
+            <Card.ActionLink
+              localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+              onClick={props.onShowAlternativeMethodsClicked}
+            />
+          </Card.Action>
         )}
       </Card.Content>
+
       <Card.Footer />
     </Card.Root>
   );

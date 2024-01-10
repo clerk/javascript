@@ -4,7 +4,7 @@ import React from 'react';
 import { useCoreSignIn } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { ArrowBlockButton, Card, Footer, Header } from '../../elements';
+import { ArrowBlockButton, Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { backupCodePrefFactorComparator, formatSafeIdentifier } from '../../utils';
 import { HavingTrouble } from './HavingTrouble';
@@ -64,19 +64,17 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
               ))}
             </Col>
           </Col>
+
+          <Card.Action elementId='havingTrouble'>
+            <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
+            <Card.ActionLink
+              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+              onClick={onHavingTroubleClick}
+            />
+          </Card.Action>
         </Card.Content>
-        <Card.Footer>
-          <Footer.Root key='signIn.alternativeMethods.actionLink'>
-            <Footer.Action elementId='havingTrouble'>
-              <Footer.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
-              <Footer.ActionLink
-                localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
-                onClick={onHavingTroubleClick}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
-        </Card.Footer>
+
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );

@@ -28,20 +28,15 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
       path: '/me/organization_invitations',
       method: 'GET',
       search: convertPageToOffset(params),
-    })
-      .then(res => {
-        const { data: invites, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<UserOrganizationInvitationJSON>;
+    }).then(res => {
+      const { data: invites, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<UserOrganizationInvitationJSON>;
 
-        return {
-          total_count,
-          data: invites.map(invitation => new UserOrganizationInvitation(invitation)),
-        };
-      })
-      .catch(() => ({
-        total_count: 0,
-        data: [],
-      }));
+      return {
+        total_count,
+        data: invites.map(invitation => new UserOrganizationInvitation(invitation)),
+      };
+    });
   }
 
   constructor(data: UserOrganizationInvitationJSON) {

@@ -12,7 +12,6 @@ import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts'
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
-  Footer,
   Form,
   Header,
   LoadingCard,
@@ -324,16 +323,13 @@ export function _SignInStart(): JSX.Element {
         </Card.Content>
 
         <Card.Footer>
-          <Footer.Root key='signIn.start.actionLink'>
-            <Footer.Action elementId='signIn'>
-              <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
-              <Footer.ActionLink
-                localizationKey={localizationKeys('signIn.start.actionLink')}
-                to={clerk.buildUrlWithAuth(signUpUrl)}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+          <Card.Action elementId='signIn'>
+            <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
+            <Card.ActionLink
+              localizationKey={localizationKeys('signIn.start.actionLink')}
+              to={clerk.buildUrlWithAuth(signUpUrl)}
+            />
+          </Card.Action>
         </Card.Footer>
       </Card.Root>
     </Flow.Part>

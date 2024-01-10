@@ -1,6 +1,5 @@
 export * from './contexts';
 export * from './Header';
-export * from './Footer';
 export * from './Alert';
 export * from './Form';
 export * from './BlockWithTrailingComponent';
@@ -13,7 +12,6 @@ export * from './VerificationCodeCard';
 export * from './LoadingCard';
 export * from './ErrorCard';
 export * from './VerificationLinkCard';
-export * from './PoweredByClerk';
 export * from './ApplicationLogo';
 export * from './Card';
 export * from './ArrowBlockButton';

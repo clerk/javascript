@@ -1,5 +1,3 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
 export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up_url', 'redirect_url'];
 
 /**
@@ -112,20 +110,3 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
     searchParams: router.searchParams,
   };
 }
-
-/**
- * Framework specific router integrations
- */
-
-export const useNextRouter = (): ClerkHostRouter => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  return {
-    push: (path: string) => router.push(path),
-    replace: (path: string) => router.replace(path),
-    pathname: () => pathname,
-    searchParams: () => searchParams,
-  };
-};

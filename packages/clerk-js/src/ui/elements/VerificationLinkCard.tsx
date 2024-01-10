@@ -5,7 +5,6 @@ import { Col, descriptors, Flow, localizationKeys, Text } from '../customizables
 import { useRouter } from '../router';
 import { Card } from '.';
 import { useCardState } from './contexts';
-import { Footer } from './Footer';
 import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';
 import { TimerButton } from './TimerButton';
@@ -51,18 +50,16 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
               />
             </VerificationLink>
           </Header.Root>
-          <Footer.Root>
-            <Footer.Action elementId='alternativeMethods'>
-              {props.onShowAlternativeMethodsClicked && (
-                <Footer.ActionLink
-                  localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-                  onClick={props.onShowAlternativeMethodsClicked}
-                />
-              )}
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+          <Card.Action elementId='alternativeMethods'>
+            {props.onShowAlternativeMethodsClicked && (
+              <Card.ActionLink
+                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                onClick={props.onShowAlternativeMethodsClicked}
+              />
+            )}
+          </Card.Action>
         </Card.Content>
+
         <Card.Footer />
       </Card.Root>
     </Flow.Part>

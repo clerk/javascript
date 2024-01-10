@@ -7,31 +7,33 @@ import type {
   SignUpStatus,
 } from './Enums';
 
-export enum ObjectType {
-  AllowlistIdentifier = 'allowlist_identifier',
-  Client = 'client',
-  Email = 'email',
-  EmailAddress = 'email_address',
-  ExternalAccount = 'external_account',
-  FacebookAccount = 'facebook_account',
-  GoogleAccount = 'google_account',
-  Invitation = 'invitation',
-  OauthAccessToken = 'oauth_access_token',
-  Organization = 'organization',
-  OrganizationInvitation = 'organization_invitation',
-  OrganizationMembership = 'organization_membership',
-  PhoneNumber = 'phone_number',
-  RedirectUrl = 'redirect_url',
-  Session = 'session',
-  SignInAttempt = 'sign_in_attempt',
-  SignInToken = 'sign_in_token',
-  SignUpAttempt = 'sign_up_attempt',
-  SmsMessage = 'sms_message',
-  User = 'user',
-  Web3Wallet = 'web3_wallet',
-  Token = 'token',
-  TotalCount = 'total_count',
-}
+export const ObjectType = {
+  AllowlistIdentifier: 'allowlist_identifier',
+  Client: 'client',
+  Email: 'email',
+  EmailAddress: 'email_address',
+  ExternalAccount: 'external_account',
+  FacebookAccount: 'facebook_account',
+  GoogleAccount: 'google_account',
+  Invitation: 'invitation',
+  OauthAccessToken: 'oauth_access_token',
+  Organization: 'organization',
+  OrganizationInvitation: 'organization_invitation',
+  OrganizationMembership: 'organization_membership',
+  PhoneNumber: 'phone_number',
+  RedirectUrl: 'redirect_url',
+  Session: 'session',
+  SignInAttempt: 'sign_in_attempt',
+  SignInToken: 'sign_in_token',
+  SignUpAttempt: 'sign_up_attempt',
+  SmsMessage: 'sms_message',
+  User: 'user',
+  Web3Wallet: 'web3_wallet',
+  Token: 'token',
+  TotalCount: 'total_count',
+} as const;
+
+export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
 
 export interface ClerkResourceJSON {
   object: ObjectType;
@@ -39,12 +41,12 @@ export interface ClerkResourceJSON {
 }
 
 export interface TokenJSON {
-  object: ObjectType.Token;
+  object: typeof ObjectType.Token;
   jwt: string;
 }
 
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
-  object: ObjectType.AllowlistIdentifier;
+  object: typeof ObjectType.AllowlistIdentifier;
   identifier: string;
   created_at: number;
   updated_at: number;
@@ -52,7 +54,7 @@ export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
-  object: ObjectType.Client;
+  object: typeof ObjectType.Client;
   session_ids: string[];
   sessions: SessionJSON[];
   sign_in_id: string | null;
@@ -63,7 +65,7 @@ export interface ClientJSON extends ClerkResourceJSON {
 }
 
 export interface EmailJSON extends ClerkResourceJSON {
-  object: ObjectType.Email;
+  object: typeof ObjectType.Email;
   from_email_name: string;
   to_email_address?: string;
   email_address_id: string | null;
@@ -77,14 +79,14 @@ export interface EmailJSON extends ClerkResourceJSON {
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
-  object: ObjectType.EmailAddress;
+  object: typeof ObjectType.EmailAddress;
   email_address: string;
   verification: VerificationJSON | null;
   linked_to: IdentificationLinkJSON[];
 }
 
 export interface ExternalAccountJSON extends ClerkResourceJSON {
-  object: ObjectType.ExternalAccount;
+  object: typeof ObjectType.ExternalAccount;
   provider: string;
   identification_id: string;
   provider_user_id: string;
@@ -104,7 +106,7 @@ export interface IdentificationLinkJSON extends ClerkResourceJSON {
 }
 
 export interface InvitationJSON extends ClerkResourceJSON {
-  object: ObjectType.Invitation;
+  object: typeof ObjectType.Invitation;
   email_address: string;
   public_metadata: Record<string, unknown> | null;
   created_at: number;
@@ -114,7 +116,7 @@ export interface InvitationJSON extends ClerkResourceJSON {
 }
 
 export interface OauthAccessTokenJSON {
-  object: ObjectType.OauthAccessToken;
+  object: typeof ObjectType.OauthAccessToken;
   provider: string;
   token: string;
   public_metadata: Record<string, unknown>;
@@ -126,7 +128,7 @@ export interface OauthAccessTokenJSON {
 }
 
 export interface OrganizationJSON extends ClerkResourceJSON {
-  object: ObjectType.Organization;
+  object: typeof ObjectType.Organization;
   name: string;
   slug: string | null;
   image_url: string;
@@ -153,7 +155,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
-  object: ObjectType.OrganizationMembership;
+  object: typeof ObjectType.OrganizationMembership;
   organization: OrganizationJSON;
   public_metadata: OrganizationMembershipPublicMetadata;
   private_metadata?: OrganizationMembershipPrivateMetadata;
@@ -173,7 +175,7 @@ export interface OrganizationMembershipPublicUserDataJSON {
 }
 
 export interface PhoneNumberJSON extends ClerkResourceJSON {
-  object: ObjectType.PhoneNumber;
+  object: typeof ObjectType.PhoneNumber;
   phone_number: string;
   reserved_for_second_factor: boolean;
   default_second_factor: boolean;
@@ -182,14 +184,14 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
 }
 
 export interface RedirectUrlJSON extends ClerkResourceJSON {
-  object: ObjectType.RedirectUrl;
+  object: typeof ObjectType.RedirectUrl;
   url: string;
   created_at: number;
   updated_at: number;
 }
 
 export interface SessionJSON extends ClerkResourceJSON {
-  object: ObjectType.Session;
+  object: typeof ObjectType.Session;
   client_id: string;
   user_id: string;
   status: string;
@@ -201,7 +203,7 @@ export interface SessionJSON extends ClerkResourceJSON {
 }
 
 export interface SignInJSON extends ClerkResourceJSON {
-  object: ObjectType.SignInToken;
+  object: typeof ObjectType.SignInToken;
   status: SignInStatus;
   identifier: string;
   created_session_id: string | null;
@@ -217,7 +219,7 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 }
 
 export interface SignUpJSON extends ClerkResourceJSON {
-  object: ObjectType.SignUpAttempt;
+  object: typeof ObjectType.SignUpAttempt;
   status: SignUpStatus;
   attribute_requirements: SignUpAttributeRequirements;
   username: string | null;
@@ -234,7 +236,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
 }
 
 export interface SMSMessageJSON extends ClerkResourceJSON {
-  object: ObjectType.SmsMessage;
+  object: typeof ObjectType.SmsMessage;
   from_phone_number: string;
   to_phone_number: string;
   phone_number_id: string | null;
@@ -244,7 +246,7 @@ export interface SMSMessageJSON extends ClerkResourceJSON {
 }
 
 export interface UserJSON extends ClerkResourceJSON {
-  object: ObjectType.User;
+  object: typeof ObjectType.User;
   username: string | null;
   first_name: string;
   last_name: string;
@@ -287,7 +289,7 @@ export interface VerificationJSON extends ClerkResourceJSON {
 }
 
 export interface Web3WalletJSON extends ClerkResourceJSON {
-  object: ObjectType.Web3Wallet;
+  object: typeof ObjectType.Web3Wallet;
   web3_wallet: string;
   verification: VerificationJSON | null;
 }

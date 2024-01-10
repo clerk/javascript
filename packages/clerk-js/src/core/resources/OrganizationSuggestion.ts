@@ -30,20 +30,15 @@ export class OrganizationSuggestion extends BaseResource implements Organization
       path: '/me/organization_suggestions',
       method: 'GET',
       search: convertPageToOffset(params),
-    })
-      .then(res => {
-        const { data: suggestions, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationSuggestionJSON>;
+    }).then(res => {
+      const { data: suggestions, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationSuggestionJSON>;
 
-        return {
-          total_count,
-          data: suggestions.map(suggestion => new OrganizationSuggestion(suggestion)),
-        };
-      })
-      .catch(() => ({
-        total_count: 0,
-        data: [],
-      }));
+      return {
+        total_count,
+        data: suggestions.map(suggestion => new OrganizationSuggestion(suggestion)),
+      };
+    });
   }
 
   accept = async (): Promise<OrganizationSuggestionResource> => {

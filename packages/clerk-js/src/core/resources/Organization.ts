@@ -114,20 +114,14 @@ export class Organization extends BaseResource implements OrganizationResource {
       {
         forceUpdateClient: true,
       },
-    )
-      .then(res => {
-        const { data: invites, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationDomainJSON>;
+    ).then(res => {
+      const { data: invites, total_count } = res?.response as unknown as ClerkPaginatedResponse<OrganizationDomainJSON>;
 
-        return {
-          total_count,
-          data: invites.map(domain => new OrganizationDomain(domain)),
-        };
-      })
-      .catch(() => ({
-        total_count: 0,
-        data: [],
-      }));
+      return {
+        total_count,
+        data: invites.map(domain => new OrganizationDomain(domain)),
+      };
+    });
   };
 
   getDomain = async ({ domainId }: { domainId: string }): Promise<OrganizationDomainResource> => {
@@ -147,20 +141,15 @@ export class Organization extends BaseResource implements OrganizationResource {
       path: `/organizations/${this.id}/membership_requests`,
       method: 'GET',
       search: convertPageToOffset(getRequestParam),
-    })
-      .then(res => {
-        const { data: requests, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipRequestJSON>;
+    }).then(res => {
+      const { data: requests, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipRequestJSON>;
 
-        return {
-          total_count,
-          data: requests.map(request => new OrganizationMembershipRequest(request)),
-        };
-      })
-      .catch(() => ({
-        total_count: 0,
-        data: [],
-      }));
+      return {
+        total_count,
+        data: requests.map(request => new OrganizationMembershipRequest(request)),
+      };
+    });
   };
 
   createDomain = async (name: string): Promise<OrganizationDomainResource> => {
@@ -174,22 +163,15 @@ export class Organization extends BaseResource implements OrganizationResource {
       // `paginated` is used in some legacy endpoints to support clerk paginated responses
       // The parameter will be dropped in FAPI v2
       search: convertPageToOffset({ ...getMembershipsParams, paginated: true }),
-    })
-      .then(res => {
-        const { data: suggestions, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
+    }).then(res => {
+      const { data: suggestions, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
 
-        return {
-          total_count,
-          data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
-        };
-      })
-      .catch(() => {
-        return {
-          total_count: 0,
-          data: [],
-        };
-      });
+      return {
+        total_count,
+        data: suggestions.map(suggestion => new OrganizationMembership(suggestion)),
+      };
+    });
   };
 
   getInvitations = async (
@@ -204,20 +186,15 @@ export class Organization extends BaseResource implements OrganizationResource {
       {
         forceUpdateClient: true,
       },
-    )
-      .then(res => {
-        const { data: requests, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;
+    ).then(res => {
+      const { data: requests, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;
 
-        return {
-          total_count,
-          data: requests.map(request => new OrganizationInvitation(request)),
-        };
-      })
-      .catch(() => ({
-        total_count: 0,
-        data: [],
-      }));
+      return {
+        total_count,
+        data: requests.map(request => new OrganizationInvitation(request)),
+      };
+    });
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {

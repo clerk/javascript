@@ -4,12 +4,13 @@ import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import type { SnapshotFrom } from 'xstate';
 
+import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import {
   getEnabledThirdPartyProviders,
   isAuthenticatableOauthStrategy,
   isWeb3Strategy,
-} from '../../utils/third-party-strategies';
-import { ClerkElementsRuntimeError } from '../errors/error';
+} from '~/utils/third-party-strategies';
+
 import { SignInMachine } from './sign-in.machine';
 import type { SignInStrategyName } from './sign-in.types';
 import { matchStrategy } from './utils/strategies';
@@ -70,15 +71,15 @@ export function useStrategy(name: SignInStrategyName) {
   };
 }
 
-export const useSignInState = () => {
+export const useSignInStateMatcher = () => {
   return useSignInFlowSelector(
     state => state,
-    // (prev, next) => prev.value === next.value && prev.tags === next.tags,
+    (prev, next) => prev.value === next.value,
   );
 };
 
 export function useSignInStrategies(_preferred?: SignInStrategy) {
-  const state = useSignInState();
+  const state = useSignInStateMatcher();
   const current = useSignInFlowSelector(clerkCurrentStrategy);
 
   const shouldRender = state.matches('FirstFactor') || state.matches('SecondFactor');
