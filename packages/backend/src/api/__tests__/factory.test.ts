@@ -2,8 +2,6 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 // @ts-ignore
-import emailJson from '../../fixtures/email.json';
-// @ts-ignore
 import userJson from '../../fixtures/user.json';
 import runtime from '../../runtime';
 import {
@@ -79,39 +77,6 @@ export default (QUnit: QUnit) => {
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users?offset=2&limit=5', {
           method: 'GET',
-          headers: {
-            Authorization: 'Bearer deadbeef',
-            'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@0.0.0-test',
-          },
-        }),
-      );
-    });
-
-    test('executes a successful backend API request for a resource that contains data (key related to pagination)', async assert => {
-      fakeFetch = sinon.stub(runtime, 'fetch');
-      fakeFetch.onCall(0).returns(jsonOk(emailJson));
-
-      const body = {
-        fromEmailName: 'foobar123',
-        emailAddressId: 'test@test.dev',
-        body: 'this is a test',
-        subject: 'this is a test',
-      };
-      const requestBody =
-        '{"from_email_name":"foobar123","email_address_id":"test@test.dev","body":"this is a test","subject":"this is a test"}';
-      const response = await apiClient.emails.createEmail(body);
-      assertResponse(assert, response);
-      const { data: payload, totalCount } = response;
-
-      assert.equal(JSON.stringify(payload.data), '{}');
-      assert.equal(payload.id, 'ema_2PHa2N3bS7D6NPPQ5mpHEg0waZQ');
-      assert.equal(totalCount, undefined);
-
-      assert.ok(
-        fakeFetch.calledOnceWith('https://api.clerk.test/v1/emails', {
-          method: 'POST',
-          body: requestBody,
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',

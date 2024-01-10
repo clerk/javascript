@@ -3,7 +3,6 @@ export * from './AllowlistIdentifierApi';
 export * from './ClientApi';
 export * from './DomainApi';
 export * from './EmailAddressApi';
-export * from './EmailApi';
 export * from './InvitationApi';
 export * from './OrganizationApi';
 export * from './PhoneNumberApi';
