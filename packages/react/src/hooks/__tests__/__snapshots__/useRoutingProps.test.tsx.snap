@@ -14,7 +14,17 @@ exports[`useRoutingProps() returns passed props and options if path is passed fr
 <body>
   <div>
     <div>
-      {"path":"/aloha","prop1":"1","prop2":"2"}
+      {"path":"/aloha","prop1":"1","prop2":"2","routing":"path"}
+    </div>
+  </div>
+</body>
+`;
+
+exports[`useRoutingProps() returns passed props but omits path prop if path is passed from routing options and a routing strategy other than path is specified 1`] = `
+<body>
+  <div>
+    <div>
+      {"prop1":"1","prop2":"2","routing":"virtual"}
     </div>
   </div>
 </body>

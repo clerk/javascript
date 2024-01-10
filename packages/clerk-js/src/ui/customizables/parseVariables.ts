@@ -24,8 +24,8 @@ export const createColorScales = (theme: Theme) => {
 };
 
 export const createThemeOptions = (theme: Theme) => {
-  const { fontSmoothing = 'auto !important' } = theme.variables || {};
-  return { fontSmoothing };
+  const { fontSmoothing } = theme.variables || {};
+  return removeUndefinedProps({ fontSmoothing });
 };
 
 export const toHSLA = (str: string | undefined) => {
