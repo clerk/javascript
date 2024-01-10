@@ -1,7 +1,7 @@
 import type { ProfileSectionId } from '@clerk/types';
 import { isValidElement } from 'react';
 
-import type { Button, LocalizationKey } from '../customizables';
+import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { Plus } from '../icons';
@@ -101,12 +101,12 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
   );
 };
 
-type ProfileSectionButtonProps = PropsOfComponent<typeof Button> & {
+type ProfileSectionButtonProps = PropsOfComponent<typeof ArrowBlockButton> & {
   id: ProfileSectionId;
 };
 
 const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
-  const { children, id, sx, localizationKey, ...rest } = props;
+  const { children, leftIcon = Plus, id, sx, localizationKey, ...rest } = props;
   return (
     <ArrowBlockButton
       elementDescriptor={descriptors.profileSectionPrimaryButton}
@@ -114,7 +114,7 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
       variant='ghost'
       sx={[t => ({ justifyContent: 'start', gap: t.space.$2, padding: `${t.space.$2} ${t.space.$4}` }), sx]}
       textLocalizationKey={localizationKey}
-      leftIcon={Plus}
+      leftIcon={leftIcon}
       leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
       {...rest}
     >
