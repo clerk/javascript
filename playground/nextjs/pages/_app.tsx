@@ -37,6 +37,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         baseTheme: themes[selectedTheme],
         layout: {
           shimmer: true,
+          helpPageUrl:'/help',
+          privacyPageUrl:'/privacy',
+          termsPageUrl:'/terms'
         },
       }}
       {...pageProps}
