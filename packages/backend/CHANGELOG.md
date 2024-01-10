@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.0.0-alpha-v5.14
+
+### Minor Changes
+
+- Add fullName, primaryEmailAddress, primaryPhoneNumber, primaryWeb3Wallet to User class. ([#2493](https://github.com/clerk/javascript/pull/2493)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix an error in the handshake flow where the request would throw an unhandled error when verification of the handshake payload fails. ([#2541](https://github.com/clerk/javascript/pull/2541)) by [@BRKalow](https://github.com/BRKalow)
+
+- Replace enums with `as const` objects so `@clerk/backend` is consistent with the other packages ([#2516](https://github.com/clerk/javascript/pull/2516)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.0.0-alpha-v5.13
 
 ### Patch Changes
