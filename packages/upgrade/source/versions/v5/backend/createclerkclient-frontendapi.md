@@ -10,12 +10,12 @@ The `frontendApi` argument passed to `createClerkClient` must be changed to `pub
 // before
 import { Clerk } from '@clerk/backend';
 
-const clerkClient = Clerk({ frontendApi: '...', ...})
-clerkClient.authenticateRequest({ frontendApi: '...'});
+const clerkClient = Clerk({ frontendApi: '...' });
+clerkClient.authenticateRequest({ frontendApi: '...' });
 
 // after
 import { createClerkClient } from '@clerk/backend';
 
 const clerkClient = createClerkClient({ publishableKey: '...' });
-clerkClient.authenticateRequest({ publishableKey: '...'});
+clerkClient.authenticateRequest({ publishableKey: '...' });
 ```

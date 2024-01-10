@@ -19,6 +19,14 @@ matcher: 'setSession'
 `setActive` also supports setting an active organization:
 
 ```js
-await setActive({ session: 'sessionID', organization: 'orgID', beforeEmit: () => void })
-await setActive({ session: sessionObj, organization: orgObj, beforeEmit: () => void })
+await setActive({
+  session: 'sessionID',
+  organization: 'orgID',
+  beforeEmit: () => void
+})
+await setActive({
+  session: sessionObj,
+  organization: orgObj,
+  beforeEmit: () => void
+})
 ```
