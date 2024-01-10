@@ -15,13 +15,13 @@ import { fromPromise } from 'xstate';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import type { ClerkRouter } from '~/react/router';
 
+import type { FormFields } from './form.types';
 import type { WithClerk, WithClient, WithParams } from './shared.types';
-import type { SignInMachineContext } from './sign-in.machine';
 import { assertIsDefined } from './utils/assert';
 
 // ================= createSignIn ================= //
 
-export type CreateSignInInput = WithClient<{ fields: SignInMachineContext['fields'] }>;
+export type CreateSignInInput = WithClient<{ fields: FormFields }>;
 
 export const createSignIn = fromPromise<SignInResource, CreateSignInInput>(({ input: { client, fields } }) => {
   const password = fields.get('password');
@@ -77,7 +77,7 @@ export const prepareFirstFactor = fromPromise<SignInResource, PrepareFirstFactor
 // ================= attemptFirstFactor ================= //
 
 export type AttemptFirstFactorInput = WithClient<
-  WithParams<{ fields: SignInMachineContext['fields']; currentFactor: SignInFirstFactor | null }>
+  WithParams<{ fields: FormFields; currentFactor: SignInFirstFactor | null }>
 >;
 
 export const attemptFirstFactor = fromPromise<SignInResource, AttemptFirstFactorInput>(
@@ -124,15 +124,18 @@ export const prepareSecondFactor = fromPromise<SignInResource, PrepareSecondFact
 // ================= attemptSecondFactor ================= //
 
 export type AttemptSecondFactorInput = WithClient<
-  WithParams<{ fields: SignInMachineContext['fields']; currentFactor: SignInSecondFactor | null }>
+  WithParams<{ fields: FormFields; currentFactor: SignInSecondFactor | null }>
 >;
 
 export const attemptSecondFactor = fromPromise<SignInResource, AttemptSecondFactorInput>(({ input }) => {
+  const code = input.params.fields.get('code')?.value as string;
+
   assertIsDefined(input.params.currentFactor);
+  assertIsDefined(code);
 
   return input.client.signIn.attemptSecondFactor({
     strategy: input.params.currentFactor.strategy,
-    code: input.params.fields.get('code').value,
+    code,
   });
 });
 
