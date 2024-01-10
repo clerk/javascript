@@ -57,7 +57,9 @@
     "typescript": "*"
   },
   "peerDependencies": {
+    "expo-application": ">=5",
     "expo-auth-session": ">=4",
+    "expo-constants": ">=14",
     "expo-web-browser": ">=12",
     "react": ">=16"
   },
