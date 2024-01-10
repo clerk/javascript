@@ -5,7 +5,7 @@ A tool that helps with upgrading major versions of Clerk's SDKs.
 ## Usage
 
 ```bash
-$ npx @clerk/upgrade
+npx @clerk/upgrade
 ```
 
 ## Caveats
