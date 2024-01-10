@@ -8,7 +8,7 @@ import { fonts, fontSizes, fontStyles, fontWeights, letterSpacings, lineHeights 
 import { zIndices } from './zIndices';
 
 const options = {
-  fontSmoothing: 'auto !important',
+  fontSmoothing: undefined,
 } as const;
 
 const defaultInternalThemeFoundations = Object.freeze({
