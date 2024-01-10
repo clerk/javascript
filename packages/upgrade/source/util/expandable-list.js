@@ -43,7 +43,8 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 			<Text color='blue'>Navigation Instructions:</Text>
 			<Text>
 				Navigate through items with ↑ and ↓ arrow keys. Expand the details of any item with space bar. ↓ key on the last
-				item goes to the next page, ↑ on the first item goes to the previous page
+				item goes to the next page, ↑ on the first item goes to the previous page. To exit this interface, use "control
+				+ c".
 			</Text>
 			<Newline />
 

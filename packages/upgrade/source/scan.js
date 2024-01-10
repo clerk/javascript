@@ -91,7 +91,11 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 		)
 			.then(() => {
 				setComplete(true);
-				setStatus('File scan complete. See results below!');
+				if (results.length < 1) {
+					setStatus('It looks like you have nothing you need to change, upgrade away!');
+				} else {
+					setStatus('File scan complete. See results below!');
+				}
 			})
 			.catch(err => {
 				console.error(err);
