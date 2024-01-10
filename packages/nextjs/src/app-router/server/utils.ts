@@ -9,8 +9,8 @@ export const buildRequestLike = () => {
       e &&
       'message' in e &&
       typeof e.message === 'string' &&
-      e.message.toLowerCase().includes('Dynamic server usage'.toLowerCase()) ||
-      e.message.toLowerCase().includes('This page needs to bail out of prerendering'.toLowerCase())
+      (e.message.toLowerCase().includes('Dynamic server usage'.toLowerCase()) ||
+        e.message.toLowerCase().includes('This page needs to bail out of prerendering'.toLowerCase()))
     ) {
       throw e;
     }
