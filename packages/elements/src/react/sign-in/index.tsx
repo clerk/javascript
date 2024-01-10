@@ -50,6 +50,12 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
     return null;
   }
 
+  const debugOptions: Record<string, unknown> = {};
+
+  if (DEBUG && inspector) {
+    debugOptions.inspect = inspector.inspect;
+  }
+
   return (
     <SignInFlowContextProvider
       options={{
@@ -58,7 +64,7 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
           router,
           form,
         },
-        inspect: inspector?.inspect,
+        ...debugOptions,
       }}
     >
       {children}
