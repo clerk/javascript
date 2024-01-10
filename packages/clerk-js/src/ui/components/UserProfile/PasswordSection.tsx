@@ -4,6 +4,7 @@ import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
+import { Pencil, Plus } from '../../icons';
 import { PasswordForm } from './PasswordForm';
 
 const PasswordScreen = () => {
@@ -38,6 +39,7 @@ export const PasswordSection = () => {
             <Action.Trigger value='edit'>
               <ProfileSection.Button
                 id='password'
+                leftIcon={passwordEnabled ? Pencil : Plus}
                 localizationKey={
                   passwordEnabled
                     ? localizationKeys('userProfile.start.passwordSection.primaryButton__changePassword')
