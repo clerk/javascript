@@ -2,7 +2,6 @@
 
 import { useClerk } from '@clerk/clerk-react';
 import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
-import type { createBrowserInspector } from '@statelyai/inspect';
 import type { PropsWithChildren } from 'react';
 
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form.context';
@@ -18,22 +17,9 @@ import {
 import type { LoadedClerkWithEnv, SignInStrategyName } from '~/internals/machines/sign-in.types';
 import { Form } from '~/react/common/form';
 import { Route, Router, useClerkRouter, useNextRouter } from '~/react/router';
+import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
 
-// ================= XState Inspector ================= //
-
-const DEBUG = process.env.NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG === 'true';
-let inspector: ReturnType<typeof createBrowserInspector>;
-
-if (DEBUG && typeof window !== 'undefined') {
-  const getInspector = async () => {
-    const { createBrowserInspector } = (await import('@statelyai/inspect')).default;
-    return createBrowserInspector();
-  };
-
-  getInspector()
-    .then(mod => (inspector = mod))
-    .catch(console.error);
-}
+const { useBrowserInspector } = createBrowserInspectorReactHook();
 
 // ================= SignInFlowProvider ================= //
 
@@ -42,12 +28,13 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
   const clerk = useClerk() as unknown as LoadedClerkWithEnv;
   const router = useClerkRouter();
   const form = useFormStore();
+  const { loading: inspectorLoading, inspector } = useBrowserInspector();
 
   if (!router) {
     throw new Error('clerk: Unable to locate ClerkRouter, make sure this is rendered within `<Router>`.');
   }
 
-  if (DEBUG && !inspector) {
+  if (inspectorLoading) {
     return null;
   }
 
