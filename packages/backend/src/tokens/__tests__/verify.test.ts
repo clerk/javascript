@@ -49,7 +49,7 @@ export default (QUnit: QUnit) => {
         headers: {
           Authorization: 'Bearer a-valid-key',
           'Content-Type': 'application/json',
-          'Clerk-Backend-SDK': '@clerk/backend',
+          'User-Agent': '@clerk/backend',
         },
       });
       assert.propEqual(data, mockJwtPayload);

@@ -54,7 +54,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend',
           },
         }),
       );
@@ -82,7 +82,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend',
           },
         }),
       );
@@ -115,7 +115,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend',
           },
         }),
       );
@@ -145,7 +145,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend',
           },
         }),
       );
@@ -173,7 +173,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend',
           },
           body: JSON.stringify({
             first_name: 'John',
@@ -214,7 +214,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend',
           },
         }),
       );
@@ -237,7 +237,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend',
           },
         }),
       );
@@ -262,7 +262,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend',
           },
         }),
       );

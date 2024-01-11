@@ -80,7 +80,7 @@ export function buildRequest(options: BuildRequestOptions) {
     // Build headers
     const headers: Record<string, any> = {
       Authorization: `Bearer ${secretKey}`,
-      'Clerk-Backend-SDK': userAgent,
+      'User-Agent': userAgent,
       ...headerParams,
     };
 
