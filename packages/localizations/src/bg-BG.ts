@@ -828,7 +828,7 @@ export const bgBG: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Фамилията не трябва да надвишава 256 символа.',
   },
   dates: {
-    previous6Days: "Последният {{ date | weekday('bg-BG','long') }} в {{ date | timeString('bg-BG') }}",
+    previous6Days: "Последно в {{ date | weekday('bg-BG','long') }} в {{ date | timeString('bg-BG') }}",
     lastDay: "Вчера в {{ date | timeString('bg-BG') }}",
     sameDay: "Днес в {{ date | timeString('bg-BG') }}",
     nextDay: "Утре в {{ date | timeString('bg-BG') }}",
