@@ -72,8 +72,11 @@ describe('CreateOrganization', () => {
         email_addresses: ['test@clerk.com'],
       });
     });
-    const { getByText } = render(<CreateOrganization />, { wrapper });
-    expect(getByText('Create Organization')).toBeInTheDocument();
+
+    const { userEvent, getByLabelText, queryByText } = render(<CreateOrganization />, { wrapper });
+
+    await userEvent.type(getByLabelText(/Name/i), 'new org');
+    expect(queryByText('Create Organization')).toBeInTheDocument();
   });
 
   it('skips invitation screen', async () => {

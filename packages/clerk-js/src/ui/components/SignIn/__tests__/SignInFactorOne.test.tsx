@@ -664,7 +664,7 @@ describe('SignInFactorOne', () => {
       expect(deactivatedMethod).not.toBeInTheDocument();
     });
 
-    it.skip('clicking the password method should show the password input', async () => {
+    it('clicking the password method should show the password input', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();
@@ -755,20 +755,20 @@ describe('SignInFactorOne', () => {
         screen.getByText('Email support');
       });
 
-      // TODO-RETHEME: The component seems not to be ready yet for this case
-      it.skip('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {
+      it('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
           f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true });
         });
 
-        const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.click(screen.getByText('Use another method'));
-        await userEvent.click(screen.getByText('Get help'));
-        screen.getByText('Use another method');
+        const { userEvent, getByText } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.click(getByText('Use another method'));
+        await userEvent.click(getByText('Get help'));
+        await userEvent.click(getByText('Back'));
+
+        expect(getByText('Use another method'));
       });
 
-      // this test needs us to mock the window.location.href to work properly
       it('should open a "mailto:" link when clicking the email support button', async () => {
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
@@ -778,9 +778,23 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText('Use another method'));
         await userEvent.click(screen.getByText('Get help'));
-        screen.getByText('Email support');
+
+        const assignMock = jest.fn();
+        const mockResponse = jest.fn();
+        Object.defineProperty(window, 'location', {
+          value: {
+            set href(_) {
+              assignMock();
+            },
+            get href() {
+              return '';
+            },
+            assign: mockResponse,
+          },
+          writable: true,
+        });
         await userEvent.click(screen.getByText('Email support'));
-        //TODO: check that location.href setter is called
+        expect(assignMock).toHaveBeenCalled();
       });
     });
   });
