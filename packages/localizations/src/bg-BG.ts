@@ -165,7 +165,7 @@ export const bgBG: LocalizationResource = {
     },
     resetPassword: {
       title: 'Задайте нова парола',
-      formButtonPrimary: 'Нулирайте паролата',
+      formButtonPrimary: 'Нулирай паролата',
       successMessage: 'Паролата ви беше успешно променена. Влизане, моля изчакайте момент.',
       requiredMessage: 'Вече съществува акаунт с непотвърден имейл адрес. Моля, нулирайте паролата си за сигурност.',
     },
@@ -235,14 +235,14 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Имате проблеми? Можете да използвате някой от тези методи за влизане.',
       actionLink: 'Получете помощ',
       actionText: 'Нямате нито един от тях?',
-      blockButton__emailLink: 'Изпратете линк по имейл до {{identifier}}',
-      blockButton__emailCode: 'Изпратете код по имейл до {{identifier}}',
-      blockButton__phoneCode: 'Изпратете SMS код до {{identifier}}',
-      blockButton__password: 'Влезте с парола',
-      blockButton__totp: 'Използвайте вашето приложение за удостоверяване',
-      blockButton__backupCode: 'Използвайте резервен код',
+      blockButton__emailLink: 'Изпрати линк по имейл до {{identifier}}',
+      blockButton__emailCode: 'Изпрати код по имейл до {{identifier}}',
+      blockButton__phoneCode: 'Изпрати SMS код до {{identifier}}',
+      blockButton__password: 'Влез с парола',
+      blockButton__totp: 'Използвай приложение за удостоверяване',
+      blockButton__backupCode: 'Използвай резервен код',
       getHelp: {
-        title: 'Получете помощ',
+        title: 'Получи помощ',
         content: `Ако имате затруднения при влизане в профила си, изпратете ни имейл и ще работим с вас, за да възстановим достъпа възможно най-скоро.`,
         blockButton__emailSupport: 'Имейл поддръжка',
       },
@@ -272,12 +272,12 @@ export const bgBG: LocalizationResource = {
       headerTitle__security: 'Сигурност',
       usernameSection: {
         title: 'Потребителско име',
-        primaryButton__changeUsername: 'Променете потребителското име',
-        primaryButton__setUsername: 'Задайте потребителско име',
+        primaryButton__changeUsername: 'Промени потребителското име',
+        primaryButton__setUsername: 'Задай потребителско име',
       },
       emailAddressesSection: {
         title: 'Имейл адреси',
-        primaryButton: 'Добавете имейл адрес',
+        primaryButton: 'Добави имейл адрес',
         detailsTitle__primary: 'Основен имейл адрес',
         detailsSubtitle__primary: 'Този имейл адрес е основният имейл адрес',
         detailsAction__primary: 'Завърши потвърждение',
@@ -295,7 +295,7 @@ export const bgBG: LocalizationResource = {
       },
       phoneNumbersSection: {
         title: 'Телефонни номера',
-        primaryButton: 'Добавете телефонен номер',
+        primaryButton: 'Добави телефонен номер',
         detailsTitle__primary: 'Основен телефонен номер',
         detailsSubtitle__primary: 'Този телефонен номер е основният телефонен номер',
         detailsAction__primary: 'Завърши потвърждение',
@@ -313,7 +313,7 @@ export const bgBG: LocalizationResource = {
       },
       connectedAccountsSection: {
         title: 'Свързани акаунти',
-        primaryButton: 'Свържете акаунт',
+        primaryButton: 'Свържи акаунт',
         title__connectionFailed: 'Опитайте отново неуспешната връзка',
         title__reauthorize: 'Изисква се повторна авторизация',
         subtitle__reauthorize:
@@ -329,8 +329,8 @@ export const bgBG: LocalizationResource = {
       },
       passwordSection: {
         title: 'Парола',
-        primaryButton__changePassword: 'Променете паролата',
-        primaryButton__setPassword: 'Задайте парола',
+        primaryButton__changePassword: 'Промени паролата',
+        primaryButton__setPassword: 'Задай парола',
       },
       mfaSection: {
         title: 'Двустепенна верификация',
@@ -410,10 +410,10 @@ export const bgBG: LocalizationResource = {
         successMessage: 'Имейлът {{identifier}} беше добавен към вашия профил.',
       },
       emailLink: {
-        formHint: 'На този имейл адрес ще бъде изпратен имейл с връзка за потвърждение.',
-        formTitle: 'Връзка за потвърждение',
-        formSubtitle: 'Кликнете върху връзката за потвърждение в имейла, изпратен на {{identifier}}',
-        resendButton: 'Не сте получили връзка? Изпрати отново',
+        formHint: 'На този имейл адрес ще бъде изпратен имейл с линк за потвърждение.',
+        formTitle: 'Линк за потвърждение',
+        formSubtitle: 'Кликнете върху линка за потвърждение в имейла, изпратен на {{identifier}}',
+        resendButton: 'Не сте получили линк? Изпрати отново',
         successMessage: 'Имейлът {{identifier}} беше добавен към вашия профил.',
       },
       removeResource: {
@@ -426,7 +426,7 @@ export const bgBG: LocalizationResource = {
     phoneNumberPage: {
       title: 'Добави телефонен номер',
       successMessage: '{{identifier}} беше добавен към вашия профил.',
-      infoText: 'Съобщение, съдържащо връзка за потвърждение, ще бъде изпратено на този телефонен номер.',
+      infoText: 'Съобщение, съдържащо линк за потвърждение, ще бъде изпратено на този телефонен номер.',
       infoText__secondary: 'Могат да се прилагат такси за съобщения и данни.',
       removeResource: {
         title: 'Премахни телефонен номер',
@@ -489,8 +489,8 @@ export const bgBG: LocalizationResource = {
           'Уверете се, че времевите или еднократните пароли са активирани, след което завършете свързването на вашия акаунт.',
         inputLabel__unableToScan2:
           'Алтернативно, ако вашият удостоверител поддържа TOTP URI, можете също да копирате пълния URI.',
-        buttonAbleToScan__nonPrimary: 'Сканирайте QR кода вместо това',
-        buttonUnableToScan__nonPrimary: 'Не може да сканира QR кода?',
+        buttonAbleToScan__nonPrimary: 'Сканирай QR кода вместо това',
+        buttonUnableToScan__nonPrimary: 'Не може да се сканира QR кода?',
       },
       removeResource: {
         title: 'Премахване на двустепенното удостоверяване',
@@ -501,7 +501,7 @@ export const bgBG: LocalizationResource = {
     },
     mfaPhoneCodePage: {
       title: 'Добавяне на SMS код за потвърждение',
-      primaryButton__addPhoneNumber: 'Добавяне на телефонен номер',
+      primaryButton__addPhoneNumber: 'Добави телефонен номер',
       subtitle__availablePhoneNumbers:
         'Изберете телефонен номер, за да се регистрирате за двустепенното удостоверяване с SMS код.',
       subtitle__unavailablePhoneNumbers:
@@ -534,7 +534,7 @@ export const bgBG: LocalizationResource = {
     deletePage: {
       title: 'Изтриване на акаунта',
       messageLine1: 'Сигурни ли сте, че искате да изтриете акаунта си?',
-      messageLine2: 'Това действие е постоянно и необратимо.',
+      messageLine2: 'Това действие е перманентно и необратимо.',
       actionDescription: 'Напишете "Изтриване на акаунта" по-долу, за да продължите.',
       confirm: 'Изтриване на акаунта',
     },
@@ -575,7 +575,7 @@ export const bgBG: LocalizationResource = {
       domainSection: {
         title: 'Верифицирани домейни',
         subtitle:
-          'Позволете на потребителите да се присъединяват към организацията автоматично или да искат да се присъединят на база верифициран имейл домейн.',
+          'Позволете на потребителите да се присъединяват към организацията автоматично или да заявят да се присъединят на база верифициран имейл домейн.',
         primaryButton: 'Добавяне на домейн',
         menuAction__verify: 'Верификация',
         menuAction__remove: 'Изтриване',
@@ -605,14 +605,14 @@ export const bgBG: LocalizationResource = {
           title: 'Напускане на организацията',
           messageLine1:
             'Сигурни ли сте, че искате да напуснете тази организация? Ще загубите достъп до тази организация и нейните приложения.',
-          messageLine2: 'Това действие е постоянно и необратимо.',
+          messageLine2: 'Това действие е перманентно и необратимо.',
           successMessage: 'Излязохте от организацията.',
           actionDescription: 'Въведете "{{organizationName}}" по-долу, за да продължите.',
         },
         deleteOrganization: {
           title: 'Изтриване на организацията',
           messageLine1: 'Сигурни ли сте, че искате да изтриете тази организация?',
-          messageLine2: 'Това действие е постоянно и необратимо.',
+          messageLine2: 'Това действие е перманентно и необратимо.',
           actionDescription: 'Въведете "{{organizationName}}" по-долу, за да продължите.',
           successMessage: 'Изтрихте организацията.',
         },
@@ -620,7 +620,7 @@ export const bgBG: LocalizationResource = {
       domainSection: {
         title: 'Верифицирани домейни',
         subtitle:
-          'Позволява на потребителите да се присъединяват към организацията автоматично или да искат да се присъединят на база верифициран имейл домейн.',
+          'Позволява на потребителите да се присъединяват към организацията автоматично или да заявят да се присъединят на база верифициран имейл домейн.',
         primaryButton: 'Добавяне на домейн',
         unverifiedDomain_menuAction__verify: 'Верификация на домейн',
         unverifiedDomain_menuAction__remove: 'Изтриване на домейн',
@@ -629,7 +629,7 @@ export const bgBG: LocalizationResource = {
     createDomainPage: {
       title: 'Добавяне на домейн',
       subtitle:
-        'Добавете домейн за верификация. Потребителите с имейл адреси на този домейн могат да се присъединят към организацията автоматично или да искат да се присъединят.',
+        'Добавете домейн за верификация. Потребителите с имейл адреси на този домейн могат да се присъединят към организацията автоматично или да заявят да се присъединят.',
     },
     verifyDomainPage: {
       title: 'Верификация на домейн',
@@ -656,7 +656,7 @@ export const bgBG: LocalizationResource = {
           'Потребителите се поканват автоматично да се присъединят към организацията, когато се регистрират и могат да се присъединят по всяко време.',
         automaticSuggestionOption__label: 'Автоматични предложения',
         automaticSuggestionOption__description:
-          'Потребителите получават предложение да поискат да се присъединят, но трябва да бъдат одобрени от администратор, преди да могат да се присъединят към организацията.',
+          'Потребителите получават предложение да заявят да се присъединят, но трябва да бъдат одобрени от администратор, преди да могат да се присъединят към организацията.',
         formButton__save: 'Запазване',
         calloutInfoLabel: 'Промяната на режима на записване ще засегне само новите потребители.',
         calloutInvitationCountLabel: 'Чакащи покани, изпратени на потребители: {{count}}',
@@ -716,13 +716,13 @@ export const bgBG: LocalizationResource = {
         },
       },
       requestsTab: {
-        tableHeader__requested: 'Изискван достъп',
+        tableHeader__requested: 'Заявен достъп',
         menuAction__approve: 'Одобрение',
         menuAction__reject: 'Отхвърляне',
         table__emptyRow: 'Няма заявки за показване',
         requests: {
           headerTitle: 'Заявки',
-          headerSubtitle: 'Преглеждайте и управлявайте потребители, които искат да се присъединят към организацията.',
+          headerSubtitle: 'Преглеждайте и управлявайте потребители, които са заявили да се присъединят към организацията.',
         },
         autoSuggestions: {
           headerTitle: 'Автоматични предложения',
@@ -758,23 +758,23 @@ export const bgBG: LocalizationResource = {
     captcha_unavailable:
       'Регистрацията неуспешна поради неуспешна валидация на бот. Моля, презаредете страницата, за да опитате отново, или се свържете с поддръжката за повече помощ.',
     captcha_invalid:
-      'Регистрацията неуспешна поради неуспешни сигурностни проверки. Моля, презаредете страницата, за да опитате отново, или се свържете с поддръжката за повече помощ.',
-    form_password_pwned: 'Тази парола е част от утечка и не може да се използва. Моля, опитайте с друга парола.',
+      'Регистрацията неуспешна поради неуспешни проверки за сигурност. Моля, презаредете страницата, за да опитате отново, или се свържете с поддръжката за повече помощ.',
+    form_password_pwned: 'Тази парола е част от изтекли данни и не може да се използва. Моля, опитайте с друга парола.',
     form_username_invalid_length: '',
     form_username_invalid_character: '',
     form_param_format_invalid: '',
-    form_param_format_invalid__phone_number: 'Телефонният номер трябва да е валиден международен формат',
-    form_param_format_invalid__email_address: 'Имейл адресът трябва да бъде валиден имейл адрес.',
+    form_param_format_invalid__phone_number: 'Телефонният номер трябва да бъде във валиден международен формат',
+    form_param_format_invalid__email_address: 'Имейл адресът трябва да бъде във валиден имейл адрес.',
     form_password_length_too_short: '',
     form_param_nil: '',
     form_code_incorrect: '',
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
-    form_password_validation_failed: 'Некоректна парола',
-    form_password_not_strong_enough: 'Вашата парола не е достатъчно здрава.',
+    form_password_validation_failed: 'Неправилна парола',
+    form_password_not_strong_enough: 'Вашата парола не е достатъчно сигурна.',
     form_password_size_in_bytes_exceeded:
-      'Паролата ви надви максималния брой байтове, позволен, моля, я скратете или премахнете някои специални знаци.',
+      'Паролата ви надвиши максималния брой байтове, позволен, моля, я скратете или премахнете някои специални знаци.',
     passwordComplexity: {
       sentencePrefix: 'Вашата парола трябва да съдържа',
       minimumLength: '{{length}} или повече символа',
@@ -785,8 +785,8 @@ export const bgBG: LocalizationResource = {
       requireSpecialCharacter: 'специален символ',
     },
     zxcvbn: {
-      notEnough: 'Вашата парола не е достатъчно здрава.',
-      couldBeStronger: 'Вашата парола работи, но може да бъде по-здрава. Опитайте да добавите повече символи.',
+      notEnough: 'Вашата парола не е достатъчно сигурна.',
+      couldBeStronger: 'Вашата парола работи, но може да бъде по-сигурна. Опитайте да добавите повече символи.',
       goodPassword: 'Вашата парола отговаря на всички необходими изисквания.',
       warnings: {
         straightRow: 'Редове от клавиши на клавиатурата са лесни за отгадване.',
@@ -804,22 +804,22 @@ export const bgBG: LocalizationResource = {
         namesByThemselves: 'Единични имена или фамилии са лесни за отгадване.',
         commonNames: 'Обичайни имена и фамилии са лесни за отгадване.',
         userInputs: 'Не трябва да има лични или свързани със страницата данни.',
-        pwned: 'Вашата парола беше изложена при утечка на данни в Интернет.',
+        pwned: 'Вашата парола е била компроментирана от изтекли данни в Интернет.',
       },
       suggestions: {
         l33t: 'Избягвайте предвидими замествания на букви като "@" за "a".',
         reverseWords: 'Избягвайте обърнати написания на обичайни думи.',
-        allUppercase: 'Капитализирайте някои, но не всички букви.',
-        capitalization: 'Капитализирайте повече от първата буква.',
+        allUppercase: 'Направете главни някои, но не всички букви.',
+        capitalization: 'Напревете главни повече от първата буква.',
         dates: 'Избягвайте дати и години, свързани с вас.',
         recentYears: 'Избягвайте скорошни години.',
         associatedYears: 'Избягвайте години, свързани с вас.',
-        sequences: 'Избягвайте обичайни символни последователности.',
+        sequences: 'Избягвайте обичайни последователности от символи.',
         repeated: 'Избягвайте повтарящи се думи и символи.',
         longerKeyboardPattern: 'Използвайте по-дълги клавишни шаблони и променяйте посоката на набиране няколко пъти.',
         anotherWord: 'Добавете още думи, които са по-малко обичайни.',
         useWords: 'Използвайте няколко думи, но избягвайте обичайни фрази.',
-        noNeed: 'Можете да създадете здрави пароли и без да използвате символи, числа или главни букви.',
+        noNeed: 'Можете да създадете сигурни пароли и без да използвате символи, числа или главни букви.',
         pwned: 'Ако използвате тази парола на друго място, трябва да я промените.',
       },
     },
