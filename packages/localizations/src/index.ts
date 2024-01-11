@@ -24,3 +24,4 @@ export { skSK } from './sk-SK';
 export { ukUA } from './uk-UA';
 export { roRO } from './ro-RO';
 export { esMX } from './es-MX';
+export { bgBG } from './bg-BG';
