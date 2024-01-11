@@ -10,7 +10,6 @@ import { createFakeDomain, createFakeMember } from './utils';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
-//TODO-RETHEME
 describe('OrganizationSettings', () => {
   it.skip('enables organization profile button and disables leave when user is the only admin', async () => {
     const adminsList: OrganizationMembershipResource[] = [createFakeMember({ id: '1', orgId: '1', role: 'admin' })];
@@ -42,7 +41,7 @@ describe('OrganizationSettings', () => {
     expect(getByText(/leave organization/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
   });
 
-  it.skip('enables organization profile button and enables leave when user is admin and there is more', async () => {
+  it('enables organization profile button when user has permissions', async () => {
     const domainList: OrganizationDomainResource[] = [
       createFakeDomain({ id: '1', organizationId: '1', name: 'clerk.com' }),
     ];
@@ -58,11 +57,38 @@ describe('OrganizationSettings', () => {
         total_count: 1,
       }),
     );
-    const { getByText } = render(<OrganizationGeneralPage />, { wrapper });
+    const { getByText, getByRole } = render(<OrganizationGeneralPage />, { wrapper });
     await waitFor(() => {
       expect(getByText('General')).toBeDefined();
-      expect(getByText('Org1', { exact: false }).closest('button')).not.toBeNull();
-      expect(getByText(/leave organization/i, { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+      getByRole('button', { name: /edit profile/i });
+      expect(getByRole('button', { name: /leave organization/i })).not.toBeDisabled();
+    });
+  });
+
+  it('disabled organization profile button when user does not have permissions', async () => {
+    const domainList: OrganizationDomainResource[] = [
+      createFakeDomain({ id: '1', organizationId: '1', name: 'clerk.com' }),
+    ];
+
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', permissions: [] }],
+      });
+    });
+
+    fixtures.clerk.organization?.getDomains.mockReturnValue(
+      Promise.resolve({
+        data: domainList,
+        total_count: 1,
+      }),
+    );
+    const { getByText, queryByRole } = render(<OrganizationGeneralPage />, { wrapper });
+    await waitFor(() => {
+      expect(getByText('General')).toBeDefined();
+      expect(queryByRole('button', { name: /edit profile/i })).not.toBeInTheDocument();
+      expect(queryByRole('button', { name: /leave organization/i })).not.toBeDisabled();
     });
   });
 
@@ -90,7 +116,7 @@ describe('OrganizationSettings', () => {
     });
   });
 
-  it.skip('hides domains when `read` permission is missing', async () => {
+  it('hides domains when `read` permission is missing', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withOrganizationDomains();
@@ -105,7 +131,7 @@ describe('OrganizationSettings', () => {
     expect(fixtures.clerk.organization?.getDomains).not.toBeCalled();
   });
 
-  it.skip('shows domains when `read` permission exists but hides the Add domain button', async () => {
+  it('shows domains when `read` permission exists but hides the Add domain button', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withOrganizationDomains();
@@ -128,7 +154,7 @@ describe('OrganizationSettings', () => {
     expect(fixtures.clerk.organization?.getDomains).toBeCalled();
   });
 
-  it.skip('shows domains and shows the Add domain button when `org:sys_domains:manage` exists', async () => {
+  it('shows domains and shows the Add domain button when `org:sys_domains:manage` exists', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withOrganizationDomains();
@@ -151,7 +177,7 @@ describe('OrganizationSettings', () => {
     expect(fixtures.clerk.organization?.getDomains).toBeCalled();
   });
 
-  describe.skip('Danger section', () => {
+  describe('Danger section', () => {
     it('always displays danger section and the leave organization button', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
@@ -223,27 +249,27 @@ describe('OrganizationSettings', () => {
     });
   });
 
-  describe.skip('Navigation', () => {
-    it('navigates to Organization Profile edit page when clicking on organization name and user is admin', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+  describe('Navigation', () => {
+    it('open the profile section', async () => {
+      const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.com'],
-          organization_memberships: [{ name: 'Org1' }],
+          organization_memberships: [{ name: 'Org1', slug: 'Org1' }],
         });
       });
 
-      fixtures.clerk.organization?.getDomains.mockReturnValue(
-        Promise.resolve({
-          data: [],
-          total_count: 0,
-        }),
-      );
-      const { getByText } = render(<OrganizationGeneralPage />, { wrapper });
-      await waitFor(async () => {
-        await userEvent.click(getByText('Org1', { exact: false }));
+      const { getByText, getByRole, userEvent, queryByText, queryByLabelText } = render(<OrganizationGeneralPage />, {
+        wrapper,
       });
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('profile');
+      getByText('Org1');
+      await userEvent.click(getByRole('button', { name: /edit profile/i }));
+      await waitFor(() => getByText(/update profile/i));
+      expect(queryByText('Logo')).toBeInTheDocument();
+      expect(queryByLabelText(/name/i)).toBeInTheDocument();
+      expect(queryByLabelText(/slug/i)).toBeInTheDocument();
+      expect(getByRole('button', { name: /upload/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /save/i })).toBeDisabled();
     });
   });
 
