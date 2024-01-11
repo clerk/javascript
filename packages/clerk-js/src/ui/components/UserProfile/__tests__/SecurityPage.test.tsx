@@ -1,6 +1,7 @@
 import type { SessionWithActivitiesResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import React from 'react';
+import { expect } from '@playwright/test';
+import { within } from '@testing-library/dom';
 
 import { render, screen, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
@@ -32,6 +33,24 @@ describe('SecurityPage', () => {
       Promise.resolve([
         {
           pathRoot: '/me/sessions',
+          id: fixtures.clerk.session?.id,
+          status: 'active',
+          expireAt: '2022-12-01T01:55:44.636Z',
+          abandonAt: '2022-12-24T01:55:44.636Z',
+          lastActiveAt: '2022-11-24T12:11:49.328Z',
+          latestActivity: {
+            id: 'sess_activity_2HyQwElm529O5NDL1KNpJAGWVJZ',
+            deviceType: 'Macintosh',
+            browserName: 'Chrome',
+            browserVersion: '107.0.0.0',
+            country: 'Greece',
+            city: 'Athens',
+            isMobile: false,
+          },
+          actor: null,
+        } as any as SessionWithActivitiesResource,
+        {
+          pathRoot: '/me/sessions',
           id: 'sess_2HyQfBh8wRJUbpvCtPNllWdsHFK',
           status: 'active',
           expireAt: '2022-12-01T01:55:44.636Z',
@@ -54,12 +73,22 @@ describe('SecurityPage', () => {
     render(<SecurityPage />, { wrapper });
     await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
     screen.getByText(/Active Devices/i);
-    expect(await screen.findByText(/Chrome/i)).toBeInTheDocument();
-    screen.getByText(/107.0.0.0/i);
-    screen.getByText(/Athens/i);
-    screen.getByText(/Greece/i);
-    //TODO-RETHEME: fix this test
-    // const externalAccountButton = await screen.findByText(/Macintosh/i);
-    // expect(externalAccountButton.closest('button')).not.toBeNull();
+
+    const element = (await screen.findByText(/This device/i)).parentElement?.parentElement?.parentElement
+      ?.parentElement;
+    expect(element?.children[1]).not.toBeDefined();
+
+    const devices = screen.getAllByText(/Macintosh/i);
+    devices.forEach(d => {
+      const elem = d.parentElement?.parentElement?.parentElement?.parentElement;
+      expect(elem).toBeDefined();
+      const { getByText } = within(elem!);
+      getByText(/107.0.0.0/i);
+      getByText(/Athens/i);
+      getByText(/Greece/i);
+      if (elem !== element) {
+        expect(elem?.children[1]).toBeDefined();
+      }
+    });
   });
 });
