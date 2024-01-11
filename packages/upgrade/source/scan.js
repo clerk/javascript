@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, Newline, Box } from 'ink';
 import { globby } from 'globby';
 import fs from 'fs/promises';
+import path from 'path';
 import { ProgressBar } from '@inkjs/ui';
 import indexToPosition from 'index-to-position';
 import ExpandableList from './util/expandable-list.js';
@@ -47,11 +48,19 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 			'**/node_modules/**',
 			'.git/**',
 			'package.json',
+			'**/package.json',
 			'package-lock.json',
+			'**/package-lock.json',
 			'yarn.lock',
+			'**/yarn.lock',
 			'pnpm-lock.yaml',
+			'**/pnpm-lock.yaml',
+			'**/*.(png|webp|svg|gif|jpg|jpeg)+', // common image files
+			'**/*.(mp4|mkv|wmv|m4v|mov|avi|flv|webm|flac|mka|m4a|aac|ogg)+', // common video files
 		);
-		globby(dir, { ignore: [...ignore.filter(x => x)] }).then(files => setFiles(files));
+		globby(path.resolve(dir), { ignore: [...ignore.filter(x => x)] }).then(files => {
+			setFiles(files);
+		});
 	}, [dir, ignore]);
 
 	// Read files and scan regexes
@@ -64,8 +73,6 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 		Promise.all(
 			// first we read all the files
 			files.map(async (file, idx) => {
-				setStatus(`Scanning ${file}`);
-				setProgress(Math.ceil((idx / files.length) * 100));
 				const content = await fs.readFile(file, 'utf8');
 
 				// then we run each of the matchers against the file contents
@@ -87,6 +94,9 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 						});
 					});
 				}
+
+				setStatus(`Scanning ${file}`);
+				setProgress(Math.ceil((idx / files.length) * 100));
 			}),
 		)
 			.then(() => {
@@ -105,15 +115,17 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 	return (
 		<>
 			{complete ? (
-				<Text color='green'>✓ {status}</Text>
+				<>
+					<Text color='green'>✓ {status}</Text>
+					<Newline />
+					{!!results.length && <ExpandableList items={results} />}
+				</>
 			) : (
 				<>
 					<ProgressBar value={progress} />
 					<Text>{status}</Text>
 				</>
 			)}
-			<Newline />
-			{!!results.length && <ExpandableList items={results} />}
 		</>
 	);
 }
