@@ -330,7 +330,7 @@ export const enUS: LocalizationResource = {
       imageFormDestructiveActionSubtitle: 'Remove',
       fileDropAreaTitle: 'Drag file here, or...',
       fileDropAreaAction: 'Select file',
-      fileDropAreaHint: 'Recommend size 1:1, up to 10MB.',
+      fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',
       readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
       successMessage: 'Your profile has been updated.',
     },
