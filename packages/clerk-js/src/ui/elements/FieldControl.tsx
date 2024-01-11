@@ -59,6 +59,7 @@ const FieldAction = (
       elementId={descriptors.formFieldLabel.setId(fieldId)}
       isDisabled={isDisabled}
       colorScheme='primary'
+      variant='buttonSmall'
       onClick={e => {
         e.preventDefault();
         props.onClick?.(e);
@@ -78,7 +79,7 @@ const FieldOptionalLabel = () => {
       elementId={descriptors.formFieldHintText.setId(fieldId)}
       as='span'
       variant='caption'
-      colorScheme='neutral'
+      colorScheme='tertiary'
       isDisabled={isDisabled}
     />
   );
