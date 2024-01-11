@@ -70,6 +70,9 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!canSubmit) {
+      return;
+    }
 
     const submittedData = new FormData(e.currentTarget);
     return organization
