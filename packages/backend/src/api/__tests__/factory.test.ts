@@ -54,7 +54,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@test',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
@@ -82,7 +82,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@test',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
@@ -115,7 +115,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@test',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
@@ -145,7 +145,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@test',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
@@ -173,7 +173,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@test',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
           body: JSON.stringify({
             first_name: 'John',
@@ -214,7 +214,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@test',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
@@ -237,7 +237,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@test',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
@@ -262,7 +262,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@test',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );

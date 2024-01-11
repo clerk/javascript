@@ -67,7 +67,7 @@ export default (QUnit: QUnit) => {
         headers: {
           Authorization: 'Bearer deadbeef',
           'Content-Type': 'application/json',
-          'User-Agent': '@clerk/backend@test',
+          'User-Agent': '@clerk/backend@0.0.0-test',
         },
       });
       assert.propEqual(jwk, mockRsaJwk);
@@ -87,7 +87,7 @@ export default (QUnit: QUnit) => {
         headers: {
           Authorization: 'Bearer sk_test_deadbeef',
           'Content-Type': 'application/json',
-          'User-Agent': '@clerk/backend@test',
+          'User-Agent': '@clerk/backend@0.0.0-test',
         },
       });
       assert.propEqual(jwk, mockRsaJwk);
