@@ -240,7 +240,8 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
       setFocusedIndex(-1);
       return;
     }
-    focusedItemRef.current?.scrollIntoView({ block: 'nearest' });
+    // Jest could not resolve `focusedItemRef.current` so we need to call scrollIntoView with ?.()
+    focusedItemRef.current?.scrollIntoView?.({ block: 'nearest' });
   };
 
   React.useEffect(scrollToItemOnSelectedIndexChange, [focusedIndex, isOpen]);
@@ -252,7 +253,8 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 
     if (isOpen) {
       setFocusedIndex(options.findIndex(o => o.value === value));
-      focusedItemRef.current?.scrollIntoView({ block: 'nearest' });
+      // Jest could not resolve `focusedItemRef.current` so we need to call scrollIntoView with ?.()
+      focusedItemRef.current?.scrollIntoView?.({ block: 'nearest' });
       return;
     }
   }, [isOpen]);
