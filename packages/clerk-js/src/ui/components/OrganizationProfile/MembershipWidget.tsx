@@ -2,8 +2,11 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { runIfFunctionOrReturn } from '../../../utils';
 import { useOrganizationProfileContext } from '../../contexts';
-import { Col, Flex, Link, Text } from '../../customizables';
+import { Flex, Icon, Link, Text } from '../../customizables';
+import { Gauge } from '../../elements';
+import { ArrowRightIcon } from '../../icons';
 import { useRouter } from '../../router';
+import { mqu } from '../../styledSystem';
 
 export const MembershipWidget = () => {
   const { organization } = useOrganization();
@@ -17,45 +20,57 @@ export const MembershipWidget = () => {
   }
 
   const totalCount = organization?.membersCount + organization?.pendingInvitationsCount;
+  const limit = runIfFunctionOrReturn(__unstable_manageBillingMembersLimit);
 
   return (
     <Flex
       sx={theme => ({
         background: theme.colors.$blackAlpha50,
-        padding: theme.space.$4,
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        padding: theme.space.$2,
         borderRadius: theme.radii.$md,
+        gap: theme.space.$4,
       })}
     >
-      <Col>
-        <Text>Members can be given access to applications.</Text>
-
-        {runIfFunctionOrReturn(__unstable_manageBillingMembersLimit) > 0 && (
-          <Link
-            sx={t => ({
-              alignSelf: 'flex-start',
-              color: t.colors.$primary500,
-              marginTop: t.space.$1,
-            })}
-            onClick={() => router.navigate(runIfFunctionOrReturn(__unstable_manageBillingUrl))}
-          >
-            {runIfFunctionOrReturn(__unstable_manageBillingLabel) || 'Manage billing'}
-          </Link>
+      <Flex
+        align='center'
+        sx={t => ({
+          [mqu.sm]: {
+            gap: t.space.$3,
+          },
+          gap: t.space.$2,
+        })}
+      >
+        {limit > 0 && (
+          <Gauge
+            limit={limit}
+            value={totalCount}
+            size='xs'
+          />
         )}
-      </Col>
-      <Col>
-        <Text
+        <Flex
           sx={t => ({
-            color: t.colors.$blackAlpha600,
+            [mqu.sm]: {
+              flexDirection: 'column',
+            },
+            gap: t.space.$0x5,
           })}
         >
-          {totalCount} of{' '}
-          {__unstable_manageBillingMembersLimit
-            ? `${runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)} members`
-            : 'unlimited'}
-        </Text>
-      </Col>
+          <Text>You can invite {__unstable_manageBillingMembersLimit ? `up to ${limit}` : 'unlimited'} members.</Text>
+          {limit > 0 && (
+            <Link
+              sx={t => ({
+                fontWeight: t.fontWeights.$medium,
+              })}
+              variant='body'
+              onClick={() => router.navigate(runIfFunctionOrReturn(__unstable_manageBillingUrl))}
+            >
+              {runIfFunctionOrReturn(__unstable_manageBillingLabel) || 'Manage billing'}
+
+              <Icon icon={ArrowRightIcon} />
+            </Link>
+          )}
+        </Flex>
+      </Flex>
     </Flex>
   );
 };
