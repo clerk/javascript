@@ -34,7 +34,7 @@ function LogButtons() {
       </Button>
       <Button onClick={() => console.dir(ref.getSnapshot().context)}>Log Context</Button>
       <Button onClick={() => console.dir(ref.getSnapshot().context.currentFactor)}>Log Current Factor</Button>
-      <Button onClick={() => console.dir(ref.getSnapshot().context.environment)}>Log Environment</Button>
+      <Button onClick={() => console.dir(ref.getSnapshot().context.__unstable__environment)}>Log Environment</Button>
       <Button onClick={() => console.dir(ref.getSnapshot().context.resource)}>Log Resource</Button>
     </>
   );

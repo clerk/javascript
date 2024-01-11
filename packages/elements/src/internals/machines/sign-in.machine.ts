@@ -192,17 +192,17 @@ export const SignInMachine = setup({
           target: 'Start',
         },
         {
-          description: 'Default to the initial sign-in flow state',
+          description: 'Go to FirstFactor flow state',
           guard: and(['needsFirstFactor', { type: 'isCurrentPath', params: { path: '/sign-in/continue' } }]),
           target: 'FirstFactor',
         },
         {
-          description: 'Default to the initial sign-in flow state',
+          description: 'Go to SecondFactor flow state',
           guard: and(['needsSecondFactor', { type: 'isCurrentPath', params: { path: '/sign-in/continue' } }]),
           target: 'SecondFactor',
         },
         {
-          description: 'Default to the initial sign-in flow state',
+          description: 'Go to SSO Callback state',
           guard: and(['needsSecondFactor', { type: 'isCurrentPath', params: { path: '/sign-in/sso-callback' } }]),
           target: 'SSOCallbackRunning',
         },
@@ -500,7 +500,6 @@ export const SignInMachine = setup({
     HavingTrouble: {
       id: 'HavingTrouble',
       always: 'Start',
-      // type: 'final',
     },
     Complete: {
       id: 'Complete',
