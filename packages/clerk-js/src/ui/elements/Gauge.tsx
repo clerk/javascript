@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { Col, type Flex, Text } from '../customizables';
+import { Col, Text } from '../customizables';
 import { defaultInternalTheme } from '../foundations';
-import type { PropsOfComponent } from '../styledSystem';
 
 export type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -29,7 +28,7 @@ const sizes: Record<Size, { svgSize: number; textSize: string }> = {
   },
 };
 
-export type GaugeProps = PropsOfComponent<typeof Flex> & {
+export type GaugeProps = {
   value: number;
   limit: number;
   size?: Size;
