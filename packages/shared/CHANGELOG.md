@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.10
+
+### Minor Changes
+
+- Allow dynamic values components props, even if these values change after the components are rendered. For example, a `SignIn` component with a `redirectUrl` prop passed in will always respect the latest value of `redirectUrl`. ([#2515](https://github.com/clerk/javascript/pull/2515)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 2.0.0-alpha-v5.9
 
 ### Patch Changes
