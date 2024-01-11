@@ -21,6 +21,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     accentColor: theme.colors.$primary500,
     ...common.textVariants(theme).body,
     ...common.borderVariants(theme, props).normal,
+    ...common.disabled(theme),
     [mqu.ios]: {
       fontSize: theme.fontSizes.$lg,
     },
