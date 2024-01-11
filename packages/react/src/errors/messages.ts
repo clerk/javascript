@@ -37,4 +37,7 @@ export const useAuthHasRequiresRoleOrPermission =
   'Missing parameters. `has` from `useAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`';
 
 export const noPathProvidedError = (componentName: string) =>
-  `<${componentName}/> is missing a path prop to work with path based routing`;
+  `The <${componentName}/> component uses path-based routing by default unless a different routing strategy is provided using the \`routing\` prop. When path-based routing is used, you need to provide the path where the component is mounted on by using the \`path\` prop. Example: <${componentName} path={'/my-path'} />`;
+
+export const incompatibleRoutingWithPathProvidedError = (componentName: string) =>
+  `The \`path\` prop will only be respected when the Clerk component uses path-based routing. Please update the  <${componentName}/> component and either drop the \`path\` prop or update the routing strategy using the \`routing\` prop. For more details please refer to our docs: https://clerk.com/docs`;
