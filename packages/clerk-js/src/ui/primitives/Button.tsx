@@ -125,11 +125,11 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           backgroundColor: theme.colors.$colorBackground,
           color: theme.colors.$danger500,
           '&:hover': {
-            backgroundColor: theme.colors.$danger50,
+            backgroundColor: theme.colors.$dangerAlpha50,
             color: theme.colors.$danger500,
           },
           '&:focus': props.hoverAsFocus
-            ? { backgroundColor: theme.colors.$danger50, color: theme.colors.$danger500 }
+            ? { backgroundColor: theme.colors.$dangerAlpha50, color: theme.colors.$danger500 }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$colorBackground },
           boxShadow: theme.shadows.$secondaryButtonShadow,
@@ -152,7 +152,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         },
         ghostDanger: {
           color: theme.colors.$danger500,
-          '&:hover': { backgroundColor: theme.colors.$danger50, color: theme.colors.$danger500 },
+          '&:hover': { backgroundColor: theme.colors.$dangerAlpha50, color: theme.colors.$danger500 },
           '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$danger50 } : undefined,
           '&:active': { backgroundColor: theme.colors.$transparent },
         },
