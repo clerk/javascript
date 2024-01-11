@@ -12,10 +12,6 @@ type SignInFactorOneCodeFormProps = {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
   inputLabel?: LocalizationKey;
-  // TODO-RETHEME remove
-  formTitle?: LocalizationKey;
-  // TODO-RETHEME remove
-  formSubtitle?: LocalizationKey;
   resendButton: LocalizationKey;
   prepare: () => Promise<SignUpResource> | undefined;
   attempt: (code: string) => Promise<SignUpResource>;
@@ -54,8 +50,6 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
     <VerificationCodeCard
       cardTitle={props.cardTitle}
       cardSubtitle={props.cardSubtitle}
-      formTitle={props.formTitle}
-      formSubtitle={props.formSubtitle}
       resendButton={props.resendButton}
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={props.prepare}

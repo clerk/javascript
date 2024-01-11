@@ -159,6 +159,7 @@ type _LocalizationResource = {
     };
     forgotPassword: {
       title: LocalizationValue;
+      subtitle: LocalizationValue;
       subtitle_email: LocalizationValue;
       subtitle_phone: LocalizationValue;
       formTitle: LocalizationValue;

@@ -150,6 +150,7 @@ export const enUS: LocalizationResource = {
     },
     forgotPassword: {
       title: 'Reset password',
+      subtitle: 'to reset your password',
       subtitle_email: 'First, enter the code sent to your email ID',
       subtitle_phone: 'First, enter the code sent to your phone',
       formTitle: 'Reset password code',
