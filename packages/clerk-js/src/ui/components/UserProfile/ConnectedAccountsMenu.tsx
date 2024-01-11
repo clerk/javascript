@@ -3,7 +3,7 @@ import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
 
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
-import { Image, localizationKeys } from '../../customizables';
+import { descriptors, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
@@ -82,6 +82,8 @@ export const AddConnectedAccount = () => {
             <Image
               isLoading={card.loadingMetadata === strategy}
               isDisabled={card.isLoading}
+              elementDescriptor={descriptors.providerIcon}
+              elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
               src={strategyToDisplayData[strategy].iconUrl}
               alt={`Connect ${strategyToDisplayData[strategy].name} account`}
               sx={theme => ({ width: theme.sizes.$4 })}

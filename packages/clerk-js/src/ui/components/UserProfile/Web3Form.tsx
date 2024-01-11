@@ -65,8 +65,8 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
           localizationKey={`Connect ${strategyToDisplayData[strategy].name} wallet`}
           leftIcon={
             <Image
-              elementDescriptor={descriptors.socialButtonsProviderIcon}
-              elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
+              elementDescriptor={descriptors.providerIcon}
+              elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
               isLoading={card.loadingMetadata === strategy}
               isDisabled={card.isLoading}
               src={strategyToDisplayData[strategy].iconUrl}
