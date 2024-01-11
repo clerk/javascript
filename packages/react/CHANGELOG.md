@@ -1,5 +1,30 @@
 # Change Log
 
+## 5.0.0-alpha-v5.16
+
+### Minor Changes
+
+- Apply the following changes to components with routing props: ([#2543](https://github.com/clerk/javascript/pull/2543)) by [@dimkl](https://github.com/dimkl)
+
+  - default is `routing="path"` and `path` prop is required to be set via env or context
+  - when `routing="hash"` or `routing="virtual"` is set the implicit (via env or context) `path` option is ignored
+  - when `routing="hash"` or `routing="virtual"` then `path` prop is not allowed to be set
+
+  Examples of components with routing props:
+
+  - `<CreateOrganization />`
+  - `<OrganizationProfile />`
+  - `<SignIn />`
+  - `<SignUp />`
+  - `<UserProfile />`
+
+### Patch Changes
+
+- Allow dynamic values components props, even if these values change after the components are rendered. For example, a `SignIn` component with a `redirectUrl` prop passed in will always respect the latest value of `redirectUrl`. ([#2515](https://github.com/clerk/javascript/pull/2515)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`8cc45d2af`](https://github.com/clerk/javascript/commit/8cc45d2af98320ccced3768fb039b86576e424a5)]:
+  - @clerk/shared@2.0.0-alpha-v5.10
+
 ## 5.0.0-alpha-v5.15
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.0.0-alpha-v5.15",
+  "version": "5.0.0-alpha-v5.16",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -76,7 +76,7 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "2.0.0-alpha-v5.9",
+    "@clerk/shared": "2.0.0-alpha-v5.10",
     "@clerk/types": "4.0.0-alpha-v5.12",
     "eslint-config-custom": "*",
     "semver": "^7.5.4",
