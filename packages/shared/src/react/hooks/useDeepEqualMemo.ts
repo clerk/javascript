@@ -16,3 +16,5 @@ const useDeepEqualMemoize = <T>(value: T) => {
 export const useDeepEqualMemo: UseDeepEqualMemo = (factory, dependencyArray) => {
   return React.useMemo(factory, useDeepEqualMemoize(dependencyArray));
 };
+
+export const isDeeplyEqual = deepEqual;
