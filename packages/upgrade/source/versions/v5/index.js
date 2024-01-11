@@ -14,6 +14,12 @@ const reactChangesList = [
 	'clerkprovider-frontendapi',
 	'setsession',
 	'navigate-to-routerpush-routerreplace',
+	'afterswitchorganizationurl',
+	'appearance-organizationpreview-organizationswitcher',
+	'useorganization-invitationlist',
+	'useorganization-membershiplist',
+	'useorganizations',
+	'userprofile-prop',
 ];
 
 export default {
@@ -114,11 +120,8 @@ export default {
 		'external-account-avatarurl', // shared w/ all
 		'organization-logourl', // shared w/ all
 		'user-orgpublicdata-profileimageurl', // shared w/ all
-		'useorganizations',
-		'userprofile-prop',
 		'setsession',
 		'user-update-password', // shared w/ all
-		'afterswitchorganizationurl', // shared w/ all
 		'experimental-canusecaptcha',
 		'experimental-captchaurl',
 		'experimental-captchasitekey',
@@ -128,11 +131,8 @@ export default {
 		'unstable-membershipupdate',
 		'organization-create-string', // maybe shared with all?
 		'organization-getpendinginvitations', // maybe shared with all?
-		'useorganization-invitationlist', // maybe shared with all?
-		'useorganization-membershiplist', // maybe shared with all?
 		'user-createexternalaccount-redirecturl', // maybe shared with all?
 		'signup-attemptweb3walletverification-generatedsignature',
-		'appearance-organizationpreview-organizationswitcher', // shared w/ all
 		'redirecttohome',
 	]),
 	shared: load('shared', [
