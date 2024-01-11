@@ -262,7 +262,6 @@ type _LocalizationResource = {
       actionLink: LocalizationValue;
       actionText: LocalizationValue;
       subtitle: LocalizationValue;
-      backLink: LocalizationValue;
       blockButton__emailLink: LocalizationValue;
       blockButton__emailCode: LocalizationValue;
       blockButton__phoneCode: LocalizationValue;

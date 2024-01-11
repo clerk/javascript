@@ -624,7 +624,7 @@ describe('SignInFactorOne', () => {
 
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      await userEvent.click(screen.getByText('Back to previous method'));
+      await userEvent.click(screen.getByText('Back'));
       screen.getByText('Enter your password');
     });
 

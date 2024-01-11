@@ -247,7 +247,6 @@ export const enUS: LocalizationResource = {
       subtitle: 'Facing issues? You can use any of these methods to sign in.',
       actionLink: 'Get help',
       actionText: 'Don’t have any of these?',
-      backLink: 'Back to previous method',
       blockButton__emailLink: 'Email link to {{identifier}}',
       blockButton__emailCode: 'Email code to {{identifier}}',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',

@@ -70,10 +70,6 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
       hasError={rest.hasError}
       sx={theme => ({
         ...common.borderVariants(theme).normal,
-        boxShadow: common
-          .shadows(theme)
-          .input.replace('{{color1}}', theme.colors.$blackAlpha100)
-          .replace('{{color2}}', theme.colors.$blackAlpha150),
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
