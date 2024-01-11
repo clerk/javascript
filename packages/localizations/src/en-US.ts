@@ -1,16 +1,5 @@
 import type { LocalizationResource } from '@clerk/types';
 
-const commonTexts = {
-  signIn: {
-    phoneCode: {
-      title: 'Check your phone',
-      subtitle: 'to continue to {{applicationName}}',
-      formTitle: 'Verification code',
-      resendButton: "Didn't receive a code? Resend",
-    },
-  },
-} as const;
-
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -203,10 +192,17 @@ export const enUS: LocalizationResource = {
         subtitle: 'Return to the original tab to continue.',
       },
     },
-    phoneCode: { ...commonTexts.signIn.phoneCode },
+    phoneCode: {
+      title: 'Check your phone',
+      subtitle: 'to continue to {{applicationName}}',
+      formTitle: 'Verification code',
+      resendButton: "Didn't receive a code? Resend",
+    },
     phoneCodeMfa: {
-      ...commonTexts.signIn.phoneCode,
+      title: 'Check your phone',
       subtitle: 'To continue, please enter the verification code sent to your phone',
+      formTitle: 'Verification code',
+      resendButton: "Didn't receive a code? Resend",
     },
     totpMfa: {
       title: 'Two-step verification',
@@ -334,7 +330,7 @@ export const enUS: LocalizationResource = {
       imageFormDestructiveActionSubtitle: 'Remove',
       fileDropAreaTitle: 'Drag file here, or...',
       fileDropAreaAction: 'Select file',
-      fileDropAreaHint: 'Recommend size 1:1, upto 10MB.',
+      fileDropAreaHint: 'Recommend size 1:1, up to 10MB.',
       readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
       successMessage: 'Your profile has been updated.',
     },
