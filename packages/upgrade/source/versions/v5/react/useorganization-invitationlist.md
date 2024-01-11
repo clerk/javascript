@@ -8,7 +8,7 @@ The `invitationList` param to the `useOrganizations` hook has been replaced by `
 
 ```js
 // before
-const { invitationList } = useOrganizations({
+const { invitationList } = useOrganization({
 	invitationList: { limit: 10, offset: 1 },
 });
 

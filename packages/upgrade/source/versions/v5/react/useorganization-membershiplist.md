@@ -7,7 +7,7 @@ The `membershipList` param from the `useOrganization` hook has been removed. Ins
 
 ```js
 // before
-const { membershipList } = useOrganizations({
+const { membershipList } = useOrganization({
 	membershipList: { limit: 10, offset: 1 },
 });
 
