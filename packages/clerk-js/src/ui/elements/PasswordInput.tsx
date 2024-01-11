@@ -49,7 +49,10 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
       onValidationError: message => setError(message),
       onValidationWarning: message => setWarning(message),
       onValidationInfo: message => {
-        if (inputRef.current === document.activeElement) {
+        // ref will be null when onFocus is triggered due to `autoFocus=true`
+        if (!inputRef.current) return;
+        const isElementFocused = inputRef.current === document.activeElement;
+        if (isElementFocused) {
           setInfo(message);
         } else {
           // Turn the suggestion into an error if not focused.
