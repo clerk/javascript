@@ -2,7 +2,7 @@ import type { Clerk } from '../core/clerk';
 import { createFapiClient } from '../core/fapiClient';
 
 export const retrieveCaptchaInfo = (clerk: Clerk) => {
-  const _environment = clerk.__unstable__environment;
+  const _environment = clerk.__internal_environment;
   const fapiClient = createFapiClient(clerk);
   return {
     captchaSiteKey: _environment ? _environment.displayConfig.captchaPublicKey : null,
