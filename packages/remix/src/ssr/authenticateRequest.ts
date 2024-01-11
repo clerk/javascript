@@ -79,6 +79,7 @@ export async function authenticateRequest(
     proxyUrl,
     isSatellite,
     domain,
+    userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
   }).authenticateRequest(request, {
     audience,
     secretKey,

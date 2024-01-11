@@ -40,12 +40,12 @@ export const clerkClient = new Proxy(clerkClientSingleton, {
 
     const env = { ...loadApiEnv(), ...loadClientEnv() };
     if (env.secretKey) {
-      clerkClientSingleton = createClerkClient({ ...env, userAgent: PACKAGE_NAME });
+      clerkClientSingleton = createClerkClient({ ...env, userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}` });
       // @ts-expect-error - Element implicitly has an 'any' type because expression of type 'string | symbol' can't be used to index type 'ExtendedClerk'.
       return clerkClientSingleton[property];
     }
 
-    const c = createClerkClient({ ...env, userAgent: PACKAGE_NAME });
+    const c = createClerkClient({ ...env, userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}` });
     // @ts-expect-error - Element implicitly has an 'any' type because expression of type 'string | symbol' can't be used to index type 'ExtendedClerk'.
     return c[property];
   },

@@ -9,5 +9,6 @@ export const clerkClient = createClerkClient({
   apiUrl: API_URL,
   apiVersion: API_VERSION,
   jwtKey: JWT_KEY,
+  userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
   sdkMetadata: SDK_METADATA,
 });
