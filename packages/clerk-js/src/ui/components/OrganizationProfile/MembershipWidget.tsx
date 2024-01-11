@@ -40,8 +40,7 @@ export const MembershipWidget = () => {
         })}
       >
         <Gauge
-          // limit={runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)}
-          limit={3}
+          limit={runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)}
           value={totalCount}
           size='xs'
         />
