@@ -12,6 +12,7 @@ exports[`clerk initializes clerk with constants 1`] = `
         "version": "0.0.0-test",
       },
       "secretKey": "TEST_SECRET_KEY",
+      "userAgent": "@clerk/fastify@0.0.0-test",
     },
   ],
 ]
