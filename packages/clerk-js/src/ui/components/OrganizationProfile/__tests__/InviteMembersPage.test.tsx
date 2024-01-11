@@ -1,17 +1,24 @@
-import type { MembershipRole, OrganizationInvitationResource } from '@clerk/types';
+import type { OrganizationInvitationResource } from '@clerk/types';
 import { describe } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
-import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { render } from '../../../../testUtils';
+import { Action } from '../../../elements/Action';
+import { clearFetchCache } from '../../../hooks';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { InviteMembersScreen } from '../InviteMembersScreen';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
-//TODO-RETHEME
-describe.skip('InviteMembersPage', () => {
+describe('InviteMembersPage', () => {
+  /**
+   * `<InviteMembersPage/>` internally uses useFetch which caches the results, be sure to clear the cache before each test
+   */
+  beforeEach(() => {
+    clearFetchCache();
+  });
+
   it('renders the component', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
@@ -23,8 +30,15 @@ describe.skip('InviteMembersPage', () => {
 
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
-    const { findByText } = render(<InviteMembersScreen />, { wrapper });
-    await waitFor(async () => expect(await findByText('Invite new members to this organization')).toBeInTheDocument());
+    const { findByText, getByText } = render(
+      <Action.Root>
+        <InviteMembersScreen />
+      </Action.Root>,
+      { wrapper },
+    );
+
+    await waitFor(async () => expect(await findByText('Invite new members')).toBeInTheDocument());
+    getByText('Enter or paste one or more email addresses, separated by spaces or commas.');
   });
 
   describe('Submitting', () => {
@@ -37,8 +51,29 @@ describe.skip('InviteMembersPage', () => {
         });
       });
 
-      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
-      const { getByText, getByRole, userEvent, getByTestId } = render(<InviteMembersScreen />, { wrapper });
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
+      const { getByText, getByRole, userEvent, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
       expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
 
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
@@ -77,7 +112,12 @@ describe.skip('InviteMembersPage', () => {
       });
 
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersScreen />, { wrapper });
+      const { getByRole, userEvent, getByTestId, getByText } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
       await userEvent.click(getByRole('button', { name: 'Select an option' }));
       await userEvent.click(getByText(/^member$/i));
@@ -86,47 +126,7 @@ describe.skip('InviteMembersPage', () => {
       await waitFor(() => {
         expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
           emailAddresses: ['test+1@clerk.com'],
-          role: 'member' as MembershipRole,
-        });
-      });
-    });
-
-    it('fetches custom role and sends invite to email entered and teacher role when clicking Send', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-          organization_memberships: [{ name: 'Org1', role: 'admin' }],
-        });
-      });
-
-      fixtures.clerk.organization?.getRoles.mockResolvedValueOnce({
-        data: [
-          {
-            pathRoot: '',
-            reload: jest.fn(),
-            id: '1',
-            description: '',
-            updatedAt: new Date(),
-            createdAt: new Date(),
-            permissions: [],
-            name: 'Teacher',
-            key: 'org:teacher',
-          },
-        ],
-        total_count: 1,
-      });
-      fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersScreen />, { wrapper });
-      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
-      await userEvent.click(getByRole('button', { name: 'Select an option' }));
-      await userEvent.click(getByText('Teacher'));
-      await userEvent.click(getByRole('button', { name: 'Send invitations' }));
-
-      await waitFor(() => {
-        expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
-          emailAddresses: ['test+1@clerk.com'],
-          role: 'org:teacher' as MembershipRole,
+          role: 'member',
         });
       });
     });
@@ -158,7 +158,12 @@ describe.skip('InviteMembersPage', () => {
       });
 
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersScreen />, { wrapper });
+      const { getByRole, userEvent, getByTestId, getByText } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
       await userEvent.type(
         getByTestId('tag-input'),
         'test+1@clerk.com,test+2@clerk.com,test+3@clerk.com,test+4@clerk.com,',
@@ -170,7 +175,7 @@ describe.skip('InviteMembersPage', () => {
       await waitFor(() => {
         expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
           emailAddresses: ['test+1@clerk.com', 'test+2@clerk.com', 'test+3@clerk.com', 'test+4@clerk.com'],
-          role: 'member' as MembershipRole,
+          role: 'member',
         });
       });
     });
@@ -190,6 +195,17 @@ describe.skip('InviteMembersPage', () => {
           {
             pathRoot: '',
             reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -202,7 +218,12 @@ describe.skip('InviteMembersPage', () => {
       });
 
       fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
-      const { getByRole, userEvent, getByText, getByTestId } = render(<InviteMembersScreen />, { wrapper });
+      const { getByRole, userEvent, getByText, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
       await userEvent.click(getByRole('button', { name: 'Select an option' }));
       await userEvent.click(getByText('Admin'));
@@ -210,7 +231,7 @@ describe.skip('InviteMembersPage', () => {
       await waitFor(() => {
         expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
           emailAddresses: ['test+1@clerk.com'],
-          role: 'admin' as MembershipRole,
+          role: 'admin',
         });
       });
     });
@@ -254,7 +275,12 @@ describe.skip('InviteMembersPage', () => {
           status: 400,
         }),
       );
-      const { getByRole, userEvent, getByText, getByTestId } = render(<InviteMembersScreen />, { wrapper });
+      const { getByRole, userEvent, getByText, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
       await waitFor(() => expect(getByRole('button', { name: /select an option/i })).not.toBeDisabled());
       await userEvent.click(getByRole('button', { name: /select an option/i }));
@@ -309,7 +335,12 @@ describe.skip('InviteMembersPage', () => {
           status: 400,
         }),
       );
-      const { getByRole, userEvent, getByTestId, getByText } = render(<InviteMembersScreen />, { wrapper });
+      const { getByRole, userEvent, getByTestId, getByText } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
       await userEvent.type(getByTestId('tag-input'), 'invalid@clerk.dev');
       await waitFor(() => expect(getByRole('button', { name: /select an option/i })).not.toBeDisabled());
       await userEvent.click(getByRole('button', { name: /select an option/i }));
@@ -358,7 +389,12 @@ describe.skip('InviteMembersPage', () => {
           status: 403,
         }),
       );
-      const { getByRole, getByText, userEvent, getByTestId } = render(<InviteMembersScreen />, { wrapper });
+      const { getByRole, getByText, userEvent, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
       await userEvent.type(getByTestId('tag-input'), 'blocked@clerk.dev');
       await waitFor(() => expect(getByRole('button', { name: /select an option/i })).not.toBeDisabled());
       await userEvent.click(getByRole('button', { name: /select an option/i }));
@@ -366,23 +402,6 @@ describe.skip('InviteMembersPage', () => {
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
       expect(getByTestId('tag-input')).not.toHaveValue();
-    });
-  });
-
-  describe('Navigation', () => {
-    it('navigates back when clicking the Cancel button', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-          organization_memberships: [{ name: 'Org1', role: 'admin' }],
-        });
-      });
-      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
-
-      const { getByRole, userEvent } = render(<InviteMembersScreen />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Cancel' }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('..');
     });
   });
 });

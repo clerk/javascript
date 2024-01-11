@@ -22,3 +22,4 @@ export * from './createSlug';
 export * from './passwordUtils';
 export * from './createCustomPages';
 export * from './ExternalElementMounter';
+export * from './colorOptionToHslaScale';

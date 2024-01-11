@@ -9,7 +9,7 @@ import { Col, descriptors, SimpleButton } from '../customizables';
 import type { UsePopoverReturn } from '../hooks';
 import { usePopover } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations, common } from '../styledSystem';
+import { animations } from '../styledSystem';
 import { colors } from '../utils/colors';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
@@ -130,14 +130,14 @@ export const MenuList = (props: MenuListProps) => {
             border: theme.borders.$normal,
             outline: 'none',
             borderRadius: theme.radii.$lg,
-            borderColor: theme.colors.$blackAlpha200,
+            borderColor: theme.colors.$blackAlpha150,
             paddingTop: theme.space.$2,
             paddingBottom: theme.space.$2,
             overflow: 'hidden',
             top: `calc(100% + ${theme.space.$2})`,
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: common.shadows(theme).menuShadow,
+            boxShadow: theme.shadows.$menuShadow,
             zIndex: theme.zIndices.$dropdown,
           }),
           sx,
@@ -182,7 +182,7 @@ export const MenuItem = (props: MenuItemProps) => {
       elementDescriptor={descriptors.menuItem}
       elementId={descriptors.menuItem.setId(elementId)}
       hoverAsFocus
-      variant={destructive ? 'secondaryDanger' : 'secondary'}
+      variant={destructive ? 'ghostDanger' : 'ghost'}
       role='menuitem'
       onKeyDown={onKeyDown}
       onClick={e => {
@@ -191,7 +191,6 @@ export const MenuItem = (props: MenuItemProps) => {
       }}
       sx={[
         theme => ({
-          boxShadow: 'none',
           justifyContent: 'start',
           borderRadius: theme.radii.$none,
           paddingLeft: theme.space.$4,

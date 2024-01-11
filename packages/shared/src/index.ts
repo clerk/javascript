@@ -29,5 +29,6 @@ export * from './poller';
 export * from './proxy';
 export * from './underscore';
 export * from './url';
+export * from './object';
 export { createWorkerTimers } from './workerTimers';
 export { DEV_BROWSER_JWT_KEY, getDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser';

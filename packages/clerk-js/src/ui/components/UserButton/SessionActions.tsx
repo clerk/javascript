@@ -49,10 +49,9 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
           t => ({
             borderBottomLeftRadius: t.radii.$lg,
             borderBottomRightRadius: t.radii.$lg,
-            borderBottom: 'none',
             padding: `${t.space.$4} ${t.space.$5}`,
             ':hover': {
-              backgroundColor: t.colors.$danger50,
+              backgroundColor: t.colors.$dangerAlpha50,
               color: t.colors.$danger400,
             },
           }),
@@ -101,7 +100,7 @@ export const MultiSessionActions = (props: SessionActionsProps) => {
           onClick={handleSignOutSessionClicked(session)}
           sx={t => ({
             ':hover': {
-              backgroundColor: t.colors.$danger50,
+              backgroundColor: t.colors.$dangerAlpha50,
               color: t.colors.$danger400,
             },
           })}

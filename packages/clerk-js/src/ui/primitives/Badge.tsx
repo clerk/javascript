@@ -2,13 +2,15 @@ import type { PropsOfComponent, StyleVariants } from '../styledSystem';
 import { common, createCssVariables, createVariants } from '../styledSystem';
 import { Flex } from './Flex';
 
-const vars = createCssVariables('accent', 'bg', 'shadow');
+const vars = createCssVariables('accent', 'bg', 'borderColor');
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     color: vars.accent,
     backgroundColor: vars.bg,
-    boxShadow: vars.shadow,
+    boxShadow: theme.shadows.$badge,
+    border: theme.borders.$normal,
+    borderColor: vars.borderColor,
     borderRadius: theme.radii.$sm,
     padding: `${theme.space.$none} ${theme.space.$1x5}`,
     display: 'inline-flex',
@@ -18,24 +20,24 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     textVariant: { ...common.textVariants(theme) },
     colorScheme: {
       primary: {
-        [vars.accent]: theme.colors.$blackAlpha500,
-        [vars.bg]: theme.colors.$blackAlpha50,
-        [vars.shadow]: common.shadows(theme).badge.replace('{{color}}', theme.colors.$blackAlpha100),
+        [vars.accent]: theme.colors.$primary500,
+        [vars.bg]: theme.colors.$primaryAlpha50,
+        [vars.borderColor]: theme.colors.$primary200,
       },
       danger: {
         [vars.accent]: theme.colors.$danger500,
-        [vars.bg]: theme.colors.$danger50,
-        [vars.shadow]: common.shadows(theme).badge.replace('{{color}}', theme.colors.$danger200),
+        [vars.bg]: theme.colors.$dangerAlpha50,
+        [vars.borderColor]: theme.colors.$danger200,
       },
       success: {
         [vars.accent]: theme.colors.$success500,
-        [vars.bg]: theme.colors.$success50,
-        [vars.shadow]: common.shadows(theme).badge.replace('{{color}}', theme.colors.$success200),
+        [vars.bg]: theme.colors.$successAlpha50,
+        [vars.borderColor]: theme.colors.$success200,
       },
       warning: {
         [vars.accent]: theme.colors.$warning500,
-        [vars.bg]: theme.colors.$warning50,
-        [vars.shadow]: common.shadows(theme).badge.replace('{{color}}', theme.colors.$warning200),
+        [vars.bg]: theme.colors.$warningAlpha50,
+        [vars.borderColor]: theme.colors.$warning200,
       },
     },
   },

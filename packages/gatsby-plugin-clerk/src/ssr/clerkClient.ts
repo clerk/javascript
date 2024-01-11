@@ -6,8 +6,7 @@ const clerkClient = createClerkClient({
   secretKey: SECRET_KEY,
   apiUrl: API_URL,
   apiVersion: API_VERSION,
-  // TODO: Fetch version from package.json
-  userAgent: 'gatsby-plugin-clerk',
+  userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
   sdkMetadata: SDK_METADATA,
   telemetry: {
     disabled: TELEMETRY_DISABLED,

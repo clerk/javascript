@@ -14,7 +14,7 @@ describe('useRoutingProps()', () => {
     console.error = originalError;
   });
 
-  it('throws error without routing & path props', () => {
+  it('defaults to path routing and a path prop is required', () => {
     const TestingComponent = props => {
       const options = useRoutingProps('TestingComponent', props);
       return <div>{JSON.stringify(options)}</div>;
@@ -22,18 +22,18 @@ describe('useRoutingProps()', () => {
 
     expect(() => {
       render(<TestingComponent />);
-    }).toThrowError('<TestingComponent/> is missing a path prop to work with path based routing');
+    }).toThrowError(/@clerk\/clerk-react: The <TestingComponent\/> component uses path-based routing by default/);
   });
 
-  it('returns path routing with passed props and options if path prop is passed', () => {
+  it('the path option is ignored when "hash" routing prop', () => {
     const TestingComponent = props => {
-      const options = useRoutingProps('TestingComponent', props);
+      const options = useRoutingProps('TestingComponent', props, { path: '/path-option' });
       return <div>{JSON.stringify(options)}</div>;
     };
 
     const { baseElement } = render(
       <TestingComponent
-        path='/aloha'
+        routing='hash'
         prop1='1'
         prop2='2'
       />,
@@ -41,9 +41,9 @@ describe('useRoutingProps()', () => {
     expect(baseElement).toMatchSnapshot();
   });
 
-  it('returns passed props and options for routing different than path', () => {
+  it('the path option is ignored when "virtual" routing prop', () => {
     const TestingComponent = props => {
-      const options = useRoutingProps('TestingComponent', props);
+      const options = useRoutingProps('TestingComponent', props, { path: '/path-option' });
       return <div>{JSON.stringify(options)}</div>;
     };
 
@@ -57,32 +57,53 @@ describe('useRoutingProps()', () => {
     expect(baseElement).toMatchSnapshot();
   });
 
-  it('returns passed props and options if path is passed from routing options', () => {
+  it('throws error when "hash" routing and path prop are set', () => {
     const TestingComponent = props => {
-      const options = useRoutingProps('TestingComponent', props, { path: '/aloha' });
+      const options = useRoutingProps('TestingComponent', props);
       return <div>{JSON.stringify(options)}</div>;
     };
 
-    const { baseElement } = render(
-      <TestingComponent
-        prop1='1'
-        prop2='2'
-      />,
+    expect(() => {
+      render(
+        <TestingComponent
+          routing='hash'
+          path='/path-prop'
+        />,
+      );
+    }).toThrowError(
+      /@clerk\/clerk-react: The `path` prop will only be respected when the Clerk component uses path-based routing/,
     );
-    expect(baseElement).toMatchSnapshot();
   });
 
-  it('returns passed props but omits path prop if path is passed from routing options and a routing strategy other than path is specified', () => {
+  it('throws error when "virtual" routing and path prop are set', () => {
     const TestingComponent = props => {
-      const options = useRoutingProps('TestingComponent', props, { path: '/aloha' });
+      const options = useRoutingProps('TestingComponent', props);
+      return <div>{JSON.stringify(options)}</div>;
+    };
+
+    expect(() => {
+      render(
+        <TestingComponent
+          routing='virtual'
+          path='/path'
+        />,
+      );
+    }).toThrowError(
+      /@clerk\/clerk-react: The `path` prop will only be respected when the Clerk component uses path-based routing/,
+    );
+  });
+
+  it('path prop has priority over path option', () => {
+    const TestingComponent = props => {
+      const options = useRoutingProps('TestingComponent', props, { path: '/path-option' });
       return <div>{JSON.stringify(options)}</div>;
     };
 
     const { baseElement } = render(
       <TestingComponent
+        path='/path-prop'
         prop1='1'
         prop2='2'
-        routing='virtual'
       />,
     );
     expect(baseElement).toMatchSnapshot();

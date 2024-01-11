@@ -8,7 +8,20 @@ import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 export const Actions = (props: PropsOfComponent<typeof Flex>) => {
-  return <Col {...props} />;
+  const { sx, ...rest } = props;
+  return (
+    <Col
+      sx={[
+        {
+          '> button:last-of-type': {
+            borderBottom: 'none',
+          },
+        },
+        sx,
+      ]}
+      {...rest}
+    />
+  );
 };
 
 export const SecondaryActions = (props: PropsOfComponent<typeof Flex>) => {
@@ -65,7 +78,6 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
       sx={[
         t => ({
           borderRadius: t.radii.$lg,
-          borderBottom: 'none',
           gap: 0,
           justifyContent: 'center',
           padding: `${t.space.$1} ${t.space.$1x5}`,
@@ -117,7 +129,6 @@ export const SmallAction = (props: ActionProps) => {
       sx={[
         t => ({
           borderRadius: t.radii.$lg,
-          borderBottom: 'none',
           gap: t.space.$0x5,
           justifyContent: 'center',
           flex: '1 1 0',
@@ -172,7 +183,7 @@ export const Action = (props: ActionProps) => {
   return (
     <Button
       size='md'
-      variant='ghostAction'
+      variant='ghost'
       textVariant='buttonLarge'
       hoverAsFocus
       focusRing={false}

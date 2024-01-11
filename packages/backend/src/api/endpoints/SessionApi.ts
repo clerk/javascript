@@ -49,11 +49,9 @@ export class SessionAPI extends AbstractAPI {
 
   public async getToken(sessionId: string, template: string) {
     this.requireId(sessionId);
-    return (
-      (await this.request<Token>({
-        method: 'POST',
-        path: joinPaths(basePath, sessionId, 'tokens', template || ''),
-      })) as any
-    ).jwt;
+    return this.request<Token>({
+      method: 'POST',
+      path: joinPaths(basePath, sessionId, 'tokens', template || ''),
+    });
   }
 }
