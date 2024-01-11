@@ -1,3 +1,5 @@
+import { colorOptionToHslaAlphaScale } from '../utils/colorOptionToHslaScale';
+
 export const whiteAlpha = Object.freeze({
   whiteAlpha25: 'hsla(0, 0%, 100%, 0.02)',
   whiteAlpha50: 'hsla(0, 0%, 100%, 0.03)',
@@ -64,6 +66,7 @@ export const colors = Object.freeze({
   primary700: '#25232A',
   primary800: '#201D23',
   primary900: '#1B171C',
+  ...colorOptionToHslaAlphaScale('#2F3037', 'primaryAlpha'),
   danger50: '#FEF2F2',
   danger100: '#FEE5E5',
   danger200: '#FECACA',
@@ -75,6 +78,7 @@ export const colors = Object.freeze({
   danger800: '#991B1B',
   danger900: '#7F1D1D',
   danger950: '#450A0A',
+  ...colorOptionToHslaAlphaScale('#EF4444', 'dangerAlpha'),
   warning50: '#FFF6ED',
   warning100: '#FFEBD5',
   warning200: '#FED1AA',
@@ -86,6 +90,7 @@ export const colors = Object.freeze({
   warning800: '#9A2F12',
   warning900: '#7C2912',
   warning950: '#431207',
+  ...colorOptionToHslaAlphaScale('#F36B16', 'warningAlpha'),
   success50: '#F0FDF2',
   success100: '#DCFCE2',
   success200: '#BBF7C6',
@@ -97,4 +102,5 @@ export const colors = Object.freeze({
   success800: '#166527',
   success900: '#145323',
   success950: '#052E0F',
+  ...colorOptionToHslaAlphaScale('#22C543', 'successAlpha'),
 } as const);

@@ -2,16 +2,25 @@ import type { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
-import { colors, fromEntries, removeUndefinedProps } from '../utils';
-import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from './colorOptionToHslaScale';
+import {
+  colorOptionToHslaAlphaScale,
+  colorOptionToHslaLightnessScale,
+  colors,
+  fromEntries,
+  removeUndefinedProps,
+} from '../utils';
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
   return removeUndefinedProps({
     ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
+    ...colorOptionToHslaAlphaScale(variables.colorPrimary, 'primaryAlpha'),
     ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
+    ...colorOptionToHslaAlphaScale(variables.colorDanger, 'dangerAlpha'),
     ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
+    ...colorOptionToHslaAlphaScale(variables.colorSuccess, 'successAlpha'),
     ...colorOptionToHslaLightnessScale(variables.colorWarning, 'warning'),
+    ...colorOptionToHslaAlphaScale(variables.colorWarning, 'warningAlpha'),
     ...colorOptionToHslaAlphaScale(variables.colorAlphaShade, 'blackAlpha'),
     colorText: toHSLA(variables.colorText),
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),

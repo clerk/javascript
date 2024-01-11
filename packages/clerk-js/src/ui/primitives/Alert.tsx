@@ -13,7 +13,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     colorScheme: {
       danger: {
         color: theme.colors.$danger500,
-        backgroundColor: theme.colors.$danger50,
+        backgroundColor: theme.colors.$dangerAlpha50,
         ...common.borderVariants(theme, {
           hasError: true,
         }).normal,

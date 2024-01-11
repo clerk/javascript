@@ -1,6 +1,7 @@
 import type { ColorScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
-import { colors, fromEntries } from '../utils';
+import { colors } from './colors';
+import { fromEntries } from './fromEntries';
 
 type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;
 
