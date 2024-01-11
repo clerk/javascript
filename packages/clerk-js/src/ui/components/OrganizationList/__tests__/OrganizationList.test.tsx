@@ -206,7 +206,7 @@ describe('OrganizationList', () => {
 
       // Form fields of CreateOrganizationForm not to be there
       expect(queryByText(/logo/i)).not.toBeInTheDocument();
-      expect(queryByText('Recommend size 1:1, upto 10MB.')).not.toBeInTheDocument();
+      expect(queryByText('Recommended size 1:1, up to 10MB.')).not.toBeInTheDocument();
       expect(queryByRole('button', { name: 'Upload' })).not.toBeInTheDocument();
       expect(queryByLabelText(/name/i)).not.toBeInTheDocument();
       expect(queryByLabelText(/slug/i)).not.toBeInTheDocument();
@@ -215,7 +215,7 @@ describe('OrganizationList', () => {
       expect(queryByRole('heading', { name: /Create organization/i })).toBeInTheDocument();
       // Form fields of CreateOrganizationForm
       expect(queryByText(/logo/i)).toBeInTheDocument();
-      expect(queryByText('Recommend size 1:1, upto 10MB.')).toBeInTheDocument();
+      expect(queryByText('Recommended size 1:1, up to 10MB.')).toBeInTheDocument();
       expect(queryByRole('button', { name: 'Upload' })).toBeInTheDocument();
       expect(queryByLabelText(/name/i)).toBeInTheDocument();
       expect(queryByLabelText(/slug/i)).toBeInTheDocument();
