@@ -28,6 +28,10 @@
 
 ---
 
+### ⚠️ Important Notice:
+
+**Clerk officially maintains only the `en-US` (English - United States) locale. All other language translations provided within this package are community contributions.**
+
 ## Overview
 
 Clerk offers the ability to override the strings for all of the elements in each of the Clerk Components. This allows you to provide localization for your users or change the wording to suit your brand.
