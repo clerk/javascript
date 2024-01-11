@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals';
-import React from 'react';
 
-import { render, screen, waitFor } from '../../../../testUtils';
+import { render, waitFor } from '../../../../testUtils';
+import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { EmailsSection } from '../EmailsSection';
 
@@ -11,108 +11,79 @@ const initConfig = createFixtures.config(f => {
   f.withUser({ username: 'georgeclerk' });
 });
 
-//TODO-RETHEME
-describe.skip('EmailSection', () => {
-  it('renders the component', async () => {
-    const { wrapper } = await createFixtures(initConfig);
+describe('EmailSection', () => {
+  it('renders the section', async () => {
+    const emails = ['test@clerk.com', 'test2@clerk.com'];
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress();
+      f.withUser({
+        email_addresses: emails,
+        first_name: 'George',
+        last_name: 'Clerk',
+      });
+    });
+    fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-    render(<EmailsSection />, { wrapper });
+    const { getByText } = render(
+      <CardStateProvider>
+        <EmailsSection />
+      </CardStateProvider>,
+      { wrapper },
+    );
+    getByText(/Email addresses/i);
+    emails.forEach(email => getByText(email));
   });
 
-  describe('EmailForm', () => {
-    it('shows add email ', async () => {
+  describe('Add email', () => {
+    it('renders add email screen', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      render(<EmailsSection />, { wrapper });
+      const { getByRole, userEvent, getByLabelText, getByText } = render(<EmailsSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Add an email address' }));
+      await waitFor(() => getByRole('heading', { name: /Add email address/i }));
 
-      screen.getByRole('heading', { name: /add email address/i });
+      getByLabelText(/email address/i);
+      getByText('An email containing a verification code will be sent to this email address.');
     });
 
-    describe('Inputs', () => {
-      it('shows the input field for the new email address', async () => {
-        const { wrapper } = await createFixtures(initConfig);
+    it('create a new email number', async () => {
+      const { wrapper, fixtures } = await createFixtures(initConfig);
 
-        render(<EmailsSection />, { wrapper });
+      const { getByRole, userEvent, getByLabelText } = render(<EmailsSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Add an email address' }));
+      await waitFor(() => getByRole('heading', { name: /Add email address/i }));
 
-        screen.getByLabelText(/email address/i);
-      });
+      fixtures.clerk.user?.createEmailAddress.mockReturnValueOnce(Promise.resolve({} as any));
+
+      await userEvent.type(getByLabelText(/email address/i), 'test+2@clerk.com');
+      await userEvent.click(getByRole('button', { name: /save$/i }));
+      expect(fixtures.clerk.user?.createEmailAddress).toHaveBeenCalledWith({ email: 'test+2@clerk.com' });
     });
 
     describe('Form buttons', () => {
-      it('navigates to the root page upon pressing cancel', async () => {
-        const { wrapper, fixtures } = await createFixtures(initConfig);
-
-        const { userEvent } = render(<EmailsSection />, { wrapper });
-
-        await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-        expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
-      });
-
-      it('continue button is disabled by default', async () => {
+      it('save button is disabled by default', async () => {
         const { wrapper } = await createFixtures(initConfig);
-        render(<EmailsSection />, { wrapper });
+        const { getByRole, userEvent, getByText } = render(<EmailsSection />, { wrapper });
+        await userEvent.click(getByRole('button', { name: 'Add an email address' }));
+        await waitFor(() => getByRole('heading', { name: /Add email address/i }));
 
-        expect(screen.getByText(/continue/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
+        expect(getByText(/save$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
       });
+      it('hides screen when when pressing cancel', async () => {
+        const { wrapper } = await createFixtures(initConfig);
 
-      it('calls the appropriate function if continue is pressed', async () => {
-        const { wrapper, fixtures } = await createFixtures(initConfig);
-        fixtures.clerk.user!.createEmailAddress.mockReturnValueOnce(Promise.resolve({} as any));
-        const { userEvent } = render(<EmailsSection />, { wrapper });
+        const { userEvent, getByRole, queryByRole } = render(<EmailsSection />, { wrapper });
+        await userEvent.click(getByRole('button', { name: 'Add an email address' }));
+        await waitFor(() => getByRole('heading', { name: /Add email address/i }));
+        expect(queryByRole('button', { name: /Add an email address/i })).not.toBeInTheDocument();
 
-        await userEvent.type(screen.getByLabelText(/email address/i), 'test+2@clerk.com');
-        await userEvent.click(screen.getByText(/continue/i));
-        expect(fixtures.clerk.user?.createEmailAddress).toHaveBeenCalledWith({ email: 'test+2@clerk.com' });
+        await userEvent.click(getByRole('button', { name: /cancel$/i }));
+        await waitFor(() => getByRole('button', { name: /Add an email address/i }));
+        expect(queryByRole('heading', { name: /Add email address/i })).not.toBeInTheDocument();
       });
     });
   });
 
-  describe('RemoveEmailForm', () => {
-    it('renders the component', async () => {
-      const { wrapper } = await createFixtures(initConfig);
-
-      render(<EmailsSection />, { wrapper });
-    });
-
-    it('shows the title', async () => {
-      const { wrapper } = await createFixtures(initConfig);
-
-      render(<EmailsSection />, { wrapper });
-
-      screen.getByRole('heading', { name: /remove email address/i });
-    });
-
-    describe('User information', () => {
-      it('references the email of the user in the message', async () => {
-        const { wrapper } = await createFixtures(initConfig);
-
-        render(<EmailsSection />, { wrapper });
-
-        screen.getByText(/test@clerk.com/);
-      });
-    });
-
-    describe('Form buttons', () => {
-      it('shows previous content when pressing cancel', async () => {
-        const { wrapper } = await createFixtures(initConfig);
-
-        const { userEvent } = render(<EmailsSection />, { wrapper });
-
-        await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-        waitFor(() => {
-          screen.getByText(/remove email address/i);
-        });
-      });
-
-      it('calls the appropriate function upon pressing continue', async () => {
-        const { wrapper, fixtures } = await createFixtures(initConfig);
-
-        fixtures.clerk.user?.emailAddresses[0].destroy.mockResolvedValue();
-        const { userEvent } = render(<EmailsSection />, { wrapper });
-
-        await userEvent.click(screen.getByRole('button', { name: /continue/i }));
-        expect(fixtures.clerk.user?.emailAddresses[0].destroy).toHaveBeenCalled();
-      });
-    });
-  });
+  // TODO-RETHEME: Test Removal
+  describe('Remove email', () => {});
 });

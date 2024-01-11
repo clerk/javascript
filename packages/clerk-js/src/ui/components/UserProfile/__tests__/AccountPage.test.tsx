@@ -45,24 +45,16 @@ describe('AccountPage', () => {
       expect(button.closest('button')).not.toBeNull();
     });
 
-    it('shows the email addresses section with the email addresses of the user', async () => {
-      const emails = ['test@clerk.com', 'test2@clerk.com'];
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEmailAddress();
+    it('hides email addresses section when disabled', async () => {
+      const { wrapper } = await createFixtures(f => {
         f.withUser({
-          email_addresses: emails,
           first_name: 'George',
           last_name: 'Clerk',
         });
       });
-      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<AccountPage />, { wrapper });
-      screen.getByText(/Email addresses/i);
-      const emailTexts: HTMLElement[] = [];
-      emails.forEach(email => {
-        emailTexts.push(screen.getByText(email));
-      });
+      const { queryByText } = render(<AccountPage />, { wrapper });
+      expect(queryByText(/Email addresses/i)).not.toBeInTheDocument();
     });
 
     it('hides phone number section when disabled', async () => {
