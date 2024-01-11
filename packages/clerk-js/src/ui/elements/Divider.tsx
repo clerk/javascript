@@ -7,15 +7,16 @@ type DividerProps = Omit<PropsOfComponent<typeof Flex>, 'elementDescriptor'> & {
 };
 
 export const Divider = (props: DividerProps) => {
+  const { dividerText, ...rest } = props;
   return (
     <Flex
       center
       elementDescriptor={descriptors.dividerRow}
-      {...props}
+      {...rest}
     >
       <DividerLine />
       <Text
-        localizationKey={!props.dividerText ? localizationKeys('dividerText') : props.dividerText}
+        localizationKey={!dividerText ? localizationKeys('dividerText') : dividerText}
         elementDescriptor={descriptors.dividerText}
         variant='subtitle'
         colorScheme='neutral'

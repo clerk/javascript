@@ -1,3 +1,4 @@
+import type { MouseEventHandler } from 'react';
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
@@ -26,7 +27,10 @@ export const ErrorCard = (props: ErrorCardProps) => {
     window.location.href = `mailto:${supportEmail}`;
   };
 
-  const goBack = () => {
+  const goBack: MouseEventHandler = e => {
+    if (props.onBackLinkClick) {
+      return props.onBackLinkClick(e);
+    }
     void navigate('../');
   };
 
