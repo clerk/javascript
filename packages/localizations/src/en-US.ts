@@ -326,7 +326,7 @@ export const enUS: LocalizationResource = {
     profilePage: {
       title: 'Update profile',
       imageFormTitle: 'Profile image',
-      imageFormSubtitle: 'Update',
+      imageFormSubtitle: 'Upload',
       imageFormDestructiveActionSubtitle: 'Remove',
       fileDropAreaTitle: 'Drag file here, or...',
       fileDropAreaAction: 'Select file',
