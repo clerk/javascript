@@ -1,5 +1,5 @@
 import { describe, it } from '@jest/globals';
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 
 import { render, screen } from '../../../../testUtils';
 import { CardStateProvider } from '../../../elements';
@@ -12,6 +12,19 @@ const initConfig = createFixtures.config(f => {
   f.withPhoneNumber();
   f.withUser({ email_addresses: ['test@clerk.com'] });
 });
+
+const numbers = ['+30 691 1111111', '+30 692 2222222'];
+
+const withNumberCofig = createFixtures.config(f => {
+  f.withPhoneNumber();
+  f.withUser({
+    phone_numbers: numbers,
+  });
+});
+
+const getMenuItemFromText = (element: HTMLElement) => {
+  return element.parentElement?.parentElement?.parentElement?.children?.[1];
+};
 
 describe('PhoneSection', () => {
   it('renders the section', async () => {
@@ -88,8 +101,108 @@ describe('PhoneSection', () => {
     });
   });
 
-  // TODO-RETHEME: Test Removal
-  describe('Remove phone', () => {});
+  describe('Remove phone', () => {
+    it('Renders remove screen', async () => {
+      const number = '+30 691 1111111';
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withUser({
+          phone_numbers: [number],
+          first_name: 'George',
+          last_name: 'Clerk',
+        });
+      });
+
+      const { getByText, userEvent, getByRole } = render(
+        <CardStateProvider>
+          <PhoneSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const item = getByText(number);
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove phone number/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove phone number/i }));
+      await waitFor(() => getByRole('heading', { name: /Remove phone number/i }));
+    });
+
+    it('removes a phone number', async () => {
+      const { wrapper, fixtures } = await createFixtures(withNumberCofig);
+      const { getByText, userEvent, getByRole, queryByRole } = render(
+        <CardStateProvider>
+          <PhoneSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      fixtures.clerk.user?.phoneNumbers[0].destroy.mockResolvedValue();
+
+      const item = getByText(numbers[0]);
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove phone number/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove phone number/i }));
+      await waitFor(() => getByRole('heading', { name: /Remove phone number/i }));
+
+      await userEvent.click(getByRole('button', { name: /save/i }));
+      expect(fixtures.clerk.user?.phoneNumbers[0].destroy).toHaveBeenCalled();
+
+      await waitFor(() => expect(queryByRole('heading', { name: /Remove phone number/i })).not.toBeInTheDocument());
+    });
+
+    describe('Form buttons', () => {
+      it('save button is not disabled by default', async () => {
+        const { wrapper } = await createFixtures(withNumberCofig);
+        const { getByRole, userEvent, getByText } = render(
+          <CardStateProvider>
+            <PhoneSection />
+          </CardStateProvider>,
+          { wrapper },
+        );
+
+        const item = getByText(numbers[0]);
+        const menuButton = getMenuItemFromText(item);
+        await act(async () => {
+          await userEvent.click(menuButton!);
+        });
+
+        getByRole('menuitem', { name: /remove phone number/i });
+        await userEvent.click(getByRole('menuitem', { name: /remove phone number/i }));
+        await waitFor(() => getByRole('heading', { name: /Remove phone number/i }));
+        expect(getByRole('button', { name: /save$/i })).not.toHaveAttribute('disabled');
+      });
+
+      it('hides screen when when pressing cancel', async () => {
+        const { wrapper } = await createFixtures(withNumberCofig);
+        const { getByRole, userEvent, getByText, queryByRole } = render(
+          <CardStateProvider>
+            <PhoneSection />
+          </CardStateProvider>,
+          { wrapper },
+        );
+
+        const item = getByText(numbers[0]);
+        const menuButton = getMenuItemFromText(item);
+        await act(async () => {
+          await userEvent.click(menuButton!);
+        });
+
+        getByRole('menuitem', { name: /remove phone number/i });
+        await userEvent.click(getByRole('menuitem', { name: /remove phone number/i }));
+        await waitFor(() => getByRole('heading', { name: /Remove phone number/i }));
+        await userEvent.click(screen.getByRole('button', { name: /cancel$/i }));
+        expect(queryByRole('heading', { name: /Remove phone number/i })).not.toBeInTheDocument();
+      });
+    });
+  });
 
   it.todo('Test for verification of added phone number');
 });
