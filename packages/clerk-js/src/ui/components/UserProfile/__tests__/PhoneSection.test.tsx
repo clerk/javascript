@@ -1,7 +1,8 @@
 import { describe, it } from '@jest/globals';
-import React from 'react';
+import { waitFor } from '@testing-library/react';
 
 import { render, screen } from '../../../../testUtils';
+import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { PhoneSection } from '../PhoneSection';
 
@@ -12,112 +13,83 @@ const initConfig = createFixtures.config(f => {
   f.withUser({ email_addresses: ['test@clerk.com'] });
 });
 
-//TODO-RETHEME
-describe.skip('PhoneForm', () => {
-  it('renders the component', async () => {
-    const { wrapper } = await createFixtures(initConfig);
+describe('PhoneSection', () => {
+  it('renders the section', async () => {
+    const numbers = ['+30 691 1111111', '+30 692 2222222'];
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withPhoneNumber();
+      f.withUser({
+        phone_numbers: numbers,
+        first_name: 'George',
+        last_name: 'Clerk',
+      });
+    });
+    fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
 
-    render(<PhoneSection />, { wrapper });
+    const { getByText } = render(
+      <CardStateProvider>
+        <PhoneSection />
+      </CardStateProvider>,
+      { wrapper },
+    );
+    getByText(/Phone numbers/i);
+    numbers.forEach(number => getByText(number));
   });
 
-  it('shows the title', async () => {
-    const { wrapper } = await createFixtures(initConfig);
-
-    render(<PhoneSection />, { wrapper });
-
-    screen.getByRole('heading', { name: /add phone number/i });
-  });
-
-  describe('Inputs', () => {
-    it('shows the input field for the new phone number', async () => {
+  describe('Add phone', () => {
+    it('renders add phone screen', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      render(<PhoneSection />, { wrapper });
+      const { getByRole, userEvent, getByLabelText, getByText } = render(<PhoneSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Add a phone number' }));
+      await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
 
-      screen.getByLabelText(/phone number/i);
+      getByLabelText(/phone number/i);
+      getByText(/A text message containing a verification link will be sent to this phone number./i);
+      getByText(/Message and data rates may apply./i);
     });
-  });
 
-  describe('Form buttons', () => {
-    it('navigates to the root page upon pressing cancel', async () => {
+    it('create a new phone number', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
-      const { userEvent } = render(<PhoneSection />, { wrapper });
+      const { getByRole, userEvent, getByLabelText } = render(<PhoneSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Add a phone number' }));
+      await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
 
-      await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
-    });
-
-    it('continue button is disabled by default', async () => {
-      const { wrapper } = await createFixtures(initConfig);
-      render(<PhoneSection />, { wrapper });
-
-      expect(screen.getByText(/continue/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
-    });
-
-    it('calls the appropriate function if continue is pressed', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
       fixtures.clerk.user?.createPhoneNumber.mockReturnValueOnce(Promise.resolve({} as any));
-      const { userEvent } = render(<PhoneSection />, { wrapper });
 
-      await userEvent.type(screen.getByLabelText(/phone number/i), '6911111111');
-      await userEvent.click(screen.getByText(/continue/i));
+      await userEvent.type(getByLabelText(/phone number/i), '6911111111');
+      await userEvent.click(getByRole('button', { name: /save$/i }));
       expect(fixtures.clerk.user?.createPhoneNumber).toHaveBeenCalledWith({ phoneNumber: '+16911111111' }); //default is +1
     });
+
+    describe('Form buttons', () => {
+      it('save button is disabled by default', async () => {
+        const { wrapper } = await createFixtures(initConfig);
+        const { getByRole, userEvent } = render(<PhoneSection />, { wrapper });
+        await userEvent.click(getByRole('button', { name: 'Add a phone number' }));
+        await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
+
+        expect(screen.getByText(/save$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
+      });
+
+      it('hides screen when when pressing cancel', async () => {
+        const { wrapper } = await createFixtures(initConfig);
+
+        const { userEvent, getByRole, queryByRole } = render(<PhoneSection />, { wrapper });
+        await userEvent.click(getByRole('button', { name: /Add a phone number/i }));
+        await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
+        expect(queryByRole('button', { name: /Add a phone number/i })).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', { name: /cancel$/i }));
+        await waitFor(() => getByRole('button', { name: /Add a phone number/i }));
+        expect(queryByRole('heading', { name: /Add phone number/i })).not.toBeInTheDocument();
+      });
+    });
   });
+
+  // TODO-RETHEME: Test Removal
+  describe('Remove phone', () => {});
 
   it.todo('Test for verification of added phone number');
-});
-
-//TODO-RETHEME
-describe.skip('RemovePhoneForm', () => {
-  it('renders the component', async () => {
-    const { wrapper, fixtures } = await createFixtures(initConfig);
-
-    fixtures.router.params.id = 'id';
-    render(<PhoneSection />, { wrapper });
-  });
-
-  it('shows the title', async () => {
-    const { wrapper, fixtures } = await createFixtures(initConfig);
-
-    fixtures.router.params.id = 'id';
-    render(<PhoneSection />, { wrapper });
-
-    screen.getByRole('heading', { name: /remove phone number/i });
-  });
-
-  describe('User information', () => {
-    it('references the phone number of the user in the message', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
-
-      fixtures.router.params.id = 'id';
-      render(<PhoneSection />, { wrapper });
-
-      screen.getByText(/\+30 691 1111111/);
-    });
-  });
-
-  describe('Form buttons', () => {
-    it('navigates to the root page when pressing cancel', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
-
-      fixtures.router.params.id = 'id';
-      const { userEvent } = render(<PhoneSection />, { wrapper });
-
-      await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
-    });
-
-    it('calls the appropriate function upon pressing continue', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
-
-      fixtures.router.params.id = 'id';
-      fixtures.clerk.user?.phoneNumbers[0].destroy.mockResolvedValue();
-      const { userEvent } = render(<PhoneSection />, { wrapper });
-
-      await userEvent.click(screen.getByRole('button', { name: /continue/i }));
-      expect(fixtures.clerk.user?.phoneNumbers[0].destroy).toHaveBeenCalled();
-    });
-  });
 });
