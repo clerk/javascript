@@ -20,6 +20,7 @@ export const MembershipWidget = () => {
   }
 
   const totalCount = organization?.membersCount + organization?.pendingInvitationsCount;
+  const limit = runIfFunctionOrReturn(__unstable_manageBillingMembersLimit);
 
   return (
     <Flex
@@ -39,11 +40,13 @@ export const MembershipWidget = () => {
           gap: t.space.$2,
         })}
       >
-        <Gauge
-          limit={runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)}
-          value={totalCount}
-          size='xs'
-        />
+        {limit > 0 && (
+          <Gauge
+            limit={limit}
+            value={totalCount}
+            size='xs'
+          />
+        )}
         <Flex
           sx={t => ({
             [mqu.sm]: {
@@ -52,8 +55,8 @@ export const MembershipWidget = () => {
             gap: t.space.$0x5,
           })}
         >
-          <Text>You can invite up to {runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)} members.</Text>
-          {runIfFunctionOrReturn(__unstable_manageBillingMembersLimit) > 0 && (
+          <Text>You can invite {__unstable_manageBillingMembersLimit ? `up to ${limit}` : 'unlimited'} members.</Text>
+          {limit > 0 && (
             <Link
               sx={t => ({
                 fontWeight: t.fontWeights.$medium,
