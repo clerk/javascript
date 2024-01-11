@@ -1,13 +1,19 @@
 import type {
   AttemptFirstFactorParams,
   AuthenticateWithRedirectParams,
+  EmailCodeAttempt,
   HandleOAuthCallbackParams,
   HandleSamlCallbackParams,
+  PasswordAttempt,
+  PhoneCodeAttempt,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
+  ResetPasswordEmailCodeAttempt,
+  ResetPasswordPhoneCodeAttempt,
   SignInFirstFactor,
   SignInResource,
   SignInSecondFactor,
+  Web3Attempt,
 } from '@clerk/types';
 import { fromPromise } from 'xstate';
 
@@ -87,21 +93,63 @@ export const attemptFirstFactor = fromPromise<SignInResource, AttemptFirstFactor
   }) => {
     assertIsDefined(currentFactor);
 
-    let params;
+    let attemptParams: AttemptFirstFactorParams;
 
-    if (currentFactor.strategy === 'password') {
-      params = {
-        strategy: 'password',
-        password: fields.get('password')?.value as string,
-      };
-    } else {
-      params = {
-        strategy: currentFactor.strategy,
-        code: fields.get('code')?.value as string,
-      };
+    const strategy = currentFactor.strategy;
+    const code = fields.get('code')?.value as string | undefined;
+    const password = fields.get('password')?.value as string | undefined;
+
+    switch (strategy) {
+      case 'password': {
+        assertIsDefined(password);
+
+        attemptParams = {
+          strategy,
+          password,
+        } satisfies PasswordAttempt;
+
+        break;
+      }
+      case 'reset_password_phone_code':
+      case 'reset_password_email_code': {
+        assertIsDefined(code);
+        assertIsDefined(password);
+
+        attemptParams = {
+          strategy,
+          code,
+          password,
+        } satisfies ResetPasswordPhoneCodeAttempt | ResetPasswordEmailCodeAttempt;
+
+        break;
+      }
+      case 'phone_code':
+      case 'email_code': {
+        assertIsDefined(code);
+
+        attemptParams = {
+          strategy,
+          code,
+        } satisfies PhoneCodeAttempt | EmailCodeAttempt;
+
+        break;
+      }
+      case 'web3_metamask_signature': {
+        const signature = fields.get('signature')?.value as string | undefined;
+        assertIsDefined(signature);
+
+        attemptParams = {
+          strategy,
+          signature,
+        } satisfies Web3Attempt;
+
+        break;
+      }
+      default:
+        throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
     }
 
-    return client.signIn.attemptFirstFactor(params as AttemptFirstFactorParams);
+    return client.signIn.attemptFirstFactor(attemptParams);
   },
 );
 

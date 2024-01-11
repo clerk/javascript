@@ -35,7 +35,6 @@ export interface SignInMachineContext extends MachineContext {
   currentFactor: SignInFactor | null;
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
-  mode: 'browser' | 'server';
   resource: SignInResource | null;
   router: ClerkRouter;
 }
@@ -92,7 +91,7 @@ export const SignInMachine = setup({
         determineStartingSignInFactor(
           context.clerk.client.signIn.supportedFirstFactors,
           context.clerk.client.signIn.identifier,
-          context.clerk.__unstable__environment.displayConfig.preferredSignInStrategy,
+          context.clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
         ),
     }),
     assignStartingSecondFactor: assign({
@@ -166,7 +165,6 @@ export const SignInMachine = setup({
     clerk: input.clerk,
     currentFactor: null,
     formRef: input.form,
-    mode: input.clerk.mode,
     resource: null,
     router: input.router,
   }),
