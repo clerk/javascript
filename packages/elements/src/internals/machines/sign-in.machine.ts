@@ -203,7 +203,7 @@ export const SignInMachine = setup({
         },
         {
           description: 'Go to SSO Callback state',
-          guard: and(['needsSecondFactor', { type: 'isCurrentPath', params: { path: '/sign-in/sso-callback' } }]),
+          guard: { type: 'isCurrentPath', params: { path: '/sign-in/sso-callback' } },
           target: 'SSOCallbackRunning',
         },
         {
@@ -488,7 +488,6 @@ export const SignInMachine = setup({
 
           return {
             clerk: context.clerk,
-            environment: context.clerk.__unstable__environment,
             strategy: event.strategy,
           };
         },
