@@ -19,7 +19,7 @@ import {
 import { Portal } from '../../elements/Portal';
 import { Eye } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
-import { common, InternalThemeProvider, mqu } from '../../styledSystem';
+import { InternalThemeProvider, mqu } from '../../styledSystem';
 
 type EyeCircleProps = PropsOfComponent<typeof Col> & {
   width: string;
@@ -188,7 +188,7 @@ const _ImpersonationFab = () => {
           top: `var(${topProperty}, ${defaultTop}px)`,
           right: `var(${rightProperty}, ${defaultRight}px)`,
           zIndex: t.zIndices.$fab,
-          boxShadow: common.shadows(t).fabShadow,
+          boxShadow: t.shadows.$fabShadow,
           borderRadius: t.radii.$halfHeight, //to match the circular eye perfectly
           backgroundColor: t.colors.$white,
           fontFamily: t.fonts.$main,

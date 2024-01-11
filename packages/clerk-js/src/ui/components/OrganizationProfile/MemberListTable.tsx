@@ -169,8 +169,11 @@ export const RoleSelect = (props: {
           isSelected={isSelected}
           option={option}
           sx={theme => ({
-            '&:hover, &[data-focused="true"]': {
-              backgroundColor: theme.colors.$blackAlpha200,
+            '&:hover': {
+              backgroundColor: theme.colors.$blackAlpha100,
+            },
+            '&[data-focused="true"]': {
+              backgroundColor: theme.colors.$blackAlpha150,
             },
           })}
         />

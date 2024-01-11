@@ -2,7 +2,6 @@ import React, { forwardRef } from 'react';
 
 import { useAppearance } from '../customizables';
 import type { ThemableCssProp } from '../styledSystem';
-import { common } from '../styledSystem';
 
 /**
  * This HOC is used to add the hover selector for the avatar shimmer effect to its immediate child.
@@ -21,7 +20,7 @@ export const withAvatarShimmer = <T extends { sx?: ThemableCssProp }>(Component:
           parsedLayout.shimmer
             ? t => ({
                 ':hover': {
-                  '--cl-shimmer-hover-shadow': common.shadows(t).shadowShimmer,
+                  '--cl-shimmer-hover-shadow': t.shadows.$shadowShimmer,
                   '--cl-shimmer-hover-transform': 'skew(-45deg) translateX(600%)',
                   '--cl-shimmer-hover-after-transform': 'skewX(45deg) translateX(-150%)',
                 },

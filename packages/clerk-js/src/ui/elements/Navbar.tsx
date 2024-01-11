@@ -8,7 +8,7 @@ import { useNavigateToFlowStart, usePopover } from '../hooks';
 import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations, common, mqu } from '../styledSystem';
+import { animations, mqu } from '../styledSystem';
 import { colors } from '../utils';
 import { Card } from './Card';
 import { withFloatingTree } from './contexts';
@@ -231,7 +231,7 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
             borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
             padding: `${t.space.$10} ${t.space.$6}`,
             animation: `${animations.navbarSlideIn} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-            boxShadow: common.shadows(t).cardContentShadow,
+            boxShadow: t.shadows.$cardContentShadow,
           })}
         >
           {props.children}
