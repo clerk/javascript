@@ -8,6 +8,26 @@ import { name, version } from './package.json';
 export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
   const shouldPublish = !!overrideOptions.env?.publish;
+  const isTest = !!overrideOptions.env?.test;
+
+  if (isTest) {
+    return {
+      entry: ['./src/**/*.{ts,js}'],
+      outDir: 'tests/dist/',
+      define: {
+        PACKAGE_NAME: `"${name}"`,
+        // use "test" instead of actual package version to avoid updating the tests
+        // depending on it (eg userAgent related) on every version bump
+        PACKAGE_VERSION: `"test"`,
+        __DEV__: `${isWatch}`,
+      },
+      external: ['#crypto'],
+      clean: true,
+      minify: false,
+      tsconfig: 'tsconfig.test.json',
+      format: 'cjs',
+    };
+  }
 
   const common: Options = {
     entry: ['src/index.ts', 'src/errors.ts', 'src/internal.ts', 'src/jwt/index.ts'],
