@@ -56,3 +56,4 @@ export * from './InformationBox';
 export * from './withAvatarShimmer';
 export * from './Card';
 export * from './ProfileCard';
+export * from './Gauge';
