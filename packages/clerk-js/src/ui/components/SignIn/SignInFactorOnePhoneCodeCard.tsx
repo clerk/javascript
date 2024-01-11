@@ -16,7 +16,7 @@ export const SignInFactorOnePhoneCodeCard = (props: SignInFactorOnePhoneCodeCard
         {...props}
         cardTitle={localizationKeys('signIn.phoneCode.title')}
         cardSubtitle={localizationKeys('signIn.phoneCode.subtitle', { applicationName })}
-        inputLabel={localizationKeys('signIn.phoneCode.inputLabel')}
+        inputLabel={localizationKeys('signIn.phoneCode.formTitle')}
         resendButton={localizationKeys('signIn.phoneCode.resendButton')}
       />
     </Flow.Part>

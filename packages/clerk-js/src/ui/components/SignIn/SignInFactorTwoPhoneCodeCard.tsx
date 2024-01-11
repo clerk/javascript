@@ -23,9 +23,7 @@ export const SignInFactorTwoPhoneCodeCard = (props: SignInFactorTwoPhoneCodeCard
         {...props}
         cardTitle={localizationKeys('signIn.phoneCodeMfa.title')}
         cardSubtitle={localizationKeys('signIn.phoneCodeMfa.subtitle')}
-        formTitle={localizationKeys('signIn.phoneCodeMfa.formTitle')}
-        formSubtitle={localizationKeys('signIn.phoneCodeMfa.formSubtitle')}
-        inputLabel={localizationKeys('signIn.phoneCodeMfa.inputLabel')}
+        inputLabel={localizationKeys('signIn.phoneCodeMfa.formTitle')}
         resendButton={localizationKeys('signIn.phoneCodeMfa.resendButton')}
         prepare={prepare}
       />

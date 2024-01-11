@@ -36,8 +36,6 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
       <SignUpVerificationCodeForm
         cardTitle={localizationKeys('signUp.phoneCode.title')}
         cardSubtitle={localizationKeys('signUp.phoneCode.subtitle')}
-        formTitle={localizationKeys('signUp.phoneCode.formTitle')}
-        formSubtitle={localizationKeys('signUp.phoneCode.formSubtitle')}
         resendButton={localizationKeys('signUp.phoneCode.resendButton')}
         prepare={prepare}
         attempt={attempt}
