@@ -44,7 +44,7 @@ export const StrategiesContext = createContext<StrategiesContextValue>({
 /**
  * Selects the clerk environment
  */
-const clerkEnvironmentSelector = (state: SnapshotState) => state.context.environment;
+const clerkEnvironmentSelector = (state: SnapshotState) => state.context.clerk.__unstable__environment;
 
 /**
  * Selects the clerk environment
@@ -96,7 +96,7 @@ export function useSignInStrategies(_preferred?: SignInStrategy) {
 /**
  * Provides the onClick handler for oauth
  */
-export const useThirdPartyProviders = () => {
+export const useSignInThirdPartyProviders = () => {
   const ref = useSignInFlow();
   const env = useSignInFlowSelector(clerkEnvironmentSelector);
   const providers = useMemo(() => env && getEnabledThirdPartyProviders(env), [env]);

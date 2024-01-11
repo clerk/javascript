@@ -4,7 +4,6 @@ import { useNextRouter } from '~/react/router/next';
 
 /** Common Components */
 export { Errors, Field, FieldState, Form, Input, Label, Submit } from '~/react/common/form';
-export { SocialProviders } from '~/react/common/social-providers';
 
 /** Sign In Components */
 export {
@@ -12,6 +11,7 @@ export {
   SignInStart,
   SignInFactorOne,
   SignInFactorTwo,
+  SignInSocialProviders,
   SignInSSOCallback,
   SignInStrategies,
   SignInStrategy,

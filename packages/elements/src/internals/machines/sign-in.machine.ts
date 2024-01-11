@@ -1,7 +1,6 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type {
-  EnvironmentResource,
   LoadedClerk,
   OAuthStrategy,
   PrepareFirstFactorParams,
@@ -13,7 +12,7 @@ import type {
   Web3Strategy,
 } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
-import { and, assertEvent, assign, not, or, sendTo, setup } from 'xstate';
+import { and, assertEvent, assign, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import type { ClerkRouter } from '~/react/router';
 
@@ -29,15 +28,13 @@ import {
   prepareSecondFactor,
 } from './sign-in.actors';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from './sign-in.utils';
-import { assertActorEventError } from './utils/assert';
+import { assertActorEventDone, assertActorEventError } from './utils/assert';
 
 export interface SignInMachineContext extends MachineContext {
   clerk: LoadedClerk;
   currentFactor: SignInFactor | null;
-  environment?: EnvironmentResource;
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
-  loaded: boolean;
   mode: 'browser' | 'server';
   resource: SignInResource | null;
   router: ClerkRouter;
@@ -53,18 +50,14 @@ export type SignInMachineEvents =
   | ErrorActorEvent
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
   | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
-  | { type: 'NEXT' }
+  | { type: 'FAILURE'; error: Error }
   | { type: 'OAUTH.CALLBACK' }
-  | { type: 'RETRY' }
-  | { type: 'SUBMIT' }
-  | { type: 'NAVIGATE'; path: string };
+  | { type: 'SUBMIT' };
 
-export type SignInTags = 'start' | 'first-factor' | 'second-factor' | 'complete';
 export interface SignInMachineTypes {
   context: SignInMachineContext;
   input: SignInMachineInput;
   events: SignInMachineEvents;
-  tags: SignInTags;
 }
 
 export const SignInMachine = setup({
@@ -88,14 +81,41 @@ export const SignInMachine = setup({
     handleSSOCallback,
   },
   actions: {
+    assignResource: assign(({ event }) => {
+      assertActorEventDone<SignInResource>(event);
+      return {
+        resource: event.output,
+      };
+    }),
+    assignStartingFirstFactor: assign({
+      currentFactor: ({ context }) =>
+        determineStartingSignInFactor(
+          context.clerk.client.signIn.supportedFirstFactors,
+          context.clerk.client.signIn.identifier,
+          context.clerk.__unstable__environment.displayConfig.preferredSignInStrategy,
+        ),
+    }),
+    assignStartingSecondFactor: assign({
+      currentFactor: ({ context }) =>
+        determineStartingSignInSecondFactor(context.clerk.client.signIn.supportedSecondFactors),
+    }),
     debug: ({ context, event }, params?: Record<string, unknown>) => console.dir({ context, event, params }),
+    logError: ({ event }) => {
+      assertActorEventError(event);
+      console.error(event.error);
+    },
     navigateTo({ context }, { path }: { path: string }) {
       context.router.replace(path);
     },
-    setAsActive: ({ context }) => {
-      const beforeEmit = () => {
-        return context.router.push(context.clerk.buildAfterSignInUrl());
+    raiseFailure: raise(({ event }) => {
+      assertActorEventError(event);
+      return {
+        type: 'FAILURE' as const,
+        error: event.error,
       };
+    }),
+    setAsActive: ({ context }) => {
+      const beforeEmit = () => context.router.push(context.clerk.buildAfterSignInUrl());
       void context.clerk.setActive({ session: context.resource?.createdSessionId, beforeEmit });
     },
     setFormErrors: sendTo(
@@ -110,15 +130,14 @@ export const SignInMachine = setup({
     ),
   },
   guards: {
-    hasCurrentFactor: ({ context }) => Boolean(context.currentFactor),
-    isServer: ({ context }) => context.mode === 'server',
-    isBrowser: ({ context }) => context.mode === 'browser',
     isCurrentFactorPassword: ({ context }) => context.currentFactor?.strategy === 'password',
     isCurrentFactorTOTP: ({ context }) => context.currentFactor?.strategy === 'totp',
-    isClerkLoaded: ({ context }) => context.clerk.loaded,
-    isClerkEnvironmentLoaded: ({ context }) => Boolean(context.clerk.__unstable__environment),
-    isSignInComplete: ({ context }) => context?.resource?.status === 'complete',
+    isCurrentPath: ({ context }, params: { path: string }) => {
+      const path = params?.path;
+      return path ? context.router.pathname() === path : false;
+    },
     isLoggedIn: ({ context }) => Boolean(context.clerk.user),
+    isSignInComplete: ({ context }) => context?.resource?.status === 'complete',
     isSingleSessionMode: ({ context }) => Boolean(context.clerk.__unstable__environment?.authConfig.singleSessionMode),
     needsIdentifier: ({ context }) =>
       context.clerk.client.signIn.status === 'needs_identifier' || context.resource?.status === 'needs_identifier',
@@ -146,90 +165,90 @@ export const SignInMachine = setup({
   context: ({ input }) => ({
     clerk: input.clerk,
     currentFactor: null,
-    environment: input.clerk.__unstable__environment,
     formRef: input.form,
-    loaded: input.clerk.loaded,
     mode: input.clerk.mode,
     resource: null,
     router: input.router,
   }),
+  initial: 'Init',
   on: {
-    'OAUTH.CALLBACK': '#SignIn.SSOCallbackRunning',
-  },
-  initial: 'DeterminingState',
-  states: {
-    DeterminingState: {
-      initial: 'Init',
-      states: {
-        Init: {
-          always: [
-            {
-              description: 'Determine if running on the server',
-              guard: 'isServer',
-              target: 'Server',
-            },
-            {
-              description: 'Determine if running on the browser',
-              guard: 'isBrowser',
-              target: 'Browser',
-            },
-          ],
-        },
-        Server: {
-          type: 'final',
-          description: 'Determines the state of the sign-in flow on the server [NOOP]',
-          entry: 'debug',
-        },
-        Browser: {
-          type: 'final',
-          description: 'Determines the state of the sign-in flow on the browser',
-          always: [
-            {
-              description: 'Wait for the Clerk instance to be ready',
-              guard: not('isClerkLoaded'),
-              target: '#SignIn.WaitingForClerk',
-            },
-            {
-              description: 'If sign-in complete or loggedin and single-session, skip to complete',
-              guard: or(['isSignInComplete', and(['isLoggedIn', 'isSingleSessionMode'])]),
-              target: '#SignIn.Complete',
-            },
-            {
-              description: 'If the SignIn resource is empty, invoke the sign-in start flow',
-              guard: not('hasSignInResource'),
-              target: '#SignIn.Start',
-            },
-            {
-              description: 'Default to the initial sign-in flow state',
-              target: '#SignIn.Start',
-            },
-          ],
-        },
-      },
+    FAILURE: {
+      target: '.HavingTrouble',
     },
-    WaitingForClerk: {
-      description: 'Waits for the Clerk instance to be ready.',
-      invoke: {
-        src: 'waitForClerk',
-        input: ({ context }) => context.clerk,
-        onDone: {
-          target: 'DeterminingState',
-          reenter: true,
-          actions: assign({
-            // @ts-expect-error -- this is really IsomorphicClerk up to this point
-            clerk: ({ context }) => context.clerk.clerkjs,
-            environment: ({ context }) => context.clerk.__unstable__environment,
-            loaded: true,
-          }),
+  },
+  states: {
+    Init: {
+      description: 'Ensure that Clerk is loaded and ready',
+      initial: 'WaitForClerk',
+      onDone: [
+        {
+          description: 'If sign-in complete or loggedin and single-session, skip to complete',
+          guard: or(['isSignInComplete', and(['isLoggedIn', 'isSingleSessionMode'])]),
+          target: 'Complete',
+        },
+        {
+          description: 'If the SignIn resource is empty, invoke the sign-in start flow',
+          guard: or([not('hasSignInResource'), { type: 'isCurrentPath', params: { path: '/sign-in' } }]),
+          target: 'Start',
+        },
+        {
+          description: 'Go to FirstFactor flow state',
+          guard: and(['needsFirstFactor', { type: 'isCurrentPath', params: { path: '/sign-in/continue' } }]),
+          target: 'FirstFactor',
+        },
+        {
+          description: 'Go to SecondFactor flow state',
+          guard: and(['needsSecondFactor', { type: 'isCurrentPath', params: { path: '/sign-in/continue' } }]),
+          target: 'SecondFactor',
+        },
+        {
+          description: 'Go to SSO Callback state',
+          guard: { type: 'isCurrentPath', params: { path: '/sign-in/sso-callback' } },
+          target: 'SSOCallbackRunning',
+        },
+        {
+          target: 'Start',
+          actions: log('Init: Default to Start'),
+        },
+      ],
+      states: {
+        WaitForClerk: {
+          invoke: {
+            id: 'waitForClerk',
+            src: 'waitForClerk',
+            input: ({ context }) => context.clerk,
+            onDone: 'Success',
+            onError: {
+              actions: 'raiseFailure',
+            },
+          },
+        },
+        Success: {
+          type: 'final',
         },
       },
     },
     Start: {
+      id: 'Start',
       description: 'The intial state of the sign-in flow.',
       initial: 'AwaitingInput',
       on: {
         'AUTHENTICATE.OAUTH': '#SignIn.InitiatingOAuthAuthentication',
       },
+      onDone: [
+        {
+          guard: 'isSignInComplete',
+          target: 'Complete',
+        },
+        {
+          guard: 'needsFirstFactor',
+          target: 'FirstFactor',
+        },
+        {
+          guard: 'needsSecondFactor',
+          target: 'SecondFactor',
+        },
+      ],
       states: {
         AwaitingInput: {
           description: 'Waiting for user input',
@@ -249,11 +268,7 @@ export const SignInMachine = setup({
               fields: context.formRef.getSnapshot().context.fields,
             }),
             onDone: {
-              actions: [
-                assign({
-                  resource: ({ event }) => event.output,
-                }),
-              ],
+              actions: 'assignResource',
               target: 'Success',
             },
             onError: {
@@ -264,41 +279,22 @@ export const SignInMachine = setup({
         },
         Success: {
           type: 'final',
-          always: [
-            {
-              guard: 'isSignInComplete',
-              target: '#SignIn.Complete',
-            },
-            {
-              guard: 'needsFirstFactor',
-              target: '#SignIn.FirstFactor',
-            },
-            {
-              guard: 'needsSecondFactor',
-              target: '#SignIn.SecondFactor',
-            },
-            {
-              target: '#SignIn.DeterminingState',
-              reenter: true,
-            },
-          ],
-        },
-        Failure: {
-          type: 'final',
-          target: '#SignIn.DeterminingState',
         },
       },
     },
     FirstFactor: {
       initial: 'DeterminingState',
-      entry: assign({
-        currentFactor: ({ context }) =>
-          determineStartingSignInFactor(
-            context.clerk.client.signIn.supportedFirstFactors,
-            context.clerk.client.signIn.identifier,
-            context.environment?.displayConfig.preferredSignInStrategy,
-          ),
-      }),
+      entry: 'assignStartingFirstFactor',
+      onDone: [
+        {
+          guard: 'isSignInComplete',
+          target: 'Complete',
+        },
+        {
+          guard: 'needsSecondFactor',
+          target: 'SecondFactor',
+        },
+      ],
       states: {
         DeterminingState: {
           always: [
@@ -306,12 +302,10 @@ export const SignInMachine = setup({
               description: 'If the current factor is not password, prepare the factor',
               guard: not('isCurrentFactorPassword'),
               target: 'Preparing',
-              reenter: true,
             },
             {
               description: 'Else, skip to awaiting input',
               target: 'AwaitingInput',
-              reenter: true,
             },
           ],
         },
@@ -331,16 +325,12 @@ export const SignInMachine = setup({
               };
             },
             onDone: {
+              actions: 'assignResource',
               target: 'AwaitingInput',
-              actions: [
-                assign({
-                  resource: ({ event }) => event.output,
-                }),
-              ],
             },
             onError: {
               actions: 'setFormErrors',
-              target: 'Failure',
+              target: 'AwaitingInput',
             },
           },
         },
@@ -365,11 +355,7 @@ export const SignInMachine = setup({
               },
             }),
             onDone: {
-              actions: [
-                assign({
-                  resource: ({ event }) => event.output,
-                }),
-              ],
+              actions: 'assignResource',
               target: 'Success',
             },
             onError: {
@@ -380,37 +366,18 @@ export const SignInMachine = setup({
         },
         Success: {
           type: 'final',
-          always: [
-            {
-              guard: 'isSignInComplete',
-              target: '#SignIn.Complete',
-            },
-            {
-              guard: 'needsFirstFactor',
-              target: '#SignIn.FirstFactor',
-            },
-            {
-              guard: 'needsSecondFactor',
-              target: '#SignIn.SecondFactor',
-            },
-            {
-              target: '#SignIn.DeterminingState',
-              reenter: true,
-            },
-          ],
-        },
-        Failure: {
-          type: 'final',
-          target: '#SignIn.DeterminingState',
         },
       },
     },
     SecondFactor: {
       initial: 'DeterminingState',
-      entry: assign({
-        currentFactor: ({ context }) =>
-          determineStartingSignInSecondFactor(context.clerk.client.signIn.supportedSecondFactors),
-      }),
+      entry: 'assignStartingSecondFactor',
+      onDone: [
+        {
+          guard: 'isSignInComplete',
+          target: 'Complete',
+        },
+      ],
       states: {
         DeterminingState: {
           always: [
@@ -431,23 +398,17 @@ export const SignInMachine = setup({
           invoke: {
             id: 'prepareSecondFactor',
             src: 'prepareSecondFactor',
-            input: ({ context }) => {
-              return {
-                client: context.clerk.client,
-                params: !context.currentFactor ? null : (context.currentFactor as PrepareSecondFactorParams),
-              };
-            },
+            input: ({ context }) => ({
+              client: context.clerk.client,
+              params: !context.currentFactor ? null : (context.currentFactor as PrepareSecondFactorParams),
+            }),
             onDone: {
+              actions: 'assignResource',
               target: 'AwaitingInput',
-              actions: [
-                assign({
-                  resource: ({ event }) => event.output,
-                }),
-              ],
             },
             onError: {
               actions: 'setFormErrors',
-              target: 'Failure',
+              target: 'AwaitingInput',
             },
           },
         },
@@ -487,20 +448,6 @@ export const SignInMachine = setup({
         },
         Success: {
           type: 'final',
-          always: [
-            {
-              guard: 'isSignInComplete',
-              target: '#SignIn.Complete',
-            },
-            {
-              target: '#SignIn.DeterminingState',
-              reenter: true,
-            },
-          ],
-        },
-        Failure: {
-          type: 'final',
-          target: '#SignIn.DeterminingState',
         },
       },
     },
@@ -516,7 +463,7 @@ export const SignInMachine = setup({
           router: context.router,
         }),
         onDone: {
-          actions: assign({ resource: ({ event }) => event.output as SignInResource }),
+          actions: [assign({ resource: ({ event }) => event.output as SignInResource })],
         },
         onError: {
           actions: 'setFormErrors',
@@ -524,11 +471,11 @@ export const SignInMachine = setup({
       },
       always: [
         {
-          guard: ({ context }) => context?.resource?.status === 'complete',
-          target: 'Complete',
+          guard: 'isSignInComplete',
+          actions: 'setAsActive',
         },
         {
-          guard: ({ context }) => context?.resource?.status === 'needs_first_factor',
+          guard: 'needsFirstFactor',
           target: 'FirstFactor',
         },
       ],
@@ -541,7 +488,6 @@ export const SignInMachine = setup({
 
           return {
             clerk: context.clerk,
-            environment: context.environment,
             strategy: event.strategy,
           };
         },
@@ -551,12 +497,11 @@ export const SignInMachine = setup({
       },
     },
     HavingTrouble: {
-      type: 'final',
-      on: {
-        // RESTART: '#SignIn.Start',
-      },
+      id: 'HavingTrouble',
+      always: 'Start',
     },
     Complete: {
+      id: 'Complete',
       type: 'final',
       entry: 'setAsActive',
     },

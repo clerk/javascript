@@ -1,7 +1,6 @@
 import type {
   AttemptFirstFactorParams,
   AuthenticateWithRedirectParams,
-  EnvironmentResource,
   HandleOAuthCallbackParams,
   HandleSamlCallbackParams,
   PrepareFirstFactorParams,
@@ -43,18 +42,17 @@ export const createSignIn = fromPromise<SignInResource, CreateSignInInput>(({ in
 // ================= authenticateWithRedirect ================= //
 
 export type AuthenticateWithRedirectInput = WithClerk<{
-  environment: EnvironmentResource | undefined;
   strategy: AuthenticateWithRedirectParams['strategy'] | undefined;
 }>;
 
 export const authenticateWithRedirect = fromPromise<void, AuthenticateWithRedirectInput>(
-  async ({ input: { clerk, environment, strategy } }) => {
-    assertIsDefined(environment);
+  async ({ input: { clerk, strategy } }) => {
+    assertIsDefined(clerk.__unstable__environment);
     assertIsDefined(strategy);
 
     return clerk.client.signIn.authenticateWithRedirect({
       strategy,
-      redirectUrl: `${environment.displayConfig.signInUrl}/sso-callback`,
+      redirectUrl: `${clerk.__unstable__environment.displayConfig.signInUrl}/sso-callback`,
       redirectUrlComplete: clerk.buildAfterSignInUrl(),
     });
   },

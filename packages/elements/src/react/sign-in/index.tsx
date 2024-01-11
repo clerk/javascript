@@ -2,6 +2,7 @@
 
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
+import { Slot } from '@radix-ui/react-slot';
 import type { PropsWithChildren } from 'react';
 
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form.context';
@@ -11,6 +12,7 @@ import {
   useSignInFlow,
   useSignInStateMatcher,
   useSignInStrategies,
+  useSignInThirdPartyProviders,
   useSSOCallbackHandler,
   useStrategy,
 } from '~/internals/machines/sign-in.context';
@@ -18,6 +20,7 @@ import type { SignInStrategyName } from '~/internals/machines/sign-in.types';
 import { Form } from '~/react/common/form';
 import { Route, Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
+import { type ThirdPartyStrategy } from '~/utils/third-party-strategies';
 
 const { useBrowserInspector } = createBrowserInspectorReactHook();
 
@@ -37,12 +40,6 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
     return null;
   }
 
-  const debugOptions: Record<string, unknown> = {};
-
-  if (DEBUG && inspector) {
-    debugOptions.inspect = inspector.inspect;
-  }
-
   return (
     <SignInFlowContextProvider
       options={{
@@ -51,7 +48,7 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
           router,
           form,
         },
-        ...debugOptions,
+        inspect: inspector?.inspect,
       }}
     >
       {children}
@@ -129,6 +126,31 @@ export type SignInStrategyProps = PropsWithChildren<{ name: SignInStrategyName }
 export function SignInStrategy({ children, name }: SignInStrategyProps) {
   const { shouldRender } = useStrategy(name);
   return shouldRender ? children : null;
+}
+
+// ================= SignInSocialProviders ================= //
+
+export type SignInSocialProvidersProps = { render(provider: ThirdPartyStrategy): React.ReactNode };
+
+export function SignInSocialProviders({ render: provider }: SignInSocialProvidersProps) {
+  const thirdPartyProviders = useSignInThirdPartyProviders();
+
+  if (!thirdPartyProviders) {
+    return null;
+  }
+
+  return (
+    <>
+      {thirdPartyProviders.strategies.map(strategy => (
+        <Slot
+          key={strategy}
+          onClick={thirdPartyProviders.createOnClick(strategy)}
+        >
+          {provider(thirdPartyProviders.strategyToDisplayData[strategy])}
+        </Slot>
+      ))}
+    </>
+  );
 }
 
 // ================= SignInSSOCallback ================= //
