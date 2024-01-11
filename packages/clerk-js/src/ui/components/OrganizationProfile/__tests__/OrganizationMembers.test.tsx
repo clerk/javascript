@@ -110,26 +110,6 @@ describe('OrganizationMembers', () => {
     expect(queryByRole('tab', { name: 'Requests' })).not.toBeInTheDocument();
   });
 
-  it('shows the invite screen when user clicks on Invite button', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
-    });
-
-    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
-
-    const { container, getByRole } = render(<OrganizationMembers />, { wrapper });
-
-    await waitForLoadingCompleted(container);
-
-    await userEvent.click(getByRole('tab', { name: 'Invitations' }));
-    await userEvent.click(getByRole('button', { name: 'Invite' }));
-
-    await waitFor(() => {
-      screen.getByRole('heading', { name: /invite new members/i });
-    });
-  });
-
   it('lists all the members of the Organization', async () => {
     const membersList: OrganizationMembershipResource[] = [
       createFakeMember({
@@ -495,5 +475,56 @@ describe('OrganizationMembers', () => {
 
     expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
     expect(getByText('You')).toBeInTheDocument();
+  });
+
+  describe('InviteMembersScreen', () => {
+    it('shows the invite screen when user clicks on Invite button', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
+      const { container, getByRole } = render(<OrganizationMembers />, { wrapper });
+
+      await waitForLoadingCompleted(container);
+
+      await userEvent.click(getByRole('button', { name: 'Invite' }));
+
+      await waitFor(() => {
+        screen.getByRole('heading', { name: /invite new members/i });
+      });
+    });
+
+    it('hides the invite screen when user clicks cancel button', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
+      const { container, getByRole, queryByRole, findByRole } = render(<OrganizationMembers />, { wrapper });
+
+      await waitForLoadingCompleted(container);
+
+      const inviteButton = queryByRole('button', { name: 'Invite' });
+      await userEvent.click(inviteButton!);
+      await waitFor(async () =>
+        expect(await findByRole('heading', { name: /invite new members/i })).toBeInTheDocument(),
+      );
+      expect(inviteButton).not.toBeInTheDocument();
+      await userEvent.click(getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(async () => expect(await findByRole('button', { name: 'Invite' })).toBeInTheDocument());
+      expect(queryByRole('heading', { name: /invite new members/i })).not.toBeInTheDocument();
+    });
   });
 });
