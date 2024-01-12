@@ -36,6 +36,7 @@ function assertSignedOut(
     domain: '',
     message: '',
     toAuth: {},
+    token: null,
     ...expectedState,
   });
 }
@@ -80,6 +81,7 @@ function assertInterstitial(
     afterSignUpUrl: '',
     domain: '',
     toAuth: {},
+    token: null,
     ...expectedState,
   });
 }

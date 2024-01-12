@@ -8,6 +8,7 @@ exports[`clerk initializes clerk with constants 1`] = `
       "apiVersion": "v1",
       "jwtKey": "",
       "secretKey": "TEST_API_KEY",
+      "userAgent": "@clerk/fastify@0.0.0-test",
     },
   ],
 ]

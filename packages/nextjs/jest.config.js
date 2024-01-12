@@ -1,6 +1,7 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   globals: {
+    PACKAGE_NAME: '@clerk/nextjs',
     PACKAGE_VERSION: '0.0.0-test',
   },
   displayName: 'nextjs',

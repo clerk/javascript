@@ -89,6 +89,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
 
     // Set auth result on request in a private property so that middleware can read it too
     setCustomAttributeOnRequest(req, constants.Attributes.AuthStatus, requestState.status);
+    setCustomAttributeOnRequest(req, constants.Attributes.AuthToken, requestState.token || '');
     setCustomAttributeOnRequest(req, constants.Attributes.AuthMessage, requestState.message || '');
     setCustomAttributeOnRequest(req, constants.Attributes.AuthReason, requestState.reason || '');
 

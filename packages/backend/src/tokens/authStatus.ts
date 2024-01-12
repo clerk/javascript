@@ -29,6 +29,7 @@ export type SignedInState = {
   isInterstitial: false;
   isUnknown: false;
   toAuth: () => SignedInAuthObject;
+  token: string;
 };
 
 export type SignedOutState = {
@@ -48,6 +49,7 @@ export type SignedOutState = {
   isInterstitial: false;
   isUnknown: false;
   toAuth: () => SignedOutAuthObject;
+  token: null;
 };
 
 export type InterstitialState = Omit<SignedOutState, 'isInterstitial' | 'status' | 'toAuth'> & {
@@ -83,7 +85,10 @@ export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
 export type RequestState = SignedInState | SignedOutState | InterstitialState | UnknownState;
 
-export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promise<SignedInState> {
+export async function signedIn<T extends { token: string }>(
+  options: T,
+  sessionClaims: JwtPayload,
+): Promise<SignedInState> {
   const {
     apiKey,
     secretKey,
@@ -103,6 +108,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
+    token,
   } = options as any;
 
   const { sid: sessionId, org_id: orgId, sub: userId } = sessionClaims;
@@ -159,6 +165,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     isInterstitial: false,
     isUnknown: false,
     toAuth: () => authObject,
+    token,
   };
 }
 
@@ -192,6 +199,7 @@ export function signedOut<T>(options: T, reason: AuthReason, message = ''): Sign
     isInterstitial: false,
     isUnknown: false,
     toAuth: () => signedOutAuthObject({ ...options, status: AuthStatus.SignedOut, reason, message }),
+    token: null,
   };
 }
 
@@ -224,6 +232,7 @@ export function interstitial<T>(options: T, reason: AuthReason, message = ''): I
     isInterstitial: true,
     isUnknown: false,
     toAuth: () => null,
+    token: null,
   };
 }
 
@@ -246,5 +255,6 @@ export function unknownState<T>(options: T, reason: AuthReason, message = ''): U
     isInterstitial: false,
     isUnknown: true,
     toAuth: () => null,
+    token: null,
   };
 }

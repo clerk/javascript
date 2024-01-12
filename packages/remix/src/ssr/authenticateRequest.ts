@@ -94,7 +94,16 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
-  return Clerk({ apiUrl, apiKey, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({
+  return Clerk({
+    apiUrl,
+    apiKey,
+    secretKey,
+    jwtKey,
+    proxyUrl,
+    isSatellite,
+    domain,
+    userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
+  }).authenticateRequest({
     apiKey,
     audience,
     secretKey,

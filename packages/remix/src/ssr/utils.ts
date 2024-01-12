@@ -109,19 +109,15 @@ export const injectRequestStateIntoResponse = async (
   requestState: RequestState,
   context: AppLoadContext,
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const clone = response.clone();
   const data = await clone.json();
-
   const { clerkState, headers } = getResponseClerkState(requestState, context);
-
   // set the correct content-type header in case the user returned a `Response` directly
   // without setting the header, instead of using the `json()` helper
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
   headers.forEach((value, key) => {
     clone.headers.set(key, value);
   });
-
   return json({ ...(data || {}), ...clerkState }, clone);
 };
 

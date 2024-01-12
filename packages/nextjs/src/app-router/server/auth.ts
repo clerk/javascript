@@ -5,8 +5,9 @@ import type {
 } from '@clerk/types';
 import { notFound, redirect } from 'next/navigation';
 
+import { buildClerkProps } from '../../server/buildClerkProps';
+import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
-import { buildClerkProps, createGetAuth } from '../../server/getAuth';
 import type { AuthObjectWithDeprecatedResources } from '../../server/types';
 import { buildRequestLike } from './utils';
 

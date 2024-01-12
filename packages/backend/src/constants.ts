@@ -1,11 +1,11 @@
 export const API_URL = 'https://api.clerk.dev';
 export const API_VERSION = 'v1';
 
-// TODO: Get information from package.json or define them from ESBuild
-export const USER_AGENT = `@clerk/backend`;
+export const USER_AGENT = `${PACKAGE_NAME}@${PACKAGE_VERSION}`;
 export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
 
 const Attributes = {
+  AuthToken: '__clerkAuthToken',
   AuthStatus: '__clerkAuthStatus',
   AuthReason: '__clerkAuthReason',
   AuthMessage: '__clerkAuthMessage',
@@ -17,6 +17,7 @@ const Cookies = {
 } as const;
 
 const Headers = {
+  AuthToken: 'x-clerk-auth-token',
   AuthStatus: 'x-clerk-auth-status',
   AuthReason: 'x-clerk-auth-reason',
   AuthMessage: 'x-clerk-auth-message',
@@ -36,6 +37,7 @@ const Headers = {
 
 const SearchParams = {
   AuthStatus: Headers.AuthStatus,
+  AuthToken: Headers.AuthToken,
 } as const;
 
 const ContentTypes = {
