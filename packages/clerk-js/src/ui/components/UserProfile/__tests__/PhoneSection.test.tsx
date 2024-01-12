@@ -96,7 +96,7 @@ describe('PhoneSection', () => {
 
         await userEvent.click(screen.getByRole('button', { name: /cancel$/i }));
         await waitFor(() => getByRole('button', { name: /Add a phone number/i }));
-        expect(queryByRole('heading', { name: /Add a phone number/i })).not.toBeInTheDocument();
+        expect(queryByRole('heading', { name: /Add phone number/i })).not.toBeInTheDocument();
       });
     });
   });
