@@ -37,7 +37,8 @@ and profile management to your application in minutes.
 
 ### Prerequisites
 
-- Next.js v10+
+- Next.js 13.0.4 or later
+- React 18 or later
 - Node.js `>=18.17.0` or later
 
 ### Installation

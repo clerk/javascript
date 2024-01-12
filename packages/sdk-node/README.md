@@ -66,7 +66,7 @@ You will then be able to access all the available methods.
 import 'dotenv/config'; // To read CLERK_SECRET_KEY
 import clerk from '@clerk/clerk-sdk-node';
 
-const userList = await clerk.users.getUserList();
+const { data: userList } = await clerk.users.getUserList();
 ```
 
 _For further details and examples, please refer to our [Documentation](https://clerk.com/docs/reference/node/getting-started?utm_source=github&utm_medium=clerk_sdk_node)._
