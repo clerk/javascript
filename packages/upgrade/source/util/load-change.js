@@ -20,7 +20,9 @@ export default function createLoader({ version, baseUrl }) {
 
 			return {
 				title: fm.title,
-				matcher: new RegExp(fm.matcher, `g${fm.matcherFlags ? fm.matcherFlags : ''}`),
+				matcher: Array.isArray(fm.matcher)
+					? fm.matcher.map(m => new RegExp(m, `g${fm.matcherFlags ? fm.matcherFlags : ''}`))
+					: new RegExp(fm.matcher, `g${fm.matcherFlags ? fm.matcherFlags : ''}`),
 				replaceWithString: fm.replaceWithString,
 				slug,
 				sdk: sdk,

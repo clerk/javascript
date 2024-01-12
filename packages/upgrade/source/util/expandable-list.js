@@ -87,6 +87,7 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 								<Newline />
 								{/* <Text color='gray'>changed in {item.sdk} SDK</Text> */}
 								<Markdown>{item.content}</Markdown>
+								<Newline />
 								<Line />
 								<Link url={item.link}>
 									<Text>Open in migration guide &raquo;</Text>

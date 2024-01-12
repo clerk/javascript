@@ -79,16 +79,25 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 				// then we run each of the matchers against the file contents
 				for (const sdk in matchers) {
 					// returns [{ ...matcher, instances: [{sdk, file, position}]  }]
-					matchers[sdk].map(matcher => {
+					matchers[sdk].map(matcherConfig => {
 						// run regex against file content, return array of matches
-						const matches = Array.from(content.matchAll(matcher.matcher));
+						// matcher can be an array or string
+						let matches = [];
+						if (Array.isArray(matcherConfig.matcher)) {
+							matcherConfig.matcher.map(m => {
+								matches = matches.concat(Array.from(content.matchAll(m)));
+							});
+						} else {
+							matches = Array.from(content.matchAll(matcherConfig.matcher));
+						}
 						if (matches.length < 1) return;
 
 						// for each match, add to `instances` array of a key, create if not exists
 						matches.map(match => {
-							if (!allResults[matcher.title]) allResults[matcher.title] = { instances: [], ...matcher };
+							if (!allResults[matcherConfig.title])
+								allResults[matcherConfig.title] = { instances: [], ...matcherConfig };
 
-							allResults[matcher.title].instances.push({
+							allResults[matcherConfig.title].instances.push({
 								sdk,
 								file: path.relative(process.cwd(), file),
 								position: indexToPosition(content, match.index, { oneBased: true }),

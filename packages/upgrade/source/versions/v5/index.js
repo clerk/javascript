@@ -24,6 +24,7 @@ const reactChangesList = [
 	'userprofile-security',
 	'mfa-dropdown',
 	'connected-accounts-dropdown',
+	'userbuttonpopoveractionbuttontext-removed',
 ];
 
 export default {
@@ -64,6 +65,7 @@ export default {
 		'userprofile-security',
 		'mfa-dropdown',
 		'connected-accounts-dropdown',
+		'userbuttonpopoveractionbuttontext-removed',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -92,6 +94,7 @@ export default {
 		'userprofile-security',
 		'mfa-dropdown',
 		'connected-accounts-dropdown',
+		'userbuttonpopoveractionbuttontext-removed',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -150,6 +153,7 @@ export default {
 		'userprofile-security',
 		'mfa-dropdown',
 		'connected-accounts-dropdown',
+		'userbuttonpopoveractionbuttontext-removed',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',
