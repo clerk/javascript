@@ -3,6 +3,7 @@ import type { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
+import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, Icon, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
@@ -21,9 +22,11 @@ import { AddPhone, VerifyPhone } from './PhoneForm';
 
 type MfaPhoneCodeScreenProps = FormProps;
 export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScreenProps) => {
-  const { onReset } = props;
+  const { onReset, onSuccess } = props;
   const ref = React.useRef<PhoneNumberResource>();
   const wizard = useWizard({ defaultStep: 2 });
+
+  const isInstanceWithBackupCodes = useEnvironment().userSettings.attributes.backup_code.enabled;
 
   return (
     <Wizard {...wizard.props}>
@@ -41,7 +44,7 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
         onReset={wizard.prevStep}
       />
       <AddMfa
-        onSuccess={wizard.nextStep}
+        onSuccess={isInstanceWithBackupCodes ? wizard.nextStep : onSuccess}
         onReset={onReset}
         onAddPhoneClick={() => wizard.goToStep(0)}
         onUnverifiedPhoneClick={phone => {
@@ -51,15 +54,17 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
       />
-      <SuccessPage
-        title={localizationKeys('userProfile.mfaPhoneCodePage.successTitle')}
-        text={[
-          localizationKeys('userProfile.mfaPhoneCodePage.successMessage1'),
-          localizationKeys('userProfile.mfaPhoneCodePage.successMessage2'),
-        ]}
-        onFinish={onReset}
-        contents={<MfaBackupCodeList backupCodes={ref.current?.backupCodes} />}
-      />
+      {isInstanceWithBackupCodes && (
+        <SuccessPage
+          title={localizationKeys('userProfile.mfaPhoneCodePage.successTitle')}
+          text={[
+            localizationKeys('userProfile.mfaPhoneCodePage.successMessage1'),
+            localizationKeys('userProfile.mfaPhoneCodePage.successMessage2'),
+          ]}
+          onFinish={onReset}
+          contents={<MfaBackupCodeList backupCodes={ref.current?.backupCodes} />}
+        />
+      )}
     </Wizard>
   );
 });
@@ -113,26 +118,28 @@ const AddMfa = (props: AddMfaProps) => {
         )}
         colorScheme='neutral'
       />
-      <Col gap={2}>
-        {availableMethods.map(phone => {
-          const { country } = getCountryFromPhoneString(phone.phoneNumber);
+      {availableMethods.length > 0 && (
+        <Col gap={2}>
+          {availableMethods.map(phone => {
+            const { country } = getCountryFromPhoneString(phone.phoneNumber);
 
-          const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
+            const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
 
-          return (
-            <Button
-              key={phone.id}
-              variant='secondary'
-              sx={{ justifyContent: 'start' }}
-              onClick={() => enableMfa(phone)}
-              isLoading={card.loadingMetadata === phone.id}
-              isDisabled={card.isLoading}
-            >
-              {country.iso.toUpperCase()} {formattedPhone}
-            </Button>
-          );
-        })}
-      </Col>
+            return (
+              <Button
+                key={phone.id}
+                variant='secondary'
+                sx={{ justifyContent: 'start' }}
+                onClick={() => enableMfa(phone)}
+                isLoading={card.loadingMetadata === phone.id}
+                isDisabled={card.isLoading}
+              >
+                {country.iso.toUpperCase()} {formattedPhone}
+              </Button>
+            );
+          })}
+        </Col>
+      )}
       <FormButtonContainer sx={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <IconButton
           variant='ghost'
