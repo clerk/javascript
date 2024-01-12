@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.68.5
+
+### Patch Changes
+
+- Ensure the token returned from `getToken()` and the token in the session cookie remain in sync. ([#2585](https://github.com/clerk/javascript/pull/2585)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 4.68.4
 
 ### Patch Changes
