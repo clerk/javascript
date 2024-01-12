@@ -37,7 +37,7 @@ This package provides Clerk Backend API resources and low-level authentication u
 - Built for V8 isolates (Cloudflare Workers, Vercel Edge Runtime, etc...).
 - Make it isomorphic to work across all modern JS runtimes.
 - Use options injection for all keys and settings.
-- Support multiple CLERK_API_KEY for multiple instance REST access.
+- Support multiple `CLERK_SECRET_KEY` for multiple instance REST access.
 - Align JWT key resolution algorithm across all environments (Function param > Environment variable > JWKS from API).
 - Tested automatically across different runtimes (Node, CF Workers, Vercel Edge middleware.)
 - Refactor the Rest Client API to return `{data, errors}` instead of throwing errors.
