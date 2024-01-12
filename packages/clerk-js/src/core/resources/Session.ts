@@ -160,7 +160,11 @@ export class Session extends BaseResource implements SessionResource {
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     if (cachedEntry) {
-      return cachedEntry.tokenResolver.then(res => res.getRawString());
+      const cachedToken = await cachedEntry.tokenResolver.then(res => res);
+      if (!template) {
+        eventBus.dispatch(events.TokenUpdate, { token: cachedToken });
+      }
+      return cachedToken.getRawString();
     }
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     const tokenResolver = Token.create(path);
