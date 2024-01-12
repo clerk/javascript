@@ -132,14 +132,15 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
  * Kebab-case is used to differentiate between the container and child elements
  */
 export type ElementsConfig = {
+  button: WithOptions;
+  input: WithOptions;
+
   rootBox: WithOptions;
   cardBox: WithOptions;
   card: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
-  // outerLogo: WithOptions;
-  // 'outerLogo-image': WithOptions;
 
   header: WithOptions;
   headerTitle: WithOptions;
