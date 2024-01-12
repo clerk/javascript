@@ -8,10 +8,7 @@ import { NextResponse } from 'next/server';
 import { constants as nextConstants } from '../constants';
 import { API_KEY, DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './clerkClient';
 import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
-import type { NextMiddlewareResult, RequestLike } from './types';
-import type { WithAuthOptions } from './types';
-
-type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
+import type { NextMiddlewareResult, RequestLike, WithAuthOptions } from './types';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
   Object.assign(req, { [key]: value });
@@ -22,12 +19,21 @@ export function getCustomAttributeFromRequest(req: RequestLike, key: string): st
   return key in req ? req[key] : undefined;
 }
 
-export function getAuthKeyFromRequest(req: RequestLike, key: AuthKey): string | null | undefined {
-  return (
-    getCustomAttributeFromRequest(req, constants.Attributes[key]) ||
-    getHeader(req, constants.Headers[key]) ||
-    (key === 'AuthStatus' ? getQueryParam(req, constants.SearchParams.AuthStatus) : undefined)
-  );
+export function getAuthKeyFromRequest(
+  req: RequestLike,
+  key: keyof typeof constants.Attributes,
+): string | null | undefined {
+  const val = getCustomAttributeFromRequest(req, constants.Attributes[key]) || getHeader(req, constants.Headers[key]);
+  if (val) {
+    return val;
+  }
+  // alternatively, check whether the value exists as a query param
+  // this is only required for specific nextjs versions that don't support overriding request headers
+  // and is no longer needed in v5
+  if (key === 'AuthStatus' || key === 'AuthToken') {
+    return getQueryParam(req, key) || undefined;
+  }
+  return undefined;
 }
 
 // Tries to extract auth status from the request using several strategies
@@ -159,7 +165,7 @@ export function decorateRequest(
   res: NextMiddlewareResult,
   requestState: RequestState,
 ): NextMiddlewareResult {
-  const { reason, message, status } = requestState;
+  const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
   if (!res) {
     res = NextResponse.next();
@@ -198,14 +204,17 @@ export function decorateRequest(
       // In this case, we won't set them at all in order to avoid having them visible in the req.url
       setRequestHeadersOnNextResponse(res, req, {
         [constants.Headers.AuthStatus]: status,
+        [constants.Headers.AuthToken]: token || '',
         [constants.Headers.AuthMessage]: message || '',
         [constants.Headers.AuthReason]: reason || '',
       });
     } else {
       res.headers.set(constants.Headers.AuthStatus, status);
+      res.headers.set(constants.Headers.AuthToken, token || '');
       res.headers.set(constants.Headers.AuthMessage, message || '');
       res.headers.set(constants.Headers.AuthReason, reason || '');
       rewriteURL.searchParams.set(constants.SearchParams.AuthStatus, status);
+      rewriteURL.searchParams.set(constants.SearchParams.AuthToken, token || '');
       rewriteURL.searchParams.set(constants.Headers.AuthMessage, message || '');
       rewriteURL.searchParams.set(constants.Headers.AuthReason, reason || '');
     }

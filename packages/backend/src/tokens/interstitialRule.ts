@@ -123,13 +123,13 @@ export const hasPositiveClientUatButCookieIsMissing: InterstitialRule = options 
 export const hasValidHeaderToken: InterstitialRule = async options => {
   const { headerToken } = options as any;
   const sessionClaims = await verifyRequestState(options, headerToken);
-  return await signedIn(options, sessionClaims);
+  return await signedIn({ ...options, token: headerToken }, sessionClaims);
 };
 
 export const hasValidCookieToken: InterstitialRule = async options => {
   const { cookieToken, clientUat } = options as any;
   const sessionClaims = await verifyRequestState(options, cookieToken);
-  const state = await signedIn(options, sessionClaims);
+  const state = await signedIn({ ...options, token: cookieToken }, sessionClaims);
 
   const jwt = state.toAuth().sessionClaims;
   const cookieTokenIsOutdated = jwt.iat < Number.parseInt(clientUat);

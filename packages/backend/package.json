@@ -41,7 +41,7 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "publish:local": "npx yalc push --replace --sig",
     "build:lib": "tsup --env.NODE_ENV production",
-    "build:tests": "tsc -p tsconfig.test.json",
+    "build:tests": "tsup --config tsup.config.test.ts",
     "build:runtime": "rsync -r --include '*/' --include '*.js' --include '*.mjs' --exclude='*' src/runtime dist",
     "clean": "rimraf ./dist",
     "clean:tests": "rimraf ./tests/dist",

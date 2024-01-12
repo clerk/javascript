@@ -115,7 +115,7 @@ export function buildRequest(options: CreateBackendApiOptions) {
     // Build headers
     const headers: Record<string, any> = {
       Authorization: `Bearer ${key}`,
-      'Clerk-Backend-SDK': userAgent,
+      'User-Agent': userAgent,
       ...headerParams,
     };
 

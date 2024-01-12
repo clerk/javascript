@@ -9,4 +9,6 @@ export const clerkClient = createClerkClient({
   apiUrl: API_URL,
   apiVersion: API_VERSION,
   jwtKey: JWT_KEY,
+  // @ts-ignore - defined by tsup config
+  userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
 });

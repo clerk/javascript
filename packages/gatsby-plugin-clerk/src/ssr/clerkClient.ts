@@ -9,7 +9,7 @@ const clerkClient = Clerk({
   apiUrl: API_URL,
   apiVersion: API_VERSION,
   // TODO: Fetch version from package.json
-  userAgent: 'gatsby-plugin-clerk',
+  userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
 });
 
 const createClerkClient = Clerk;

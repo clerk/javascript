@@ -8,8 +8,7 @@ const clerkClient = Clerk({
   secretKey: SECRET_KEY,
   apiUrl: API_URL,
   apiVersion: API_VERSION,
-  // TODO: Fetch version from package.json
-  userAgent: '@clerk/nextjs',
+  userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
   proxyUrl: PROXY_URL,
   domain: DOMAIN,
   isSatellite: IS_SATELLITE,

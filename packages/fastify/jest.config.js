@@ -1,5 +1,9 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
+  globals: {
+    PACKAGE_NAME: '@clerk/fastify',
+    PACKAGE_VERSION: '0.0.0-test',
+  },
   displayName: 'fastify',
   injectGlobals: true,
   roots: ['<rootDir>/src'],

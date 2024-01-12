@@ -15,7 +15,7 @@ import type { RequestState } from './authStatus';
 import type { AuthenticateRequestOptions } from './request';
 
 type AuthObjectDebugData = Partial<AuthenticateRequestOptions & RequestState>;
-type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
+type CreateAuthObjectDebug = (data?: Record<string, unknown>) => AuthObjectDebug;
 type AuthObjectDebug = () => unknown;
 
 export type SignedInAuthObjectOptions = {
@@ -71,9 +71,9 @@ export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
 const createDebug: CreateAuthObjectDebug = data => {
   return () => {
     const res = { ...data } || {};
-    res.apiKey = (res.apiKey || '').substring(0, 7);
-    res.secretKey = (res.secretKey || '').substring(0, 7);
-    res.jwtKey = (res.jwtKey || '').substring(0, 7);
+    res.apiKey = ((res.apiKey as string) || '').substring(0, 7);
+    res.secretKey = ((res.secretKey as string) || '').substring(0, 7);
+    res.jwtKey = ((res.jwtKey as string) || '').substring(0, 7);
     return { ...res };
   };
 };
