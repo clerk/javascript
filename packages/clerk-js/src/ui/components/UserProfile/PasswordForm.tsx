@@ -135,6 +135,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
         {/* For password managers */}
         <input
           readOnly
+          data-testid='hidden-identifier'
           id='identifier-field'
           name='identifier'
           value={session?.publicUserData.identifier || ''}
