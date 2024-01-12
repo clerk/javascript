@@ -1,5 +1,12 @@
 {
-  "search.exclude": {},
+  "search.exclude": {
+    "**/.tsup": true,
+    "**/.turbo": true,
+    "**/.yalc": true,
+    "**/node_modules": true,
+    ".temp_integration": true,
+    "packages/*/dist": true
+  },
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.codeActionsOnSave": {

@@ -5,6 +5,7 @@ import type {
   OAuthStrategy,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
+  SamlStrategy,
   SignInFactor,
   SignInFirstFactor,
   SignInResource,
@@ -16,14 +17,14 @@ import { and, assertEvent, assign, log, not, or, raise, sendTo, setup } from 'xs
 
 import type { ClerkRouter } from '~/react/router';
 
+import { ClerkElementsRuntimeError } from '../errors/error';
 import type { FormMachine } from './form.machine';
-import { waitForClerk } from './shared.actors';
+import { handleRedirectCallback, waitForClerk } from './shared.actors';
 import {
   attemptFirstFactor,
   attemptSecondFactor,
-  authenticateWithRedirect,
+  authenticateWithSignInRedirect,
   createSignIn,
-  handleSSOCallback,
   prepareFirstFactor,
   prepareSecondFactor,
 } from './sign-in.actors';
@@ -48,6 +49,7 @@ export interface SignInMachineInput {
 export type SignInMachineEvents =
   | ErrorActorEvent
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
+  | { type: 'AUTHENTICATE.SAML'; strategy: SamlStrategy }
   | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
   | { type: 'FAILURE'; error: Error }
   | { type: 'OAUTH.CALLBACK' }
@@ -65,7 +67,7 @@ export const SignInMachine = setup({
     waitForClerk,
 
     // Start
-    authenticateWithRedirect,
+    authenticateWithSignInRedirect,
     createSignIn,
 
     // First Factor
@@ -77,7 +79,7 @@ export const SignInMachine = setup({
     attemptSecondFactor,
 
     // SSO
-    handleSSOCallback,
+    handleRedirectCallback,
   },
   actions: {
     assignResource: assign(({ event }) => {
@@ -170,9 +172,8 @@ export const SignInMachine = setup({
   }),
   initial: 'Init',
   on: {
-    FAILURE: {
-      target: '.HavingTrouble',
-    },
+    'CLERKJS.NAVIGATE.*': '.HavingTrouble',
+    FAILURE: '.HavingTrouble',
   },
   states: {
     Init: {
@@ -202,7 +203,7 @@ export const SignInMachine = setup({
         {
           description: 'Go to SSO Callback state',
           guard: { type: 'isCurrentPath', params: { path: '/sign-in/sso-callback' } },
-          target: 'SSOCallbackRunning',
+          target: 'SSOCallback',
         },
         {
           target: 'Start',
@@ -231,7 +232,8 @@ export const SignInMachine = setup({
       description: 'The intial state of the sign-in flow.',
       initial: 'AwaitingInput',
       on: {
-        'AUTHENTICATE.OAUTH': '#SignIn.InitiatingOAuthAuthentication',
+        'AUTHENTICATE.OAUTH': '#SignIn.AuthenticatingWithRedirect',
+        'AUTHENTICATE.SAML': '#SignIn.AuthenticatingWithRedirect',
       },
       onDone: [
         {
@@ -449,44 +451,31 @@ export const SignInMachine = setup({
         },
       },
     },
-    SSOCallbackRunning: {
+    AuthenticatingWithRedirect: {
       invoke: {
-        src: 'handleSSOCallback',
-        input: ({ context }) => ({
-          clerk: context.clerk,
-          params: {
-            firstFactorUrl: '../factor-one',
-            secondFactorUrl: '../factor-two',
-          },
-          router: context.router,
-        }),
-        onDone: {
-          actions: [assign({ resource: ({ event }) => event.output as SignInResource })],
-        },
-        onError: {
-          actions: 'setFormErrors',
-        },
-      },
-      always: [
-        {
-          guard: 'isSignInComplete',
-          actions: 'setAsActive',
-        },
-        {
-          guard: 'needsFirstFactor',
-          target: 'FirstFactor',
-        },
-      ],
-    },
-    InitiatingOAuthAuthentication: {
-      invoke: {
-        src: 'authenticateWithRedirect',
+        id: 'authenticateWithSignInRedirect',
+        src: 'authenticateWithSignInRedirect',
         input: ({ context, event }) => {
-          assertEvent(event, 'AUTHENTICATE.OAUTH');
+          assertEvent(event, ['AUTHENTICATE.OAUTH', 'AUTHENTICATE.SAML']);
+
+          if (event.type === 'AUTHENTICATE.SAML' && event.strategy === 'saml') {
+            return {
+              clerk: context.clerk,
+              params: {
+                strategy: event.strategy,
+                emailAddress: '', // TODO: Handle case
+                identifier: '', // TODO: Handle case
+                // continueSignUp
+              },
+            };
+          }
 
           return {
             clerk: context.clerk,
-            strategy: event.strategy,
+            params: {
+              strategy: event.strategy,
+              // continueSignUp
+            },
           };
         },
         onError: {
@@ -494,9 +483,88 @@ export const SignInMachine = setup({
         },
       },
     },
+    SSOCallback: {
+      tags: 'external',
+      initial: 'Attempting',
+      on: {
+        'CLERKJS.NAVIGATE.COMPLETE': '#SignIn.Complete',
+        'CLERKJS.NAVIGATE.RESET_PASSWORD': '#SignIn.NotImplemented',
+        'CLERKJS.NAVIGATE.SIGN_IN': {
+          actions: [
+            log('Navigating to sign in'),
+            {
+              type: 'navigateTo',
+              params: {
+                path: '/sign-in',
+              },
+            },
+          ],
+        },
+        'CLERKJS.NAVIGATE.SIGN_UP': {
+          actions: [
+            log('Navigating to sign in'),
+            {
+              type: 'navigateTo',
+              params: {
+                path: '/sign-up',
+              },
+            },
+          ],
+        },
+        'CLERKJS.NAVIGATE.VERIFICATION': {
+          actions: [
+            log('Navigating to sign in'),
+            {
+              type: 'navigateTo',
+              params: {
+                path: '/sign-up',
+              },
+            },
+          ],
+        },
+        'CLERKJS.NAVIGATE.CONTINUE': {
+          description: 'Redirect to the sign-up flow',
+          actions: [
+            log('Navigating to sign up'),
+            {
+              type: 'navigateTo',
+              params: {
+                path: '/sign-up',
+              },
+            },
+          ],
+        },
+        'CLERKJS.NAVIGATE.*': {
+          target: '#SignIn.Start',
+          actions: [
+            {
+              type: 'setGlobalError',
+              params: {
+                error: new ClerkElementsRuntimeError('Unknown navigation event.'),
+              },
+            },
+          ],
+        },
+      },
+      states: {
+        Attempting: {
+          invoke: {
+            id: 'handleRedirectCallback',
+            src: 'handleRedirectCallback',
+            input: ({ context }) => context.clerk,
+            onError: {
+              actions: 'setFormErrors',
+            },
+          },
+        },
+      },
+    },
     HavingTrouble: {
       id: 'HavingTrouble',
       always: 'Start',
+    },
+    NotImplemented: {
+      entry: log('Not implemented.'),
     },
     Complete: {
       id: 'Complete',
