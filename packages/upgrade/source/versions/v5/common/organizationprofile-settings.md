@@ -2,6 +2,7 @@
 title: '`Settings` -> `General` tab in `OrganizationProfile`'
 matcher: '<OrganizationProfile'
 type: 'warning'
+image: true
 ---
 
 The "Settings" tab within the `<OrganizationProfile />` component has been renamed to "General". If you are linking directly to `/organization-settings` from anywhere, the link will need to be updated to `/organization-general`.
