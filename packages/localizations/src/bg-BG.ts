@@ -154,14 +154,9 @@ export const bgBG: LocalizationResource = {
       title: 'Нулиране на парола',
       subtitle_email: 'Първо, въведете кода, изпратен на вашия имейл',
       subtitle_phone: 'Първо, въведете кода, изпратен на вашия телефон',
-      inputLabel: 'Код за нулиране на парола',
       resendButton: 'Не сте получили код? Изпрати отново',
-      title_email: 'Проверете вашия имейл',
-      title_phone: 'Проверете вашия телефон',
       subtitle: 'за да нулирате паролата си',
       formTitle: 'Код за нулиране на парола',
-      formSubtitle_email: 'Въведете кода, изпратен на вашия имейл адрес',
-      formSubtitle_phone: 'Въведете кода, изпратен на вашия телефонен номер',
     },
     resetPassword: {
       title: 'Задайте нова парола',
@@ -176,8 +171,6 @@ export const bgBG: LocalizationResource = {
       title: 'Проверете вашия имейл',
       subtitle: 'за да продължите към {{applicationName}}',
       formTitle: 'Код за потвърждение',
-      formSubtitle: 'Въведете кода за потвърждение, изпратен на вашия имейл адрес',
-      inputLabel: 'Код за потвърждение',
       resendButton: 'Не сте получили код? Изпрати отново',
     },
     emailLink: {
@@ -220,15 +213,11 @@ export const bgBG: LocalizationResource = {
       title: 'Двустепенна верификация',
       subtitle:
         'За да продължите, моля въведете кода за потвърждение, генериран от вашето приложение за удостоверяване',
-      inputLabel: 'Код за потвърждение',
       formTitle: 'Код за потвърждение',
-      formSubtitle: 'Въведете кода за потвърждение, генериран от вашето приложение за удостоверяване',
     },
     backupCodeMfa: {
       title: 'Въведете резервен код',
       subtitle: 'Вашият резервен код е този, който сте получили при настройване на двустепенната аутентикация.',
-      formTitle: '',
-      formSubtitle: '',
     },
     alternativeMethods: {
       title: 'Използвайте друг метод',
@@ -255,7 +244,6 @@ export const bgBG: LocalizationResource = {
   },
   userProfile: {
     mobileButton__menu: 'Меню',
-    formButtonPrimary__save: 'Запази',
     formButtonPrimary__continue: 'Продължи',
     formButtonPrimary__finish: 'Завърши',
     formButtonReset: 'Откажи',
@@ -278,51 +266,25 @@ export const bgBG: LocalizationResource = {
       emailAddressesSection: {
         title: 'Имейл адреси',
         primaryButton: 'Добави имейл адрес',
-        detailsTitle__primary: 'Основен имейл адрес',
-        detailsSubtitle__primary: 'Този имейл адрес е основният имейл адрес',
         detailsAction__primary: 'Завърши потвърждение',
-        detailsTitle__nonPrimary: 'Задайте като основен',
-        detailsSubtitle__nonPrimary:
-          'Задайте този имейл адрес като основен, за да получавате съобщения относно вашия профил.',
         detailsAction__nonPrimary: 'Задайте като основен',
-        detailsTitle__unverified: 'Потвърдете имейл адреса',
-        detailsSubtitle__unverified:
-          'Завършете потвърждението, за да получите достъп до всички функции с този имейл адрес',
         detailsAction__unverified: 'Потвърдете',
-        destructiveActionTitle: 'Премахни',
-        destructiveActionSubtitle: 'Изтрийте този имейл адрес и го премахнете от вашия профил',
         destructiveAction: 'Премахни имейл',
       },
       phoneNumbersSection: {
         title: 'Телефонни номера',
         primaryButton: 'Добави телефонен номер',
-        detailsTitle__primary: 'Основен телефонен номер',
-        detailsSubtitle__primary: 'Този телефонен номер е основният телефонен номер',
         detailsAction__primary: 'Завърши потвърждение',
-        detailsTitle__nonPrimary: 'Задайте като основен телефонен номер',
-        detailsSubtitle__nonPrimary:
-          'Задайте този телефонен номер като основен, за да получавате съобщения относно вашия профил.',
         detailsAction__nonPrimary: 'Задайте като основен',
-        detailsTitle__unverified: 'Потвърдете телефонния номер',
-        detailsSubtitle__unverified:
-          'Завършете потвърждението, за да получите достъп до всички функции с този телефонен номер',
         detailsAction__unverified: 'Потвърдете телефонния номер',
-        destructiveActionTitle: 'Премахни',
-        destructiveActionSubtitle: 'Изтрийте този телефонен номер и го премахнете от вашия профил',
         destructiveAction: 'Премахни телефонен номер',
       },
       connectedAccountsSection: {
         title: 'Свързани акаунти',
         primaryButton: 'Свържи акаунт',
-        title__connectionFailed: 'Опитайте отново неуспешната връзка',
-        title__reauthorize: 'Изисква се повторна авторизация',
-        subtitle__reauthorize:
-          'Необходимите обхвати са актуализирани и може да изпитвате ограничена функционалност. Моля, авторизирайте отново това приложение, за да избегнете всякакви проблеми',
         actionLabel__connectionFailed: 'Опитайте отново',
         actionLabel__reauthorize: 'Авторизирайте сега',
         destructiveActionTitle: 'Премахни',
-        destructiveActionSubtitle: 'Премахнете този свързан акаунт от вашия профил',
-        destructiveActionAccordionSubtitle: 'Премахни свързания акаунт',
       },
       enterpriseAccountsSection: {
         title: 'Корпоративни акаунти',
@@ -336,14 +298,7 @@ export const bgBG: LocalizationResource = {
         title: 'Двустепенна верификация',
         primaryButton: 'Добави двустепенна верификация',
         phoneCode: {
-          destructiveActionTitle: 'Премахни',
-          destructiveActionSubtitle: 'Премахни този телефонен номер от методите за двустепенна верификация',
           destructiveActionLabel: 'Премахни',
-          title__default: 'Стандартен фактор',
-          title__setDefault: 'Задай като стандартен фактор',
-          subtitle__default: 'Този фактор ще се използва като стандартен метод за двустепенна верификация при влизане.',
-          subtitle__setDefault:
-            'Задайте този фактор като стандартен, за да го използвате като стандартен метод за двустепенна верификация при влизане.',
           actionLabel__setDefault: 'Задай като стандартен',
         },
         backupCodes: {
@@ -355,34 +310,21 @@ export const bgBG: LocalizationResource = {
         },
         totp: {
           headerTitle: 'Приложение за удостоверяване',
-          title: 'Стандартен фактор',
-          subtitle: 'Този фактор ще се използва като стандартен метод за двустепенна верификация при влизане.',
           destructiveActionTitle: 'Премахни',
-          destructiveActionSubtitle: 'Премахни приложението за удостоверяване от методите за двустепенна верификация',
-          destructiveActionLabel: 'Премахни приложението за удостоверяване',
         },
       },
       activeDevicesSection: {
         title: 'Активни устройства',
-        primaryButton: 'Активни устройства',
-        detailsTitle: 'Текущо устройство',
-        detailsSubtitle: 'Това е устройството, което използвате в момента',
-        destructiveActionTitle: 'Излез',
-        destructiveActionSubtitle: 'Излезте от профила си на това устройство',
         destructiveAction: 'Излез от устройството',
       },
       web3WalletsSection: {
         title: 'Web3 портфейли',
         primaryButton: 'Web3 портфейли',
-        destructiveActionTitle: 'Премахни',
-        destructiveActionSubtitle: 'Премахни този web3 портфейл от вашия профил',
         destructiveAction: 'Премахни портфейл',
       },
       dangerSection: {
         title: 'Прекратяване на профила',
         deleteAccountButton: 'Изтрий профила',
-        deleteAccountTitle: 'Изтрий профила',
-        deleteAccountDescription: 'Изтрийте профила си и всички свързани с него данни',
       },
     },
     profilePage: {
@@ -565,39 +507,15 @@ export const bgBG: LocalizationResource = {
       general: 'Общи',
       members: 'Членове',
     },
-    general: {
-      title: 'Общи',
-      profileSection: {
-        title: 'Профил на организацията',
-        primaryButton: 'Редакция на профила',
-        uploadAction__title: 'Лого',
-      },
-      domainSection: {
-        title: 'Верифицирани домейни',
-        subtitle:
-          'Позволете на потребителите да се присъединяват към организацията автоматично или да заявят да се присъединят на база верифициран имейл домейн.',
-        primaryButton: 'Добавяне на домейн',
-        menuAction__verify: 'Верификация',
-        menuAction__remove: 'Изтриване',
-        menuAction__manage: 'Управление',
-        unverifiedDomain_menuAction__verify: 'Верификация на домейн',
-        unverifiedDomain_menuAction__remove: 'Изтриване на домейн',
-      },
-    },
-    members: {
-      title: 'Членове',
-    },
     badge__unverified: 'Неверифициран',
     badge__automaticInvitation: 'Автоматични покани',
     badge__automaticSuggestion: 'Автоматични предложения',
     badge__manualInvitation: 'Няма автоматично включване',
     start: {
       headerTitle__members: 'Членове',
-      headerTitle__settings: 'Настройки',
     },
     profilePage: {
       title: 'Актуализиране на профила',
-      subtitle: 'Управление на профила на организацията',
       successMessage: 'Организацията е актуализирана.',
       dangerSection: {
         title: 'Опасност',
@@ -622,8 +540,6 @@ export const bgBG: LocalizationResource = {
         subtitle:
           'Позволява на потребителите да се присъединяват към организацията автоматично или да заявят да се присъединят на база верифициран имейл домейн.',
         primaryButton: 'Добавяне на домейн',
-        unverifiedDomain_menuAction__verify: 'Верификация на домейн',
-        unverifiedDomain_menuAction__remove: 'Изтриване на домейн',
       },
     },
     createDomainPage: {
