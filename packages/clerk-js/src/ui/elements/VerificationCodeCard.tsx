@@ -66,7 +66,6 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
           <Button
             elementDescriptor={descriptors.formButtonPrimary}
             block
-            hasArrow
             isLoading={otp.isLoading}
             localizationKey={localizationKeys('formButtonPrimary')}
             onClick={otp.onFakeContinue}
