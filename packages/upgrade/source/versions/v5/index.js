@@ -20,6 +20,7 @@ const reactChangesList = [
 	'useorganization-membershiplist',
 	'useorganizations',
 	'userprofile-prop',
+	'organizationprofile-settings',
 ];
 
 export default {
@@ -56,6 +57,7 @@ export default {
 		'usemagiclink',
 		'magiclinkerrorcode',
 		'setsession',
+		'organizationprofile-settings',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -80,6 +82,7 @@ export default {
 		'usemagiclink',
 		'magiclinkerrorcode',
 		'setsession',
+		'organizationprofile-settings',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -134,6 +137,7 @@ export default {
 		'user-createexternalaccount-redirecturl', // maybe shared with all?
 		'signup-attemptweb3walletverification-generatedsignature',
 		'redirecttohome',
+		'organizationprofile-settings',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',
