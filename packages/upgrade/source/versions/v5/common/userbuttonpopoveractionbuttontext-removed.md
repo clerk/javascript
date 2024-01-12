@@ -1,5 +1,6 @@
 ---
 title: '`userButtonPopoverActionButtonText` descriptor removed'
+image: true
 matcher:
   - "\\.cl-userButtonPopoverActionButtonText"
   - "elements:\\s+{[\\s\\S]*?userButtonPopoverActionButtonText:[\\s\\S]*?}"
