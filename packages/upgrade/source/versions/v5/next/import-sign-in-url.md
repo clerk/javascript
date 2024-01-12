@@ -1,6 +1,6 @@
 ---
 title: '`SIGN_IN_URL` constant removed'
-matcher: "SIGN_IN_URL[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+matcher: "import\\s+{[\\s\\S]*?SIGN_IN_URL[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
 matcherFlags: 'm'
 ---
 

@@ -69,6 +69,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 	//
 	useEffect(() => {
 		if (!matchers || !files) return;
+		const allResults = {};
 
 		Promise.all(
 			// first we read all the files
@@ -76,21 +77,22 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 				const content = await fs.readFile(file, 'utf8');
 
 				// then we run each of the matchers against the file contents
-				// TODO: combine results on the same match, add multiple file/positions
 				for (const sdk in matchers) {
+					// returns [{ ...matcher, instances: [{sdk, file, position}]  }]
 					matchers[sdk].map(matcher => {
-						const matches = content.matchAll(matcher.matcher);
-						if (!matches) return;
+						// run regex against file content, return array of matches
+						const matches = Array.from(content.matchAll(matcher.matcher));
+						if (matches.length < 1) return;
 
-						Array.from(matches).map(match => {
-							// TODO: index should be converted to line/col
-							results.push({
+						// for each match, add to `instances` array of a key, create if not exists
+						matches.map(match => {
+							if (!allResults[matcher.title]) allResults[matcher.title] = { instances: [], ...matcher };
+
+							allResults[matcher.title].instances.push({
 								sdk,
-								file,
-								position: indexToPosition(content, match.index),
-								...matcher,
+								file: path.relative(process.cwd(), file),
+								position: indexToPosition(content, match.index, { oneBased: true }),
 							});
-							setResults(results);
 						});
 					});
 				}
@@ -100,6 +102,8 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 			}),
 		)
 			.then(() => {
+				setResults([...results, ...Object.keys(allResults).map(k => allResults[k])]);
+
 				setComplete(true);
 				if (results.length < 1) {
 					setStatus('It looks like you have nothing you need to change, upgrade away!');

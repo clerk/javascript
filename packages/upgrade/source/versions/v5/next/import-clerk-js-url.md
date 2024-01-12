@@ -1,6 +1,6 @@
 ---
 title: '`CLERK_JS_URL` constant removed'
-matcher: "CLERK_JS_URL[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+matcher: "import\\s+{[\\s\\S]*?CLERK_JS_URL[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
 matcherFlags: 'm'
 ---
 

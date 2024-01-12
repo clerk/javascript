@@ -51,24 +51,50 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 			{state.all.reduce((memo, item, idx) => {
 				if (idx < state.visible[0] || idx >= state.visible[1]) return memo;
 
-				const loc = `${item.file}:${item.position.line}:${item.position.column}`;
+				const locations = item.instances.map(
+					instance => `${instance.file}:${instance.position.line}:${instance.position.column}`,
+				);
+
 				memo.push(
 					<Box
 						borderStyle={item.focused ? 'double' : 'single'}
 						flexDirection='column'
 						borderColor={item.focused ? 'blue' : 'white'}
 						paddingX={1}
-						key={loc}
+						key={item.title}
 					>
 						<Markdown>{item.title}</Markdown>
-						<Text>Location: {loc}</Text>
+						{locations.length > 1 ? (
+							<Text>Found {locations.length} instances, expand for detail</Text>
+						) : (
+							<Text>Location: {locations[0]}</Text>
+						)}
 						{item.expanded && (
 							<>
+								<Box
+									borderStyle='single'
+									borderRight={false}
+									borderLeft={false}
+									borderBottom={false}
+								/>
+
+								{locations.length > 1 && (
+									<>
+										<Text>Locations:</Text>
+										{locations.map(loc => (
+											<Text>
+												{'  '}- {loc}
+											</Text>
+										))}
+									</>
+								)}
+
 								<Newline />
 								{/* <Text color='gray'>changed in {item.sdk} SDK</Text> */}
 								<Markdown>{item.content}</Markdown>
+								<Newline />
 								<Link url={item.link}>
-									<Text>See in migration guide &raquo;</Text>
+									<Text>Open in migration guide &raquo;</Text>
 								</Link>
 							</>
 						)}
@@ -153,6 +179,7 @@ function reducer(state, action) {
 			}
 			return item;
 		});
+		console.log(''); // this is strange but seems to solve a rendering bug
 		return { all, visible: state.visible, numberVisible: state.numberVisible };
 	}
 }

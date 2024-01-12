@@ -1,6 +1,6 @@
 ---
 title: '`PUBLISHABLE_KEY` constant removed'
-matcher: "PUBLISHABLE_KEY[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+matcher: "import\\s+{[\\s\\S]*?PUBLISHABLE_KEY[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
 matcherFlags: 'm'
 ---
 
