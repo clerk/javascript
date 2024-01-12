@@ -1,6 +1,6 @@
 {
 	"name": "@clerk/upgrade",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"license": "MIT",
 	"type": "module",
 	"bin": "dist/cli.js",
