@@ -2,4 +2,4 @@
 "@clerk/nextjs": patch
 ---
 
-Rethrow partial prerendering (PPR) error.
+Fix partial prerendering error when using NextJS by correctly rethrowing partial prerendering (PPR) error.
