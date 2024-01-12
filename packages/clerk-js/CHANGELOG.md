@@ -92,14 +92,12 @@
 
 ### Minor Changes
 
-- Remove MemberRole Type`MemberRole` would always include the old role keys `admin`, `member`, `guest_member`. ([#2388](https://github.com/clerk/javascript/pull/2388)) by [@panteliselef](https://github.com/panteliselef)
+- Remove MembershipRole. The type `MembershipRole` would always include the old role keys `admin`, `basic_member`, `guest_member`. ([#2388](https://github.com/clerk/javascript/pull/2388)) by [@panteliselef](https://github.com/panteliselef)
 
   If developers still depend on them after the introduction of custom roles, the can provide them as their custom types for authorization.
 
   ```ts
   // clerk.d.ts
-  export {};
-
   interface ClerkAuthorization {
     permission: '';
     role: 'admin' | 'basic_member' | 'guest_member';
