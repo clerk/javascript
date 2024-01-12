@@ -1,5 +1,19 @@
 # Change Log
 
+## 0.37.2
+
+### Patch Changes
+
+- Replace the `Clerk-Backend-SDK` header with `User-Agent` in BAPI requests and update it's value to contain both the package name and the package version of the clerk package ([#2579](https://github.com/clerk/javascript/pull/2579)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  executing the request. Eg request from `@clerk/nextjs` to BAPI with append `User-Agent: @clerk/nextjs@5.0.0-alpha-v5.16` using the latest version.
+
+  Miscellaneous changes: The backend test build changed to use tsup.
+
+- Add deprecation warning for `EmailAPI.createEmail`. ([#2555](https://github.com/clerk/javascript/pull/2555)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  This endpoint is no longer available and the function will be removed in the next major version.
+
 ## 0.37.1
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.29.3
+
+### Patch Changes
+
+- Replace the `Clerk-Backend-SDK` header with `User-Agent` in BAPI requests and update it's value to contain both the package name and the package version of the clerk package ([#2579](https://github.com/clerk/javascript/pull/2579)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  executing the request. Eg request from `@clerk/nextjs` to BAPI with append `User-Agent: @clerk/nextjs@5.0.0-alpha-v5.16` using the latest version.
+
+  Miscellaneous changes: The backend test build changed to use tsup.
+
+- Updated dependencies [[`c59a2d4a2`](https://github.com/clerk/javascript/commit/c59a2d4a22166076340b3c5c5e20c112a138acbe), [`2a615bf98`](https://github.com/clerk/javascript/commit/2a615bf98a22250c9105671ce72bf5374602802f)]:
+  - @clerk/clerk-sdk-node@4.13.6
+  - @clerk/backend@0.37.2
+
 ## 4.29.2
 
 ### Patch Changes
