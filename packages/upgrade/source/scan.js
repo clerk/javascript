@@ -105,7 +105,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 				setResults([...results, ...Object.keys(allResults).map(k => allResults[k])]);
 
 				setComplete(true);
-				if (allResults.length < 1) {
+				if (Object.keys(allResults).length < 1) {
 					setStatus('It looks like you have nothing you need to change, upgrade away!');
 				} else {
 					setStatus('File scan complete. See results below!');

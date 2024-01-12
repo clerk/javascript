@@ -2,7 +2,12 @@ import { readPackageSync } from 'read-pkg';
 import SDKS from '../constants/sdks.js';
 
 export default function guessFrameworks(dir) {
-	const pkg = readPackageSync({ cwd: dir });
+	let pkg;
+	try {
+		pkg = readPackageSync({ cwd: dir });
+	} catch (err) {
+		return [];
+	}
 
 	// no guessing if there are no deps
 	if (!pkg.dependencies && !pkg.devDependencies) return [];
