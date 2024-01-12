@@ -77,7 +77,9 @@
     "uk-UA",
     "vi-VN",
     "zh-CN",
-    "zh-TW"
+    "zh-TW",
+    "es-MX",
+    "bg-BG"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",

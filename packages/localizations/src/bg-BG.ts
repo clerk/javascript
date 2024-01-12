@@ -722,7 +722,8 @@ export const bgBG: LocalizationResource = {
         table__emptyRow: 'Няма заявки за показване',
         requests: {
           headerTitle: 'Заявки',
-          headerSubtitle: 'Преглеждайте и управлявайте потребители, които са заявили да се присъединят към организацията.',
+          headerSubtitle:
+            'Преглеждайте и управлявайте потребители, които са заявили да се присъединят към организацията.',
         },
         autoSuggestions: {
           headerTitle: 'Автоматични предложения',
