@@ -71,12 +71,7 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 						)}
 						{item.expanded && (
 							<>
-								<Box
-									borderStyle='single'
-									borderRight={false}
-									borderLeft={false}
-									borderBottom={false}
-								/>
+								<Line />
 
 								{locations.length > 1 && (
 									<>
@@ -92,7 +87,7 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 								<Newline />
 								{/* <Text color='gray'>changed in {item.sdk} SDK</Text> */}
 								<Markdown>{item.content}</Markdown>
-								<Newline />
+								<Line />
 								<Link url={item.link}>
 									<Text>Open in migration guide &raquo;</Text>
 								</Link>
@@ -111,6 +106,15 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 		</>
 	);
 }
+
+const Line = () => (
+	<Box
+		borderStyle='single'
+		borderRight={false}
+		borderLeft={false}
+		borderBottom={false}
+	/>
+);
 
 // I'd like to recognize that this logic is kinda crazy, but it works 💖
 function reducer(state, action) {
