@@ -27,6 +27,7 @@ const reactChangesList = [
 	'userbuttonpopoveractionbuttontext-removed',
 	'userbuttontrigger-userbuttonbox-invert',
 	'organizationswitcherpopoveractionbuttontext-removed',
+	'card-changes',
 ];
 
 export default {
@@ -70,6 +71,7 @@ export default {
 		'userbuttonpopoveractionbuttontext-removed',
 		'userbuttontrigger-userbuttonbox-invert',
 		'organizationswitcherpopoveractionbuttontext-removed',
+		'card-changes',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -101,6 +103,7 @@ export default {
 		'userbuttonpopoveractionbuttontext-removed',
 		'userbuttontrigger-userbuttonbox-invert',
 		'organizationswitcherpopoveractionbuttontext-removed',
+		'card-changes',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -162,6 +165,7 @@ export default {
 		'userbuttonpopoveractionbuttontext-removed',
 		'userbuttontrigger-userbuttonbox-invert',
 		'organizationswitcherpopoveractionbuttontext-removed',
+		'card-changes',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',
