@@ -3,7 +3,11 @@ title: '`userButtonPopoverActionButtonText` descriptor removed'
 image: true
 matcher:
   - "\\.cl-userButtonPopoverActionButtonText"
+  - "\\.cl-userButtonPopoverActionButtonText__signOut"
+  - "\\.cl-userButtonPopoverActionButtonText__manageAccount"
   - "elements:\\s+{[\\s\\S]*?userButtonPopoverActionButtonText:[\\s\\S]*?}"
+  - "elements:\\s+{[\\s\\S]*?userButtonPopoverActionButtonText__signOut:[\\s\\S]*?}"
+  - "elements:\\s+{[\\s\\S]*?userButtonPopoverActionButtonText__manageAccount:[\\s\\S]*?}"
 ---
 
-The `userButtonPopoverActionButtonText` customization descriptor has been removed, as the text for this button is now directly rendered inside the button rather than an extra wrapping element. Any styling that needs to apply to the text can be applied to its direct parent `cl-userButtonPopoverActionButton`.
+The `userButtonPopoverActionButtonText` customization descriptor has been removed, as the text for this button is now directly rendered inside the button rather than an extra wrapping element. The nested descriptors `userButtonPopoverActionButtonText__signOut` and `userButtonPopoverActionButtonText__manageAccount` have also been removed. Any styling that needs to apply to the text can be applied to its direct parent `cl-userButtonPopoverActionButton`.
