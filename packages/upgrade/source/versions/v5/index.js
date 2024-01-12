@@ -23,6 +23,7 @@ const reactChangesList = [
 	'organizationprofile-settings',
 	'userprofile-security',
 	'mfa-dropdown',
+	'connected-accounts-dropdown',
 ];
 
 export default {
@@ -62,6 +63,7 @@ export default {
 		'organizationprofile-settings',
 		'userprofile-security',
 		'mfa-dropdown',
+		'connected-accounts-dropdown',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -89,6 +91,7 @@ export default {
 		'organizationprofile-settings',
 		'userprofile-security',
 		'mfa-dropdown',
+		'connected-accounts-dropdown',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -146,6 +149,7 @@ export default {
 		'organizationprofile-settings',
 		'userprofile-security',
 		'mfa-dropdown',
+		'connected-accounts-dropdown',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',
