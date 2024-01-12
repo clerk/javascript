@@ -120,13 +120,14 @@ export const TagInput = (props: TagInputProps) => {
       sx={[
         t => ({
           maxWidth: '100%',
-          padding: `${t.space.$2x5} ${t.space.$4}`,
+          padding: `${t.space.$1x5} ${t.space.$2}`,
           backgroundColor: t.colors.$colorInputBackground,
           color: t.colors.$colorInputText,
           minHeight: t.sizes.$20,
           maxHeight: t.sizes.$60,
           overflowY: 'auto',
           cursor: 'text',
+          justifyItems: 'center',
           ...common.borderVariants(t).normal,
         }),
         sx,
@@ -160,7 +161,7 @@ export const TagInput = (props: TagInputProps) => {
           border: 'none',
           width: 'initial',
           padding: 0,
-          lineHeight: t.space.$6,
+          lineHeight: t.space.$5,
           paddingLeft: t.space.$1,
           '::placeholder': {
             color: t.colors.$colorTextTertiary,

@@ -54,13 +54,13 @@ export const OrganizationMembers = withCardStateProvider(() => {
   return (
     <Col
       elementDescriptor={descriptors.page}
-      gap={8}
+      gap={2}
     >
       <Card.Alert>{card.error}</Card.Alert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('organizationMembers')}
-        gap={8}
+        gap={4}
       >
         <Action.Root>
           <Header.Root sx={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
@@ -96,8 +96,10 @@ export const OrganizationMembers = withCardStateProvider(() => {
                   <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />
                 </Tab>
               )}
-              <Col
-                justify='center'
+            </TabsList>
+            {canManageMemberships && (
+              <Flex
+                justify='end'
                 sx={{
                   marginLeft: 'auto',
                   [mqu.md]: {
@@ -105,13 +107,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
                   },
                 }}
               >
-                {canManageMemberships && (
-                  <Action.Trigger value='invite'>
-                    <InviteMembersButton />
-                  </Action.Trigger>
-                )}
-              </Col>
-            </TabsList>
+                <Action.Trigger value='invite'>
+                  <InviteMembersButton />
+                </Action.Trigger>
+              </Flex>
+            )}
             {canReadMemberships && (
               <Action.Open value='invite'>
                 <Action.Card>

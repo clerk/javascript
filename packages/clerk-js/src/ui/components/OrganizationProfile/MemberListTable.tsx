@@ -74,7 +74,7 @@ export const DataTable = (props: MembersListTableProps) => {
           </Tbody>
         </Table>
       </Flex>
-      {
+      {pageCount > 1 && (
         <Pagination
           count={pageCount}
           page={page}
@@ -86,7 +86,7 @@ export const DataTable = (props: MembersListTableProps) => {
             endingRow,
           }}
         />
-      }
+      )}
     </Col>
   );
 };
@@ -195,12 +195,7 @@ export const RoleSelect = (props: {
           </Flex>
         )}
       </SelectButton>
-      <SelectOptionList
-        sx={optionListSx}
-        containerSx={{
-          gap: 0,
-        }}
-      />
+      <SelectOptionList sx={optionListSx} />
     </Select>
   );
 };
@@ -220,8 +215,8 @@ const RolesListItem = memo((props: RolesListItemProps) => {
       sx={[
         theme => ({
           width: '100%',
-          gap: theme.space.$1,
           padding: `${theme.space.$2} ${theme.space.$4}`,
+          borderRadius: theme.radii.$md,
         }),
         sx,
       ]}
