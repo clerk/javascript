@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { Flex } from '../customizables';
-import { Box, Button, Col, descriptors, Text } from '../customizables';
+import { Button, Col, descriptors, Text } from '../customizables';
 import { FormButtonContainer, Header } from '../elements';
 import { useNavigateToFlowStart } from '../hooks';
 import type { LocalizationKey } from '../localization';
@@ -21,16 +21,20 @@ export const SuccessPage = (props: SuccessPageProps) => {
   const { navigateToFlowStart } = useNavigateToFlowStart();
 
   return (
-    <Col {...rest}>
+    <Col
+      {...rest}
+      gap={4}
+    >
       <Header.Root>
         <Header.Title localizationKey={title} />
       </Header.Root>
-      <Box>
+      <Col gap={4}>
         {Array.isArray(text) ? (
           text.map(t => (
             <Text
               key={t.key}
               localizationKey={t}
+              colorScheme='neutral'
               sx={t => ({
                 display: 'inline',
                 ':not(:last-of-type)': {
@@ -40,9 +44,12 @@ export const SuccessPage = (props: SuccessPageProps) => {
             />
           ))
         ) : (
-          <Text localizationKey={text} />
+          <Text
+            localizationKey={text}
+            colorScheme='neutral'
+          />
         )}
-      </Box>
+      </Col>
       {contents}
       <FormButtonContainer>
         <Button

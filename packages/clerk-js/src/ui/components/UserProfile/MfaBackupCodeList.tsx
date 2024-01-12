@@ -10,7 +10,7 @@ import { Check, Copy, Download, Print } from '../../icons';
 import { MfaBackupCodeTile } from './MfaBackupCodeTile';
 
 type MfaBackupCodeListProps = {
-  subtitle: LocalizationKey;
+  subtitle?: LocalizationKey;
   backupCodes?: string[];
 };
 

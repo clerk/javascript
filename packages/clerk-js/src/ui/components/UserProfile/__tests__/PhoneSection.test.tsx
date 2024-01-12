@@ -55,7 +55,7 @@ describe('PhoneSection', () => {
 
       const { getByRole, userEvent, getByLabelText, getByText } = render(<PhoneSection />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Add a phone number' }));
-      await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
+      await waitFor(() => getByRole('heading', { name: /Add a phone number/i }));
 
       getByLabelText(/phone number/i);
       getByText(/A text message containing a verification link will be sent to this phone number./i);
@@ -67,7 +67,7 @@ describe('PhoneSection', () => {
 
       const { getByRole, userEvent, getByLabelText } = render(<PhoneSection />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Add a phone number' }));
-      await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
+      await waitFor(() => getByRole('heading', { name: /Add a phone number/i }));
 
       fixtures.clerk.user?.createPhoneNumber.mockReturnValueOnce(Promise.resolve({} as any));
 
@@ -81,7 +81,7 @@ describe('PhoneSection', () => {
         const { wrapper } = await createFixtures(initConfig);
         const { getByRole, userEvent } = render(<PhoneSection />, { wrapper });
         await userEvent.click(getByRole('button', { name: 'Add a phone number' }));
-        await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
+        await waitFor(() => getByRole('heading', { name: /Add a phone number/i }));
 
         expect(screen.getByText(/save$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
       });
@@ -91,7 +91,7 @@ describe('PhoneSection', () => {
 
         const { userEvent, getByRole, queryByRole } = render(<PhoneSection />, { wrapper });
         await userEvent.click(getByRole('button', { name: /Add a phone number/i }));
-        await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
+        await waitFor(() => getByRole('heading', { name: /Add a phone number/i }));
         expect(queryByRole('button', { name: /Add a phone number/i })).not.toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('button', { name: /cancel$/i }));

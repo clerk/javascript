@@ -383,6 +383,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       successMessage: LocalizationValue;
       infoText: LocalizationValue;
+      // TODO-RETHEME remove
       infoText__secondary: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
@@ -451,9 +452,14 @@ type _LocalizationResource = {
     mfaPhoneCodePage: {
       title: LocalizationValue;
       primaryButton__addPhoneNumber: LocalizationValue;
+      backButton: LocalizationValue;
       subtitle__availablePhoneNumbers: LocalizationValue;
       subtitle__unavailablePhoneNumbers: LocalizationValue;
+      // TODO-RETHEME remove
       successMessage: LocalizationValue;
+      successTitle: LocalizationValue;
+      successMessage1: LocalizationValue;
+      successMessage2: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;
