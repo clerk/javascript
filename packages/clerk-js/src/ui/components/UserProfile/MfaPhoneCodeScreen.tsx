@@ -4,9 +4,16 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
-import { Button, Col, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import { Button, Col, Icon, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { FormContainer, IconButton, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import {
+  FormButtonContainer,
+  FormContainer,
+  IconButton,
+  SuccessPage,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { Plus } from '../../icons';
 import { getCountryFromPhoneString, handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
@@ -116,40 +123,35 @@ const AddMfa = (props: AddMfaProps) => {
             <Button
               key={phone.id}
               variant='secondary'
+              sx={{ justifyContent: 'start' }}
               onClick={() => enableMfa(phone)}
               isLoading={card.loadingMetadata === phone.id}
               isDisabled={card.isLoading}
-              sx={t => ({
-                columnGap: t.space.$2x5,
-                justifyContent: 'start',
-              })}
             >
-              <span>{country.iso.toUpperCase()}</span> <span>{formattedPhone}</span>
+              {country.iso.toUpperCase()} {formattedPhone}
             </Button>
           );
         })}
-
-        <Flex sx={{ justifyContent: 'space-between' }}>
-          <IconButton
-            variant='ghost'
-            aria-label='Add phone number'
-            icon={
-              <Icon
-                icon={Plus}
-                sx={t => ({ marginRight: t.space.$2 })}
-              />
-            }
-            localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}
-            onClick={onAddPhoneClick}
-          />
-
-          <Button
-            variant='ghost'
-            localizationKey={localizationKeys('userProfile.formButtonReset')}
-            onClick={onReset}
-          />
-        </Flex>
       </Col>
+      <FormButtonContainer sx={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <IconButton
+          variant='ghost'
+          aria-label='Add phone number'
+          icon={
+            <Icon
+              icon={Plus}
+              sx={t => ({ marginRight: t.space.$2 })}
+            />
+          }
+          localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}
+          onClick={onAddPhoneClick}
+        />
+        <Button
+          variant='ghost'
+          localizationKey={localizationKeys('userProfile.formButtonReset')}
+          onClick={onReset}
+        />
+      </FormButtonContainer>
     </FormContainer>
   );
 };

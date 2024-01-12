@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
-import { Button, Col, Flex, localizationKeys, Text } from '../../customizables';
+import { Button, Flex, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -75,37 +75,33 @@ export const AddPhone = (props: AddPhoneProps) => {
       gap={1}
     >
       <Form.Root
-        gap={6}
+        gap={4}
         onSubmit={addPhone}
       >
         <Text
           localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')}
           colorScheme='neutral'
         />
-
-        <Col gap={1}>
-          <Form.ControlRow elementId={phoneField.id}>
-            <Form.PhoneInput
-              {...phoneField.props}
-              autoFocus
+        <Form.ControlRow elementId={phoneField.id}>
+          <Form.PhoneInput
+            {...phoneField.props}
+            autoFocus
+          />
+        </Form.ControlRow>
+        <Flex justify={onUseExistingNumberClick ? 'between' : 'end'}>
+          {onUseExistingNumberClick && (
+            <Button
+              variant='ghost'
+              localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.backButton')}
+              onClick={onUseExistingNumberClick}
             />
-          </Form.ControlRow>
+          )}
 
-          <Flex justify={onUseExistingNumberClick ? 'between' : 'end'}>
-            {onUseExistingNumberClick && (
-              <Button
-                variant='ghost'
-                localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.backButton')}
-                onClick={onUseExistingNumberClick}
-              />
-            )}
-
-            <FormButtons
-              isDisabled={!canSubmit}
-              onReset={onReset}
-            />
-          </Flex>
-        </Col>
+          <FormButtons
+            isDisabled={!canSubmit}
+            onReset={onReset}
+          />
+        </Flex>
       </Form.Root>
     </FormContainer>
   );
