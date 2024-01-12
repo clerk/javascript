@@ -2,11 +2,10 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
-  IconButton,
   Tab,
   TabPanel,
   TabPanels,
@@ -16,7 +15,6 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { Action } from '../../elements/Action';
-import { UserAdd } from '../../icons';
 import { mqu, type ThemableCssProp } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
 import { InviteMembersScreen } from './InviteMembersScreen';
@@ -26,17 +24,10 @@ import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests
 
 export const InviteMembersButton = (props: { sx?: ThemableCssProp }) => {
   return (
-    <IconButton
+    <Button
       {...props}
       elementDescriptor={descriptors.membersPageInviteButton}
       aria-label='Invite'
-      icon={
-        <Icon
-          icon={UserAdd}
-          size={'sm'}
-          sx={t => ({ marginRight: t.space.$2 })}
-        />
-      }
       textVariant='buttonSmall'
       localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
     />

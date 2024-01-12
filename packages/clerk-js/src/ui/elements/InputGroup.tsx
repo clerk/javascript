@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 import { descriptors, Flex, Input, Text } from '../customizables';
-import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import { common, type PropsOfComponent, type ThemableCssProp } from '../styledSystem';
 
 type InputGroupProps = PropsOfComponent<typeof Input>;
 
@@ -26,7 +26,6 @@ export const InputGroup = forwardRef<
 
   const textProps: ThemableCssProp = t => ({
     paddingInline: t.space.$2,
-    backgroundColor: t.colors.$blackAlpha50,
     borderTopRightRadius: '0',
     borderBottomRightRadius: '0',
     width: 'fit-content',
@@ -41,18 +40,28 @@ export const InputGroup = forwardRef<
       hasError={rest.hasError}
       sx={theme => ({
         position: 'relative',
-        borderRadius: theme.radii.$md,
         zIndex: 1,
-        border: theme.borders.$normal,
-        borderColor: theme.colors.$blackAlpha300, // we use this value in the Input primitive
+        ...common.borderVariants(theme).normal,
       })}
     >
-      {groupPrefix && <Text sx={textProps}>{groupPrefix}</Text>}
+      {groupPrefix && (
+        <Text
+          colorScheme='neutral'
+          sx={textProps}
+        >
+          {groupPrefix}
+        </Text>
+      )}
       <Input
         maxLength={25}
         sx={[
           {
-            borderColor: 'transparent',
+            boxShadow: 'none',
+            border: 'none',
+            ':hover:not(:focus)': {
+              border: 'none',
+              boxShadow: 'none',
+            },
             height: '100%',
             ...inputBorder,
           },
