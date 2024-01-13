@@ -29,6 +29,7 @@ const reactChangesList = [
 	'organizationswitcherpopoveractionbuttontext-removed',
 	'card-changes',
 	'alternativemethods-backlink',
+	'button-to-organizationlistcreateorganizationactionbutton',
 ];
 
 export default {
@@ -74,6 +75,7 @@ export default {
 		'organizationswitcherpopoveractionbuttontext-removed',
 		'card-changes',
 		'alternativemethods-backlink',
+		'button-to-organizationlistcreateorganizationactionbutton',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -107,6 +109,7 @@ export default {
 		'organizationswitcherpopoveractionbuttontext-removed',
 		'card-changes',
 		'alternativemethods-backlink',
+		'button-to-organizationlistcreateorganizationactionbutton',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -170,6 +173,7 @@ export default {
 		'organizationswitcherpopoveractionbuttontext-removed',
 		'card-changes',
 		'alternativemethods-backlink',
+		'button-to-organizationlistcreateorganizationactionbutton',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',
