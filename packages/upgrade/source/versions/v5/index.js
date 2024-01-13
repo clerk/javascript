@@ -31,6 +31,7 @@ const reactChangesList = [
 	'alternativemethods-backlink',
 	'button-to-organizationlistcreateorganizationactionbutton',
 	'remove-socialbuttonsblockbuttonarrow',
+	'remove-identitypreview-avatar',
 ];
 
 export default {
@@ -78,6 +79,7 @@ export default {
 		'alternativemethods-backlink',
 		'button-to-organizationlistcreateorganizationactionbutton',
 		'remove-socialbuttonsblockbuttonarrow',
+		'remove-identitypreview-avatar',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -113,6 +115,7 @@ export default {
 		'alternativemethods-backlink',
 		'button-to-organizationlistcreateorganizationactionbutton',
 		'remove-socialbuttonsblockbuttonarrow',
+		'remove-identitypreview-avatar',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -178,6 +181,7 @@ export default {
 		'alternativemethods-backlink',
 		'button-to-organizationlistcreateorganizationactionbutton',
 		'remove-socialbuttonsblockbuttonarrow',
+		'remove-identitypreview-avatar',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',
