@@ -43,14 +43,19 @@ export const TabsList = (props: TabsListProps) => {
   const { children, sx, ...rest } = props;
   const { setSelectedIndex, selectedIndex, setFocusedIndex } = useTabsContext();
 
-  const childrenWithProps = getValidChildren(children).map((child, index) =>
-    React.cloneElement(child, {
-      tabIndex: index,
-    }),
-  );
+  let index = 0;
+  const childrenWithProps = getValidChildren(children).map(child => {
+    const el = React.cloneElement(child, {
+      tabIndex: child.type === Tab ? index : undefined,
+    });
+    index++;
+    return el;
+  });
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const tabs = childrenWithProps.filter(child => !child.props?.isDisabled).map(child => child.props.tabIndex);
+    const tabs = childrenWithProps
+      .filter(child => !child.props?.isDisabled && child.type === Tab)
+      .map(child => child.props.tabIndex);
     const tabsLenth = tabs.length;
     const current = tabs.indexOf(selectedIndex);
 
@@ -83,7 +88,6 @@ export const TabsList = (props: TabsListProps) => {
     </Flex>
   );
 };
-
 type TabProps = PropsOfComponent<typeof Button>;
 type TabPropsWithTabIndex = TabProps & { tabIndex?: number };
 export const Tab = (props: TabProps) => {
@@ -128,7 +132,6 @@ export const Tab = (props: TabProps) => {
       aria-controls={`cl-tabpanel-${tabIndex}`}
       role='tab'
       ref={buttonRef}
-      focusRing={false}
       sx={[
         t => ({
           background: t.colors.$transparent,
