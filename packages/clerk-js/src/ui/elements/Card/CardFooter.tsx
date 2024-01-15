@@ -2,7 +2,8 @@ import React from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../customizables';
-import { mqu, type PropsOfComponent } from '../../styledSystem';
+import { common, mqu, type PropsOfComponent } from '../../styledSystem';
+import { colors } from '../../utils';
 import { Card } from '.';
 type CardFooterProps = PropsOfComponent<typeof Flex>;
 export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((props, ref) => {
@@ -21,7 +22,11 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
         t => ({
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
-          background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+          background: common.mergedColorsBackground(
+            colors.setAlpha(t.colors.$colorBackground, 0.8),
+            t.colors.$blackAlpha50,
+          ),
+          backdropFilter: t.backdropFilters.$defaultBlur,
           '>:first-of-type': {
             padding: `${t.space.$4} ${t.space.$8} ${t.space.$4} ${t.space.$8}`,
           },

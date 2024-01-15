@@ -11,7 +11,6 @@ const dropdownSlideInScaleAndFade = keyframes`
     opacity: 0;
     transform: scaleY(1) translateY(-6px);
   }
-
   100% {
     opacity: 1;
     transform: scaleY(1)  translateY(0px);

@@ -188,6 +188,10 @@ const maxHeightScroller = (t: InternalTheme) =>
     ...unstyledScrollbar(t),
   } as const);
 
+const mergedColorsBackground = (colorBack: string, colorFront: string) => {
+  return `linear-gradient(${colorFront},${colorFront}), linear-gradient(${colorBack}, ${colorBack})`;
+};
+
 export const common = {
   textVariants,
   borderVariants,
@@ -198,4 +202,5 @@ export const common = {
   centeredFlex,
   maxHeightScroller,
   unstyledScrollbar,
+  mergedColorsBackground,
 };
