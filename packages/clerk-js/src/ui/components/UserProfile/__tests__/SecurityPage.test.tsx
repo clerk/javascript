@@ -1,6 +1,5 @@
 import type { SessionWithActivitiesResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import { expect } from '@playwright/test';
 import { within } from '@testing-library/dom';
 
 import { render, screen, waitFor } from '../../../../testUtils';
@@ -16,8 +15,22 @@ describe('SecurityPage', () => {
     });
     fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
 
-    render(<SecurityPage />, { wrapper });
+    const { queryByText } = render(<SecurityPage />, { wrapper });
     await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
+    expect(queryByText(/^password/i)).not.toBeInTheDocument();
+  });
+
+  it('renders the Password section if instance is password based', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withPassword({
+        required: true,
+      });
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
+
+    const { getByText } = render(<SecurityPage />, { wrapper });
+    await waitFor(() => getByText(/^password/i));
   });
 
   it('shows the active devices of the user and has appropriate buttons', async () => {
