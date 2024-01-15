@@ -1,7 +1,21 @@
 import React, { memo, useMemo } from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import {
+  Col,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useLocalizations,
+} from '../../customizables';
 import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
@@ -125,15 +139,16 @@ export const RoleSelect = (props: {
   isDisabled?: boolean;
   triggerSx?: ThemableCssProp;
   optionListSx?: ThemableCssProp;
-  prependLocalizationKey?: LocalizationKey | string;
+  prefixLocalizationKey?: LocalizationKey | string;
 }) => {
-  const { value, roles, onChange, isDisabled, triggerSx, optionListSx, prependLocalizationKey } = props;
+  const { value, roles, onChange, isDisabled, triggerSx, optionListSx, prefixLocalizationKey } = props;
 
   const { localizeCustomRole } = useLocalizeCustomRoles();
 
   const fetchedRoles = useMemo(() => [...(roles || [])], [roles]);
 
   const selectedRole = useMemo(() => fetchedRoles.find(r => r.value === value), [fetchedRoles]);
+  const { t } = useLocalizations();
 
   const localizedOptions = useMemo(
     () =>
@@ -149,7 +164,7 @@ export const RoleSelect = (props: {
       elementId='role'
       options={localizedOptions}
       value={value}
-      placeholder='Select role'
+      placeholder={t(localizationKeys('organizationProfile.invitePage.selectDropdown__role'))}
       onChange={role => onChange(role.value)}
       renderOption={(option, _index, isSelected) => (
         <RolesListItem
@@ -188,11 +203,11 @@ export const RoleSelect = (props: {
             as='span'
             gap={1}
           >
-            {prependLocalizationKey && (
+            {prefixLocalizationKey && (
               <Text
                 as='span'
                 sx={t => ({ color: t.colors.$blackAlpha400 })}
-                localizationKey={prependLocalizationKey}
+                localizationKey={prefixLocalizationKey}
               />
             )}
             <Text

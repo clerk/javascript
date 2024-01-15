@@ -169,7 +169,7 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
           onChange={value => field.setValue(value)}
           triggerSx={t => ({ minWidth: t.sizes.$40, justifyContent: 'space-between', display: 'flex' })}
           optionListSx={t => ({ minWidth: t.sizes.$48 })}
-          prependLocalizationKey={`${t(localizationKeys('formFieldLabel__role'))}:`}
+          prefixLocalizationKey={`${t(localizationKeys('formFieldLabel__role'))}:`}
         />
       </Flex>
     </Form.ControlRow>
