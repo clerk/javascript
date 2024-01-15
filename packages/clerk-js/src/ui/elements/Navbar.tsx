@@ -101,6 +101,7 @@ export const NavBar = (props: NavBarProps) => {
           isActive={checkIfActive(r)}
           sx={t => ({
             padding: `${t.space.$1x5} ${t.space.$3}`,
+            minHeight: t.space.$8,
           })}
         >
           {t(r.name)}
@@ -137,15 +138,15 @@ const NavbarContainer = (
         [mqu.md]: {
           display: 'none',
         },
-        flex: `0 0 ${t.space.$60}`,
-        width: t.sizes.$60,
-        maxWidth: t.space.$60,
+        flex: `0 0 ${t.space.$57}`,
+        width: t.sizes.$57,
+        maxWidth: t.space.$57,
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 0.8),
           t.colors.$blackAlpha50,
         ),
         backdropFilter: t.backdropFilters.$defaultBlur,
-        padding: `${t.space.$6} ${t.space.$5} ${t.space.$3} ${t.space.$3}`,
+        padding: `${t.space.$6} ${t.space.$5} ${t.space.$4} ${t.space.$3}`,
         marginRight: `-${t.space.$2}`,
         color: t.colors.$colorText,
         justifyContent: 'space-between',
@@ -263,7 +264,7 @@ const NavButton = (props: NavButtonProps) => {
       {...rest}
       sx={[
         t => ({
-          gap: t.space.$4,
+          gap: t.space.$3,
           justifyContent: 'flex-start',
           opacity: isActive ? 1 : 0.6,
         }),

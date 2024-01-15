@@ -57,7 +57,10 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
 
             return (
               <Action.Root key={account.id}>
-                <ProfileSection.Item id='connectedAccounts'>
+                <ProfileSection.Item
+                  id='connectedAccounts'
+                  sx={t => ({ maxHeight: t.space.$8 })}
+                >
                   <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
                     <Image
                       elementDescriptor={[descriptors.providerIcon]}
@@ -72,7 +75,9 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                         gap={2}
                         center
                       >
-                        <Text>{`${providerToDisplayData[account.provider].name}`}</Text>
+                        <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{`${
+                          providerToDisplayData[account.provider].name
+                        }`}</Text>
                         <Text
                           as='span'
                           sx={t => ({ color: t.colors.$blackAlpha400 })}

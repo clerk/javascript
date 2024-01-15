@@ -131,14 +131,14 @@ export const MenuList = (props: MenuListProps) => {
             outline: 'none',
             borderRadius: theme.radii.$lg,
             borderColor: theme.colors.$blackAlpha150,
-            paddingTop: theme.space.$2,
-            paddingBottom: theme.space.$2,
+            padding: theme.space.$0x5,
             overflow: 'hidden',
             top: `calc(100% + ${theme.space.$2})`,
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
             boxShadow: theme.shadows.$menuShadow,
             zIndex: theme.zIndices.$dropdown,
+            gap: theme.space.$0x5,
           }),
           sx,
         ]}
@@ -192,9 +192,8 @@ export const MenuItem = (props: MenuItemProps) => {
       sx={[
         theme => ({
           justifyContent: 'start',
-          borderRadius: theme.radii.$none,
-          paddingLeft: theme.space.$4,
-          paddingRight: theme.space.$4,
+          borderRadius: theme.radii.$sm,
+          padding: `${theme.space.$1} ${theme.space.$3}`,
         }),
         sx,
       ]}

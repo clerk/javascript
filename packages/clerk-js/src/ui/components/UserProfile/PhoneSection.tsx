@@ -48,13 +48,18 @@ export const PhoneSection = () => {
           {user?.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
             <Action.Root key={phone.id}>
               <Action.Closed value=''>
-                <ProfileSection.Item id='phoneNumbers'>
+                <ProfileSection.Item
+                  id='phoneNumbers'
+                  sx={t => ({ maxHeight: t.space.$8 })}
+                >
                   <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                     <Flex
                       gap={2}
                       center
                     >
-                      <Text>{stringToFormattedPhoneString(phone.phoneNumber)} </Text>
+                      <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>
+                        {stringToFormattedPhoneString(phone.phoneNumber)}
+                      </Text>
                       {user?.primaryPhoneNumberId === phone.id && (
                         <Badge localizationKey={localizationKeys('badge__primary')} />
                       )}
