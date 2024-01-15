@@ -243,7 +243,7 @@ describe('OrganizationMembers', () => {
     });
   });
 
-  it('display pagination counts for 1 page', async () => {
+  it('dont display pagination counts for 1 page', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
@@ -261,14 +261,12 @@ describe('OrganizationMembers', () => {
 
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
-    const { container, getByText, getByLabelText } = render(<OrganizationMembers />, { wrapper });
+    const { container, queryByText, queryByLabelText } = render(<OrganizationMembers />, { wrapper });
 
     await waitForLoadingCompleted(container);
 
-    const pagination = getByText(/displaying/i).closest('p');
-    expect(pagination?.textContent).toEqual('Displaying 1 – 5 of 5');
-
-    expect(getByLabelText(/next/i)).toBeDisabled();
+    expect(queryByText(/displaying/i)).not.toBeInTheDocument();
+    expect(queryByLabelText(/next/i)).not.toBeInTheDocument();
   });
 
   // TODO: Bring this test back once we can determine the last admin by permissions.
