@@ -116,7 +116,6 @@ const EmptyRow = (props: { localizationKey: LocalizationKey }) => {
             display: 'block',
             width: 'fit-content',
           }}
-          variant='body'
         />
       </Td>
     </Tr>
