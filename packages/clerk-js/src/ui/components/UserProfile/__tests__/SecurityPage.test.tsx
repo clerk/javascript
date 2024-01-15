@@ -18,6 +18,7 @@ describe('SecurityPage', () => {
     const { queryByText } = render(<SecurityPage />, { wrapper });
     await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
     expect(queryByText(/^password/i)).not.toBeInTheDocument();
+    expect(queryByText(/^Two-step verification/i)).not.toBeInTheDocument();
   });
 
   it('renders the Password section if instance is password based', async () => {
@@ -31,6 +32,20 @@ describe('SecurityPage', () => {
 
     const { getByText } = render(<SecurityPage />, { wrapper });
     await waitFor(() => getByText(/^password/i));
+  });
+
+  it('renders the MFA section if instance supports it', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withPhoneNumber({
+        used_for_second_factor: true,
+        second_factors: ['phone_code'],
+      });
+    });
+    fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
+
+    const { getByText } = render(<SecurityPage />, { wrapper });
+    await waitFor(() => getByText('Two-step verification'));
   });
 
   it('shows the active devices of the user and has appropriate buttons', async () => {
