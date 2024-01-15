@@ -2,7 +2,7 @@ export const missingDomainAndProxy = `
 Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl.
 
 1) With middleware
-   e.g. export default authMiddleware({domain:'YOUR_DOMAIN',isSatellite:true});
+   e.g. export default clerkMiddleware({domain:'YOUR_DOMAIN',isSatellite:true}); // or the deprecated authMiddleware()
 2) With environment variables e.g.
    NEXT_PUBLIC_CLERK_DOMAIN='YOUR_DOMAIN'
    NEXT_PUBLIC_CLERK_IS_SATELLITE='true'
@@ -13,7 +13,7 @@ Invalid signInUrl. A satellite application requires a signInUrl for development 
 Check if signInUrl is missing from your configuration or if it is not an absolute URL
 
 1) With middleware
-   e.g. export default authMiddleware({signInUrl:'SOME_URL', isSatellite:true});
+   e.g. export default clerkMiddleware({signInUrl:'SOME_URL', isSatellite:true}); // or the deprecated authMiddleware()
 2) With environment variables e.g.
    NEXT_PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
    NEXT_PUBLIC_CLERK_IS_SATELLITE='true'`;
