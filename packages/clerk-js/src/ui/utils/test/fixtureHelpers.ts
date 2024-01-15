@@ -413,6 +413,36 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     us.saml = { enabled: true };
   };
 
+  const withBackupCode = (opts?: Partial<UserSettingsJSON['attributes']['backup_code']>) => {
+    us.attributes.backup_code = {
+      ...emptyAttribute,
+      enabled: true,
+      required: false,
+      used_for_first_factor: false,
+      first_factors: [],
+      used_for_second_factor: true,
+      second_factors: ['backup_code'],
+      verifications: [],
+      verify_at_sign_up: false,
+      ...opts,
+    };
+  };
+
+  const withAuthenticatorApp = (opts?: Partial<UserSettingsJSON['attributes']['authenticator_app']>) => {
+    us.attributes.authenticator_app = {
+      ...emptyAttribute,
+      enabled: false,
+      required: false,
+      used_for_first_factor: false,
+      first_factors: [],
+      used_for_second_factor: true,
+      second_factors: ['totp'],
+      verifications: [],
+      verify_at_sign_up: false,
+      ...opts,
+    };
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -426,5 +456,7 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withPasswordComplexity,
     withSocialProvider,
     withSaml,
+    withBackupCode,
+    withAuthenticatorApp,
   };
 };
