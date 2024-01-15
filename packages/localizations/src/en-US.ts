@@ -668,7 +668,7 @@ export const enUS: LocalizationResource = {
     },
   },
   organizationList: {
-    createOrganization: 'Create Organization',
+    createOrganization: 'Create organization',
     title: 'Choose an account',
     titleWithoutPersonal: 'Choose an organization',
     subtitle: 'to continue to {{applicationName}}',
