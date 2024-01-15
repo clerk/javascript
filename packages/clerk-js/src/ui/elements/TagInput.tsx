@@ -189,11 +189,18 @@ const TagPill = (props: TagPillProps) => {
       {...rest}
       sx={t => ({
         padding: `${t.space.$0x5} ${t.space.$1x5}`,
-        backgroundColor: t.colors.$blackAlpha50,
-        color: t.colors.$blackAlpha700,
         borderRadius: t.radii.$sm,
+        color: t.colors.$primary500,
+        backgroundColor: t.colors.$primaryAlpha50,
         boxShadow: t.shadows.$badge,
+        border: t.borders.$normal,
+        borderColor: t.colors.$primary50,
+        display: 'inline-flex',
+        marginRight: '1px',
         cursor: 'pointer',
+        ':hover': {
+          backgroundColor: t.colors.$primaryAlpha100,
+        },
         ':hover svg': {
           color: t.colors.$danger500,
         },
@@ -208,9 +215,9 @@ const TagPill = (props: TagPillProps) => {
       </Text>
       <Icon
         elementDescriptor={descriptors.tagPillIcon}
-        size='sm'
+        size='md'
         icon={Plus}
-        sx={t => ({ color: t.colors.$colorTextTertiary, transform: 'translateY(1px) rotate(45deg)' })}
+        sx={t => ({ color: t.colors.$colorTextTertiary, transform: 'translateY(0px) rotate(45deg)' })}
       />
     </Flex>
   );
