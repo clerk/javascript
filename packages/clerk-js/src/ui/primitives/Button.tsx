@@ -37,7 +37,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         },
         sm: {
           minHeight: theme.sizes.$8x5,
-          padding: `${theme.space.$1x5} ${theme.space.$3x5}`,
+          padding: `${theme.space.$1x5} ${theme.space.$3}`,
         },
         md: {
           minHeight: theme.sizes.$9,
