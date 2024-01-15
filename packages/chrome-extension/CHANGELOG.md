@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.0.0-alpha-v5.17
+
+### Patch Changes
+
+- Updated dependencies [[`434a96ebe`](https://github.com/clerk/javascript/commit/434a96ebefc550b726b417788b7bae9e41791408), [`6a769771c`](https://github.com/clerk/javascript/commit/6a769771c975996d8d52b35b5cfdbae5dcec85d4)]:
+  - @clerk/clerk-js@5.0.0-alpha-v5.17
+
 ## 1.0.0-alpha-v5.16
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.0.0-alpha-v5.18
+
+### Patch Changes
+
+- Update README for v5 ([#2577](https://github.com/clerk/javascript/pull/2577)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`935b0886e`](https://github.com/clerk/javascript/commit/935b0886e8317445f30c92000a27ed68e1223ff6), [`6a769771c`](https://github.com/clerk/javascript/commit/6a769771c975996d8d52b35b5cfdbae5dcec85d4)]:
+  - @clerk/backend@1.0.0-alpha-v5.16
+
 ## 4.0.0-alpha-v5.17
 
 ### Minor Changes
