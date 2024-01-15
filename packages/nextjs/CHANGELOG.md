@@ -1,5 +1,30 @@
 # Change Log
 
+## 5.0.0-alpha-v5.18
+
+### Patch Changes
+
+- Update README for v5 ([#2577](https://github.com/clerk/javascript/pull/2577)) by [@LekoArts](https://github.com/LekoArts)
+
+- Introduce `createRouteMatcher` which is designed to generate and return a function that evaluates whether a given Request object matches a set of predefined routes. It provides flexibility in defining these routes through various patterns, including glob patterns, regular expressions, and custom functions. This composable helper can be used in combination with the `clerkMiddleware` helper to easily protect specific routes, eg: ([#2572](https://github.com/clerk/javascript/pull/2572)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  ```ts
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+
+  const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
+
+  export default clerkMiddleware((auth, request) => {
+    if (isProtectedRoute(request)) {
+      auth().protect();
+    }
+  });
+  ```
+
+- Fix partial prerendering error when using NextJS by correctly rethrowing partial prerendering (PPR) error. ([#2518](https://github.com/clerk/javascript/pull/2518)) by [@juliuslipp](https://github.com/juliuslipp)
+
+- Updated dependencies [[`935b0886e`](https://github.com/clerk/javascript/commit/935b0886e8317445f30c92000a27ed68e1223ff6), [`6a769771c`](https://github.com/clerk/javascript/commit/6a769771c975996d8d52b35b5cfdbae5dcec85d4)]:
+  - @clerk/backend@1.0.0-alpha-v5.16
+
 ## 5.0.0-alpha-v5.17
 
 ### Minor Changes

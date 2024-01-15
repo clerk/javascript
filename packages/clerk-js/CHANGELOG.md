@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.0.0-alpha-v5.17
+
+### Patch Changes
+
+- Hide backup codes when adding `phone_code` mfa and instance setting is off. ([#2583](https://github.com/clerk/javascript/pull/2583)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update README for v5 ([#2577](https://github.com/clerk/javascript/pull/2577)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`34fe88f73`](https://github.com/clerk/javascript/commit/34fe88f73f12a0ee569b3e8c8c956f05a8bdc3dc)]:
+  - @clerk/localizations@2.0.0-alpha-v5.11
+
 ## 5.0.0-alpha-v5.16
 
 ### Patch Changes
