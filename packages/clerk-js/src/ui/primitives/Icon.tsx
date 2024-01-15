@@ -9,6 +9,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   variants: {
     size: {
+      xs: { width: theme.sizes.$2x5, height: theme.sizes.$2x5 },
       sm: { width: theme.sizes.$3, height: theme.sizes.$3 },
       md: { width: theme.sizes.$4, height: theme.sizes.$4 },
       lg: { width: theme.sizes.$5, height: theme.sizes.$5 },

@@ -50,7 +50,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           icon={
             <Icon
               icon={Close}
-              size='sm'
+              size='xs'
             />
           }
           sx={t => ({

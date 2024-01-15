@@ -12,8 +12,8 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const card = useCardState();
 
   return (
-    <Card.Root sx={t => ({ width: t.sizes.$120 })}>
-      <Card.Content sx={t => ({ padding: `${t.space.$5}` })}>
+    <Card.Root sx={t => ({ width: t.sizes.$108 })}>
+      <Card.Content sx={t => ({ padding: `${t.space.$4} ${t.space.$5} ${t.space.$6}` })}>
         <Card.Alert>{card.error}</Card.Alert>
         <CreateOrganizationForm
           skipInvitationScreen={skipInvitationScreen}

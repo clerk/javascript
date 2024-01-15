@@ -83,6 +83,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
               }
               isDisabled={card.isLoading}
               variant='secondary'
+              size='xs'
               onClick={(e: any) => {
                 e.target?.blur();
                 toggle();
@@ -101,7 +102,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
             )}
           </Flex>
           <Text
-            sx={t => ({ color: t.colors.$blackAlpha400 })}
+            sx={t => ({ color: t.colors.$blackAlpha400, fontSize: t.fontSizes.$sm })}
             localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaHint')}
           />
         </Col>
