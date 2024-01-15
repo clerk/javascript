@@ -22,17 +22,17 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       primary: {
         [vars.accent]: theme.colors.$primary500,
         [vars.bg]: theme.colors.$primaryAlpha50,
-        [vars.borderColor]: theme.colors.$primary200,
+        [vars.borderColor]: theme.colors.$primary50,
       },
       danger: {
         [vars.accent]: theme.colors.$danger500,
         [vars.bg]: theme.colors.$dangerAlpha50,
-        [vars.borderColor]: theme.colors.$danger200,
+        [vars.borderColor]: theme.colors.$danger50,
       },
       success: {
         [vars.accent]: theme.colors.$success500,
         [vars.bg]: theme.colors.$successAlpha50,
-        [vars.borderColor]: theme.colors.$success200,
+        [vars.borderColor]: theme.colors.$success50,
       },
       warning: {
         [vars.accent]: theme.colors.$warning500,
