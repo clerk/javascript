@@ -661,7 +661,7 @@ export const enUS: LocalizationResource = {
     },
   },
   createOrganization: {
-    title: 'Create organization',
+    title: 'Create Organization',
     formButtonSubmit: 'Create organization',
     invitePage: {
       formButtonReset: 'Skip',

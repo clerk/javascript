@@ -76,7 +76,7 @@ describe('CreateOrganization', () => {
     const { userEvent, getByLabelText, queryByText } = render(<CreateOrganization />, { wrapper });
 
     await userEvent.type(getByLabelText(/Name/i), 'new org');
-    expect(queryByText('Create organization')).toBeInTheDocument();
+    expect(queryByText('Create Organization')).toBeInTheDocument();
   });
 
   it('skips invitation screen', async () => {
