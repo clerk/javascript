@@ -661,14 +661,14 @@ export const enUS: LocalizationResource = {
     },
   },
   createOrganization: {
-    title: 'Create Organization',
+    title: 'Create organization',
     formButtonSubmit: 'Create organization',
     invitePage: {
       formButtonReset: 'Skip',
     },
   },
   organizationList: {
-    createOrganization: 'Create organization',
+    createOrganization: 'Create Organization',
     title: 'Choose an account',
     titleWithoutPersonal: 'Choose an organization',
     subtitle: 'to continue to {{applicationName}}',
