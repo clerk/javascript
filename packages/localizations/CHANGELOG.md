@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-alpha-v5.11
+
+### Patch Changes
+
+- Add Bulgarian (bg-BG) localization (#2565) ([#2565](https://github.com/clerk/javascript/pull/2565)) by [@samusarsar](https://github.com/samusarsar)
+
 ## 2.0.0-alpha-v5.10
 
 ### Minor Changes

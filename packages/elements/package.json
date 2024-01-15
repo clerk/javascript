@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.0.2-alpha-v5.5",
+  "version": "0.0.2-alpha-v5.6",
   "private": true,
   "description": "Clerk Elements",
   "keywords": [
@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "5.0.0-alpha-v5.16",
-    "@clerk/nextjs": "5.0.0-alpha-v5.17",
+    "@clerk/nextjs": "5.0.0-alpha-v5.18",
     "@clerk/shared": "2.0.0-alpha-v5.10",
     "@radix-ui/react-form": "^0.0.3",
     "@radix-ui/react-slot": "^1.0.2",
