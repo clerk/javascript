@@ -254,6 +254,10 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       message: LocalizationValue;
     };
+    accountSwitcher: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   userProfile: {
     mobileButton__menu: LocalizationValue;

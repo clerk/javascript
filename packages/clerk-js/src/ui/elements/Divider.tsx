@@ -34,7 +34,7 @@ const DividerLine = () => {
       sx={t => ({
         flex: '1',
         height: '1px',
-        backgroundColor: t.colors.$blackAlpha200,
+        backgroundColor: t.colors.$blackAlpha100,
       })}
     />
   );

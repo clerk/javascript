@@ -63,23 +63,25 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
             label={props.inputLabel}
             resendButton={props.resendButton}
           />
-          <Button
-            elementDescriptor={descriptors.formButtonPrimary}
-            block
-            isLoading={otp.isLoading}
-            localizationKey={localizationKeys('formButtonPrimary')}
-            onClick={otp.onFakeContinue}
-          />
-        </Col>
-
-        {showAlternativeMethods && props.onShowAlternativeMethodsClicked && (
-          <Card.Action elementId='alternativeMethods'>
-            <Card.ActionLink
-              localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-              onClick={props.onShowAlternativeMethodsClicked}
+          <Col gap={4}>
+            <Button
+              elementDescriptor={descriptors.formButtonPrimary}
+              block
+              hasArrow
+              isLoading={otp.isLoading}
+              localizationKey={localizationKeys('formButtonPrimary')}
+              onClick={otp.onFakeContinue}
             />
-          </Card.Action>
-        )}
+            {showAlternativeMethods && props.onShowAlternativeMethodsClicked && (
+              <Card.Action elementId='alternativeMethods'>
+                <Card.ActionLink
+                  localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                  onClick={props.onShowAlternativeMethodsClicked}
+                />
+              </Card.Action>
+            )}
+          </Col>
+        </Col>
       </Card.Content>
 
       <Card.Footer />

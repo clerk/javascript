@@ -252,7 +252,7 @@ function _SignUpStart(): JSX.Element {
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}
-            gap={8}
+            gap={6}
           >
             <SocialButtonsReversibleContainerWithDivider>
               {(showOauthProviders || showWeb3Providers) && (

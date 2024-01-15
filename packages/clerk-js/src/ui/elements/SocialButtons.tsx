@@ -98,9 +98,10 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
             [mqu.xs]: {
               gridTemplateColumns: 'repeat(1, 1fr)',
             },
-            gridTemplateColumns: preferBlockButtons
-              ? `repeat(1, 1fr)`
-              : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
+            gridTemplateColumns:
+              strategies.length < 1
+                ? `repeat(1, 1fr)`
+                : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
           }}
         >
           {row.map((strategy, strategyIndex) => {
