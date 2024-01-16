@@ -54,6 +54,25 @@ export default function SignInPage() {
     <SignIn>
       <div className='m-auto w-max text-sm'>
         <SignInStart>
+          <Field name='code'>
+            <Input
+              type='otp'
+              className='flex'
+              render={({ value, state }) => (
+                <span
+                  data-state={state}
+                  className={clsx(
+                    'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 border-gray-300 bg-white [--segment-color:#6366f1] data-[state="error"]:[--segment-color:#ef4444] data-[state="success"]:[--segment-color:#10b981] text-lg text-black self-stretch',
+                    (state === 'cursor' || state === 'selected') &&
+                      'border-purple-500 shadow-[theme.colors.purple.500_0_0_0_1px]',
+                    state === 'selected' && 'bg-purple-100',
+                  )}
+                >
+                  {value}
+                </span>
+              )}
+            />
+          </Field>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>START</H1>
             <div className='flex flex-col gap-3'>

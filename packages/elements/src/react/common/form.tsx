@@ -8,14 +8,24 @@ import {
   Submit,
 } from '@radix-ui/react-form';
 import { Slot } from '@radix-ui/react-slot';
-import type { HTMLProps, ReactNode } from 'react';
-import React, { createContext, useCallback, useContext, useEffect } from 'react';
+import type { CSSProperties, HTMLProps, ReactNode } from 'react';
+import React, {
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors/error';
 import {
   fieldErrorsSelector,
   fieldHasValueSelector,
+  fieldValueSelector,
   globalErrorsSelector,
   useFormSelector,
   useFormStore,
@@ -105,7 +115,8 @@ const useInput = ({ name: inputName, value: initialValue }: Partial<Pick<FieldDe
   const name = inputName || fieldContext?.name;
 
   const ref = useFormStore();
-  const hasValue = useFormSelector(fieldHasValueSelector(name));
+  const value = useFormSelector(fieldValueSelector(name));
+  const hasValue = Boolean(value);
 
   // Register the field in the machine context
   useEffect(() => {
@@ -136,6 +147,7 @@ const useInput = ({ name: inputName, value: initialValue }: Partial<Pick<FieldDe
   return {
     type,
     props: {
+      value: value ?? '',
       onChange,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
@@ -192,14 +204,148 @@ function Input(props: FormControlProps) {
   const { name, value } = props;
   const field = useInput({ name, value });
 
+  let propsForType = {};
+  if (props.type === 'otp') {
+    const { type, ...rest } = props;
+
+    propsForType = {
+      type: 'text',
+      asChild: true,
+      children: <OTPInput {...rest} />,
+    };
+  }
+
   return (
     <RadixControl
       type={field.type}
       {...field.props}
       {...props}
+      {...propsForType}
     />
   );
 }
+
+const OTPInput = forwardRef<HTMLInputElement>(function OTPInput(props: any, ref) {
+  const length = 6;
+  const { className, ...rest } = props;
+
+  const innerRef = useRef<HTMLInputElement>(null);
+  const [selectionRange, setSelectionRange] = React.useState<[number, number]>([0, 0]);
+
+  useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
+
+  useLayoutEffect(() => {
+    setSelectionRange(cur => {
+      const updated: [number, number] = [innerRef.current?.selectionStart ?? 0, innerRef.current?.selectionEnd ?? 0];
+
+      if (updated[0] === cur[0] && updated[1] < cur[1]) {
+        updated[0] = updated[0] - 1;
+      }
+
+      if (updated[0] !== cur[0] || updated[1] !== cur[1]) {
+        innerRef.current?.setSelectionRange(updated[0], updated[1]);
+        return updated;
+      }
+
+      return cur;
+    });
+  }, [props.value]);
+
+  return (
+    <div
+      style={
+        {
+          position: 'relative',
+        } as CSSProperties
+      }
+    >
+      <style>
+        {`
+      input[data-otp-input]::selection {
+        color: transparent;
+        background-color: none;
+      }
+      `}
+      </style>
+      <input
+        data-otp-input
+        ref={innerRef}
+        type='text'
+        autoComplete='one-time-code'
+        maxLength={length}
+        inputMode='numeric'
+        pattern='[0-9]*'
+        {...rest}
+        onChange={event => {
+          console.log(event.currentTarget.value);
+          rest?.onChange(event);
+        }}
+        onSelect={() => {
+          setSelectionRange(cur => {
+            let direction: 'forward' | 'backward' = 'forward' as const;
+            let updated: [number, number] = [
+              innerRef.current?.selectionStart ?? 0,
+              innerRef.current?.selectionEnd ?? 0,
+            ];
+
+            if (cur[0] === updated[0] && cur[1] === updated[1]) {
+              return cur;
+            }
+
+            if (updated[0] === updated[1]) {
+              if (updated[0] > 0 && cur[0] === updated[0] && cur[1] === updated[0] + 1) {
+                direction = 'backward' as const;
+                updated = [updated[0] - 1, updated[1]];
+              } else if (typeof innerRef.current?.value[updated[0]] !== 'undefined') {
+                updated = [updated[0], updated[1] + 1];
+              }
+            }
+
+            innerRef.current?.setSelectionRange(updated[0], updated[1], direction);
+
+            return updated;
+          });
+        }}
+        style={{
+          display: 'block',
+          width: '110%',
+          height: '100%',
+          background: 'none',
+          outline: 'none',
+          appearance: 'none',
+          color: 'transparent',
+          inset: 0,
+          position: 'absolute',
+        }}
+      />
+      <div
+        className={className}
+        aria-hidden
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: '1em',
+          zIndex: 1,
+          height: '100%',
+          pointerEvents: 'none',
+        }}
+      >
+        {Array.from({ length }).map((_, i) =>
+          props.render({
+            value: props.value[i] || '',
+            state:
+              selectionRange[0] === selectionRange[1] && selectionRange[0] === i
+                ? 'cursor'
+                : selectionRange[0] <= i && selectionRange[1] > i
+                ? 'selected'
+                : 'none',
+            index: i,
+          }),
+        )}
+      </div>
+    </div>
+  );
+});
 
 function Label(props: FormLabelProps) {
   return <RadixLabel {...props} />;
