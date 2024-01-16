@@ -1,76 +1,18 @@
 import { createClerkClient } from '@clerk/backend';
-import type { SignedInState, SignedOutState } from '@clerk/backend/internal';
-import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
-import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
-import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
-import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
-import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
-import { isTruthy } from '@clerk/shared/underscore';
+import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '@clerk/backend/internal';
+import { AuthStatus } from '@clerk/backend/internal';
 
-import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../errors';
-import { getEnvVariable } from '../utils';
-import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
+import type { LoaderFunctionArgs } from './types';
 
 export async function authenticateRequest(
   args: LoaderFunctionArgs,
-  opts: RootAuthLoaderOptions = {},
+  opts: AuthenticateRequestOptions,
 ): Promise<SignedInState | SignedOutState> {
-  const { request, context } = args;
-  const clerkRequest = createClerkRequest(request);
+  const { request } = args;
   const { audience, authorizedParties } = opts;
 
-  // Fetch environment variables across Remix runtime.
-  // 1. First check if the user passed the key in the getAuth function or the rootAuthLoader.
-  // 2. Then try from process.env if exists (Node).
-  // 3. Then try from globalThis (Cloudflare Workers).
-  // 4. Then from loader context (Cloudflare Pages).
-  const secretKey = opts.secretKey || getEnvVariable('CLERK_SECRET_KEY', context) || '';
-
-  if (!secretKey) {
-    throw new Error(noSecretKeyError);
-  }
-
-  const publishableKey = opts.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY', context) || '';
-
-  const jwtKey = opts.jwtKey || getEnvVariable('CLERK_JWT_KEY', context);
-
-  const apiUrl = getEnvVariable('CLERK_API_URL', context) || apiUrlFromPublishableKey(publishableKey);
-
-  const domain = handleValueOrFn(opts.domain, new URL(request.url)) || getEnvVariable('CLERK_DOMAIN', context) || '';
-
-  const isSatellite =
-    handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
-    isTruthy(getEnvVariable('CLERK_IS_SATELLITE', context)) ||
-    false;
-
-  const relativeOrAbsoluteProxyUrl = handleValueOrFn(
-    opts?.proxyUrl,
-    clerkRequest.clerkUrl,
-    getEnvVariable('CLERK_PROXY_URL', context),
-  );
-
-  let proxyUrl;
-  if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
-    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, clerkRequest.clerkUrl).toString();
-  } else {
-    proxyUrl = relativeOrAbsoluteProxyUrl;
-  }
-
-  const signInUrl = opts.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL', context) || '';
-
-  const signUpUrl = opts.signUpUrl || getEnvVariable('CLERK_SIGN_UP_URL', context) || '';
-
-  const afterSignInUrl = opts.afterSignInUrl || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context) || '';
-
-  const afterSignUpUrl = opts.afterSignUpUrl || getEnvVariable('CLERK_AFTER_SIGN_UP_URL', context) || '';
-
-  if (isSatellite && !proxyUrl && !domain) {
-    throw new Error(satelliteAndMissingProxyUrlAndDomain);
-  }
-
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
-    throw new Error(satelliteAndMissingSignInUrl);
-  }
+  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey } = opts;
+  const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
   const requestState = await createClerkClient({
     apiUrl,
@@ -79,16 +21,11 @@ export async function authenticateRequest(
     proxyUrl,
     isSatellite,
     domain,
+    publishableKey,
     userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
   }).authenticateRequest(request, {
     audience,
-    secretKey,
-    jwtKey,
-    publishableKey,
     authorizedParties,
-    proxyUrl,
-    isSatellite,
-    domain,
     signInUrl,
     signUpUrl,
     afterSignInUrl,

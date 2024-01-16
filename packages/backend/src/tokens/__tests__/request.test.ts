@@ -41,13 +41,10 @@ function assertSignedOutToAuth(assert, requestState: RequestState) {
   assert.propContains(requestState.toAuth(), {
     sessionClaims: null,
     sessionId: null,
-    session: null,
     userId: null,
-    user: null,
     orgId: null,
     orgRole: null,
     orgSlug: null,
-    organization: null,
     getToken: {},
   });
 }
