@@ -129,12 +129,7 @@ export type AttemptVerificationParams =
       signature: string;
     };
 
-export type SignUpAttributeField =
-  | FirstNameAttribute
-  | LastNameAttribute
-  | PasswordAttribute
-  | BirthdayAttribute
-  | GenderAttribute;
+export type SignUpAttributeField = FirstNameAttribute | LastNameAttribute | PasswordAttribute;
 
 // TODO: SignUpVerifiableField or SignUpIdentifier?
 export type SignUpVerifiableField =
