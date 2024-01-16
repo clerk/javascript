@@ -11,8 +11,11 @@ import { MembershipWidget } from './MembershipWidget';
 export const OrganizationMembersTabInvitations = () => {
   const { organizationSettings } = useEnvironment();
   const { navigate } = useRouter();
-  //@ts-expect-error
-  const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
+  const {
+    //@ts-expect-error
+    __unstable_manageBillingUrl,
+    navigateToAddDomainPage,
+  } = useOrganizationProfileContext();
 
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
 
@@ -55,7 +58,7 @@ export const OrganizationMembersTabInvitations = () => {
                     'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
                   )}
                   id='manageVerifiedDomains'
-                  onClick={() => navigate('organization-settings/domain')}
+                  onClick={navigateToAddDomainPage}
                 />
               }
               redirectSubPath={'organization-settings/domain'}
