@@ -98,7 +98,12 @@ export default {
 			'withserverauth-return-type',
 		]),
 	),
-	remix: load('remix', ['clerkerrorboundary-removed']),
+	remix: load('remix', [
+		'clerkerrorboundary-removed',
+		'createclerkclient-apikey',
+		'rootauthloader-apikey',
+		'getauth-apikey',
+	]),
 	expo: load('expo', [
 		'apikey-to-publishable-key',
 		'ismagiclinkerror',
