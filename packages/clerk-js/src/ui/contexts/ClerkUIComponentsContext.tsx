@@ -5,6 +5,7 @@ import React, { useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
 import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
+import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import { useEnvironment, useOptions } from '../contexts';
 import type { NavbarRoute } from '../elements';
 import type { ParsedQs } from '../router';
@@ -424,6 +425,9 @@ export const useOrganizationListContext = () => {
 export type OrganizationProfileContextType = OrganizationProfileCtx & {
   pages: PagesType;
   navigateAfterLeaveOrganization: () => Promise<unknown>;
+  navigateToGeneralPageRoot: () => Promise<unknown>;
+  isMembersPageRoot: boolean;
+  isGeneralPageRoot: boolean;
 };
 
 export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
@@ -440,11 +444,19 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const navigateAfterLeaveOrganization = () =>
     navigate(ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl);
 
+  const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
+  const isGeneralPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
+  const navigateToGeneralPageRoot = () =>
+    navigate(isGeneralPageRoot ? '../' : isMembersPageRoot ? './organization-general' : '../organization-general');
+
   return {
     ...ctx,
     pages,
     navigateAfterLeaveOrganization,
     componentName,
+    navigateToGeneralPageRoot,
+    isMembersPageRoot,
+    isGeneralPageRoot,
   };
 };
 
