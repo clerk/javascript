@@ -324,7 +324,7 @@ export const enUS: LocalizationResource = {
       },
       dangerSection: {
         title: 'Account termination',
-        deleteAccountButton: 'Delete Account',
+        deleteAccountButton: 'Delete account',
       },
     },
     profilePage: {
