@@ -109,7 +109,10 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             elementDescriptor={descriptors.main}
             gap={4}
           >
-            <Form.Root onSubmit={handlePasswordSubmit}>
+            <Form.Root
+              onSubmit={handlePasswordSubmit}
+              gap={6}
+            >
               {/* For password managers */}
               <input
                 readOnly
@@ -126,16 +129,15 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               </Form.ControlRow>
               <Form.SubmitButton hasArrow />
             </Form.Root>
+            <Card.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
+              <Card.ActionLink
+                localizationKey={localizationKeys(
+                  onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
+                )}
+                onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
+              />
+            </Card.Action>
           </Flex>
-
-          <Card.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
-            <Card.ActionLink
-              localizationKey={localizationKeys(
-                onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
-              )}
-              onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
-            />
-          </Card.Action>
         </Card.Content>
 
         <Card.Footer />

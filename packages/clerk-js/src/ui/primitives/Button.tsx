@@ -47,7 +47,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           color: theme.colors.$colorTextOnPrimaryBackground,
           boxShadow: theme.shadows.$buttonShadow,
           border: theme.borders.$normal,
-          borderColor: theme.colors.$primary800,
+          borderColor: theme.colors.$primary500,
           ':before': {
             position: 'absolute',
             content: '""',
@@ -79,14 +79,14 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           color: theme.colors.$colorTextOnPrimaryBackground,
           boxShadow: theme.shadows.$buttonShadow,
           border: theme.borders.$normal,
-          borderColor: theme.colors.$danger800,
+          borderColor: theme.colors.$danger500,
           ':before': {
             position: 'absolute',
             content: '""',
             borderRadius: 'inherit',
             zIndex: -1,
             inset: 0,
-            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%)`,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha150} 0%, ${theme.colors.$transparent} 100%)`,
           },
           ':after': {
             position: 'absolute',
@@ -97,7 +97,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
             opacity: 0,
             transitionProperty: theme.transitionProperty.$common,
             transitionDuration: theme.transitionDuration.$controls,
-            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha200} 0%, ${theme.colors.$transparent} 100%)`,
+            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha100} 0%, ${theme.colors.$transparent} 100%)`,
           },
           ':hover::after': {
             opacity: 1,

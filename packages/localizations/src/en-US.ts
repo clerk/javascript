@@ -235,6 +235,10 @@ export const enUS: LocalizationResource = {
       subtitle: 'An error occurred',
       message: "Cannot proceed with sign in. There's no available authentication factor.",
     },
+    accountSwitcher: {
+      title: 'Choose an account',
+      subtitle: 'Select the account with which you wish to continue.',
+    },
   },
   userProfile: {
     mobileButton__menu: 'Menu',

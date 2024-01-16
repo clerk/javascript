@@ -66,7 +66,18 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
         props.sx,
       ]}
     >
-      {logoUrl ? <RouterLink to={logoUrl}>{image}</RouterLink> : image}
+      {logoUrl ? (
+        <RouterLink
+          sx={{
+            justifyContent: 'center',
+          }}
+          to={logoUrl}
+        >
+          {image}
+        </RouterLink>
+      ) : (
+        image
+      )}
     </Flex>
   );
 };

@@ -295,7 +295,7 @@ export function _SignInStart(): JSX.Element {
           {/*TODO: extract main in its own component */}
           <Col
             elementDescriptor={descriptors.main}
-            gap={8}
+            gap={6}
           >
             <SocialButtonsReversibleContainerWithDivider>
               {hasSocialOrWeb3Buttons && (
