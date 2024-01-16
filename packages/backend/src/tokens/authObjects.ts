@@ -47,15 +47,12 @@ export type SignedInAuthObject = {
 export type SignedOutAuthObject = {
   sessionClaims: null;
   sessionId: null;
-  session: null;
   actor: null;
   userId: null;
-  user: null;
   orgId: null;
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
-  organization: null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -148,15 +145,12 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
   return {
     sessionClaims: null,
     sessionId: null,
-    session: null,
     userId: null,
-    user: null,
     actor: null,
     orgId: null,
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
-    organization: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
