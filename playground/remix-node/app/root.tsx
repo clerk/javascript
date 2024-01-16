@@ -1,8 +1,8 @@
-import { defer, type DataFunctionArgs, type Headers } from '@remix-run/node';
+import { defer, type DataFunctionArgs } from '@remix-run/node';
 import type { MetaFunction } from '@remix-run/react';
 import { Await, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
-import { getClerkDebugHeaders, rootAuthLoader } from '@clerk/remix/ssr.server';
-import { ClerkApp, ClerkErrorBoundary } from '@clerk/remix';
+import { rootAuthLoader } from '@clerk/remix/ssr.server';
+import { ClerkApp } from '@clerk/remix';
 import { Suspense } from 'react';
 
 export const loader = (args: DataFunctionArgs) => {
@@ -45,8 +45,6 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
-
-export const ErrorBoundary = ClerkErrorBoundary();
 
 function App() {
   const loaderData = useLoaderData<typeof loader>();
