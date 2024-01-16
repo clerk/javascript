@@ -37,6 +37,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
             borderRadius: t.radii.$xl,
             color: t.colors.$colorText,
             position: 'relative',
+            overflow: 'hidden',
           }),
           sx,
         ]}
