@@ -73,10 +73,10 @@ describe('CreateOrganization', () => {
       });
     });
 
-    const { userEvent, getByLabelText, queryByText } = render(<CreateOrganization />, { wrapper });
+    const { userEvent, getByLabelText, getByRole } = render(<CreateOrganization />, { wrapper });
 
     await userEvent.type(getByLabelText(/Name/i), 'new org');
-    expect(queryByText('Create Organization')).toBeInTheDocument();
+    expect(getByRole('heading', { name: 'Create organization', level: 1 })).toBeInTheDocument();
   });
 
   it('skips invitation screen', async () => {

@@ -37,7 +37,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldInputPlaceholder__organizationSlug: '',
+  formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__organizationDomain: '',
   formFieldInputPlaceholder__organizationDomainEmailAddress: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
@@ -666,7 +666,7 @@ export const enUS: LocalizationResource = {
     },
   },
   createOrganization: {
-    title: 'Create Organization',
+    title: 'Create organization',
     formButtonSubmit: 'Create organization',
     invitePage: {
       formButtonReset: 'Skip',
