@@ -390,6 +390,7 @@ export const SelectButton = (
           paddingLeft: theme.space.$3x5,
           paddingRight: theme.space.$3x5,
           alignItems: 'center',
+          minHeight: 'unset',
           '> *': { pointerEvents: 'none' },
         }),
         sx,

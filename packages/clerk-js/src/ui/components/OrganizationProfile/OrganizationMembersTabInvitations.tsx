@@ -16,7 +16,7 @@ export const OrganizationMembersTabInvitations = () => {
 
   return (
     <Col
-      gap={8}
+      gap={4}
       sx={{
         width: '100%',
       }}
@@ -29,6 +29,8 @@ export const OrganizationMembersTabInvitations = () => {
             sx={t => ({
               width: '100%',
               gap: t.space.$8,
+              paddingBottom: `${t.space.$4}`,
+              borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
               [mqu.md]: {
                 flexDirection: 'column',
                 gap: t.space.$2,

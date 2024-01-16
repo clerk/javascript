@@ -215,7 +215,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
             <Form.RadioGroup {...enrollmentMode.props} />
           </Form.ControlRow>
 
-          {allowsEdit && (
+          {allowsEdit && enrollmentMode.value === 'manual_invitation' && (
             <Form.ControlRow elementId={deletePending.id}>
               <Form.Checkbox {...deletePending.props} />
             </Form.ControlRow>
