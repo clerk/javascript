@@ -110,6 +110,7 @@ export default {
 		'ismagiclinkerror',
 		'magiclinkerrorcode',
 		'usemagiclink',
+		'setsession',
 	]),
 	expo: load('expo', [
 		'apikey-to-publishable-key',
