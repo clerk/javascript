@@ -50,14 +50,26 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
     hasError: props.hasError || fieldControlProps.hasError,
   });
   const { onChange } = useInput(propsWithoutVariants.onChange);
-  const { isDisabled, hasError, focusRing, isRequired, ...rest } = propsWithoutVariants;
+  const { isDisabled, hasError, focusRing, isRequired, type, ...rest } = propsWithoutVariants;
   const _disabled = isDisabled || fieldControlProps.isDisabled;
   const _required = isRequired || fieldControlProps.isRequired;
   const _hasError = hasError || fieldControlProps.hasError;
 
+  /**
+   * type="email" will not allow characters like this one "ö", instead remove type email and provide a pattern that accepts any character before the "@" symbol
+   */
+
+  const typeProps =
+    type === 'email'
+      ? {
+          pattern: '^.*@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$',
+        }
+      : { type };
+
   return (
     <input
       {...rest}
+      {...typeProps}
       ref={ref}
       onChange={onChange}
       disabled={isDisabled}
