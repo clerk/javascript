@@ -23,7 +23,6 @@ export const UserButtonTrigger = withAvatarShimmer(
         variant='roundWrapper'
         sx={[t => ({ borderRadius: showName ? t.radii.$md : t.radii.$circle, color: t.colors.$colorText }), sx]}
         ref={ref}
-        focusRing
         aria-label={`${props.isOpen ? 'Close' : 'Open'} user button`}
         aria-expanded={props.isOpen}
         aria-haspopup='dialog'
