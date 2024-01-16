@@ -16,7 +16,6 @@ import type {
 import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
 import { and, assertEvent, assign, log, raise, sendTo, setup } from 'xstate';
 
-import type { ClerkJSNavigationEvent } from '~/internals/constants';
 import type { ClerkElementsErrorBase } from '~/internals/errors/error';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import type { FormMachine } from '~/internals/machines/form.machine';
@@ -30,6 +29,7 @@ import {
   startSignUpEmailLinkFlow,
 } from '~/internals/machines/sign-up/sign-up.actors';
 import { assertActorEventDone, assertActorEventError } from '~/internals/machines/utils/assert';
+import type { ClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 import type { ClerkRouter } from '~/react/router';
 
 type SignUpVerificationsResourceKey = keyof SignUpVerificationsResource;
@@ -111,7 +111,7 @@ export const SignUpMachine = setup({
       };
     }),
     setAsActive: ({ context }) => {
-      const beforeEmit = () => context.router.push(context.clerk.buildAfterSignInUrl());
+      const beforeEmit = () => context.router.push(context.clerk.buildAfterSignUpUrl());
       void context.clerk.setActive({ session: context.resource?.createdSessionId, beforeEmit });
     },
     // Necessary?
@@ -164,7 +164,7 @@ export const SignUpMachine = setup({
       {
         type: 'isFieldUnverified',
         params: {
-          field: 'phone_number' satisfies SignUpVerifiableField as SignUpVerifiableField,
+          field: 'phone_number' as const,
         },
       },
     ]),
@@ -173,14 +173,14 @@ export const SignUpMachine = setup({
       {
         type: 'isFieldUnverified',
         params: {
-          field: 'email_address' satisfies SignUpVerifiableField as SignUpVerifiableField,
+          field: 'email_address' as const,
         },
       },
       {
         type: 'isStrategyEnabled',
         params: {
-          attribute: 'email_address' satisfies Attribute as Attribute,
-          strategy: 'email_link' satisfies VerificationStrategy as VerificationStrategy,
+          attribute: 'email_address' as const,
+          strategy: 'email_link' as const,
         },
       },
     ]),
@@ -188,14 +188,14 @@ export const SignUpMachine = setup({
       {
         type: 'isFieldUnverified',
         params: {
-          field: 'email_address' satisfies SignUpVerifiableField as SignUpVerifiableField,
+          field: 'email_address' as const,
         },
       },
       {
         type: 'isStrategyEnabled',
         params: {
-          attribute: 'email_address' satisfies Attribute as Attribute,
-          strategy: 'email_code' satisfies VerificationStrategy as VerificationStrategy,
+          attribute: 'email_address' as const,
+          strategy: 'email_code' as const,
         },
       },
     ]),
@@ -389,7 +389,7 @@ export const SignUpMachine = setup({
               guard: {
                 type: 'isFieldUnverified',
                 params: {
-                  field: 'phone_number' satisfies SignUpVerifiableField,
+                  field: 'phone_number' as const,
                 },
               },
               target: 'PhoneCode',
@@ -418,7 +418,7 @@ export const SignUpMachine = setup({
                   guard: {
                     type: 'shouldAvoidPrepare',
                     params: {
-                      key: 'emailAddress' satisfies SignUpVerificationsResourceKey as SignUpVerificationsResourceKey,
+                      key: 'emailAddress' as const,
                     },
                   },
                   target: 'Attempting',
@@ -436,7 +436,7 @@ export const SignUpMachine = setup({
                   clerk: context.clerk,
                   params: {
                     strategy: 'email_link',
-                    redirectUrl: context.clerk.buildAfterSignInUrl(), // TODO: Update
+                    redirectUrl: context.clerk.buildAfterSignUpUrl(),
                   },
                 }),
                 onDone: {
@@ -502,7 +502,7 @@ export const SignUpMachine = setup({
                   guard: {
                     type: 'shouldAvoidPrepare',
                     params: {
-                      key: 'emailAddress' satisfies SignUpVerificationsResourceKey as SignUpVerificationsResourceKey,
+                      key: 'emailAddress' as const,
                     },
                   },
                   target: 'AwaitingInput',
@@ -520,7 +520,7 @@ export const SignUpMachine = setup({
                   clerk: context.clerk,
                   params: {
                     strategy: 'email_code',
-                    redirectUrl: context.clerk.buildAfterSignInUrl(), // TODO: Update
+                    redirectUrl: context.clerk.buildAfterSignUpUrl(),
                   },
                 }),
                 onDone: {
@@ -545,7 +545,7 @@ export const SignUpMachine = setup({
                   guard: {
                     type: 'shouldAvoidPrepare',
                     params: {
-                      key: 'phoneNumber' satisfies SignUpVerificationsResourceKey as SignUpVerificationsResourceKey,
+                      key: 'phoneNumber' as const,
                     },
                   },
                   target: 'AwaitingInput',
