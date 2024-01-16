@@ -205,6 +205,7 @@ export default {
 	//  'createauthenticaterequest-import-path-move'
 	//  'createisomorphicrequest-import-path-move'
 	// 	'createclerkclient-frontendapi',
+	//  'authenticaterequest-params-change',
 	// 	'clerk-import',
 	// 	'externalaccount-picture',
 	// 	'externalaccountjson-avatarurl',
