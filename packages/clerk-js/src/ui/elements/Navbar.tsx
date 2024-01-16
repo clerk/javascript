@@ -8,7 +8,7 @@ import { useNavigateToFlowStart, usePopover } from '../hooks';
 import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations, mqu } from '../styledSystem';
+import { animations, common, mqu } from '../styledSystem';
 import { colors } from '../utils';
 import { Card } from './Card';
 import { withFloatingTree } from './contexts';
@@ -140,7 +140,11 @@ const NavbarContainer = (
         flex: `0 0 ${t.space.$60}`,
         width: t.sizes.$60,
         maxWidth: t.space.$60,
-        background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+        background: common.mergedColorsBackground(
+          colors.setAlpha(t.colors.$colorBackground, 0.8),
+          t.colors.$blackAlpha50,
+        ),
+        backdropFilter: t.backdropFilters.$defaultBlur,
         padding: `${t.space.$6} ${t.space.$5} ${t.space.$3} ${t.space.$3}`,
         marginRight: `-${t.space.$2}`,
         color: t.colors.$colorText,
@@ -295,7 +299,11 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
       elementDescriptor={descriptors.navbarMobileMenuRow}
       sx={t => ({
         display: 'none',
-        background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+        background: common.mergedColorsBackground(
+          colors.setAlpha(t.colors.$colorBackground, 0.8),
+          t.colors.$blackAlpha50,
+        ),
+        backdropFilter: t.backdropFilters.$defaultBlur,
         padding: `${t.space.$2} ${t.space.$3} ${t.space.$4} ${t.space.$3}`,
         marginBottom: `-${t.space.$2}`,
         [mqu.md]: {

@@ -21,6 +21,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
   });
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const [domainId, setDomainId] = useState('');
+  const [verified, setVerified] = useState(false);
   const title = localizationKeys('organizationProfile.createDomainPage.title');
   const subtitle = localizationKeys('organizationProfile.createDomainPage.subtitle');
   const card = useCardState();
@@ -47,10 +48,9 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
         setDomainId(res.id);
         domains?.revalidate?.();
         if (res.verification && res.verification.status === 'verified') {
-          onSuccess();
-        } else {
-          wizard.nextStep();
+          setVerified(true);
         }
+        wizard.nextStep();
       })
       .catch(err => {
         handleError(err, [nameField], card.setError);
@@ -84,6 +84,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
           domains?.revalidate?.();
           onSuccess?.();
         }}
+        skipToVerified={verified}
         onReset={onReset}
       />
     </Wizard>

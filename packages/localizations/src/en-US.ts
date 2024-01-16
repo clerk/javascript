@@ -235,6 +235,10 @@ export const enUS: LocalizationResource = {
       subtitle: 'An error occurred',
       message: "Cannot proceed with sign in. There's no available authentication factor.",
     },
+    accountSwitcher: {
+      title: 'Choose an account',
+      subtitle: 'Select the account with which you wish to continue.',
+    },
   },
   userProfile: {
     mobileButton__menu: 'Menu',
@@ -603,6 +607,7 @@ export const enUS: LocalizationResource = {
       detailsTitle__inviteFailed:
         'The invitations could not be sent. There are already pending invitations for the following email addresses: {{email_addresses}}.',
       formButtonPrimary__continue: 'Send invitations',
+      selectDropdown__role: 'Select role',
     },
     removeDomainPage: {
       title: 'Remove domain',

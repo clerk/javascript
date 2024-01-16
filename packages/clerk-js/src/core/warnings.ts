@@ -6,7 +6,7 @@ const warnings = {
   cannotRenderComponentWhenSessionExists:
     'The <SignUp/> and <SignIn/> components cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the Home URL instead.',
   cannotRenderSignUpComponentWhenSessionExists:
-    'The <SignUp/> component cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the value setted in `afterSignUp` URL instead.',
+    'The <SignUp/> component cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the value set in `afterSignUp` URL instead.',
   cannotRenderSignInComponentWhenSessionExists:
     'The <SignIn/> component cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the `afterSignIn` URL instead.',
   cannotRenderComponentWhenUserDoesNotExist:

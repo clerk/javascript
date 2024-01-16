@@ -4,6 +4,7 @@ import type {
   OrganizationEnrollmentMode,
   OrganizationSettingsResource,
 } from '@clerk/types';
+import { useEffect } from 'react';
 
 import { CalloutWithAction } from '../../common';
 import { useEnvironment } from '../../contexts';
@@ -112,19 +113,16 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
     type: 'checkbox',
   });
 
-  const { data: domain, isLoading: domainIsLoading } = useFetch(
-    organization?.getDomain,
-    {
-      domainId: id,
-    },
-    {
-      onSuccess(d) {
-        enrollmentMode.setValue(d.enrollmentMode);
-      },
-    },
-  );
+  const { data: domain, isLoading: domainIsLoading } = useFetch(organization?.getDomain, {
+    domainId: id,
+  });
 
-  const isFormDirty = deletePending.checked || domain?.enrollmentMode !== enrollmentMode.value;
+  useEffect(() => {
+    if (domain) {
+      enrollmentMode.setValue(domain.enrollmentMode);
+    }
+  }, [domain?.id]);
+
   const title = localizationKeys('organizationProfile.verifiedDomainPage.title', {
     domain: domain?.name,
   });
@@ -225,7 +223,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
 
           <FormButtons
             localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save')}
-            isDisabled={domainIsLoading || !domain || !isFormDirty}
+            isDisabled={domainIsLoading || !domain}
             onReset={onReset}
           />
         </Form.Root>

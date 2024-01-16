@@ -2,11 +2,10 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
-  IconButton,
   Tab,
   TabPanel,
   TabPanels,
@@ -16,7 +15,6 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { Action } from '../../elements/Action';
-import { UserAdd } from '../../icons';
 import { mqu, type ThemableCssProp } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
 import { InviteMembersScreen } from './InviteMembersScreen';
@@ -26,17 +24,10 @@ import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests
 
 export const InviteMembersButton = (props: { sx?: ThemableCssProp }) => {
   return (
-    <IconButton
+    <Button
       {...props}
       elementDescriptor={descriptors.membersPageInviteButton}
       aria-label='Invite'
-      icon={
-        <Icon
-          icon={UserAdd}
-          size={'sm'}
-          sx={t => ({ marginRight: t.space.$2 })}
-        />
-      }
       textVariant='buttonSmall'
       localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
     />
@@ -63,13 +54,13 @@ export const OrganizationMembers = withCardStateProvider(() => {
   return (
     <Col
       elementDescriptor={descriptors.page}
-      gap={8}
+      gap={2}
     >
       <Card.Alert>{card.error}</Card.Alert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('organizationMembers')}
-        gap={8}
+        gap={4}
       >
         <Action.Root>
           <Header.Root sx={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
@@ -105,8 +96,10 @@ export const OrganizationMembers = withCardStateProvider(() => {
                   <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />
                 </Tab>
               )}
-              <Col
-                justify='center'
+            </TabsList>
+            {canManageMemberships && (
+              <Flex
+                justify='end'
                 sx={{
                   marginLeft: 'auto',
                   [mqu.md]: {
@@ -114,13 +107,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
                   },
                 }}
               >
-                {canManageMemberships && (
-                  <Action.Trigger value='invite'>
-                    <InviteMembersButton />
-                  </Action.Trigger>
-                )}
-              </Col>
-            </TabsList>
+                <Action.Trigger value='invite'>
+                  <InviteMembersButton />
+                </Action.Trigger>
+              </Flex>
+            )}
             {canReadMemberships && (
               <Action.Open value='invite'>
                 <Action.Card>

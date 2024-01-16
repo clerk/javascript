@@ -3,7 +3,8 @@ import React from 'react';
 import { useEnvironment } from '../contexts';
 import { Col, Flex, Flow, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations } from '../styledSystem';
+import { animations, common } from '../styledSystem';
+import { colors } from '../utils';
 import { Card } from '.';
 
 const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card.Content>>((props, ref) => {
@@ -16,8 +17,9 @@ const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof
           width: t.sizes.$94,
           maxWidth: `calc(100vw - ${t.sizes.$8})`,
           zIndex: t.zIndices.$modal,
+          backdropFilter: t.backdropFilters.$defaultBlur,
           borderRadius: t.radii.$lg,
-          animation: `${animations.dropdownSlideInScaleAndFade} 140ms `,
+          animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$fast}`,
         })}
       >
         {props.children}
@@ -59,7 +61,10 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
       justify='between'
       sx={[
         t => ({
-          background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
+          background: common.mergedColorsBackground(
+            colors.setAlpha(t.colors.$colorBackground, 0.8),
+            t.colors.$blackAlpha50,
+          ),
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
           borderBottomLeftRadius: 'inherit',

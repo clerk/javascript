@@ -31,7 +31,8 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
       <Button
         elementDescriptor={descriptors.organizationSwitcherTrigger}
         variant='ghost'
-        focusRing
+        hoverAsFocus
+        focusRing={false}
         sx={[
           t => ({
             minHeight: 0,

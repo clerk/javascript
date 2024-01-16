@@ -254,6 +254,10 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       message: LocalizationValue;
     };
+    accountSwitcher: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   userProfile: {
     mobileButton__menu: LocalizationValue;
@@ -601,6 +605,7 @@ type _LocalizationResource = {
       successMessage: LocalizationValue;
       detailsTitle__inviteFailed: LocalizationValue;
       formButtonPrimary__continue: LocalizationValue;
+      selectDropdown__role: LocalizationValue;
     };
     removeDomainPage: {
       title: LocalizationValue;

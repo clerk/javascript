@@ -54,7 +54,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}
-            gap={4}
+            gap={6}
           >
             {asForgotPassword && resetPasswordFactor && (
               <Button
