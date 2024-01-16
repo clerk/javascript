@@ -1,3 +1,4 @@
+import { parseError } from '@clerk/shared/error';
 import type {
   ClerkAPIError,
   SignUpVerificationJSON,
@@ -10,7 +11,7 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, parseError } from './internal';
+import { BaseResource } from './internal';
 
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';

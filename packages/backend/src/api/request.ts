@@ -1,3 +1,4 @@
+import { parseError } from '@clerk/shared/error';
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import snakecaseKeys from 'snakecase-keys';
 
@@ -167,16 +168,4 @@ function parseErrors(data: unknown): ClerkAPIError[] {
     return errors.length > 0 ? errors.map(parseError) : [];
   }
   return [];
-}
-
-function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
-  return {
-    code: error.code,
-    message: error.message,
-    longMessage: error.long_message,
-    meta: {
-      paramName: error?.meta?.param_name,
-      sessionId: error?.meta?.session_id,
-    },
-  };
 }
