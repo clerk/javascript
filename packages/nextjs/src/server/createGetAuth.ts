@@ -46,9 +46,9 @@ export const createGetAuth = ({
       logger.debug('Options debug', options);
 
       if (authStatus === AuthStatus.SignedIn) {
-        const { data: jwt, error } = decodeJwt(authToken as string);
-        if (error) {
-          throw error;
+        const { data: jwt, errors } = decodeJwt(authToken as string);
+        if (errors) {
+          throw errors[0];
         }
 
         logger.debug('JWT debug', jwt.raw.text);
@@ -68,10 +68,10 @@ export const getAuth = createGetAuth({
 export const parseJwt = (req: RequestLike) => {
   const cookieToken = getCookie(req, constants.Cookies.Session);
   const headerToken = getHeader(req, 'authorization')?.replace('Bearer ', '');
-  const { data, error } = decodeJwt(cookieToken || headerToken || '');
+  const { data, errors } = decodeJwt(cookieToken || headerToken || '');
 
-  if (error) {
-    throw error;
+  if (errors) {
+    throw errors[0];
   }
 
   return data;
