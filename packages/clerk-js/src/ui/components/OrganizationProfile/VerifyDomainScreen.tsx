@@ -8,6 +8,7 @@ export const VerifyDomainScreen = (props: VerifyDomainScreenProps) => {
     <VerifyDomainForm
       onSuccess={close}
       onReset={close}
+      skipToVerified={false}
       {...props}
     />
   );
