@@ -12,6 +12,7 @@ const warnings = {
   cannotRenderComponentWhenUserDoesNotExist:
     '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderComponentWhenOrgDoesNotExist: `<OrganizationProfile/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
+  cannotRenderAnyOrganizationComponent: `Any of the organization related components, <OrganizationProfile/>, <OrganizationSwitcher/>, <OrganizationList/>, and <CreateOrganization/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,
   cannotOpenOrgProfile:
     'The OrganizationProfile cannot render unless an organization is active. Since no organization is currently active, this is no-op.',
   cannotOpenUserProfile:

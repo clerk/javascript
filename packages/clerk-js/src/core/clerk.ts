@@ -64,6 +64,7 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledOrganizationsFeature,
   errorThrower,
   getClerkQueryParam,
   hasExternalAccountSignUpError,
@@ -379,6 +380,10 @@ export class Clerk implements ClerkInterface {
       console.info(warnings.cannotOpenOrgProfile);
       return;
     }
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      return;
+    }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'OrganizationProfile' })
       .then(controls => controls.openModal('organizationProfile', props || {}));
@@ -391,6 +396,10 @@ export class Clerk implements ClerkInterface {
 
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      return;
+    }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'CreateOrganization' })
       .then(controls => controls.openModal('createOrganization', props || {}));
@@ -478,6 +487,10 @@ export class Clerk implements ClerkInterface {
       console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
       return;
     }
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      return;
+    }
     void this.#componentControls.ensureMounted({ preloadHint: 'OrganizationProfile' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationProfile',
@@ -501,6 +514,10 @@ export class Clerk implements ClerkInterface {
 
   public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      return;
+    }
     void this.#componentControls?.ensureMounted({ preloadHint: 'CreateOrganization' }).then(controls =>
       controls.mountComponent({
         name: 'CreateOrganization',
@@ -524,6 +541,10 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      return;
+    }
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationSwitcher' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationSwitcher',
@@ -543,6 +564,10 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      return;
+    }
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationList' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationList',
