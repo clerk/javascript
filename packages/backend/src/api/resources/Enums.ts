@@ -28,13 +28,4 @@ export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_fact
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
-export type SignUpAttributeRequirements = (
-  | 'name_title'
-  | 'name_middle'
-  | 'name_last'
-  | 'name_suffix'
-  | 'age'
-  | 'gender'
-)[][];
-
 export type InvitationStatus = 'pending' | 'accepted' | 'revoked';
