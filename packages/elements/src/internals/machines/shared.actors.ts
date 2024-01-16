@@ -2,8 +2,8 @@ import type { Clerk, HandleOAuthCallbackParams, HandleSamlCallbackParams, Loaded
 import type { AnyEventObject } from 'xstate';
 import { fromCallback, fromPromise } from 'xstate';
 
-import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 
 export const waitForClerk = fromPromise<LoadedClerk, Clerk | LoadedClerk>(({ input: clerk }) => {
   return new Promise((resolve, reject) => {

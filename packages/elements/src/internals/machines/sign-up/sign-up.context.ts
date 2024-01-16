@@ -1,17 +1,15 @@
 import type { OAuthStrategy, SignInStrategy, Web3Strategy } from '@clerk/types';
 import { createActorContext } from '@xstate/react';
 import type React from 'react';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, useCallback, useMemo } from 'react';
 import type { SnapshotFrom } from 'xstate';
 
-import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import {
   getEnabledThirdPartyProviders,
   isAuthenticatableOauthStrategy,
   isWeb3Strategy,
 } from '~/utils/third-party-strategies';
 
-import type { SignInStrategyName } from '../sign-in.types'; // TODO: Update
 import { SignUpMachine } from './sign-up.machine';
 
 export type SnapshotState = SnapshotFrom<typeof SignUpMachine>;
@@ -46,24 +44,6 @@ export const StrategiesContext = createContext<StrategiesContextValue>({
 const clerkEnvironmentSelector = (state: SnapshotState) => state.context.clerk.__unstable__environment;
 
 // ================= HOOKS ================= //
-
-export function useStrategy(name: SignInStrategyName) {
-  const ctx = useContext(StrategiesContext);
-
-  if (!ctx) {
-    throw new ClerkElementsRuntimeError('useSignUpStrategy must be used within a <SignUpContinue> component.');
-  }
-
-  const { current, preferred, isActive } = ctx;
-
-  return {
-    current,
-    preferred,
-    get shouldRender() {
-      return isActive(name);
-    },
-  };
-}
 
 export const useSignUpStateMatcher = () => {
   return useSignUpFlowSelector(

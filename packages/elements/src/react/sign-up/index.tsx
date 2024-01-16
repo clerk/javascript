@@ -5,13 +5,11 @@ import { Slot } from '@radix-ui/react-slot';
 import type { PropsWithChildren } from 'react';
 
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form.context';
-import type { SignInStrategyName } from '~/internals/machines/sign-in.types';
 import {
   SignUpFlowProvider as SignUpFlowContextProvider,
   useSignUpFlow,
   useSignUpStateMatcher,
   useSignUpThirdPartyProviders,
-  useStrategy,
 } from '~/internals/machines/sign-up/sign-up.context';
 import { Form } from '~/react/common/form';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
@@ -20,7 +18,7 @@ import type { ThirdPartyStrategy } from '~/utils/third-party-strategies';
 
 const { useBrowserInspector } = createBrowserInspectorReactHook();
 
-// ================= SignInFlowProvider ================= //
+// ================= SignUpFlowProvider ================= //
 
 function SignUpFlowProvider({ children }: PropsWithChildren) {
   const clerk = useClerk();
@@ -81,22 +79,13 @@ export function SignUpStart({ children }: PropsWithChildren) {
   return state.matches('Start') ? <Form flowActor={actorRef}>{children}</Form> : null;
 }
 
-// // ================= SignUpContinue ================= //
+// ================= SignUpContinue ================= //
 
 export function SignUpContinue({ children }: PropsWithChildren) {
   const state = useSignUpStateMatcher();
   const actorRef = useSignUpFlow();
 
   return state.matches('Continue') ? <Form flowActor={actorRef}>{children}</Form> : null;
-}
-
-// ================= SignUpStrategy ================= //
-
-export type SignUpStrategyProps = PropsWithChildren<{ name: SignInStrategyName }>; // TODO: Update type
-
-export function SignUpStrategy({ children, name }: SignUpStrategyProps) {
-  const { shouldRender } = useStrategy(name);
-  return shouldRender ? children : null;
 }
 
 // ================= SignUpSocialProviders ================= //
