@@ -15,6 +15,7 @@ exports[`constants from environment variables 1`] = `
     "AuthMessage": "x-clerk-auth-message",
     "AuthReason": "x-clerk-auth-reason",
     "AuthStatus": "x-clerk-auth-status",
+    "AuthToken": "x-clerk-auth-token",
     "Authorization": "authorization",
     "ClerkRedirectTo": "x-clerk-redirect-to",
     "CloudFrontForwardedProto": "cloudfront-forwarded-proto",

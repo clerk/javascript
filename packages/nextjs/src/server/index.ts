@@ -10,7 +10,8 @@ export { clerkClient } from './clerkClient';
 /**
  * NextJS-specific exports
  */
-export { buildClerkProps, getAuth } from './getAuth';
+export { getAuth } from './createGetAuth';
+export { buildClerkProps } from './buildClerkProps';
 export { auth } from '../app-router/server/auth';
 export { currentUser } from '../app-router/server/currentUser';
 export { authMiddleware } from './authMiddleware';

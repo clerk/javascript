@@ -119,7 +119,7 @@ export async function authenticateRequest(
 
     const { data, error } = await verifyToken(sessionToken, authenticateContext);
     if (data) {
-      return signedIn(authenticateContext, data, headers);
+      return signedIn(authenticateContext, data, headers, sessionToken);
     }
 
     if (
@@ -145,7 +145,7 @@ ${error.getFullMessage()}`,
         clockSkewInMs: 86_400_000,
       });
       if (retryResult) {
-        return signedIn(authenticateContext, retryResult, headers);
+        return signedIn(authenticateContext, retryResult, headers, sessionToken);
       }
 
       throw retryError;
@@ -185,7 +185,7 @@ ${error.getFullMessage()}`,
         throw error;
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data);
+      return await signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -301,7 +301,7 @@ ${error.getFullMessage()}`,
         throw error;
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data);
+      return await signedIn(authenticateContext, data, undefined, authenticateContext.sessionTokenInCookie!);
     } catch (err) {
       return handleError(err, 'cookie');
     }
