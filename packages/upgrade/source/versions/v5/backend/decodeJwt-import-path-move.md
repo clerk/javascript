@@ -1,0 +1,12 @@
+---
+title: '`decodeJwt` import moved to `@clerk/backend/tokens`'
+matcher: "import\\s+{[\\s\\S]*?decodeJwt[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)['\"]"
+replaceWithString: 'backend/tokens'
+---
+
+The `decodeJwt` import path has changed from `@clerk/backend` to `@clerk/backend/tokens`. You must update your import path in order for it to work correctly. Example below of the fix that needs to be made
+
+```diff
+- import { decodeJwt } from "@clerk/backend"
++ import { decodeJwt } from "@clerk/backend/tokens"
+```

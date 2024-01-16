@@ -197,6 +197,13 @@ export default {
 	types: [],
 	backend: [],
 	// backend: load('backend', [
+	//  'verifyjwt-import-path-move'
+	//  'decodejwt-import-path-move'
+	//  'signjwt-import-path-move'
+	//  'constants-import-path-move'
+	//  'redirect-import-path-move'
+	//  'createauthenticaterequest-import-path-move'
+	//  'createisomorphicrequest-import-path-move'
 	// 	'createclerkclient-frontendapi',
 	// 	'clerk-import',
 	// 	'externalaccount-picture',
