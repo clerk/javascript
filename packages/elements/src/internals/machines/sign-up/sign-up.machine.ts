@@ -18,7 +18,7 @@ import { and, assertEvent, assign, log, raise, sendTo, setup } from 'xstate';
 
 import type { ClerkElementsErrorBase } from '~/internals/errors/error';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
-import type { FormMachine } from '~/internals/machines/form.machine';
+import type { FormMachine } from '~/internals/machines/form/form.machine';
 import { handleRedirectCallback, waitForClerk } from '~/internals/machines/shared.actors';
 import {
   authenticateWithSignUpRedirect,
