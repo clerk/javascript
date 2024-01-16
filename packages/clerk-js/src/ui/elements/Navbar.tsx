@@ -261,12 +261,17 @@ const NavButton = (props: NavButtonProps) => {
       textVariant='buttonLarge'
       size='md'
       isActive={isActive}
+      hoverAsFocus
       {...rest}
       sx={[
         t => ({
           gap: t.space.$3,
           justifyContent: 'flex-start',
+          backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
           opacity: isActive ? 1 : 0.6,
+          ':focus': {
+            boxShadow: 'none',
+          },
         }),
         sx,
       ]}

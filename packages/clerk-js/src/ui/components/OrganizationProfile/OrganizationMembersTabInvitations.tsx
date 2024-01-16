@@ -1,7 +1,8 @@
 import { Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Col, Flex, localizationKeys } from '../../customizables';
+import { Col, Flex, localizationKeys, Text } from '../../customizables';
 import { Header, ProfileSection } from '../../elements';
+import { mqu } from '../../styledSystem';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';
 import { MembershipWidget } from './MembershipWidget';
@@ -24,41 +25,53 @@ export const OrganizationMembersTabInvitations = () => {
 
       {isDomainsEnabled && (
         <Protect permission={'org:sys_domains:manage'}>
-          <Col
+          <Flex
             gap={2}
-            sx={{
+            sx={t => ({
               width: '100%',
-            }}
+              gap: t.space.$8,
+              [mqu.md]: {
+                flexDirection: 'column',
+                gap: 0,
+              },
+            })}
           >
-            <Header.Root>
-              <Header.Title
-                localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
-                )}
-                textVariant='h3'
+            <Col sx={t => ({ width: t.space.$66, marginTop: t.space.$2 })}>
+              <Header.Root>
+                <Header.Title
+                  localizationKey={localizationKeys(
+                    'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
+                  )}
+                  textVariant='h3'
+                />
+              </Header.Root>
+            </Col>
+            <Col sx={{ width: '100%' }}>
+              <DomainList
+                fallback={
+                  <ProfileSection.Button
+                    localizationKey={localizationKeys(
+                      'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
+                    )}
+                    id='manageVerifiedDomains'
+                    sx={t => ({ gap: t.space.$2 })}
+                    onClick={navigateToGeneralPageRoot}
+                  />
+                }
+                verificationStatus={'verified'}
+                enrollmentMode={'automatic_invitation'}
               />
-              <Header.Subtitle
+              <Text
                 localizationKey={localizationKeys(
                   'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
                 )}
-                variant='body'
+                sx={t => ({
+                  paddingLeft: t.space.$10,
+                  color: t.colors.$colorTextSecondary,
+                })}
               />
-            </Header.Root>
-            <DomainList
-              fallback={
-                <ProfileSection.Button
-                  localizationKey={localizationKeys(
-                    'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
-                  )}
-                  id='manageVerifiedDomains'
-                  sx={t => ({ gap: t.space.$2 })}
-                  onClick={navigateToGeneralPageRoot}
-                />
-              }
-              verificationStatus={'verified'}
-              enrollmentMode={'automatic_invitation'}
-            />
-          </Col>
+            </Col>
+          </Flex>
         </Protect>
       )}
 
