@@ -4,7 +4,7 @@ import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import { Slot } from '@radix-ui/react-slot';
 import type { PropsWithChildren } from 'react';
 
-import { FormStoreProvider, useFormStore } from '~/internals/machines/form.context';
+import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import {
   SignUpFlowProvider as SignUpFlowContextProvider,
   useSignUpFlow,

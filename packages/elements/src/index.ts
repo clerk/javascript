@@ -22,5 +22,5 @@ export { SignUp, SignUpStart, SignUpSocialProviders } from '~/react/sign-up';
 
 /** Hooks */
 export { useSignUpFlow, useSignUpFlowSelector } from '~/internals/machines/sign-up/sign-up.context';
-export { useSignInFlow, useSignInFlowSelector } from '~/internals/machines/sign-in.context';
+export { useSignInFlow, useSignInFlowSelector } from '~/internals/machines/sign-in/sign-in.context';
 export { useNextRouter };

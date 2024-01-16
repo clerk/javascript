@@ -4,8 +4,8 @@ import type { SetOptional, Simplify } from 'type-fest';
 import { fromCallback, fromPromise } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
+import type { FormMachineContext } from '~/internals/machines/form/form.machine';
 
-import type { FormMachineContext } from '../form.machine';
 import type {
   AuthenticateWithRedirectOAuthParams,
   AuthenticateWithRedirectSamlParams,

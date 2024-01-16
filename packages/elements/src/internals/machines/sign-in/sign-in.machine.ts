@@ -15,11 +15,12 @@ import type {
 import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
 import { and, assertEvent, assign, log, not, or, raise, sendTo, setup } from 'xstate';
 
+import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import type { FormMachine } from '~/internals/machines/form/form.machine';
+import { handleRedirectCallback, waitForClerk } from '~/internals/machines/shared.actors';
+import { assertActorEventDone, assertActorEventError } from '~/internals/machines/utils/assert';
 import type { ClerkRouter } from '~/react/router';
 
-import { ClerkElementsRuntimeError } from '../errors/error';
-import type { FormMachine } from './form.machine';
-import { handleRedirectCallback, waitForClerk } from './shared.actors';
 import {
   attemptFirstFactor,
   attemptSecondFactor,
@@ -29,7 +30,6 @@ import {
   prepareSecondFactor,
 } from './sign-in.actors';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from './sign-in.utils';
-import { assertActorEventDone, assertActorEventError } from './utils/assert';
 
 export interface SignInMachineContext extends MachineContext {
   clerk: LoadedClerk;

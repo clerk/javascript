@@ -19,8 +19,8 @@ import {
   globalErrorsSelector,
   useFormSelector,
   useFormStore,
-} from '~/internals/machines/form.context';
-import type { FieldDetails } from '~/internals/machines/form.types';
+} from '~/internals/machines/form/form.context';
+import type { FieldDetails } from '~/internals/machines/form/form.types';
 
 const FieldContext = createContext<Pick<FieldDetails, 'name'> | null>(null);
 const useFieldContext = () => useContext(FieldContext);

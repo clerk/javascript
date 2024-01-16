@@ -5,7 +5,7 @@ import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
 import { Slot } from '@radix-ui/react-slot';
 import type { PropsWithChildren } from 'react';
 
-import { FormStoreProvider, useFormStore } from '~/internals/machines/form.context';
+import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import {
   SignInFlowProvider as SignInFlowContextProvider,
   StrategiesContext,
@@ -15,8 +15,8 @@ import {
   useSignInThirdPartyProviders,
   useSSOCallbackHandler,
   useStrategy,
-} from '~/internals/machines/sign-in.context';
-import type { SignInStrategyName } from '~/internals/machines/sign-in.types';
+} from '~/internals/machines/sign-in/sign-in.context';
+import type { SignInStrategyName } from '~/internals/machines/sign-in/sign-in.types';
 import { Form } from '~/react/common/form';
 import { Route, Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
