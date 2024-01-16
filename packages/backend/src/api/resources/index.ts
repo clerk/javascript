@@ -11,7 +11,6 @@ export type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
-  SignUpAttributeRequirements,
   SignUpStatus,
 } from './Enums';
 

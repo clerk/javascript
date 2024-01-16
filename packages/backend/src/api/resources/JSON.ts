@@ -3,7 +3,6 @@ import type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
-  SignUpAttributeRequirements,
   SignUpStatus,
 } from './Enums';
 
@@ -221,7 +220,6 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 export interface SignUpJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SignUpAttempt;
   status: SignUpStatus;
-  attribute_requirements: SignUpAttributeRequirements;
   username: string | null;
   email_address: string | null;
   phone_number: string | null;
@@ -250,8 +248,6 @@ export interface UserJSON extends ClerkResourceJSON {
   username: string | null;
   first_name: string;
   last_name: string;
-  gender: string;
-  birthday: string;
   image_url: string;
   has_image: boolean;
   primary_email_address_id: string;
