@@ -107,6 +107,9 @@ export default {
 		'rootauthloader-frontendapi',
 		'frontend-api-to-publishable-key',
 		'api-key-to-secret-key',
+		'ismagiclinkerror',
+		'magiclinkerrorcode',
+		'usemagiclink',
 	]),
 	expo: load('expo', [
 		'apikey-to-publishable-key',
