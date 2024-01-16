@@ -1,5 +1,5 @@
 ---
-title: 'Back button descriptors change on alternative 2fa methods page'
+title: 'Back button customization ids change on alternative 2fa methods page'
 image: true
 matcher:
   - "\\.cl-headerBackIcon"
@@ -10,7 +10,7 @@ matcher:
   - "elements:\\s+{[\\s\\S]*?headerBackLink:[\\s\\S]*?}"
 ---
 
-The "back" button on the panel within `<SignIn />` that lists out alternative two factor auth methods has changed location, and there have been some changes to the descriptors as a result of this:
+The "back" button on the panel within `<SignIn />` that lists out alternative two factor auth methods has changed location, and there have been some changes to the ids as a result of this:
 
 - `headerBackIcon` has been removed, as there is no longer an associated icon
 - `headerBackRow` has been renamed to `backRow` as it's no longer in the header

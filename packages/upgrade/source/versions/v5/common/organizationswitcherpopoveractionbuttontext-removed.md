@@ -1,5 +1,5 @@
 ---
-title: '`organizationSwitcherPopoverActionButtonText` descriptor removed'
+title: '`organizationSwitcherPopoverActionButtonText` customization id removed'
 image: true
 matcher:
   - "\\.cl-organizationSwitcherPopoverActionButtonText"
@@ -10,4 +10,4 @@ matcher:
   - "elements:\\s+{[\\s\\S]*?organizationSwitcherPopoverActionButtonText__createOrganization:[\\s\\S]*?}"
 ---
 
-The `organizationSwitcherPopoverActionButtonText` customization descriptor has been removed, as the text for this button is now directly rendered inside the button rather than an extra wrapping element. The nested descriptors `organizationSwitcherPopoverActionButtonText__manageOrganization` and `organizationSwitcherPopoverActionButtonText__createOrganization` have also been removed. Any styling that needs to apply to the text can be applied to its direct parent `cl-organizationSwitcherPopoverActionButton`.
+The `organizationSwitcherPopoverActionButtonText` customization id has been removed, as the text for this button is now directly rendered inside the button rather than an extra wrapping element. The nested ids `organizationSwitcherPopoverActionButtonText__manageOrganization` and `organizationSwitcherPopoverActionButtonText__createOrganization` have also been removed. Any styling that needs to apply to the text can be applied to its direct parent `cl-organizationSwitcherPopoverActionButton`.
