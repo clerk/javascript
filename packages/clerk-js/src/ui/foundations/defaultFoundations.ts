@@ -1,3 +1,4 @@
+import { backdropFilters } from './backdropFilters';
 import { borders } from './borders';
 import { colors } from './colors';
 import { opacity } from './opacity';
@@ -23,6 +24,7 @@ const defaultInternalThemeFoundations = Object.freeze({
   sizes,
   space,
   shadows,
+  backdropFilters,
   transitionProperty,
   transitionTiming,
   transitionDuration,
