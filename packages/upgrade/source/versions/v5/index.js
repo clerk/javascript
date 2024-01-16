@@ -103,6 +103,10 @@ export default {
 		'createclerkclient-apikey',
 		'rootauthloader-apikey',
 		'getauth-apikey',
+		'clerkprovider-frontendapi',
+		'rootauthloader-frontendapi',
+		'frontend-api-to-publishable-key',
+		'api-key-to-secret-key',
 	]),
 	expo: load('expo', [
 		'apikey-to-publishable-key',
