@@ -4,6 +4,7 @@ import { Button, localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
+import { mqu } from '../../styledSystem';
 import { UsernameForm } from './UsernameForm';
 
 const UsernameScreen = () => {
@@ -27,16 +28,23 @@ export const UsernameSection = () => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.usernameSection.title')}
       id='username'
+      sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <ProfileSection.Item id='username'>
-            {user.username && <Text>{user.username}</Text>}
+          <ProfileSection.Item
+            id='username'
+            sx={t => ({
+              padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$3}`,
+            })}
+          >
+            {user.username && <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{user.username}</Text>}
 
             <Action.Trigger value='edit'>
               <Button
                 id='username'
                 variant='ghost'
+                textVariant='buttonSmall'
                 localizationKey={
                   user.username
                     ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')

@@ -13,7 +13,12 @@ export const EnterpriseAccountsSection = () => {
       title={localizationKeys('userProfile.start.enterpriseAccountsSection.title')}
       id='enterpriseAccounts'
     >
-      <ProfileSection.Item id='enterpriseAccounts'>
+      <ProfileSection.Item
+        id='enterpriseAccounts'
+        sx={t => ({
+          padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$3}`,
+        })}
+      >
         {user?.samlAccounts.map(account => {
           const label = account.emailAddress;
           const providerName = getSamlProviderName(account.provider);
@@ -37,7 +42,9 @@ export const EnterpriseAccountsSection = () => {
                   gap={2}
                   center
                 >
-                  <Text>{`${providerName} ${label ? `(${label})` : ''}`}</Text>
+                  <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{`${providerName} ${
+                    label ? `(${label})` : ''
+                  }`}</Text>
                   {error && (
                     <Badge
                       colorScheme='danger'

@@ -48,14 +48,17 @@ export const EmailsSection = () => {
           {user?.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
             <Action.Root key={email.emailAddress}>
               <Action.Closed value=''>
-                <ProfileSection.Item id='emailAddresses'>
+                <ProfileSection.Item
+                  id='emailAddresses'
+                  sx={t => ({ maxHeight: t.space.$8 })}
+                >
                   <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                     <Flex
                       as={'span'}
                       gap={2}
                       center
                     >
-                      <Text>{email.emailAddress} </Text>
+                      <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{email.emailAddress} </Text>
                       {user?.primaryEmailAddressId === email.id && (
                         <Badge localizationKey={localizationKeys('badge__primary')} />
                       )}

@@ -252,11 +252,11 @@ export const enUS: LocalizationResource = {
       security: 'Security',
     },
     start: {
-      headerTitle__account: 'Profile',
+      headerTitle__account: 'Profile details',
       headerTitle__security: 'Security',
       profileSection: {
         title: 'Profile',
-        primaryButton: 'Edit Profile',
+        primaryButton: 'Edit profile',
       },
       usernameSection: {
         title: 'Username',
@@ -324,7 +324,7 @@ export const enUS: LocalizationResource = {
       },
       dangerSection: {
         title: 'Account termination',
-        deleteAccountButton: 'Delete Account',
+        deleteAccountButton: 'Delete account',
       },
     },
     profilePage: {
@@ -383,7 +383,7 @@ export const enUS: LocalizationResource = {
       title: 'Add connected account',
       formHint: 'Select a provider to connect your account.',
       formHint__noAccounts: 'There are no available external account providers.',
-      socialButtonsBlockButton: 'Connect {{provider|titleize}} account',
+      socialButtonsBlockButton: '{{provider|titleize}}',
       successMessage: 'The provider has been added to your account',
       removeResource: {
         title: 'Remove connected account',

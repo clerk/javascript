@@ -1,10 +1,10 @@
 import { useUser } from '@clerk/shared/react';
 
-import { localizationKeys, Text } from '../../customizables';
+import { Button, localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { Pencil, Plus } from '../../icons';
+import { mqu } from '../../styledSystem';
 import { PasswordForm } from './PasswordForm';
 
 const PasswordScreen = () => {
@@ -30,16 +30,23 @@ export const PasswordSection = () => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.passwordSection.title')}
       id='password'
+      sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <ProfileSection.ItemList id='password'>
-            {passwordEnabled && <Text sx={t => ({ padding: `${t.space.$2} ${t.space.$4}` })}>••••••••••</Text>}
+          <ProfileSection.Item
+            id='password'
+            sx={t => ({
+              padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$3}`,
+            })}
+          >
+            {passwordEnabled && <Text sx={t => ({ fontSize: t.fontSizes.$xl })}>••••••••••</Text>}
 
             <Action.Trigger value='edit'>
-              <ProfileSection.Button
+              <Button
                 id='password'
-                leftIcon={passwordEnabled ? Pencil : Plus}
+                variant='ghost'
+                textVariant='buttonSmall'
                 localizationKey={
                   passwordEnabled
                     ? localizationKeys('userProfile.start.passwordSection.primaryButton__changePassword')
@@ -47,7 +54,7 @@ export const PasswordSection = () => {
                 }
               />
             </Action.Trigger>
-          </ProfileSection.ItemList>
+          </ProfileSection.Item>
         </Action.Closed>
 
         <Action.Open value='edit'>

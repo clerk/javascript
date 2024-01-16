@@ -45,7 +45,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
           <Form.PlainInput
             {...usernameField.props}
             autoFocus
-            isRequired
+            isRequired={isUsernameRequired}
           />
         </Form.ControlRow>
         <FormButtons

@@ -6,6 +6,7 @@ import { Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { Plus } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import { mqu } from '../styledSystem';
 import { ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
@@ -17,14 +18,18 @@ type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
 const ProfileSectionRoot = (props: ProfileSectionProps) => {
   const { title, children, id, subtitle, sx, ...rest } = props;
   return (
-    <Col
+    <Flex
       elementDescriptor={descriptors.profileSection}
       elementId={descriptors.profileSection.setId(id)}
       sx={[
         t => ({
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           padding: `${t.space.$4} 0`,
-          gap: t.space.$2,
+          gap: t.space.$8,
+          [mqu.md]: {
+            flexDirection: 'column',
+            gap: 0,
+          },
         }),
         sx,
       ]}
@@ -33,7 +38,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
       <Col
         elementDescriptor={descriptors.profileSectionHeader}
         elementId={descriptors.profileSectionHeader.setId(id)}
-        sx={t => ({ gap: t.space.$1 })}
+        sx={t => ({ gap: t.space.$1, width: t.space.$66 })}
       >
         <SectionHeader
           localizationKey={title}
@@ -41,6 +46,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           elementId={descriptors.profileSectionTitle.setId(id)}
           textElementDescriptor={descriptors.profileSectionTitleText}
           textElementId={descriptors.profileSectionTitleText.setId(id)}
+          sx={t => ({ padding: `${t.space.$2} ${t.space.$none}` })}
         />
         {subtitle && (
           <SectionSubHeader
@@ -60,7 +66,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
       >
         {children}
       </Col>
-    </Col>
+    </Flex>
   );
 };
 
@@ -72,7 +78,7 @@ const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
     <Col
       elementDescriptor={descriptors.profileSectionItemList}
       elementId={descriptors.profileSectionItemList.setId(id)}
-      sx={t => ({ gap: t.space.$1 })}
+      sx={t => ({ gap: t.space.$0x5 })}
       {...rest}
     >
       {children}
@@ -83,17 +89,20 @@ const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
 type ProfileSectionItemProps = PropsOfComponent<typeof Flex> & { id: ProfileSectionId };
 
 const ProfileSectionItem = (props: ProfileSectionItemProps) => {
-  const { children, id, ...rest } = props;
+  const { children, id, sx, ...rest } = props;
   return (
     <Flex
       elementDescriptor={descriptors.profileSectionItem}
       elementId={descriptors.profileSectionItem.setId(id)}
-      sx={t => ({
-        justifyContent: 'space-between',
-        width: '100%',
-        alignItems: 'center',
-        padding: `${t.space.$2} ${t.space.$4}`,
-      })}
+      sx={[
+        t => ({
+          justifyContent: 'space-between',
+          width: '100%',
+          alignItems: 'center',
+          padding: `${t.space.$1x5} ${t.space.$3}`,
+        }),
+        sx,
+      ]}
       {...rest}
     >
       {children}
@@ -112,7 +121,15 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
       elementDescriptor={descriptors.profileSectionPrimaryButton}
       elementId={descriptors.profileSectionPrimaryButton.setId(id)}
       variant='ghost'
-      sx={[t => ({ justifyContent: 'start', gap: t.space.$2, padding: `${t.space.$2} ${t.space.$4}` }), sx]}
+      sx={[
+        t => ({
+          justifyContent: 'start',
+          gap: t.space.$2,
+          padding: `${t.space.$1x5} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
+          height: t.sizes.$8,
+        }),
+        sx,
+      ]}
       textLocalizationKey={localizationKey}
       leftIcon={leftIcon}
       leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
@@ -138,7 +155,7 @@ export const ProfileSectionActionMenuItem = (props: ProfileSectionActionMenuItem
     <MenuItem
       sx={[
         theme => ({
-          borderRadius: theme.radii.$sm,
+          padding: `${theme.space.$1x5} ${theme.space.$2}`,
         }),
         sx,
       ]}
@@ -200,7 +217,12 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
             textLocalizationKey={triggerLocalizationKey}
             variant='ghost'
             sx={[
-              t => ({ justifyContent: 'start', gap: t.space.$2, padding: `${t.space.$2} ${t.space.$4}` }),
+              t => ({
+                justifyContent: 'start',
+                gap: t.space.$2,
+                padding: `${t.space.$1x5} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
+                height: t.sizes.$8,
+              }),
               triggerSx,
             ]}
             leftIcon={Plus}
@@ -211,9 +233,7 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
           asPortal={false}
           sx={t => ({
             width: '100%',
-            gap: 2,
-            paddingLeft: t.space.$1,
-            paddingRight: t.space.$1,
+            padding: t.space.$1,
           })}
         >
           {children}

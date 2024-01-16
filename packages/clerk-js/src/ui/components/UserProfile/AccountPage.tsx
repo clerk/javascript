@@ -25,7 +25,7 @@ export const AccountPage = withCardStateProvider(() => {
   return (
     <Col
       elementDescriptor={descriptors.page}
-      sx={t => ({ gap: t.space.$8 })}
+      sx={t => ({ gap: t.space.$8, color: t.colors.$blackAlpha950 })}
     >
       <Card.Alert>{card.error}</Card.Alert>
       <Col
