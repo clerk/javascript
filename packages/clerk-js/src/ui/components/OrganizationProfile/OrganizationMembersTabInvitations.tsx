@@ -26,13 +26,12 @@ export const OrganizationMembersTabInvitations = () => {
       {isDomainsEnabled && (
         <Protect permission={'org:sys_domains:manage'}>
           <Flex
-            gap={2}
             sx={t => ({
               width: '100%',
               gap: t.space.$8,
               [mqu.md]: {
                 flexDirection: 'column',
-                gap: 0,
+                gap: t.space.$2,
               },
             })}
           >
@@ -49,26 +48,31 @@ export const OrganizationMembersTabInvitations = () => {
             <Col sx={{ width: '100%' }}>
               <DomainList
                 fallback={
-                  <ProfileSection.Button
-                    localizationKey={localizationKeys(
-                      'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
-                    )}
-                    id='manageVerifiedDomains'
-                    sx={t => ({ gap: t.space.$2 })}
-                    onClick={navigateToGeneralPageRoot}
-                  />
+                  <>
+                    <ProfileSection.Button
+                      localizationKey={localizationKeys(
+                        'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
+                      )}
+                      id='manageVerifiedDomains'
+                      sx={t => ({ gap: t.space.$2 })}
+                      onClick={navigateToGeneralPageRoot}
+                    />
+                    <Text
+                      localizationKey={localizationKeys(
+                        'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
+                      )}
+                      sx={t => ({
+                        paddingLeft: t.space.$10,
+                        color: t.colors.$colorTextSecondary,
+                        [mqu.md]: {
+                          paddingLeft: 0,
+                        },
+                      })}
+                    />
+                  </>
                 }
                 verificationStatus={'verified'}
                 enrollmentMode={'automatic_invitation'}
-              />
-              <Text
-                localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
-                )}
-                sx={t => ({
-                  paddingLeft: t.space.$10,
-                  color: t.colors.$colorTextSecondary,
-                })}
               />
             </Col>
           </Flex>

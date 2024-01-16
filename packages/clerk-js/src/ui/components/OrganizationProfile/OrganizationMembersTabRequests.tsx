@@ -1,7 +1,8 @@
 import { Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Col, Flex, localizationKeys } from '../../customizables';
+import { Col, Flex, localizationKeys, Text } from '../../customizables';
 import { Header, ProfileSection } from '../../elements';
+import { mqu } from '../../styledSystem';
 import { DomainList } from './DomainList';
 import { MembershipWidget } from './MembershipWidget';
 import { RequestToJoinList } from './RequestToJoinList';
@@ -24,41 +25,57 @@ export const OrganizationMembersTabRequests = () => {
 
       {isDomainsEnabled && (
         <Protect permission='org:sys_domains:manage'>
-          <Col
-            gap={2}
-            sx={{
+          <Flex
+            sx={t => ({
               width: '100%',
-            }}
+              gap: t.space.$8,
+              [mqu.md]: {
+                flexDirection: 'column',
+                gap: t.space.$2,
+              },
+            })}
           >
-            <Header.Root>
-              <Header.Title
-                localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.requestsTab.autoSuggestions.headerTitle',
-                )}
-                textVariant='h3'
-              />
-              <Header.Subtitle
-                localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.requestsTab.autoSuggestions.headerSubtitle',
-                )}
-                variant='body'
-              />
-            </Header.Root>
-            <DomainList
-              fallback={
-                <ProfileSection.Button
+            <Col sx={t => ({ width: t.space.$66, marginTop: t.space.$2 })}>
+              <Header.Root>
+                <Header.Title
                   localizationKey={localizationKeys(
-                    'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
+                    'organizationProfile.membersPage.requestsTab.autoSuggestions.headerTitle',
                   )}
-                  sx={t => ({ gap: t.space.$2 })}
-                  id='manageVerifiedDomains'
-                  onClick={navigateToGeneralPageRoot}
+                  textVariant='h3'
                 />
-              }
-              verificationStatus={'verified'}
-              enrollmentMode={'automatic_suggestion'}
-            />
-          </Col>
+              </Header.Root>
+            </Col>
+            <Col sx={{ width: '100%' }}>
+              <DomainList
+                fallback={
+                  <>
+                    <ProfileSection.Button
+                      localizationKey={localizationKeys(
+                        'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
+                      )}
+                      sx={t => ({ gap: t.space.$2 })}
+                      id='manageVerifiedDomains'
+                      onClick={navigateToGeneralPageRoot}
+                    />
+                    <Text
+                      localizationKey={localizationKeys(
+                        'organizationProfile.membersPage.requestsTab.autoSuggestions.headerSubtitle',
+                      )}
+                      sx={t => ({
+                        paddingLeft: t.space.$10,
+                        color: t.colors.$colorTextSecondary,
+                        [mqu.md]: {
+                          paddingLeft: 0,
+                        },
+                      })}
+                    />
+                  </>
+                }
+                verificationStatus={'verified'}
+                enrollmentMode={'automatic_suggestion'}
+              />
+            </Col>
+          </Flex>
         </Protect>
       )}
 

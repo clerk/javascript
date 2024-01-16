@@ -11,7 +11,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       borderSpacing: '0',
       borderCollapse: 'separate',
       border: theme.borders.$normal,
-      borderColor: theme.colors.$blackAlpha100,
+      borderColor: 'transparent',
       borderRadius: theme.radii.$lg,
       boxShadow: theme.shadows.$tableBodyShadow,
       width: '100%',
@@ -44,6 +44,12 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderLeftWidth: '0px',
         borderRightWidth: '0px',
         borderColor: theme.colors.$blackAlpha100,
+      },
+      'tr:hover td:first-child': {
+        borderBottomLeftRadius: theme.radii.$lg,
+      },
+      'tr:hover td:last-child': {
+        borderBottomRightRadius: theme.radii.$lg,
       },
       'tr > th:first-of-type': {
         paddingLeft: theme.space.$5,
