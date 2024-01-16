@@ -15,3 +15,4 @@ export { auth } from '../app-router/server/auth';
 export { currentUser } from '../app-router/server/currentUser';
 export { authMiddleware } from './authMiddleware';
 export { clerkMiddleware } from './clerkMiddleware';
+export type { ClerkMiddlewareAuth, ClerkMiddlewareAuthObject, ClerkMiddlewareOptions } from './clerkMiddleware';
