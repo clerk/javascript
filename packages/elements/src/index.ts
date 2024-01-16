@@ -17,6 +17,19 @@ export {
   SignInStrategy,
 } from '~/react/sign-in';
 
+/** Sign Up Components */
+export {
+  SignUp,
+  SignUpStart,
+  // SignUpFactorOne,
+  // SignUpFactorTwo,
+  SignUpSocialProviders,
+  // SignUpSSOCallback,
+  // SignUpStrategies,
+  SignUpStrategy,
+} from '~/react/sign-up';
+
 /** Hooks */
+export { useSignUpFlow, useSignUpFlowSelector } from '~/internals/machines/sign-up/sign-up.context';
 export { useSignInFlow, useSignInFlowSelector } from '~/internals/machines/sign-in.context';
 export { useNextRouter };

@@ -1,3 +1,4 @@
+import { snakeToCamel } from '@clerk/shared';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
@@ -69,7 +70,8 @@ export const FormMachine = setup({
           const globalErrors: ClerkElementsError[] = [];
 
           for (const error of event.error.errors) {
-            const name = error.meta?.paramName;
+            // TODO: Why are we sending in snake and receiving camel?
+            const name = snakeToCamel(error.meta?.paramName);
 
             if (!name) {
               globalErrors.push(ClerkElementsError.fromAPIError(error));

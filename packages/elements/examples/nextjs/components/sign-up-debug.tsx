@@ -1,13 +1,13 @@
 'use client';
 
 import { SignedIn } from '@clerk/clerk-react';
-import { useSignInFlow, useSignInFlowSelector } from '@clerk/elements';
+import { useSignUpFlow, useSignUpFlowSelector } from '@clerk/elements';
 import { SignOutButton } from '@clerk/nextjs';
 
 import { Button } from './design';
 
-function SignInActiveState() {
-  const activeState = useSignInFlowSelector(state => state.value);
+function SignUpActiveState() {
+  const activeState = useSignUpFlowSelector(state => state.value);
   const state = activeState ? (typeof activeState === 'string' ? activeState : JSON.stringify({ ...activeState })) : '';
 
   return (
@@ -17,8 +17,8 @@ function SignInActiveState() {
   );
 }
 
-export function SignInLogButtons() {
-  const ref = useSignInFlow();
+export function SignUpLogButtons() {
+  const ref = useSignUpFlow();
 
   return (
     <>
@@ -35,15 +35,15 @@ export function SignInLogButtons() {
   );
 }
 
-export function SignInDebug() {
+export function SignUpDebug() {
   return (
-    <div className='absolute text-xs flex flex-col p-4 gap-4 bottom-0 justify-center bg-secondary border-tertiary border-t w-full overflow-hidden'>
-      <SignInActiveState />
+    <div className='absolute text-xs flex flex-col p-4 gap-4 bottom-0 justify-center bg-secondary border-tertiary border-t  w-full overflow-hidden'>
+      <SignUpActiveState />
 
       <div className='flex gap-4 bottom-0 w-screen justify-center'>
-        <SignInLogButtons />
+        <SignUpLogButtons />
         <SignedIn>
-          <SignOutButton redirectUrl='/sign-in'>
+          <SignOutButton redirectUrl='/sign-up'>
             <Button>Sign Out</Button>
           </SignOutButton>
         </SignedIn>

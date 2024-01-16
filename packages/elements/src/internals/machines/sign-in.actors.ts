@@ -1,9 +1,6 @@
 import type {
   AttemptFirstFactorParams,
-  AuthenticateWithRedirectParams,
   EmailCodeAttempt,
-  HandleOAuthCallbackParams,
-  HandleSamlCallbackParams,
   PasswordAttempt,
   PhoneCodeAttempt,
   PrepareFirstFactorParams,
@@ -15,13 +12,20 @@ import type {
   SignInSecondFactor,
   Web3Attempt,
 } from '@clerk/types';
+import type { SetOptional, Simplify } from 'type-fest';
 import { fromPromise } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
-import type { ClerkRouter } from '~/react/router';
 
+import { SSO_CALLBACK_PATH_ROUTE } from '../constants';
 import type { FormFields } from './form.types';
-import type { WithClerk, WithClient, WithParams } from './shared.types';
+import type {
+  AuthenticateWithRedirectOAuthParams,
+  AuthenticateWithRedirectSamlParams,
+  WithClerk,
+  WithClient,
+  WithParams,
+} from './shared.types';
 import { assertIsDefined } from './utils/assert';
 
 // ================= createSignIn ================= //
@@ -45,23 +49,21 @@ export const createSignIn = fromPromise<SignInResource, CreateSignInInput>(({ in
   });
 });
 
-// ================= authenticateWithRedirect ================= //
+// ================= authenticateWithSignInRedirect ================= //
 
-export type AuthenticateWithRedirectInput = WithClerk<{
-  strategy: AuthenticateWithRedirectParams['strategy'] | undefined;
-}>;
+export type AuthenticateWithRedirectSignInParams = SetOptional<
+  AuthenticateWithRedirectOAuthParams | AuthenticateWithRedirectSamlParams,
+  'redirectUrl' | 'redirectUrlComplete'
+>;
+export type AuthenticateWithRedirectSignInInput = Simplify<WithClerk<WithParams<AuthenticateWithRedirectSignInParams>>>;
 
-export const authenticateWithRedirect = fromPromise<void, AuthenticateWithRedirectInput>(
-  async ({ input: { clerk, strategy } }) => {
-    assertIsDefined(clerk.__unstable__environment);
-    assertIsDefined(strategy);
-
-    return clerk.client.signIn.authenticateWithRedirect({
-      strategy,
-      redirectUrl: `${clerk.__unstable__environment.displayConfig.signInUrl}/sso-callback`,
-      redirectUrlComplete: clerk.buildAfterSignInUrl(),
-    });
-  },
+export const authenticateWithSignInRedirect = fromPromise<void, AuthenticateWithRedirectSignInInput>(
+  async ({ input: { clerk, params } }) =>
+    clerk.client.signIn.authenticateWithRedirect({
+      redirectUrl: params.redirectUrl || clerk.buildUrlWithAuth(`/sign-up${SSO_CALLBACK_PATH_ROUTE}`),
+      redirectUrlComplete: params.redirectUrlComplete || clerk.buildAfterSignInUrl(),
+      ...params,
+    }),
 );
 
 // ================= prepareFirstFactor ================= //
@@ -183,23 +185,4 @@ export const attemptSecondFactor = fromPromise<SignInResource, AttemptSecondFact
     strategy: input.params.currentFactor.strategy,
     code,
   });
-});
-
-// ================= handleSSOCallback ================= //
-
-export type HandleSSOCallbackInput = WithClerk<
-  WithParams<HandleOAuthCallbackParams | HandleSamlCallbackParams> & { router: ClerkRouter }
->;
-
-export const handleSSOCallback = fromPromise<unknown, HandleSSOCallbackInput>(async ({ input }) => {
-  return input.clerk.handleRedirectCallback(
-    {
-      afterSignInUrl: input.clerk.buildAfterSignInUrl(),
-      firstFactorUrl: '../',
-      secondFactorUrl: '../',
-      ...input.params,
-    },
-    // @ts-expect-error - Align on return typing. `void` vs `Promise<unknown>`
-    input.router.replace,
-  );
 });

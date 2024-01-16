@@ -1,11 +1,5 @@
-import { authMiddleware } from '@clerk/nextjs/server';
-
-// Set the paths that don't require the user to be signed in
-const publicPaths = ['/', /^(\/(sign-in|sign-up|app-dir|custom)\/*).*$/];
-
-export default authMiddleware({
-  publicRoutes: publicPaths,
-});
+import { clerkMiddleware } from '@clerk/nextjs/server';
+export default clerkMiddleware;
 
 export const config = {
   matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],

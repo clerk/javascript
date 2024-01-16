@@ -69,13 +69,14 @@
     "xstate": "^5.4.1"
   },
   "devDependencies": {
-    "@clerk/types": "^4.0.0-alpha-v5.11",
+    "@clerk/types": "^4.0.0-alpha-v5.12",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "eslint-config-custom": "*",
     "next": "^14.0.4",
     "tslib": "2.4.1",
+    "type-fest": "^4.9.0",
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
