@@ -603,6 +603,7 @@ export const enUS: LocalizationResource = {
       detailsTitle__inviteFailed:
         'The invitations could not be sent. There are already pending invitations for the following email addresses: {{email_addresses}}.',
       formButtonPrimary__continue: 'Send invitations',
+      selectDropdown__role: 'Select role',
     },
     removeDomainPage: {
       title: 'Remove domain',

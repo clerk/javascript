@@ -138,7 +138,6 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           <Form.SubmitButton
             block={false}
             isDisabled={!canSubmit}
-            hasArrow
             localizationKey={localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')}
           />
           <Form.ResetButton
@@ -155,6 +154,8 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
   const { options, isLoading } = useFetchRoles();
 
+  const { t } = useLocalizations();
+
   return (
     <Form.ControlRow elementId={field.id}>
       <Flex
@@ -166,8 +167,9 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
           roles={options}
           isDisabled={isLoading}
           onChange={value => field.setValue(value)}
-          triggerSx={t => ({ width: t.sizes.$40, justifyContent: 'space-between', display: 'flex' })}
+          triggerSx={t => ({ minWidth: t.sizes.$40, justifyContent: 'space-between', display: 'flex' })}
           optionListSx={t => ({ minWidth: t.sizes.$48 })}
+          prefixLocalizationKey={`${t(localizationKeys('formFieldLabel__role'))}:`}
         />
       </Flex>
     </Form.ControlRow>

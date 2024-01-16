@@ -43,7 +43,7 @@ export const OrganizationMembersTabInvitations = () => {
                 localizationKey={localizationKeys(
                   'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
                 )}
-                variant='subtitle'
+                variant='body'
               />
             </Header.Root>
             <DomainList
@@ -86,7 +86,7 @@ export const OrganizationMembersTabInvitations = () => {
               localizationKey={localizationKeys(
                 'organizationProfile.membersPage.invitationsTab.manualInvitations.headerSubtitle',
               )}
-              variant='subtitle'
+              variant='body'
             />
           </Header.Root>
         </Flex>

@@ -79,7 +79,7 @@ describe('InviteMembersPage', () => {
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
       expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
 
-      await userEvent.click(getByRole('button', { name: /select an option/i }));
+      await userEvent.click(getByRole('button', { name: /select role/i }));
       await userEvent.click(getByText(/^member$/i));
 
       expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled();
@@ -119,7 +119,7 @@ describe('InviteMembersPage', () => {
         { wrapper },
       );
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
-      await userEvent.click(getByRole('button', { name: 'Select an option' }));
+      await userEvent.click(getByRole('button', { name: 'Select role' }));
       await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
@@ -168,7 +168,7 @@ describe('InviteMembersPage', () => {
         getByTestId('tag-input'),
         'test+1@clerk.com,test+2@clerk.com,test+3@clerk.com,test+4@clerk.com,',
       );
-      await userEvent.click(getByRole('button', { name: 'Select an option' }));
+      await userEvent.click(getByRole('button', { name: 'Select role' }));
       await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
@@ -225,7 +225,7 @@ describe('InviteMembersPage', () => {
         { wrapper },
       );
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
-      await userEvent.click(getByRole('button', { name: 'Select an option' }));
+      await userEvent.click(getByRole('button', { name: 'Select role' }));
       await userEvent.click(getByText('Admin'));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       await waitFor(() => {
@@ -282,8 +282,8 @@ describe('InviteMembersPage', () => {
         { wrapper },
       );
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
-      await waitFor(() => expect(getByRole('button', { name: /select an option/i })).not.toBeDisabled());
-      await userEvent.click(getByRole('button', { name: /select an option/i }));
+      await waitFor(() => expect(getByRole('button', { name: /select role/i })).not.toBeDisabled());
+      await userEvent.click(getByRole('button', { name: /select role/i }));
       await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       await waitFor(() =>
@@ -342,8 +342,8 @@ describe('InviteMembersPage', () => {
         { wrapper },
       );
       await userEvent.type(getByTestId('tag-input'), 'invalid@clerk.dev');
-      await waitFor(() => expect(getByRole('button', { name: /select an option/i })).not.toBeDisabled());
-      await userEvent.click(getByRole('button', { name: /select an option/i }));
+      await waitFor(() => expect(getByRole('button', { name: /select role/i })).not.toBeDisabled());
+      await userEvent.click(getByRole('button', { name: /select role/i }));
       await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 
@@ -396,8 +396,8 @@ describe('InviteMembersPage', () => {
         { wrapper },
       );
       await userEvent.type(getByTestId('tag-input'), 'blocked@clerk.dev');
-      await waitFor(() => expect(getByRole('button', { name: /select an option/i })).not.toBeDisabled());
-      await userEvent.click(getByRole('button', { name: /select an option/i }));
+      await waitFor(() => expect(getByRole('button', { name: /select role/i })).not.toBeDisabled());
+      await userEvent.click(getByRole('button', { name: /select role/i }));
       await userEvent.click(getByText(/^member$/i));
       await userEvent.click(getByRole('button', { name: 'Send invitations' }));
 

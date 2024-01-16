@@ -18,7 +18,6 @@ describe('OrganizationProfile', () => {
     });
 
     const { getByText } = render(<OrganizationProfile />, { wrapper });
-    expect(getByText('Org1')).toBeDefined();
     expect(getByText('General')).toBeDefined();
     expect(getByText('Members')).toBeDefined();
   });
@@ -49,7 +48,6 @@ describe('OrganizationProfile', () => {
     props.setProps({ customPages });
 
     const { getByText } = render(<OrganizationProfile />, { wrapper });
-    expect(getByText('Org1')).toBeDefined();
     expect(getByText('Members')).toBeDefined();
     expect(getByText('General')).toBeDefined();
     expect(getByText('Custom1')).toBeDefined();
@@ -71,7 +69,6 @@ describe('OrganizationProfile', () => {
     });
 
     const { queryByText } = render(<OrganizationProfile />, { wrapper });
-    expect(queryByText('Org1')).toBeInTheDocument();
     expect(queryByText('Members')).not.toBeInTheDocument();
     expect(queryByText('General')).toBeInTheDocument();
   });

@@ -4,7 +4,7 @@ import React from 'react';
 import { useProtect } from '../../common';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
-import { Breadcrumbs, NavBar, NavbarContextProvider, OrganizationPreview } from '../../elements';
+import { Breadcrumbs, NavBar, NavbarContextProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
 
@@ -30,13 +30,6 @@ export const OrganizationProfileNavbar = (
       <NavBar
         title={localizationKeys('organizationProfile.navbar.title')}
         description={localizationKeys('organizationProfile.navbar.description')}
-        header={
-          <OrganizationPreview
-            size='md'
-            organization={organization}
-            sx={t => ({ margin: `0 0 ${t.space.$4} ${t.space.$2}` })}
-          />
-        }
         routes={pages.routes.filter(
           r =>
             r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS ||

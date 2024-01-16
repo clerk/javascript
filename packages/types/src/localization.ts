@@ -601,6 +601,7 @@ type _LocalizationResource = {
       successMessage: LocalizationValue;
       detailsTitle__inviteFailed: LocalizationValue;
       formButtonPrimary__continue: LocalizationValue;
+      selectDropdown__role: LocalizationValue;
     };
     removeDomainPage: {
       title: LocalizationValue;

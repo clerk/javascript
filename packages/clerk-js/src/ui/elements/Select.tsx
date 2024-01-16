@@ -323,11 +323,11 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           tabIndex={comparator ? undefined : 0}
           sx={[
             theme => ({
-              gap: theme.space.$1,
+              gap: theme.space.$0x5,
               outline: 'none',
               overflowY: 'auto',
               maxHeight: '18vh',
-              padding: `${theme.space.$2} 0`,
+              padding: `${theme.space.$0x5} ${theme.space.$0x5}`,
             }),
             containerSx,
           ]}
