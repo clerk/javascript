@@ -20,15 +20,16 @@ import { VerifiedDomainForm } from './VerifiedDomainForm';
 
 type VerifyDomainFormProps = FormProps & {
   domainId: string;
+  skipToVerified: boolean;
 };
 
 export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormProps) => {
-  const { domainId: id, onSuccess, onReset } = props;
+  const { domainId: id, onSuccess, onReset, skipToVerified } = props;
   const card = useCardState();
   const { organizationSettings } = useEnvironment();
   const { organization } = useOrganization();
 
-  const { data: domain, isLoading: domainIsLoading } = useFetch(organization?.getDomain, {
+  const { data: domain, isLoading: domainIsLoading } = useFetch(!skipToVerified ? organization?.getDomain : undefined, {
     domainId: id,
   });
   const title = localizationKeys('organizationProfile.verifyDomainPage.title');
@@ -36,7 +37,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
     domainName: domain?.name ?? '',
   });
 
-  const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
+  const wizard = useWizard({ defaultStep: skipToVerified ? 2 : 0, onNextStep: () => card.setError(undefined) });
 
   const emailField = useFormControl('affiliationEmailAddress', '', {
     type: 'text',
@@ -106,7 +107,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
       });
   };
 
-  if (domainIsLoading || !domain) {
+  if ((domainIsLoading || !domain) && !skipToVerified) {
     return (
       <Flex
         direction={'row'}
