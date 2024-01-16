@@ -80,7 +80,7 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
           borderRadius: t.radii.$lg,
           gap: 0,
           justifyContent: 'center',
-          padding: `${t.space.$1} ${t.space.$1x5}`,
+          padding: t.space.$1,
         }),
         sx,
       ]}
