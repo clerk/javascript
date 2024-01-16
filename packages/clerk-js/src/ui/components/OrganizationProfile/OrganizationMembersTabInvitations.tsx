@@ -2,16 +2,14 @@ import { Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys } from '../../customizables';
 import { Header, ProfileSection } from '../../elements';
-import { useRouter } from '../../router';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';
 import { MembershipWidget } from './MembershipWidget';
 
 export const OrganizationMembersTabInvitations = () => {
   const { organizationSettings } = useEnvironment();
-  const { navigate } = useRouter();
   //@ts-expect-error
-  const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
+  const { __unstable_manageBillingUrl, navigateToGeneralPageRoot } = useOrganizationProfileContext();
 
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
 
@@ -54,7 +52,7 @@ export const OrganizationMembersTabInvitations = () => {
                   )}
                   id='manageVerifiedDomains'
                   sx={t => ({ gap: t.space.$2 })}
-                  onClick={() => navigate('../')}
+                  onClick={navigateToGeneralPageRoot}
                 />
               }
               verificationStatus={'verified'}
