@@ -1,5 +1,41 @@
 # Change Log
 
+## 5.0.0-alpha-v5.17
+
+### Major Changes
+
+- Changes the `request.auth` type from `LegacyAuthObject` to `AuthObject`. ([#2609](https://github.com/clerk/javascript/pull/2609)) by [@dimkl](https://github.com/dimkl)
+
+  ```typescript
+  type LegacyAuthObject = {
+    sessionId: string | null;
+    actor: ActClaim | undefined | null;
+    userId: string | null;
+    getToken: ServerGetToken | null;
+    debug: AuthObjectDebug | null;
+    claims: JwtPayload | null;
+  };
+
+  type AuthObject = {
+    sessionClaims: JwtPayload | null;
+    sessionId: string | null;
+    actor: ActClaim | undefined | null;
+    userId: string | null;
+    orgId: string | undefined | null;
+    orgRole: OrganizationCustomRoleKey | undefined | null;
+    orgSlug: string | undefined | null;
+    orgPermissions: OrganizationCustomPermissionKey[] | undefined | null;
+    getToken: ServerGetToken | null;
+    has: CheckAuthorizationWithCustomPermissions | null;
+    debug: AuthObjectDebug | null;
+  };
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`3a2f13604`](https://github.com/clerk/javascript/commit/3a2f13604e1b8b351a05de26d2c0672503aa67b3), [`9e99eb727`](https://github.com/clerk/javascript/commit/9e99eb7276249c68ef6f930cce418ce0004653b9), [`6fffd3b54`](https://github.com/clerk/javascript/commit/6fffd3b542f3df0bcb49281b7c4f77209a83f7a1)]:
+  - @clerk/backend@1.0.0-alpha-v5.17
+
 ## 5.0.0-alpha-v5.16
 
 ### Patch Changes

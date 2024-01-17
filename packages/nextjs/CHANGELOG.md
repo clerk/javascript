@@ -1,5 +1,71 @@
 # Change Log
 
+## 5.0.0-alpha-v5.19
+
+### Major Changes
+
+- Replace return the value of the following jwt helpers to match the format of backend API client return values (for consistency). ([#2596](https://github.com/clerk/javascript/pull/2596)) by [@dimkl](https://github.com/dimkl)
+
+  ```diff
+  import { signJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await signJwt(...);
+  + const { data, errors: [error] = [] } = await signJwt(...);
+  ```
+
+  ```diff
+  import { verifyJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await verifyJwt(...);
+  + const { data, errors: [error] = [] } = await verifyJwt(...);
+  ```
+
+  ```diff
+  import { hasValidSignature } from '@clerk/backend/jwt';
+
+  - const { data, error } = await hasValidSignature(...);
+  + const { data, errors: [error] = [] } = await hasValidSignature(...);
+  ```
+
+  ```diff
+  import { decodeJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await decodeJwt(...);
+  + const { data, errors: [error] = [] } = await decodeJwt(...);
+  ```
+
+  ```diff
+  import { verifyToken } from '@clerk/backend';
+
+  - const { data, error } = await verifyToken(...);
+  + const { data, errors: [error] = [] } = await verifyToken(...);
+  ```
+
+### Patch Changes
+
+- - Export ClerkMiddlewareAuthObject, ClerkMiddlewareAuth and ClerkMiddlewareOptions types ([#2611](https://github.com/clerk/javascript/pull/2611)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  - Introduce `auth().redirectToSignIn()` that can be used in API routes and pages, eg
+
+  ```ts
+  import { auth } from '@clerk/nextjs/server';
+
+  export const Layout = ({ children }) => {
+    const { userId } = auth();
+
+    if (!userId) {
+      return auth().redirectToSignIn();
+    }
+
+    return <>{children}</>;
+  };
+  ```
+
+- Update `@clerk/nextjs` error messages to refer to `clerkMiddleware()` and deprecated `authMiddleware()` and fix a typo in `cannotRenderSignUpComponentWhenSessionExists` error message. ([#2589](https://github.com/clerk/javascript/pull/2589)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`3a2f13604`](https://github.com/clerk/javascript/commit/3a2f13604e1b8b351a05de26d2c0672503aa67b3), [`9e99eb727`](https://github.com/clerk/javascript/commit/9e99eb7276249c68ef6f930cce418ce0004653b9), [`6fffd3b54`](https://github.com/clerk/javascript/commit/6fffd3b542f3df0bcb49281b7c4f77209a83f7a1)]:
+  - @clerk/backend@1.0.0-alpha-v5.17
+
 ## 5.0.0-alpha-v5.18
 
 ### Patch Changes

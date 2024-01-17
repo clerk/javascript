@@ -1,5 +1,98 @@
 # Change Log
 
+## 1.0.0-alpha-v5.17
+
+### Major Changes
+
+- Drop `user` / `organization` / `session` from auth object on **signed-out** state (current value was `null`). Eg ([#2598](https://github.com/clerk/javascript/pull/2598)) by [@dimkl](https://github.com/dimkl)
+
+  ```diff
+      // Backend
+      import { createClerkClient } from '@clerk/backend';
+
+      const clerkClient = createClerkClient({...});
+      const requestState = clerkClient.authenticateRequest(request, {...});
+
+      - const { user, organization, session } = requestState.toAuth();
+      + const { userId, organizationId, sessionId } = requestState.toAuth();
+
+      // Remix
+      import { getAuth } from '@clerk/remix/ssr.server';
+
+      - const { user, organization, session } = await getAuth(args);
+      + const { userId, organizationId, sessionId } = await getAuth(args);
+
+      // or
+      rootAuthLoader(
+          args,
+          ({ request }) => {
+              - const { user, organization, session } = request.auth;
+              + const { userId, organizationId, sessionId } = request.auth;
+              // ...
+          },
+          { loadUser: true },
+      );
+
+      // NextJS
+      import { getAuth } from '@clerk/nextjs/server';
+
+      - const { user, organization, session } = getAuth(args);
+      + const { userId, organizationId, sessionId } = getAuth(req, opts);
+
+      // Gatsby
+      import { withServerAuth } from 'gatsby-plugin-clerk';
+
+      export const getServerData: GetServerData<any> = withServerAuth(
+          async props => {
+              - const { user, organization, session } =  props;
+              + const { userId, organizationId, sessionId } = props;
+              return { props: { data: '1', auth: props.auth, userId, organizationId, sessionId } };
+          },
+          { loadUser: true },
+      );
+  ```
+
+- Replace return the value of the following jwt helpers to match the format of backend API client return values (for consistency). ([#2596](https://github.com/clerk/javascript/pull/2596)) by [@dimkl](https://github.com/dimkl)
+
+  ```diff
+  import { signJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await signJwt(...);
+  + const { data, errors: [error] = [] } = await signJwt(...);
+  ```
+
+  ```diff
+  import { verifyJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await verifyJwt(...);
+  + const { data, errors: [error] = [] } = await verifyJwt(...);
+  ```
+
+  ```diff
+  import { hasValidSignature } from '@clerk/backend/jwt';
+
+  - const { data, error } = await hasValidSignature(...);
+  + const { data, errors: [error] = [] } = await hasValidSignature(...);
+  ```
+
+  ```diff
+  import { decodeJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await decodeJwt(...);
+  + const { data, errors: [error] = [] } = await decodeJwt(...);
+  ```
+
+  ```diff
+  import { verifyToken } from '@clerk/backend';
+
+  - const { data, error } = await verifyToken(...);
+  + const { data, errors: [error] = [] } = await verifyToken(...);
+  ```
+
+### Patch Changes
+
+- Update `@clerk/nextjs` error messages to refer to `clerkMiddleware()` and deprecated `authMiddleware()` and fix a typo in `cannotRenderSignUpComponentWhenSessionExists` error message. ([#2589](https://github.com/clerk/javascript/pull/2589)) by [@dimkl](https://github.com/dimkl)
+
 ## 1.0.0-alpha-v5.16
 
 ### Patch Changes
