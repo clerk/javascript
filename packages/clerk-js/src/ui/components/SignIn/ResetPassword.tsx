@@ -91,6 +91,10 @@ export const _ResetPassword = () => {
     }
   };
 
+  const goBack = () => {
+    return navigate('../');
+  };
+
   return (
     <Card.Root>
       <Card.Content>
@@ -105,43 +109,58 @@ export const _ResetPassword = () => {
           <Form.Root
             onSubmit={resetPassword}
             onBlur={validateForm}
+            gap={8}
           >
-            {/* For password managers */}
-            <input
-              readOnly
-              data-testid='hidden-identifier'
-              id='identifier-field'
-              name='identifier'
-              value={signIn.identifier || ''}
-              style={{ display: 'none' }}
-            />
-            <Form.ControlRow elementId={passwordField.id}>
-              <Form.PasswordInput
-                {...passwordField.props}
-                isRequired
-                autoFocus
+            <Col gap={6}>
+              {/* For password managers */}
+              <input
+                readOnly
+                data-testid='hidden-identifier'
+                id='identifier-field'
+                name='identifier'
+                value={signIn.identifier || ''}
+                style={{ display: 'none' }}
               />
-            </Form.ControlRow>
-            <Form.ControlRow elementId={confirmField.id}>
-              <Form.PasswordInput
-                {...confirmField.props}
-                onChange={e => {
-                  if (e.target.value) {
-                    setConfirmPasswordFeedback(e.target.value);
-                  }
-                  return confirmField.props.onChange(e);
-                }}
-              />
-            </Form.ControlRow>
-            {!requiresNewPassword && (
-              <Form.ControlRow elementId={sessionsField.id}>
-                <Form.Checkbox {...sessionsField.props} />
+              <Form.ControlRow elementId={passwordField.id}>
+                <Form.PasswordInput
+                  {...passwordField.props}
+                  isRequired
+                  autoFocus
+                />
               </Form.ControlRow>
-            )}
-            <Form.SubmitButton
-              isDisabled={!canSubmit}
-              localizationKey={localizationKeys('signIn.resetPassword.formButtonPrimary')}
-            />
+              <Form.ControlRow elementId={confirmField.id}>
+                <Form.PasswordInput
+                  {...confirmField.props}
+                  onChange={e => {
+                    if (e.target.value) {
+                      setConfirmPasswordFeedback(e.target.value);
+                    }
+                    return confirmField.props.onChange(e);
+                  }}
+                />
+              </Form.ControlRow>
+              {!requiresNewPassword && (
+                <Form.ControlRow elementId={sessionsField.id}>
+                  <Form.Checkbox {...sessionsField.props} />
+                </Form.ControlRow>
+              )}
+            </Col>
+            <Col gap={4}>
+              <Form.SubmitButton
+                isDisabled={!canSubmit}
+                localizationKey={localizationKeys('signIn.resetPassword.formButtonPrimary')}
+              />
+              <Card.Action
+                elementId='backRow'
+                elementDescriptor={descriptors.backRow}
+              >
+                <Card.ActionLink
+                  elementDescriptor={descriptors.backLink}
+                  localizationKey={localizationKeys('backButton')}
+                  onClick={goBack}
+                />
+              </Card.Action>
+            </Col>
           </Form.Root>
         </Col>
       </Card.Content>

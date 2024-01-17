@@ -289,10 +289,11 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
           onKeyDown={handleOnKeyDown(index)}
           onInput={handleOnInput(index)}
           onPaste={handleOnPaste(index)}
+          id={`digit-${index}-field`}
           ref={node => (refs.current[index] = node)}
           autoFocus={index === 0 || undefined}
           autoComplete='one-time-code'
-          aria-label={`${index === 0 ? 'Enter verification code. ' : ''} Digit ${index + 1}`}
+          aria-label={`${index === 0 ? 'Enter verification code. ' : ''}Digit ${index + 1}`}
           isDisabled={isDisabled || isLoading || disabled || feedbackType === 'success'}
           hasError={feedbackType === 'error'}
           isSuccessfullyFilled={feedbackType === 'success'}
