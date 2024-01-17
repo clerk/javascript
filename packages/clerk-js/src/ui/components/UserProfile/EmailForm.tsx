@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { localizationKeys, Text } from '../../customizables';
+import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -51,16 +51,15 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContainer headerTitle={title}>
+      <FormContainer
+        headerTitle={title}
+        headerSubtitle={
+          preferEmailLinks
+            ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
+            : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
+        }
+      >
         <Form.Root onSubmit={addEmail}>
-          <Text
-            localizationKey={
-              preferEmailLinks
-                ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
-                : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
-            }
-            colorScheme='neutral'
-          />
           <Form.ControlRow elementId={emailField.id}>
             <Form.PlainInput
               {...emailField.props}
