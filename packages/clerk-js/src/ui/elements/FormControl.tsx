@@ -150,7 +150,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     <Flex
       style={{
         height: feedback ? maxHeight : 0, // dynamic height
-        position: 'relative',
+        position: feedback ? 'relative' : 'absolute', // so the parent element doesn't add an unnecessary gap for this while hidden
       }}
       center={center}
       sx={[getFormTextAnimation(!!feedback)]}

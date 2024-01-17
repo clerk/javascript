@@ -33,6 +33,7 @@ function assertSignedOut(
     domain: '',
     message: '',
     toAuth: {},
+    token: null,
     ...expectedState,
   });
 }
@@ -71,6 +72,7 @@ function assertHandshake(
     afterSignUpUrl: '',
     domain: '',
     toAuth: {},
+    token: null,
     ...expectedState,
   });
 }

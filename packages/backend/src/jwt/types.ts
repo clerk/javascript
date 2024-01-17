@@ -1,9 +1,9 @@
 export type JwtReturnType<R, E extends Error> =
   | {
       data: R;
-      error?: undefined;
+      errors?: undefined;
     }
   | {
       data?: undefined;
-      error: E;
+      errors: [E];
     };

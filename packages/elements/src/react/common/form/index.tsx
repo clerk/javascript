@@ -29,8 +29,8 @@ import {
   globalErrorsSelector,
   useFormSelector,
   useFormStore,
-} from '~/internals/machines/form.context';
-import type { FieldDetails } from '~/internals/machines/form.types';
+} from '~/internals/machines/form/form.context';
+import type { FieldDetails } from '~/internals/machines/form/form.types';
 
 import type { ClerkInputType, FieldState } from './types';
 

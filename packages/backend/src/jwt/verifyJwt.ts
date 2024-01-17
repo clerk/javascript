@@ -34,10 +34,12 @@ export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Pro
     return { data: verified };
   } catch (error) {
     return {
-      error: new TokenVerificationError({
-        reason: TokenVerificationErrorReason.TokenInvalidSignature,
-        message: (error as Error)?.message,
-      }),
+      errors: [
+        new TokenVerificationError({
+          reason: TokenVerificationErrorReason.TokenInvalidSignature,
+          message: (error as Error)?.message,
+        }),
+      ],
     };
   }
 }
@@ -46,10 +48,12 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
   const tokenParts = (token || '').toString().split('.');
   if (tokenParts.length !== 3) {
     return {
-      error: new TokenVerificationError({
-        reason: TokenVerificationErrorReason.TokenInvalid,
-        message: `Invalid JWT form. A JWT consists of three parts separated by dots.`,
-      }),
+      errors: [
+        new TokenVerificationError({
+          reason: TokenVerificationErrorReason.TokenInvalid,
+          message: `Invalid JWT form. A JWT consists of three parts separated by dots.`,
+        }),
+      ],
     };
   }
 
@@ -105,9 +109,9 @@ export async function verifyJwt(
   const { audience, authorizedParties, clockSkewInMs, key } = options;
   const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
 
-  const { data: decoded, error } = decodeJwt(token);
-  if (error) {
-    return { error };
+  const { data: decoded, errors } = decodeJwt(token);
+  if (errors) {
+    return { errors };
   }
 
   const { header, payload } = decoded;
@@ -128,26 +132,30 @@ export async function verifyJwt(
     assertActivationClaim(nbf, clockSkew);
     assertIssuedAtClaim(iat, clockSkew);
   } catch (err) {
-    return { error: err as TokenVerificationError };
+    return { errors: [err as TokenVerificationError] };
   }
 
-  const { data: signatureValid, error: signatureError } = await hasValidSignature(decoded, key);
-  if (signatureError) {
+  const { data: signatureValid, errors: signatureErrors } = await hasValidSignature(decoded, key);
+  if (signatureErrors) {
     return {
-      error: new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClerkJWT,
-        reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message: `Error verifying JWT signature. ${signatureError}`,
-      }),
+      errors: [
+        new TokenVerificationError({
+          action: TokenVerificationErrorAction.EnsureClerkJWT,
+          reason: TokenVerificationErrorReason.TokenVerificationFailed,
+          message: `Error verifying JWT signature. ${signatureErrors[0]}`,
+        }),
+      ],
     };
   }
 
   if (!signatureValid) {
     return {
-      error: new TokenVerificationError({
-        reason: TokenVerificationErrorReason.TokenInvalidSignature,
-        message: 'JWT signature is invalid.',
-      }),
+      errors: [
+        new TokenVerificationError({
+          reason: TokenVerificationErrorReason.TokenInvalidSignature,
+          message: 'JWT signature is invalid.',
+        }),
+      ],
     };
   }
 

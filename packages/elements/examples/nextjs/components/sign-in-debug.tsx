@@ -37,7 +37,7 @@ export function SignInLogButtons() {
 
 export function SignInDebug() {
   return (
-    <div className='absolute text-xs flex flex-col p-4 gap-4 bottom-0 w-screen justify-center bg-secondary border-tertiary border-t'>
+    <div className='absolute text-xs flex flex-col p-4 gap-4 bottom-0 justify-center bg-secondary border-tertiary border-t w-full overflow-hidden'>
       <SignInActiveState />
 
       <div className='flex gap-4 bottom-0 w-screen justify-center'>

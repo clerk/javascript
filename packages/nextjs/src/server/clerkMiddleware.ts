@@ -1,5 +1,11 @@
-import type { AuthenticateRequestOptions, AuthObject, ClerkRequest, RequestState } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest, redirect } from '@clerk/backend/internal';
+import type {
+  AuthenticateRequestOptions,
+  AuthObject,
+  ClerkRequest,
+  RedirectFun,
+  RequestState,
+} from '@clerk/backend/internal';
+import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -20,18 +26,20 @@ const PROTECT_REWRITE = 'CLERK_PROTECT_REWRITE';
 const PROTECT_REDIRECT_TO_URL = 'CLERK_PROTECT_REDIRECT_TO_URL';
 const PROTECT_REDIRECT_TO_SIGN_IN = 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN';
 
-type ClerkMiddlewareAuthObject = AuthObject & {
+export type ClerkMiddlewareAuthObject = AuthObject & {
   protect: AuthProtect;
-  redirectToSignIn: (opts?: { returnBackUrl?: URL | string | null }) => Response;
+  redirectToSignIn: RedirectFun<Response>;
 };
 
+export type ClerkMiddlewareAuth = () => ClerkMiddlewareAuthObject;
+
 type ClerkMiddlewareHandler = (
-  auth: () => ClerkMiddlewareAuthObject,
+  auth: ClerkMiddlewareAuth,
   request: NextMiddlewareRequestParam,
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
-type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
+export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
 
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
@@ -157,8 +165,7 @@ export const createAuthenticateRequestOptions = (clerkRequest: ClerkRequest, opt
 };
 
 const redirectAdapter = (url: string | URL) => {
-  const res = NextResponse.redirect(url);
-  return setHeader(res, constants.Headers.ClerkRedirectTo, 'true');
+  return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
 };
 
 const createMiddlewareRedirectToSignIn = (
@@ -166,12 +173,15 @@ const createMiddlewareRedirectToSignIn = (
   requestState: RequestState,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
-    return redirect({
+    return createRedirect({
       redirectAdapter,
+      baseUrl: clerkRequest.clerkUrl,
       signInUrl: requestState.signInUrl,
       signUpUrl: requestState.signUpUrl,
       publishableKey: PUBLISHABLE_KEY,
-    }).redirectToSignIn({ returnBackUrl: opts.returnBackUrl === null ? '' : clerkRequest.clerkUrl.toString() });
+    }).redirectToSignIn({
+      returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkRequest.clerkUrl.toString(),
+    });
   };
 };
 

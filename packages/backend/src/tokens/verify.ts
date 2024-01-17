@@ -14,9 +14,9 @@ export async function verifyToken(
   token: string,
   options: VerifyTokenOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
-  const { data: decodedResult, error: decodedError } = decodeJwt(token);
-  if (decodedError) {
-    return { error: decodedError };
+  const { data: decodedResult, errors } = decodeJwt(token);
+  if (errors) {
+    return { errors };
   }
 
   const { header } = decodedResult;
@@ -32,16 +32,18 @@ export async function verifyToken(
       key = await loadClerkJWKFromRemote({ ...options, kid });
     } else {
       return {
-        error: new TokenVerificationError({
-          action: TokenVerificationErrorAction.SetClerkJWTKey,
-          message: 'Failed to resolve JWK during verification.',
-          reason: TokenVerificationErrorReason.JWKFailedToResolve,
-        }),
+        errors: [
+          new TokenVerificationError({
+            action: TokenVerificationErrorAction.SetClerkJWTKey,
+            message: 'Failed to resolve JWK during verification.',
+            reason: TokenVerificationErrorReason.JWKFailedToResolve,
+          }),
+        ],
       };
     }
 
     return await verifyJwt(token, { ...options, key });
   } catch (error) {
-    return { error: error as TokenVerificationError };
+    return { errors: [error as TokenVerificationError] };
   }
 }

@@ -130,7 +130,10 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
         headerSubtitleTextVariant={headerSubtitleTextVariant}
         sx={t => ({ minHeight: t.sizes.$60, gap: t.space.$6, textAlign: 'left' })}
       >
-        <Form.Root onSubmit={onSubmit}>
+        <Form.Root
+          onSubmit={onSubmit}
+          sx={t => ({ gap: t.space.$6 })}
+        >
           <Col>
             <OrganizationProfileAvatarUploader
               organization={{ name: nameField.value }}
@@ -183,10 +186,9 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
               pattern='^[a-z0-9\-]+$'
             />
           </Form.ControlRow>
-          <FormButtonContainer>
+          <FormButtonContainer sx={t => ({ marginTop: t.space.$none })}>
             <Form.SubmitButton
               block={false}
-              isDisabled={!canSubmit}
               localizationKey={localizationKeys('createOrganization.formButtonSubmit')}
             />
             {props.onCancel && (

@@ -5,6 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo } from 'reac
 import type { SnapshotFrom } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { matchStrategy } from '~/internals/machines/utils/strategies';
 import {
   getEnabledThirdPartyProviders,
   isAuthenticatableOauthStrategy,
@@ -13,7 +14,6 @@ import {
 
 import { SignInMachine } from './sign-in.machine';
 import type { SignInStrategyName } from './sign-in.types';
-import { matchStrategy } from './utils/strategies';
 
 export type SnapshotState = SnapshotFrom<typeof SignInMachine>;
 

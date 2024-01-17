@@ -56,27 +56,27 @@ export default (QUnit: QUnit) => {
     });
 
     test('returns an error if null is given as jwt', assert => {
-      const { error } = decodeJwt('null');
+      const { errors: [error] = [] } = decodeJwt('null');
       assert.propContains(error, invalidTokenError);
     });
 
     test('returns an error if undefined is given as jwt', assert => {
-      const { error } = decodeJwt('undefined');
+      const { errors: [error] = [] } = decodeJwt('undefined');
       assert.propContains(error, invalidTokenError);
     });
 
     test('returns an error if empty string is given as jwt', assert => {
-      const { error } = decodeJwt('');
+      const { errors: [error] = [] } = decodeJwt('');
       assert.propContains(error, invalidTokenError);
     });
 
     test('throws an error if invalid string is given as jwt', assert => {
-      const { error } = decodeJwt('whatever');
+      const { errors: [error] = [] } = decodeJwt('whatever');
       assert.propContains(error, invalidTokenError);
     });
 
     test('throws an error if number is given as jwt', assert => {
-      const { error } = decodeJwt('42');
+      const { errors: [error] = [] } = decodeJwt('42');
       assert.propContains(error, invalidTokenError);
     });
   });
@@ -127,7 +127,7 @@ export default (QUnit: QUnit) => {
         issuer: mockJwtPayload.iss,
         authorizedParties: ['', 'https://accounts.inspired.puma-74.lcl.dev'],
       };
-      const { error } = await verifyJwt('invalid-jwt', inputVerifyJwtOptions);
+      const { errors: [error] = [] } = await verifyJwt('invalid-jwt', inputVerifyJwtOptions);
       assert.propContains(error, invalidTokenError);
     });
   });

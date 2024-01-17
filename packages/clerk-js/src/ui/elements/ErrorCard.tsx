@@ -2,11 +2,9 @@ import type { MouseEventHandler } from 'react';
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { descriptors, Flex, Flow, Icon, localizationKeys, Text } from '../customizables';
+import { Button, descriptors, Flex, Flow, localizationKeys, Text } from '../customizables';
 import { useSupportEmail } from '../hooks/useSupportEmail';
-import { Email } from '../icons';
 import { useRouter } from '../router';
-import { ArrowBlockButton } from './ArrowBlockButton';
 import { Card } from './Card';
 import { useCardState } from './contexts';
 import { Header } from './Header';
@@ -55,30 +53,20 @@ export const ErrorCard = (props: ErrorCardProps) => {
                 localizationKey={props.message}
               />
             )}
-            {/*TODO: extract  */}
-            <Text
-              colorScheme='neutral'
-              localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.content')}
-            />
-            <ArrowBlockButton
-              textLocalizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
+            <Button
+              localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
               onClick={handleEmailSupport}
-              leftIcon={
-                <Icon
-                  icon={Email}
-                  sx={theme => ({ color: theme.colors.$blackAlpha500 })}
-                />
-              }
+              variant='primary'
+              hasArrow
             />
+            <Card.Action elementId='alternativeMethods'>
+              <Card.ActionLink
+                localizationKey={localizationKeys('backButton')}
+                onClick={goBack}
+              />
+            </Card.Action>
           </Flex>
-          <Card.Action elementId='alternativeMethods'>
-            <Card.ActionLink
-              localizationKey={localizationKeys('backButton')}
-              onClick={goBack}
-            />
-          </Card.Action>
         </Card.Content>
-
         <Card.Footer />
       </Card.Root>
     </Flow.Part>

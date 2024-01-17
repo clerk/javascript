@@ -117,9 +117,9 @@ export async function authenticateRequest(
       return signedOut(authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
     }
 
-    const { data, error } = await verifyToken(sessionToken, authenticateContext);
+    const { data, errors: [error] = [] } = await verifyToken(sessionToken, authenticateContext);
     if (data) {
-      return signedIn(authenticateContext, data, headers);
+      return signedIn(authenticateContext, data, headers, sessionToken);
     }
 
     if (
@@ -140,12 +140,12 @@ ${error.getFullMessage()}`,
       );
 
       // Retry with a generous clock skew allowance (1 day)
-      const { data: retryResult, error: retryError } = await verifyToken(sessionToken, {
+      const { data: retryResult, errors: [retryError] = [] } = await verifyToken(sessionToken, {
         ...authenticateContext,
         clockSkewInMs: 86_400_000,
       });
       if (retryResult) {
-        return signedIn(authenticateContext, retryResult, headers);
+        return signedIn(authenticateContext, retryResult, headers, sessionToken);
       }
 
       throw retryError;
@@ -180,12 +180,12 @@ ${error.getFullMessage()}`,
     const { sessionTokenInHeader } = authenticateContext;
 
     try {
-      const { data, error } = await verifyToken(sessionTokenInHeader!, authenticateContext);
-      if (error) {
-        throw error;
+      const { data, errors } = await verifyToken(sessionTokenInHeader!, authenticateContext);
+      if (errors) {
+        throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data);
+      return await signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -286,9 +286,9 @@ ${error.getFullMessage()}`,
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '');
     }
 
-    const { data: decodeResult, error: decodedError } = decodeJwt(authenticateContext.sessionTokenInCookie!);
-    if (decodedError) {
-      return handleError(decodedError, 'cookie');
+    const { data: decodeResult, errors: decodedErrors } = decodeJwt(authenticateContext.sessionTokenInCookie!);
+    if (decodedErrors) {
+      return handleError(decodedErrors[0], 'cookie');
     }
 
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
@@ -296,12 +296,12 @@ ${error.getFullMessage()}`,
     }
 
     try {
-      const { data, error } = await verifyToken(authenticateContext.sessionTokenInCookie!, authenticateContext);
-      if (error) {
-        throw error;
+      const { data, errors } = await verifyToken(authenticateContext.sessionTokenInCookie!, authenticateContext);
+      if (errors) {
+        throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data);
+      return await signedIn(authenticateContext, data, undefined, authenticateContext.sessionTokenInCookie!);
     } catch (err) {
       return handleError(err, 'cookie');
     }
