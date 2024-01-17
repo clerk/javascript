@@ -1,6 +1,6 @@
 import { useOrganization } from '@clerk/shared/react';
 
-import { Protect } from '../../common';
+import { Protect, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { Button, Col, descriptors, localizationKeys, Text } from '../../customizables';
 import { Header, OrganizationPreview, ProfileSection } from '../../elements';
@@ -73,9 +73,7 @@ export const OrganizationGeneralPage = () => {
           <OrganizationDomainsSection />
         </Protect>
         <OrganizationLeaveSection />
-        <Protect permission='org:sys_profile:delete'>
-          <OrganizationDeleteSection />
-        </Protect>
+        <OrganizationDeleteSection />
       </Col>
     </Col>
   );
@@ -144,13 +142,16 @@ const OrganizationDomainsSection = () => {
     <ProfileSection.Root
       title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
       id='organizationDomains'
+      sx={{
+        gap: 0,
+      }}
     >
       <Action.Root>
         <DomainList />
 
         <Protect permission='org:sys_domains:manage'>
           <Action.Trigger value='add'>
-            <Col gap={1}>
+            <Col>
               <ProfileSection.Button
                 localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
                 id='organizationDomains'
@@ -217,8 +218,15 @@ const OrganizationLeaveSection = () => {
 
 const OrganizationDeleteSection = () => {
   const { organization } = useOrganization();
+  const canDeleteOrganization = useProtect({ permission: 'org:sys_profile:delete' });
 
   if (!organization) {
+    return null;
+  }
+
+  const adminDeleteEnabled = organization.adminDeleteEnabled;
+
+  if (!canDeleteOrganization || !adminDeleteEnabled) {
     return null;
   }
 

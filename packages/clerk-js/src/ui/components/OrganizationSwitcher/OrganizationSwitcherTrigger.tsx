@@ -35,7 +35,6 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         focusRing={false}
         sx={[
           t => ({
-            minHeight: 0,
             padding: `${t.space.$1} ${t.space.$2}`,
             position: 'relative',
             color: t.colors.$colorText,

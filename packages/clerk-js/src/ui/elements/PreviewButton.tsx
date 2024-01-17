@@ -23,7 +23,6 @@ export const PreviewButton = (props: PreviewButtonProps) => {
       isDisabled={card.isLoading}
       sx={[
         t => ({
-          minHeight: 'unset',
           justifyContent: 'space-between',
           padding: `${t.space.$4} ${t.space.$5}`,
           borderRadius: 0,

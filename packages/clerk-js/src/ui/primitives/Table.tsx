@@ -45,10 +45,10 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderRightWidth: '0px',
         borderColor: theme.colors.$blackAlpha100,
       },
-      'tr:hover td:first-child': {
+      'tr:hover td:first-of-type': {
         borderBottomLeftRadius: theme.radii.$lg,
       },
-      'tr:hover td:last-child': {
+      'tr:hover td:last-of-type': {
         borderBottomRightRadius: theme.radii.$lg,
       },
       'tr > th:first-of-type': {
