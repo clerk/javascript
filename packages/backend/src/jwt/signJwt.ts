@@ -60,6 +60,6 @@ export async function signJwt(
     const encodedSignature = `${firstPart}.${base64url.stringify(new Uint8Array(signature), { pad: false })}`;
     return { data: encodedSignature };
   } catch (error) {
-    return { error: new SignJWTError((error as Error)?.message) };
+    return { errors: [new SignJWTError((error as Error)?.message)] };
   }
 }
