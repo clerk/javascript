@@ -11,8 +11,6 @@ import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './cons
 import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
 import type { RequestLike } from './types';
 
-type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
-
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
   Object.assign(req, { [key]: value });
 }
@@ -22,7 +20,10 @@ export function getCustomAttributeFromRequest(req: RequestLike, key: string): st
   return key in req ? req[key] : undefined;
 }
 
-export function getAuthKeyFromRequest(req: RequestLike, key: AuthKey): string | null | undefined {
+export function getAuthKeyFromRequest(
+  req: RequestLike,
+  key: keyof typeof constants.Attributes,
+): string | null | undefined {
   return getCustomAttributeFromRequest(req, constants.Attributes[key]) || getHeader(req, constants.Headers[key]);
 }
 
@@ -108,7 +109,7 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
 
 // Auth result will be set as both a query param & header when applicable
 export function decorateRequest(req: Request, res: Response, requestState: RequestState): Response {
-  const { reason, message, status } = requestState;
+  const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
   if (!res) {
     res = NextResponse.next();
@@ -143,6 +144,7 @@ export function decorateRequest(req: Request, res: Response, requestState: Reque
   if (rewriteURL) {
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
+      [constants.Headers.AuthToken]: token || '',
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
     });

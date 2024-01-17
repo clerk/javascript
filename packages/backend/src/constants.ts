@@ -6,6 +6,7 @@ export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
 export const JWKS_CACHE_TTL_MS = 1000 * 60 * 60;
 
 const Attributes = {
+  AuthToken: '__clerkAuthToken',
   AuthStatus: '__clerkAuthStatus',
   AuthReason: '__clerkAuthReason',
   AuthMessage: '__clerkAuthMessage',
@@ -24,6 +25,7 @@ const QueryParameters = {
 } as const;
 
 const Headers = {
+  AuthToken: 'x-clerk-auth-token',
   AuthStatus: 'x-clerk-auth-status',
   AuthReason: 'x-clerk-auth-reason',
   AuthMessage: 'x-clerk-auth-message',

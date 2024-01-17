@@ -28,6 +28,7 @@ export type SignedInState = {
   isSignedIn: true;
   toAuth: () => SignedInAuthObject;
   headers: Headers;
+  token: string;
 };
 
 export type SignedOutState = {
@@ -45,6 +46,7 @@ export type SignedOutState = {
   isSignedIn: false;
   toAuth: () => SignedOutAuthObject;
   headers: Headers;
+  token: null;
 };
 
 export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
@@ -75,6 +77,7 @@ export function signedIn(
   authenticateContext: AuthenticateContext,
   sessionClaims: JwtPayload,
   headers: Headers = new Headers(),
+  token: string,
 ): SignedInState {
   const authObject = signedInAuthObject(authenticateContext, sessionClaims);
   return {
@@ -92,6 +95,7 @@ export function signedIn(
     isSignedIn: true,
     toAuth: () => authObject,
     headers,
+    token,
   };
 }
 
@@ -116,6 +120,7 @@ export function signedOut(
     isSignedIn: false,
     headers,
     toAuth: () => signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message }),
+    token: null,
   };
 }
 
@@ -140,5 +145,6 @@ export function handshake(
     isSignedIn: false,
     headers,
     toAuth: () => null,
+    token: null,
   };
 }
