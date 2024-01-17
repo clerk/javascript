@@ -21,7 +21,6 @@ export * from './Modal';
 export * from './UserPreview';
 export * from './Accordion';
 export * from './FormattedPhoneNumber';
-export * from './FileDropArea';
 export * from './RootBox';
 export * from './InvisibleRootBox';
 export * from './ClipboardInput';
