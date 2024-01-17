@@ -350,6 +350,10 @@ type _LocalizationResource = {
       imageFormTitle: LocalizationValue;
       imageFormSubtitle: LocalizationValue;
       imageFormDestructiveActionSubtitle: LocalizationValue;
+      //TODO-RETHEME remove
+      fileDropAreaTitle: LocalizationValue;
+      //TODO-RETHEME remove
+      fileDropAreaAction: LocalizationValue;
       fileDropAreaHint: LocalizationValue;
       readonly: LocalizationValue;
       successMessage: LocalizationValue;

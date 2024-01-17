@@ -332,6 +332,10 @@ export const enUS: LocalizationResource = {
       imageFormTitle: 'Profile image',
       imageFormSubtitle: 'Upload',
       imageFormDestructiveActionSubtitle: 'Remove',
+      //TODO-RETHEME remove
+      fileDropAreaTitle: 'Drag file here, or...',
+      //TODO-RETHEME remove
+      fileDropAreaAction: 'Select file',
       fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',
       readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
       successMessage: 'Your profile has been updated.',
