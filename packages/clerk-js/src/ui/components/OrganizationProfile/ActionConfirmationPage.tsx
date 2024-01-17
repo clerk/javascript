@@ -42,7 +42,7 @@ export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
   const { organization } = useOrganization();
   const { user } = useUser();
 
-  const leaveOrg = useLeaveWithRevalidations(() => user.leaveOrganization(organization.id));
+  const leaveOrg = useLeaveWithRevalidations(() => user!.leaveOrganization(organization!.id));
 
   if (!organization || !user) {
     return null;
