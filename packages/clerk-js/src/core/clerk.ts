@@ -376,12 +376,12 @@ export class Clerk implements ClerkInterface {
 
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      console.info(warnings.cannotOpenOrgProfile);
-      return;
-    }
     if (disabledOrganizationsFeature(this, this.#environment)) {
       console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'));
+      return;
+    }
+    if (noOrganizationExists(this) && this.#instanceType === 'development') {
+      console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
       return;
     }
     void this.#componentControls
@@ -483,12 +483,12 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
     this.assertComponentsReady(this.#componentControls);
-    if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
-      return;
-    }
     if (disabledOrganizationsFeature(this, this.#environment)) {
       console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'));
+      return;
+    }
+    if (noOrganizationExists(this) && this.#instanceType === 'development') {
+      console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
       return;
     }
     void this.#componentControls.ensureMounted({ preloadHint: 'OrganizationProfile' }).then(controls =>

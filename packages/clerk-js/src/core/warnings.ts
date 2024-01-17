@@ -22,8 +22,6 @@ const warnings = {
     '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderComponentWhenOrgDoesNotExist: `<OrganizationProfile/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
   cannotRenderAnyOrganizationComponent: createMessageForDisabledOrganizations,
-  cannotOpenOrgProfile:
-    'The OrganizationProfile cannot render unless an organization is active. Since no organization is currently active, this is no-op.',
   cannotOpenUserProfile:
     'The UserProfile modal cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotOpenSignUpOrSignUp:
