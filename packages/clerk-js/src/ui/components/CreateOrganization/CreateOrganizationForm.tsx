@@ -189,6 +189,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
           <FormButtonContainer sx={t => ({ marginTop: t.space.$none })}>
             <Form.SubmitButton
               block={false}
+              isDisabled={!canSubmit}
               localizationKey={localizationKeys('createOrganization.formButtonSubmit')}
             />
             {props.onCancel && (
