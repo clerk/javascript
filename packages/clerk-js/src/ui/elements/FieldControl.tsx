@@ -146,10 +146,6 @@ const FieldLabelRow = (props: PropsWithChildren) => {
       align='center'
       elementDescriptor={descriptors.formFieldLabelRow}
       elementId={descriptors.formFieldLabelRow.setId(fieldId)}
-      sx={theme => ({
-        marginBottom: theme.space.$1,
-        marginLeft: 0,
-      })}
     >
       {props.children}
     </Flex>

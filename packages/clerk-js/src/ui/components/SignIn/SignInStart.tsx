@@ -372,7 +372,7 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   return (
     <Form.ControlRow
       elementId={field.id}
-      sx={show ? undefined : { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
+      sx={show ? undefined : { position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
     >
       <Form.PasswordInput
         {...field.props}

@@ -25,7 +25,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
         t => ({
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           padding: `${t.space.$4} 0`,
-          gap: t.space.$8,
+          gap: t.space.$6,
           [mqu.md]: {
             flexDirection: 'column',
             gap: 0,

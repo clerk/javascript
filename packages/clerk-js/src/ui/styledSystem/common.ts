@@ -80,7 +80,7 @@ const textVariants = (t: InternalTheme) => {
 const borderVariants = (t: InternalTheme, props?: any) => {
   const defaultBoxShadow = t.shadows.$input.replace(
     '{{color}}',
-    !props?.hasError ? t.colors.$blackAlpha200 : t.colors.$danger300,
+    !props?.hasError ? t.colors.$blackAlpha100 : t.colors.$danger300,
   );
   const hoverBorderColor = !props?.hasError ? t.colors.$primary300 : t.colors.$danger400;
   const hoverStyles = {
@@ -106,7 +106,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
     normal: {
       borderRadius: t.radii.$md,
       border: t.borders.$normal,
-      borderColor: !props?.hasError ? t.colors.$blackAlpha300 : t.colors.$danger300,
+      borderColor: !props?.hasError ? t.colors.$blackAlpha200 : t.colors.$danger300,
       boxShadow: defaultBoxShadow,
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
