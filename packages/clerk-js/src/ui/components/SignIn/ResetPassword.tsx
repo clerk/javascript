@@ -150,10 +150,7 @@ export const _ResetPassword = () => {
                 isDisabled={!canSubmit}
                 localizationKey={localizationKeys('signIn.resetPassword.formButtonPrimary')}
               />
-              <Card.Action
-                elementId='backRow'
-                elementDescriptor={descriptors.backRow}
-              >
+              <Card.Action elementId='alternativeMethods'>
                 <Card.ActionLink
                   elementDescriptor={descriptors.backLink}
                   localizationKey={localizationKeys('backButton')}
