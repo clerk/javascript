@@ -32,6 +32,8 @@ import {
 } from '~/internals/machines/form.context';
 import type { FieldDetails } from '~/internals/machines/form.types';
 
+import type { ClerkInputType, FieldState } from './types';
+
 const FieldContext = createContext<Pick<FieldDetails, 'name'> | null>(null);
 const useFieldContext = () => useContext(FieldContext);
 
@@ -105,11 +107,16 @@ const determineInputTypeFromName = (name: string) => {
   if (name === 'password') return 'password' as const;
   if (name === 'email') return 'email' as const;
   if (name === 'phone') return 'tel' as const;
+  if (name === 'code') return 'otp' as const;
 
   return 'text' as const;
 };
 
-const useInput = ({ name: inputName, value: initialValue }: Partial<Pick<FieldDetails, 'name' | 'value'>>) => {
+const useInput = ({
+  name: inputName,
+  value: initialValue,
+  type: inputType,
+}: Partial<Pick<FieldDetails, 'name' | 'value'> & { type: ClerkInputType }>) => {
   // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
@@ -142,7 +149,7 @@ const useInput = ({ name: inputName, value: initialValue }: Partial<Pick<FieldDe
 
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;
-  const type = determineInputTypeFromName(name);
+  const type = inputType ?? determineInputTypeFromName(name);
 
   return {
     type,
@@ -190,7 +197,7 @@ function InnerField(props: FormFieldProps) {
  * A helper to access the state of the field programmatically. This can be useful if you need to trigger
  * animations or certain behavior based on the field's state independent of the existing components.
  */
-function FieldState({ children }: { children: (state: { state: 'valid' | 'invalid' }) => ReactNode }) {
+function FieldState({ children }: { children: (state: { state: FieldState }) => ReactNode }) {
   const field = useFieldContext();
   const error = useFormSelector(fieldErrorsSelector(field?.name));
   const state = error ? ('invalid' as const) : ('valid' as const);
@@ -200,18 +207,19 @@ function FieldState({ children }: { children: (state: { state: 'valid' | 'invali
   return children(fieldState);
 }
 
-function Input(props: FormControlProps) {
-  const { name, value } = props;
-  const field = useInput({ name, value });
+type ClerkInputProps = FormControlProps | ({ type: 'otp' } & OTPInputProps);
+
+function Input(props: ClerkInputProps) {
+  const { name, value, type, ...passthroughProps } = props;
+  const field = useInput({ name, value, type });
 
   let propsForType = {};
-  if (props.type === 'otp') {
-    const { type, ...rest } = props;
-
+  if (field.type === 'otp') {
     propsForType = {
       type: 'text',
       asChild: true,
-      children: <OTPInput {...rest} />,
+      // @ts-expect-error -- render is passed opaquely by RadixControl
+      children: <OTPInput />,
     };
   }
 
@@ -219,29 +227,42 @@ function Input(props: FormControlProps) {
     <RadixControl
       type={field.type}
       {...field.props}
-      {...props}
+      {...(passthroughProps as FormControlProps)}
       {...propsForType}
     />
   );
 }
 
-const OTPInput = forwardRef<HTMLInputElement>(function OTPInput(props: any, ref) {
+type OTPInputProps = Exclude<
+  HTMLProps<HTMLInputElement>,
+  'type' | 'autoComplete' | 'maxLength' | 'inputMode' | 'pattern'
+> & { render: (props: { value: string; status: 'cursor' | 'selected' | 'none'; index: number }) => ReactNode };
+
+/**
+ * A custom input component to handle accepting OTP codes. An invisible input element is used to capture input and handle native input
+ * interactions, while the provided render prop is used to visually render the input's contents.
+ */
+const OTPInput = forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(props, ref) {
   const length = 6;
-  const { className, ...rest } = props;
+  const { className, render, ...rest } = props;
 
   const innerRef = useRef<HTMLInputElement>(null);
   const [selectionRange, setSelectionRange] = React.useState<[number, number]>([0, 0]);
 
+  // This ensures we can access innerRef internally while still exposing it via the ref prop
   useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
 
+  // A layout effect is used here to avoid any perceived visual lag when changing the selection
   useLayoutEffect(() => {
     setSelectionRange(cur => {
       const updated: [number, number] = [innerRef.current?.selectionStart ?? 0, innerRef.current?.selectionEnd ?? 0];
 
+      // When navigating backwards, ensure we select the previous character instead of only moving the cursor
       if (updated[0] === cur[0] && updated[1] < cur[1]) {
         updated[0] = updated[0] - 1;
       }
 
+      // Only update the selection if it has changed to avoid unnecessary updates
       if (updated[0] !== cur[0] || updated[1] !== cur[1]) {
         innerRef.current?.setSelectionRange(updated[0], updated[1]);
         return updated;
@@ -259,14 +280,13 @@ const OTPInput = forwardRef<HTMLInputElement>(function OTPInput(props: any, ref)
         } as CSSProperties
       }
     >
-      <style>
-        {`
+      {/* We can't target pseud-elements with the style prop, so we inject a tag here */}
+      <style>{`
       input[data-otp-input]::selection {
         color: transparent;
         background-color: none;
       }
-      `}
-      </style>
+      `}</style>
       <input
         data-otp-input
         ref={innerRef}
@@ -277,8 +297,10 @@ const OTPInput = forwardRef<HTMLInputElement>(function OTPInput(props: any, ref)
         pattern='[0-9]*'
         {...rest}
         onChange={event => {
-          console.log(event.currentTarget.value);
-          rest?.onChange(event);
+          // Only accept numbers
+          event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
+
+          rest?.onChange?.(event);
         }}
         onSelect={() => {
           setSelectionRange(cur => {
@@ -288,10 +310,13 @@ const OTPInput = forwardRef<HTMLInputElement>(function OTPInput(props: any, ref)
               innerRef.current?.selectionEnd ?? 0,
             ];
 
+            // Abort unnecessary updates
             if (cur[0] === updated[0] && cur[1] === updated[1]) {
               return cur;
             }
 
+            // When moving the selection, we want to select either the previous or next character instead of only moving the cursor.
+            // If the start and end indices are the same, it means only the cursor has moved and we need to make a decision on which character to select.
             if (updated[0] === updated[1]) {
               if (updated[0] > 0 && cur[0] === updated[0] && cur[1] === updated[0] + 1) {
                 direction = 'backward' as const;
@@ -308,6 +333,7 @@ const OTPInput = forwardRef<HTMLInputElement>(function OTPInput(props: any, ref)
         }}
         style={{
           display: 'block',
+          // Attempt to add some padding to let autocomplete overlays show without overlap
           width: '110%',
           height: '100%',
           background: 'none',
@@ -331,9 +357,9 @@ const OTPInput = forwardRef<HTMLInputElement>(function OTPInput(props: any, ref)
         }}
       >
         {Array.from({ length }).map((_, i) =>
-          props.render({
-            value: props.value[i] || '',
-            state:
+          render({
+            value: String(props.value)[i] || '',
+            status:
               selectionRange[0] === selectionRange[1] && selectionRange[0] === i
                 ? 'cursor'
                 : selectionRange[0] <= i && selectionRange[1] > i

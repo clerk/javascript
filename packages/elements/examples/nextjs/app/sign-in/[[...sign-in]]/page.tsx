@@ -49,30 +49,32 @@ const CustomError = forwardRef<HTMLParagraphElement, { code: string; message: st
   );
 });
 
+function OTPInputSegment({ value, status }: any) {
+  return (
+    <FieldState>
+      {({ state }) => (
+        <span
+          data-state={state}
+          data-status={status}
+          className={clsx(
+            'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 bg-white border-[var(--border-color)] [--border-color:theme(colors.gray.300)] data-[state="invalid"]:[--border-color:theme(colors.red.500)] data-[state="success"]:[--border-color:theme(colors.green.500)] text-lg text-black self-stretch',
+            (status === 'cursor' || status === 'selected') &&
+              '[--border-color:theme(colors.purple.500)] shadow-[theme(colors.purple.500_0_0_0_1px)]',
+            status === 'selected' && 'bg-purple-100',
+          )}
+        >
+          {value}
+        </span>
+      )}
+    </FieldState>
+  );
+}
+
 export default function SignInPage() {
   return (
     <SignIn>
       <div className='m-auto w-max text-sm'>
         <SignInStart>
-          <Field name='code'>
-            <Input
-              type='otp'
-              className='flex'
-              render={({ value, state }) => (
-                <span
-                  data-state={state}
-                  className={clsx(
-                    'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 border-gray-300 bg-white [--segment-color:#6366f1] data-[state="error"]:[--segment-color:#ef4444] data-[state="success"]:[--segment-color:#10b981] text-lg text-black self-stretch',
-                    (state === 'cursor' || state === 'selected') &&
-                      'border-purple-500 shadow-[theme.colors.purple.500_0_0_0_1px]',
-                    state === 'selected' && 'bg-purple-100',
-                  )}
-                >
-                  {value}
-                </span>
-              )}
-            />
-          </Field>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>START</H1>
             <div className='flex flex-col gap-3'>
@@ -225,8 +227,9 @@ export default function SignInPage() {
                 <div className='flex gap-4 justify-between items-center'>
                   <Label>Email Code</Label>
                   <Input
-                    type='code'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                    type='otp'
+                    className='flex'
+                    render={OTPInputSegment}
                   />
                 </div>
 
@@ -253,8 +256,9 @@ export default function SignInPage() {
                 <div className='flex gap-4 justify-between items-center'>
                   <Label>Phone Code</Label>
                   <Input
-                    type='code'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                    type='otp'
+                    className='flex'
+                    render={OTPInputSegment}
                   />
                 </div>
 
@@ -285,8 +289,9 @@ export default function SignInPage() {
                 <div className='flex gap-4 justify-between items-center'>
                   <Label>Email Code</Label>
                   <Input
-                    type='code'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                    type='otp'
+                    className='flex'
+                    render={OTPInputSegment}
                   />
                 </div>
 
