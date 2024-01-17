@@ -47,7 +47,7 @@ export const jaJP: LocalizationResource = {
   formFieldAction__forgotPassword: 'パスワードをお忘れですか？',
   formFieldError__matchingPasswords: 'パスワードが一致します。',
   formFieldError__notMatchingPasswords: 'パスワードが一致しません。',
-  formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
+  formFieldError__verificationLinkExpired: '検証リンクの有効期限が切れています。新しいリンクをリクエストしてください。',
   formFieldHintText__optional: '任意',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
   formFieldInputPlaceholder__backupCode: '',
@@ -65,7 +65,7 @@ export const jaJP: LocalizationResource = {
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
+  formFieldLabel__automaticInvitations: 'このドメインの自動招待を有効にする',
   formFieldLabel__backupCode: 'バックアップコード',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__confirmPassword: 'パスワードの確認',
@@ -96,9 +96,9 @@ export const jaJP: LocalizationResource = {
   membershipRole__basicMember: 'メンバー',
   membershipRole__guestMember: 'ゲスト',
   organizationList: {
-    action__createOrganization: 'Create organization',
-    action__invitationAccept: 'Join',
-    action__suggestionsAccept: 'Request to join',
+    action__createOrganization: '組織を作成する',
+    action__invitationAccept: '参加する',
+    action__suggestionsAccept: '参加をリクエストする',
     createOrganization: 'Create Organization',
     invitationAcceptedLabel: 'Joined',
     subtitle: 'to continue to {{applicationName}}',
@@ -295,13 +295,13 @@ export const jaJP: LocalizationResource = {
       title: '別の方法を使用',
     },
     backupCodeMfa: {
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'バックアップコードを入力',
     },
     emailCode: {
       formTitle: '検証コード',
       resendButton: 'コードを再送信',
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'メールを確認',
     },
     emailLink: {
@@ -320,7 +320,7 @@ export const jaJP: LocalizationResource = {
         title: 'サインイン中...',
       },
       resendButton: 'リンクを再送信',
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'メールを確認',
       unusedTab: {
         title: 'このタブを閉じてもかまいません',
@@ -355,7 +355,7 @@ export const jaJP: LocalizationResource = {
     },
     password: {
       actionLink: '別の方法を使用',
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'パスワードを入力',
     },
     phoneCode: {
@@ -387,7 +387,7 @@ export const jaJP: LocalizationResource = {
       actionLink__use_phone: '電話番号を使用',
       actionLink__use_username: 'ユーザー名を使用',
       actionText: 'アカウントをお持ちでないですか？',
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'サインイン',
     },
     totpMfa: {
@@ -401,14 +401,14 @@ export const jaJP: LocalizationResource = {
     continue: {
       actionLink: 'サインイン',
       actionText: 'アカウントをお持ちですか？',
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: '未入力のフィールドを入力',
     },
     emailCode: {
       formSubtitle: 'メールアドレスに送信された確認コードを入力してください',
       formTitle: '確認コード',
       resendButton: 'コードを再送信',
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'メールアドレスを確認',
     },
     emailLink: {
@@ -418,7 +418,7 @@ export const jaJP: LocalizationResource = {
         title: '登録中...',
       },
       resendButton: 'リンクを再送信',
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'メールアドレスを確認',
       verified: {
         title: '登録が完了しました',
@@ -433,13 +433,13 @@ export const jaJP: LocalizationResource = {
       formSubtitle: '電話番号に送信された確認コードを入力してください',
       formTitle: '確認コード',
       resendButton: 'コードを再送信',
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: '電話番号を確認',
     },
     start: {
       actionLink: 'サインイン',
       actionText: 'アカウントをお持ちですか？',
-      subtitle: '{{applicationName}}への続行のために',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'アカウントを作成',
     },
   },
