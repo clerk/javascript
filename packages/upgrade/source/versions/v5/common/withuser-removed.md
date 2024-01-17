@@ -1,0 +1,15 @@
+---
+title: '`WithUser` component removed'
+matcher: "import\\s+{[\\s\\S]*?WithUser[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
+---
+
+The `WithUser` higher order component has been removed. If you would still like to use this function in the way its implemented, it can be created quickly using Clerk's [custom hooks](https://clerk.com/docs/references/react/overview). An example of how to do so is below:
+
+```js
+export const WithUser = ({ children }) => {
+  const user = useUser();
+  if (typeof children !== 'function') throw new Error();
+
+  return {children(user)};
+};
+```

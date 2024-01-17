@@ -32,6 +32,12 @@ const reactChangesList = [
 	'button-to-organizationlistcreateorganizationactionbutton',
 	'remove-socialbuttonsblockbuttonarrow',
 	'remove-identitypreview-avatar',
+	'withsession-removed',
+	'withclerk-removed',
+	'withuser-removed',
+	'withclerk-hof-removed',
+	'withsession-hof-removed',
+	'withuser-hof-removed',
 ];
 
 export default {
@@ -97,6 +103,12 @@ export default {
 		'isemaillinkerror-import-change',
 		'isknownerror-import-change',
 		'ismetamaskerror-import-change',
+		'withsession-removed',
+		'withclerk-removed',
+		'withuser-removed',
+		'withclerk-hof-removed',
+		'withsession-hof-removed',
+		'withuser-hof-removed',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
