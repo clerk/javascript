@@ -381,7 +381,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'));
       return;
     }
     void this.#componentControls
@@ -397,7 +397,7 @@ export class Clerk implements ClerkInterface {
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      console.info(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'));
       return;
     }
     void this.#componentControls
@@ -488,7 +488,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'));
       return;
     }
     void this.#componentControls.ensureMounted({ preloadHint: 'OrganizationProfile' }).then(controls =>
@@ -515,7 +515,7 @@ export class Clerk implements ClerkInterface {
   public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      console.info(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'));
       return;
     }
     void this.#componentControls?.ensureMounted({ preloadHint: 'CreateOrganization' }).then(controls =>
@@ -542,7 +542,7 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'));
       return;
     }
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationSwitcher' }).then(controls =>
@@ -565,7 +565,7 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent);
+      console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationList'));
       return;
     }
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationList' }).then(controls =>
