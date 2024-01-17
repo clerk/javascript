@@ -4,10 +4,6 @@ import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { NextFunction, Request, Response } from 'express';
 import type { IncomingMessage } from 'http';
 
-type LegacyAuthObject<T extends AuthObject> = Pick<T, 'sessionId' | 'userId' | 'actor' | 'getToken' | 'debug'> & {
-  claims: AuthObject['sessionClaims'];
-};
-
 export type MiddlewareWithAuthProp = (
   // req: WithAuthProp<Request>
   req: Request,
@@ -22,8 +18,8 @@ export type MiddlewareRequireAuthProp = (
   next: NextFunction,
 ) => Promise<void>;
 
-export type LooseAuthProp = { auth: LegacyAuthObject<AuthObject> };
-export type StrictAuthProp = { auth: LegacyAuthObject<SignedInAuthObject> };
+export type LooseAuthProp = { auth: AuthObject };
+export type StrictAuthProp = { auth: SignedInAuthObject };
 export type WithAuthProp<T> = T & LooseAuthProp;
 export type RequireAuthProp<T> = T & StrictAuthProp;
 
