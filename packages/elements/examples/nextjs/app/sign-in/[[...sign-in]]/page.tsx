@@ -49,6 +49,27 @@ const CustomError = forwardRef<HTMLParagraphElement, { code: string; message: st
   );
 });
 
+function OTPInputSegment({ value, status }: any) {
+  return (
+    <FieldState>
+      {({ state }) => (
+        <span
+          data-state={state}
+          data-status={status}
+          className={clsx(
+            'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 bg-white border-[var(--border-color)] [--border-color:theme(colors.gray.300)] data-[state="invalid"]:[--border-color:theme(colors.red.500)] text-lg text-black self-stretch',
+            (status === 'cursor' || status === 'selected') &&
+              '[--border-color:theme(colors.purple.500)] shadow-[theme(colors.purple.500_0_0_0_1px)]',
+            status === 'selected' && 'bg-purple-100',
+          )}
+        >
+          {value}
+        </span>
+      )}
+    </FieldState>
+  );
+}
+
 export default function SignInPage() {
   return (
     <SignIn>
@@ -206,8 +227,9 @@ export default function SignInPage() {
                 <div className='flex gap-4 justify-between items-center'>
                   <Label>Email Code</Label>
                   <Input
-                    type='code'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                    type='otp'
+                    className='flex'
+                    render={OTPInputSegment}
                   />
                 </div>
 
@@ -234,8 +256,9 @@ export default function SignInPage() {
                 <div className='flex gap-4 justify-between items-center'>
                   <Label>Phone Code</Label>
                   <Input
-                    type='code'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                    type='otp'
+                    className='flex'
+                    render={OTPInputSegment}
                   />
                 </div>
 
@@ -266,8 +289,9 @@ export default function SignInPage() {
                 <div className='flex gap-4 justify-between items-center'>
                   <Label>Email Code</Label>
                   <Input
-                    type='code'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
+                    type='otp'
+                    className='flex'
+                    render={OTPInputSegment}
                   />
                 </div>
 
