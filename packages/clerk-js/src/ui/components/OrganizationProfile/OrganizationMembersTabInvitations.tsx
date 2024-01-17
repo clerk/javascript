@@ -1,7 +1,8 @@
 import { Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Col, Flex, localizationKeys } from '../../customizables';
+import { Col, Flex, localizationKeys, Text } from '../../customizables';
 import { Header, ProfileSection } from '../../elements';
+import { mqu } from '../../styledSystem';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';
 import { MembershipWidget } from './MembershipWidget';
@@ -15,7 +16,7 @@ export const OrganizationMembersTabInvitations = () => {
 
   return (
     <Col
-      gap={8}
+      gap={4}
       sx={{
         width: '100%',
       }}
@@ -24,41 +25,59 @@ export const OrganizationMembersTabInvitations = () => {
 
       {isDomainsEnabled && (
         <Protect permission={'org:sys_domains:manage'}>
-          <Col
-            gap={2}
-            sx={{
+          <Flex
+            sx={t => ({
               width: '100%',
-            }}
+              gap: t.space.$8,
+              paddingBottom: t.space.$4,
+              borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+              [mqu.md]: {
+                flexDirection: 'column',
+                gap: t.space.$2,
+              },
+            })}
           >
-            <Header.Root>
-              <Header.Title
-                localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
-                )}
-                textVariant='h3'
-              />
-              <Header.Subtitle
-                localizationKey={localizationKeys(
-                  'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
-                )}
-                variant='body'
-              />
-            </Header.Root>
-            <DomainList
-              fallback={
-                <ProfileSection.Button
+            <Col sx={t => ({ width: t.space.$66, marginTop: t.space.$2 })}>
+              <Header.Root>
+                <Header.Title
                   localizationKey={localizationKeys(
-                    'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
+                    'organizationProfile.membersPage.invitationsTab.autoInvitations.headerTitle',
                   )}
-                  id='manageVerifiedDomains'
-                  sx={t => ({ gap: t.space.$2 })}
-                  onClick={navigateToGeneralPageRoot}
+                  textVariant='h3'
                 />
-              }
-              verificationStatus={'verified'}
-              enrollmentMode={'automatic_invitation'}
-            />
-          </Col>
+              </Header.Root>
+            </Col>
+            <Col sx={{ width: '100%' }}>
+              <DomainList
+                fallback={
+                  <>
+                    <ProfileSection.Button
+                      localizationKey={localizationKeys(
+                        'organizationProfile.membersPage.invitationsTab.autoInvitations.primaryButton',
+                      )}
+                      id='manageVerifiedDomains'
+                      sx={t => ({ gap: t.space.$2 })}
+                      onClick={navigateToGeneralPageRoot}
+                    />
+                    <Text
+                      localizationKey={localizationKeys(
+                        'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
+                      )}
+                      sx={t => ({
+                        paddingLeft: t.space.$10,
+                        color: t.colors.$colorTextSecondary,
+                        [mqu.md]: {
+                          paddingLeft: 0,
+                        },
+                      })}
+                    />
+                  </>
+                }
+                verificationStatus={'verified'}
+                enrollmentMode={'automatic_invitation'}
+              />
+            </Col>
+          </Flex>
         </Protect>
       )}
 

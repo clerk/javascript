@@ -12,7 +12,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     fontSize: theme.fontSizes.$sm,
     fontWeight: theme.fontWeights.$normal,
     color: colors.setAlpha(theme.colors.$colorText, 0.62),
-    padding: `${theme.space.$3} ${theme.space.$4}`,
+    padding: `${theme.space.$2} ${theme.space.$4}`,
   },
   variants: {},
 }));

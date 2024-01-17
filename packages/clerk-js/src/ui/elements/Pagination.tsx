@@ -46,6 +46,7 @@ const PageButton = (props: PageButtonProps) => {
     >
       {icon && (
         <Icon
+          size='md'
           elementDescriptor={descriptors.paginationButtonIcon}
           icon={props.icon as React.ComponentType}
         />
@@ -78,6 +79,7 @@ const RowInformation = (props: RowInfoProps) => {
         elementId={descriptors.paginationRowText?.setId('displaying')}
         sx={t => ({ opacity: t.opacity.$inactive })}
         localizationKey={localizationKeys('paginationRowText__displaying')}
+        colorScheme='neutral'
       />{' '}
       <Text
         as='span'
@@ -152,7 +154,13 @@ export const Pagination = (props: PaginationProps) => {
     >
       {rowInfo && <RowInformation rowInfo={rowInfo} />}
 
-      <Flex gap={2}>
+      <Flex
+        gap={2}
+        align='center'
+        sx={{
+          display: 'inline-flex',
+        }}
+      >
         <PageButton
           isDisabled={page <= 1}
           icon={CaretLeft}

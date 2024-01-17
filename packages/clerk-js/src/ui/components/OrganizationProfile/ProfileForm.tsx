@@ -98,7 +98,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
         <FormButtons
           isDisabled={!canSubmit}
           onReset={onReset}
-          sx={t => ({ marginTop: t.space.$1 })}
         />
       </Form.Root>
     </FormContainer>

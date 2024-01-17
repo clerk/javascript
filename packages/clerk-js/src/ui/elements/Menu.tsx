@@ -185,6 +185,7 @@ export const MenuItem = (props: MenuItemProps) => {
       variant={destructive ? 'ghostDanger' : 'ghost'}
       role='menuitem'
       onKeyDown={onKeyDown}
+      focusRing={false}
       onClick={e => {
         onClick?.(e);
         closeAfterClick && toggle();

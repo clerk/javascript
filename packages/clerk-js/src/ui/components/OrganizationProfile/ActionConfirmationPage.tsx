@@ -151,9 +151,12 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
 
   return (
     <Wizard {...wizard.props}>
-      <FormContainer headerTitle={title}>
+      <FormContainer
+        headerTitle={title}
+        gap={1}
+      >
         <Form.Root onSubmit={handleSubmit}>
-          <Col gap={1}>
+          <Col>
             <Text
               localizationKey={messageLine1}
               colorScheme='neutral'

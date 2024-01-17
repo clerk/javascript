@@ -187,10 +187,9 @@ describe('OrganizationSettings', () => {
         });
       });
 
-      const { getByText, queryByRole } = await act(() => render(<OrganizationGeneralPage />, { wrapper }));
+      const { queryByRole } = await act(() => render(<OrganizationGeneralPage />, { wrapper }));
       await waitFor(() => {
-        expect(getByText('Danger')).toBeDefined();
-        expect(getByText(/leave organization/i).closest('button')).toBeInTheDocument();
+        expect(queryByRole('button', { name: /leave organization/i })).toBeInTheDocument();
         expect(queryByRole('button', { name: /delete organization/i })).not.toBeInTheDocument();
       });
     });
@@ -204,11 +203,10 @@ describe('OrganizationSettings', () => {
         });
       });
 
-      const { getByText } = render(<OrganizationGeneralPage />, { wrapper });
+      const { getByRole } = render(<OrganizationGeneralPage />, { wrapper });
       await waitFor(() => {
-        expect(getByText('Danger')).toBeDefined();
-        expect(getByText(/leave organization/i).closest('button')).not.toHaveAttribute('disabled');
-        expect(getByText(/delete organization/i).closest('button')).toBeInTheDocument();
+        expect(getByRole('button', { name: /leave organization/i })).not.toHaveAttribute('disabled');
+        expect(getByRole('button', { name: /delete organization/i })).toBeInTheDocument();
       });
     });
 
@@ -238,12 +236,10 @@ describe('OrganizationSettings', () => {
       });
 
       fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
-      const { getByText, getByRole } = render(<OrganizationGeneralPage />, { wrapper });
+      const { getByRole } = render(<OrganizationGeneralPage />, { wrapper });
       await waitFor(() => {
         expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
-        expect(getByText('Danger')).toBeDefined();
-        expect(getByText(/leave organization/i).closest('button')).toHaveAttribute('disabled');
-        expect(getByText(/delete organization/i).closest('button')).toBeInTheDocument();
+        expect(getByRole('button', { name: /leave organization/i })).toHaveAttribute('disabled');
         expect(getByRole('button', { name: /delete organization/i })).toBeInTheDocument();
       });
     });

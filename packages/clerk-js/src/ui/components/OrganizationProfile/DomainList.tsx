@@ -101,6 +101,10 @@ export const DomainList = withProtect(
 
     const hasNextOrFetching = domains?.hasNextPage || domains?.isFetching;
 
+    if (domainList.length === 0 && !domains?.isLoading && !fallback) {
+      return null;
+    }
+
     return (
       <ProfileSection.ItemList id='organizationDomains'>
         {domainList.length === 0 && !domains?.isLoading && fallback}

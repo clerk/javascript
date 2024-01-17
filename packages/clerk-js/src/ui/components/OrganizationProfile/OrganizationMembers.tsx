@@ -81,6 +81,13 @@ export const OrganizationMembers = withCardStateProvider(() => {
               </Action.Trigger>
             )}
           </Header.Root>
+          {canReadMemberships && (
+            <Action.Open value='invite'>
+              <Action.Card>
+                <InviteMembersScreen />
+              </Action.Card>
+            </Action.Open>
+          )}
           <Tabs>
             <TabsList>
               {canReadMemberships && (
@@ -111,13 +118,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
                   <InviteMembersButton />
                 </Action.Trigger>
               </Flex>
-            )}
-            {canReadMemberships && (
-              <Action.Open value='invite'>
-                <Action.Card>
-                  <InviteMembersScreen />
-                </Action.Card>
-              </Action.Open>
             )}
             <TabPanels>
               {canReadMemberships && (
