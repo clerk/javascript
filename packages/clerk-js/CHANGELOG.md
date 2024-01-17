@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.0.0-alpha-v5.18
+
+### Patch Changes
+
+- Update `@clerk/nextjs` error messages to refer to `clerkMiddleware()` and deprecated `authMiddleware()` and fix a typo in `cannotRenderSignUpComponentWhenSessionExists` error message. ([#2589](https://github.com/clerk/javascript/pull/2589)) by [@dimkl](https://github.com/dimkl)
+
+- Throw error for unsupported method `OrganizationMembership.reload` ([#2604](https://github.com/clerk/javascript/pull/2604)) by [@panteliselef](https://github.com/panteliselef)
+
+- Use pattern for email input fields. ([#2575](https://github.com/clerk/javascript/pull/2575)) by [@panteliselef](https://github.com/panteliselef)
+
+- Take account custom pages when redirecting inside OrganizationProfile. ([#2600](https://github.com/clerk/javascript/pull/2600)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 5.0.0-alpha-v5.17
 
 ### Patch Changes
