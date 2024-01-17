@@ -99,10 +99,7 @@ const OrganizationProfileSection = () => {
           fallback={profile}
         >
           <Action.Closed value='edit'>
-            <ProfileSection.Item
-              id='organizationProfile'
-              sx={t => ({ maxHeight: t.space.$8 })}
-            >
+            <ProfileSection.Item id='organizationProfile'>
               {profile}
 
               <Action.Trigger value='edit'>
@@ -142,6 +139,7 @@ const OrganizationDomainsSection = () => {
     <ProfileSection.Root
       title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
       id='organizationDomains'
+      centered={false}
       sx={{
         gap: 0,
       }}
@@ -191,10 +189,7 @@ const OrganizationLeaveSection = () => {
     >
       <Action.Root>
         <Action.Closed value='leave'>
-          <ProfileSection.Item
-            id='organizationDanger'
-            sx={t => ({ maxHeight: t.space.$8 })}
-          >
+          <ProfileSection.Item id='organizationDanger'>
             <Action.Trigger value='leave'>
               <Button
                 variant='ghostDanger'
@@ -238,10 +233,7 @@ const OrganizationDeleteSection = () => {
     >
       <Action.Root>
         <Action.Closed value='delete'>
-          <ProfileSection.Item
-            id={'organizationDanger'}
-            sx={t => ({ maxHeight: t.space.$8 })}
-          >
+          <ProfileSection.Item id={'organizationDanger'}>
             <Action.Trigger value='delete'>
               <Button
                 variant='ghostDanger'

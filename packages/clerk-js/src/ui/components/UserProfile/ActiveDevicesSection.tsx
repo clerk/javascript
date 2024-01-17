@@ -23,6 +23,7 @@ export const ActiveDevicesSection = () => {
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.activeDevicesSection.title')}
+      centered={false}
       id='activeDevices'
     >
       <ProfileSection.ItemList id='activeDevices'>

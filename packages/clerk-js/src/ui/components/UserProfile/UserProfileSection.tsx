@@ -30,7 +30,7 @@ export const UserProfileSection = () => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.profileSection.title')}
       id='profile'
-      sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
+      sx={{ [mqu.md]: { alignItems: 'flex-start' } }}
     >
       <Action.Root>
         <Action.Closed value='edit'>
