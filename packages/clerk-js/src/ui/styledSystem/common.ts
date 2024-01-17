@@ -78,15 +78,16 @@ const textVariants = (t: InternalTheme) => {
 };
 
 const borderVariants = (t: InternalTheme, props?: any) => {
-  const defaultBoxShadow = t.shadows.$input.replace(
+  const hoverBorderColor = !props?.hasError ? t.colors.$blackAlpha300 : t.colors.$danger500;
+  const hoverBoxShadow = t.shadows.$input.replace(
     '{{color}}',
-    !props?.hasError ? t.colors.$blackAlpha100 : t.colors.$danger300,
+    !props?.hasError ? t.colors.$blackAlpha150 : t.colors.$blackAlpha200,
   );
-  const hoverBorderColor = !props?.hasError ? t.colors.$primary300 : t.colors.$danger400;
   const hoverStyles = {
     '&:hover': {
       WebkitTapHighlightColor: 'transparent',
       borderColor: hoverBorderColor,
+      boxShadow: hoverBoxShadow,
     },
   };
   const focusStyles =
@@ -97,8 +98,11 @@ const borderVariants = (t: InternalTheme, props?: any) => {
             borderColor: hoverBorderColor,
             WebkitTapHighlightColor: 'transparent',
             boxShadow: [
-              defaultBoxShadow,
-              t.shadows.$focusRing.replace('{{color}}', props?.hasError ? t.colors.$danger200 : t.colors.$primary50),
+              hoverBoxShadow,
+              t.shadows.$focusRing.replace(
+                '{{color}}',
+                !props?.hasError ? t.colors.$blackAlpha150 : t.colors.$danger200,
+              ),
             ].toString(),
           },
         };
@@ -106,8 +110,11 @@ const borderVariants = (t: InternalTheme, props?: any) => {
     normal: {
       borderRadius: t.radii.$md,
       border: t.borders.$normal,
-      borderColor: !props?.hasError ? t.colors.$blackAlpha200 : t.colors.$danger300,
-      boxShadow: defaultBoxShadow,
+      borderColor: !props?.hasError ? t.colors.$blackAlpha150 : t.colors.$danger400,
+      boxShadow: t.shadows.$input.replace(
+        '{{color}}',
+        !props?.hasError ? t.colors.$blackAlpha100 : t.colors.$blackAlpha150,
+      ),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
