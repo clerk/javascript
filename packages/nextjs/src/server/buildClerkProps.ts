@@ -51,10 +51,10 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
   if (!authStatus || authStatus !== AuthStatus.SignedIn) {
     authObject = signedOutAuthObject(options);
   } else {
-    const { data: jwt, error } = decodeJwt(authToken as string);
+    const { data: jwt, errors } = decodeJwt(authToken as string);
 
-    if (error) {
-      throw error;
+    if (errors) {
+      throw errors[0];
     }
 
     // @ts-expect-error - TODO @nikos: Align types
