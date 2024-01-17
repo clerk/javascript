@@ -36,7 +36,10 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const canSubmit = confirmationField.value === 'Delete account';
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.deletePage.title')}>
+    <FormContainer
+      headerTitle={localizationKeys('userProfile.deletePage.title')}
+      sx={t => ({ gap: t.space.$0x5 })}
+    >
       <Form.Root onSubmit={deleteUser}>
         <Col gap={1}>
           <Text

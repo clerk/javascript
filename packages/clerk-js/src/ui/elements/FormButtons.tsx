@@ -38,7 +38,6 @@ export const FormButtonContainer = (props: PropsOfComponent<typeof Flex>) => {
       direction={'rowReverse'}
       gap={2}
       {...props}
-      sx={[theme => ({ marginTop: theme.space.$1 }), props.sx]}
     >
       {props.children}
     </Flex>

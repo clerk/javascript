@@ -315,7 +315,10 @@ export function _SignInStart(): JSX.Element {
                     />
                   </Form.ControlRow>
                   <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
-                  <Form.SubmitButton hasArrow />
+                  <Form.SubmitButton
+                    hasArrow
+                    sx={t => ({ marginTop: t.space.$2 })}
+                  />
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
@@ -372,7 +375,7 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   return (
     <Form.ControlRow
       elementId={field.id}
-      sx={show ? undefined : { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
+      sx={show ? undefined : { position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
     >
       <Form.PasswordInput
         {...field.props}

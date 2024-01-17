@@ -51,7 +51,7 @@ const FormRoot = (props: FormProps): JSX.Element => {
     <FormState.Provider value={value}>
       <FormPrim
         elementDescriptor={descriptors.form}
-        gap={4}
+        gap={6}
         {...props}
         onSubmit={onSubmit}
       >
@@ -135,7 +135,7 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
         elementDescriptor={descriptors.formField}
         elementId={descriptors.formField.setId(fieldProps.id)}
         sx={{ position: 'relative', flex: '1 1 auto' }}
-        gap={1}
+        gap={2}
       >
         <Field.LabelRow>
           <Field.Label />

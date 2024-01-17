@@ -97,6 +97,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
       )}
       <Form.SubmitButton
         hasArrow
+        sx={t => ({ marginTop: t.space.$2 })}
         localizationKey={localizationKeys('formButtonPrimary')}
       />
     </Form.Root>

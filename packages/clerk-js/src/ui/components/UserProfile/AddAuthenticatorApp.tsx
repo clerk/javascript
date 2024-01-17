@@ -4,7 +4,7 @@ import React from 'react';
 
 import { QRCode } from '../../common';
 import type { LocalizationKey } from '../../customizables';
-import { Button, Col, descriptors, localizationKeys, Text } from '../../customizables';
+import { Button, Col, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
 import {
   ClipboardInput,
@@ -43,37 +43,30 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
   }
 
   return (
-    <FormContainer headerTitle={title}>
+    <FormContainer
+      headerTitle={title}
+      headerSubtitle={
+        displayFormat == 'qr'
+          ? localizationKeys('userProfile.mfaTOTPPage.authenticatorApp.infoText__ableToScan')
+          : localizationKeys('userProfile.mfaTOTPPage.authenticatorApp.infoText__unableToScan')
+      }
+    >
       {!totp && <FullHeightLoader />}
 
       {totp && (
         <>
           <Col gap={4}>
             {displayFormat == 'qr' && (
-              <>
-                <Text
-                  localizationKey={localizationKeys('userProfile.mfaTOTPPage.authenticatorApp.infoText__ableToScan')}
-                />
-
-                <QRCode url={totp.uri || ''} />
-
-                <Button
-                  variant='link'
-                  onClick={() => setDisplayFormat('uri')}
-                  localizationKey={localizationKeys(
-                    'userProfile.mfaTOTPPage.authenticatorApp.buttonUnableToScan__nonPrimary',
-                  )}
-                />
-              </>
+              <QRCode
+                justify='center'
+                url={totp.uri || ''}
+              />
             )}
 
             {displayFormat == 'uri' && (
               <>
                 <Text
-                  localizationKey={localizationKeys('userProfile.mfaTOTPPage.authenticatorApp.infoText__unableToScan')}
-                />
-
-                <Text
+                  colorScheme='neutral'
                   localizationKey={localizationKeys(
                     'userProfile.mfaTOTPPage.authenticatorApp.inputLabel__unableToScan1',
                   )}
@@ -82,39 +75,55 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
                 <ClipboardInput value={totp.secret} />
 
                 <Text
+                  colorScheme='neutral'
                   localizationKey={localizationKeys(
                     'userProfile.mfaTOTPPage.authenticatorApp.inputLabel__unableToScan2',
                   )}
                 />
 
                 <ClipboardInput value={totp.uri} />
-
-                <Button
-                  variant='link'
-                  onClick={() => setDisplayFormat('qr')}
-                  localizationKey={localizationKeys(
-                    'userProfile.mfaTOTPPage.authenticatorApp.buttonAbleToScan__nonPrimary',
-                  )}
-                />
               </>
             )}
           </Col>
+          <Flex
+            justify='between'
+            align='center'
+            sx={{ width: '100%' }}
+          >
+            {displayFormat == 'qr' && (
+              <Button
+                variant='link'
+                onClick={() => setDisplayFormat('uri')}
+                localizationKey={localizationKeys(
+                  'userProfile.mfaTOTPPage.authenticatorApp.buttonUnableToScan__nonPrimary',
+                )}
+              />
+            )}
+            {displayFormat == 'uri' && (
+              <Button
+                variant='link'
+                onClick={() => setDisplayFormat('qr')}
+                localizationKey={localizationKeys(
+                  'userProfile.mfaTOTPPage.authenticatorApp.buttonAbleToScan__nonPrimary',
+                )}
+              />
+            )}
+            <FormButtonContainer>
+              <Button
+                textVariant='buttonSmall'
+                onClick={onSuccess}
+                localizationKey={localizationKeys('userProfile.formButtonPrimary__continue')}
+                elementDescriptor={descriptors.formButtonPrimary}
+              />
 
-          <FormButtonContainer sx={{ marginTop: 0 }}>
-            <Button
-              textVariant='buttonSmall'
-              onClick={onSuccess}
-              localizationKey={localizationKeys('userProfile.formButtonPrimary__continue')}
-              elementDescriptor={descriptors.formButtonPrimary}
-            />
-
-            <Button
-              variant='ghost'
-              onClick={onReset}
-              localizationKey={localizationKeys('userProfile.formButtonReset')}
-              elementDescriptor={descriptors.formButtonReset}
-            />
-          </FormButtonContainer>
+              <Button
+                variant='ghost'
+                onClick={onReset}
+                localizationKey={localizationKeys('userProfile.formButtonReset')}
+                elementDescriptor={descriptors.formButtonReset}
+              />
+            </FormButtonContainer>
+          </Flex>
         </>
       )}
     </FormContainer>

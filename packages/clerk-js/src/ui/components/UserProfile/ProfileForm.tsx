@@ -88,7 +88,10 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     <FormContainer headerTitle={localizationKeys('userProfile.profilePage.title')}>
       {nameEditDisabled && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
 
-      <Form.Root onSubmit={onSubmit}>
+      <Form.Root
+        onSubmit={onSubmit}
+        sx={t => ({ gap: t.space.$6 })}
+      >
         <UserProfileAvatarUploader
           user={user}
           onAvatarChange={uploadAvatar}

@@ -53,19 +53,20 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
     <Wizard {...wizard.props}>
       <FormContainer headerTitle={title}>
         <Form.Root onSubmit={addEmail}>
-          <Form.ControlRow elementId={emailField.id}>
-            <Form.PlainInput
-              {...emailField.props}
-              autoFocus
-            />
-          </Form.ControlRow>
           <Text
             localizationKey={
               preferEmailLinks
                 ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
                 : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
             }
+            colorScheme='neutral'
           />
+          <Form.ControlRow elementId={emailField.id}>
+            <Form.PlainInput
+              {...emailField.props}
+              autoFocus
+            />
+          </Form.ControlRow>
           <FormButtons
             isDisabled={!canSubmit}
             onReset={onReset}

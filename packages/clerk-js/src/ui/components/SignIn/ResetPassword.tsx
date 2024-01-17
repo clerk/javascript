@@ -140,6 +140,7 @@ export const _ResetPassword = () => {
             )}
             <Form.SubmitButton
               isDisabled={!canSubmit}
+              sx={t => ({ marginTop: t.space.$2 })}
               localizationKey={localizationKeys('signIn.resetPassword.formButtonPrimary')}
             />
           </Form.Root>

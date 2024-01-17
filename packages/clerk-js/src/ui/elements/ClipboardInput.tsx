@@ -22,18 +22,18 @@ export const ClipboardInput = (props: PropsOfComponent<typeof Input>) => {
 
       <Button
         elementDescriptor={descriptors.formFieldInputCopyToClipboardButton}
-        variant='secondary'
+        variant='ghost'
         tabIndex={-1}
         onClick={onCopy}
-        sx={theme => ({
+        sx={{
           position: 'absolute',
           right: 0,
-          marginRight: theme.space.$3,
-        })}
+        }}
       >
         <Icon
           elementDescriptor={descriptors.formFieldInputCopyToClipboardIcon}
           icon={hasCopied ? TickShield : Clipboard}
+          size='sm'
         />
       </Button>
     </Flex>
