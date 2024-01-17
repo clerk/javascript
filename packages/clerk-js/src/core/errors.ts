@@ -8,8 +8,8 @@ export function clerkErrorInitFailed(): never {
   throw new Error(`${errorPrefix} Something went wrong initializing Clerk.`);
 }
 
-export function clerkErrorDevInitFailed(msg?: string): never {
-  throw new Error(`${errorPrefix} Something went wrong initializing Clerk in development mode${msg && ` - ${msg}`}.`);
+export function clerkErrorDevInitFailed(msg: string = ''): never {
+  throw new Error(`${errorPrefix} Something went wrong initializing Clerk in development mode.${msg && ` ${msg}`}`);
 }
 
 export function clerkErrorPathRouterMissingPath(componentName: string): never {
