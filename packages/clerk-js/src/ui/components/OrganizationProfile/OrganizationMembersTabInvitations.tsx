@@ -29,7 +29,7 @@ export const OrganizationMembersTabInvitations = () => {
             sx={t => ({
               width: '100%',
               gap: t.space.$8,
-              paddingBottom: `${t.space.$4}`,
+              paddingBottom: t.space.$4,
               borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
               [mqu.md]: {
                 flexDirection: 'column',

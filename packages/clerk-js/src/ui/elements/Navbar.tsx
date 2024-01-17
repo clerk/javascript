@@ -262,6 +262,7 @@ const NavButton = (props: NavButtonProps) => {
       size='md'
       isActive={isActive}
       hoverAsFocus
+      focusRing={false}
       {...rest}
       sx={[
         t => ({
@@ -269,9 +270,6 @@ const NavButton = (props: NavButtonProps) => {
           justifyContent: 'flex-start',
           backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
           opacity: isActive ? 1 : 0.6,
-          ':focus': {
-            boxShadow: 'none',
-          },
         }),
         sx,
       ]}
