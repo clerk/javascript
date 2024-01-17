@@ -1,4 +1,6 @@
 import { DEV_BROWSER_JWT_HEADER, getDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
+import { parseErrors } from '@clerk/shared/error';
+import type { ClerkAPIErrorJSON } from '@clerk/types';
 
 import { isDevOrStagingUrl } from '../utils';
 import { getDevBrowserCookie, removeDevBrowserCookie, setDevBrowserCookie } from '../utils/cookies/devBrowser';
@@ -83,15 +85,21 @@ export function createDevBrowser({ frontendApi, fapiClient }: CreateDevBrowserOp
       path: '/dev_browser',
     });
 
-    const resp = await fetch(createDevBrowserUrl.toString(), {
+    const response = await fetch(createDevBrowserUrl.toString(), {
       method: 'POST',
     });
 
-    if (!resp.ok) {
-      clerkErrorDevInitFailed();
+    if (!response.ok) {
+      const data = await response.json();
+      const errors = parseErrors(data.errors as ClerkAPIErrorJSON[]);
+      if (errors[0]) {
+        clerkErrorDevInitFailed(errors[0].longMessage);
+      } else {
+        clerkErrorDevInitFailed();
+      }
     }
 
-    const data = await resp.json();
+    const data = await response.json();
     setDevBrowserJWT(data?.token);
   }
 
