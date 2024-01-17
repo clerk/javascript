@@ -5,4 +5,4 @@ import type { HTMLInputTypeAttribute } from 'react';
  */
 export type ClerkInputType = HTMLInputTypeAttribute | 'otp';
 
-export type FieldState = 'valid' | 'invalid';
+export type FieldStates = 'valid' | 'invalid';

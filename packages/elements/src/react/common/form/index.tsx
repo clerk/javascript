@@ -32,7 +32,7 @@ import {
 } from '~/internals/machines/form/form.context';
 import type { FieldDetails } from '~/internals/machines/form/form.types';
 
-import type { ClerkInputType, FieldState } from './types';
+import type { ClerkInputType, FieldStates } from './types';
 
 const FieldContext = createContext<Pick<FieldDetails, 'name'> | null>(null);
 const useFieldContext = () => useContext(FieldContext);
@@ -197,7 +197,7 @@ function InnerField(props: FormFieldProps) {
  * A helper to access the state of the field programmatically. This can be useful if you need to trigger
  * animations or certain behavior based on the field's state independent of the existing components.
  */
-function FieldState({ children }: { children: (state: { state: FieldState }) => ReactNode }) {
+function FieldState({ children }: { children: (state: { state: FieldStates }) => ReactNode }) {
   const field = useFieldContext();
   const error = useFormSelector(fieldErrorsSelector(field?.name));
   const state = error ? ('invalid' as const) : ('valid' as const);
