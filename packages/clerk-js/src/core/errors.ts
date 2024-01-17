@@ -119,3 +119,7 @@ export function clerkFailedToLoadThirdPartyScript(name?: string): never {
 export function clerkInvalidRoutingStrategy(strategy?: string): never {
   throw new Error(`${errorPrefix} Invalid routing strategy, path cannot be used in tandem with ${strategy}.`);
 }
+
+export function clerkUnsupportedReloadMethod(className: string): never {
+  throw new Error(`${errorPrefix} Calling ${className}.reload is not currently supported. Please contact support.`);
+}
