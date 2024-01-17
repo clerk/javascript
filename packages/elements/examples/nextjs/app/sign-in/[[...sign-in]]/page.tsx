@@ -57,7 +57,7 @@ function OTPInputSegment({ value, status }: any) {
           data-state={state}
           data-status={status}
           className={clsx(
-            'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 bg-white border-[var(--border-color)] [--border-color:theme(colors.gray.300)] data-[state="invalid"]:[--border-color:theme(colors.red.500)] data-[state="success"]:[--border-color:theme(colors.green.500)] text-lg text-black self-stretch',
+            'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 bg-white border-[var(--border-color)] [--border-color:theme(colors.gray.300)] data-[state="invalid"]:[--border-color:theme(colors.red.500)] text-lg text-black self-stretch',
             (status === 'cursor' || status === 'selected') &&
               '[--border-color:theme(colors.purple.500)] shadow-[theme(colors.purple.500_0_0_0_1px)]',
             status === 'selected' && 'bg-purple-100',
