@@ -81,6 +81,7 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
           gap: 0,
           justifyContent: 'center',
           padding: t.space.$1,
+          minHeight: 0,
         }),
         sx,
       ]}
