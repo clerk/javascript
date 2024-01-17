@@ -261,6 +261,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
       onClick={onClick}
       disabled={isDisabled}
       css={applyVariants(parsedProps) as any}
+      data-variant={props.variant || 'primary'}
       ref={ref}
     >
       {isLoading && (
@@ -309,6 +310,7 @@ const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, re
       onClick={onClick}
       css={applyVariants(parsedProps) as any}
       disabled={isDisabled}
+      data-variant={props.variant || 'primary'}
       ref={ref}
     >
       {children}
