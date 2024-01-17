@@ -30,7 +30,6 @@ export const RemoveResourceForm = withCardStateProvider((props: RemoveFormProps)
       headerSubtitle={messageLine1}
     >
       <Form.Root onSubmit={handleSubmit}>
-        {/*<Text localizationKey={messageLine1} />*/}
         <Text
           colorScheme='neutral'
           localizationKey={messageLine2}
