@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.37.3
+
+### Patch Changes
+
+- Add the following properties to `users.updateUser(userId, params)` params: ([#2628](https://github.com/clerk/javascript/pull/2628)) by [@dimkl](https://github.com/dimkl)
+
+  - `password_hasher`
+  - `password_digest`
+  - `publicMetadata`
+  - `privateMetadata`
+  - `unsafeMetadata`
+
 ## 0.37.2
 
 ### Patch Changes
