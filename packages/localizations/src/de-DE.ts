@@ -669,9 +669,7 @@ export const deDE: LocalizationResource = {
       title: 'Telefonnummer hinzufügen',
     },
     profilePage: {
-      fileDropAreaAction: 'Datei auswählen',
       fileDropAreaHint: 'Laden Sie ein JPG-, PNG-, GIF- oder WEBP-Bild hoch, welches kleiner als 10 MB ist',
-      fileDropAreaTitle: 'Datei hierher ziehen, oder...',
       imageFormDestructiveActionSubtitle: 'Bild entfernen',
       imageFormSubtitle: 'Bild hochladen',
       imageFormTitle: 'Profilbild',

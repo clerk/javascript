@@ -652,9 +652,7 @@ export const heIL: LocalizationResource = {
       title: 'הוסף מספר טלפון',
     },
     profilePage: {
-      fileDropAreaAction: 'בחר קובץ',
       fileDropAreaHint: 'העלה תמונה בפורמט JPG, PNG, GIF, או WEBP הקטנה מ-10 מ"ב',
-      fileDropAreaTitle: 'גרור קובץ לכאן, או...',
       imageFormDestructiveActionSubtitle: 'הסר תמונה',
       imageFormSubtitle: 'העלה תמונה',
       imageFormTitle: 'תמונת פרופיל',

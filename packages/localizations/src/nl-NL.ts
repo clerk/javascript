@@ -661,9 +661,7 @@ export const nlNL: LocalizationResource = {
       title: 'Telefoonnummer toevoegen',
     },
     profilePage: {
-      fileDropAreaAction: 'Selecteer bestand',
       fileDropAreaHint: 'Upload een JPG, PNG, GIF, of WEBP afbeelding kleiner dan 10 MB',
-      fileDropAreaTitle: 'Sleep afbeelding hier, of ...',
       imageFormDestructiveActionSubtitle: 'Verwijder afbeelding',
       imageFormSubtitle: 'Afbeelding uploaden',
       imageFormTitle: 'Profielfoto',

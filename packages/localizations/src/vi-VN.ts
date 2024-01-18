@@ -663,9 +663,7 @@ export const viVN: LocalizationResource = {
       title: 'Thêm số điện thoại',
     },
     profilePage: {
-      fileDropAreaAction: 'Chọn tệp',
       fileDropAreaHint: 'Tải lên ảnh JPG, PNG, GIF, hoặc WEBP có dung lượng nhỏ hơn 10 MB',
-      fileDropAreaTitle: 'Kéo và thả tệp vào đây, hoặc...',
       imageFormDestructiveActionSubtitle: 'Xóa ảnh',
       imageFormSubtitle: 'Tải ảnh lên',
       imageFormTitle: 'Hình ảnh hồ sơ',

@@ -332,8 +332,6 @@ export const bgBG: LocalizationResource = {
       imageFormTitle: 'Профилна снимка',
       imageFormSubtitle: 'Качи',
       imageFormDestructiveActionSubtitle: 'Премахни',
-      fileDropAreaTitle: 'Влачете файл тук или...',
-      fileDropAreaAction: 'Изберете файл',
       fileDropAreaHint: 'Препоръчителен размер 1:1, до 10MB.',
       readonly: 'Информацията ви за профила е предоставена от корпоративната връзка и не може да бъде редактирана.',
       successMessage: 'Вашият профил е актуализиран.',

@@ -666,9 +666,7 @@ export const esMX: LocalizationResource = {
       title: 'Agregar el número de teléfono',
     },
     profilePage: {
-      fileDropAreaAction: 'Seleccione archivo',
       fileDropAreaHint: 'Cargue una imagen JPG, PNG, GIF o WEBP de menos de 10 MB',
-      fileDropAreaTitle: 'Arrastre el archivo aquí, o...',
       imageFormDestructiveActionSubtitle: 'Eliminar la imagen',
       imageFormSubtitle: 'Cargar imagen',
       imageFormTitle: 'Imagen de perfil',

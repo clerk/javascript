@@ -670,9 +670,7 @@ export const elGR: LocalizationResource = {
       title: 'Προσθήκη αριθμού τηλεφώνου',
     },
     profilePage: {
-      fileDropAreaAction: 'Επιλέξτε αρχείο',
       fileDropAreaHint: 'Ανεβάστε μια εικόνα σε μορφή JPG, PNG, GIF ή WEBP μικρότερη των 10 MB',
-      fileDropAreaTitle: 'Σύρετε το αρχείο εδώ ή...',
       imageFormDestructiveActionSubtitle: 'Αφαίρεση εικόνας',
       imageFormSubtitle: 'Ανέβασμα εικόνας',
       imageFormTitle: 'Εικόνα προφίλ',
