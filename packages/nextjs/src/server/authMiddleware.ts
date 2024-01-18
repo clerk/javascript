@@ -1,5 +1,5 @@
 import type { AuthenticateRequestOptions, AuthObject, ClerkRequest } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
@@ -9,8 +9,9 @@ import { isRedirect, mergeResponses, serverRedirectWithAuth, setHeader, stringif
 import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
 import { createAuthenticateRequestOptions } from './clerkMiddleware';
-import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { SECRET_KEY } from './constants';
 import { informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
+import { redirectToSignIn } from './redirectHelpers';
 import type { RouteMatcherParam } from './routeMatcher';
 import { createRouteMatcher } from './routeMatcher';
 import type { NextMiddlewareReturn } from './types';
@@ -240,16 +241,7 @@ const createDefaultAfterAuth = (
       } else {
         informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, false);
       }
-
-      return createRedirect({
-        redirectAdapter: url => {
-          return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
-        },
-        baseUrl: req.experimental_clerkUrl,
-        signInUrl: SIGN_IN_URL,
-        signUpUrl: SIGN_UP_URL,
-        publishableKey: PUBLISHABLE_KEY,
-      }).redirectToSignIn({ returnBackUrl: req.experimental_clerkUrl.href });
+      return redirectToSignIn({ returnBackUrl: req.experimental_clerkUrl.href });
     }
     return NextResponse.next();
   };
