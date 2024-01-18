@@ -1,6 +1,6 @@
 'use client';
 
-import { ClerkError, Field, FieldState, Input, Label, Submit } from '@clerk/elements';
+import { ClerkError, Field as ElementsField, FieldState, Input, Label, Submit } from '@clerk/elements';
 import clsx from 'clsx';
 import { forwardRef } from 'react';
 
@@ -39,7 +39,7 @@ export const CustomField = forwardRef<Input, { name: string; label: string }>(fu
         };
 
   return (
-    <Field
+    <ElementsField
       name={name}
       className='flex flex-col gap-4'
     >
@@ -54,7 +54,7 @@ export const CustomField = forwardRef<Input, { name: string; label: string }>(fu
 
       <ClerkError className='block text-red-400 font-mono' />
       <FieldState>{({ state }) => <pre className='opacity-60 text-xs'>Field state: {state}</pre>}</FieldState>
-    </Field>
+    </ElementsField>
   );
 });
 
@@ -70,3 +70,8 @@ export const CustomSubmit = forwardRef<HTMLButtonElement, React.ComponentPropsWi
     );
   },
 );
+
+const Field = CustomField;
+const Submit = CustomSubmit;
+
+export { Field, Submit };

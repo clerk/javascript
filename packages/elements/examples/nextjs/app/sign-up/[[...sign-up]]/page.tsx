@@ -8,28 +8,12 @@ import {
   SignUpStart,
   SignUpStrategy,
   SignUpVerify,
-  Submit,
 } from '@clerk/elements';
-import { forwardRef } from 'react';
 
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
 import { SignUpDebug } from '@/components/sign-up-debug';
 import { SocialProviderIcon } from '@/components/social-providers';
-
-const CustomButton = forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(function CustomButton(
-  props,
-  forwardedRef,
-) {
-  return (
-    <button
-      className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'
-      {...props}
-      type='submit'
-      ref={forwardedRef}
-    />
-  );
-});
 
 export default function SignUpPage() {
   return (
@@ -78,9 +62,8 @@ export default function SignUpPage() {
                 label='Password'
                 name='password'
               />
-              <Submit asChild>
-                <CustomButton>Sign Up</CustomButton>
-              </Submit>
+
+              <CustomSubmit>Sign Up</CustomSubmit>
             </div>
           </div>
         </SignUpStart>
