@@ -60,7 +60,7 @@ type CreateUserParams = {
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);
 
-interface UpdateUserParams extends UserMetadataParams {
+type UpdateUserParams = {
   firstName?: string;
   lastName?: string;
   username?: string;
@@ -76,7 +76,8 @@ interface UpdateUserParams extends UserMetadataParams {
   externalId?: string;
   createdAt?: Date;
   createOrganizationEnabled?: boolean;
-}
+} & UserMetadataParams &
+  (UserPasswordHashingParams | object);
 
 type GetOrganizationMembershipListParams = {
   userId: string;
