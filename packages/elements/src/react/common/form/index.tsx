@@ -13,7 +13,7 @@ import {
   Label as RadixLabel,
   Submit,
 } from '@radix-ui/react-form';
-import type { CSSProperties, HTMLProps, ReactNode } from 'react';
+import type { ComponentProps, CSSProperties, HTMLProps, ReactNode } from 'react';
 import React, {
   createContext,
   forwardRef,
@@ -46,9 +46,8 @@ const useFieldContext = () => useContext(FieldContext);
  * Provides the form submission handler along with the form's validity via a data attribute
  */
 const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
-  const ref = useFormStore();
   const error = useFormSelector(globalErrorsSelector);
-  const validity = error.length > 0 ? 'invalid' : 'valid';
+  const validity = error ? 'invalid' : 'valid';
 
   // Register the onSubmit handler for form submission
   // TODO: merge user-provided submit handler
@@ -63,7 +62,6 @@ const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }
   );
 
   return {
-    ref,
     props: {
       [`data-${validity}`]: true,
       onSubmit,
@@ -386,7 +384,36 @@ function Label(props: FormLabelProps) {
 // ================= ERRORS ================= //
 
 type ClerkElementsErrorsRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
+type ClerkErrorChildrenFn = ((error: ClerkElementsErrorsRenderProps) => React.ReactNode) | React.ReactNode;
 type ClerkErrorProps = ClerkGlobalErrorProps | ClerkFieldErrorProps;
+
+type ClerkGlobalErrorProps = Omit<ComponentProps<'span'>, 'children'> &
+  (
+    | {
+        children?: ClerkErrorChildrenFn;
+        code?: string;
+        name?: never;
+      }
+    | {
+        children: React.ReactNode;
+        code: string;
+        name?: never;
+      }
+  );
+
+type ClerkFieldErrorProps = Omit<FormMessageProps, 'asChild' | 'children'> &
+  (
+    | {
+        children?: ClerkErrorChildrenFn;
+        code?: string;
+        name: string;
+      }
+    | {
+        children: React.ReactNode;
+        code: string;
+        name: string;
+      }
+  );
 
 /**
  * Component used to render:
@@ -410,20 +437,6 @@ function ClerkError({ name, ...rest }: ClerkErrorProps) {
   return <GlobalError {...rest} />;
 }
 
-type ClerkGlobalErrorProps = Omit<FormMessageProps, 'asChild' | 'children'> &
-  (
-    | {
-        children?: OptionalFnChildren;
-        code?: string;
-        name?: never;
-      }
-    | {
-        children: React.ReactNode;
-        code: string;
-        name?: never;
-      }
-  );
-
 function GlobalError({ children, code, ...rest }: ClerkGlobalErrorProps) {
   const { errors } = useGlobalErrors();
 
@@ -444,20 +457,6 @@ function GlobalError({ children, code, ...rest }: ClerkGlobalErrorProps) {
     </span>
   );
 }
-type OptionalFnChildren = ((error: ClerkElementsErrorsRenderProps) => React.ReactNode) | React.ReactNode;
-type ClerkFieldErrorProps = Omit<FormMessageProps, 'asChild' | 'children'> &
-  (
-    | {
-        name: string;
-        code?: string;
-        children?: OptionalFnChildren;
-      }
-    | {
-        name: string;
-        code: string;
-        children: React.ReactNode;
-      }
-  );
 
 function FieldError({ children, code, name, ...rest }: ClerkFieldErrorProps) {
   const fieldContext = useFieldContext();

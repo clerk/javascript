@@ -78,7 +78,6 @@ export default function SignUpPage() {
                 label='Password'
                 name='password'
               />
-
               <Submit asChild>
                 <CustomButton>Sign Up</CustomButton>
               </Submit>
@@ -97,17 +96,14 @@ export default function SignUpPage() {
                 label='First Name'
                 name='firstName'
               />
-
               <CustomField
                 label='Last Name'
                 name='lastName'
               />
-
               <CustomField
                 label='Username'
                 name='username'
               />
-
               <CustomField
                 label='Phone'
                 name='phoneNumber'
