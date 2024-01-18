@@ -40,6 +40,9 @@ const reactChangesList = [
 	'withuser-hof-removed',
 	'multisessionappsupport-import-change',
 	'clerkprovideroptionswrapper-dropped',
+	'aftersignouturl-behavior-change',
+	'aftersigninurl-behavior-change',
+	'aftersignupurl-behavior-change',
 ];
 
 export default {
@@ -112,6 +115,9 @@ export default {
 		'withsession-hof-removed',
 		'withuser-hof-removed',
 		'next-public-clerk-js-url',
+		'aftersignouturl-behavior-change',
+		'aftersigninurl-behavior-change',
+		'aftersignupurl-behavior-change',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -143,6 +149,9 @@ export default {
 		'magiclinkerrorcode',
 		'usemagiclink',
 		'setsession',
+		'aftersignouturl-behavior-change',
+		'aftersigninurl-behavior-change',
+		'aftersignupurl-behavior-change',
 	]),
 	expo: load('expo', [
 		'apikey-to-publishable-key',
@@ -162,6 +171,9 @@ export default {
 		'button-to-organizationlistcreateorganizationactionbutton',
 		'remove-socialbuttonsblockbuttonarrow',
 		'remove-identitypreview-avatar',
+		'aftersignouturl-behavior-change',
+		'aftersigninurl-behavior-change',
+		'aftersignupurl-behavior-change',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -237,6 +249,9 @@ export default {
 		'user-getorganizationinvitations-arguments-chanaged',
 		'user-getorganizationsuggestions-arguments-chanaged',
 		'user-getorganizationmemberships-arguments-chanaged',
+		'aftersignouturl-behavior-change',
+		'aftersigninurl-behavior-change',
+		'aftersignupurl-behavior-change',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',
