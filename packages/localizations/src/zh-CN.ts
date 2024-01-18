@@ -648,9 +648,7 @@ export const zhCN: LocalizationResource = {
       title: '添加电话号码',
     },
     profilePage: {
-      fileDropAreaAction: '选择文件',
       fileDropAreaHint: '上传小于10MB的JPG, PNG, GIF, 或WEBP格式的图片',
-      fileDropAreaTitle: '拖拽文件到这里，或者...',
       imageFormDestructiveActionSubtitle: '移除图片',
       imageFormSubtitle: '上传图片',
       imageFormTitle: '个人资料图片',

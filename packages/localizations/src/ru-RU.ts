@@ -667,9 +667,7 @@ export const ruRU: LocalizationResource = {
       title: 'Добавить номер телефона',
     },
     profilePage: {
-      fileDropAreaAction: 'Выберите файл',
       fileDropAreaHint: 'Загрузите изображение в форматах JPG, PNG, GIF или WEBP размером меньше 10 МБ',
-      fileDropAreaTitle: 'Перетащите файл сюда или...',
       imageFormDestructiveActionSubtitle: 'Удалить изображение',
       imageFormSubtitle: 'Загрузить изображение',
       imageFormTitle: 'Изображение профиля',

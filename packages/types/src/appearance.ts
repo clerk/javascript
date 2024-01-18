@@ -371,14 +371,6 @@ export type ElementsConfig = {
   impersonationFabTitle: WithOptions;
   impersonationFabActionLink: WithOptions;
 
-  fileDropAreaOuterBox: WithOptions;
-  fileDropAreaBox: WithOptions;
-  fileDropAreaIconBox: WithOptions;
-  fileDropAreaIcon: WithOptions;
-  fileDropAreaHint: WithOptions;
-  fileDropAreaButtonPrimary: WithOptions;
-  fileDropAreaFooterHint: WithOptions;
-
   invitationsSentIconBox: WithOptions;
   invitationsSentIcon: WithOptions;
 

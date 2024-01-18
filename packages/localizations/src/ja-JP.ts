@@ -659,9 +659,7 @@ export const jaJP: LocalizationResource = {
       title: '電話番号の追加',
     },
     profilePage: {
-      fileDropAreaAction: 'ファイルの選択',
       fileDropAreaHint: '10MB未満のJPG、PNG、GIF、またはWEBP画像をアップロードしてください',
-      fileDropAreaTitle: 'ファイルをここにドラッグするか、...',
       imageFormDestructiveActionSubtitle: '画像の削除',
       imageFormSubtitle: '画像のアップロード',
       imageFormTitle: 'プロフィール画像',

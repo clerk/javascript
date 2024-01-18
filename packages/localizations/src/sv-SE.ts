@@ -661,9 +661,7 @@ export const svSE: LocalizationResource = {
       title: 'Lägg till telefonnummer',
     },
     profilePage: {
-      fileDropAreaAction: 'Välj fil',
       fileDropAreaHint: 'Ladda upp en JPG, PNG, GIF, eller WEBP bild som är mindre än 10 MB',
-      fileDropAreaTitle: 'Dra filen hit, eller...',
       imageFormDestructiveActionSubtitle: 'Ta bort bild',
       imageFormSubtitle: 'Ladda upp bild',
       imageFormTitle: 'Profilbild',

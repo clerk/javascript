@@ -662,9 +662,7 @@ export const daDK: LocalizationResource = {
       title: 'Tilføj telefonnummer',
     },
     profilePage: {
-      fileDropAreaAction: 'Select file',
       fileDropAreaHint: 'Upload a JPG, PNG, GIF, or WEBP image smaller than 10 MB',
-      fileDropAreaTitle: 'Drag file here, or...',
       imageFormDestructiveActionSubtitle: 'Remove image',
       imageFormSubtitle: 'Upload image',
       imageFormTitle: 'Profile image',

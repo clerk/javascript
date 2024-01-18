@@ -663,9 +663,7 @@ export const trTR: LocalizationResource = {
       title: 'Telefon numarası ekle',
     },
     profilePage: {
-      fileDropAreaAction: 'Dosya seç',
       fileDropAreaHint: "10 MB'tan küçük boyutta bir JPG, PNG, GIF, veya WEBP dosyası yükle",
-      fileDropAreaTitle: 'Dosyayı buraya sürükle, veya...',
       imageFormDestructiveActionSubtitle: 'Görseli kaldır',
       imageFormSubtitle: 'Görsel yükle',
       imageFormTitle: 'Profil görseli',

@@ -653,9 +653,7 @@ export const koKR: LocalizationResource = {
       title: '휴대폰 번호 추가',
     },
     profilePage: {
-      fileDropAreaAction: '파일 선택',
       fileDropAreaHint: '10MB보다 작은 JPG, PNG, GIF 또는 WEBP 이미지를 업로드합니다',
-      fileDropAreaTitle: '이미지를 이곳에 드래그 하세요 또는...',
       imageFormDestructiveActionSubtitle: '이미지 제거',
       imageFormSubtitle: '이미지 업로드',
       imageFormTitle: '프로필 이미지',

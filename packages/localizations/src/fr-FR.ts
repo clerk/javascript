@@ -667,9 +667,7 @@ export const frFR: LocalizationResource = {
       title: 'Ajouter un numéro de téléphone',
     },
     profilePage: {
-      fileDropAreaAction: 'Choisir le dossier',
       fileDropAreaHint: 'Téléchargez une image JPG, PNG, GIF ou WEBP inférieure à 10 Mo',
-      fileDropAreaTitle: 'Faites glisser le fichier ici, ou...',
       imageFormDestructiveActionSubtitle: "Supprimer l'image",
       imageFormSubtitle: 'Télécharger une image',
       imageFormTitle: 'Photo de profil',

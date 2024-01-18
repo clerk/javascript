@@ -671,9 +671,7 @@ export const ptBR: LocalizationResource = {
       title: 'Adicionar telefone',
     },
     profilePage: {
-      fileDropAreaAction: 'Selecione uma imagem',
       fileDropAreaHint: 'Carregue uma imagem JPG, PNG, GIF ou WEBP menor que 10 MB',
-      fileDropAreaTitle: 'Arraste o arquivo aqui ou...',
       imageFormDestructiveActionSubtitle: 'Remover imagem',
       imageFormSubtitle: 'Carregar imagem',
       imageFormTitle: 'Imagem do perfil',
