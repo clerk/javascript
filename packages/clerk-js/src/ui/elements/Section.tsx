@@ -2,7 +2,7 @@ import type { ProfileSectionId } from '@clerk/types';
 import { isValidElement } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
+import { Box, Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { Plus } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
@@ -11,12 +11,13 @@ import { ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
-  subtitle?: LocalizationKey;
   id: ProfileSectionId;
+  willGrow?: boolean;
+  headerSx?: ThemableCssProp;
 };
 
 const ProfileSectionRoot = (props: ProfileSectionProps) => {
-  const { title, children, id, subtitle, sx, ...rest } = props;
+  const { title, children, id, sx, willGrow = false, headerSx, ...rest } = props;
   return (
     <Flex
       elementDescriptor={descriptors.profileSection}
@@ -38,7 +39,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
       <Col
         elementDescriptor={descriptors.profileSectionHeader}
         elementId={descriptors.profileSectionHeader.setId(id)}
-        sx={t => ({ gap: t.space.$1, width: t.space.$66 })}
+        sx={[t => ({ width: t.space.$66 }), headerSx]}
       >
         <SectionHeader
           localizationKey={title}
@@ -46,17 +47,16 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           elementId={descriptors.profileSectionTitle.setId(id)}
           textElementDescriptor={descriptors.profileSectionTitleText}
           textElementId={descriptors.profileSectionTitleText.setId(id)}
-          sx={t => ({ padding: `${t.space.$2} ${t.space.$none}` })}
+          sx={t => ({ padding: `${t.space.$2} ${t.space.$none}`, flexGrow: '0' })}
         />
-        {subtitle && (
-          <SectionSubHeader
-            localizationKey={subtitle}
-            elementDescriptor={descriptors.profileSectionSubtitle}
-            elementId={descriptors.profileSectionSubtitle.setId(id)}
-            textElementDescriptor={descriptors.profileSectionSubtitleText}
-            textElementId={descriptors.profileSectionSubtitleText.setId(id)}
-          />
-        )}
+        <Box
+          sx={{
+            height: 'auto',
+            flexShrink: '1',
+            flexGrow: willGrow ? '1' : '0',
+            transition: 'all 0.2s ease',
+          }}
+        />
       </Col>
       <Col
         elementDescriptor={descriptors.profileSectionContent}
@@ -265,22 +265,6 @@ export const SectionHeader = (props: SectionHeaderProps) => {
       <Text
         localizationKey={localizationKey}
         variant='subtitle'
-        elementDescriptor={textElementDescriptor}
-        elementId={textElementId}
-      />
-    </Flex>
-  );
-};
-export const SectionSubHeader = (props: SectionHeaderProps) => {
-  const { textElementDescriptor, textElementId, localizationKey, ...rest } = props;
-  return (
-    <Flex
-      {...rest}
-      sx={t => ({ padding: `${t.space.$2} ${t.space.$none}` })}
-    >
-      <Text
-        localizationKey={localizationKey}
-        colorScheme='neutral'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
       />

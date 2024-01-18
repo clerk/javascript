@@ -1,4 +1,5 @@
 import { useUser } from '@clerk/shared/react';
+import { useState } from 'react';
 
 import { Button, localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
@@ -19,6 +20,7 @@ const ProfileScreen = () => {
 
 export const UserProfileSection = () => {
   const { user } = useUser();
+  const [action, setAction] = useState<string | null>(null);
 
   if (!user) {
     return null;
@@ -30,9 +32,17 @@ export const UserProfileSection = () => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.profileSection.title')}
       id='profile'
+      willGrow={action === 'edit'}
+      headerSx={{
+        height: '100%',
+        justifyContent: 'center',
+      }}
       sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
     >
-      <Action.Root>
+      <Action.Root
+        action={action}
+        onActionChange={setAction}
+      >
         <Action.Closed value='edit'>
           <ProfileSection.Item
             id='profile'
