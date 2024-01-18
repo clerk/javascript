@@ -279,7 +279,11 @@ export default {
 		'useorganizationlist-organizationlist', // shared outside this pkg?
 	]),
 	chromeExtension: load('chromeExtension', ['clerkprovider-tokencache']),
-	localizations: load('localization', ['new-localization-keys']),
+	localizations: load('localization', [
+		'new-localization-keys',
+		'removed-localization-keys',
+		'changed-localization-keys',
+	]),
 	types: [],
 	backend: [],
 	// backend: load('backend', [
