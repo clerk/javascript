@@ -1,6 +1,7 @@
 ---
 title: '`signJwt` import moved to `@clerk/backend/tokens`'
 matcher: "import\\s+{[\\s\\S]*?signJwt[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)['\"]"
+matcherFlags: 'm'
 replaceWithString: 'backend/tokens'
 ---
 

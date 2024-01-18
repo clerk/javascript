@@ -1,6 +1,7 @@
 ---
 title: '`createIsomorphicRequest` import moved to `@clerk/backend/internal`'
 matcher: "import\\s+{[\\s\\S]*?createIsomorphicRequest[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)['\"]"
+matcherFlags: 'm'
 replaceWithString: 'backend/internal'
 ---
 

@@ -1,12 +1,12 @@
 ---
-title: '`getPendingOrganizationInvitationList` -> `getOrganizationInvitationList`'
-matcher: 'getPendingOrganizationInvitationList'
+title: '`Organizations.getPendingOrganizationInvitationList` -> `getOrganizationInvitationList`'
+matcher: "\\.(getPendingOrganizationInvitationList)\\("
 replaceWithString: 'getOrganizationInvitationList'
 ---
 
-Use `getOrganizationInvitationList` with a `status` option instead.
+The `Organizations.getPendingOrganizationInvitationList` method has been removed. To match the same functionality, use `Organizations.getOrganizationInvitationList` and pass in `status` option as "pending" instead.
 
 ```diff
-- getPendingOrganizationInvitationList({ organizationId: "" })
-+ getOrganizationInvitationList({ organizationId: "", status: "pending" })
+- clerkClient.organizations.getPendingOrganizationInvitationList()
++ clerkClient.organizations.getOrganizationInvitationList({ status: "pending" })
 ```

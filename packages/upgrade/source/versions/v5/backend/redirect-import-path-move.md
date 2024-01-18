@@ -1,6 +1,7 @@
 ---
 title: '`redirect` import moved to `@clerk/backend/internal`'
 matcher: "import\\s+{[\\s\\S]*?redirect[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)['\"]"
+matcherFlags: 'm'
 replaceWithString: 'backend/internal'
 ---
 

@@ -285,28 +285,29 @@ export default {
 		'changed-localization-keys',
 	]),
 	types: [],
-	backend: [],
-	// backend: load('backend', [
-	//  'verifyjwt-import-path-move'
-	//  'decodejwt-import-path-move'
-	//  'signjwt-import-path-move'
-	//  'constants-import-path-move'
-	//  'redirect-import-path-move'
-	//  'createauthenticaterequest-import-path-move'
-	//  'createisomorphicrequest-import-path-move'
-	// 	'createclerkclient-frontendapi',
-	//  'authenticaterequest-params-change',
-	// 	'clerk-import',
-	// 	'externalaccount-picture',
-	// 	'externalaccountjson-avatarurl',
-	// 	'organization-logourl',
-	// 	'organizationjson-logourl',
-	// 	'user-profileimageurl',
-	// 	'userjson-profileimageurl',
-	// 	'organizationmembershippublicuserdata-profileimageurl',
-	// 	'organizationmembershippublicuserdatajson-profileimageurl',
-	// 	'clockskewinseconds',
-	// ]),
+	backend: load('backend', [
+		'api-url-value-changed',
+		'verifyjwt-import-path-move',
+		'decodejwt-import-path-move',
+		'signjwt-import-path-move',
+		'constants-import-path-move',
+		'redirect-import-path-move',
+		'createauthenticaterequest-import-path-move',
+		'createisomorphicrequest-import-path-move',
+		'createclerkclient-frontendapi',
+		'authenticaterequest-params-change',
+		'clerk-import',
+		'externalaccount-picture',
+		'externalaccountjson-avatarurl',
+		'organization-logourl',
+		'organizationjson-logourl',
+		'user-profileimageurl',
+		'userjson-profileimageurl',
+		'organizationmembershippublicuserdata-profileimageurl',
+		'organizationmembershippublicuserdatajson-profileimageurl',
+		'clockskewinseconds',
+		'pkgversion',
+	]),
 };
 
 function dedupeMerge(arr1, arr2) {
