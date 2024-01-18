@@ -1,4 +1,4 @@
-import type { OAuthStrategy, SignInStrategy, Web3Strategy } from '@clerk/types';
+import type { OAuthProvider, OAuthStrategy, SignInStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import { createActorContext } from '@xstate/react';
 import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
@@ -6,6 +6,7 @@ import type { SnapshotFrom } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import { matchStrategy } from '~/internals/machines/utils/strategies';
+import type { UseThirdPartyProviderReturn } from '~/react/common/third-party-providers/social-provider';
 import {
   getEnabledThirdPartyProviders,
   isAuthenticatableOauthStrategy,
@@ -51,6 +52,12 @@ const clerkEnvironmentSelector = (state: SnapshotState) => state.context.clerk._
  */
 const clerkCurrentStrategy = (state: SnapshotState) => state.context.currentFactor?.strategy;
 
+/**
+ * Selects the clerk third-party provider
+ */
+const clerkThirdPartyProviderSelector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotState) =>
+  state.context.thirdPartyProviders.providerToDisplayData[provider];
+
 // ================= HOOKS ================= //
 
 export function useStrategy(name: SignInStrategyName) {
@@ -95,6 +102,8 @@ export function useSignInStrategies(_preferred?: SignInStrategy) {
 
 /**
  * Provides the onClick handler for oauth
+ *
+ * @experimental
  */
 export const useSignInThirdPartyProviders = () => {
   const ref = useSignInFlow();
@@ -130,6 +139,38 @@ export const useSignInThirdPartyProviders = () => {
   return {
     ...providers,
     createOnClick,
+  };
+};
+
+export const useSignInThirdPartyProvider = (provider: OAuthProvider | Web3Provider): UseThirdPartyProviderReturn => {
+  const ref = useSignInFlow();
+  const details = useSignInFlowSelector(clerkThirdPartyProviderSelector(provider));
+
+  const authenticate = useCallback(
+    (event: React.MouseEvent<Element>) => {
+      if (!details) return;
+
+      event.preventDefault();
+
+      if (provider === 'metamask') {
+        return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_metamask_signature' });
+      }
+
+      return ref.send({ type: 'AUTHENTICATE.OAUTH', strategy: `oauth_${provider}` });
+    },
+    [provider, details, ref],
+  );
+
+  if (!details) {
+    console.warn(`Please ensure that ${provider} is enabled.`);
+    return null;
+  }
+
+  return {
+    events: {
+      authenticate,
+    },
+    ...details,
   };
 };
 

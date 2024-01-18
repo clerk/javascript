@@ -1,13 +1,18 @@
-import type { FormControlProps, FormFieldProps, FormLabelProps, FormProps } from '@radix-ui/react-form';
+import type {
+  FormControlProps,
+  FormFieldProps,
+  FormLabelProps,
+  FormMessageProps,
+  FormProps,
+} from '@radix-ui/react-form';
 import {
   Control as RadixControl,
   Field as RadixField,
   Form as RadixForm,
+  FormMessage,
   Label as RadixLabel,
-  Message as RadixMessage,
   Submit,
 } from '@radix-ui/react-form';
-import { Slot } from '@radix-ui/react-slot';
 import type { CSSProperties, HTMLProps, ReactNode } from 'react';
 import React, {
   createContext,
@@ -41,9 +46,9 @@ const useFieldContext = () => useContext(FieldContext);
  * Provides the form submission handler along with the form's validity via a data attribute
  */
 const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
+  const ref = useFormStore();
   const error = useFormSelector(globalErrorsSelector);
-
-  const validity = error ? 'invalid' : 'valid';
+  const validity = error.length > 0 ? 'invalid' : 'valid';
 
   // Register the onSubmit handler for form submission
   // TODO: merge user-provided submit handler
@@ -58,6 +63,7 @@ const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }
   );
 
   return {
+    ref,
     props: {
       [`data-${validity}`]: true,
       onSubmit,
@@ -378,75 +384,105 @@ function Label(props: FormLabelProps) {
 }
 
 // ================= ERRORS ================= //
+
 type ClerkElementsErrorsRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
-type ErrorsProps = {
-  name?: string;
-  render(error: ClerkElementsErrorsRenderProps): React.ReactNode;
-} & HTMLProps<HTMLDivElement>;
+type ClerkErrorProps = ClerkGlobalErrorProps | ClerkFieldErrorProps;
 
 /**
  * Component used to render:
  *  1. field-level errors when render within a <Field> or with a `name` prop
  *  2. global errors when rendered outside of a <Field> and without a `name` prop
  */
-function Errors({ name, ...props }: ErrorsProps) {
-  const fieldContext = useFieldContext();
 
-  if (!fieldContext && !name) {
-    return <GlobalErrors {...props} />;
+function ClerkError({ name, ...rest }: ClerkErrorProps) {
+  const fieldContext = useFieldContext();
+  const fieldName = name || fieldContext?.name;
+
+  if (fieldName) {
+    return (
+      <FieldError
+        name={fieldName}
+        {...rest}
+      />
+    );
   }
 
-  return (
-    <FieldErrors
-      name={name}
-      {...props}
-    />
-  );
+  return <GlobalError {...rest} />;
 }
 
-function GlobalErrors({ render, ...rest }: Exclude<ErrorsProps, 'name'>) {
+type ClerkGlobalErrorProps = Omit<FormMessageProps, 'asChild' | 'children'> &
+  (
+    | {
+        children?: OptionalFnChildren;
+        code?: string;
+        name?: never;
+      }
+    | {
+        children: React.ReactNode;
+        code: string;
+        name?: never;
+      }
+  );
+
+function GlobalError({ children, code, ...rest }: ClerkGlobalErrorProps) {
   const { errors } = useGlobalErrors();
 
-  if (!errors) {
+  const error = errors?.[0];
+
+  if (!error || error.code !== code) {
     return null;
   }
+
+  const child = typeof children === 'function' ? children(error) : children;
 
   return (
     <span
       role='alert'
       {...rest}
     >
-      {errors.map(error => (
-        <Slot key={`${error.name}-${error.code}`}>{render(error)}</Slot>
-      ))}
+      {child || error.message}
     </span>
   );
 }
+type OptionalFnChildren = ((error: ClerkElementsErrorsRenderProps) => React.ReactNode) | React.ReactNode;
+type ClerkFieldErrorProps = Omit<FormMessageProps, 'asChild' | 'children'> &
+  (
+    | {
+        name: string;
+        code?: string;
+        children?: OptionalFnChildren;
+      }
+    | {
+        name: string;
+        code: string;
+        children: React.ReactNode;
+      }
+  );
 
-function FieldErrors({ name, render }: ErrorsProps) {
+function FieldError({ children, code, name, ...rest }: ClerkFieldErrorProps) {
   const fieldContext = useFieldContext();
   const fieldName = fieldContext?.name || name;
   const { errors } = useFieldErrors({ name: fieldName });
 
-  if (!errors) {
+  const error = errors?.[0];
+
+  if (!error) {
     return null;
   }
 
+  const child = typeof children === 'function' ? children(error) : children;
+  const forceMatch = code ? error.code === code : true;
+
   return (
-    <>
-      {errors.map(error => (
-        <RadixMessage
-          asChild
-          match={error.matchFn}
-          forceMatch={error.forceMatch}
-          key={`${error.name}-${error.code}`}
-        >
-          {render(error)}
-        </RadixMessage>
-      ))}
-    </>
+    <FormMessage
+      data-error-code={error.code}
+      forceMatch={forceMatch}
+      {...rest}
+    >
+      {child || error.message}
+    </FormMessage>
   );
 }
 
-export { Field, FieldState, Form, Input, Errors, Label, Submit };
-export type { FormControlProps, FormFieldProps, FormProps, ErrorsProps };
+export { Field, FieldState, Form, Input, ClerkError, Label, Submit };
+export type { FormControlProps, FormFieldProps, FormProps, ClerkErrorProps };

@@ -1,255 +1,107 @@
 'use client';
 
 import {
-  Errors,
-  Field,
-  FieldState,
-  Input,
-  Label,
+  ClerkError,
   SignIn,
+  SignInContinue,
   SignInFactorOne,
   SignInFactorTwo,
-  SignInSocialProviders,
-  SignInSSOCallback,
+  SignInSocialProvider,
   SignInStart,
-  SignInStrategies,
   SignInStrategy,
   Submit,
 } from '@clerk/elements';
-import clsx from 'clsx';
-import Image from 'next/image';
-import type { CSSProperties } from 'react';
-import { forwardRef } from 'react';
 
-import { H1, H2, H3, HR, P } from '@/components/design';
+import { H1, H2, H3, HR as Hr, P } from '@/components/design';
+import { CustomField, CustomSubmit } from '@/components/form';
 import { SignInDebug } from '@/components/sign-in-debug';
-
-const BUTTON_BGS: Record<string, string> = {
-  github: 'rgba(23 23 23)',
-  google: 'rgb(51 63 97)',
-};
-
-const BUTTON_BGS_HOVER: Record<string, string> = {
-  github: 'rgba(23 23 23 / 0.8)',
-  google: 'rgb(51 63 97 / 0.8)',
-};
-
-const CustomError = forwardRef<HTMLParagraphElement, { code: string; message: string }>(function CustomError(
-  { code, message, ...rest },
-  ref,
-) {
-  return (
-    <p
-      className='text-red-400 font-mono'
-      ref={ref}
-      {...rest}
-    >
-      <span className='block '>{code}:</span> {message}
-    </p>
-  );
-});
-
-function OTPInputSegment({ value, status }: any) {
-  return (
-    <FieldState>
-      {({ state }) => (
-        <span
-          data-state={state}
-          data-status={status}
-          className={clsx(
-            'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 bg-white border-[var(--border-color)] [--border-color:theme(colors.gray.300)] data-[state="invalid"]:[--border-color:theme(colors.red.500)] text-lg text-black self-stretch',
-            (status === 'cursor' || status === 'selected') &&
-              '[--border-color:theme(colors.purple.500)] shadow-[theme(colors.purple.500_0_0_0_1px)]',
-            status === 'selected' && 'bg-purple-100',
-          )}
-        >
-          {value}
-        </span>
-      )}
-    </FieldState>
-  );
-}
+import { SocialProviderImage } from '@/components/social-providers';
 
 export default function SignInPage() {
   return (
     <SignIn>
       <div className='m-auto w-max text-sm'>
         <SignInStart>
-          <div className='flex flex-col items-center justify-center gap-12'>
+          <div className='flex flex-col items-center justify-center  gap-12'>
             <H1>START</H1>
-            <div className='flex flex-col gap-3'>
-              <SignInSocialProviders
-                render={provider => {
-                  return (
-                    <button
-                      type='button'
-                      style={
-                        {
-                          '--button-bg': BUTTON_BGS[provider.id],
-                          '--button-bg-hover': BUTTON_BGS_HOVER[provider.id],
-                        } as CSSProperties
-                      }
-                      className={clsx(
-                        'flex items-center justify-center gap-4 rounded bg-[var(--button-bg)] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all',
-                        'hover:bg-[var(--button-bg-hover)]',
-                      )}
-                    >
-                      <Image
-                        src={provider.iconUrl}
-                        alt={provider.name}
-                        width={24}
-                        height={24}
-                        className={clsx(provider.id === 'github' && 'invert')}
-                      />
-                      <span className='text-white'>Continue with {provider.name}</span>
-                    </button>
-                  );
-                }}
-              />
+
+            <ClerkError className='block text-red-400 font-mono' />
+
+            <div className='flex flex-col items-stretch justify-center gap-2'>
+              <SignInSocialProvider
+                name='github'
+                className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
+              >
+                <SocialProviderImage className='invert' />
+                Sign In with GitHub
+              </SignInSocialProvider>
+
+              <SignInSocialProvider
+                name='google'
+                className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
+              >
+                <SocialProviderImage />
+                Sign In with Google
+              </SignInSocialProvider>
+
+              <SignInSocialProvider
+                name='metamask'
+                className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
+              >
+                <SocialProviderImage />
+                Sign In with Metamask
+              </SignInSocialProvider>
             </div>
 
-            <HR />
-
-            <Errors
-              render={({ code, message }) => (
-                <CustomError
-                  code={code}
-                  message={message}
-                />
-              )}
-            />
+            <Hr />
 
             <div className='flex gap-6 flex-col'>
-              <Field
+              <CustomField
+                label='Email'
                 name='identifier'
-                className='flex flex-col gap-4'
-              >
-                <div className='flex gap-4 justify-between items-center'>
-                  <Label>Email</Label>
-                  <Input
-                    type='identifier'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500'
-                  />
-                </div>
+              />
 
-                <Errors
-                  render={({ code, message }) => (
-                    <CustomError
-                      code={code}
-                      message={message}
-                    />
-                  )}
-                />
-                <FieldState>{({ state }) => <span>Field state: {state}</span>}</FieldState>
-              </Field>
+              {/* <Hr />
 
-              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In with Email/Password
-              </Submit>
-
-              <HR />
-
-              <Field
+              <CustomField
+                label='Phone'
                 name='identifier'
-                className='flex flex-col gap-4'
-              >
-                <div className='flex gap-4 justify-between items-center'>
-                  <Label>Phone</Label>
-                  <Input
-                    type='identifier'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500'
-                    asChild
-                  >
-                    <input type='tel' />
-                  </Input>
-                </div>
+              /> */}
 
-                <Errors
-                  render={({ code, message }) => (
-                    <CustomError
-                      code={code}
-                      message={message}
-                    />
-                  )}
-                />
-              </Field>
-
-              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In with Phone Number
-              </Submit>
+              <CustomSubmit>Sign In</CustomSubmit>
             </div>
           </div>
         </SignInStart>
 
-        <SignInStrategies>
+        <SignInContinue>
           <div className='flex gap-6 flex-col'>
             <H1>STRATEGIES (FIRST/SECOND FACTOR)</H1>
 
             <H2>
-              <SignInFactorOne>First Factor</SignInFactorOne>
-              <SignInFactorTwo>Second Factor</SignInFactorTwo>
+              Current Factor: <SignInFactorOne>First</SignInFactorOne>
+              <SignInFactorTwo>Second</SignInFactorTwo>
             </H2>
 
             <SignInStrategy name='password'>
-              <Field
+              <CustomField
+                label='Password'
                 name='password'
-                className='flex flex-col gap-4'
-              >
-                <div className='flex gap-4 justify-between items-center'>
-                  <Label>Password</Label>
-                  <Input
-                    type='password'
-                    className='bg-tertiary rounded-sm px-2 py-1 border border-foreground  data-[invalid]:border-red-500'
-                  />
-                </div>
+              />
 
-                <Errors
-                  render={({ code, message }) => (
-                    <CustomError
-                      code={code}
-                      message={message}
-                    />
-                  )}
-                />
-                <FieldState>{({ state }) => <span>Field state: {state}</span>}</FieldState>
-              </Field>
-
-              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In
-              </Submit>
+              <CustomSubmit>Sign In</CustomSubmit>
             </SignInStrategy>
 
             <SignInStrategy name='email_code'>
-              <Field
+              <CustomField
+                label='Email Code'
                 name='code'
-                className='flex flex-col gap-4'
-              >
-                <div className='flex gap-4 justify-between items-center'>
-                  <Label>Email Code</Label>
-                  <Input
-                    type='otp'
-                    className='flex'
-                    render={OTPInputSegment}
-                  />
-                </div>
+              />
 
-                <Errors
-                  render={({ code, message }) => (
-                    <CustomError
-                      code={code}
-                      message={message}
-                    />
-                  )}
-                />
-              </Field>
-
-              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In
-              </Submit>
+              <CustomSubmit>Sign In</CustomSubmit>
             </SignInStrategy>
 
             <SignInStrategy name='phone_code'>
-              <Field
+              {/* <Field
                 name='code'
                 className='flex flex-col gap-4'
               >
@@ -262,15 +114,8 @@ export default function SignInPage() {
                   />
                 </div>
 
-                <Errors
-                  render={({ code, message }) => (
-                    <CustomError
-                      code={code}
-                      message={message}
-                    />
-                  )}
-                />
-              </Field>
+                <ClerkError className='block text-red-400 font-mono' />
+              </Field> */}
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
                 Sign In
@@ -282,7 +127,7 @@ export default function SignInPage() {
 
               <P>Please check your email for a verification code...</P>
 
-              <Field
+              {/* <Field
                 name='code'
                 className='flex flex-col gap-4'
               >
@@ -294,25 +139,15 @@ export default function SignInPage() {
                     render={OTPInputSegment}
                   />
                 </div>
-
-                <Errors
-                  render={({ code, message }) => (
-                    <CustomError
-                      code={code}
-                      message={message}
-                    />
-                  )}
-                />
-              </Field>
+                <ClerkError className='block text-red-400 font-mono' />
+              </Field> */}
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
                 Verify
               </Submit>
             </SignInStrategy>
           </div>
-        </SignInStrategies>
-
-        <SignInSSOCallback />
+        </SignInContinue>
       </div>
 
       <SignInDebug />

@@ -1,7 +1,7 @@
 'use client';
 
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
-import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
+import type { OAuthProvider, SignInStrategy as ClerkSignInStrategy, Web3Provider } from '@clerk/types';
 import { Slot } from '@radix-ui/react-slot';
 import type { PropsWithChildren } from 'react';
 
@@ -12,15 +12,18 @@ import {
   useSignInFlow,
   useSignInStateMatcher,
   useSignInStrategies,
+  useSignInThirdPartyProvider,
   useSignInThirdPartyProviders,
-  useSSOCallbackHandler,
   useStrategy,
 } from '~/internals/machines/sign-in/sign-in.context';
 import type { SignInStrategyName } from '~/internals/machines/sign-in/sign-in.types';
 import { Form } from '~/react/common/form';
-import { Route, Router, useClerkRouter, useNextRouter } from '~/react/router';
+import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
-import { type ThirdPartyStrategy } from '~/utils/third-party-strategies';
+import type { ThirdPartyStrategy } from '~/utils/third-party-strategies';
+
+import type { SocialProviderProps } from '../common/third-party-providers/social-provider';
+import { SocialProvider, SocialProviderImage } from '../common/third-party-providers/social-provider';
 
 const { useBrowserInspector } = createBrowserInspectorReactHook();
 
@@ -104,11 +107,11 @@ export function SignInFactorTwo({ children }: PropsWithChildren) {
   return state.matches('SecondFactor') ? <Form flowActor={actorRef}>{children}</Form> : null;
 }
 
-// ================= SignInStrategies ================= //
+// ================= SignInContinue ================= //
 
-export type SignInStrategiesProps = PropsWithChildren<{ preferred?: ClerkSignInStrategy }>;
+export type SignInContinueProps = PropsWithChildren<{ preferred?: ClerkSignInStrategy }>;
 
-export function SignInStrategies({ children, preferred }: SignInStrategiesProps) {
+export function SignInContinue({ children, preferred }: SignInContinueProps) {
   const { current, isActive, shouldRender } = useSignInStrategies(preferred);
   const actorRef = useSignInFlow();
 
@@ -153,19 +156,21 @@ export function SignInSocialProviders({ render: provider }: SignInSocialProvider
   );
 }
 
-// ================= SignInSSOCallback ================= //
+// ================= SignInSocialProvider ================= //
 
-// TODO: Remove and rely on SignInMachine
-export function SignInSSOCallbackInner() {
-  useSSOCallbackHandler();
-  return null;
+export interface SignInSocialProviderProps extends Omit<SocialProviderProps, 'provider'> {
+  name: OAuthProvider | Web3Provider;
 }
 
-export function SignInSSOCallback({ children }: PropsWithChildren) {
+export function SignInSocialProvider({ name, ...rest }: SignInSocialProviderProps) {
+  const thirdPartyProvider = useSignInThirdPartyProvider(name);
+
   return (
-    <Route path='sso-callback'>
-      <SignInSSOCallbackInner />
-      {children ? children : 'Loading...'}
-    </Route>
+    <SocialProvider
+      {...rest}
+      provider={thirdPartyProvider}
+    />
   );
 }
+
+export const SignInSocialProviderImage = SocialProviderImage;
