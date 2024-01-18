@@ -74,29 +74,18 @@ export default (QUnit: QUnit) => {
 
     test('executes a successful backend API request for a paginated response', async assert => {
       fakeFetch = sinon.stub(runtime, 'fetch');
-      fakeFetch.onCall(0).returns(jsonPaginatedOk([userJson], 3));
+      fakeFetch.onCall(0).returns(jsonPaginatedOk([{ id: '1' }], 3));
 
-      const response = await apiClient.users.getUserList({ offset: 2, limit: 5 });
+      const { data: response, totalCount } = await apiClient.users.getOrganizationMembershipList({
+        offset: 2,
+        limit: 5,
+        userId: 'user_123',
+      });
 
-      assert.equal(response[0].firstName, 'John');
-      assert.equal(response[0].lastName, 'Doe');
-      assert.equal(response[0].emailAddresses[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(response[0].phoneNumbers[0].phoneNumber, '+311-555-2368');
-      assert.equal(response[0].externalAccounts[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(response[0].publicMetadata.zodiac_sign, 'leo');
+      assert.equal(response[0].id, '1');
       // payload.length is different from response total_count to check that totalCount use the total_count from response
-      assert.equal(response.totalCount, 3);
-
-      assert.ok(
-        fakeFetch.calledOnceWith('https://api.clerk.test/v1/users?offset=2&limit=5', {
-          method: 'GET',
-          headers: {
-            Authorization: 'Bearer deadbeef',
-            'Content-Type': 'application/json',
-            'User-Agent': '@clerk/backend@0.0.0-test',
-          },
-        }),
-      );
+      assert.equal(totalCount, 3);
+      assert.equal(response.length, 1);
     });
 
     test('executes a successful backend API request to create a new resource', async assert => {

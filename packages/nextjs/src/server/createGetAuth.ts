@@ -48,7 +48,6 @@ export const createGetAuth = ({
       if (authStatus === AuthStatus.SignedIn) {
         const jwt = decodeJwt(authToken as string);
 
-        //@ts-expect-error - TODO(dimkl): Will be fixed when `undefined` will be omitted from the return type
         logger.debug('JWT debug', jwt.raw.text);
         // @ts-expect-error - TODO @nikos: Align types
         return signedInAuthObject({ ...options, sessionToken: jwt.raw.text }, jwt.payload);

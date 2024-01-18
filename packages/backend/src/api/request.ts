@@ -172,9 +172,7 @@ function parseErrors(data: unknown): ClerkAPIError[] {
   return [];
 }
 
-type LegacyRequestFunction = <T>(
-  requestOptions: ClerkBackendApiRequestOptions,
-) => Promise<T extends [] ? T & { totalCount?: number } : T>;
+type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) => Promise<T>;
 
 // TODO(dimkl): Will be probably be dropped in next major version
 function withLegacyRequestReturn(cb: any): LegacyRequestFunction {
@@ -195,7 +193,7 @@ function withLegacyRequestReturn(cb: any): LegacyRequestFunction {
     }
 
     if (typeof totalCount !== 'undefined') {
-      data.totalCount = totalCount;
+      return { data, totalCount };
     }
 
     return data;

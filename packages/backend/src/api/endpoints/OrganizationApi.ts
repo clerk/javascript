@@ -8,6 +8,7 @@ import type {
   OrganizationInvitationStatus,
   OrganizationMembership,
 } from '../resources';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractAPI } from './AbstractApi';
 
@@ -95,7 +96,7 @@ type RevokeOrganizationInvitationParams = {
 
 export class OrganizationAPI extends AbstractAPI {
   public async getOrganizationList(params?: GetOrganizationListParams) {
-    return this.request<Organization[]>({
+    return this.request<PaginatedResourceResponse<Organization[]>>({
       method: 'GET',
       path: basePath,
       queryParams: params,
@@ -234,7 +235,7 @@ export class OrganizationAPI extends AbstractAPI {
     const { organizationId, status, limit, offset } = params;
     this.requireId(organizationId);
 
-    return this.request<OrganizationInvitation[]>({
+    return this.request<PaginatedResourceResponse<OrganizationInvitation[]>>({
       method: 'GET',
       path: joinPaths(basePath, organizationId, 'invitations'),
       queryParams: { status, limit, offset },
