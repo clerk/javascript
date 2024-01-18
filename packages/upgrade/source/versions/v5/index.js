@@ -307,6 +307,15 @@ export default {
 		'organizationmembershippublicuserdatajson-profileimageurl',
 		'clockskewinseconds',
 		'pkgversion',
+		'client-unstableoptions-removed',
+		'httpoptions-removed',
+		'createisomorphicrequest-removed',
+		'createemail-removed',
+		'signjwterror-import-move',
+		'tokenverificationerror-import-move',
+		'tokenverificationerroraction-import-move',
+		'tokenverificationerrorreason-import-move',
+		'membershiprole',
 	]),
 };
 
