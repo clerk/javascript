@@ -10,17 +10,6 @@ const authenticateRequestMock = jest.fn().mockResolvedValue({
   headers: new Headers(),
 });
 
-const mockCreateRedirect = jest.fn().mockImplementation(() => {
-  return {
-    redirectToSignIn: () => {
-      const res = NextResponse.redirect(
-        'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
-      );
-      return setHeader(res, 'x-clerk-redirect-to', 'true');
-    },
-  };
-});
-
 jest.mock('./clerkClient', () => {
   return {
     clerkClient: {
@@ -30,10 +19,16 @@ jest.mock('./clerkClient', () => {
   };
 });
 
-jest.mock('@clerk/backend/internal', () => {
+const mockRedirectToSignIn = jest.fn().mockImplementation(() => {
+  const res = NextResponse.redirect(
+    'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
+  );
+  return setHeader(res, 'x-clerk-redirect-to', 'true');
+});
+
+jest.mock('./redirectHelpers', () => {
   return {
-    ...jest.requireActual('@clerk/backend/internal'),
-    createRedirect: () => mockCreateRedirect(),
+    redirectToSignIn: mockRedirectToSignIn,
   };
 });
 
@@ -458,16 +453,11 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
   });
 
   it('does NOT append the Dev Browser JWT if x-clerk-redirect-to header is not set', async () => {
-    mockCreateRedirect.mockImplementationOnce(() => {
-      return {
-        redirectToSignIn: () => {
-          return NextResponse.redirect(
-            'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
-          );
-        },
-      };
-    });
-
+    mockRedirectToSignIn.mockReturnValueOnce(
+      NextResponse.redirect(
+        'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
+      ),
+    );
     const resp = await authMiddleware({
       beforeAuth: () => NextResponse.next(),
     })(mockRequest({ url: '/protected', appendDevBrowserCookie: true }), {} as NextFetchEvent);
