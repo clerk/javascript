@@ -1,6 +1,6 @@
 ---
 title: '`CLERK_JS_VERSION` should be `NEXT_PUBLIC_CLERK_JS_VERSION`'
-matcher: '[^_]CLERK_JS_VERSION'
+matcher: '^[^_]*CLERK_JS_VERSION'
 ---
 
 If you are using `CLERK_JS_VERSION` as an environment variable, it should be changed to `NEXT_PUBLIC_CLERK_JS_VERSION` instead.

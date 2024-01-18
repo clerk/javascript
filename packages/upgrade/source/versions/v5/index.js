@@ -38,6 +38,8 @@ const reactChangesList = [
 	'withclerk-hof-removed',
 	'withsession-hof-removed',
 	'withuser-hof-removed',
+	'multisessionappsupport-import-change',
+	'clerkprovideroptionswrapper-dropped',
 ];
 
 export default {
@@ -109,6 +111,7 @@ export default {
 		'withclerk-hof-removed',
 		'withsession-hof-removed',
 		'withuser-hof-removed',
+		'next-public-clerk-js-url',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
