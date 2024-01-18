@@ -32,7 +32,7 @@ export const SignInFactorTwoAlternativeMethods = (props: AlternativeMethodsProps
 };
 
 const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroubleClick: React.MouseEventHandler }) => {
-  const { onHavingTroubleClick, onFactorSelected } = props;
+  const { onHavingTroubleClick, onFactorSelected, onBackLinkClick } = props;
   const card = useCardState();
   const { supportedSecondFactors } = useCoreSignIn();
 
@@ -48,7 +48,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           {/*TODO: extract main in its own component */}
           <Col
             elementDescriptor={descriptors.main}
-            gap={8}
+            gap={4}
           >
             <Col gap={2}>
               {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
@@ -63,8 +63,18 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
                 />
               ))}
             </Col>
+            <Card.Action elementId='alternativeMethods'>
+              {onBackLinkClick && (
+                <Card.ActionLink
+                  localizationKey={localizationKeys('backButton')}
+                  onClick={props.onBackLinkClick}
+                />
+              )}
+            </Card.Action>
           </Col>
+        </Card.Content>
 
+        <Card.Footer>
           <Card.Action elementId='havingTrouble'>
             <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
             <Card.ActionLink
@@ -72,9 +82,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
               onClick={onHavingTroubleClick}
             />
           </Card.Action>
-        </Card.Content>
-
-        <Card.Footer />
+        </Card.Footer>
       </Card.Root>
     </Flow.Part>
   );
