@@ -20,7 +20,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     return null;
   }
 
-  const [avatarChanged, setAvatarChanged] = React.useState(false);
   const { first_name, last_name } = useEnvironment().userSettings.attributes;
   const showFirstName = first_name.enabled;
   const showLastName = last_name.enabled;
@@ -42,7 +41,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
 
   const userInfoChanged =
     (showFirstName && firstNameField.value !== userFirstName) || (showLastName && lastNameField.value !== userLastName);
-  const optionalFieldsChanged = userInfoChanged || avatarChanged;
+  const optionalFieldsChanged = userInfoChanged;
 
   const hasRequiredFields = (showFirstName && first_name.required) || (showLastName && last_name.required);
   const requiredFieldsFilled =
@@ -68,7 +67,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     return user
       .setProfileImage({ file })
       .then(() => {
-        setAvatarChanged(true);
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
@@ -78,7 +76,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     void user
       .setProfileImage({ file: null })
       .then(() => {
-        setAvatarChanged(true);
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));

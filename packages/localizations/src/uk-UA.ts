@@ -663,9 +663,7 @@ export const ukUA: LocalizationResource = {
       title: 'Додати номер телефону',
     },
     profilePage: {
-      fileDropAreaAction: 'Виберіть файл',
       fileDropAreaHint: 'Завантажте зображення у форматах JPG, PNG, GIF або WEBP розміром менше 10 МБ',
-      fileDropAreaTitle: 'Перетягніть файл сюди або...',
       imageFormDestructiveActionSubtitle: 'Видалити зображення',
       imageFormSubtitle: 'Завантажити зображення',
       imageFormTitle: 'Зображення профілю',

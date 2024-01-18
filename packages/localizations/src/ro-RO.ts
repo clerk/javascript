@@ -672,9 +672,7 @@ export const roRO: LocalizationResource = {
       title: 'Adăugați numărul de telefon',
     },
     profilePage: {
-      fileDropAreaAction: 'Selectați fișierul',
       fileDropAreaHint: 'Încărcați o imagine JPG, PNG, GIF sau WEBP mai mică de 10 MB',
-      fileDropAreaTitle: 'Trageți fișierul aici, sau...',
       imageFormDestructiveActionSubtitle: 'Eliminați imaginea',
       imageFormSubtitle: 'Încărcați imaginea',
       imageFormTitle: 'Imagine de profil',

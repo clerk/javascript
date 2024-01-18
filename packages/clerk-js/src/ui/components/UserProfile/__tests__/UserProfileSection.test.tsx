@@ -152,21 +152,6 @@ describe('ProfileSection', () => {
       screen.getByRole('img', { name: 'F L' });
     });
 
-    it('clicking "Upload image" opens the "Upload" section', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-        });
-      });
-      const { userEvent, getByText, queryByText, findByRole } = render(<UserProfileSection />, { wrapper });
-      await userEvent.click(getByText(/edit profile/i));
-      expect(await findByRole('heading', { name: /update profile/i })).toBeInTheDocument();
-
-      expect(queryByText(/select file/i)).toBeNull();
-      await userEvent.click(getByText(/upload$/i));
-      getByText(/select file/i);
-    });
-
     it('clicking "Remove image" calls the appropriate function', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({

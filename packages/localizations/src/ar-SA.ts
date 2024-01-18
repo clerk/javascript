@@ -656,9 +656,7 @@ export const arSA: LocalizationResource = {
       title: 'إضافة رقم جوال',
     },
     profilePage: {
-      fileDropAreaAction: 'أختر ملف',
       fileDropAreaHint: 'أرفع صورة بصيغة JPG, PNG, GIF أو WEBP أقل من 10 ميغابايت',
-      fileDropAreaTitle: 'اسحب الملف هنا, أو...',
       imageFormDestructiveActionSubtitle: 'حذف صورة الملف الشخصي',
       imageFormSubtitle: 'رفع صورة للملف الشخصي',
       imageFormTitle: 'صورة الملف الشخصي',

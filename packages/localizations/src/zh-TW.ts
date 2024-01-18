@@ -648,9 +648,7 @@ export const zhTW: LocalizationResource = {
       title: '添加電話號碼',
     },
     profilePage: {
-      fileDropAreaAction: '選擇文件',
       fileDropAreaHint: '上傳小於10MB的JPG, PNG, GIF, 或WEBP格式的圖片',
-      fileDropAreaTitle: '拖拽文件到這裡，或者...',
       imageFormDestructiveActionSubtitle: '移除圖片',
       imageFormSubtitle: '上傳圖片',
       imageFormTitle: '個人資料圖片',

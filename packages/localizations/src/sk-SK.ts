@@ -662,9 +662,7 @@ export const skSK: LocalizationResource = {
       title: 'Pridať telefónne číslo',
     },
     profilePage: {
-      fileDropAreaAction: 'Vybrať súbor',
       fileDropAreaHint: 'Nahrajte obrázok vo formátoch JPG, PNG, GIF alebo WEBP s veľkosťou menšou než 10 MB',
-      fileDropAreaTitle: 'Presuňte súbor sem alebo...',
       imageFormDestructiveActionSubtitle: 'Odstrániť obrázok',
       imageFormSubtitle: 'Nahrať obrázok',
       imageFormTitle: 'Profilový obrázok',

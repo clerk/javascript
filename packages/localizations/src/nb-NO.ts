@@ -664,9 +664,7 @@ export const nbNO: LocalizationResource = {
       title: 'Legg til telefonnummer',
     },
     profilePage: {
-      fileDropAreaAction: 'Velg fil',
       fileDropAreaHint: 'Last opp et JPG, PNG, GIF eller WEBP-bilde som er mindre enn 10 MB',
-      fileDropAreaTitle: 'Dra filen hit eller...',
       imageFormDestructiveActionSubtitle: 'Fjern bilde',
       imageFormSubtitle: 'Last opp bilde',
       imageFormTitle: 'Profilbilde',

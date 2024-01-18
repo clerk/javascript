@@ -14,7 +14,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const { onSuccess, onReset } = props;
   const title = localizationKeys('organizationProfile.profilePage.title');
   const card = useCardState();
-  const [avatarChanged, setAvatarChanged] = React.useState(false);
   const { organization } = useOrganization();
 
   const nameField = useFormControl('name', organization?.name || '', {
@@ -34,7 +33,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   }
 
   const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value;
-  const canSubmit = (dataChanged || avatarChanged) && slugField.feedbackType !== 'error';
+  const canSubmit = dataChanged && slugField.feedbackType !== 'error';
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +48,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     return organization
       .setLogo({ file })
       .then(() => {
-        setAvatarChanged(true);
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
@@ -59,7 +57,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     void organization
       .setLogo({ file: null })
       .then(() => {
-        setAvatarChanged(true);
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));

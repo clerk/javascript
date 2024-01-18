@@ -246,14 +246,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'impersonationFabTitle',
   'impersonationFabActionLink',
 
-  'fileDropAreaOuterBox',
-  'fileDropAreaBox',
-  'fileDropAreaIconBox',
-  'fileDropAreaIcon',
-  'fileDropAreaHint',
-  'fileDropAreaButtonPrimary',
-  'fileDropAreaFooterHint',
-
   'invitationsSentIconBox',
   'invitationsSentIcon',
 

@@ -661,9 +661,7 @@ export const csCZ: LocalizationResource = {
       title: 'Přidat telefonní číslo',
     },
     profilePage: {
-      fileDropAreaAction: 'Vybrat soubor',
       fileDropAreaHint: 'Nahrajte obrázek ve formátech JPG, PNG, GIF nebo WEBP s velikostí menší než 10 MB',
-      fileDropAreaTitle: 'Přetáhněte soubor sem nebo...',
       imageFormDestructiveActionSubtitle: 'Odstranit obrázek',
       imageFormSubtitle: 'Nahrát obrázek',
       imageFormTitle: 'Profilový obrázek',

@@ -4,7 +4,6 @@ import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, localizationKeys, SimpleButton, Text } from '../customizables';
 import { handleError } from '../utils';
 import { useCardState } from './contexts';
-import { FileDropArea } from './FileDropArea';
 
 export type AvatarUploaderProps = {
   title: LocalizationKey;
@@ -23,10 +22,19 @@ export const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
+const MAX_SIZE_BYTES = 10 * 1000 * 1000;
+const SUPPORTED_MIME_TYPES = Object.freeze(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
+
+const validType = (f: File | DataTransferItem) => SUPPORTED_MIME_TYPES.includes(f.type);
+const validSize = (f: File) => f.size <= MAX_SIZE_BYTES;
+const validFile = (f: File) => validType(f) && validSize(f);
+
 export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const openDialog = () => inputRef.current?.click();
 
   const { onAvatarChange, onAvatarRemove, title, avatarPreview, avatarPreviewPlaceholder, ...rest } = props;
 
@@ -49,10 +57,16 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
       .catch(err => handleError(err, [], card.setError));
   };
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     card.setLoading();
-    handleFileDrop(null);
+    await handleFileDrop(null);
     return onAvatarRemove?.();
+  };
+
+  const upload = async (f: File | undefined) => {
+    if (f && validFile(f)) {
+      await handleFileDrop(f);
+    }
   };
 
   const previewElement = objectUrl
@@ -63,6 +77,14 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
 
   return (
     <Col gap={4}>
+      <input
+        type='file'
+        accept={SUPPORTED_MIME_TYPES.join(',')}
+        style={{ display: 'none' }}
+        ref={inputRef}
+        onChange={e => upload(e.currentTarget.files?.[0])}
+      />
+
       <Flex
         gap={4}
         align='center'
@@ -76,18 +98,11 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
           >
             <SimpleButton
               elementDescriptor={descriptors.avatarImageActionsUpload}
-              localizationKey={
-                !showUpload
-                  ? localizationKeys('userProfile.profilePage.imageFormSubtitle')
-                  : localizationKeys('userProfile.formButtonReset')
-              }
+              localizationKey={localizationKeys('userProfile.profilePage.imageFormSubtitle')}
               isDisabled={card.isLoading}
               variant='secondary'
               size='xs'
-              onClick={(e: any) => {
-                e.target?.blur();
-                toggle();
-              }}
+              onClick={openDialog}
             />
 
             {!!onAvatarRemove && !showUpload && (
@@ -107,8 +122,6 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
           />
         </Col>
       </Flex>
-
-      {showUpload && <FileDropArea onFileDrop={handleFileDrop} />}
     </Col>
   );
 };

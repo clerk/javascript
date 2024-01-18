@@ -90,24 +90,4 @@ describe('OrganizationProfileScreen', () => {
     await userEvent.click(getByRole('button', { name: /save$/i }));
     expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1', slug: 'my-org' });
   });
-
-  it('opens file drop area to update organization logo on clicking "Upload image"', async () => {
-    const { wrapper } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({
-        email_addresses: ['test@clerk.com'],
-        organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
-      });
-    });
-
-    const { userEvent, getByRole } = render(
-      <ProfileForm
-        onSuccess={jest.fn()}
-        onReset={jest.fn()}
-      />,
-      { wrapper },
-    );
-    await userEvent.click(getByRole('button', { name: /^upload$/i }));
-    expect(getByRole('button', { name: 'Select file' })).toBeDefined();
-  });
 });

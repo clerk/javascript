@@ -664,9 +664,7 @@ export const plPL: LocalizationResource = {
       title: 'Dodaj numer telefonu',
     },
     profilePage: {
-      fileDropAreaAction: 'Wybierz plik',
       fileDropAreaHint: 'Prześlij zdjęcie w formacie JPG, PNG, GIF lub WEBP mniejsze niż 10 MB',
-      fileDropAreaTitle: 'Przeciągnij plik tutaj lub...',
       imageFormDestructiveActionSubtitle: 'Usuń zdjęcie',
       imageFormSubtitle: 'Prześlij zdjęcie',
       imageFormTitle: 'Zdjęcie profilowe',
