@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  ClerkError,
+  GlobalError,
   SignIn,
   SignInContinue,
   SignInFactorOne,
@@ -25,7 +25,7 @@ export default function SignInPage() {
           <div className='flex flex-col items-center justify-center  gap-12'>
             <H1>START</H1>
 
-            <ClerkError className='block text-red-400 font-mono' />
+            <GlobalError className='block text-red-400 font-mono' />
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
               <SignInSocialProvider
@@ -101,21 +101,10 @@ export default function SignInPage() {
             </SignInStrategy>
 
             <SignInStrategy name='phone_code'>
-              {/* <Field
+              <CustomField
+                label='Phone Code'
                 name='code'
-                className='flex flex-col gap-4'
-              >
-                <div className='flex gap-4 justify-between items-center'>
-                  <Label>Phone Code</Label>
-                  <Input
-                    type='otp'
-                    className='flex'
-                    render={OTPInputSegment}
-                  />
-                </div>
-
-                <ClerkError className='block text-red-400 font-mono' />
-              </Field> */}
+              />
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
                 Sign In
@@ -126,21 +115,6 @@ export default function SignInPage() {
               <H3>Verify your email</H3>
 
               <P>Please check your email for a verification code...</P>
-
-              {/* <Field
-                name='code'
-                className='flex flex-col gap-4'
-              >
-                <div className='flex gap-4 justify-between items-center'>
-                  <Label>Email Code</Label>
-                  <Input
-                    type='otp'
-                    className='flex'
-                    render={OTPInputSegment}
-                  />
-                </div>
-                <ClerkError className='block text-red-400 font-mono' />
-              </Field> */}
 
               <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
                 Verify

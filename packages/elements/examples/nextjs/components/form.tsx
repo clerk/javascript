@@ -1,8 +1,8 @@
 'use client';
 
 import {
-  ClerkError,
   Field as ElementsField,
+  FieldError,
   FieldState,
   Input,
   Label,
@@ -59,7 +59,7 @@ export const CustomField = forwardRef<Input, { name: string; label: string }>(fu
         />
       </div>
 
-      <ClerkError className='block text-red-400 font-mono' />
+      <FieldError className='block text-red-400 font-mono' />
       <FieldState>{({ state }) => <pre className='opacity-60 text-xs'>Field state: {state}</pre>}</FieldState>
     </ElementsField>
   );

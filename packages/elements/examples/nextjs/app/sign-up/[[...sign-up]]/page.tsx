@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  ClerkError,
+  GlobalError,
   SignUp,
   SignUpContinue,
   SignUpSocialProvider,
@@ -51,7 +51,7 @@ export default function SignUpPage() {
 
             <Hr />
 
-            <ClerkError className='block text-red-400 font-mono' />
+            <GlobalError className='block text-red-400 font-mono' />
 
             <div className='flex gap-6 flex-col'>
               <CustomField
@@ -72,7 +72,7 @@ export default function SignUpPage() {
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>SIGN UP - CONTINUE</H1>
 
-            <ClerkError className='block text-red-400 font-mono' />
+            <GlobalError className='block text-red-400 font-mono' />
 
             <div className='flex gap-6 flex-col'>
               <CustomField

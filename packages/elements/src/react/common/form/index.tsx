@@ -383,66 +383,28 @@ function Label(props: FormLabelProps) {
 
 // ================= ERRORS ================= //
 
-type ClerkElementsErrorsRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
-type ClerkErrorChildrenFn = ((error: ClerkElementsErrorsRenderProps) => React.ReactNode) | React.ReactNode;
-type ClerkErrorProps = ClerkGlobalErrorProps | ClerkFieldErrorProps;
-
-type ClerkGlobalErrorProps = Omit<ComponentProps<'span'>, 'children'> &
+type FormErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
+type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> &
   (
     | {
-        children?: ClerkErrorChildrenFn;
+        children?: (error: FormErrorRenderProps) => React.ReactNode;
         code?: string;
-        name?: never;
       }
     | {
         children: React.ReactNode;
         code: string;
-        name?: never;
       }
   );
 
-type ClerkFieldErrorProps = Omit<FormMessageProps, 'asChild' | 'children'> &
-  (
-    | {
-        children?: ClerkErrorChildrenFn;
-        code?: string;
-        name: string;
-      }
-    | {
-        children: React.ReactNode;
-        code: string;
-        name: string;
-      }
-  );
+type FormGlobalErrorProps = FormErrorProps<ComponentProps<'span'>>;
+type FormFieldErrorProps = FormErrorProps<FormMessageProps & { name?: string }>;
 
-/**
- * Component used to render:
- *  1. field-level errors when render within a <Field> or with a `name` prop
- *  2. global errors when rendered outside of a <Field> and without a `name` prop
- */
-
-function ClerkError({ name, ...rest }: ClerkErrorProps) {
-  const fieldContext = useFieldContext();
-  const fieldName = name || fieldContext?.name;
-
-  if (fieldName) {
-    return (
-      <FieldError
-        name={fieldName}
-        {...rest}
-      />
-    );
-  }
-
-  return <GlobalError {...rest} />;
-}
-
-function GlobalError({ children, code, ...rest }: ClerkGlobalErrorProps) {
+function GlobalError({ children, code, ...rest }: FormGlobalErrorProps) {
   const { errors } = useGlobalErrors();
 
   const error = errors?.[0];
 
-  if (!error || error.code !== code) {
+  if (!error || (code && error.code !== code)) {
     return null;
   }
 
@@ -458,7 +420,7 @@ function GlobalError({ children, code, ...rest }: ClerkGlobalErrorProps) {
   );
 }
 
-function FieldError({ children, code, name, ...rest }: ClerkFieldErrorProps) {
+function FieldError({ children, code, name, ...rest }: FormFieldErrorProps) {
   const fieldContext = useFieldContext();
   const fieldName = fieldContext?.name || name;
   const { errors } = useFieldErrors({ name: fieldName });
@@ -483,5 +445,13 @@ function FieldError({ children, code, name, ...rest }: ClerkFieldErrorProps) {
   );
 }
 
-export { Field, FieldState, Form, Input, ClerkError, Label, Submit };
-export type { FormControlProps, FormFieldProps, FormProps, ClerkErrorProps };
+export { Field, FieldError, FieldState, Form, GlobalError, Input, Label, Submit };
+export type {
+  FormControlProps,
+  FormErrorProps,
+  FormGlobalErrorProps,
+  FormErrorRenderProps,
+  FormFieldErrorProps,
+  FormFieldProps,
+  FormProps,
+};

@@ -1,5 +1,3 @@
-// ================= useSocialProviderContext ================= //
-
 import { Slot } from '@radix-ui/react-slot';
 import { createContext, useContext } from 'react';
 
@@ -46,7 +44,7 @@ export function SocialProvider({ asChild, provider, ...rest }: SocialProviderPro
   );
 }
 
-export interface SocialProviderIconProps extends React.HTMLAttributes<HTMLImageElement> {
+export interface SocialProviderIconProps extends Omit<React.HTMLAttributes<HTMLImageElement>, 'src'> {
   asChild?: boolean;
 }
 
@@ -56,7 +54,7 @@ export function SocialProviderIcon({ asChild, ...rest }: SocialProviderIconProps
   const Comp = asChild ? Slot : 'img';
   return (
     <Comp
-      alt={`Sign in with ${name}`}
+      alt={`${name} logo`}
       src={iconUrl}
       {...rest}
     />
