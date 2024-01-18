@@ -1,6 +1,13 @@
 'use client';
 
-import { ClerkError, Field as ElementsField, FieldState, Input, Label, Submit } from '@clerk/elements';
+import {
+  ClerkError,
+  Field as ElementsField,
+  FieldState,
+  Input,
+  Label,
+  Submit as ElementsSubmit,
+} from '@clerk/elements';
 import clsx from 'clsx';
 import { forwardRef } from 'react';
 
@@ -61,7 +68,7 @@ export const CustomField = forwardRef<Input, { name: string; label: string }>(fu
 export const CustomSubmit = forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(
   function CustomButton(props, forwardedRef) {
     return (
-      <Submit
+      <ElementsSubmit
         className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'
         {...props}
         type='submit'
