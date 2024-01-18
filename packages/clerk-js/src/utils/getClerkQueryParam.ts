@@ -6,6 +6,8 @@ const ClerkQueryParams = [
   '__clerk_invitation_token',
   '__clerk_ticket',
   '__clerk_modal_state',
+  '__clerk_handshake',
+  '__clerk_help',
   CLERK_SYNCED,
   CLERK_SATELLITE_URL,
 ] as const;
@@ -20,6 +22,8 @@ type ClerkQueryParamsToValuesMap = {
   __clerk_modal_state: string;
   __clerk_synced: string;
   __clerk_satellite_url: string;
+  __clerk_handshake: string;
+  __clerk_help: string;
 };
 
 export type VerificationStatus = 'expired' | 'failed' | 'loading' | 'verified' | 'verified_switch_tab';
@@ -31,7 +35,9 @@ export function getClerkQueryParam<T extends ClerkQueryParam>(param: T): ClerkQu
 
 export function removeClerkQueryParam<T extends ClerkQueryParam>(param: T) {
   const url = new URL(window.location.href);
-  url.searchParams.delete(param);
-  window.history.replaceState(window.history.state, '', url);
+  if (url.searchParams.has(param)) {
+    url.searchParams.delete(param);
+    window.history.replaceState(window.history.state, '', url);
+  }
   return;
 }
