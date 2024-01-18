@@ -305,16 +305,21 @@ export function _SignInStart(): JSX.Element {
                 />
               )}
               {standardFormAttributes.length ? (
-                <Form.Root onSubmit={handleFirstPartySubmit}>
-                  <Form.ControlRow elementId={identifierField.id}>
-                    <DynamicField
-                      actionLabel={nextIdentifier?.action}
-                      onActionClicked={switchToNextIdentifier}
-                      {...identifierFieldProps}
-                      autoFocus={shouldAutofocus}
-                    />
-                  </Form.ControlRow>
-                  <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                <Form.Root
+                  onSubmit={handleFirstPartySubmit}
+                  gap={8}
+                >
+                  <Col>
+                    <Form.ControlRow elementId={identifierField.id}>
+                      <DynamicField
+                        actionLabel={nextIdentifier?.action}
+                        onActionClicked={switchToNextIdentifier}
+                        {...identifierFieldProps}
+                        autoFocus={shouldAutofocus}
+                      />
+                    </Form.ControlRow>
+                    <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                  </Col>
                   <Form.SubmitButton hasArrow />
                 </Form.Root>
               ) : null}
