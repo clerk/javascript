@@ -46,6 +46,7 @@ const reactChangesList = [
 	'new-localization-keys',
 	'removed-localization-keys',
 	'changed-localization-keys',
+	'router-navigate',
 ];
 
 export default {
@@ -316,6 +317,7 @@ export default {
 		'tokenverificationerroraction-import-move',
 		'tokenverificationerrorreason-import-move',
 		'membershiprole',
+		'return-signature-change',
 	]),
 };
 
