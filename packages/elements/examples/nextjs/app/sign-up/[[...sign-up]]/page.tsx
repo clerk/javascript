@@ -15,7 +15,7 @@ import { forwardRef } from 'react';
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
 import { SignUpDebug } from '@/components/sign-up-debug';
-import { SocialProviderImage } from '@/components/social-providers';
+import { SocialProviderIcon } from '@/components/social-providers';
 
 const CustomButton = forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(function CustomButton(
   props,
@@ -44,7 +44,7 @@ export default function SignUpPage() {
                 name='github'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderImage className='invert' />
+                <SocialProviderIcon className='invert' />
                 Sign In with GitHub
               </SignUpSocialProvider>
 
@@ -52,7 +52,7 @@ export default function SignUpPage() {
                 name='google'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderImage />
+                <SocialProviderIcon />
                 Sign In with Google
               </SignUpSocialProvider>
 
@@ -60,7 +60,7 @@ export default function SignUpPage() {
                 name='metamask'
                 className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderImage />
+                <SocialProviderIcon />
                 Sign In with Metamask
               </SignUpSocialProvider>
             </div>

@@ -4,7 +4,7 @@ import { useNextRouter } from '~/react/router/next';
 
 /** Common Components */
 export { ClerkError, Field, FieldState, Form, Input, Label, Submit } from '~/react/common/form';
-export { SocialProviderImage } from '~/react/common/third-party-providers/social-provider';
+export { SocialProviderIcon } from '~/react/common/third-party-providers/social-provider';
 
 /** Sign In Components */
 export {
@@ -15,7 +15,7 @@ export {
   SignInContinue,
   SignInSocialProviders,
   SignInSocialProvider,
-  SignInSocialProviderImage,
+  SignInSocialProviderIcon,
   SignInStrategy,
 } from '~/react/sign-in';
 
@@ -27,7 +27,7 @@ export {
   SignUpVerify,
   SignUpSocialProviders,
   SignUpSocialProvider,
-  SignUpSocialProviderImage,
+  SignUpSocialProviderIcon,
   SignUpStrategy,
 } from '~/react/sign-up';
 

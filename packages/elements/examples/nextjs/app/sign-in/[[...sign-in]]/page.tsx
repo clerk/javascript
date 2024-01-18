@@ -15,7 +15,7 @@ import {
 import { H1, H2, H3, HR as Hr, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
 import { SignInDebug } from '@/components/sign-in-debug';
-import { SocialProviderImage } from '@/components/social-providers';
+import { SocialProviderIcon } from '@/components/social-providers';
 
 export default function SignInPage() {
   return (
@@ -32,7 +32,7 @@ export default function SignInPage() {
                 name='github'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderImage className='invert' />
+                <SocialProviderIcon className='invert' />
                 Sign In with GitHub
               </SignInSocialProvider>
 
@@ -40,7 +40,7 @@ export default function SignInPage() {
                 name='google'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderImage />
+                <SocialProviderIcon />
                 Sign In with Google
               </SignInSocialProvider>
 
@@ -48,7 +48,7 @@ export default function SignInPage() {
                 name='metamask'
                 className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderImage />
+                <SocialProviderIcon />
                 Sign In with Metamask
               </SignInSocialProvider>
             </div>

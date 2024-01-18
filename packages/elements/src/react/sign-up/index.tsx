@@ -20,7 +20,7 @@ import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
 import type { ThirdPartyStrategy } from '~/utils/third-party-strategies';
 
 import type { SocialProviderProps } from '../common/third-party-providers/social-provider';
-import { SocialProvider, SocialProviderImage } from '../common/third-party-providers/social-provider';
+import { SocialProvider, SocialProviderIcon } from '../common/third-party-providers/social-provider';
 
 const { useBrowserInspector } = createBrowserInspectorReactHook();
 
@@ -156,4 +156,4 @@ export function SignUpSocialProvider({ name, ...rest }: SignUpSocialProviderProp
   );
 }
 
-export const SignUpSocialProviderImage = SocialProviderImage;
+export const SignUpSocialProviderIcon = SocialProviderIcon;

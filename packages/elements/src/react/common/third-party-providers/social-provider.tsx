@@ -46,11 +46,11 @@ export function SocialProvider({ asChild, provider, ...rest }: SocialProviderPro
   );
 }
 
-export interface SocialProviderImageProps extends React.HTMLAttributes<HTMLImageElement> {
+export interface SocialProviderIconProps extends React.HTMLAttributes<HTMLImageElement> {
   asChild?: boolean;
 }
 
-export function SocialProviderImage({ asChild, ...rest }: SocialProviderImageProps) {
+export function SocialProviderIcon({ asChild, ...rest }: SocialProviderIconProps) {
   const { iconUrl, name } = useSocialProviderContext();
 
   const Comp = asChild ? Slot : 'img';
