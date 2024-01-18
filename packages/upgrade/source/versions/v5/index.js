@@ -43,6 +43,9 @@ const reactChangesList = [
 	'aftersignouturl-behavior-change',
 	'aftersigninurl-behavior-change',
 	'aftersignupurl-behavior-change',
+	'new-localization-keys',
+	'removed-localization-keys',
+	'changed-localization-keys',
 ];
 
 export default {
@@ -118,6 +121,9 @@ export default {
 		'aftersignouturl-behavior-change',
 		'aftersigninurl-behavior-change',
 		'aftersignupurl-behavior-change',
+		'new-localization-keys',
+		'removed-localization-keys',
+		'changed-localization-keys',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -152,6 +158,9 @@ export default {
 		'aftersignouturl-behavior-change',
 		'aftersigninurl-behavior-change',
 		'aftersignupurl-behavior-change',
+		'new-localization-keys',
+		'removed-localization-keys',
+		'changed-localization-keys',
 	]),
 	expo: load('expo', [
 		'apikey-to-publishable-key',
@@ -174,6 +183,9 @@ export default {
 		'aftersignouturl-behavior-change',
 		'aftersigninurl-behavior-change',
 		'aftersignupurl-behavior-change',
+		'new-localization-keys',
+		'removed-localization-keys',
+		'changed-localization-keys',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -252,6 +264,10 @@ export default {
 		'aftersignouturl-behavior-change',
 		'aftersigninurl-behavior-change',
 		'aftersignupurl-behavior-change',
+		'clerk-isready-removed',
+		'new-localization-keys',
+		'removed-localization-keys',
+		'changed-localization-keys',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',
@@ -263,7 +279,7 @@ export default {
 		'useorganizationlist-organizationlist', // shared outside this pkg?
 	]),
 	chromeExtension: load('chromeExtension', ['clerkprovider-tokencache']),
-	localizations: [],
+	localizations: load('localization', ['new-localization-keys']),
 	types: [],
 	backend: [],
 	// backend: load('backend', [
