@@ -9,6 +9,7 @@ import type {
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
+  EnvironmentResource,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
@@ -523,10 +524,29 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return undefined;
     }
   }
-
-  get __unstable__environment(): any {
+  /**
+   * Clerk Instance Environment.
+   *
+   * @internal This is an internal resource, not intended for public usage. It may be changed or removed at any time.
+   * @deprecated Use `__internal_environment` instead.
+   */
+  get __unstable__environment(): EnvironmentResource | null | undefined {
     if (this.clerkjs) {
-      return (this.clerkjs as any).__unstable__environment;
+      return this.clerkjs.__unstable__environment;
+      // TODO: add ssr condition
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Clerk Instance Environment.
+   *
+   * @internal This is an internal resource, not intended for public usage. It may be changed or removed at any time.
+   */
+  get __internal_environment(): EnvironmentResource | null | undefined {
+    if (this.clerkjs) {
+      return this.clerkjs.__internal_environment;
       // TODO: add ssr condition
     } else {
       return undefined;

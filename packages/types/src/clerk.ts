@@ -11,6 +11,7 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type { CustomPage } from './customPages';
+import type { EnvironmentResource } from './environment';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
@@ -90,6 +91,21 @@ export interface Clerk {
 
   /** Clerk flag for loading Clerk in a standard browser setup */
   isStandardBrowser: boolean | undefined;
+
+  /**
+   * Clerk Instance Environment.
+   *
+   * @internal This is an internal resource, not intended for public usage. It may be changed or removed at any time.
+   * @deprecated Use `__internal_environment` instead.
+   */
+  __unstable__environment: EnvironmentResource | null | undefined;
+
+  /**
+   * Clerk Instance Environment.
+   *
+   * @internal This is an internal resource, not intended for public usage. It may be changed or removed at any time.
+   */
+  __internal_environment: EnvironmentResource | null | undefined;
 
   /** Client handling most Clerk operations. */
   client: ClientResource | undefined;
