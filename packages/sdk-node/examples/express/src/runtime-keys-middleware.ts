@@ -23,10 +23,12 @@ app.get('/', async (req: WithAuthProp<Request>, res: Response) => {
   console.log(debug());
   if (!userId) return res.json({ auth: req.auth, user: null });
 
-  const { data, errors } = await clerk.users.getUser(userId);
-  if (errors) return res.json({ auth: req.auth, user: null });
-
-  return res.json({ auth: req.auth, user: data });;
+  try{
+    const user = await clerk.users.getUser(userId);
+    return res.json({ auth: req.auth, user });
+  }catch(error){
+    return res.json({ auth: req.auth, user: null });
+  }
 });
 
 // @ts-ignore
