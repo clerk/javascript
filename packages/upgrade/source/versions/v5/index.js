@@ -191,6 +191,7 @@ export default {
 		'setclerkhttpoptions',
 		'setclerkserverapiurl',
 		'cjs-esm-instance',
+		'legacyauthobject-removed',
 	]),
 	react: load('react', reactChangesList),
 	js: load('js', [
@@ -228,6 +229,14 @@ export default {
 		'button-to-organizationlistcreateorganizationactionbutton',
 		'remove-socialbuttonsblockbuttonarrow',
 		'remove-identitypreview-avatar',
+		'organization-getroles-arguments-changed',
+		'organization-getdomains-arguments-change',
+		'organization-getmembershiprequests-arguments-changed',
+		'organization-getmemberships-arguments-changed',
+		'organization-getinvitations-arguments-changed',
+		'user-getorganizationinvitations-arguments-chanaged',
+		'user-getorganizationsuggestions-arguments-chanaged',
+		'user-getorganizationmemberships-arguments-chanaged',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',

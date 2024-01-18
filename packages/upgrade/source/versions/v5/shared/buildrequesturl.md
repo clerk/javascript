@@ -1,14 +1,12 @@
 ---
-title: '`getRequestUrl` -> `buildRequestUrl` from `@clerk/backend`'
+title: '`getRequestUrl` -> `buildRequestUrl` from `@clerk/backend/internal`'
 matcher: "getRequestUrl\\("
 ---
 
-```js
-// before
-import { getRequestUrl } from '@clerk/shared/proxy';
-const url = getRequestUrl(req, '/your/path');
+```diff
+- import { getRequestUrl } from '@clerk/shared/proxy';
++ import { buildRequestUrl } from '@clerk/backend/internal';
 
-// after
-import { buildRequestUrl } from '@clerk/backend';
-const url = buildRequestUrl(/* ??? */);
+- const url = getRequestUrl(req, '/your/path');
++ const url = buildRequestUrl(/* ??? */);
 ```
