@@ -31,7 +31,6 @@ export const Menu = withFloatingTree((props: MenuProps) => {
   const popoverCtx = usePopover({
     placement: popoverPlacement,
     offset: 8,
-    bubbles: false,
     shoudFlip: false,
   });
 
