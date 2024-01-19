@@ -27,6 +27,7 @@ export default function createLoader({ version, baseUrl }) {
 				slug,
 				sdk: sdk,
 				content: parsed.content,
+				warning: fm.warning,
 				link: `${baseUrl}#${slug}`,
 			};
 		});

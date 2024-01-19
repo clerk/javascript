@@ -7,7 +7,7 @@ import { ProgressBar } from '@inkjs/ui';
 import indexToPosition from 'index-to-position';
 import ExpandableList from './util/expandable-list.js';
 
-export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
+export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarnings }) {
 	// NOTE: if the difference between fromVersion and toVersion is greater than 1
 	// we need to do a little extra work here and import two matchers,
 	// sequence them after each other, and clearly mark which version migration
@@ -94,6 +94,8 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 
 						// for each match, add to `instances` array of a key, create if not exists
 						matches.map(match => {
+							if (noWarnings && matcherConfig.warning) return;
+
 							if (!allResults[matcherConfig.title])
 								allResults[matcherConfig.title] = { instances: [], ...matcherConfig };
 

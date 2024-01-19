@@ -1,7 +1,7 @@
 ---
 title: '`Settings` -> `General` tab in `OrganizationProfile`'
 matcher: '<OrganizationProfile'
-type: 'warning'
+warning: true
 image: true
 ---
 

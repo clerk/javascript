@@ -11,11 +11,12 @@ const cli = meow(
 		  $ clerk-upgrade
 
 		Options
-			--from   Major version number you're upgrading from
-			--to     Major version number you're upgrading to
-			--sdk    Name of the SDK you're upgrading
-			--dir    Directory you'd like to scan for files
-			--ignore Any files or directories you'd like to ignore
+			--from         Major version number you're upgrading from
+			--to           Major version number you're upgrading to
+			--sdk          Name of the SDK you're upgrading
+			--dir          Directory you'd like to scan for files
+			--ignore       Any files or directories you'd like to ignore
+			--noWarnings   Do not print warnings, only items that must be fixed
 
 		Examples
 		  $ clerk-upgrade --from=4 --to=5 --sdk=nextjs --dir=src/**
@@ -30,6 +31,7 @@ const cli = meow(
 			dir: { type: 'string' },
 			ignore: { type: 'string', isMultiple: true },
 			yolo: { type: 'boolean' },
+			noWarnings: { type: 'boolean' },
 		},
 	},
 );
@@ -41,5 +43,6 @@ render(
 		_sdk={cli.flags.sdk}
 		_dir={cli.flags.dir}
 		_yolo={cli.flags.yolo}
+		noWarnings={cli.flags.noWarnings}
 	/>,
 );

@@ -9,7 +9,15 @@ import getClerkMajorVersion from './util/get-clerk-version.js';
 import Gradient from 'ink-gradient';
 import BigText from 'ink-big-text';
 
-export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ignore = [], _yolo = false }) {
+export default function App({
+	_fromVersion,
+	_toVersion,
+	_sdk,
+	_dir = false,
+	_ignore = [],
+	_yolo = false,
+	noWarnings = false,
+}) {
 	const [yolo, setYolo] = useState(_yolo);
 	const [sdks, setSdks] = useState(_sdk ? [_sdk] : []);
 	const [sdkGuesses, setSdkGuesses] = useState([]);
@@ -236,7 +244,7 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 
 			{configVerified && (
 				<>
-					<Scan {...{ fromVersion, toVersion, sdks, dir, ignore }} />
+					<Scan {...{ fromVersion, toVersion, sdks, dir, ignore, noWarnings }} />
 				</>
 			)}
 		</>

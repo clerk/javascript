@@ -81,17 +81,31 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
 												{'  '}- {loc}
 											</Text>
 										))}
+										<Line />
+									</>
+								)}
+
+								{item.warning && (
+									<>
+										<Text color='yellow'>
+											⚠️ This is a WARNING and will still match even if you corrected the issue or if no correction is
+											necessary. To dismiss warnings, pass the `--noWarnings` flag to the CLI when running.
+										</Text>
+										<Line />
 									</>
 								)}
 
 								<Newline />
+
+								{/* This didn't feel like useful information, but keeping it for future reference */}
 								{/* <Text color='gray'>changed in {item.sdk} SDK</Text> */}
 								<Markdown>{item.content}</Markdown>
-								<Newline />
-								<Line />
-								<Link url={item.link}>
+								{/* We are not generating the upgrade guide from the slugs this round, so this is commented out */}
+								{/* <Newline /> */}
+								{/* <Line /> */}
+								{/* <Link url={item.link}>
 									<Text>Open in migration guide &raquo;</Text>
-								</Link>
+								</Link> */}
 							</>
 						)}
 					</Box>,
