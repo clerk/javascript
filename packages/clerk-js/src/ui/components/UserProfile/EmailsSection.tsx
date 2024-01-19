@@ -41,6 +41,7 @@ export const EmailsSection = () => {
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.emailAddressesSection.title')}
+      centered={false}
       id='emailAddresses'
     >
       <Action.Root>

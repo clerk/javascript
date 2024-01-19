@@ -1,5 +1,5 @@
 import type { ProfileSectionId } from '@clerk/types';
-import { isValidElement } from 'react';
+import { isValidElement, useLayoutEffect, useRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
@@ -11,24 +11,32 @@ import { ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
-  subtitle?: LocalizationKey;
+  centered?: boolean;
   id: ProfileSectionId;
 };
 
 const ProfileSectionRoot = (props: ProfileSectionProps) => {
-  const { title, children, id, subtitle, sx, ...rest } = props;
+  const { title, centered = true, children, id, sx, ...rest } = props;
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [height, setHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    setHeight(ref.current?.clientHeight || 0);
+  }, []);
+
   return (
     <Flex
       elementDescriptor={descriptors.profileSection}
       elementId={descriptors.profileSection.setId(id)}
       sx={[
         t => ({
+          flexDirection: 'row-reverse',
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           padding: `${t.space.$4} 0`,
-          gap: t.space.$6,
+          gap: t.space.$4,
           [mqu.md]: {
-            flexDirection: 'column',
-            gap: 0,
+            flexDirection: 'column-reverse',
+            gap: t.space.$2,
           },
         }),
         sx,
@@ -36,9 +44,37 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
       {...rest}
     >
       <Col
+        elementDescriptor={descriptors.profileSectionContent}
+        elementId={descriptors.profileSectionContent.setId(id)}
+        gap={2}
+        ref={ref}
+        sx={{
+          width: '100%',
+          '+ *': {
+            '--clerk-height': `${height}px`,
+          },
+        }}
+      >
+        {children}
+      </Col>
+
+      <Col
         elementDescriptor={descriptors.profileSectionHeader}
         elementId={descriptors.profileSectionHeader.setId(id)}
-        sx={t => ({ gap: t.space.$1, width: t.space.$66 })}
+        sx={t => ({
+          padding: centered ? undefined : `${t.space.$2} 0`,
+          gap: t.space.$1,
+          width: t.space.$66,
+          alignSelf: height ? 'self-start' : centered ? 'center' : undefined,
+          marginTop: centered ? 'calc(var(--clerk-height)/2)' : undefined,
+          transform: height && centered ? 'translateY(-50%)' : undefined,
+          [mqu.md]: {
+            alignSelf: 'self-start',
+            marginTop: 'unset',
+            transform: 'none',
+            padding: 0,
+          },
+        })}
       >
         <SectionHeader
           localizationKey={title}
@@ -46,25 +82,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           elementId={descriptors.profileSectionTitle.setId(id)}
           textElementDescriptor={descriptors.profileSectionTitleText}
           textElementId={descriptors.profileSectionTitleText.setId(id)}
-          sx={t => ({ padding: `${t.space.$2} ${t.space.$none}` })}
         />
-        {subtitle && (
-          <SectionSubHeader
-            localizationKey={subtitle}
-            elementDescriptor={descriptors.profileSectionSubtitle}
-            elementId={descriptors.profileSectionSubtitle.setId(id)}
-            textElementDescriptor={descriptors.profileSectionSubtitleText}
-            textElementId={descriptors.profileSectionSubtitleText.setId(id)}
-          />
-        )}
-      </Col>
-      <Col
-        elementDescriptor={descriptors.profileSectionContent}
-        elementId={descriptors.profileSectionContent.setId(id)}
-        gap={2}
-        sx={{ width: '100%' }}
-      >
-        {children}
       </Col>
     </Flex>
   );
