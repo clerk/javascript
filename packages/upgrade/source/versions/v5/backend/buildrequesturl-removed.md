@@ -1,13 +1,7 @@
 ---
-title: '`buildRequestUrl` import moved to `/internal`'
-matcher: "import\\s+{[\\s\\S]*?buildRequestUrl[\\s\\S]*?}\\s+from\\s+['\"]@clerk\/(backend)['\"]"
-replaceWithString: 'backend/internal'
+title: '`buildRequestUrl` import removed'
+matcher: "import\\s+{[\\s\\S]*?buildRequestUrl[\\s\\S]*?}\\s+from\\s+['\"]@clerk\/backend['\"]"
 matcherFlags: 'm'
 ---
 
-The `buildRequestUrl` import was intended for those building custom Clerk integrations for frameworks and has been moved to `@clerk/backend/internal` to reflect this. Please use caution when using internal imports as they are outside the bounds of semver.
-
-```diff
-- import { buildRequestUrl } from "@clerk/backend"
-+ import { buildRequestUrl } from "@clerk/backend/internal"
-```
+The `buildRequestUrl` import was intended for those building custom Clerk integrations for frameworks and has been removed in favor of other methods internally. If you were relying on this function and this is an issue, please [reach out to Clerk support](https://clerk.com/support).

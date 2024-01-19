@@ -280,7 +280,7 @@ export default {
 		'ismagiclinkerror',
 		'magiclinkerrorcode',
 		'usemagiclink',
-		'buildrequesturl',
+		'getrequesturl',
 		'organizationcontext',
 		'useorganizationlist-organizationlist', // shared outside this pkg?
 	]),
