@@ -44,6 +44,7 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.connectedAccountsSection.title')}
+      centered={false}
       id='connectedAccounts'
     >
       <Card.Alert>{card.error}</Card.Alert>

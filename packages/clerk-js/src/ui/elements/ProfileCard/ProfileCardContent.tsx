@@ -44,6 +44,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         elementDescriptor={descriptors.pageScrollBox}
         sx={theme => ({
           flex: `1`,
+          scrollbarGutter: 'stable',
           padding: `${theme.space.$7} ${theme.space.$8}`,
           [mqu.xs]: {
             padding: `${theme.space.$8} ${theme.space.$5}`,

@@ -38,6 +38,7 @@ export const MfaSection = () => {
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.mfaSection.title')}
+      centered={false}
       id='mfa'
     >
       <Action.Root>
