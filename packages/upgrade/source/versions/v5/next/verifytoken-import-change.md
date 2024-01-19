@@ -1,6 +1,7 @@
 ---
 title: '`verifyToken` import moved under `/server`'
 matcher: "import\\s+{[\\s\\S]*?verifyToken[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)[\\s\\S]*?['\"]"
+matcherFlags: 'm'
 replaceWithString: 'nextjs/server'
 ---
 

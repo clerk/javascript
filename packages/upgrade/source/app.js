@@ -9,7 +9,8 @@ import getClerkMajorVersion from './util/get-clerk-version.js';
 import Gradient from 'ink-gradient';
 import BigText from 'ink-big-text';
 
-export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ignore = [] }) {
+export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ignore = [], _yolo = false }) {
+	const [yolo, setYolo] = useState(_yolo);
 	const [sdks, setSdks] = useState(_sdk ? [_sdk] : []);
 	const [sdkGuesses, setSdkGuesses] = useState([]);
 	const [sdkGuessConfirmed, setSdkGuessConfirmed] = useState(false);
@@ -22,6 +23,11 @@ export default function App({ _fromVersion, _toVersion, _sdk, _dir = false, _ign
 	const [configComplete, setConfigComplete] = useState(false);
 	const [configVerified, setConfigVerified] = useState(false);
 	let fromVersionGuess = false;
+
+	if (yolo) {
+		setSdks(SDKS.map(s => s.value));
+		setYolo(false);
+	}
 
 	// We try to guess which SDK they are using
 	if (isEmpty(sdks) && isEmpty(sdkGuesses) && !sdkGuessAttempted) {

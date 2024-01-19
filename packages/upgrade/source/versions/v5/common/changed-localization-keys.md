@@ -1,5 +1,6 @@
 ---
 title: 'Localization keys changed'
+matcherFlags: 'm'
 matcher:
   - 'formFieldLabel__organizationName:'
   - 'formFieldLabel__organizationSlug:'

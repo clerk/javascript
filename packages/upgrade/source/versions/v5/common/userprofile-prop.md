@@ -1,6 +1,7 @@
 ---
 title: '`userProfile` -> `userProfileProps` for `UserButton`'
-matcher: '<UserButton.*?(userProfile)=.*?>'
+matcher: "<UserButton[\\s\\S]*?(userProfile)=[\\s\\S]*?>"
+matcherFlags: 'm'
 replaceWithString: 'userProfileProps'
 ---
 

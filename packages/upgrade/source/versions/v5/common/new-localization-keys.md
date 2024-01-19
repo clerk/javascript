@@ -1,6 +1,7 @@
 ---
 title: 'New localization keys added'
 matcher: "<ClerkProvider[\\s\\S]*?localization=[\\s\\S]*?>"
+matcherFlags: 'm'
 warning: true
 ---
 

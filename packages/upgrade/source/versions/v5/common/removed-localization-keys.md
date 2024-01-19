@@ -1,5 +1,6 @@
 ---
 title: 'Removed localization keys'
+matcherFlags: 'm'
 matcher:
   - "signIn:\\s+{[\\s\\S]*?forgotPassword:\\s+{[\\s\\S]*?title_email:"
   - "signIn:\\s+{[\\s\\S]*?forgotPassword:\\s+{[\\s\\S]*?title_phone:"

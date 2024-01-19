@@ -1,6 +1,6 @@
 ---
 title: '`invitationList` -> `invitations` as param to `useOrganizations`'
-matcher: "useOrganizations\\(\\s*{\\.*?invitationList:"
+matcher: "useOrganizations\\(\\s*{[\\s\\S]*?invitationList:"
 matcherFlags: 'm'
 ---
 

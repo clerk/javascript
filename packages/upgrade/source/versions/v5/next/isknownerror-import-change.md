@@ -1,6 +1,7 @@
 ---
 title: '`isKnownError` import moved under `/errors`'
 matcher: "import\\s+{[\\s\\S]*?isKnownError[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)[\\s\\S]*?['\"]"
+matcherFlags: 'm'
 replaceWithString: 'nextjs/errors'
 ---
 

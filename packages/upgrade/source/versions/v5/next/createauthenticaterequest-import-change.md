@@ -1,6 +1,7 @@
 ---
 title: '`createAuthenticateRequest` import moved under `/server`'
 matcher: "import\\s+{[\\s\\S]*?createAuthenticateRequest[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)[\\s\\S]*?['\"]"
+matcherFlags: 'm'
 replaceWithString: 'nextjs/server'
 ---
 

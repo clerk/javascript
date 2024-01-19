@@ -1,9 +1,9 @@
 ---
 title: '`clockSkewInSeconds` -> `clockSkewInMs`'
 matcher:
-  - "verifyJwt\\([\\s\\S]*?(clockSkewInSeconds):[\\s\\S]*?)"
-  - "verifyToken\\([\\s\\S]*?(clockSkewInSeconds):[\\s\\S]*?)"
-  - "authenticateRequest\\([\\s\\S]*?(clockSkewInSeconds):[\\s\\S]*?)"
+  - "verifyJwt\\([\\s\\S]*?(clockSkewInSeconds):[\\s\\S]*?\\)"
+  - "verifyToken\\([\\s\\S]*?(clockSkewInSeconds):[\\s\\S]*?\\)"
+  - "authenticateRequest\\([\\s\\S]*?(clockSkewInSeconds):[\\s\\S]*?\\)"
 matcherFlags: 'm'
 replaceWithString: 'clockSkewInMs'
 ---

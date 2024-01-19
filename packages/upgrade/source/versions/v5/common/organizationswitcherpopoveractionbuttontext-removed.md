@@ -1,6 +1,7 @@
 ---
 title: '`organizationSwitcherPopoverActionButtonText` customization id removed'
 image: true
+matcherFlags: 'm'
 matcher:
   - "\\.cl-organizationSwitcherPopoverActionButtonText"
   - "\\.cl-organizationSwitcherPopoverActionButtonText__manageOrganization"

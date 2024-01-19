@@ -1,6 +1,7 @@
 ---
 title: '`withClerk` function removed'
 matcher: "import\\s+{[\\s\\S]*?withClerk[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
+matcherFlags: 'm'
 ---
 
 The `withClerk` higher order function has been removed. If you would still like to use this function in the way its implemented, it can be created quickly using Clerk's [custom hooks](https://clerk.com/docs/references/react/overview). An example of how to do so is below:

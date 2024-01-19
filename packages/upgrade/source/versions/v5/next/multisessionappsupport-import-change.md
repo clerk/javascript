@@ -1,6 +1,7 @@
 ---
 title: '`MultiSessionAppSupport` import moved under `/internal`'
 matcher: "import\\s+{[\\s\\S]*?MultiSessionAppSupport[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)[\\s\\S]*?['\"]"
+matcherFlags: 'm'
 replaceWithString: 'nextjs/internal'
 ---
 

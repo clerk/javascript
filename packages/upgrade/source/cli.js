@@ -29,6 +29,7 @@ const cli = meow(
 			sdk: { type: 'string', choices: sdks.map(i => i.value) },
 			dir: { type: 'string' },
 			ignore: { type: 'string', isMultiple: true },
+			yolo: { type: 'boolean' },
 		},
 	},
 );
@@ -39,5 +40,6 @@ render(
 		_toVersion={cli.flags.to}
 		_sdk={cli.flags.sdk}
 		_dir={cli.flags.dir}
+		_yolo={cli.flags.yolo}
 	/>,
 );

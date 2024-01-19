@@ -1,6 +1,7 @@
 ---
 title: '`afterSwitchOrganizationUrl` -> `afterSelectOrganizationUrl` in `OrganizationSwitcher`'
-matcher: '<OrganizationSwitcher.*?(afterSwitchOrganizationUrl)=.*?>'
+matcher: "<OrganizationSwitcher[\\s\\S]*?(afterSwitchOrganizationUrl)=[\\s\\S]*?>"
+matcherFlags: 'm'
 replaceWithString: 'afterSelectOrganizationUrl'
 ---
 

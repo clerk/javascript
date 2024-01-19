@@ -1,6 +1,7 @@
 ---
 title: 'Back button customization ids change on alternative 2fa methods page'
 image: true
+matcherFlags: 'm'
 matcher:
   - "\\.cl-headerBackIcon"
   - "\\.cl-headerBackRow"

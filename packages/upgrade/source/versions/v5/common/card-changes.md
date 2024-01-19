@@ -1,6 +1,7 @@
 ---
 title: 'Changes to the `card` customization id'
 warning: true
+matcherFlags: 'm'
 matcher:
   - "\\.cl-card"
   - "elements:\\s+{[\\s\\S]*?card:[\\s\\S]*?}"
