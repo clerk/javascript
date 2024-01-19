@@ -45,6 +45,7 @@
   "scripts": {
     "app:build": "(cd examples/nextjs && npm run build)",
     "app:dev": "(cd examples/nextjs && npm run dev)",
+    "app:dev:debug": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true npm run dev)",
     "app:e2e": "(cd examples/nextjs && npm run e2e)",
     "app:lint": "(cd examples/nextjs && npm run lint)",
     "build": "tsup",

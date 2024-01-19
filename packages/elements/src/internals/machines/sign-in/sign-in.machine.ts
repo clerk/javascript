@@ -20,6 +20,8 @@ import type { FormMachine } from '~/internals/machines/form/form.machine';
 import { handleRedirectCallback, waitForClerk } from '~/internals/machines/shared.actors';
 import { assertActorEventDone, assertActorEventError } from '~/internals/machines/utils/assert';
 import type { ClerkRouter } from '~/react/router';
+import type { EnabledThirdPartyProviders } from '~/utils/third-party-strategies';
+import { getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 
 import {
   attemptFirstFactor,
@@ -38,6 +40,7 @@ export interface SignInMachineContext extends MachineContext {
   formRef: ActorRefFrom<typeof FormMachine>;
   resource: SignInResource | null;
   router: ClerkRouter;
+  thirdPartyProviders: EnabledThirdPartyProviders;
 }
 
 export interface SignInMachineInput {
@@ -99,6 +102,9 @@ export const SignInMachine = setup({
     assignStartingSecondFactor: assign({
       currentFactor: ({ context }) =>
         determineStartingSignInSecondFactor(context.clerk.client.signIn.supportedSecondFactors),
+    }),
+    assignThirdPartyProviders: assign({
+      thirdPartyProviders: ({ context }) => getEnabledThirdPartyProviders(context.clerk.__unstable__environment),
     }),
     debug: ({ context, event }, params?: Record<string, unknown>) => console.dir({ context, event, params }),
     logError: ({ event }) => {
@@ -169,6 +175,7 @@ export const SignInMachine = setup({
     formRef: input.form,
     resource: null,
     router: input.router,
+    thirdPartyProviders: getEnabledThirdPartyProviders(input.clerk.__unstable__environment),
   }),
   initial: 'Init',
   on: {
@@ -179,6 +186,7 @@ export const SignInMachine = setup({
     Init: {
       description: 'Ensure that Clerk is loaded and ready',
       initial: 'WaitForClerk',
+      exit: 'assignThirdPartyProviders',
       onDone: [
         {
           description: 'If sign-in complete or loggedin and single-session, skip to complete',
