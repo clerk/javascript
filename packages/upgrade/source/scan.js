@@ -97,14 +97,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore }) {
 							if (!allResults[matcherConfig.title])
 								allResults[matcherConfig.title] = { instances: [], ...matcherConfig };
 
-							try {
-								indexToPosition(content, match.index, { oneBased: true });
-							} catch (err) {
-								console.log(matcherConfig);
-								console.log(file);
-								console.log(content.length, match.index);
-							}
-
+							// TODO: there's a small bug where we can see multiple instances of the same position
 							allResults[matcherConfig.title].instances.push({
 								sdk,
 								file: path.relative(process.cwd(), file),
