@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.0.0-beta-v5.13
+
+### Major Changes
+
+- Refresh the look and feel of the Clerk UI components ([#2622](https://github.com/clerk/javascript/pull/2622)) by [@anagstef](https://github.com/anagstef)
+
+  For more info, refer to the [upgrade guide from v4 to v5 in Clerk docs](https://clerk.com/docs/upgrade-guides/upgrading-from-v4-to-v5).
+
 ## 4.0.0-alpha-v5.12
 
 ### Minor Changes

@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.0.0-beta-v5.18
+
+### Patch Changes
+
+- The following paginated APIs now return `{ data, totalCount }` instead of simple arrays, in order to make building paginated UIs easier: ([#2633](https://github.com/clerk/javascript/pull/2633)) by [@dimkl](https://github.com/dimkl)
+
+  - `clerkClient.users.getOrganizationMembershipList(...)`
+  - `clerkClient.organization.getOrganizationList(...)`
+  - `clerkClient.organization.getOrganizationInvitationList(...)`
+
+  Revert changing the `{ data, errors }` return value of the following helpers to throw the `errors` or return the `data` (keep v4 format):
+
+  - `import { verifyToken } from '@clerk/backend'`
+  - `import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt'`
+  - BAPI `clerkClient` methods eg (`clerkClient.users.getUserList(...)`)
+
+- Updated dependencies [[`8e5c881c4`](https://github.com/clerk/javascript/commit/8e5c881c40d7306c5dbd2e1f1803fbf75127bd71), [`d4ff346dd`](https://github.com/clerk/javascript/commit/d4ff346dd53bb3e1970e80bdc7b188c2dd344f12), [`a6308c67e`](https://github.com/clerk/javascript/commit/a6308c67e329879e001cee56cccd82e60b804422)]:
+  - @clerk/backend@1.0.0-beta-v5.18
+  - @clerk/shared@2.0.0-beta-v5.11
+
 ## 5.0.0-alpha-v5.17
 
 ### Major Changes

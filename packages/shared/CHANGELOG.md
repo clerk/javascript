@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta-v5.11
+
+### Patch Changes
+
+- Version bump to convert `@clerk/shared` from alpha to beta ([#2638](https://github.com/clerk/javascript/pull/2638)) by [@dimkl](https://github.com/dimkl)
+
 ## 2.0.0-alpha-v5.10
 
 ### Minor Changes
