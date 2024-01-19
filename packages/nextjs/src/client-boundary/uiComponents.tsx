@@ -17,7 +17,7 @@ import type {
 } from '@clerk/types';
 import React from 'react';
 
-import { useClerkNextOptions } from './NextOptionsContext';
+import { usePathnameWithoutWithCatchAll } from './usePathnameWithoutCatchAll';
 
 export {
   OrganizationList,
@@ -35,13 +35,15 @@ export {
 // "The inferred type of 'UserProfile' cannot be named without a reference to ..."
 export const UserProfile: typeof BaseUserProfile = Object.assign(
   (props: UserProfileProps) => {
-    return <BaseUserProfile {...useRoutingProps('UserProfile', props)} />;
+    const path = usePathnameWithoutWithCatchAll();
+    return <BaseUserProfile {...useRoutingProps('UserProfile', props, { path })} />;
   },
   { ...BaseUserProfile },
 );
 
 export const CreateOrganization = (props: CreateOrganizationProps) => {
-  return <BaseCreateOrganization {...useRoutingProps('CreateOrganization', props)} />;
+  const path = usePathnameWithoutWithCatchAll();
+  return <BaseCreateOrganization {...useRoutingProps('CreateOrganization', props, { path })} />;
 };
 
 // The assignment of OrganizationProfile with BaseOrganizationProfile props is used
@@ -50,17 +52,18 @@ export const CreateOrganization = (props: CreateOrganizationProps) => {
 // "The inferred type of 'OrganizationProfile' cannot be named without a reference to ..."
 export const OrganizationProfile: typeof BaseOrganizationProfile = Object.assign(
   (props: OrganizationProfileProps) => {
-    return <BaseOrganizationProfile {...useRoutingProps('OrganizationProfile', props)} />;
+    const path = usePathnameWithoutWithCatchAll();
+    return <BaseOrganizationProfile {...useRoutingProps('OrganizationProfile', props, { path })} />;
   },
   { ...BaseOrganizationProfile },
 );
 
 export const SignIn = (props: SignInProps) => {
-  const { signInUrl } = useClerkNextOptions();
-  return <BaseSignIn {...useRoutingProps('SignIn', props, { path: signInUrl })} />;
+  const path = usePathnameWithoutWithCatchAll();
+  return <BaseSignIn {...useRoutingProps('SignIn', props, { path })} />;
 };
 
 export const SignUp = (props: SignUpProps) => {
-  const { signUpUrl } = useClerkNextOptions();
-  return <BaseSignUp {...useRoutingProps('SignUp', props, { path: signUpUrl })} />;
+  const path = usePathnameWithoutWithCatchAll();
+  return <BaseSignUp {...useRoutingProps('SignUp', props, { path })} />;
 };
