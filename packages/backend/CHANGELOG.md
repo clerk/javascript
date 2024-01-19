@@ -18,7 +18,13 @@
 
 ### Patch Changes
 
-- Add `password_hasher` and `password_digest` to `users.updateUser(userId, params)` ([#2619](https://github.com/clerk/javascript/pull/2619)) by [@SokratisVidros](https://github.com/SokratisVidros)
+- Add the following properties to `users.updateUser(userId, params)` params: ([#2619](https://github.com/clerk/javascript/pull/2619)) by [@SokratisVidros](https://github.com/SokratisVidros)
+  
+  - `password_hasher`
+  - `password_digest`
+  - `publicMetadata`
+  - `privateMetadata`
+  - `unsafeMetadata`
 
 ## 1.0.0-alpha-v5.17
 
