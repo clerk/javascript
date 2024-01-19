@@ -1,6 +1,7 @@
 'use client';
 
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
+import type { OAuthProvider, Web3Provider } from '@clerk/types';
 import { Slot } from '@radix-ui/react-slot';
 import type { PropsWithChildren } from 'react';
 
@@ -9,12 +10,17 @@ import {
   SignUpFlowProvider as SignUpFlowContextProvider,
   useSignUpFlow,
   useSignUpStateMatcher,
+  useSignUpThirdPartyProvider,
   useSignUpThirdPartyProviders,
 } from '~/internals/machines/sign-up/sign-up.context';
+import type { SignUpVerificationTags } from '~/internals/machines/sign-up/sign-up.machine';
 import { Form } from '~/react/common/form';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
 import type { ThirdPartyStrategy } from '~/utils/third-party-strategies';
+
+import type { SocialProviderProps } from '../common/third-party-providers/social-provider';
+import { SocialProvider, SocialProviderIcon } from '../common/third-party-providers/social-provider';
 
 const { useBrowserInspector } = createBrowserInspectorReactHook();
 
@@ -88,6 +94,26 @@ export function SignUpContinue({ children }: PropsWithChildren) {
   return state.matches('Continue') ? <Form flowActor={actorRef}>{children}</Form> : null;
 }
 
+// ================= SignUpVerify ================= //
+
+export type SignUpVerifyProps = PropsWithChildren;
+
+export function SignUpVerify({ children }: SignUpVerifyProps) {
+  const actorRef = useSignUpFlow();
+  const state = useSignUpStateMatcher();
+
+  return state.matches('Verification') ? <Form flowActor={actorRef}>{children}</Form> : null;
+}
+
+// ================= SignUpStrategy ================= //
+
+export type SignUpStrategyProps = PropsWithChildren<{ name: SignUpVerificationTags }>;
+
+export function SignUpStrategy({ children, name }: SignUpStrategyProps) {
+  const state = useSignUpStateMatcher();
+  return state.hasTag(name) ? children : null;
+}
+
 // ================= SignUpSocialProviders ================= //
 
 export type SignUpSocialProvidersProps = { render(provider: ThirdPartyStrategy): React.ReactNode };
@@ -112,3 +138,22 @@ export function SignUpSocialProviders({ render: provider }: SignUpSocialProvider
     </>
   );
 }
+
+// ================= SignUpSocialProvider ================= //
+
+export interface SignUpSocialProviderProps extends Omit<SocialProviderProps, 'provider'> {
+  name: OAuthProvider | Web3Provider;
+}
+
+export function SignUpSocialProvider({ name, ...rest }: SignUpSocialProviderProps) {
+  const thirdPartyProvider = useSignUpThirdPartyProvider(name);
+
+  return (
+    <SocialProvider
+      {...rest}
+      provider={thirdPartyProvider}
+    />
+  );
+}
+
+export const SignUpSocialProviderIcon = SocialProviderIcon;

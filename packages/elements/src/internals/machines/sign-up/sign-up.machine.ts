@@ -31,6 +31,7 @@ import {
 import { assertActorEventDone, assertActorEventError } from '~/internals/machines/utils/assert';
 import type { ClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 import type { ClerkRouter } from '~/react/router';
+import { type EnabledThirdPartyProviders, getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 
 type SignUpVerificationsResourceKey = keyof SignUpVerificationsResource;
 
@@ -41,6 +42,7 @@ export interface SignUpMachineContext extends MachineContext {
   resource: SignUpResource | null;
   resourceVerification: SignUpVerificationsResource | null;
   router: ClerkRouter;
+  thirdPartyProviders: EnabledThirdPartyProviders;
 }
 
 export interface SignUpMachineInput {
@@ -64,7 +66,9 @@ export type SignUpMachineEvents =
   | { type: 'EMAIL_LINK.FAILURE'; error: Error }
   | { type: ClerkJSNavigationEvent };
 
-export type SignUpTags = 'start' | 'first-factor' | 'second-factor' | 'complete' | 'external';
+export type SignUpVerificationTags = 'code' | VerificationStrategy;
+
+export type SignUpTags = SignUpVerificationTags | 'external';
 export type SignUpDelays = 'TIMEOUT.POLLING';
 
 export interface SignUpMachineTypes {
@@ -102,6 +106,9 @@ export const SignUpMachine = setup({
       return {
         resource: event.output,
       };
+    }),
+    assignThirdPartyProviders: assign({
+      thirdPartyProviders: ({ context }) => getEnabledThirdPartyProviders(context.clerk.__unstable__environment),
     }),
     raiseFailure: raise(({ event }) => {
       assertActorEventError(event);
@@ -212,6 +219,7 @@ export const SignUpMachine = setup({
     resource: null,
     resourceVerification: null,
     router: input.router,
+    thirdPartyProviders: getEnabledThirdPartyProviders(input.clerk.__unstable__environment),
   }),
   initial: 'Init',
   on: {
@@ -324,6 +332,7 @@ export const SignUpMachine = setup({
     Start: {
       id: 'Start',
       description: 'The intial state of the sign-in flow.',
+      entry: 'assignThirdPartyProviders',
       initial: 'AwaitingInput',
       on: {
         'AUTHENTICATE.OAUTH': '#SignUp.AuthenticatingWithRedirect',
@@ -333,6 +342,10 @@ export const SignUpMachine = setup({
         {
           guard: and(['isStatusMissingRequirements', 'areFieldsUnverified']),
           target: 'Verification',
+        },
+        {
+          guard: 'areFieldsMissing',
+          target: 'Continue',
         },
         {
           guard: 'isStatusComplete',

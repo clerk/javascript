@@ -1,14 +1,19 @@
-import type { FormControlProps, FormFieldProps, FormLabelProps, FormProps } from '@radix-ui/react-form';
+import type {
+  FormControlProps,
+  FormFieldProps,
+  FormLabelProps,
+  FormMessageProps,
+  FormProps,
+} from '@radix-ui/react-form';
 import {
   Control as RadixControl,
   Field as RadixField,
   Form as RadixForm,
+  FormMessage,
   Label as RadixLabel,
-  Message as RadixMessage,
   Submit,
 } from '@radix-ui/react-form';
-import { Slot } from '@radix-ui/react-slot';
-import type { CSSProperties, HTMLProps, ReactNode } from 'react';
+import type { ComponentProps, CSSProperties, HTMLProps, ReactNode } from 'react';
 import React, {
   createContext,
   forwardRef,
@@ -42,7 +47,6 @@ const useFieldContext = () => useContext(FieldContext);
  */
 const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
   const error = useFormSelector(globalErrorsSelector);
-
   const validity = error ? 'invalid' : 'valid';
 
   // Register the onSubmit handler for form submission
@@ -378,75 +382,76 @@ function Label(props: FormLabelProps) {
 }
 
 // ================= ERRORS ================= //
-type ClerkElementsErrorsRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
-type ErrorsProps = {
-  name?: string;
-  render(error: ClerkElementsErrorsRenderProps): React.ReactNode;
-} & HTMLProps<HTMLDivElement>;
 
-/**
- * Component used to render:
- *  1. field-level errors when render within a <Field> or with a `name` prop
- *  2. global errors when rendered outside of a <Field> and without a `name` prop
- */
-function Errors({ name, ...props }: ErrorsProps) {
-  const fieldContext = useFieldContext();
-
-  if (!fieldContext && !name) {
-    return <GlobalErrors {...props} />;
-  }
-
-  return (
-    <FieldErrors
-      name={name}
-      {...props}
-    />
+type FormErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
+type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> &
+  (
+    | {
+        children?: (error: FormErrorRenderProps) => React.ReactNode;
+        code?: string;
+      }
+    | {
+        children: React.ReactNode;
+        code: string;
+      }
   );
-}
 
-function GlobalErrors({ render, ...rest }: Exclude<ErrorsProps, 'name'>) {
+type FormGlobalErrorProps = FormErrorProps<ComponentProps<'span'>>;
+type FormFieldErrorProps = FormErrorProps<FormMessageProps & { name?: string }>;
+
+function GlobalError({ children, code, ...rest }: FormGlobalErrorProps) {
   const { errors } = useGlobalErrors();
 
-  if (!errors) {
+  const error = errors?.[0];
+
+  if (!error || (code && error.code !== code)) {
     return null;
   }
+
+  const child = typeof children === 'function' ? children(error) : children;
 
   return (
     <span
       role='alert'
       {...rest}
     >
-      {errors.map(error => (
-        <Slot key={`${error.name}-${error.code}`}>{render(error)}</Slot>
-      ))}
+      {child || error.message}
     </span>
   );
 }
 
-function FieldErrors({ name, render }: ErrorsProps) {
+function FieldError({ children, code, name, ...rest }: FormFieldErrorProps) {
   const fieldContext = useFieldContext();
   const fieldName = fieldContext?.name || name;
   const { errors } = useFieldErrors({ name: fieldName });
 
-  if (!errors) {
+  const error = errors?.[0];
+
+  if (!error) {
     return null;
   }
 
+  const child = typeof children === 'function' ? children(error) : children;
+  const forceMatch = code ? error.code === code : true;
+
   return (
-    <>
-      {errors.map(error => (
-        <RadixMessage
-          asChild
-          match={error.matchFn}
-          forceMatch={error.forceMatch}
-          key={`${error.name}-${error.code}`}
-        >
-          {render(error)}
-        </RadixMessage>
-      ))}
-    </>
+    <FormMessage
+      data-error-code={error.code}
+      forceMatch={forceMatch}
+      {...rest}
+    >
+      {child || error.message}
+    </FormMessage>
   );
 }
 
-export { Field, FieldState, Form, Input, Errors, Label, Submit };
-export type { FormControlProps, FormFieldProps, FormProps, ErrorsProps };
+export { Field, FieldError, FieldState, Form, GlobalError, Input, Label, Submit };
+export type {
+  FormControlProps,
+  FormErrorProps,
+  FormGlobalErrorProps,
+  FormErrorRenderProps,
+  FormFieldErrorProps,
+  FormFieldProps,
+  FormProps,
+};
