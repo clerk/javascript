@@ -322,7 +322,9 @@ export default {
 		'tokenverificationerroraction-import-move',
 		'tokenverificationerrorreason-import-move',
 		'membershiprole',
-		'return-signature-change',
+		'getorganizationmembershiplist-return-signature',
+		'getorganizationlist-return-signature',
+		'getorganizationinvitationlist-return-signature',
 	]),
 };
 
