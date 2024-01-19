@@ -2,4 +2,10 @@
 '@clerk/backend': patch
 ---
 
-Add `password_hasher` and `password_digest` to `users.updateUser(userId, params)`
+Add the following properties to `users.updateUser(userId, params)` params:
+
+  - `password_hasher`
+  - `password_digest`
+  - `publicMetadata`
+  - `privateMetadata`
+  - `unsafeMetadata`
