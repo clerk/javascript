@@ -47,6 +47,7 @@ const reactChangesList = [
 	'removed-localization-keys',
 	'changed-localization-keys',
 	'router-navigate',
+	'signoutcallback-to-redirecturl',
 ];
 
 export default {
@@ -125,6 +126,7 @@ export default {
 		'new-localization-keys',
 		'removed-localization-keys',
 		'changed-localization-keys',
+		'signoutcallback-to-redirecturl',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -162,6 +164,7 @@ export default {
 		'new-localization-keys',
 		'removed-localization-keys',
 		'changed-localization-keys',
+		'signoutcallback-to-redirecturl',
 	]),
 	expo: load('expo', [
 		'apikey-to-publishable-key',
@@ -187,6 +190,7 @@ export default {
 		'new-localization-keys',
 		'removed-localization-keys',
 		'changed-localization-keys',
+		'signoutcallback-to-redirecturl',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -269,6 +273,7 @@ export default {
 		'new-localization-keys',
 		'removed-localization-keys',
 		'changed-localization-keys',
+		'signoutcallback-to-redirecturl',
 	]),
 	shared: load('shared', [
 		'magiclinkerror',
