@@ -1,46 +1,55 @@
 'use client';
 
-import { Field, FieldState, Input, SignIn, SignInStart } from '@clerk/elements';
+import { Field, Input, Label, SignIn, SignInStart } from '@clerk/elements';
 import clsx from 'clsx';
-
-function OTPInputSegment({ value, status }: any) {
-  return (
-    <FieldState>
-      {({ state }) => (
-        <span
-          data-state={state}
-          data-status={status}
-          className={clsx(
-            'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 bg-white border-[var(--border-color)] [--border-color:theme(colors.gray.300)] data-[state="invalid"]:[--border-color:theme(colors.red.500)] text-lg text-black self-stretch',
-            (status === 'cursor' || status === 'selected') &&
-              '[--border-color:theme(colors.purple.500)] shadow-[theme(colors.purple.500_0_0_0_1px)]',
-            status === 'selected' && 'bg-purple-100',
-          )}
-        >
-          {value}
-        </span>
-      )}
-    </FieldState>
-  );
-}
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Page() {
   return (
-    <div>
-      <h1>OTP Playground</h1>
-      <SignIn>
-        <SignInStart>
-          <Field
-            name='code'
-            className='w-[400px]'
-          >
+    <SignIn>
+      <SignInStart>
+        <div className='h-dvh flex items-center justify-center bg-neutral-800'>
+          <Field name='code'>
+            <Label className='sr-only'>Label</Label>
             <Input
+              className='flex gap-3 text-white isolate font-semibold text-2xl'
+              data-1p-ignore
               type='otp'
-              render={OTPInputSegment}
+              render={({ value, status }: any) => (
+                <div
+                  className={clsx(
+                    'relative flex h-14 w-12 items-center justify-center rounded-md bg-neutral-900 shadow-[0_10px_19px_4px_theme(colors.black/16%),_0_-10px_16px_-4px_theme(colors.white/4%),_0_0_0_1px_theme(colors.white/1%),_0_1px_0_0_theme(colors.white/2%)]',
+                    // status === 'selected' &&
+                    //   'border border-sky-400 shadow-[0_0_8px_2px_theme(colors.sky.400/30%)] bg-sky-400/10',
+                  )}
+                >
+                  <AnimatePresence>
+                    {value && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.75 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.75 }}
+                        className='absolute inset-0 flex items-center justify-center text-white'
+                      >
+                        {value}
+                      </motion.span>
+                    )}
+                    {value}
+                  </AnimatePresence>
+
+                  {(status === 'cursor' || status === 'selected') && (
+                    <motion.div
+                      layoutId='tab-trigger-underline'
+                      transition={{ duration: 0.2, type: 'spring', damping: 20, stiffness: 200 }}
+                      className='absolute inset-0 border border-sky-400 shadow-[0_0_8px_2px_theme(colors.sky.400/30%)] z-10 rounded-[inherit] bg-sky-400/10'
+                    />
+                  )}
+                </div>
+              )}
             />
           </Field>
-        </SignInStart>
-      </SignIn>
-    </div>
+        </div>
+      </SignInStart>
+    </SignIn>
   );
 }

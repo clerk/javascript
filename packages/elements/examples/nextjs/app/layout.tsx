@@ -16,7 +16,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en'>
       <ClerkProvider clerkJSVariant='headless'>
-        <body className={`${inter.variable} ${mono.variable} font-sans`}>{children}</body>
+        <body
+          className={`${inter.variable} ${mono.variable} text-[rgb(var(--foreground-rgb))] font-sans bg-[rgb(var(--background-rgb))]`}
+        >
+          {children}
+        </body>
       </ClerkProvider>
     </html>
   );

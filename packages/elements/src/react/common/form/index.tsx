@@ -331,28 +331,25 @@ const OTPInput = forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(p
             return updated;
           });
         }}
+        onBlur={() => setSelectionRange([-1, -1])}
         style={{
           display: 'block',
+          cursor: 'default',
           // Attempt to add some padding to let autocomplete overlays show without overlap
-          width: '110%',
-          height: '100%',
           background: 'none',
           outline: 'none',
           appearance: 'none',
           color: 'transparent',
-          inset: 0,
           position: 'absolute',
+          inset: 0,
+          right: '-2.75rem',
         }}
       />
       <div
         className={className}
         aria-hidden
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '1em',
           zIndex: 1,
-          height: '100%',
           pointerEvents: 'none',
         }}
       >

@@ -14,6 +14,7 @@
     "@clerk/nextjs": "file:../../nextjs",
     "@radix-ui/react-form": "^0.0.3",
     "clsx": "^2.0.0",
+    "framer-motion": "^10.18.0",
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18"
