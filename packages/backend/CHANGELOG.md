@@ -1,5 +1,25 @@
 # Change Log
 
+## 1.0.0-beta-v5.18
+
+### Major Changes
+
+- The following paginated APIs now return `{ data, totalCount }` instead of simple arrays, in order to make building paginated UIs easier: ([#2633](https://github.com/clerk/javascript/pull/2633)) by [@dimkl](https://github.com/dimkl)
+
+  - `clerkClient.users.getOrganizationMembershipList(...)`
+  - `clerkClient.organization.getOrganizationList(...)`
+  - `clerkClient.organization.getOrganizationInvitationList(...)`
+
+  Revert changing the `{ data, errors }` return value of the following helpers to throw the `errors` or return the `data` (keep v4 format):
+
+  - `import { verifyToken } from '@clerk/backend'`
+  - `import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt'`
+  - BAPI `clerkClient` methods eg (`clerkClient.users.getUserList(...)`)
+
+### Patch Changes
+
+- Add `password_hasher` and `password_digest` to `users.updateUser(userId, params)` ([#2619](https://github.com/clerk/javascript/pull/2619)) by [@SokratisVidros](https://github.com/SokratisVidros)
+
 ## 1.0.0-alpha-v5.17
 
 ### Major Changes

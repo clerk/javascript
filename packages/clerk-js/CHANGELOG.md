@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.0.0-beta-v5.19
+
+### Major Changes
+
+- Refresh the look and feel of the Clerk UI components ([#2622](https://github.com/clerk/javascript/pull/2622)) by [@anagstef](https://github.com/anagstef)
+
+  For more info, refer to the [upgrade guide from v4 to v5 in Clerk docs](https://clerk.com/docs/upgrade-guides/upgrading-from-v4-to-v5).
+
+### Patch Changes
+
+- Inform developers who are using legacy Clerk development instances that in V5 URL Based Session Syncing must be enabled. For more information refer to https://clerk.com/docs/upgrade-guides/url-based-session-syncing. ([#2614](https://github.com/clerk/javascript/pull/2614)) by [@SokratisVidros](https://github.com/SokratisVidros)
+
+- Display a warning in the browser's console when organization components are mounted but the "Organizations" feature is disabled for the instance. ([#2603](https://github.com/clerk/javascript/pull/2603)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove handshake-related query parameters on load of clerk-js. It's possible that these parameters will be returned from Clerk's API, but they are only applicable for SSR-compatible frameworks and so on the client they are unused. ([#2624](https://github.com/clerk/javascript/pull/2624)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`7886ba89d`](https://github.com/clerk/javascript/commit/7886ba89d76bfea2d6882a46baf64bf98f1148d3)]:
+  - @clerk/localizations@2.0.0-beta-v5.12
+  - @clerk/types@4.0.0-beta-v5.13
+
 ## 5.0.0-alpha-v5.18
 
 ### Patch Changes
