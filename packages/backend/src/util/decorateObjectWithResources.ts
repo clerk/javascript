@@ -33,10 +33,12 @@ export const decorateObjectWithResources = async <T extends object>(
     loadOrganization && orgId ? organizations.getOrganization({ organizationId: orgId }) : Promise.resolve(undefined),
   ]);
 
-  const session = sessionResp && !sessionResp.errors ? sessionResp.data : undefined;
-  const user = userResp && !userResp.errors ? userResp.data : undefined;
-  const organization = organizationResp && !organizationResp.errors ? organizationResp.data : undefined;
-  return Object.assign(obj, stripPrivateDataFromObject({ session, user, organization }));
+  const resources = stripPrivateDataFromObject({
+    session: sessionResp,
+    user: userResp,
+    organization: organizationResp,
+  });
+  return Object.assign(obj, resources);
 };
 
 /**

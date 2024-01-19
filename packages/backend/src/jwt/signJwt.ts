@@ -42,7 +42,9 @@ export async function signJwt(
 
   const algorithm = getCryptoAlgorithm(options.algorithm);
   if (!algorithm) {
-    throw new Error(`Unsupported algorithm ${options.algorithm}`);
+    return {
+      errors: [new SignJWTError(`Unsupported algorithm ${options.algorithm}`)],
+    };
   }
 
   const cryptoKey = await importKey(key, algorithm, 'sign');

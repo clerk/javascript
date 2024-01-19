@@ -2,8 +2,8 @@ import type { JwtPayload } from '@clerk/types';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
-import { decodeJwt, verifyJwt } from '../jwt';
 import type { JwtReturnType } from '../jwt/types';
+import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 

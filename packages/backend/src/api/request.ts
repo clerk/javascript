@@ -1,4 +1,4 @@
-import { parseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import snakecaseKeys from 'snakecase-keys';
 
@@ -55,7 +55,7 @@ type BuildRequestOptions = {
   userAgent?: string;
 };
 export function buildRequest(options: BuildRequestOptions) {
-  return async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
+  const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
     const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
@@ -149,6 +149,8 @@ export function buildRequest(options: BuildRequestOptions) {
       };
     }
   };
+
+  return withLegacyRequestReturn(requestFn);
 }
 
 // Returns either clerk_trace_id if present in response json, otherwise defaults to CF-Ray header
@@ -168,4 +170,32 @@ function parseErrors(data: unknown): ClerkAPIError[] {
     return errors.length > 0 ? errors.map(parseError) : [];
   }
   return [];
+}
+
+type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) => Promise<T>;
+
+// TODO(dimkl): Will be probably be dropped in next major version
+function withLegacyRequestReturn(cb: any): LegacyRequestFunction {
+  return async (...args) => {
+    // @ts-ignore
+    const { data, errors, totalCount, status, statusText, clerkTraceId } = await cb<T>(...args);
+    if (errors) {
+      // instead of passing `data: errors`, we have set the `error.errors` because
+      // the errors returned from callback is already parsed and passing them as `data`
+      // will not be able to assign them to the instance
+      const error = new ClerkAPIResponseError(statusText || '', {
+        data: [],
+        status,
+        clerkTraceId,
+      });
+      error.errors = errors;
+      throw error;
+    }
+
+    if (typeof totalCount !== 'undefined') {
+      return { data, totalCount };
+    }
+
+    return data;
+  };
 }

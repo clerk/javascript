@@ -3,6 +3,7 @@ import type { ClerkPaginationRequest, OAuthProvider } from '@clerk/types';
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/users';
@@ -199,7 +200,7 @@ export class UserAPI extends AbstractAPI {
     const { userId, limit, offset } = params;
     this.requireId(userId);
 
-    return this.request<OrganizationMembership[]>({
+    return this.request<PaginatedResourceResponse<OrganizationMembership[]>>({
       method: 'GET',
       path: joinPaths(basePath, userId, 'organization_memberships'),
       queryParams: { limit, offset },

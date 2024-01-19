@@ -24,19 +24,16 @@ type ResourceResponse<T> = {
   data: T;
 };
 
-type PaginatedResponse<T> = {
-  data: T;
-  totalCount?: number;
+export type PaginatedResourceResponse<T> = ResourceResponse<T> & {
+  totalCount: number;
 };
 
-export function deserialize<U = any>(payload: unknown): PaginatedResponse<U> | ResourceResponse<U> {
+export function deserialize<U = any>(payload: unknown): PaginatedResourceResponse<U> | ResourceResponse<U> {
   let data, totalCount: number | undefined;
 
   if (Array.isArray(payload)) {
-    data = payload.map(item => jsonToObject(item)) as U;
-    totalCount = payload.length;
-
-    return { data, totalCount };
+    const data = payload.map(item => jsonToObject(item)) as U;
+    return { data };
   } else if (isPaginated(payload)) {
     data = payload.data.map(item => jsonToObject(item)) as U;
     totalCount = payload.total_count;

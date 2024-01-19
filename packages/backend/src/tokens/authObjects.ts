@@ -1,4 +1,3 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
@@ -11,7 +10,6 @@ import type {
 
 import type { CreateBackendApiOptions } from '../api';
 import { createBackendApiClient } from '../api';
-import type { ClerkBackendApiResponse } from '../api/request';
 import type { AuthenticateContext } from './authenticateContext';
 
 type AuthObjectDebugData = Record<string, any>;
@@ -72,27 +70,6 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
   };
 };
 
-// This helper is introduced as compat layer between the v4 and v5 implementations to keep the
-// exposed top-level getToken API the same since it's critical and there are already a lot of
-// breaking changes.
-// TODO: Revamp AuthObject `getToken()` to return { data, errors } in next major version
-const throwResponseErrors = <T>(response: ClerkBackendApiResponse<T>): never => {
-  // used to by-pass type-safety for the `{ status, statusText, clerkTraceId } = response` line below
-  if (!response.errors) {
-    throw new Error('no error to throw');
-  }
-
-  const { status, statusText, clerkTraceId } = response;
-  const error = new ClerkAPIResponseError(statusText || '', {
-    data: [],
-    status: Number(status || ''),
-    clerkTraceId,
-  });
-  error.errors = response.errors;
-
-  throw error;
-};
-
 /**
  * @internal
  */
@@ -113,14 +90,7 @@ export function signedInAuthObject(
   const getToken = createGetToken({
     sessionId,
     sessionToken: authenticateContext.sessionToken || '',
-    fetcher: async (...args) => {
-      const response = await apiClient.sessions.getToken(...args);
-      if (response.errors) {
-        return throwResponseErrors(response);
-      }
-
-      return response.data.jwt;
-    },
+    fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
 
   return {
