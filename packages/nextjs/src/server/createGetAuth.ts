@@ -46,10 +46,7 @@ export const createGetAuth = ({
       logger.debug('Options debug', options);
 
       if (authStatus === AuthStatus.SignedIn) {
-        const { data: jwt, errors } = decodeJwt(authToken as string);
-        if (errors) {
-          throw errors[0];
-        }
+        const jwt = decodeJwt(authToken as string);
 
         logger.debug('JWT debug', jwt.raw.text);
         // @ts-expect-error - TODO @nikos: Align types
@@ -68,11 +65,5 @@ export const getAuth = createGetAuth({
 export const parseJwt = (req: RequestLike) => {
   const cookieToken = getCookie(req, constants.Cookies.Session);
   const headerToken = getHeader(req, 'authorization')?.replace('Bearer ', '');
-  const { data, errors } = decodeJwt(cookieToken || headerToken || '');
-
-  if (errors) {
-    throw errors[0];
-  }
-
-  return data;
+  return decodeJwt(cookieToken || headerToken || '');
 };

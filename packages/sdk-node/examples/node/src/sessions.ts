@@ -9,25 +9,25 @@ const sessionIdtoRevoke = process.env.SESSION_ID_TO_REVOKE || '';
 const sessionToken = process.env.SESSION_TOKEN || '';
 
 console.log('Get session list');
-const { data: sessionList } = await sessions.getSessionList();
+const sessionList = await sessions.getSessionList();
 console.log(sessionList);
 
 console.log('Get session list filtered by userId');
-const { data: filteredSessions1 } = await sessions.getSessionList({ userId });
+const filteredSessions1 = await sessions.getSessionList({ userId });
 console.log(filteredSessions1);
 
 console.log('Get session list filtered by clientId');
-const { data: filteredSessions2 } = await sessions.getSessionList({ clientId });
+const filteredSessions2 = await sessions.getSessionList({ clientId });
 console.log(filteredSessions2);
 
 console.log('Get single session');
-const { data: session } = await sessions.getSession(sessionId);
+const session = await sessions.getSession(sessionId);
 console.log(session);
 
 console.log('Revoke session');
-const { data: revokedSession } = await sessions.revokeSession(sessionIdtoRevoke);
+const revokedSession = await sessions.revokeSession(sessionIdtoRevoke);
 console.log(revokedSession);
 
 console.log('Verify session');
-const { data: verifiedSession } = await sessions.verifySession(sessionId, sessionToken);
+const verifiedSession = await sessions.verifySession(sessionId, sessionToken);
 console.log(verifiedSession);

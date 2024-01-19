@@ -15,11 +15,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
   test.beforeAll(async () => {
     const m = createTestUtils({ app });
     fakeAdmin = m.services.users.createFakeUser();
-    const { data: admin } = await m.services.users.createBapiUser(fakeAdmin);
+    const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
     fakeViewer = m.services.users.createFakeUser();
-    const { data: viewer } = await m.services.users.createBapiUser(fakeViewer);
-
+    const viewer = await m.services.users.createBapiUser(fakeViewer);
     await m.services.clerk.organizations.createOrganizationMembership({
       organizationId: fakeOrganization.organization.id,
       role: 'org:viewer' as OrganizationMembershipRole,

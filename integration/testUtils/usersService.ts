@@ -39,7 +39,7 @@ export const createUserService = (clerkClient: ReturnType<typeof Clerk>) => {
     },
     createFakeOrganization: async (userId: string) => {
       const name = faker.animal.dog();
-      const { data: organization } = await clerkClient.organizations.createOrganization({
+      const organization = await clerkClient.organizations.createOrganization({
         name: faker.animal.dog(),
         createdBy: userId,
       });

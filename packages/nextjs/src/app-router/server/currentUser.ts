@@ -7,8 +7,5 @@ export async function currentUser(): Promise<User | null> {
   const { userId } = auth();
   if (!userId) return null;
 
-  const { data, errors } = await clerkClient.users.getUser(userId);
-  if (errors) return null;
-
-  return data;
+  return clerkClient.users.getUser(userId);
 }

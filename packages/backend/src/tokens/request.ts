@@ -3,7 +3,7 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
-import { decodeJwt } from '../jwt';
+import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
