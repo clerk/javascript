@@ -20,7 +20,7 @@ type UsePopoverProps = {
 export type UsePopoverReturn = ReturnType<typeof usePopover>;
 
 export const usePopover = (props: UsePopoverProps = {}) => {
-  const { bubbles = true, shoudFlip = true, outsidePress } = props;
+  const { bubbles = false, shoudFlip = true, outsidePress } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const nodeId = useFloatingNodeId();
   const { update, refs, strategy, x, y, context } = useFloating({
