@@ -59,7 +59,7 @@ export const EmailsSection = () => {
                       gap={2}
                       center
                     >
-                      <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{email.emailAddress} </Text>
+                      <Text sx={t => ({ color: t.colors.$colorTextSecondary })}>{email.emailAddress} </Text>
                       {user?.primaryEmailAddressId === email.id && (
                         <Badge localizationKey={localizationKeys('badge__primary')} />
                       )}

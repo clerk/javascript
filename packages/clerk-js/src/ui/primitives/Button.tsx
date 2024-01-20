@@ -110,18 +110,18 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         },
         secondary: {
           backgroundColor: theme.colors.$colorBackground,
-          color: theme.colors.$blackAlpha700,
+          color: theme.colors.$colorTextSecondary,
           '&:hover': {
             backgroundColor: theme.colors.$blackAlpha50,
-            color: theme.colors.$blackAlpha950,
+            color: theme.colors.$colorText,
           },
           '&:focus': props.hoverAsFocus
-            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
+            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$colorText }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$colorBackground },
           boxShadow: theme.shadows.$secondaryButtonShadow,
           border: theme.borders.$normal,
-          borderColor: theme.colors.$blackAlpha100,
+          borderColor: theme.colors.$blackAlpha200,
         },
         secondaryDanger: {
           backgroundColor: theme.colors.$colorBackground,
@@ -136,13 +136,13 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           '&:active': { backgroundColor: theme.colors.$colorBackground },
           boxShadow: theme.shadows.$secondaryButtonShadow,
           border: theme.borders.$normal,
-          borderColor: theme.colors.$blackAlpha100,
+          borderColor: theme.colors.$blackAlpha200,
         },
         ghost: {
-          color: theme.colors.$blackAlpha700,
-          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 },
+          color: theme.colors.$colorTextSecondary,
+          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$colorText },
           '&:focus': props.hoverAsFocus
-            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
+            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$colorText }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$transparent },
         },

@@ -76,12 +76,12 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                         gap={2}
                         center
                       >
-                        <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{`${
+                        <Text sx={t => ({ color: t.colors.$colorTextSecondary })}>{`${
                           providerToDisplayData[account.provider].name
                         }`}</Text>
                         <Text
                           as='span'
-                          sx={t => ({ color: t.colors.$blackAlpha400 })}
+                          sx={t => ({ color: t.colors.$colorTextTertiary })}
                         >
                           {label ? `• ${label}` : ''}
                         </Text>

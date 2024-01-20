@@ -205,13 +205,13 @@ export const RoleSelect = (props: {
             {prefixLocalizationKey && (
               <Text
                 as='span'
-                sx={t => ({ color: t.colors.$blackAlpha400 })}
+                sx={t => ({ color: t.colors.$colorTextTertiary })}
                 localizationKey={prefixLocalizationKey}
               />
             )}
             <Text
               as='span'
-              sx={t => ({ color: t.colors.$blackAlpha950 })}
+              sx={t => ({ color: t.colors.$colorText })}
             >
               {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
             </Text>

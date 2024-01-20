@@ -42,7 +42,7 @@ export const EnterpriseAccountsSection = () => {
                   gap={2}
                   center
                 >
-                  <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{`${providerName} ${
+                  <Text sx={t => ({ color: t.colors.$colorTextSecondary })}>{`${providerName} ${
                     label ? `(${label})` : ''
                   }`}</Text>
                   {error && (

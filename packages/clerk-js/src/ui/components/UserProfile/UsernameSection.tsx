@@ -38,7 +38,7 @@ export const UsernameSection = () => {
               padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$3}`,
             })}
           >
-            {user.username && <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{user.username}</Text>}
+            {user.username && <Text sx={t => ({ color: t.colors.$colorTextSecondary })}>{user.username}</Text>}
 
             <Action.Trigger value='edit'>
               <Button

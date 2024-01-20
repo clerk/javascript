@@ -81,9 +81,9 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
             mainIdentifierVariant={'buttonLarge'}
             title={localizationKeys('organizationSwitcher.personalWorkspace')}
             mainIdentifierSx={t => ({
-              color: t.colors.$blackAlpha600,
+              color: t.colors.$colorTextSecondary,
               ':hover': {
-                color: t.colors.$blackAlpha600,
+                color: t.colors.$colorTextSecondary,
               },
             })}
           />
@@ -101,9 +101,9 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
             elementId='organizationSwitcherListedOrganization'
             organization={organization}
             sx={t => ({
-              color: t.colors.$blackAlpha600,
+              color: t.colors.$colorTextSecondary,
               ':hover': {
-                color: t.colors.$blackAlpha600,
+                color: t.colors.$colorTextSecondary,
               },
             })}
           />

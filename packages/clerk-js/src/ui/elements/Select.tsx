@@ -369,11 +369,7 @@ export const SelectButton = (
 
   let show: React.ReactNode = children;
   if (!children) {
-    show = selectedOption ? (
-      buttonRenderOption(selectedOption)
-    ) : (
-      <Text sx={t => ({ opacity: t.opacity.$inactive })}>{placeholder}</Text>
-    );
+    show = selectedOption ? buttonRenderOption(selectedOption) : <Text>{placeholder}</Text>;
   }
 
   return (
