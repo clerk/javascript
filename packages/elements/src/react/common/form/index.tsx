@@ -13,7 +13,8 @@ import {
   Label as RadixLabel,
   Submit,
 } from '@radix-ui/react-form';
-import type { ComponentProps, CSSProperties, HTMLProps, ReactNode } from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import type { ComponentProps, ComponentType, CSSProperties, ReactNode } from 'react';
 import React, {
   createContext,
   forwardRef,
@@ -83,7 +84,7 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
       [`data-${validity}`]: true,
       'data-hidden': shouldBeHidden ? true : undefined,
       serverInvalid: hasError,
-      tabIndex: shouldBeHidden ? -1 : 0,
+      // tabIndex: shouldBeHidden ? -1 : 0,
     },
   };
 };
@@ -217,30 +218,25 @@ function Input(props: ClerkInputProps) {
   const { name, value, type, ...passthroughProps } = props;
   const field = useInput({ name, value, type });
 
-  let propsForType = {};
+  let El: ComponentType<ClerkInputProps> = RadixControl;
+
   if (field.type === 'otp') {
-    propsForType = {
-      type: 'text',
-      asChild: true,
-      // @ts-expect-error -- render is passed opaquely by RadixControl
-      children: <OTPInput />,
-    };
+    // @ts-ignore -- type='otp' ensures props are handled correctly in this case
+    El = OTPInput;
   }
 
   return (
-    <RadixControl
+    <El
       type={field.type}
       {...field.props}
       {...(passthroughProps as FormControlProps)}
-      {...propsForType}
     />
   );
 }
 
-type OTPInputProps = Exclude<
-  HTMLProps<HTMLInputElement>,
-  'type' | 'autoComplete' | 'maxLength' | 'inputMode' | 'pattern'
-> & { render: (props: { value: string; status: 'cursor' | 'selected' | 'none'; index: number }) => ReactNode };
+type OTPInputProps = Exclude<FormControlProps, 'type' | 'autoComplete' | 'maxLength' | 'inputMode' | 'pattern'> & {
+  render: (props: { value: string; status: 'cursor' | 'selected' | 'none'; index: number }) => ReactNode;
+};
 
 /**
  * A custom input component to handle accepting OTP codes. An invisible input element is used to capture input and handle native input
@@ -251,19 +247,28 @@ const OTPInput = forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(p
   const { className, render, ...rest } = props;
 
   const innerRef = useRef<HTMLInputElement>(null);
-  const [selectionRange, setSelectionRange] = React.useState<[number, number]>([0, 0]);
+  const [selectionRange, setSelectionRange] = React.useState<[number, number]>(props.autoFocus ? [0, 0] : [-1, -1]);
 
   // This ensures we can access innerRef internally while still exposing it via the ref prop
   useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
 
   // A layout effect is used here to avoid any perceived visual lag when changing the selection
   useLayoutEffect(() => {
-    setSelectionRange(cur => {
-      const updated: [number, number] = [innerRef.current?.selectionStart ?? 0, innerRef.current?.selectionEnd ?? 0];
+    if (document.activeElement !== innerRef.current) {
+      return;
+    }
 
-      // When navigating backwards, ensure we select the previous character instead of only moving the cursor
-      if (updated[0] === cur[0] && updated[1] < cur[1]) {
-        updated[0] = updated[0] - 1;
+    setSelectionRange(cur => {
+      let updated: [number, number] = [innerRef.current?.selectionStart ?? 0, innerRef.current?.selectionEnd ?? 0];
+
+      // When moving the selection, we want to select either the previous or next character instead of only moving the cursor.
+      // If the start and end indices are the same, it means only the cursor has moved and we need to make a decision on which character to select.
+      if (updated[0] === updated[1]) {
+        if (updated[0] > 0 && cur[0] === updated[0] && cur[1] === updated[0] + 1) {
+          updated = [updated[0] - 1, updated[1]];
+        } else if (typeof innerRef.current?.value[updated[0]] !== 'undefined') {
+          updated = [updated[0], updated[1] + 1];
+        }
       }
 
       // Only update the selection if it has changed to avoid unnecessary updates
@@ -291,15 +296,20 @@ const OTPInput = forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(p
         background-color: none;
       }
       `}</style>
-      <input
+      <RadixControl
         data-otp-input
         ref={innerRef}
+        maxLength={length}
+        {...rest}
         type='text'
         autoComplete='one-time-code'
-        maxLength={length}
         inputMode='numeric'
         pattern='[0-9]*'
-        {...rest}
+        onBlur={event => {
+          setSelectionRange([-1, -1]);
+
+          rest?.onBlur?.(event);
+        }}
         onChange={event => {
           // Only accept numbers
           event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
@@ -337,41 +347,38 @@ const OTPInput = forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(p
         }}
         style={{
           display: 'block',
-          // Attempt to add some padding to let autocomplete overlays show without overlap
-          width: '110%',
-          height: '100%',
+          cursor: 'default',
           background: 'none',
           outline: 'none',
           appearance: 'none',
           color: 'transparent',
-          inset: 0,
           position: 'absolute',
+          inset: 0,
+          right: '-2.75rem',
         }}
       />
       <div
         className={className}
         aria-hidden
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '1em',
           zIndex: 1,
-          height: '100%',
           pointerEvents: 'none',
         }}
       >
-        {Array.from({ length }).map((_, i) =>
-          render({
-            value: String(props.value)[i] || '',
-            status:
-              selectionRange[0] === selectionRange[1] && selectionRange[0] === i
-                ? 'cursor'
-                : selectionRange[0] <= i && selectionRange[1] > i
-                ? 'selected'
-                : 'none',
-            index: i,
-          }),
-        )}
+        {Array.from({ length }).map((_, i) => (
+          <Slot key={i}>
+            {render({
+              value: String(props.value)[i] || '',
+              status:
+                selectionRange[0] === selectionRange[1] && selectionRange[0] === i
+                  ? 'cursor'
+                  : selectionRange[0] <= i && selectionRange[1] > i
+                  ? 'selected'
+                  : 'none',
+              index: i,
+            })}
+          </Slot>
+        ))}
       </div>
     </div>
   );
