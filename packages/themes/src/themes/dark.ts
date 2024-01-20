@@ -23,5 +23,13 @@ export const dark = experimental_createTheme({
       '--cl-chassis-screen': '#e6e6e6',
       '--cl-screen': '#111111',
     },
+    button: {
+      '&[data-variant="primary"]': {
+        ':after': {},
+      },
+    },
+    input: {
+      '&[data-variant="danger"]': {},
+    },
   },
 });
