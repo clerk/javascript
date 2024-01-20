@@ -30,7 +30,7 @@ const config = {
   //   '!**/dist/**',
   //   '!**/node_modules/**',
   // ],
-
+  transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\](?!(@formkit/auto-animate/react)).+\\.(js|jsx|mjs|cjs|ts|tsx)$'],
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {
     '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],

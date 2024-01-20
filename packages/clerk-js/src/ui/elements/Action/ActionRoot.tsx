@@ -1,4 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { PropsWithChildren } from 'react';
 import { useCallback, useState } from 'react';
 
@@ -12,6 +13,7 @@ export const [ActionContext, useActionContext, _] = createContextAndHook<{
 
 export const ActionRoot = (props: ActionRootProps) => {
   const { children } = props;
+  const [parent] = useAutoAnimate();
   const [active, setActive] = useState<string | null>(null);
 
   const close = useCallback(() => {
@@ -22,5 +24,9 @@ export const ActionRoot = (props: ActionRootProps) => {
     setActive(value);
   }, []);
 
-  return <ActionContext.Provider value={{ value: { active, open, close } }}>{children}</ActionContext.Provider>;
+  return (
+    <ActionContext.Provider value={{ value: { active, open, close } }}>
+      <div ref={parent}>{children}</div>
+    </ActionContext.Provider>
+  );
 };
