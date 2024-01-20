@@ -9,7 +9,7 @@ const transitionDuration = Object.freeze({
 } as const);
 
 const transitionProperty = Object.freeze({
-  common: 'background-color,border-color,color,fill,stroke,opacity,box-shadow,transform',
+  common: 'background-color,background,border-color,color,fill,stroke,opacity,box-shadow,transform',
 } as const);
 
 const transitionTiming = Object.freeze({

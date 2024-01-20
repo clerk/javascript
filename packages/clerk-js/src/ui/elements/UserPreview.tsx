@@ -141,14 +141,12 @@ export const UserPreview = (props: UserPreviewProps) => {
           elementDescriptor={descriptors.userPreviewMainIdentifier}
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
           variant={mainIdentifierSize}
-          colorScheme='inherit'
           sx={[theme => ({ display: 'flex', gap: theme.sizes.$1, alignItems: 'center' }), mainIdentifierSx]}
         >
           <Text
             as='span'
             truncate
-            colorScheme='inherit'
-            sx={{ fontSize: 'inherit', fontWeight: 'inherit' }}
+            sx={{ fontWeight: 'inherit' }}
           >
             {localizedTitle || name || identifier}
           </Text>
@@ -160,8 +158,8 @@ export const UserPreview = (props: UserPreviewProps) => {
           <Text
             elementDescriptor={descriptors.userPreviewSecondaryIdentifier}
             elementId={descriptors.userPreviewSecondaryIdentifier.setId(elementId)}
-            colorScheme='neutral'
             truncate
+            colorScheme='neutral'
             localizationKey={subtitle || identifier}
           />
         )}
