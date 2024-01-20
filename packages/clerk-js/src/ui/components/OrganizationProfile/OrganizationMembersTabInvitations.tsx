@@ -65,7 +65,7 @@ export const OrganizationMembersTabInvitations = () => {
                       )}
                       sx={t => ({
                         paddingLeft: t.space.$10,
-                        color: t.colors.$colorTextSecondary,
+                        color: t.colors.$textSecondary,
                         [mqu.md]: {
                           paddingLeft: 0,
                         },

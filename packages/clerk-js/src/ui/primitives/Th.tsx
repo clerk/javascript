@@ -11,7 +11,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     textAlign: 'left',
     fontSize: theme.fontSizes.$sm,
     fontWeight: theme.fontWeights.$normal,
-    color: colors.setAlpha(theme.colors.$colorText, 0.62),
+    color: colors.setAlpha(theme.colors.$text, 0.62),
     padding: `${theme.space.$2} ${theme.space.$4}`,
   },
   variants: {},

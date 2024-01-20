@@ -123,7 +123,7 @@ export const MenuList = (props: MenuListProps) => {
         onKeyDown={onKeyDown}
         sx={[
           theme => ({
-            backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
+            backgroundColor: colors.makeSolid(theme.colors.$background),
             border: theme.borders.$normal,
             outline: 'none',
             borderRadius: theme.radii.$lg,

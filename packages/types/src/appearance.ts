@@ -393,58 +393,83 @@ export type Elements = {
 }[keyof ElementsConfig];
 
 export type Variables = {
-  /**
-   * The primary color used throughout the components. Set this to your brand color.
-   */
-  colorPrimary?: CssColorOrScale;
-  /**
-   * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
-   */
-  colorDanger?: CssColorOrScale;
-  /**
-   * The color used to indicate an action that completed successfully or a positive result.
-   */
-  colorSuccess?: CssColorOrScale;
-  /**
-   * The color used for potentially destructive actions or when the user's attention is required.
-   */
-  colorWarning?: CssColorOrScale;
-  /**
-   * The color that will be used for all to generate the alpha shades the components use. To achieve sufficient contrast,
-   * light themes should be using dark shades (`black`), while dark themes should be using light (`white`) shades. This option applies to borders,
-   * backgrounds for hovered elements, hovered dropdown options etc.
-   * @default 'black'
-   */
-  colorAlphaShade?: CssColorOrAlphaScale;
-  /**
-   * The default text color.
-   * @default black
-   */
-  colorText?: CssColor;
-  /**
-   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
-   * eg: solid primary buttons.
-   * @default white
-   */
-  colorTextOnPrimaryBackground?: CssColor;
-  /**
-   * The text color for elements of lower importance, eg: a subtitle text.
-   * @default A lighter shade of {@link Variables.colorText}
-   */
-  colorTextSecondary?: CssColor;
-  /**
-   * The background color for the card container.
-   */
-  colorBackground?: CssColor;
-  /**
-   * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
-   * @default The value of {@link Variables.colorText}
-   */
-  colorInputText?: CssColor;
-  /**
-   * The background color for all input elements.
-   */
-  colorInputBackground?: CssColor;
+  colors?: {
+    /**
+     * The primary color used throughout the components. Set this to your brand color.
+     */
+    primary?: CssColorOrScale;
+    /**
+     * The color of text appearing on top of an element that with a background color of {@link Variables.primary},
+     * eg: solid primary buttons.
+     * @default white
+     */
+    primaryForeground?: CssColor;
+    /**
+     * The secondary color used throughout the components.
+     */
+    secondary?: CssColorOrScale;
+    /**
+     * The secondary color used throughout the components.
+     */
+    secondaryForeground?: CssColor;
+    /**
+     * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
+     */
+    danger?: CssColorOrScale;
+    /**
+     * The color used to indicate an action that completed successfully or a positive result.
+     */
+    success?: CssColorOrScale;
+    /**
+     * The color used for potentially destructive actions or when the user's attention is required.
+     */
+    warning?: CssColorOrScale;
+    /**
+     * The color that will be used for all to generate the alpha shades the components use. To achieve sufficient contrast,
+     * light themes should be using dark shades (`black`), while dark themes should be using light (`white`) shades. This option applies to borders,
+     * backgrounds for hovered elements, hovered dropdown options etc.
+     * @default 'black'
+     */
+    alphaShade?: CssColorOrAlphaScale;
+    /**
+     * The default text color.
+     * @default black
+     */
+    text?: CssColor;
+    /**
+     * The text color for elements of lower importance, eg: a subtitle text.
+     * @default A lighter shade of {@link Variables.text}
+     */
+    textSecondary?: CssColor;
+    /**
+     * The text color for elements of even lower importance.
+     * @default An lighter shade of {@link Variables.textSecondary}
+     */
+    textTertiary?: CssColor;
+    /**
+     * The background color for the card container.
+     */
+    background?: CssColor;
+    /**
+     * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+     * @default The value of {@link Variables.inputForeground}
+     */
+    inputForeground?: CssColor;
+    /**
+     * The background color for all input elements.
+     */
+    input?: CssColor;
+    /**
+     * The color of the avatar shimmer
+     * @default rgba(255, 255, 255, 0.36)
+     */
+    shimmer?: CssColor;
+    /**
+     * The shadow that appears on the avatar when hovered
+     * @default rgba(0, 0, 0, 0.36)
+     */
+    shimmerShadow?: CssColor;
+  };
   /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
@@ -489,16 +514,6 @@ export type Variables = {
    * @default 1rem
    */
   spacingUnit?: CssLengthUnit;
-  /**
-   * The color of the avatar shimmer
-   * @default rgba(255, 255, 255, 0.36)
-   */
-  colorShimmer?: CssColor;
-  /**
-   * The shadow that appears on the avatar when hovered
-   * @default rgba(0, 0, 0, 0.36)
-   */
-  shadowShimmer?: CssColor;
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };

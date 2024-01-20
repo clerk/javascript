@@ -185,7 +185,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
               padding: `${t.space.$4} ${t.space.$5}`,
             })}
           />
-          <Actions role='menu'>{manageOrganizationSmallIconButton}</Actions>
+          {manageOrganizationSmallIconButton}
         </Flex>
       );
 

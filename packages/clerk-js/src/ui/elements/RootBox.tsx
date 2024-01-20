@@ -8,7 +8,7 @@ export const RootBox = (props: PropsOfComponent<typeof Col>) => {
       sx={t => ({
         boxSizing: 'border-box',
         width: 'fit-content',
-        color: t.colors.$colorText,
+        color: t.colors.$text,
         fontFamily: t.fonts.$main,
         fontStyle: t.fontStyles.$normal,
       })}

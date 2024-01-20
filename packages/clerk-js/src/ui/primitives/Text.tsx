@@ -10,7 +10,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       boxSizing: 'border-box',
       // TODO: this should probably be inherited
       // and handled through cards
-      color: theme.colors.$colorText,
+      color: theme.colors.$text,
       margin: 0,
       fontSize: 'inherit',
       ...common.disabled(theme),
@@ -18,12 +18,12 @@ const { applyVariants, filterProps } = createVariants(theme => {
     variants: {
       variant: common.textVariants(theme),
       colorScheme: {
-        primary: { color: theme.colors.$colorText },
-        onPrimaryBg: { color: theme.colors.$colorTextOnPrimaryBackground },
+        primary: { color: theme.colors.$text },
+        onPrimaryBg: { color: theme.colors.$primaryForeground },
         danger: { color: theme.colors.$danger500 },
         success: { color: theme.colors.$success500 },
-        neutral: { color: theme.colors.$colorTextSecondary },
-        tertiary: { color: theme.colors.$colorTextTertiary },
+        neutral: { color: theme.colors.$textSecondary },
+        tertiary: { color: theme.colors.$textTertiary },
         inherit: { color: 'inherit' },
       },
       truncate: {

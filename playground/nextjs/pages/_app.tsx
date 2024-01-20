@@ -52,7 +52,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       appearance={{
         baseTheme: themes[selectedTheme],
         variables: {
-          colorPrimary:primaryColor,
+          colors:{
+            primary:primaryColor,
+          }
         },
         layout: {
           helpPageUrl: '/help',

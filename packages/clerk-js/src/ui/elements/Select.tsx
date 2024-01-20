@@ -299,7 +299,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
         justify='start'
         sx={[
           theme => ({
-            backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
+            backgroundColor: colors.makeSolid(theme.colors.$background),
             borderRadius: theme.radii.$lg,
             overflow: 'hidden',
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
@@ -369,11 +369,7 @@ export const SelectButton = (
 
   let show: React.ReactNode = children;
   if (!children) {
-    show = selectedOption ? (
-      buttonRenderOption(selectedOption)
-    ) : (
-      <Text sx={t => ({ opacity: t.opacity.$inactive })}>{placeholder}</Text>
-    );
+    show = selectedOption ? buttonRenderOption(selectedOption) : <Text>{placeholder}</Text>;
   }
 
   return (

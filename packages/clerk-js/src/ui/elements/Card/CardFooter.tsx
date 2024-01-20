@@ -22,10 +22,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
         t => ({
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 0.8),
-            t.colors.$blackAlpha50,
-          ),
+          background: common.mergedColorsBackground(colors.setAlpha(t.colors.$background, 0.8), t.colors.$blackAlpha50),
           backdropFilter: t.backdropFilters.$defaultBlur,
           '>:first-of-type': {
             padding: `${t.space.$4} ${t.space.$8} ${t.space.$4} ${t.space.$8}`,

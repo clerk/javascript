@@ -35,7 +35,7 @@ const PageButton = (props: PageButtonProps) => {
       variant='secondary'
       sx={t => [
         {
-          color: t.colors.$colorText,
+          color: t.colors.$text,
           opacity: isActive ? 1 : t.opacity.$inactive,
           padding: `${t.space.$0x5} ${t.space.$0x5}`,
         },
@@ -117,7 +117,7 @@ const shouldShowDots = (currentPage: number, pageToShow: number, siblingCount: n
 
 const ThreeDots = () => (
   <Flex center>
-    <Text sx={t => ({ color: t.colors.$blackAlpha500 })}>...</Text>
+    <Text sx={t => ({ color: t.colors.$textTertiary })}>...</Text>
   </Flex>
 );
 

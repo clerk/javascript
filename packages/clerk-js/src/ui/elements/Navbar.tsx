@@ -141,14 +141,11 @@ const NavbarContainer = (
         flex: `0 0 ${t.space.$57}`,
         width: t.sizes.$57,
         maxWidth: t.space.$57,
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 0.8),
-          t.colors.$blackAlpha50,
-        ),
+        background: common.mergedColorsBackground(colors.setAlpha(t.colors.$background, 0.8), t.colors.$blackAlpha50),
         backdropFilter: t.backdropFilters.$defaultBlur,
         padding: `${t.space.$6} ${t.space.$5} ${t.space.$4} ${t.space.$3}`,
         marginRight: `-${t.space.$2}`,
-        color: t.colors.$colorText,
+        color: t.colors.$text,
         justifyContent: 'space-between',
       })}
     >
@@ -216,7 +213,7 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
           zIndex: t.zIndices.$navbar,
           borderRadius: t.radii.$xl,
           overflow: 'hidden',
-          color: t.colors.$colorText,
+          color: t.colors.$text,
         })}
       >
         <Col
@@ -229,7 +226,7 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
             top: 0,
             bottom: 0,
             width: t.space.$60,
-            backgroundColor: colors.makeSolid(t.colors.$colorBackground),
+            backgroundColor: colors.makeSolid(t.colors.$background),
             borderTopRightRadius: t.radii.$lg,
             borderBottomRightRadius: t.radii.$lg,
             borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
@@ -265,6 +262,7 @@ const NavButton = (props: NavButtonProps) => {
       {...rest}
       sx={[
         t => ({
+          color: t.colors.$text,
           gap: t.space.$3,
           justifyContent: 'flex-start',
           backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
@@ -302,10 +300,7 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
       elementDescriptor={descriptors.navbarMobileMenuRow}
       sx={t => ({
         display: 'none',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 0.8),
-          t.colors.$blackAlpha50,
-        ),
+        background: common.mergedColorsBackground(colors.setAlpha(t.colors.$background, 0.8), t.colors.$blackAlpha50),
         backdropFilter: t.backdropFilters.$defaultBlur,
         padding: `${t.space.$2} ${t.space.$3} ${t.space.$4} ${t.space.$3}`,
         marginBottom: `-${t.space.$2}`,
@@ -322,7 +317,7 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
         textVariant='h2'
         variant='ghost'
         sx={t => ({
-          color: t.colors.$colorText,
+          color: t.colors.$text,
           gap: t.space.$2x5,
           width: 'fit-content',
           alignItems: 'center',

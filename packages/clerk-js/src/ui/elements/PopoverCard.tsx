@@ -35,7 +35,7 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
       direction='col'
       sx={[
         t => ({
-          backgroundColor: t.colors.$colorBackground,
+          backgroundColor: t.colors.$background,
           overflow: 'hidden',
           borderRadius: t.radii.$lg,
           zIndex: t.zIndices.$card,
@@ -61,10 +61,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
       justify='between'
       sx={[
         t => ({
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 0.8),
-            t.colors.$blackAlpha50,
-          ),
+          background: common.mergedColorsBackground(colors.setAlpha(t.colors.$background, 0.8), t.colors.$blackAlpha50),
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
           borderBottomLeftRadius: 'inherit',

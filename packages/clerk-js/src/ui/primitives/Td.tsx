@@ -9,7 +9,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     fontSize: theme.fontSizes.$xs,
     fontWeight: theme.fontWeights.$normal,
-    color: theme.colors.$colorText,
+    color: theme.colors.$text,
   },
   variants: {},
 }));

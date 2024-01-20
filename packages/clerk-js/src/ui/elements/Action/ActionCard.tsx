@@ -9,7 +9,7 @@ type ActionCardProps = ComponentProps<typeof Col> & {
 
 const styles = (t: InternalTheme) => ({
   neutral: {
-    backgroundColor: t.colors.$colorBackground,
+    backgroundColor: t.colors.$background,
   },
   destructive: {
     backgroundColor: t.colors.$blackAlpha50,

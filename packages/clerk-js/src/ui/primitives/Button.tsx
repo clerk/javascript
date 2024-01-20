@@ -46,7 +46,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       variant: {
         primary: {
           backgroundColor: theme.colors.$primary500,
-          color: theme.colors.$colorTextOnPrimaryBackground,
+          color: theme.colors.$primaryForeground,
           boxShadow: theme.shadows.$buttonShadow,
           border: theme.borders.$normal,
           borderColor: theme.colors.$primary500,
@@ -78,7 +78,7 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         },
         primaryDanger: {
           backgroundColor: theme.colors.$danger500,
-          color: theme.colors.$colorTextOnPrimaryBackground,
+          color: theme.colors.$primaryForeground,
           boxShadow: theme.shadows.$buttonShadow,
           border: theme.borders.$normal,
           borderColor: theme.colors.$danger500,
@@ -109,54 +109,73 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           },
         },
         secondary: {
-          backgroundColor: theme.colors.$colorBackground,
-          color: theme.colors.$blackAlpha700,
+          color: theme.colors.$secondaryForeground,
+          //browser didn't like going from a gradient to a normal color
+          background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$transparent),
           '&:hover': {
-            backgroundColor: theme.colors.$blackAlpha50,
-            color: theme.colors.$blackAlpha950,
+            color: theme.colors.$secondaryForeground,
+            background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$blackAlpha50),
           },
           '&:focus': props.hoverAsFocus
-            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
+            ? {
+                color: theme.colors.$secondaryForeground,
+                background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$blackAlpha50),
+              }
             : undefined,
-          '&:active': { backgroundColor: theme.colors.$colorBackground },
+          '&:active': { backgroundColor: theme.colors.$secondary500 },
           boxShadow: theme.shadows.$secondaryButtonShadow,
           border: theme.borders.$normal,
           borderColor: theme.colors.$blackAlpha100,
         },
         secondaryDanger: {
-          backgroundColor: theme.colors.$colorBackground,
+          background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$transparent),
           color: theme.colors.$danger500,
           '&:hover': {
-            backgroundColor: theme.colors.$dangerAlpha50,
             color: theme.colors.$danger500,
+            background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$dangerAlpha50),
           },
           '&:focus': props.hoverAsFocus
-            ? { backgroundColor: theme.colors.$dangerAlpha50, color: theme.colors.$danger500 }
+            ? { color: theme.colors.$danger500, backgroundColor: theme.colors.$dangerAlpha50 }
             : undefined,
-          '&:active': { backgroundColor: theme.colors.$colorBackground },
+          '&:active': {
+            background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$transparent),
+          },
           boxShadow: theme.shadows.$secondaryButtonShadow,
           border: theme.borders.$normal,
           borderColor: theme.colors.$blackAlpha100,
         },
         ghost: {
-          color: theme.colors.$blackAlpha700,
-          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 },
+          color: theme.colors.$textSecondary,
+          '&:hover': {
+            color: theme.colors.$text,
+            background: theme.colors.$blackAlpha50,
+          },
           '&:focus': props.hoverAsFocus
-            ? { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$blackAlpha950 }
+            ? {
+                background: theme.colors.$blackAlpha50,
+                color: theme.colors.$text,
+              }
             : undefined,
-          '&:active': { backgroundColor: theme.colors.$transparent },
         },
         ghostPrimary: {
           color: theme.colors.$primary500,
-          '&:hover': { backgroundColor: theme.colors.$blackAlpha50, color: theme.colors.$primary500 },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$blackAlpha50 } : undefined,
-          '&:active': { backgroundColor: theme.colors.$transparent },
+          '&:hover': {
+            color: theme.colors.$primary500,
+            backgroundColor: theme.colors.$blackAlpha50,
+          },
+          '&:focus': props.hoverAsFocus
+            ? {
+                color: theme.colors.$primary500,
+                backgroundColor: theme.colors.$blackAlpha50,
+              }
+            : undefined,
         },
         ghostDanger: {
           color: theme.colors.$danger500,
-          '&:hover': { backgroundColor: theme.colors.$dangerAlpha50, color: theme.colors.$danger500 },
-          '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$danger50 } : undefined,
-          '&:active': { backgroundColor: theme.colors.$transparent },
+          '&:hover': { color: theme.colors.$danger500, backgroundColor: theme.colors.$dangerAlpha50 },
+          '&:focus': props.hoverAsFocus
+            ? { color: theme.colors.$danger500, backgroundColor: theme.colors.$danger50 }
+            : undefined,
         },
         link: {
           ...common.textVariants(theme).buttonSmall,

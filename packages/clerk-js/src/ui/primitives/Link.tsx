@@ -29,7 +29,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
         '&:active': { color: theme.colors.$danger600 },
       },
       neutral: {
-        color: theme.colors.$colorTextSecondary,
+        color: theme.colors.$textSecondary,
       },
       inherit: { color: 'inherit' },
     },

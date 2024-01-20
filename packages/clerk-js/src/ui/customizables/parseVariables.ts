@@ -11,24 +11,33 @@ import {
 } from '../utils';
 
 export const createColorScales = (theme: Theme) => {
-  const variables = theme.variables || {};
+  const variables = theme.variables;
+
+  //values dependent on other values
+  const textSecondary =
+    toHSLA(variables?.colors?.textSecondary) || colors.makeTransparent(variables?.colors?.text, 0.15);
+  const textTertiary = toHSLA(variables?.colors?.textTertiary) || colors.makeTransparent(textSecondary, 0.4);
+
   return removeUndefinedProps({
-    ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
-    ...colorOptionToHslaAlphaScale(variables.colorPrimary, 'primaryAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
-    ...colorOptionToHslaAlphaScale(variables.colorDanger, 'dangerAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
-    ...colorOptionToHslaAlphaScale(variables.colorSuccess, 'successAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorWarning, 'warning'),
-    ...colorOptionToHslaAlphaScale(variables.colorWarning, 'warningAlpha'),
-    ...colorOptionToHslaAlphaScale(variables.colorAlphaShade, 'blackAlpha'),
-    colorText: toHSLA(variables.colorText),
-    colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
-    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
-    colorInputText: toHSLA(variables.colorInputText),
-    colorBackground: toHSLA(variables.colorBackground),
-    colorInputBackground: toHSLA(variables.colorInputBackground),
-    colorShimmer: toHSLA(variables.colorShimmer),
+    ...colorOptionToHslaLightnessScale(variables?.colors?.primary, 'primary'),
+    ...colorOptionToHslaAlphaScale(variables?.colors?.primary, 'primaryAlpha'),
+    ...colorOptionToHslaLightnessScale(variables?.colors?.secondary, 'secondary'),
+    ...colorOptionToHslaLightnessScale(variables?.colors?.danger, 'danger'),
+    ...colorOptionToHslaAlphaScale(variables?.colors?.danger, 'dangerAlpha'),
+    ...colorOptionToHslaLightnessScale(variables?.colors?.success, 'success'),
+    ...colorOptionToHslaAlphaScale(variables?.colors?.success, 'successAlpha'),
+    ...colorOptionToHslaLightnessScale(variables?.colors?.warning, 'warning'),
+    ...colorOptionToHslaAlphaScale(variables?.colors?.warning, 'warningAlpha'),
+    ...colorOptionToHslaAlphaScale(variables?.colors?.alphaShade, 'blackAlpha'),
+    primaryForeground: toHSLA(variables?.colors?.primaryForeground),
+    secondaryForeground: toHSLA(variables?.colors?.secondaryForeground),
+    text: toHSLA(variables?.colors?.text),
+    textSecondary: textSecondary,
+    textTertiary: textTertiary,
+    inputForeground: toHSLA(variables?.colors?.inputForeground),
+    background: toHSLA(variables?.colors?.background),
+    input: toHSLA(variables?.colors?.input),
+    shimmer: toHSLA(variables?.colors?.shimmer),
   });
 };
 
@@ -102,8 +111,8 @@ export const createFonts = (theme: Theme) => {
 };
 
 export const createShadows = (theme: Theme) => {
-  const { shadowShimmer } = theme.variables || {};
-  return removeUndefinedProps({ shadowShimmer });
+  const { shimmerShadow } = theme.variables?.colors || {};
+  return removeUndefinedProps({ shimmerShadow });
 };
 
 const splitCssUnit = (str: string) => {

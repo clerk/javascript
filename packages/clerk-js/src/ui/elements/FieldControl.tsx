@@ -130,7 +130,7 @@ const FieldLabel = (props: PropsWithChildren<{ localizationKey?: LocalizationKey
       sx={t => ({
         display: 'flex',
         alignItems: 'center',
-        color: t.colors.$blackAlpha700,
+        color: t.colors.$text,
       })}
     >
       {props.children}

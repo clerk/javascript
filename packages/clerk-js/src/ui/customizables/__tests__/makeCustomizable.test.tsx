@@ -12,7 +12,7 @@ describe('Theme used in sx callback', () => {
     render(
       <AppearanceProvider
         appearanceKey='signIn'
-        globalAppearance={{ variables: { colorPrimary: 'blue' } }}
+        globalAppearance={{ variables: { colors: { primary: 'blue' } } }}
       >
         <InternalThemeProvider>
           <Box
@@ -30,7 +30,7 @@ describe('Theme used in sx callback', () => {
     render(
       <AppearanceProvider
         appearanceKey='signIn'
-        appearance={{ variables: { colorPrimary: 'red' } }}
+        appearance={{ variables: { colors: { primary: 'red' } } }}
       >
         <InternalThemeProvider>
           <Box
@@ -48,8 +48,8 @@ describe('Theme used in sx callback', () => {
     render(
       <AppearanceProvider
         appearanceKey='signIn'
-        globalAppearance={{ variables: { colorPrimary: 'blue' } }}
-        appearance={{ variables: { colorPrimary: 'red' } }}
+        globalAppearance={{ variables: { colors: { primary: 'blue' } } }}
+        appearance={{ variables: { colors: { primary: 'red' } } }}
       >
         <InternalThemeProvider>
           <Box

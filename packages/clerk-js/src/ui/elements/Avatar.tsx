@@ -77,7 +77,7 @@ export const Avatar = (props: AvatarProps) => {
       <Box
         sx={t => ({
           overflow: 'hidden',
-          background: t.colors.$colorShimmer,
+          background: t.colors.$shimmer,
           position: 'absolute',
           width: '25%',
           height: '100%',
@@ -93,7 +93,7 @@ export const Avatar = (props: AvatarProps) => {
             transform: 'var(--cl-shimmer-hover-after-transform, skewX(45deg) translateX(75%))',
             transition: `all ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
             border: t.borders.$heavy,
-            borderColor: t.colors.$colorShimmer,
+            borderColor: t.colors.$shimmer,
             borderRadius: rounded ? t.radii.$circle : t.radii.$md,
           },
         })}

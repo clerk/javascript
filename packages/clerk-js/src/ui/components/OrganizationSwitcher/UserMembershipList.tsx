@@ -80,12 +80,6 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
             user={userWithoutIdentifiers}
             mainIdentifierVariant={'buttonLarge'}
             title={localizationKeys('organizationSwitcher.personalWorkspace')}
-            mainIdentifierSx={t => ({
-              color: t.colors.$blackAlpha600,
-              ':hover': {
-                color: t.colors.$blackAlpha600,
-              },
-            })}
           />
         </PreviewButton>
       )}
@@ -100,12 +94,6 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           <OrganizationPreview
             elementId='organizationSwitcherListedOrganization'
             organization={organization}
-            sx={t => ({
-              color: t.colors.$blackAlpha600,
-              ':hover': {
-                color: t.colors.$blackAlpha600,
-              },
-            })}
           />
         </PreviewButton>
       ))}

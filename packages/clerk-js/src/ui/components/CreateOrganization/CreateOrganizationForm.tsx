@@ -148,7 +148,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
                       size='md'
                       icon={Upload}
                       sx={t => ({
-                        color: t.colors.$blackAlpha400,
+                        color: t.colors.$textTertiary,
                         transitionDuration: t.transitionDuration.$controls,
                       })}
                     />

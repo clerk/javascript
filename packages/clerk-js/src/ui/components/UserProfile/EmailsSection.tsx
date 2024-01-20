@@ -54,7 +54,7 @@ export const EmailsSection = () => {
                   sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}
                 >
                   <Text
-                    sx={t => ({ color: t.colors.$blackAlpha700 })}
+                    sx={t => ({ color: t.colors.$text })}
                     truncate
                   >
                     {email.emailAddress}
@@ -66,7 +66,6 @@ export const EmailsSection = () => {
                     <Badge localizationKey={localizationKeys('badge__unverified')} />
                   )}
                 </Flex>
-
                 <EmailMenu email={email} />
               </ProfileSection.Item>
 

@@ -31,7 +31,6 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
         onClick={handleManageAccountClicked}
         sx={t => ({
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-          backgroundColor: t.colors.$colorBackground,
           padding: `${t.space.$4} ${t.space.$5}`,
         })}
       />
@@ -51,8 +50,7 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
             borderBottomRightRadius: t.radii.$lg,
             padding: `${t.space.$4} ${t.space.$5}`,
             ':hover': {
-              backgroundColor: t.colors.$dangerAlpha50,
-              color: t.colors.$danger400,
+              background: t.colors.$dangerAlpha50,
             },
           }),
         ]}
@@ -98,11 +96,9 @@ export const MultiSessionActions = (props: SessionActionsProps) => {
           icon={SignOut}
           label={localizationKeys('userButton.action__signOut')}
           onClick={handleSignOutSessionClicked(session)}
+          variant='secondaryDanger'
           sx={t => ({
-            ':hover': {
-              backgroundColor: t.colors.$dangerAlpha50,
-              color: t.colors.$danger400,
-            },
+            color: t.colors.$secondaryForeground,
           })}
         />
       </Flex>

@@ -114,9 +114,9 @@ const Preview = (
         elementId='organizationSwitcherListedOrganization'
         organization={publicOrganizationData}
         sx={t => ({
-          color: t.colors.$blackAlpha600,
+          color: t.colors.$textSecondary,
           ':hover': {
-            color: t.colors.$blackAlpha600,
+            color: t.colors.$textSecondary,
           },
         })}
       />
@@ -177,9 +177,9 @@ const InvitationPreview = withCardStateProvider(
             elementId='organizationSwitcherListedOrganization'
             organization={publicOrganizationData}
             sx={t => ({
-              color: t.colors.$blackAlpha600,
+              color: t.colors.$textSecondary,
               ':hover': {
-                color: t.colors.$blackAlpha600,
+                color: t.colors.$textSecondary,
               },
             })}
           />

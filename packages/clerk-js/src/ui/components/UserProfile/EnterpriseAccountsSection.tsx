@@ -43,9 +43,7 @@ export const EnterpriseAccountsSection = () => {
                   gap={2}
                   center
                 >
-                  <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{`${providerName} ${
-                    label ? `(${label})` : ''
-                  }`}</Text>
+                  <Text sx={t => ({ color: t.colors.$text })}>{`${providerName} ${label ? `(${label})` : ''}`}</Text>
                   {error && (
                     <Badge
                       colorScheme='danger'

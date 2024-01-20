@@ -20,7 +20,7 @@ export const withAvatarShimmer = <T extends { sx?: ThemableCssProp }>(Component:
           parsedLayout.shimmer
             ? t => ({
                 ':hover': {
-                  '--cl-shimmer-hover-shadow': t.shadows.$shadowShimmer,
+                  '--cl-shimmer-hover-shadow': t.shadows.$shimmerShadow,
                   '--cl-shimmer-hover-transform': 'skew(-45deg) translateX(600%)',
                   '--cl-shimmer-hover-after-transform': 'skewX(45deg) translateX(-150%)',
                 },
