@@ -205,7 +205,6 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
       nodeId={nodeId}
       context={context}
       isOpen={isOpen}
-      order={['floating', 'content']}
       portal={false}
     >
       <Col
