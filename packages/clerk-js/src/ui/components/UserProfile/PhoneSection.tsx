@@ -93,13 +93,13 @@ export const PhoneSection = () => {
               localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
             />
           </Action.Trigger>
-        </ProfileSection.ItemList>
 
-        <Action.Open value='add'>
-          <Action.Card>
-            <PhoneScreen />
-          </Action.Card>
-        </Action.Open>
+          <Action.Open value='add'>
+            <Action.Card>
+              <PhoneScreen />
+            </Action.Card>
+          </Action.Open>
+        </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
   );

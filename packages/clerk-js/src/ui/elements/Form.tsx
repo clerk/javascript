@@ -130,28 +130,33 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
   const { isOptional, icon, actionLabel, children, onActionClicked, ...fieldProps } = props;
   return (
     <Field.Root {...fieldProps}>
-      <Flex
-        direction='col'
+      <Col
         elementDescriptor={descriptors.formField}
         elementId={descriptors.formField.setId(fieldProps.id)}
         sx={{ position: 'relative', flex: '1 1 auto' }}
-        gap={2}
       >
-        <Field.LabelRow>
-          <Field.Label />
-          <Field.LabelIcon icon={icon} />
-          {!actionLabel && isOptional && <Field.AsOptional />}
-          {actionLabel && (
-            <Field.Action
-              localizationKey={actionLabel}
-              onClick={onActionClicked}
-            />
-          )}
-          <Field.Action />
-        </Field.LabelRow>
-        {children}
+        <Flex
+          direction='col'
+          sx={t => ({ gap: t.space.$2 })}
+        >
+          <Field.LabelRow>
+            <Field.Label />
+            <Field.LabelIcon icon={icon} />
+            {!actionLabel && isOptional && <Field.AsOptional />}
+            {actionLabel && (
+              <Field.Action
+                localizationKey={actionLabel}
+                onClick={onActionClicked}
+              />
+            )}
+            <Field.Action />
+          </Field.LabelRow>
+
+          {children}
+        </Flex>
+
         <Field.Feedback />
-      </Flex>
+      </Col>
     </Field.Root>
   );
 };

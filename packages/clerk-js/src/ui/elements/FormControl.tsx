@@ -26,7 +26,9 @@ export function useFormTextAnimation() {
         animation: `${enterAnimation ? inAnimation : animations.outAnimation} ${t.transitionDuration.$textField} ${
           t.transitionTiming.$common
         }`,
-        transition: `height ${t.transitionDuration.$slow} ${t.transitionTiming.$common}`, // This is expensive but required for a smooth layout shift
+        transitionProperty: 'height',
+        transitionDuration: t.transitionDuration.$slow,
+        transitionTimingFunction: t.transitionTiming.$common,
       });
     },
     [prefersReducedMotion],
@@ -62,10 +64,11 @@ type Feedback = { feedback?: string; feedbackType?: FeedbackType; shouldEnter: b
 export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
   center?: boolean;
+  sx?: ThemableCssProp;
 };
 
 export const FormFeedback = (props: FormFeedbackProps) => {
-  const { id, elementDescriptors, feedback, feedbackType = 'info', center = false } = props;
+  const { id, elementDescriptors, sx, feedback, feedbackType = 'info', center = false } = props;
   const feedbacksRef = useRef<{
     a?: Feedback;
     b?: Feedback;
@@ -150,10 +153,10 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     <Flex
       style={{
         height: feedback ? maxHeight : 0, // dynamic height
-        position: feedback ? 'relative' : 'absolute', // so the parent element doesn't add an unnecessary gap for this while hidden
+        position: 'relative',
       }}
       center={center}
-      sx={[getFormTextAnimation(!!feedback)]}
+      sx={[getFormTextAnimation(!!feedback), sx]}
     >
       <InfoComponentA
         {...getElementProps(feedbacks.a?.feedbackType)}

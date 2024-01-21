@@ -7,7 +7,7 @@ import type { ElementDescriptor, ElementId } from '../customizables/elementDescr
 import { Plus } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
-import { ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
+import { Animated, ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
@@ -92,15 +92,18 @@ type ProfileSectionItemListProps = PropsOfComponent<typeof Col> & { id: ProfileS
 
 const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
   const { children, id, ...rest } = props;
+
   return (
-    <Col
-      elementDescriptor={descriptors.profileSectionItemList}
-      elementId={descriptors.profileSectionItemList.setId(id)}
-      sx={t => ({ gap: t.space.$0x5 })}
-      {...rest}
-    >
-      {children}
-    </Col>
+    <Animated asChild>
+      <Col
+        elementDescriptor={descriptors.profileSectionItemList}
+        elementId={descriptors.profileSectionItemList.setId(id)}
+        sx={t => ({ gap: t.space.$0x5 })}
+        {...rest}
+      >
+        {children}
+      </Col>
+    </Animated>
   );
 };
 
@@ -108,6 +111,7 @@ type ProfileSectionItemProps = PropsOfComponent<typeof Flex> & { id: ProfileSect
 
 const ProfileSectionItem = (props: ProfileSectionItemProps) => {
   const { children, id, sx, ...rest } = props;
+
   return (
     <Flex
       elementDescriptor={descriptors.profileSectionItem}
