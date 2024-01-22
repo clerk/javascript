@@ -47,7 +47,6 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       nodeId={nodeId}
       context={context}
       isOpen={isOpen}
-      order={['floating', 'content']}
     >
       <ModalContext.Provider value={modalCtx}>
         <Flex
@@ -75,7 +74,6 @@ export const Modal = withFloatingTree((props: ModalProps) => {
           <Flex
             elementDescriptor={descriptors.modalContent}
             ref={floating}
-            tabIndex={0}
             aria-modal='true'
             role='dialog'
             sx={[

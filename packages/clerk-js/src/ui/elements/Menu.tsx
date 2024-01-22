@@ -113,7 +113,6 @@ export const MenuList = (props: MenuListProps) => {
       context={context}
       nodeId={nodeId}
       isOpen={isOpen}
-      order={['floating', 'content']}
       portal={asPortal}
     >
       <Col
@@ -122,7 +121,6 @@ export const MenuList = (props: MenuListProps) => {
         ref={containerRef}
         role='menu'
         onKeyDown={onKeyDown}
-        tabIndex={0}
         sx={[
           theme => ({
             backgroundColor: colors.makeSolid(theme.colors.$colorBackground),

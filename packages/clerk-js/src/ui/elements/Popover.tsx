@@ -13,7 +13,7 @@ type PopoverProps = PropsWithChildren<{
 }>;
 
 export const Popover = (props: PopoverProps) => {
-  const { context, initialFocus, order = ['reference', 'content'], nodeId, isOpen, portal = true, children } = props;
+  const { context, initialFocus, order = ['floating', 'content'], nodeId, isOpen, portal = true, children } = props;
 
   if (portal) {
     return (
