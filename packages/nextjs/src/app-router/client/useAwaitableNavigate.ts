@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 
 type NavigateFunction = ReturnType<typeof useRouter>['push'];
@@ -15,10 +15,6 @@ declare global {
 export const useAwaitableNavigate = () => {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { push } = useRouter();
-  const pathname = usePathname();
-  const params = useSearchParams();
-
-  const urlKey = pathname + params.toString();
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -37,7 +33,7 @@ export const useAwaitableNavigate = () => {
         push(to);
       });
     };
-  }, [urlKey]);
+  }, [push]);
 
   useEffect(() => {
     if (window.__clerk_nav_resolves_ref && window.__clerk_nav_resolves_ref.length) {
