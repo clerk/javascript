@@ -3,7 +3,6 @@ import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
 } from '@clerk/types';
-import { notFound, redirect } from 'next/navigation';
 
 import { buildClerkProps } from '../../server/buildClerkProps';
 import { createGetAuth } from '../../server/createGetAuth';
@@ -52,6 +51,9 @@ export const auth = () => {
     noAuthStatusMessage: authAuthHeaderMissing(),
   })(buildRequestLike());
 
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { notFound, redirect } = require('next/navigation');
+
   (authObject as unknown as ProtectGeneric).protect = (params: any, options: any) => {
     const paramsOrFunction = params?.redirectUrl
       ? undefined
@@ -60,7 +62,7 @@ export const auth = () => {
           | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
     const redirectUrl = (params?.redirectUrl || options?.redirectUrl) as string | undefined;
 
-    const handleUnauthorized = (): never => {
+    const handleUnauthorized = (): any => {
       if (redirectUrl) {
         redirect(redirectUrl);
       }
