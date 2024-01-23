@@ -44,4 +44,5 @@ render(
 		_yolo={cli.flags.yolo}
 		noWarnings={cli.flags.noWarnings}
 	/>,
+	// { debug: true }, if having issues with errors being swallowed, uncomment this
 );
