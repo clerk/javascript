@@ -126,6 +126,7 @@ export default {
 		'removed-localization-keys',
 		'changed-localization-keys',
 		'signoutcallback-to-redirecturl',
+		'min-nextjs-version',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -200,7 +201,6 @@ export default {
 		'clerkplugin-frontendapi',
 	]),
 	node: load('node', [
-		'package-rename',
 		'api-key-to-secret-key',
 		'api-url-value-change',
 		'frontend-api-to-publishable-key',

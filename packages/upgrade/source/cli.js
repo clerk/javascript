@@ -19,8 +19,7 @@ const cli = meow(
 			--noWarnings   Do not print warnings, only items that must be fixed
 
 		Examples
-		  $ clerk-upgrade --from=4 --to=5 --sdk=nextjs --dir=src/**
-		  Hello, Jane
+		  $ clerk-upgrade --sdk=nextjs --dir=src/**
 	`,
 	{
 		importMeta: import.meta,
