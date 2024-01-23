@@ -1,5 +1,6 @@
 'use client';
 
+import type { ClerkPaginationParams } from '@clerk/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useSWR, useSWRInfinite } from '../clerk-swr';
@@ -18,18 +19,7 @@ function getDifferentKeys(obj1: Record<string, unknown>, obj2: Record<string, un
   return differentKeysObject;
 }
 
-type PagesOrInfiniteOptions = {
-  /**
-   * This the starting point for your fetched results. The initial value persists between re-renders
-   */
-  initialPage?: number;
-  /**
-   * Maximum number of items returned per request. The initial value persists between re-renders
-   */
-  pageSize?: number;
-};
-
-export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | true | undefined, defaultValues: T) => {
+export const useWithSafeValues = <T extends ClerkPaginationParams>(params: T | true | undefined, defaultValues: T) => {
   const shouldUseDefaults = typeof params === 'boolean' && params;
 
   // Cache initialPage and initialPageSize until unmount
@@ -75,7 +65,7 @@ type DefaultOptions = {
 };
 
 type UsePagesOrInfinite = <
-  Params extends PagesOrInfiniteOptions,
+  Params extends ClerkPaginationParams,
   FetcherReturnData extends Record<string, any>,
   CacheKeys = Record<string, unknown>,
   TOptions extends DefaultOptions = DefaultOptions,

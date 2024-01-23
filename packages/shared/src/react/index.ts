@@ -13,3 +13,10 @@ export {
   useUserContext,
   useAssertWrappedByClerkProvider,
 } from './contexts';
+
+export type {
+  PaginatedResources as HookPaginatedResources,
+  PaginatedResourcesWithDefault as HookEmptyPaginatedResources,
+  ValueOrSetter as HookValueOrSetter,
+  CacheSetter as HookCacheSetter,
+} from './types';

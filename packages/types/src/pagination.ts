@@ -23,7 +23,7 @@ export interface ClerkPaginatedResponse<T> {
 /**
  * Pagination params passed in FAPI client methods
  */
-export type ClerkPaginationParams<T = any> = {
+export type ClerkPaginationParams<T = unknown> = {
   /**
    * This is the starting point for your fetched results.
    */
