@@ -3,17 +3,20 @@ import React from 'react';
 import { Col, descriptors, Heading, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 
-const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
-  const { sx, ...rest } = props;
-  return (
-    <Col
-      elementDescriptor={descriptors.header}
-      gap={1}
-      sx={sx}
-      {...rest}
-    />
-  );
-});
+const Root = React.memo(
+  React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Col>>((props, ref) => {
+    const { sx, ...rest } = props;
+    return (
+      <Col
+        ref={ref}
+        elementDescriptor={descriptors.header}
+        gap={1}
+        sx={sx}
+        {...rest}
+      />
+    );
+  }),
+);
 
 const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element => {
   const { sx, ...rest } = props;

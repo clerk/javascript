@@ -48,30 +48,28 @@ export const EmailsSection = () => {
         <ProfileSection.ItemList id='emailAddresses'>
           {user?.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
             <Action.Root key={email.emailAddress}>
-              <Action.Closed value=''>
-                <ProfileSection.Item
-                  id='emailAddresses'
-                  sx={t => ({ maxHeight: t.space.$8 })}
-                >
-                  <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                    <Flex
-                      as={'span'}
-                      gap={2}
-                      center
-                    >
-                      <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{email.emailAddress} </Text>
-                      {user?.primaryEmailAddressId === email.id && (
-                        <Badge localizationKey={localizationKeys('badge__primary')} />
-                      )}
-                      {email.verification.status !== 'verified' && (
-                        <Badge localizationKey={localizationKeys('badge__unverified')} />
-                      )}
-                    </Flex>
-                  </Box>
+              <ProfileSection.Item
+                id='emailAddresses'
+                sx={t => ({ maxHeight: t.space.$8 })}
+              >
+                <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                  <Flex
+                    as={'span'}
+                    gap={2}
+                    center
+                  >
+                    <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{email.emailAddress} </Text>
+                    {user?.primaryEmailAddressId === email.id && (
+                      <Badge localizationKey={localizationKeys('badge__primary')} />
+                    )}
+                    {email.verification.status !== 'verified' && (
+                      <Badge localizationKey={localizationKeys('badge__unverified')} />
+                    )}
+                  </Flex>
+                </Box>
 
-                  <EmailMenu email={email} />
-                </ProfileSection.Item>
-              </Action.Closed>
+                <EmailMenu email={email} />
+              </ProfileSection.Item>
 
               <Action.Open value='remove'>
                 <Action.Card variant='destructive'>
@@ -93,13 +91,13 @@ export const EmailsSection = () => {
               localizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
             />
           </Action.Trigger>
-        </ProfileSection.ItemList>
 
-        <Action.Open value='add'>
-          <Action.Card>
-            <EmailScreen />
-          </Action.Card>
-        </Action.Open>
+          <Action.Open value='add'>
+            <Action.Card>
+              <EmailScreen />
+            </Action.Card>
+          </Action.Open>
+        </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
   );

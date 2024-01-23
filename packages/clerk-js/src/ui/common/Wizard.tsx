@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Animated } from '../elements';
+
 type WizardProps = React.PropsWithChildren<{
   step: number;
 }>;
@@ -25,5 +27,6 @@ export const useWizard = (params: UseWizardProps = {}) => {
 
 export const Wizard = (props: WizardProps) => {
   const { step, children } = props;
-  return <>{React.Children.toArray(children)[step]}</>;
+
+  return <Animated>{React.Children.toArray(children)[step]}</Animated>;
 };
