@@ -13,18 +13,8 @@ import {
   Label as RadixLabel,
   Submit,
 } from '@radix-ui/react-form';
-import { Slot } from '@radix-ui/react-slot';
-import type { ComponentProps, ComponentType, CSSProperties, ReactNode } from 'react';
-import React, {
-  createContext,
-  forwardRef,
-  useCallback,
-  useContext,
-  useEffect,
-  useImperativeHandle,
-  useLayoutEffect,
-  useRef,
-} from 'react';
+import type { ComponentProps, ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useEffect } from 'react';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors/error';
@@ -38,7 +28,9 @@ import {
 } from '~/internals/machines/form/form.context';
 import type { FieldDetails } from '~/internals/machines/form/form.types';
 
-import type { ClerkInputType, FieldStates } from './types';
+import type { OTPInputProps } from './otp';
+import { OTPInput } from './otp';
+import type { FieldStates } from './types';
 
 const FieldContext = createContext<Pick<FieldDetails, 'name'> | null>(null);
 const useFieldContext = () => useContext(FieldContext);
@@ -84,7 +76,7 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
       [`data-${validity}`]: true,
       'data-hidden': shouldBeHidden ? true : undefined,
       serverInvalid: hasError,
-      // tabIndex: shouldBeHidden ? -1 : 0,
+      tabIndex: shouldBeHidden ? -1 : 0,
     },
   };
 };
@@ -117,14 +109,11 @@ const determineInputTypeFromName = (name: string) => {
   return 'text' as const;
 };
 
-const useInput = ({
-  name: inputName,
-  value: initialValue,
-  type: inputType,
-}: Partial<Pick<FieldDetails, 'name' | 'value'> & { type: ClerkInputType }>) => {
+const useInput = ({ name: inputName, value: initialValue, type: inputType, ...passthroughProps }: ClerkInputProps) => {
   // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
+  const onChangeProp = passthroughProps?.onChange;
 
   const ref = useFormStore();
   const value = useFormSelector(fieldValueSelector(name));
@@ -142,10 +131,11 @@ const useInput = ({
   // Register the onChange handler for field updates to persist to the machine context
   const onChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeProp?.(event);
       if (!name) return;
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
     },
-    [ref, name],
+    [ref, name, onChangeProp],
   );
 
   if (!name) {
@@ -156,14 +146,35 @@ const useInput = ({
   const shouldBeHidden = false;
   const type = inputType ?? determineInputTypeFromName(name);
 
+  const Element = inputType === 'otp' ? OTPInput : RadixControl;
+
+  let props = {};
+  if (inputType === 'otp') {
+    props = {
+      'data-otp-input': true,
+      autoComplete: 'one-time-code',
+      inputMode: 'numeric',
+      pattern: '[0-9]*',
+      maxLength: 6,
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        // Only accept numbers
+        event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
+        onChange(event);
+      },
+    };
+  }
+
   return {
-    type,
+    Element,
     props: {
+      type,
       value: value ?? '',
       onChange,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
       tabIndex: shouldBeHidden ? -1 : 0,
+      ...props,
+      ...passthroughProps,
     },
   };
 };
@@ -215,174 +226,10 @@ function FieldState({ children }: { children: (state: { state: FieldStates }) =>
 type ClerkInputProps = FormControlProps | ({ type: 'otp' } & OTPInputProps);
 
 function Input(props: ClerkInputProps) {
-  const { name, value, type, ...passthroughProps } = props;
-  const field = useInput({ name, value, type });
+  const field = useInput(props);
 
-  let El: ComponentType<ClerkInputProps> = RadixControl;
-
-  if (field.type === 'otp') {
-    // @ts-ignore -- type='otp' ensures props are handled correctly in this case
-    El = OTPInput;
-  }
-
-  return (
-    <El
-      type={field.type}
-      {...field.props}
-      {...(passthroughProps as FormControlProps)}
-    />
-  );
+  return <field.Element {...field.props} />;
 }
-
-type OTPInputProps = Exclude<FormControlProps, 'type' | 'autoComplete' | 'maxLength' | 'inputMode' | 'pattern'> & {
-  render: (props: { value: string; status: 'cursor' | 'selected' | 'none'; index: number }) => ReactNode;
-};
-
-/**
- * A custom input component to handle accepting OTP codes. An invisible input element is used to capture input and handle native input
- * interactions, while the provided render prop is used to visually render the input's contents.
- */
-const OTPInput = forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(props, ref) {
-  const length = 6;
-  const { className, render, ...rest } = props;
-
-  const innerRef = useRef<HTMLInputElement>(null);
-  const [selectionRange, setSelectionRange] = React.useState<[number, number]>(props.autoFocus ? [0, 0] : [-1, -1]);
-
-  // This ensures we can access innerRef internally while still exposing it via the ref prop
-  useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
-
-  // A layout effect is used here to avoid any perceived visual lag when changing the selection
-  useLayoutEffect(() => {
-    if (document.activeElement !== innerRef.current) {
-      return;
-    }
-
-    setSelectionRange(cur => {
-      let updated: [number, number] = [innerRef.current?.selectionStart ?? 0, innerRef.current?.selectionEnd ?? 0];
-
-      // When moving the selection, we want to select either the previous or next character instead of only moving the cursor.
-      // If the start and end indices are the same, it means only the cursor has moved and we need to make a decision on which character to select.
-      if (updated[0] === updated[1]) {
-        if (updated[0] > 0 && cur[0] === updated[0] && cur[1] === updated[0] + 1) {
-          updated = [updated[0] - 1, updated[1]];
-        } else if (typeof innerRef.current?.value[updated[0]] !== 'undefined') {
-          updated = [updated[0], updated[1] + 1];
-        }
-      }
-
-      // Only update the selection if it has changed to avoid unnecessary updates
-      if (updated[0] !== cur[0] || updated[1] !== cur[1]) {
-        innerRef.current?.setSelectionRange(updated[0], updated[1]);
-        return updated;
-      }
-
-      return cur;
-    });
-  }, [props.value]);
-
-  return (
-    <div
-      style={
-        {
-          position: 'relative',
-        } as CSSProperties
-      }
-    >
-      {/* We can't target pseud-elements with the style prop, so we inject a tag here */}
-      <style>{`
-      input[data-otp-input]::selection {
-        color: transparent;
-        background-color: none;
-      }
-      `}</style>
-      <RadixControl
-        data-otp-input
-        ref={innerRef}
-        maxLength={length}
-        {...rest}
-        type='text'
-        autoComplete='one-time-code'
-        inputMode='numeric'
-        pattern='[0-9]*'
-        onBlur={event => {
-          setSelectionRange([-1, -1]);
-
-          rest?.onBlur?.(event);
-        }}
-        onChange={event => {
-          // Only accept numbers
-          event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
-
-          rest?.onChange?.(event);
-        }}
-        onSelect={() => {
-          setSelectionRange(cur => {
-            let direction: 'forward' | 'backward' = 'forward' as const;
-            let updated: [number, number] = [
-              innerRef.current?.selectionStart ?? 0,
-              innerRef.current?.selectionEnd ?? 0,
-            ];
-
-            // Abort unnecessary updates
-            if (cur[0] === updated[0] && cur[1] === updated[1]) {
-              return cur;
-            }
-
-            // When moving the selection, we want to select either the previous or next character instead of only moving the cursor.
-            // If the start and end indices are the same, it means only the cursor has moved and we need to make a decision on which character to select.
-            if (updated[0] === updated[1]) {
-              if (updated[0] > 0 && cur[0] === updated[0] && cur[1] === updated[0] + 1) {
-                direction = 'backward' as const;
-                updated = [updated[0] - 1, updated[1]];
-              } else if (typeof innerRef.current?.value[updated[0]] !== 'undefined') {
-                updated = [updated[0], updated[1] + 1];
-              }
-            }
-
-            innerRef.current?.setSelectionRange(updated[0], updated[1], direction);
-
-            return updated;
-          });
-        }}
-        style={{
-          display: 'block',
-          cursor: 'default',
-          background: 'none',
-          outline: 'none',
-          appearance: 'none',
-          color: 'transparent',
-          position: 'absolute',
-          inset: 0,
-          right: '-2.75rem',
-        }}
-      />
-      <div
-        className={className}
-        aria-hidden
-        style={{
-          zIndex: 1,
-          pointerEvents: 'none',
-        }}
-      >
-        {Array.from({ length }).map((_, i) => (
-          <Slot key={i}>
-            {render({
-              value: String(props.value)[i] || '',
-              status:
-                selectionRange[0] === selectionRange[1] && selectionRange[0] === i
-                  ? 'cursor'
-                  : selectionRange[0] <= i && selectionRange[1] > i
-                  ? 'selected'
-                  : 'none',
-              index: i,
-            })}
-          </Slot>
-        ))}
-      </div>
-    </div>
-  );
-});
 
 function Label(props: FormLabelProps) {
   return <RadixLabel {...props} />;
