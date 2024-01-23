@@ -114,8 +114,9 @@ export interface AuthMiddleware {
 }
 
 /**
- * @deprecated Use {@link clerkMiddleware}` instead.
- * Migration guide: https://clerk.com/docs/upgrade-guides/v5-introduction
+ * @deprecated `authMiddleware` is deprecated and will be removed in the next major version.
+ * Use {@link clerkMiddleware}` instead.
+ * Migration guide: https://clerk.com/docs/upgrade-guides/upgrading-from-v4-to-v5
  */
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
