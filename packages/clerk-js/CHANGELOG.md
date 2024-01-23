@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.0-beta-v5.20
+
+### Patch Changes
+
+- Introduce more component animations by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.0.0-beta-v5.19
 
 ### Major Changes
