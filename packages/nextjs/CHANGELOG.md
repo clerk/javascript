@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.29.5
+
+### Patch Changes
+
+- Adjust how we are importing `next/navigation` to ensure it can function in versions of next that don't have this export. ([#2652](https://github.com/clerk/javascript/pull/2652)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 4.29.4
 
 ### Patch Changes
