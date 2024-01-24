@@ -17,8 +17,8 @@ export default defineConfig(overrideOptions => {
     dts: true,
     entry: {
       index: 'src/index.ts',
+      'sign-in': 'src/sign-in.ts',
     },
-    external: ['react', 'react-dom'],
     format: ['cjs', 'esm'],
     minify: false,
     sourcemap: true,

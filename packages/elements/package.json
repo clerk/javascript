@@ -35,6 +35,16 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       }
+    },
+    "./sign-in": {
+      "import": {
+        "types": "./dist/sign-in.d.mts",
+        "default": "./dist/sign-in.mjs"
+      },
+      "require": {
+        "types": "./dist/sign-in.d.ts",
+        "default": "./dist/sign-in.js"
+      }
     }
   },
   "main": "./dist/index.js",

@@ -1,7 +1,7 @@
 'use client';
 
+import { GlobalError, Submit } from '@clerk/elements';
 import {
-  GlobalError,
   SignIn,
   SignInContinue,
   SignInFactorOne,
@@ -9,8 +9,7 @@ import {
   SignInSocialProvider,
   SignInStart,
   SignInStrategy,
-  Submit,
-} from '@clerk/elements';
+} from '@clerk/elements/sign-in';
 
 import { H1, H2, H3, HR as Hr, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';

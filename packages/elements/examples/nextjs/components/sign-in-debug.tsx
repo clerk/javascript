@@ -1,7 +1,7 @@
 'use client';
 
 import { SignedIn } from '@clerk/clerk-react';
-import { useSignInFlow, useSignInFlowSelector } from '@clerk/elements';
+import { useSignInFlow, useSignInFlowSelector } from '@clerk/elements/sign-in';
 import { SignOutButton } from '@clerk/nextjs';
 
 import { Button } from './design';

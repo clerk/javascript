@@ -50,6 +50,7 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
           clerk,
           router,
           form,
+          signUpPath: '/sign-up',
         },
         inspect: inspector?.inspect,
       }}
@@ -61,14 +62,14 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
 
 // ================= SignIn ================= //
 
-export function SignIn({ children }: PropsWithChildren): JSX.Element | null {
+export function SignIn({ children, path = '/sign-in' }: PropsWithChildren<{ path?: string }>): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
 
   return (
     <Router
       router={router}
-      basePath='/sign-in'
+      basePath={path}
     >
       {/* TODO: Temporary hydration fix */}
       <ClerkLoaded>
