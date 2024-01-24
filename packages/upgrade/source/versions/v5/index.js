@@ -128,6 +128,8 @@ export default {
 		'changed-localization-keys',
 		'signoutcallback-to-redirecturl',
 		'min-nextjs-version',
+		'redirecttosignin-import-path',
+		'redirecttosignup-import-path',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -324,6 +326,7 @@ export default {
 		'getorganizationmembershiplist-return-signature',
 		'getorganizationlist-return-signature',
 		'getorganizationinvitationlist-return-signature',
+		'buildrequesturl-removed',
 	]),
 	types: [],
 	redwood: [],
