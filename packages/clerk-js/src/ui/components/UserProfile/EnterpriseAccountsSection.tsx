@@ -25,7 +25,6 @@ export const EnterpriseAccountsSection = () => {
             <ProfileSection.Item
               id='enterpriseAccounts'
               sx={t => ({
-                maxHeight: t.space.$8,
                 gap: t.space.$2,
                 justifyContent: 'start',
               })}

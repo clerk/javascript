@@ -66,7 +66,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
         as='ol'
         sx={t => ({
           gap: t.space.$3,
-          [mqu.xs]: { gap: t.space.$1 },
+          [mqu.sm]: { gap: t.space.$1 },
           margin: 0,
           padding: 0,
         })}
@@ -82,7 +82,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
                 icon={root.icon}
                 size={'sm'}
                 sx={t => ({
-                  [mqu.xs]: { display: 'none' },
+                  [mqu.sm]: { display: 'none' },
                   opacity: 0.7,
                   marginRight: t.space.$2,
                 })}

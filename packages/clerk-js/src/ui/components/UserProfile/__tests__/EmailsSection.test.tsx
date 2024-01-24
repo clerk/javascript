@@ -21,7 +21,7 @@ const withEmails = createFixtures.config(f => {
 });
 
 const getMenuItemFromText = (element: HTMLElement) => {
-  return element.parentElement?.parentElement?.parentElement?.children?.[1];
+  return element.parentElement?.parentElement?.children?.[1];
 };
 
 describe('EmailSection', () => {
@@ -74,17 +74,17 @@ describe('EmailSection', () => {
 
         expect(getByText(/save$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
       });
-      it('hides screen when when pressing cancel', async () => {
+      it('hides card when when pressing cancel', async () => {
         const { wrapper } = await createFixtures(initConfig);
 
-        const { userEvent, getByRole, queryByRole } = render(<EmailsSection />, { wrapper });
+        const { userEvent, getByRole, getByText, queryByRole } = render(<EmailsSection />, { wrapper });
         await userEvent.click(getByRole('button', { name: 'Add an email address' }));
         await waitFor(() => getByRole('heading', { name: /Add email address/i }));
         expect(queryByRole('button', { name: /Add an email address/i })).not.toBeInTheDocument();
 
         await userEvent.click(getByRole('button', { name: /cancel$/i }));
         await waitFor(() => getByRole('button', { name: /Add an email address/i }));
-        expect(queryByRole('heading', { name: /Add email address/i })).not.toBeInTheDocument();
+        getByText(/Email addresses/i);
       });
     });
   });

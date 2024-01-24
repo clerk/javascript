@@ -1,4 +1,4 @@
-import { Button, localizationKeys } from '../../customizables';
+import { localizationKeys } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -24,17 +24,11 @@ export const DeleteSection = () => {
     >
       <Action.Root>
         <Action.Closed value='delete'>
-          <ProfileSection.Item
-            id='danger'
-            sx={t => ({
-              padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$3}`,
-            })}
-          >
+          <ProfileSection.Item id='danger'>
             <Action.Trigger value='delete'>
-              <Button
+              <ProfileSection.Button
                 id='danger'
                 variant='ghostDanger'
-                textVariant='buttonSmall'
                 localizationKey={localizationKeys('userProfile.start.dangerSection.deleteAccountButton')}
               />
             </Action.Trigger>

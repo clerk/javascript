@@ -97,7 +97,7 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
         width: '100%',
         overflow: 'hidden',
         gap: t.space.$4,
-        [mqu.xs]: { gap: t.space.$2 },
+        [mqu.sm]: { gap: t.space.$2 },
       })}
     >
       <Flex

@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Button, localizationKeys, Text } from '../../customizables';
+import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -36,17 +36,13 @@ export const PasswordSection = () => {
         <Action.Closed value='edit'>
           <ProfileSection.Item
             id='password'
-            sx={t => ({
-              padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$3}`,
-            })}
+            sx={t => ({ paddingLeft: passwordEnabled ? undefined : t.space.$none })}
           >
             {passwordEnabled && <Text sx={t => ({ fontSize: t.fontSizes.$xl })}>••••••••••</Text>}
 
             <Action.Trigger value='edit'>
-              <Button
+              <ProfileSection.Button
                 id='password'
-                variant='ghost'
-                textVariant='buttonSmall'
                 localizationKey={
                   passwordEnabled
                     ? localizationKeys('userProfile.start.passwordSection.primaryButton__changePassword')
