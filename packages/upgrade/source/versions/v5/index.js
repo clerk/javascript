@@ -47,6 +47,7 @@ const reactChangesList = [
 	'removed-localization-keys',
 	'changed-localization-keys',
 	'signoutcallback-to-redirecturl',
+	'min-react-version',
 ];
 
 export default {
