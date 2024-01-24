@@ -2,7 +2,7 @@
 
 import { GlobalError, Submit } from '@clerk/elements';
 import {
-  SignIn,
+  Root as SignIn,
   SignInContinue,
   SignInFactorOne,
   SignInFactorTwo,
