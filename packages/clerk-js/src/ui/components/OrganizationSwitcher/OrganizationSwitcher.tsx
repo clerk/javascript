@@ -17,7 +17,10 @@ const _OrganizationSwitcher = withFloatingTree(() => {
   const switcherButtonMenuId = useId();
 
   return (
-    <Flow.Root flow='organizationSwitcher'>
+    <Flow.Root
+      flow='organizationSwitcher'
+      sx={{ display: 'inline-flex' }}
+    >
       <AcceptedInvitationsProvider>
         <OrganizationSwitcherTrigger
           ref={reference}

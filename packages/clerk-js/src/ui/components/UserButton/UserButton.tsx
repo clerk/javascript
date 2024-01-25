@@ -18,7 +18,10 @@ const _UserButton = withFloatingTree(() => {
   const userButtonMenuId = useId();
 
   return (
-    <Flow.Root flow='userButton'>
+    <Flow.Root
+      flow='userButton'
+      sx={{ display: 'inline-flex' }}
+    >
       <UserButtonTrigger
         ref={reference}
         onClick={toggle}
