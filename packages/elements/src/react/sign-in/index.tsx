@@ -1,6 +1,6 @@
 'use client';
 
-import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/clerk-react';
 import type { OAuthProvider, SignInStrategy as ClerkSignInStrategy, Web3Provider } from '@clerk/types';
 import { Slot } from '@radix-ui/react-slot';
 import type { PropsWithChildren } from 'react';
@@ -71,12 +71,9 @@ export function SignIn({ children, path = '/sign-in' }: PropsWithChildren<{ path
       router={router}
       basePath={path}
     >
-      {/* TODO: Temporary hydration fix */}
-      <ClerkLoaded>
-        <FormStoreProvider>
-          <SignInFlowProvider>{children}</SignInFlowProvider>
-        </FormStoreProvider>
-      </ClerkLoaded>
+      <FormStoreProvider>
+        <SignInFlowProvider>{children}</SignInFlowProvider>
+      </FormStoreProvider>
     </Router>
   );
 }
@@ -84,10 +81,11 @@ export function SignIn({ children, path = '/sign-in' }: PropsWithChildren<{ path
 // ================= SignInStart ================= //
 
 export function SignInStart({ children }: PropsWithChildren) {
+  const router = useClerkRouter();
   const state = useSignInStateMatcher();
   const actorRef = useSignInFlow();
 
-  return state.matches('Start') ? <Form flowActor={actorRef}>{children}</Form> : null;
+  return state.matches('Start') || router?.match(undefined, true) ? <Form flowActor={actorRef}>{children}</Form> : null;
 }
 
 // ================= SignInFactorOne ================= //
