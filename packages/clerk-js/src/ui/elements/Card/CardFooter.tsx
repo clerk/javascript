@@ -69,7 +69,7 @@ export const CardFooterLinks = React.memo((): JSX.Element | null => {
       justify='between'
       sx={t => ({
         gap: t.space.$3,
-        [mqu.xs]: {
+        [mqu.sm]: {
           gap: t.space.$2,
         },
       })}

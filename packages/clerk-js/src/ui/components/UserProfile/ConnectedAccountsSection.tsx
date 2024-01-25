@@ -58,17 +58,14 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
 
             return (
               <Action.Root key={account.id}>
-                <ProfileSection.Item
-                  id='connectedAccounts'
-                  sx={t => ({ maxHeight: t.space.$8 })}
-                >
-                  <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
+                <ProfileSection.Item id='connectedAccounts'>
+                  <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
                     <Image
                       elementDescriptor={[descriptors.providerIcon]}
                       elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
                       alt={providerToDisplayData[account.provider].name}
                       src={providerToDisplayData[account.provider].iconUrl}
-                      sx={theme => ({ width: theme.sizes.$4 })}
+                      sx={theme => ({ width: theme.sizes.$4, flexShrink: 0 })}
                     />
                     <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                       <Flex
@@ -76,10 +73,12 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                         gap={2}
                         center
                       >
-                        <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{`${
-                          providerToDisplayData[account.provider].name
-                        }`}</Text>
                         <Text
+                          truncate
+                          sx={t => ({ color: t.colors.$blackAlpha700 })}
+                        >{`${providerToDisplayData[account.provider].name}`}</Text>
+                        <Text
+                          truncate
                           as='span'
                           sx={t => ({ color: t.colors.$blackAlpha400 })}
                         >
@@ -107,6 +106,7 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
             );
           })}
         </ProfileSection.ItemList>
+
         <AddConnectedAccount />
       </Action.Root>
     </ProfileSection.Root>

@@ -120,6 +120,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
             elementId={'userButton'}
             user={user}
             sx={t => ({
+              width: '100%',
               padding: `${t.space.$4} ${t.space.$5}`,
             })}
           />

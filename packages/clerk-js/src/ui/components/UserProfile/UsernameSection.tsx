@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Button, localizationKeys, Text } from '../../customizables';
+import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -32,19 +32,19 @@ export const UsernameSection = () => {
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <ProfileSection.Item
-            id='username'
-            sx={t => ({
-              padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$3}`,
-            })}
-          >
-            {user.username && <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{user.username}</Text>}
+          <ProfileSection.Item id='username'>
+            {user.username && (
+              <Text
+                truncate
+                sx={t => ({ color: t.colors.$blackAlpha700 })}
+              >
+                {user.username}
+              </Text>
+            )}
 
             <Action.Trigger value='edit'>
-              <Button
+              <ProfileSection.Button
                 id='username'
-                variant='ghost'
-                textVariant='buttonSmall'
                 localizationKey={
                   user.username
                     ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')

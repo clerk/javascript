@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Button, localizationKeys } from '../../customizables';
+import { localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -34,12 +34,7 @@ export const UserProfileSection = () => {
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <ProfileSection.Item
-            id='profile'
-            sx={t => ({
-              padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$3}`,
-            })}
-          >
+          <ProfileSection.Item id='profile'>
             <UserPreview
               user={userWithoutIdentifiers}
               size='lg'
@@ -48,10 +43,9 @@ export const UserProfileSection = () => {
             />
 
             <Action.Trigger value='edit'>
-              <Button
+              <ProfileSection.Button
                 id='profile'
                 variant='ghost'
-                textVariant='buttonSmall'
                 localizationKey={localizationKeys('userProfile.start.profileSection.primaryButton')}
               />
             </Action.Trigger>
