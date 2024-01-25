@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
 import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
+import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import type { NavbarRoute } from '../elements';
 import type { ParsedQs } from '../router';
@@ -411,6 +412,10 @@ export const useOrganizationListContext = () => {
 export type OrganizationProfileContextType = OrganizationProfileCtx & {
   pages: PagesType;
   navigateAfterLeaveOrganization: () => Promise<unknown>;
+  navigateToAddDomainPage: () => Promise<unknown>;
+  isMembersPageRoot: boolean;
+  isSettingsPageRoot: boolean;
+  pathToDomainPage: string;
 };
 
 export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
@@ -427,11 +432,26 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const navigateAfterLeaveOrganization = () =>
     navigate(ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl);
 
+  const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
+  const isSettingsPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS;
+
+  const pathToDomainPage = isSettingsPageRoot
+    ? '../domain'
+    : isMembersPageRoot
+    ? './organization-settings/domain'
+    : '../organization-settings/domain';
+
+  const navigateToAddDomainPage = () => navigate(pathToDomainPage);
+
   return {
     ...ctx,
     pages,
     navigateAfterLeaveOrganization,
     componentName,
+    navigateToAddDomainPage,
+    isMembersPageRoot,
+    isSettingsPageRoot,
+    pathToDomainPage,
   };
 };
 

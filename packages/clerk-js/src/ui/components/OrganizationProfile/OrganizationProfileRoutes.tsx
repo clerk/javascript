@@ -1,6 +1,5 @@
 import { Gate } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
-import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
@@ -16,9 +15,7 @@ import { VerifiedDomainPage } from './VerifiedDomainPage';
 import { VerifyDomainPage } from './VerifyDomainPage';
 
 export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof ProfileCardContent>) => {
-  const { pages } = useOrganizationProfileContext();
-  const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
-  const isSettingsPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS;
+  const { pages, isMembersPageRoot, isSettingsPageRoot } = useOrganizationProfileContext();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isSettingsPageRoot && !isMembersPageRoot && index === 0;

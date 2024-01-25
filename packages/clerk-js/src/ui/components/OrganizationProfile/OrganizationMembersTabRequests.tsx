@@ -2,16 +2,18 @@ import { BlockButton, Gate } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
-import { useRouter } from '../../router';
 import { DomainList } from './DomainList';
 import { MembershipWidget } from './MembershipWidget';
 import { RequestToJoinList } from './RequestToJoinList';
 
 export const OrganizationMembersTabRequests = () => {
   const { organizationSettings } = useEnvironment();
-  const { navigate } = useRouter();
-  //@ts-expect-error
-  const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
+
+  const {
+    //@ts-expect-error
+    __unstable_manageBillingUrl,
+    navigateToAddDomainPage,
+  } = useOrganizationProfileContext();
 
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
 
@@ -54,7 +56,7 @@ export const OrganizationMembersTabRequests = () => {
                     'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
                   )}
                   id='manageVerifiedDomains'
-                  onClick={() => navigate('organization-settings/domain')}
+                  onClick={navigateToAddDomainPage}
                 />
               }
               redirectSubPath={'organization-settings/domain'}

@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 
 import { stripOrigin, toURL, trimLeadingSlash } from '../../../utils';
 import { useGate, withGate } from '../../common';
-import { useCoreOrganization } from '../../contexts';
+import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Box, Col, localizationKeys, Spinner } from '../../customizables';
 import { ArrowBlockButton, BlockWithTrailingComponent, ThreeDotsMenu } from '../../elements';
@@ -81,6 +81,7 @@ export const DomainList = withGate(
       },
     });
     const { navigate } = useRouter();
+    const { pathToDomainPage } = useOrganizationProfileContext();
 
     const domainList = useMemo(() => {
       if (!domains?.data) {
@@ -146,7 +147,12 @@ export const DomainList = withGate(
                 padding: `${t.space.$3} ${t.space.$4}`,
                 minHeight: t.sizes.$10,
               })}
-              onClick={() => navigate(buildDomainListRelativeURL(redirectSubPath, d.id))}
+              onClick={() => {
+                if (redirectSubPath === 'domain') {
+                  return navigate(trimLeadingSlash(stripOrigin(toURL(`domain/${d.id}`))));
+                }
+                return navigate(trimLeadingSlash(`${pathToDomainPage}/${d.id}`));
+              }}
             >
               {d.name}
             </ArrowBlockButton>
