@@ -435,15 +435,11 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
   const isSettingsPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SETTINGS;
 
-  const pathToDomainPage = useMemo(
-    () =>
-      isSettingsPageRoot
-        ? '../domain'
-        : isMembersPageRoot
-        ? './organization-settings/domain'
-        : '../organization-settings/domain',
-    [isMembersPageRoot, isMembersPageRoot],
-  );
+  const pathToDomainPage = isSettingsPageRoot
+    ? '../domain'
+    : isMembersPageRoot
+    ? './organization-settings/domain'
+    : '../organization-settings/domain';
 
   const navigateToAddDomainPage = () => navigate(pathToDomainPage);
 
