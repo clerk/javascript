@@ -48,6 +48,9 @@ const reactChangesList = [
 	'changed-localization-keys',
 	'signoutcallback-to-redirecturl',
 	'min-react-version',
+	'getorganizationlist-return-type-change',
+	'getorganizationinvitationlist-return-type-change',
+	'getorganizationmembershiplist-return-type-change',
 ];
 
 export default {
@@ -130,6 +133,9 @@ export default {
 		'min-nextjs-version',
 		'redirecttosignin-import-path',
 		'redirecttosignup-import-path',
+		'getorganizationlist-return-type-change',
+		'getorganizationinvitationlist-return-type-change',
+		'getorganizationmembershiplist-return-type-change',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -146,6 +152,7 @@ export default {
 			'setsession',
 			'api-url-value-change',
 			'withserverauth-return-type',
+			'clerk-import-change',
 		]),
 	),
 	remix: load('remix', [
@@ -168,6 +175,10 @@ export default {
 		'removed-localization-keys',
 		'changed-localization-keys',
 		'signoutcallback-to-redirecturl',
+		'clerk-import-change',
+		'getorganizationlist-return-type-change',
+		'getorganizationinvitationlist-return-type-change',
+		'getorganizationmembershiplist-return-type-change',
 	]),
 	expo: load('expo', [
 		'apikey-to-publishable-key',
@@ -194,6 +205,9 @@ export default {
 		'removed-localization-keys',
 		'changed-localization-keys',
 		'signoutcallback-to-redirecturl',
+		'getorganizationlist-return-type-change',
+		'getorganizationinvitationlist-return-type-change',
+		'getorganizationmembershiplist-return-type-change',
 	]),
 	fastify: load('fastify', [
 		'api-key-to-secret-key',
@@ -202,6 +216,7 @@ export default {
 		'createclerkclient-apikey',
 		'createclerkclient-frontendapi',
 		'clerkplugin-frontendapi',
+		'clerk-import-change',
 	]),
 	node: load('node', [
 		'api-key-to-secret-key',
@@ -223,6 +238,7 @@ export default {
 		'setclerkserverapiurl',
 		'cjs-esm-instance',
 		'legacyauthobject-removed',
+		'clerk-import-change',
 	]),
 	react: load('react', reactChangesList),
 	js: load('js', [
