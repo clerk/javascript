@@ -24,38 +24,37 @@ export const EnterpriseAccountsSection = () => {
           return (
             <ProfileSection.Item
               id='enterpriseAccounts'
-              sx={t => ({ maxHeight: t.space.$8 })}
+              sx={t => ({
+                maxHeight: t.space.$8,
+                gap: t.space.$2,
+                justifyContent: 'start',
+              })}
               key={account.id}
             >
-              <Flex
-                key={account.id}
-                sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}
-              >
-                <Image
-                  elementDescriptor={[descriptors.providerIcon]}
-                  elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
-                  alt={providerName}
-                  src={providerLogoUrl}
-                  sx={theme => ({ width: theme.sizes.$4 })}
-                />
-                <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                  <Flex
-                    as={'span'}
-                    gap={2}
-                    center
-                  >
-                    <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{`${providerName} ${
-                      label ? `(${label})` : ''
-                    }`}</Text>
-                    {error && (
-                      <Badge
-                        colorScheme='danger'
-                        localizationKey={localizationKeys('badge__requiresAction')}
-                      />
-                    )}
-                  </Flex>
-                </Box>
-              </Flex>
+              <Image
+                elementDescriptor={[descriptors.providerIcon]}
+                elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+                alt={providerName}
+                src={providerLogoUrl}
+                sx={theme => ({ width: theme.sizes.$4 })}
+              />
+              <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                <Flex
+                  as={'span'}
+                  gap={2}
+                  center
+                >
+                  <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{`${providerName} ${
+                    label ? `(${label})` : ''
+                  }`}</Text>
+                  {error && (
+                    <Badge
+                      colorScheme='danger'
+                      localizationKey={localizationKeys('badge__requiresAction')}
+                    />
+                  )}
+                </Flex>
+              </Box>
             </ProfileSection.Item>
           );
         })}
