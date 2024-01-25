@@ -57,6 +57,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   });
 
   const canSubmit = phoneField.value.length > 1 && user?.username !== phoneField.value;
+  const hasExistingNumber = user?.phoneNumbers.length > 0 && onUseExistingNumberClick;
 
   const addPhone = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,8 +89,8 @@ export const AddPhone = (props: AddPhoneProps) => {
             autoFocus
           />
         </Form.ControlRow>
-        <Flex justify={onUseExistingNumberClick ? 'between' : 'end'}>
-          {onUseExistingNumberClick && (
+        <Flex justify={hasExistingNumber ? 'between' : 'end'}>
+          {hasExistingNumber && (
             <Button
               variant='ghost'
               localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.backButton')}
