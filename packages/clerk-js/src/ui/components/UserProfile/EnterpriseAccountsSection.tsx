@@ -12,13 +12,9 @@ export const EnterpriseAccountsSection = () => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.enterpriseAccountsSection.title')}
       id='enterpriseAccounts'
+      centered={false}
     >
-      <ProfileSection.Item
-        id='enterpriseAccounts'
-        sx={t => ({
-          padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$3}`,
-        })}
-      >
+      <ProfileSection.ItemList id='enterpriseAccounts'>
         {user?.samlAccounts.map(account => {
           const label = account.emailAddress;
           const providerName = getSamlProviderName(account.provider);
@@ -26,9 +22,14 @@ export const EnterpriseAccountsSection = () => {
           const error = account.verification?.error?.longMessage;
 
           return (
-            <Flex
+            <ProfileSection.Item
+              id='enterpriseAccounts'
+              sx={t => ({
+                maxHeight: t.space.$8,
+                gap: t.space.$2,
+                justifyContent: 'start',
+              })}
               key={account.id}
-              sx={t => ({ gap: t.space.$2, width: '100%' })}
             >
               <Image
                 elementDescriptor={[descriptors.providerIcon]}
@@ -39,6 +40,7 @@ export const EnterpriseAccountsSection = () => {
               />
               <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                 <Flex
+                  as={'span'}
                   gap={2}
                   center
                 >
@@ -53,10 +55,10 @@ export const EnterpriseAccountsSection = () => {
                   )}
                 </Flex>
               </Box>
-            </Flex>
+            </ProfileSection.Item>
           );
         })}
-      </ProfileSection.Item>
+      </ProfileSection.ItemList>
     </ProfileSection.Root>
   );
 };
