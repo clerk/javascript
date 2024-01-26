@@ -323,7 +323,7 @@ export const SignInMachine = setup({
     },
     FirstFactor: {
       initial: 'DeterminingState',
-      // entry: ['assignStartingFirstFactor'],
+      entry: ['assignStartingFirstFactor'],
       entry: [{ type: 'navigateTo', params: { path: '/continue' } }, 'assignStartingFirstFactor'],
       onDone: [
         {
