@@ -44,6 +44,16 @@
         "types": "./dist/sign-in.d.ts",
         "default": "./dist/sign-in.js"
       }
+    },
+    "./server": {
+      "import": {
+        "types": "./dist/server.d.mts",
+        "default": "./dist/server.mjs"
+      },
+      "require": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      }
     }
   },
   "files": [

@@ -6,6 +6,7 @@ import {
   SignInContinue,
   SignInFactorOne,
   SignInFactorTwo,
+  SignInLoading,
   SignInSocialProvider,
   SignInStart,
   SignInStrategy,
@@ -23,9 +24,7 @@ export default function SignInPage() {
         <SignInStart>
           <div className='flex flex-col items-center justify-center  gap-12'>
             <H1>START</H1>
-
             <GlobalError className='block text-red-400 font-mono' />
-
             <div className='flex flex-col items-stretch justify-center gap-2'>
               <SignInSocialProvider
                 name='github'
@@ -51,23 +50,16 @@ export default function SignInPage() {
                 Sign In with Metamask
               </SignInSocialProvider>
             </div>
-
             <Hr />
-
             <div className='flex gap-6 flex-col'>
               <CustomField
                 label='Email'
                 name='identifier'
               />
 
-              {/* <Hr />
-
-              <CustomField
-                label='Phone'
-                name='identifier'
-              /> */}
-
-              <CustomSubmit>Sign In</CustomSubmit>
+              <CustomSubmit>
+                <SignInLoading fallback={<>Submitting...</>}>Sign In</SignInLoading>
+              </CustomSubmit>
             </div>
           </div>
         </SignInStart>

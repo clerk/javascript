@@ -13,8 +13,8 @@ import {
   Label as RadixLabel,
   Submit,
 } from '@radix-ui/react-form';
-import type { ComponentProps, ReactNode } from 'react';
-import React, { createContext, useCallback, useContext, useEffect } from 'react';
+import type { ChangeEvent, ComponentProps, FormEvent, ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useTransition } from 'react';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors/error';
@@ -40,15 +40,16 @@ const useFieldContext = () => useContext(FieldContext);
  */
 const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
   const error = useFormSelector(globalErrorsSelector);
+  const [isPending, startTransition] = useTransition();
   const validity = error ? 'invalid' : 'valid';
 
   // Register the onSubmit handler for form submission
   // TODO: merge user-provided submit handler
   const onSubmit = useCallback(
-    (event: React.FormEvent<Element>) => {
+    (event: FormEvent<Element>) => {
       event.preventDefault();
       if (flowActor) {
-        flowActor.send({ type: 'SUBMIT' });
+        startTransition(() => flowActor.send({ type: 'SUBMIT' }));
       }
     },
     [flowActor],
@@ -56,6 +57,7 @@ const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }
 
   return {
     props: {
+      [`data-submitting`]: isPending,
       [`data-${validity}`]: true,
       onSubmit,
     },
@@ -130,7 +132,7 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
 
   // Register the onChange handler for field updates to persist to the machine context
   const onChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       onChangeProp?.(event);
       if (!name) return;
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
@@ -156,7 +158,7 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
       inputMode: 'numeric',
       pattern: '[0-9]*',
       maxLength: 6,
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange: (event: ChangeEvent<HTMLInputElement>) => {
         // Only accept numbers
         event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
         onChange(event);
@@ -241,11 +243,11 @@ type FormErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
 type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> &
   (
     | {
-        children?: (error: FormErrorRenderProps) => React.ReactNode;
+        children?: (error: FormErrorRenderProps) => ReactNode;
         code?: string;
       }
     | {
-        children: React.ReactNode;
+        children: ReactNode;
         code: string;
       }
   );
@@ -303,9 +305,9 @@ export { Field, FieldError, FieldState, Form, GlobalError, Input, Label, Submit 
 export type {
   FormControlProps,
   FormErrorProps,
-  FormGlobalErrorProps,
   FormErrorRenderProps,
   FormFieldErrorProps,
   FormFieldProps,
+  FormGlobalErrorProps,
   FormProps,
 };

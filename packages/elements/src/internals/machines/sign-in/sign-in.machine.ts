@@ -58,7 +58,8 @@ export type SignInMachineEvents =
   | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
   | { type: 'FAILURE'; error: Error }
   | { type: 'OAUTH.CALLBACK' }
-  | { type: 'SUBMIT' };
+  | { type: 'SUBMIT' }
+  | { type: 'SET_LOADING_CONTEXT'; name: string };
 
 export interface SignInMachineTypes {
   context: SignInMachineContext;
@@ -141,6 +142,14 @@ export const SignInMachine = setup({
         };
       },
     ),
+    setLoadingContext: assign(({ event }) => {
+      if (event.type === 'SET_LOADING_CONTEXT') {
+        return {
+          loadingContext: event.name,
+        };
+      }
+      return {};
+    }),
   },
   guards: {
     isCurrentFactorPassword: ({ context }) => context.currentFactor?.strategy === 'password',
@@ -188,6 +197,7 @@ export const SignInMachine = setup({
   on: {
     'CLERKJS.NAVIGATE.*': '.HavingTrouble',
     FAILURE: '.HavingTrouble',
+    SET_LOADING_CONTEXT: { actions: ['setLoadingContext'] },
   },
   states: {
     Init: {
@@ -264,6 +274,11 @@ export const SignInMachine = setup({
           target: 'Complete',
         },
         {
+          guard: 'needsIdentifier',
+          target: 'Start',
+          reenter: true,
+        },
+        {
           guard: 'needsFirstFactor',
           target: 'FirstFactor',
         },
@@ -283,6 +298,7 @@ export const SignInMachine = setup({
           },
         },
         Attempting: {
+          tags: ['loading'],
           invoke: {
             id: 'createSignIn',
             src: 'createSignIn',
@@ -307,6 +323,7 @@ export const SignInMachine = setup({
     },
     FirstFactor: {
       initial: 'DeterminingState',
+      // entry: ['assignStartingFirstFactor'],
       entry: [{ type: 'navigateTo', params: { path: '/continue' } }, 'assignStartingFirstFactor'],
       onDone: [
         {
@@ -323,7 +340,7 @@ export const SignInMachine = setup({
           always: [
             {
               description: 'If the current factor is not password, prepare the factor',
-              guard: not('isCurrentFactorPassword'),
+              guard: and([not('isCurrentFactorPassword'), { type: 'isCurrentPath', params: { path: '/continue' } }]),
               target: 'Preparing',
             },
             {
@@ -333,6 +350,7 @@ export const SignInMachine = setup({
           ],
         },
         Preparing: {
+          tags: ['loading'],
           invoke: {
             id: 'prepareFirstFactor',
             src: 'prepareFirstFactor',
@@ -367,6 +385,7 @@ export const SignInMachine = setup({
           },
         },
         Attempting: {
+          tags: ['loading'],
           invoke: {
             id: 'attemptFirstFactor',
             src: 'attemptFirstFactor',
@@ -406,7 +425,7 @@ export const SignInMachine = setup({
           always: [
             {
               description: 'If the current factor is not TOTP, prepare the factor',
-              guard: not('isCurrentFactorTOTP'),
+              guard: and([not('isCurrentFactorTOTP'), { type: 'isCurrentPath', params: { path: '/continue' } }]),
               target: 'Preparing',
               reenter: true,
             },
@@ -418,6 +437,7 @@ export const SignInMachine = setup({
           ],
         },
         Preparing: {
+          tags: ['loading'],
           invoke: {
             id: 'prepareSecondFactor',
             src: 'prepareSecondFactor',
@@ -445,6 +465,7 @@ export const SignInMachine = setup({
           },
         },
         Attempting: {
+          tags: ['loading'],
           invoke: {
             id: 'attemptSecondFactor',
             src: 'attemptSecondFactor',
@@ -475,6 +496,7 @@ export const SignInMachine = setup({
       },
     },
     AuthenticatingWithRedirect: {
+      tags: ['loading'],
       invoke: {
         id: 'authenticateWithSignInRedirect',
         src: 'authenticateWithSignInRedirect',

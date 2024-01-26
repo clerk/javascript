@@ -10,6 +10,7 @@ export {
   SignInSocialProvider,
   SignInSocialProviderIcon,
   SignInStrategy,
+  SignInLoading,
 } from '~/react/sign-in';
 
 export { useSignInFlow, useSignInFlowSelector } from '~/internals/machines/sign-in/sign-in.context';

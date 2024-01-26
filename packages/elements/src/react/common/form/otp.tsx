@@ -1,8 +1,7 @@
 import type { FormControlProps } from '@radix-ui/react-form';
 import { Control as RadixControl } from '@radix-ui/react-form';
-import { Slot } from '@radix-ui/react-slot';
 import type { CSSProperties, ReactNode, RefObject } from 'react';
-import { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, Fragment, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 
 export type OTPInputProps = Exclude<
   FormControlProps,
@@ -101,7 +100,7 @@ const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputPro
           }}
         >
           {Array.from({ length: maxLength }).map((_, i) => (
-            <Slot key={i}>
+            <Fragment key={`${String(props.value)[i]}-i`}>
               {render({
                 value: String(props.value)[i] || '',
                 status:
@@ -112,7 +111,7 @@ const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputPro
                     : 'none',
                 index: i,
               })}
-            </Slot>
+            </Fragment>
           ))}
         </div>
       </div>

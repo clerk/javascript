@@ -85,25 +85,27 @@ export function SignInStart({ children }: PropsWithChildren) {
   const state = useSignInStateMatcher();
   const actorRef = useSignInFlow();
 
-  return state.matches('Start') || router?.match(undefined, true) ? <Form flowActor={actorRef}>{children}</Form> : null;
+  return state.matches('AuthenticatingWithRedirect') ||
+    state.matches('Start') ||
+    (router?.match(undefined, true) && state.matches('Init')) ? (
+    <Form flowActor={actorRef}>{children}</Form>
+  ) : null;
 }
 
 // ================= SignInFactorOne ================= //
 
 export function SignInFactorOne({ children }: PropsWithChildren) {
   const state = useSignInStateMatcher();
-  const actorRef = useSignInFlow();
 
-  return state.matches('FirstFactor') ? <Form flowActor={actorRef}>{children}</Form> : null;
+  return state.matches('FirstFactor') ? children : null;
 }
 
 // ================= SignInFactorTwo ================= //
 
 export function SignInFactorTwo({ children }: PropsWithChildren) {
   const state = useSignInStateMatcher();
-  const actorRef = useSignInFlow();
 
-  return state.matches('SecondFactor') ? <Form flowActor={actorRef}>{children}</Form> : null;
+  return state.matches('SecondFactor') ? children : null;
 }
 
 // ================= SignInContinue ================= //
@@ -162,14 +164,19 @@ export interface SignInSocialProviderProps extends Omit<SocialProviderProps, 'pr
 }
 
 export function SignInSocialProvider({ name, ...rest }: SignInSocialProviderProps) {
-  const thirdPartyProvider = useSignInThirdPartyProvider(name);
+  const thirdPartyProviderProps = useSignInThirdPartyProvider(name);
 
   return (
     <SocialProvider
       {...rest}
-      provider={thirdPartyProvider}
+      {...thirdPartyProviderProps}
     />
   );
 }
 
 export const SignInSocialProviderIcon = SocialProviderIcon;
+
+export function SignInLoading({ children, fallback }: any) {
+  const state = useSignInStateMatcher();
+  return state.hasTag('loading') ? fallback : children;
+}

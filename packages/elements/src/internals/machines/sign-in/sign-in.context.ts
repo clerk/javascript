@@ -144,7 +144,9 @@ export const useSignInThirdPartyProviders = () => {
 
 export const useSignInThirdPartyProvider = (provider: OAuthProvider | Web3Provider): UseThirdPartyProviderReturn => {
   const ref = useSignInFlow();
+  const state = useSignInStateMatcher();
   const details = useSignInFlowSelector(clerkThirdPartyProviderSelector(provider));
+  const strategy = provider === 'metamask' ? ('web3_metamask_signature' as const) : (`oauth_${provider}` as const);
 
   const authenticate = useCallback(
     (event: React.MouseEvent<Element>) => {
@@ -153,12 +155,16 @@ export const useSignInThirdPartyProvider = (provider: OAuthProvider | Web3Provid
       event.preventDefault();
 
       if (provider === 'metamask') {
-        return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_metamask_signature' });
+        ref.send({ type: 'SET_LOADING_CONTEXT', name: strategy });
+        // @ts-expect-error -- TS is not respecting the ternary in the strategy declaration above
+        return ref.send({ type: 'AUTHENTICATE.WEB3', strategy });
       }
 
-      return ref.send({ type: 'AUTHENTICATE.OAUTH', strategy: `oauth_${provider}` });
+      ref.send({ type: 'SET_LOADING_CONTEXT', name: strategy });
+      // @ts-expect-error -- TS is not respecting the ternary in the strategy declaration above
+      return ref.send({ type: 'AUTHENTICATE.OAUTH', strategy });
     },
-    [provider, details, ref],
+    [provider, details, ref, strategy],
   );
 
   if (!details) {
@@ -170,7 +176,9 @@ export const useSignInThirdPartyProvider = (provider: OAuthProvider | Web3Provid
     events: {
       authenticate,
     },
-    ...details,
+    isDisabled: state.hasTag('loading'),
+    isLoading: state.hasTag('loading') && state.context.loadingContext === strategy,
+    provider: details,
   };
 };
 
