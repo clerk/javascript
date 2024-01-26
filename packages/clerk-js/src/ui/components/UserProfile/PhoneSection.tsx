@@ -40,6 +40,7 @@ export const PhoneSection = () => {
 
   return (
     <ProfileSection.Root
+      centered={false}
       title={localizationKeys('userProfile.start.phoneNumbersSection.title')}
       id='phoneNumbers'
     >
@@ -48,10 +49,7 @@ export const PhoneSection = () => {
           {user?.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
             <Action.Root key={phone.id}>
               <Action.Closed value=''>
-                <ProfileSection.Item
-                  id='phoneNumbers'
-                  sx={t => ({ maxHeight: t.space.$8 })}
-                >
+                <ProfileSection.Item id='phoneNumbers'>
                   <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                     <Flex
                       gap={2}
@@ -88,7 +86,7 @@ export const PhoneSection = () => {
           ))}
 
           <Action.Trigger value='add'>
-            <ProfileSection.Button
+            <ProfileSection.ArrowButton
               id='phoneNumbers'
               localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
             />

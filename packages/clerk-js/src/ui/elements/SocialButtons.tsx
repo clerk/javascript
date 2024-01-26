@@ -95,7 +95,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           gap={2}
           sx={{
             justifyContent: 'center',
-            [mqu.xs]: {
+            [mqu.sm]: {
               gridTemplateColumns: 'repeat(1, 1fr)',
             },
             gridTemplateColumns:

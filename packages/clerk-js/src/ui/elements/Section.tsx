@@ -2,7 +2,7 @@ import type { ProfileSectionId } from '@clerk/types';
 import { isValidElement, useLayoutEffect, useRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
+import { Button, Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { Plus } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
@@ -34,7 +34,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           padding: `${t.space.$4} 0`,
           gap: t.space.$4,
-          [mqu.md]: {
+          [mqu.lg]: {
             flexDirection: 'column-reverse',
             gap: t.space.$2,
           },
@@ -49,6 +49,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
         gap={2}
         ref={ref}
         sx={{
+          minWidth: 0,
           width: '100%',
           '+ *': {
             '--clerk-height': `${height}px`,
@@ -68,7 +69,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           alignSelf: height ? 'self-start' : centered ? 'center' : undefined,
           marginTop: centered ? 'calc(var(--clerk-height)/2)' : undefined,
           transform: height && centered ? 'translateY(-50%)' : undefined,
-          [mqu.md]: {
+          [mqu.lg]: {
             alignSelf: 'self-start',
             marginTop: 'unset',
             transform: 'none',
@@ -107,7 +108,7 @@ const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
   );
 };
 
-type ProfileSectionItemProps = PropsOfComponent<typeof Flex> & { id: ProfileSectionId };
+type ProfileSectionItemProps = Omit<PropsOfComponent<typeof Flex>, 'id'> & { id: ProfileSectionId };
 
 const ProfileSectionItem = (props: ProfileSectionItemProps) => {
   const { children, id, sx, ...rest } = props;
@@ -121,7 +122,11 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
           justifyContent: 'space-between',
           width: '100%',
           alignItems: 'center',
-          padding: `${t.space.$1x5} ${t.space.$3}`,
+          gap: t.space.$2,
+          paddingTop: t.space.$1x5,
+          paddingBottom: t.space.$1x5,
+          paddingLeft: t.space.$3,
+          paddingRight: t.space.$3,
         }),
         sx,
       ]}
@@ -137,6 +142,31 @@ type ProfileSectionButtonProps = PropsOfComponent<typeof ArrowBlockButton> & {
 };
 
 const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
+  const { children, id, sx, ...rest } = props;
+  return (
+    <Button
+      elementDescriptor={descriptors.profileSectionPrimaryButton}
+      elementId={descriptors.profileSectionPrimaryButton.setId(id)}
+      variant='ghost'
+      textVariant='buttonSmall'
+      sx={[
+        t => ({
+          whiteSpace: 'nowrap',
+          justifyContent: 'start',
+          gap: t.space.$2,
+          padding: `${t.space.$1x5} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
+          height: t.sizes.$8,
+        }),
+        sx,
+      ]}
+      {...rest}
+    >
+      {children}
+    </Button>
+  );
+};
+
+const ProfileSectionArrowButton = (props: ProfileSectionButtonProps) => {
   const { children, leftIcon = Plus, id, sx, localizationKey, ...rest } = props;
   return (
     <ArrowBlockButton
@@ -145,6 +175,7 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
       variant='ghost'
       sx={[
         t => ({
+          textWrap: 'nowrap',
           justifyContent: 'start',
           gap: t.space.$2,
           padding: `${t.space.$1x5} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
@@ -270,6 +301,7 @@ export const ProfileSection = {
   ItemList: ProfileSectionItemList,
   Item: ProfileSectionItem,
   Button: ProfileSectionButton,
+  ArrowButton: ProfileSectionArrowButton,
   ActionMenu: ProfileSectionActionMenu,
   ActionMenuItem: ProfileSectionActionMenuItem,
 };

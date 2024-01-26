@@ -46,7 +46,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
           flex: `1`,
           scrollbarGutter: 'stable',
           padding: `${theme.space.$7} ${theme.space.$8}`,
-          [mqu.xs]: {
+          [mqu.sm]: {
             padding: `${theme.space.$8} ${theme.space.$5}`,
           },
           ...common.maxHeightScroller(theme),

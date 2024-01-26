@@ -40,6 +40,7 @@ const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element 
       sx={[
         t => ({
           lineHeight: t.lineHeights.$normal,
+          wordWrap: 'break-word',
         }),
         sx,
       ]}

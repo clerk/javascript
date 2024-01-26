@@ -51,7 +51,7 @@ export const OrganizationMembersTabRequests = () => {
               <DomainList
                 fallback={
                   <>
-                    <ProfileSection.Button
+                    <ProfileSection.ArrowButton
                       localizationKey={localizationKeys(
                         'organizationProfile.membersPage.requestsTab.autoSuggestions.primaryButton',
                       )}

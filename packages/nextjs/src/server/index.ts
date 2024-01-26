@@ -4,7 +4,6 @@
 export { createRouteMatcher } from './routeMatcher';
 
 export { verifyToken, createClerkClient } from '@clerk/backend';
-export type { WebhookEvent, WebhookEventType } from '@clerk/backend';
 export { clerkClient } from './clerkClient';
 
 /**
@@ -16,6 +15,33 @@ export { auth } from '../app-router/server/auth';
 export { currentUser } from '../app-router/server/currentUser';
 export { clerkMiddleware } from './clerkMiddleware';
 export type { ClerkMiddlewareAuth, ClerkMiddlewareAuthObject, ClerkMiddlewareOptions } from './clerkMiddleware';
+
+/**
+ * Re-export resource types from @clerk/backend
+ */
+export type {
+  OrganizationMembershipRole,
+  // Webhook event types
+  WebhookEvent,
+  WebhookEventType,
+  // Resources
+  AllowlistIdentifier,
+  Client,
+  OrganizationMembership,
+  EmailAddress,
+  ExternalAccount,
+  Invitation,
+  OauthAccessToken,
+  Organization,
+  OrganizationInvitation,
+  OrganizationMembershipPublicUserData,
+  PhoneNumber,
+  Session,
+  SignInToken,
+  SMSMessage,
+  Token,
+  User,
+} from '@clerk/backend';
 
 /**
  * Deprecated APIs

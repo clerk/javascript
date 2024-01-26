@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
 
-import { Badge, Box, Flex, localizationKeys, Text } from '../../customizables';
+import { Badge, Flex, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -48,25 +48,24 @@ export const EmailsSection = () => {
         <ProfileSection.ItemList id='emailAddresses'>
           {user?.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
             <Action.Root key={email.emailAddress}>
-              <ProfileSection.Item
-                id='emailAddresses'
-                sx={t => ({ maxHeight: t.space.$8 })}
-              >
-                <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                  <Flex
-                    as={'span'}
-                    gap={2}
-                    center
+              <ProfileSection.Item id='emailAddresses'>
+                <Flex
+                  as='span'
+                  sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}
+                >
+                  <Text
+                    sx={t => ({ color: t.colors.$blackAlpha700 })}
+                    truncate
                   >
-                    <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>{email.emailAddress} </Text>
-                    {user?.primaryEmailAddressId === email.id && (
-                      <Badge localizationKey={localizationKeys('badge__primary')} />
-                    )}
-                    {email.verification.status !== 'verified' && (
-                      <Badge localizationKey={localizationKeys('badge__unverified')} />
-                    )}
-                  </Flex>
-                </Box>
+                    {email.emailAddress}
+                  </Text>
+                  {user?.primaryEmailAddressId === email.id && (
+                    <Badge localizationKey={localizationKeys('badge__primary')} />
+                  )}
+                  {email.verification.status !== 'verified' && (
+                    <Badge localizationKey={localizationKeys('badge__unverified')} />
+                  )}
+                </Flex>
 
                 <EmailMenu email={email} />
               </ProfileSection.Item>
@@ -86,7 +85,7 @@ export const EmailsSection = () => {
           ))}
 
           <Action.Trigger value='add'>
-            <ProfileSection.Button
+            <ProfileSection.ArrowButton
               id='emailAddresses'
               localizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
             />

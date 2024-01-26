@@ -326,7 +326,7 @@ const SingleCharInput = React.forwardRef<
         ...(isSuccessfullyFilled ? { borderColor: theme.colors.$success500 } : common.borderColor(theme, props)),
         backgroundColor: 'unset',
         '&:focus': {},
-        [mqu.xs]: {
+        [mqu.sm]: {
           height: theme.space.$8,
           width: theme.space.$8,
         },

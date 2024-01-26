@@ -78,7 +78,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
           <VerifyWithLink
             nextStep={onSuccess}
             email={emailAddressRef.current as any}
-            onReset={wizard.prevStep}
+            onReset={onReset}
           />
         ) : (
           <VerifyWithCode
@@ -86,7 +86,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
             identification={emailAddressRef.current}
             identifier={emailAddressRef.current?.emailAddress}
             prepareVerification={() => emailAddressRef.current?.prepareVerification({ strategy: 'email_code' })}
-            onReset={wizard.prevStep}
+            onReset={onReset}
           />
         )}
       </FormContainer>

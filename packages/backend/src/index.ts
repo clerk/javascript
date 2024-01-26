@@ -9,9 +9,6 @@ import type { CreateAuthenticateRequestOptions } from './tokens/factory';
 import { createAuthenticateRequest } from './tokens/factory';
 import { verifyToken as _verifyToken } from './tokens/verify';
 
-export type { Organization, Session, User, WebhookEvent, WebhookEventType } from './api/resources';
-export type { VerifyTokenOptions } from './tokens/verify';
-
 export const verifyToken = withLegacyReturn(_verifyToken);
 
 export type ClerkOptions = CreateBackendApiOptions &
@@ -46,3 +43,36 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
     telemetry,
   };
 }
+
+/**
+ * General Types
+ */
+export type { OrganizationMembershipRole } from './api/resources';
+export type { VerifyTokenOptions } from './tokens/verify';
+
+/**
+ * Webhook event types
+ */
+export type { WebhookEvent, WebhookEventType } from './api/resources';
+
+/**
+ * Resources
+ */
+export type {
+  AllowlistIdentifier,
+  Client,
+  EmailAddress,
+  ExternalAccount,
+  Invitation,
+  OauthAccessToken,
+  Organization,
+  OrganizationInvitation,
+  OrganizationMembership,
+  OrganizationMembershipPublicUserData,
+  PhoneNumber,
+  Session,
+  SignInToken,
+  SMSMessage,
+  Token,
+  User,
+} from './api/resources';

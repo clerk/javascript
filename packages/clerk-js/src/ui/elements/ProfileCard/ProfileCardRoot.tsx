@@ -17,7 +17,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
       sx={[
         t => ({
           width: t.sizes.$220,
-          maxWidth: `calc(100vw - ${t.sizes.$16})`,
+          maxWidth: `calc(100vw - ${t.sizes.$8})`,
           display: 'flex',
           flexDirection: 'row',
           [mqu.md]: {

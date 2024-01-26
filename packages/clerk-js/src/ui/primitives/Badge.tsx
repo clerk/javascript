@@ -7,6 +7,7 @@ const vars = createCssVariables('accent', 'bg', 'borderColor');
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     color: vars.accent,
+    flexShrink: 0,
     backgroundColor: vars.bg,
     boxShadow: theme.shadows.$badge,
     border: theme.borders.$normal,

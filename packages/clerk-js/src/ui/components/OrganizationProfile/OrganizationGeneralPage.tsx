@@ -2,7 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { Protect, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { Button, Col, descriptors, localizationKeys, Text } from '../../customizables';
+import { Col, descriptors, localizationKeys, Text } from '../../customizables';
 import { Header, OrganizationPreview, ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -103,9 +103,8 @@ const OrganizationProfileSection = () => {
               {profile}
 
               <Action.Trigger value='edit'>
-                <Button
+                <ProfileSection.Button
                   id='organizationProfile'
-                  variant='ghost'
                   localizationKey={localizationKeys('organizationProfile.start.profileSection.primaryButton')}
                 />
               </Action.Trigger>
@@ -150,7 +149,7 @@ const OrganizationDomainsSection = () => {
         <Protect permission='org:sys_domains:manage'>
           <Action.Trigger value='add'>
             <Col>
-              <ProfileSection.Button
+              <ProfileSection.ArrowButton
                 localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
                 id='organizationDomains'
               />
@@ -191,7 +190,8 @@ const OrganizationLeaveSection = () => {
         <Action.Closed value='leave'>
           <ProfileSection.Item id='organizationDanger'>
             <Action.Trigger value='leave'>
-              <Button
+              <ProfileSection.Button
+                id='organizationDanger'
                 variant='ghostDanger'
                 localizationKey={localizationKeys(
                   'organizationProfile.profilePage.dangerSection.leaveOrganization.title',
@@ -235,7 +235,8 @@ const OrganizationDeleteSection = () => {
         <Action.Closed value='delete'>
           <ProfileSection.Item id={'organizationDanger'}>
             <Action.Trigger value='delete'>
-              <Button
+              <ProfileSection.Button
+                id='organizationDanger'
                 variant='ghostDanger'
                 localizationKey={localizationKeys(
                   'organizationProfile.profilePage.dangerSection.deleteOrganization.title',
