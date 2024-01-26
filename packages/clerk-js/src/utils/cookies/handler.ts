@@ -47,8 +47,8 @@ export const createCookieHandler = () => {
 
   const setClientUatCookie = (client: ClientResource | undefined) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = 'Strict';
-    const secure = false;
+    const sameSite = inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE;
+    const secure = inSecureCrossOriginIframe() || window.location.protocol === 'https:';
 
     // '0' indicates the user is signed out
     let val = '0';
@@ -67,8 +67,8 @@ export const createCookieHandler = () => {
 
   const setDevBrowserCookie = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = DEFAULT_SAME_SITE;
-    const secure = false;
+    const sameSite = inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE;
+    const secure = inSecureCrossOriginIframe() || window.location.protocol === 'https:';
 
     return devBrowserCookie.set(jwt, {
       expires,
