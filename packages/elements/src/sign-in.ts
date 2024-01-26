@@ -1,7 +1,7 @@
 'use client';
 /** Sign In Components */
 export {
-  SignIn,
+  SignIn as Root,
   SignInStart,
   SignInFactorOne,
   SignInFactorTwo,
