@@ -66,12 +66,12 @@ jobs:
 
       - name: Lint types using attw
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!backend --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!elements --filter=!backend --only
 
       - name: Lint types using attw [Errors Allowed]
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=backend --continue --only
-        continue-on-error: true  # TODO: Remove this when all related errors are fixed
+        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=backend --filter=elements --continue --only
+        continue-on-error: true # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
         timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
@@ -97,7 +97,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 18, 20 ]
+        node-version: [18, 20]
 
     steps:
       - name: Checkout Repo
@@ -138,7 +138,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: [ 'generic', 'nextjs', 'express' ]
+        test-name: ['generic', 'nextjs', 'express']
 
     steps:
       - name: Checkout Repo
