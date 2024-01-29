@@ -51,6 +51,14 @@ const reactChangesList = [
 	'getorganizationlist-return-type-change',
 	'getorganizationinvitationlist-return-type-change',
 	'getorganizationmembershiplist-return-type-change',
+	'organization-getroles-arguments-changed',
+	'organization-getmemberships-arguments-changed',
+	'organization-getdomains-arguments-change',
+	'organization-getinvitations-arguments-changed',
+	'organization-getmembershiprequests-arguments-changed',
+	'user-getorganizationinvitations-arguments-chanaged',
+	'user-getorganizationsuggestions-arguments-chanaged',
+	'user-getorganizationmemberships-arguments-chanaged',
 ];
 
 export default {
@@ -136,6 +144,14 @@ export default {
 		'getorganizationlist-return-type-change',
 		'getorganizationinvitationlist-return-type-change',
 		'getorganizationmembershiplist-return-type-change',
+		'organization-getroles-arguments-changed',
+		'organization-getmemberships-arguments-changed',
+		'organization-getdomains-arguments-change',
+		'organization-getinvitations-arguments-changed',
+		'organization-getmembershiprequests-arguments-changed',
+		'user-getorganizationinvitations-arguments-chanaged',
+		'user-getorganizationsuggestions-arguments-chanaged',
+		'user-getorganizationmemberships-arguments-chanaged',
 	]),
 	// since we export clerk-react at the top level from the gatsby plugin
 	// if you're using gatsby, we also need to scan for the react changes
@@ -179,6 +195,14 @@ export default {
 		'getorganizationlist-return-type-change',
 		'getorganizationinvitationlist-return-type-change',
 		'getorganizationmembershiplist-return-type-change',
+		'organization-getroles-arguments-changed',
+		'organization-getmemberships-arguments-changed',
+		'organization-getdomains-arguments-change',
+		'organization-getinvitations-arguments-changed',
+		'organization-getmembershiprequests-arguments-changed',
+		'user-getorganizationinvitations-arguments-chanaged',
+		'user-getorganizationsuggestions-arguments-chanaged',
+		'user-getorganizationmemberships-arguments-chanaged',
 	]),
 	expo: load('expo', [
 		'apikey-to-publishable-key',

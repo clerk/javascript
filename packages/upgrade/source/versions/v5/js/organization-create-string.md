@@ -6,10 +6,7 @@ matcherFlags: 'm'
 
 Passing a string as an argument to `Organization.create` is no longer possible - instead, pass an object with the `name` property.
 
-```js
-// before
-Organization.create('...');
-
-// after
-Organization.create({ name: '...' });
+```diff
+- Organization.create('...');
++ Organization.create({ name: '...' });
 ```
