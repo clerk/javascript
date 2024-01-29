@@ -279,7 +279,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
               position: loadingText ? undefined : 'absolute',
             }}
           />
-          {loadingText || <span style={{ opacity: 0 }}>{children}</span>}
+          {loadingText || <span style={{ display: 'inline-flex', visibility: 'hidden' }}>{children}</span>}
         </Flex>
       )}
       {!isLoading && (hasArrow ? <ButtonChildrenWithArrow>{children}</ButtonChildrenWithArrow> : children)}
