@@ -1,7 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.0.2-beta-v5.8",
-  "private": true,
+  "version": "0.0.0",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
