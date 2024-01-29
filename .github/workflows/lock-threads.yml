@@ -57,6 +57,19 @@ jobs:
             After 60 days of no activity, we'll close this PR. Keep in mind, I'm just a robot, so if I've closed this PR in error, please reply here and my human colleagues will reopen it.
 
             Thanks for being a part of the Clerk community! 🙏
+      - uses: actions/stale@v8
+        with:
+          repo-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          days-before-issue-stale: 7
+          days-before-issue-close: 1
+          exempt-all-assignees: true
+          only-issue-labels: 'needs-reproduction'
+          stale-issue-message: |
+            In an effort to keep our GitHub issues clean and focused, we close any issues that are awaiting a reproduction after 8 days on inactivity, and it has been 7 days. This issue will be closed tomorrow unless a reproduction is produced. If it takes longer than this to get a reproduction, that's ok, just drop a comment and we will re-open the issue then.
+
+            Thanks for being a part of the Clerk community! 🙏
+          close-issue-message: |
+            After 8 days without a reproduction being supplied, we are closing this issue. Keep in mind, I'm just a robot, so if I've closed this issue in error, please reply here and my human colleagues will reopen it. Likewise if a reproduction is prepared after it has been closed.
       - uses: dessant/lock-threads@v4
         with:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
