@@ -73,6 +73,8 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
+    "@clerk/clerk-react": "5.0.0-beta-v5.17",
+    "@clerk/shared": "2.0.0-beta-v5.11",
     "@radix-ui/react-form": "^0.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@statelyai/inspect": "^0.1.0",
@@ -92,17 +94,11 @@
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
-    "@clerk/clerk-react": ">=5.0.0-beta-v5.17",
-    "@clerk/nextjs": ">=5.0.0-beta-v5.20",
-    "@clerk/shared": ">=2.0.0-beta-v5.11",
     "next": ">=13.0.4",
     "react": ">=18",
     "react-dom": ">=18"
   },
   "peerDependenciesMeta": {
-    "@clerk/nextjs": {
-      "optional": true
-    },
     "next": {
       "optional": true
     }
