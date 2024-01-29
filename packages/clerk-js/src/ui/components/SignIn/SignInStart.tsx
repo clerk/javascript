@@ -309,7 +309,7 @@ export function _SignInStart(): JSX.Element {
                   onSubmit={handleFirstPartySubmit}
                   gap={8}
                 >
-                  <Col>
+                  <Col gap={6}>
                     <Form.ControlRow elementId={identifierField.id}>
                       <DynamicField
                         actionLabel={nextIdentifier?.action}

@@ -323,7 +323,7 @@ export const enUS: LocalizationResource = {
         destructiveAction: 'Remove wallet',
       },
       dangerSection: {
-        title: 'Account termination',
+        title: 'Delete account',
         deleteAccountButton: 'Delete account',
       },
     },
