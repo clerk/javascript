@@ -1,7 +1,7 @@
 'use client';
 
 import { SignedIn } from '@clerk/clerk-react';
-import { useSignUpFlow, useSignUpFlowSelector } from '@clerk/elements';
+import { useSignUpFlow, useSignUpFlowSelector } from '@clerk/elements/sign-up';
 import { SignOutButton } from '@clerk/nextjs';
 
 import { Button } from './design';
@@ -27,6 +27,7 @@ export function SignUpLogButtons() {
       </Button>
       <Button onClick={() => console.dir(ref.getSnapshot().context)}>Log Context</Button>
       <Button onClick={() => console.dir(ref.getSnapshot().context.currentFactor)}>Log Current Factor</Button>
+      {/* @ts-expect-error - Intentionally not in exported clerk-js types */}
       <Button onClick={() => console.dir(ref.getSnapshot().context.clerk.__unstable__environment)}>
         Log Environment
       </Button>

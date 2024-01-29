@@ -1,14 +1,7 @@
 'use client';
 
-import {
-  GlobalError,
-  SignUp,
-  SignUpContinue,
-  SignUpSocialProvider,
-  SignUpStart,
-  SignUpStrategy,
-  SignUpVerify,
-} from '@clerk/elements';
+import { GlobalError } from '@clerk/elements/common';
+import { Continue, SignUp, SocialProvider, Start, Verification, Verify } from '@clerk/elements/sign-up';
 
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
@@ -19,34 +12,34 @@ export default function SignUpPage() {
   return (
     <SignUp>
       <div className='m-auto w-max text-sm'>
-        <SignUpStart>
+        <Start>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>SIGN UP - START</H1>
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
-              <SignUpSocialProvider
+              <SocialProvider
                 name='github'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
                 <SocialProviderIcon className='invert' />
                 Sign In with GitHub
-              </SignUpSocialProvider>
+              </SocialProvider>
 
-              <SignUpSocialProvider
+              <SocialProvider
                 name='google'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
                 <SocialProviderIcon />
                 Sign In with Google
-              </SignUpSocialProvider>
+              </SocialProvider>
 
-              <SignUpSocialProvider
+              <SocialProvider
                 name='metamask'
                 className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
                 <SocialProviderIcon />
                 Sign In with Metamask
-              </SignUpSocialProvider>
+              </SocialProvider>
             </div>
 
             <Hr />
@@ -66,9 +59,9 @@ export default function SignUpPage() {
               <CustomSubmit>Sign Up</CustomSubmit>
             </div>
           </div>
-        </SignUpStart>
+        </Start>
 
-        <SignUpContinue>
+        <Continue>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>SIGN UP - CONTINUE</H1>
 
@@ -95,22 +88,22 @@ export default function SignUpPage() {
               <CustomSubmit>Submit</CustomSubmit>
             </div>
           </div>
-        </SignUpContinue>
+        </Continue>
 
-        <SignUpVerify>
+        <Verify>
           <H1>SIGN UP - VERIFY</H1>
 
-          <SignUpStrategy name='code'>
+          <Verification name='code'>
             <CustomField
               label='Code'
               name='code'
             />
 
             <CustomSubmit>Verify</CustomSubmit>
-          </SignUpStrategy>
+          </Verification>
 
-          <SignUpStrategy name='email_link'>Please check your email for a link to verify your account.</SignUpStrategy>
-        </SignUpVerify>
+          <Verification name='email_link'>Please check your email for a link to verify your account.</Verification>
+        </Verify>
       </div>
 
       <SignUpDebug />

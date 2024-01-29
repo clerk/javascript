@@ -55,7 +55,7 @@ export type SignUpMachineEvents =
   | ErrorActorEvent
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
   | { type: 'AUTHENTICATE.SAML'; strategy: SamlStrategy }
-  | { type: 'AUTHENTICATE.WEB3'; strategy?: Web3Strategy }
+  | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
   | { type: 'FAILURE'; error: Error }
   | { type: 'OAUTH.CALLBACK' }
   | { type: 'SUBMIT' }
@@ -280,15 +280,17 @@ export const SignUpMachine = setup({
                 // continueSignUp
               },
             };
+          } else if (event.type === 'AUTHENTICATE.OAUTH' && event.strategy) {
+            return {
+              clerk: context.clerk,
+              params: {
+                strategy: event.strategy,
+                // continueSignUp
+              },
+            };
           }
 
-          return {
-            clerk: context.clerk,
-            params: {
-              strategy: event.strategy,
-              // continueSignUp
-            },
-          };
+          throw new ClerkElementsRuntimeError('Invalid strategy'); // TODO: Should never hit. Statisfies Typescript declarations
         },
         onError: {
           actions: 'setFormErrors',

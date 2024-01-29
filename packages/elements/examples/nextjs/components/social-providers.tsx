@@ -1,6 +1,6 @@
 'use client';
 
-import { SocialProviderIcon as ClerkElementsSocialProviderIcon } from '@clerk/elements';
+import { SocialProviderIcon as ClerkElementsSocialProviderIcon } from '@clerk/elements/common';
 import Image from 'next/image';
 import type { ComponentProps } from 'react';
 
