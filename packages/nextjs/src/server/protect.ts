@@ -8,7 +8,7 @@ import type {
 import { constants as nextConstants } from '../constants';
 import { SIGN_IN_URL } from './constants';
 
-type AuthProtectOptions = { redirectUrl?: string };
+type AuthProtectOptions = { unauthorizedUrl?: string; unauthenticatedUrl?: string };
 
 /**
  * @experimental
@@ -17,10 +17,12 @@ type AuthProtectOptions = { redirectUrl?: string };
  */
 export interface AuthProtect {
   (params?: CheckAuthorizationParamsWithCustomPermissions, options?: AuthProtectOptions): SignedInAuthObject;
+
   (
     params?: (has: CheckAuthorizationWithCustomPermissions) => boolean,
     options?: AuthProtectOptions,
   ): SignedInAuthObject;
+
   (options?: AuthProtectOptions): SignedInAuthObject;
 }
 
@@ -47,16 +49,18 @@ export const createProtect = (opts: {
   const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
 
   return ((...args: any[]) => {
-    const paramsOrFunction = args[0]?.redirectUrl
+    const optionValuesAsParam = args[0]?.unauthenticatedUrl || args[0]?.unauthorizedUrl;
+    const paramsOrFunction = optionValuesAsParam
       ? undefined
       : (args[0] as
           | CheckAuthorizationParamsWithCustomPermissions
           | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
-    const redirectUrl = (args[0]?.redirectUrl || args[1]?.redirectUrl) as string | undefined;
+    const unauthenticatedUrl = (args[0]?.unauthenticatedUrl || args[1]?.unauthenticatedUrl) as string | undefined;
+    const unauthorizedUrl = (args[0]?.unauthorizedUrl || args[1]?.unauthorizedUrl) as string | undefined;
 
     const handleUnauthenticated = () => {
-      if (redirectUrl) {
-        return redirect(redirectUrl);
+      if (unauthenticatedUrl) {
+        return redirect(unauthenticatedUrl);
       }
       if (isPageRequest(request)) {
         // TODO: Handle runtime values. What happens if runtime values are set in middleware and in ClerkProvider as well?
@@ -66,8 +70,8 @@ export const createProtect = (opts: {
     };
 
     const handleUnauthorized = () => {
-      if (redirectUrl) {
-        return redirect(redirectUrl);
+      if (unauthorizedUrl) {
+        return redirect(unauthorizedUrl);
       }
       return notFound();
     };
