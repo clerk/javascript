@@ -57,7 +57,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   });
 
   const canSubmit = phoneField.value.length > 1 && user?.username !== phoneField.value;
-  const hasExistingNumber = user?.phoneNumbers.length > 0 && onUseExistingNumberClick;
+  const hasExistingNumber = !!user?.phoneNumbers?.length && onUseExistingNumberClick;
 
   const addPhone = async (e: React.FormEvent) => {
     e.preventDefault();
