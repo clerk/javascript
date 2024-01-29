@@ -4,6 +4,7 @@ import type {
   FormLabelProps,
   FormMessageProps,
   FormProps,
+  FormSubmitProps as RadixFormSubmitProps,
 } from '@radix-ui/react-form';
 import {
   Control as RadixControl,
@@ -11,10 +12,11 @@ import {
   Form as RadixForm,
   FormMessage,
   Label as RadixLabel,
-  Submit,
+  Submit as RadixSubmit,
 } from '@radix-ui/react-form';
 import type { ComponentProps, ReactNode } from 'react';
 import React, { createContext, useCallback, useContext, useEffect } from 'react';
+import type { SetRequired } from 'type-fest';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors/error';
@@ -109,7 +111,7 @@ const determineInputTypeFromName = (name: string) => {
   return 'text' as const;
 };
 
-const useInput = ({ name: inputName, value: initialValue, type: inputType, ...passthroughProps }: ClerkInputProps) => {
+const useInput = ({ name: inputName, value: initialValue, type: inputType, ...passthroughProps }: FormInputProps) => {
   // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
@@ -223,9 +225,9 @@ function FieldState({ children }: { children: (state: { state: FieldStates }) =>
   return children(fieldState);
 }
 
-type ClerkInputProps = FormControlProps | ({ type: 'otp' } & OTPInputProps);
+type FormInputProps = FormControlProps | ({ type: 'otp' } & OTPInputProps);
 
-function Input(props: ClerkInputProps) {
+function Input(props: FormInputProps) {
   const field = useInput(props);
 
   return <field.Element {...field.props} />;
@@ -233,6 +235,12 @@ function Input(props: ClerkInputProps) {
 
 function Label(props: FormLabelProps) {
   return <RadixLabel {...props} />;
+}
+
+type FormSubmitProps = SetRequired<RadixFormSubmitProps, 'children'>;
+
+function Submit(props: FormSubmitProps) {
+  return <RadixSubmit {...props} />;
 }
 
 // ================= ERRORS ================= //
@@ -302,10 +310,12 @@ function FieldError({ children, code, name, ...rest }: FormFieldErrorProps) {
 export { Field, FieldError, FieldState, Form, GlobalError, Input, Label, Submit };
 export type {
   FormControlProps,
-  FormErrorProps,
-  FormGlobalErrorProps,
-  FormErrorRenderProps,
   FormFieldErrorProps,
+  FormErrorProps,
+  FormErrorRenderProps,
   FormFieldProps,
+  FormGlobalErrorProps,
+  FormInputProps,
   FormProps,
+  FormSubmitProps,
 };

@@ -33,11 +33,13 @@ export function SocialProvider({ asChild, provider, ...rest }: SocialProviderPro
   }
 
   const Comp = asChild ? Slot : 'button';
+  const defaultProps = asChild ? {} : { type: 'button' as const };
 
   return (
     <SocialProviderContext.Provider value={provider}>
       <Comp
         onClick={provider.events.authenticate}
+        {...defaultProps}
         {...rest}
       />
     </SocialProviderContext.Provider>
