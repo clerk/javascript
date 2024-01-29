@@ -1,7 +1,7 @@
 'use client';
 
-export { SignInContinue, SignInContinue as Continue } from './continue';
-export { SignInRoot, SignInRoot as SignIn, SignInRoot as Root } from './root';
+export { SignInContinue as Continue } from './continue';
+export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export {
   SignInSocialProvider as SocialProvider,
   SignInSocialProviderIcon as SocialProviderIcon,

@@ -1,7 +1,7 @@
 'use client';
 
 export { SignUpContinue as Continue } from './continue';
-export { SignUpRoot, SignUpRoot as SignUp, SignUpRoot as Root } from './root';
+export { SignUpRoot as SignUp, SignUpRoot as Root } from './root';
 export {
   SignUpSocialProvider as SocialProvider,
   SignUpSocialProviderIcon as SocialProviderIcon,
