@@ -1,5 +1,7 @@
 'use client';
 
+import { SignInCtx } from '~/react/sign-in/contexts/sign-in.context';
+
 export { SignInContinue as Continue } from './continue';
 export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export {
@@ -9,5 +11,8 @@ export {
 export { SignInStart as Start } from './start';
 export { SignInFactor as Factor, SignInVerification as Verification } from './verifications';
 
-// TODO: Move contexts from /internals to /react
-export { useSignInFlow, useSignInFlowSelector } from '~/react/sign-in/contexts/machine.context';
+/** @internal Internal use only */
+export const useSignInActorRef_internal = SignInCtx.useActorRef;
+
+/** @internal Internal use only */
+export const useSignInSelector_internal = SignInCtx.useSelector;

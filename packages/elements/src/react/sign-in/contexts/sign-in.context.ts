@@ -5,8 +5,4 @@ import { SignInMachine } from '~/internals/machines/sign-in/sign-in.machine';
 
 export type SnapshotState = SnapshotFrom<typeof SignInMachine>;
 
-export const {
-  Provider: SignInFlowProvider,
-  useActorRef: useSignInFlow,
-  useSelector: useSignInFlowSelector,
-} = createActorContext(SignInMachine);
+export const SignInCtx = createActorContext(SignInMachine);

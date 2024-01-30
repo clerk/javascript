@@ -5,7 +5,7 @@ import type { PropsWithChildren } from 'react';
 
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
-import { SignInFlowProvider as SignInFlowContextProvider } from '~/react/sign-in/contexts/machine.context';
+import { SignInCtx } from '~/react/sign-in/contexts/sign-in.context';
 import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
 
 const { useBrowserInspector } = createBrowserInspectorReactHook();
@@ -25,7 +25,7 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
   }
 
   return (
-    <SignInFlowContextProvider
+    <SignInCtx.Provider
       options={{
         input: {
           clerk,
@@ -36,7 +36,7 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
       }}
     >
       {children}
-    </SignInFlowContextProvider>
+    </SignInCtx.Provider>
   );
 }
 

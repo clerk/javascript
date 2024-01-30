@@ -2,7 +2,7 @@
 
 import type { SignInStrategyName } from '~/internals/machines/sign-in/sign-in.types';
 import { useActiveTags } from '~/react/hooks/use-active-tags.hook';
-import { useSignInFlow } from '~/react/sign-in/contexts/machine.context';
+import { SignInCtx } from '~/react/sign-in/contexts/sign-in.context';
 import { useStrategy } from '~/react/sign-in/hooks/use-strategy.hook';
 
 export type SignInFactorProps = React.PropsWithChildren<
@@ -10,9 +10,9 @@ export type SignInFactorProps = React.PropsWithChildren<
 >;
 
 export function SignInFactor({ children, first, second }: SignInFactorProps) {
-  const actorRef = useSignInFlow();
-  const activeFirstState = useActiveTags(actorRef, 'state:first-factor');
-  const activeSecondState = useActiveTags(actorRef, 'state:second-factor');
+  const ref = SignInCtx.useActorRef();
+  const activeFirstState = useActiveTags(ref, 'state:first-factor');
+  const activeSecondState = useActiveTags(ref, 'state:second-factor');
 
   const render = (first && activeFirstState) || (second && activeSecondState);
   return render ? children : null;

@@ -1,13 +1,13 @@
 'use client';
 
 import { SignedIn } from '@clerk/clerk-react';
-import { useSignInFlow, useSignInFlowSelector } from '@clerk/elements/sign-in';
+import { useSignInActorRef_internal, useSignInSelector_internal } from '@clerk/elements/sign-in';
 import { SignOutButton } from '@clerk/nextjs';
 
 import { Button } from './design';
 
 function SignInActiveState() {
-  const activeState = useSignInFlowSelector(state => state.value);
+  const activeState = useSignInSelector_internal(state => state.value);
   const state = activeState ? (typeof activeState === 'string' ? activeState : JSON.stringify({ ...activeState })) : '';
 
   return (
@@ -18,7 +18,7 @@ function SignInActiveState() {
 }
 
 export function SignInLogButtons() {
-  const ref = useSignInFlow();
+  const ref = useSignInActorRef_internal();
 
   return (
     <>

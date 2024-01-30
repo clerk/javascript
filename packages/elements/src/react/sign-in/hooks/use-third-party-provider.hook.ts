@@ -3,8 +3,8 @@ import type React from 'react';
 import { useCallback } from 'react';
 
 import type { UseThirdPartyProviderReturn } from '~/react/common/third-party-providers/social-provider';
-import type { SnapshotState } from '~/react/sign-in/contexts/machine.context';
-import { useSignInFlow, useSignInFlowSelector } from '~/react/sign-in/contexts/machine.context';
+import type { SnapshotState } from '~/react/sign-in/contexts/sign-in.context';
+import { SignInCtx } from '~/react/sign-in/contexts/sign-in.context';
 
 /**
  * Selects the clerk third-party provider
@@ -13,8 +13,8 @@ const selector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotSta
   state.context.thirdPartyProviders.providerToDisplayData[provider];
 
 export const useSignInThirdPartyProvider = (provider: OAuthProvider | Web3Provider): UseThirdPartyProviderReturn => {
-  const ref = useSignInFlow();
-  const details = useSignInFlowSelector(selector(provider));
+  const ref = SignInCtx.useActorRef();
+  const details = SignInCtx.useSelector(selector(provider));
 
   const authenticate = useCallback(
     (event: React.MouseEvent<Element>) => {
