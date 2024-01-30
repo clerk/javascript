@@ -182,6 +182,7 @@ const MfaTOTPMenu = () => {
     [
       {
         label: localizationKeys('userProfile.start.mfaSection.totp.destructiveActionTitle'),
+        isDestructive: true,
         onClick: () => open('remove'),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
