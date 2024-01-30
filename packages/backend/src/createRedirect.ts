@@ -1,6 +1,6 @@
 import { errorThrower, parsePublishableKey } from './util/shared';
 
-const buildUrl = (_baseUrl: string | URL, _targetUrl: string | URL, _returnBackUrl?: string | URL) => {
+const buildUrl = (_baseUrl: string | URL, _targetUrl: string | URL, _returnBackUrl?: string | URL | null) => {
   if (_baseUrl === '') {
     return legacyBuildUrl(_targetUrl.toString(), _returnBackUrl?.toString());
   }
@@ -58,7 +58,7 @@ const buildAccountsBaseUrl = (frontendApi?: string) => {
 };
 
 type RedirectAdapter<RedirectReturn> = (url: string) => RedirectReturn;
-type RedirectToParams = { returnBackUrl?: string | URL };
+type RedirectToParams = { returnBackUrl?: string | URL | null };
 export type RedirectFun<ReturnType> = (params?: RedirectToParams) => ReturnType;
 
 /**

@@ -22,9 +22,11 @@ import {
   setRequestHeadersOnNextResponse,
 } from './utils';
 
-const PROTECT_REWRITE = 'CLERK_PROTECT_REWRITE';
-const PROTECT_REDIRECT_TO_URL = 'CLERK_PROTECT_REDIRECT_TO_URL';
-const PROTECT_REDIRECT_TO_SIGN_IN = 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN';
+const CONTROL_FLOW_ERROR = {
+  FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
+  REDIRECT_TO_URL: 'CLERK_PROTECT_REDIRECT_TO_URL',
+  REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
+};
 
 export type ClerkMiddlewareAuthObject = AuthObject & {
   protect: AuthProtect;
@@ -85,30 +87,15 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const authObject = requestState.toAuth();
 
-    const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
-      protect: createMiddlewareProtect(clerkRequest, authObject),
-      redirectToSignIn: createMiddlewareRedirectToSignIn(clerkRequest, requestState),
-    });
+    const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
+    const protect = createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
+    const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { protect, redirectToSignIn });
 
     let handlerResult: Response = NextResponse.next();
     try {
       handlerResult = (await handler?.(() => authObjWithMethods, request, event)) || handlerResult;
     } catch (e: any) {
-      switch (e.message) {
-        case PROTECT_REWRITE:
-          // Rewrite to a bogus URL to force not found error
-          handlerResult = NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`);
-          setHeader(handlerResult, constants.Headers.AuthReason, 'protect-rewrite');
-          break;
-        case PROTECT_REDIRECT_TO_URL:
-          handlerResult = redirectAdapter(e.redirectUrl);
-          break;
-        case PROTECT_REDIRECT_TO_SIGN_IN:
-          handlerResult = authObjWithMethods.redirectToSignIn();
-          break;
-        default:
-          throw e;
-      }
+      handlerResult = handleControlFlowErrors(e, clerkRequest, requestState);
     }
 
     if (isRedirect(handlerResult)) {
@@ -121,6 +108,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     }
 
     decorateRequest(clerkRequest, handlerResult, requestState);
+
+    // TODO @nikos: we need to make this more generic
+    // and move the logic in clerk/backend
     if (requestState.headers) {
       requestState.headers.forEach((value, key) => {
         handlerResult.headers.append(key, value);
@@ -170,41 +160,62 @@ const redirectAdapter = (url: string | URL) => {
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
-  requestState: RequestState,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
-    return createRedirect({
-      redirectAdapter,
-      baseUrl: clerkRequest.clerkUrl,
-      signInUrl: requestState.signInUrl,
-      signUpUrl: requestState.signUpUrl,
-      publishableKey: PUBLISHABLE_KEY,
-    }).redirectToSignIn({
-      returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkRequest.clerkUrl.toString(),
-    });
+    const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN) as any;
+    err.returnBackUrl = opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkRequest.clerkUrl.toString();
+    throw err;
   };
 };
 
 const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
   authObject: AuthObject,
+  redirectToSignIn: RedirectFun<Response>,
 ): ClerkMiddlewareAuthObject['protect'] => {
   return ((params, options) => {
     const notFound = () => {
-      throw new Error(PROTECT_REWRITE) as any;
+      throw new Error(CONTROL_FLOW_ERROR.FORCE_NOT_FOUND) as any;
     };
 
     const redirect = (url: string) => {
-      const err = new Error(PROTECT_REDIRECT_TO_URL) as any;
+      const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_URL) as any;
       err.redirectUrl = url;
       throw err;
-    };
-
-    const redirectToSignIn = () => {
-      throw new Error(PROTECT_REDIRECT_TO_SIGN_IN) as any;
     };
 
     // @ts-expect-error TS is not happy even though the types are correct
     return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
   }) as AuthProtect;
+};
+
+// Handle errors thrown by protect() and redirectToSignIn() calls,
+// as we want to align the APIs between middleware, pages and route handlers
+// Normally, middleware requires to explicitly return a response, but we want to
+// avoid discrepancies between the APIs as it's easy to miss the `return` statement
+// especially when copy-pasting code from one place to another.
+// This function handles the known errors thrown by the APIs described above,
+// and returns the appropriate response.
+const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestState: RequestState): Response => {
+  switch (e.message) {
+    case CONTROL_FLOW_ERROR.FORCE_NOT_FOUND:
+      // Rewrite to a bogus URL to force not found error
+      return setHeader(
+        NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`),
+        constants.Headers.AuthReason,
+        'protect-rewrite',
+      );
+    case CONTROL_FLOW_ERROR.REDIRECT_TO_URL:
+      return redirectAdapter(e.redirectUrl);
+    case CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN:
+      return createRedirect({
+        redirectAdapter,
+        baseUrl: clerkRequest.clerkUrl,
+        signInUrl: requestState.signInUrl,
+        signUpUrl: requestState.signUpUrl,
+        publishableKey: PUBLISHABLE_KEY,
+      }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
+    default:
+      throw e;
+  }
 };

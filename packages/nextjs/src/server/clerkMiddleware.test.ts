@@ -1,4 +1,4 @@
-// There is no need to execute the complete authenticateRequest to test authMiddleware
+// There is no need to execute the complete authenticateRequest to test clerkMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { describe, expect } from '@jest/globals';
@@ -36,7 +36,7 @@ afterAll(() => {
   global.console.warn = consoleWarn;
 });
 
-// Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
+// Removing this mock will cause the clerkMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
 jest.mock('./constants', () => {
   return {
@@ -179,7 +179,7 @@ describe('authenticateRequest & handshake', () => {
   });
 });
 
-describe('authMiddleware(params)', () => {
+describe('clerkMiddleware(params)', () => {
   it('renders route as normally when used without params', async () => {
     const signInResp = await clerkMiddleware()(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
     expect(signInResp?.status).toEqual(200);
@@ -215,21 +215,15 @@ describe('authMiddleware(params)', () => {
   });
 
   describe('auth().redirectToSignIn()', () => {
-    it('redirects to sign-in url when redirectToSignIn is calle and the request is a page request', async () => {
+    it('redirects to sign-in url when redirectToSignIn is called and the request is a page request', async () => {
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
         appendDevBrowserCookie: true,
       });
 
-      authenticateRequestMock.mockResolvedValueOnce({
-        status: AuthStatus.SignedOut,
-        headers: new Headers(),
-        toAuth: () => ({ userId: null }),
-      });
-
       const resp = await clerkMiddleware(auth => {
-        return auth().redirectToSignIn();
+        auth().redirectToSignIn();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
@@ -238,25 +232,58 @@ describe('authMiddleware(params)', () => {
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
-    it('redirects to sign-in url when redirectToSignIn is calle and the request is not a page request', async () => {
+    it('redirects to sign-in url when redirectToSignIn is called with the correct returnBackUrl', async () => {
       const req = mockRequest({
         url: '/protected',
-        headers: new Headers(),
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
         appendDevBrowserCookie: true,
       });
 
-      authenticateRequestMock.mockResolvedValueOnce({
-        status: AuthStatus.SignedOut,
-        headers: new Headers(),
-        toAuth: () => ({ userId: null }),
-      });
-
       const resp = await clerkMiddleware(auth => {
-        return auth().redirectToSignIn();
+        auth().redirectToSignIn();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
+      expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toContain('/protected');
+      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
+      expect(clerkClient.authenticateRequest).toBeCalled();
+    });
+
+    it('redirects to sign-in url with redirect_url set to the  provided returnBackUrl param', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      const resp = await clerkMiddleware(auth => {
+        auth().redirectToSignIn({ returnBackUrl: 'https://www.clerk.com/hello' });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-in');
+      expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toEqual(
+        'https://www.clerk.com/hello',
+      );
+      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
+      expect(clerkClient.authenticateRequest).toBeCalled();
+    });
+
+    it('redirects to sign-in url without a redirect_url when returnBackUrl is null', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      const resp = await clerkMiddleware(auth => {
+        auth().redirectToSignIn({ returnBackUrl: null });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-in');
+      expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toBeNull();
       expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
@@ -401,6 +428,55 @@ describe('authMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/discover');
+      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
+      expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
+      expect(clerkClient.authenticateRequest).toBeCalled();
+    });
+  });
+
+  describe('auth().redirectToSignIn()', () => {
+    it('redirects to sign-in url even if called without a return statement', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({ userId: null }),
+      });
+
+      const resp = await clerkMiddleware(auth => {
+        auth().protect();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-in');
+      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
+      expect(clerkClient.authenticateRequest).toBeCalled();
+    });
+
+    it('redirects to redirectUrl when protect is called with the redirectUrl param, the user is signed out, and is a page request', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({ userId: null }),
+      });
+
+      const resp = await clerkMiddleware(auth => {
+        auth().protect({ redirectUrl: 'https://www.clerk.com/hello' });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('https://www.clerk.com/hello');
       expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
       expect(clerkClient.authenticateRequest).toBeCalled();
