@@ -1,63 +1,50 @@
 {
-	"name": "@clerk/upgrade",
-	"version": "0.1.1",
-	"license": "MIT",
-	"type": "module",
-	"bin": "dist/cli.js",
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "babel --out-dir=dist source --copy-files",
-		"dev": "babel --out-dir=dist --watch source --copy-files",
-		"test": "prettier --check . && xo && ava"
-	},
-	"babel": {
-		"presets": [
-			"@babel/preset-react"
-		]
-	},
-	"ava": {
-		"environmentVariables": {
-			"NODE_NO_WARNINGS": "1"
-		},
-		"nodeArguments": [
-			"--loader=import-jsx"
-		]
-	},
-	"dependencies": {
-		"@inkjs/ui": "^1.0.0",
-		"@jescalan/ink-markdown": "^2.0.0",
-		"globby": "^14.0.0",
-		"gray-matter": "^4.0.3",
-		"index-to-position": "^0.1.2",
-		"ink": "^4.4.1",
-		"ink-big-text": "^2.0.0",
-		"ink-gradient": "^3.0.0",
-		"ink-link": "^3.0.0",
-		"marked": "^11.1.1",
-		"meow": "^11.0.0",
-		"react": "^18.2.0",
-		"read-pkg": "^9.0.1",
-		"semver-regex": "^4.0.5"
-	},
-	"devDependencies": {
-		"@babel/cli": "^7.21.0",
-		"@babel/preset-react": "^7.18.6",
-		"@vdemedes/prettier-config": "^2.0.1",
-		"ava": "^5.2.0",
-		"chalk": "^5.2.0",
-		"eslint-config-xo-react": "^0.27.0",
-		"eslint-plugin-react": "^7.32.2",
-		"eslint-plugin-react-hooks": "^4.6.0",
-		"import-jsx": "^5.0.0",
-		"ink-testing-library": "^3.0.0",
-		"prettier": "^2.8.7"
-	},
-	"engines": {
-		"node": ">=16"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+  "name": "@clerk/upgrade",
+  "version": "0.1.1",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/cli.js",
+  "bin": "dist/cli.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run clean && NODE_ENV=production babel --out-dir=dist source --copy-files",
+    "clean": "del-cli dist/*",
+    "dev": "babel --out-dir=dist --watch source --copy-files"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-react"
+    ]
+  },
+  "dependencies": {
+    "@inkjs/ui": "^1.0.0",
+    "@jescalan/ink-markdown": "^2.0.0",
+    "globby": "^14.0.0",
+    "gray-matter": "^4.0.3",
+    "index-to-position": "^0.1.2",
+    "ink": "^4.4.1",
+    "ink-big-text": "^2.0.0",
+    "ink-gradient": "^3.0.0",
+    "ink-link": "^3.0.0",
+    "marked": "^11.1.1",
+    "meow": "^11.0.0",
+    "react": "^18.2.0",
+    "read-pkg": "^9.0.1",
+    "semver-regex": "^4.0.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.21.0",
+    "@babel/preset-react": "^7.18.6",
+    "chalk": "^5.2.0",
+    "del-cli": "^5.1.0",
+    "eslint-config-custom": "*"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
