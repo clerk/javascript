@@ -2,9 +2,9 @@
 
 import type { OAuthProvider, Web3Provider } from '@clerk/types';
 
-import { useSignInThirdPartyProvider } from '~/internals/machines/sign-in/sign-in.context';
 import type { SocialProviderProps } from '~/react/common/third-party-providers/social-provider';
 import { SocialProvider, SocialProviderIcon } from '~/react/common/third-party-providers/social-provider';
+import { useSignInThirdPartyProvider } from '~/react/sign-in/hooks/use-third-party-provider.hook';
 
 export interface SignInSocialProviderProps extends Omit<SocialProviderProps, 'provider'> {
   name: OAuthProvider | Web3Provider;

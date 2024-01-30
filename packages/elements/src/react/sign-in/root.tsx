@@ -4,8 +4,8 @@ import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import type { PropsWithChildren } from 'react';
 
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
-import { SignInFlowProvider as SignInFlowContextProvider } from '~/internals/machines/sign-in/sign-in.context';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
+import { SignInFlowProvider as SignInFlowContextProvider } from '~/react/sign-in/contexts/machine.context';
 import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
 
 const { useBrowserInspector } = createBrowserInspectorReactHook();

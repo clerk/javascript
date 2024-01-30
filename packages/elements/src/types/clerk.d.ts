@@ -7,3 +7,5 @@ declare module '@clerk/types' {
     __unstable__environment: EnvironmentResource | null | undefined;
   }
 }
+
+type TODO = any;

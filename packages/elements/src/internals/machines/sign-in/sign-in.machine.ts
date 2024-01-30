@@ -49,6 +49,8 @@ export interface SignInMachineInput {
   router: ClerkRouter;
 }
 
+export type SignInMachineTags = 'state:start' | 'state:first-factor' | 'state:second-factor' | 'external';
+
 export type SignInMachineEvents =
   | ErrorActorEvent
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
@@ -62,6 +64,7 @@ export interface SignInMachineTypes {
   context: SignInMachineContext;
   input: SignInMachineInput;
   events: SignInMachineEvents;
+  tags: SignInMachineTags;
 }
 
 export const SignInMachine = setup({
@@ -237,6 +240,7 @@ export const SignInMachine = setup({
     },
     Start: {
       id: 'Start',
+      tags: 'state:start',
       description: 'The intial state of the sign-in flow.',
       initial: 'AwaitingInput',
       on: {
@@ -291,6 +295,7 @@ export const SignInMachine = setup({
       },
     },
     FirstFactor: {
+      tags: 'state:first-factor',
       initial: 'DeterminingState',
       entry: 'assignStartingFirstFactor',
       onDone: [
@@ -378,6 +383,7 @@ export const SignInMachine = setup({
       },
     },
     SecondFactor: {
+      tags: 'state:second-factor',
       initial: 'DeterminingState',
       entry: 'assignStartingSecondFactor',
       onDone: [
