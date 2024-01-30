@@ -3,8 +3,6 @@ title: '`@clerk/nextjs/api` import removed'
 matcher: "@clerk\\/nextjs\\/api"
 ---
 
-<!-- TODO: verify accuracy of this with dimitris -->
-
 The import subpath `@clerk/nextjs/api` has been removed. This includes the following imports:
 
 ```js

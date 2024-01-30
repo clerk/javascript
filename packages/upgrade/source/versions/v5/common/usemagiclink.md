@@ -4,4 +4,4 @@ matcher: 'useMagicLink'
 replaceWithString: 'useEmailLink'
 ---
 
-Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects the functionality.
+Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects functionality.

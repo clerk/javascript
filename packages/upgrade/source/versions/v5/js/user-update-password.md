@@ -1,6 +1,6 @@
 ---
 title: "`User.update({ password: 'x' })` -> `User.updatePassword('x')`"
-matcher: "\\.update\\(\\s*{.*?password:"
+matcher: "\\.update\\([\\s\\S]*?password:[\\s\\S]*?\\)"
 matcherFlags: 'm'
 ---
 

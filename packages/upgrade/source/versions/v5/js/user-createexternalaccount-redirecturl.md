@@ -1,6 +1,6 @@
 ---
 title: '`redirect_url` -> `redirectUrl` as param of `User.createExternalAccount`'
-matcher: "createExternalAccount\\(\\s*{\\.*?(redirect_url):"
+matcher: "createExternalAccount\\(\\s*{[\\s\\S]*?(redirect_url):[\\s\\S]*?\\)"
 replaceWithString: 'redirectUrl'
 ---
 

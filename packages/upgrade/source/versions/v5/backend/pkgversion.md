@@ -1,9 +1,9 @@
 ---
 title: '`pkgVersion` -> `clerkJSVersion`'
 matcher:
-  - "loadInterstitialFromLocal\\([\\s\\S]*?pkgVersion:"
-  - "loadInterstitialFromBAPI\\([\\s\\S]*?pkgVersion:"
-  - "buildPublicInterstitialUrl\\([\\s\\S]*?pkgVersion:"
+  - "loadInterstitialFromLocal\\([\\s\\S]*?pkgVersion:[\\s\\S]*?\\)"
+  - "loadInterstitialFromBAPI\\([\\s\\S]*?pkgVersion:[\\s\\S]*?\\)"
+  - "buildPublicInterstitialUrl\\([\\s\\S]*?pkgVersion:[\\s\\S]*?\\)"
 matcherFlags: 'm'
 ---
 

@@ -1,17 +1,14 @@
 ---
 title: '`apiKey` -> `secretKey` as param to ClerkExpressRequireAuth'
-matcher: "ClerkExpressRequireAuth\\({.*?apiKey:.*?}\\)"
+matcher: "ClerkExpressRequireAuth\\([\\s\\S]*?apiKey:[\\s\\S]*?\\)"
 matcherFlags: 'm'
 ---
 
 The `apiKey` argument passed to `ClerkExpressRequireAuth` must be changed to `secretKey`.
 
-```js
+```diff
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 
-// before
-ClerkExpressRequireAuth({ apiKey: '...' });
-
-// after
-ClerkExpressRequireAuth({ secretKey: '...' });
+- ClerkExpressRequireAuth({ apiKey: '...' });
++ ClerkExpressRequireAuth({ secretKey: '...' });
 ```

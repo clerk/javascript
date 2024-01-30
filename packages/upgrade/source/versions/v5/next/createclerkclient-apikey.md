@@ -6,12 +6,9 @@ matcherFlags: 'm'
 
 The `apiKey` argument passed to `createClerkClient` must be changed to `secretKey`.
 
-```js
+```diff
 import { createClerkClient } from '@clerk/nextjs/server';
 
-// before
-createClerkClient({ apiKey: '...' });
-
-// after
-createClerkClient({ secretKey: '...' });
+- createClerkClient({ apiKey: '...' });
++ createClerkClient({ secretKey: '...' });
 ```

@@ -24,6 +24,7 @@ await setActive({
   organization: 'orgID',
   beforeEmit: () => void
 })
+
 await setActive({
   session: sessionObj,
   organization: orgObj,

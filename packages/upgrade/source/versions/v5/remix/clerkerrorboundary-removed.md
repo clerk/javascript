@@ -1,6 +1,7 @@
 ---
 title: '`ClerkErrorBoundary` removed'
 matcher: "import\\s+{[\\s\\S]*?ClerkErrorBoundary[\\s\\S]*?from\\s+['\"]@clerk\\/remix[\\s\\S]*?['\"]"
+matcherFlags: 'm'
 ---
 
 `ClerkErrorBoundary` is no longer needed for correct error handling in remix, so we have removed this function from the remix SDK, and it can be removed from your code as well. Example below:

@@ -4,14 +4,11 @@ matcher: "<ClerkProvider[\\s\\S]*?frontendApi=[\\s\\S]*?>"
 matcherFlags: 'm'
 ---
 
-The `frontendApi` prop passed to `ClerkProvider` must be changed to `publishableKey`. The value also must be updated to be a publishable key rather than a frontend API key, [here’s more information on how to do this](TODO)
+The `frontendApi` prop passed to `ClerkProvider` must be changed to `publishableKey`. The value also must be updated to be a publishable key rather than a frontend API key. Publishable keys can be found in your Clerk dashboard.
 
-```js
+```diff
 import { ClerkProvider } from '@clerk/clerk-expo';
 
-// before
-<ClerkProvider frontendApi='...' />
-
-// after
-<ClerkProvider publishableKey='...' />
+- <ClerkProvider frontendApi='...' />
++ <ClerkProvider publishableKey='...' />
 ```

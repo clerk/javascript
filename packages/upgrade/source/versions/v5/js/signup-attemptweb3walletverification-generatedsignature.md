@@ -1,6 +1,7 @@
 ---
 title: '`generatedSignature` -> `signature` as param of Signup.attemptWeb3WalletVerification()'
-matcher: "attemptWeb3WalletVerification\\(\\s*{\\.*?generatedSignature:"
+matcher: "attemptWeb3WalletVerification\\([\\s\\S]*?generatedSignature:[\\s\\S]*?\\)"
+matcherFlags: 'm'
 ---
 
 The `generatedSignature` param to [`Signup.attemptWeb3WalletVerification()`](https://clerk.com/docs/references/javascript/sign-up/web3-verification#attempt-web3-wallet-verification) has been removed. Instead, use the `signature` param. Note that this param takes a string, where the `generatedSignature` param took a function, so both key and value will need to change.

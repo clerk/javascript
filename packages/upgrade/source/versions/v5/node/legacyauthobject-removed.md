@@ -15,12 +15,12 @@ We changed the values that our middleware adds to the `request` object after r
     debug: AuthObjectDebug | null;
 -   claims: JwtPayload | null;
 -   sessionClaims: JwtPayload | null;
-+  orgId: string | undefined | null;
-+  orgRole: OrganizationCustomRoleKey | undefined | null;
-+  orgSlug: string | undefined | null;
-+  orgPermissions: OrganizationCustomPermissionKey[] | undefined | null;
-+  has: CheckAuthorizationWithCustomPermissions | null;
-    }
++   orgId: string | undefined | null;
++   orgRole: OrganizationCustomRoleKey | undefined | null;
++   orgSlug: string | undefined | null;
++   orgPermissions: OrganizationCustomPermissionKey[] | undefined | null;
++   has: CheckAuthorizationWithCustomPermissions | null;
+  }
 ```
 
 If you were using the `claims` key on the request after running middleware, you will need to instead use `sessionClaims`. Additionally, if you were using the `LooseAuthProp` or `StrictAuthProp` exported types anywhere, note that these have been adjusted to fit the shape of the new middleware response typing.

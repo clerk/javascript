@@ -1,17 +1,14 @@
 ---
 title: '`apiKey` -> `secretKey` as param to createClerkClient'
-matcher: "createClerkClient\\({.*?apiKey:.*?}\\)"
+matcher: "createClerkClient\\([\\s\\S]*?apiKey:[\\s\\S]*?\\)"
 matcherFlags: 'm'
 ---
 
 The `apiKey` argument passed to `createClerkClient` must be changed to `secretKey`.
 
-```js
+```diff
 import { createClerkClient } from 'gatsby-plugin-clerk/api';
 
-// before
-createClerkClient({ apiKey: '...' });
-
-// after
-createClerkClient({ secretKey: '...' });
+- createClerkClient({ apiKey: '...' });
++ createClerkClient({ secretKey: '...' });
 ```
