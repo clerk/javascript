@@ -9,9 +9,9 @@ const textVariants = (t: InternalTheme) => {
 
   const h1 = {
     ...base,
-    fontWeight: t.fontWeights.$medium,
+    fontWeight: t.fontWeights.$semibold,
     fontSize: t.fontSizes.$xl,
-    lineHeight: t.lineHeights.$large,
+    lineHeight: t.lineHeights.$extraSmall,
   } as const;
 
   const h2 = {
@@ -46,7 +46,7 @@ const textVariants = (t: InternalTheme) => {
     ...base,
     fontWeight: t.fontWeights.$medium,
     fontSize: t.fontSizes.$xs,
-    lineHeight: t.lineHeights.$none,
+    lineHeight: t.lineHeights.$large,
   } as const;
 
   const buttonLarge = {
@@ -61,7 +61,7 @@ const textVariants = (t: InternalTheme) => {
     ...base,
     fontWeight: t.fontWeights.$medium,
     fontSize: t.fontSizes.$sm,
-    lineHeight: t.lineHeights.$none,
+    lineHeight: t.lineHeights.$extraSmall,
     fontFamily: t.fonts.$buttons,
   } as const;
 
