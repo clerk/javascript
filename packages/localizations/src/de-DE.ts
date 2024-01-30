@@ -47,14 +47,17 @@ export const deDE: LocalizationResource = {
   formFieldAction__forgotPassword: 'Passwort vergessen?',
   formFieldError__matchingPasswords: 'Passwörter stimmen überein.',
   formFieldError__notMatchingPasswords: 'Passwörter stimmen nicht überein.',
-  formFieldError__verificationLinkExpired: 'Der Bestätigungslink ist abgelaufen. Bitte fordern Sie einen neuen Link an.',
+  formFieldError__verificationLinkExpired:
+    'Der Bestätigungslink ist abgelaufen. Bitte fordern Sie einen neuen Link an.',
   formFieldHintText__optional: 'Optional',
-  formFieldHintText__slug: 'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
+  formFieldHintText__slug:
+    'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Account löschen',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__emailAddresses: 'Geben oder fügen Sie eine oder mehrere E-Mail-Adressen ein, getrennt durch Leerzeichen oder Kommas',
+  formFieldInputPlaceholder__emailAddresses:
+    'Geben oder fügen Sie eine oder mehrere E-Mail-Adressen ein, getrennt durch Leerzeichen oder Kommas',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__organizationDomain: '',
@@ -78,7 +81,8 @@ export const deDE: LocalizationResource = {
   formFieldLabel__organizationDomain: 'Domain',
   formFieldLabel__organizationDomainDeletePending: 'Ausstehende Einladungen und Vorschläge löschen',
   formFieldLabel__organizationDomainEmailAddress: 'E-Mail-Adresse für die Verifizierung',
-  formFieldLabel__organizationDomainEmailAddressDescription: 'Geben Sie eine E-Mail-Adresse dieser Domain ein, um einen Code zu erhalten und diese Domain zu verifizieren.',
+  formFieldLabel__organizationDomainEmailAddressDescription:
+    'Geben Sie eine E-Mail-Adresse dieser Domain ein, um einen Code zu erhalten und diese Domain zu verifizieren.',
   formFieldLabel__organizationName: 'Organisationsname',
   formFieldLabel__organizationSlug: 'Slug',
   formFieldLabel__password: 'Passwort',
@@ -115,7 +119,8 @@ export const deDE: LocalizationResource = {
       title: 'Domain hinzufügen',
     },
     invitePage: {
-      detailsTitle__inviteFailed: 'Die Einladungen konnten nicht versendet werden. Beheben Sie Folgendes und versuchen Sie es erneut:',
+      detailsTitle__inviteFailed:
+        'Die Einladungen konnten nicht versendet werden. Beheben Sie Folgendes und versuchen Sie es erneut:',
       formButtonPrimary__continue: 'Einladungen verschicken',
       subtitle: 'Laden Sie neue Mitglieder zu dieser Organisation ein',
       successMessage: 'Einladungen erfolgreich versendet',
@@ -150,14 +155,16 @@ export const deDE: LocalizationResource = {
       },
       requestsTab: {
         autoSuggestions: {
-          headerSubtitle: 'Benutzer, die sich mit einer passenden E-Mail-Domain anmelden, können einen Vorschlag für eine Beitrittsanfrage zu Ihrer Organisation sehen.',
+          headerSubtitle:
+            'Benutzer, die sich mit einer passenden E-Mail-Domain anmelden, können einen Vorschlag für eine Beitrittsanfrage zu Ihrer Organisation sehen.',
           headerTitle: 'Automatische Vorschläge',
           primaryButton: 'Verifizierte Domains verwalten',
         },
         menuAction__approve: 'Bestätigen',
         menuAction__reject: 'Ablehnen',
         requests: {
-          headerSubtitle: 'Durchsuchen und Verwalten von Benutzern, die eine Mitgliedschaft in der Organisation beantragt haben.',
+          headerSubtitle:
+            'Durchsuchen und Verwalten von Benutzern, die eine Mitgliedschaft in der Organisation beantragt haben.',
           headerTitle: 'Anfragen',
         },
         tableHeader__requested: 'Angefragte Zugänge',
@@ -186,7 +193,8 @@ export const deDE: LocalizationResource = {
         },
         leaveOrganization: {
           actionDescription: 'Geben Sie "{{organizationName}}" unten ein, um fortzufahren.',
-          messageLine1: 'Möchten Sie diese Organisation wirklich verlassen? Sie verlieren den Zugriff auf diese Organisation und Ihre Anwendungen.',
+          messageLine1:
+            'Möchten Sie diese Organisation wirklich verlassen? Sie verlieren den Zugriff auf diese Organisation und Ihre Anwendungen.',
           messageLine2: 'Diese Aktion ist dauerhaft und irreversibel.',
           successMessage: 'Sie haben die Organisation verlassen.',
           title: 'Organisation verlassen',
@@ -198,7 +206,8 @@ export const deDE: LocalizationResource = {
         menuAction__remove: 'Löschen',
         menuAction__verify: 'Verifizieren',
         primaryButton: 'Domain hinzufügen',
-        subtitle: 'Erlauben Sie Benutzern, der Organisation automatisch beizutreten oder den Beitritt auf der Grundlage einer verifizierten E-Mail-Domain anzufragen.',
+        subtitle:
+          'Erlauben Sie Benutzern, der Organisation automatisch beizutreten oder den Beitritt auf der Grundlage einer verifizierten E-Mail-Domain anzufragen.',
         title: 'Verifizierte Domains',
       },
       successMessage: 'Die Organisation wurde aktualisiert.',
@@ -227,7 +236,8 @@ export const deDE: LocalizationResource = {
         removeDomainTitle: 'Domain entfernen',
       },
       enrollmentTab: {
-        automaticInvitationOption__description: 'Benutzer werden bei der Anmeldung automatisch eingeladen, der Organisation beizutreten, und können jederzeit beitreten.',
+        automaticInvitationOption__description:
+          'Benutzer werden bei der Anmeldung automatisch eingeladen, der Organisation beizutreten, und können jederzeit beitreten.',
         automaticInvitationOption__label: 'Automatische Einladungen',
         automaticSuggestionOption__description:
           'Benutzer erhalten einen Vorschlag für eine Beitrittsanfrage, müssen aber von einem Administrator genehmigt werden, bevor sie der Organisation beitreten können.',
@@ -252,7 +262,8 @@ export const deDE: LocalizationResource = {
       formTitle: 'Verifizierungscode',
       resendButton: 'Sie haben keinen Code erhalten? Erneut senden',
       subtitle: 'Die Domain {{domainName}} muss per E-mail verifiziert werden.',
-      subtitleVerificationCodeScreen: 'Ein Verifizierungscode wurde an {{emailAddress}} gesendet. Geben Sie den Code ein, um fortzufahren.',
+      subtitleVerificationCodeScreen:
+        'Ein Verifizierungscode wurde an {{emailAddress}} gesendet. Geben Sie den Code ein, um fortzufahren.',
       title: 'Domain verifizieren',
     },
   },
@@ -366,7 +377,8 @@ export const deDE: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Passwort zurücksetzen',
-      requiredMessage: 'Es existiert bereits ein Konto mit einer nicht verifizierten E-Mail Adresse. Bitte setzen Sie Ihr Passwort zur Sicherheit zurück.',
+      requiredMessage:
+        'Es existiert bereits ein Konto mit einer nicht verifizierten E-Mail Adresse. Bitte setzen Sie Ihr Passwort zur Sicherheit zurück.',
       successMessage: 'Ihr Passwort wurde erfolgreich geändert. Bitte warten Sie einen Moment, um Sie anzumelden.',
       title: 'Neues Passwort setzen',
     },
@@ -455,8 +467,10 @@ export const deDE: LocalizationResource = {
     form_password_incorrect: '',
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Passwort nicht stark genug',
-    form_password_pwned: 'Das gewählte Passwort wurde durch eine Datenpanne im Internet offengelegt. Wählen Sie aus Sicherheitsgründen bitte ein anderes Passwort',
-    form_password_size_in_bytes_exceeded: 'Das Passwort hat die maximale Anzahl an Bytes überschritten. Bitte kürzen oder Sonderzeichen entfernen.',
+    form_password_pwned:
+      'Das gewählte Passwort wurde durch eine Datenpanne im Internet offengelegt. Wählen Sie aus Sicherheitsgründen bitte ein anderes Passwort',
+    form_password_size_in_bytes_exceeded:
+      'Das Passwort hat die maximale Anzahl an Bytes überschritten. Bitte kürzen oder Sonderzeichen entfernen.',
     form_password_validation_failed: 'Falsches Passwort',
     form_username_invalid_character: '',
     form_username_invalid_length: '',
@@ -484,7 +498,8 @@ export const deDE: LocalizationResource = {
         dates: 'Daten, die mit persönlichen Daten in Verbindung gebracht werden können, vermeiden.',
         l33t: "Vorhersehbare Buchstabenersetzungen wie '@' für 'a' vermeiden.",
         longerKeyboardPattern: 'Längere Tastaturmuster in unterschiedlicher Tipprichtung verwenden.',
-        noNeed: 'Es ist möglich, starke Passwörter zu erstellen, ohne Symbole, Zahlen oder Großbuchstaben zu verwenden.',
+        noNeed:
+          'Es ist möglich, starke Passwörter zu erstellen, ohne Symbole, Zahlen oder Großbuchstaben zu verwenden.',
         pwned: 'Wenn Sie dieses Passwort an anderer Stelle verwenden, sollten Sie es ändern.',
         recentYears: 'Die jüngsten Jahreszahlen vermeiden.',
         repeated: 'Wort- und Zeichenwiederholungen vermeiden.',
@@ -530,7 +545,8 @@ export const deDE: LocalizationResource = {
       subtitle__codelist: 'Bewahren Sie die Codes sicher auf und halten Sie sie geheim.',
       successMessage:
         'Sicherungscodes sind jetzt aktiviert. Sie können eines davon verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren. Jeder Code kann nur einmal verwendet werden.',
-      successSubtitle: 'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
+      successSubtitle:
+        'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
       title: 'Backup-Code-Verifizierung hinzufügen',
       title__codelist: 'Sicherungscodes',
     },
@@ -539,7 +555,8 @@ export const deDE: LocalizationResource = {
       formHint__noAccounts: 'Es sind keine externen Kontoanbieter verfügbar.',
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
-        messageLine2: 'Sie können dieses verbundene Konto nicht mehr verwenden und alle abhängigen Funktionen funktionieren nicht mehr.',
+        messageLine2:
+          'Sie können dieses verbundene Konto nicht mehr verwenden und alle abhängigen Funktionen funktionieren nicht mehr.',
         successMessage: '{{connectedAccount}} wurde aus Ihrem Konto entfernt.',
         title: 'Verbundenes Konto entfernen',
       },
@@ -592,8 +609,10 @@ export const deDE: LocalizationResource = {
         successMessage: 'SMS-Code-Bestätigung in zwei Schritten wurde für {{mfaPhoneCode}} entfernt',
         title: 'Entfernen Sie die Bestätigung in zwei Schritten',
       },
-      subtitle__availablePhoneNumbers: 'Wählen Sie eine Telefonnummer aus, um sich für die Bestätigung in zwei Schritten per SMS-Code zu registrieren.',
-      subtitle__unavailablePhoneNumbers: 'Es sind keine Telefonnummern verfügbar, um sich für die SMS-Code-Bestätigung in zwei Schritten zu registrieren.',
+      subtitle__availablePhoneNumbers:
+        'Wählen Sie eine Telefonnummer aus, um sich für die Bestätigung in zwei Schritten per SMS-Code zu registrieren.',
+      subtitle__unavailablePhoneNumbers:
+        'Es sind keine Telefonnummern verfügbar, um sich für die SMS-Code-Bestätigung in zwei Schritten zu registrieren.',
       successMessage:
         'Die SMS-Code-Bestätigung in zwei Schritten ist jetzt für diese Telefonnummer aktiviert. Bei der Anmeldung müssen Sie als zusätzlichen Schritt einen Bestätigungscode eingeben, der an diese Telefonnummer gesendet wird.',
       title: 'SMS-Code-Bestätigung hinzufügen',
@@ -604,14 +623,17 @@ export const deDE: LocalizationResource = {
         buttonUnableToScan__nonPrimary: 'QR-Code kann nicht gescannt werden?',
         infoText__ableToScan:
           'Richten Sie eine neue Anmeldemethode in Ihrer Authentifizierungs-App ein und scannen Sie den folgenden QR-Code, um ihn mit Ihrem Konto zu verknüpfen.',
-        infoText__unableToScan: 'Richten Sie eine neue Anmeldemethode in Ihrem Authentifikator ein und geben Sie den unten angegebenen Schlüssel ein.',
+        infoText__unableToScan:
+          'Richten Sie eine neue Anmeldemethode in Ihrem Authentifikator ein und geben Sie den unten angegebenen Schlüssel ein.',
         inputLabel__unableToScan1:
           'Stellen Sie sicher, dass zeitbasierte oder einmalige Passwörter aktiviert sind, und schließen Sie dann die Verknüpfung Ihres Kontos ab.',
-        inputLabel__unableToScan2: 'Wenn Ihr Authentifikator TOTP-URIs unterstützt, können Sie alternativ auch die vollständige URI kopieren.',
+        inputLabel__unableToScan2:
+          'Wenn Ihr Authentifikator TOTP-URIs unterstützt, können Sie alternativ auch die vollständige URI kopieren.',
       },
       removeResource: {
         messageLine1: 'Bei der Anmeldung sind keine Bestätigungscodes von diesem Authentifikator mehr erforderlich.',
-        messageLine2: 'Ihr Konto ist möglicherweise nicht mehr so sicher. Sind Sie sich sicher, dass Sie fortfahren wollen?',
+        messageLine2:
+          'Ihr Konto ist möglicherweise nicht mehr so sicher. Sind Sie sich sicher, dass Sie fortfahren wollen?',
         successMessage: 'Die zweistufige Verifizierung über die Authentifizierungs-App wurde entfernt.',
         title: 'Entfernen Sie die Bestätigung in zwei Schritten',
       },
@@ -631,7 +653,8 @@ export const deDE: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Dein Passwort wurde aktualisiert.',
       changePasswordTitle: 'Passwort ändern',
-      readonly: 'Ihr Passwort kann derzeit nicht geändert werden, da Sie sich nur über die Enterprise-Verbindung anmelden können.',
+      readonly:
+        'Ihr Passwort kann derzeit nicht geändert werden, da Sie sich nur über die Enterprise-Verbindung anmelden können.',
       sessionsSignedOutSuccessMessage: 'Alle anderen Geräte wurden abgemeldet.',
       successMessage: 'Ihr Passwort wurde festgelegt.',
       title: 'Passwort festlegen',
@@ -690,7 +713,8 @@ export const deDE: LocalizationResource = {
         backupCodes: {
           actionLabel__regenerate: 'Codes neu generieren',
           headerTitle: 'Backup-Codes',
-          subtitle__regenerate: 'Generieren Sie einen neuen Satz sicherer Backup-Codes. Alte Backup-Code werden gelöscht und können nicht mehr verwendet werden.',
+          subtitle__regenerate:
+            'Generieren Sie einen neuen Satz sicherer Backup-Codes. Alte Backup-Code werden gelöscht und können nicht mehr verwendet werden.',
           title__regenerate: 'Backup-Codes neu generieren',
         },
         phoneCode: {
