@@ -45,7 +45,6 @@ export const UserProfileSection = () => {
             <Action.Trigger value='edit'>
               <ProfileSection.Button
                 id='profile'
-                variant='ghost'
                 localizationKey={localizationKeys('userProfile.start.profileSection.primaryButton')}
               />
             </Action.Trigger>

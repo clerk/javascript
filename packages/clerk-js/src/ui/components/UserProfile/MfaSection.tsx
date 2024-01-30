@@ -232,7 +232,7 @@ const MfaAddMenu = (props: MfaAddMenuProps) => {
   return (
     <>
       <ProfileSection.ActionMenu
-        elementId='mfa'
+        id='mfa'
         triggerLocalizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
       >
         {strategies.map(
