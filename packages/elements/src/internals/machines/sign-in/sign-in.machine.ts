@@ -486,7 +486,7 @@ export const SignInMachine = setup({
             };
           }
 
-          throw new ClerkElementsRuntimeError('Invalid strategy'); // TODO: Should never hit. Statisfies Typescript declarations
+          throw new ClerkElementsRuntimeError('Invalid strategy');
         },
         onError: {
           actions: 'setFormErrors',
