@@ -14,6 +14,10 @@ body.dark-mode {
   background: black;
   color: white;
 }
+body.font-smoothing {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 a {
   color: inherit;

@@ -198,7 +198,6 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
           gap: theme.space.$4,
           position: 'relative',
           justifyContent: 'flex-start',
-          borderColor: theme.colors.$blackAlpha200,
         },
         props.sx,
       ]}
