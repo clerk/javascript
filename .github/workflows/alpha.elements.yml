@@ -35,16 +35,20 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
           registry-url: "https://registry.npmjs.org"
+      
+      - name: Git configuration
+        run: |
+          git config --global user.name "Clerk Cookie"
+          git config --global user.email "clerk-cookie@users.noreply.github.com"
 
-      - name: Version packages
-        id: version-packages
+      - name: Version package
+        id: version-package
         uses: ./.github/actions/version-prepatch
         with:
           package: '@clerk/elements'
           tag: 'alpha'
 
       - name: Build release
-        if: steps.version-packages.outputs.success == '1'
         run: npx turbo build $TURBO_ARGS
 
       - name: Publish to NPM
