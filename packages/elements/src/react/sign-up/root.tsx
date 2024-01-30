@@ -4,8 +4,8 @@ import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import type { PropsWithChildren } from 'react';
 
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
-import { SignUpFlowProvider as SignUpFlowContextProvider } from '~/internals/machines/sign-up/sign-up.context';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
+import { SignUpCtx } from '~/react/sign-up/contexts/sign-up.context';
 import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
 
 const { useBrowserInspector } = createBrowserInspectorReactHook();
@@ -25,7 +25,7 @@ function SignUpFlowProvider({ children }: PropsWithChildren) {
   }
 
   return (
-    <SignUpFlowContextProvider
+    <SignUpCtx.Provider
       options={{
         input: {
           clerk,
@@ -36,7 +36,7 @@ function SignUpFlowProvider({ children }: PropsWithChildren) {
       }}
     >
       {children}
-    </SignUpFlowContextProvider>
+    </SignUpCtx.Provider>
   );
 }
 

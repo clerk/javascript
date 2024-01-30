@@ -12,7 +12,7 @@ type TaggedActor<TActor extends AnyActorRef> = TActor extends ActorRef<
  * Generic hook to check if a tag is active.
  *
  * @example
- * const ref = useSignUpFlow();
+ * const ref = SignUpCtx.useActorRef();
  *
  * useActiveTags(ref, 'external');
  * useActiveTags(ref, ['external', 'email_code']);

@@ -12,7 +12,7 @@ type StatefulActor<TActor extends AnyActorRef> = TActor extends ActorRef<
  * Generic hook to check if a state is active.
  *
  * @example
- * const ref = useSignUpFlow();
+ * const ref = SignUpCtx.useActorRef();
 
  * useActiveStates(ref, { Start: 'Attempting' });
  * useActiveStates(ref, [{ Start: 'AwaitingInput' }, { Start: 'Attempting' }]);

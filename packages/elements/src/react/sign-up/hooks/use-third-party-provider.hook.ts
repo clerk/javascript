@@ -1,20 +1,23 @@
 import type { OAuthProvider, Web3Provider } from '@clerk/types';
 import type React from 'react';
 import { useCallback } from 'react';
+import type { SnapshotFrom } from 'xstate';
 
+import type { SignUpMachine } from '~/internals/machines/sign-up/sign-up.machine';
 import type { UseThirdPartyProviderReturn } from '~/react/common/third-party-providers/social-provider';
-import type { SnapshotState } from '~/react/sign-in/contexts/sign-in.context';
-import { SignInCtx } from '~/react/sign-in/contexts/sign-in.context';
+import { SignUpCtx } from '~/react/sign-up/contexts/sign-up.context';
+
+export type SnapshotState = SnapshotFrom<typeof SignUpMachine>;
 
 /**
  * Selects the clerk third-party provider
  */
-const selector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotState) =>
+const clerkThirdPartyProviderSelector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotState) =>
   state.context.thirdPartyProviders.providerToDisplayData[provider];
 
 export const useThirdPartyProvider = (provider: OAuthProvider | Web3Provider): UseThirdPartyProviderReturn => {
-  const ref = SignInCtx.useActorRef();
-  const details = SignInCtx.useSelector(selector(provider));
+  const ref = SignUpCtx.useActorRef();
+  const details = SignUpCtx.useSelector(clerkThirdPartyProviderSelector(provider));
 
   const authenticate = useCallback(
     (event: React.MouseEvent<Element>) => {
