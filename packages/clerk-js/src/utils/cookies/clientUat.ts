@@ -2,6 +2,8 @@ import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
 import type { ClientResource } from '@clerk/types';
 
+import { inCrossOriginIframe } from '../../utils';
+
 const CLIENT_UAT_COOKIE_NAME = '__client_uat';
 
 export const clientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
@@ -12,8 +14,8 @@ export const getClientUatCookie = (): number => {
 
 export const setClientUatCookie = (client: ClientResource | undefined) => {
   const expires = addYears(Date.now(), 1);
-  const sameSite = 'Strict';
-  const secure = false;
+  const sameSite = inCrossOriginIframe() ? 'None' : 'Strict';
+  const secure = window.location.protocol === 'https:';
 
   // '0' indicates the user is signed out
   let val = '0';
