@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 
 import ExpandableList from './util/expandable-list.js';
 
-export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarnings }) {
+export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarnings, uuid, disableTelemetry }) {
   // NOTE: if the difference between fromVersion and toVersion is greater than 1
   // we need to do a little extra work here and import two matchers,
   // sequence them after each other, and clearly mark which version migration
@@ -129,7 +129,40 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarn
       }),
     )
       .then(() => {
-        setResults([...results, ...Object.keys(allResults).map(k => allResults[k])]);
+        const newResults = [...results, ...Object.keys(allResults).map(k => allResults[k])];
+        setResults(newResults);
+
+        // Anonymously track how many instances of each breaking change item were encountered.
+        // This only tracks the name of the breaking change found, and how many instances of it
+        // were found. It does not send any part of the scanned codebase or any PII.
+        // It is used internally to help us understand what the most common sticking points are
+        // for our users so we can appropriate prioritize support/guidance/docs around them.
+        if (!disableTelemetry) {
+          fetch('https://api.segment.io/v1/batch', {
+            method: 'POST',
+            headers: {
+              Authorization: `Basic ${Buffer.from('5TkC1SM87VX2JRJcIGBBmL7sHLRWaIvc:').toString('base64')}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              batch: newResults.map(item => {
+                return {
+                  type: 'track',
+                  userId: 'clerk-upgrade-tool',
+                  event: 'Clerk Migration Tool_CLI_Breaking Change Found',
+                  properties: {
+                    appId: `cmt_${uuid}`,
+                    title: item.title,
+                    surface: 'Clerk Migration Tool',
+                    location: 'CLI',
+                    instances: item.instances.length,
+                  },
+                  timestamp: new Date().toISOString(),
+                };
+              }),
+            }),
+          });
+        }
 
         setComplete(true);
         if (Object.keys(allResults).length < 1) {

@@ -17,6 +17,7 @@ export default function App({
   _ignore = [],
   _yolo = false,
   noWarnings = false,
+  disableTelemetry = false,
 }) {
   const [yolo, setYolo] = useState(_yolo);
   const [sdks, setSdks] = useState(_sdk ? [_sdk] : []);
@@ -30,6 +31,7 @@ export default function App({
   const [ignore, setIgnore] = useState(_ignore);
   const [configComplete, setConfigComplete] = useState(false);
   const [configVerified, setConfigVerified] = useState(false);
+  const [uuid, setUuid] = useState();
   let fromVersionGuess = false;
 
   if (yolo) {
@@ -40,7 +42,9 @@ export default function App({
   // We try to guess which SDK they are using
   if (isEmpty(sdks) && isEmpty(sdkGuesses) && !sdkGuessAttempted) {
     if (!dir) return setDir(process.cwd());
-    setSdkGuesses(guessFrameworks(dir)); // this is the suspect line
+    const { guesses, _uuid } = guessFrameworks(dir, disableTelemetry);
+    setUuid(_uuid);
+    setSdkGuesses(guesses);
     setSdkGuessAttempted(true);
   }
 
@@ -245,7 +249,9 @@ export default function App({
         </>
       )}
 
-      {configVerified && <Scan {...{ fromVersion, toVersion, sdks, dir, ignore, noWarnings }} />}
+      {configVerified && (
+        <Scan {...{ fromVersion, toVersion, sdks, dir, ignore, noWarnings, uuid, disableTelemetry }} />
+      )}
     </>
   );
 }
