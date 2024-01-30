@@ -1,0 +1,54 @@
+name: Publish Alpha of @clerk/elements
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  alpha-clerk-elements:
+    if: ${{ github.repository == 'clerk/javascript' }}
+    runs-on: ${{ vars.RUNNER_NORMAL }}
+    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      TURBO_REMOTE_ONLY: true
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true # Must be present to enable caching on branched workflows
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Version packages
+        id: version-packages
+        uses: ./.github/actions/version-prepatch
+        with:
+          package: '@clerk/elements'
+          tag: 'alpha'
+
+      - name: Build release
+        if: steps.version-packages.outputs.success == '1'
+        run: npx turbo build $TURBO_ARGS
+
+      - name: Canary release
+        run: npm publish --workspace=@clerk/elements --tag=alpha --dry-run
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
