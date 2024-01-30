@@ -152,10 +152,12 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarn
                   event: 'Clerk Migration Tool_CLI_Breaking Change Found',
                   properties: {
                     appId: `cmt_${uuid}`,
-                    title: item.title,
                     surface: 'Clerk Migration Tool',
                     location: 'CLI',
+                    title: item.title,
                     instances: item.instances.length,
+                    fromVersion,
+                    toVersion,
                   },
                   timestamp: new Date().toISOString(),
                 };
