@@ -47,8 +47,18 @@ jobs:
         if: steps.version-packages.outputs.success == '1'
         run: npx turbo build $TURBO_ARGS
 
-      - name: Canary release
+      - name: Publish to NPM
         run: npm publish --workspace=@clerk/elements --tag=alpha --dry-run
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+      
+      - name: Commit changes
+        run: |
+          git add --all
+          git commit -m "chore(repo): Publish alpha of @clerk/elements"
+      
+      - name: Push changes
+        run: git push --dry-run
+        env:
+          GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
