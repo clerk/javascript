@@ -110,7 +110,6 @@ export const OrganizationListPreviewButton = (props: PropsWithChildren<{ onClick
       elementDescriptor={descriptors.organizationListPreviewButton}
       sx={[sharedStyles]}
       icon={SwitchArrowRight}
-      showIconOnHover={false}
       {...props}
     />
   );
