@@ -174,7 +174,7 @@ export class OrganizationAPI extends AbstractAPI {
     const { organizationId, limit, offset } = params;
     this.requireId(organizationId);
 
-    return this.request<OrganizationMembership[]>({
+    return this.request<PaginatedResourceResponse<OrganizationMembership[]>>({
       method: 'GET',
       path: joinPaths(basePath, organizationId, 'memberships'),
       queryParams: { limit, offset },
