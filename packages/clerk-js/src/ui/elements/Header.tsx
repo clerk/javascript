@@ -38,10 +38,9 @@ const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element 
       variant='body'
       colorScheme='neutral'
       sx={[
-        t => ({
-          lineHeight: t.lineHeights.$normal,
+        {
           wordWrap: 'break-word',
-        }),
+        },
         sx,
       ]}
       {...rest}
