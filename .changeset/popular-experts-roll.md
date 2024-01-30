@@ -2,4 +2,4 @@
 '@clerk/elements': patch
 ---
 
-Changeset to trigger `@clerk/elements` snapshot release.
+Export components under `/sign-in`, `/sign-up`, and `/common` subpaths.
