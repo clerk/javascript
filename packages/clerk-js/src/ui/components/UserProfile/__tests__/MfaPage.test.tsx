@@ -1,8 +1,14 @@
-import type { BackupCodeResource, PhoneNumberResource, VerificationJSON } from '@clerk/types';
+import type {
+  BackupCodeResource,
+  DeletedObjectResource,
+  PhoneNumberResource,
+  TOTPResource,
+  VerificationJSON,
+} from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import { act, waitFor } from '@testing-library/react';
 
-import { render } from '../../../../testUtils';
+import { render, runFakeTimers, screen } from '../../../../testUtils';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { MfaSection } from '../MfaSection';
@@ -150,7 +156,47 @@ describe('MfaPage', () => {
       await waitFor(() => expect(queryByRole(/Add SMS code verification/i)).not.toBeInTheDocument());
     });
 
-    it.todo('Complete verification with authenticator app');
+    it('Complete verification with authenticator app', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ two_factor_enabled: true });
+        f.withAuthenticatorApp();
+      });
+
+      fixtures.clerk.user?.createTOTP.mockResolvedValue({} as TOTPResource);
+      fixtures.clerk.user?.verifyTOTP.mockResolvedValue({} as TOTPResource);
+
+      await runFakeTimers(async timers => {
+        const { getByText, userEvent, getByRole } = render(<MfaSection />, { wrapper });
+        await waitFor(() => getByText('Two-step verification'));
+
+        await act(async () => {
+          await userEvent.click(getByRole('button', { name: /Add two-step verification/i }));
+        });
+
+        await waitFor(() => getByText(/authenticator app/i));
+        await userEvent.click(getByRole('menuitem', { name: /authenticator app/i }));
+
+        await waitFor(() => expect(getByText(/Add authenticator application/i)).toBeInTheDocument());
+
+        await waitFor(() => expect(getByRole('button', { name: /save/i })).toBeInTheDocument());
+        await userEvent.click(getByRole('button', { name: /save/i }));
+
+        await userEvent.type(screen.getByRole('textbox', { name: /Enter verification code/i }), '123456');
+        timers.runOnlyPendingTimers();
+        await waitFor(() => {
+          expect(fixtures.clerk.user?.verifyTOTP).toHaveBeenCalled();
+        });
+        timers.runOnlyPendingTimers();
+        await waitFor(() =>
+          expect(
+            getByText(
+              /Two-step verification is now enabled. When signing in, you will need to enter a verification code from this authenticator as an additional step./i,
+            ),
+          ).toBeInTheDocument(),
+        );
+        await userEvent.click(getByRole('button', { name: /finish/i }));
+      });
+    });
   });
 
   describe('Regenerates', () => {
@@ -248,6 +294,38 @@ describe('MfaPage', () => {
       expect(fixtures.clerk.user?.phoneNumbers[0].setReservedForSecondFactor).toHaveBeenCalledWith({ reserved: false });
     });
 
-    it.todo('Complete verification with authenticator app');
+    it('Removes a authenticator app verification', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ two_factor_enabled: true, totp_enabled: true });
+        f.withAuthenticatorApp();
+      });
+
+      fixtures.clerk.user?.disableTOTP.mockResolvedValue({} as DeletedObjectResource);
+
+      const { getByText, userEvent, getByRole } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+      await waitFor(() => getByText('Two-step verification'));
+
+      const itemButton = getByText(/Authenticator application/i)?.parentElement?.parentElement?.children[1];
+
+      expect(itemButton).toBeDefined();
+
+      await act(async () => {
+        await userEvent.click(itemButton!);
+      });
+      await waitFor(() => getByText(/^remove$/i));
+      await userEvent.click(getByText(/^remove$/i));
+      getByText(/remove two-step verification/i);
+      getByText('Your account may not be as secure. Are you sure you want to continue?');
+      getByText('Verification codes from this authenticator will no longer be required when signing in.');
+
+      await userEvent.click(getByRole('button', { name: /^save$/i }));
+
+      expect(fixtures.clerk.user?.disableTOTP).toHaveBeenCalled();
+    });
   });
 });
