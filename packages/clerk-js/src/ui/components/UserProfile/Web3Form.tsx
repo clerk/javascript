@@ -52,7 +52,7 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
 
   return (
     <ProfileSection.ActionMenu
-      elementId='web3Wallets'
+      id='web3Wallets'
       triggerLocalizationKey={localizationKeys('userProfile.start.web3WalletsSection.primaryButton')}
     >
       {unconnectedStrategies.map(strategy => (

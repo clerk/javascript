@@ -19,6 +19,7 @@ const themes = { default: undefined, dark, neobrutalism, shadesOfPurple };
 function MyApp({ Component, pageProps }: AppProps) {
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof themes>('default');
   const [selectedSmoothing, setSelectedSmoothing] = useState<boolean>(true);
+  const [primaryColor, setPrimaryColor] = useState<string | undefined>(undefined);
 
   const onToggleDark = () => {
     if (window.document.body.classList.contains('dark-mode')) {
@@ -51,8 +52,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       appearance={{
         baseTheme: themes[selectedTheme],
         variables: {
-          colorPrimary: 'red',
-          // colorAlphaShade: 'red',
+          colorPrimary:primaryColor,
         },
         layout: {
           helpPageUrl: '/help',
@@ -67,6 +67,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         onToggleDark={onToggleDark}
         onToggleSmooth={onToggleSmooth}
         smooth={selectedSmoothing}
+        onPrimaryColorChange={setPrimaryColor}
       />
       <C {...pageProps} />
     </ClerkProvider>
@@ -78,6 +79,7 @@ type AppBarProps = {
   onToggleDark: React.MouseEventHandler<HTMLButtonElement>;
   onToggleSmooth: React.MouseEventHandler<HTMLButtonElement>;
   smooth: boolean;
+  onPrimaryColorChange: (primaryColor: string | undefined) => void;
 };
 
 const AppBar = (props: AppBarProps) => {
@@ -116,6 +118,7 @@ const AppBar = (props: AppBarProps) => {
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
       <button onClick={props.onToggleSmooth}>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
+      <input type='color' onChange={(e) => props.onPrimaryColorChange(e.target.value)}/>
       <UserButton />
 
       <SignedIn>

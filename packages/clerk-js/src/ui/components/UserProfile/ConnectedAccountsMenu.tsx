@@ -59,7 +59,7 @@ export const AddConnectedAccount = () => {
   return (
     <ProfileSection.ActionMenu
       triggerLocalizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
-      elementId='connectedAccounts'
+      id='connectedAccounts'
     >
       {unconnectedStrategies.map(strategy => (
         <ProfileSection.ActionMenuItem

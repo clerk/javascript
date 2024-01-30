@@ -147,7 +147,7 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
     <Button
       elementDescriptor={descriptors.profileSectionPrimaryButton}
       elementId={descriptors.profileSectionPrimaryButton.setId(id)}
-      variant='ghost'
+      variant='ghostPrimary'
       textVariant='buttonSmall'
       sx={[
         t => ({
@@ -172,7 +172,7 @@ const ProfileSectionArrowButton = (props: ProfileSectionButtonProps) => {
     <ArrowBlockButton
       elementDescriptor={descriptors.profileSectionPrimaryButton}
       elementId={descriptors.profileSectionPrimaryButton.setId(id)}
-      variant='ghost'
+      variant='ghostPrimary'
       sx={[
         t => ({
           textWrap: 'nowrap',
@@ -251,24 +251,24 @@ type ProfileSectionActionMenuProps = {
   destructive?: boolean;
   triggerLocalizationKey?: LocalizationKey;
   triggerSx?: ThemableCssProp;
-  elementId?: ProfileSectionId;
+  id?: ProfileSectionId;
 };
 
 export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) => {
-  const { children, triggerLocalizationKey, elementId, triggerSx } = props;
+  const { children, triggerLocalizationKey, id, triggerSx } = props;
   return (
     <Flex
       sx={{
         position: 'relative',
       }}
     >
-      <Menu elementId={elementId}>
+      <Menu elementId={id}>
         <MenuTrigger>
-          <ArrowBlockButton
+          <ProfileSectionArrowButton
+            id='connectedAccounts'
             elementDescriptor={descriptors.profileSectionPrimaryButton}
-            elementId={descriptors.profileSectionPrimaryButton.setId(elementId)}
+            elementId={descriptors.profileSectionPrimaryButton.setId(id)}
             textLocalizationKey={triggerLocalizationKey}
-            variant='ghost'
             sx={[
               t => ({
                 justifyContent: 'start',
