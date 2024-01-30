@@ -5,10 +5,18 @@ import { $, argv } from 'zx';
 
 import { constants } from './common.mjs';
 
-const PACKAGES = argv._[0]?.split(',') || [];
+const PACKAGES = argv.packages?.split(',') || [];
+const PREID = argv.preid;
 
 if (PACKAGES.length === 0) {
-  core.setFailed('No packages were specified. Specify a list of comma-separate packages to version (e.g. "abc,def")');
+  core.setFailed(
+    'No packages were specified. Specify a list of comma-separate packages to version (e.g. "@clerk/remix,@clerk/nextjs")',
+  );
+  process.exit();
+}
+
+if (!PREID) {
+  core.setFailed('No preid was specified. Specify a preid to use for the version (e.g. "alpha")');
   process.exit();
 }
 
@@ -41,7 +49,7 @@ const success = !res.stderr.includes('No unreleased changesets found');
 await $`git checkout HEAD -- ${constants.ChangesetConfigFile}`;
 
 if (success) {
-  core.info('Versioning was successful');
+  core.info('Versioning was successful!');
 } else {
   core.setFailed(`Script failed with error: ${res.stderr}`);
   process.exit();
