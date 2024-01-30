@@ -60,9 +60,9 @@ jobs:
       - name: Commit changes
         run: |
           git add --all
-          git commit -m "chore(repo): Publish alpha of @clerk/elements"
+          git commit -m "chore(repo): Publish alpha of @clerk/elements" --no-verify
       
       - name: Push changes
-        run: git push --dry-run
+        run: git push origin --dry-run
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
