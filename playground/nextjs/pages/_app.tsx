@@ -12,12 +12,13 @@ import {
 } from '@clerk/nextjs';
 import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 
 const themes = { default: undefined, dark, neobrutalism, shadesOfPurple };
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof themes>('default');
+  const [selectedSmoothing, setSelectedSmoothing] = useState<boolean>(true);
 
   const onToggleDark = () => {
     if (window.document.body.classList.contains('dark-mode')) {
@@ -29,17 +30,34 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   };
 
+  const onToggleSmooth = () => {
+    if (window.document.body.classList.contains('font-smoothing')) {
+      setSelectedSmoothing(false);
+      window.document.body.classList.remove('font-smoothing');
+    } else {
+      setSelectedSmoothing(true);
+      window.document.body.classList.add('font-smoothing');
+    }
+  };
+
+  useEffect(() => {
+    window.document.body.classList.add('font-smoothing');
+  }, []);
+
   const C = Component as FunctionComponent;
 
   return (
     <ClerkProvider
       appearance={{
         baseTheme: themes[selectedTheme],
+        variables: {
+          colorPrimary: 'red',
+          // colorAlphaShade: 'red',
+        },
         layout: {
-          shimmer: true,
-          helpPageUrl:'/help',
-          privacyPageUrl:'/privacy',
-          termsPageUrl:'/terms'
+          helpPageUrl: '/help',
+          privacyPageUrl: '/privacy',
+          termsPageUrl: '/terms',
         },
       }}
       {...pageProps}
@@ -47,6 +65,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       <AppBar
         onChangeTheme={e => setSelectedTheme(e.target.value as any)}
         onToggleDark={onToggleDark}
+        onToggleSmooth={onToggleSmooth}
+        smooth={selectedSmoothing}
       />
       <C {...pageProps} />
     </ClerkProvider>
@@ -56,6 +76,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 type AppBarProps = {
   onChangeTheme: React.ChangeEventHandler<HTMLSelectElement>;
   onToggleDark: React.MouseEventHandler<HTMLButtonElement>;
+  onToggleSmooth: React.MouseEventHandler<HTMLButtonElement>;
+  smooth: boolean;
 };
 
 const AppBar = (props: AppBarProps) => {
@@ -93,6 +115,7 @@ const AppBar = (props: AppBarProps) => {
         <option value='shadesOfPurple'>shadesOfPurple</option>
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
+      <button onClick={props.onToggleSmooth}>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
       <UserButton />
 
       <SignedIn>
