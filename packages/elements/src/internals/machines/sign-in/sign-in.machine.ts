@@ -476,15 +476,17 @@ export const SignInMachine = setup({
                 // continueSignUp
               },
             };
+          } else if (event.type === 'AUTHENTICATE.OAUTH' && event.strategy) {
+            return {
+              clerk: context.clerk,
+              params: {
+                strategy: event.strategy,
+                // continueSignUp
+              },
+            };
           }
 
-          return {
-            clerk: context.clerk,
-            params: {
-              strategy: event.strategy,
-              // continueSignUp
-            },
-          };
+          throw new ClerkElementsRuntimeError('Invalid strategy');
         },
         onError: {
           actions: 'setFormErrors',

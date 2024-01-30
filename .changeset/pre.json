@@ -16,8 +16,7 @@
     "@clerk/clerk-sdk-node": "4.12.16",
     "@clerk/shared": "1.0.0",
     "@clerk/themes": "1.7.9",
-    "@clerk/types": "3.57.0",
-    "@clerk/elements": "0.0.1"
+    "@clerk/types": "3.57.0"
   },
   "changesets": [
     "afraid-experts-eat",

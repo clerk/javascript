@@ -7,7 +7,7 @@ import {
   Input,
   Label,
   Submit as ElementsSubmit,
-} from '@clerk/elements';
+} from '@clerk/elements/common';
 import clsx from 'clsx';
 import { forwardRef } from 'react';
 
@@ -21,7 +21,7 @@ function OTPInputSegment({ value, status }: any) {
           className={clsx(
             'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 bg-white border-[var(--border-color)] [--border-color:theme(colors.gray.300)] data-[state="invalid"]:[--border-color:theme(colors.red.500)] text-lg text-black self-stretch',
             (status === 'cursor' || status === 'selected') &&
-              '[--border-color:theme(colors.purple.500)] shadow-[theme(colors.purple.500_0_0_0_1px)]',
+              '[--border-color:theme(colors.purple.500)] shadow-[0_0_0_1px_theme(colors.purple.500)]',
             status === 'selected' && 'bg-purple-100',
           )}
         >
@@ -32,7 +32,7 @@ function OTPInputSegment({ value, status }: any) {
   );
 }
 
-export const CustomField = forwardRef<Input, { name: string; label: string }>(function CustomField(
+export const CustomField = forwardRef<typeof Input, { name: string; label: string }>(function CustomField(
   { name, label },
   forwardedRef,
 ) {
@@ -43,6 +43,7 @@ export const CustomField = forwardRef<Input, { name: string; label: string }>(fu
         }
       : {
           className: 'bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500',
+          ref: forwardedRef,
         };
 
   return (
@@ -53,7 +54,6 @@ export const CustomField = forwardRef<Input, { name: string; label: string }>(fu
       <div className='flex gap-4 justify-between items-center'>
         <Label>{label}</Label>
         <Input
-          ref={forwardedRef}
           name={name}
           {...inputProps}
         />
