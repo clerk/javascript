@@ -1,21 +1,22 @@
 import { readPackageSync } from 'read-pkg';
+
 import SDKS from '../constants/sdks.js';
 
 export default function guessFrameworks(dir) {
-	let pkg;
-	try {
-		pkg = readPackageSync({ cwd: dir });
-	} catch (err) {
-		return [];
-	}
+  let pkg;
+  try {
+    pkg = readPackageSync({ cwd: dir });
+  } catch (err) {
+    return [];
+  }
 
-	// no guessing if there are no deps
-	if (!pkg.dependencies && !pkg.devDependencies) return [];
-	const deps = pkg.dependencies ? Object.keys(pkg.dependencies) : [];
-	const devDeps = pkg.devDependencies ? Object.keys(pkg.devDependencies) : [];
+  // no guessing if there are no deps
+  if (!pkg.dependencies && !pkg.devDependencies) return [];
+  const deps = pkg.dependencies ? Object.keys(pkg.dependencies) : [];
+  const devDeps = pkg.devDependencies ? Object.keys(pkg.devDependencies) : [];
 
-	return SDKS.reduce((m, { label, value }) => {
-		if (deps.includes(label) || devDeps.includes(label)) m.push({ label, value });
-		return m;
-	}, []);
+  return SDKS.reduce((m, { label, value }) => {
+    if (deps.includes(label) || devDeps.includes(label)) m.push({ label, value });
+    return m;
+  }, []);
 }
