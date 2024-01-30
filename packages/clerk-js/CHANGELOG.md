@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.68.6
+
+### Patch Changes
+
+- Update cookie setting to ensure cookies can be set to be read when an application is embedded in an iframe. ([#2668](https://github.com/clerk/javascript/pull/2668)) by [@BRKalow](https://github.com/BRKalow)
+
+- Take account custom pages when redirecting inside OrganizationProfile. ([#2648](https://github.com/clerk/javascript/pull/2648)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.68.5
 
 ### Patch Changes
