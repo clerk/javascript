@@ -5,12 +5,13 @@
   "keywords": [
     "clerk",
     "typescript",
-    "nextjs",
     "auth",
     "authentication",
     "passwordless",
     "session",
-    "jwt"
+    "jwt",
+    "elements",
+    "radix"
   ],
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -34,24 +35,10 @@
         "types": "./dist/react/*/index.d.ts",
         "default": "./dist/react/*/index.js"
       }
-    },
-    ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "files": [
-    "dist",
-    "!dist/metafile-*.json",
-    "!dist/**/*.map"
+    "dist"
   ],
   "scripts": {
     "app:build": "(cd examples/nextjs && npm run build)",
@@ -62,9 +49,7 @@
     "build": "tsup",
     "build:analyze": "tsup --metafile; open https://esbuild.github.io/analyze/",
     "build:declarations": "tsc -p tsconfig.json",
-    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
