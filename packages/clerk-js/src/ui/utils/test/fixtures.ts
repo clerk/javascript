@@ -131,6 +131,7 @@ const socials = Object.freeze(
     'oauth_box',
     'oauth_slack',
     'oauth_linear',
+    'oauth_x',
   ]),
 );
 

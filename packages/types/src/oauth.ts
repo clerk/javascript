@@ -34,6 +34,7 @@ export type XeroOauthProvider = 'xero';
 export type BoxOauthProvider = 'box';
 export type SlackOauthProvider = 'slack';
 export type LinearOauthProvider = 'linear';
+export type XOauthProvider = 'x';
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -60,7 +61,8 @@ export type OAuthProvider =
   | XeroOauthProvider
   | BoxOauthProvider
   | SlackOauthProvider
-  | LinearOauthProvider;
+  | LinearOauthProvider
+  | XOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -212,6 +214,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_linear',
     name: 'Linear',
     docsUrl: 'https://clerk.com/docs/authentication/social-connection-with-linear',
+  },
+  {
+    provider: 'x',
+    strategy: 'oauth_x',
+    name: 'X / Twitter',
+    docsUrl: 'https://clerk.com/docs/authentication/social-connection-with-x-twitter-v2',
   },
 ];
 
