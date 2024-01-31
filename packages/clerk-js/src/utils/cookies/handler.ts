@@ -9,11 +9,6 @@ import { devBrowserCookie } from './devBrowser';
 import { inittedCookie } from './initted';
 import { sessionCookie } from './session';
 
-const DEFAULT_SAME_SITE = 'Lax';
-const IFRAME_SAME_SITE = 'None';
-
-const COOKIE_PATH = '/';
-
 export type CookieHandler = ReturnType<typeof createCookieHandler>;
 export const createCookieHandler = () => {
   // First party cookie helpers
@@ -22,16 +17,16 @@ export const createCookieHandler = () => {
   const setDevBrowserInittedCookie = () =>
     inittedCookie.set('1', {
       expires: addYears(Date.now(), 1),
-      sameSite: inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE,
+      sameSite: inSecureCrossOriginIframe() ? 'None' : 'Lax',
       secure: inSecureCrossOriginIframe() ? true : undefined,
-      path: COOKIE_PATH,
+      path: '/',
     });
 
   const removeSessionCookie = () => sessionCookie.remove();
 
   const setSessionCookie = (token: string) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE;
+    const sameSite = inSecureCrossOriginIframe() ? 'None' : 'Lax';
     const secure = inSecureCrossOriginIframe() || window.location.protocol === 'https:';
 
     return sessionCookie.set(token, {
@@ -47,7 +42,7 @@ export const createCookieHandler = () => {
 
   const setClientUatCookie = (client: ClientResource | undefined) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE;
+    const sameSite = inSecureCrossOriginIframe() ? 'None' : 'strict';
     const secure = inSecureCrossOriginIframe() || window.location.protocol === 'https:';
 
     // '0' indicates the user is signed out
@@ -67,7 +62,7 @@ export const createCookieHandler = () => {
 
   const setDevBrowserCookie = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = inSecureCrossOriginIframe() ? IFRAME_SAME_SITE : DEFAULT_SAME_SITE;
+    const sameSite = inSecureCrossOriginIframe() ? 'None' : 'Lax';
     const secure = inSecureCrossOriginIframe() || window.location.protocol === 'https:';
 
     return devBrowserCookie.set(jwt, {
