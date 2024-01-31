@@ -57,7 +57,7 @@ jobs:
         run: npx turbo build $TURBO_ARGS
 
       - name: Publish to NPM
-        run: npm publish --workspace=$PACKAGE_NAME --tag=$PACKAGE_TAG --dry-run
+        run: npm publish --workspace=$PACKAGE_NAME --tag=$PACKAGE_TAG
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
@@ -68,4 +68,4 @@ jobs:
           git commit -m "chore(repo): Publish alpha of $PACKAGE_NAME" --no-verify
       
       - name: Push changes
-        run: git push origin main --dry-run
+        run: git push origin main
