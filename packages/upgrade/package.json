@@ -4,7 +4,9 @@
   "license": "MIT",
   "type": "module",
   "main": "dist/cli.js",
-  "bin": "dist/cli.js",
+  "bin": {
+    "clerk-upgrade": "dist/cli.js"
+  },
   "files": [
     "dist"
   ],
