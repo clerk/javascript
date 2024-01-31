@@ -1613,11 +1613,13 @@ export class Clerk implements ClerkInterface {
     }
 
     const userSignedIn = this.session;
-    const signInUrl = this.#environment?.displayConfig.signInUrl;
+    const signInUrl = this.#options.signInUrl || this.#environment?.displayConfig.signInUrl;
     const referrerIsSignInUrl = signInUrl && window.location.href.startsWith(signInUrl);
+    const signUpUrl = this.#options.signUpUrl || this.#environment?.displayConfig.signUpUrl;
+    const referrerIsSignUpUrl = signUpUrl && window.location.href.startsWith(signUpUrl);
 
-    // don't redirect if user is not signed in and referrer is sign in url
-    if (requiresUserInput(redirectUrl) && !userSignedIn && referrerIsSignInUrl) {
+    // don't redirect if user is not signed in and referrer is sign in/up url
+    if (requiresUserInput(redirectUrl) && !userSignedIn && (referrerIsSignInUrl || referrerIsSignUpUrl)) {
       return false;
     }
 
