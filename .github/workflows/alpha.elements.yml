@@ -31,6 +31,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           token: ${{ secrets.CLERK_COOKIE_PAT }}
           # ref: main # Checkout main branch (to build from and push to)
 
@@ -41,7 +42,6 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true # Must be present to enable caching on branched workflows
           registry-url: "https://registry.npmjs.org"
       
       - name: Git configuration
@@ -50,7 +50,7 @@ jobs:
           git config --global user.email "clerk-cookie@users.noreply.github.com"
 
       - name: Fetch main branch (Temp)
-        run: git fetch origin main --depth 1
+        run: git fetch origin main --depth 0
 
       - name: Version package
         id: version-package
@@ -75,5 +75,3 @@ jobs:
       
       - name: Push changes
         run: git push origin main --dry-run
-        env:
-          GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
