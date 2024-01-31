@@ -19,11 +19,11 @@ const Root = React.memo(
 );
 
 const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element => {
-  const { sx, ...rest } = props;
+  const { sx, textVariant = 'h2', ...rest } = props;
   return (
     <Heading
       elementDescriptor={descriptors.headerTitle}
-      textVariant='title'
+      textVariant={textVariant}
       sx={sx}
       {...rest}
     />

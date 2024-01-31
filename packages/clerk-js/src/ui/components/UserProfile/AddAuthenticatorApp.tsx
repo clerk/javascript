@@ -102,6 +102,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
             {displayFormat == 'uri' && (
               <Button
                 variant='link'
+                textVariant='body'
                 onClick={() => setDisplayFormat('qr')}
                 localizationKey={localizationKeys(
                   'userProfile.mfaTOTPPage.authenticatorApp.buttonAbleToScan__nonPrimary',
