@@ -50,7 +50,7 @@ jobs:
           git config --global user.email "clerk-cookie@users.noreply.github.com"
 
       - name: Fetch main branch (Temp)
-        run: git fetch origin main --depth 0
+        run: git fetch origin main --unshallow
 
       - name: Version package
         id: version-package
