@@ -42,6 +42,13 @@ const textVariants = (t: InternalTheme) => {
     lineHeight: t.lineHeights.$small,
   } as const;
 
+  const label = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+  } as const;
+
   const body = {
     ...base,
     fontWeight: t.fontWeights.$normal,
@@ -82,6 +89,7 @@ const textVariants = (t: InternalTheme) => {
     caption,
     buttonLarge,
     buttonSmall,
+    label,
   } as const;
 };
 
