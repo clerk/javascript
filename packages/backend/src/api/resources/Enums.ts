@@ -16,7 +16,8 @@ export type OAuthProvider =
   | 'bitbucket'
   | 'microsoft'
   | 'notion'
-  | 'apple';
+  | 'apple'
+  | 'x';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
