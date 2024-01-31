@@ -68,7 +68,9 @@ export type SignUpMachineEvents =
 
 export type SignUpVerificationTags = 'code' | VerificationStrategy;
 
-export type SignUpTags = SignUpVerificationTags | 'external';
+export type SignUpStateTags = 'state:start' | 'state:continue' | 'state:verification';
+
+export type SignUpTags = SignUpStateTags | SignUpVerificationTags | 'external';
 export type SignUpDelays = 'TIMEOUT.POLLING';
 
 export interface SignUpMachineTypes {
@@ -333,6 +335,7 @@ export const SignUpMachine = setup({
     },
     Start: {
       id: 'Start',
+      tags: 'state:start',
       description: 'The intial state of the sign-in flow.',
       entry: 'assignThirdPartyProviders',
       initial: 'AwaitingInput',
@@ -390,9 +393,11 @@ export const SignUpMachine = setup({
       },
     },
     Continue: {
+      tags: 'state:continue',
       entry: log('#SignUp.Continue: Not implemented.'),
     },
     Verification: {
+      tags: 'state:verification',
       description: 'Verification state of the sign-up flow',
       initial: 'Init',
       states: {
