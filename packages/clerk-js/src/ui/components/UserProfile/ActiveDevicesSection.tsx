@@ -61,6 +61,7 @@ const DeviceAccordion = ({ session }: { session: SessionWithActivitiesResource }
           sx={t => ({
             alignItems: 'flex-start',
             padding: `${t.space.$2} ${t.space.$4}`,
+            marginLeft: `-${t.space.$4}`,
             borderRadius: t.radii.$md,
             ':hover': { backgroundColor: t.colors.$blackAlpha50 },
           })}
@@ -115,8 +116,8 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
             '--cl-chassis-back': '#343434',
             '--cl-chassis-screen': '#575757',
             '--cl-screen': '#000000',
-            width: theme.space.$10,
-            height: theme.space.$10,
+            width: theme.space.$8,
+            height: theme.space.$8,
           })}
         />
       </Flex>

@@ -44,7 +44,7 @@ describe('EmailSection', () => {
       const { wrapper } = await createFixtures(initConfig);
 
       const { getByRole, userEvent, getByLabelText, getByText } = render(<EmailsSection />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Add an email address' }));
+      await userEvent.click(getByRole('button', { name: 'Add email address' }));
       await waitFor(() => getByRole('heading', { name: /Add email address/i }));
 
       getByLabelText(/email address/i);
@@ -55,7 +55,7 @@ describe('EmailSection', () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       const { getByRole, userEvent, getByLabelText } = render(<EmailsSection />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Add an email address' }));
+      await userEvent.click(getByRole('button', { name: 'Add email address' }));
       await waitFor(() => getByRole('heading', { name: /Add email address/i }));
 
       fixtures.clerk.user?.createEmailAddress.mockReturnValueOnce(Promise.resolve({} as any));
@@ -69,7 +69,7 @@ describe('EmailSection', () => {
       it('save button is disabled by default', async () => {
         const { wrapper } = await createFixtures(initConfig);
         const { getByRole, userEvent, getByText } = render(<EmailsSection />, { wrapper });
-        await userEvent.click(getByRole('button', { name: 'Add an email address' }));
+        await userEvent.click(getByRole('button', { name: 'Add email address' }));
         await waitFor(() => getByRole('heading', { name: /Add email address/i }));
 
         expect(getByText(/save$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
@@ -78,12 +78,12 @@ describe('EmailSection', () => {
         const { wrapper } = await createFixtures(initConfig);
 
         const { userEvent, getByRole, getByText, queryByRole } = render(<EmailsSection />, { wrapper });
-        await userEvent.click(getByRole('button', { name: 'Add an email address' }));
+        await userEvent.click(getByRole('button', { name: 'Add email address' }));
         await waitFor(() => getByRole('heading', { name: /Add email address/i }));
-        expect(queryByRole('button', { name: /Add an email address/i })).not.toBeInTheDocument();
+        expect(queryByRole('button', { name: /Add email address/i })).not.toBeInTheDocument();
 
         await userEvent.click(getByRole('button', { name: /cancel$/i }));
-        await waitFor(() => getByRole('button', { name: /Add an email address/i }));
+        await waitFor(() => getByRole('button', { name: /Add email address/i }));
         getByText(/Email addresses/i);
       });
     });

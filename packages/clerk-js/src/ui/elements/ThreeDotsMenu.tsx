@@ -25,6 +25,9 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
         <Button
           size='xs'
           sx={t => ({
+            width: t.sizes.$5,
+            height: t.sizes.$5,
+            padding: 0,
             opacity: t.opacity.$inactive,
             ':hover': {
               opacity: 1,
@@ -32,7 +35,10 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
           })}
           variant='ghost'
         >
-          <Icon icon={ThreeDots} />
+          <Icon
+            icon={ThreeDots}
+            sx={t => ({ width: 'auto', height: t.sizes.$4 })}
+          />
         </Button>
       </MenuTrigger>
       <MenuList>
