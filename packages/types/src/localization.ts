@@ -262,6 +262,7 @@ type _LocalizationResource = {
   userProfile: {
     mobileButton__menu: LocalizationValue;
     formButtonPrimary__continue: LocalizationValue;
+    formButtonPrimary__save: LocalizationValue;
     formButtonPrimary__finish: LocalizationValue;
     formButtonReset: LocalizationValue;
     navbar: {
