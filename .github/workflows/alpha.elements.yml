@@ -1,10 +1,14 @@
-name: Publish Alpha of @clerk/elements
+name: Publish alpha of @clerk/elements
 
 on:
   workflow_dispatch:
   pull_request:
     branches:
       - main
+
+env:
+  PACKAGE_NAME: '@clerk/elements'
+  PACKAGE_TAG: 'alpha'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -45,14 +49,14 @@ jobs:
         id: version-package
         uses: ./.github/actions/version-prepatch
         with:
-          package: '@clerk/elements'
-          tag: 'alpha'
+          package: ${{ env.PACKAGE_NAME }}
+          tag: ${{ env.PACKAGE_TAG }}
 
       - name: Build release
         run: npx turbo build $TURBO_ARGS
 
       - name: Publish to NPM
-        run: npm publish --workspace=@clerk/elements --tag=alpha --dry-run
+        run: npm publish --workspace=$PACKAGE_NAME --tag=$PACKAGE_TAG --dry-run
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
@@ -60,9 +64,9 @@ jobs:
       - name: Commit changes
         run: |
           git add --all
-          git commit -m "chore(repo): Publish alpha of @clerk/elements" --no-verify
+          git commit -m "chore(repo): Publish alpha of $PACKAGE_NAME" --no-verify
       
       - name: Push changes
-        run: git push origin --dry-run
+        run: git push origin main --dry-run
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
