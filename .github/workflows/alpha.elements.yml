@@ -29,8 +29,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          ref: main # Checkout main branch (to build from and push to)
+        # with:
+          # ref: main # Checkout main branch (to build from and push to)
 
       - name: Setup
         id: config
@@ -48,7 +48,7 @@ jobs:
           git config --global user.email "clerk-cookie@users.noreply.github.com"
 
       - name: Fetch current branch (Temp)
-        run: git fetch origin ${{ github.ref }}:$GITHUB_REF
+        run: git fetch origin main --depth 1
 
       - name: Version package
         id: version-package
