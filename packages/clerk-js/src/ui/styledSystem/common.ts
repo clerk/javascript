@@ -28,9 +28,16 @@ const textVariants = (t: InternalTheme) => {
     lineHeight: t.lineHeights.$small,
   } as const;
 
+  const title = {
+    ...base,
+    fontWeight: t.fontWeights.$bold,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$small,
+  } as const;
+
   const subtitle = {
     ...base,
-    fontWeight: t.fontWeights.$medium,
+    fontWeight: t.fontWeights.$normal,
     fontSize: t.fontSizes.$md,
     lineHeight: t.lineHeights.$small,
   } as const;
@@ -69,6 +76,7 @@ const textVariants = (t: InternalTheme) => {
     h1,
     h2,
     h3,
+    title,
     subtitle,
     body,
     caption,

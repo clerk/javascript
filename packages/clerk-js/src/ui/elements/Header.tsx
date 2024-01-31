@@ -23,7 +23,7 @@ const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element 
   return (
     <Heading
       elementDescriptor={descriptors.headerTitle}
-      textVariant='h2'
+      textVariant='title'
       sx={sx}
       {...rest}
     />

@@ -110,7 +110,6 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
             )}
             <FormButtonContainer>
               <Button
-                textVariant='buttonSmall'
                 onClick={onSuccess}
                 localizationKey={localizationKeys('userProfile.formButtonPrimary__continue')}
                 elementDescriptor={descriptors.formButtonPrimary}
