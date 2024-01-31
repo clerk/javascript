@@ -28,6 +28,13 @@ const textVariants = (t: InternalTheme) => {
     lineHeight: t.lineHeights.$small,
   } as const;
 
+  const sectionTitle = {
+    ...base,
+    fontWeight: t.fontWeights.$medium,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$normal,
+  } as const;
+
   const title = {
     ...base,
     fontWeight: t.fontWeights.$bold,
@@ -90,6 +97,7 @@ const textVariants = (t: InternalTheme) => {
     buttonLarge,
     buttonSmall,
     label,
+    sectionTitle,
   } as const;
 };
 
