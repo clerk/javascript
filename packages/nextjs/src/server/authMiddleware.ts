@@ -215,7 +215,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       logger.debug(`Added ${constants.Headers.EnableDebug} on request`);
     }
 
-    const result = decorateRequest(nextRequest, finalRes, requestState) || NextResponse.next();
+    const result = decorateRequest(clerkRequest, finalRes, requestState) || NextResponse.next();
 
     if (requestState.headers) {
       requestState.headers.forEach((value, key) => {

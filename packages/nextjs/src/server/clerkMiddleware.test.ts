@@ -458,7 +458,7 @@ describe('clerkMiddleware(params)', () => {
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
-    it('redirects to redirectUrl when protect is called with the redirectUrl param, the user is signed out, and is a page request', async () => {
+    it('redirects to unauthenticatedUrl when protect is called with the unauthenticatedUrl param, the user is signed out, and is a page request', async () => {
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
@@ -472,11 +472,44 @@ describe('clerkMiddleware(params)', () => {
       });
 
       const resp = await clerkMiddleware(auth => {
-        auth().protect({ redirectUrl: 'https://www.clerk.com/hello' });
+        auth().protect({
+          unauthenticatedUrl: 'https://www.clerk.com/unauthenticatedUrl',
+          unauthorizedUrl: 'https://www.clerk.com/unauthorizedUrl',
+        });
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
-      expect(resp?.headers.get('location')).toContain('https://www.clerk.com/hello');
+      expect(resp?.headers.get('location')).toContain('https://www.clerk.com/unauthenticatedUrl');
+      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
+      expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
+      expect(clerkClient.authenticateRequest).toBeCalled();
+    });
+
+    it('redirects to unauthorizedUrl when protect is called with the unauthorizedUrl param, the user is signed in but does not have permissions, and is a page request', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({ userId: 'userId', has: () => false }),
+      });
+
+      const resp = await clerkMiddleware(auth => {
+        auth().protect(
+          { permission: 'random-permission' },
+          {
+            unauthenticatedUrl: 'https://www.clerk.com/unauthenticatedUrl',
+            unauthorizedUrl: 'https://www.clerk.com/unauthorizedUrl',
+          },
+        );
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('https://www.clerk.com/unauthorizedUrl');
       expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
       expect(clerkClient.authenticateRequest).toBeCalled();
