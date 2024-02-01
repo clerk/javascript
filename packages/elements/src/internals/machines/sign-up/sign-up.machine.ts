@@ -13,7 +13,7 @@ import type {
   Web3Strategy,
 } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
-import { and, assertEvent, assign, log, sendTo, setup } from 'xstate';
+import { and, assertEvent, assign, enqueueActions, log, sendTo, setup } from 'xstate';
 
 import type { ClerkElementsErrorBase } from '~/internals/errors/error';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
@@ -51,10 +51,10 @@ export interface SignUpMachineInput {
 
 export type SignUpMachineEvents =
   | ErrorActorEvent
+  | ClerkLoaderEvents
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
   | { type: 'AUTHENTICATE.SAML'; strategy: SamlStrategy }
   | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
-  | { type: 'CLERK.READY' }
   | { type: 'FAILURE'; error: Error }
   | { type: 'OAUTH.CALLBACK' }
   | { type: 'SUBMIT' }
@@ -64,8 +64,7 @@ export type SignUpMachineEvents =
   | { type: 'EMAIL_LINK.EXPIRED'; resource: SignUpResource }
   | { type: 'EMAIL_LINK.RESTART' }
   | { type: 'EMAIL_LINK.FAILURE'; error: Error }
-  | { type: ClerkJSNavigationEvent }
-  | ClerkLoaderEvents;
+  | { type: ClerkJSNavigationEvent };
 
 export type SignUpVerificationTags = 'code' | VerificationStrategy;
 
@@ -151,6 +150,7 @@ export const SignUpMachine = setup({
     areFieldsUnverified: ({ context }) => context.clerk.client.signUp.unverifiedFields.length > 0,
     currentPathMatches: ({ context }, { regex }: { regex: RegExp }) =>
       regex ? Boolean(context.router.pathname()?.match(regex)) : false,
+    isComplete: ({ context }) => context.clerk.client.signUp.status === 'complete',
     isFieldMissing: ({ context }, { field }: { field: SignUpField }) =>
       context.clerk.client.signUp.missingFields.includes(field),
     isFieldUnverified: ({ context }, { field }: { field: SignUpVerifiableField }) =>
@@ -223,9 +223,15 @@ export const SignUpMachine = setup({
     thirdPartyProviders: getEnabledThirdPartyProviders(input.clerk.__unstable__environment),
   }),
   initial: 'Init',
-
   on: {
-    'CLERKJS.NAVIGATE.*': '.HavingTrouble',
+    'CLERKJS.NAVIGATE.*': {
+      actions: {
+        type: 'raiseFailure',
+        params: {
+          error: 'Having trouble?',
+        },
+      },
+    },
     FAILURE: {
       actions: sendTo(
         ({ context }) => context.formRef,
@@ -299,6 +305,26 @@ export const SignUpMachine = setup({
     },
     SSOCallback: {
       tags: 'external',
+      on: {
+        'CLERKJS.NAVIGATE.*': {
+          actions: enqueueActions(({ enqueue, check, event }) => {
+            if (check('isComplete')) {
+              return enqueue('setAsActive');
+            }
+
+            if (event.type === 'CLERKJS.NAVIGATE.SIGN_IN') {
+              return enqueue({
+                type: 'navigateTo',
+                params: {
+                  path: '/sign-up',
+                },
+              });
+            }
+
+            return enqueue('goToNextState');
+          }),
+        },
+      },
       invoke: {
         id: 'handleRedirectCallback',
         src: 'handleRedirectCallback',
@@ -306,24 +332,6 @@ export const SignUpMachine = setup({
         onError: {
           actions: 'setFormErrors',
         },
-      },
-      on: {
-        'CLERKJS.NAVIGATE.COMPLETE': '#SignUp.Complete',
-        'CLERKJS.NAVIGATE.CONTINUE': '#SignUp.Continue',
-        'CLERKJS.NAVIGATE.RESET_PASSWORD': '#SignUp.NotImplemented',
-        'CLERKJS.NAVIGATE.SIGN_IN': {
-          actions: [
-            log('Navigating to sign in'),
-            {
-              type: 'navigateTo',
-              params: {
-                path: '/sign-in',
-              },
-            },
-          ],
-        },
-        'CLERKJS.NAVIGATE.SIGN_UP': '#SignUp.Start',
-        'CLERKJS.NAVIGATE.VERIFICATION': '#SignUp.Verification',
       },
     },
     Start: {

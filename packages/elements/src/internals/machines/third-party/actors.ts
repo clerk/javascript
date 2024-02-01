@@ -1,42 +1,45 @@
-import type { Clerk, HandleOAuthCallbackParams, HandleSamlCallbackParams, LoadedClerk } from '@clerk/types';
-import type { AnyEventObject, EventObject } from 'xstate';
+import type {
+  AuthenticateWithRedirectParams,
+  HandleOAuthCallbackParams,
+  HandleSamlCallbackParams,
+  LoadedClerk,
+} from '@clerk/types';
+import type { SetOptional } from 'type-fest';
+import type { AnyEventObject } from 'xstate';
 import { fromCallback, fromPromise } from 'xstate';
 
+import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import type { WithClerk, WithParams, WithUnsafeMetadata } from '~/internals/machines/shared.types';
 import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 
-// TODO: Remove
-/** @deprecated Use clerkLoader instead */
-export const waitForClerk = fromPromise<LoadedClerk, Clerk | LoadedClerk>(({ input: clerk }) => {
-  return new Promise((resolve, reject) => {
-    if (clerk.loaded) {
-      resolve(clerk as LoadedClerk);
-    } else if ('addOnLoaded' in clerk) {
-      // @ts-expect-error - Expects addOnLoaded from IsomorphicClerk.
-      // We don't want internals to rely on the @clerk/clerk-react package
-      clerk.addOnLoaded(() => resolve(clerk as LoadedClerk));
-    } else {
-      reject(new ClerkElementsRuntimeError('Clerk client could not be loaded'));
-    }
-  });
-});
+type OptionalRedirectParams = 'redirectUrl' | 'redirectUrlComplete';
 
-export type ClerkLoaderEvents = { type: 'CLERK.READY' } | { type: 'CLERK.ERROR'; message: string };
+export type AuthenticateWithRedirectSignInParams = SetOptional<AuthenticateWithRedirectParams, OptionalRedirectParams>;
+export type AuthenticateWithRedirectSignUpParams = SetOptional<
+  WithUnsafeMetadata<AuthenticateWithRedirectParams>,
+  OptionalRedirectParams
+>;
 
-export const clerkLoader = fromCallback<EventObject, Clerk | LoadedClerk>(({ sendBack, input: clerk }) => {
-  const reportLoaded = () => sendBack({ type: 'CLERK.READY' });
+export type AuthenticateWithRedirectSignInInput = WithClerk<WithParams<AuthenticateWithRedirectSignInParams>>;
+export type AuthenticateWithRedirectSignUpInput = WithClerk<WithParams<AuthenticateWithRedirectSignUpParams>>;
 
-  if (clerk.loaded) {
-    reportLoaded();
-  } else if ('addOnLoaded' in clerk) {
-    // @ts-expect-error - Expects `addOnLoaded` from @clerk/clerk-react's IsomorphicClerk.
-    clerk.addOnLoaded(reportLoaded);
-  } else {
-    sendBack({ type: 'ERROR', message: 'Clerk client could not be loaded' });
-  }
-
-  return () => {};
-});
+export const signInRedirect = fromPromise<void, AuthenticateWithRedirectSignInInput>(
+  async ({ input: { clerk, params } }) =>
+    clerk.client.signIn.authenticateWithRedirect({
+      redirectUrl: params.redirectUrl || clerk.buildUrlWithAuth(`/sign-up${SSO_CALLBACK_PATH_ROUTE}`),
+      redirectUrlComplete: params.redirectUrlComplete || clerk.buildAfterSignInUrl(),
+      ...params,
+    }),
+);
+export const signUpRedirect = fromPromise<void, AuthenticateWithRedirectSignUpInput>(
+  async ({ input: { clerk, params } }) =>
+    clerk.client.signUp.authenticateWithRedirect({
+      redirectUrl: params.redirectUrl || clerk.buildUrlWithAuth(`/sign-up${SSO_CALLBACK_PATH_ROUTE}`),
+      redirectUrlComplete: params.redirectUrlComplete || clerk.buildAfterSignUpUrl(),
+      ...params,
+    }),
+);
 
 export type HandleRedirectCallbackParams<T = Required<HandleOAuthCallbackParams | HandleSamlCallbackParams>> = {
   [K in keyof T]: NonNullable<T[K]>;
@@ -44,7 +47,6 @@ export type HandleRedirectCallbackParams<T = Required<HandleOAuthCallbackParams 
 
 export type HandleRedirectCallbackInput = LoadedClerk;
 
-// TODO: Remove
 /**
  * This function hijacks handleRedirectCallback from ClerkJS to handle navigation events
  * from the state machine.
