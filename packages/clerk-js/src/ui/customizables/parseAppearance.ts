@@ -21,6 +21,7 @@ export type ParsedLayout = Required<Layout>;
 type PublicAppearanceTopLevelKey = keyof Omit<Appearance, 'baseTheme' | 'elements' | 'layout' | 'variables'>;
 
 export type AppearanceCascade = {
+  defaultAppearance?: Appearance;
   globalAppearance?: Appearance;
   appearance?: Appearance;
   appearanceKey: PublicAppearanceTopLevelKey | 'impersonationFab';
@@ -53,12 +54,15 @@ const defaultLayout: ParsedLayout = {
  * Both are injected by the AppearanceContext
  */
 export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance => {
-  const { globalAppearance, appearance: componentAppearance, appearanceKey } = cascade;
+  const { defaultAppearance, globalAppearance, appearance: componentAppearance, appearanceKey } = cascade;
 
   const appearanceList: Appearance[] = [];
-  [globalAppearance, globalAppearance?.[appearanceKey as PublicAppearanceTopLevelKey], componentAppearance].forEach(a =>
-    expand(a, appearanceList),
-  );
+  [
+    defaultAppearance,
+    globalAppearance,
+    globalAppearance?.[appearanceKey as PublicAppearanceTopLevelKey],
+    componentAppearance,
+  ].forEach(a => expand(a, appearanceList));
 
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedLayout = parseLayout(appearanceList);

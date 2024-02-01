@@ -43,9 +43,11 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
         iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('signOut')}
         icon={SignOut}
         label={localizationKeys('userButton.action__signOut')}
+        variant='secondaryDanger'
         onClick={handleSignOutSessionClicked(session)}
         sx={[
           t => ({
+            color: t.colors.$colorTextOnSecondaryBackground,
             borderBottomLeftRadius: t.radii.$lg,
             borderBottomRightRadius: t.radii.$lg,
             padding: `${t.space.$4} ${t.space.$5}`,
@@ -93,6 +95,10 @@ export const MultiSessionActions = (props: SessionActionsProps) => {
           icon={SignOut}
           label={localizationKeys('userButton.action__signOut')}
           onClick={handleSignOutSessionClicked(session)}
+          variant='secondaryDanger'
+          sx={t => ({
+            color: t.colors.$colorTextOnSecondaryBackground,
+          })}
         />
       </Flex>
     </Actions>

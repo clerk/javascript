@@ -50,31 +50,15 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           boxShadow: theme.shadows.$buttonShadow,
           border: theme.borders.$normal,
           borderColor: theme.colors.$primary500,
-          ':before': {
-            position: 'absolute',
-            content: '""',
-            borderRadius: 'inherit',
-            zIndex: -1,
-            inset: 0,
-            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha150} 0%, ${theme.colors.$transparent} 100%)`,
+          '&:hover': {
+            backgroundColor: theme.colors.$primaryHover,
           },
-          ':after': {
-            position: 'absolute',
-            content: '""',
-            borderRadius: 'inherit',
-            zIndex: -1,
-            inset: 0,
-            opacity: 0,
-            transitionProperty: theme.transitionProperty.$common,
-            transitionDuration: theme.transitionDuration.$controls,
-            background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha100} 0%, ${theme.colors.$transparent} 100%)`,
-          },
-          ':hover::after': {
-            opacity: 1,
-          },
-          ':active::after': {
-            opacity: 0,
-          },
+          '&:focus': props.hoverAsFocus
+            ? {
+                color: theme.colors.$colorTextOnPrimaryBackground,
+                backgroundColor: theme.colors.$primaryHover,
+              }
+            : undefined,
         },
         primaryDanger: {
           backgroundColor: theme.colors.$danger500,
@@ -111,18 +95,35 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         secondary: {
           color: theme.colors.$colorTextOnSecondaryBackground,
           //browser didn't like going from a gradient to a normal color
-          backgroundColor: theme.colors.$secondary500,
+          background: common.mergedColorsBackground(theme.colors.$secondary50, theme.colors.$transparent),
           '&:hover': {
             color: theme.colors.$colorTextOnSecondaryBackground,
-            backgroundColor: theme.colors.$secondaryHover,
+            background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$blackAlpha50),
           },
           '&:focus': props.hoverAsFocus
             ? {
                 color: theme.colors.$colorTextOnSecondaryBackground,
-                backgroundColor: theme.colors.$secondaryHover,
+                background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$blackAlpha50),
               }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$secondary500 },
+          boxShadow: theme.shadows.$secondaryButtonShadow,
+          border: theme.borders.$normal,
+          borderColor: theme.colors.$blackAlpha100,
+        },
+        secondaryDanger: {
+          background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$transparent),
+          color: theme.colors.$danger500,
+          '&:hover': {
+            color: theme.colors.$danger500,
+            background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$dangerAlpha50),
+          },
+          '&:focus': props.hoverAsFocus
+            ? { color: theme.colors.$danger500, backgroundColor: theme.colors.$dangerAlpha50 }
+            : undefined,
+          '&:active': {
+            background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$transparent),
+          },
           boxShadow: theme.shadows.$secondaryButtonShadow,
           border: theme.borders.$normal,
           borderColor: theme.colors.$blackAlpha100,

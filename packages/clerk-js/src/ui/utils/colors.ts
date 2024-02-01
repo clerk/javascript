@@ -347,9 +347,9 @@ const adjustForLightness = (color: string | undefined, lightness = 5) => {
   }
 
   if (hsla.l === 100) {
-    hsla.l = 95;
+    hsla.l = hsla.l - lightness;
   } else {
-    hsla.l = Math.min(hsla.l + 2 * lightness, 100);
+    hsla.l = Math.min(hsla.l + lightness, 100);
   }
 
   return colors.toHslaString(hsla);

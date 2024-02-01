@@ -1,6 +1,8 @@
 import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
+import { useOptions } from '../contexts';
+import { defaultAppearance } from '../defaultAppearance';
 import type { FlowMetadata } from '../elements';
 import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
@@ -45,8 +47,11 @@ type LazyComponentRendererProps = React.PropsWithChildren<
 type PortalProps = Parameters<typeof Portal>[0];
 
 export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
+  const { simpleStyles } = useOptions();
+
   return (
     <AppearanceProvider
+      defaultAppearance={simpleStyles ? undefined : defaultAppearance}
       globalAppearance={props.globalAppearance}
       appearanceKey={props.appearanceKey}
       appearance={props.componentAppearance}
@@ -79,6 +84,7 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
   return (
     <Suspense fallback={''}>
       <AppearanceProvider
+        defaultAppearance={defaultAppearance}
         globalAppearance={props.globalAppearance}
         appearanceKey={props.appearanceKey}
         appearance={props.componentAppearance}
@@ -120,6 +126,7 @@ export const LazyImpersonationFabProvider = (
   return (
     <Suspense>
       <AppearanceProvider
+        defaultAppearance={defaultAppearance}
         globalAppearance={props.globalAppearance}
         appearanceKey={'impersonationFab'}
       >

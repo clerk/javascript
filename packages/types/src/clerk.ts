@@ -530,6 +530,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     signUpUrl?: string;
     allowedRedirectOrigins?: Array<string | RegExp>;
     isSatellite?: boolean | ((url: URL) => boolean);
+    simpleStyles?: boolean;
 
     /**
      * Telemetry options

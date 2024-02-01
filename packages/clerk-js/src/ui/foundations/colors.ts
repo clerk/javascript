@@ -67,6 +67,7 @@ export const colors = Object.freeze({
   primary700: '#25232A',
   primary800: '#201D23',
   primary900: '#1B171C',
+  primaryHover: '#3B3C45', //primary 500 adjusted for lightness
   ...colorOptionToHslaAlphaScale('#2F3037', 'primaryAlpha')!,
   secondary25: '#FFFFFF',
   secondary50: '#FFFFFF',
@@ -79,7 +80,6 @@ export const colors = Object.freeze({
   secondary700: '#BFBFBF',
   secondary800: '#9F9F9F',
   secondary900: '#808080',
-  secondaryHover: '#F7F7F8',
   danger50: '#FEF2F2',
   danger100: '#FEE5E5',
   danger200: '#FECACA',

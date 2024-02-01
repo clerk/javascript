@@ -17,14 +17,13 @@ export const createColorScales = (theme: Theme) => {
   const textSecondary = toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.15);
   const textTertiary = toHSLA(variables.colorTextTertiary) || colors.makeTransparent(textSecondary, 0.4);
 
-  const secondaryScale = colorOptionToHslaLightnessScale(variables.colorSecondary, 'secondary');
-  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
+  const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
 
   return removeUndefinedProps({
-    ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
+    ...primaryScale,
     ...colorOptionToHslaAlphaScale(variables.colorPrimary, 'primaryAlpha'),
-    ...secondaryScale,
-    ...dangerScale,
+    ...colorOptionToHslaLightnessScale(variables.colorSecondary, 'secondary'),
+    ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
     ...colorOptionToHslaAlphaScale(variables.colorDanger, 'dangerAlpha'),
     ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
     ...colorOptionToHslaAlphaScale(variables.colorSuccess, 'successAlpha'),
@@ -40,7 +39,7 @@ export const createColorScales = (theme: Theme) => {
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),
     colorShimmer: toHSLA(variables.colorShimmer),
-    secondaryHover: colors.adjustForLightness(secondaryScale?.secondary500),
+    primaryHover: colors.adjustForLightness(primaryScale?.primary500),
   });
 };
 

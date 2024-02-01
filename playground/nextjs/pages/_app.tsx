@@ -20,6 +20,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof themes>('default');
   const [selectedSmoothing, setSelectedSmoothing] = useState<boolean>(true);
   const [primaryColor, setPrimaryColor] = useState<string | undefined>(undefined);
+  const [simpleStyles, setSimpleStyles] = useState(false);
 
   const onToggleDark = () => {
     if (window.document.body.classList.contains('dark-mode')) {
@@ -48,17 +49,19 @@ function MyApp({ Component, pageProps }: AppProps) {
   const C = Component as FunctionComponent;
 
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: themes[selectedTheme],
-        variables: {
-            colorPrimary:primaryColor,
-        },
-        layout: {
-          helpPageUrl: '/help',
-          privacyPageUrl: '/privacy',
-          termsPageUrl: '/terms',
-        },
+      <ClerkProvider
+        key={simpleStyles}
+        simpleStyles={simpleStyles}
+        appearance={{
+          baseTheme: themes[selectedTheme],
+          variables: {
+              colorPrimary:primaryColor,
+          },
+          layout: {
+            helpPageUrl: '/help',
+            privacyPageUrl: '/privacy',
+            termsPageUrl: '/terms',
+          },
       }}
       {...pageProps}
     >
@@ -70,6 +73,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         onPrimaryColorChange={setPrimaryColor}
       />
       <C {...pageProps} />
+      <button style={{
+        position:'absolute',
+        bottom:'10px',
+        left: '10px'
+      }} onClick={() => setSimpleStyles(s => !s)}>simple styles</button>
     </ClerkProvider>
   );
 }
