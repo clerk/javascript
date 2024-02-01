@@ -102,14 +102,15 @@ describe('SignUpStart', () => {
       expect(screen.getByText('Phone number').nextElementSibling?.textContent).toBe('Optional');
     });
 
-    // TODO-RETHEME: Continue button includes a <div>. We should avoid that.
-    it.skip('shows the "Continue" button', async () => {
+    it('shows the "Continue" button', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
         f.withPassword({ required: true });
       });
       render(<SignUpStart />, { wrapper });
-      expect(screen.getByText('Continue').tagName.toUpperCase()).toBe('BUTTON');
+      const button = screen.getByText('Continue');
+      expect(button.tagName.toUpperCase()).toBe('SPAN');
+      expect(button.parentElement?.tagName.toUpperCase()).toBe('BUTTON');
     });
 
     it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
