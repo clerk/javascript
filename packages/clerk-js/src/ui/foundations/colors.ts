@@ -71,6 +71,7 @@ export const colors = Object.freeze({
   secondary700: '#BFBFBF',
   secondary800: '#9F9F9F',
   secondary900: '#808080',
+  secondaryHover: '#F7F7F8',
   danger50: '#FEF2F2',
   danger100: '#FEE5E5',
   danger200: '#FECACA',

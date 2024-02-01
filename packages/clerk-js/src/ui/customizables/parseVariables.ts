@@ -17,11 +17,13 @@ export const createColorScales = (theme: Theme) => {
   const textSecondary = toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.15);
   const textTertiary = toHSLA(variables.colorTextTertiary) || colors.makeTransparent(textSecondary, 0.4);
 
-  console.log(colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'));
+  const secondaryScale = colorOptionToHslaLightnessScale(variables.colorSecondary, 'secondary');
+
   return removeUndefinedProps({
     ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
     ...colorOptionToHslaAlphaScale(variables.colorPrimary, 'primaryAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorSecondary, 'secondary'),
+    ...secondaryScale,
+    colorTextSecondary: textSecondary,
     ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
     ...colorOptionToHslaAlphaScale(variables.colorDanger, 'dangerAlpha'),
     ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
@@ -32,12 +34,12 @@ export const createColorScales = (theme: Theme) => {
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
     colorTextOnSecondaryBackground: toHSLA(variables.colorTextOnSecondaryBackground),
     colorText: toHSLA(variables.colorText),
-    colorTextSecondary: textSecondary,
     colorTextTertiary: textTertiary,
     colorInputText: toHSLA(variables.colorInputText),
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),
     colorShimmer: toHSLA(variables.colorShimmer),
+    secondaryHover: colors.adjustForLightness(secondaryScale?.secondary500), // auto generate hover state
   });
 };
 
