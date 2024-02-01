@@ -131,12 +131,9 @@ describe('ResetPassword', () => {
       });
     }, 10000);
 
-    // TODO-RETHEME: Replace back button whith the new edit (pencil) icon
-    it.skip('navigates to the root page upon pressing the back link', async () => {
+    it('navigates to the root page upon pressing the back link', async () => {
       const { wrapper, fixtures } = await createFixtures();
-
       const { userEvent } = render(<ResetPassword />, { wrapper });
-
       await userEvent.click(screen.getByText(/back/i));
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
     });

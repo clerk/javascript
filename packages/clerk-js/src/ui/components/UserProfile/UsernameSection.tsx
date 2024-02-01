@@ -36,7 +36,7 @@ export const UsernameSection = () => {
             {user.username && (
               <Text
                 truncate
-                sx={t => ({ color: t.colors.$blackAlpha700 })}
+                sx={t => ({ color: t.colors.$colorText })}
               >
                 {user.username}
               </Text>

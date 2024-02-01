@@ -265,6 +265,7 @@ const NavButton = (props: NavButtonProps) => {
       {...rest}
       sx={[
         t => ({
+          color: t.colors.$colorText,
           gap: t.space.$3,
           justifyContent: 'flex-start',
           backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,

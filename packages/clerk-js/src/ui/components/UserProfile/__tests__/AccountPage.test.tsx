@@ -49,7 +49,7 @@ describe('AccountPage', () => {
       expect(getByRole('button', { name: /save$/i })).toBeDisabled();
     });
 
-    it('hides email addresses section when disabled', async () => {
+    it('hides section that are disabled', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withUser({
           first_name: 'George',
@@ -59,18 +59,9 @@ describe('AccountPage', () => {
 
       const { queryByText } = render(<AccountPage />, { wrapper });
       expect(queryByText(/Email addresses/i)).not.toBeInTheDocument();
-    });
-
-    it('hides phone number section when disabled', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withUser({
-          first_name: 'George',
-          last_name: 'Clerk',
-        });
-      });
-
-      const { queryByText } = render(<AccountPage />, { wrapper });
       expect(queryByText(/Phone numbers/i)).not.toBeInTheDocument();
+      expect(queryByText(/Connected Accounts/i)).not.toBeInTheDocument();
+      expect(queryByText(/Enterprise Accounts/i)).not.toBeInTheDocument();
     });
 
     it('shows the connected accounts of the user', async () => {

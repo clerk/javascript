@@ -148,20 +148,20 @@ const OrganizationDomainsSection = () => {
 
         <Protect permission='org:sys_domains:manage'>
           <Action.Trigger value='add'>
-            <Col>
-              <ProfileSection.ArrowButton
-                localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
-                id='organizationDomains'
-              />
-              <Text
-                localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
-                sx={t => ({
-                  paddingLeft: t.space.$9,
-                  color: t.colors.$colorTextSecondary,
-                })}
-              />
-            </Col>
+            <ProfileSection.ArrowButton
+              localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
+              id='organizationDomains'
+            />
           </Action.Trigger>
+          <Action.Closed value='add'>
+            <Text
+              localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
+              sx={t => ({
+                paddingLeft: t.space.$9,
+                color: t.colors.$colorTextSecondary,
+              })}
+            />
+          </Action.Closed>
 
           <Action.Open value='add'>
             <Action.Card>

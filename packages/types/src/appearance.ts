@@ -398,6 +398,20 @@ export type Variables = {
    */
   colorPrimary?: CssColorOrScale;
   /**
+   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
+   * eg: solid primary buttons.
+   * @default white
+   */
+  colorTextOnPrimaryBackground?: CssColor;
+  /**
+   * The secondary color used throughout the components.
+   */
+  colorSecondary?: CssColorOrScale;
+  /**
+   * The secondary color used throughout the components.
+   */
+  colorTextOnSecondaryBackground?: CssColor;
+  /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
    */
   colorDanger?: CssColorOrScale;
@@ -422,29 +436,38 @@ export type Variables = {
    */
   colorText?: CssColor;
   /**
-   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
-   * eg: solid primary buttons.
-   * @default white
-   */
-  colorTextOnPrimaryBackground?: CssColor;
-  /**
    * The text color for elements of lower importance, eg: a subtitle text.
    * @default A lighter shade of {@link Variables.colorText}
    */
   colorTextSecondary?: CssColor;
+  /**
+   * The text color for elements of even lower importance.
+   * @default An lighter shade of {@link Variables.colorTextSecondary}
+   */
+  colorTextTertiary?: CssColor;
   /**
    * The background color for the card container.
    */
   colorBackground?: CssColor;
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
-   * @default The value of {@link Variables.colorText}
+   * @default The value of {@link Variables.colorInputText}
    */
   colorInputText?: CssColor;
   /**
    * The background color for all input elements.
    */
   colorInputBackground?: CssColor;
+  /**
+   * The color of the avatar shimmer
+   * @default rgba(255, 255, 255, 0.36)
+   */
+  colorShimmer?: CssColor;
+  /**
+   * The shadow that appears on the avatar when hovered
+   * @default rgba(0, 0, 0, 0.36)
+   */
+  shadowShimmer?: CssColor;
   /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
@@ -489,16 +512,6 @@ export type Variables = {
    * @default 1rem
    */
   spacingUnit?: CssLengthUnit;
-  /**
-   * The color of the avatar shimmer
-   * @default rgba(255, 255, 255, 0.36)
-   */
-  colorShimmer?: CssColor;
-  /**
-   * The shadow that appears on the avatar when hovered
-   * @default rgba(0, 0, 0, 0.36)
-   */
-  shadowShimmer?: CssColor;
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };

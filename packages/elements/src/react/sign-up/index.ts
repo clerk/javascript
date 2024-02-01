@@ -1,5 +1,7 @@
 'use client';
 
+import { SignUpCtx } from '~/react/sign-up/contexts/sign-up.context';
+
 export { SignUpContinue as Continue } from './continue';
 export { SignUpRoot as SignUp, SignUpRoot as Root } from './root';
 export {
@@ -9,5 +11,8 @@ export {
 export { SignUpStart as Start } from './start';
 export { SignUpVerification as Verification, SignUpVerify as Verify } from './verifications';
 
-// TODO: Move contexts from /internals to /react
-export { useSignUpFlow, useSignUpFlowSelector } from '~/internals/machines/sign-up/sign-up.context';
+/** @internal Internal use only */
+export const useSignUpActorRef_internal = SignUpCtx.useActorRef;
+
+/** @internal Internal use only */
+export const useSignUpSelector_internal = SignUpCtx.useSelector;

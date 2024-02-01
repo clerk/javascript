@@ -11,6 +11,7 @@ const themeAColor = 'blue';
 const themeA = {
   variables: {
     colorPrimary: themeAColor,
+    colorSecondary: themeAColor,
     colorDanger: themeAColor,
     colorSuccess: themeAColor,
     colorWarning: themeAColor,
@@ -19,7 +20,9 @@ const themeA = {
     colorInputText: themeAColor,
     colorText: themeAColor,
     colorTextOnPrimaryBackground: themeAColor,
+    colorTextOnSecondaryBackground: themeAColor,
     colorTextSecondary: themeAColor,
+    colorTextTertiary: themeAColor,
     borderRadius: '1rem',
     fontFamily: 'Comic Sans',
     fontFamilyButtons: 'Comic Sans',
@@ -34,6 +37,7 @@ const themeBColor = 'red';
 const themeB = {
   variables: {
     colorPrimary: themeBColor,
+    colorSecondary: themeBColor,
     colorDanger: themeBColor,
     colorSuccess: themeBColor,
     colorWarning: themeBColor,
@@ -42,7 +46,9 @@ const themeB = {
     colorInputText: themeBColor,
     colorText: themeBColor,
     colorTextOnPrimaryBackground: themeBColor,
+    colorTextOnSecondaryBackground: themeBColor,
     colorTextSecondary: themeBColor,
+    colorTextTertiary: themeBColor,
     borderRadius: '2rem',
     fontFamily: 'Arial',
     fontFamilyButtons: 'Arial',

@@ -2,14 +2,15 @@
 
 import type { PropsWithChildren } from 'react';
 
-import { useSignInFlow, useSignInStateMatcher } from '~/internals/machines/sign-in/sign-in.context';
 import { Form } from '~/react/common/form';
+import { useActiveTags } from '~/react/hooks/use-active-tags.hook';
+import { SignInCtx } from '~/react/sign-in/contexts/sign-in.context';
 
 export type SignInStartProps = PropsWithChildren;
 
 export function SignInStart({ children }: SignInStartProps) {
-  const state = useSignInStateMatcher();
-  const actorRef = useSignInFlow();
+  const ref = SignInCtx.useActorRef();
+  const activeState = useActiveTags(ref, 'state:start');
 
-  return state.matches('Start') ? <Form flowActor={actorRef}>{children}</Form> : null;
+  return activeState ? <Form flowActor={ref}>{children}</Form> : null;
 }

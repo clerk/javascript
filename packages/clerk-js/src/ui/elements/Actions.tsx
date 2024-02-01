@@ -191,9 +191,9 @@ export const Action = (props: ActionProps) => {
         t => ({
           flex: '1',
           borderRadius: 0,
-          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           gap: t.space.$3,
           justifyContent: 'flex-start',
+          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
         }),
         sx,
       ]}
