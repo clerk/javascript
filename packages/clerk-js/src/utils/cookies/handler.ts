@@ -82,9 +82,9 @@ export const createCookieHandler = () => {
   const ssoCookie = clientCookie;
 
   const removeAllDevBrowserCookies = () => {
-    inittedCookie.remove({ path: COOKIE_PATH });
+    inittedCookie.remove({ path: '/' });
     // Delete cookie in a best-effort way by iterating all ETLDs
-    getAllETLDs().forEach(domain => ssoCookie.remove({ domain, path: COOKIE_PATH }));
+    getAllETLDs().forEach(domain => ssoCookie.remove({ domain, path: '/' }));
   };
 
   return {
