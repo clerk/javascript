@@ -58,11 +58,10 @@ export const createRadiiUnits = (theme: Theme) => {
   const md = borderRadius === 'none' ? '0' : borderRadius;
   const { numericValue, unit = 'rem' } = splitCssUnit(md);
   return {
-    sm: percentage(numericValue, 0.23).toString() + unit,
+    sm: (numericValue * 0.66).toString() + unit,
     md,
-    lg: percentage(numericValue, 0.35).toString() + unit,
-    xl: percentage(numericValue, 1.7).toString() + unit,
-    '2xl': percentage(numericValue, 2.35).toString() + unit,
+    lg: (numericValue * 1.33).toString() + unit,
+    xl: (numericValue * 2).toString() + unit,
   };
 };
 
@@ -118,8 +117,4 @@ const splitCssUnit = (str: string) => {
   const numericValue = Number.parseFloat(str);
   const unit = str.replace(numericValue.toString(), '') || undefined;
   return { numericValue, unit };
-};
-
-const percentage = (base: number, perc: number) => {
-  return base + base * perc;
 };
