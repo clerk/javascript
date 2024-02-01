@@ -18,12 +18,13 @@ export const createColorScales = (theme: Theme) => {
   const textTertiary = toHSLA(variables.colorTextTertiary) || colors.makeTransparent(textSecondary, 0.4);
 
   const secondaryScale = colorOptionToHslaLightnessScale(variables.colorSecondary, 'secondary');
+  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
 
   return removeUndefinedProps({
     ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
     ...colorOptionToHslaAlphaScale(variables.colorPrimary, 'primaryAlpha'),
     ...secondaryScale,
-    ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
+    ...dangerScale,
     ...colorOptionToHslaAlphaScale(variables.colorDanger, 'dangerAlpha'),
     ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
     ...colorOptionToHslaAlphaScale(variables.colorSuccess, 'successAlpha'),

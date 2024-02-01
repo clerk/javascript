@@ -335,7 +335,7 @@ const setAlpha = (color: string, alpha: number) => {
   return toHslaString(setHslaAlpha(toHslaColor(color), alpha));
 };
 
-const adjustForLightness = (color: string | undefined) => {
+const adjustForLightness = (color: string | undefined, lightness = 5) => {
   if (!color) {
     return undefined;
   }
@@ -349,7 +349,7 @@ const adjustForLightness = (color: string | undefined) => {
   if (hsla.l === 100) {
     hsla.l = 95;
   } else {
-    hsla.l = Math.min(hsla.l + 20, 100);
+    hsla.l = Math.min(hsla.l + 2 * lightness, 100);
   }
 
   return colors.toHslaString(hsla);

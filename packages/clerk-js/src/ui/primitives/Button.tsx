@@ -127,23 +127,6 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           border: theme.borders.$normal,
           borderColor: theme.colors.$blackAlpha100,
         },
-        secondaryDanger: {
-          background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$transparent),
-          color: theme.colors.$danger500,
-          '&:hover': {
-            color: theme.colors.$danger500,
-            background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$dangerAlpha50),
-          },
-          '&:focus': props.hoverAsFocus
-            ? { color: theme.colors.$danger500, backgroundColor: theme.colors.$dangerAlpha50 }
-            : undefined,
-          '&:active': {
-            background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$transparent),
-          },
-          boxShadow: theme.shadows.$secondaryButtonShadow,
-          border: theme.borders.$normal,
-          borderColor: theme.colors.$blackAlpha100,
-        },
         ghost: {
           color: theme.colors.$colorTextSecondary,
           '&:hover': {
