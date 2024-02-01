@@ -18,7 +18,7 @@ const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof
           maxWidth: `calc(100vw - ${t.sizes.$8})`,
           zIndex: t.zIndices.$modal,
           backdropFilter: t.backdropFilters.$defaultBlur,
-          borderRadius: t.radii.$lg,
+          borderRadius: t.radii.$xl,
           animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$fast}`,
         })}
       >

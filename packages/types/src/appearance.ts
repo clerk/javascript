@@ -501,9 +501,9 @@ export type Variables = {
    */
   fontWeight?: FontWeightScale;
   /**
-   * The size that will be used as the `md` base borderRadius value. This is used as the base to calculate the `lg`, `xl`, `2xl`
+   * The size that will be used as the `md` base borderRadius value. This is used as the base to calculate the `sm`, `lg`, `xl`,
    * our components use. As a general rule, the bigger an element is, the larger its borderRadius is going to be.
-   * eg: the Card element uses '2xl'
+   * eg: the Card element uses 'xl'
    * @default 0.375rem
    */
   borderRadius?: CssLengthUnit;

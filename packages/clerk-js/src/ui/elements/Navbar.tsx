@@ -214,7 +214,6 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
           bottom: 0,
           width: '100%',
           zIndex: t.zIndices.$navbar,
-          borderRadius: t.radii.$xl,
           overflow: 'hidden',
           color: t.colors.$colorText,
         })}
