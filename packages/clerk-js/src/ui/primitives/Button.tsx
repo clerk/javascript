@@ -111,15 +111,15 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
         secondary: {
           color: theme.colors.$colorTextOnSecondaryBackground,
           //browser didn't like going from a gradient to a normal color
-          background: common.mergedColorsBackground(theme.colors.$secondary50, theme.colors.$transparent),
+          backgroundColor: theme.colors.$secondary500,
           '&:hover': {
             color: theme.colors.$colorTextOnSecondaryBackground,
-            background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$blackAlpha50),
+            backgroundColor: theme.colors.$secondaryHover,
           },
           '&:focus': props.hoverAsFocus
             ? {
                 color: theme.colors.$colorTextOnSecondaryBackground,
-                background: common.mergedColorsBackground(theme.colors.$secondary500, theme.colors.$blackAlpha50),
+                backgroundColor: theme.colors.$secondaryHover,
               }
             : undefined,
           '&:active': { backgroundColor: theme.colors.$secondary500 },

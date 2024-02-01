@@ -335,11 +335,32 @@ const setAlpha = (color: string, alpha: number) => {
   return toHslaString(setHslaAlpha(toHslaColor(color), alpha));
 };
 
+const adjustForLightness = (color: string | undefined) => {
+  if (!color) {
+    return undefined;
+  }
+
+  const hsla = colors.toHslaColor(color);
+
+  if (!hsla) {
+    return color;
+  }
+
+  if (hsla.l === 100) {
+    hsla.l = 95;
+  } else {
+    hsla.l = Math.min(hsla.l + 20, 100);
+  }
+
+  return colors.toHslaString(hsla);
+};
+
 export const colors = {
   toHslaColor,
   toHslaString,
   changeHslaLightness,
   setHslaAlpha,
+  adjustForLightness,
   lighten,
   makeTransparent,
   makeSolid,
