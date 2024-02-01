@@ -55,7 +55,7 @@ export const PhoneSection = () => {
                       gap={2}
                       center
                     >
-                      <Text sx={t => ({ color: t.colors.$blackAlpha700 })}>
+                      <Text sx={t => ({ color: t.colors.$colorText })}>
                         {stringToFormattedPhoneString(phone.phoneNumber)}
                       </Text>
                       {user?.primaryPhoneNumberId === phone.id && (

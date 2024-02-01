@@ -68,7 +68,6 @@ const _SignInAccountSwitcher = () => {
                 label={localizationKeys('userButton.action__addAccount')}
                 onClick={handleAddAccountClicked}
                 iconSx={t => ({
-                  color: t.colors.$blackAlpha400,
                   width: t.sizes.$9,
                   height: t.sizes.$6,
                 })}
@@ -107,7 +106,7 @@ const _SignInAccountSwitcher = () => {
               onClick={handleSignOutAllClicked}
               variant='ghostDanger'
               sx={t => ({
-                color: t.colors.$blackAlpha600,
+                color: t.colors.$colorTextSecondary,
                 padding: `${t.space.$2} ${t.space.$3}`,
                 borderBottom: 'none',
                 width: '100%',

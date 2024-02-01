@@ -2,13 +2,14 @@ import { experimental_createTheme } from '../createTheme';
 
 export const dark = experimental_createTheme({
   variables: {
-    colorBackground: '#19191A',
-    colorInputBackground: '#19191A',
+    colorBackground: '#212126',
     colorAlphaShade: 'white',
     colorPrimary: '#ffffff',
     colorTextOnPrimaryBackground: 'black',
-    colorTextSecondary: 'white',
+    colorSecondary: '#26262B',
+    colorTextOnSecondaryBackground: '#D9D9DE',
     colorText: 'white',
+    colorInputBackground: '#26262B',
     colorInputText: 'white',
     colorShimmer: 'rgba(255,255,255,0.36)',
     shadowShimmer: '1px 1px 2px rgba(0,0,0,0.36)',
