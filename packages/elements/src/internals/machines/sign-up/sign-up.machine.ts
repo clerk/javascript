@@ -13,21 +13,21 @@ import type {
   Web3Strategy,
 } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
-import { and, assertEvent, assign, enqueueActions, log, sendTo, setup } from 'xstate';
+import { and, assign, log, sendTo, setup } from 'xstate';
 
 import type { ClerkElementsErrorBase } from '~/internals/errors/error';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import type { FormMachine } from '~/internals/machines/form/form.machine';
 import type { ClerkLoaderEvents } from '~/internals/machines/shared.actors';
-import { clerkLoader, handleRedirectCallback } from '~/internals/machines/shared.actors';
+import { clerkLoader } from '~/internals/machines/shared.actors';
 import {
   attemptVerification,
-  authenticateWithSignUpRedirect,
   createSignUp,
   prepareVerification,
   startSignUpEmailLinkFlow,
   updateSignUp,
 } from '~/internals/machines/sign-up/sign-up.actors';
+import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 import type { ClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 import type { ClerkRouter } from '~/react/router';
@@ -53,7 +53,7 @@ export type SignUpMachineEvents =
   | ErrorActorEvent
   | ClerkLoaderEvents
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
-  | { type: 'AUTHENTICATE.SAML'; strategy: SamlStrategy }
+  | { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy }
   | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
   | { type: 'FAILURE'; error: Error }
   | { type: 'OAUTH.CALLBACK' }
@@ -97,11 +97,7 @@ export const SignUpMachine = setup({
     attemptVerification,
     startSignUpEmailLinkFlow,
 
-    // OAuth & Web3
-    authenticateWithSignUpRedirect,
-
-    // Callbacks
-    handleRedirectCallback,
+    ThirdPartyMachine,
   },
   actions: {
     assignThirdPartyProviders: assign({
@@ -223,6 +219,13 @@ export const SignUpMachine = setup({
     thirdPartyProviders: getEnabledThirdPartyProviders(input.clerk.__unstable__environment),
   }),
   initial: 'Init',
+  invoke: {
+    id: THIRD_PARTY_MACHINE_ID,
+    src: 'ThirdPartyMachine',
+    input: ({ context }) => ({
+      clerk: context.clerk,
+    }),
+  },
   on: {
     'CLERKJS.NAVIGATE.*': {
       actions: {
@@ -254,84 +257,19 @@ export const SignUpMachine = setup({
         'CLERK.READY': [
           {
             description: 'Taken when an SSO Callback is required',
-            target: 'SSOCallback',
             guard: {
               type: 'currentPathMatches',
               params: {
                 regex: /\/sso-callback$/,
               },
             },
+            actions: sendTo(THIRD_PARTY_MACHINE_ID, { type: 'REDIRECT.CALLBACK' }),
           },
           {
             description: 'By default, we enter the Start state',
             target: 'Start',
           },
         ],
-      },
-    },
-    AuthenticatingWithRedirect: {
-      invoke: {
-        id: 'authenticateWithSignUpRedirect',
-        src: 'authenticateWithSignUpRedirect',
-        input: ({ context, event }) => {
-          assertEvent(event, ['AUTHENTICATE.OAUTH', 'AUTHENTICATE.SAML']);
-
-          if (event.type === 'AUTHENTICATE.SAML' && event.strategy === 'saml') {
-            return {
-              clerk: context.clerk,
-              params: {
-                strategy: event.strategy,
-                emailAddress: '', // TODO: Handle case
-                identifier: '', // TODO: Handle case
-                // continueSignUp
-              },
-            };
-          } else if (event.type === 'AUTHENTICATE.OAUTH' && event.strategy) {
-            return {
-              clerk: context.clerk,
-              params: {
-                strategy: event.strategy,
-                // continueSignUp
-              },
-            };
-          }
-
-          throw new ClerkElementsRuntimeError('Invalid strategy');
-        },
-        onError: {
-          actions: 'setFormErrors',
-        },
-      },
-    },
-    SSOCallback: {
-      tags: 'external',
-      on: {
-        'CLERKJS.NAVIGATE.*': {
-          actions: enqueueActions(({ enqueue, check, event }) => {
-            if (check('isComplete')) {
-              return enqueue('setAsActive');
-            }
-
-            if (event.type === 'CLERKJS.NAVIGATE.SIGN_IN') {
-              return enqueue({
-                type: 'navigateTo',
-                params: {
-                  path: '/sign-up',
-                },
-              });
-            }
-
-            return enqueue('goToNextState');
-          }),
-        },
-      },
-      invoke: {
-        id: 'handleRedirectCallback',
-        src: 'handleRedirectCallback',
-        input: ({ context }) => context.clerk,
-        onError: {
-          actions: 'setFormErrors',
-        },
       },
     },
     Start: {
@@ -341,8 +279,18 @@ export const SignUpMachine = setup({
       entry: 'assignThirdPartyProviders',
       initial: 'AwaitingInput',
       on: {
-        'AUTHENTICATE.OAUTH': '#SignUp.AuthenticatingWithRedirect',
-        'AUTHENTICATE.SAML': '#SignUp.AuthenticatingWithRedirect',
+        'AUTHENTICATE.OAUTH': {
+          actions: sendTo(THIRD_PARTY_MACHINE_ID, ({ event }) => ({
+            type: 'REDIRECT.SIGN_UP',
+            params: { strategy: event.strategy },
+          })),
+        },
+        'AUTHENTICATE.SAML': {
+          actions: sendTo(THIRD_PARTY_MACHINE_ID, {
+            type: 'REDIRECT.SIGN_UP',
+            params: { strategy: 'saml' },
+          }),
+        },
         NEXT: [
           {
             guard: 'isMissingRequiredUnverifiedFields',

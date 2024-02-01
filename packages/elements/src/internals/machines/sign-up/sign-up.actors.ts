@@ -7,19 +7,11 @@ import type {
   SignUpUpdateParams,
   SignUpVerificationsResource,
 } from '@clerk/types';
-import type { SetOptional, Simplify } from 'type-fest';
 import { fromCallback, fromPromise } from 'xstate';
 
-import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
 
-import type {
-  AuthenticateWithRedirectOAuthParams,
-  AuthenticateWithRedirectSamlParams,
-  WithClerk,
-  WithParams,
-  WithUnsafeMetadata,
-} from '../shared.types';
+import type { WithClerk, WithParams } from '../shared.types';
 
 // ================= startSignUpEmailLinkFlow ================= //
 
@@ -52,24 +44,6 @@ export const startSignUpEmailLinkFlow = fromCallback<StartSignUpEmailLinkFlowEve
 
     return () => stop();
   },
-);
-
-// ================= authenticateWithSignUpRedirect ================= //
-
-export type AuthenticateWithRedirectSignUpParams = SetOptional<
-  WithUnsafeMetadata<AuthenticateWithRedirectOAuthParams> | WithUnsafeMetadata<AuthenticateWithRedirectSamlParams>,
-  'redirectUrl' | 'redirectUrlComplete'
->;
-
-export type AuthenticateWithRedirectSignUpInput = Simplify<WithClerk<WithParams<AuthenticateWithRedirectSignUpParams>>>;
-
-export const authenticateWithSignUpRedirect = fromPromise<void, AuthenticateWithRedirectSignUpInput>(
-  async ({ input: { clerk, params } }) =>
-    clerk.client.signUp.authenticateWithRedirect({
-      redirectUrl: params.redirectUrl || clerk.buildUrlWithAuth(`/sign-up${SSO_CALLBACK_PATH_ROUTE}`),
-      redirectUrlComplete: params.redirectUrlComplete || clerk.buildAfterSignUpUrl(),
-      ...params,
-    }),
 );
 
 // ================= Verification ================= //

@@ -6,7 +6,9 @@ import { getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 import { handleRedirectCallback, signInRedirect, signUpRedirect } from './actors';
 import type { ThirdPartyMachineSchema } from './types';
 
-export const ThirdPartyMachine = setup({
+const THIRD_PARTY_MACHINE_ID = 'ThirdParty';
+
+const machine = setup({
   actors: {
     handleRedirectCallback,
     signInRedirect,
@@ -35,7 +37,7 @@ export const ThirdPartyMachine = setup({
   },
   types: {} as ThirdPartyMachineSchema,
 }).createMachine({
-  id: 'ThirdParty',
+  id: THIRD_PARTY_MACHINE_ID,
   context: ({ input }) => ({
     clerk: input.clerk,
     thirdPartyProviders: getEnabledThirdPartyProviders(input.clerk.__unstable__environment),
@@ -106,3 +108,5 @@ export const ThirdPartyMachine = setup({
     },
   },
 });
+
+export { THIRD_PARTY_MACHINE_ID, machine as ThirdPartyMachine };
