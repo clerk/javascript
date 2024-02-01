@@ -47,6 +47,7 @@ export const SingleSessionActions = (props: SessionActionsProps) => {
         onClick={handleSignOutSessionClicked(session)}
         sx={[
           t => ({
+            border: 0,
             color: t.colors.$colorTextOnSecondaryBackground,
             borderBottomLeftRadius: t.radii.$lg,
             borderBottomRightRadius: t.radii.$lg,
