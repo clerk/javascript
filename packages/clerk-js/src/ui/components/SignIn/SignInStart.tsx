@@ -286,7 +286,7 @@ export function _SignInStart(): JSX.Element {
   return (
     <Flow.Part part='start'>
       <Card.Root>
-        <Card.Content>
+        <Card.Content gap={6}>
           <Card.Alert>{card.error}</Card.Alert>
           <Header.Root>
             <Header.Title localizationKey={localizationKeys('signIn.start.title')} />

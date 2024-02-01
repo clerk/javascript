@@ -92,7 +92,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   return (
     <Flow.Part part='password'>
       <Card.Root>
-        <Card.Content gap={4}>
+        <Card.Content gap={6}>
           <Card.Alert>{card.error}</Card.Alert>
           <Header.Root gap={1}>
             <Header.Title localizationKey={localizationKeys('signIn.password.title')} />

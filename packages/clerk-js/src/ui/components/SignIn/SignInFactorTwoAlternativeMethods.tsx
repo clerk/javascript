@@ -39,7 +39,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
   return (
     <Flow.Part part='alternativeMethods'>
       <Card.Root>
-        <Card.Content>
+        <Card.Content gap={6}>
           <Card.Alert>{card.error}</Card.Alert>
           <Header.Root>
             <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />

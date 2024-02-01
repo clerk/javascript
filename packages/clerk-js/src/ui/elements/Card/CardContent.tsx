@@ -10,7 +10,7 @@ import { useUnsafeModalContext } from '../Modal';
 
 type CardContentProps = PropsOfComponent<typeof Flex>;
 export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((props, ref) => {
-  const { children, sx, ...rest } = props;
+  const { children, sx, gap = 8, ...rest } = props;
   const flowMetadata = useFlowMetadata();
   const appearance = useAppearance();
   const { toggle } = useUnsafeModalContext();
@@ -19,7 +19,6 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
     <Flex
       direction='col'
       className={generateFlowPartClassname(flowMetadata)}
-      {...rest}
       elementDescriptor={descriptors.card}
       sx={[
         t => ({
@@ -32,13 +31,14 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           borderRadius: t.radii.$lg,
           position: 'relative',
           padding: t.space.$8,
-          gap: t.space.$8,
           justifyContent: 'center',
           alignContent: 'center',
         }),
         sx,
       ]}
+      gap={gap}
       ref={ref}
+      {...rest}
     >
       {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo />}
       {toggle && (

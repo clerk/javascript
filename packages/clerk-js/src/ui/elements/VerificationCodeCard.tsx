@@ -42,7 +42,7 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
 
   return (
     <Card.Root>
-      <Card.Content>
+      <Card.Content gap={6}>
         <Card.Alert>{card.error}</Card.Alert>
         <Header.Root>
           <Header.Title localizationKey={props.cardTitle} />

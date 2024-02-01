@@ -38,7 +38,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   return (
     <Flow.Part part={asForgotPassword ? 'forgotPasswordMethods' : 'alternativeMethods'}>
       <Card.Root>
-        <Card.Content>
+        <Card.Content gap={6}>
           <Card.Alert>{card.error}</Card.Alert>
           <Header.Root>
             <Header.Title
@@ -54,7 +54,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}
-            gap={6}
+            gap={4}
           >
             {asForgotPassword && resetPasswordFactor && (
               <Button
