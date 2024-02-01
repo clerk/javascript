@@ -21,8 +21,6 @@ const RemoveWeb3WalletScreen = (props: RemoveWeb3WalletScreenProps) => {
   );
 };
 
-// type Web3WalletScreenProps = { walletId?: string };
-
 export const Web3Section = withCardStateProvider(() => {
   const { user } = useUser();
   const card = useCardState();
