@@ -26,7 +26,10 @@ export const SuccessPage = (props: SuccessPageProps) => {
       gap={4}
     >
       <Header.Root>
-        <Header.Title localizationKey={title} />
+        <Header.Title
+          localizationKey={title}
+          textVariant='subtitle'
+        />
       </Header.Root>
       <Col gap={4}>
         {Array.isArray(text) ? (

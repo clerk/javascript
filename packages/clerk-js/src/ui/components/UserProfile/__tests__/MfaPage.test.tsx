@@ -178,8 +178,8 @@ describe('MfaPage', () => {
 
         await waitFor(() => expect(getByText(/Add authenticator application/i)).toBeInTheDocument());
 
-        await waitFor(() => expect(getByRole('button', { name: /save/i })).toBeInTheDocument());
-        await userEvent.click(getByRole('button', { name: /save/i }));
+        await waitFor(() => expect(getByRole('button', { name: /continue/i })).toBeInTheDocument());
+        await userEvent.click(getByRole('button', { name: /continue/i }));
 
         await userEvent.type(screen.getByRole('textbox', { name: /Enter verification code/i }), '123456');
         timers.runOnlyPendingTimers();

@@ -19,6 +19,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
     <Button
       elementDescriptor={descriptors.identityPreviewEditButton}
       variant='link'
+      textVariant='buttonSmall'
       onClick={onClick}
       aria-label={'Edit'}
     >

@@ -242,7 +242,8 @@ export const enUS: LocalizationResource = {
   },
   userProfile: {
     mobileButton__menu: 'Menu',
-    formButtonPrimary__continue: 'Save',
+    formButtonPrimary__save: 'Save',
+    formButtonPrimary__continue: 'Continue',
     formButtonPrimary__finish: 'Finish',
     formButtonReset: 'Cancel',
     navbar: {
