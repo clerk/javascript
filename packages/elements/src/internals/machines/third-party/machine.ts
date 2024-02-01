@@ -1,4 +1,4 @@
-import { assertEvent, log, sendParent, setup } from 'xstate';
+import { assertEvent, assign, log, sendParent, setup } from 'xstate';
 
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 import { getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
@@ -15,6 +15,9 @@ const machine = setup({
     signUpRedirect,
   },
   actions: {
+    assignThirdPartyProviders: assign({
+      thirdPartyProviders: ({ context }) => getEnabledThirdPartyProviders(context.clerk.__unstable__environment),
+    }),
     logError: log(({ event }) => `Error: ${event.type}, `),
     reportError: ({ event }) => {
       assertActorEventError(event);
@@ -45,6 +48,7 @@ const machine = setup({
   initial: 'Idle',
   states: {
     Idle: {
+      entry: 'assignThirdPartyProviders',
       on: {
         'REDIRECT.SIGN_IN': 'RedirectingSignIn',
         'REDIRECT.SIGN_UP': 'RedirectingSignUp',

@@ -1,23 +1,29 @@
 import type { OAuthProvider, Web3Provider } from '@clerk/types';
+import { useSelector } from '@xstate/react';
 import type React from 'react';
 import { useCallback } from 'react';
-import type { SnapshotFrom } from 'xstate';
+import type { ActorRef, SnapshotFrom } from 'xstate';
 
-import type { SignUpMachine } from '~/internals/machines/sign-up/sign-up.machine';
+import type { SignInMachineEvents } from '~/internals/machines/sign-in/sign-in.machine';
+import type { SignUpMachineEvents } from '~/internals/machines/sign-up/sign-up.machine';
+import type { ThirdPartyMachine } from '~/internals/machines/third-party/machine';
+import { THIRD_PARTY_MACHINE_ID } from '~/internals/machines/third-party/machine';
 import type { UseThirdPartyProviderReturn } from '~/react/common/third-party-providers/social-provider';
-import { SignUpCtx } from '~/react/sign-up/contexts/sign-up.context';
-
-export type SnapshotState = SnapshotFrom<typeof SignUpMachine>;
 
 /**
  * Selects the clerk third-party provider
  */
-const clerkThirdPartyProviderSelector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotState) =>
+const selector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotFrom<typeof ThirdPartyMachine>) =>
   state.context.thirdPartyProviders.providerToDisplayData[provider];
 
-export const useThirdPartyProvider = (provider: OAuthProvider | Web3Provider): UseThirdPartyProviderReturn => {
-  const ref = SignUpCtx.useActorRef();
-  const details = SignUpCtx.useSelector(clerkThirdPartyProviderSelector(provider));
+export const useThirdPartyProvider = <
+  TActor extends ActorRef<any, SignInMachineEvents> | ActorRef<any, SignUpMachineEvents>,
+>(
+  ref: TActor,
+  provider: OAuthProvider | Web3Provider,
+): UseThirdPartyProviderReturn => {
+  // const ref = SignInCtx.useActorRef();
+  const details = useSelector(ref.system.get(THIRD_PARTY_MACHINE_ID), selector(provider));
 
   const authenticate = useCallback(
     (event: React.MouseEvent<Element>) => {

@@ -13,7 +13,7 @@ import type {
   Web3Strategy,
 } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
-import { and, assign, log, sendTo, setup } from 'xstate';
+import { and, log, sendTo, setup } from 'xstate';
 
 import type { ClerkElementsErrorBase } from '~/internals/errors/error';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
@@ -31,7 +31,6 @@ import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 import type { ClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 import type { ClerkRouter } from '~/react/router';
-import { type EnabledThirdPartyProviders, getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 
 type SignUpVerificationsResourceKey = keyof SignUpVerificationsResource;
 
@@ -40,7 +39,6 @@ export interface SignUpMachineContext extends MachineContext {
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
   router: ClerkRouter;
-  thirdPartyProviders: EnabledThirdPartyProviders;
 }
 
 export interface SignUpMachineInput {
@@ -100,9 +98,6 @@ export const SignUpMachine = setup({
     ThirdPartyMachine,
   },
   actions: {
-    assignThirdPartyProviders: assign({
-      thirdPartyProviders: ({ context }) => getEnabledThirdPartyProviders(context.clerk.__unstable__environment),
-    }),
     goToNextState: sendTo(({ self }) => self, { type: 'NEXT' }),
     navigateTo({ context }, { path }: { path: string }) {
       context.router.replace(path);
@@ -216,11 +211,11 @@ export const SignUpMachine = setup({
     clerk: input.clerk,
     formRef: input.form,
     router: input.router,
-    thirdPartyProviders: getEnabledThirdPartyProviders(input.clerk.__unstable__environment),
   }),
   initial: 'Init',
   invoke: {
     id: THIRD_PARTY_MACHINE_ID,
+    systemId: THIRD_PARTY_MACHINE_ID,
     src: 'ThirdPartyMachine',
     input: ({ context }) => ({
       clerk: context.clerk,
@@ -275,8 +270,7 @@ export const SignUpMachine = setup({
     Start: {
       id: 'Start',
       tags: 'state:start',
-      description: 'The intial state of the sign-up flow.',
-      entry: 'assignThirdPartyProviders',
+      description: 'The intial state of the sign-in flow.',
       initial: 'AwaitingInput',
       on: {
         'AUTHENTICATE.OAUTH': {
