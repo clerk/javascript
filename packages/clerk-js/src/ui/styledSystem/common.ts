@@ -28,28 +28,7 @@ const textVariants = (t: InternalTheme) => {
     lineHeight: t.lineHeights.$small,
   } as const;
 
-  const sectionTitle = {
-    ...base,
-    fontWeight: t.fontWeights.$medium,
-    fontSize: t.fontSizes.$md,
-    lineHeight: t.lineHeights.$normal,
-  } as const;
-
-  const title = {
-    ...base,
-    fontWeight: t.fontWeights.$bold,
-    fontSize: t.fontSizes.$md,
-    lineHeight: t.lineHeights.$small,
-  } as const;
-
   const subtitle = {
-    ...base,
-    fontWeight: t.fontWeights.$normal,
-    fontSize: t.fontSizes.$md,
-    lineHeight: t.lineHeights.$small,
-  } as const;
-
-  const label = {
     ...base,
     fontWeight: t.fontWeights.$medium,
     fontSize: t.fontSizes.$md,
@@ -90,14 +69,11 @@ const textVariants = (t: InternalTheme) => {
     h1,
     h2,
     h3,
-    title,
     subtitle,
     body,
     caption,
     buttonLarge,
     buttonSmall,
-    label,
-    sectionTitle,
   } as const;
 };
 

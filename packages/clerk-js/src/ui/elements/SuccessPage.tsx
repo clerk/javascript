@@ -28,7 +28,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
       <Header.Root>
         <Header.Title
           localizationKey={title}
-          textVariant='title'
+          textVariant='subtitle'
         />
       </Header.Root>
       <Col gap={4}>

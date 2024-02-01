@@ -8,7 +8,7 @@ import { useFormField } from './hooks';
 const { applyVariants } = createVariants(theme => ({
   base: {
     color: theme.colors.$colorText,
-    ...common.textVariants(theme).label,
+    ...common.textVariants(theme).subtitle,
     ...common.disabled(theme),
   },
   variants: {},

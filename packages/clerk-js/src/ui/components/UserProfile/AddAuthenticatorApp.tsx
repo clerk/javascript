@@ -93,6 +93,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
             {displayFormat == 'qr' && (
               <Button
                 variant='link'
+                textVariant='buttonLarge'
                 onClick={() => setDisplayFormat('uri')}
                 localizationKey={localizationKeys(
                   'userProfile.mfaTOTPPage.authenticatorApp.buttonUnableToScan__nonPrimary',
@@ -102,7 +103,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
             {displayFormat == 'uri' && (
               <Button
                 variant='link'
-                textVariant='body'
+                textVariant='buttonLarge'
                 onClick={() => setDisplayFormat('qr')}
                 localizationKey={localizationKeys(
                   'userProfile.mfaTOTPPage.authenticatorApp.buttonAbleToScan__nonPrimary',

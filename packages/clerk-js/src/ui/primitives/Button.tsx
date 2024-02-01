@@ -159,7 +159,6 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           '&:active': { backgroundColor: theme.colors.$transparent },
         },
         link: {
-          // ...common.textVariants(theme).buttonSmall,
           minHeight: 'fit-content',
           height: 'fit-content',
           width: 'fit-content',
@@ -170,7 +169,6 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
         },
         linkDanger: {
-          ...common.textVariants(theme).buttonSmall,
           minHeight: 'fit-content',
           height: 'fit-content',
           width: 'fit-content',

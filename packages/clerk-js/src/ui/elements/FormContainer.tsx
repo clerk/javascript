@@ -18,9 +18,9 @@ type PageProps = PropsOfComponent<typeof Col> & {
 export const FormContainer = (props: PageProps) => {
   const {
     headerTitle,
-    headerTitleTextVariant = 'title',
+    headerTitleTextVariant = 'h3',
     headerSubtitle,
-    headerSubtitleTextVariant = 'subtitle',
+    headerSubtitleTextVariant = 'body',
     children,
     sx,
     ...rest

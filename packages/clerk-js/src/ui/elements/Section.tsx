@@ -318,7 +318,7 @@ export const SectionHeader = (props: SectionHeaderProps) => {
     <Flex {...rest}>
       <Text
         localizationKey={localizationKey}
-        variant='sectionTitle'
+        variant='subtitle'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
       />

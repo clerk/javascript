@@ -39,6 +39,7 @@ export const AccountPage = withCardStateProvider(() => {
           <Header.Title
             localizationKey={localizationKeys('userProfile.start.headerTitle__account')}
             sx={t => ({ marginBottom: t.space.$4 })}
+            textVariant='h2'
           />
         </Header.Root>
 
