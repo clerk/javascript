@@ -36,11 +36,11 @@ export const ErrorCard = (props: ErrorCardProps) => {
     <Flow.Part part='havingTrouble'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+          <Header.Root showLogo>
             <Header.Title localizationKey={props.cardTitle || 'Error'} />
             {props.cardSubtitle && <Header.Subtitle localizationKey={props.cardSubtitle} />}
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
           <Flex
             direction='col'

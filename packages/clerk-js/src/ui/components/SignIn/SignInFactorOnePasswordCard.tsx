@@ -92,9 +92,8 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   return (
     <Flow.Part part='password'>
       <Card.Root>
-        <Card.Content gap={6}>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root gap={1}>
+        <Card.Content>
+          <Header.Root showLogo>
             <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
             <IdentityPreview
@@ -103,6 +102,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               onClick={goBack}
             />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
           <Flex
             direction='col'

@@ -38,9 +38,8 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   return (
     <Flow.Part part={asForgotPassword ? 'forgotPasswordMethods' : 'alternativeMethods'}>
       <Card.Root>
-        <Card.Content gap={6}>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+        <Card.Content>
+          <Header.Root showLogo>
             <Header.Title
               localizationKey={localizationKeys(
                 asForgotPassword ? 'signIn.forgotPasswordAlternativeMethods.title' : 'signIn.alternativeMethods.title',
@@ -50,11 +49,12 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
               <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
             )}
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}
-            gap={4}
+            gap={3}
           >
             {asForgotPassword && resetPasswordFactor && (
               <Button

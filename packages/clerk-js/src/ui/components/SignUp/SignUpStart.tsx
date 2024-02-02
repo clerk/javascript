@@ -243,12 +243,12 @@ function _SignUpStart(): JSX.Element {
   return (
     <Flow.Part part='start'>
       <Card.Root>
-        <Card.Content gap={6}>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+        <Card.Content>
+          <Header.Root showLogo>
             <Header.Title localizationKey={localizationKeys('signUp.start.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}

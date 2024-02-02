@@ -286,12 +286,12 @@ export function _SignInStart(): JSX.Element {
   return (
     <Flow.Part part='start'>
       <Card.Root>
-        <Card.Content gap={6}>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+        <Card.Content>
+          <Header.Root showLogo>
             <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
           <Col
             elementDescriptor={descriptors.main}

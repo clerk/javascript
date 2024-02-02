@@ -33,8 +33,8 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
     <Flow.Part part='emailLinkVerify'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+          <Header.Root showLogo>
+            <Card.Alert>{card.error}</Card.Alert>
             <Header.Title localizationKey={props.cardTitle} />
             <VerificationLink
               formTitle={props.formTitle}

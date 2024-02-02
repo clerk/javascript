@@ -160,11 +160,11 @@ function _SignUpContinue() {
     <Flow.Part part='complete'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+          <Header.Root showLogo>
             <Header.Title localizationKey={localizationKeys('signUp.continue.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signUp.continue.subtitle')} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}
