@@ -62,7 +62,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
   const typeProps =
     type === 'email'
       ? {
-          pattern: '^.*@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$',
+          pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$',
         }
       : { type };
 
