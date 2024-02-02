@@ -32,7 +32,9 @@ export const useAwaitableNavigate = () => {
 
   // Handle flushing the promise buffer when pending is false. If pending is false and there are promises in the buffer we should be able to safely flush them.
   useEffect(() => {
-    if (isPending) {return;}
+    if (isPending) {
+      return;
+    }
 
     if (clerkNavPromiseBuffer?.current?.length) {
       clerkNavPromiseBuffer.current.forEach(resolve => resolve());
