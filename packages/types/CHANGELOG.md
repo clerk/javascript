@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.61.0
+
+### Minor Changes
+
+- Add support for X/Twitter v2 OAuth provider ([#2697](https://github.com/clerk/javascript/pull/2697)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
 ## 3.60.0
 
 ### Minor Changes

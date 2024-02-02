@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.30.4
+
+### Patch Changes
+
+- Updated dependencies [[`38f0f862b`](https://github.com/clerk/javascript/commit/38f0f862bfc5eb697625131a753f4127ff262895)]:
+  - @clerk/types@3.61.0
+
 ## 4.30.3
 
 ### Patch Changes
