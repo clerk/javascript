@@ -66,6 +66,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
       )}
       {children}
       <Card.Footer
+        isProfileFooter
         sx={{
           display: 'none',
           [mqu.md]: {

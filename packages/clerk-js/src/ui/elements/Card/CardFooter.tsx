@@ -2,16 +2,35 @@ import React from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../customizables';
-import { common, mqu, type PropsOfComponent } from '../../styledSystem';
+import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
+import { common, mqu } from '../../styledSystem';
 import { colors } from '../../utils';
 import { Card } from '.';
 
-type CardFooterProps = PropsOfComponent<typeof Flex>;
+type CardFooterProps = PropsOfComponent<typeof Flex> & {
+  isProfileFooter?: boolean;
+};
 export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((props, ref) => {
-  const { children, sx, ...rest } = props;
+  const { children, isProfileFooter = false, sx, ...rest } = props;
   const { branded } = useEnvironment().displayConfig;
   const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
-  const showSponsor = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
+  const sponsorOrLinksExist = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
+  const showSponsorAndLinks = isProfileFooter ? branded : sponsorOrLinksExist;
+
+  const footerStyles = (t: InternalTheme) => ({
+    '>:first-of-type': {
+      padding: `${t.space.$4} ${t.space.$8} ${t.space.$4} ${t.space.$8}`,
+    },
+    '>:not(:first-of-type)': {
+      padding: `${t.space.$4} ${t.space.$8}`,
+      borderTop: t.borders.$normal,
+      borderColor: t.colors.$blackAlpha100,
+    },
+  });
+
+  const profileCardFooterStyles = (t: InternalTheme) => ({
+    padding: `${t.space.$4} ${t.space.$6} ${t.space.$2}`,
+  });
 
   return (
     <Flex
@@ -27,15 +46,8 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
             colors.setAlpha(t.colors.$colorBackground, 1),
             t.colors.$blackAlpha50,
           ),
-          '>:first-of-type': {
-            padding: `${t.space.$4} ${t.space.$8} ${t.space.$4} ${t.space.$8}`,
-          },
-          '>:not(:first-of-type)': {
-            padding: `${t.space.$4} ${t.space.$8}`,
-            borderTop: t.borders.$normal,
-            borderColor: t.colors.$blackAlpha100,
-          },
         }),
+        isProfileFooter ? profileCardFooterStyles : footerStyles,
         sx,
       ]}
       {...rest}
@@ -43,7 +55,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
     >
       {children}
 
-      {showSponsor && <Card.ClerkAndPagesTag withFooterPages />}
+      {showSponsorAndLinks && <Card.ClerkAndPagesTag withFooterPages={!isProfileFooter} />}
     </Flex>
   );
 });
@@ -54,6 +66,7 @@ const CardFooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
       elementDescriptor={descriptors.footerPagesLink}
       {...props}
       colorScheme='neutral'
+      variant='buttonSmall'
     />
   );
 };
