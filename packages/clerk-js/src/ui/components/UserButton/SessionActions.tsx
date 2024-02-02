@@ -1,7 +1,7 @@
 import type { ActiveSessionResource } from '@clerk/types';
 
 import { descriptors, Flex, localizationKeys } from '../../customizables';
-import { Action, Actions, PreviewButton, SmallAction, UserPreview } from '../../elements';
+import { Action, Actions, PreviewButton, SmallAction, SmallActions, UserPreview } from '../../elements';
 import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
 
 type SingleSessionActionsProps = {
@@ -77,7 +77,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
 
   return (
     <>
-      <Actions
+      <SmallActions
         role='menu'
         elementDescriptor={descriptors.userButtonPopoverActions}
         elementId={descriptors.userButtonPopoverActions.setId('multiSession')}
@@ -112,7 +112,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
             onClick={handleSignOutSessionClicked(session)}
           />
         </Flex>
-      </Actions>
+      </SmallActions>
       <Actions role='menu'>
         {otherSessions.map(session => (
           <PreviewButton
@@ -174,8 +174,10 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
         icon={SignOut}
         label={localizationKeys('userButton.action__signOutAll')}
         onClick={handleSignOutAllClicked}
+        variant='ghost'
+        colorScheme='neutral'
         sx={t => ({
-          color: t.colors.$colorTextSecondary,
+          backgroundColor: t.colors.$transparent,
           padding: `${t.space.$2} ${t.space.$3}`,
           borderBottom: 'none',
           borderRadius: t.radii.$lg,

@@ -159,7 +159,6 @@ export const UserPreview = (props: UserPreviewProps) => {
             elementDescriptor={descriptors.userPreviewSecondaryIdentifier}
             elementId={descriptors.userPreviewSecondaryIdentifier.setId(elementId)}
             truncate
-            colorScheme='neutral'
             localizationKey={subtitle || identifier}
           />
         )}

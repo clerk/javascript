@@ -46,7 +46,6 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
       />
       <FormButtonContainer>
         <Button
-          variant='primary'
           isLoading={otp.isLoading}
           localizationKey={localizationKeys('formButtonPrimary__verify')}
           elementDescriptor={descriptors.formButtonPrimary}

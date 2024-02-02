@@ -45,7 +45,6 @@ const _SignInAccountSwitcher = () => {
                     justifyContent: 'flex-start',
                     borderRadius: 0,
                     borderBottom: `${theme.borders.$normal} ${theme.colors.$blackAlpha100}`,
-                    backgroundColor: theme.colors.$colorBackground,
                   })}
                   icon={SwitchArrowRight}
                 >

@@ -107,7 +107,7 @@ type ActionConfirmationPageProps = FormProps & {
   successMessage: LocalizationKey;
   submitLabel: LocalizationKey;
   onConfirmation: () => Promise<any>;
-  variant?: 'primaryDanger' | 'primary';
+  colorScheme?: 'danger' | 'primary';
 };
 
 const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationPageProps) => {
@@ -122,7 +122,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     onSuccess,
     onReset,
     onConfirmation,
-    variant = 'primaryDanger',
+    colorScheme = 'danger',
   } = props;
   const wizard = useWizard();
   const card = useCardState();
@@ -174,7 +174,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
           <FormButtonContainer>
             <Form.SubmitButton
               block={false}
-              variant={variant}
+              colorScheme={colorScheme}
               localizationKey={submitLabel}
               isDisabled={!canSubmit}
             />

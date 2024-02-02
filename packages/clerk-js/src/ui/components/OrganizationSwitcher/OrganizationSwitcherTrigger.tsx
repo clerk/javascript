@@ -31,6 +31,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
       <Button
         elementDescriptor={descriptors.organizationSwitcherTrigger}
         variant='ghost'
+        colorScheme='neutral'
         hoverAsFocus
         focusRing={false}
         sx={[

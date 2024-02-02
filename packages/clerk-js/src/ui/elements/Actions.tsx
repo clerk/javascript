@@ -12,16 +12,20 @@ export const Actions = (props: PropsOfComponent<typeof Flex>) => {
   return (
     <Col
       sx={[
-        {
-          '> button:last-of-type': {
-            borderBottom: 'none',
+        t => ({
+          '> button:not(:last-of-type)': {
+            borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100} `,
           },
-        },
+        }),
         sx,
       ]}
       {...rest}
     />
   );
+};
+
+export const SmallActions = (props: PropsOfComponent<typeof Flex>) => {
+  return <Col {...props} />;
 };
 
 type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
@@ -69,7 +73,7 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
   return (
     <SimpleButton
       size='xs'
-      variant='secondary'
+      variant='outline'
       hoverAsFocus
       sx={[
         t => ({
@@ -120,7 +124,7 @@ export const SmallAction = (props: ActionProps) => {
   return (
     <Action
       size='xs'
-      variant='secondary'
+      variant='outline'
       textVariant='buttonSmall'
       sx={[
         t => ({
@@ -180,6 +184,7 @@ export const Action = (props: ActionProps) => {
     <Button
       size='md'
       variant='ghost'
+      colorScheme='neutral'
       textVariant='buttonLarge'
       hoverAsFocus
       focusRing={false}
@@ -189,7 +194,6 @@ export const Action = (props: ActionProps) => {
           borderRadius: 0,
           gap: t.space.$3,
           justifyContent: 'flex-start',
-          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
         }),
         sx,
       ]}

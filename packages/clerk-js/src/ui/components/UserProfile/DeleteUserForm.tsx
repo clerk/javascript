@@ -60,7 +60,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
         </Form.ControlRow>
         <FormButtons
           submitLabel={localizationKeys('userProfile.deletePage.confirm')}
-          variant='primaryDanger'
+          colorScheme='danger'
           isDisabled={!canSubmit}
           onReset={onReset}
         />
