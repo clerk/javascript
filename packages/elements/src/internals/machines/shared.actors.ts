@@ -1,10 +1,11 @@
 import type { Clerk, HandleOAuthCallbackParams, HandleSamlCallbackParams, LoadedClerk } from '@clerk/types';
-import type { AnyEventObject } from 'xstate';
+import type { AnyEventObject, EventObject } from 'xstate';
 import { fromCallback, fromPromise } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 
+/** @deprecated Use clerkLoader instead */
 export const waitForClerk = fromPromise<LoadedClerk, Clerk | LoadedClerk>(({ input: clerk }) => {
   return new Promise((resolve, reject) => {
     if (clerk.loaded) {
@@ -17,6 +18,23 @@ export const waitForClerk = fromPromise<LoadedClerk, Clerk | LoadedClerk>(({ inp
       reject(new ClerkElementsRuntimeError('Clerk client could not be loaded'));
     }
   });
+});
+
+export type ClerkLoaderEvents = { type: 'CLERK.READY' } | { type: 'CLERK.ERROR'; message: string };
+
+export const clerkLoader = fromCallback<EventObject, Clerk | LoadedClerk>(({ sendBack, input: clerk }) => {
+  const reportLoaded = () => sendBack({ type: 'CLERK.READY' });
+
+  if (clerk.loaded) {
+    reportLoaded();
+  } else if ('addOnLoaded' in clerk) {
+    // @ts-expect-error - Expects `addOnLoaded` from @clerk/clerk-react's IsomorphicClerk.
+    clerk.addOnLoaded(reportLoaded);
+  } else {
+    sendBack({ type: 'ERROR', message: 'Clerk client could not be loaded' });
+  }
+
+  return () => {};
 });
 
 export type HandleRedirectCallbackParams<T = Required<HandleOAuthCallbackParams | HandleSamlCallbackParams>> = {
