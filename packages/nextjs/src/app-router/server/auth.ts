@@ -8,6 +8,7 @@ import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
+import { getAuthKeyFromRequest } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
 type Auth = AuthObject & { protect: AuthProtect; redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
@@ -19,16 +20,23 @@ export const auth = (): Auth => {
     noAuthStatusMessage: authAuthHeaderMissing(),
   })(request);
 
-  const protect = createProtect({ request, authObject, notFound, redirect });
-  const redirectToSignIn = createRedirect({
-    redirectAdapter: redirect,
-    baseUrl: createClerkRequest(request).clerkUrl.toString(),
-    // TODO: Support runtime-value configuration of these options
-    // via setting and reading headers from clerkMiddleware
-    publishableKey: PUBLISHABLE_KEY,
-    signInUrl: SIGN_IN_URL,
-    signUpUrl: SIGN_UP_URL,
-  }).redirectToSignIn;
+  const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
+
+  const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
+    return createRedirect({
+      redirectAdapter: redirect,
+      baseUrl: createClerkRequest(request).clerkUrl.toString(),
+      // TODO: Support runtime-value configuration of these options
+      // via setting and reading headers from clerkMiddleware
+      publishableKey: PUBLISHABLE_KEY,
+      signInUrl: SIGN_IN_URL,
+      signUpUrl: SIGN_UP_URL,
+    }).redirectToSignIn({
+      returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl?.toString(),
+    });
+  };
+
+  const protect = createProtect({ request, authObject, redirectToSignIn, notFound, redirect });
 
   return Object.assign(authObject, { protect, redirectToSignIn });
 };

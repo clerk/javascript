@@ -43,7 +43,7 @@ export const isRedirect = (res: Response) => {
   return res.headers.get(nextConstants.Headers.NextRedirect);
 };
 
-export const setHeader = (res: Response, name: string, val: string) => {
+export const setHeader = <T extends Response>(res: T, name: string, val: string): T => {
   res.headers.set(name, val);
   return res;
 };

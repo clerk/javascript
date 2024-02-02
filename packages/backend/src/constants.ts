@@ -10,6 +10,7 @@ const Attributes = {
   AuthStatus: '__clerkAuthStatus',
   AuthReason: '__clerkAuthReason',
   AuthMessage: '__clerkAuthMessage',
+  ClerkUrl: '__clerkUrl',
 } as const;
 
 const Cookies = {
@@ -29,6 +30,7 @@ const Headers = {
   AuthStatus: 'x-clerk-auth-status',
   AuthReason: 'x-clerk-auth-reason',
   AuthMessage: 'x-clerk-auth-message',
+  ClerkUrl: 'x-clerk-clerk-url',
   EnableDebug: 'x-clerk-debug',
   ClerkRedirectTo: 'x-clerk-redirect-to',
   CloudFrontForwardedProto: 'cloudfront-forwarded-proto',

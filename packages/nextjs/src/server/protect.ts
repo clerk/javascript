@@ -1,4 +1,4 @@
-import type { AuthObject, SignedInAuthObject } from '@clerk/backend/internal';
+import type { AuthObject, RedirectFun, SignedInAuthObject } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationParamsWithCustomPermissions,
@@ -6,7 +6,6 @@ import type {
 } from '@clerk/types';
 
 import { constants as nextConstants } from '../constants';
-import { SIGN_IN_URL } from './constants';
 
 type AuthProtectOptions = { unauthorizedUrl?: string; unauthenticatedUrl?: string };
 
@@ -44,7 +43,7 @@ export const createProtect = (opts: {
    * protect() in pages throws a notFound error if signed out
    * use this callback to customise the behavior
    */
-  redirectToSignIn?: () => void;
+  redirectToSignIn: RedirectFun<unknown>;
 }): AuthProtect => {
   const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
 
@@ -64,7 +63,7 @@ export const createProtect = (opts: {
       }
       if (isPageRequest(request)) {
         // TODO: Handle runtime values. What happens if runtime values are set in middleware and in ClerkProvider as well?
-        return redirectToSignIn ? redirectToSignIn() : redirect(SIGN_IN_URL);
+        return redirectToSignIn();
       }
       return notFound();
     };

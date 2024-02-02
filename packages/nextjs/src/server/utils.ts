@@ -108,7 +108,7 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
 };
 
 // Auth result will be set as both a query param & header when applicable
-export function decorateRequest(req: Request, res: Response, requestState: RequestState): Response {
+export function decorateRequest(req: ClerkRequest, res: Response, requestState: RequestState): Response {
   const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
   if (!res) {
@@ -147,6 +147,7 @@ export function decorateRequest(req: Request, res: Response, requestState: Reque
       [constants.Headers.AuthToken]: token || '',
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
+      [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
     });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }
