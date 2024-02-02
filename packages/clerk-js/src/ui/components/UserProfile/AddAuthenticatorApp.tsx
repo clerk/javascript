@@ -118,7 +118,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
               />
 
               <Button
-                variant='ghostPrimary'
+                variant='ghost'
                 onClick={onReset}
                 localizationKey={localizationKeys('userProfile.formButtonReset')}
                 elementDescriptor={descriptors.formButtonReset}

@@ -111,19 +111,6 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
           borderColor: theme.colors.$blackAlpha100,
         },
         ghost: {
-          color: theme.colors.$colorTextSecondary,
-          '&:hover': {
-            color: theme.colors.$colorText,
-            background: theme.colors.$blackAlpha50,
-          },
-          '&:focus': props.hoverAsFocus
-            ? {
-                background: theme.colors.$blackAlpha50,
-                color: theme.colors.$colorText,
-              }
-            : undefined,
-        },
-        ghostPrimary: {
           color: theme.colors.$primary500,
           '&:hover': {
             color: theme.colors.$primary500,

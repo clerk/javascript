@@ -142,7 +142,7 @@ const AddMfa = (props: AddMfaProps) => {
       )}
       <FormButtonContainer sx={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <IconButton
-          variant='ghostPrimary'
+          variant='ghost'
           aria-label='Add phone number'
           icon={
             <Icon
