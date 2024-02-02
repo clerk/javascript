@@ -170,6 +170,7 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       elementDescriptor={descriptors.socialButtonsIconButton}
       elementId={descriptors.socialButtonsIconButton.setId(id)}
       variant='secondary'
+      textVariant='buttonLarge'
       sx={t => ({
         minHeight: t.sizes.$8,
         width: '100%',
@@ -243,7 +244,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
           elementId={descriptors.socialButtonsBlockButtonText.setId(id)}
           as='span'
           truncate
-          variant='buttonSmall'
+          variant='buttonLarge'
           localizationKey={textLocalizationKey}
         >
           {label}
