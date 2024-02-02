@@ -1,49 +1,44 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useTransition } from 'react';
 
-declare global {
-  interface Window {
-    __clerk_nav_ref: (to: string) => any;
-    __clerk_nav_resolves_ref: Array<(val?: any) => any> | undefined;
-  }
-}
+type NavigateFunction = ReturnType<typeof useRouter>['push'];
 
+/**
+ * Creates an "awaitable" navigation function that will do its best effort to wait for Next.js to finish its route transition.
+ *
+ * This is accomplished by wrapping the call to `router.push` in `startTransition()`, which should rely on React to coordinate the pending state. We key off of
+ * `isPending` to flush the stored promises and ensure the navigates "resolve".
+ */
 export const useAwaitableNavigate = () => {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { push } = useRouter();
-  const pathname = usePathname();
-  const params = useSearchParams();
-  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-  const urlKey = pathname + params.toString();
+  const [isPending, startTransition] = useTransition();
+  const clerkNavRef = useRef<(...args: Parameters<NavigateFunction>) => Promise<void>>();
+  const clerkNavPromiseBuffer = useRef<(() => void)[]>([]);
 
-  useEffect(() => {
-    window.__clerk_nav_ref = (to: string) => {
-      if (to === window.location.href.replace(window.location.origin, '')) {
-        push(to);
-        return Promise.resolve();
-      }
-
+  // Set the navigation function reference only once
+  if (!clerkNavRef.current) {
+    clerkNavRef.current = (to, opts) => {
       return new Promise<void>(res => {
-        if (window.__clerk_nav_resolves_ref) {
-          window.__clerk_nav_resolves_ref.push(res);
-        } else {
-          window.__clerk_nav_resolves_ref = [res];
-        }
-        push(to);
+        clerkNavPromiseBuffer.current.push(res);
+        startTransition(() => {
+          push(to, opts);
+        });
       });
     };
-  }, [urlKey]);
+  }
 
+  // Handle flushing the promise buffer when pending is false. If pending is false and there are promises in the buffer we should be able to safely flush them.
   useEffect(() => {
-    if (window.__clerk_nav_resolves_ref && window.__clerk_nav_resolves_ref.length) {
-      window.__clerk_nav_resolves_ref.forEach(resolve => resolve());
-    }
-    window.__clerk_nav_resolves_ref = [];
-  });
+    if (isPending) {return;}
 
-  return useCallback((to: string) => {
-    return window.__clerk_nav_ref(to);
-  }, []);
+    if (clerkNavPromiseBuffer?.current?.length) {
+      clerkNavPromiseBuffer.current.forEach(resolve => resolve());
+    }
+    clerkNavPromiseBuffer.current = [];
+  }, [isPending]);
+
+  return clerkNavRef.current;
 };
