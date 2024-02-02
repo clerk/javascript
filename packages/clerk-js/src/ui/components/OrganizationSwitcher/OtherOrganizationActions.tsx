@@ -2,7 +2,7 @@ import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import { descriptors, localizationKeys } from '../../customizables';
-import { Action, SecondaryActions } from '../../elements';
+import { Action, Actions } from '../../elements';
 import { Add } from '../../icons';
 import { UserInvitationSuggestionList } from './UserInvitationSuggestionList';
 import type { UserMembershipListProps } from './UserMembershipList';
@@ -55,13 +55,13 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
   return (
     <>
       <UserInvitationSuggestionList onOrganizationClick={onOrganizationClick} />
-      <SecondaryActions
+      <Actions
         elementDescriptor={descriptors.organizationSwitcherPopoverActions}
         role='menu'
       >
         <UserMembershipList {...{ onPersonalWorkspaceClick, onOrganizationClick }} />
         <CreateOrganizationButton {...{ onCreateOrganizationClick }} />
-      </SecondaryActions>
+      </Actions>
     </>
   );
 };

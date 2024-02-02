@@ -3,7 +3,8 @@ import { useEnvironment, useSignInContext, useSignOutContext } from '../../conte
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Action, Actions, Card, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { Add, SignOut, SwitchArrowRight } from '../../icons';
+import { Add, SwitchArrowRight } from '../../icons';
+import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
 const _SignInAccountSwitcher = () => {
@@ -94,26 +95,7 @@ const _SignInAccountSwitcher = () => {
               width: '100%',
             }}
           >
-            <Action
-              elementDescriptor={descriptors.userButtonPopoverActionButton}
-              elementId={descriptors.userButtonPopoverActionButton.setId('signOutAll')}
-              iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
-              iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('signOutAll')}
-              iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
-              iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('signOutAll')}
-              icon={SignOut}
-              label={localizationKeys('userButton.action__signOutAll')}
-              onClick={handleSignOutAllClicked}
-              variant='ghostDanger'
-              sx={t => ({
-                color: t.colors.$colorTextSecondary,
-                padding: `${t.space.$2} ${t.space.$3}`,
-                borderBottom: 'none',
-                width: '100%',
-                borderRadius: t.radii.$lg,
-              })}
-              spinnerSize='md'
-            />
+            <SignOutAllActions handleSignOutAllClicked={handleSignOutAllClicked} />
           </Card.Action>
         </Card.Footer>
       </Card.Root>

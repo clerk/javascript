@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { Action, Card, Header, SecondaryActions, useCardState, withCardStateProvider } from '../../elements';
+import { Action, Actions, Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
@@ -149,7 +149,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
         sx={t => ({ borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}` })}
       >
         <PreviewListItems>
-          <SecondaryActions role='menu'>
+          <Actions role='menu'>
             <PersonalAccountPreview />
             {(userMemberships.count || 0) > 0 &&
               userMemberships.data?.map(inv => {
@@ -183,7 +183,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
               })}
 
             {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
-          </SecondaryActions>
+          </Actions>
         </PreviewListItems>
 
         <Action

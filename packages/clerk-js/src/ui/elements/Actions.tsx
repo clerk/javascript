@@ -24,10 +24,6 @@ export const Actions = (props: PropsOfComponent<typeof Flex>) => {
   );
 };
 
-export const SecondaryActions = (props: PropsOfComponent<typeof Flex>) => {
-  return <Actions {...props} />;
-};
-
 type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
   icon: React.ComponentType;
   trailing?: React.ReactNode;
