@@ -853,7 +853,6 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     afterSelectOrganizationUrl?:
       | ((organization: OrganizationResource) => string)
       | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
-
     /**
      * Full URL or path to navigate after a successful selection of personal workspace.
      * Accepts a function that returns URL or path
@@ -866,12 +865,17 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     afterLeaveOrganizationUrl?: string;
     /**
+     * Hides the screen for sending invitations after an organization is created.
+     * @default undefined When left undefined Clerk will automatically hide the screen if
+     * the number of max allowed members is equal to 1
+     */
+    skipInvitationScreen?: boolean;
+    /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
      * prop of ClerkProvided (if one is provided)
      */
     appearance?: OrganizationSwitcherTheme;
-
     /*
      * Specify options for the underlying <OrganizationProfile /> component.
      * e.g. <UserButton userProfileProps={{appearance: {...}}} />
