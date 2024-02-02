@@ -172,7 +172,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async getCount(params: UserListParams = {}) {
+  public async getCount(params: UserCountParams = {}) {
     return this.request<number>({
       method: 'GET',
       path: joinPaths(basePath, 'count'),
