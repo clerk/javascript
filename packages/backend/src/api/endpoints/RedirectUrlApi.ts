@@ -1,4 +1,5 @@
 import { joinPaths } from '../../util/path';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { RedirectUrl } from '../resources/RedirectUrl';
 import { AbstractAPI } from './AbstractApi';
 
@@ -10,7 +11,7 @@ type CreateRedirectUrlParams = {
 
 export class RedirectUrlAPI extends AbstractAPI {
   public async getRedirectUrlList() {
-    return this.request<RedirectUrl[]>({
+    return this.request<PaginatedResourceResponse<RedirectUrl[]>>({
       method: 'GET',
       path: basePath,
     });

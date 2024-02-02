@@ -1,6 +1,7 @@
 import type { SessionStatus } from '@clerk/types';
 
 import { joinPaths } from '../../util/path';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { Session } from '../resources/Session';
 import type { Token } from '../resources/Token';
 import { AbstractAPI } from './AbstractApi';
@@ -15,7 +16,7 @@ type QueryParams = {
 
 export class SessionAPI extends AbstractAPI {
   public async getSessionList(queryParams?: QueryParams) {
-    return this.request<Session[]>({
+    return this.request<PaginatedResourceResponse<Session[]>>({
       method: 'GET',
       path: basePath,
       queryParams: queryParams,

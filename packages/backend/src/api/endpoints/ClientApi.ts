@@ -1,12 +1,13 @@
 import { joinPaths } from '../../util/path';
 import type { Client } from '../resources/Client';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/clients';
 
 export class ClientAPI extends AbstractAPI {
   public async getClientList() {
-    return this.request<Client[]>({
+    return this.request<PaginatedResourceResponse<Client[]>>({
       method: 'GET',
       path: basePath,
     });

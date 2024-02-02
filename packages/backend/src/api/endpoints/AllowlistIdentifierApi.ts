@@ -1,5 +1,6 @@
 import { joinPaths } from '../../util/path';
 import type { AllowlistIdentifier } from '../resources/AllowlistIdentifier';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/allowlist_identifiers';
@@ -11,7 +12,7 @@ type AllowlistIdentifierCreateParams = {
 
 export class AllowlistIdentifierAPI extends AbstractAPI {
   public async getAllowlistIdentifierList() {
-    return this.request<AllowlistIdentifier[]>({
+    return this.request<PaginatedResourceResponse<AllowlistIdentifier[]>>({
       method: 'GET',
       path: basePath,
     });

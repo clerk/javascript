@@ -182,7 +182,7 @@ export class UserAPI extends AbstractAPI {
 
   public async getUserOauthAccessToken(userId: string, provider: `oauth_${OAuthProvider}`) {
     this.requireId(userId);
-    return this.request<OauthAccessToken[]>({
+    return this.request<PaginatedResourceResponse<OauthAccessToken[]>>({
       method: 'GET',
       path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
     });
