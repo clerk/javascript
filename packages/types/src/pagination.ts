@@ -1,7 +1,7 @@
 /**
  * Pagination params in request
  */
-export type ClerkPaginationRequest<T = any> = {
+export type ClerkPaginationRequest<T = object> = {
   /**
    * Maximum number of items returned per request.
    */
@@ -23,7 +23,7 @@ export interface ClerkPaginatedResponse<T> {
 /**
  * Pagination params passed in FAPI client methods
  */
-export type ClerkPaginationParams<T = any> = {
+export type ClerkPaginationParams<T = object> = {
   /**
    * This is the starting point for your fetched results.
    */
