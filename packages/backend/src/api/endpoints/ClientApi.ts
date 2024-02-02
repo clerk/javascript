@@ -1,3 +1,5 @@
+import type { ClerkPaginationRequest } from '@clerk/types';
+
 import { joinPaths } from '../../util/path';
 import type { Client } from '../resources/Client';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
@@ -6,10 +8,11 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/clients';
 
 export class ClientAPI extends AbstractAPI {
-  public async getClientList() {
+  public async getClientList(params: ClerkPaginationRequest = {}) {
     return this.request<PaginatedResourceResponse<Client[]>>({
       method: 'GET',
       path: basePath,
+      queryParams: params,
     });
   }
 
