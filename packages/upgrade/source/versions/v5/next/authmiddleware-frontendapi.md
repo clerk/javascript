@@ -1,6 +1,7 @@
 ---
-title: '`frontendApi` -> `publishableKey` as param to authMiddleware'
+title: '`frontendApi` -> `publishableKey` as param to `authMiddleware`'
 matcher: "authMiddleware\\({[\\s\\S]*?frontendApi:[\\s\\S]*?}\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

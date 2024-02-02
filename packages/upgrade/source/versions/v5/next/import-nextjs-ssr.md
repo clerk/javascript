@@ -1,6 +1,7 @@
 ---
 title: '`@clerk/nextjs/ssr` import removed'
 matcher: "@clerk\\/nextjs\\/ssr"
+category: 'deprecation-removal'
 replaceWithString: '@clerk/nextjs'
 ---
 

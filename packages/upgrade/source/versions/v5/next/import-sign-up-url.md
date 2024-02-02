@@ -1,6 +1,7 @@
 ---
 title: '`SIGN_UP_URL` constant removed'
 matcher: "import\\s+{[\\s\\S]*?SIGN_UP_URL[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

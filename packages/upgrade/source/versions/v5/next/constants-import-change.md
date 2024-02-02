@@ -2,6 +2,7 @@
 title: '`constants` import moved under `/server`'
 matcher: "import\\s+{[\\s\\S]*?constants[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)[\\s\\S]*?['\"]"
 matcherFlags: 'm'
+category: 'top-level-imports'
 replaceWithString: 'nextjs/server'
 ---
 

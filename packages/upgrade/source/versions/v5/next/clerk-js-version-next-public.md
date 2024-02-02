@@ -1,5 +1,6 @@
 ---
 title: '`CLERK_JS_VERSION` should be `NEXT_PUBLIC_CLERK_JS_VERSION`'
+category: 'deprecation-removal'
 matcher: '^[^_]*CLERK_JS_VERSION'
 ---
 

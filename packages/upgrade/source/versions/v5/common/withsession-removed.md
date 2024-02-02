@@ -1,6 +1,7 @@
 ---
 title: '`WithSession` component removed'
 matcher: "import\\s+{[\\s\\S]*?WithSession[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

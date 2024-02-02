@@ -1,6 +1,7 @@
 ---
 title: '`afterSwitchOrganizationUrl` -> `afterSelectOrganizationUrl` in `OrganizationSwitcher`'
 matcher: "<OrganizationSwitcher[\\s\\S]*?(afterSwitchOrganizationUrl)=[\\s\\S]*?>"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 replaceWithString: 'afterSelectOrganizationUrl'
 ---

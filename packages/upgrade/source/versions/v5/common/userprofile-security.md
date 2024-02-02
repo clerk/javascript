@@ -1,6 +1,7 @@
 ---
 title: 'Within `<UserProfile />`, Account and Security Pages Separated'
 matcher: '(?:<UserProfile|<UserButton)'
+category: 'appearance'
 warning: true
 image: true
 ---

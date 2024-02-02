@@ -1,6 +1,7 @@
 ---
 title: '`Clerk` import moved under `/server`'
 matcher: "import\\s+{[\\s\\S]*?[,\\s]Clerk[,\\s][\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+category: 'top-level-imports'
 matcherFlags: 'm'
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: '`@clerk/nextjs/api` import removed'
+category: 'deprecation-removal'
 matcher: "@clerk\\/nextjs\\/api"
 ---
 
@@ -8,12 +9,12 @@ The import subpath `@clerk/nextjs/api` has been removed. This includes the follo
 ```js
 // These have been removed
 import {
-	ClerkMiddleware,
-	ClerkMiddlewareOptions,
-	LooseAuthProp,
-	RequireAuthProp,
-	StrictAuthProp,
-	WithAuthProp,
+  ClerkMiddleware,
+  ClerkMiddlewareOptions,
+  LooseAuthProp,
+  RequireAuthProp,
+  StrictAuthProp,
+  WithAuthProp,
 } from '@clerk/nextjs/api';
 ```
 

@@ -1,6 +1,7 @@
 ---
 title: '`WithClerk` component removed'
 matcher: "import\\s+{[\\s\\S]*?WithClerk[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

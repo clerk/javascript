@@ -1,6 +1,7 @@
 ---
 title: '`authMiddleware` deprecated'
 matcher: "import\\s+{[\\s\\S]*?authMiddleware[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+category: 'middleware'
 matcherFlags: 'm'
 warning: true
 ---
@@ -17,11 +18,11 @@ For more documentation on the new `clerkMiddleware` function, check out [our off
 import { authMiddleware } from '@clerk/nextjs';
 
 export default authMiddleware({
-	publicRoutes: req => !req.url.includes('/dashboard'),
+  publicRoutes: req => !req.url.includes('/dashboard'),
 });
 
 export const config = {
-	matcher: ['/((?!.+\\.[\\w]+$|_next)._)', '/', '/(api|trpc)(._)'],
+  matcher: ['/((?!.+\\.[\\w]+$|_next)._)', '/', '/(api|trpc)(._)'],
 };
 ```
 
@@ -36,14 +37,14 @@ import { NextResponse } from 'next/server';
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
 
 export default clerkMiddleware((auth, request) => {
-	if (isProtectedRoute(request)) {
-		auth().protect();
-	}
+  if (isProtectedRoute(request)) {
+    auth().protect();
+  }
 
-	return NextResponse.next();
+  return NextResponse.next();
 });
 
 export const config = {
-	matcher: ['/((?!.+\\.[\\w]+$|_next)._)', '/', '/(api|trpc)(._)'],
+  matcher: ['/((?!.+\\.[\\w]+$|_next)._)', '/', '/(api|trpc)(._)'],
 };
 ```

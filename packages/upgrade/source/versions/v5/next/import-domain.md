@@ -1,6 +1,7 @@
 ---
 title: '`DOMAIN` constant removed'
 matcher: "import\\s+{[\\s\\S]*?DOMAIN[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

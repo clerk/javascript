@@ -1,6 +1,7 @@
 ---
 title: '`userButtonPopoverActionButtonText` customization id removed'
 image: true
+category: 'appearance'
 matcher:
   - "\\.cl-userButtonPopoverActionButtonText"
   - "\\.cl-userButtonPopoverActionButtonText__signOut"

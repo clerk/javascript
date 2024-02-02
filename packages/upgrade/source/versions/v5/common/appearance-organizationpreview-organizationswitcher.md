@@ -2,6 +2,7 @@
 title: '`elements.organizationPreview__organizationSwitcher` -> `elements.organizationPreview__organizationSwitcherTrigger` in `<OrganizationSwitcher />` appearance prop'
 matcher: "<OrganizationSwitcher[\\s\\S]*?appearance={\\s*{\\s*elements:\\s*{\\s*(organizationPreview__organizationSwitcher)[\\s\\S]*?>"
 matcherFlags: 'm'
+category: 'appearance'
 replaceWithString: 'organizationPreview__organizationSwitcherTrigger'
 ---
 

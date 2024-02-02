@@ -1,17 +1,15 @@
 ---
-title: '`apiKey` -> `secretKey` as param to authMiddleware'
+title: '`apiKey` -> `secretKey` as param to `authMiddleware`'
 matcher: "authMiddleware\\({[\\s\\S]*?apiKey:[\\s\\S]*?}\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 
 The `apiKey` argument passed to `authMiddleware` must be changed to `secretKey`.
 
-```js
+```diff
 import { authMiddleware } from '@clerk/nextjs';
 
-// before
-authMiddleware({ apiKey: '...' });
-
-// after
-authMiddleware({ secretKey: '...' });
+- authMiddleware({ apiKey: '...' });
++ authMiddleware({ secretKey: '...' });
 ```

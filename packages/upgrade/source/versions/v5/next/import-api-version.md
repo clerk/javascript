@@ -1,6 +1,7 @@
 ---
 title: '`API_VERSION` constant removed'
 matcher: "import\\s+{[\\s\\S]*?API_VERSION[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: '`CLERK_JS_VERSION` constant removed'
 matcher: "import\\s+{[\\s\\S]*?CLERK_JS_VERSION[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

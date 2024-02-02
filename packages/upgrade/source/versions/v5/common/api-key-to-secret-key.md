@@ -1,5 +1,6 @@
 ---
 title: '`CLERK_API_KEY` replaced by `CLERK_SECRET_KEY`'
+category: 'deprecation-removal'
 matcher: 'CLERK_API_KEY'
 ---
 

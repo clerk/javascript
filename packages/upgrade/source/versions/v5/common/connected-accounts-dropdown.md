@@ -1,6 +1,7 @@
 ---
 title: 'Within `<UserProfile />`, Connected Accounts Added via Dropdown'
 matcher: '(?:<UserProfile|<UserButton)'
+category: 'appearance'
 warning: true
 image: true
 ---

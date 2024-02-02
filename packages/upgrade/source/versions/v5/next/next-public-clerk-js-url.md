@@ -1,5 +1,6 @@
 ---
 title: '`NEXT_PUBLIC_CLERK_JS` should be `NEXT_PUBLIC_CLERK_JS_URL`'
+category: 'deprecation-removal'
 matcher: 'NEXT_PUBLIC_CLERK_JS[^_]*$'
 ---
 

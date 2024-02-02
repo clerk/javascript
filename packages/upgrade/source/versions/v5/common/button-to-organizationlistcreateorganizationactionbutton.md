@@ -2,6 +2,7 @@
 title: '`button` -> `organizationListCreateOrganizationActionButton` customization id'
 image: true
 replaceWithString: 'organizationListCreateOrganizationActionButton'
+category: 'appearance'
 matcherFlags: 'm'
 matcher:
   - "\\.cl-(button)"

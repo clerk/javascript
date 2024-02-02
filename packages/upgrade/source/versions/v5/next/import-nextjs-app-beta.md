@@ -1,5 +1,6 @@
 ---
 title: '`@clerk/nextjs/app-beta` import removed'
+category: 'deprecation-removal'
 matcher: "@clerk\\/nextjs\\/app-beta"
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: '`withClerk` function removed'
 matcher: "import\\s+{[\\s\\S]*?withClerk[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 
@@ -8,22 +9,22 @@ The `withClerk` higher order function has been removed. If you would still like 
 
 ```js
 function withClerk(Component, displayName) {
-	displayName = displayName || Component.displayName || Component.name || 'Component';
-	Component.displayName = displayName;
-	const HOC = props => {
-		const clerk = useIsomorphicClerkContext();
+  displayName = displayName || Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+  const HOC = props => {
+    const clerk = useIsomorphicClerkContext();
 
-		if (!clerk.loaded) return null;
+    if (!clerk.loaded) return null;
 
-		return (
-			<Component
-				{...props}
-				clerk={clerk}
-			/>
-		);
-	};
+    return (
+      <Component
+        {...props}
+        clerk={clerk}
+      />
+    );
+  };
 
-	HOC.displayName = `withClerk(${displayName})`;
-	return HOC;
+  HOC.displayName = `withClerk(${displayName})`;
+  return HOC;
 }
 ```

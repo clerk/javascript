@@ -1,6 +1,7 @@
 ---
 title: 'Changes to the `card` customization id'
 warning: true
+category: 'appearance'
 matcherFlags: 'm'
 matcher:
   - "\\.cl-card"

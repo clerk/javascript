@@ -2,6 +2,7 @@
 title: '`Settings` -> `General` tab in `OrganizationProfile`'
 matcher: '<OrganizationProfile'
 warning: true
+category: 'appearance'
 image: true
 ---
 

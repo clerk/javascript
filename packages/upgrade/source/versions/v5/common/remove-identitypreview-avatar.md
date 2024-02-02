@@ -2,6 +2,7 @@
 title: 'Identity preview avatar customization ids removed'
 image: true
 matcherFlags: 'm'
+category: 'appearance'
 matcher:
   - "\\.cl-identityPreviewAvatarBox"
   - "\\.cl-identityPreviewAvatarImage"

@@ -2,6 +2,7 @@
 title: '`redirect` import moved under `/server`'
 matcher: "import\\s+{[\\s\\S]*?[,\\s]redirect[,\\s][\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)[\\s\\S]*?['\"]"
 matcherFlags: 'm'
+category: 'top-level-imports'
 replaceWithString: 'nextjs/server'
 ---
 

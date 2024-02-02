@@ -2,6 +2,7 @@
 title: 'Within `<UserProfile />`, Multi-Factor Auth is Added via Dropdown'
 matcher: '(?:<UserProfile|<UserButton)'
 matcherFlags: 'm'
+category: 'appearance'
 warning: true
 image: true
 ---

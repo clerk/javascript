@@ -1,5 +1,6 @@
 ---
 title: '`ClerkProviderOptionsWrapper` type removed'
+category: 'deprecation-removal'
 matcher: 'ClerkProviderOptionsWrapper'
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: '`withClerkMiddleware` removed'
+category: 'middleware'
 matcher: "withClerkMiddleware\\("
 ---
 

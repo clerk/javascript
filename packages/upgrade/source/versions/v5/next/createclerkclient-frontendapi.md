@@ -1,6 +1,7 @@
 ---
-title: '`frontendApi` -> `publishableKey` as param to createClerkClient'
+title: '`frontendApi` -> `publishableKey` as param to `createClerkClient`'
 matcher: "createClerkClient\\({[\\s\\S]*?frontendApi:[\\s\\S]*?}\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

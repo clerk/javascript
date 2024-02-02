@@ -2,6 +2,7 @@
 title: '`socialButtonsBlockButtonArrow` customization id removed'
 image: true
 matcherFlags: 'm'
+category: 'appearance'
 matcher:
   - "\\.cl-socialButtonsBlockButtonArrow"
   - "elements:\\s+{[\\s\\S]*?socialButtonsBlockButtonArrow:[\\s\\S]*?}"

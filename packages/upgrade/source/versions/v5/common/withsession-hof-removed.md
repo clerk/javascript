@@ -1,6 +1,7 @@
 ---
 title: '`withSession` function removed'
 matcher: "import\\s+{[\\s\\S]*?withSession[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 
@@ -8,22 +9,22 @@ The `withSession` higher order function has been removed. If you would still lik
 
 ```js
 function withSession(Component, displayName) {
-	displayName = displayName || Component.displayName || Component.name || 'Component';
-	Component.displayName = displayName;
-	const HOC = props => {
-		const session = useSessionContext();
+  displayName = displayName || Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+  const HOC = props => {
+    const session = useSessionContext();
 
-		if (!session) return null;
+    if (!session) return null;
 
-		return (
-			<Component
-				{...props}
-				session={session}
-			/>
-		);
-	};
+    return (
+      <Component
+        {...props}
+        session={session}
+      />
+    );
+  };
 
-	HOC.displayName = `withSession(${displayName})`;
-	return HOC;
+  HOC.displayName = `withSession(${displayName})`;
+  return HOC;
 }
 ```

@@ -1,5 +1,6 @@
 ---
 title: 'Back button customization ids change on alternative 2fa methods page'
+category: 'appearance'
 image: true
 matcherFlags: 'm'
 matcher:

@@ -1,0 +1,251 @@
+## New middleware architecture
+
+User and customer feedback about `authMiddleware()` has been clear in that middleware logic was a often friction point. As such, in v5 you will find a completely new middleware helper called [`clerkMiddleware()`](/docs/references/nextjs/clerk-middleware) that will hopefully alleviate all of the issues folks had with `authMiddleware()`.
+
+Additionally, there are now new helpers that enable controlling auth on a _per-page and/or per-layout basis_ when using app router. While you can still configure which routes are protected via middleware, the page-based protection strategy is what is now recommended, as the co-location of auth protection configuration with the code for the pages themselves results in a superior developer experience that adds clarity as you navigate your codebase.
+
+### Per-route auth config
+
+Sometimes, code speaks louder than words. Let's get right into an example:
+
+<Tabs type="auth-protect-layout-page" items={["Layout", "Page"]}>
+<Tab>
+```ts filename="app/src/dashboard/layout.tsx"
+import { auth } from '@clerk/nextjs/server'
+
+export default async function DashboardLayout({ children }) {
+    auth().protect();
+    // 👆 This one line is all it takes - the layout and all its children
+    // will now redirect to your sign in page for un-authenticated users.
+
+    return <>{children}</>
+
+}
+
+````
+</Tab>
+<Tab>
+```ts filename="app/src/dashboard/page.tsx"
+import { auth } from '@clerk/nextjs/server'
+
+export default async function DashboardPage() {
+    auth().protect();
+    // 👆 This one line is all it takes - the layout and all its children
+    // will now redirect to your sign in page for un-authenticated users.
+
+    return <p>This page is now protected!</p>
+}
+````
+
+</Tab>
+</Tabs>
+
+In this example, we add `auth().protect()` to a layout, and like magic, that layout and all of it's children will be gated by auth. The same logic can be applied for pages.
+
+Want to get more specific with permission gating? Just add the role you are gating as a param:
+
+```ts filename="app/src/admin/layout.tsx"
+import { auth } from '@clerk/nextjs/server';
+
+export default async function AdminLayout({ children }) {
+  auth().protect({ role: 'org:admin' });
+
+  return <>{children}</>;
+}
+```
+
+Note that in order for this to work, you will still need middleware to be present, but it only requires the most minimal configuration:
+
+```ts filename="middleware.ts"
+import { clerkMiddleware } from '@clerk/nextjs/server';
+
+export default clerkMiddleware();
+
+export const config = {
+  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+};
+```
+
+If you are using the pages router, we instead recommend middleware auth config as seen below.
+
+### Middleware auth config
+
+If you'd still prefer to define your auth logic within the middleware, we support this fully as well, and have put a lot of work into improving the ergonomics as well. The primary change was to make `clerkMiddleware()` not protect any routes by default, instead requiring the developer to add routes they would like to be protected by auth. This is a substantial contrast to the previous `authMiddleware()`, which protected all routes by default, requiring the developer to add exceptions. We have also made efforts to substantially simplify the API and make it easier to combine with other middleware helpers smoothly.
+
+Here's an example that replicates the auth protection scheme above, but entirely inside the middleware:
+
+```ts filename="middleware.ts"
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+
+const isDashboardRoute = createRouteMatcher(['/dashboard(.*)']);
+const isAdminRoute = createRouteMatcher(['/admin']);
+
+export default clerkMiddleware((auth, req) => {
+  // Restrict admin route to users with specific role
+  if (isAdminRoute(req)) auth().protect({ role: 'org:admin' });
+
+  // Restrict dashboard routes to logged in users
+  if (isDashboardRoute(req)) auth().protect();
+});
+
+export const config = {
+  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+};
+```
+
+A couple things to note here:
+
+- The `createRouteMatcher` helper makes it easy to define route groups that you can leverage inside the middleware function and check in whichever order you'd like. Note that it can take an array of routes as well.
+- With `clerkMiddleware`, we are defining the routes we want **to be protected**, rather than the routes we don't want to be protected.
+- We are able to use the same `auth().protect()` helpers that we can use within layouts/pages here in the middleware.
+
+### Migrating to `clerkMiddleware()`
+
+We strongly recommend migrating to the new `clerkMiddleware()` for an improved DX and access to all present and upcoming features, but also want to note that `authMiddleware()`, while deprecated, will continue to work in v5 and will not be removed until the next major version, so you do not _need_ to make any changes to your middleware setup this version.
+
+The most basic migration will be updating the import and changing out the default export.
+
+```diff
+- import { authMiddleware } from "@clerk/nextjs"
++ import { clerkMiddleware } from '@clerk/nextjs/server'
+
+- export default authMiddleware()
++ export default clerkMiddleware()
+
+  export const config = {
+    matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  }
+```
+
+Of course, in most cases you'll have a more complicated setup than this. You can find some examples below for how to migrate a few common use cases. Be sure to review the [`clerkMiddleware()` documentation](/docs/references/nextjs/clerk-middleware) and [route protection guide](/docs/references/nextjs/route-protection) if your specific use case is not mentioned.
+
+<Accordion titles={["Making the index page public", "Protecting a single route path", "Combining with other middlewares (like i18n)"]} heading="h4">
+  <AccordionPanel>
+    By default, `clerkMiddleware()` treats all pages as public, so you no longer need to explcitly set `/` as public.
+
+    Before:
+
+    ```ts filename="middleware.ts"
+    import { authMiddleware } from "@clerk/nextjs"
+
+    export default authMiddleware({
+      publicRoutes: ["/"],
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+    After:
+
+    ```ts filename="middleware.ts"
+    import {
+      clerkMiddleware,
+      createRouteMatcher
+    } from "@clerk/nextjs/server"
+
+    export default clerkMiddleware()
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    Having all routes public except everything under `/dashboard`.
+
+    Before:
+
+    ```ts filename="middleware.ts"
+    import { authMiddleware } from "@clerk/nextjs"
+
+    export default authMiddleware({
+      publicRoutes: (req) => !req.url.includes("/dashboard"),
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+    After:
+
+    ```ts filename="middleware.ts"
+    import {
+      clerkMiddleware,
+      createRouteMatcher
+    } from "@clerk/nextjs/server"
+
+    const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
+
+    export default clerkMiddleware((auth, request) => {
+      if (isDashboardRoute(request)) {
+        auth().protect()
+      }
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    You can call other middlewares inside `clerkMiddleware()`, giving you more direct control over what is called where. An example would be [next-intl](https://next-intl-docs.vercel.app/) to add internationalization to your app.
+
+    Before:
+
+    ```ts filename="middleware.ts"
+    import { authMiddleware } from "@clerk/nextjs"
+    import createMiddleware from "next-intl/middleware"
+
+    const intlMiddleware = createMiddleware({
+      locales: ["en", "de"],
+      defaultLocale: "en",
+    })
+
+    export default authMiddleware({
+      beforeAuth: (req) => {
+        return intlMiddleware(req);
+      },
+      publicRoutes: ["((?!^/dashboard/).*)"],
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+    After:
+
+    ```ts filename="middleware.ts"
+    import {
+      clerkMiddleware,
+      createRouteMatcher
+    } from "@clerk/nextjs/server"
+    import createMiddleware from "next-intl/middleware"
+
+    const intlMiddleware = createMiddleware({
+      locales: ["en", "de"],
+      defaultLocale: "en",
+    })
+
+    const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
+
+    export default clerkMiddleware((auth, request) => {
+      if (isDashboardRoute(request)) {
+        auth().protect()
+      }
+
+      return intlMiddleware(request)
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+  </AccordionPanel>
+</Accordion>

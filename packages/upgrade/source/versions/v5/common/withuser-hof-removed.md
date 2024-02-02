@@ -1,6 +1,7 @@
 ---
 title: '`withUser` function removed'
 matcher: "import\\s+{[\\s\\S]*?withUser[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 
@@ -8,22 +9,22 @@ The `withUser` higher order function has been removed. If you would still like t
 
 ```js
 function withUser(Component, displayName) {
-	displayName = displayName || Component.displayName || Component.name || 'Component';
-	Component.displayName = displayName;
-	const HOC = props => {
-		const clerk = useUserContext();
+  displayName = displayName || Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+  const HOC = props => {
+    const clerk = useUserContext();
 
-		if (!user) return null;
+    if (!user) return null;
 
-		return (
-			<Component
-				{...props}
-				user={user}
-			/>
-		);
-	};
+    return (
+      <Component
+        {...props}
+        user={user}
+      />
+    );
+  };
 
-	HOC.displayName = `withUser(${displayName})`;
-	return HOC;
+  HOC.displayName = `withUser(${displayName})`;
+  return HOC;
 }
 ```

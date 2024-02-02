@@ -1,5 +1,6 @@
 ---
 title: '`@clerk/nextjs/edge-middlewarefiles` import removed'
+category: 'deprecation-removal'
 matcher: "@clerk\\/nextjs\\/edge-middlewarefiles"
 ---
 
