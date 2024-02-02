@@ -32,7 +32,8 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
         t => ({
           flexDirection: 'row-reverse',
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-          padding: `${t.space.$4} 0`,
+          paddingTop: t.space.$4,
+          paddingBottom: t.space.$4,
           gap: t.space.$4,
           [mqu.lg]: {
             flexDirection: 'column-reverse',
@@ -48,13 +49,14 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
         elementId={descriptors.profileSectionContent.setId(id)}
         gap={2}
         ref={ref}
-        sx={{
+        sx={t => ({
+          paddingLeft: t.space.$6,
           minWidth: 0,
           width: '100%',
           '+ *': {
             '--clerk-height': `${height}px`,
           },
-        }}
+        })}
       >
         {children}
       </Col>
@@ -99,7 +101,9 @@ const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
       <Col
         elementDescriptor={descriptors.profileSectionItemList}
         elementId={descriptors.profileSectionItemList.setId(id)}
-        sx={t => ({ gap: t.space.$0x5 })}
+        sx={t => ({
+          gap: t.space.$0x5,
+        })}
         {...rest}
       >
         {children}
@@ -122,11 +126,9 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
           justifyContent: 'space-between',
           width: '100%',
           alignItems: 'center',
-          gap: t.space.$2,
           paddingTop: t.space.$1x5,
           paddingBottom: t.space.$1x5,
-          paddingLeft: t.space.$3,
-          paddingRight: t.space.$3,
+          gap: t.space.$2,
         }),
         sx,
       ]}
@@ -155,7 +157,6 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
           justifyContent: 'start',
           gap: t.space.$2,
           padding: `${t.space.$1x5} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
-          height: t.sizes.$8,
         }),
         sx,
       ]}
@@ -177,9 +178,8 @@ const ProfileSectionArrowButton = (props: ProfileSectionButtonProps) => {
         t => ({
           textWrap: 'nowrap',
           justifyContent: 'start',
-          gap: t.space.$2,
-          padding: `${t.space.$1x5} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
           height: t.sizes.$8,
+          marginLeft: `-${t.space.$3x5}`,
         }),
         sx,
       ]}
@@ -272,8 +272,6 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
             sx={[
               t => ({
                 justifyContent: 'start',
-                gap: t.space.$2,
-                padding: `${t.space.$1x5} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
                 height: t.sizes.$8,
               }),
               triggerSx,

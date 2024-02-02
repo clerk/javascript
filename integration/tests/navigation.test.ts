@@ -110,7 +110,7 @@ export default function Page() {
   //
   //   await u.page.waitForURL(`${app.serverUrl}/user`);
   //
-  //   await u.page.getByText(/Add an email address/i).click();
+  //   await u.page.getByText(/Add email address/i).click();
   //
   //   await u.page.waitForURL(`${app.serverUrl}/user/email-address`);
   //
@@ -138,7 +138,7 @@ export default function Page() {
   //
   //   expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#`);
   //
-  //   await u.page.getByText(/Add an email address/i).click();
+  //   await u.page.getByText(/Add email address/i).click();
   //
   //   expect(u.page.url()).toBe(`${app.serverUrl}/hash/user#/email-address`);
   //
@@ -199,7 +199,7 @@ export default function Page() {
   //   await u.page.getByText(/Set username/i).click();
   //   await u.page.getByText(/Cancel/i).click();
   //
-  //   await u.page.getByText(/Add an email address/i).click();
+  //   await u.page.getByText(/Add email address/i).click();
   //   await u.page.getByText(/Cancel/i).click();
   // });
   //

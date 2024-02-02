@@ -266,7 +266,7 @@ export const enUS: LocalizationResource = {
       },
       emailAddressesSection: {
         title: 'Email addresses',
-        primaryButton: 'Add an email address',
+        primaryButton: 'Add email address',
         detailsAction__primary: 'Complete verification',
         detailsAction__nonPrimary: 'Set as primary',
         detailsAction__unverified: 'Verify',
@@ -274,7 +274,7 @@ export const enUS: LocalizationResource = {
       },
       phoneNumbersSection: {
         title: 'Phone numbers',
-        primaryButton: 'Add a phone number',
+        primaryButton: 'Add phone number',
         detailsAction__primary: 'Complete verification',
         detailsAction__nonPrimary: 'Set as primary',
         detailsAction__unverified: 'Verify phone number',
@@ -365,7 +365,7 @@ export const enUS: LocalizationResource = {
       },
     },
     phoneNumberPage: {
-      title: 'Add a phone number',
+      title: 'Add phone number',
       successMessage: '{{identifier}} has been added to your account.',
       infoText:
         'A text message containing a verification link will be sent to this phone number. Message and data rates may apply.',
@@ -442,7 +442,7 @@ export const enUS: LocalizationResource = {
     },
     mfaPhoneCodePage: {
       title: 'Add SMS code verification',
-      primaryButton__addPhoneNumber: 'Add a phone number',
+      primaryButton__addPhoneNumber: 'Add phone number',
       backButton: 'Use existing number',
       subtitle__availablePhoneNumbers:
         'Select an existing phone number to register for SMS code two-step verification or add a new one.',
