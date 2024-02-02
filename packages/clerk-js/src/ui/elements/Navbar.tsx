@@ -142,10 +142,9 @@ const NavbarContainer = (
         width: t.sizes.$57,
         maxWidth: t.space.$57,
         background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 0.8),
+          colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$blackAlpha50,
         ),
-        backdropFilter: t.backdropFilters.$defaultBlur,
         padding: `${t.space.$6} ${t.space.$5} ${t.space.$4} ${t.space.$3}`,
         marginRight: `-${t.space.$2}`,
         color: t.colors.$colorText,
@@ -303,10 +302,9 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
       sx={t => ({
         display: 'none',
         background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 0.8),
+          colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$blackAlpha50,
         ),
-        backdropFilter: t.backdropFilters.$defaultBlur,
         padding: `${t.space.$2} ${t.space.$3} ${t.space.$4} ${t.space.$3}`,
         marginBottom: `-${t.space.$2}`,
         [mqu.md]: {
