@@ -944,11 +944,13 @@ export interface HandleEmailLinkVerificationParams {
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: OrganizationCustomRoleKey;
+  redirectUrl?: string;
 };
 
 export type CreateBulkOrganizationInvitationParams = {
   emailAddresses: string[];
   role: OrganizationCustomRoleKey;
+  redirectUrl?: string;
 };
 
 export interface CreateOrganizationParams {
