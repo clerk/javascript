@@ -128,7 +128,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         </SelectButton>
         <SelectOptionList
           sx={{ width: '100%', padding: '0 0' }}
-          containerSx={{ gap: 0 }}
+          containerSx={theme => ({ gap: 0, padding: `${theme.space.$0x5} 0` })}
         />
       </Select>
 
@@ -187,7 +187,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
         theme => ({
           width: '100%',
           gap: theme.space.$2,
-          padding: `${theme.space.$0x5} ${theme.space.$4}`,
+          padding: `${theme.space.$1x5} ${theme.space.$4}`,
         }),
         sx,
       ]}

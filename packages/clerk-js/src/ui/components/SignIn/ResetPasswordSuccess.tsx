@@ -9,10 +9,10 @@ export const _ResetPasswordSuccess = () => {
   return (
     <Card.Root>
       <Card.Content>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
+        <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
         </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Col
           elementDescriptor={descriptors.main}
           gap={8}

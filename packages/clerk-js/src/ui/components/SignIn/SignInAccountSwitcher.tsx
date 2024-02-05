@@ -24,11 +24,11 @@ const _SignInAccountSwitcher = () => {
     <Flow.Part part='accountSwitcher'>
       <Card.Root>
         <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
-          <Card.Alert>{card.error}</Card.Alert>
           <Header.Root>
             <Header.Title localizationKey={localizationKeys('signIn.accountSwitcher.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signIn.accountSwitcher.subtitle')} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           <Col
             elementDescriptor={descriptors.main}
             gap={8}

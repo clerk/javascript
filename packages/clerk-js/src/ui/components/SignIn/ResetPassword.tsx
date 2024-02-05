@@ -98,10 +98,10 @@ export const _ResetPassword = () => {
   return (
     <Card.Root>
       <Card.Content>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
+        <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
         </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Col
           elementDescriptor={descriptors.main}
           gap={8}
@@ -145,7 +145,7 @@ export const _ResetPassword = () => {
                 </Form.ControlRow>
               )}
             </Col>
-            <Col gap={4}>
+            <Col gap={3}>
               <Form.SubmitButton
                 isDisabled={!canSubmit}
                 localizationKey={localizationKeys('signIn.resetPassword.formButtonPrimary')}

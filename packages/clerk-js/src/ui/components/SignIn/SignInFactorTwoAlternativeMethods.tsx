@@ -40,15 +40,15 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
     <Flow.Part part='alternativeMethods'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+          <Header.Root showLogo>
             <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
           <Col
             elementDescriptor={descriptors.main}
-            gap={4}
+            gap={3}
           >
             <Col gap={2}>
               {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (

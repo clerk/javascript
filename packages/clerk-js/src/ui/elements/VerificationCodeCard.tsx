@@ -43,8 +43,7 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
   return (
     <Card.Root>
       <Card.Content>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
+        <Header.Root showLogo>
           <Header.Title localizationKey={props.cardTitle} />
           <Header.Subtitle localizationKey={props.cardSubtitle} />
           <IdentityPreview
@@ -53,6 +52,7 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
             onClick={!props.onBackLinkClicked ? props.onIdentityPreviewEditClicked : undefined}
           />
         </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         {children}
         <Col
           elementDescriptor={descriptors.main}
@@ -63,7 +63,7 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
             label={props.inputLabel}
             resendButton={props.resendButton}
           />
-          <Col gap={4}>
+          <Col gap={3}>
             <Button
               elementDescriptor={descriptors.formButtonPrimary}
               block

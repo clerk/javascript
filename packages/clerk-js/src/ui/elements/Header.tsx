@@ -1,19 +1,31 @@
 import React from 'react';
 
-import { Col, descriptors, Heading, Text } from '../customizables';
+import { Col, descriptors, Heading, Text, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
+import { ApplicationLogo } from './ApplicationLogo';
+
+export type HeaderProps = PropsOfComponent<typeof Col> & {
+  showLogo?: boolean;
+};
 
 const Root = React.memo(
-  React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Col>>((props, ref) => {
-    const { sx, ...rest } = props;
+  React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
+    const { sx, children, showLogo = false, ...rest } = props;
+    const appearance = useAppearance();
+
+    const logoIsVisible = appearance.parsedLayout.logoPlacement === 'inside' && showLogo;
+
     return (
       <Col
         ref={ref}
         elementDescriptor={descriptors.header}
-        gap={1}
+        gap={6}
         sx={sx}
         {...rest}
-      />
+      >
+        {logoIsVisible && <ApplicationLogo />}
+        <Col gap={1}>{children}</Col>
+      </Col>
     );
   }),
 );

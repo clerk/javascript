@@ -59,7 +59,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
       {...props}
       sx={[
         theme => ({
-          height: getContainerHeightForImageRatio(imageRef, theme.sizes.$6),
+          height: getContainerHeightForImageRatio(imageRef, theme.sizes.$4),
           objectFit: 'cover',
           justifyContent: 'center',
         }),
