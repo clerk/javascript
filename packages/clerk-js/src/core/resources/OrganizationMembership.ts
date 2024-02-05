@@ -8,8 +8,8 @@ import type {
   OrganizationPermissionKey,
 } from '@clerk/types';
 
+import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { clerkUnsupportedReloadMethod } from '../errors';
 import { BaseResource, Organization, PublicUserData } from './internal';
 
@@ -34,7 +34,7 @@ export class OrganizationMembership extends BaseResource implements Organization
       method: 'GET',
       // `paginated` is used in some legacy endpoints to support clerk paginated responses
       // The parameter will be dropped in FAPI v2
-      search: convertPageToOffset({ ...retrieveMembershipsParams, paginated: true }),
+      search: convertPageToOffsetSearchParams({ ...retrieveMembershipsParams, paginated: true }),
     }).then(res => {
       // TODO: Fix typing
       const { data: suggestions, total_count } =

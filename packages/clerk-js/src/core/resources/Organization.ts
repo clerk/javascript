@@ -25,8 +25,8 @@ import type {
   UpdateOrganizationParams,
 } from '@clerk/types';
 
+import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
@@ -87,7 +87,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       {
         path: `/organizations/${this.id}/roles`,
         method: 'GET',
-        search: convertPageToOffset(getRolesParams),
+        search: convertPageToOffsetSearchParams(getRolesParams),
       },
       {
         forceUpdateClient: true,
@@ -109,7 +109,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       {
         path: `/organizations/${this.id}/domains`,
         method: 'GET',
-        search: convertPageToOffset(getDomainParams),
+        search: convertPageToOffsetSearchParams(getDomainParams),
       },
       {
         forceUpdateClient: true,
@@ -140,7 +140,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/membership_requests`,
       method: 'GET',
-      search: convertPageToOffset(getRequestParam),
+      search: convertPageToOffsetSearchParams(getRequestParam),
     }).then(res => {
       const { data: requests, total_count } =
         res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipRequestJSON>;
@@ -162,7 +162,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       method: 'GET',
       // `paginated` is used in some legacy endpoints to support clerk paginated responses
       // The parameter will be dropped in FAPI v2
-      search: convertPageToOffset({ ...getMembershipsParams, paginated: true }),
+      search: convertPageToOffsetSearchParams({ ...getMembershipsParams, paginated: true }),
     }).then(res => {
       const { data: suggestions, total_count } =
         res?.response as unknown as ClerkPaginatedResponse<OrganizationMembershipJSON>;
@@ -181,7 +181,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       {
         path: `/organizations/${this.id}/invitations`,
         method: 'GET',
-        search: convertPageToOffset(getInvitationsParams),
+        search: convertPageToOffsetSearchParams(getInvitationsParams),
       },
       {
         forceUpdateClient: true,
