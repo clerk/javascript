@@ -26,7 +26,6 @@ export const ActionCard = (props: ActionCardProps) => {
           boxShadow: t.shadows.$actionCardShadow,
           gap: t.space.$4,
           borderRadius: t.radii.$lg,
-          overflow: 'hidden',
           padding: `${t.space.$4} ${t.space.$5}`,
           border: t.borders.$normal,
           borderColor: t.colors.$blackAlpha150,
