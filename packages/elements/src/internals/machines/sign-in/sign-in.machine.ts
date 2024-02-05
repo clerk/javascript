@@ -1,5 +1,6 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { joinURL } from '@clerk/shared/url';
 import type {
   LoadedClerk,
   OAuthStrategy,
@@ -41,12 +42,14 @@ export interface SignInMachineContext extends MachineContext {
   resource: SignInResource | null;
   router: ClerkRouter;
   thirdPartyProviders: EnabledThirdPartyProviders;
+  signUpPath: string;
 }
 
 export interface SignInMachineInput {
   clerk: LoadedClerk;
   form: ActorRefFrom<typeof FormMachine>;
   router: ClerkRouter;
+  signUpPath: string;
 }
 
 export type SignInMachineTags = 'state:start' | 'state:first-factor' | 'state:second-factor' | 'external';
@@ -115,7 +118,11 @@ export const SignInMachine = setup({
       console.error(event.error);
     },
     navigateTo({ context }, { path }: { path: string }) {
-      context.router.replace(path);
+      const resolvedPath = joinURL(context.router.basePath, path);
+      context.router.replace(resolvedPath);
+    },
+    navigateToSignUp({ context }) {
+      context.router.push(context.signUpPath);
     },
     raiseFailure: raise(({ event }) => {
       assertActorEventError(event);
@@ -143,8 +150,7 @@ export const SignInMachine = setup({
     isCurrentFactorPassword: ({ context }) => context.currentFactor?.strategy === 'password',
     isCurrentFactorTOTP: ({ context }) => context.currentFactor?.strategy === 'totp',
     isCurrentPath: ({ context }, params: { path: string }) => {
-      const path = params?.path;
-      return path ? context.router.pathname() === path : false;
+      return context.router.match(params?.path);
     },
     isLoggedIn: ({ context }) => Boolean(context.clerk.user),
     isSignInComplete: ({ context }) => context?.resource?.status === 'complete',
@@ -179,6 +185,7 @@ export const SignInMachine = setup({
     resource: null,
     router: input.router,
     thirdPartyProviders: getEnabledThirdPartyProviders(input.clerk.__unstable__environment),
+    signUpPath: input.signUpPath,
   }),
   initial: 'Init',
   on: {
@@ -198,22 +205,22 @@ export const SignInMachine = setup({
         },
         {
           description: 'If the SignIn resource is empty, invoke the sign-in start flow',
-          guard: or([not('hasSignInResource'), { type: 'isCurrentPath', params: { path: '/sign-in' } }]),
+          guard: or([not('hasSignInResource'), { type: 'isCurrentPath', params: { path: '/' } }]),
           target: 'Start',
         },
         {
           description: 'Go to FirstFactor flow state',
-          guard: and(['needsFirstFactor', { type: 'isCurrentPath', params: { path: '/sign-in/continue' } }]),
+          guard: and(['needsFirstFactor', { type: 'isCurrentPath', params: { path: '/continue' } }]),
           target: 'FirstFactor',
         },
         {
           description: 'Go to SecondFactor flow state',
-          guard: and(['needsSecondFactor', { type: 'isCurrentPath', params: { path: '/sign-in/continue' } }]),
+          guard: and(['needsSecondFactor', { type: 'isCurrentPath', params: { path: '/continue' } }]),
           target: 'SecondFactor',
         },
         {
           description: 'Go to SSO Callback state',
-          guard: { type: 'isCurrentPath', params: { path: '/sign-in/sso-callback' } },
+          guard: { type: 'isCurrentPath', params: { path: '/sso-callback' } },
           target: 'SSOCallback',
         },
         {
@@ -241,12 +248,20 @@ export const SignInMachine = setup({
     Start: {
       id: 'Start',
       tags: 'state:start',
-      description: 'The intial state of the sign-in flow.',
+      description: 'The initial state of the sign-in flow.',
       initial: 'AwaitingInput',
       on: {
         'AUTHENTICATE.OAUTH': '#SignIn.AuthenticatingWithRedirect',
         'AUTHENTICATE.SAML': '#SignIn.AuthenticatingWithRedirect',
       },
+      entry: [
+        {
+          type: 'navigateTo',
+          params: {
+            path: '/',
+          },
+        },
+      ],
       onDone: [
         {
           guard: 'isSignInComplete',
@@ -297,7 +312,7 @@ export const SignInMachine = setup({
     FirstFactor: {
       tags: 'state:first-factor',
       initial: 'DeterminingState',
-      entry: 'assignStartingFirstFactor',
+      entry: [{ type: 'navigateTo', params: { path: '/continue' } }, 'assignStartingFirstFactor'],
       onDone: [
         {
           guard: 'isSignInComplete',
@@ -385,7 +400,7 @@ export const SignInMachine = setup({
     SecondFactor: {
       tags: 'state:second-factor',
       initial: 'DeterminingState',
-      entry: 'assignStartingSecondFactor',
+      entry: [{ type: 'navigateTo', params: { path: '/continue' } }, 'assignStartingSecondFactor'],
       onDone: [
         {
           guard: 'isSignInComplete',
@@ -507,48 +522,24 @@ export const SignInMachine = setup({
         'CLERKJS.NAVIGATE.RESET_PASSWORD': '#SignIn.NotImplemented',
         'CLERKJS.NAVIGATE.SIGN_IN': {
           actions: [
-            log('Navigating to sign in'),
+            log('Navigating to sign in root'),
             {
               type: 'navigateTo',
               params: {
-                path: '/sign-in',
+                path: '/',
               },
             },
           ],
         },
         'CLERKJS.NAVIGATE.SIGN_UP': {
-          actions: [
-            log('Navigating to sign in'),
-            {
-              type: 'navigateTo',
-              params: {
-                path: '/sign-up',
-              },
-            },
-          ],
+          actions: [log('Navigating to sign up'), 'navigateToSignUp'],
         },
         'CLERKJS.NAVIGATE.VERIFICATION': {
-          actions: [
-            log('Navigating to sign in'),
-            {
-              type: 'navigateTo',
-              params: {
-                path: '/sign-up',
-              },
-            },
-          ],
+          actions: [log('Navigating to sign in'), 'navigateToSignUp'],
         },
         'CLERKJS.NAVIGATE.CONTINUE': {
           description: 'Redirect to the sign-up flow',
-          actions: [
-            log('Navigating to sign up'),
-            {
-              type: 'navigateTo',
-              params: {
-                path: '/sign-up',
-              },
-            },
-          ],
+          actions: [log('Navigating to sign up'), 'navigateToSignUp'],
         },
         'CLERKJS.NAVIGATE.*': {
           target: '#SignIn.Start',
