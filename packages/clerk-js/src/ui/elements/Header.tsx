@@ -10,7 +10,7 @@ export type HeaderProps = PropsOfComponent<typeof Col> & {
 
 const Root = React.memo(
   React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
-    const { sx, children, showLogo = false, ...rest } = props;
+    const { sx, children, gap = 6, showLogo = false, ...rest } = props;
     const appearance = useAppearance();
 
     const logoIsVisible = appearance.parsedLayout.logoPlacement === 'inside' && showLogo;
@@ -19,12 +19,18 @@ const Root = React.memo(
       <Col
         ref={ref}
         elementDescriptor={descriptors.header}
-        gap={6}
+        gap={gap}
         sx={sx}
         {...rest}
       >
         {logoIsVisible && <ApplicationLogo />}
-        <Col gap={1}>{children}</Col>
+        <Col
+          gap={1}
+          sx={sx}
+          {...rest}
+        >
+          {children}
+        </Col>
       </Col>
     );
   }),

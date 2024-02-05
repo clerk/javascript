@@ -49,14 +49,13 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
         elementId={descriptors.profileSectionContent.setId(id)}
         gap={2}
         ref={ref}
-        sx={t => ({
-          paddingLeft: t.space.$6,
+        sx={{
           minWidth: 0,
           width: '100%',
           '+ *': {
             '--clerk-height': `${height}px`,
           },
-        })}
+        }}
       >
         {children}
       </Col>
@@ -126,8 +125,7 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
           justifyContent: 'space-between',
           width: '100%',
           alignItems: 'center',
-          paddingTop: t.space.$1x5,
-          paddingBottom: t.space.$1x5,
+          padding: `${t.space.$1x5} ${t.space.$3}`,
           gap: t.space.$2,
         }),
         sx,
@@ -179,7 +177,6 @@ const ProfileSectionArrowButton = (props: ProfileSectionButtonProps) => {
           textWrap: 'nowrap',
           justifyContent: 'start',
           height: t.sizes.$8,
-          marginLeft: `-${t.space.$3x5}`,
         }),
         sx,
       ]}
