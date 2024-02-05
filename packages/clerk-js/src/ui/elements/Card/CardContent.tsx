@@ -9,7 +9,7 @@ import { useUnsafeModalContext } from '../Modal';
 
 type CardContentProps = PropsOfComponent<typeof Flex>;
 export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((props, ref) => {
-  const { children, sx, gap = 8, ...rest } = props;
+  const { children, sx, ...rest } = props;
   const flowMetadata = useFlowMetadata();
   const { toggle } = useUnsafeModalContext();
 
@@ -34,7 +34,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
         }),
         sx,
       ]}
-      gap={gap}
+      gap={8}
       ref={ref}
       {...rest}
     >

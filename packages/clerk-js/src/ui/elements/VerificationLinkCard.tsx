@@ -34,7 +34,6 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Card.Alert>{card.error}</Card.Alert>
             <Header.Title localizationKey={props.cardTitle} />
             <VerificationLink
               formTitle={props.formTitle}
@@ -50,6 +49,7 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
               />
             </VerificationLink>
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           <Card.Action elementId='alternativeMethods'>
             {props.onShowAlternativeMethodsClicked && (
               <Card.ActionLink
