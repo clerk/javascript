@@ -36,7 +36,7 @@ export const CardClerkAndPagesTag = React.memo(
             gap={1}
             align='center'
             justify='center'
-            sx={t => ({ color: t.colors.$colorTextTertiary })}
+            sx={t => ({ color: t.colors.$colorTextSecondary })}
           >
             <>
               <Text variant='buttonSmall'>Secured by</Text>
