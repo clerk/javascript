@@ -1,8 +1,8 @@
 import { buildEmailLinkRedirectUrl, buildSSOCallbackURL } from '../redirects';
 
 describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
-  it('handles empty routing strategy based routing ', function () {
-    expect(buildEmailLinkRedirectUrl({ path: '', authQueryString: '' } as any, '')).toBe('http://localhost/#/verify');
+  it('defaults to path based routing strategy on empty routing', function () {
+    expect(buildEmailLinkRedirectUrl({ path: '', authQueryString: '' } as any, '')).toBe('http://localhost/verify');
   });
 
   it('returns the magic link redirect url for components using path based routing ', function () {
@@ -129,10 +129,10 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
 describe('buildSSOCallbackURL(ctx, baseUrl)', () => {
   it('returns the SSO callback URL based on sign in|up component routing or the provided base URL', () => {
     // Default callback URLS
-    expect(buildSSOCallbackURL({}, '')).toBe('http://localhost/#/sso-callback');
-    expect(buildSSOCallbackURL({}, 'http://test.host')).toBe('http://localhost/#/sso-callback');
+    expect(buildSSOCallbackURL({}, '')).toBe('http://localhost/sso-callback');
+    expect(buildSSOCallbackURL({}, 'http://test.host')).toBe('http://localhost/sso-callback');
     expect(buildSSOCallbackURL({ authQueryString: 'redirect_url=%2Ffoo' }, 'http://test.host')).toBe(
-      'http://localhost/#/sso-callback?redirect_url=%2Ffoo',
+      'http://localhost/sso-callback?redirect_url=%2Ffoo',
     );
 
     // Components mounted with hash routing
