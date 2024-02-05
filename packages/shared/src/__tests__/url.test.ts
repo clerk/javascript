@@ -1,4 +1,11 @@
-import { addClerkPrefix, getClerkJsMajorVersionOrTag, getScriptUrl, parseSearchParams, stripScheme } from '../url';
+import {
+  addClerkPrefix,
+  getClerkJsMajorVersionOrTag,
+  getScriptUrl,
+  joinURL,
+  parseSearchParams,
+  stripScheme,
+} from '../url';
 
 describe('parseSearchParams(queryString)', () => {
   it('parses query string and returns a URLSearchParams object', () => {
@@ -94,5 +101,35 @@ describe('getScriptUrl', () => {
     expect(getScriptUrl('https://foobar.lclstage.dev', {})).toBe(
       'https://foobar.lclstage.dev/npm/@clerk/clerk-js@canary/dist/clerk.browser.js',
     );
+  });
+});
+
+describe('joinURL', () => {
+  const tests = [
+    { input: [], out: '' },
+    { input: ['/'], out: '/' },
+    { input: [null, './'], out: './' },
+    { input: ['/a'], out: '/a' },
+    { input: ['a', 'b'], out: 'a/b' },
+    { input: ['/a', 'b'], out: '/a/b' },
+    { input: ['/', '/b'], out: '/b' },
+    { input: ['a', 'b/', 'c'], out: 'a/b/c' },
+    { input: ['a', 'b/', '/c'], out: 'a/b/c' },
+    { input: ['/', './'], out: '/' },
+    { input: ['/', './foo'], out: '/foo' },
+    { input: ['/', './foo/'], out: '/foo/' },
+    { input: ['/', './foo', 'bar'], out: '/foo/bar' },
+  ];
+
+  for (const t of tests) {
+    test(JSON.stringify(t.input), () => {
+      // @ts-expect-error - Tests
+      expect(joinURL(...t.input)).toBe(t.out);
+    });
+  }
+
+  test('no arguments', () => {
+    // @ts-expect-error - Tests
+    expect(joinURL()).toBe('');
   });
 });
