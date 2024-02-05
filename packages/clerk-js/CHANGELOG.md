@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.69.0
+
+### Minor Changes
+
+- Add support for X/Twitter v2 OAuth provider ([#2697](https://github.com/clerk/javascript/pull/2697)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+### Patch Changes
+
+- Update cookie setting to ensure cookies can be set to be read when an application is embedded in an iframe. ([#2694](https://github.com/clerk/javascript/pull/2694)) by [@SokratisVidros](https://github.com/SokratisVidros)
+
+- Fix redirect flow for OAuth2 IDP flow with email_link verification. ([#2702](https://github.com/clerk/javascript/pull/2702)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`38f0f862b`](https://github.com/clerk/javascript/commit/38f0f862bfc5eb697625131a753f4127ff262895)]:
+  - @clerk/types@3.61.0
+  - @clerk/localizations@1.26.14
+
 ## 4.68.6
 
 ### Patch Changes
