@@ -157,16 +157,21 @@ export const useSignInContext = (): SignInContextType => {
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
-  let signUpUrl = pickRedirectionProp('signUpUrl', { ctx, options, displayConfig }, false);
-
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
     afterSignInUrl: afterSignInUrl,
     afterSignUpUrl: afterSignUpUrl,
     displayConfig: displayConfig,
   });
+
+  let signUpUrl = pickRedirectionProp('signUpUrl', { ctx, options, displayConfig }, false);
   if (authQs && ctx.routing !== 'virtual') {
     signUpUrl += `#/?${authQs}`;
+  }
+
+  let signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
+  if (authQs && ctx.routing !== 'virtual') {
+    signInUrl += `#/?${authQs}`;
   }
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
@@ -175,6 +180,7 @@ export const useSignInContext = (): SignInContextType => {
     ...ctx,
     componentName,
     signUpUrl,
+    signInUrl,
     afterSignInUrl,
     afterSignUpUrl,
     navigateAfterSignIn,
