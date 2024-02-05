@@ -40,6 +40,8 @@ export const CustomField = forwardRef<typeof Input, { name: string; label: strin
     name === 'code'
       ? {
           render: OTPInputSegment,
+          type: 'otp',
+          className: 'flex gap-3',
         }
       : {
           className: 'bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500',

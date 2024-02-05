@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Page() {
   return (
-    <SignIn>
+    <SignIn path='/otp-playground'>
       <Start>
         <div className='h-dvh flex items-center justify-center bg-neutral-800'>
           <Field name='code'>
