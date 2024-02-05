@@ -9,7 +9,7 @@ export type HTTPMethod = 'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PA
 
 export type FapiRequestInit = RequestInit & {
   path?: string;
-  search?: string | URLSearchParams | string[][] | Record<string, string | string[]> | undefined;
+  search?: ConstructorParameters<typeof URLSearchParams>[0];
   sessionId?: string;
   rotatingTokenNonce?: string;
   pathPrefix?: string;
@@ -92,7 +92,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     return true;
   }
 
-  function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit) {
+  function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
     const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
 

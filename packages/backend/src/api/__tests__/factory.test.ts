@@ -47,21 +47,35 @@ export default (QUnit: QUnit) => {
       );
     });
 
-    test('executes a successful backend API request for a list of resources and parses the response', async assert => {
+    test('executes 2 backend API request for users.getUserList()', async assert => {
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonOk([userJson]));
+      // use different total_count from data in the 1st response to assert that this value is returned from method
+      fakeFetch.onCall(1).returns(jsonOk({ object: 'total_count', total_count: 2 }));
 
-      const response = await apiClient.users.getUserList({ offset: 2, limit: 5 });
+      const { data, totalCount } = await apiClient.users.getUserList({
+        offset: 2,
+        limit: 5,
+        userId: ['user_cafebabe'],
+      });
 
-      assert.equal(response[0].firstName, 'John');
-      assert.equal(response[0].lastName, 'Doe');
-      assert.equal(response[0].emailAddresses[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(response[0].phoneNumbers[0].phoneNumber, '+311-555-2368');
-      assert.equal(response[0].externalAccounts[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(response[0].publicMetadata.zodiac_sign, 'leo');
+      assert.equal(data[0].firstName, 'John');
+      assert.equal(data[0].id, 'user_cafebabe');
+      assert.equal(data.length, 1);
+      assert.equal(totalCount, 2);
 
       assert.ok(
-        fakeFetch.calledOnceWith('https://api.clerk.test/v1/users?offset=2&limit=5', {
+        fakeFetch.calledWith('https://api.clerk.test/v1/users?offset=2&limit=5&user_id=user_cafebabe', {
+          method: 'GET',
+          headers: {
+            Authorization: 'Bearer deadbeef',
+            'Content-Type': 'application/json',
+            'User-Agent': '@clerk/backend@0.0.0-test',
+          },
+        }),
+      );
+      assert.ok(
+        fakeFetch.calledWith('https://api.clerk.test/v1/users/count?user_id=user_cafebabe', {
           method: 'GET',
           headers: {
             Authorization: 'Bearer deadbeef',

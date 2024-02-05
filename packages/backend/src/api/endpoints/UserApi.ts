@@ -108,11 +108,19 @@ type VerifyTOTPParams = {
 
 export class UserAPI extends AbstractAPI {
   public async getUserList(params: UserListParams = {}) {
-    return this.request<User[]>({
-      method: 'GET',
-      path: basePath,
-      queryParams: params,
-    });
+    const { limit, offset, orderBy, ...userCountParams } = params;
+    // TODO(dimkl): Temporary change to populate totalCount using a 2nd BAPI call to /users/count endpoint
+    // until we update the /users endpoint to be paginated in a next BAPI version.
+    // In some edge cases the data.length != totalCount due to a creation of a user between the 2 api responses
+    const [data, totalCount] = await Promise.all([
+      this.request<User[]>({
+        method: 'GET',
+        path: basePath,
+        queryParams: params,
+      }),
+      this.getCount(userCountParams),
+    ]);
+    return { data, totalCount } as PaginatedResourceResponse<User[]>;
   }
 
   public async getUser(userId: string) {
@@ -172,7 +180,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async getCount(params: UserListParams = {}) {
+  public async getCount(params: UserCountParams = {}) {
     return this.request<number>({
       method: 'GET',
       path: joinPaths(basePath, 'count'),
@@ -182,7 +190,7 @@ export class UserAPI extends AbstractAPI {
 
   public async getUserOauthAccessToken(userId: string, provider: `oauth_${OAuthProvider}`) {
     this.requireId(userId);
-    return this.request<OauthAccessToken[]>({
+    return this.request<PaginatedResourceResponse<OauthAccessToken[]>>({
       method: 'GET',
       path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
     });
