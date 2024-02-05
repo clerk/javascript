@@ -4,7 +4,7 @@ import { useEnvironment } from '../contexts';
 import { descriptors, Flex, generateFlowPartClassname, Icon, useAppearance } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { Close } from '../icons';
-import type { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
 import { useFlowMetadata } from './contexts';
@@ -12,10 +12,13 @@ import { IconButton } from './IconButton';
 import { useUnsafeModalContext } from './Modal';
 import { PoweredByClerkTag } from './PoweredByClerk';
 
-type CardProps = PropsOfComponent<typeof BaseCard> & React.PropsWithChildren<Record<never, never>>;
+type CardProps = PropsOfComponent<typeof BaseCard> &
+  React.PropsWithChildren<Record<never, never>> & {
+    insideAppLogoSx?: ThemableCssProp;
+  };
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
-  const { sx, children, ...rest } = props;
+  const { sx, children, insideAppLogoSx, ...rest } = props;
   const appearance = useAppearance();
   const flowMetadata = useFlowMetadata();
   const { branded } = useEnvironment().displayConfig;
@@ -55,7 +58,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
         ]}
         ref={ref}
       >
-        {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo />}
+        {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo sx={insideAppLogoSx} />}
         {children}
         {branded && <PoweredByClerkTag />}
       </BaseCard>
