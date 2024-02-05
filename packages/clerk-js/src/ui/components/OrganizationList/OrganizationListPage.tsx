@@ -51,6 +51,9 @@ export const OrganizationListPage = withCardStateProvider(() => {
       sx={t => ({
         padding: `${t.space.$8} ${t.space.$none}`,
       })}
+      insideAppLogoSx={t => ({
+        padding: `${t.space.$none} ${t.space.$8}`,
+      })}
       gap={6}
     >
       <CardAlert>{card.error}</CardAlert>
