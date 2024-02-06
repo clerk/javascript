@@ -84,12 +84,14 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
             {...nameField.props}
             autoFocus
             isRequired
+            ignorePasswordManager
           />
         </Form.ControlRow>
         <Form.ControlRow elementId={slugField.id}>
           <Form.PlainInput
             {...slugField.props}
             onChange={onChangeSlug}
+            ignorePasswordManager
           />
         </Form.ControlRow>
         <FormButtons

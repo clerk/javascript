@@ -176,6 +176,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
               onChange={onChangeName}
               isRequired
               autoFocus
+              ignorePasswordManager
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={slugField.id}>
@@ -184,6 +185,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
               onChange={onChangeSlug}
               isRequired
               pattern='^[a-z0-9\-]+$'
+              ignorePasswordManager
             />
           </Form.ControlRow>
           <FormButtonContainer sx={t => ({ marginTop: t.space.$none })}>
