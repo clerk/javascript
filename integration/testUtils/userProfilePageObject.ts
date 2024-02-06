@@ -15,6 +15,18 @@ export const createUserProfileComponentPageObject = (testArgs: TestArgs) => {
     waitForMounted: () => {
       return page.waitForSelector('.cl-userProfile-root', { state: 'attached' });
     },
+    clickSetUsername: () => {
+      return page.getByText(/Set username/i).click();
+    },
+    typeUsername: (value: string) => {
+      return page.getByLabel(/username/i).fill(value);
+    },
+    clickAddEmailAddress: () => {
+      return page.getByText(/Add email address/i).click();
+    },
+    typeEmailAddress: (value: string) => {
+      return page.getByLabel(/Email address/i).fill(value);
+    },
   };
   return self;
 };
