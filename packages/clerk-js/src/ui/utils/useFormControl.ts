@@ -60,6 +60,7 @@ type FieldStateProps<Id> = {
   clearFeedback: () => void;
   hasPassedComplexity: boolean;
   isFocused: boolean;
+  ignorePasswordManager?: boolean;
 } & Omit<Options, 'defaultChecked'>;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {

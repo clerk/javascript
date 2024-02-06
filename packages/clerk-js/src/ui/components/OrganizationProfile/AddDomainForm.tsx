@@ -68,6 +68,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
             <Form.PlainInput
               {...nameField.props}
               autoFocus
+              ignorePasswordManager
               isRequired
             />
           </Form.ControlRow>
