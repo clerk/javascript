@@ -13,7 +13,7 @@ export const ActiveDevicesSection = () => {
   const { user } = useUser();
   const { session } = useSession();
 
-  const { data, isLoading } = useFetch(user?.getSessions, {});
+  const { data: sessions, isLoading } = useFetch(user?.getSessions, 'user-sessions');
 
   return (
     <ProfileSection.Root
@@ -22,17 +22,15 @@ export const ActiveDevicesSection = () => {
       id='activeDevices'
     >
       <ProfileSection.ItemList id='activeDevices'>
-        {isLoading || !data ? (
+        {isLoading ? (
           <FullHeightLoader />
         ) : (
-          Object.values(data)
-            .sort(currentSessionFirst(session!.id))
-            .map(sa => (
-              <DeviceItem
-                key={sa.id}
-                session={sa}
-              />
-            ))
+          sessions?.sort(currentSessionFirst(session!.id)).map(sa => (
+            <DeviceItem
+              key={sa.id}
+              session={sa}
+            />
+          ))
         )}
       </ProfileSection.ItemList>
     </ProfileSection.Root>
