@@ -21,7 +21,10 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
   const [height, setHeight] = useState(0);
 
   useLayoutEffect(() => {
-    setHeight(ref.current?.clientHeight || 0);
+    const element = ref.current;
+    if (element) {
+      setHeight(element.clientHeight + element.clientTop || 0);
+    }
   }, []);
 
   return (
@@ -34,7 +37,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           paddingTop: t.space.$4,
           paddingBottom: t.space.$4,
-          gap: t.space.$4,
+          gap: t.space.$6,
           [mqu.lg]: {
             flexDirection: 'column-reverse',
             gap: t.space.$2,
@@ -64,7 +67,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
         elementDescriptor={descriptors.profileSectionHeader}
         elementId={descriptors.profileSectionHeader.setId(id)}
         sx={t => ({
-          padding: centered ? undefined : `${t.space.$2} 0`,
+          padding: centered ? undefined : `${t.space.$1x5} 0`,
           gap: t.space.$1,
           width: t.space.$66,
           alignSelf: height ? 'self-start' : centered ? 'center' : undefined,
@@ -125,7 +128,7 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
           justifyContent: 'space-between',
           width: '100%',
           alignItems: 'center',
-          padding: `${t.space.$1x5} ${t.space.$3}`,
+          padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$4}`,
           gap: t.space.$2,
         }),
         sx,
