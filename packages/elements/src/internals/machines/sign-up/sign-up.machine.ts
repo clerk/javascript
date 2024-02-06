@@ -329,7 +329,7 @@ export const SignUpMachine = setup({
     Start: {
       id: 'Start',
       tags: 'state:start',
-      description: 'The intial state of the sign-in flow.',
+      description: 'The intial state of the sign-up flow.',
       entry: 'assignThirdPartyProviders',
       initial: 'AwaitingInput',
       on: {

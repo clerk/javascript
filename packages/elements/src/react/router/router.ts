@@ -15,6 +15,10 @@ export type ClerkHostRouter = {
  */
 export type ClerkRouter = {
   /**
+   * The basePath the router is currently mounted on.
+   */
+  basePath: string;
+  /**
    * Creates a child router instance scoped to the provided base path.
    */
   child: (childBasePath: string) => ClerkRouter;
@@ -108,5 +112,6 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
     replace,
     pathname: router.pathname,
     searchParams: router.searchParams,
+    basePath: normalizedBasePath,
   };
 }

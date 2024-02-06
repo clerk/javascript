@@ -148,7 +148,7 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
   const shouldBeHidden = false;
   const type = inputType ?? determineInputTypeFromName(name);
 
-  const Element = inputType === 'otp' ? OTPInput : RadixControl;
+  const Element = type === 'otp' ? OTPInput : RadixControl;
 
   let props = {};
   if (inputType === 'otp') {
