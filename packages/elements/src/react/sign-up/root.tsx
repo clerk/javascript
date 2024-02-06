@@ -39,15 +39,16 @@ function SignUpFlowProvider({ children }: PropsWithChildren) {
     </SignUpCtx.Provider>
   );
 }
+export type SignUpRootProps = PropsWithChildren<{ path?: string }>;
 
-export function SignUpRoot({ children }: PropsWithChildren): JSX.Element | null {
+export function SignUpRoot({ children, path = '/sign-up' }: SignUpRootProps): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
 
   return (
     <Router
+      basePath={path}
       router={router}
-      basePath='/sign-in'
     >
       <ClerkLoaded>
         <FormStoreProvider>

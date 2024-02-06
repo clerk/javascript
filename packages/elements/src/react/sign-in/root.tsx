@@ -1,45 +1,31 @@
 'use client';
 
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
+import { useActorRef } from '@xstate/react';
 import type { PropsWithChildren } from 'react';
 
-import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
+import { FormStoreProvider } from '~/internals/machines/form/form.context';
+import { SignInRouterMachine } from '~/internals/machines/sign-in/router/machine';
+import { useBrowserInspector } from '~/react/hooks';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
-import { SignInCtx } from '~/react/sign-in/contexts/sign-in.context';
-import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
+import { SignInRouterCtx } from '~/react/sign-in/contexts/router.context';
 
-const { useBrowserInspector } = createBrowserInspectorReactHook();
+type SignInFlowProviderProps = Required<PropsWithChildren>;
 
-function SignInFlowProvider({ children }: PropsWithChildren) {
+function SignInFlowProvider({ children }: SignInFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
-  const form = useFormStore();
-  const { loading: inspectorLoading, inspector } = useBrowserInspector();
+  const { inspector } = useBrowserInspector();
 
-  if (!router) {
-    throw new Error('clerk: Unable to locate ClerkRouter, make sure this is rendered within `<Router>`.');
-  }
+  const ref = useActorRef(SignInRouterMachine, {
+    input: { clerk, router, signUpPath: '/sign-up' },
+    inspect: inspector?.inspect,
+  });
 
-  if (inspectorLoading) {
-    return null;
-  }
-
-  return (
-    <SignInCtx.Provider
-      options={{
-        input: {
-          clerk,
-          router,
-          form,
-          signUpPath: '/sign-up',
-        },
-        inspect: inspector?.inspect,
-      }}
-    >
-      {children}
-    </SignInCtx.Provider>
-  );
+  return <SignInRouterCtx.Provider actorRef={ref}>{children}</SignInRouterCtx.Provider>;
 }
+
+export type SignInRootProps = SignInFlowProviderProps & { path?: string };
 
 /**
  * Root component for the sign-in flow. It sets up providers and state management for its children.
@@ -52,16 +38,20 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
  *  </SignIn>
  * )
  */
-export function SignInRoot({ children, path = '/sign-in' }: PropsWithChildren<{ path?: string }>): JSX.Element | null {
+export function SignInRoot({ children, path = '/sign-in' }: SignInRootProps): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
+  const { loading: inspectorLoading } = useBrowserInspector();
+
+  if (inspectorLoading) {
+    return null;
+  }
 
   return (
     <Router
-      router={router}
       basePath={path}
+      router={router}
     >
-      {/* TODO: Temporary hydration fix */}
       <ClerkLoaded>
         <FormStoreProvider>
           <SignInFlowProvider>{children}</SignInFlowProvider>

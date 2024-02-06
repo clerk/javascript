@@ -7,7 +7,13 @@ import { createClerkRouter } from './router';
 export const ClerkRouterContext = createContext<ClerkRouter | null>(null);
 
 export function useClerkRouter() {
-  return useContext(ClerkRouterContext);
+  const ctx = useContext(ClerkRouterContext);
+
+  if (!ctx) {
+    throw new Error('clerk: Unable to locate ClerkRouter, make sure this is rendered within `<Router>`.');
+  }
+
+  return ctx;
 }
 
 export function Router({

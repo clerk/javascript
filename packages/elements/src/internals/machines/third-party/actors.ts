@@ -21,24 +21,23 @@ export type AuthenticateWithRedirectSignUpParams = SetOptional<
   OptionalRedirectParams
 >;
 
-export type AuthenticateWithRedirectSignInInput = WithClerk<WithParams<AuthenticateWithRedirectSignInParams>>;
-export type AuthenticateWithRedirectSignUpInput = WithClerk<WithParams<AuthenticateWithRedirectSignUpParams>>;
+export type AuthenticateWithRedirectInput = WithClerk<
+  (
+    | (WithParams<AuthenticateWithRedirectSignInParams> & { flow: 'signIn' })
+    | (WithParams<AuthenticateWithRedirectSignUpParams> & { flow: 'signUp' })
+  ) & { basePath: string }
+>;
 
-export const signInRedirect = fromPromise<void, AuthenticateWithRedirectSignInInput>(
-  async ({ input: { clerk, params } }) =>
-    clerk.client.signIn.authenticateWithRedirect({
-      redirectUrl: params.redirectUrl || clerk.buildUrlWithAuth(`/sign-up${SSO_CALLBACK_PATH_ROUTE}`),
-      redirectUrlComplete: params.redirectUrlComplete || clerk.buildAfterSignInUrl(),
+export const redirect = fromPromise<void, AuthenticateWithRedirectInput>(
+  async ({ input: { basePath, clerk, flow, params } }) => {
+    const path = clerk.buildUrlWithAuth(`${basePath}${SSO_CALLBACK_PATH_ROUTE}`);
+
+    return clerk.client[flow].authenticateWithRedirect({
+      redirectUrl: path,
+      redirectUrlComplete: path,
       ...params,
-    }),
-);
-export const signUpRedirect = fromPromise<void, AuthenticateWithRedirectSignUpInput>(
-  async ({ input: { clerk, params } }) =>
-    clerk.client.signUp.authenticateWithRedirect({
-      redirectUrl: params.redirectUrl || clerk.buildUrlWithAuth(`/sign-up${SSO_CALLBACK_PATH_ROUTE}`),
-      redirectUrlComplete: params.redirectUrlComplete || clerk.buildAfterSignUpUrl(),
-      ...params,
-    }),
+    });
+  },
 );
 
 export type HandleRedirectCallbackParams<T = Required<HandleOAuthCallbackParams | HandleSamlCallbackParams>> = {

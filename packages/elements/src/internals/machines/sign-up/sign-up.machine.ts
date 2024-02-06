@@ -6,20 +6,21 @@ import type {
   SamlStrategy,
   SignUpField,
   SignUpResource,
+  SignUpStatus,
   SignUpVerifiableField,
   SignUpVerificationsResource,
   VerificationStatus,
   VerificationStrategy,
   Web3Strategy,
 } from '@clerk/types';
-import type { ActorRefFrom, ErrorActorEvent, MachineContext } from 'xstate';
-import { and, log, sendTo, setup } from 'xstate';
+import type { Writable } from 'type-fest';
+import type { ActorRefFrom, ErrorActorEvent, MachineContext, NonReducibleUnknown } from 'xstate';
+import { and, log, not, or, sendTo, setup } from 'xstate';
 
+import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import type { ClerkElementsErrorBase } from '~/internals/errors/error';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import type { FormMachine } from '~/internals/machines/form/form.machine';
-import type { ClerkLoaderEvents } from '~/internals/machines/shared.actors';
-import { clerkLoader } from '~/internals/machines/shared.actors';
 import {
   attemptVerification,
   createSignUp,
@@ -49,7 +50,6 @@ export interface SignUpMachineInput {
 
 export type SignUpMachineEvents =
   | ErrorActorEvent
-  | ClerkLoaderEvents
   | { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy }
   | { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy }
   | { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy }
@@ -66,7 +66,7 @@ export type SignUpMachineEvents =
 
 export type SignUpVerificationTags = 'code' | VerificationStrategy;
 
-export type SignUpStateTags = 'state:start' | 'state:continue' | 'state:verification';
+export type SignUpStateTags = 'state:start' | 'state:continue' | 'state:verification' | 'state:callback';
 
 export type SignUpTags = SignUpStateTags | SignUpVerificationTags | 'external';
 export type SignUpDelays = 'TIMEOUT.POLLING';
@@ -79,11 +79,41 @@ export interface SignUpMachineSchema {
   delays: SignUpDelays;
 }
 
+const isCurrentPath =
+  (path: `/${string}`) =>
+  ({ context }: { context: SignUpMachineContext }, _params?: NonReducibleUnknown) =>
+    context.router.match(path);
+
+const needsStatus =
+  (status: SignUpStatus) =>
+  ({ context }: { context: SignUpMachineContext }, _params?: NonReducibleUnknown) =>
+    context.clerk.client.signUp.status === status;
+
+const shouldVerify = (field: SignUpVerifiableField, strategy?: VerificationStrategy) => {
+  const guards: Writable<Parameters<typeof and<SignUpMachineContext, SignUpMachineEvents, any>>[0]> = [
+    {
+      type: 'isFieldUnverified',
+      params: {
+        field,
+      },
+    },
+  ];
+
+  if (strategy) {
+    guards.push({
+      type: 'isStrategyEnabled',
+      params: {
+        attribute: field,
+        strategy,
+      },
+    });
+  }
+
+  return and(guards);
+};
+
 export const SignUpMachine = setup({
   actors: {
-    // Root
-    clerkLoader,
-
     // Start
     createSignUp,
 
@@ -101,6 +131,14 @@ export const SignUpMachine = setup({
     goToNextState: sendTo(({ self }) => self, { type: 'NEXT' }),
     navigateTo({ context }, { path }: { path: string }) {
       context.router.replace(path);
+    },
+    navigateInternal({ context }, { path }: { path: string }) {
+      const resolvedPath = [context.router.basePath, path].join('/').replace(/\/\/g/, '/');
+      if (resolvedPath === context.router.pathname()) return;
+      context.router.replace(resolvedPath);
+    },
+    navigateExternal({ context }, { path }: { path: string }) {
+      context.router.push(path);
     },
     raiseFailure: ({ event, self }, { error }: { error: string | ClerkElementsErrorBase }) => {
       let selectedError: Error = typeof error === 'string' ? new ClerkElementsRuntimeError(error) : error;
@@ -139,9 +177,11 @@ export const SignUpMachine = setup({
   guards: {
     areFieldsMissing: ({ context }) => context.clerk.client.signUp.missingFields.length > 0,
     areFieldsUnverified: ({ context }) => context.clerk.client.signUp.unverifiedFields.length > 0,
-    currentPathMatches: ({ context }, { regex }: { regex: RegExp }) =>
-      regex ? Boolean(context.router.pathname()?.match(regex)) : false,
-    isComplete: ({ context }) => context.clerk.client.signUp.status === 'complete',
+    hasResource: ({ context }) => Boolean(context.clerk.client.signUp),
+
+    isActivePathRoot: isCurrentPath('/'),
+    isActivePathContinue: isCurrentPath('/continue'),
+    isActivePathCallback: isCurrentPath('/sso-callback'),
     isFieldMissing: ({ context }, { field }: { field: SignUpField }) =>
       context.clerk.client.signUp.missingFields.includes(field),
     isFieldUnverified: ({ context }, { field }: { field: SignUpVerifiableField }) =>
@@ -153,53 +193,23 @@ export const SignUpMachine = setup({
       Boolean(
         context.clerk.__unstable__environment?.userSettings.attributes[attribute].verifications.includes(strategy),
       ),
+    isLoggedIn: ({ context }) => Boolean(context.clerk.user),
     isMissingRequiredFields: and(['isStatusMissingRequirements', 'areFieldsMissing']),
     isMissingRequiredUnverifiedFields: and(['isStatusMissingRequirements', 'areFieldsUnverified']),
-    isStatusAbandoned: ({ context }) => context.clerk.client.signUp.status === 'abandoned',
-    isStatusComplete: ({ context }) => context?.clerk.client.signUp.status === 'complete',
-    isStatusMissingRequirements: ({ context }) => context.clerk.client.signUp.status === 'missing_requirements',
+    isStatusAbandoned: needsStatus('abandoned'),
+    isStatusComplete: needsStatus('complete'),
+    isStatusMissingRequirements: needsStatus('missing_requirements'),
     isVerificationStatusExpired: (
       { context },
       params: { strategy: SignUpVerificationsResourceKey; status: VerificationStatus },
     ) => context.clerk.client.signUp.verifications[params.strategy].status === 'expired',
-    shouldVerifyPhoneCode: and([
-      {
-        type: 'isFieldUnverified',
-        params: {
-          field: 'phone_number' as const,
-        },
-      },
-    ]),
-    shouldVerifyEmailLink: and([
-      {
-        type: 'isFieldUnverified',
-        params: {
-          field: 'email_address' as const,
-        },
-      },
-      {
-        type: 'isStrategyEnabled',
-        params: {
-          attribute: 'email_address' as const,
-          strategy: 'email_link' as const,
-        },
-      },
-    ]),
-    shouldVerifyEmailCode: and([
-      {
-        type: 'isFieldUnverified',
-        params: {
-          field: 'email_address' as const,
-        },
-      },
-      {
-        type: 'isStrategyEnabled',
-        params: {
-          attribute: 'email_address' as const,
-          strategy: 'email_code' as const,
-        },
-      },
-    ]),
+    needsIdentifier: or([not('hasResource'), 'isActivePathRoot']),
+    needsContinue: and(['isMissingRequiredFields', 'isActivePathContinue']),
+    needsVerification: and(['isMissingRequiredUnverifiedFields', 'isActivePathContinue']),
+    needsCallback: isCurrentPath('/sso-callback'),
+    shouldVerifyPhoneCode: shouldVerify('phone_number'),
+    shouldVerifyEmailLink: shouldVerify('email_address', 'email_link'),
+    shouldVerifyEmailCode: shouldVerify('email_address', 'email_code'),
   },
   delays: {
     'TIMEOUT.POLLING': 300_000, // 5 minutes
@@ -218,18 +228,12 @@ export const SignUpMachine = setup({
     systemId: THIRD_PARTY_MACHINE_ID,
     src: 'ThirdPartyMachine',
     input: ({ context }) => ({
+      basePath: context.router.basePath,
       clerk: context.clerk,
+      flow: 'signUp',
     }),
   },
   on: {
-    'CLERKJS.NAVIGATE.*': {
-      actions: {
-        type: 'raiseFailure',
-        params: {
-          error: 'Having trouble?',
-        },
-      },
-    },
     FAILURE: {
       actions: sendTo(
         ({ context }) => context.formRef,
@@ -240,32 +244,57 @@ export const SignUpMachine = setup({
       ),
       target: '.Start',
     },
+    NEXT: [
+      {
+        guard: 'isStatusComplete',
+        actions: log('isStatusComplete'),
+        target: '.LoggingIn',
+      },
+      {
+        guard: 'isLoggedIn',
+        actions: [
+          log('isLoggedIn'),
+          { type: 'navigateExternal', params: ({ context }) => ({ path: context.clerk.buildAfterSignInUrl() }) },
+        ],
+      },
+      {
+        guard: 'needsIdentifier',
+        actions: log('needsIdentifier'),
+        target: '.Start',
+        reenter: true,
+      },
+      {
+        guard: 'needsContinue',
+        actions: log('needsContinue'),
+        target: '.Continue',
+        reenter: true,
+      },
+      {
+        guard: 'needsVerification',
+        actions: log('needsVerification'),
+        target: '.Verification',
+        reenter: true,
+      },
+      {
+        guard: 'needsCallback',
+        actions: [
+          log('needsCallback'),
+          sendTo(THIRD_PARTY_MACHINE_ID, ({ context }) => ({
+            type: 'CALLBACK',
+            redirectUrl: `${context.router.basePath}/${SSO_CALLBACK_PATH_ROUTE}`,
+          })),
+        ],
+        target: '.Callback',
+      },
+      {
+        target: '.Start',
+        reenter: true,
+      },
+    ],
   },
   states: {
     Init: {
-      invoke: {
-        id: 'clerkLoader',
-        src: 'clerkLoader',
-        input: ({ context }) => context.clerk,
-      },
-      on: {
-        'CLERK.READY': [
-          {
-            description: 'Taken when an SSO Callback is required',
-            guard: {
-              type: 'currentPathMatches',
-              params: {
-                regex: /\/sso-callback$/,
-              },
-            },
-            actions: sendTo(THIRD_PARTY_MACHINE_ID, { type: 'REDIRECT.CALLBACK' }),
-          },
-          {
-            description: 'By default, we enter the Start state',
-            target: 'Start',
-          },
-        ],
-      },
+      entry: 'goToNextState',
     },
     Start: {
       id: 'Start',
@@ -275,13 +304,13 @@ export const SignUpMachine = setup({
       on: {
         'AUTHENTICATE.OAUTH': {
           actions: sendTo(THIRD_PARTY_MACHINE_ID, ({ event }) => ({
-            type: 'REDIRECT.SIGN_UP',
+            type: 'REDIRECT',
             params: { strategy: event.strategy },
           })),
         },
         'AUTHENTICATE.SAML': {
           actions: sendTo(THIRD_PARTY_MACHINE_ID, {
-            type: 'REDIRECT.SIGN_UP',
+            type: 'REDIRECT',
             params: { strategy: 'saml' },
           }),
         },
@@ -296,8 +325,7 @@ export const SignUpMachine = setup({
           },
           {
             guard: 'isStatusComplete',
-            actions: 'setAsActive',
-            target: 'Complete',
+            target: 'LoggingIn',
           },
         ],
       },
@@ -336,12 +364,16 @@ export const SignUpMachine = setup({
       on: {
         NEXT: [
           {
+            guard: 'isMissingRequiredFields',
+            target: 'Continue',
+          },
+          {
             guard: 'isMissingRequiredUnverifiedFields',
             target: 'Verification',
           },
           {
             guard: 'isStatusComplete',
-            target: 'Complete',
+            target: 'LoggingIn',
           },
         ],
       },
@@ -381,7 +413,7 @@ export const SignUpMachine = setup({
         NEXT: [
           {
             guard: 'isStatusComplete',
-            target: 'Complete',
+            target: 'LoggingIn',
           },
           {
             guard: 'isMissingRequiredFields',
@@ -393,10 +425,10 @@ export const SignUpMachine = setup({
             target: 'Verification',
             reenter: true,
           },
-          {
-            target: 'Start',
-            reenter: true,
-          },
+          // {
+          //   target: 'Start',
+          //   reenter: true,
+          // },
         ],
       },
       states: {
@@ -595,16 +627,42 @@ export const SignUpMachine = setup({
         },
       },
     },
-    HavingTrouble: {
-      id: 'HavingTrouble',
-      always: 'Start',
+    Callback: {
+      tags: 'state:callback',
+      on: {
+        'CLERKJS.NAVIGATE.SIGN_IN': {
+          actions: {
+            type: 'navigateExternal',
+            params: {
+              path: '/sign-in',
+            },
+          },
+        },
+        'CLERKJS.NAVIGATE.SIGN_UP': {
+          actions: {
+            type: 'navigateExternal',
+            params: {
+              path: '/sign-up',
+            },
+          },
+        },
+        NEXT: [
+          {
+            guard: 'isMissingRequiredUnverifiedFields',
+            target: 'Verification',
+          },
+          {
+            guard: 'isMissingRequiredFields',
+            target: 'Continue',
+          },
+          {
+            guard: 'isStatusComplete',
+            target: 'LoggingIn',
+          },
+        ],
+      },
     },
-    NotImplemented: {
-      entry: log('Not implemented.'),
-      always: 'Start',
-    },
-    Complete: {
-      id: 'Complete',
+    LoggingIn: {
       type: 'final',
       entry: 'setAsActive',
     },

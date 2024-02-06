@@ -1,21 +1,26 @@
 'use client';
 
+import type { PropsWithChildren } from 'react';
+
 import type { SignInStrategyName } from '~/internals/machines/sign-in/sign-in.types';
-import { useActiveTags } from '~/react/hooks/use-active-tags.hook';
-import { SignInCtx } from '~/react/sign-in/contexts/sign-in.context';
-import { useStrategy } from '~/react/sign-in/hooks/use-strategy.hook';
+import { useActiveTags } from '~/react/hooks';
+import { useStrategy } from '~/react/sign-in/contexts';
 
-export type SignInFactorProps = React.PropsWithChildren<
-  { first: true; second?: never } | { first?: never; second: true }
->;
+import { SignInRouterCtx } from './contexts/router.context';
 
-export function SignInFactor({ children, first, second }: SignInFactorProps) {
-  const ref = SignInCtx.useActorRef();
-  const activeFirstState = useActiveTags(ref, 'state:first-factor');
-  const activeSecondState = useActiveTags(ref, 'state:second-factor');
+export type SignInFactorProps = PropsWithChildren;
 
-  const render = (first && activeFirstState) || (second && activeSecondState);
-  return render ? children : null;
+export function SignInSecondFactor({ children }: SignInFactorProps) {
+  const routerRef = SignInRouterCtx.useActorRef();
+  const activeState = useActiveTags(routerRef, 'route:first-factor');
+  return activeState ? children : null;
+}
+
+export function SignInFirstFactor({ children }: SignInFactorProps) {
+  const routerRef = SignInRouterCtx.useActorRef();
+  const activeState = useActiveTags(routerRef, 'route:second-factor');
+
+  return activeState ? children : null;
 }
 
 export type SignInVerificationProps = React.PropsWithChildren<{ name: SignInStrategyName }>;

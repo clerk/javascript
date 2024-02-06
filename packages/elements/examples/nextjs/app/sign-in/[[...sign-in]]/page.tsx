@@ -1,19 +1,11 @@
 'use client';
 
 import { GlobalError, Submit } from '@clerk/elements/common';
-import {
-  Continue,
-  Factor,
-  SignIn,
-  SocialProvider,
-  SocialProviderIcon,
-  Start,
-  Verification,
-} from '@clerk/elements/sign-in';
+import { Continue, SignIn, SocialProvider, Start, Verification } from '@clerk/elements/sign-in';
 
-import { H1, H2, H3, HR as Hr, P } from '@/components/design';
+import { H1, H3, HR as Hr, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
-import { SignInDebug } from '@/components/sign-in-debug';
+import { SocialProviderIcon } from '@/components/social-providers';
 
 export default function SignInPage() {
   return (
@@ -75,10 +67,6 @@ export default function SignInPage() {
           <div className='flex gap-6 flex-col'>
             <H1>STRATEGIES (FIRST/SECOND FACTOR)</H1>
 
-            <H2>
-              Current Factor: <Factor first>First</Factor> | <Factor second>Second</Factor>
-            </H2>
-
             <Verification name='password'>
               <CustomField
                 label='Password'
@@ -121,7 +109,7 @@ export default function SignInPage() {
         </Continue>
       </div>
 
-      <SignInDebug />
+      {/* <SignInDebug /> */}
     </SignIn>
   );
 }

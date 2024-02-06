@@ -4,7 +4,7 @@ import type React from 'react';
 import { useCallback } from 'react';
 import type { ActorRef, SnapshotFrom } from 'xstate';
 
-import type { SignInMachineEvents } from '~/internals/machines/sign-in/sign-in.machine';
+import type { SignInStartEvents } from '~/internals/machines/sign-in/start/types';
 import type { SignUpMachineEvents } from '~/internals/machines/sign-up/sign-up.machine';
 import type { ThirdPartyMachine } from '~/internals/machines/third-party/machine';
 import { THIRD_PARTY_MACHINE_ID } from '~/internals/machines/third-party/machine';
@@ -17,12 +17,11 @@ const selector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotFro
   state.context.thirdPartyProviders.providerToDisplayData[provider];
 
 export const useThirdPartyProvider = <
-  TActor extends ActorRef<any, SignInMachineEvents> | ActorRef<any, SignUpMachineEvents>,
+  TActor extends ActorRef<any, SignInStartEvents> | ActorRef<any, SignUpMachineEvents>,
 >(
   ref: TActor,
   provider: OAuthProvider | Web3Provider,
 ): UseThirdPartyProviderReturn => {
-  // const ref = SignInCtx.useActorRef();
   const details = useSelector(ref.system.get(THIRD_PARTY_MACHINE_ID), selector(provider));
 
   const authenticate = useCallback(

@@ -36,6 +36,7 @@ export interface BrowserInspectorOptions extends InspectorOptions {
 export function createBrowserInspectorReactHook(params?: { enabled: boolean; options?: BrowserInspectorOptions }) {
   const { enabled = process.env.NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG === 'true', options } = params || {};
   const loadable = typeof window !== 'undefined';
+  let storedInspector: any;
 
   function useDisabledBrowserInspector() {
     return {
@@ -45,16 +46,23 @@ export function createBrowserInspectorReactHook(params?: { enabled: boolean; opt
   }
 
   function useEnabledBrowserInspector() {
-    const [inspector, setInspector] = useState<any>(undefined); // TODO: No relevant types exported from statelyai/inspect
+    const [inspector, setInspector] = useState<any>(storedInspector || undefined); // TODO: No relevant types exported from statelyai/inspect
 
     useEffect(() => {
+      if (inspector) return;
+
       const getInspector = async () => {
         const { createBrowserInspector } = (await import('@statelyai/inspect')).default;
         return createBrowserInspector(options);
       };
 
-      getInspector().then(setInspector).catch(console.error);
-    }, []);
+      getInspector()
+        .then(res => {
+          storedInspector = res;
+          setInspector(res);
+        })
+        .catch(console.error);
+    }, [inspector]);
 
     return {
       /**
