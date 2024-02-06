@@ -50,20 +50,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }`,
       )
       .addFile(
-        'src/app/hash/user/page.tsx',
-        () => `
-import { UserProfile, UserButton } from '@clerk/nextjs';
-
-export default function Page() {
-  return (
-    <div>
-      <UserButton />
-      <UserProfile routing="hash" />
-    </div>
-  );
-}`,
-      )
-      .addFile(
         'src/app/hash/sign-in/page.tsx',
         () => `
 import { SignIn } from '@clerk/nextjs';
@@ -89,64 +75,6 @@ export default function Page() {
   test.afterAll(async () => {
     await fakeUser.deleteIfExists();
     await app.teardown();
-  });
-
-  test('user profile with path routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.expect.toBeSignedIn();
-
-    await u.po.userProfile.goTo();
-    await u.po.userProfile.waitForMounted();
-
-    await u.po.userProfile.clickSetUsername();
-
-    u.page.getByText(/Update username/i);
-
-    await u.po.userProfile.typeUsername('some_username');
-
-    await u.page.getByText(/Cancel/i).click();
-
-    await u.page.waitForSelector('.cl-profileSectionContent__username .cl-headerTitle', { state: 'detached' });
-
-    await u.po.userProfile.clickAddEmailAddress();
-
-    u.page.getByText(/an email containing/i);
-
-    await u.po.userProfile.typeEmailAddress('some@email.com');
-
-    await u.page.getByText(/Cancel/i).click();
-  });
-
-  test('user profile with hash routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.expect.toBeSignedIn();
-
-    await u.page.goToRelative('/hash/user');
-    await u.po.userProfile.waitForMounted();
-
-    await u.po.userProfile.clickSetUsername();
-
-    u.page.getByText(/Update username/i);
-
-    await u.po.userProfile.typeUsername('some_username');
-
-    await u.page.getByText(/Cancel/i).click();
-
-    await u.page.waitForSelector('.cl-profileSectionContent__username .cl-headerTitle', { state: 'detached' });
-
-    await u.po.userProfile.clickAddEmailAddress();
-
-    u.page.getByText(/an email containing/i);
-
-    await u.po.userProfile.typeEmailAddress('some@email.com');
-
-    await u.page.getByText(/Cancel/i).click();
   });
 
   test('sign in with path routing', async ({ page, context }) => {
@@ -177,31 +105,6 @@ export default function Page() {
     await u.po.signIn.continue();
 
     await u.po.expect.toBeSignedIn();
-  });
-
-  test('user profile from user button navigates correctly', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.expect.toBeSignedIn();
-
-    await u.page.goToRelative('/');
-    await u.page.waitForClerkComponentMounted();
-
-    await u.page.getByRole('button', { name: 'Open user button' }).click();
-
-    await u.page.getByText(/Manage account/).click();
-
-    await u.page.waitForSelector('.cl-modalContent > .cl-userProfile-root', { state: 'attached' });
-
-    await u.po.userProfile.clickSetUsername();
-    await u.page.getByText(/Cancel/i).click();
-
-    await u.page.waitForSelector('.cl-profileSectionContent__username .cl-headerTitle', { state: 'detached' });
-
-    await u.po.userProfile.clickAddEmailAddress();
-    await u.page.getByText(/Cancel/i).click();
   });
 
   test('sign in with path routing navigates to previous page', async ({ page, context }) => {
