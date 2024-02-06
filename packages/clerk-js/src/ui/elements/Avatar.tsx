@@ -79,7 +79,7 @@ export const Avatar = (props: AvatarProps) => {
           position: 'absolute',
           width: '25%',
           height: '100%',
-          transition: `all ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
+          transition: `all ${t.transitionDuration.$slow} ${t.transitionTiming.$easeOut}`,
           transform: 'var(--cl-shimmer-hover-transform, skewX(-45deg) translateX(-300%))',
           ':after': {
             display: 'block',
@@ -89,7 +89,7 @@ export const Avatar = (props: AvatarProps) => {
             width: '400%',
             height: '100%',
             transform: 'var(--cl-shimmer-hover-after-transform, skewX(45deg) translateX(75%))',
-            transition: `all ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
+            transition: `all ${t.transitionDuration.$slow} ${t.transitionTiming.$easeOut}`,
             border: t.borders.$heavy,
             borderColor: t.colors.$colorShimmer,
             borderRadius: rounded ? t.radii.$circle : t.radii.$md,
