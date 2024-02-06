@@ -14,13 +14,13 @@ export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
 
   //values dependent on other values
-  const textSecondary = toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.15);
-  const textTertiary = toHSLA(variables.colorTextTertiary) || colors.makeTransparent(textSecondary, 0.4);
+  const colorTextSecondary = toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.15);
+  const colorTextTertiary = toHSLA(variables.colorTextTertiary) || colors.makeTransparent(colorTextSecondary, 0.4);
+  const colorTextLabel = toHSLA(variables.colorTextLabel) || colors.makeTransparent(variables.colorText, 0.05);
 
   return removeUndefinedProps({
     ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
     ...colorOptionToHslaAlphaScale(variables.colorPrimary, 'primaryAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorSecondary, 'secondary'),
     ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
     ...colorOptionToHslaAlphaScale(variables.colorDanger, 'dangerAlpha'),
     ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
@@ -29,10 +29,10 @@ export const createColorScales = (theme: Theme) => {
     ...colorOptionToHslaAlphaScale(variables.colorWarning, 'warningAlpha'),
     ...colorOptionToHslaAlphaScale(variables.colorAlphaShade, 'blackAlpha'),
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
-    colorTextOnSecondaryBackground: toHSLA(variables.colorTextOnSecondaryBackground),
     colorText: toHSLA(variables.colorText),
-    colorTextSecondary: textSecondary,
-    colorTextTertiary: textTertiary,
+    colorTextSecondary,
+    colorTextTertiary,
+    colorTextLabel,
     colorInputText: toHSLA(variables.colorInputText),
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),

@@ -56,7 +56,6 @@ export const ErrorCard = (props: ErrorCardProps) => {
             <Button
               localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
               onClick={handleEmailSupport}
-              variant='primary'
               hasArrow
             />
             <Card.Action elementId='alternativeMethods'>

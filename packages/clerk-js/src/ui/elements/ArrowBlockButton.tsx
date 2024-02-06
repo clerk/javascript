@@ -50,7 +50,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
 
   return (
     <SimpleButton
-      variant='secondary'
+      variant='outline'
       block
       isLoading={isLoading}
       {...rest}

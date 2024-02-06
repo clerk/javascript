@@ -192,7 +192,8 @@ const OrganizationLeaveSection = () => {
             <Action.Trigger value='leave'>
               <ProfileSection.Button
                 id='organizationDanger'
-                variant='ghostDanger'
+                variant='ghost'
+                colorScheme='danger'
                 localizationKey={localizationKeys(
                   'organizationProfile.profilePage.dangerSection.leaveOrganization.title',
                 )}
@@ -237,7 +238,8 @@ const OrganizationDeleteSection = () => {
             <Action.Trigger value='delete'>
               <ProfileSection.Button
                 id='organizationDanger'
-                variant='ghostDanger'
+                variant='ghost'
+                colorScheme='danger'
                 localizationKey={localizationKeys(
                   'organizationProfile.profilePage.dangerSection.deleteOrganization.title',
                 )}

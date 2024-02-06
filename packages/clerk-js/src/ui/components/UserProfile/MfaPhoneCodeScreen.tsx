@@ -128,7 +128,8 @@ const AddMfa = (props: AddMfaProps) => {
             return (
               <Button
                 key={phone.id}
-                variant='secondary'
+                variant='outline'
+                colorScheme='neutral'
                 sx={{ justifyContent: 'start' }}
                 onClick={() => enableMfa(phone)}
                 isLoading={card.loadingMetadata === phone.id}
@@ -142,7 +143,7 @@ const AddMfa = (props: AddMfaProps) => {
       )}
       <FormButtonContainer sx={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <IconButton
-          variant='ghostPrimary'
+          variant='ghost'
           aria-label='Add phone number'
           icon={
             <Icon

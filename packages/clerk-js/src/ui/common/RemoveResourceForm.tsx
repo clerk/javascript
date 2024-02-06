@@ -35,7 +35,7 @@ export const RemoveResourceForm = withCardStateProvider((props: RemoveFormProps)
           localizationKey={messageLine2}
         />
         <FormButtons
-          variant='primaryDanger'
+          colorScheme='danger'
           onReset={onReset}
         />
       </Form.Root>

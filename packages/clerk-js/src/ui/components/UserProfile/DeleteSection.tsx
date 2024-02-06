@@ -28,7 +28,8 @@ export const DeleteSection = () => {
             <Action.Trigger value='delete'>
               <ProfileSection.Button
                 id='danger'
-                variant='ghostDanger'
+                variant='ghost'
+                colorScheme='danger'
                 localizationKey={localizationKeys('userProfile.start.dangerSection.deleteAccountButton')}
               />
             </Action.Trigger>

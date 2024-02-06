@@ -127,11 +127,10 @@ const FieldLabel = (props: PropsWithChildren<{ localizationKey?: LocalizationKey
       hasError={!!hasError}
       isDisabled={isDisabled}
       isRequired={isRequired}
-      sx={t => ({
+      sx={{
         display: 'flex',
         alignItems: 'center',
-        color: t.colors.$colorText,
-      })}
+      }}
     >
       {props.children}
     </FormLabel>

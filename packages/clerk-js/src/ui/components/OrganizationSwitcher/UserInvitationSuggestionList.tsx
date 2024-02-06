@@ -67,7 +67,8 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
       textVariant='buttonSmall'
-      variant='secondary'
+      variant='outline'
+      colorScheme='neutral'
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
@@ -83,7 +84,8 @@ const AcceptRejectInvitationButtons = (props: { onAccept: () => void }) => {
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
       textVariant='buttonSmall'
-      variant='secondary'
+      variant='outline'
+      colorScheme='neutral'
       size='xs'
       isLoading={card.isLoading}
       onClick={props.onAccept}

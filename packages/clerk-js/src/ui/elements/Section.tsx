@@ -149,7 +149,7 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
     <Button
       elementDescriptor={descriptors.profileSectionPrimaryButton}
       elementId={descriptors.profileSectionPrimaryButton.setId(id)}
-      variant='ghostPrimary'
+      variant='ghost'
       textVariant='buttonSmall'
       sx={[
         t => ({
@@ -173,7 +173,7 @@ const ProfileSectionArrowButton = (props: ProfileSectionButtonProps) => {
     <ArrowBlockButton
       elementDescriptor={descriptors.profileSectionPrimaryButton}
       elementId={descriptors.profileSectionPrimaryButton.setId(id)}
-      variant='ghostPrimary'
+      variant='ghost'
       sx={[
         t => ({
           textWrap: 'nowrap',

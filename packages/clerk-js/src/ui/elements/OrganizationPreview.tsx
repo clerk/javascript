@@ -92,7 +92,6 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
             elementDescriptor={descriptors.organizationPreviewSecondaryIdentifier}
             elementId={descriptors.organizationPreviewSecondaryIdentifier.setId(elementId)}
             localizationKey={localizeCustomRole(membership?.role) || unlocalizedRoleLabel}
-            colorScheme='neutral'
             truncate
           />
         )}

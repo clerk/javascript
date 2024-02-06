@@ -394,6 +394,7 @@ export type Elements = {
 export type Variables = {
   /**
    * The primary color used throughout the components. Set this to your brand color.
+   * @default #42434D
    */
   colorPrimary?: CssColorOrScale;
   /**
@@ -404,10 +405,12 @@ export type Variables = {
   colorTextOnPrimaryBackground?: CssColor;
   /**
    * The secondary color used throughout the components.
+   * @default white
    */
   colorSecondary?: CssColorOrScale;
   /**
    * The secondary color used throughout the components.
+   * @default #42434D
    */
   colorTextOnSecondaryBackground?: CssColor;
   /**
@@ -431,7 +434,7 @@ export type Variables = {
   colorAlphaShade?: CssColorOrAlphaScale;
   /**
    * The default text color.
-   * @default black
+   * @default #131316
    */
   colorText?: CssColor;
   /**
@@ -444,6 +447,11 @@ export type Variables = {
    * @default An lighter shade of {@link Variables.colorTextSecondary}
    */
   colorTextTertiary?: CssColor;
+  /**
+   * The text color for labels.
+   * @default #42434D
+   */
+  colorTextLabel?: CssColor;
   /**
    * The background color for the card container.
    */
