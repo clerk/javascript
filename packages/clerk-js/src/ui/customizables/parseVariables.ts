@@ -103,11 +103,6 @@ export const createFonts = (theme: Theme) => {
   return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
 };
 
-export const createShadows = (theme: Theme) => {
-  const { shadowShimmer } = theme.variables || {};
-  return removeUndefinedProps({ shadowShimmer });
-};
-
 const splitCssUnit = (str: string) => {
   const numericValue = Number.parseFloat(str);
   const unit = str.replace(numericValue.toString(), '') || undefined;

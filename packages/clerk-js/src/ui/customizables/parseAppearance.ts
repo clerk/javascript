@@ -9,7 +9,6 @@ import {
   createFontSizeScale,
   createFontWeightScale,
   createRadiiUnits,
-  createShadows,
   createSpaceScale,
 } from './parseVariables';
 
@@ -111,6 +110,5 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   const fontSizes = { ...createFontSizeScale(theme) };
   const fontWeights = { ...createFontWeightScale(theme) };
   const fonts = { ...createFonts(theme) };
-  const shadows = { ...createShadows(theme) };
-  return createInternalTheme({ colors, radii, space, fontSizes, fontWeights, fonts, shadows } as any);
+  return createInternalTheme({ colors, radii, space, fontSizes, fontWeights, fonts } as any);
 };

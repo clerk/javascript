@@ -9,6 +9,5 @@ export const shadesOfPurple = experimental_createTheme({
     colorTextOnPrimaryBackground: '#38375f',
     colorInputText: '#a1fdfe',
     colorShimmer: 'rgba(161,253,254,0.36)',
-    shadowShimmer: '1px 1px 2px rgba(0,0,0,0.36)',
   },
 });

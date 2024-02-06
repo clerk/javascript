@@ -18,7 +18,6 @@ export const neobrutalism = experimental_createTheme({
   variables: {
     colorPrimary: '#DF1B1B',
     colorShimmer: 'rgba(255,255,255,0.64)',
-    shadowShimmer: '2px 2px 0px #000',
     fontWeight: {
       normal: 500,
       medium: 600,
