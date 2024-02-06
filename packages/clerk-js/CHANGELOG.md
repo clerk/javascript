@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.69.1
+
+### Patch Changes
+
+- Add padding to app logo inside OrganizationList to align the logo with the rest of the content. ([#2724](https://github.com/clerk/javascript/pull/2724)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.69.0
 
 ### Minor Changes
