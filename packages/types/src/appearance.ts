@@ -49,7 +49,6 @@ export type CssColorOrScale = string | ColorScaleWithRequiredBase;
 export type CssColorOrAlphaScale = string | AlphaColorScale;
 type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
-type FontSmoothing = 'auto' | 'antialiased' | 'never';
 
 type FontWeightNamedValue = CSS.Properties['fontWeight'];
 type FontWeightNumericValue = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
@@ -489,11 +488,6 @@ export type Variables = {
    * @default 1rem;
    */
   fontSize?: CssLengthUnit;
-  /**
-   * What text anti-aliasing strategy the components will use by default. You can set it to `auto`, `antialiased` or `never`
-   * @default auto;
-   */
-  fontSmoothing?: FontSmoothing;
   /**
    * The font weight the components will use. By default, the components will use the 400, 500 and 600 weights for normal, medium and bold
    * text respectively. You can override the default weights by passing a {@FontWeightScale} object

@@ -40,11 +40,6 @@ export const createColorScales = (theme: Theme) => {
   });
 };
 
-export const createThemeOptions = (theme: Theme) => {
-  const { fontSmoothing } = theme.variables || {};
-  return removeUndefinedProps({ fontSmoothing });
-};
-
 export const toHSLA = (str: string | undefined) => {
   return str ? colors.toHslaString(str) : undefined;
 };
