@@ -65,7 +65,15 @@ export const OrganizationMembers = withCardStateProvider(() => {
       >
         <Action.Root animate={false}>
           <Animated asChild>
-            <Header.Root sx={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+            <Header.Root
+              contentSx={{
+                [mqu.md]: {
+                  flexDirection: 'row',
+                  width: '100%',
+                  justifyContent: 'space-between',
+                },
+              }}
+            >
               <Header.Title
                 localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
                 textVariant='h2'
