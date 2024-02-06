@@ -1,6 +1,6 @@
 import type { AppLoadContext } from '@remix-run/server-runtime';
 
-import type { ClerkState } from './client/types';
+import type { ClerkState } from '../client/types';
 import { invalidClerkStatePropError, noClerkStateError } from './errors';
 
 export function warnForSsr(val: ClerkState | undefined) {

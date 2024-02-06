@@ -2,7 +2,7 @@ import { decorateObjectWithResources } from '@clerk/backend/internal';
 import type { defer } from '@remix-run/server-runtime';
 import { isDeferredData } from '@remix-run/server-runtime/dist/responses';
 
-import { invalidRootLoaderCallbackReturn } from '../errors';
+import { invalidRootLoaderCallbackReturn } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
 import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';

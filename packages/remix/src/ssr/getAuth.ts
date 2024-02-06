@@ -1,6 +1,6 @@
 import { stripPrivateDataFromObject } from '@clerk/backend/internal';
 
-import { noLoaderArgsPassedInGetAuth } from '../errors';
+import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
 import type { GetAuthReturn, LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
