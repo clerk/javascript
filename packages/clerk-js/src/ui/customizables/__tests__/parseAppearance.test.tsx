@@ -28,7 +28,6 @@ const themeA = {
     fontFamilyButtons: 'Comic Sans',
     fontSize: '1rem',
     fontWeight: { normal: 600 },
-    fontSmoothing: 'antialiased',
     spacingUnit: 'px',
   },
 } as const;
@@ -54,7 +53,6 @@ const themeB = {
     fontFamilyButtons: 'Arial',
     fontSize: '2rem',
     fontWeight: { normal: 700 },
-    fontSmoothing: 'never',
     spacingUnit: 'px',
   },
 } as const;
@@ -97,7 +95,6 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeA.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('1rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeA.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.options.$fontSmoothing).toBe(themeA.variables.fontSmoothing);
     expect(result.current.parsedInternalTheme.space.$1).toContain(themeA.variables.spacingUnit);
   });
 
@@ -128,7 +125,6 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('2rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.options.$fontSmoothing).toBe(themeB.variables.fontSmoothing);
     expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
   });
 
@@ -160,7 +156,6 @@ describe('AppearanceProvider internalTheme flows', () => {
     expect(result.current.parsedInternalTheme.fonts.$buttons).toBe(themeB.variables.fontFamily);
     expect(result.current.parsedInternalTheme.fontSizes.$md).toBe('2rem');
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
-    expect(result.current.parsedInternalTheme.options.$fontSmoothing).toBe(themeB.variables.fontSmoothing);
     expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
   });
 });

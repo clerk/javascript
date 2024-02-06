@@ -7,10 +7,6 @@ import { transitionDuration, transitionProperty, transitionTiming } from './tran
 import { fonts, fontSizes, fontStyles, fontWeights, letterSpacings, lineHeights } from './typography';
 import { zIndices } from './zIndices';
 
-const options = {
-  fontSmoothing: undefined,
-} as const;
-
 const defaultInternalThemeFoundations = Object.freeze({
   colors,
   fonts,
@@ -29,7 +25,6 @@ const defaultInternalThemeFoundations = Object.freeze({
   opacity,
   borders,
   zIndices,
-  options,
 } as const);
 
 type InternalThemeFoundations = typeof defaultInternalThemeFoundations;

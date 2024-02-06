@@ -2,7 +2,6 @@ import type { InternalTheme } from './types';
 
 const textVariants = (t: InternalTheme) => {
   const base = {
-    WebkitFontSmoothing: t.options.$fontSmoothing,
     fontFamily: 'inherit',
     letterSpacing: t.letterSpacings.$normal,
   };
