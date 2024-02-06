@@ -118,6 +118,7 @@ export type SignInContextType = SignInCtx & {
   navigateAfterSignIn: () => any;
   queryParams: ParsedQs;
   signUpUrl: string;
+  signInUrl: string;
   signUpContinueUrl: string;
   authQueryString: string | null;
 };
