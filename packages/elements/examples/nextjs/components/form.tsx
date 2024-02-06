@@ -32,40 +32,40 @@ function OTPInputSegment({ value, status }: any) {
   );
 }
 
-export const CustomField = forwardRef<typeof Input, { name: string; label: string }>(function CustomField(
-  { name, label },
-  forwardedRef,
-) {
-  const inputProps =
-    name === 'code'
-      ? {
-          render: OTPInputSegment,
-          type: 'otp',
-          className: 'flex gap-3',
-        }
-      : {
-          className: 'bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500',
-          ref: forwardedRef,
-        };
+export const CustomField = forwardRef<typeof Input, { name: string; label: string; required?: boolean }>(
+  function CustomField({ name, label, required = false }, forwardedRef) {
+    const inputProps =
+      name === 'code'
+        ? {
+            render: OTPInputSegment,
+            className: 'flex gap-3',
+            required,
+          }
+        : {
+            className: 'bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500',
+            ref: forwardedRef,
+            required,
+          };
 
-  return (
-    <ElementsField
-      name={name}
-      className='flex flex-col gap-4'
-    >
-      <div className='flex gap-4 justify-between items-center'>
-        <Label>{label}</Label>
-        <Input
-          name={name}
-          {...inputProps}
-        />
-      </div>
+    return (
+      <ElementsField
+        name={name}
+        className='flex flex-col gap-4'
+      >
+        <div className='flex gap-4 justify-between items-center'>
+          <Label>{label}</Label>
+          <Input
+            name={name}
+            {...inputProps}
+          />
+        </div>
 
-      <FieldError className='block text-red-400 font-mono' />
-      <FieldState>{({ state }) => <pre className='opacity-60 text-xs'>Field state: {state}</pre>}</FieldState>
-    </ElementsField>
-  );
-});
+        <FieldError className='block text-red-400 font-mono' />
+        <FieldState>{({ state }) => <pre className='opacity-60 text-xs'>Field state: {state}</pre>}</FieldState>
+      </ElementsField>
+    );
+  },
+);
 
 export const CustomSubmit = forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(
   function CustomButton(props, forwardedRef) {
