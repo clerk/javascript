@@ -3,7 +3,7 @@ import type { LoadedClerk, SignInFactor } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form/form.machine';
-import type { SignInRouterMachine } from '~/internals/machines/sign-in/router/machine';
+import type { SignInRouterMachine } from '~/internals/machines/sign-in/machines';
 
 // ---------------------------------- Tags ---------------------------------- //
 
@@ -11,8 +11,8 @@ export type SignInContinueTags = 'state:pending' | 'state:preparing' | 'state:at
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SubmitEvent = { type: 'SUBMIT' };
-export type SignInContinueEvents = ErrorActorEvent | SubmitEvent;
+export type SignInContinueSubmitEvent = { type: 'SUBMIT' };
+export type SignInContinueEvents = ErrorActorEvent | SignInContinueSubmitEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 

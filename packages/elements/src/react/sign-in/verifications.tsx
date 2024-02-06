@@ -2,7 +2,7 @@
 
 import type { PropsWithChildren } from 'react';
 
-import type { SignInStrategyName } from '~/internals/machines/sign-in/sign-in.types';
+import type { SignInStrategyName } from '~/internals/machines/sign-in/types';
 import { useActiveTags } from '~/react/hooks';
 import { useStrategy } from '~/react/sign-in/contexts';
 

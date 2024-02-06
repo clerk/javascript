@@ -5,8 +5,8 @@ import { useActorRef } from '@xstate/react';
 import { type PropsWithChildren } from 'react';
 
 import { useFormStore } from '~/internals/machines/form/form.context';
-import type { TSignInStartMachine } from '~/internals/machines/sign-in/start/machine';
-import { SignInStartMachine } from '~/internals/machines/sign-in/start/machine';
+import type { TSignInStartMachine } from '~/internals/machines/sign-in/machines';
+import { SignInStartMachine } from '~/internals/machines/sign-in/machines';
 import { Form } from '~/react/common/form';
 import { useActiveTags, useBrowserInspector } from '~/react/hooks';
 import { useClerkRouter } from '~/react/router';

@@ -29,12 +29,16 @@ export type SignInRouterSystemId = keyof typeof SignInRouterSystemId;
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type NextEvent = { type: 'NEXT' };
-export type PrevEvent = { type: 'PREV' };
-export type ErrorEvent = { type: 'ERROR'; error: Error };
-export type TransferEvent = { type: 'TRANSFER' };
+export type SignInRouterNextEvent = { type: 'NEXT' };
+export type SignInRouterPrevEvent = { type: 'PREV' };
+export type SignInRouterErrorEvent = { type: 'ERROR'; error: Error };
+export type SignInRouterTransferEvent = { type: 'TRANSFER' };
 
-export type SignInRouterEvents = NextEvent | PrevEvent | ErrorEvent | TransferEvent;
+export type SignInRouterEvents =
+  | SignInRouterNextEvent
+  | SignInRouterPrevEvent
+  | SignInRouterErrorEvent
+  | SignInRouterTransferEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 

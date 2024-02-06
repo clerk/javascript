@@ -16,14 +16,14 @@ import type {
 import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import type { SignInContinueSchema } from '~/internals/machines/sign-in/types';
 import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
 
 import type { FormFields } from '../../form/form.types';
 import type { WithClient, WithParams } from '../../shared.types';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '../sign-in.utils';
-import type { SignInContinueSchema } from './types';
 
-type ResourceResponse = SignInResource | void;
+export type ResourceResponse = SignInResource | void;
 
 export type PrepareFirstFactorInput = WithClient<
   WithParams<PrepareFirstFactorParams | null> & { strategy?: SignInStrategy }
@@ -39,6 +39,14 @@ export type AttemptFirstFactorInput = WithClient<
 export type AttemptSecondFactorInput = WithClient<
   WithParams<{ fields: FormFields; currentFactor: SignInSecondFactor | null }>
 >;
+
+export const SignInContinueMachineId = 'SignInContinue';
+export const SignInFirstFactorMachineId = 'SignInFirstFactor';
+export const SignInSecondFactorMachineId = 'SignInSecondFactor';
+
+export type TSignInContinueMachine = typeof SignInContinueMachine;
+export type TSignInFirstFactorMachine = ReturnType<typeof createFirstFactorMachine>;
+export type TSignInSecondFactorMachine = ReturnType<typeof createSecondFactorMachine>;
 
 export const SignInContinueMachine = setup({
   actors: {
@@ -61,7 +69,7 @@ export const SignInContinueMachine = setup({
   },
   types: {} as SignInContinueSchema,
 }).createMachine({
-  id: 'SignInContinue',
+  id: SignInContinueMachineId,
   context: ({ input }) => ({
     currentFactor: null,
     clerk: input.clerk,
@@ -78,7 +86,7 @@ export const SignInContinueMachine = setup({
         src: 'prepare',
         input: ({ context }) => ({
           client: context.clerk.client,
-          params: context.currentFactor as any, // TODO: Appropriately type
+          params: context.currentFactor, // TODO: Appropriately type
           strategy: context.currentFactor?.strategy,
         }),
         onDone: 'Pending',
@@ -107,7 +115,7 @@ export const SignInContinueMachine = setup({
         input: ({ context }) => ({
           client: context.clerk.client,
           params: {
-            currentFactor: context.currentFactor as any, // TODO: Appropriately type
+            currentFactor: context.currentFactor, // TODO: Appropriately type
             fields: context.formRef.getSnapshot().context.fields,
           },
         }),

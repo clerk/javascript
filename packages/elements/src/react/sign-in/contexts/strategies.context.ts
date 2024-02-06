@@ -2,7 +2,7 @@ import type { SignInStrategy } from '@clerk/types';
 import { createContext, useContext } from 'react';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
-import type { SignInStrategyName } from '~/internals/machines/sign-in/sign-in.types';
+import type { SignInStrategyName } from '~/internals/machines/sign-in/types';
 
 export type StrategiesContextValue = {
   current: SignInStrategy | undefined;

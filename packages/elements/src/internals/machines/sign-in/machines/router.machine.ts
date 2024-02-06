@@ -4,8 +4,7 @@ import { and, assign, log, not, or, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors/error';
-
-import type { SignInRouterContext, SignInRouterSchema } from './types';
+import type { SignInRouterContext, SignInRouterSchema } from '~/internals/machines/sign-in/types';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 

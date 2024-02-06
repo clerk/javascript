@@ -6,7 +6,7 @@ import { createActorContext } from '@xstate/react';
 import { type PropsWithChildren, useCallback } from 'react';
 
 import { useFormStore } from '~/internals/machines/form/form.context';
-import { createFirstFactorMachine, createSecondFactorMachine } from '~/internals/machines/sign-in/continue/machine';
+import { createFirstFactorMachine, createSecondFactorMachine } from '~/internals/machines/sign-in/machines';
 import { matchStrategy } from '~/internals/machines/utils/strategies';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';

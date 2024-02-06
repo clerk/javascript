@@ -3,12 +3,13 @@ import { assertEvent, fromPromise, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
+import type { SignInStartSchema } from '~/internals/machines/sign-in/types';
 import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-import type { SignInStartSchema } from './types';
-
 export type TSignInStartMachine = typeof SignInStartMachine;
+
+export const SignInStartMachineId = 'SignInStart';
 
 export const SignInStartMachine = setup({
   actors: {
@@ -63,7 +64,7 @@ export const SignInStartMachine = setup({
   },
   types: {} as SignInStartSchema,
 }).createMachine({
-  id: 'SignInStart',
+  id: SignInStartMachineId,
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
     clerk: input.clerk,

@@ -5,7 +5,7 @@ import { useActorRef } from '@xstate/react';
 import type { PropsWithChildren } from 'react';
 
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
-import { SignInRouterMachine } from '~/internals/machines/sign-in/router/machine';
+import { SignInRouterMachine } from '~/internals/machines/sign-in/machines';
 import { useBrowserInspector } from '~/react/hooks';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/contexts/router.context';
