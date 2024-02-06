@@ -1,12 +1,19 @@
 'use client';
 
 import { GlobalError } from '@clerk/elements/common';
-import { Continue, SignUp, SocialProvider, Start, Verification, Verify } from '@clerk/elements/sign-up';
+import {
+  Continue,
+  SignUp,
+  SocialProvider,
+  SocialProviderIcon,
+  Start,
+  Verification,
+  Verify,
+} from '@clerk/elements/sign-up';
 
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
 import { SignUpDebug } from '@/components/sign-up-debug';
-import { SocialProviderIcon } from '@/components/social-providers';
 
 export default function SignUpPage() {
   return (

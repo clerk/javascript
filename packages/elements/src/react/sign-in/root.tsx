@@ -31,6 +31,7 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
           clerk,
           router,
           form,
+          signUpPath: '/sign-up',
         },
         inspect: inspector?.inspect,
       }}
@@ -40,14 +41,25 @@ function SignInFlowProvider({ children }: PropsWithChildren) {
   );
 }
 
-export function SignInRoot({ children }: PropsWithChildren): JSX.Element | null {
+/**
+ * Root component for the sign-in flow. It sets up providers and state management for its children.
+ * Must wrap all sign-in related components.
+ * @example
+ * import { SignIn } from "@clerk/elements/sign-in"
+ *
+ * export default SignInPage = () => (
+ *  <SignIn>
+ *  </SignIn>
+ * )
+ */
+export function SignInRoot({ children, path = '/sign-in' }: PropsWithChildren<{ path?: string }>): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
 
   return (
     <Router
       router={router}
-      basePath='/sign-in'
+      basePath={path}
     >
       {/* TODO: Temporary hydration fix */}
       <ClerkLoaded>

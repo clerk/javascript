@@ -118,8 +118,6 @@ function fieldsToSignUpParams<T extends SignUpCreateParams | SignUpUpdateParams>
 ): Pick<T, SignUpAdditionalKeys> {
   const params: SignUpUpdateParams = {};
 
-  // TODO: Determine what takes priority
-
   fields.forEach(({ value }, key) => {
     if (isSignUpParam(key) && value !== undefined) {
       params[key] = value as string;
