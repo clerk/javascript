@@ -3,12 +3,20 @@ import { describe, it } from '@jest/globals';
 import { within } from '@testing-library/dom';
 
 import { render, screen, waitFor } from '../../../../testUtils';
+import { clearFetchCache } from '../../../hooks';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SecurityPage } from '../SecurityPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
 describe('SecurityPage', () => {
+  /**
+   * `<SecurityPage/>` internally uses useFetch which caches the results, be sure to clear the cache before each test
+   */
+  beforeEach(() => {
+    clearFetchCache();
+  });
+
   it('renders the component', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });

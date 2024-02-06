@@ -1,11 +1,9 @@
 import { useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/types';
-import React from 'react';
 
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu } from '../../elements';
-import { Action } from '../../elements/Action';
-import { useLoadingStatus } from '../../hooks';
+import { useFetch, useLoadingStatus } from '../../hooks';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
 import { mqu, type PropsOfComponent } from '../../styledSystem';
 import { getRelativeToNowDateKey } from '../../utils';
@@ -14,11 +12,8 @@ import { currentSessionFirst } from './utils';
 export const ActiveDevicesSection = () => {
   const { user } = useUser();
   const { session } = useSession();
-  const [sessionsWithActivities, setSessionsWithActivities] = React.useState<SessionWithActivitiesResource[]>([]);
 
-  React.useEffect(() => {
-    void user?.getSessions().then(sa => setSessionsWithActivities(sa));
-  }, [user]);
+  const { data: sessions, isLoading } = useFetch(user?.getSessions, 'user-sessions');
 
   return (
     <ProfileSection.Root
@@ -27,20 +22,22 @@ export const ActiveDevicesSection = () => {
       id='activeDevices'
     >
       <ProfileSection.ItemList id='activeDevices'>
-        {!sessionsWithActivities.length && <FullHeightLoader />}
-        {!!sessionsWithActivities.length &&
-          sessionsWithActivities.sort(currentSessionFirst(session!.id)).map(sa => (
-            <DeviceAccordion
+        {isLoading ? (
+          <FullHeightLoader />
+        ) : (
+          sessions?.sort(currentSessionFirst(session!.id)).map(sa => (
+            <DeviceItem
               key={sa.id}
               session={sa}
             />
-          ))}
+          ))
+        )}
       </ProfileSection.ItemList>
     </ProfileSection.Root>
   );
 };
 
-const DeviceAccordion = ({ session }: { session: SessionWithActivitiesResource }) => {
+const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useSession().session?.id === session.id;
   const status = useLoadingStatus();
   const revoke = async () => {
@@ -52,30 +49,26 @@ const DeviceAccordion = ({ session }: { session: SessionWithActivitiesResource }
   };
 
   return (
-    <Action.Root>
-      <Action.Closed value=''>
-        <ProfileSection.Item
-          id='activeDevices'
-          elementDescriptor={descriptors.activeDeviceListItem}
-          elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
-          sx={t => ({
-            alignItems: 'flex-start',
-            padding: `${t.space.$2} ${t.space.$4}`,
-            marginLeft: `-${t.space.$4}`,
-            borderRadius: t.radii.$md,
-            ':hover': { backgroundColor: t.colors.$blackAlpha50 },
-          })}
-        >
-          {status.isLoading && <FullHeightLoader />}
-          {!status.isLoading && (
-            <>
-              <DeviceInfo session={session} />
-              {!isCurrent && <ActiveDeviceMenu revoke={revoke} />}
-            </>
-          )}
-        </ProfileSection.Item>
-      </Action.Closed>
-    </Action.Root>
+    <ProfileSection.Item
+      id='activeDevices'
+      elementDescriptor={descriptors.activeDeviceListItem}
+      elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
+      sx={t => ({
+        alignItems: 'flex-start',
+        padding: `${t.space.$2} ${t.space.$4}`,
+        marginLeft: `-${t.space.$4}`,
+        borderRadius: t.radii.$md,
+        ':hover': { backgroundColor: t.colors.$blackAlpha50 },
+      })}
+    >
+      {status.isLoading && <FullHeightLoader />}
+      {!status.isLoading && (
+        <>
+          <DeviceInfo session={session} />
+          {!isCurrent && <ActiveDeviceMenu revoke={revoke} />}
+        </>
+      )}
+    </ProfileSection.Item>
   );
 };
 
