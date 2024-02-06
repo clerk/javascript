@@ -44,7 +44,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
   const unlocalizedRoleLabel = options?.find(a => a.value === membership?.role)?.label;
 
   const mainTextSize =
-    mainIdentifierVariant || ({ xs: 'subtitle', sm: 'caption', md: 'subtitle', lg: 'h3' } as const)[size];
+    mainIdentifierVariant || ({ xs: 'subtitle', sm: 'caption', md: 'subtitle', lg: 'h1' } as const)[size];
 
   return (
     <Flex
