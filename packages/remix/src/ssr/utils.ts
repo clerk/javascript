@@ -5,7 +5,7 @@ import type { AppLoadContext, defer } from '@remix-run/server-runtime';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
-import { getEnvVariable } from '../utils';
+import { getEnvVariable } from '../utils/utils';
 
 export function isResponse(value: any): value is Response {
   return (

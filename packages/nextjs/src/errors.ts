@@ -1,1 +1,7 @@
-export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from './client-boundary/hooks';
+export {
+  isClerkAPIResponseError,
+  isEmailLinkError,
+  isKnownError,
+  isMetamaskError,
+  EmailLinkErrorCode,
+} from './client-boundary/hooks';

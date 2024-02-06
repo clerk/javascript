@@ -1,1 +1,7 @@
-export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/shared/error';
+export {
+  isClerkAPIResponseError,
+  isEmailLinkError,
+  isKnownError,
+  isMetamaskError,
+  EmailLinkErrorCode,
+} from '@clerk/shared/error';

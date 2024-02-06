@@ -5,8 +5,8 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { isTruthy } from '@clerk/shared/underscore';
 
-import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../errors';
-import { getEnvVariable } from '../utils';
+import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
+import { getEnvVariable } from '../utils/utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 
 export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderOptions = {}) => {

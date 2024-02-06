@@ -13,4 +13,10 @@ export {
   useUser,
 } from '@clerk/clerk-react';
 
-export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
+export {
+  isClerkAPIResponseError,
+  isEmailLinkError,
+  isKnownError,
+  isMetamaskError,
+  EmailLinkErrorCode,
+} from '@clerk/clerk-react/errors';
