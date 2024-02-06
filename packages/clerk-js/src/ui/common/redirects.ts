@@ -42,11 +42,11 @@ type BuildRedirectUrlParams = {
 };
 
 const buildRedirectUrl = ({ routing, authQueryString, baseUrl, path, endpoint }: BuildRedirectUrlParams): string => {
-  if (!routing || routing === 'hash') {
+  if (routing === 'hash') {
     return buildHashBasedUrl(authQueryString, endpoint);
   }
 
-  if (routing === 'path') {
+  if (!routing || routing === 'path') {
     return buildPathBasedUrl(path || '', authQueryString, endpoint);
   }
 

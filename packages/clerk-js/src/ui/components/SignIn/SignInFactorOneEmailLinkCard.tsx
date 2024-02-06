@@ -5,7 +5,7 @@ import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
 import { buildEmailLinkRedirectUrl } from '../../common/redirects';
-import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { VerificationLinkCard } from '../../elements';
@@ -25,7 +25,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const card = useCardState();
   const signIn = useCoreSignIn();
   const signInContext = useSignInContext();
-  const { signInUrl } = useEnvironment().displayConfig;
+  const { signInUrl } = signInContext;
   const { navigate } = useRouter();
   const { navigateAfterSignIn } = useSignInContext();
   const { setActive } = useClerk();
