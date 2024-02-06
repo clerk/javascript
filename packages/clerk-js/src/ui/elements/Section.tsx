@@ -21,7 +21,10 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
   const [height, setHeight] = useState(0);
 
   useLayoutEffect(() => {
-    setHeight(ref.current?.clientHeight || 0);
+    const element = ref.current;
+    if (element) {
+      setHeight(element.clientHeight + element.clientTop || 0);
+    }
   }, []);
 
   return (
@@ -34,7 +37,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
           borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           paddingTop: t.space.$4,
           paddingBottom: t.space.$4,
-          gap: t.space.$4,
+          gap: t.space.$6,
           [mqu.lg]: {
             flexDirection: 'column-reverse',
             gap: t.space.$2,
@@ -49,14 +52,13 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
         elementId={descriptors.profileSectionContent.setId(id)}
         gap={2}
         ref={ref}
-        sx={t => ({
-          paddingLeft: t.space.$6,
+        sx={{
           minWidth: 0,
           width: '100%',
           '+ *': {
             '--clerk-height': `${height}px`,
           },
-        })}
+        }}
       >
         {children}
       </Col>
@@ -65,7 +67,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
         elementDescriptor={descriptors.profileSectionHeader}
         elementId={descriptors.profileSectionHeader.setId(id)}
         sx={t => ({
-          padding: centered ? undefined : `${t.space.$2} 0`,
+          padding: centered ? undefined : `${t.space.$1x5} 0`,
           gap: t.space.$1,
           width: t.space.$66,
           alignSelf: height ? 'self-start' : centered ? 'center' : undefined,
@@ -126,8 +128,7 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
           justifyContent: 'space-between',
           width: '100%',
           alignItems: 'center',
-          paddingTop: t.space.$1x5,
-          paddingBottom: t.space.$1x5,
+          padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$4}`,
           gap: t.space.$2,
         }),
         sx,
@@ -179,7 +180,6 @@ const ProfileSectionArrowButton = (props: ProfileSectionButtonProps) => {
           textWrap: 'nowrap',
           justifyContent: 'start',
           height: t.sizes.$8,
-          marginLeft: `-${t.space.$3x5}`,
         }),
         sx,
       ]}

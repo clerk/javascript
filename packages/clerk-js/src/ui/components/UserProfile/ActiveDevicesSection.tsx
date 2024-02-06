@@ -56,7 +56,6 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       sx={t => ({
         alignItems: 'flex-start',
         padding: `${t.space.$2} ${t.space.$4}`,
-        marginLeft: `-${t.space.$4}`,
         borderRadius: t.radii.$md,
         ':hover': { backgroundColor: t.colors.$blackAlpha50 },
       })}

@@ -1,16 +1,17 @@
 import React from 'react';
 
 import { Col, descriptors, Heading, Text, useAppearance } from '../customizables';
-import type { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
 
 export type HeaderProps = PropsOfComponent<typeof Col> & {
   showLogo?: boolean;
+  contentSx?: ThemableCssProp;
 };
 
 const Root = React.memo(
   React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
-    const { sx, children, showLogo = false, ...rest } = props;
+    const { sx, children, contentSx, gap = 6, showLogo = false, ...rest } = props;
     const appearance = useAppearance();
 
     const logoIsVisible = appearance.parsedLayout.logoPlacement === 'inside' && showLogo;
@@ -19,12 +20,18 @@ const Root = React.memo(
       <Col
         ref={ref}
         elementDescriptor={descriptors.header}
-        gap={6}
+        gap={gap}
         sx={sx}
         {...rest}
       >
         {logoIsVisible && <ApplicationLogo />}
-        <Col gap={1}>{children}</Col>
+        <Col
+          gap={1}
+          sx={contentSx}
+          {...rest}
+        >
+          {children}
+        </Col>
       </Col>
     );
   }),

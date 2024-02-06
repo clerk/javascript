@@ -86,7 +86,13 @@ const OrganizationProfileSection = () => {
     return null;
   }
 
-  const profile = <OrganizationPreview organization={organization} />;
+  const profile = (
+    <OrganizationPreview
+      size='lg'
+      mainIdentifierVariant='subtitle'
+      organization={organization}
+    />
+  );
 
   return (
     <ProfileSection.Root
@@ -139,9 +145,6 @@ const OrganizationDomainsSection = () => {
       title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
       id='organizationDomains'
       centered={false}
-      sx={{
-        gap: 0,
-      }}
     >
       <Action.Root>
         <DomainList />
@@ -156,9 +159,10 @@ const OrganizationDomainsSection = () => {
               <Text
                 localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
                 sx={t => ({
-                  paddingLeft: t.space.$5x5,
-                  color: t.colors.$colorTextSecondary,
+                  paddingLeft: t.space.$9,
+                  marginTop: `-${t.space.$1}`,
                 })}
+                colorScheme='tertiary'
               />
             </Col>
           </Action.Trigger>
@@ -188,12 +192,20 @@ const OrganizationLeaveSection = () => {
     >
       <Action.Root>
         <Action.Closed value='leave'>
-          <ProfileSection.Item id='organizationDanger'>
+          <ProfileSection.Item
+            sx={t => ({
+              paddingTop: 0,
+              paddingBottom: 0,
+              paddingLeft: t.space.$1,
+            })}
+            id='organizationDanger'
+          >
             <Action.Trigger value='leave'>
               <ProfileSection.Button
                 id='organizationDanger'
                 variant='ghost'
                 colorScheme='danger'
+                textVariant='buttonLarge'
                 localizationKey={localizationKeys(
                   'organizationProfile.profilePage.dangerSection.leaveOrganization.title',
                 )}
@@ -234,12 +246,20 @@ const OrganizationDeleteSection = () => {
     >
       <Action.Root>
         <Action.Closed value='delete'>
-          <ProfileSection.Item id={'organizationDanger'}>
+          <ProfileSection.Item
+            sx={t => ({
+              paddingTop: 0,
+              paddingBottom: 0,
+              paddingLeft: t.space.$1,
+            })}
+            id={'organizationDanger'}
+          >
             <Action.Trigger value='delete'>
               <ProfileSection.Button
                 id='organizationDanger'
                 variant='ghost'
                 colorScheme='danger'
+                textVariant='buttonLarge'
                 localizationKey={localizationKeys(
                   'organizationProfile.profilePage.dangerSection.deleteOrganization.title',
                 )}
