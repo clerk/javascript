@@ -464,11 +464,6 @@ export type Variables = {
    */
   colorShimmer?: CssColor;
   /**
-   * The shadow that appears on the avatar when hovered
-   * @default rgba(0, 0, 0, 0.36)
-   */
-  shadowShimmer?: CssColor;
-  /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
    * If a specific fontFamily is not provided, the components will inherit the font of the parent element.
