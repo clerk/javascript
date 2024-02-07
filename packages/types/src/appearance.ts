@@ -417,9 +417,9 @@ export type Variables = {
   colorWarning?: CssColorOrScale;
   /**
    * The color that will be used as the neutral color for all the components. To achieve sufficient contrast,
-   * light themes should be using dark shades (`black`), while dark themes should be using light (`white`) shades. This option applies to borders,
+   * light themes should be using dark shades, while dark themes should be using light shades. This option applies to borders,
    * backgrounds for hovered elements, hovered dropdown options etc.
-   * @default 'black'
+   * @default 'hsla(0, 0%, 0%, 0.53)'
    */
   colorNeutral?: CssColorOrAlphaScale;
   /**

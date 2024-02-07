@@ -123,7 +123,7 @@ const generateFilledScaleFromBaseHslaColor = (base: HslaColor): InternalColorSca
 };
 
 const generateFilledAlphaScaleFromBaseHslaColor = (base: HslaColor): InternalColorScale<HslaColor> => {
-  const newScale = { 20: undefined, ...createEmptyColorScale<HslaColor>() };
+  const newScale = createEmptyColorScale<HslaColor>();
   const baseWithoutAlpha = colors.setHslaAlpha(base, 0);
   const alphas = [0.02, 0.03, 0.07, 0.11, 0.15, 0.28, 0.41, 0.53, 0.62, 0.73, 0.78, 0.81, 0.84, 0.87, 0.92];
   // @ts-expect-error

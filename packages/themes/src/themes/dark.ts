@@ -3,7 +3,7 @@ import { experimental_createTheme } from '../createTheme';
 export const dark = experimental_createTheme({
   variables: {
     colorBackground: '#212126',
-    colorNeutral: 'white',
+    colorNeutral: 'hsla(0, 0%, 100%, 0.53)',
     colorPrimary: '#ffffff',
     colorTextOnPrimaryBackground: 'black',
     colorText: 'white',
