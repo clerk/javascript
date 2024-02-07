@@ -13,8 +13,8 @@ export const Actions = (props: PropsOfComponent<typeof Flex>) => {
     <Col
       sx={[
         t => ({
-          '> button:not(:last-of-type)': {
-            borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100} `,
+          '> button:not(:first-of-type)': {
+            borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100} `,
           },
         }),
         sx,

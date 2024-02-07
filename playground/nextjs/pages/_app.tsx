@@ -53,6 +53,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         baseTheme: themes[selectedTheme],
         variables: {
             colorPrimary:primaryColor,
+            colorNeutral:'black'
         },
         layout: {
           helpPageUrl: '/help',
