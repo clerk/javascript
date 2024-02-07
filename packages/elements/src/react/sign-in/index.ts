@@ -11,6 +11,8 @@ export {
 export { SignInStart as Start } from './start';
 export { SignInFactor as Factor, SignInVerification as Verification } from './verifications';
 
+export { unstable_useIsLoading } from './hooks/use-loading.hook';
+
 /** @internal Internal use only */
 export const useSignInActorRef_internal = SignInCtx.useActorRef;
 
