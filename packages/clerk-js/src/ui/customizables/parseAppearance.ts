@@ -1,6 +1,7 @@
 import type { Appearance, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
+import { polishedAppearance } from '../polishedAppearance';
 import type { InternalTheme } from '../styledSystem';
 import { fastDeepMergeAndReplace } from '../utils';
 import {
@@ -60,6 +61,16 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
 
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedLayout = parseLayout(appearanceList);
+
+  if (
+    !appearanceList.find(a => {
+      //@ts-expect-error not public api
+      return !!a.simpleStyles;
+    })
+  ) {
+    appearanceList.unshift(polishedAppearance);
+  }
+
   const parsedElements = parseElements(
     appearanceList.map(appearance => {
       if (!appearance.elements || typeof appearance.elements !== 'function') {
@@ -77,9 +88,11 @@ const expand = (theme: Theme | undefined, cascade: any[]) => {
   if (!theme) {
     return;
   }
+
   (Array.isArray(theme.baseTheme) ? theme.baseTheme : [theme.baseTheme]).forEach(baseTheme =>
     expand(baseTheme as Theme, cascade),
   );
+
   cascade.push(theme);
 };
 

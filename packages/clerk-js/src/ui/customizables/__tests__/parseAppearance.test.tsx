@@ -176,7 +176,8 @@ describe('AppearanceProvider element flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
+    //polished theme is index 0
+    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(themeAColor);
   });
 
   it('sets the parsedElements correctly from the globalAppearance and appearance prop', () => {
@@ -199,8 +200,9 @@ describe('AppearanceProvider element flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
-    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(themeBColor);
+    //polished theme is index 0
+    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(themeAColor);
+    expect(result.current.parsedElements[2]['alert'].backgroundColor).toBe(themeBColor);
   });
 
   it('sets the parsedElements correctly when a function is passed for the elements', () => {
@@ -221,7 +223,8 @@ describe('AppearanceProvider element flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(knownColors[themeAColor]);
+    //polished theme is index 0
+    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(knownColors[themeAColor]);
   });
 });
 

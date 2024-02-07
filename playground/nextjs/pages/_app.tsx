@@ -10,7 +10,7 @@ import {
   SignOutButton,
   UserButton,
 } from '@clerk/nextjs';
-import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
+import { dark, neobrutalism, reset, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
 import React, { FunctionComponent, useEffect, useState } from 'react';
 
@@ -19,6 +19,7 @@ const themes = { default: undefined, dark, neobrutalism, shadesOfPurple };
 function MyApp({ Component, pageProps }: AppProps) {
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof themes>('default');
   const [selectedSmoothing, setSelectedSmoothing] = useState<boolean>(true);
+  const [styleReset, setStyleReset] = useState<boolean>(false);
   const [primaryColor, setPrimaryColor] = useState<string | undefined>(undefined);
 
   const onToggleDark = () => {
@@ -50,7 +51,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: themes[selectedTheme],
+        baseTheme: styleReset ? [reset, themes[selectedTheme]] : themes[selectedTheme],
         variables: {
             colorPrimary:primaryColor,
         },
@@ -66,6 +67,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         onChangeTheme={e => setSelectedTheme(e.target.value as any)}
         onToggleDark={onToggleDark}
         onToggleSmooth={onToggleSmooth}
+        onResetStyles={() => setStyleReset((s) => !s)}
         smooth={selectedSmoothing}
         onPrimaryColorChange={setPrimaryColor}
       />
@@ -78,6 +80,7 @@ type AppBarProps = {
   onChangeTheme: React.ChangeEventHandler<HTMLSelectElement>;
   onToggleDark: React.MouseEventHandler<HTMLButtonElement>;
   onToggleSmooth: React.MouseEventHandler<HTMLButtonElement>;
+  onResetStyles: React.MouseEventHandler<HTMLButtonElement>;
   smooth: boolean;
   onPrimaryColorChange: (primaryColor: string | undefined) => void;
 };
@@ -118,6 +121,7 @@ const AppBar = (props: AppBarProps) => {
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
       <button onClick={props.onToggleSmooth}>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
+      <button onClick={props.onResetStyles} style={{position:'absolute', left: '10px', bottom:'10px'}}>simple styles</button>
       <input type='color' onChange={(e) => props.onPrimaryColorChange(e.target.value)}/>
       <UserButton />
 
