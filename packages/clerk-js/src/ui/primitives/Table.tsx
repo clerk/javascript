@@ -21,7 +21,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderStyle: 'solid',
         borderLeftWidth: '0px',
         borderRightWidth: '0px',
-        borderColor: theme.colors.$blackAlpha100,
+        borderColor: theme.colors.$blackAlpha250,
       },
       'td:not(:first-of-type)': {
         paddingLeft: theme.space.$2,
@@ -31,7 +31,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       },
       'tr > td': {
         borderTop: theme.borders.$normal,
-        borderColor: theme.colors.$blackAlpha100,
+        borderColor: theme.colors.$blackAlpha250,
         paddingBottom: theme.space.$2,
         paddingTop: theme.space.$2,
         paddingLeft: theme.space.$4,
@@ -43,7 +43,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderStyle: 'solid',
         borderLeftWidth: '0px',
         borderRightWidth: '0px',
-        borderColor: theme.colors.$blackAlpha100,
+        borderColor: theme.colors.$blackAlpha250,
       },
       'tr:hover td:first-of-type': {
         borderBottomLeftRadius: theme.radii.$lg,

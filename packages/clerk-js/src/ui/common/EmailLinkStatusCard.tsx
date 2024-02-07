@@ -91,7 +91,7 @@ const StatusIcon = (props: { status: Exclude<VerificationStatus, 'loading'> }) =
         width: theme.sizes.$24,
         height: theme.sizes.$24,
         borderRadius: theme.radii.$circle,
-        backgroundColor: theme.colors.$blackAlpha100,
+        backgroundColor: theme.colors.$blackAlpha250,
         color: statusToColor(theme, status),
         animation: `${animations.dropdownSlideInScaleAndFade} 500ms ease`,
       })}

@@ -83,10 +83,10 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
           <CountryCodeListItem
             sx={theme => ({
               '&:hover': {
-                backgroundColor: theme.colors.$blackAlpha100,
+                backgroundColor: theme.colors.$blackAlpha250,
               },
               '&[data-focused="true"]': {
-                backgroundColor: theme.colors.$blackAlpha150,
+                backgroundColor: theme.colors.$blackAlpha100,
               },
             })}
             isSelected={isSelected}

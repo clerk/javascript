@@ -228,7 +228,7 @@ const RadioGroup = (
           <Flex
             key={value}
             sx={t => ({
-              border: `1px solid ${t.colors.$blackAlpha100}`,
+              border: `1px solid ${t.colors.$blackAlpha250}`,
               borderRadius: t.radii.$md,
               padding: t.space.$2,
             })}

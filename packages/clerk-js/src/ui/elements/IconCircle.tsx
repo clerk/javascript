@@ -30,7 +30,7 @@ export const IconCircle = (props: IconCircleProps) => {
         elementDescriptor={iconElementDescriptor}
         icon={icon}
         size='lg'
-        sx={theme => ({ color: theme.colors.$blackAlpha600 })}
+        sx={theme => ({ color: theme.colors.$blackAlpha250 })}
       />
     </Flex>
   );

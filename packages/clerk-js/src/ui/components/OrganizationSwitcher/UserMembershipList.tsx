@@ -66,7 +66,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         overflowY: 'auto',
         ...common.unstyledScrollbar(t),
         '> button:not(:first-of-type)': {
-          borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100} `,
+          borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha250} `,
         },
       })}
       role='group'

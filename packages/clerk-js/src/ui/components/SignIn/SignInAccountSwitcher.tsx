@@ -33,7 +33,7 @@ const _SignInAccountSwitcher = () => {
           <Col
             elementDescriptor={descriptors.main}
             gap={8}
-            sx={t => ({ borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}` })}
+            sx={t => ({ borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha250}` })}
           >
             <Actions role='menu'>
               {activeSessions.map(s => (
@@ -44,7 +44,7 @@ const _SignInAccountSwitcher = () => {
                     height: theme.sizes.$16,
                     justifyContent: 'flex-start',
                     borderRadius: 0,
-                    borderBottom: `${theme.borders.$normal} ${theme.colors.$blackAlpha100}`,
+                    borderBottom: `${theme.borders.$normal} ${theme.colors.$blackAlpha250}`,
                   })}
                   icon={SwitchArrowRight}
                 >

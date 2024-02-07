@@ -30,7 +30,7 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
         label={localizationKeys('userButton.action__manageAccount')}
         onClick={handleManageAccountClicked}
         sx={t => ({
-          borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha250}`,
           padding: `${t.space.$4} ${t.space.$5}`,
         })}
       />
@@ -82,7 +82,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
         elementDescriptor={descriptors.userButtonPopoverActions}
         elementId={descriptors.userButtonPopoverActions.setId('multiSession')}
         sx={t => ({
-          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha250}`,
         })}
       >
         <Flex
@@ -161,7 +161,7 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
       role='menu'
       sx={t => ({
         padding: t.space.$2,
-        borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+        borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha150}`,
       })}
     >
       <Action

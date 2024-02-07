@@ -27,8 +27,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
       colorScheme: {
         primary: { borderTopColor: theme.colors.$primary500, borderRightColor: theme.colors.$primary500, opacity: 1 },
         neutral: {
-          borderTopColor: theme.colors.$blackAlpha700,
-          borderRightColor: theme.colors.$blackAlpha700,
+          borderTopColor: theme.colors.$blackAlpha600,
+          borderRightColor: theme.colors.$blackAlpha600,
           opacity: 1,
         },
       },

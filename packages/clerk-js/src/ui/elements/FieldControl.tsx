@@ -103,7 +103,7 @@ const FieldLabelIcon = (props: { icon?: React.ComponentType }) => {
         icon={props.icon}
         sx={theme => ({
           marginLeft: theme.space.$0x5,
-          color: theme.colors.$blackAlpha400,
+          color: theme.colors.$blackAlpha300,
           width: theme.sizes.$4,
           height: theme.sizes.$4,
         })}

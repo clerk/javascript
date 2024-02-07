@@ -30,7 +30,7 @@ export const OrganizationMembersTabInvitations = () => {
               width: '100%',
               gap: t.space.$8,
               paddingBottom: t.space.$4,
-              borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+              borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha250}`,
               [mqu.md]: {
                 flexDirection: 'column',
                 gap: t.space.$2,

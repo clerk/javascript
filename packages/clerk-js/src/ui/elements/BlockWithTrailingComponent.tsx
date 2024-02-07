@@ -37,7 +37,7 @@ export const BlockWithTrailingComponent = (props: BlockWithTrailingComponentProp
           gap: theme.space.$4,
           position: 'relative',
           justifyContent: 'flex-start',
-          borderColor: theme.colors.$blackAlpha200,
+          borderColor: theme.colors.$blackAlpha150,
         },
         props.sx,
       ]}

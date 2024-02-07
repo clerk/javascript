@@ -194,12 +194,12 @@ const TagPill = (props: TagPillProps) => {
         backgroundColor: t.colors.$blackAlpha50,
         boxShadow: t.shadows.$badge,
         border: t.borders.$normal,
-        borderColor: t.colors.$blackAlpha100,
+        borderColor: t.colors.$blackAlpha250,
         display: 'inline-flex',
         marginRight: '1px',
         cursor: 'pointer',
         ':hover': {
-          backgroundColor: t.colors.$blackAlpha100,
+          backgroundColor: t.colors.$blackAlpha250,
         },
         ':hover svg': {
           color: t.colors.$danger500,

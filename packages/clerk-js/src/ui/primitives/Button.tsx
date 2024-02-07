@@ -55,9 +55,9 @@ const { applyVariants, filterProps } = createVariants(
             [vars.alpha]: theme.colors.$blackAlpha25,
           },
           neutral: {
-            [vars.accent]: theme.colors.$blackAlpha700,
-            [vars.accentDark]: theme.colors.$blackAlpha800,
-            [vars.border]: theme.colors.$blackAlpha200,
+            [vars.accent]: theme.colors.$blackAlpha600,
+            [vars.accentDark]: theme.colors.$blackAlpha750,
+            [vars.border]: theme.colors.$blackAlpha150,
             [vars.accentContrast]: theme.colors.$white,
             [vars.alpha]: theme.colors.$blackAlpha25,
           },
@@ -96,8 +96,8 @@ const { applyVariants, filterProps } = createVariants(
           },
           outline: {
             border: theme.borders.$normal,
-            borderColor: theme.colors.$blackAlpha200,
-            color: theme.colors.$blackAlpha700,
+            borderColor: theme.colors.$blackAlpha150,
+            color: theme.colors.$blackAlpha600,
             '&:hover': { backgroundColor: theme.colors.$blackAlpha25 },
             '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$blackAlpha25 } : undefined,
             boxShadow: theme.shadows.$outlineButtonShadow,

@@ -157,7 +157,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
                     width: t.sizes.$16,
                     height: t.sizes.$16,
                     borderRadius: t.radii.$md,
-                    border: `${t.borders.$dashed} ${t.colors.$blackAlpha200}`,
+                    border: `${t.borders.$dashed} ${t.colors.$blackAlpha150}`,
                     backgroundColor: t.colors.$blackAlpha50,
                     ':hover': {
                       backgroundColor: t.colors.$blackAlpha50,

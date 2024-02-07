@@ -49,8 +49,8 @@ export const Gauge = React.memo((props: GaugeProps) => {
     <Col
       center
       sx={theme => ({
-        '--cl-gauge-inner-stroke-color': theme.colors.$blackAlpha900,
-        '--cl-gauge-outter-stroke-color': theme.colors.$blackAlpha300,
+        '--cl-gauge-inner-stroke-color': theme.colors.$blackAlpha850,
+        '--cl-gauge-outter-stroke-color': theme.colors.$blackAlpha200,
         '> svg': {
           transform: 'rotate(-90deg)',
         },
@@ -90,7 +90,7 @@ export const Gauge = React.memo((props: GaugeProps) => {
           position: 'absolute',
           display: 'flex',
           fontSize: textSize,
-          color: theme.colors.$blackAlpha900,
+          color: theme.colors.$blackAlpha850,
         })}
       >
         {value}

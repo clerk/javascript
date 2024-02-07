@@ -33,7 +33,7 @@ const CreateOrganizationButton = ({
       label={localizationKeys('organizationSwitcher.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({
-        borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+        borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha250}`,
         padding: `${t.space.$5} ${t.space.$5}`,
       })}
       iconSx={t => ({

@@ -14,7 +14,7 @@ export const Actions = (props: PropsOfComponent<typeof Flex>) => {
       sx={[
         t => ({
           '> button:not(:first-of-type)': {
-            borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100} `,
+            borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha250} `,
           },
         }),
         sx,
