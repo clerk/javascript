@@ -56,9 +56,9 @@ const defaultRenderOption = <O extends Option>(option: O, _index?: number, isFoc
         padding: `${theme.space.$2} ${theme.space.$4}`,
         margin: `0 ${theme.space.$1}`,
         borderRadius: theme.radii.$md,
-        ...(isFocused && { backgroundColor: theme.colors.$blackAlpha100 }),
+        ...(isFocused && { backgroundColor: theme.colors.$neutralAlpha100 }),
         '&:hover': {
-          backgroundColor: theme.colors.$blackAlpha100,
+          backgroundColor: theme.colors.$neutralAlpha100,
         },
       })}
     >
@@ -189,7 +189,7 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
         sx={[
           t => ({
             borderRadius: t.radii.$md,
-            backgroundColor: t.colors.$blackAlpha50,
+            backgroundColor: t.colors.$neutralAlpha50,
             padding: t.space.$2,
           }),
           sx,

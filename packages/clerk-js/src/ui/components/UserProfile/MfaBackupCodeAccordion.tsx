@@ -13,7 +13,7 @@ export const MfaBackupCodeAccordion = () => {
       icon={
         <Icon
           icon={DotCircle}
-          sx={theme => ({ color: theme.colors.$blackAlpha700 })}
+          sx={theme => ({ color: theme.colors.$neutralAlpha700 })}
         />
       }
       title={t(localizationKeys('userProfile.start.mfaSection.backupCodes.headerTitle'))}

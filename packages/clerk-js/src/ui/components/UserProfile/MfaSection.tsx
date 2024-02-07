@@ -49,7 +49,7 @@ export const MfaSection = () => {
                 <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
                   <Icon
                     icon={AuthApp}
-                    sx={theme => ({ color: theme.colors.$blackAlpha700 })}
+                    sx={theme => ({ color: theme.colors.$neutralAlpha700 })}
                   />
 
                   <Text localizationKey={localizationKeys('userProfile.start.mfaSection.totp.headerTitle')} />
@@ -77,7 +77,7 @@ export const MfaSection = () => {
                     <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
                       <Icon
                         icon={Mobile}
-                        sx={theme => ({ color: theme.colors.$blackAlpha700 })}
+                        sx={theme => ({ color: theme.colors.$neutralAlpha700 })}
                       />
                       <Text>
                         SMS Code <FormattedPhoneNumberText value={phone.phoneNumber} />
@@ -106,7 +106,7 @@ export const MfaSection = () => {
                 <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
                   <Icon
                     icon={DotCircle}
-                    sx={theme => ({ color: theme.colors.$blackAlpha700 })}
+                    sx={theme => ({ color: theme.colors.$neutralAlpha700 })}
                   />
 
                   <Text localizationKey={localizationKeys('userProfile.start.mfaSection.backupCodes.headerTitle')} />

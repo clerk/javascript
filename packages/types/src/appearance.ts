@@ -404,16 +404,6 @@ export type Variables = {
    */
   colorTextOnPrimaryBackground?: CssColor;
   /**
-   * The secondary color used throughout the components.
-   * @default white
-   */
-  colorSecondary?: CssColorOrScale;
-  /**
-   * The secondary color used throughout the components.
-   * @default #42434D
-   */
-  colorTextOnSecondaryBackground?: CssColor;
-  /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
    */
   colorDanger?: CssColorOrScale;
@@ -426,12 +416,12 @@ export type Variables = {
    */
   colorWarning?: CssColorOrScale;
   /**
-   * The color that will be used for all to generate the alpha shades the components use. To achieve sufficient contrast,
+   * The color that will be used as the neutral color for all the components. To achieve sufficient contrast,
    * light themes should be using dark shades (`black`), while dark themes should be using light (`white`) shades. This option applies to borders,
    * backgrounds for hovered elements, hovered dropdown options etc.
    * @default 'black'
    */
-  colorAlphaShade?: CssColorOrAlphaScale;
+  colorNeutral?: CssColorOrAlphaScale;
   /**
    * The default text color.
    * @default #131316

@@ -24,7 +24,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
     '>:not(:first-of-type)': {
       padding: `${t.space.$4} ${t.space.$8}`,
       borderTop: t.borders.$normal,
-      borderColor: t.colors.$blackAlpha100,
+      borderColor: t.colors.$neutralAlpha100,
     },
   });
 
@@ -44,7 +44,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
           paddingTop: t.space.$2,
           background: common.mergedColorsBackground(
             colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$blackAlpha50,
+            t.colors.$neutralAlpha50,
           ),
         }),
         isProfileFooter ? profileCardFooterStyles : footerStyles,

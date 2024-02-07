@@ -57,7 +57,7 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
         alignItems: 'flex-start',
         padding: `${t.space.$2} ${t.space.$4}`,
         borderRadius: t.radii.$md,
-        ':hover': { backgroundColor: t.colors.$blackAlpha50 },
+        ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
       })}
     >
       {status.isLoading && <FullHeightLoader />}

@@ -18,32 +18,32 @@ export const whiteAlpha = Object.freeze({
   whiteAlpha950: 'hsla(0, 0%, 100%, 0.92)',
 } as const);
 
-export const blackAlpha = Object.freeze({
-  blackAlpha25: 'hsla(0, 0%, 0%, 0.02)',
-  blackAlpha50: 'hsla(0, 0%, 0%, 0.03)',
-  blackAlpha100: 'hsla(0, 0%, 0%, 0.07)',
-  blackAlpha150: 'hsla(0, 0%, 0%, 0.11)',
-  blackAlpha200: 'hsla(0, 0%, 0%, 0.15)',
-  blackAlpha300: 'hsla(0, 0%, 0%, 0.28)',
-  blackAlpha400: 'hsla(0, 0%, 0%, 0.41)',
-  blackAlpha500: 'hsla(0, 0%, 0%, 0.53)',
-  blackAlpha600: 'hsla(0, 0%, 0%, 0.62)',
-  blackAlpha700: 'hsla(0, 0%, 0%, 0.73)',
-  blackAlpha750: 'hsla(0, 0%, 0%, 0.78)',
-  blackAlpha800: 'hsla(0, 0%, 0%, 0.81)',
-  blackAlpha850: 'hsla(0, 0%, 0%, 0.84)',
-  blackAlpha900: 'hsla(0, 0%, 0%, 0.87)',
-  blackAlpha950: 'hsla(0, 0%, 0%, 0.92)',
+export const neutralAlpha = Object.freeze({
+  neutralAlpha25: 'hsla(0, 0%, 0%, 0.02)',
+  neutralAlpha50: 'hsla(0, 0%, 0%, 0.03)',
+  neutralAlpha100: 'hsla(0, 0%, 0%, 0.07)',
+  neutralAlpha150: 'hsla(0, 0%, 0%, 0.11)',
+  neutralAlpha200: 'hsla(0, 0%, 0%, 0.15)',
+  neutralAlpha300: 'hsla(0, 0%, 0%, 0.28)',
+  neutralAlpha400: 'hsla(0, 0%, 0%, 0.41)',
+  neutralAlpha500: 'hsla(0, 0%, 0%, 0.53)',
+  neutralAlpha600: 'hsla(0, 0%, 0%, 0.62)',
+  neutralAlpha700: 'hsla(0, 0%, 0%, 0.73)',
+  neutralAlpha750: 'hsla(0, 0%, 0%, 0.78)',
+  neutralAlpha800: 'hsla(0, 0%, 0%, 0.81)',
+  neutralAlpha850: 'hsla(0, 0%, 0%, 0.84)',
+  neutralAlpha900: 'hsla(0, 0%, 0%, 0.87)',
+  neutralAlpha950: 'hsla(0, 0%, 0%, 0.92)',
 } as const);
 
 export const colors = Object.freeze({
   // Colors that are not affected by `alphaShadesMode`
-  avatarBorder: blackAlpha.blackAlpha200,
-  avatarBackground: blackAlpha.blackAlpha400,
-  modalBackdrop: blackAlpha.blackAlpha700,
+  avatarBorder: neutralAlpha.neutralAlpha200,
+  avatarBackground: neutralAlpha.neutralAlpha400,
+  modalBackdrop: neutralAlpha.neutralAlpha700,
   activeDeviceBackground: whiteAlpha.whiteAlpha200,
   // Themable colors
-  ...blackAlpha,
+  ...neutralAlpha,
   ...whiteAlpha,
   colorBackground: 'white',
   colorInputBackground: 'white',

@@ -25,7 +25,7 @@ export const MembershipWidget = () => {
   return (
     <Flex
       sx={theme => ({
-        background: theme.colors.$blackAlpha50,
+        background: theme.colors.$neutralAlpha50,
         padding: theme.space.$2,
         borderRadius: theme.radii.$md,
         gap: theme.space.$4,

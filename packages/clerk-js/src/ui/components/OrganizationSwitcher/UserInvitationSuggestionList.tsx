@@ -109,7 +109,7 @@ const Preview = (
       sx={t => ({
         justifyContent: 'space-between',
         padding: `${t.space.$4} ${t.space.$5}`,
-        borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+        borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
       })}
     >
       <OrganizationPreview

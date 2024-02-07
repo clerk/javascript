@@ -57,7 +57,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
       </Col>
       <Box
         sx={t => ({
-          border: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          border: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
           borderRadius: t.radii.$lg,
         })}
       >
@@ -78,13 +78,13 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
 
         <Grid
           sx={t => ({
-            borderTop: `1px solid ${t.colors.$blackAlpha100}`,
+            borderTop: `1px solid ${t.colors.$neutralAlpha100}`,
             gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
             '>:not([hidden])~:not([hidden])': {
               borderRightWidth: '0px',
               borderLeftWidth: '1px',
               borderStyle: 'solid',
-              borderColor: t.colors.$blackAlpha100,
+              borderColor: t.colors.$neutralAlpha100,
             },
             '>:first-child': {
               borderBottomLeftRadius: t.radii.$lg,

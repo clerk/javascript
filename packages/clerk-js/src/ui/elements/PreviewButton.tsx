@@ -27,7 +27,7 @@ export const PreviewButton = (props: PreviewButtonProps) => {
           justifyContent: 'space-between',
           padding: `${t.space.$4} ${t.space.$5}`,
           borderRadius: 0,
-          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
           ...(showIconOnHover
             ? {
                 ':hover > svg': {
