@@ -322,6 +322,7 @@ export const useOrganizationSwitcherContext = () => {
     hidePersonal: ctx.hidePersonal || false,
     organizationProfileMode: ctx.organizationProfileMode || 'modal',
     createOrganizationMode: ctx.createOrganizationMode || 'modal',
+    skipInvitationScreen: ctx.skipInvitationScreen || false,
     afterCreateOrganizationUrl,
     afterLeaveOrganizationUrl,
     navigateOrganizationProfile,
