@@ -3,27 +3,34 @@ import React, { useEffect, useRef } from 'react';
 
 import { useActionContext } from './ActionRoot';
 
-const ScrollWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren>((props, ref) => {
-  return (
-    <div
-      ref={ref}
-      {...props}
-    />
-  );
-});
-
 type ActionOpenProps = PropsWithChildren<{ value: string }>;
 
-export const ActionOpen = (props: ActionOpenProps) => {
-  const { children, value } = props;
+const ScrollWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren>((props, ref) => (
+  <div
+    ref={ref}
+    {...props}
+  />
+));
+
+export const ActionOpen = ({ children, value }: ActionOpenProps) => {
   const { active } = useActionContext();
   const ref = useRef<HTMLDivElement>(null);
 
+  const centerCard = () => {
+    const element = ref.current;
+    if (element) {
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
+
   useEffect(() => {
     const element = ref.current;
-    if (!element || active !== value) return;
 
-    element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (active === value && element) {
+      centerCard();
+    }
   }, [active, value]);
 
   if (active !== value) {
