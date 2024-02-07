@@ -887,7 +887,12 @@ export type OrganizationSwitcherProps = {
   afterSelectOrganizationUrl?:
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
-
+  /**
+   * Hides the screen for sending invitations after an organization is created.
+   * @default undefined When left undefined Clerk will automatically hide the screen if
+   * the number of max allowed members is equal to 1
+   */
+  skipInvitationScreen?: boolean;
   /**
    * Full URL or path to navigate after a successful selection of personal workspace.
    * Accepts a function that returns URL or path
