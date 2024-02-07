@@ -3,8 +3,6 @@ import React, { useEffect, useRef } from 'react';
 
 import { useActionContext } from './ActionRoot';
 
-type ActionOpenProps = PropsWithChildren<{ value: string }>;
-
 const ScrollWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren>((props, ref) => {
   return (
     <div
@@ -13,6 +11,8 @@ const ScrollWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren>((props
     />
   );
 });
+
+type ActionOpenProps = PropsWithChildren<{ value: string }>;
 
 export const ActionOpen = (props: ActionOpenProps) => {
   const { children, value } = props;
