@@ -17,7 +17,7 @@ export const IconCircle = (props: IconCircleProps) => {
       elementDescriptor={boxElementDescriptor}
       sx={[
         t => ({
-          backgroundColor: t.colors.$blackAlpha50,
+          backgroundColor: t.colors.$neutralAlpha50,
           width: t.sizes.$16,
           height: t.sizes.$16,
           borderRadius: t.radii.$circle,
@@ -30,7 +30,7 @@ export const IconCircle = (props: IconCircleProps) => {
         elementDescriptor={iconElementDescriptor}
         icon={icon}
         size='lg'
-        sx={theme => ({ color: theme.colors.$blackAlpha600 })}
+        sx={theme => ({ color: theme.colors.$neutralAlpha600 })}
       />
     </Flex>
   );

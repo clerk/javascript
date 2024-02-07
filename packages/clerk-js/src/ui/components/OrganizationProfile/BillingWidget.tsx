@@ -13,7 +13,11 @@ export const BillingWidget = ({
 
   return (
     <Flex
-      sx={theme => ({ background: theme.colors.$blackAlpha50, padding: theme.space.$4, borderRadius: theme.radii.$md })}
+      sx={theme => ({
+        background: theme.colors.$neutralAlpha50,
+        padding: theme.space.$4,
+        borderRadius: theme.radii.$md,
+      })}
     >
       <AlertIcon
         variant='warning'

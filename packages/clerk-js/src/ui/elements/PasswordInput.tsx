@@ -112,7 +112,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
           position: 'absolute',
           right: 0,
           marginRight: theme.space.$1,
-          color: theme.colors.$blackAlpha400,
+          color: theme.colors.$neutralAlpha400,
         })}
         icon={hidden ? Eye : EyeSlash}
       />

@@ -34,7 +34,7 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
       sx={[
         t => ({
           flexDirection: 'row-reverse',
-          borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
           paddingTop: t.space.$4,
           paddingBottom: t.space.$4,
           gap: t.space.$6,
@@ -230,7 +230,7 @@ export const ProfileSectionActionMenuItem = (props: ProfileSectionActionMenuItem
               icon={leftIcon as React.ComponentType}
               sx={[
                 theme => ({
-                  color: theme.colors.$blackAlpha600,
+                  color: theme.colors.$neutralAlpha600,
                   width: theme.sizes.$5,
                 }),
                 leftIconSx,

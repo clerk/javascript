@@ -12,7 +12,7 @@ const styles = (t: InternalTheme) => ({
     backgroundColor: t.colors.$colorBackground,
   },
   destructive: {
-    backgroundColor: t.colors.$blackAlpha50,
+    backgroundColor: t.colors.$neutralAlpha50,
   },
 });
 
@@ -28,7 +28,7 @@ export const ActionCard = (props: ActionCardProps) => {
           borderRadius: t.radii.$lg,
           padding: `${t.space.$4} ${t.space.$5}`,
           border: t.borders.$normal,
-          borderColor: t.colors.$blackAlpha150,
+          borderColor: t.colors.$neutralAlpha150,
           ...styles(t)[variant],
         }),
         sx,
