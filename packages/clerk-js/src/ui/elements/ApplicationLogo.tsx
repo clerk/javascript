@@ -49,6 +49,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
       sx={{
         display: loaded ? 'inline-block' : 'none',
         height: '100%',
+        width: 'auto',
       }}
     />
   );
