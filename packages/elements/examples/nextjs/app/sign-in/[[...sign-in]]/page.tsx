@@ -13,6 +13,7 @@ import {
 
 import { H1, H2, H3, HR as Hr, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
+import { Loading } from '@/components/loader';
 import { SignInDebug } from '@/components/sign-in-debug';
 
 export default function SignInPage() {
@@ -54,10 +55,12 @@ export default function SignInPage() {
             <Hr />
 
             <div className='flex gap-6 flex-col'>
-              <CustomField
-                label='Email'
-                name='identifier'
-              />
+              <Loading>
+                <CustomField
+                  label='Email'
+                  name='identifier'
+                />
+              </Loading>
 
               {/* <Hr />
 
@@ -79,48 +82,49 @@ export default function SignInPage() {
               Current Factor: <Factor first>First</Factor> | <Factor second>Second</Factor>
             </H2>
 
-            <Verification name='password'>
-              <CustomField
-                label='Password'
-                name='password'
-              />
+            <Loading>
+              <Verification name='password'>
+                <CustomField
+                  label='Password'
+                  name='password'
+                />
 
-              <CustomSubmit>Sign In</CustomSubmit>
-            </Verification>
+                <CustomSubmit>Sign In</CustomSubmit>
+              </Verification>
 
-            <Verification name='email_code'>
-              <CustomField
-                label='Email Code'
-                name='code'
-              />
+              <Verification name='email_code'>
+                <CustomField
+                  label='Email Code'
+                  name='code'
+                />
 
-              <CustomSubmit>Sign In</CustomSubmit>
-            </Verification>
+                <CustomSubmit>Sign In</CustomSubmit>
+              </Verification>
 
-            <Verification name='phone_code'>
-              <CustomField
-                label='Phone Code'
-                name='code'
-              />
+              <Verification name='phone_code'>
+                <CustomField
+                  label='Phone Code'
+                  name='code'
+                />
 
-              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In
-              </Submit>
-            </Verification>
+                <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+                  Sign In
+                </Submit>
+              </Verification>
 
-            <Verification name='reset_password_email_code'>
-              <H3>Verify your email</H3>
+              <Verification name='reset_password_email_code'>
+                <H3>Verify your email</H3>
 
-              <P>Please check your email for a verification code...</P>
+                <P>Please check your email for a verification code...</P>
 
-              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Verify
-              </Submit>
-            </Verification>
+                <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
+                  Verify
+                </Submit>
+              </Verification>
+            </Loading>
           </div>
         </Continue>
       </div>
-
       <SignInDebug />
     </SignIn>
   );
