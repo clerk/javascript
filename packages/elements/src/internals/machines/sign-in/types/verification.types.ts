@@ -7,16 +7,16 @@ import type { SignInRouterMachine } from '~/internals/machines/sign-in/machines'
 
 // ---------------------------------- Tags ---------------------------------- //
 
-export type SignInContinueTags = 'state:pending' | 'state:preparing' | 'state:attempting' | 'state:loading';
+export type SignInVerificationTags = 'state:pending' | 'state:preparing' | 'state:attempting' | 'state:loading';
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignInContinueSubmitEvent = { type: 'SUBMIT' };
-export type SignInContinueEvents = ErrorActorEvent | SignInContinueSubmitEvent;
+export type SignInVerificationSubmitEvent = { type: 'SUBMIT' };
+export type SignInVerificationEvents = ErrorActorEvent | SignInVerificationSubmitEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 
-export interface SignInContinueInput {
+export interface SignInVerificationInput {
   clerk: LoadedClerk;
   form: ActorRefFrom<typeof FormMachine>;
   router: ActorRefFrom<typeof SignInRouterMachine>;
@@ -24,7 +24,7 @@ export interface SignInContinueInput {
 
 // ---------------------------------- Context ---------------------------------- //
 
-export interface SignInContinueContext {
+export interface SignInVerificationContext {
   currentFactor: SignInFactor | null;
   clerk: LoadedClerk;
   error?: Error | ClerkAPIResponseError;
@@ -34,9 +34,9 @@ export interface SignInContinueContext {
 
 // ---------------------------------- Schema ---------------------------------- //
 
-export interface SignInContinueSchema {
-  context: SignInContinueContext;
-  input: SignInContinueInput;
-  events: SignInContinueEvents;
-  tags: SignInContinueTags;
+export interface SignInVerificationSchema {
+  context: SignInVerificationContext;
+  input: SignInVerificationInput;
+  events: SignInVerificationEvents;
+  tags: SignInVerificationTags;
 }

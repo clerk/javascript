@@ -18,7 +18,7 @@ import { assign, fromPromise, sendTo, setup } from 'xstate';
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import type { FormFields } from '~/internals/machines/form/form.types';
 import type { WithClient, WithParams } from '~/internals/machines/shared.types';
-import type { SignInContinueSchema } from '~/internals/machines/sign-in/types';
+import type { SignInVerificationSchema } from '~/internals/machines/sign-in/types';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '~/internals/machines/sign-in/utils';
 import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
 
@@ -35,11 +35,11 @@ export type PrepareSecondFactorInput = WithClient<
 export type AttemptFirstFactorInput = WithClient<{ fields: FormFields; currentFactor: SignInFirstFactor | null }>;
 export type AttemptSecondFactorInput = WithClient<{ fields: FormFields; currentFactor: SignInSecondFactor | null }>;
 
-export const SignInContinueMachineId = 'SignInContinue';
+export const SignInVerificationMachineId = 'SignInVerification';
 export const SignInFirstFactorMachineId = 'SignInFirstFactor';
 export const SignInSecondFactorMachineId = 'SignInSecondFactor';
 
-const SignInContinueMachine = setup({
+const SignInVerificationMachine = setup({
   actors: {
     prepare: fromPromise<SignInResource, PrepareFirstFactorInput | PrepareSecondFactorInput>(() =>
       Promise.reject(new ClerkElementsRuntimeError('Actor `prepare` must be overridden')),
@@ -70,9 +70,9 @@ const SignInContinueMachine = setup({
       },
     ),
   },
-  types: {} as SignInContinueSchema,
+  types: {} as SignInVerificationSchema,
 }).createMachine({
-  id: SignInContinueMachineId,
+  id: SignInVerificationMachineId,
   context: ({ input }) => ({
     currentFactor: null,
     clerk: input.clerk,
@@ -133,7 +133,7 @@ const SignInContinueMachine = setup({
   },
 });
 
-export const SignInFirstFactorMachine = SignInContinueMachine.provide({
+export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(async ({ input }) => {
       const { client, params, strategy } = input as PrepareFirstFactorInput;
@@ -224,7 +224,7 @@ export const SignInFirstFactorMachine = SignInContinueMachine.provide({
   },
 });
 
-export const SignInSecondFactorMachine = SignInContinueMachine.provide({
+export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(({ input }) => {
       const { client, params, strategy } = input as PrepareSecondFactorInput;
