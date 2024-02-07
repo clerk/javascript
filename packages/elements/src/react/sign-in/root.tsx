@@ -8,7 +8,7 @@ import { FormStoreProvider } from '~/internals/machines/form/form.context';
 import { SignInRouterMachine } from '~/internals/machines/sign-in/machines';
 import { useBrowserInspector } from '~/react/hooks';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
-import { SignInRouterCtx } from '~/react/sign-in/contexts/router.context';
+import { SignInRouterCtx } from '~/react/sign-in/context';
 
 type SignInFlowProviderProps = Required<PropsWithChildren>;
 

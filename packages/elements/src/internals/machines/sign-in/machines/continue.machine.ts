@@ -13,17 +13,17 @@ import type {
   SignInStrategy,
   Web3Attempt,
 } from '@clerk/types';
-import { assign, fromPromise, log, sendTo, setup } from 'xstate';
+import { assign, fromPromise, sendTo, setup } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import type { FormFields } from '~/internals/machines/form/form.types';
+import type { WithClient, WithParams } from '~/internals/machines/shared.types';
 import type { SignInContinueSchema } from '~/internals/machines/sign-in/types';
+import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '~/internals/machines/sign-in/utils';
 import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
 
-import type { FormFields } from '../../form/form.types';
-import type { WithClient, WithParams } from '../../shared.types';
-import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '../sign-in.utils';
-
-export type ResourceResponse = SignInResource | void;
+export type TSignInFirstFactorMachine = typeof SignInFirstFactorMachine;
+export type TSignInSecondFactorMachine = typeof SignInSecondFactorMachine;
 
 export type PrepareFirstFactorInput = WithClient<
   WithParams<PrepareFirstFactorParams | null> & { strategy?: SignInStrategy }
@@ -32,30 +32,33 @@ export type PrepareSecondFactorInput = WithClient<
   WithParams<PrepareSecondFactorParams | null> & { strategy?: SignInStrategy }
 >;
 
-export type AttemptFirstFactorInput = WithClient<
-  WithParams<{ fields: FormFields; currentFactor: SignInFirstFactor | null }>
->;
-
-export type AttemptSecondFactorInput = WithClient<
-  WithParams<{ fields: FormFields; currentFactor: SignInSecondFactor | null }>
->;
+export type AttemptFirstFactorInput = WithClient<{ fields: FormFields; currentFactor: SignInFirstFactor | null }>;
+export type AttemptSecondFactorInput = WithClient<{ fields: FormFields; currentFactor: SignInSecondFactor | null }>;
 
 export const SignInContinueMachineId = 'SignInContinue';
 export const SignInFirstFactorMachineId = 'SignInFirstFactor';
 export const SignInSecondFactorMachineId = 'SignInSecondFactor';
 
-export type TSignInContinueMachine = typeof SignInContinueMachine;
-export type TSignInFirstFactorMachine = ReturnType<typeof createFirstFactorMachine>;
-export type TSignInSecondFactorMachine = ReturnType<typeof createSecondFactorMachine>;
-
-export const SignInContinueMachine = setup({
+const SignInContinueMachine = setup({
   actors: {
-    prepare: fromPromise<ResourceResponse, PrepareFirstFactorInput | PrepareSecondFactorInput>(() => Promise.reject()),
-    attempt: fromPromise<ResourceResponse, AttemptFirstFactorInput | AttemptSecondFactorInput>(() => Promise.reject()),
+    prepare: fromPromise<SignInResource, PrepareFirstFactorInput | PrepareSecondFactorInput>(() =>
+      Promise.reject(new ClerkElementsRuntimeError('Actor `prepare` must be overridden')),
+    ),
+    attempt: fromPromise<SignInResource, AttemptFirstFactorInput | AttemptSecondFactorInput>(() =>
+      Promise.reject(new ClerkElementsRuntimeError('Actor `attempt` must be overridden')),
+    ),
   },
   actions: {
-    determineStartingFactor: assign({ currentFactor: undefined }),
-    goToNextState: sendTo(({ context }) => context.routerRef, { type: 'NEXT' }),
+    determineStartingFactor: () => {
+      throw new ClerkElementsRuntimeError('Action `determineStartingFactor` be overridden');
+    },
+    goToNextState: sendTo(
+      ({ context }) => context.routerRef,
+      (_, { resource }: { resource: SignInResource }) => ({
+        type: 'NEXT',
+        resource,
+      }),
+    ),
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -76,7 +79,7 @@ export const SignInContinueMachine = setup({
     formRef: input.form,
     routerRef: input.router,
   }),
-  initial: 'Pending',
+  initial: 'Preparing',
   entry: 'determineStartingFactor',
   states: {
     Preparing: {
@@ -84,11 +87,13 @@ export const SignInContinueMachine = setup({
       invoke: {
         id: 'prepare',
         src: 'prepare',
-        input: ({ context }) => ({
-          client: context.clerk.client,
-          params: context.currentFactor, // TODO: Appropriately type
-          strategy: context.currentFactor?.strategy,
-        }),
+        input: ({ context }) => {
+          return {
+            client: context.clerk.client,
+            params: context.currentFactor as PrepareFirstFactorParams,
+            strategy: context.currentFactor?.strategy,
+          };
+        },
         onDone: 'Pending',
         onError: {
           actions: 'setFormErrors',
@@ -108,167 +113,147 @@ export const SignInContinueMachine = setup({
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
-      entry: log(({ context }) => context.clerk.client.signIn),
       invoke: {
         id: 'attempt',
         src: 'attempt',
         input: ({ context }) => ({
           client: context.clerk.client,
-          params: {
-            currentFactor: context.currentFactor, // TODO: Appropriately type
-            fields: context.formRef.getSnapshot().context.fields,
-          },
+          currentFactor: context.currentFactor as SignInFirstFactor,
+          fields: context.formRef.getSnapshot().context.fields,
         }),
-        // onDone: {
-        //   actions: [log(({ context }) => context.clerk.client.signIn), 'goToNextState'],
-        // },
-        onDone: 'Done',
+        onDone: {
+          actions: { type: 'goToNextState', params: ({ event }) => ({ resource: event.output }) },
+        },
         onError: {
           actions: 'setFormErrors',
           target: 'Pending',
         },
       },
     },
-    Done: {
-      type: 'final',
-      entry: [log('TEST'), log(({ context }) => context.clerk.client.signIn), 'goToNextState'],
-    },
   },
 });
 
-export function createFirstFactorMachine() {
-  return SignInContinueMachine.provide({
-    actors: {
-      prepare: fromPromise(async ({ input }) => {
-        const { client, params, strategy } = input as PrepareFirstFactorInput;
+export const SignInFirstFactorMachine = SignInContinueMachine.provide({
+  actors: {
+    prepare: fromPromise(async ({ input }) => {
+      const { client, params, strategy } = input as PrepareFirstFactorInput;
 
-        if (strategy === 'password') {
-          return Promise.resolve(client.signIn);
+      if (strategy === 'password') {
+        return Promise.resolve(client.signIn);
+      }
+
+      if (!params) {
+        throw new ClerkElementsRuntimeError('prepareFirstFactor parameters were undefined');
+      }
+
+      return client.signIn.prepareFirstFactor(params);
+    }),
+    attempt: fromPromise(async ({ input }) => {
+      const { client, fields, currentFactor } = input as AttemptFirstFactorInput;
+
+      assertIsDefined(currentFactor);
+
+      let attemptParams: AttemptFirstFactorParams;
+
+      const strategy = currentFactor.strategy;
+      const code = fields.get('code')?.value as string | undefined;
+      const password = fields.get('password')?.value as string | undefined;
+
+      switch (strategy) {
+        case 'password': {
+          assertIsDefined(password);
+
+          attemptParams = {
+            strategy,
+            password,
+          } satisfies PasswordAttempt;
+
+          break;
         }
+        case 'reset_password_phone_code':
+        case 'reset_password_email_code': {
+          assertIsDefined(code);
+          assertIsDefined(password);
 
-        if (!params) {
-          throw new ClerkElementsRuntimeError('prepareFirstFactor parameters were undefined');
+          attemptParams = {
+            strategy,
+            code,
+            password,
+          } satisfies ResetPasswordPhoneCodeAttempt | ResetPasswordEmailCodeAttempt;
+
+          break;
         }
+        case 'phone_code':
+        case 'email_code': {
+          assertIsDefined(code);
 
-        return client.signIn.prepareFirstFactor(params);
-      }),
-      attempt: fromPromise(async ({ input }) => {
-        const {
-          client,
-          params: { fields, currentFactor },
-        } = input as AttemptFirstFactorInput;
+          attemptParams = {
+            strategy,
+            code,
+          } satisfies PhoneCodeAttempt | EmailCodeAttempt;
 
-        console.log('input', input);
-
-        assertIsDefined(currentFactor);
-
-        let attemptParams: AttemptFirstFactorParams;
-
-        const strategy = currentFactor.strategy;
-        const code = fields.get('code')?.value as string | undefined;
-        const password = fields.get('password')?.value as string | undefined;
-
-        switch (strategy) {
-          case 'password': {
-            assertIsDefined(password);
-
-            attemptParams = {
-              strategy,
-              password,
-            } satisfies PasswordAttempt;
-
-            break;
-          }
-          case 'reset_password_phone_code':
-          case 'reset_password_email_code': {
-            assertIsDefined(code);
-            assertIsDefined(password);
-
-            attemptParams = {
-              strategy,
-              code,
-              password,
-            } satisfies ResetPasswordPhoneCodeAttempt | ResetPasswordEmailCodeAttempt;
-
-            break;
-          }
-          case 'phone_code':
-          case 'email_code': {
-            assertIsDefined(code);
-
-            attemptParams = {
-              strategy,
-              code,
-            } satisfies PhoneCodeAttempt | EmailCodeAttempt;
-
-            break;
-          }
-          case 'web3_metamask_signature': {
-            const signature = fields.get('signature')?.value as string | undefined;
-            assertIsDefined(signature);
-
-            attemptParams = {
-              strategy,
-              signature,
-            } satisfies Web3Attempt;
-
-            break;
-          }
-          default:
-            throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
+          break;
         }
+        case 'web3_metamask_signature': {
+          const signature = fields.get('signature')?.value as string | undefined;
+          assertIsDefined(signature);
 
-        return client.signIn.attemptFirstFactor(attemptParams);
-      }),
-    },
-    actions: {
-      determineStartingFactor: assign({
-        currentFactor: ({ context }) =>
-          determineStartingSignInFactor(
-            context.clerk.client.signIn.supportedFirstFactors,
-            context.clerk.client.signIn.identifier,
-            context.clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
-          ),
-      }),
-    },
-  });
-}
+          attemptParams = {
+            strategy,
+            signature,
+          } satisfies Web3Attempt;
 
-export function createSecondFactorMachine() {
-  return SignInContinueMachine.provide({
-    actors: {
-      prepare: fromPromise(({ input }) => {
-        const { client, params, strategy } = input as PrepareSecondFactorInput;
-
-        if (strategy === 'totp') {
-          return Promise.resolve(client.signIn);
+          break;
         }
+        default:
+          throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
+      }
 
-        assertIsDefined(params);
-        return client.signIn.prepareSecondFactor(params);
-      }),
-      attempt: fromPromise(async ({ input }) => {
-        const {
-          client,
-          params: { fields, currentFactor },
-        } = input as AttemptSecondFactorInput;
+      return client.signIn.attemptFirstFactor(attemptParams);
+    }),
+  },
+  actions: {
+    determineStartingFactor: assign({
+      currentFactor: ({ context }) =>
+        determineStartingSignInFactor(
+          context.clerk.client.signIn.supportedFirstFactors,
+          context.clerk.client.signIn.identifier,
+          context.clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
+        ),
+    }),
+  },
+});
 
-        const code = fields.get('code')?.value as string;
+export const SignInSecondFactorMachine = SignInContinueMachine.provide({
+  actors: {
+    prepare: fromPromise(({ input }) => {
+      const { client, params, strategy } = input as PrepareSecondFactorInput;
 
-        assertIsDefined(currentFactor);
-        assertIsDefined(code);
+      if (strategy === 'totp') {
+        return Promise.resolve(client.signIn);
+      }
 
-        return client.signIn.attemptSecondFactor({
-          strategy: currentFactor.strategy,
-          code,
-        });
-      }),
-    },
-    actions: {
-      determineStartingFactor: assign({
-        currentFactor: ({ context }) =>
-          determineStartingSignInSecondFactor(context.clerk.client.signIn.supportedSecondFactors),
-      }),
-    },
-  });
-}
+      assertIsDefined(params);
+      return client.signIn.prepareSecondFactor(params);
+    }),
+    attempt: fromPromise(async ({ input }) => {
+      const { client, fields, currentFactor } = input as AttemptSecondFactorInput;
+
+      const code = fields.get('code')?.value as string;
+
+      assertIsDefined(currentFactor);
+      assertIsDefined(code);
+
+      return client.signIn.attemptSecondFactor({
+        strategy: currentFactor.strategy,
+        code,
+      });
+    }),
+  },
+  actions: {
+    determineStartingFactor: assign({
+      currentFactor: ({ context }) =>
+        determineStartingSignInSecondFactor(context.clerk.client.signIn.supportedSecondFactors),
+    }),
+  },
+});

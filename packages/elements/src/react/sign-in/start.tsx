@@ -1,18 +1,13 @@
 'use client';
 
-import { useClerk } from '@clerk/clerk-react';
-import { useActorRef } from '@xstate/react';
 import { type PropsWithChildren } from 'react';
 
-import { useFormStore } from '~/internals/machines/form/form.context';
 import type { TSignInStartMachine } from '~/internals/machines/sign-in/machines';
 import { SignInStartMachine } from '~/internals/machines/sign-in/machines';
 import { Form } from '~/react/common/form';
 import { useActiveTags, useBrowserInspector } from '~/react/hooks';
-import { useClerkRouter } from '~/react/router';
+import { SignInRouterCtx, useSignInRouteRegistration } from '~/react/sign-in/context';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
-
-import { SignInRouterCtx } from './contexts/router.context';
 
 export type SignInStartProps = PropsWithChildren;
 
@@ -27,17 +22,11 @@ export function SignInStart(props: SignInStartProps) {
 }
 
 function SignInStartInner(props: SignInStartProps) {
-  const routerRef = SignInRouterCtx.useActorRef();
+  const ref = useSignInRouteRegistration('start', SignInStartMachine);
 
-  const clerk = useClerk();
-  const form = useFormStore();
-  const router = useClerkRouter();
-  const { inspector } = useBrowserInspector();
-
-  const ref = useActorRef(SignInStartMachine, {
-    input: { clerk, basePath: router?.basePath, form, router: routerRef },
-    inspect: inspector?.inspect,
-  });
+  if (!ref) {
+    return null;
+  }
 
   return (
     <SignInStartCtx.Provider actorRef={ref}>

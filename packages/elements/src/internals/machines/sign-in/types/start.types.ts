@@ -26,12 +26,12 @@ export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent | SignI
 
 // ---------------------------------- Input ---------------------------------- //
 
-export interface SignInStartInput {
-  basePath?: string;
-  clerk: LoadedClerk;
+export type SignInStartInput = {
   form: ActorRefFrom<typeof FormMachine>;
-  router: ActorRefFrom<typeof SignInRouterMachine>;
-}
+  basePath?: string; // Standard
+  clerk: LoadedClerk; // Standard
+  router: ActorRefFrom<typeof SignInRouterMachine>; // Standard
+};
 
 // ---------------------------------- Context ---------------------------------- //
 

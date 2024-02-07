@@ -1,10 +1,15 @@
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, log, not, or, setup } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, setup, stopChild } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors/error';
-import type { SignInRouterContext, SignInRouterSchema } from '~/internals/machines/sign-in/types';
+import type {
+  SignInRouterContext,
+  SignInRouterEvents,
+  SignInRouterNextEvent,
+  SignInRouterSchema,
+} from '~/internals/machines/sign-in/types';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
@@ -15,8 +20,8 @@ const isCurrentPath =
 
 const needsStatus =
   (status: SignInStatus) =>
-  ({ context }: { context: SignInRouterContext }, _params?: NonReducibleUnknown) =>
-    context.clerk.client.signIn.status === status;
+  ({ context, event }: { context: SignInRouterContext; event?: SignInRouterEvents }, _?: NonReducibleUnknown) =>
+    (event as SignInRouterNextEvent)?.resource?.status === status || context.clerk.client.signIn.status === status;
 
 export const SignInRouterMachineId = 'SignInRouter';
 
@@ -27,7 +32,7 @@ export const SignInRouterMachine = setup({
       if (!context.router) return;
       const resolvedPath = [context.router?.basePath, path].join('/').replace(/\/\/g/, '/');
       if (resolvedPath === context.router.pathname()) return;
-      context.router.replace(resolvedPath);
+      context.router.push(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     setActive({ context }) {
@@ -48,9 +53,14 @@ export const SignInRouterMachine = setup({
 
     isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode']),
     isActivePathRoot: isCurrentPath('/'),
-    isComplete: ({ context }) => {
-      console.debug(context.clerk.client.signIn);
-      return context.clerk.client.signIn.status === 'complete' && Boolean(context.clerk.client.signIn.createdSessionId);
+    isComplete: ({ context, event }) => {
+      const resource = (event as SignInRouterNextEvent)?.resource;
+      const signIn = context.clerk.client.signIn;
+
+      return (
+        (resource?.status === 'complete' && Boolean(resource?.createdSessionId)) ||
+        (signIn.status === 'complete' && Boolean(signIn.createdSessionId))
+      );
     },
     isLoggedIn: ({ context }) => Boolean(context.clerk.user),
     isSingleSessionMode: ({ context }) => Boolean(context.clerk.__unstable__environment?.authConfig.singleSessionMode),
@@ -68,17 +78,44 @@ export const SignInRouterMachine = setup({
   },
   types: {} as SignInRouterSchema,
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QGUCWUB2BJDAlA9gK4AuYATgMQAKuAogGoDaADALqKgAO+sqxq+DBxAAPRABYATABoQAT0QBGZgFYAdAGZxGgOyKAbIp0b9+yQA4dAXyuy0mHARLk1OPhRbskIbr36DhMQRJFXFNAE5mcT1JRXDwkw1ZBQRjHTVDSQ0VSWZ9cXDzcXEbO3RsPCJSMlcMd0ZFLy4ePgEhbyCQ8IiomLiE-Q0k+URJHW6dPMlB0x1o0OtbEHsKp2ra+skmnxb-dtBOlW6NSOjFWPjE4ZTzc3VmZg1mePCVVUVFc1Ll8scqlzcxA8Gm2vlaAQ6oyOPTOFwGQ2SSluGR0byMGmmxge4W+Kz+zhqgI84lBuzagShx1OfUug2uiBUinU4X0zE+RjmIXOuN+lQJGyBjBUpL85MhwWhJ16536V0RCCOkjUtw+4XEbPMTw0PIcfPWyGIAEMyECAHK0AAaABVPMIwXsKakVPo1OJzs7VCcjPpwvLQmENEYinETFEvks8XqXAbjWbLTbGnayRCDohwnNlSonjpjCpUWNfSMEGZzGpJOJBsVUfNTDrVv8ajGTRRzdbGFsk6KU6I0xm7tnc-nxn6MWo9AVzPojplJDiI7y1i4AGKoMiwYhLw0AY2I+EorZtbE74P2PYQikDYRyBlUlnOOkn8vMqjL6pOlgfoU1dfx6xXa43bdd33eMGhFE9HSZUcWViSRpnMGDXifcwlVRJ5iiiJl9BzH8o0bMAt0ECBNx3PcW1Ao9vHtMVU3PSwlUGZQ3jGCsin0eVxGhFRGQQsxCjmRRilwxd8MIjBiKAsiDzA48HXFT5UTUBJlCGSJ9AQrR5SGdIjDyNjn20HJhIbNQAGFDQAGwsgAjbcAGsKCtXAAEFTWQJdaFwW0qOTU8gmvMcHwvXQUJzAwONyMdYludSQvEcwDGM-laDIMgpIo8C5NoqdSxMPNmCyEwukUeUHzCBJjA0O5wkEz4Sm+DB8AgOBhEjETZJos8AFp2KLHq1AeQahqG7IVCS9ZAQ67sggvZgMgKmqqqePM3RUJ9wiVAqTiyNVbjg8Myl1ES1CbYgpr8xAULmj07liIZuNReV8jCIoNsGtV1MS+cjpM-91xI4Dzsg7J0keEItGqtidHlSJ1DC1EfV0dk50O+t+WQAiiIBvcgfk04BueVRHg+KQSqLD0Bs1EJijzXQxu+tH1nMqzbK3OzcdorNFAyTjtqGZ8OT9WIyxyIo8k5Kr6tR38XBStKyA5s9QnUXIzCyO5nm43qUk-MtA2mWKQaicblz3KB8GIKhDVgWAAHc9wgRWgikJ8hjULNHleSITFZFGfh+-kAAlUHXJ3KRhGl4XpBAEoGir4m4h5DCOGwbCAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QGUCWUB2BJDAlA9gK4AuYATgMQAKuAogGoDaADALqKgAO+sqxq+DBxAAPRABYATABoQAT0QBGZgFYAdAHYVzHRoAcivQDZtzAMwBfC7LSYcBEuTU4+FFuyQhuvfoOFiESRVxNTMATj1xDQ1JMxUVY2DZBQQNcUVQxUlxMJUsjUVxPT0rG3RsPCJSMmcMV0ZFDy4ePgEhTwCgsNCIqJi4hJNxZMRJAzVxFTNFQrjFIw1p0pBbCodq2vrJJq8W33bQTpVu8Mjo2PjE4flEYu7mRRUTRQLVJ5Vl1fsqpxdiNzMO28rT8HVGxx6Z36lyGIwQhm6OTCuTCRki4jRxU+5W+jhqfzc4iBeza-nBJ165wGVzheT0amKYyC00eWnE2LslTxm3+jBUxJ8pLBgQhpz6F0GSRuCGO6km00kaWyOkUHLWPxqyGIAEMyP8AHK0AAaABV3MJgfsyakVBpNEiiswwmYjPM9LSMWoVJJUXpzIYotk1biNlrdQbjWbGhaSaDDogwhojGoFoZqRonXE4UYzMw1GFJD7zEZC5E4sGuaGdXqKIbTYxtjHBXHRAmkymCnp05mVLSzCEMYmTMw9PoYpIK+snAAxVBkWDEafagDGxHwlDrZrYTZBB1b8OmyYMkhLRkm4mY6Thfvp+jCl8v4jMWnmk41aln88XK7XG8jDQFXdrUeOJNH7PJwiiPIk2vYxNBMIwdFiPR7yyN9uWQMBl0ECAl1Xdda3-bdPEtIV43hUd1Eo5gjFonNnz0GRpQxPMy0kcxTiCKYPmsFYcUrJxMOwjBcJ-AjNwAncrWFQwNG6F4EgvRZ5hLOEzGfCYXVyLt5SyWJ0I2ABhbUABsTIAIxXABrCgTVwABBfVkGnWhcHNEjYz3AJvUkNRskkRQwkmPRjnYsw4SkXyC1RMI3W9LQTwMpxaDIMhxKIwDpPIkxuhPeJ7yCEwDHC6V9HpZEAuKSZlASDQrF4jB8AgOBhC+ASyCksj9wAWiMOFerUHQhuG4bCiS-E6mITqWwCRRcwZXpaJiRjpnMa9UQmAtDFtcQMSTMJxrUMM9WmrzbkLNQ5sVSI0RmC8SpSM87QiMZDBC-snyMQ7PwXPDf1O4C4m6S5x2mRjVDhWK838l4ULHUtDqEnC-vXAGZPvO0ii7OaTG9XamJSJ5fJ9HN0mdMxC1ow7jLMyzlystHyKmXzDwvWJnyCubaWyUJGK7ZhCwFjEeLKTkpxqFK0o6jzmzOmVJgZPnbRzdmjDCOE702yrIjyVRjG+9coHwYgqG1WBYAAd3XCBGf3KRrw0ir2IxFD+313i2vFtQAAlUAXW2jgpKEJRpaVxlMcwMxHR4gvZeqgA */
   id: SignInRouterMachineId,
   context: ({ input }) => ({
     activeRouteRef: null,
     clerk: input.clerk,
     router: input.router,
+    routes: new Map(),
     signUpPath: input.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
   }),
   initial: 'Init',
   on: {
     PREV: '.Hist',
+    'ROUTE.REGISTER': {
+      actions: enqueueActions(({ context, enqueue, event, self }) => {
+        const { clerk, router } = context;
+        const { id, logic, input } = event;
+
+        router?.push;
+
+        if (!self.getSnapshot().children[id]) {
+          enqueue.spawnChild(logic, {
+            id,
+            systemId: id,
+            input: { basePath: router?.basePath, clerk, router: self, ...input },
+          });
+        }
+      }),
+    },
+    'ROUTE.UNREGISTER': {
+      actions: stopChild(({ event }) => event.id),
+    },
+    'ROUTE.CLEAR': {
+      actions: enqueueActions(({ enqueue, self }) => {
+        Object.keys(self.getSnapshot().children).forEach(id => {
+          enqueue.stopChild(id);
+        });
+      }),
+    },
   },
   states: {
     Init: {
@@ -164,6 +201,9 @@ export const SignInRouterMachine = setup({
             guard: 'statusNeedsSecondFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
+          },
+          {
+            actions: ['logUnknownError', { type: 'navigateInternal', params: { path: '/' } }],
           },
         ],
       },

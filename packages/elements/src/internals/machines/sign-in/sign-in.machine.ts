@@ -32,7 +32,7 @@ import {
   prepareFirstFactor,
   prepareSecondFactor,
 } from './sign-in.actors';
-import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from './sign-in.utils';
+import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from './utils';
 
 export interface SignInMachineContext extends MachineContext {
   clerk: LoadedClerk;

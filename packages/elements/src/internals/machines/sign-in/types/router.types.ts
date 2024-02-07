@@ -1,4 +1,5 @@
-import type { LoadedClerk } from '@clerk/types';
+import type { LoadedClerk, SignInResource } from '@clerk/types';
+import type { AnyActorLogic, AnyActorRef, InputFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors/error';
 import type { ClerkRouter } from '~/react/router';
@@ -29,16 +30,32 @@ export type SignInRouterSystemId = keyof typeof SignInRouterSystemId;
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignInRouterNextEvent = { type: 'NEXT' };
+export type SignInRouterNextEvent = { type: 'NEXT'; resource?: SignInResource };
 export type SignInRouterPrevEvent = { type: 'PREV' };
 export type SignInRouterErrorEvent = { type: 'ERROR'; error: Error };
 export type SignInRouterTransferEvent = { type: 'TRANSFER' };
+
+export type SignInRouterRouteRegisterEvent<TLogic extends AnyActorLogic = AnyActorLogic> = {
+  type: 'ROUTE.REGISTER';
+  id: SignInRouterSystemId;
+  logic: TLogic;
+  input: Omit<InputFrom<TLogic>, 'basePath' | 'clerk' | 'form' | 'router'>;
+  // options?: ActorOptions<TLogic>;
+};
+export type SignInRouterRouteUnregisterEvent = { type: 'ROUTE.UNREGISTER'; id: SignInRouterSystemId };
+export type SignInRouterRouteClearEvent = { type: 'ROUTE.CLEAR'; id: SignInRouterSystemId };
+
+export type SignInRouterRouteEvent =
+  | SignInRouterRouteRegisterEvent
+  | SignInRouterRouteUnregisterEvent
+  | SignInRouterRouteClearEvent;
 
 export type SignInRouterEvents =
   | SignInRouterNextEvent
   | SignInRouterPrevEvent
   | SignInRouterErrorEvent
-  | SignInRouterTransferEvent;
+  | SignInRouterTransferEvent
+  | SignInRouterRouteEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 
@@ -53,6 +70,7 @@ export interface SignInRouterInput {
 export interface SignInRouterContext {
   clerk: LoadedClerk;
   error?: ClerkElementsError;
+  routes: Map<SignInRouterSystemId, AnyActorRef>;
   router?: ClerkRouter;
   signUpPath: string;
 }

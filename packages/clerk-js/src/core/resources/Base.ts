@@ -77,6 +77,7 @@ export abstract class BaseResource {
   }
 
   protected static _updateClient<J>(responseJSON: FapiResponseJSON<J> | null): void {
+    console.log('responseJSON', responseJSON);
     if (!responseJSON) {
       return;
     }

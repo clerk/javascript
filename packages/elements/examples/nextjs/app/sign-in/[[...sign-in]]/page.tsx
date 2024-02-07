@@ -1,7 +1,7 @@
 'use client';
 
 import { GlobalError, Submit } from '@clerk/elements/common';
-import { Continue, SignIn, SocialProvider, Start, Verification } from '@clerk/elements/sign-in';
+import { SignIn, SocialProvider, Start, Verification, Verify } from '@clerk/elements/sign-in';
 
 import { H1, H3, HR as Hr, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
@@ -63,9 +63,9 @@ export default function SignInPage() {
           </div>
         </Start>
 
-        <Continue>
+        <Verify>
           <div className='flex gap-6 flex-col'>
-            <H1>STRATEGIES (FIRST/SECOND FACTOR)</H1>
+            <H1>VERFIY</H1>
 
             <Verification name='password'>
               <CustomField
@@ -106,7 +106,7 @@ export default function SignInPage() {
               </Submit>
             </Verification>
           </div>
-        </Continue>
+        </Verify>
       </div>
 
       {/* <SignInDebug /> */}
