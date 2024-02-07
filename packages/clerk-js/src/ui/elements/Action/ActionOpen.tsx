@@ -12,11 +12,12 @@ const ScrollWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren>((props
 export const ActionOpen = (props: ActionOpenProps) => {
   const { children, value } = props;
   const { active } = useActionContext();
-  const ref = useRef(null);
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (active === value && ref.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const element = ref.current;
+    if (active === value && element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [active, value]);
 
