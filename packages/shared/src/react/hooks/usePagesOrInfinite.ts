@@ -194,7 +194,8 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
 
   const isLoading = triggerInfinite ? swrInfiniteIsLoading : swrIsLoading;
   const isFetching = triggerInfinite ? swrInfiniteIsValidating : swrIsValidating;
-  const isError = !!(triggerInfinite ? swrInfiniteError : swrError);
+  const error = (triggerInfinite ? swrInfiniteError : swrError) ?? null;
+  const isError = !!error;
   /**
    * Helpers
    */
@@ -227,6 +228,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
   return {
     data,
     count,
+    error,
     isLoading,
     isFetching,
     isError,
