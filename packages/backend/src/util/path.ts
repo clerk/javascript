@@ -1,5 +1,5 @@
 const SEPARATOR = '/';
-const MULTIPLE_SEPARATOR_REGEX = new RegExp(SEPARATOR + '{1,}', 'g');
+const MULTIPLE_SEPARATOR_REGEX = new RegExp('(?<!:)' + SEPARATOR + '{1,}', 'g');
 
 type PathString = string | null | undefined;
 
