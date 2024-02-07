@@ -1,16 +1,45 @@
 import type { PropsWithChildren } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { useActionContext } from './ActionRoot';
 
 type ActionOpenProps = PropsWithChildren<{ value: string }>;
 
-export const ActionOpen = (props: ActionOpenProps) => {
-  const { children, value } = props;
+const ScrollWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren>((props, ref) => (
+  <div
+    ref={ref}
+    {...props}
+  />
+));
+
+export const ActionOpen = ({ children, value }: ActionOpenProps) => {
   const { active } = useActionContext();
+  const ref = useRef<HTMLDivElement>(null);
+  const dummyRef = useRef<HTMLDivElement>(null);
+  const [showChildren, setShowChildren] = useState(false);
 
-  if (active !== value) {
-    return null;
-  }
+  useEffect(() => {
+    if (active === value) {
+      const dummyElement = dummyRef.current;
+      if (dummyElement) {
+        setTimeout(() => {
+          dummyElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 200);
+      }
 
-  return children;
+      setShowChildren(true);
+    } else {
+      setShowChildren(false);
+    }
+  }, [active, value]);
+
+  return (
+    <>
+      <div
+        ref={dummyRef}
+        style={{ height: '1px', visibility: 'hidden' }}
+      />
+      {showChildren && <ScrollWrapper ref={ref}>{children}</ScrollWrapper>}
+    </>
+  );
 };
