@@ -13,17 +13,19 @@ type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType
   node: HTMLDivElement;
   component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
   // Aligning this with props attributes of ComponentControls
-  props: PropsType & RoutingOptions;
+  props?: PropsType & RoutingOptions;
 } & Pick<CtxType, 'componentName'>;
 
 export class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
   render(): React.ReactPortal {
     const { props, component, componentName, node } = this.props;
-    const normalizedProps = { ...props, ...normalizeRoutingOptions({ routing: props.routing, path: props.path }) };
+    const normalizedProps = { ...props, ...normalizeRoutingOptions({ routing: props?.routing, path: props?.path }) };
 
     const el = (
       <ComponentContext.Provider value={{ componentName: componentName, ...normalizedProps } as CtxType}>
-        <Suspense fallback={''}>{React.createElement(component, normalizedProps)}</Suspense>
+        <Suspense fallback={''}>
+          {React.createElement(component, normalizedProps as PortalProps<CtxType>['props'])}
+        </Suspense>
       </ComponentContext.Provider>
     );
 
