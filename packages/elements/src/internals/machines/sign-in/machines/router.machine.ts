@@ -35,9 +35,10 @@ export const SignInRouterMachine = setup({
       context.router.push(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
-    setActive({ context }) {
+    setActive({ context, event }) {
+      const session = ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn).createdSessionId;
       const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignInUrl());
-      void context.clerk.setActive({ session: context.clerk.client.signIn.createdSessionId, beforeEmit });
+      void context.clerk.setActive({ session, beforeEmit });
     },
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
