@@ -25,7 +25,6 @@ export const PreviewListItems = (props: PropsWithChildren) => {
 
 const sharedStyles: ThemableCssProp = t => ({
   padding: `${t.space.$4} ${t.space.$5}`,
-  borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
 });
 
 export const sharedMainIdentifierSx: ThemableCssProp = t => ({
