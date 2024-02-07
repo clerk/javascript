@@ -19,7 +19,6 @@ const snapshot = `---
 '@clerk/remix': patch
 '@clerk/types': patch
 '@clerk/clerk-expo': patch
-'@clerk/elements': patch
 ---
 
 Snapshot release
