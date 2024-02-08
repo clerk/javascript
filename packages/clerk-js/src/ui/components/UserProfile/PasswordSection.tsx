@@ -36,7 +36,7 @@ export const PasswordSection = () => {
         <Action.Closed value='edit'>
           <ProfileSection.Item
             id='password'
-            sx={{ padding: 0 }}
+            sx={t => ({ paddingLeft: t.space.$3 })}
           >
             {passwordEnabled && <Text sx={t => ({ fontSize: t.fontSizes.$xl })}>••••••••••</Text>}
 

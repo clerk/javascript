@@ -135,12 +135,12 @@ export const Tab = (props: TabProps) => {
       sx={[
         t => ({
           background: t.colors.$transparent,
-          color: isActive ? t.colors.$neutralAlpha900 : t.colors.$neutralAlpha700,
+          color: isActive ? t.colors.$primary500 : t.colors.$neutralAlpha700,
           gap: t.space.$1x5,
           fontWeight: t.fontWeights.$medium,
           borderBottom: t.borders.$normal,
           marginBottom: '-1px',
-          borderColor: isActive ? t.colors.$neutralAlpha800 : t.colors.$transparent,
+          borderColor: isActive ? t.colors.$primary500 : t.colors.$transparent,
           borderRadius: 0,
           padding: `${t.space.$2x5} ${t.space.$3x5}`,
           width: 'fit-content',
