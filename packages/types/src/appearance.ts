@@ -41,7 +41,9 @@ type Shade =
   | '900'
   | '950';
 export type ColorScale<T = string> = Record<Shade, T>;
-export type AlphaColorScale<T = string> = Record<'20' | Shade, T>;
+export type AlphaColorScale<T = string> = {
+  [K in Shade]: T;
+};
 
 export type ColorScaleWithRequiredBase<T = string> = Partial<ColorScale<T>> & { '500': T };
 
@@ -417,9 +419,9 @@ export type Variables = {
   colorWarning?: CssColorOrScale;
   /**
    * The color that will be used as the neutral color for all the components. To achieve sufficient contrast,
-   * light themes should be using dark shades, while dark themes should be using light shades. This option applies to borders,
-   * backgrounds for hovered elements, hovered dropdown options etc.
-   * @default 'hsla(0, 0%, 0%, 0.53)'
+   * light themes should be using dark shades ('black'), while dark themes should be using light shades ('white').
+   * This option applies to borders, backgrounds for hovered elements, hovered dropdown options etc.
+   * @default 'black'
    */
   colorNeutral?: CssColorOrAlphaScale;
   /**
