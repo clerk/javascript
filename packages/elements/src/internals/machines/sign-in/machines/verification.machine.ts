@@ -13,7 +13,7 @@ import type {
   SignInStrategy,
   Web3Attempt,
 } from '@clerk/types';
-import { assign, fromPromise, sendTo, setup } from 'xstate';
+import { assign, fromPromise, log, sendParent, sendTo, setup } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors/error';
 import type { FormFields } from '~/internals/machines/form/form.types';
@@ -52,13 +52,6 @@ const SignInVerificationMachine = setup({
     determineStartingFactor: () => {
       throw new ClerkElementsRuntimeError('Action `determineStartingFactor` be overridden');
     },
-    goToNextState: sendTo(
-      ({ context }) => context.routerRef,
-      (_, { resource }: { resource: SignInResource }) => ({
-        type: 'NEXT',
-        resource,
-      }),
-    ),
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -84,6 +77,7 @@ const SignInVerificationMachine = setup({
   states: {
     Preparing: {
       tags: ['state:preparing', 'state:loading'],
+      entry: log(({ context }) => context.currentFactor),
       invoke: {
         id: 'prepare',
         src: 'prepare',
@@ -122,7 +116,7 @@ const SignInVerificationMachine = setup({
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
-          actions: { type: 'goToNextState', params: ({ event }) => ({ resource: event.output }) },
+          actions: sendParent(({ event }) => ({ type: 'NEXT', resource: event.output })),
         },
         onError: {
           actions: 'setFormErrors',
@@ -214,12 +208,14 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   },
   actions: {
     determineStartingFactor: assign({
-      currentFactor: ({ context }) =>
-        determineStartingSignInFactor(
+      currentFactor: ({ context }) => {
+        console.log('determineStartingFactor', context.clerk.client.signIn.supportedFirstFactors);
+        return determineStartingSignInFactor(
           context.clerk.client.signIn.supportedFirstFactors,
           context.clerk.client.signIn.identifier,
           context.clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
-        ),
+        );
+      },
     }),
   },
 });

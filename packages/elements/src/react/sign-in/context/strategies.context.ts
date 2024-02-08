@@ -18,6 +18,7 @@ export const StrategiesContext = createContext<StrategiesContextValue>({
 
 export function useStrategy(name: SignInStrategyName) {
   const ctx = useContext(StrategiesContext);
+  console.log('useStrategy', ctx);
 
   if (!ctx) {
     throw new ClerkElementsRuntimeError('useStrategy must be used within a <SignInVerification> component.');

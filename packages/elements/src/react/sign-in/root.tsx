@@ -4,6 +4,7 @@ import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import { useActorRef } from '@xstate/react';
 import type { PropsWithChildren } from 'react';
 
+import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
 import { SignInRouterMachine } from '~/internals/machines/sign-in/machines';
 import { useBrowserInspector } from '~/react/hooks';
@@ -30,6 +31,7 @@ export type SignInRootProps = SignInFlowProviderProps & { path?: string };
 /**
  * Root component for the sign-in flow. It sets up providers and state management for its children.
  * Must wrap all sign-in related components.
+ *
  * @example
  * import { SignIn } from "@clerk/elements/sign-in"
  *
@@ -38,7 +40,7 @@ export type SignInRootProps = SignInFlowProviderProps & { path?: string };
  *  </SignIn>
  * )
  */
-export function SignInRoot({ children, path = '/sign-in' }: SignInRootProps): JSX.Element | null {
+export function SignInRoot({ children, path = SIGN_IN_DEFAULT_BASE_PATH }: SignInRootProps): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
   const { loading: inspectorLoading } = useBrowserInspector();
@@ -48,15 +50,15 @@ export function SignInRoot({ children, path = '/sign-in' }: SignInRootProps): JS
   }
 
   return (
-    <Router
-      basePath={path}
-      router={router}
-    >
-      <ClerkLoaded>
+    <ClerkLoaded>
+      <Router
+        basePath={path}
+        router={router}
+      >
         <FormStoreProvider>
           <SignInFlowProvider>{children}</SignInFlowProvider>
         </FormStoreProvider>
-      </ClerkLoaded>
-    </Router>
+      </Router>
+    </ClerkLoaded>
   );
 }

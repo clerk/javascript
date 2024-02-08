@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import type { ActorRefFrom, AnyActorLogic, SnapshotFrom } from 'xstate';
 
@@ -15,7 +14,6 @@ export function useSignInRouteRegistration<
   TLogic extends AnyActorLogic,
   TEvent extends SignInRouterRouteRegisterEvent<TLogic>,
 >(id: TEvent['id'], logic: TLogic, input?: TEvent['input']): ActorRefFrom<TLogic> | undefined {
-  const clerk = useClerk();
   const routerRef = SignInRouterCtx.useActorRef();
   const form = useFormStore();
 
@@ -30,7 +28,7 @@ export function useSignInRouteRegistration<
       type: 'ROUTE.REGISTER',
       id,
       logic,
-      input: { clerk, form, ...input },
+      input: { form, ...input },
     });
 
     return () => {
@@ -41,15 +39,5 @@ export function useSignInRouteRegistration<
     };
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const actorRef = ref || routerRef.system.get(id);
-
-  // useEffect(() => {
-
-  //   if (!actorRef) {
-  //     return;
-  //   }
-
-  // }, [actorRef]);
-
-  return actorRef;
+  return ref || routerRef.system.get(id);
 }

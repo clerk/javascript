@@ -33,7 +33,7 @@ export interface BrowserInspectorOptions extends InspectorOptions {
  *
  * @returns useBrowserInspector - A hook for using the inspector
  */
-export function createBrowserInspectorReactHook(params?: { enabled: boolean; options?: BrowserInspectorOptions }) {
+export function createBrowserInspectorReactHook(params?: { enabled?: boolean; options?: BrowserInspectorOptions }) {
   const { enabled = process.env.NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG === 'true', options } = params || {};
   const loadable = typeof window !== 'undefined';
   let storedInspector: any;

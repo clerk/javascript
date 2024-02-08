@@ -1,36 +1,24 @@
-import type { ClientResource, SignInResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/types';
 import { assertEvent, fromPromise, sendParent, sendTo, setup } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
-import type { SignInStartSchema } from '~/internals/machines/sign-in/types';
+import type { WithClient } from '~/internals/machines/shared.types';
+import type { SignUpStartSchema } from '~/internals/machines/sign-up/types';
+import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
 import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-export type TSignInStartMachine = typeof SignInStartMachine;
+export type TSignUpStartMachine = typeof SignUpStartMachine;
 
-export const SignInStartMachineId = 'SignInStart';
+export const SignUpStartMachineId = 'SignUpStart';
 
-export const SignInStartMachine = setup({
+export const SignUpStartMachine = setup({
   actors: {
-    attempt: fromPromise<SignInResource, { client: ClientResource; fields: FormFields }>(
-      ({ input: { client, fields } }) => {
-        const password = fields.get('password');
-        const identifier = fields.get('identifier');
-
-        const passwordParams = password?.value
-          ? {
-              password: password.value,
-              strategy: 'password',
-            }
-          : {};
-
-        return client.signIn.create({
-          identifier: identifier?.value as string,
-          ...passwordParams,
-        });
-      },
-    ),
+    attempt: fromPromise<SignUpResource, WithClient<{ fields: FormFields }>>(({ input: { client, fields } }) => {
+      const params = fieldsToSignUpParams(fields);
+      return client.signUp.create(params);
+    }),
     thirdParty: ThirdPartyMachine,
   },
   actions: {
@@ -61,11 +49,11 @@ export const SignInStartMachine = setup({
       },
     ),
   },
-  types: {} as SignInStartSchema,
+  types: {} as SignUpStartSchema,
 }).createMachine({
-  id: SignInStartMachineId,
+  id: SignUpStartMachineId,
   context: ({ input }) => ({
-    basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
+    basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
     clerk: input.clerk,
     formRef: input.form,
     routerRef: input.router,
@@ -79,7 +67,7 @@ export const SignInStartMachine = setup({
       input: ({ context }) => ({
         basePath: context.basePath,
         clerk: context.clerk,
-        flow: 'signIn',
+        flow: 'signUp',
       }),
     },
   ],
@@ -103,7 +91,7 @@ export const SignInStartMachine = setup({
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
       invoke: {
-        id: 'attempt',
+        id: 'attemptCreate',
         src: 'attempt',
         input: ({ context }) => ({
           client: context.clerk.client,

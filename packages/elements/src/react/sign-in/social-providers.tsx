@@ -12,6 +12,7 @@ export interface SignInSocialProviderProps extends Omit<SocialProviderProps, 'pr
   name: OAuthProvider | Web3Provider;
 }
 
+// TODO: Consolidate with sign-up/social-providers.tsx
 export function SignInSocialProvider({ name, ...rest }: SignInSocialProviderProps) {
   const ref = SignInStartCtx.useActorRef();
   const thirdPartyProvider = useThirdPartyProvider(ref, name);

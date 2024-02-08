@@ -1,19 +1,10 @@
 'use client';
 
 import { GlobalError } from '@clerk/elements/common';
-import {
-  Continue,
-  SignUp,
-  SocialProvider,
-  SocialProviderIcon,
-  Start,
-  Verification,
-  Verify,
-} from '@clerk/elements/sign-up';
+import { SignUp, SocialProvider, SocialProviderIcon, Start, Verify } from '@clerk/elements/sign-up';
 
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
-import { SignUpDebug } from '@/components/sign-up-debug';
 
 export default function SignUpPage() {
   return (
@@ -54,52 +45,22 @@ export default function SignUpPage() {
             <GlobalError className='block text-red-400 font-mono' />
 
             <div className='flex gap-6 flex-col'>
+              {/* <CustomField
+                label='Phone Number'
+                name='phoneNumber'
+              /> */}
               <CustomField
                 label='Email'
                 name='emailAddress'
               />
-              <CustomField
-                label='Password'
-                name='password'
-              />
-
               <CustomSubmit>Sign Up</CustomSubmit>
             </div>
           </div>
         </Start>
 
-        <Continue>
-          <div className='flex flex-col items-center justify-center gap-12'>
-            <H1>SIGN UP - CONTINUE</H1>
-
-            <GlobalError className='block text-red-400 font-mono' />
-
-            <div className='flex gap-6 flex-col'>
-              <CustomField
-                label='First Name'
-                name='firstName'
-              />
-              <CustomField
-                label='Last Name'
-                name='lastName'
-              />
-              <CustomField
-                label='Username'
-                name='username'
-              />
-              <CustomField
-                label='Phone'
-                name='phoneNumber'
-              />
-
-              <CustomSubmit>Submit</CustomSubmit>
-            </div>
-          </div>
-        </Continue>
-
         <Verify>
           <H1>SIGN UP - VERIFY</H1>
-
+          {/*
           <Verification name='code'>
             <CustomField
               label='Code'
@@ -109,11 +70,11 @@ export default function SignUpPage() {
             <CustomSubmit>Verify</CustomSubmit>
           </Verification>
 
-          <Verification name='email_link'>Please check your email for a link to verify your account.</Verification>
+          <Verification name='email_link'>Please check your email for a link to verify your account.</Verification> */}
         </Verify>
       </div>
 
-      <SignUpDebug />
+      {/* <SignUpDebug /> */}
     </SignUp>
   );
 }

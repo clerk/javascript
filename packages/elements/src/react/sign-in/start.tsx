@@ -1,6 +1,6 @@
 'use client';
 
-import { type PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import type { TSignInStartMachine } from '~/internals/machines/sign-in/machines';
 import { SignInStartMachine } from '~/internals/machines/sign-in/machines';

@@ -9,9 +9,10 @@ import type {
 } from '@clerk/types';
 import { fromCallback, fromPromise } from 'xstate';
 
+import { ClerkElementsError } from '~/internals/errors/error';
 import type { FormFields } from '~/internals/machines/form/form.types';
 
-import type { WithClerk, WithParams } from '../shared.types';
+import type { WithClerk, WithClient, WithParams } from '../shared.types';
 
 // ================= startSignUpEmailLinkFlow ================= //
 
@@ -23,17 +24,16 @@ export const startSignUpEmailLinkFlow = fromCallback<StartSignUpEmailLinkFlowEve
     const { run, stop } = Poller();
 
     void run(async () =>
-      clerk.client.signUp
-        .reload()
-        .then(resource => {
-          const status = resource.verifications.emailAddress.status;
+      clerk.client.signUp.reload().then(resource => {
+        stop();
+        const status = resource.verifications.emailAddress.status;
 
-          if (status === 'verified' || status === 'expired') {
-            stop();
-            sendBack({ type: `EMAIL_LINK.${status.toUpperCase()}`, resource });
-          }
-        })
-        .catch(error => sendBack({ type: 'EMAIL_LINK.FAILURE', error })),
+        if (status) {
+          return sendBack({ type: `EMAIL_LINK.${status?.toUpperCase()}`, resource });
+        } else {
+          throw new ClerkElementsError('verify-email-link-missing-status', 'No email verification status found');
+        }
+      }),
     );
 
     receive(event => {
@@ -48,24 +48,34 @@ export const startSignUpEmailLinkFlow = fromCallback<StartSignUpEmailLinkFlowEve
 
 // ================= Verification ================= //
 
-export type PrepareVerificationInput = WithClerk<
+export type PrepareVerificationInput = WithClient<
   WithParams<PrepareVerificationParams> & { skipIfVerified: keyof SignUpVerificationsResource }
 >;
 
 export const prepareVerification = fromPromise<SignUpResource, PrepareVerificationInput>(
-  async ({ input: { clerk, params, skipIfVerified: skipKey } }) => {
-    if (!clerk.client.signUp.status || clerk.client.signUp.verifications[skipKey].status === 'verified') {
-      return Promise.resolve(clerk.client.signUp);
+  ({ input: { client, params, skipIfVerified: skipKey } }) => {
+    console.log(
+      'clerk.client.signUp.prepareVerification',
+      1,
+      skipKey,
+      client.signUp.verifications,
+      client.signUp.verifications[skipKey],
+      client.signUp.verifications[skipKey].status,
+    );
+    if (!client.signUp.status || client.signUp.verifications[skipKey].status === 'verified') {
+      console.log('clerk.client.signUp.prepareVerification', 2);
+      return Promise.resolve(client.signUp);
     }
 
-    return await clerk.client.signUp.prepareVerification(params);
+    console.log('clerk.client.signUp.prepareVerification', 3);
+    return client.signUp.prepareVerification(params);
   },
 );
 
-export type AttemptVerificationInput = WithClerk<WithParams<AttemptVerificationParams>>;
+export type AttemptVerificationInput = WithClient<WithParams<AttemptVerificationParams>>;
 
 export const attemptVerification = fromPromise<SignUpResource, AttemptVerificationInput>(
-  async ({ input: { clerk, params } }) => clerk.client.signUp.attemptVerification(params),
+  ({ input: { client, params } }) => client.signUp.attemptVerification(params),
 );
 
 // ================= Start / Continue ================= //

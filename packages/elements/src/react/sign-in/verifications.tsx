@@ -40,6 +40,7 @@ export type SignInVerificationProps = React.PropsWithChildren<{ name: SignInStra
 
 export function SignInVerification({ children, name }: SignInVerificationProps) {
   const { active } = useStrategy(name);
+  console.log('SignInVerification', name, active);
   return active ? children : null;
 }
 
