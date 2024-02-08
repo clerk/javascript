@@ -47,7 +47,7 @@ export const colors = Object.freeze({
   colorInputBackground: 'white',
   colorText: '#212126',
   colorTextSecondary: '#747686',
-  colorInputText: 'black',
+  colorInputText: '#131316',
   colorTextOnPrimaryBackground: 'white',
   colorShimmer: 'rgba(255, 255, 255, 0.36)',
   transparent: 'transparent',

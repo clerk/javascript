@@ -434,6 +434,7 @@ export type Variables = {
   colorText?: CssColor;
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
+   * This color is a lighter shade of {@link Variables.colorText}.
    * @default '#747686'
    */
   colorTextSecondary?: CssColor;
