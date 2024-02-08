@@ -34,6 +34,21 @@ export const polishedAppearance = {
             '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(0, 0, 0, 0.02), 0px 0px 0px 1px rgba(0, 0, 0, 0.08)',
         },
       },
+      badge: {
+        border: 0,
+        '&[data-color="primary"]': {
+          boxShadow: `0px 0px 0px 1px ${theme.colors.$neutralAlpha100}, 0px 2px 0px -1px rgba(0, 0, 0, 0.04)`,
+        },
+        '&[data-color="danger"]': {
+          boxShadow: `0px 0px 0px 1px ${theme.colors.$dangerAlpha300}, 0px 2px 0px -1px rgba(0, 0, 0, 0.04)`,
+        },
+        '&[data-color="success"]': {
+          boxShadow: `0px 0px 0px 1px ${theme.colors.$successAlpha300}, 0px 2px 0px -1px rgba(0, 0, 0, 0.04)`,
+        },
+        '&[data-color="warning"]': {
+          boxShadow: `0px 0px 0px 1px ${theme.colors.$warningAlpha300}, 0px 2px 0px -1px rgba(0, 0, 0, 0.04)`,
+        },
+      },
     };
   },
 } satisfies Appearance;
