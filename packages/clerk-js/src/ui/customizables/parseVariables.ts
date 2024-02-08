@@ -18,8 +18,10 @@ export const createColorScales = (theme: Theme) => {
   const colorTextTertiary = toHSLA(variables.colorTextTertiary) || colors.makeTransparent(colorTextSecondary, 0.4);
   const colorTextLabel = toHSLA(variables.colorTextLabel) || colors.makeTransparent(variables.colorText, 0.05);
 
+  const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
+
   return removeUndefinedProps({
-    ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
+    ...primaryScale,
     ...colorOptionToHslaAlphaScale(variables.colorPrimary, 'primaryAlpha'),
     ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
     ...colorOptionToHslaAlphaScale(variables.colorDanger, 'dangerAlpha'),
@@ -28,6 +30,7 @@ export const createColorScales = (theme: Theme) => {
     ...colorOptionToHslaLightnessScale(variables.colorWarning, 'warning'),
     ...colorOptionToHslaAlphaScale(variables.colorWarning, 'warningAlpha'),
     ...colorOptionToHslaAlphaScale(variables.colorNeutral, 'neutralAlpha'),
+    primaryHover: colors.adjustForLightness(primaryScale?.primary500),
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
     colorText: toHSLA(variables.colorText),
     colorTextSecondary,
