@@ -24,6 +24,7 @@ type UseOrganizationListParams = {
 const undefinedPaginatedResource = {
   data: undefined,
   count: undefined,
+  error: undefined,
   isLoading: false,
   isFetching: false,
   isError: false,

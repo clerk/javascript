@@ -1,5 +1,7 @@
 import type { ClerkPaginatedResponse } from '@clerk/types';
 
+import type { ClerkAPIResponseError } from '../error';
+
 export type ValueOrSetter<T = unknown> = (size: T | ((_size: T) => T)) => void;
 
 export type CacheSetter<CData = any> = (
@@ -9,6 +11,7 @@ export type CacheSetter<CData = any> = (
 export type PaginatedResources<T = unknown, Infinite = false> = {
   data: T[];
   count: number;
+  error: ClerkAPIResponseError | null;
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;

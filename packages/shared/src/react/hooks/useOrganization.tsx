@@ -73,6 +73,7 @@ type UseOrganization = <T extends UseOrganizationParams>(
 const undefinedPaginatedResource = {
   data: undefined,
   count: undefined,
+  error: undefined,
   isLoading: false,
   isFetching: false,
   isError: false,
