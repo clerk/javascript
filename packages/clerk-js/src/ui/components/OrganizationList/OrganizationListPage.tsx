@@ -144,10 +144,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
           })}
         />
       </Header.Root>
-      <Col
-        elementDescriptor={descriptors.main}
-        sx={t => ({ borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}` })}
-      >
+      <Col elementDescriptor={descriptors.main}>
         <PreviewListItems>
           <Actions role='menu'>
             <PersonalAccountPreview />
@@ -192,7 +189,6 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
           label={localizationKeys('organizationList.action__createOrganization')}
           onClick={handleCreateOrganizationClicked}
           sx={t => ({
-            borderBottom: 'none',
             borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
             padding: `${t.space.$5} ${t.space.$5}`,
           })}

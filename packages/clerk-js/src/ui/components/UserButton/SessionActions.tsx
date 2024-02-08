@@ -161,7 +161,7 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
       role='menu'
       sx={t => ({
         padding: t.space.$2,
-        borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha200}`,
+        borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
       })}
     >
       <Action
