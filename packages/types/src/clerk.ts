@@ -510,8 +510,8 @@ type ClerkOptionsNavigation =
       routerReplace?: never;
     }
   | {
-      routerPush: (to: string) => Promise<unknown> | unknown;
-      routerReplace: (to: string) => Promise<unknown> | unknown;
+      routerPush: RouterFn;
+      routerReplace: RouterFn;
       routerDebug?: boolean;
     };
 
@@ -546,6 +546,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
 
 export interface NavigateOptions {
   replace?: boolean;
+  metadata?: RouterMetadata;
 }
 
 export interface Resources {
@@ -556,6 +557,35 @@ export interface Resources {
 }
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';
+
+/**
+ * Internal is a navigation type that affects the component
+ *
+ */
+type NavigationType =
+  /**
+   * Internal navigations affect the components and alter the
+   * part of the URL that comes after the `path` passed to the component.
+   * eg  <SignIn path='sign-in'>
+   * going from /sign-in to /sign-in/factor-one is an internal navigation
+   */
+  | 'internal'
+  /**
+   * Internal navigations affect the components and alter the
+   * part of the URL that comes before the `path` passed to the component.
+   * eg  <SignIn path='sign-in'>
+   * going from /sign-in to / is an external navigation
+   */
+  | 'external'
+  /**
+   * Window navigations are navigations towards a different origin
+   * and are not handled by the Clerk component or the host app router.
+   */
+  | 'window';
+
+type RouterMetadata = { routing?: RoutingStrategy; navigationType?: NavigationType };
+
+type RouterFn = (to: string, metadata?: { __internal_metadata?: RouterMetadata }) => Promise<unknown> | unknown;
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
 

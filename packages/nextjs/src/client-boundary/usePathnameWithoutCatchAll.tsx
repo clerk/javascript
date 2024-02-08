@@ -1,6 +1,8 @@
 import { useRouter } from 'next/compat/router';
+import React from 'react';
 
 export const usePathnameWithoutWithCatchAll = () => {
+  const pathRef = React.useRef<string>();
   // The compat version of useRouter returns null instead of throwing an error
   // when used inside app router instead of pages router
   // we use it to detect if the component is used inside pages or app router
@@ -8,9 +10,14 @@ export const usePathnameWithoutWithCatchAll = () => {
   const pagesRouter = useRouter();
 
   if (pagesRouter) {
-    // in pages router things are simpler as the pathname includes the catch all route
-    // which starts with [[... and we can just remove it
-    return pagesRouter.pathname.replace(/\/\[\[\.\.\..*/, '');
+    if (pathRef.current) {
+      return pathRef.current;
+    } else {
+      // in pages router things are simpler as the pathname includes the catch all route
+      // which starts with [[... and we can just remove it
+      pathRef.current = pagesRouter.pathname.replace(/\/\[\[\.\.\..*/, '');
+      return pathRef.current;
+    }
   }
 
   // require is used to avoid importing next/navigation when the pages router is used,
@@ -38,5 +45,10 @@ export const usePathnameWithoutWithCatchAll = () => {
     .flat(Infinity);
   // so we end up with the pathname where the components are mounted at
   // eg /user/123/profile/security will return /user/123/profile as the path
-  return `/${pathParts.slice(0, pathParts.length - catchAllParams.length).join('/')}`;
+  if (pathRef.current) {
+    return pathRef.current;
+  } else {
+    pathRef.current = `/${pathParts.slice(0, pathParts.length - catchAllParams.length).join('/')}`;
+    return pathRef.current;
+  }
 };
