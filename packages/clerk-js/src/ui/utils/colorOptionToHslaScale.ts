@@ -1,4 +1,4 @@
-import type { ColorScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
+import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
 import { colors } from './colors';
 import { fromEntries } from './fromEntries';
@@ -7,6 +7,8 @@ type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;
 
 const LIGHT_SHADES = ['25', '50', '100', '150', '200', '300', '400'].reverse();
 const DARK_SHADES = ['600', '700', '750', '800', '850', '900', '950'];
+
+const ALL_SHADES = [...[...LIGHT_SHADES].reverse(), '500', ...DARK_SHADES] as const;
 
 const TARGET_L_50_SHADE = 97;
 const TARGET_L_900_SHADE = 12;
@@ -36,10 +38,10 @@ type WithPrefix<T extends Record<string, string>, Prefix extends string> = {
 };
 
 export const colorOptionToHslaAlphaScale = <Prefix extends string>(
-  colorOption: CssColorOrScale | undefined,
+  colorOption: CssColorOrAlphaScale | undefined,
   prefix: Prefix,
 ): WithPrefix<InternalColorScale<HslaColorString>, Prefix> | undefined => {
-  return fillUserProvidedScaleWithGeneratedHslaColors(colorOption, prefix, generateFilledAlphaScaleFromBaseHslaColor);
+  return getUserProvidedScaleOrGenerateHslaColorsScale(colorOption, prefix, generateFilledAlphaScaleFromBaseHslaColor);
 };
 
 export const colorOptionToHslaLightnessScale = <Prefix extends string>(
@@ -47,6 +49,33 @@ export const colorOptionToHslaLightnessScale = <Prefix extends string>(
   prefix: Prefix,
 ): WithPrefix<InternalColorScale<HslaColorString>, Prefix> | undefined => {
   return fillUserProvidedScaleWithGeneratedHslaColors(colorOption, prefix, generateFilledScaleFromBaseHslaColor);
+};
+
+const getUserProvidedScaleOrGenerateHslaColorsScale = <Prefix extends string>(
+  colorOption: CssColorOrAlphaScale | undefined,
+  prefix: Prefix,
+  generator: (base: HslaColor) => InternalColorScale<HslaColor>,
+): WithPrefix<InternalColorScale<HslaColorString>, Prefix> | undefined => {
+  if (!colorOption) {
+    return undefined;
+  }
+
+  if (typeof colorOption === 'object' && !ALL_SHADES.every(key => key in colorOption)) {
+    throw new Error('You need to provide all the following shades: ' + ALL_SHADES.join(', '));
+  }
+
+  if (typeof colorOption === 'object') {
+    const scale = Object.keys(colorOption).reduce((acc, key) => {
+      // @ts-expect-error
+      acc[key] = colors.toHslaColor(colorOption[key]);
+      return acc;
+    }, createEmptyColorScale());
+    return prefixAndStringifyHslaScale(scale, prefix);
+  }
+
+  const hslaColor = colors.toHslaColor(colorOption);
+  const filledHslaColorScale = generator(hslaColor);
+  return prefixAndStringifyHslaScale(filledHslaColorScale, prefix);
 };
 
 const fillUserProvidedScaleWithGeneratedHslaColors = <Prefix extends string>(
@@ -123,7 +152,7 @@ const generateFilledScaleFromBaseHslaColor = (base: HslaColor): InternalColorSca
 };
 
 const generateFilledAlphaScaleFromBaseHslaColor = (base: HslaColor): InternalColorScale<HslaColor> => {
-  const newScale = { 20: undefined, ...createEmptyColorScale<HslaColor>() };
+  const newScale = createEmptyColorScale<HslaColor>();
   const baseWithoutAlpha = colors.setHslaAlpha(base, 0);
   const alphas = [0.02, 0.03, 0.07, 0.11, 0.15, 0.28, 0.41, 0.53, 0.62, 0.73, 0.78, 0.81, 0.84, 0.87, 0.92];
   // @ts-expect-error

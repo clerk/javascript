@@ -19,16 +19,23 @@ export const createColorScales = (theme: Theme) => {
   const colorTextLabel = toHSLA(variables.colorTextLabel) || colors.makeTransparent(variables.colorText, 0.05);
 
   const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
+  const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');
+  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
+  const dangerAlphaScale = colorOptionToHslaAlphaScale(dangerScale?.danger500, 'dangerAlpha');
+  const successScale = colorOptionToHslaLightnessScale(variables.colorSuccess, 'success');
+  const successAlphaScale = colorOptionToHslaAlphaScale(successScale?.success500, 'successAlpha');
+  const warningScale = colorOptionToHslaLightnessScale(variables.colorWarning, 'warning');
+  const warningAlphaScale = colorOptionToHslaAlphaScale(warningScale?.warning500, 'warningAlpha');
 
   return removeUndefinedProps({
     ...primaryScale,
-    ...colorOptionToHslaAlphaScale(variables.colorPrimary, 'primaryAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
-    ...colorOptionToHslaAlphaScale(variables.colorDanger, 'dangerAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
-    ...colorOptionToHslaAlphaScale(variables.colorSuccess, 'successAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorWarning, 'warning'),
-    ...colorOptionToHslaAlphaScale(variables.colorWarning, 'warningAlpha'),
+    ...primaryAlphaScale,
+    ...dangerScale,
+    ...dangerAlphaScale,
+    ...successScale,
+    ...successAlphaScale,
+    ...warningScale,
+    ...warningAlphaScale,
     ...colorOptionToHslaAlphaScale(variables.colorNeutral, 'neutralAlpha'),
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
