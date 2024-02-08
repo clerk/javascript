@@ -31,3 +31,32 @@ export type PaginatedResources<T = unknown, Infinite = false> = {
 export type PaginatedResourcesWithDefault<T> = {
   [K in keyof PaginatedResources<T>]: PaginatedResources<T>[K] extends boolean ? false : undefined;
 };
+
+export type PaginatedHookConfig<T> = T & {
+  /**
+   * Persists the previous pages with new ones in the same array
+   */
+  infinite?: boolean;
+  /**
+   * Return the previous key's data until the new data has been loaded
+   */
+  keepPreviousData?: boolean;
+};
+
+export type PagesOrInfiniteConfig = PaginatedHookConfig<{
+  /**
+   * Should a request be triggered
+   */
+  enabled?: boolean;
+}>;
+
+export type PagesOrInfiniteOptions = {
+  /**
+   * This the starting point for your fetched results. The initial value persists between re-renders
+   */
+  initialPage?: number;
+  /**
+   * Maximum number of items returned per request. The initial value persists between re-renders
+   */
+  pageSize?: number;
+};
