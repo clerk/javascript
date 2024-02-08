@@ -53,7 +53,7 @@ declare global {
 const WIDGET_CLASSNAME = 'clerk-captcha';
 
 export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
-  const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300100', '600'];
+  const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300', '600'];
 
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };

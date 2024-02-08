@@ -11,7 +11,7 @@ describe('shouldRetryTurnstileErrorCode', () => {
     ['104xxx', true],
     ['106xxx', true],
     ['110600', true],
-    ['300100', true],
+    ['300xxx', true],
     ['600xxx', true],
     ['200010', false],
     ['100405', false],
