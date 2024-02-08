@@ -45,14 +45,14 @@ export const EnterpriseAccountsSection = () => {
                 >
                   <Text
                     truncate
-                    sx={t => ({ color: t.colors.$colorText })}
+                    colorScheme='primary'
                   >
                     {providerName}
                   </Text>
                   <Text
                     truncate
                     as='span'
-                    sx={t => ({ color: t.colors.$colorTextTertiary })}
+                    colorScheme='neutral'
                   >
                     {label ? `• ${label}` : ''}
                   </Text>

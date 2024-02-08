@@ -13,11 +13,6 @@ import {
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
 
-  //values dependent on other values
-  const colorTextSecondary = toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.15);
-  const colorTextTertiary = toHSLA(variables.colorTextTertiary) || colors.makeTransparent(colorTextSecondary, 0.4);
-  const colorTextLabel = toHSLA(variables.colorTextLabel) || colors.makeTransparent(variables.colorText, 0.05);
-
   const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
   const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');
   const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
@@ -40,9 +35,7 @@ export const createColorScales = (theme: Theme) => {
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
     colorText: toHSLA(variables.colorText),
-    colorTextSecondary,
-    colorTextTertiary,
-    colorTextLabel,
+    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.15),
     colorInputText: toHSLA(variables.colorInputText),
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),

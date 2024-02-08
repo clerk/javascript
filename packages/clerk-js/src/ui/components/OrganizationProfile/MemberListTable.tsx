@@ -205,7 +205,7 @@ export const RoleSelect = (props: {
             {prefixLocalizationKey && (
               <Text
                 as='span'
-                sx={t => ({ color: t.colors.$colorTextTertiary })}
+                colorScheme='neutral'
                 localizationKey={prefixLocalizationKey}
               />
             )}

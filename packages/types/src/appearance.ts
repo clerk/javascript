@@ -396,25 +396,28 @@ export type Elements = {
 export type Variables = {
   /**
    * The primary color used throughout the components. Set this to your brand color.
-   * @default #42434D
+   * @default '#2F3037'
    */
   colorPrimary?: CssColorOrScale;
   /**
    * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
    * eg: solid primary buttons.
-   * @default white
+   * @default 'white'
    */
   colorTextOnPrimaryBackground?: CssColor;
   /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
+   * @default '#EF4444'
    */
   colorDanger?: CssColorOrScale;
   /**
    * The color used to indicate an action that completed successfully or a positive result.
+   * @default '#22C543'
    */
   colorSuccess?: CssColorOrScale;
   /**
    * The color used for potentially destructive actions or when the user's attention is required.
+   * @default '#F36B16'
    */
   colorWarning?: CssColorOrScale;
   /**
@@ -426,47 +429,40 @@ export type Variables = {
   colorNeutral?: CssColorOrAlphaScale;
   /**
    * The default text color.
-   * @default #131316
+   * @default '#212126'
    */
   colorText?: CssColor;
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
-   * @default A lighter shade of {@link Variables.colorText}
+   * This color is a lighter shade of {@link Variables.colorText}.
+   * @default '#747686'
    */
   colorTextSecondary?: CssColor;
   /**
-   * The text color for elements of even lower importance.
-   * @default An lighter shade of {@link Variables.colorTextSecondary}
-   */
-  colorTextTertiary?: CssColor;
-  /**
-   * The text color for labels.
-   * @default #42434D
-   */
-  colorTextLabel?: CssColor;
-  /**
    * The background color for the card container.
+   * @default 'white'
    */
   colorBackground?: CssColor;
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
-   * @default The value of {@link Variables.colorInputText}
+   * @default 'black'
    */
   colorInputText?: CssColor;
   /**
    * The background color for all input elements.
+   * @default 'white'
    */
   colorInputBackground?: CssColor;
   /**
    * The color of the avatar shimmer
-   * @default rgba(255, 255, 255, 0.36)
+   * @default 'rgba(255, 255, 255, 0.36)'
    */
   colorShimmer?: CssColor;
   /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
    * If a specific fontFamily is not provided, the components will inherit the font of the parent element.
-   * @default inherit
+   * @default 'inherit'
    * @example
    * { fontFamily: 'Montserrat' }
    */
@@ -474,31 +470,32 @@ export type Variables = {
   /**
    * The default font that will be used in all buttons. See {@link Variables.fontFamily} for details.
    * If not provided, {@link Variables.fontFamily} will be used instead.
-   * @default inherit
+   * @default 'inherit'
    */
   fontFamilyButtons?: FontFamily;
   /**
-   * The value will be used as the base `md` to calculate all the other scale values (`2xs`, `xs`, `sm`, `lg` and `xl`).
+   * The value will be used as the base `md` to calculate all the other scale values (`xs`, `sm`, `lg` and `xl`).
    * By default, this value is relative to the root fontSize of the html element.
-   * @default 1rem;
+   * @default '0.8125rem'
    */
   fontSize?: CssLengthUnit;
   /**
-   * The font weight the components will use. By default, the components will use the 400, 500 and 600 weights for normal, medium and bold
-   * text respectively. You can override the default weights by passing a {@FontWeightScale} object
-   * @default { normal: 400, medium: 500, bold: 600 };
+   * The font weight the components will use. By default, the components will use the 400, 500, 600 and 700 weights
+   * for normal, medium, semibold and bold text respectively.
+   * You can override the default weights by passing a {@FontWeightScale} object
+   * @default { normal: 400, medium: 500, semibold: 600, bold: 700 };
    */
   fontWeight?: FontWeightScale;
   /**
    * The size that will be used as the `md` base borderRadius value. This is used as the base to calculate the `sm`, `lg`, `xl`,
    * our components use. As a general rule, the bigger an element is, the larger its borderRadius is going to be.
    * eg: the Card element uses 'xl'
-   * @default 0.375rem
+   * @default '0.375rem'
    */
   borderRadius?: CssLengthUnit;
   /**
    * The base spacing unit that all margins, paddings and gaps between the elements are derived from.
-   * @default 1rem
+   * @default '1rem'
    */
   spacingUnit?: CssLengthUnit;
 };
