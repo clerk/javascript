@@ -255,6 +255,7 @@ const NavButton = (props: NavButtonProps) => {
   return (
     <Button
       variant='ghost'
+      colorScheme={isActive ? 'primary' : 'neutral'}
       textVariant='buttonLarge'
       size='md'
       isActive={isActive}
