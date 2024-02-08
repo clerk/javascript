@@ -40,5 +40,5 @@ export const ActionOpen = ({ children, value }: ActionOpenProps) => {
     return null;
   }
 
-  return <ScrollWrapper ref={ref}>{active === value && children}</ScrollWrapper>;
+  return <ScrollWrapper ref={ref}>{children}</ScrollWrapper>;
 };
