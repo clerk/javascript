@@ -12,28 +12,13 @@ import type {
 } from '@clerk/types';
 
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
-import type { PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationListParams = {
-  userMemberships?:
-    | true
-    | (GetUserOrganizationMembershipParams & {
-        infinite?: boolean;
-        keepPreviousData?: boolean;
-      });
-  userInvitations?:
-    | true
-    | (GetUserOrganizationInvitationsParams & {
-        infinite?: boolean;
-        keepPreviousData?: boolean;
-      });
-  userSuggestions?:
-    | true
-    | (GetUserOrganizationSuggestionsParams & {
-        infinite?: boolean;
-        keepPreviousData?: boolean;
-      });
+  userMemberships?: true | PaginatedHookConfig<GetUserOrganizationMembershipParams>;
+  userInvitations?: true | PaginatedHookConfig<GetUserOrganizationInvitationsParams>;
+  userSuggestions?: true | PaginatedHookConfig<GetUserOrganizationSuggestionsParams>;
 };
 
 const undefinedPaginatedResource = {
