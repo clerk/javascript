@@ -3,8 +3,6 @@ import React, { useEffect, useRef } from 'react';
 
 import { useActionContext } from './ActionRoot';
 
-type ActionOpenProps = PropsWithChildren<{ value: string }>;
-
 const ScrollWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren>((props, ref) => (
   <div
     ref={ref}
@@ -12,30 +10,35 @@ const ScrollWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren>((props
   />
 ));
 
+type ActionOpenProps = PropsWithChildren<{ value: string }>;
+
 export const ActionOpen = ({ children, value }: ActionOpenProps) => {
   const { active } = useActionContext();
   const ref = useRef<HTMLDivElement>(null);
 
-  const centerCard = () => {
-    const element = ref.current;
-    if (element) {
-      setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-    }
-  };
-
   useEffect(() => {
     const element = ref.current;
+    const observer = new MutationObserver(() => {
+      observer.disconnect();
 
+      if (!element) {
+        return;
+      }
+
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    });
     if (active === value && element) {
-      centerCard();
+      observer.observe(element, { childList: true, subtree: true, attributes: true });
     }
+
+    return () => observer.disconnect();
   }, [active, value]);
 
   if (active !== value) {
     return null;
   }
 
-  return <ScrollWrapper ref={ref}>{children}</ScrollWrapper>;
+  return <ScrollWrapper ref={ref}>{active === value && children}</ScrollWrapper>;
 };
