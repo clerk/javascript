@@ -117,7 +117,7 @@ const shouldShowDots = (currentPage: number, pageToShow: number, siblingCount: n
 
 const ThreeDots = () => (
   <Flex center>
-    <Text sx={t => ({ color: t.colors.$colorTextTertiary })}>...</Text>
+    <Text colorScheme='neutral'>...</Text>
   </Flex>
 );
 

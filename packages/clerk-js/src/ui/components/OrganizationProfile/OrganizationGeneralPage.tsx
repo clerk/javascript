@@ -162,7 +162,7 @@ const OrganizationDomainsSection = () => {
                   paddingLeft: t.space.$9,
                   marginTop: `-${t.space.$1}`,
                 })}
-                colorScheme='tertiary'
+                colorScheme='neutral'
               />
             </Col>
           </Action.Trigger>

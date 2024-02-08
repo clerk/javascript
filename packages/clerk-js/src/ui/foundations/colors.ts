@@ -37,23 +37,19 @@ export const neutralAlpha = Object.freeze({
 } as const);
 
 export const colors = Object.freeze({
-  // Colors that are not affected by `alphaShadesMode`
   avatarBorder: neutralAlpha.neutralAlpha200,
   avatarBackground: neutralAlpha.neutralAlpha400,
   modalBackdrop: neutralAlpha.neutralAlpha700,
-  activeDeviceBackground: whiteAlpha.whiteAlpha200,
   // Themable colors
   ...neutralAlpha,
   ...whiteAlpha,
   colorBackground: 'white',
   colorInputBackground: 'white',
-  colorText: '#131316',
+  colorText: '#212126',
   colorTextSecondary: '#747686',
-  colorTextTertiary: '#9394A1',
-  colorTextLabel: '#42434D',
   colorInputText: 'black',
-  colorShimmer: 'rgba(255, 255, 255, 0.36)',
   colorTextOnPrimaryBackground: 'white',
+  colorShimmer: 'rgba(255, 255, 255, 0.36)',
   transparent: 'transparent',
   white: 'white',
   black: 'black',
