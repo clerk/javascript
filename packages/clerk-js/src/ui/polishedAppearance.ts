@@ -73,6 +73,10 @@ export const polishedAppearance = {
       organizationSwitcherPopoverMain: {
         ...cardContentStyles(theme),
       },
+      menuList: {
+        border: 0,
+        boxShadow: `${theme.shadows.$menuShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+      },
       actionCard: {
         border: 0,
         boxShadow: `${theme.shadows.$actionCardShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
