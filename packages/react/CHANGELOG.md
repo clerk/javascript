@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.30.5
+
+### Patch Changes
+
+- Properly fire onLoad event when clerk-js is already loaded. ([#2767](https://github.com/clerk/javascript/pull/2767)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`cd00175cb`](https://github.com/clerk/javascript/commit/cd00175cbbf902e8c0a0a1ff3875c173e03259a7)]:
+  - @clerk/types@3.62.0
+
 ## 4.30.4
 
 ### Patch Changes

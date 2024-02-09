@@ -1,5 +1,24 @@
 # Change Log
 
+## 4.70.0
+
+### Minor Changes
+
+- Accept `skipInvitationScreen` as a prop from OrganizationSwitcher. ([#2740](https://github.com/clerk/javascript/pull/2740)) by [@panteliselef](https://github.com/panteliselef)
+
+  `skipInvitationScreen` hides the screen for sending invitations after an organization is created.
+  By default, Clerk will automatically hide the screen if the number of max allowed members is equal to 1
+
+### Patch Changes
+
+- Allow retries for all 300xxx error codes for CF Turnstile. ([#2755](https://github.com/clerk/javascript/pull/2755)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Give application logo correct CSS width to prevent incorrect widths ([#2741](https://github.com/clerk/javascript/pull/2741)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`cd00175cb`](https://github.com/clerk/javascript/commit/cd00175cbbf902e8c0a0a1ff3875c173e03259a7)]:
+  - @clerk/types@3.62.0
+  - @clerk/localizations@1.26.15
+
 ## 4.69.1
 
 ### Patch Changes

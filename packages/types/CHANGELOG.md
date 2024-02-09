@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.62.0
+
+### Minor Changes
+
+- Accept `skipInvitationScreen` as a prop from OrganizationSwitcher. ([#2740](https://github.com/clerk/javascript/pull/2740)) by [@panteliselef](https://github.com/panteliselef)
+
+  `skipInvitationScreen` hides the screen for sending invitations after an organization is created.
+  By default, Clerk will automatically hide the screen if the number of max allowed members is equal to 1
+
 ## 3.61.0
 
 ### Minor Changes
