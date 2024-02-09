@@ -177,6 +177,7 @@ const PhoneInputElement = forwardRef<HTMLInputElement>((_, ref) => {
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(formField.fieldId)}
       {...inputProps}
+      feedbackType={formField.feedbackType}
       placeholder={t(placeholder)}
     />
   );

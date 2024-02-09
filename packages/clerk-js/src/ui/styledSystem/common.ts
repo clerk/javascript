@@ -80,7 +80,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
   const hoverBorderColor = !props?.hasError ? t.colors.$neutralAlpha300 : t.colors.$dangerAlpha500;
   const hoverBoxShadow = t.shadows.$input.replace(
     '{{color}}',
-    !props?.hasError ? t.colors.$neutralAlpha150 : t.colors.$neutralAlpha200,
+    !props?.hasError ? t.colors.$neutralAlpha150 : t.colors.$dangerAlpha200,
   );
   const hoverStyles = {
     '&:hover': {

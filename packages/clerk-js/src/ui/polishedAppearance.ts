@@ -9,14 +9,68 @@ const cardContentStyles = (theme: InternalTheme) => ({
   boxShadow: `${theme.shadows.$cardContentShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha50}`,
 });
 
+const inputShadowStyles = (
+  theme: InternalTheme,
+  colors: { idle1: string; idle2: string; hover1: string; hover2: string; focus: string },
+) => {
+  const idleShadow = [
+    `0px 0px 0px 1px ${colors.idle1}`,
+    theme.shadows.$input.replace('{{color}}', colors.idle2),
+  ].toString();
+  const hoverShadow = [
+    `0px 0px 0px 1px ${colors.hover1}`,
+    theme.shadows.$input.replace('{{color}}', colors.hover2),
+  ].toString();
+
+  return {
+    boxShadow: idleShadow,
+    '&:hover': {
+      boxShadow: hoverShadow,
+    },
+    '&:focus': {
+      boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
+    },
+  };
+};
+
+const inputStyles = (theme: InternalTheme) => ({
+  border: 0,
+  ...inputShadowStyles(theme, {
+    idle1: theme.colors.$neutralAlpha150,
+    idle2: theme.colors.$neutralAlpha100,
+    hover1: theme.colors.$neutralAlpha300,
+    hover2: theme.colors.$neutralAlpha150,
+    focus: theme.colors.$neutralAlpha150,
+  }),
+  '&[data-feedback="error"]': inputShadowStyles(theme, {
+    idle1: theme.colors.$dangerAlpha400,
+    idle2: theme.colors.$dangerAlpha200,
+    hover1: theme.colors.$dangerAlpha500,
+    hover2: theme.colors.$dangerAlpha200,
+    focus: theme.colors.$dangerAlpha200,
+  }),
+  '&[data-feedback="warning"]': inputShadowStyles(theme, {
+    idle1: theme.colors.$warningAlpha400,
+    idle2: theme.colors.$warningAlpha200,
+    hover1: theme.colors.$warningAlpha500,
+    hover2: theme.colors.$warningAlpha200,
+    focus: theme.colors.$warningAlpha200,
+  }),
+  '&[data-feedback="success"]': inputShadowStyles(theme, {
+    idle1: theme.colors.$successAlpha400,
+    idle2: theme.colors.$successAlpha200,
+    hover1: theme.colors.$successAlpha500,
+    hover2: theme.colors.$successAlpha200,
+    focus: theme.colors.$successAlpha200,
+  }),
+});
+
 export const polishedAppearance = {
   elements: ({ theme }: { theme: InternalTheme }) => {
     return {
       button: {
         '&[data-variant="solid"]': {
           border: 0,
-          '&:hover': null,
-          '&:focus': null,
           '&:after': {
             position: 'absolute',
             content: '""',
@@ -57,6 +111,23 @@ export const polishedAppearance = {
           boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$warningAlpha300}, ${theme.shadows.$badge}`,
         },
       },
+      input: inputStyles(theme),
+      selectSearchInput: { margin: '4px' },
+      phoneInputBox: (() => {
+        const boxShadow = [
+          `0px 0px 0px 1px ${theme.colors.$neutralAlpha150}`,
+          theme.shadows.$input.replace('{{color}}', theme.colors.$neutralAlpha100),
+        ].toString();
+        return {
+          border: 0,
+          '> div > input': {
+            boxShadow: 'unset',
+          },
+          boxShadow,
+          '&:hover': { boxShadow },
+          '&:focus': { boxShadow },
+        };
+      })(),
       cardBox: {
         border: 0,
         boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
