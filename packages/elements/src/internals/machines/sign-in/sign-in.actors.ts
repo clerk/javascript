@@ -16,7 +16,7 @@ import type { SetOptional, Simplify } from 'type-fest';
 import { fromPromise } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
-import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
 import type {
   AuthenticateWithRedirectOAuthParams,

@@ -15,7 +15,7 @@ import type {
 } from '@clerk/types';
 import { assign, fromPromise, sendParent, sendTo, setup } from 'xstate';
 
-import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
 import type { WithClient, WithParams } from '~/internals/machines/shared.types';
 import type { SignInVerificationSchema } from '~/internals/machines/sign-in/types';

@@ -3,7 +3,7 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
 
-import { ClerkElementsError, ClerkElementsFieldError } from '~/internals/errors/error';
+import { ClerkElementsError, ClerkElementsFieldError } from '~/internals/errors';
 
 import type { FieldDetails, FormFields } from './form.types';
 

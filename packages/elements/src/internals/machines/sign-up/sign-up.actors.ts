@@ -9,7 +9,7 @@ import type {
 } from '@clerk/types';
 import { fromCallback, fromPromise } from 'xstate';
 
-import { ClerkElementsError } from '~/internals/errors/error';
+import { ClerkElementsError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
 
 import type { WithClerk, WithClient, WithParams } from '../shared.types';

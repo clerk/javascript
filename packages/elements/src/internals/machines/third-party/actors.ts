@@ -9,7 +9,7 @@ import type { AnyEventObject } from 'xstate';
 import { fromCallback, fromPromise } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
-import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { WithClerk, WithParams, WithUnsafeMetadata } from '~/internals/machines/shared.types';
 import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 

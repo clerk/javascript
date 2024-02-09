@@ -18,8 +18,8 @@ import type { ActorRefFrom, ErrorActorEvent, MachineContext, NonReducibleUnknown
 import { and, log, not, or, sendTo, setup } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
-import type { ClerkElementsErrorBase } from '~/internals/errors/error';
-import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import type { ClerkElementsErrorBase } from '~/internals/errors';
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormMachine } from '~/internals/machines/form/form.machine';
 import {
   attemptVerification,

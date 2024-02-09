@@ -3,7 +3,7 @@
 import type { ClerkResource, LoadedClerk } from '@clerk/types';
 import type { AnyActorLogic, InputFrom } from 'xstate';
 
-import type { ClerkElementsError } from '~/internals/errors/error';
+import type { ClerkElementsError } from '~/internals/errors';
 import type { ClerkRouter } from '~/react/router';
 
 // ---------------------------------- Events ---------------------------------- //

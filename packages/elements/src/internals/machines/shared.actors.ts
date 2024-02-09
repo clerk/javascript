@@ -2,7 +2,7 @@ import type { Clerk, HandleOAuthCallbackParams, HandleSamlCallbackParams, Loaded
 import type { AnyEventObject, EventObject } from 'xstate';
 import { fromCallback, fromPromise } from 'xstate';
 
-import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 
 // TODO: Remove

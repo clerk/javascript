@@ -1,7 +1,7 @@
 import type { SignInStrategy } from '@clerk/types';
 import { createContext, useContext } from 'react';
 
-import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { SignInStrategyName } from '~/internals/machines/sign-in/types';
 
 export type StrategiesContextValue = {

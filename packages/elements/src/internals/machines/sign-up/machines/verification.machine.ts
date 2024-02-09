@@ -12,7 +12,7 @@ import type { Writable } from 'type-fest';
 import { and, assign, enqueueActions, fromCallback, fromPromise, raise, sendParent, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
-import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type {
   SignUpVerificationContext,
   SignUpVerificationEvents,

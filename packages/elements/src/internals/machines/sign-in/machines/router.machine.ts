@@ -3,7 +3,7 @@ import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, log, not, or, setup, stopChild } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
-import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type {
   SignInRouterContext,
   SignInRouterEvents,
