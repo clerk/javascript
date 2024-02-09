@@ -17,6 +17,8 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
   const sponsorOrLinksExist = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
   const showSponsorAndLinks = isProfileFooter ? branded : sponsorOrLinksExist;
 
+  if (!children && !showSponsorAndLinks) return null;
+
   const footerStyles = (t: InternalTheme) => ({
     '>:first-of-type': {
       padding: `${t.space.$4} ${t.space.$8} ${t.space.$4} ${t.space.$8}`,
