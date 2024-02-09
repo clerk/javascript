@@ -2,6 +2,8 @@ import type { Appearance } from '@clerk/types';
 
 import type { InternalTheme } from './foundations';
 
+const BADGE_SHADOW_LENGTH = '0px 0px 0px 1px';
+
 export const polishedAppearance = {
   elements: ({ theme }: { theme: InternalTheme }) => {
     return {
@@ -36,17 +38,18 @@ export const polishedAppearance = {
       },
       badge: {
         border: 0,
+        margin: '1px',
         '&[data-color="primary"]': {
-          boxShadow: `0px 0px 0px 1px ${theme.colors.$neutralAlpha100}, 0px 2px 0px -1px rgba(0, 0, 0, 0.04)`,
+          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
         },
         '&[data-color="danger"]': {
-          boxShadow: `0px 0px 0px 1px ${theme.colors.$dangerAlpha300}, 0px 2px 0px -1px rgba(0, 0, 0, 0.04)`,
+          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$dangerAlpha300}, ${theme.shadows.$badge}`,
         },
         '&[data-color="success"]': {
-          boxShadow: `0px 0px 0px 1px ${theme.colors.$successAlpha300}, 0px 2px 0px -1px rgba(0, 0, 0, 0.04)`,
+          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$successAlpha300}, ${theme.shadows.$badge}`,
         },
         '&[data-color="warning"]': {
-          boxShadow: `0px 0px 0px 1px ${theme.colors.$warningAlpha300}, 0px 2px 0px -1px rgba(0, 0, 0, 0.04)`,
+          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$warningAlpha300}, ${theme.shadows.$badge}`,
         },
       },
     };
