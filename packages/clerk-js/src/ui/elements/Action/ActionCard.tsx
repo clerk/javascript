@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 
-import { Col } from '../../customizables';
+import { Col, descriptors } from '../../customizables';
 import type { InternalTheme } from '../../styledSystem';
 
 type ActionCardProps = ComponentProps<typeof Col> & {
@@ -21,6 +21,7 @@ export const ActionCard = (props: ActionCardProps) => {
 
   return (
     <Col
+      elementDescriptor={descriptors.actionCard}
       sx={[
         t => ({
           boxShadow: t.shadows.$actionCardShadow,
