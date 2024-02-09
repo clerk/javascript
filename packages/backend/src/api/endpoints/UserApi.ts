@@ -236,4 +236,12 @@ export class UserAPI extends AbstractAPI {
       bodyParams: { code },
     });
   }
+
+  public async banUser(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'ban'),
+    });
+  }
 }
