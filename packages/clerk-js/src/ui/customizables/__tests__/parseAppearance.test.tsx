@@ -337,4 +337,46 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
     expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
   });
+
+  it('removes the polishedAppearance when simpleStyles is passed to globalAppearance', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          //@ts-expect-error not public api
+          simpleStyles: true,
+          elements: {
+            alert: { backgroundColor: themeAColor },
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    //notice the "0" index, not "1" as it would be without simpleStyles
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
+  });
+
+  it('removes the polishedAppearance when simpleStyles is passed to appearance', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          //@ts-expect-error not public api
+          simpleStyles: true,
+          elements: {
+            alert: { backgroundColor: themeBColor },
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    //notice the "0" index, not "1" as it would be without simpleStyles
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeBColor);
+  });
 });

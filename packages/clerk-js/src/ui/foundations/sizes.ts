@@ -5,6 +5,7 @@ const baseSpaceUnits = Object.freeze({
 } as const);
 
 const dynamicSpaceUnits = Object.freeze({
+  '0x25': '0.0625rem',
   '0x5': '0.125rem',
   '1': '0.25rem',
   '1x5': '0.375rem',
