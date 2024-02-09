@@ -27,6 +27,7 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
+import { eventBus } from '../events';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
@@ -229,7 +230,9 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   destroy = async (): Promise<void> => {
-    return this._baseDelete();
+    const deletedObj = await this._baseDelete();
+    eventBus.dispatch('organization:destroy', null);
+    return deletedObj;
   };
 
   setLogo = async ({ file }: SetOrganizationLogoParams): Promise<OrganizationResource> => {

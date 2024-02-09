@@ -2,6 +2,7 @@ import type { TokenResource } from '@clerk/types';
 
 export const events = {
   TokenUpdate: 'token:update',
+  OrganizationDestroy: 'organization:destroy',
 } as const;
 
 type ClerkEvent = (typeof events)[keyof typeof events];
@@ -11,6 +12,7 @@ type TokenUpdatePayload = { token: TokenResource | null };
 
 type EventPayload = {
   [events.TokenUpdate]: TokenUpdatePayload;
+  [events.OrganizationDestroy]: null;
 };
 
 const createEventBus = () => {

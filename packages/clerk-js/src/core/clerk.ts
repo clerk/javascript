@@ -100,6 +100,7 @@ import {
   clerkOAuthCallbackDidNotCompleteSignInSignUp,
   clerkRedirectUrlIsMissingScheme,
 } from './errors';
+import { eventBus } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import {
@@ -1244,6 +1245,10 @@ export class Clerk implements ClerkInterface {
     // in the v4 build. This will be removed when v4 becomes the main stable version
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
+
+  __unstable__eventBus_on = eventBus.on;
+
+  __unstable__eventBus_off = eventBus.off;
 
   __internal_navigateWithError(to: string, err: ClerkAPIError) {
     this.__internal_last_error = err;
