@@ -4,6 +4,11 @@ import type { InternalTheme } from './foundations';
 
 const BORDER_SHADOW_LENGTH = '0px 0px 0px 1px';
 
+const cardContentStyles = (theme: InternalTheme) => ({
+  border: 0,
+  boxShadow: `${theme.shadows.$cardContentShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha50}`,
+});
+
 export const polishedAppearance = {
   elements: ({ theme }: { theme: InternalTheme }) => {
     return {
@@ -55,6 +60,18 @@ export const polishedAppearance = {
       cardBox: {
         border: 0,
         boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+      },
+      card: {
+        ...cardContentStyles(theme),
+      },
+      scrollBox: {
+        ...cardContentStyles(theme),
+      },
+      userButtonPopoverMain: {
+        ...cardContentStyles(theme),
+      },
+      organizationSwitcherPopoverMain: {
+        ...cardContentStyles(theme),
       },
       actionCard: {
         border: 0,
