@@ -238,6 +238,8 @@ export const enUS: LocalizationResource = {
     accountSwitcher: {
       title: 'Choose an account',
       subtitle: 'Select the account with which you wish to continue.',
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
     },
   },
   userProfile: {

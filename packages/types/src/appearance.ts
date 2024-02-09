@@ -293,6 +293,10 @@ export type ElementsConfig = {
   identityPreviewEditButton: WithOptions;
   identityPreviewEditButtonIcon: WithOptions;
 
+  accountSwitcherActionButton: WithOptions<'addAccount' | 'signOutAll'>;
+  accountSwitcherActionButtonIconBox: WithOptions<'addAccount' | 'signOutAll'>;
+  accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
+
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
   alertText: WithOptions<AlertId>;

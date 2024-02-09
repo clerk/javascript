@@ -44,7 +44,6 @@ const _SignInAccountSwitcher = () => {
                     height: theme.sizes.$16,
                     justifyContent: 'flex-start',
                     borderRadius: 0,
-                    borderBottom: `${theme.borders.$normal} ${theme.colors.$neutralAlpha100}`,
                   })}
                   icon={SwitchArrowRight}
                 >
@@ -58,14 +57,14 @@ const _SignInAccountSwitcher = () => {
               ))}
 
               <Action
-                elementDescriptor={descriptors.userButtonPopoverActionButton}
-                elementId={descriptors.userButtonPopoverActionButton.setId('addAccount')}
-                iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
-                iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('addAccount')}
-                iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
-                iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('addAccount')}
+                elementDescriptor={descriptors.accountSwitcherActionButton}
+                elementId={descriptors.accountSwitcherActionButton.setId('addAccount')}
+                iconBoxElementDescriptor={descriptors.accountSwitcherActionButtonIconBox}
+                iconBoxElementId={descriptors.accountSwitcherActionButtonIconBox.setId('addAccount')}
+                iconElementDescriptor={descriptors.accountSwitcherActionButtonIcon}
+                iconElementId={descriptors.accountSwitcherActionButtonIcon.setId('addAccount')}
                 icon={Add}
-                label={localizationKeys('userButton.action__addAccount')}
+                label={localizationKeys('signIn.accountSwitcher.action__addAccount')}
                 onClick={handleAddAccountClicked}
                 iconSx={t => ({
                   width: t.sizes.$9,
@@ -94,7 +93,19 @@ const _SignInAccountSwitcher = () => {
               width: '100%',
             }}
           >
-            <SignOutAllActions handleSignOutAllClicked={handleSignOutAllClicked} />
+            <SignOutAllActions
+              handleSignOutAllClicked={handleSignOutAllClicked}
+              elementDescriptor={descriptors.accountSwitcherActionButton}
+              elementId={descriptors.accountSwitcherActionButton.setId('signOutAll')}
+              iconBoxElementDescriptor={descriptors.accountSwitcherActionButtonIconBox}
+              iconBoxElementId={descriptors.accountSwitcherActionButtonIconBox.setId('signOutAll')}
+              iconElementDescriptor={descriptors.accountSwitcherActionButtonIcon}
+              iconElementId={descriptors.accountSwitcherActionButtonIcon.setId('signOutAll')}
+              label={localizationKeys('signIn.accountSwitcher.action__signOutAll')}
+              sx={{
+                borderBottom: 'none',
+              }}
+            />
           </Card.Action>
         </Card.Footer>
       </Card.Root>
