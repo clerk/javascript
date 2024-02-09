@@ -2,6 +2,8 @@ import type { Appearance } from '@clerk/types';
 
 import type { InternalTheme } from './foundations';
 
+const BADGE_SHADOW_LENGTH = '0px 0px 0px 1px';
+
 export const polishedAppearance = {
   elements: ({ theme }: { theme: InternalTheme }) => {
     return {
@@ -32,6 +34,22 @@ export const polishedAppearance = {
         '&[data-variant="outline"]': {
           boxShadow:
             '0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(0, 0, 0, 0.02), 0px 0px 0px 1px rgba(0, 0, 0, 0.08)',
+        },
+      },
+      badge: {
+        border: 0,
+        margin: '1px',
+        '&[data-color="primary"]': {
+          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
+        },
+        '&[data-color="danger"]': {
+          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$dangerAlpha300}, ${theme.shadows.$badge}`,
+        },
+        '&[data-color="success"]': {
+          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$successAlpha300}, ${theme.shadows.$badge}`,
+        },
+        '&[data-color="warning"]': {
+          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$warningAlpha300}, ${theme.shadows.$badge}`,
         },
       },
     };
