@@ -56,7 +56,6 @@
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
     "@floating-ui/react": "0.25.4",
-    "@formkit/auto-animate": "^0.8.1",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",
     "browser-tabs-lock": "1.2.15",

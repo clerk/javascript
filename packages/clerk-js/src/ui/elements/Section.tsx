@@ -7,7 +7,7 @@ import type { ElementDescriptor, ElementId } from '../customizables/elementDescr
 import { Plus } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
-import { Animated, ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
+import { ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
@@ -99,18 +99,16 @@ const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
   const { children, id, ...rest } = props;
 
   return (
-    <Animated asChild>
-      <Col
-        elementDescriptor={descriptors.profileSectionItemList}
-        elementId={descriptors.profileSectionItemList.setId(id)}
-        sx={t => ({
-          gap: t.space.$0x5,
-        })}
-        {...rest}
-      >
-        {children}
-      </Col>
-    </Animated>
+    <Col
+      elementDescriptor={descriptors.profileSectionItemList}
+      elementId={descriptors.profileSectionItemList.setId(id)}
+      sx={t => ({
+        gap: t.space.$0x5,
+      })}
+      {...rest}
+    >
+      {children}
+    </Col>
   );
 };
 

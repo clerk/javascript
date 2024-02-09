@@ -4,7 +4,6 @@ import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
-  Animated,
   Card,
   Header,
   Tab,
@@ -63,43 +62,39 @@ export const OrganizationMembers = withCardStateProvider(() => {
         elementId={descriptors.profilePage.setId('organizationMembers')}
         gap={4}
       >
-        <Action.Root animate={false}>
-          <Animated asChild>
-            <Header.Root
-              contentSx={{
-                [mqu.md]: {
-                  flexDirection: 'row',
-                  width: '100%',
-                  justifyContent: 'space-between',
-                },
-              }}
-            >
-              <Header.Title
-                localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
-                textVariant='h2'
-              />
-              {canManageMemberships && (
-                <Action.Trigger value='invite'>
-                  <InviteMembersButton
-                    sx={{
-                      display: 'none',
-                      [mqu.md]: {
-                        display: 'inline-flex',
-                      },
-                    }}
-                  />
-                </Action.Trigger>
-              )}
-            </Header.Root>
-          </Animated>
+        <Action.Root>
+          <Header.Root
+            contentSx={{
+              [mqu.md]: {
+                flexDirection: 'row',
+                width: '100%',
+                justifyContent: 'space-between',
+              },
+            }}
+          >
+            <Header.Title
+              localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
+              textVariant='h2'
+            />
+            {canManageMemberships && (
+              <Action.Trigger value='invite'>
+                <InviteMembersButton
+                  sx={{
+                    display: 'none',
+                    [mqu.md]: {
+                      display: 'inline-flex',
+                    },
+                  }}
+                />
+              </Action.Trigger>
+            )}
+          </Header.Root>
           {canReadMemberships && (
-            <Animated>
-              <Action.Open value='invite'>
-                <Action.Card>
-                  <InviteMembersScreen />
-                </Action.Card>
-              </Action.Open>
-            </Animated>
+            <Action.Open value='invite'>
+              <Action.Card>
+                <InviteMembersScreen />
+              </Action.Card>
+            </Action.Open>
           )}
           <Tabs>
             <TabsList>
@@ -118,22 +113,20 @@ export const OrganizationMembers = withCardStateProvider(() => {
               )}
             </TabsList>
             {canManageMemberships && (
-              <Animated asChild>
-                <Flex
-                  justify='end'
-                  sx={{
-                    width: '100%',
-                    marginLeft: 'auto',
-                    [mqu.md]: {
-                      display: 'none',
-                    },
-                  }}
-                >
-                  <Action.Trigger value='invite'>
-                    <InviteMembersButton />
-                  </Action.Trigger>
-                </Flex>
-              </Animated>
+              <Flex
+                justify='end'
+                sx={{
+                  width: '100%',
+                  marginLeft: 'auto',
+                  [mqu.md]: {
+                    display: 'none',
+                  },
+                }}
+              >
+                <Action.Trigger value='invite'>
+                  <InviteMembersButton />
+                </Action.Trigger>
+              </Flex>
             )}
             <TabPanels>
               {canReadMemberships && (
