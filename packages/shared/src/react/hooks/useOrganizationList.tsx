@@ -10,6 +10,7 @@ import type {
   SetActive,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
+import { useEffect } from 'react';
 
 import { deprecatedObjectProperty } from '../../deprecated';
 import { useClerkInstanceContext, useUserContext } from '../contexts';
@@ -206,6 +207,18 @@ export const useOrganizationList: UseOrganizationList = params => {
       userId: user?.id,
     },
   );
+
+  useEffect(() => {
+    const handler = () => {
+      console.log('Organization destroyed');
+      void memberships.revalidate?.();
+    };
+    (clerk as any).__unstable__eventBus_on('organization:destroy', handler);
+
+    return () => {
+      (clerk as any).__unstable__eventBus_off('organization:destroy', handler);
+    };
+  }, []);
 
   // TODO: Properly check for SSR user values
   if (!isClerkLoaded) {
