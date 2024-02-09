@@ -115,26 +115,25 @@ export function createConsoleInspector(): Observer<InspectionEvent> {
     }
   }
 
-  const defaults = 'font-weight: bold; line-height: 1.75;';
-  const labelDefaults = `${defaults} background: #222; margin: 0px 10px 0px 0px;`;
+  const defaults = 'font-weight: bold; line-height: 2; border-radius: 8px; padding: 6px 10px;';
   const reset = 'color: inherit;';
 
   const Styles = {
     info: {
-      label: `color: #0D74CE;`,
-      sublabel: `color: #5EB1EF;`,
+      label: `background: #113264; color: #8EC8F6;`, // blue 12, blue 5
+      sublabel: `background: #113264; color: #C2E5FF;`, // blue 12, blue 7
     },
     success: {
-      label: `color: #2A7E3B;`,
-      sublabel: `color: #65BA74;`,
+      label: `background: #203C25; color: #94CE9A;`, // grass 12, grass 5
+      sublabel: `background: #203C25; color: #C9E8CA;`, // grass 12, grass 7
     },
     warning: {
-      label: `color: #9E6C00;`,
-      sublabel: `color: #E4C767;`,
+      label: `background: #473B1F; color: #E4C767;`, // yellow 12, yellow 5
+      sublabel: `background: #473B1F; color: #FFE770;`, // yellow 12, yellow 7
     },
     error: {
-      label: `color: #D13415;`,
-      sublabel: `color: #E54D2E;`,
+      label: `background: #5C271F; color: #F5A898;`, // tomato 12, tomato 5
+      sublabel: `background: #5C271F; color: #FFCDC2;`, // tomato 12, tomato 7
     },
   } as const;
 
@@ -146,20 +145,20 @@ export function createConsoleInspector(): Observer<InspectionEvent> {
   ) => {
     const styles = Styles[style];
 
-    let msg = `%c${label}%c`;
-    const params: string[] = [`${labelDefaults} padding: 6px 10px; ${styles.label}`, reset];
+    const msg = [`%c${label}%c\t`];
+    const params: string[] = [`${defaults} ${styles.label}`, reset];
 
     if (sublabel) {
-      msg += `%c${sublabel}%c`;
-      params.push(`${labelDefaults} padding: 6px 10px 6px 0; ${styles.sublabel}`, reset);
+      msg.push(`%c${sublabel}%c`);
+      params.push(`${defaults} ${styles.sublabel}`, reset);
     }
 
     if (details) {
-      msg += `%c${details}%c`;
-      params.push(`${defaults} padding: 6px 10px;`, reset);
+      msg.push(`%c${details}`);
+      params.push(defaults);
     }
 
-    console.groupCollapsed(msg, ...params);
+    console.groupCollapsed(msg.join(''), ...params);
     cb();
     console.groupEnd();
   };
@@ -186,7 +185,7 @@ export function createConsoleInspector(): Observer<InspectionEvent> {
   consoleInspector = {
     next: inspectionEvent => {
       if (inspectionEvent.type === '@xstate.actor') {
-        logGroup({ label: 'ACTOR:', sublabel: parseRefId(inspectionEvent.actorRef) }, () => {
+        logGroup({ label: 'ACTOR', sublabel: parseRefId(inspectionEvent.actorRef) }, () => {
           logEvent('Actor Ref', inspectionEvent.actorRef);
         });
       }
@@ -194,7 +193,7 @@ export function createConsoleInspector(): Observer<InspectionEvent> {
       if (inspectionEvent.type === '@xstate.event') {
         logGroup(
           {
-            label: 'EVENT:',
+            label: 'EVENT',
             sublabel: inspectionEvent.event.type,
             details: [parseRefId(inspectionEvent.sourceRef), parseRefId(inspectionEvent.actorRef)]
               .filter(Boolean)
@@ -213,7 +212,7 @@ export function createConsoleInspector(): Observer<InspectionEvent> {
       if (inspectionEvent.type === '@xstate.snapshot') {
         logGroup(
           {
-            label: 'SNAPSHOT:',
+            label: 'SNAPSHOT',
             sublabel: parseRefId(inspectionEvent.actorRef),
             style: determineStyleFromEvent(inspectionEvent.event),
           },
