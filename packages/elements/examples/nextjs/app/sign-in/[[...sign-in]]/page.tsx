@@ -67,6 +67,8 @@ export default function SignInPage() {
           <div className='flex gap-6 flex-col'>
             <H1>VERFIY</H1>
 
+            <GlobalError className='block text-red-400 font-mono' />
+
             <Verification name='password'>
               <CustomField
                 label='Password'

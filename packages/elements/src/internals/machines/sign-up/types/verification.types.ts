@@ -1,6 +1,6 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { LoadedClerk, SignUpResource } from '@clerk/types';
-import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
+import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form/form.machine';
 import type { SignUpRouterMachine } from '~/internals/machines/sign-up/machines';
@@ -37,16 +37,21 @@ export type SignUpVerificationEmailLinkTransferrableEvent = {
   resource: SignUpResource;
 };
 export type SignUpVerificationEmailLinkRestartEvent = { type: 'EMAIL_LINK.RESTART' };
-export type SignUpVerificationEmailLinkFailureEvent = { type: 'EMAIL_LINK.FAILURE'; error: Error };
+export type SignUpVerificationEmailLinkFailedEvent = {
+  type: 'EMAIL_LINK.FAILED';
+  resource: SignUpResource;
+  error: Error;
+};
 
 export type SignUpVerificationEmailLinkEvent =
   | SignUpVerificationEmailLinkVerifiedEvent
   | SignUpVerificationEmailLinkUnverifiedEvent
   | SignUpVerificationEmailLinkExpiredEvent
   | SignUpVerificationEmailLinkRestartEvent
-  | SignUpVerificationEmailLinkFailureEvent;
+  | SignUpVerificationEmailLinkFailedEvent;
 
 export type SignUpVerificationEvents =
+  | DoneActorEvent
   | ErrorActorEvent
   | SignUpVerificationSubmitEvent
   | SignUpVerificationNextEvent
@@ -66,6 +71,7 @@ export type SignUpVerificationInput = {
 export interface SignUpVerificationContext {
   basePath: string;
   clerk: LoadedClerk;
+  resource: SignUpResource;
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
   routerRef: ActorRefFrom<typeof SignUpRouterMachine>;

@@ -21,7 +21,6 @@ export type BaseRouterRouteRegisterEvent<TSystemId extends string, TLogic extend
 };
 
 export type BaseRouterRouteUnregisterEvent<T extends string> = { type: 'ROUTE.UNREGISTER'; id: T };
-export type BaseRouterRouteClearEvent = { type: 'ROUTE.CLEAR' };
 
 // ---------------------------------- Input ---------------------------------- //
 

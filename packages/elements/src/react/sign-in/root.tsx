@@ -7,7 +7,7 @@ import type { PropsWithChildren } from 'react';
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
 import { SignInRouterMachine } from '~/internals/machines/sign-in/machines';
-import { useBrowserInspector } from '~/react/hooks';
+import { useConsoleInspector } from '~/react/hooks';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
@@ -16,11 +16,14 @@ type SignInFlowProviderProps = Required<PropsWithChildren>;
 function SignInFlowProvider({ children }: SignInFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
-  const { inspector } = useBrowserInspector();
+  const inspector = useConsoleInspector();
+
+  // const { inspector } = useBrowserInspector();
 
   const ref = useActorRef(SignInRouterMachine, {
     input: { clerk, router, signUpPath: '/sign-up' },
-    inspect: inspector?.inspect,
+    // inspect: inspector?.inspect,
+    inspect: inspector,
   });
 
   return <SignInRouterCtx.Provider actorRef={ref}>{children}</SignInRouterCtx.Provider>;
@@ -43,11 +46,12 @@ export type SignInRootProps = SignInFlowProviderProps & { path?: string };
 export function SignInRoot({ children, path = SIGN_IN_DEFAULT_BASE_PATH }: SignInRootProps): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
-  const { loading: inspectorLoading } = useBrowserInspector();
 
-  if (inspectorLoading) {
-    return null;
-  }
+  // const { loading: inspectorLoading } = useBrowserInspector();
+
+  // if (inspectorLoading) {
+  //   return null;
+  // }
 
   return (
     <ClerkLoaded>

@@ -61,7 +61,7 @@ export type SignUpMachineEvents =
   | { type: 'EMAIL_LINK.VERIFIED'; resource: SignUpResource }
   | { type: 'EMAIL_LINK.EXPIRED'; resource: SignUpResource }
   | { type: 'EMAIL_LINK.RESTART' }
-  | { type: 'EMAIL_LINK.FAILURE'; error: Error }
+  | { type: 'EMAIL_LINK.FAILED'; error: Error }
   | { type: ClerkJSNavigationEvent };
 
 export type SignUpVerificationTags = 'code' | VerificationStrategy;
@@ -480,7 +480,7 @@ export const SignUpMachine = setup({
               target: '.Attempting',
               reenter: true,
             },
-            'EMAIL_LINK.FAILURE': {
+            'EMAIL_LINK.FAILED': {
               actions: sendTo(
                 ({ self }) => self,
                 ({ event }) => ({

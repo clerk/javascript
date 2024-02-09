@@ -1,6 +1,6 @@
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, raise, setup, stopChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, setup, stopChild } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors/error';
@@ -27,7 +27,6 @@ export const SignInRouterMachineId = 'SignInRouter';
 
 export const SignInRouterMachine = setup({
   actions: {
-    clearSpawnedRoutes: raise({ type: 'ROUTE.CLEAR' }),
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path }: { path: string }) => {
       if (!context.router) return;
@@ -80,7 +79,6 @@ export const SignInRouterMachine = setup({
   },
   types: {} as SignInRouterSchema,
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QGUCWUB2BJDAlA9gK4AuYATgMQAKuAogGoDaADALqKgAO+sqxq+DBxAAPRABYATABoQAT0QBGZgFYAdAHYVzHRoAcivQDZtzAMwBfC7LSYcBEuTU4+FFuyQhuvfoOFiESRVxNTMATj1xDQ1JMxUVY2DZBQQNcUVQxUlxMJUsjUVxPT0rG3RsPCJSMmcMV0ZFDy4ePgEhTwCgsNCIqJi4hJNxZMRJAzVxFTNFQrjFIw1p0pBbCodq2vrJJq8W33bQTpVu8Mjo2PjE4flEYu7mRRUTRQLVJ5Vl1fsqpxdiNzMO28rT8HVGxx6Z36lyGIwQhm6OTCuTCRki4jRxU+5W+jhqfzc4iBeza-nBJ165wGVzheT0amKYyC00eWnE2LslTxm3+jBUxJ8pLBgQhpz6F0GSRuCGO6km00kaWyOkUHLWPxqyGIAEMyP8AHK0AAaABV3MJgfsyakVBpNEiiswwmYjPM9LSMWoVJJUXpzIYotk1biNlrdQbjWbGhaSaDDogwhojGoFoZqRonXE4UYzMw1GFJD7zEZC5E4sGuaGdXqKIbTYxtjHBXHRAmkymCnp05mVLSzCEMYmTMw9PoYpIK+snAAxVBkWDEafagDGxHwlDrZrYTZBB1b8OmyYMkhLRkm4mY6Thfvp+jCl8v4jMWnmk41aln88XK7XG8jDQFXdrUeOJNH7PJwiiPIk2vYxNBMIwdFiPR7yyN9uWQMBl0ECAl1Xdda3-bdPEtIV43hUd1Eo5gjFonNnz0GRpQxPMy0kcxTiCKYPmsFYcUrJxMOwjBcJ-AjNwAncrWFQwNG6F4EgvRZ5hLOEzGfCYXVyLt5SyWJ0I2ABhbUABsTIAIxXABrCgTVwABBfVkGnWhcHNEjYz3AJvUkNRskkRQwkmPRjnYsw4SkXyC1RMI3W9LQTwMpxaDIMhxKIwDpPIkxuhPeJ7yCEwDHC6V9HpZEAuKSZlASDQrF4jB8AgOBhC+ASyCksj9wAWiMOFerUHQhuG4bCiS-E6mITqWwCRRcwZXpaJiRjpnMa9UQmAtDFtcQMSTMJxrUMM9WmrzbkLNQ5sVSI0RmC8SpSM87QiMZDBC-snyMQ7PwXPDf1O4C4m6S5x2mRjVDhWK838l4ULHUtDqEnC-vXAGZPvO0ii7OaTG9XamJSJ5fJ9HN0mdMxC1ow7jLMyzlystHyKmXzDwvWJnyCubaWyUJGK7ZhCwFjEeLKTkpxqFK0o6jzmzOmVJgZPnbRzdmjDCOE702yrIjyVRjG+9coHwYgqG1WBYAAd3XCBGf3KRrw0ir2IxFD+313i2vFtQAAlUAXW2jgpKEJRpaVxlMcwMxHR4gvZeqgA */
   id: SignInRouterMachineId,
   context: ({ input }) => ({
     clerk: input.clerk,
@@ -100,7 +98,7 @@ export const SignInRouterMachine = setup({
             id,
             systemId: id,
             input: { basePath: router?.basePath, clerk, router: self, ...input },
-            syncSnapshot: true,
+            syncSnapshot: false, // Subscribes to the spawned actor and send back snapshot events
           });
         }
       }),
@@ -108,17 +106,7 @@ export const SignInRouterMachine = setup({
     'ROUTE.UNREGISTER': {
       actions: stopChild(({ event }) => event.id),
     },
-    'ROUTE.CLEAR': {
-      actions: enqueueActions(({ enqueue, self }) => {
-        Object.keys(self.getSnapshot().children).forEach(id => {
-          enqueue.stopChild(id);
-        });
-      }),
-    },
   },
-  // onDone: {
-  //   actions: 'clearSpawnedRoutes',
-  // },
   states: {
     Init: {
       always: [
@@ -171,13 +159,13 @@ export const SignInRouterMachine = setup({
           },
           {
             guard: 'statusNeedsFirstFactor',
-            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            // actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'FirstFactor',
             reenter: true,
           },
           {
             guard: 'statusNeedsSecondFactor',
-            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            // actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
             reenter: true,
           },
@@ -194,7 +182,7 @@ export const SignInRouterMachine = setup({
           },
           {
             guard: 'statusNeedsSecondFactor',
-            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            // actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
             reenter: true,
           },

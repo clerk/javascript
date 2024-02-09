@@ -1,3 +1,4 @@
+import { Poller } from '@clerk/shared';
 import type {
   AttemptVerificationParams,
   Attribute,
@@ -5,15 +6,13 @@ import type {
   SignUpResource,
   SignUpVerifiableField,
   SignUpVerificationsResource,
-  VerificationStatus,
   VerificationStrategy,
 } from '@clerk/types';
 import type { Writable } from 'type-fest';
-import { and, enqueueActions, fromPromise, log, raise, sendTo, setup } from 'xstate';
+import { and, assign, enqueueActions, fromCallback, fromPromise, raise, sendParent, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
-import { ClerkElementsError } from '~/internals/errors/error';
-import { startSignUpEmailLinkFlow } from '~/internals/machines/sign-up/sign-up.actors'; // TODO: Move source actors
+import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors/error';
 import type {
   SignUpVerificationContext,
   SignUpVerificationEvents,
@@ -25,6 +24,9 @@ import type { WithClerk, WithParams } from '../../shared.types';
 
 export type SignUpVerificationsResourceKey = keyof SignUpVerificationsResource;
 export type TSignUpVerificationMachine = typeof SignUpVerificationMachine;
+
+export type StartSignUpEmailLinkFlowEvents = { type: 'STOP' };
+export type StartSignUpEmailLinkFlowInput = WithClerk;
 
 export const SignUpVerificationMachineId = 'SignUpVerification';
 
@@ -51,26 +53,70 @@ const shouldVerify = (field: SignUpVerifiableField, strategy?: VerificationStrat
   return and(guards);
 };
 
-export type PrepareVerificationInput = WithClerk<
-  WithParams<PrepareVerificationParams> & { skipIfVerified: keyof SignUpVerificationsResource }
->;
+export type PrepareVerificationInput = WithClerk<WithParams<PrepareVerificationParams>>;
 export type AttemptVerificationInput = WithClerk<WithParams<AttemptVerificationParams>>;
 
 export const SignUpVerificationMachine = setup({
   actors: {
-    prepare: fromPromise<SignUpResource, PrepareVerificationInput>(
-      ({ input: { clerk, params, skipIfVerified: skipKey } }) => {
-        console.log('Preparing', skipKey);
-        if (!clerk.client.signUp.status || clerk.client.signUp.verifications[skipKey].status === 'verified') {
-          return Promise.resolve(clerk.client.signUp);
-        }
-        return clerk.client.signUp.prepareVerification(params);
-      },
+    prepare: fromPromise<SignUpResource, PrepareVerificationInput>(({ input: { clerk, params } }) =>
+      clerk.client.signUp.prepareVerification(params),
     ),
     attempt: fromPromise<SignUpResource, AttemptVerificationInput>(({ input: { clerk, params } }) =>
       clerk.client.signUp.attemptVerification(params),
     ),
-    startSignUpEmailLinkFlow,
+    attemptEmailLinkVerification: fromCallback<StartSignUpEmailLinkFlowEvents, StartSignUpEmailLinkFlowInput>(
+      ({ receive, sendBack, input: { clerk } }) => {
+        const { run, stop } = Poller();
+
+        void run(async () =>
+          clerk.client.signUp
+            .reload()
+            .then(resource => {
+              const signInStatus = resource.status;
+              const verificationStatus = resource.verifications.emailAddress.status;
+
+              // Short-circuit if the sign-up resource is already complete
+              if (signInStatus === 'complete') {
+                return sendBack({ type: `EMAIL_LINK.VERIFIED`, resource });
+              }
+
+              switch (verificationStatus) {
+                case 'verified':
+                case 'transferable':
+                case 'expired': {
+                  sendBack({ type: `EMAIL_LINK.${verificationStatus.toUpperCase()}`, resource });
+                  break;
+                }
+                case 'failed': {
+                  sendBack({
+                    type: `EMAIL_LINK.FAILED`,
+                    error: new ClerkElementsError('email-link-verification-failed', 'Email verification failed'),
+                    resource,
+                  });
+                  break;
+                }
+                case 'unverified':
+                default:
+                  return;
+              }
+
+              stop();
+            })
+            .catch(error => {
+              stop();
+              new ClerkElementsRuntimeError(error);
+            }),
+        );
+
+        receive(event => {
+          if (event.type === 'STOP') {
+            stop();
+          }
+        });
+
+        return () => stop();
+      },
+    ),
   },
   actions: {
     setFormErrors: sendTo(
@@ -85,12 +131,16 @@ export const SignUpVerificationMachine = setup({
     ),
   },
   guards: {
-    hasVerificationStatus: (
-      { context },
-      params: { strategy: SignUpVerificationsResourceKey; status: VerificationStatus },
-    ) => context.clerk.client.signUp.verifications[params.strategy].status === params.status,
-    isFieldUnverified: ({ context }, { field }: { field: SignUpVerifiableField }) =>
-      context.clerk.client.signUp.unverifiedFields.includes(field),
+    isComplete: ({ context }) => context.resource.status === 'complete',
+    isFieldUnverified: ({ context, event }, { field }: { field: SignUpVerifiableField }) => {
+      let resource = context.resource;
+
+      if (event?.type === 'NEXT' && event.resource) {
+        resource = event.resource;
+      }
+
+      return resource.unverifiedFields.includes(field);
+    },
     isStrategyEnabled: (
       { context },
       { attribute, strategy }: { attribute: Attribute; strategy: VerificationStrategy },
@@ -109,33 +159,34 @@ export const SignUpVerificationMachine = setup({
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
     clerk: input.clerk,
+    resource: input.clerk.client.signUp,
     formRef: input.form,
     routerRef: input.router,
   }),
   on: {
     NEXT: [
       {
+        guard: 'isComplete',
+        actions: sendParent(({ event }) => ({ type: 'NEXT', resource: event.resource })),
+      },
+      {
         description: 'Validate via phone number',
-        actions: log('NEXT 1'),
         guard: 'shouldVerifyPhoneCode',
         target: '.PhoneCode',
       },
       {
         description: 'Validate via email link',
-        actions: log('NEXT 2'),
         guard: 'shouldVerifyEmailLink',
         target: '.EmailLink',
       },
       {
         description: 'Verify via email code',
-        actions: log('NEXT 3'),
         guard: 'shouldVerifyEmailCode',
         target: '.EmailCode',
       },
-      // {
-      //   guard: and([not('shouldVerifyPhoneCode'), not('shouldVerifyEmailLink'), not('shouldVerifyEmailCode')]),
-      //   actions: sendParent({ type: 'NEXT' }),
-      // },
+      {
+        actions: sendParent(({ event }) => ({ type: 'NEXT', resource: event.resource })),
+      },
     ],
   },
   states: {
@@ -143,25 +194,22 @@ export const SignUpVerificationMachine = setup({
       always: [
         {
           description: 'Validate via phone number',
-          actions: log('ALWAYS 1'),
           guard: 'shouldVerifyPhoneCode',
           target: 'PhoneCode',
         },
         {
           description: 'Validate via email link',
-          actions: log('ALWAYS 2'),
           guard: 'shouldVerifyEmailLink',
           target: 'EmailLink',
         },
         {
           description: 'Verify via email code',
-          actions: log('ALWAYS 3'),
           guard: 'shouldVerifyEmailCode',
           target: 'EmailCode',
         },
-        // {
-        //   actions: sendParent({ type: 'NEXT' }),
-        // },
+        {
+          actions: sendParent(({ context }) => ({ type: 'NEXT', resource: context.resource })),
+        },
       ],
     },
     EmailLink: {
@@ -169,20 +217,22 @@ export const SignUpVerificationMachine = setup({
       initial: 'Preparing',
       on: {
         'EMAIL_LINK.RESTART': {
-          actions: sendTo('signUpEmailLinkFlow', { type: 'STOP' }),
           target: '.Attempting',
           reenter: true,
         },
+        'EMAIL_LINK.FAILED': {
+          actions: [
+            { type: 'setFormErrors', params: ({ event }) => ({ error: event.error }) },
+            assign({ resource: ({ event }) => event.resource }),
+          ],
+          target: '.Pending',
+        },
         'EMAIL_LINK.*': {
-          actions: enqueueActions(({ context, enqueue, event }) => {
-            console.debug('EMAIL_LINK.*', event);
+          actions: enqueueActions(({ enqueue, event }) => {
+            if (event.type === 'EMAIL_LINK.RESTART') return;
 
-            if (event.type === 'EMAIL_LINK.FAILURE') {
-              enqueue.sendTo(context.formRef, { type: 'ERRORS.SET', error: event.error });
-              enqueue.raise({ type: 'NEXT' });
-            } else if (event.type !== 'EMAIL_LINK.RESTART') {
-              enqueue.raise({ type: 'NEXT', resource: event.resource });
-            }
+            enqueue.assign({ resource: event.resource });
+            enqueue.raise({ type: 'NEXT', resource: event.resource });
           }),
         },
       },
@@ -198,16 +248,32 @@ export const SignUpVerificationMachine = setup({
                 strategy: 'email_link',
                 redirectUrl: context.clerk.buildAfterSignUpUrl(),
               },
-              skipIfVerified: 'emailAddress',
             }),
-            onDone: 'Attempting',
+            onDone: {
+              target: 'Attempting',
+              actions: assign({ resource: ({ event }) => event.output }),
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
+        Pending: {
+          description: 'Placeholder for allowing resending of email link',
+          tags: ['state:pending'],
+          on: {
+            NEXT: {
+              target: 'Preparing',
+              reenter: true,
+            },
           },
         },
         Attempting: {
           tags: ['state:attempting'],
           invoke: {
-            id: 'signUpEmailLinkVerificationFlow',
-            src: 'startSignUpEmailLinkFlow',
+            id: 'attemptEmailLinkVerification',
+            src: 'attemptEmailLinkVerification',
             input: ({ context }) => ({
               clerk: context.clerk,
             }),
@@ -216,9 +282,10 @@ export const SignUpVerificationMachine = setup({
             // TODO: Use named delays
             300_000: {
               description: 'Timeout after 5 minutes',
-              actions: raise({
-                type: 'EMAIL_LINK.FAILURE',
-                error: new ClerkElementsError('verify-email-link-timeout', 'Timeout'),
+              target: 'Pending',
+              actions: sendTo(({ context }) => context.formRef, {
+                type: 'ERRORS.SET',
+                error: new ClerkElementsError('verify-email-link-timeout', 'Email link verification timed out'),
               }),
             },
           },
@@ -239,9 +306,19 @@ export const SignUpVerificationMachine = setup({
               params: {
                 strategy: 'email_code',
               },
-              skipIfVerified: 'emailAddress',
             }),
-            onDone: 'Pending',
+            onDone: [
+              {
+                guard: 'shouldVerifyEmailCode',
+                target: 'Pending',
+              },
+              {
+                actions: [
+                  assign({ resource: ({ event }) => event.output }),
+                  raise(({ event }) => ({ type: 'NEXT', resource: event.output })),
+                ],
+              },
+            ],
           },
         },
         Pending: {
@@ -265,6 +342,9 @@ export const SignUpVerificationMachine = setup({
                 code: (context.formRef.getSnapshot().context.fields.get('code')?.value as string) || '',
               },
             }),
+            onDone: {
+              actions: raise(({ event }) => ({ type: 'NEXT', resource: event.output })),
+            },
             onError: {
               actions: 'setFormErrors',
               target: 'Pending',
@@ -275,11 +355,10 @@ export const SignUpVerificationMachine = setup({
     },
     PhoneCode: {
       tags: ['verification:method:phone', 'verification:category:code', 'verification:phone_code'],
-      initial: 'Pending',
+      initial: 'Preparing',
       states: {
         Preparing: {
           tags: ['state:preparing', 'state:loading'],
-          entry: log('PhoneCode:Preparing'),
           invoke: {
             id: 'preparePhoneCodeVerification',
             src: 'prepare',
@@ -288,9 +367,20 @@ export const SignUpVerificationMachine = setup({
               params: {
                 strategy: 'phone_code',
               },
-              skipIfVerified: 'phoneNumber',
             }),
-            onDone: 'Pending',
+            onDone: [
+              {
+                guard: 'shouldVerifyPhoneCode',
+                target: 'Pending',
+                actions: assign({ resource: ({ event }) => event.output }),
+              },
+              {
+                actions: [
+                  assign({ resource: ({ event }) => event.output }),
+                  raise(({ event }) => ({ type: 'NEXT', resource: event.output })),
+                ],
+              },
+            ],
             onError: {
               actions: 'setFormErrors',
               target: 'Pending',
@@ -299,7 +389,6 @@ export const SignUpVerificationMachine = setup({
         },
         Pending: {
           tags: ['state:pending'],
-          entry: log('PhoneCode:Pending'),
           on: {
             SUBMIT: {
               target: 'Attempting',
@@ -320,7 +409,7 @@ export const SignUpVerificationMachine = setup({
               },
             }),
             onDone: {
-              actions: raise({ type: 'NEXT' }),
+              actions: raise(({ event }) => ({ type: 'NEXT', resource: event.output })),
             },
             onError: {
               actions: 'setFormErrors',

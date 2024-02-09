@@ -5,7 +5,7 @@ import type { PropsWithChildren } from 'react';
 import type { TSignInStartMachine } from '~/internals/machines/sign-in/machines';
 import { SignInStartMachine } from '~/internals/machines/sign-in/machines';
 import { Form } from '~/react/common/form';
-import { useActiveTags, useBrowserInspector } from '~/react/hooks';
+import { useActiveTags } from '~/react/hooks';
 import { SignInRouterCtx, useSignInRouteRegistration } from '~/react/sign-in/context';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
@@ -16,9 +16,8 @@ export const SignInStartCtx = createContextFromActorRef<TSignInStartMachine>('Si
 export function SignInStart(props: SignInStartProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'route:start');
-  const { loading } = useBrowserInspector();
 
-  return activeState && !loading ? <SignInStartInner {...props} /> : null;
+  return activeState ? <SignInStartInner {...props} /> : null;
 }
 
 function SignInStartInner(props: SignInStartProps) {

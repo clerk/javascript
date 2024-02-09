@@ -70,7 +70,6 @@ export const FormMachine = setup({
           const globalErrors: ClerkElementsError[] = [];
 
           for (const error of event.error.errors || [event.error]) {
-            // TODO: Why are we sending in snake and receiving camel?
             const name = snakeToCamel(error.meta?.paramName);
 
             if (!name) {

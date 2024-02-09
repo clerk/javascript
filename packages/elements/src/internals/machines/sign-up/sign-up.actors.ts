@@ -54,20 +54,10 @@ export type PrepareVerificationInput = WithClient<
 
 export const prepareVerification = fromPromise<SignUpResource, PrepareVerificationInput>(
   ({ input: { client, params, skipIfVerified: skipKey } }) => {
-    console.log(
-      'clerk.client.signUp.prepareVerification',
-      1,
-      skipKey,
-      client.signUp.verifications,
-      client.signUp.verifications[skipKey],
-      client.signUp.verifications[skipKey].status,
-    );
     if (!client.signUp.status || client.signUp.verifications[skipKey].status === 'verified') {
-      console.log('clerk.client.signUp.prepareVerification', 2);
       return Promise.resolve(client.signUp);
     }
 
-    console.log('clerk.client.signUp.prepareVerification', 3);
     return client.signUp.prepareVerification(params);
   },
 );

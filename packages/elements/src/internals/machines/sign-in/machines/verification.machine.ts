@@ -13,9 +13,9 @@ import type {
   SignInStrategy,
   Web3Attempt,
 } from '@clerk/types';
-import { assign, fromPromise, log, sendParent, sendTo, setup } from 'xstate';
+import { assign, fromPromise, sendParent, sendTo, setup } from 'xstate';
 
-import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors/error';
 import type { FormFields } from '~/internals/machines/form/form.types';
 import type { WithClient, WithParams } from '~/internals/machines/shared.types';
 import type { SignInVerificationSchema } from '~/internals/machines/sign-in/types';
@@ -77,7 +77,6 @@ const SignInVerificationMachine = setup({
   states: {
     Preparing: {
       tags: ['state:preparing', 'state:loading'],
-      entry: log(({ context }) => context.currentFactor),
       invoke: {
         id: 'prepare',
         src: 'prepare',
@@ -130,6 +129,7 @@ const SignInVerificationMachine = setup({
 export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(async ({ input }) => {
+      console.log('input', input);
       const { client, params, strategy } = input as PrepareFirstFactorInput;
 
       if (strategy === 'password') {
@@ -137,7 +137,11 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       }
 
       if (!params) {
-        throw new ClerkElementsRuntimeError('prepareFirstFactor parameters were undefined');
+        // enUS.signIn.noAvailableMethods
+        throw new ClerkElementsError(
+          'noAvailableMethods',
+          "Cannot proceed with sign in. There's no available authentication factor.",
+        );
       }
 
       return client.signIn.prepareFirstFactor(params);
@@ -209,7 +213,6 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   actions: {
     determineStartingFactor: assign({
       currentFactor: ({ context }) => {
-        console.log('determineStartingFactor', context.clerk.client.signIn.supportedFirstFactors);
         return determineStartingSignInFactor(
           context.clerk.client.signIn.supportedFirstFactors,
           context.clerk.client.signIn.identifier,

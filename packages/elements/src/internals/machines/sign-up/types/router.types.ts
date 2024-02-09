@@ -7,7 +7,6 @@ import type {
   BaseRouterInput,
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
-  BaseRouterRouteClearEvent,
   BaseRouterRouteRegisterEvent,
   BaseRouterRouteUnregisterEvent,
   BaseRouterTransferEvent,
@@ -48,12 +47,8 @@ export type SignUpRouterRouteRegisterEvent<TLogic extends AnyActorLogic = AnyAct
   TLogic
 >;
 export type SignUpRouterRouteUnregisterEvent = BaseRouterRouteUnregisterEvent<SignUpRouterSystemId>;
-export type SignUpRouterRouteClearEvent = BaseRouterRouteClearEvent;
 
-export type SignUpRouterRouteEvents =
-  | SignUpRouterRouteRegisterEvent
-  | SignUpRouterRouteUnregisterEvent
-  | SignUpRouterRouteClearEvent;
+export type SignUpRouterRouteEvents = SignUpRouterRouteRegisterEvent | SignUpRouterRouteUnregisterEvent;
 
 export type SignUpRouterEvents =
   | SignUpRouterNextEvent
