@@ -1,5 +1,5 @@
 import type { ProfileSectionId } from '@clerk/types';
-import { isValidElement, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, isValidElement, useLayoutEffect, useRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
@@ -168,7 +168,7 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
   );
 };
 
-const ProfileSectionArrowButton = (props: ProfileSectionButtonProps) => {
+const ProfileSectionArrowButton = forwardRef<HTMLButtonElement, ProfileSectionButtonProps>((props, ref) => {
   const { children, leftIcon = Plus, id, sx, localizationKey, ...rest } = props;
   return (
     <ArrowBlockButton
@@ -186,12 +186,13 @@ const ProfileSectionArrowButton = (props: ProfileSectionButtonProps) => {
       textLocalizationKey={localizationKey}
       leftIcon={leftIcon}
       leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
+      ref={ref}
       {...rest}
     >
       {children}
     </ArrowBlockButton>
   );
-};
+});
 
 export type ProfileSectionActionMenuItemProps = PropsOfComponent<typeof MenuItem> & {
   destructive?: boolean;
