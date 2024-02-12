@@ -8,22 +8,16 @@ import { SwitchArrowRight } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 
-export const PreviewListItems = (
-  props: PropsWithChildren<{
-    sx?: ThemableCssProp;
-  }>,
-) => {
+export const PreviewListItems = (props: PropsWithChildren) => {
   return (
     <Col
       elementDescriptor={descriptors.organizationListPreviewItems}
-      sx={[
-        t => ({
-          maxHeight: `calc(8 * ${t.sizes.$12})`,
-          overflowY: 'auto',
-          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
-          ...common.unstyledScrollbar(t),
-        }),
-      ]}
+      sx={t => ({
+        maxHeight: `calc(8 * ${t.sizes.$12})`,
+        overflowY: 'auto',
+        borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+        ...common.unstyledScrollbar(t),
+      })}
     >
       {props.children}
     </Col>

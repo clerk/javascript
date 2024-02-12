@@ -2,12 +2,11 @@ import type { CardActionId } from '@clerk/types';
 import React from 'react';
 
 import { descriptors, Flex, Text } from '../../customizables';
-import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { RouterLink } from '../RouterLink';
 
 type CardActionProps = Omit<PropsOfComponent<typeof Flex>, 'elementId'> & {
   elementId?: CardActionId;
-  sx?: ThemableCssProp;
 };
 export const CardAction = (props: CardActionProps): JSX.Element => {
   const { elementId, sx, ...rest } = props;

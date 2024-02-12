@@ -1,7 +1,6 @@
 import type { ActiveSessionResource } from '@clerk/types';
 
 import type { ElementDescriptor, ElementId } from '../../../ui/customizables/elementDescriptors';
-import type { ThemableCssProp } from '../../../ui/styledSystem';
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { Action, Actions, PreviewButton, SmallAction, SmallActions, UserPreview } from '../../elements';
@@ -162,7 +161,6 @@ type SignOutAllActionsProps = {
   iconElementDescriptor?: ElementDescriptor;
   iconElementId?: ElementId;
   label?: LocalizationKey;
-  sx?: ThemableCssProp;
 };
 
 export const SignOutAllActions = (props: SignOutAllActionsProps) => {
@@ -196,14 +194,12 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
         onClick={handleSignOutAllClicked}
         variant='ghost'
         colorScheme='neutral'
-        sx={[
-          t => ({
-            backgroundColor: t.colors.$transparent,
-            padding: `${t.space.$2} ${t.space.$3}`,
-            borderBottom: 'none',
-            borderRadius: t.radii.$lg,
-          }),
-        ]}
+        sx={t => ({
+          backgroundColor: t.colors.$transparent,
+          padding: `${t.space.$2} ${t.space.$3}`,
+          borderBottom: 'none',
+          borderRadius: t.radii.$lg,
+        })}
         spinnerSize='md'
       />
     </Actions>
