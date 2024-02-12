@@ -170,8 +170,8 @@ export const useOrganizationList: UseOrganizationList = params => {
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,
       enabled: !!userMembershipsParams,
-      __unstable__dependencyRevalidation: userMembershipsSafeValues.__unstable__dependencyRevalidation,
-      __unstable__defaultRevalidateOnEvents: userMembershipsSafeValues.__unstable__defaultRevalidateOnEvents,
+      __unstable__dependencyRevalidation: (userMembershipsSafeValues as any).__unstable__dependencyRevalidation,
+      __unstable__defaultRevalidateOnEvents: (userMembershipsSafeValues as any).__unstable__defaultRevalidateOnEvents,
     },
     {
       type: 'userMemberships',
@@ -191,8 +191,8 @@ export const useOrganizationList: UseOrganizationList = params => {
       keepPreviousData: userInvitationsSafeValues.keepPreviousData,
       infinite: userInvitationsSafeValues.infinite,
       enabled: !!userInvitationsParams,
-      __unstable__dependencyRevalidation: userInvitationsSafeValues.__unstable__dependencyRevalidation,
-      __unstable__defaultRevalidateOnEvents: userInvitationsSafeValues.__unstable__defaultRevalidateOnEvents,
+      __unstable__dependencyRevalidation: (userInvitationsSafeValues as any).__unstable__dependencyRevalidation,
+      __unstable__defaultRevalidateOnEvents: (userInvitationsSafeValues as any).__unstable__defaultRevalidateOnEvents,
     },
     {
       type: 'userInvitations',
@@ -212,8 +212,8 @@ export const useOrganizationList: UseOrganizationList = params => {
       keepPreviousData: userSuggestionsSafeValues.keepPreviousData,
       infinite: userSuggestionsSafeValues.infinite,
       enabled: !!userSuggestionsParams,
-      __unstable__dependencyRevalidation: userSuggestionsSafeValues.__unstable__dependencyRevalidation,
-      __unstable__defaultRevalidateOnEvents: userSuggestionsSafeValues.__unstable__defaultRevalidateOnEvents,
+      __unstable__dependencyRevalidation: (userSuggestionsSafeValues as any).__unstable__dependencyRevalidation,
+      __unstable__defaultRevalidateOnEvents: (userSuggestionsSafeValues as any).__unstable__defaultRevalidateOnEvents,
     },
     {
       type: 'userSuggestions',

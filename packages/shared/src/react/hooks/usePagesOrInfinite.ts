@@ -28,6 +28,9 @@ type PagesOrInfiniteOptions = {
    * Maximum number of items returned per request. The initial value persists between re-renders
    */
   pageSize?: number;
+
+  __unstable__dependencyRevalidation?: boolean;
+  __unstable__defaultRevalidateOnEvents?: string[];
 };
 
 export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | true | undefined, defaultValues: T) => {
