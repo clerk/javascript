@@ -27,7 +27,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           zIndex: t.zIndices.$card,
           border: `${t.borders.$normal} ${t.colors.$neutralAlpha50}`,
           boxShadow: t.shadows.$cardContentShadow,
-          borderRadius: t.radii.$lg,
+          borderRadius: t.radii.$xl,
           position: 'relative',
           padding: `${t.space.$8} ${t.space.$10}`,
           justifyContent: 'center',

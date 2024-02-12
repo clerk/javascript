@@ -48,6 +48,8 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
             colors.setAlpha(t.colors.$colorBackground, 1),
             t.colors.$neutralAlpha50,
           ),
+          borderBottomLeftRadius: t.radii.$xl,
+          borderBottomRightRadius: t.radii.$xl,
         }),
         isProfileFooter ? profileCardFooterStyles : footerStyles,
         sx,
