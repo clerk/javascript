@@ -83,7 +83,7 @@ const _SignInAccountSwitcher = () => {
         <Card.Footer
           sx={t => ({
             '>:first-of-type': {
-              padding: `${t.space.$2}`,
+              padding: `${t.space.$1}`,
               width: '100%',
             },
           })}
@@ -91,6 +91,10 @@ const _SignInAccountSwitcher = () => {
           <Card.Action
             sx={{
               width: '100%',
+              '>:first-of-type': {
+                width: '100%',
+                borderBottom: 'none',
+              },
             }}
           >
             <SignOutAllActions

@@ -175,13 +175,13 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
     iconElementDescriptor,
     iconElementId,
     label,
-    sx,
   } = props;
   return (
     <Actions
       role='menu'
       sx={t => ({
         padding: t.space.$2,
+        borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
       })}
     >
       <Action
@@ -202,9 +202,7 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
             padding: `${t.space.$2} ${t.space.$3}`,
             borderBottom: 'none',
             borderRadius: t.radii.$lg,
-            borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
           }),
-          sx,
         ]}
         spinnerSize='md'
       />
