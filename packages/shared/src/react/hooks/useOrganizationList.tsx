@@ -10,7 +10,6 @@ import type {
   SetActive,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
-import { useEffect } from 'react';
 
 import { deprecatedObjectProperty } from '../../deprecated';
 import { useClerkInstanceContext, useUserContext } from '../contexts';
@@ -93,6 +92,11 @@ type UseOrganizationList = <T extends UseOrganizationListParams>(
       >;
     };
 
+const __unstable__revalidationParams = {
+  __unstable__dependencyRevalidation: true,
+  __unstable__defaultRevalidateOnEvents: ['organization:deleted', 'organization:created', 'user:membership_deleted'],
+};
+
 export const useOrganizationList: UseOrganizationList = params => {
   const { userMemberships, userInvitations, userSuggestions } = params || {};
 
@@ -101,6 +105,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     pageSize: 10,
     keepPreviousData: false,
     infinite: false,
+    ...__unstable__revalidationParams,
   });
 
   const userInvitationsSafeValues = useWithSafeValues(userInvitations, {
@@ -109,6 +114,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     status: 'pending',
     keepPreviousData: false,
     infinite: false,
+    ...__unstable__revalidationParams,
   });
 
   const userSuggestionsSafeValues = useWithSafeValues(userSuggestions, {
@@ -117,6 +123,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     status: 'pending',
     keepPreviousData: false,
     infinite: false,
+    ...__unstable__revalidationParams,
   });
 
   const clerk = useClerkInstanceContext();
@@ -163,6 +170,8 @@ export const useOrganizationList: UseOrganizationList = params => {
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,
       enabled: !!userMembershipsParams,
+      __unstable__dependencyRevalidation: userMembershipsSafeValues.__unstable__dependencyRevalidation,
+      __unstable__defaultRevalidateOnEvents: userMembershipsSafeValues.__unstable__defaultRevalidateOnEvents,
     },
     {
       type: 'userMemberships',
@@ -182,6 +191,8 @@ export const useOrganizationList: UseOrganizationList = params => {
       keepPreviousData: userInvitationsSafeValues.keepPreviousData,
       infinite: userInvitationsSafeValues.infinite,
       enabled: !!userInvitationsParams,
+      __unstable__dependencyRevalidation: userInvitationsSafeValues.__unstable__dependencyRevalidation,
+      __unstable__defaultRevalidateOnEvents: userInvitationsSafeValues.__unstable__defaultRevalidateOnEvents,
     },
     {
       type: 'userInvitations',
@@ -201,24 +212,14 @@ export const useOrganizationList: UseOrganizationList = params => {
       keepPreviousData: userSuggestionsSafeValues.keepPreviousData,
       infinite: userSuggestionsSafeValues.infinite,
       enabled: !!userSuggestionsParams,
+      __unstable__dependencyRevalidation: userSuggestionsSafeValues.__unstable__dependencyRevalidation,
+      __unstable__defaultRevalidateOnEvents: userSuggestionsSafeValues.__unstable__defaultRevalidateOnEvents,
     },
     {
       type: 'userSuggestions',
       userId: user?.id,
     },
   );
-
-  useEffect(() => {
-    const handler = () => {
-      console.log('Organization destroyed');
-      void memberships.revalidate?.();
-    };
-    (clerk as any).__unstable__eventBus_on('organization:destroy', handler);
-
-    return () => {
-      (clerk as any).__unstable__eventBus_off('organization:destroy', handler);
-    };
-  }, []);
 
   // TODO: Properly check for SSR user values
   if (!isClerkLoaded) {

@@ -1,7 +1,6 @@
 import { useWizard, Wizard } from '../../common';
 import {
   useCoreOrganization,
-  useCoreOrganizationList,
   useCoreUser,
   useOrganizationProfileContext,
 } from '../../contexts';
@@ -17,34 +16,25 @@ import {
 } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
-import { organizationListParams } from '../OrganizationSwitcher/utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
-const useLeaveWithRevalidations = (leavePromise: (() => Promise<any>) | undefined) => {
+const useLeaveWithNavigation = (leavePromise: (() => Promise<any>) | undefined) => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
-  const { userMemberships, userInvitations } = useCoreOrganizationList({
-    userMemberships: organizationListParams.userMemberships,
-    userInvitations: organizationListParams.userInvitations,
-  });
 
   return () =>
     card
       .runAsync(async () => {
         await leavePromise?.();
       })
-      .then(() => {
-        void userMemberships.revalidate?.();
-        void userInvitations.revalidate?.();
-        void navigateAfterLeaveOrganization();
-      });
+      .then(navigateAfterLeaveOrganization);
 };
 
 export const LeaveOrganizationPage = () => {
   const { organization } = useCoreOrganization();
   const user = useCoreUser();
 
-  const leaveOrg = useLeaveWithRevalidations(organization ? () => user.leaveOrganization(organization.id) : undefined);
+  const leaveOrg = useLeaveWithNavigation(() => user!.leaveOrganization(organization!.id));
 
   if (!organization || !user) {
     return null;
@@ -72,7 +62,7 @@ export const LeaveOrganizationPage = () => {
 export const DeleteOrganizationPage = () => {
   const { organization, membership } = useCoreOrganization();
 
-  const deleteOrg = useLeaveWithRevalidations(organization?.destroy);
+  const deleteOrg = useLeaveWithNavigation(organization?.destroy);
 
   if (!organization || !membership) {
     return null;
