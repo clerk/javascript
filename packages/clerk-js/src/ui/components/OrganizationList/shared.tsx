@@ -45,10 +45,11 @@ export const PreviewListItem = (
       align='center'
       gap={2}
       sx={[
-        {
+        t => ({
           minHeight: 'unset',
           justifyContent: 'space-between',
-        },
+          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+        }),
         sharedStyles,
       ]}
       elementDescriptor={descriptors.organizationListPreviewItem}
