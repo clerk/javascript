@@ -306,6 +306,7 @@ type _LocalizationResource = {
         primaryButton: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
         actionLabel__reauthorize: LocalizationValue;
+        subtitle__reauthorize: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
       };
       enterpriseAccountsSection: {

@@ -34,6 +34,7 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
             },
           })}
           variant='ghost'
+          colorScheme='neutral'
         >
           <Icon
             icon={ThreeDots}
