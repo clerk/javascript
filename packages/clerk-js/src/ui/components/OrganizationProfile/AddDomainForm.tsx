@@ -46,6 +46,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
       .createDomain(nameField.value)
       .then(async res => {
         setDomainId(res.id);
+        // TODO: AUTO-REVALIDATIONS
         domains?.revalidate?.();
         if (res.verification && res.verification.status === 'verified') {
           setVerified(true);
@@ -82,6 +83,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
       <VerifyDomainForm
         domainId={domainId}
         onSuccess={() => {
+          // TODO: AUTO-REVALIDATIONS
           domains?.revalidate?.();
           onSuccess?.();
         }}

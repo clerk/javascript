@@ -145,6 +145,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
         deletePending: deletePending.checked,
       });
 
+      // TODO: AUTO-REVALIDATIONS
       await domains.revalidate();
 
       onSuccess();

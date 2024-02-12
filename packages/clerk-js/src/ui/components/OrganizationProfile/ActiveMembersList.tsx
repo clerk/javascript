@@ -32,6 +32,7 @@ export const ActiveMembersList = () => {
     return card
       .runAsync(async () => {
         const destroyedMembership = await membership.destroy();
+        // TODO: AUTO-REVALIDATIONS
         await memberships?.revalidate?.();
         return destroyedMembership;
       })

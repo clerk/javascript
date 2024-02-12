@@ -28,6 +28,7 @@ export const InvitedMembersList = () => {
     return card
       .runAsync(async () => {
         await invitation.revoke();
+        // TODO: AUTO-REVALIDATIONS
         await invitations?.revalidate?.();
         return invitation;
       })

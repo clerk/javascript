@@ -66,6 +66,7 @@ export const RemoveDomainForm = (props: RemoveDomainFormProps) => {
       messageLine2={localizationKeys('organizationProfile.removeDomainPage.messageLine2')}
       deleteResource={() =>
         domain?.delete().then(async () => {
+          // TODO: AUTO-REVALIDATIONS
           await domains?.revalidate?.();
           onSuccess();
         })

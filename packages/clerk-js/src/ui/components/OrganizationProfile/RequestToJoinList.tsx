@@ -59,6 +59,7 @@ const RequestRow = withCardStateProvider(
       return card
         .runAsync(async () => {
           await request.accept();
+          // TODO: AUTO-REVALIDATIONS
           await membershipRequests.revalidate();
         }, 'accept')
         .catch(err => handleError(err, [], onError));
