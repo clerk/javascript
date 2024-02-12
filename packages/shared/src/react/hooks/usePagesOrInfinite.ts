@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useSWR, useSWRInfinite } from '../clerk-swr';
+import { useClerkInstanceContext } from '../contexts';
 import type {
   CacheSetter,
   PagesOrInfiniteConfig,
@@ -85,6 +86,8 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   const enabled = config.enabled ?? true;
   const triggerInfinite = config.infinite ?? false;
   const keepPreviousData = config.keepPreviousData ?? false;
+  const __unstable__dependencyRevalidation = config.__unstable__dependencyRevalidation ?? true;
+  const __unstable__defaultRevalidateOnEvents = config.__unstable__defaultRevalidateOnEvents || [];
 
   const pagesCacheKey = {
     ...cacheKeys,
@@ -204,6 +207,30 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
         });
 
   const revalidate = triggerInfinite ? () => swrInfiniteMutate() : () => swrMutate();
+
+  const clerk = useClerkInstanceContext();
+
+  useEffect(() => {
+    if (!(!!fetcher && enabled && __unstable__dependencyRevalidation)) {
+      return;
+    }
+
+    const on = (clerk as any).__unstable__eventBus_on.bind(clerk);
+    const off = (clerk as any).__unstable__eventBus_off.bind(clerk);
+    const handler = () => {
+      // When multiple handlers call `revalidate` the request will fire only once.
+      void revalidate();
+    };
+
+    __unstable__defaultRevalidateOnEvents.map(event => {
+      on(event, handler);
+    });
+    return () => {
+      __unstable__defaultRevalidateOnEvents.map(event => {
+        off(event, handler);
+      });
+    };
+  }, [!!fetcher, enabled, __unstable__dependencyRevalidation]);
 
   return {
     data,

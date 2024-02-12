@@ -1,4 +1,4 @@
-import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useOrganization, useUser } from '@clerk/shared/react';
 
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
@@ -14,35 +14,26 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { organizationListParams } from '../OrganizationSwitcher/utils';
 
 type LeaveOrganizationFormProps = FormProps;
 
-const useLeaveWithRevalidations = (leavePromise: (() => Promise<any>) | undefined) => {
+const useLeaveWithNavigation = (leavePromise: (() => Promise<any>) | undefined) => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
-  const { userMemberships, userInvitations } = useOrganizationList({
-    userMemberships: organizationListParams.userMemberships,
-    userInvitations: organizationListParams.userInvitations,
-  });
 
   return () =>
     card
       .runAsync(async () => {
         await leavePromise?.();
       })
-      .then(() => {
-        void userMemberships.revalidate?.();
-        void userInvitations.revalidate?.();
-        void navigateAfterLeaveOrganization();
-      });
+      .then(navigateAfterLeaveOrganization);
 };
 
 export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
   const { organization } = useOrganization();
   const { user } = useUser();
 
-  const leaveOrg = useLeaveWithRevalidations(() => user!.leaveOrganization(organization!.id));
+  const leaveOrg = useLeaveWithNavigation(() => user!.leaveOrganization(organization!.id));
 
   if (!organization || !user) {
     return null;
@@ -72,7 +63,7 @@ type DeleteOrganizationFormProps = FormProps;
 export const DeleteOrganizationForm = (props: DeleteOrganizationFormProps) => {
   const { organization, membership } = useOrganization();
 
-  const deleteOrg = useLeaveWithRevalidations(organization?.destroy);
+  const deleteOrg = useLeaveWithNavigation(organization?.destroy);
 
   if (!organization || !membership) {
     return null;

@@ -44,6 +44,9 @@ export type PaginatedHookConfig<T> = T & {
    * Return the previous key's data until the new data has been loaded
    */
   keepPreviousData?: boolean;
+
+  __unstable__dependencyRevalidation?: boolean;
+  __unstable__defaultRevalidateOnEvents?: string[];
 };
 
 export type PagesOrInfiniteConfig = PaginatedHookConfig<{

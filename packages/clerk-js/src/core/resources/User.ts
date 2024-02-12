@@ -32,6 +32,7 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
+import { eventBus } from '../events';
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,
@@ -270,6 +271,7 @@ export class User extends BaseResource implements UserResource {
       })
     )?.response as unknown as DeletedObjectJSON;
 
+    eventBus.dispatch('user:membership_deleted', null);
     return new DeletedObject(json);
   };
 

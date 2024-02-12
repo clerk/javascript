@@ -63,6 +63,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       })
     )?.response as unknown as OrganizationJSON;
 
+    eventBus.dispatch('organization:created', null);
     return new Organization(json);
   }
 
@@ -231,7 +232,7 @@ export class Organization extends BaseResource implements OrganizationResource {
 
   destroy = async (): Promise<void> => {
     const deletedObj = await this._baseDelete();
-    eventBus.dispatch('organization:destroy', null);
+    eventBus.dispatch('organization:deleted', null);
     return deletedObj;
   };
 

@@ -551,6 +551,24 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
+  __unstable__eventBus_on(...args: any): void {
+    const callback = () => (this.clerkjs as any)?.__unstable__eventBus_on(...args);
+    if (this.clerkjs && this.#loaded && '__unstable__eventBus_on' in this.clerkjs) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('__unstable__eventBus_on' as any, callback);
+    }
+  }
+
+  __unstable__eventBus_off(...args: any): void {
+    const callback = () => (this.clerkjs as any)?.__unstable__eventBus_off(...args);
+    if (this.clerkjs && this.#loaded && '__unstable__eventBus_off' in this.clerkjs) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('__unstable__eventBus_off' as any, callback);
+    }
+  }
+
   __unstable__updateProps = (props: any): any => {
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
     if (this.clerkjs && '__unstable__updateProps' in this.clerkjs) {
