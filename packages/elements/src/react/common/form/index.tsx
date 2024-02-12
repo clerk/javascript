@@ -164,6 +164,7 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
         event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
         onChange(event);
       },
+      type: 'text',
     };
   }
 
