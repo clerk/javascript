@@ -111,7 +111,15 @@ export const polishedAppearance = {
           boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$warningAlpha300}, ${theme.shadows.$badge}`,
         },
       },
-      input: inputStyles(theme),
+      input: {
+        ...inputStyles(theme),
+        '&[type="radio"]': {
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: 'none',
+          },
+        },
+      },
       selectSearchInput: { margin: '4px' },
       phoneInputBox: (() => {
         const boxShadow = [
