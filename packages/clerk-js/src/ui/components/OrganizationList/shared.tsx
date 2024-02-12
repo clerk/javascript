@@ -15,6 +15,7 @@ export const PreviewListItems = (props: PropsWithChildren) => {
       sx={t => ({
         maxHeight: `calc(8 * ${t.sizes.$12})`,
         overflowY: 'auto',
+        borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
         ...common.unstyledScrollbar(t),
       })}
     >

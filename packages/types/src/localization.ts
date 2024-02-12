@@ -257,6 +257,8 @@ type _LocalizationResource = {
     accountSwitcher: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      action__addAccount: LocalizationValue;
+      action__signOutAll: LocalizationValue;
     };
   };
   userProfile: {
