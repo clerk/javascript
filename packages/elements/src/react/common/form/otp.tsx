@@ -4,6 +4,8 @@ import { Slot } from '@radix-ui/react-slot';
 import type { CSSProperties, ReactNode, RefObject } from 'react';
 import { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 
+export const OTP_MAXLENGTH_DEFAULT = 6;
+
 export type OTPInputProps = Exclude<
   FormControlProps,
   'type' | 'autoComplete' | 'maxLength' | 'inputMode' | 'pattern'
@@ -38,7 +40,7 @@ export const OTPInput = forwardRef<HTMLInputElement, OTPInputProps>(function OTP
  */
 const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputProps, 'render'>> & OTPInputProps>(
   function OTPInput(props, ref) {
-    const { className, render, maxLength = 6, ...rest } = props;
+    const { className, render, maxLength = OTP_MAXLENGTH_DEFAULT, ...rest } = props;
 
     const innerRef = useRef<HTMLInputElement>(null);
     const [selectionRange, setSelectionRange] = useState<[number, number]>(props.autoFocus ? [0, 0] : [-1, -1]);

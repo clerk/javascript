@@ -31,7 +31,7 @@ import {
 import type { FieldDetails } from '~/internals/machines/form/form.types';
 
 import type { OTPInputProps } from './otp';
-import { OTPInput } from './otp';
+import { OTP_MAXLENGTH_DEFAULT, OTPInput } from './otp';
 import type { FieldStates } from './types';
 
 const FieldContext = createContext<Pick<FieldDetails, 'name'> | null>(null);
@@ -152,12 +152,14 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
 
   let props = {};
   if (inputType === 'otp') {
+    const maxLength = passthroughProps?.maxLength || OTP_MAXLENGTH_DEFAULT;
+
     props = {
       'data-otp-input': true,
       autoComplete: 'one-time-code',
       inputMode: 'numeric',
-      pattern: '[0-9]*',
-      maxLength: 6,
+      pattern: `[0-9]{${maxLength}}`,
+      maxLength,
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
         // Only accept numbers
         event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
