@@ -10,7 +10,7 @@ import {
   SignOutButton,
   UserButton,
 } from '@clerk/nextjs';
-import { dark, neobrutalism, simple, shadesOfPurple } from '@clerk/themes';
+import { dark, neobrutalism, shadesOfPurple, simple } from '@clerk/themes';
 import Link from 'next/link';
 import React, { FunctionComponent, useEffect, useState } from 'react';
 
@@ -53,7 +53,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       appearance={{
         baseTheme: styleReset ? [simple, themes[selectedTheme]] : themes[selectedTheme],
         variables: {
-            colorPrimary:primaryColor,
+          colorPrimary: primaryColor,
         },
         layout: {
           helpPageUrl: '/help',
@@ -67,7 +67,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         onChangeTheme={e => setSelectedTheme(e.target.value as any)}
         onToggleDark={onToggleDark}
         onToggleSmooth={onToggleSmooth}
-        onResetStyles={() => setStyleReset((s) => !s)}
+        onResetStyles={() => setStyleReset(s => !s)}
+        styleReset={styleReset}
         smooth={selectedSmoothing}
         onPrimaryColorChange={setPrimaryColor}
       />
@@ -82,6 +83,7 @@ type AppBarProps = {
   onToggleSmooth: React.MouseEventHandler<HTMLButtonElement>;
   onResetStyles: React.MouseEventHandler<HTMLButtonElement>;
   smooth: boolean;
+  styleReset: boolean;
   onPrimaryColorChange: (primaryColor: string | undefined) => void;
 };
 
@@ -121,8 +123,16 @@ const AppBar = (props: AppBarProps) => {
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
       <button onClick={props.onToggleSmooth}>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
-      <button onClick={props.onResetStyles} style={{position:'absolute', left: '10px', bottom:'10px'}}>simple styles</button>
-      <input type='color' onChange={(e) => props.onPrimaryColorChange(e.target.value)}/>
+      <button
+        onClick={props.onResetStyles}
+        style={{ position: 'absolute', left: '10px', bottom: '10px' }}
+      >
+        simple styles: {props.styleReset ? 'On' : 'Off'}
+      </button>
+      <input
+        type='color'
+        onChange={e => props.onPrimaryColorChange(e.target.value)}
+      />
       <UserButton />
 
       <SignedIn>

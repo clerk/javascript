@@ -2,7 +2,12 @@ import type { Appearance } from '@clerk/types';
 
 import type { InternalTheme } from './foundations';
 
-const BADGE_SHADOW_LENGTH = '0px 0px 0px 1px';
+const BORDER_SHADOW_LENGTH = '0px 0px 0px 1px';
+
+const cardContentStyles = (theme: InternalTheme) => ({
+  border: 0,
+  boxShadow: `${theme.shadows.$cardContentShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha50}`,
+});
 
 export const polishedAppearance = {
   elements: ({ theme }: { theme: InternalTheme }) => {
@@ -40,17 +45,41 @@ export const polishedAppearance = {
         border: 0,
         margin: '1px',
         '&[data-color="primary"]': {
-          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
+          boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
         },
         '&[data-color="danger"]': {
-          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$dangerAlpha300}, ${theme.shadows.$badge}`,
+          boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$dangerAlpha300}, ${theme.shadows.$badge}`,
         },
         '&[data-color="success"]': {
-          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$successAlpha300}, ${theme.shadows.$badge}`,
+          boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$successAlpha300}, ${theme.shadows.$badge}`,
         },
         '&[data-color="warning"]': {
-          boxShadow: `${BADGE_SHADOW_LENGTH} ${theme.colors.$warningAlpha300}, ${theme.shadows.$badge}`,
+          boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$warningAlpha300}, ${theme.shadows.$badge}`,
         },
+      },
+      cardBox: {
+        border: 0,
+        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+      },
+      card: {
+        ...cardContentStyles(theme),
+      },
+      scrollBox: {
+        ...cardContentStyles(theme),
+      },
+      userButtonPopoverMain: {
+        ...cardContentStyles(theme),
+      },
+      organizationSwitcherPopoverMain: {
+        ...cardContentStyles(theme),
+      },
+      menuList: {
+        border: 0,
+        boxShadow: `${theme.shadows.$menuShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+      },
+      actionCard: {
+        border: 0,
+        boxShadow: `${theme.shadows.$actionCardShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
       },
     };
   },

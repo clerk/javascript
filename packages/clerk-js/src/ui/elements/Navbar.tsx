@@ -230,9 +230,9 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
             backgroundColor: colors.makeSolid(t.colors.$colorBackground),
             borderTopRightRadius: t.radii.$lg,
             borderBottomRightRadius: t.radii.$lg,
-            borderRight: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
             padding: `${t.space.$10} ${t.space.$6}`,
             animation: `${animations.navbarSlideIn} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
+            borderRight: `${t.borders.$normal} ${t.colors.$neutralAlpha150}`,
             boxShadow: t.shadows.$cardContentShadow,
           })}
         >
