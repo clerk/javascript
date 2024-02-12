@@ -127,6 +127,19 @@ export const polishedAppearance = {
           },
         },
       },
+      tagInputContainer: {
+        ...inputStyles(theme),
+        // remove the box shadow from the input inside the tag input container
+        '.cl-input': {
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: 'none',
+          },
+          '&:focus': {
+            boxShadow: 'none',
+          },
+        },
+      },
       selectSearchInput: { margin: '4px' },
       phoneInputBox: (() => {
         const boxShadow = [
