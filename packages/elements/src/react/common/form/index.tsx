@@ -78,7 +78,6 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
       [`data-${validity}`]: true,
       'data-hidden': shouldBeHidden ? true : undefined,
       serverInvalid: hasError,
-      tabIndex: shouldBeHidden ? -1 : 0,
     },
   };
 };
@@ -176,7 +175,6 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
       onChange,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
-      tabIndex: shouldBeHidden ? -1 : 0,
       ...props,
       ...passthroughProps,
     },
