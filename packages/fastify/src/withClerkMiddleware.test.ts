@@ -23,7 +23,8 @@ describe('withClerkMiddleware(options)', () => {
   });
 
   test('handles signin with Authorization Bearer', async () => {
-    authenticateRequestMock.mockResolvedValue({
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
       toAuth: () => 'mockedAuth',
     });
     const fastify = Fastify();
@@ -59,7 +60,8 @@ describe('withClerkMiddleware(options)', () => {
   });
 
   test('handles signin with cookie', async () => {
-    authenticateRequestMock.mockResolvedValue({
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
       toAuth: () => 'mockedAuth',
     });
     const fastify = Fastify();
@@ -94,37 +96,42 @@ describe('withClerkMiddleware(options)', () => {
     );
   });
 
-  // @TODO handshake
-  // test('handles handshake case by redirecting the request to fapi', async () => {
-  //   authenticateRequestMock.mockResolvedValue({
-  //     reason: 'auth-reason',
-  //     message: 'auth-message',
-  //     toAuth: () => 'mockedAuth',
-  //   });
-  //   const fastify = Fastify();
-  //   await fastify.register(clerkPlugin);
-  //
-  //   fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
-  //     const auth = getAuth(request);
-  //     reply.send({ auth });
-  //   });
-  //
-  //   const response = await fastify.inject({
-  //     method: 'GET',
-  //     path: '/',
-  //     headers: {
-  //       cookie: '_gcl_au=value1; ko_id=value2; __session=deadbeef; __client_uat=1675692233',
-  //     },
-  //   });
-  //
-  //   expect(response.statusCode).toEqual(401);
-  //   expect(response.headers['content-type']).toEqual('text/html');
-  //   expect(response.headers['x-clerk-auth-reason']).toEqual('auth-reason');
-  //   expect(response.headers['x-clerk-auth-message']).toEqual('auth-message');
-  // });
+  test('handles handshake case by redirecting the request to fapi', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      status: 'handshake',
+      reason: 'auth-reason',
+      message: 'auth-message',
+      headers: new Headers({ location: 'https://fapi.example.com/v1/clients/handshake' }),
+      toAuth: () => 'mockedAuth',
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin);
+
+    fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+      const auth = getAuth(request);
+      reply.send({ auth });
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+      headers: {
+        cookie: '_gcl_au=value1; ko_id=value2; __session=deadbeef; __client_uat=1675692233',
+      },
+    });
+
+    expect(response.statusCode).toEqual(307);
+    expect(response.headers).toMatchObject({
+      location: 'https://fapi.example.com/v1/clients/handshake',
+      'x-clerk-auth-status': 'handshake',
+      'x-clerk-auth-reason': 'auth-reason',
+      'x-clerk-auth-message': 'auth-message',
+    });
+  });
 
   test('handles signout case by populating the req.auth', async () => {
-    authenticateRequestMock.mockResolvedValue({
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
       toAuth: () => 'mockedAuth',
     });
     const fastify = Fastify();
