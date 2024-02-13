@@ -50,7 +50,7 @@ const SignInVerificationMachine = setup({
   },
   actions: {
     determineStartingFactor: () => {
-      throw new ClerkElementsRuntimeError('Action `determineStartingFactor` be overridden');
+      throw new ClerkElementsRuntimeError('Action `determineStartingFactor` must be overridden');
     },
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
