@@ -10,6 +10,7 @@ import * as path from 'node:path';
 import * as fs from 'fs';
 
 import { arSA } from '../ar-SA';
+import { bgBG } from '../bg-BG';
 import { csCZ } from '../cs-CZ';
 import { daDK } from '../da-DK';
 import { deDE } from '../de-DE';
@@ -141,3 +142,4 @@ run(ukUA, 'uk-UA');
 run(viVN, 'vi-VN');
 run(zhCN, 'zh-CN');
 run(zhTW, 'zh-TW');
+run(bgBG, 'bg-BG');
