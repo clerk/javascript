@@ -601,6 +601,11 @@ export type Layout = {
    * @default true
    */
   shimmer?: boolean;
+  /**
+   * This option enables animations
+   * @default true
+   */
+  animations?: boolean;
 };
 
 export type SignInTheme = Theme;

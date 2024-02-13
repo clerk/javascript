@@ -59,6 +59,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           helpPageUrl: '/help',
           privacyPageUrl: '/privacy',
           termsPageUrl: '/terms',
+          animations: false,
         },
       }}
       {...pageProps}

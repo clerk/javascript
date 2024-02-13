@@ -42,6 +42,7 @@ const defaultLayout: ParsedLayout = {
   privacyPageUrl: '',
   termsPageUrl: '',
   shimmer: true,
+  animations: true,
 };
 
 /**
