@@ -2,7 +2,7 @@ import type { SignUpStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, log, not, or, sendTo, setup, stopChild } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import type { ClerkElementsError } from '~/internals/errors';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type {
@@ -83,7 +83,7 @@ export const SignUpRouterMachine = setup({
     needsIdentifier: or(['statusNeedsIdentifier', isCurrentPath('/')]),
     needsContinue: and(['statusNeedsContinue', isCurrentPath('/continue')]),
     needsVerification: and(['statusNeedsVerification', isCurrentPath('/continue')]),
-    needsCallback: isCurrentPath('/sso-callback'),
+    needsCallback: isCurrentPath(SSO_CALLBACK_PATH_ROUTE),
 
     statusNeedsIdentifier: or([not('hasResource'), 'isStatusAbandoned']),
     statusNeedsContinue: or(['isMissingRequiredFields']),
@@ -225,7 +225,7 @@ export const SignUpRouterMachine = setup({
         systemId: THIRD_PARTY_MACHINE_ID,
         src: 'thirdParty',
         input: ({ context }) => ({
-          basePath: context.router?.basePath ?? '/sign-up',
+          basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
           clerk: context.clerk,
           flow: 'signUp',
         }),

@@ -2,7 +2,7 @@ import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, log, not, or, sendTo, setup, stopChild } from 'xstate';
 
-import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type {
   SignInRouterContext,
@@ -54,7 +54,7 @@ export const SignInRouterMachine = setup({
       },
     }),
     resetError: assign({ error: undefined }),
-    transfer: ({ context }) => context.router?.push(context.clerk.buildSignInUrl() + '/sso-callback'),
+    transfer: ({ context }) => context.router?.push(context.clerk.buildSignInUrl() + SSO_CALLBACK_PATH_ROUTE),
   },
   guards: {
     hasAuthenticatedViaClerkJS: ({ context }) =>
@@ -78,7 +78,7 @@ export const SignInRouterMachine = setup({
     needsStart: or([not('hasResource'), 'statusNeedsIdentifier', isCurrentPath('/')]),
     needsFirstFactor: and(['statusNeedsFirstFactor', isCurrentPath('/continue')]),
     needsSecondFactor: and(['statusNeedsSecondFactor', isCurrentPath('/continue')]),
-    needsCallback: isCurrentPath('/sso-callback'),
+    needsCallback: isCurrentPath(SSO_CALLBACK_PATH_ROUTE),
     needsNewPassword: and(['statusNeedsNewPassword', isCurrentPath('/new-password')]),
 
     statusNeedsIdentifier: needsStatus('needs_identifier'),
@@ -223,7 +223,7 @@ export const SignInRouterMachine = setup({
         systemId: THIRD_PARTY_MACHINE_ID,
         src: 'thirdParty',
         input: ({ context }) => ({
-          basePath: context.router?.basePath ?? '/sign-in',
+          basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
           clerk: context.clerk,
           flow: 'signIn',
         }),
