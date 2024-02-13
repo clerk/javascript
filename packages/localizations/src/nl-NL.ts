@@ -762,8 +762,3 @@ export const nlNL: LocalizationResource = {
     },
   },
 } as const;
-
-export const nlBE: LocalizationResource = {
-  locale: 'nl-BE',
-  ...nlNL,
-};
