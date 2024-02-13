@@ -67,8 +67,8 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/clerk-react": "5.0.0-beta-v5.17",
-    "@clerk/shared": "2.0.0-beta-v5.11",
+    "@clerk/clerk-react": "5.0.0-beta-v5.18",
+    "@clerk/shared": "2.0.0-beta-v5.12",
     "@radix-ui/react-form": "^0.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@statelyai/inspect": "^0.1.0",
@@ -76,7 +76,7 @@
     "xstate": "^5.4.1"
   },
   "devDependencies": {
-    "@clerk/types": "^4.0.0-beta-v5.13",
+    "@clerk/types": "^4.0.0-beta-v5.14",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
