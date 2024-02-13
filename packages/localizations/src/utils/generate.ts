@@ -37,6 +37,25 @@ import { viVN } from '../vi-VN';
 import { zhCN } from '../zh-CN';
 import { zhTW } from '../zh-TW';
 
+const disclaimer = `
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+ `;
+const initialText = (locale: string) => `
+
+import type { LocalizationResource } from '@clerk/types';
+
+export const ${locale}: LocalizationResource = `;
+
 function alignKeys(source: any, target: any) {
   // Add or update keys from the source to the target
   Object.keys(source).forEach(key => {
@@ -88,12 +107,14 @@ function run(langObj: any, name: string) {
 
   // convert to JSON and write to text file in typescript format
   const json = JSON.stringify(sorted, null, 2);
+  const disclaimerText = name !== 'en-US' ? disclaimer : '';
 
-  fs.writeFileSync(path.join(__dirname, `output/${name}.json`), json);
+  const finalText = disclaimerText + initialText(name.replace('-', '')) + json + ' as const;';
+
+  fs.writeFileSync(path.join(__dirname, `../${name}.ts`), finalText);
 }
 
-fs.mkdirSync(path.join(__dirname, 'output'), { recursive: true });
-
+run(enUS, 'en-US');
 run(elGR, 'el-GR');
 run(arSA, 'ar-SA');
 run(csCZ, 'cs-CZ');
