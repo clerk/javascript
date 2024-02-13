@@ -1,7 +1,7 @@
 import type { SignUpResource } from '@clerk/types';
 import { assertEvent, fromPromise, sendParent, sendTo, setup } from 'xstate';
 
-import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
 import type { WithClient } from '~/internals/machines/shared.types';
 import type { SignUpStartSchema } from '~/internals/machines/sign-up/types';
@@ -29,8 +29,8 @@ export const SignUpStartMachine = setup({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
-          redirectUrl: context.clerk.buildUrlWithAuth(`${context.basePath}/sso-callback`),
-          redirectUrlComplete: context.clerk.buildUrlWithAuth(`${context.basePath}/sso-callback`),
+          redirectUrl: context.clerk.buildUrlWithAuth(`${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`),
+          redirectUrlComplete: context.clerk.buildUrlWithAuth(`${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`),
         },
       };
     }),

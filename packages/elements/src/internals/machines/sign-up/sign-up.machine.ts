@@ -17,7 +17,7 @@ import type { Writable } from 'type-fest';
 import type { ActorRefFrom, ErrorActorEvent, MachineContext, NonReducibleUnknown } from 'xstate';
 import { and, log, not, or, sendTo, setup } from 'xstate';
 
-import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
+import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import type { ClerkElementsErrorBase } from '~/internals/errors';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormMachine } from '~/internals/machines/form/form.machine';
@@ -181,7 +181,7 @@ export const SignUpMachine = setup({
 
     isActivePathRoot: isCurrentPath('/'),
     isActivePathContinue: isCurrentPath('/continue'),
-    isActivePathCallback: isCurrentPath('/sso-callback'),
+    isActivePathCallback: isCurrentPath(SSO_CALLBACK_PATH_ROUTE),
     isFieldMissing: ({ context }, { field }: { field: SignUpField }) =>
       context.clerk.client.signUp.missingFields.includes(field),
     isFieldUnverified: ({ context }, { field }: { field: SignUpVerifiableField }) =>
@@ -206,7 +206,7 @@ export const SignUpMachine = setup({
     needsIdentifier: or([not('hasResource'), 'isActivePathRoot']),
     needsContinue: and(['isMissingRequiredFields', 'isActivePathContinue']),
     needsVerification: and(['isMissingRequiredUnverifiedFields', 'isActivePathContinue']),
-    needsCallback: isCurrentPath('/sso-callback'),
+    needsCallback: isCurrentPath(SSO_CALLBACK_PATH_ROUTE),
     shouldVerifyPhoneCode: shouldVerify('phone_number'),
     shouldVerifyEmailLink: shouldVerify('email_address', 'email_link'),
     shouldVerifyEmailCode: shouldVerify('email_address', 'email_code'),
@@ -281,7 +281,7 @@ export const SignUpMachine = setup({
           log('needsCallback'),
           sendTo(THIRD_PARTY_MACHINE_ID, ({ context }) => ({
             type: 'CALLBACK',
-            redirectUrl: `${context.router.basePath}/${SSO_CALLBACK_PATH_ROUTE}`,
+            redirectUrl: `${context.router.basePath}${SSO_CALLBACK_PATH_ROUTE}`,
           })),
         ],
         target: '.Callback',
@@ -634,7 +634,7 @@ export const SignUpMachine = setup({
           actions: {
             type: 'navigateExternal',
             params: {
-              path: '/sign-in',
+              path: SIGN_IN_DEFAULT_BASE_PATH,
             },
           },
         },
@@ -642,7 +642,7 @@ export const SignUpMachine = setup({
           actions: {
             type: 'navigateExternal',
             params: {
-              path: '/sign-up',
+              path: SIGN_UP_DEFAULT_BASE_PATH,
             },
           },
         },

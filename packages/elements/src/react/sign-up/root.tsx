@@ -4,7 +4,7 @@ import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import { useActorRef } from '@xstate/react';
 import type { PropsWithChildren } from 'react';
 
-import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 import { useConsoleInspector } from '~/react/hooks';
@@ -19,7 +19,7 @@ function SignUpFlowProvider({ children }: SignUpFlowProviderProps) {
   const inspector = useConsoleInspector();
 
   const ref = useActorRef(SignUpRouterMachine, {
-    input: { clerk, router, signInPath: '/sign-in' },
+    input: { clerk, router, signInPath: SIGN_IN_DEFAULT_BASE_PATH },
     inspect: inspector,
   });
 

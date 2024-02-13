@@ -1,7 +1,7 @@
 import type { ClientResource, SignInResource } from '@clerk/types';
 import { assertEvent, fromPromise, sendParent, sendTo, setup } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { SIGN_IN_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
 import type { SignInStartSchema } from '~/internals/machines/sign-in/types';
 import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
@@ -41,8 +41,8 @@ export const SignInStartMachine = setup({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
-          redirectUrl: context.clerk.buildUrlWithAuth(`${context.basePath}/sso-callback`),
-          redirectUrlComplete: context.clerk.buildUrlWithAuth(`${context.basePath}/sso-callback`),
+          redirectUrl: context.clerk.buildUrlWithAuth(`${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`),
+          redirectUrlComplete: context.clerk.buildUrlWithAuth(`${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`),
         },
       };
     }),
