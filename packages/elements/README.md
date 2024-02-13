@@ -71,3 +71,48 @@ npm run e2e -- --headed
 # Specific Tests: https://playwright.dev/docs/running-tests#run-specific-tests
 npm run e2e -- e2e/elements.spec.ts
 ```
+
+### Flows
+
+Flows per `clerk-js` UI components
+
+#### `<SignInRoutes>`
+
+```
+/sign-in
+  /factor-one               <SignInFactorOne />
+  /factor-two               <SignInFactorTwo />
+  /reset-password           <ResetPassword />
+  /reset-password-success   <ResetPasswordSuccess />
+  /sso-callback             <SignInSSOCallback {...} />
+  /choose                   <SignInAccountSwitcher />
+  /verify                   <SignInEmailLinkFlowComplete {...} />
+  /                         <SignInStart />
+  [ELSE]                    <RedirectToSignIn />
+```
+
+#### `<SignUpRoutes>`
+
+```
+/sign-up
+  /verify-email-address     <SignUpVerifyEmail />                 [Guarded: Boolean(clerk.client.signUp.emailAddress)]
+  /verify-phone-number      <SignUpVerifyPhone />                 [Guarded: Boolean(clerk.client.signUp.phoneNumber)]
+  /sso-callback             <SignUpSSOCallback {...} />
+  /verify                   <SignUpEmailLinkFlowComplete {...} />
+  /continue
+    /verify-email-address   <SignUpVerifyEmail />                 [Guarded: Boolean(clerk.client.signUp.emailAddress)]
+    /verify-phone-number    <SignUpVerifyPhone />                 [Guarded: Boolean(clerk.client.signUp.phoneNumber)]
+    /                       <SignUpContinue />
+  /                         <SignUpStart />
+  [ELSE]                    <RedirectToSignUp />
+
+/sign-up
+  /verify-email-address     <SignUpVerifyEmail />                 [Guarded: Boolean(clerk.client.signUp.emailAddress)]
+  /verify-phone-number      <SignUpVerifyPhone />                 [Guarded: Boolean(clerk.client.signUp.phoneNumber)]
+  /sso-callback             <SignUpSSOCallback {...} />
+  /verify                   <SignUpEmailLinkFlowComplete {...} />
+  /continue
+    /                       <SignUpContinue />
+  /                         <SignUpStart />
+  [ELSE]                    <RedirectToSignUp />
+```

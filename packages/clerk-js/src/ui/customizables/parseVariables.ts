@@ -13,26 +13,29 @@ import {
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
 
-  //values dependent on other values
-  const colorTextSecondary = toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.15);
-  const colorTextTertiary = toHSLA(variables.colorTextTertiary) || colors.makeTransparent(colorTextSecondary, 0.4);
-  const colorTextLabel = toHSLA(variables.colorTextLabel) || colors.makeTransparent(variables.colorText, 0.05);
+  const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
+  const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');
+  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
+  const dangerAlphaScale = colorOptionToHslaAlphaScale(dangerScale?.danger500, 'dangerAlpha');
+  const successScale = colorOptionToHslaLightnessScale(variables.colorSuccess, 'success');
+  const successAlphaScale = colorOptionToHslaAlphaScale(successScale?.success500, 'successAlpha');
+  const warningScale = colorOptionToHslaLightnessScale(variables.colorWarning, 'warning');
+  const warningAlphaScale = colorOptionToHslaAlphaScale(warningScale?.warning500, 'warningAlpha');
 
   return removeUndefinedProps({
-    ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
-    ...colorOptionToHslaAlphaScale(variables.colorPrimary, 'primaryAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
-    ...colorOptionToHslaAlphaScale(variables.colorDanger, 'dangerAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
-    ...colorOptionToHslaAlphaScale(variables.colorSuccess, 'successAlpha'),
-    ...colorOptionToHslaLightnessScale(variables.colorWarning, 'warning'),
-    ...colorOptionToHslaAlphaScale(variables.colorWarning, 'warningAlpha'),
-    ...colorOptionToHslaAlphaScale(variables.colorAlphaShade, 'blackAlpha'),
+    ...primaryScale,
+    ...primaryAlphaScale,
+    ...dangerScale,
+    ...dangerAlphaScale,
+    ...successScale,
+    ...successAlphaScale,
+    ...warningScale,
+    ...warningAlphaScale,
+    ...colorOptionToHslaAlphaScale(variables.colorNeutral, 'neutralAlpha'),
+    primaryHover: colors.adjustForLightness(primaryScale?.primary500),
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
     colorText: toHSLA(variables.colorText),
-    colorTextSecondary,
-    colorTextTertiary,
-    colorTextLabel,
+    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.15),
     colorInputText: toHSLA(variables.colorInputText),
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),

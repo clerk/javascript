@@ -164,7 +164,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.#loaded;
   }
 
-  static #instance: IsomorphicClerk;
+  static #instance: IsomorphicClerk | null | undefined;
 
   static getOrCreateInstance(options: IsomorphicClerkOptions) {
     // During SSR: a new instance should be created for every request
@@ -175,6 +175,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
+  }
+
+  static clearInstance() {
+    this.#instance = null;
   }
 
   get domain(): string {
@@ -417,6 +421,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   public addOnLoaded = (cb: () => void) => {
     this.loadedListeners.push(cb);
+    /**
+     * When IsomorphicClerk is loaded execute the callback directly
+     */
+    if (this.loaded) {
+      this.emitLoaded();
+    }
   };
 
   public emitLoaded = () => {

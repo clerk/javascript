@@ -61,26 +61,19 @@ export function createDevBrowser({ frontendApi, fapiClient }: CreateDevBrowserOp
       }
     });
 
-    // 1. If a cookie already exists, it might have SameSite=Strict. Re-set it to make sure it has SameSite=Lax
-    const existingDevBrowserCookie = getDevBrowserCookie();
-    if (existingDevBrowserCookie) {
-      removeDevBrowserCookie();
-      setDevBrowserCookie(existingDevBrowserCookie);
-    }
-
-    // 2. Get the JWT from hash or search parameters when the redirection comes from AP
+    // 1. Get the JWT from hash or search parameters when the redirection comes from AP
     const devBrowserToken = getDevBrowserJWTFromURL(new URL(window.location.href));
     if (devBrowserToken) {
       setDevBrowserJWT(devBrowserToken);
       return;
     }
 
-    // 3. If no JWT is found in the first step, check if a JWT is already available in the JS cookie
+    // 2. If no JWT is found in the first step, check if a JWT is already available in the __clerk_db_jwt JS cookie
     if (getDevBrowserCookie()) {
       return;
     }
 
-    // 4. Otherwise, fetch a new DevBrowser JWT from FAPI and cache it
+    // 3. Otherwise, fetch a new DevBrowser JWT from FAPI and set it in the __clerk_db_jwt JS cookie
     const createDevBrowserUrl = fapiClient.buildUrl({
       path: '/dev_browser',
     });

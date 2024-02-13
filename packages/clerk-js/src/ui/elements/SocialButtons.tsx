@@ -229,7 +229,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
                 icon={icon as unknown as React.ComponentType}
                 sx={[
                   theme => ({
-                    color: theme.colors.$blackAlpha600,
+                    color: theme.colors.$neutralAlpha600,
                     width: theme.sizes.$4,
                     position: 'absolute',
                   }),

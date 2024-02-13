@@ -143,7 +143,7 @@ const NavbarContainer = (
         maxWidth: t.space.$57,
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$blackAlpha50,
+          t.colors.$neutralAlpha50,
         ),
         padding: `${t.space.$6} ${t.space.$5} ${t.space.$4} ${t.space.$3}`,
         marginRight: `-${t.space.$2}`,
@@ -230,9 +230,9 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
             backgroundColor: colors.makeSolid(t.colors.$colorBackground),
             borderTopRightRadius: t.radii.$lg,
             borderBottomRightRadius: t.radii.$lg,
-            borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
             padding: `${t.space.$10} ${t.space.$6}`,
             animation: `${animations.navbarSlideIn} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
+            borderRight: `${t.borders.$normal} ${t.colors.$neutralAlpha150}`,
             boxShadow: t.shadows.$cardContentShadow,
           })}
         >
@@ -255,6 +255,7 @@ const NavButton = (props: NavButtonProps) => {
   return (
     <Button
       variant='ghost'
+      colorScheme={isActive ? 'primary' : 'neutral'}
       textVariant='buttonLarge'
       size='md'
       isActive={isActive}
@@ -265,7 +266,7 @@ const NavButton = (props: NavButtonProps) => {
         t => ({
           gap: t.space.$3,
           justifyContent: 'flex-start',
-          backgroundColor: isActive ? t.colors.$blackAlpha100 : undefined,
+          backgroundColor: isActive ? t.colors.$neutralAlpha100 : undefined,
           opacity: isActive ? 1 : 0.6,
         }),
         sx,
@@ -302,7 +303,7 @@ export const NavbarMenuButtonRow = ({ navbarTitleLocalizationKey, ...props }: Na
         display: 'none',
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$blackAlpha50,
+          t.colors.$neutralAlpha50,
         ),
         padding: `${t.space.$2} ${t.space.$3} ${t.space.$4} ${t.space.$3}`,
         marginBottom: `-${t.space.$2}`,

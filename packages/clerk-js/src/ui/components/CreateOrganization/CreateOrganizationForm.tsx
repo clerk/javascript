@@ -148,7 +148,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
                       size='md'
                       icon={Upload}
                       sx={t => ({
-                        color: t.colors.$colorTextTertiary,
+                        color: t.colors.$colorTextSecondary,
                         transitionDuration: t.transitionDuration.$controls,
                       })}
                     />
@@ -157,10 +157,10 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
                     width: t.sizes.$16,
                     height: t.sizes.$16,
                     borderRadius: t.radii.$md,
-                    border: `${t.borders.$dashed} ${t.colors.$blackAlpha200}`,
-                    backgroundColor: t.colors.$blackAlpha50,
+                    border: `${t.borders.$dashed} ${t.colors.$neutralAlpha200}`,
+                    backgroundColor: t.colors.$neutralAlpha50,
                     ':hover': {
-                      backgroundColor: t.colors.$blackAlpha50,
+                      backgroundColor: t.colors.$neutralAlpha50,
                       svg: {
                         transform: 'scale(1.2)',
                       },

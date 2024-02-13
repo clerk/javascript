@@ -9,16 +9,19 @@ type CardActionProps = Omit<PropsOfComponent<typeof Flex>, 'elementId'> & {
   elementId?: CardActionId;
 };
 export const CardAction = (props: CardActionProps): JSX.Element => {
-  const { elementId, ...rest } = props;
+  const { elementId, sx, ...rest } = props;
   return (
     <Flex
       elementDescriptor={descriptors.footerAction}
       elementId={descriptors.footerAction.setId(elementId)}
       {...rest}
       gap={1}
-      sx={t => ({
-        margin: `${t.space.$none} auto`,
-      })}
+      sx={[
+        t => ({
+          margin: `${t.space.$none} auto`,
+        }),
+        sx,
+      ]}
     />
   );
 };

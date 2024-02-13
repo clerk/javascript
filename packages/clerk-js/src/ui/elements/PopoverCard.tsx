@@ -38,6 +38,7 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
           overflow: 'hidden',
           borderRadius: t.radii.$lg,
           zIndex: t.zIndices.$card,
+          border: `${t.borders.$normal} ${t.colors.$neutralAlpha50}`,
           boxShadow: t.shadows.$cardContentShadow,
         }),
         sx,
@@ -62,7 +63,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
         t => ({
           background: common.mergedColorsBackground(
             colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$blackAlpha50,
+            t.colors.$neutralAlpha50,
           ),
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,

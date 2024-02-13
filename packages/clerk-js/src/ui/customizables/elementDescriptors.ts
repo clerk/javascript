@@ -22,6 +22,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'card',
   'footerItem',
 
+  'actionCard',
+
   'logoBox',
   'logoImage',
 
@@ -166,6 +168,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'identityPreviewText',
   'identityPreviewEditButton',
   'identityPreviewEditButtonIcon',
+
+  'accountSwitcherActionButton',
+  'accountSwitcherActionButtonIconBox',
+  'accountSwitcherActionButtonIcon',
 
   'alert',
   'alertIcon',

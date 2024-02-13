@@ -6,6 +6,8 @@ import UserEvent from '@testing-library/user-event';
 
 expect.extend(matchers);
 
+Element.prototype.scrollIntoView = jest.fn();
+
 const render = (ui: React.ReactElement, options?: RenderOptions) => {
   const userEvent = UserEvent.setup({ delay: null });
   return { ..._render(ui, { ...options }), userEvent };

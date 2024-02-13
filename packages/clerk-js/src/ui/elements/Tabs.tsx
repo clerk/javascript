@@ -78,7 +78,7 @@ export const TabsList = (props: TabsListProps) => {
       sx={[
         theme => ({
           borderBottom: theme.borders.$normal,
-          borderColor: theme.colors.$blackAlpha100,
+          borderColor: theme.colors.$neutralAlpha100,
         }),
         sx,
       ]}
@@ -135,12 +135,12 @@ export const Tab = (props: TabProps) => {
       sx={[
         t => ({
           background: t.colors.$transparent,
-          color: isActive ? t.colors.$blackAlpha900 : t.colors.$blackAlpha700,
+          color: isActive ? t.colors.$primary500 : t.colors.$neutralAlpha700,
           gap: t.space.$1x5,
           fontWeight: t.fontWeights.$medium,
           borderBottom: t.borders.$normal,
           marginBottom: '-1px',
-          borderColor: isActive ? t.colors.$blackAlpha800 : t.colors.$transparent,
+          borderColor: isActive ? t.colors.$primary500 : t.colors.$transparent,
           borderRadius: 0,
           padding: `${t.space.$2x5} ${t.space.$3x5}`,
           width: 'fit-content',

@@ -60,7 +60,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
           gap: theme.space.$1,
           position: 'relative',
           justifyContent: 'center',
-          borderColor: theme.colors.$blackAlpha100,
+          borderColor: theme.colors.$neutralAlpha100,
           alignItems: 'center',
           '--arrow-opacity': '0',
           '--arrow-transform': `translateX(-${theme.space.$2});`,

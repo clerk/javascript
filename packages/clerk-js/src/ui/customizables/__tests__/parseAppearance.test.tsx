@@ -11,7 +11,6 @@ const themeAColor = 'blue';
 const themeA = {
   variables: {
     colorPrimary: themeAColor,
-    colorSecondary: themeAColor,
     colorDanger: themeAColor,
     colorSuccess: themeAColor,
     colorWarning: themeAColor,
@@ -20,9 +19,7 @@ const themeA = {
     colorInputText: themeAColor,
     colorText: themeAColor,
     colorTextOnPrimaryBackground: themeAColor,
-    colorTextOnSecondaryBackground: themeAColor,
     colorTextSecondary: themeAColor,
-    colorTextTertiary: themeAColor,
     borderRadius: '1rem',
     fontFamily: 'Comic Sans',
     fontFamilyButtons: 'Comic Sans',
@@ -36,7 +33,6 @@ const themeBColor = 'red';
 const themeB = {
   variables: {
     colorPrimary: themeBColor,
-    colorSecondary: themeBColor,
     colorDanger: themeBColor,
     colorSuccess: themeBColor,
     colorWarning: themeBColor,
@@ -45,9 +41,7 @@ const themeB = {
     colorInputText: themeBColor,
     colorText: themeBColor,
     colorTextOnPrimaryBackground: themeBColor,
-    colorTextOnSecondaryBackground: themeBColor,
     colorTextSecondary: themeBColor,
-    colorTextTertiary: themeBColor,
     borderRadius: '2rem',
     fontFamily: 'Arial',
     fontFamilyButtons: 'Arial',
@@ -176,7 +170,8 @@ describe('AppearanceProvider element flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
+    //polished theme is index 0
+    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(themeAColor);
   });
 
   it('sets the parsedElements correctly from the globalAppearance and appearance prop', () => {
@@ -199,8 +194,9 @@ describe('AppearanceProvider element flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
-    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(themeBColor);
+    //polished theme is index 0
+    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(themeAColor);
+    expect(result.current.parsedElements[2]['alert'].backgroundColor).toBe(themeBColor);
   });
 
   it('sets the parsedElements correctly when a function is passed for the elements', () => {
@@ -221,7 +217,8 @@ describe('AppearanceProvider element flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(knownColors[themeAColor]);
+    //polished theme is index 0
+    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(knownColors[themeAColor]);
   });
 });
 
@@ -339,5 +336,47 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedLayout.showOptionalFields).toBe(true);
     expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
     expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
+  });
+
+  it('removes the polishedAppearance when simpleStyles is passed to globalAppearance', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          //@ts-expect-error not public api
+          simpleStyles: true,
+          elements: {
+            alert: { backgroundColor: themeAColor },
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    //notice the "0" index, not "1" as it would be without simpleStyles
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
+  });
+
+  it('removes the polishedAppearance when simpleStyles is passed to appearance', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          //@ts-expect-error not public api
+          simpleStyles: true,
+          elements: {
+            alert: { backgroundColor: themeBColor },
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    //notice the "0" index, not "1" as it would be without simpleStyles
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeBColor);
   });
 });

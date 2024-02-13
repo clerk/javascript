@@ -125,9 +125,9 @@ export const MenuList = (props: MenuListProps) => {
           theme => ({
             backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
             border: theme.borders.$normal,
+            borderColor: theme.colors.$neutralAlpha50,
             outline: 'none',
-            borderRadius: theme.radii.$lg,
-            borderColor: theme.colors.$blackAlpha150,
+            borderRadius: theme.radii.$md,
             padding: theme.space.$0x5,
             overflow: 'hidden',
             top: `calc(100% + ${theme.space.$2})`,

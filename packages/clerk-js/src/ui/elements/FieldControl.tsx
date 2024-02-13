@@ -79,7 +79,7 @@ const FieldOptionalLabel = () => {
       elementId={descriptors.formFieldHintText.setId(fieldId)}
       as='span'
       variant='caption'
-      colorScheme='tertiary'
+      colorScheme='neutral'
       isDisabled={isDisabled}
     />
   );
@@ -103,7 +103,7 @@ const FieldLabelIcon = (props: { icon?: React.ComponentType }) => {
         icon={props.icon}
         sx={theme => ({
           marginLeft: theme.space.$0x5,
-          color: theme.colors.$blackAlpha400,
+          color: theme.colors.$neutralAlpha400,
           width: theme.sizes.$4,
           height: theme.sizes.$4,
         })}
@@ -177,6 +177,7 @@ const PhoneInputElement = forwardRef<HTMLInputElement>((_, ref) => {
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(formField.fieldId)}
       {...inputProps}
+      feedbackType={formField.feedbackType}
       placeholder={t(placeholder)}
     />
   );

@@ -12,7 +12,7 @@ export function InformationBox(props: InformationBoxProps) {
       sx={t => ({
         gap: t.space.$2,
         padding: `${t.space.$3} ${t.space.$4}`,
-        backgroundColor: t.colors.$blackAlpha50,
+        backgroundColor: t.colors.$neutralAlpha50,
         borderRadius: t.radii.$md,
       })}
     >

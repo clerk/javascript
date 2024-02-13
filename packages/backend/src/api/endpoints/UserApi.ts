@@ -236,4 +236,36 @@ export class UserAPI extends AbstractAPI {
       bodyParams: { code },
     });
   }
+
+  public async banUser(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'ban'),
+    });
+  }
+
+  public async unbanUser(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'unban'),
+    });
+  }
+
+  public async lockUser(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'lock'),
+    });
+  }
+
+  public async unlockUser(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'unlock'),
+    });
+  }
 }

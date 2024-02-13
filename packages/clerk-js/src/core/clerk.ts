@@ -726,8 +726,9 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    const metadata = options?.metadata ? { __internal_metadata: options?.metadata } : undefined;
     // React router only wants the path, search or hash portion.
-    return await customNavigate(stripOrigin(toURL));
+    return await customNavigate(stripOrigin(toURL), metadata);
   };
 
   public buildUrlWithAuth(to: string): string {

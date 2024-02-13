@@ -1,5 +1,7 @@
 import type { ActiveSessionResource } from '@clerk/types';
 
+import type { ElementDescriptor, ElementId } from '../../../ui/customizables/elementDescriptors';
+import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { Action, Actions, PreviewButton, SmallAction, SmallActions, UserPreview } from '../../elements';
 import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
@@ -30,7 +32,7 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
         label={localizationKeys('userButton.action__manageAccount')}
         onClick={handleManageAccountClicked}
         sx={t => ({
-          borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
           padding: `${t.space.$4} ${t.space.$5}`,
         })}
       />
@@ -82,7 +84,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
         elementDescriptor={descriptors.userButtonPopoverActions}
         elementId={descriptors.userButtonPopoverActions.setId('multiSession')}
         sx={t => ({
-          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+          borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
         })}
       >
         <Flex
@@ -152,27 +154,43 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
 
 type SignOutAllActionsProps = {
   handleSignOutAllClicked: () => Promise<unknown> | void;
+  elementDescriptor?: ElementDescriptor;
+  elementId?: ElementId;
+  iconBoxElementDescriptor?: ElementDescriptor;
+  iconBoxElementId?: ElementId;
+  iconElementDescriptor?: ElementDescriptor;
+  iconElementId?: ElementId;
+  label?: LocalizationKey;
 };
 
 export const SignOutAllActions = (props: SignOutAllActionsProps) => {
-  const { handleSignOutAllClicked } = props;
+  const {
+    handleSignOutAllClicked,
+    elementDescriptor,
+    elementId,
+    iconBoxElementDescriptor,
+    iconBoxElementId,
+    iconElementDescriptor,
+    iconElementId,
+    label,
+  } = props;
   return (
     <Actions
       role='menu'
       sx={t => ({
         padding: t.space.$2,
-        borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+        borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
       })}
     >
       <Action
-        elementDescriptor={descriptors.userButtonPopoverActionButton}
-        elementId={descriptors.userButtonPopoverActionButton.setId('signOutAll')}
-        iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
-        iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('signOutAll')}
-        iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
-        iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('signOutAll')}
+        elementDescriptor={elementDescriptor || descriptors.userButtonPopoverActionButton}
+        elementId={elementId || descriptors.userButtonPopoverActionButton.setId('signOutAll')}
+        iconBoxElementDescriptor={iconBoxElementDescriptor || descriptors.userButtonPopoverActionButtonIconBox}
+        iconBoxElementId={iconBoxElementId || descriptors.userButtonPopoverActionButtonIconBox.setId('signOutAll')}
+        iconElementDescriptor={iconElementDescriptor || descriptors.userButtonPopoverActionButtonIcon}
+        iconElementId={iconElementId || descriptors.userButtonPopoverActionButtonIcon.setId('signOutAll')}
         icon={SignOut}
-        label={localizationKeys('userButton.action__signOutAll')}
+        label={label || localizationKeys('userButton.action__signOutAll')}
         onClick={handleSignOutAllClicked}
         variant='ghost'
         colorScheme='neutral'

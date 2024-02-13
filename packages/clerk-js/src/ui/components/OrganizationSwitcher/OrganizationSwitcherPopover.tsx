@@ -155,11 +155,15 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           />
           <Actions
             role='menu'
-            sx={t => ({ borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}` })}
+            sx={t => ({ borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}` })}
           >
             <Flex
               justify='between'
-              sx={t => ({ marginLeft: t.space.$12, padding: `0 ${t.space.$5} ${t.space.$4}`, gap: t.space.$2 })}
+              sx={t => ({
+                marginLeft: t.space.$12,
+                padding: `0 ${t.space.$5} ${t.space.$4}`,
+                gap: t.space.$2,
+              })}
             >
               {manageOrganizationButton}
               {billingOrganizationButton}
@@ -173,7 +177,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           sx={t => ({
             width: '100%',
             paddingRight: t.space.$5,
-            borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+            borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
           })}
         >
           <OrganizationPreview
@@ -207,7 +211,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                     user={userWithoutIdentifiers}
                     sx={t => ({
                       padding: `${t.space.$4} ${t.space.$5}`,
-                      borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+                      borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
                       width: '100%',
                     })}
                     title={localizationKeys('organizationSwitcher.personalWorkspace')}

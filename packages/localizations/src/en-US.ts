@@ -238,6 +238,8 @@ export const enUS: LocalizationResource = {
     accountSwitcher: {
       title: 'Choose an account',
       subtitle: 'Select the account with which you wish to continue.',
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
     },
   },
   userProfile: {
@@ -285,6 +287,8 @@ export const enUS: LocalizationResource = {
         primaryButton: 'Connect account',
         actionLabel__connectionFailed: 'Try again',
         actionLabel__reauthorize: 'Authorize now',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         destructiveActionTitle: 'Remove',
       },
       enterpriseAccountsSection: {

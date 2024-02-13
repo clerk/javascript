@@ -15,6 +15,7 @@ export const PreviewListItems = (props: PropsWithChildren) => {
       sx={t => ({
         maxHeight: `calc(8 * ${t.sizes.$12})`,
         overflowY: 'auto',
+        borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
         ...common.unstyledScrollbar(t),
       })}
     >
@@ -25,7 +26,6 @@ export const PreviewListItems = (props: PropsWithChildren) => {
 
 const sharedStyles: ThemableCssProp = t => ({
   padding: `${t.space.$4} ${t.space.$5}`,
-  borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
 });
 
 export const sharedMainIdentifierSx: ThemableCssProp = t => ({
@@ -45,10 +45,11 @@ export const PreviewListItem = (
       align='center'
       gap={2}
       sx={[
-        {
+        t => ({
           minHeight: 'unset',
           justifyContent: 'space-between',
-        },
+          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+        }),
         sharedStyles,
       ]}
       elementDescriptor={descriptors.organizationListPreviewItem}

@@ -65,6 +65,9 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         maxHeight: `calc((4 * ${t.sizes.$17}) + 4px)`,
         overflowY: 'auto',
         ...common.unstyledScrollbar(t),
+        '> button:not(:first-of-type)': {
+          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100} `,
+        },
       })}
       role='group'
       aria-label={hidePersonal ? 'List of all organization memberships' : 'List of all accounts'}

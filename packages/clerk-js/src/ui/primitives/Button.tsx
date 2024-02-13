@@ -8,7 +8,7 @@ import { common, createCssVariables, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
 
-const vars = createCssVariables('accent', 'accentDark', 'accentContrast', 'alpha', 'border');
+const vars = createCssVariables('accent', 'accentHover', 'accentContrast', 'alpha', 'border');
 
 const { applyVariants, filterProps } = createVariants(
   (theme, props: OwnProps & { colorScheme?: 'primary' | 'neutral' | 'danger' }) => {
@@ -49,21 +49,21 @@ const { applyVariants, filterProps } = createVariants(
         colorScheme: {
           primary: {
             [vars.accent]: theme.colors.$primary500,
-            [vars.accentDark]: theme.colors.$primary600,
+            [vars.accentHover]: theme.colors.$primaryHover,
             [vars.border]: theme.colors.$primary500,
             [vars.accentContrast]: theme.colors.$colorTextOnPrimaryBackground,
-            [vars.alpha]: theme.colors.$blackAlpha50,
+            [vars.alpha]: theme.colors.$neutralAlpha50,
           },
           neutral: {
-            [vars.accent]: theme.colors.$blackAlpha600,
-            [vars.accentDark]: theme.colors.$blackAlpha700,
-            [vars.border]: theme.colors.$blackAlpha200,
+            [vars.accent]: theme.colors.$neutralAlpha600,
+            [vars.accentHover]: theme.colors.$neutralAlpha700,
+            [vars.border]: theme.colors.$neutralAlpha200,
             [vars.accentContrast]: theme.colors.$white,
-            [vars.alpha]: theme.colors.$blackAlpha50,
+            [vars.alpha]: theme.colors.$neutralAlpha50,
           },
           danger: {
             [vars.accent]: theme.colors.$danger500,
-            [vars.accentDark]: theme.colors.$danger600,
+            [vars.accentHover]: theme.colors.$danger600,
             [vars.accentContrast]: theme.colors.$white,
             [vars.border]: theme.colors.$danger500,
             [vars.alpha]: theme.colors.$dangerAlpha50,
@@ -76,36 +76,27 @@ const { applyVariants, filterProps } = createVariants(
             boxShadow: theme.shadows.$buttonShadow,
             border: theme.borders.$normal,
             borderColor: vars.accent,
-            ':after': {
-              position: 'absolute',
-              content: '""',
-              borderRadius: 'inherit',
-              zIndex: -1,
-              inset: 0,
-              opacity: 1,
-              transitionProperty: theme.transitionProperty.$common,
-              transitionDuration: theme.transitionDuration.$controls,
-              background: `linear-gradient(180deg, ${theme.colors.$whiteAlpha150} 0%, ${theme.colors.$transparent} 100%)`,
+            '&:hover': {
+              backgroundColor: vars.accentHover,
             },
-            ':hover::after': {
-              opacity: 0,
-            },
-            ':active::after': {
-              opacity: 1,
-            },
+            '&:focus': props.hoverAsFocus
+              ? {
+                  backgroundColor: vars.accentHover,
+                }
+              : undefined,
           },
           outline: {
             border: theme.borders.$normal,
-            borderColor: theme.colors.$blackAlpha100,
-            color: theme.colors.$blackAlpha600,
-            '&:hover': { backgroundColor: theme.colors.$blackAlpha50 },
-            '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$blackAlpha50 } : undefined,
+            borderColor: theme.colors.$neutralAlpha100,
+            color: theme.colors.$neutralAlpha600,
+            '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
+            '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$neutralAlpha50 } : undefined,
             boxShadow: theme.shadows.$outlineButtonShadow,
           },
           ghost: {
             color: vars.accent,
-            '&:hover': { backgroundColor: vars.alpha, color: vars.accentDark },
-            '&:focus': props.hoverAsFocus ? { backgroundColor: vars.alpha, color: vars.accentDark } : undefined,
+            '&:hover': { backgroundColor: vars.alpha, color: vars.accentHover },
+            '&:focus': props.hoverAsFocus ? { backgroundColor: vars.alpha, color: vars.accentHover } : undefined,
           },
           link: {
             minHeight: 'fit-content',
@@ -259,7 +250,8 @@ const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, re
       onClick={onClick}
       css={applyVariants(parsedProps) as any}
       disabled={isDisabled}
-      data-variant={props.variant || 'primary'}
+      data-variant={props.variant || 'solid'}
+      data-color={props.colorScheme || 'primary'}
       ref={ref}
     >
       {children}

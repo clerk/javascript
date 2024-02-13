@@ -17,6 +17,8 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
   const sponsorOrLinksExist = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
   const showSponsorAndLinks = isProfileFooter ? branded : sponsorOrLinksExist;
 
+  if (!children && !showSponsorAndLinks) return null;
+
   const footerStyles = (t: InternalTheme) => ({
     '>:first-of-type': {
       padding: `${t.space.$4} ${t.space.$8} ${t.space.$4} ${t.space.$8}`,
@@ -24,7 +26,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
     '>:not(:first-of-type)': {
       padding: `${t.space.$4} ${t.space.$8}`,
       borderTop: t.borders.$normal,
-      borderColor: t.colors.$blackAlpha100,
+      borderColor: t.colors.$neutralAlpha100,
     },
   });
 
@@ -44,7 +46,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
           paddingTop: t.space.$2,
           background: common.mergedColorsBackground(
             colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$blackAlpha50,
+            t.colors.$neutralAlpha50,
           ),
         }),
         isProfileFooter ? profileCardFooterStyles : footerStyles,

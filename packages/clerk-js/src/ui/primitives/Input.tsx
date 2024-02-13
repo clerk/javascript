@@ -7,7 +7,7 @@ import { useInput } from './hooks/useInput';
 
 const { applyVariants, filterProps } = createVariants((theme, props) => ({
   base: {
-    boxSizing: 'inherit',
+    boxSizing: 'border-box',
     margin: 0,
     padding: `${theme.space.$1x5} ${theme.space.$3}`,
     backgroundColor: theme.colors.$colorInputBackground,
@@ -20,7 +20,6 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     aspectRatio: props.type === 'checkbox' ? '1/1' : 'unset',
     accentColor: theme.colors.$primary500,
     ...common.textVariants(theme).body,
-    ...common.borderVariants(theme, props).normal,
     ...common.disabled(theme),
     [mqu.ios]: {
       fontSize: theme.fontSizes.$lg,
@@ -29,7 +28,21 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
       animationName: 'onAutoFillStart',
     },
   },
-  variants: {},
+  variants: {
+    variant: {
+      default: {
+        ...common.borderVariants(theme, props).normal,
+      },
+      unstyled: {
+        border: 0,
+        boxShadow: 'unset',
+        backgroundColor: 'transparent',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 }));
 
 type OwnProps = {
@@ -44,10 +57,10 @@ export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVar
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const fieldControl = useFormField() || {};
   // @ts-expect-error Typescript is complaining that `errorMessageId` does not exist. We are clearly passing them from above.
-  const { errorMessageId, ignorePasswordManager, ...fieldControlProps } = sanitizeInputProps(fieldControl, [
-    'errorMessageId',
-    'ignorePasswordManager',
-  ]);
+  const { errorMessageId, ignorePasswordManager, feedbackType, ...fieldControlProps } = sanitizeInputProps(
+    fieldControl,
+    ['errorMessageId', 'ignorePasswordManager', 'feedbackType'],
+  );
 
   const propsWithoutVariants = filterProps({
     ...props,
@@ -90,7 +103,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       aria-describedby={errorMessageId}
       aria-required={_required}
       aria-disabled={_disabled}
-      css={applyVariants(propsWithoutVariants)}
+      data-feedback={feedbackType}
+      data-variant={props.variant || 'default'}
+      css={applyVariants(props)}
     />
   );
 });

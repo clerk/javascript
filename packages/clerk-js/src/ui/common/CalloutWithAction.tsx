@@ -21,7 +21,7 @@ export const CalloutWithAction = (props: PropsWithChildren<CalloutWithActionProp
   return (
     <Flex
       sx={theme => ({
-        background: theme.colors.$blackAlpha50,
+        background: theme.colors.$neutralAlpha50,
         padding: `${theme.space.$2x5} ${theme.space.$4}`,
         justifyContent: 'space-between',
         alignItems: 'flex-start',

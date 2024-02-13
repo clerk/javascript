@@ -73,7 +73,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
         })}
         badge={badge}
         sx={t => ({
-          backgroundColor: isOpen ? t.colors.$blackAlpha50 : undefined,
+          backgroundColor: isOpen ? t.colors.$neutralAlpha50 : undefined,
           padding: `${t.space.$3} ${t.space.$4}`,
           minHeight: t.sizes.$10,
           justifyContent: 'start',

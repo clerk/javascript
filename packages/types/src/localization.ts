@@ -257,6 +257,8 @@ type _LocalizationResource = {
     accountSwitcher: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      action__addAccount: LocalizationValue;
+      action__signOutAll: LocalizationValue;
     };
   };
   userProfile: {
@@ -304,6 +306,7 @@ type _LocalizationResource = {
         primaryButton: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
         actionLabel__reauthorize: LocalizationValue;
+        subtitle__reauthorize: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
       };
       enterpriseAccountsSection: {
