@@ -3,6 +3,8 @@ import type { Appearance } from '@clerk/types';
 import type { InternalTheme } from './foundations';
 
 const BORDER_SHADOW_LENGTH = '0px 0px 0px 1px';
+const BUTTON_SOLID_SHADOW = (color: string) =>
+  `${BORDER_SHADOW_LENGTH} ${color}, 0px 1px 1px 0px rgba(255, 255, 255, 0.07) inset, 0px 2px 3px 0px rgba(34, 42, 53, 0.20), 0px 1px 1px 0px rgba(0, 0, 0, 0.24)`;
 
 const cardContentStyles = (theme: InternalTheme) => ({
   border: 0,
@@ -88,7 +90,12 @@ export const polishedAppearance = {
           '&:active::after': {
             opacity: 1,
           },
-          boxShadow: `0px 0px 0px 1px ${theme.colors.$primary500}, 0px 1px 1px 0px rgba(255, 255, 255, 0.07) inset, 0px 2px 3px 0px rgba(34, 42, 53, 0.20), 0px 1px 1px 0px rgba(0, 0, 0, 0.24)`,
+          '&[data-color="primary"]': {
+            boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$primary500),
+          },
+          '&[data-color="danger"]': {
+            boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$danger500),
+          },
         },
         '&[data-variant="outline"]': {
           border: 0,
